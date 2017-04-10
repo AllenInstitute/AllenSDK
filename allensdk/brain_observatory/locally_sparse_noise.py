@@ -13,15 +13,18 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-import numpy as np
-import h5py
-import pandas as pd
-from .stimulus_analysis import StimulusAnalysis
 import allensdk.brain_observatory.stimulus_info as stimulus_info
-import scipy.ndimage 
-from . import observatory_plots as oplots
+import h5py
+import numpy as np
+import pandas as pd
+import scipy.ndimage
+from .receptive_field_analysis import get_receptive_fields
+
 from . import circle_plots as cplots
+from . import observatory_plots as oplots
 from .brain_observatory_exceptions import MissingStimulusException
+from .stimulus_analysis import StimulusAnalysis
+
 
 class LocallySparseNoise(StimulusAnalysis):
     """ Perform tuning analysis specific to the locally sparse noise stimulus.
@@ -66,6 +69,7 @@ class LocallySparseNoise(StimulusAnalysis):
         self._interlength = LocallySparseNoise._PRELOAD
         self._extralength = LocallySparseNoise._PRELOAD
         self._receptive_field = LocallySparseNoise._PRELOAD
+        self._mean_response = LocallySparseNoise._PRELOAD
 
     @property
     def LSN(self):
@@ -109,6 +113,13 @@ class LocallySparseNoise(StimulusAnalysis):
 
         return self._receptive_field
 
+    @property
+    def mean_response(self):
+        if self._mean_response is LocallySparseNoise._PRELOAD:
+            self._mean_response = self.get_mean_response()
+
+        return self._mean_response
+
     def populate_stimulus_table(self):
         self._stim_table = self.data_set.get_stimulus_table(self.stimulus)
         self._LSN, self._LSN_mask = self.data_set.get_locally_sparse_noise_stimulus_template(
@@ -118,11 +129,10 @@ class LocallySparseNoise(StimulusAnalysis):
         self._interlength = 4 * self._sweeplength
         self._extralength = self._sweeplength
 
-    def get_receptive_field(self):
-        ''' Calculates receptive fields for each cell
-        '''
+    def get_mean_response(self):
+
         print("Calculating mean responses")
-        receptive_field = np.empty(
+        mean_response = np.empty(
             (self.nrows, self.ncols, self.numbercells + 1, 2))
 
         for xp in range(self.nrows):
@@ -133,9 +143,16 @@ class LocallySparseNoise(StimulusAnalysis):
                     self.stim_table.frame.isin(on_frame)]
                 subset_off = self.mean_sweep_response[
                     self.stim_table.frame.isin(off_frame)]
-                receptive_field[xp, yp, :, 0] = subset_on.mean(axis=0)
-                receptive_field[xp, yp, :, 1] = subset_off.mean(axis=0)
-        return receptive_field
+                mean_response[xp, yp, :, 0] = subset_on.mean(axis=0)
+                mean_response[xp, yp, :, 1] = subset_off.mean(axis=0)
+        return mean_response
+
+    def get_receptive_field(self):
+        ''' Calculates receptive fields for each cell
+        '''
+
+        print("Calculating receptive fields")
+        return get_receptive_fields(self)
 
     @staticmethod
     def merge_receptive_fields(rc1, rc2):
@@ -211,7 +228,11 @@ class LocallySparseNoise(StimulusAnalysis):
             lsn._mean_sweep_response = pd.read_hdf(analysis_file, "analysis/mean_sweep_response_lsn")
 
             with h5py.File(analysis_file, "r") as f:
+                lsn._mean_response = f["analysis/mean_response_lsn"].value
+
+            with h5py.File(analysis_file, "r") as f:
                 lsn._receptive_field = f["analysis/receptive_field_lsn"].value
+
         except Exception as e:
             raise MissingStimulusException(e.args)
 

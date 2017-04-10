@@ -116,6 +116,7 @@ class SessionAnalysis(object):
 
         nwb.save_analysis_arrays(
             ('receptive_field_lsn', lsn.receptive_field),
+            ('mean_response_lsn', lsn.mean_response),
             ('celltraces_dff', nm1.dfftraces),
             ('binned_dx_sp', nm1.binned_dx_sp),
             ('binned_dx_vis', nm1.binned_dx_vis),
