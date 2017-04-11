@@ -65,32 +65,46 @@ def plot_fields(data, axes=None, show=True, clim=(0, 1), colorbar=True):
 
 @memoize
 def get_A(data):
+    import warnings
+    warnings.warn('FOR DEBUG')
+    try:
 
-    stimulus_table = data.get_stimulus_table('locally_sparse_noise')
-    stimulus_template = data.get_stimulus_template('locally_sparse_noise')[stimulus_table['frame'].values, :,:]
+        warnings.warn('A loaded')
+        return np.load('/data/mat/nicholasc/brain_observatory_analysis/receptive_field_analysis/A_tmp.npy')
+    except:
+        stimulus_table = data.get_stimulus_table('locally_sparse_noise')
+        stimulus_template = data.get_stimulus_template('locally_sparse_noise')[stimulus_table['frame'].values, :,:]
 
-    A = np.zeros((2*16*28, stimulus_template.shape[0]))
-    for fi in range(stimulus_template.shape[0]):
-        A[:16*28, fi] = (stimulus_template[fi,:,:].flatten() > 127).astype(float)
-        A[16*28:, fi] = (stimulus_template[fi, :, :].flatten() < 127).astype(float)
+        A = np.zeros((2*16*28, stimulus_template.shape[0]))
+        for fi in range(stimulus_template.shape[0]):
+            A[:16*28, fi] = (stimulus_template[fi,:,:].flatten() > 127).astype(float)
+            A[16*28:, fi] = (stimulus_template[fi, :, :].flatten() < 127).astype(float)
 
-    assert A[:,100].sum() == 12
-    assert A[:,200].sum() == 10
-    assert A.shape == (896,8880)
+        assert A[:,100].sum() == 12
+        assert A[:,200].sum() == 10
+        assert A.shape == (896,8880)
 
 
     return A
 
 @memoize
 def get_A_blur(data):
+    import warnings
+    warnings.warn('FOR DEBUG')
 
-    A = get_A(data).copy()
+    try:
+        warnings.warn('A_blur loaded')
+        return np.load('/data/mat/nicholasc/brain_observatory_analysis/receptive_field_analysis/A_blur_tmp.npy')
 
-    for fi in range(A.shape[1]):
-        A[:16*28,fi] = convolve(A[:16 * 28, fi].reshape(16, 28)).flatten()
-        A[16*28:,fi] = convolve(A[16 * 28:, fi].reshape(16, 28)).flatten()
+    except:
 
-    return A
+        A = get_A(data).copy()
+
+        for fi in range(A.shape[1]):
+            A[:16*28,fi] = convolve(A[:16 * 28, fi].reshape(16, 28)).flatten()
+            A[16*28:,fi] = convolve(A[16 * 28:, fi].reshape(16, 28)).flatten()
+
+        return A
 
 def get_shuffle_matrix(data, number_of_events, number_of_shuffles=5000, response_detection_error_std_dev=.1):
 
