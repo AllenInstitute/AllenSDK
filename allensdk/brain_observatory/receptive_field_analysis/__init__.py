@@ -19,9 +19,7 @@ def receptive_field_analysis(lsn):
 
     # df_list = []
     csid_receptive_field_data_dict = {}
-    import warnings
-    warnings.warn('TAKE AWAY THIS 2')
-    for csid in csid_list[:2]:
+    for csid in csid_list:
 
         cell_index = lsn.data_set.get_cell_specimen_indices(cell_specimen_ids=[csid])[0]
         curr_receptive_field_data_dict = get_receptive_field_data_dict_with_postprocessing(lsn.data_set, csid, alpha=.05)

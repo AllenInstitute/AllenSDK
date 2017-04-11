@@ -162,13 +162,9 @@ class LocallySparseNoise(StimulusAnalysis):
 
         receptive_field = np.zeros((self.nrows, self.ncols, self.numbercells, 2))
         csid_list = self.data_set.get_cell_specimen_ids()
-        import warnings
-        warnings.warn('comment in this line when done debugging')
-        # assert len(csid_list) == len(self.csid_receptive_field_analysis_data_dict)
+        assert len(csid_list) == len(self.csid_receptive_field_analysis_data_dict)
 
-
-        warnings.warn('change this from 2')
-        for csid in csid_list[:2]:
+        for csid in csid_list:
             cell_index = self.data_set.get_cell_specimen_indices(cell_specimen_ids=[csid])[0]
             curr_receptive_field_data_dict = self.csid_receptive_field_analysis_data_dict[str(csid)]
             rf_on = curr_receptive_field_data_dict['on']['rts_convolution']['data'].copy()
