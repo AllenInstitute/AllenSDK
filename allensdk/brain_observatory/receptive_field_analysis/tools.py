@@ -144,6 +144,18 @@ def read_h5_group(g):
 
     return return_dict
 
+def read_h5_group(g):
+    return_dict = {}
+    if len(g.attrs) > 0:
+        return_dict['attrs'] = dict(g.attrs)
+    for key in g:
+        if key == 'data':
+            return_dict[key] = g[key].value
+        else:
+            return_dict[key] = read_h5_group(g[key])
+
+    return return_dict
+
 if __name__ == "__main__":
 
     import numpy as np

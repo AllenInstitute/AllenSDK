@@ -684,7 +684,6 @@ class BrainObservatoryNwbDataSet(object):
                     del f['analysis'][k]
                 f.create_dataset('analysis/%s' % k, data=v)
 
-
 def align_running_speed(dxcm, dxtime, timestamps):
     ''' If running speed timestamps differ from fluorescence
     timestamps, adjust by inserting NaNs to running speed.

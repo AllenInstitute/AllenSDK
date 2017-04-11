@@ -2,6 +2,7 @@ from .eventdetection import detect_events
 from statsmodels.sandbox.stats.multicomp import multipletests
 import numpy as np
 from .utilities import get_A, get_A_blur, get_shuffle_matrix, get_components
+from .postprocessing import run_postprocessing
 
 # import h5py
 
@@ -10,18 +11,18 @@ from .utilities import get_A, get_A_blur, get_shuffle_matrix, get_components
 # from receptivefield.core.eventdetection import detect_events
 
 # from receptivefield.core.utilities import plot_fields, get_A, get_A_blur, get_components
-# from receptivefield.core.postprocessing import run_postprocessing
 
-def events_to_pvalues_no_fdr_correction(data, event_vector, number_of_shuffles=5000, response_detection_error_std_dev=.1, seed=1, debug=False):
+
+def events_to_pvalues_no_fdr_correction(data, event_vector, number_of_shuffles=5000, response_detection_error_std_dev=.1, seed=1):
 
     # Load design matrix and event vector
-    A = get_A_blur(data, debug=debug)
+    A = get_A_blur(data)
 
     # Initializations:
     number_of_events = event_vector.sum()
     np.random.seed(seed)
 
-    shuffle_data = get_shuffle_matrix(data, number_of_events, number_of_shuffles=number_of_shuffles, response_detection_error_std_dev=response_detection_error_std_dev, debug=debug)
+    shuffle_data = get_shuffle_matrix(data, number_of_events, number_of_shuffles=number_of_shuffles, response_detection_error_std_dev=response_detection_error_std_dev)
 
     # Build list of p-values:
     response_triggered_stimulus_vector = A.dot(event_vector)/number_of_events
@@ -38,7 +39,6 @@ def run_receptive_field_computation(data, csid, **kwargs):
 
     event_vector = detect_events(data, csid)
 
-    print 'number_of_events', event_vector.sum()
     pvalues = events_to_pvalues_no_fdr_correction(data, event_vector, **kwargs)
     pvalues_on, pvalues_off = pvalues[:16*28].reshape(16, 28), pvalues[16*28:].reshape(16, 28)
 
@@ -88,7 +88,7 @@ def run_receptive_field_computation(data, csid, **kwargs):
 def get_receptive_field_data_dict_with_postprocessing(data, csid, **kwargs):
 
     receptive_field_data_dict = run_receptive_field_computation(data, csid, **kwargs)
-    receptive_field_data_dict = run_postprocessing(receptive_field_data_dict)
+    receptive_field_data_dict = run_postprocessing(data, receptive_field_data_dict)
 
     return receptive_field_data_dict
 
@@ -166,40 +166,4 @@ def read_receptive_field_data_dict_from_h5(file_name, path=None):
     return receptive_field_data_dict
 
 
-# if __name__ == "__main__":
-#
-#     from utilities import plot_fields
-#     from receptivefield.tools import get_temp_file_name
-#     from receptivefield.core.visualization import plot_receptive_field_data
-#
-#     csid = 539919364
-#     # csid = 539772953
-#     # csid = 541095385
-#     # csid = 517503985 #horizontal on
-#     # csid = 517472007    # debug correction chi square
-#     # csid = 540988186
-#     # csid = 517526760
-#     # csid = 517472524 # Called false
-#     # csid = 517504484
-#
-#     # receptive_field_data_dict = get_receptive_field_data_dict_with_postprocessing(csid, debug=True, alpha=.05)
-#     receptive_field_data_dict = get_receptive_field_data_dict_with_postprocessing(csid=csid, alpha=.05, debug=True)
-#
-#     # write_receptive_field_data_dict_to_h5(receptive_field_data_dict, 'tmp.h5', prefix=str(csid))
-#     # receptive_field_data_dict = read_receptive_field_data_dict_from_h5('tmp.h5', path=str(csid))
-#     print_summary(receptive_field_data_dict)
-#     plot_receptive_field_data(receptive_field_data_dict)
-#
-#
-#
-#
-#     # print_summary(receptive_field_data_dict)
-    # plot_receptive_field_data(receptive_field_data_dict)
-
-
-
-    # write_receptive_field_data_dict_to_h5(receptive_field_data_dict, get_temp_file_name(), prefix=str(csid))
-
-
-    # receptive_field_data_dict = run_receptive_field_computation(csid=csid, alpha=.05, debug=False)
 

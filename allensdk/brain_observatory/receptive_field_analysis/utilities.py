@@ -1,7 +1,7 @@
 from scipy.ndimage.filters import gaussian_filter
 import numpy as np
 import scipy.interpolate as spinterp
-from .tools import memoize
+from .tools import memoize, dict_generator
 import os
 import warnings
 from skimage.measure import block_reduce
@@ -36,12 +36,6 @@ def convolve(img, upsample=4, sigma=4):
     assert upsample == 4  # Offset needs to be computed for each upsample...
     ZZ_on = g(offset + np.arange(0, 28 * 3, 1. / upsample), offset + np.arange(0, 16 * 3, 1. / upsample))
     ZZ_on_f = gaussian_filter(ZZ_on, float(sigma), mode='constant')
-
-    # For debugging:
-    # fig, ax = plt.subplots(1, 2, sharex=True, sharey=True)
-    # ax[0].imshow(ZZ_on, interpolation='none')
-    # ax[1].imshow(ZZ_on_f, interpolation='none')
-    # plt.show()
 
     z_on_new = block_reduce(ZZ_on_f, (upsample, upsample))
     z_on_new = z_on_new / z_on_new.sum() * img.sum()
@@ -78,7 +72,7 @@ def get_A(data):
     try:
 
         warnings.warn('A loaded')
-        return np.load('./A_tmp.npy')
+        return np.load('/data/mat/nicholasc/brain_observatory_analysis/receptive_field_analysis/A_tmp.npy')
     except:
 
 
@@ -100,36 +94,31 @@ def get_A(data):
     return A
 
 @memoize
-def get_A_blur(data, debug=False):
+def get_A_blur(data):
 
     import warnings
     warnings.warn('FOR DEBUG')
 
     try:
         warnings.warn('A_blur loaded')
-        return np.load('./A_tmp.npy')
+        return np.load('/data/mat/nicholasc/brain_observatory_analysis/receptive_field_analysis/A_blur_tmp.npy')
 
     except:
 
-        if debug == True:
-            warnings.warn("DEBUG MODE: Loading A_blur")
-            A_blur_location = '/data/mat/nicholasc/brain_observatory_analysis/receptivefield/receptivefield/allensdk_tools/allensdk_tools_cache/A_blur.h5'
-            A_blur = get_cache_array_sparse_h5_reader_writer()['reader'](A_blur_location)
-            return A_blur
-        else:
-            A = get_A(data).copy()
 
-            for fi in range(A.shape[1]):
-                A[:16*28,fi] = convolve(A[:16 * 28, fi].reshape(16, 28)).flatten()
-                A[16*28:,fi] = convolve(A[16 * 28:, fi].reshape(16, 28)).flatten()
+        A = get_A(data).copy()
+
+        for fi in range(A.shape[1]):
+            A[:16*28,fi] = convolve(A[:16 * 28, fi].reshape(16, 28)).flatten()
+            A[16*28:,fi] = convolve(A[16 * 28:, fi].reshape(16, 28)).flatten()
 
         np.save('./A_blur_tmp.npy', A)
 
     return A
 
-def get_shuffle_matrix(data, number_of_events, number_of_shuffles=5000, response_detection_error_std_dev=.1, debug=False):
+def get_shuffle_matrix(data, number_of_events, number_of_shuffles=5000, response_detection_error_std_dev=.1):
 
-    A = get_A_blur(data, debug=debug)
+    A = get_A_blur(data)
 
     shuffle_data = np.zeros((2*16*28, number_of_shuffles))
     for ii in range(number_of_shuffles):
@@ -282,33 +271,16 @@ def get_components(receptive_field_data):
 
     return return_array, len(component_list)
 
+def get_attribute_dict(receptive_field_data_dict):
 
-if __name__ == "__main__":
+    attribute_dict = {}
+    for x in dict_generator(receptive_field_data_dict):
+        if x[-3] == 'attrs':
+            if len(x[:-3]) == 0:
+                key = x[-2]
+            else:
+                key = '/'.join(['/'.join(x[:-3]), x[-2]])
+            attribute_dict[key] = x[-1]
 
-    csid = 517526760
+    return attribute_dict
 
-    from receptivefield.core import get_receptive_field_data_dict_with_postprocessing, write_receptive_field_data_dict_to_h5, print_summary, read_receptive_field_data_dict_from_h5
-
-    receptive_field_data_dict = get_receptive_field_data_dict_with_postprocessing(csid=csid, alpha=.05, debug=True)
-    # receptive_field_data_dict = read_receptive_field_data_dict_from_h5('tmp.h5', path=str(csid))
-    # write_receptive_field_data_dict_to_h5(receptive_field_data_dict, 'tmp.h5', prefix=str(csid))
-    print_summary(receptive_field_data_dict)
-    # plot_receptive_field_data(receptive_field_data_dict)
-
-    # import time
-    #
-    # number_of_events = 100
-    #
-    # t0 = time.time()
-    # A = get_shuffle_matrix(number_of_events, debug=True)
-    # print time.time() - t0
-    #
-    # t0 = time.time()
-    # A = get_shuffle_matrix(number_of_events, debug=True)
-    # print time.time() - t0
-    #
-    # t0 = time.time()
-    # A = get_shuffle_matrix(number_of_events, debug=True)
-    # print time.time() - t0
-    #
-    # print A.shape
