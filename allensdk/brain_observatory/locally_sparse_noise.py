@@ -19,6 +19,7 @@ import numpy as np
 import pandas as pd
 import scipy.ndimage
 from .receptive_field_analysis import receptive_field_analysis
+from .receptive_field_analysis.visualization import plot_receptive_field_data
 
 from . import circle_plots as cplots
 from . import observatory_plots as oplots
@@ -188,7 +189,9 @@ class LocallySparseNoise(StimulusAnalysis):
         csid_receptive_field_analysis_data_dict = receptive_field_analysis(self)
         return csid_receptive_field_analysis_data_dict
 
-
+    def plot_receptive_field_analysis_data(self, csid, **kwargs):
+        receptive_field_data_dict = self._csid_receptive_field_analysis_data_dict(str(csid))
+        return plot_receptive_field_data(receptive_field_data_dict, self, **kwargs)
 
     @staticmethod
     def merge_receptive_fields(rc1, rc2):
@@ -277,17 +280,17 @@ class LocallySparseNoise(StimulusAnalysis):
 
         return lsn
 
-
-    def save_csid_receptive_field_analysis_dict(self):
+    @staticmethod
+    def save_csid_receptive_field_analysis_dict(csid_receptive_field_analysis_data_dict, new_nwb):
 
         prefix = 'receptive_field_analysis'
 
         attr_list = []
-        file_handle = h5py.File(self.data_set.nwb_file, 'a')
+        file_handle = h5py.File(new_nwb.nwb_file, 'a')
         if prefix in file_handle['analysis']:
             del file_handle['analysis'][prefix]
         f = file_handle.create_group('analysis/%s' % prefix)
-        for x in dict_generator(self.csid_receptive_field_analysis_data_dict):
+        for x in dict_generator(csid_receptive_field_analysis_data_dict):
             if x[-2] == 'data':
                 f['/'.join(x[:-1])] = x[-1]
             elif x[-3] == 'attrs':

@@ -123,7 +123,7 @@ class SessionAnalysis(object):
             ('binned_cells_sp', nm1.binned_cells_sp),
             ('binned_cells_vis', nm1.binned_cells_vis))
 
-        lsn.save_csid_receptive_field_analysis_dict()
+        LocallySparseNoise.save_csid_receptive_field_analysis_dict(lsn.csid_receptive_field_analysis_data_dict, nwb)
 
     def save_session_c2(self, lsn4, lsn8, nm1, nm2, peak):
         nwb = BrainObservatoryNwbDataSet(self.save_path)
