@@ -82,7 +82,7 @@ def fitgaussian2D(data):
 
     params = moments2(data)
     def errorfunction(p):
-        p2 = np.array([p[0], p[1], p[2], np.abs(p[3]), np.abs(p[4]), p[5]])
+        p2 = np.array([p[0], params[1], params[2], np.abs(p[3]), np.abs(p[4]), p[5]])
 
         val = np.ravel(gaussian2D(*p2)(*np.indices(data.shape)) - data)
 
