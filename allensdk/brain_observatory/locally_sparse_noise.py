@@ -186,8 +186,35 @@ class LocallySparseNoise(StimulusAnalysis):
         return csid_receptive_field_analysis_data_dict
 
     def plot_receptive_field_analysis_data(self, csid, **kwargs):
-        receptive_field_data_dict = self._csid_receptive_field_analysis_data_dict(str(csid))
+        receptive_field_data_dict = self._csid_receptive_field_analysis_data_dict[str(csid)]
         return plot_receptive_field_data(receptive_field_data_dict, self, **kwargs)
+
+    def get_receptive_field_attribute_df(self):
+
+        df_list = []
+        for csid_as_str, receptive_field_data_dict in self.csid_receptive_field_analysis_data_dict.items():
+
+            attribute_dict = {}
+            for x in dict_generator(receptive_field_data_dict):
+                if x[-3] == 'attrs':
+                    if len(x[:-3]) == 0:
+                        key = x[-2]
+                    else:
+                        key = '/'.join(['/'.join(x[:-3]), x[-2]])
+                    attribute_dict[key] = x[-1]
+
+            massaged_dict = {}
+            for key, val in attribute_dict.items():
+                massaged_dict[key] = [val]
+
+            massaged_dict['oeid'] = self.data_set.get_metadata()['ophys_experiment_id']
+
+            curr_df = pd.DataFrame.from_dict(massaged_dict)
+            df_list.append(curr_df)
+
+            attribute_df = pd.concat(df_list)
+
+        return attribute_df
 
     @staticmethod
     def merge_receptive_fields(rc1, rc2):
@@ -256,12 +283,11 @@ class LocallySparseNoise(StimulusAnalysis):
     @staticmethod
     def from_analysis_file(data_set, analysis_file, stimulus):
         lsn = LocallySparseNoise(data_set, stimulus)
+
         lsn.populate_stimulus_table()
 
         try:
 
-            # import warnings
-            # warnings.warn('COmment this back in')
             lsn._sweep_response = pd.read_hdf(analysis_file, "analysis/sweep_response_lsn")
             lsn._mean_sweep_response = pd.read_hdf(analysis_file, "analysis/mean_sweep_response_lsn")
 

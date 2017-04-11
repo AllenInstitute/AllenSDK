@@ -3,6 +3,7 @@ from matplotlib import ticker
 import numpy as np
 import matplotlib.gridspec as gridspec
 
+
 def pvalue_to_NLL(p_values,
                   max_NLL=10.0):
     return np.where(p_values == 0.0, max_NLL, -np.log10(p_values))
@@ -60,16 +61,15 @@ def plot_receptive_field_data(receptive_field_data_dict, lsn, show=True, save_fi
     curr_axes.axes.get_xaxis().set_visible(False)
     curr_axes.axes.get_yaxis().set_visible(False)
     curr_axes.set_title('Significant: %s (min_p=%s)' % (receptive_field_data_dict['chi_squared_analysis']['attrs']['significant'], receptive_field_data_dict['chi_squared_analysis']['attrs']['min_p']) )
-    # curr_axes.set_title('Significant:')
 
-    # If available, plot from website:
+    # MSR plot:
     curr_on_axes = fig.add_subplot(gs[2:4, 0:2])
     curr_off_axes = fig.add_subplot(gs[2:4, 2:4])
     ax_list += [curr_on_axes, curr_off_axes]
-    ind = data_set.get_cell_specimen_indices([csid])
-    min_clim = lsn.mean_response[:, :, ind[0],:].min()
-    max_clim = lsn.mean_response[:, :, ind[0],:].max()
-    plot_fields(lsn.mean_response[:, :, ind[0], 0], lsn.mean_response[:, :, ind[0], 1], curr_on_axes, curr_off_axes, clim=(min_clim, max_clim))
+    ind = lsn.data_set.get_cell_specimen_indices([csid])[0]
+    min_clim = lsn.mean_response[:, :, ind,:].min()
+    max_clim = lsn.mean_response[:, :, ind,:].max()
+    plot_fields(lsn.mean_response[:, :, ind, 0], lsn.mean_response[:, :, ind, 1], curr_on_axes, curr_off_axes, clim=(min_clim, max_clim))
 
     # RTS no blur:
     curr_on_axes = fig.add_subplot(gs[4:6, 0:2])
