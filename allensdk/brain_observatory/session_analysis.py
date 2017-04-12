@@ -102,8 +102,7 @@ class SessionAnalysis(object):
             ('binned_cells_sp', nm1.binned_cells_sp),
             ('binned_cells_vis', nm1.binned_cells_vis),
             ('binned_dx_sp', nm1.binned_dx_sp),
-            ('binned_dx_vis', nm1.binned_dx_vis)),
-            ('signal_corr_ns', ns.signal)
+            ('binned_dx_vis', nm1.binned_dx_vis))
 
     def save_session_c(self, lsn, nm1, nm2, peak):
         nwb = BrainObservatoryNwbDataSet(self.save_path)

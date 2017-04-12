@@ -393,7 +393,10 @@ class StaticGratings(StimulusAnalysis):
                     for c in range(self.numbercells):
                         response_new[c, i, j, k] = mean_sweep_response[ind, c]
 
-        return response_new
+        ind = (stim_table.spatial_frequency.values == 0)
+        response_blank = mean_sweep_response[ind, :]
+
+        return response_new, response_blank
 
 
     def get_signal_corr(self, corr='pearson'):
@@ -452,9 +455,12 @@ class StaticGratings(StimulusAnalysis):
 
     def get_noise_correlation(self, corr='pearson'):
 
-        response = self.reshape_response_array()
+        response, response_blank = self.reshape_response_array()
         noise_corr = np.zeros((self.numbercells, self.numbercells, self.number_ori, self.number_sf-1, self.number_phase))
         noise_corr_p = np.zeros((self.numbercells, self.numbercells, self.number_ori, self.number_sf-1, self.number_phase))
+
+        noise_corr_blank = np.zeros((self.numbercells, self.numbercells))
+        noise_corr_blank_p = np.zeros((self.numbercells, self.numbercells))
 
         if corr == 'pearson':
             for k in range(self.number_ori):
@@ -466,6 +472,12 @@ class StaticGratings(StimulusAnalysis):
 
                         noise_corr[:, :, k, l, m] = np.triu(noise_corr[:, :, k, l, m]) + np.triu(noise_corr[:, :, k, l, m], 1).T
 
+            for i in range(self.numbercells):
+                for j in range(i, self.numbercells):
+                    noise_corr_blank[i, j], noise_corr_blank_p[i, j] = st.pearsonr(response_blank[i], response_blank[j])
+
+            noise_corr_blank[:, :, k, l, m] = np.triu(noise_corr_blank[:, :]) + np.triu(noise_corr_blank[:, :], 1).T
+
         elif corr == 'spearman':
             for k in range(self.number_ori):
                 for l in range(self.number_sf-1):
@@ -476,10 +488,16 @@ class StaticGratings(StimulusAnalysis):
 
                         noise_corr[:, :, k, l, m] = np.triu(noise_corr[:, :, k, l, m]) + np.triu(noise_corr[:, :, k, l, m], 1).T
 
+            for i in range(self.numbercells):
+                for j in range(i, self.numbercells):
+                    noise_corr_blank[i, j], noise_corr_blank_p[i, j] = st.spearmanr(response_blank[i], response_blank[j])
+
+            noise_corr_blank[:, :] = np.triu(noise_corr_blank[:, :]) + np.triu(noise_corr_blank[:, :], 1).T
+
         else:
             raise Exception('correlation should be pearson or spearman')
 
-        return noise_corr, noise_corr_p
+        return noise_corr, noise_corr_p, noise_corr_blank, noise_corr_blank_p
 
 
     @staticmethod
