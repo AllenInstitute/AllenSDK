@@ -371,9 +371,34 @@ class StaticGratings(StimulusAnalysis):
             fp.show_angle_labels()
 
 
+    def reshape_response_array(self):
+        '''
+        :return: response array in cells x stim x repetition for noise correlations
+        '''
+
+        mean_sweep_response = self.mean_sweep_response.values[:, :self.numbercells].as_matrix()
+
+        reps = []
+        stim_table = self.stim_table
+
+        sfvals = self.sfvals
+        sfvals = sfvals[sfvals != 0] # blank sweep
+
+        response_new = np.zeros((self.numbercells, self.number_ori, self.number_sf-1, self.number_phase), dtype='object')
+
+        for i, ori in enumerate(self.ori_vals):
+            for j, sf in enumerate(sfvals):
+                for k, phase in enumerate(self.phasevals):
+                    ind = (stim_table.orientation.values == ori) * (stim_table.spatial_frequency.values == sf) * (stim_table.phase.values == phase)
+                    for c in range(self.numbercells):
+                        response_new[c, i, j, k] = mean_sweep_response[ind, c]
+
+        return response_new
+
+
     def get_signal_corr(self, corr='pearson'):
 
-        response = self.response[:, :, :, :, 0] # orientation x freq x phase x cell
+        response = self.response[:, :, :, :self.numbercells, 0] # orientation x freq x phase x cell
         response = response.reshape(self.number_ori * self.number_sf * self.number_phase, self.numbercells).T
         N, Nstim = response.shape
 
@@ -400,9 +425,9 @@ class StaticGratings(StimulusAnalysis):
 
     def get_representational_similarity(self, corr='pearson'):
 
-        response = self.response[:, :, :, :, 0] # orientation x freq x phase x cell
-        response = response.reshape(self.number_ori * self.number_sf * self.number_phase, self.numbercells).T
-        N, Nstim = response.shape
+        response = self.response[:, :, :, :self.numbercells, 0] # orientation x freq x phase x cell
+        response = response.reshape(self.number_ori * self.number_sf * self.number_phase, self.numbercells)
+        Nstim, N = response.shape
 
         rep_sim = np.zeros((Nstim, Nstim))
         rep_sim_p = np.empty((Nstim, Nstim))
@@ -423,6 +448,38 @@ class StaticGratings(StimulusAnalysis):
         rep_sim_p = np.triu(rep_sim_p) + np.triu(rep_sim_p, 1).T  # fill in lower triangle
 
         return rep_sim, rep_sim_p
+
+
+    def get_noise_correlation(self, corr='pearson'):
+
+        response = self.reshape_response_array()
+        noise_corr = np.zeros((self.numbercells, self.numbercells, self.number_ori, self.number_sf-1, self.number_phase))
+        noise_corr_p = np.zeros((self.numbercells, self.numbercells, self.number_ori, self.number_sf-1, self.number_phase))
+
+        if corr == 'pearson':
+            for k in range(self.number_ori):
+                for l in range(self.number_sf-1):
+                    for m in range(self.number_phase):
+                        for i in range(self.numbercells):
+                            for j in range(i, self.numbercells):
+                                noise_corr[i, j, k, l, m], noise_corr_p[i, j, k, l, m] = st.pearsonr(response[i, k, l, m], response[j, k, l, m])
+
+                        noise_corr[:, :, k, l, m] = np.triu(noise_corr[:, :, k, l, m]) + np.triu(noise_corr[:, :, k, l, m], 1).T
+
+        elif corr == 'spearman':
+            for k in range(self.number_ori):
+                for l in range(self.number_sf-1):
+                    for m in range(self.number_phase):
+                        for i in range(self.numbercells):
+                            for j in range(i, self.numbercells):
+                                noise_corr[i, j, k, l, m], noise_corr_p[i, j, k, l, m] = st.spearmanr(response[i, k, l, m], response[j, k, l, m])
+
+                        noise_corr[:, :, k, l, m] = np.triu(noise_corr[:, :, k, l, m]) + np.triu(noise_corr[:, :, k, l, m], 1).T
+
+        else:
+            raise Exception('correlation should be pearson or spearman')
+
+        return noise_corr, noise_corr_p
 
 
     @staticmethod

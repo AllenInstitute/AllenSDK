@@ -209,7 +209,6 @@ class NaturalScenes(StimulusAnalysis):
                 clim=[cmin, cmax])
         cp.show_arrow()
 
-
     def reshape_response_array(self):
         '''
         :return: response array in cells x stim x repetition for noise correlations
@@ -223,13 +222,13 @@ class NaturalScenes(StimulusAnalysis):
         reps = [len(np.where(stim_table.frame.values == frame)[0]) for frame in frames]
         Nreps = min(reps) # just in case there are different numbers of repetitions
 
-        response_new = np.zeros((self.numbercells, self.number_scenes, Nreps))
+        response_new = np.zeros((self.numbercells, self.number_scenes), dtype='object')
         for i, frame in enumerate(frames):
             ind = np.where(stim_table.frame.values == frame)[0][:Nreps]
-            response_new[:, i, :] =  mean_sweep_response[ind, :].T
+            for c in range(self.numbercells):
+                response_new[c, i] = mean_sweep_response[ind, c]
 
         return response_new
-
 
     def get_signal_corr(self, corr='pearson'):
 
@@ -257,7 +256,6 @@ class NaturalScenes(StimulusAnalysis):
 
         return signal_corr, signal_p
 
-
     def get_representational_similarity(self, corr='pearson'):
 
         response = self.response[:, :, 0]
@@ -284,7 +282,6 @@ class NaturalScenes(StimulusAnalysis):
 
         return rep_sim, rep_sim_p
 
-
     def get_noise_correlation(self, corr='pearson'):
 
         response = self.reshape_response_array()
@@ -309,8 +306,10 @@ class NaturalScenes(StimulusAnalysis):
                 noise_corr[:, :, k] = np.triu(noise_corr[:, :, k]) + np.triu(noise_corr[:, :, k], 1).T
                 noise_corr_p[:, :, k] = np.triu(noise_corr_p[:, :, k]) + np.triu(noise_corr_p[:, :, k], 1).T
 
-        return noise_corr, noise_corr_p
+        else:
+            raise Exception('correlation should be pearson or spearman')
 
+        return noise_corr, noise_corr_p
 
     @staticmethod
     def from_analysis_file(data_set, analysis_file):
