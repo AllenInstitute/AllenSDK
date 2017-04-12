@@ -370,6 +370,61 @@ class StaticGratings(StimulusAnalysis):
             fp.show_r_labels()
             fp.show_angle_labels()
 
+
+    def get_signal_corr(self, corr='pearson'):
+
+        response = self.response[:, :, :, :, 0] # orientation x freq x phase x cell
+        response = response.reshape(self.number_ori * self.number_sf * self.number_phase, self.numbercells).T
+        N, Nstim = response.shape
+
+        signal_corr = np.zeros((N, N))
+        signal_p = np.empty((N, N))
+        if corr == 'pearson':
+            for i in range(N):
+                for j in range(i, N): # matrix is symmetric
+                    signal_corr[i, j], signal_p[i, j] = st.pearsonr(response[i], response[j])
+
+        elif corr == 'spearman':
+            for i in range(N):
+                for j in range(i, N): # matrix is symmetric
+                    signal_corr[i, j], signal_p[i, j] = st.spearmanr(response[i], response[j])
+
+        else:
+            raise Exception('correlation should be pearson or spearman')
+
+        signal_corr = np.triu(signal_corr) + np.triu(signal_corr, 1).T  # fill in lower triangle
+        signal_p = np.triu(signal_p) + np.triu(signal_p, 1).T  # fill in lower triangle
+
+        return signal_corr, signal_p
+
+
+    def get_representational_similarity(self, corr='pearson'):
+
+        response = self.response[:, :, :, :, 0] # orientation x freq x phase x cell
+        response = response.reshape(self.number_ori * self.number_sf * self.number_phase, self.numbercells).T
+        N, Nstim = response.shape
+
+        rep_sim = np.zeros((Nstim, Nstim))
+        rep_sim_p = np.empty((Nstim, Nstim))
+        if corr == 'pearson':
+            for i in range(Nstim):
+                for j in range(i, Nstim): # matrix is symmetric
+                    rep_sim[i, j], rep_sim_p[i, j] = st.pearsonr(response[i], response[j])
+
+        elif corr == 'spearman':
+            for i in range(Nstim):
+                for j in range(i, Nstim): # matrix is symmetric
+                    rep_sim[i, j], rep_sim_p[i, j] = st.spearmanr(response[i], response[j])
+
+        else:
+            raise Exception('correlation should be pearson or spearman')
+
+        rep_sim = np.triu(rep_sim) + np.triu(rep_sim, 1).T # fill in lower triangle
+        rep_sim_p = np.triu(rep_sim_p) + np.triu(rep_sim_p, 1).T  # fill in lower triangle
+
+        return rep_sim, rep_sim_p
+
+
     @staticmethod
     def from_analysis_file(data_set, analysis_file):
         sg = StaticGratings(data_set)

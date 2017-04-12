@@ -234,6 +234,7 @@ class NaturalScenes(StimulusAnalysis):
     def get_signal_corr(self, corr='pearson'):
 
         response = self.response[:, :, 0].T
+        response = response[:self.numbercells, :]
         N, Nstim = response.shape
 
         signal_corr = np.zeros((N, N))
@@ -260,6 +261,7 @@ class NaturalScenes(StimulusAnalysis):
     def get_representational_similarity(self, corr='pearson'):
 
         response = self.response[:, :, 0]
+        response = response[:, :self.numbercells]
         Nstim, N = response.shape
 
         rep_sim = np.zeros((Nstim, Nstim))
