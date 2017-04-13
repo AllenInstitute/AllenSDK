@@ -287,8 +287,15 @@ class StructureTree( SimpleTree ):
                                         in val['structure_id_path'].split('/')
                                         if stid != ''] 
    
-            val['structure_set_ids'] = [sts['id'] for sts in val['structure_sets']]
-
+            if not 'structure_sets' in val:
+                val['structure_sets'] = []
+            if not 'structure_set_ids' in val:
+                val['structure_set_ids'] = []    
+            
+            val['structure_set_ids'].extend([sts['id'] for sts 
+                                             in val['structure_sets']])
+            val['structure_set_ids'] = list(set(val['structure_set_ids']))
+            
             structures[ii] = StructureTree.filter_dict(val, *field_whitelist)
 
         return structures

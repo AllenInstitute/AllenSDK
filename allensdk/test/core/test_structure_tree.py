@@ -121,6 +121,43 @@ def test_clean_structures(nodes):
     assert( repr(clean_node[0]) == repr(nodes[0]) )
     
     
+def test_clean_structures_no_sets():
+    
+    dirty_node = {'id': 0, 'structure_id_path': '/0/', 
+                  'color_hex_triplet': '000000', 'acronym': 'rt', 
+                  'name': 'root'}
+    
+    clean_node = StructureTree.clean_structures([dirty_node])
+    st = StructureTree(clean_node)
+    
+    assert( len(clean_node[0]['structure_set_ids']) == 0 )
+    
+    
+def test_clean_structures_only_ids():
+    
+    dirty_node = {'id': 0, 'structure_id_path': '/0/', 
+                  'color_hex_triplet': '000000', 'acronym': 'rt', 
+                  'name': 'root', 'structure_set_ids': [1, 2, 3] }
+    
+    clean_node = StructureTree.clean_structures([dirty_node])
+    st = StructureTree(clean_node)
+    
+    assert( len(clean_node[0]['structure_set_ids']) == 3 )
+    
+    
+def test_clean_structures_ids_sets():
+    
+    dirty_node = {'id': 0, 'structure_id_path': '/0/', 
+                  'color_hex_triplet': '000000', 'acronym': 'rt', 
+                  'name': 'root', 'structure_set_ids': [1, 2, 3], 
+                  'structure_sets': [{'id': 1}, {'id': 4}] }
+    
+    clean_node = StructureTree.clean_structures([dirty_node])
+    st = StructureTree(clean_node)
+    
+    assert( len(clean_node[0]['structure_set_ids']) == 4 )
+    
+    
 def test_get_structure_sets(tree):
 
     expected = set([1, 2, 3, 4])
