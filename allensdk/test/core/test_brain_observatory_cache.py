@@ -189,8 +189,10 @@ def test_get_stimulus_mappings(brain_observatory_cache):
 
         with patch('allensdk.core.json_utilities.write',
                    MagicMock(name='write_json')):
-            # Download a list of all transgenic driver lines
-            tls = brain_observatory_cache._get_stimulus_mappings()
+            with patch('allensdk.core.json_utilities.read',
+                       MagicMock(name='read_json')):
+                # Download a list of all transgenic driver lines
+                tls = brain_observatory_cache._get_stimulus_mappings()
 
     brain_observatory_cache.api.json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="

@@ -216,7 +216,7 @@ class BrainObservatoryApi(RmaTemplate):
 
         return data
 
-    # TODO: search by item type and level
+    @cacheable()
     def get_stimulus_mappings(self, stimulus_mapping_ids=None):
         ''' Get stimulus mappings by id
 

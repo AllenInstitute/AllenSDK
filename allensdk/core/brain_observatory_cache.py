@@ -278,13 +278,9 @@ class BrainObservatoryCache(Cache):
 
         file_name = self.get_cache_path(file_name, self.STIMULUS_MAPPINGS_KEY)
 
-        if os.path.exists(file_name):
-            mappings = ju.read(file_name)
-        else:
-            mappings = self.api.get_stimulus_mappings()
-
-            if self.cache:
-                ju.write(file_name, mappings)
+        mappings = self.api.get_stimulus_mappings(path=file_name,
+                                                  strategy='lazy',
+                                                  **Cache.cache_json())
 
         return mappings
 
