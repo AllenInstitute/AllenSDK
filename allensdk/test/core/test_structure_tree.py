@@ -159,6 +159,19 @@ def test_clean_structures_ids_sets():
     assert( len(clean_node[0]['structure_set_ids']) == 4 )
     
     
+def test_clean_structures_str_id():
+
+    dirty_node = {'id': '0', 'structure_id_path': '/0/', 
+                  'color_hex_triplet': '000000', 'acronym': 'rt', 
+                  'name': 'root', 'structure_set_ids': [1, 2, 3], 
+                  'structure_sets': [{'id': 1}, {'id': 4}] }
+    
+    clean_node = StructureTree.clean_structures([dirty_node])
+    st = StructureTree(clean_node)
+    
+    assert( set(st.node_ids()) == set([0]) )
+    
+    
 def test_get_structure_sets(tree):
 
     expected = set([1, 2, 3, 4])
