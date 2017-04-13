@@ -328,9 +328,9 @@ class BrainObservatoryCache(Cache):
 
         file_name = self.get_cache_path(file_name, self.CELL_SPECIMENS_KEY)
 
-        cell_specimens.get_cell_metrics(path=file_name,
-                                        strategy='lazy',
-                                        **Cache.cache_json())
+        cell_specimens = self.api.get_cell_metrics(path=file_name,
+                                                   strategy='lazy',
+                                                   **Cache.cache_json())
 
         cell_specimens = self.api.filter_cell_specimens(cell_specimens,
                                                         ids=ids,
