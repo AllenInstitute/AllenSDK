@@ -268,8 +268,9 @@ class StructureTree( SimpleTree ):
         structures : list of dict
             Each element describes a structure. Should have a structure id path 
             field (str values) and a structure_sets field (list of dict).
-        field_whitelist : list of str, optional
-           Each record should keep only fields in this list
+        field_whitelist : dict maps str to fn, optional
+           Input fields are filtered to keys of this dict and passed through 
+           the value functions
            
         Returns
         -------
@@ -279,26 +280,26 @@ class StructureTree( SimpleTree ):
         '''
 
         if field_whitelist is None:
-            field_whitelist = StructureTree.FIELDS
+            field_whitelist = StructureTree.whitelist()
 
         for ii, val in enumerate(structures):
 
-            val['structure_id_path'] = [int(stid) for stid 
-                                        in val['structure_id_path'].split('/')
-                                        if stid != ''] 
-   
-            if not 'structure_sets' in val:
-                val['structure_sets'] = []
-            if not 'structure_set_ids' in val:
-                val['structure_set_ids'] = []    
-            
-            val['structure_set_ids'].extend([sts['id'] for sts 
-                                             in val['structure_sets']])
-            val['structure_set_ids'] = list(set(val['structure_set_ids']))
-            
-            structures[ii] = StructureTree.filter_dict(val, *field_whitelist)
+            StructureTree.collect_sets(val)
+            structures[ii] = {k: field_whitelist[k](v) for k, v in val.iteritems()}
 
         return structures
+        
+        
+    @staticmethod
+    def whitelist():
+        return {'acronym': str, 
+                'color_hex_triplet': StructureTree.hex_to_rgb, 
+                'graph_id': int, 
+                'graph_order': int, 
+                'id': int, 
+                'name': str, 
+                'structure_id_path': StructureTree.path_to_list, 
+                'structure_set_ids': list}   
         
         
     @staticmethod
@@ -321,10 +322,24 @@ class StructureTree( SimpleTree ):
         if hex_color[0] == '#':
             hex_color = hex_color[1:]
         
-        return [int(hex_color[a * 2: a*2 + 2], 16) for a in xrange(3)]
+        return [int(hex_color[a * 2: a*2 + 2], 16) for a in xrange(3)] 
+    
+
+    @staticmethod
+    def path_to_list(path):
+        return [int(stid) for stid in path.split('/') if stid != ''] 
 
 
     @staticmethod
-    def filter_dict(dictionary, *pass_keys):
-        return {k:v for k, v in dictionary.iteritems() if k in pass_keys}
+    def collect_sets(structure):
+        if not 'structure_sets' in structure:
+            structure['structure_sets'] = []
+        if not 'structure_set_ids' in structure:
+            structure['structure_set_ids'] = []    
+        
+        structure['structure_set_ids'].extend([sts['id'] for sts 
+                                               in structure['structure_sets']])
+        structure['structure_set_ids'] = list(set(structure['structure_set_ids']))
+        
+        del structure['structure_sets']
     
