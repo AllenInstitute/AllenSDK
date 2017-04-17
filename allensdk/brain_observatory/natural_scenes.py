@@ -327,6 +327,14 @@ class NaturalScenes(StimulusAnalysis):
                 ns._binned_cells_sp = f["analysis/binned_cells_sp"].value
                 ns._binned_dx_vis = f["analysis/binned_dx_vis"].value
                 ns._binned_cells_vis = f["analysis/binned_cells_vis"].value
+
+                if "analysis/noise_corr_dg" in f:
+                    ns.noise_correlation = f["analysis/noise_corr_ns"].value
+                if "analysis/signal_corr_dg" in f:
+                    ns.signal_correlation = f["analysis/signal_corr_ns"].value
+                if "analysis/rep_similarity_dg" in f:
+                    ns.representational_similarity = f["analysis/rep_similarity_ns"].value
+
         except Exception as e:
             raise MissingStimulusException(e.args)
 

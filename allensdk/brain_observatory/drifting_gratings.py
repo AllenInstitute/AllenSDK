@@ -437,6 +437,13 @@ class DriftingGratings(StimulusAnalysis):
                 dg._binned_cells_sp = f["analysis/binned_cells_sp"].value
                 dg._binned_dx_vis = f["analysis/binned_dx_vis"].value
                 dg._binned_cells_vis = f["analysis/binned_cells_vis"].value
+                if "analysis/noise_corr_dg" in f:
+                    dg.noise_correlation = f["analysis/noise_corr_dg"].value
+                if "analysis/signal_corr_dg" in f:
+                    dg.signal_correlation = f["analysis/signal_corr_dg"].value
+                if "analysis/rep_similarity_dg" in f:
+                    dg.representational_similarity = f["analysis/rep_similarity_dg"].value
+
         except Exception as e:
             raise MissingStimulusException(e.args)
 
