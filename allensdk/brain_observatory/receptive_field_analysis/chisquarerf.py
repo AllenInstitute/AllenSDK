@@ -166,15 +166,17 @@ def get_events_per_pixel(responses_np,
 
 def smooth_STA(STA,
                gauss_std=0.75):
-    STA_interpolated = interpolate_RF(STA)
+
+    deg_per_pnt = 64/STA.shape[0]
+    STA_interpolated = interpolate_RF(STA, deg_per_pnt)
     STA_interpolated_smoothed = filt.gaussian_filter(STA_interpolated, gauss_std)
-    STA_smoothed = deinterpolate_RF(STA_interpolated_smoothed)
+    STA_smoothed = deinterpolate_RF(STA_interpolated_smoothed, STA.shape[1], STA.shape[0], deg_per_pnt)
 
     return STA_smoothed
 
 
 def interpolate_RF(rf_map,
-                   deg_per_pnt=4):
+                   deg_per_pnt):
     x_pnts = np.shape(rf_map)[1]
     y_pnts = np.shape(rf_map)[0]
 
@@ -190,13 +192,10 @@ def interpolate_RF(rf_map,
     return interpolated
 
 
-def deinterpolate_RF(rf_map,
-                     deg_per_pnt=4):
-    # x_pnts = np.shape(rf_map)[1]
-    # y_pnts = np.shape(rf_map)[0]
+def deinterpolate_RF(rf_map, x_pnts, y_pnts, deg_per_pnt):
 
-    x_pnts = 28
-    y_pnts = 16
+    # x_pnts = 28
+    # y_pnts = 16
 
     x_interpolated = np.arange(-(x_pnts - 1) * deg_per_pnt / 2, deg_per_pnt / 2 + (x_pnts / 2 - 1) * deg_per_pnt + 1, 1)
     y_interpolated = np.arange(-(y_pnts - 1) * deg_per_pnt / 2, deg_per_pnt / 2 + (y_pnts / 2 - 1) * deg_per_pnt + 1, 1)
@@ -245,7 +244,7 @@ def chi_square_within_mask(exclusion_mask,
 
 
 def build_trial_matrix(LSN_template,
-                       num_trials=8880):
+                       num_trials):
     num_y = np.shape(LSN_template)[1]
     num_x = np.shape(LSN_template)[2]
     on_off_luminance = [255, 0]

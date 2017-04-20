@@ -10,7 +10,7 @@ def pvalue_to_NLL(p_values,
 
 def plot_receptive_field_data(receptive_field_data_dict, lsn, show=True, save_file_name=None, close=True):
 
-    csid = receptive_field_data_dict['attrs']['csid']
+    cell_index = receptive_field_data_dict['attrs']['cell_index']
 
     rts_on = receptive_field_data_dict['on']['rts']['data']
     rts_off = receptive_field_data_dict['off']['rts']['data']
@@ -63,13 +63,13 @@ def plot_receptive_field_data(receptive_field_data_dict, lsn, show=True, save_fi
     curr_axes.set_title('Significant: %s (min_p=%s)' % (receptive_field_data_dict['chi_squared_analysis']['attrs']['significant'], receptive_field_data_dict['chi_squared_analysis']['attrs']['min_p']) )
 
     # MSR plot:
-    curr_on_axes = fig.add_subplot(gs[2:4, 0:2])
-    curr_off_axes = fig.add_subplot(gs[2:4, 2:4])
-    ax_list += [curr_on_axes, curr_off_axes]
-    ind = lsn.data_set.get_cell_specimen_indices([csid])[0]
-    min_clim = lsn.mean_response[:, :, ind,:].min()
-    max_clim = lsn.mean_response[:, :, ind,:].max()
-    plot_fields(lsn.mean_response[:, :, ind, 0], lsn.mean_response[:, :, ind, 1], curr_on_axes, curr_off_axes, clim=(min_clim, max_clim))
+    if not lsn is None:
+        curr_on_axes = fig.add_subplot(gs[2:4, 0:2])
+        curr_off_axes = fig.add_subplot(gs[2:4, 2:4])
+        ax_list += [curr_on_axes, curr_off_axes]
+        min_clim = lsn.mean_response[:, :, cell_index,:].min()
+        max_clim = lsn.mean_response[:, :, cell_index,:].max()
+        plot_fields(lsn.mean_response[:, :, cell_index, 0], lsn.mean_response[:, :, cell_index, 1], curr_on_axes, curr_off_axes, clim=(min_clim, max_clim))
 
     # RTS no blur:
     curr_on_axes = fig.add_subplot(gs[4:6, 0:2])

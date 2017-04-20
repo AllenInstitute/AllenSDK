@@ -1,24 +1,24 @@
 from scipy.ndimage.filters import gaussian_filter
 import numpy as np
 import scipy.interpolate as spinterp
-from .tools import memoize, dict_generator
+from .tools import dict_generator
+from allensdk.api.cache import memoize
 import os
 import warnings
 from skimage.measure import block_reduce
 
-def upsample_image(img, upsample=4):
+def upsample_image_to_degrees(img):
 
-    x = np.arange(16)
-    y = np.arange(28)
+    upsample = 74.4/img.shape[0]
+    x = np.arange(img.shape[0])
+    y = np.arange(img.shape[1])
+
     g = spinterp.interp2d(y, x, img, kind='linear')
-    # offset = -(1 - .625)  # Offset so that linear interpolation doesnt get biased
-    offset=0
-    ZZ_on = g(offset + np.arange(0, 28, 1. / upsample), offset + np.arange(0, 16, 1. / upsample))
+    ZZ_on = g(np.arange(0, img.shape[1], 1. / upsample), np.arange(0, img.shape[0], 1. / upsample))
 
     return ZZ_on
 
-
-def convolve(img, upsample=4, sigma=4):
+def convolve(img, sigma=4):
     '''
     2D Gaussian convolution
     '''
@@ -29,12 +29,19 @@ def convolve(img, upsample=4, sigma=4):
     img_pad = np.zeros((3 * img.shape[0], 3 * img.shape[1]))
     img_pad[img.shape[0]:2 * img.shape[0], img.shape[1]:2 * img.shape[1]] = img
 
-    x = np.arange(3 * 16)
-    y = np.arange(3 * 28)
+    x = np.arange(3 * img.shape[0])
+    y = np.arange(3 * img.shape[1])
     g = spinterp.interp2d(y, x, img_pad, kind='linear')
-    offset = -(1 - .625)  # Offset so that linear interpolation doesnt get biased
-    assert upsample == 4  # Offset needs to be computed for each upsample...
-    ZZ_on = g(offset + np.arange(0, 28 * 3, 1. / upsample), offset + np.arange(0, 16 * 3, 1. / upsample))
+
+    if img.shape[0] == 16:
+        upsample = 4
+        offset = -(1 - .625)
+    elif img.shape[0] == 8:
+        upsample = 8
+        offset = -(1 - .5625)
+    else:
+        raise NotImplementedError
+    ZZ_on = g(offset + np.arange(0, img.shape[1] * 3, 1. / upsample), offset + np.arange(0, img.shape[0] * 3, 1. / upsample))
     ZZ_on_f = gaussian_filter(ZZ_on, float(sigma), mode='constant')
 
     z_on_new = block_reduce(ZZ_on_f, (upsample, upsample))
@@ -43,79 +50,50 @@ def convolve(img, upsample=4, sigma=4):
 
     return z_on_new
 
-def plot_fields(data, axes=None, show=True, clim=(0, 1), colorbar=True):
 
-    import matplotlib.pyplot as plt
-    from matplotlib import ticker
-
-    data = np.array(data)
-    if axes is None:
-        _, axes = plt.subplots(1, 2)
-
-    axes[0].imshow(data[:16 * 28].reshape(16, 28), clim=clim, interpolation='none', origin='lower')
-    img = axes[1].imshow(data[16 * 28:].reshape(16, 28), clim=clim, interpolation='none', origin='lower')
-    if colorbar == True:
-        cb = axes[0].figure.colorbar(img, ax=axes[1])
-        tick_locator = ticker.MaxNLocator(nbins=5)
-        cb.locator = tick_locator
-        cb.update_ticks()
-
-    if show == True:
-        plt.show()
 
 @memoize
-def get_A(data):
-    import warnings
-    warnings.warn('FOR DEBUG')
-    try:
+def get_A(data, stimulus):
 
-        warnings.warn('A loaded')
-        return np.load('/data/mat/nicholasc/brain_observatory_analysis/receptive_field_analysis/A_tmp.npy')
-    except:
-        stimulus_table = data.get_stimulus_table('locally_sparse_noise')
-        stimulus_template = data.get_stimulus_template('locally_sparse_noise')[stimulus_table['frame'].values, :,:]
+    stimulus_table = data.get_stimulus_table(stimulus)
+    stimulus_template = data.get_stimulus_template(stimulus)[stimulus_table['frame'].values, :,:]
 
-        A = np.zeros((2*16*28, stimulus_template.shape[0]))
-        for fi in range(stimulus_template.shape[0]):
-            A[:16*28, fi] = (stimulus_template[fi,:,:].flatten() > 127).astype(float)
-            A[16*28:, fi] = (stimulus_template[fi, :, :].flatten() < 127).astype(float)
+    number_of_pixels = stimulus_template.shape[1]*stimulus_template.shape[2]
 
-        assert A[:,100].sum() == 12
-        assert A[:,200].sum() == 10
-        assert A.shape == (896,8880)
-
+    A = np.zeros((2*number_of_pixels, stimulus_template.shape[0]))
+    for fi in range(stimulus_template.shape[0]):
+        A[:number_of_pixels, fi] = (stimulus_template[fi,:,:].flatten() > 127).astype(float)
+        A[number_of_pixels:, fi] = (stimulus_template[fi, :, :].flatten() < 127).astype(float)
 
     return A
 
 @memoize
-def get_A_blur(data):
-    import warnings
-    warnings.warn('FOR DEBUG')
+def get_A_blur(data, stimulus):
 
-    try:
-        warnings.warn('A_blur loaded')
-        return np.load('/data/mat/nicholasc/brain_observatory_analysis/receptive_field_analysis/A_blur_tmp.npy')
+    stimulus_table = data.get_stimulus_table(stimulus)
+    stimulus_template = data.get_stimulus_template(stimulus)[stimulus_table['frame'].values, :, :]
 
-    except:
+    A = get_A(data, stimulus).copy()
 
-        A = get_A(data).copy()
 
-        for fi in range(A.shape[1]):
-            A[:16*28,fi] = convolve(A[:16 * 28, fi].reshape(16, 28)).flatten()
-            A[16*28:,fi] = convolve(A[16 * 28:, fi].reshape(16, 28)).flatten()
+    number_of_pixels = A.shape[0] / 2
+    for fi in range(A.shape[1]):
+        A[:number_of_pixels,fi] = convolve(A[:number_of_pixels, fi].reshape(stimulus_template.shape[1], stimulus_template.shape[2])).flatten()
+        A[number_of_pixels:,fi] = convolve(A[number_of_pixels:, fi].reshape(stimulus_template.shape[1], stimulus_template.shape[2])).flatten()
 
-        return A
 
-def get_shuffle_matrix(data, number_of_events, number_of_shuffles=5000, response_detection_error_std_dev=.1):
+    return A
 
-    A = get_A_blur(data)
+def get_shuffle_matrix(data, event_vector, A, number_of_shuffles=5000, response_detection_error_std_dev=.1):
 
-    shuffle_data = np.zeros((2*16*28, number_of_shuffles))
+    number_of_events = event_vector.sum()
+    number_of_pixels = A.shape[0] / 2
+    shuffle_data = np.zeros((2*number_of_pixels, number_of_shuffles))
     for ii in range(number_of_shuffles):
 
         size = number_of_events + int(np.round(response_detection_error_std_dev*number_of_events*np.random.randn()))
-        shuffled_event_inds = np.random.choice(range(8880), size=size, replace=False)
-        b_tmp = np.zeros(8880)
+        shuffled_event_inds = np.random.choice(range(len(event_vector)), size=size, replace=False)
+        b_tmp = np.zeros(len(event_vector))
         b_tmp[shuffled_event_inds] = 1
         shuffle_data[:, ii] = A.dot(b_tmp)/float(size)
 
@@ -208,8 +186,10 @@ def smooth(x,window_len=11,window='hanning', mode='valid'):
 
 def get_components(receptive_field_data):
 
+    s1, s2 = receptive_field_data.shape
+
     candidate_pixel_list = np.where(receptive_field_data.flatten()==True)[0]
-    pixel_coord_dict = dict((px, (px/28, (px - 28 * (px/28)), px% (16 * 28) == px)) for px in candidate_pixel_list)
+    pixel_coord_dict = dict((px, (px/s2, (px - s2 * (px/s2)), px% (s1 * s2) == px)) for px in candidate_pixel_list)
 
     component_list = []
 

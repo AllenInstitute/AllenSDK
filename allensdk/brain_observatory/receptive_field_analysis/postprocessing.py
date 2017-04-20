@@ -1,6 +1,6 @@
 from .fit_parameters import get_gaussian_fit_single_channel, compute_distance, compute_overlap
 from .chisquarerf import chi_square_binary, get_peak_significance, pvalue_to_NLL
-from .utilities import upsample_image
+from .utilities import upsample_image_to_degrees
 import collections
 import numpy as np
 import sys
@@ -12,8 +12,8 @@ def get_gaussian_fit(receptive_field_data_dict):
     for on_off_key in ['on', 'off']:
         fit_parameters_dict = fit_parameters_dict_combined[on_off_key]
         for ci in range(receptive_field_data_dict[on_off_key]['fdr_mask']['attrs']['number_of_components']):
-            curr_component_mask = upsample_image(np.logical_not(receptive_field_data_dict[on_off_key]['fdr_mask']['data'][ci,:,:]), 4.65) > .5
-            rf_response = upsample_image(receptive_field_data_dict[on_off_key]['rts_convolution']['data'].copy(), 4.65)
+            curr_component_mask = upsample_image_to_degrees(np.logical_not(receptive_field_data_dict[on_off_key]['fdr_mask']['data'][ci,:,:])) > .5
+            rf_response = upsample_image_to_degrees(receptive_field_data_dict[on_off_key]['rts_convolution']['data'].copy())
             rf_response[curr_component_mask] = 0
 
             if rf_response.sum() > 0:
@@ -47,6 +47,8 @@ def get_gaussian_fit(receptive_field_data_dict):
 
 def run_postprocessing(data, receptive_field_data_dict):
 
+    stimulus = receptive_field_data_dict['attrs']['stimulus']
+
     # Gaussian fit postprocessing:
     fit_parameters_dict_combined, counter = get_gaussian_fit(receptive_field_data_dict)
 
@@ -66,10 +68,10 @@ def run_postprocessing(data, receptive_field_data_dict):
                     receptive_field_data_dict[on_off_key]['gaussian_fit']['attrs'][key] = np.array(val)
 
     # Chi squared test statistic postprocessing:
-    csid = receptive_field_data_dict['attrs']['csid']
-    locally_sparse_noise_template = data.get_stimulus_template('locally_sparse_noise')
+    cell_index = receptive_field_data_dict['attrs']['cell_index']
+    locally_sparse_noise_template = data.get_stimulus_template(stimulus)
 
-    event_array = np.zeros((8880, 1), dtype=np.bool)
+    event_array = np.zeros((receptive_field_data_dict['event_vector']['data'].shape[0], 1), dtype=np.bool)
     event_array[:,0] = receptive_field_data_dict['event_vector']['data']
 
     chi_squared_grid = chi_square_binary(event_array, locally_sparse_noise_template)

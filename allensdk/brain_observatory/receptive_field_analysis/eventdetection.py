@@ -5,10 +5,9 @@ import scipy.stats as sps
 def detect_events_cache(csid):
     return detect_events(csid)
 
-def detect_events(data, csid):
+def detect_events(data, cell_index, stimulus):
 
-    stimulus_table = data.get_stimulus_table('locally_sparse_noise')
-    cell_index = data.get_cell_specimen_indices(cell_specimen_ids=[csid])[0]
+    stimulus_table = data.get_stimulus_table(stimulus)
     dff_trace = data.get_dff_traces()[1][cell_index, :]
 
     k_min = 0
@@ -86,20 +85,9 @@ def detect_events(data, csid):
         else:
             no_set.add(ii)
 
-    assert len(var_dict) == 8880
-    b = np.zeros(8880, dtype=np.bool)
+    assert len(var_dict) == len(stimulus_table)
+    b = np.zeros(len(stimulus_table), dtype=np.bool)
     for yi in yes_set:
         b[yi] = True
 
     return b
-
-if __name__ == "__main__":
-
-    csid = 541095385
-    b = detect_events(csid)
-    assert b.sum() == 423 # 422 by old method
-
-
-    csid = 540988186
-    b = detect_events_cache(csid)
-    assert b.sum() == 113 # 113 by old method

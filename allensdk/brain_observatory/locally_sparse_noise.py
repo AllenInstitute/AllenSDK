@@ -18,7 +18,7 @@ import h5py
 import numpy as np
 import pandas as pd
 import scipy.ndimage
-from .receptive_field_analysis import receptive_field_analysis
+from .receptive_field_analysis.receptive_field import get_receptive_field_data_dict_with_postprocessing
 from .receptive_field_analysis.visualization import plot_receptive_field_data
 
 from . import circle_plots as cplots
@@ -71,7 +71,7 @@ class LocallySparseNoise(StimulusAnalysis):
         self._extralength = LocallySparseNoise._PRELOAD
         self._mean_response = LocallySparseNoise._PRELOAD
         self._receptive_field = LocallySparseNoise._PRELOAD
-        self._csid_receptive_field_analysis_data_dict = LocallySparseNoise._PRELOAD
+        self._cell_index_receptive_field_analysis_data_dict = LocallySparseNoise._PRELOAD
 
     @property
     def LSN(self):
@@ -116,11 +116,11 @@ class LocallySparseNoise(StimulusAnalysis):
         return self._receptive_field
 
     @property
-    def csid_receptive_field_analysis_data_dict(self):
-        if self._csid_receptive_field_analysis_data_dict is LocallySparseNoise._PRELOAD:
-            self._csid_receptive_field_analysis_data_dict = self.get_receptive_field_analysis_data()
+    def cell_index_receptive_field_analysis_data_dict(self):
+        if self._cell_index_receptive_field_analysis_data_dict is LocallySparseNoise._PRELOAD:
+            self._cell_index_receptive_field_analysis_data_dict = self.get_receptive_field_analysis_data()
 
-        return self._csid_receptive_field_analysis_data_dict
+        return self._cell_index_receptive_field_analysis_data_dict
 
     @property
     def mean_response(self):
@@ -161,12 +161,9 @@ class LocallySparseNoise(StimulusAnalysis):
         '''
 
         receptive_field = np.zeros((self.nrows, self.ncols, self.numbercells, 2))
-        csid_list = self.data_set.get_cell_specimen_ids()
-        assert len(csid_list) == len(self.csid_receptive_field_analysis_data_dict)
 
-        for csid in csid_list:
-            cell_index = self.data_set.get_cell_specimen_indices(cell_specimen_ids=[csid])[0]
-            curr_receptive_field_data_dict = self.csid_receptive_field_analysis_data_dict[str(csid)]
+        for cell_index in range(len(self.cell_index_receptive_field_analysis_data_dict)):
+            curr_receptive_field_data_dict = self.cell_index_receptive_field_analysis_data_dict[str(cell_index)]
             rf_on = curr_receptive_field_data_dict['on']['rts_convolution']['data'].copy()
             rf_off = curr_receptive_field_data_dict['off']['rts_convolution']['data'].copy()
             rf_on[np.logical_not(curr_receptive_field_data_dict['on']['fdr_mask']['data'].sum(axis=0))] = np.nan
@@ -181,18 +178,22 @@ class LocallySparseNoise(StimulusAnalysis):
         ''' Calculates receptive fields for each cell
         '''
 
-        print("Calculating receptive analysis")
-        csid_receptive_field_analysis_data_dict = receptive_field_analysis(self)
-        return csid_receptive_field_analysis_data_dict
+        csid_receptive_field_data_dict = {}
+        for cell_index in range(self.data_set.number_of_cells):
+            csid_receptive_field_data_dict[str(cell_index)] = get_receptive_field_data_dict_with_postprocessing(
+                self.data_set, cell_index, self.stimulus, alpha=.05, number_of_shuffles=5000)
 
-    def plot_receptive_field_analysis_data(self, csid, **kwargs):
-        receptive_field_data_dict = self._csid_receptive_field_analysis_data_dict[str(csid)]
+        return csid_receptive_field_data_dict
+
+
+    def plot_receptive_field_analysis_data(self, cell_index, **kwargs):
+        receptive_field_data_dict = self._cell_index_receptive_field_analysis_data_dict[str(cell_index)]
         return plot_receptive_field_data(receptive_field_data_dict, self, **kwargs)
 
     def get_receptive_field_attribute_df(self):
 
         df_list = []
-        for csid_as_str, receptive_field_data_dict in self.csid_receptive_field_analysis_data_dict.items():
+        for cell_index_as_str, receptive_field_data_dict in self.cell_index_receptive_field_analysis_data_dict.items():
 
             attribute_dict = {}
             for x in dict_generator(receptive_field_data_dict):
@@ -217,8 +218,8 @@ class LocallySparseNoise(StimulusAnalysis):
         return attribute_df
 
     @staticmethod
-    def merge_receptive_fields(rc1, rc2):
-        """ TODO
+    def merge_mean_response(rc1, rc2):
+        """ Move out of this class, to session analysis
         """
 
         # make sure that rc1 is the larger one
@@ -286,16 +287,23 @@ class LocallySparseNoise(StimulusAnalysis):
 
         lsn.populate_stimulus_table()
 
+        if stimulus == stimulus_info.LOCALLY_SPARSE_NOISE:
+            stimulus_suffix = ''
+        elif stimulus == stimulus_info.LOCALLY_SPARSE_NOISE_4DEG:
+            stimulus_suffix = '4'
+        elif stimulus == stimulus_info.LOCALLY_SPARSE_NOISE_8DEG:
+            stimulus_suffix = '8'
+
         try:
 
-            lsn._sweep_response = pd.read_hdf(analysis_file, "analysis/sweep_response_lsn")
-            lsn._mean_sweep_response = pd.read_hdf(analysis_file, "analysis/mean_sweep_response_lsn")
+            with h5py.File(analysis_file, "r") as f:
+                lsn._mean_response = f["analysis/mean_response_lsn%s" % stimulus_suffix].value
+
+            lsn._sweep_response = pd.read_hdf(analysis_file, "analysis/sweep_response_lsn%s" % stimulus_suffix)
+            lsn._mean_sweep_response = pd.read_hdf(analysis_file, "analysis/mean_sweep_response_lsn%s" % stimulus_suffix)
 
             with h5py.File(analysis_file, "r") as f:
-                lsn._mean_response = f["analysis/mean_response_lsn"].value
-
-            with h5py.File(analysis_file, "r") as f:
-                lsn._csid_receptive_field_analysis_data_dict = LocallySparseNoise.read_csid_receptive_field_analysis_dict(f)
+                lsn._cell_index_receptive_field_analysis_data_dict = LocallySparseNoise.read_cell_index_receptive_field_analysis_dict(f, stimulus)
 
         except Exception as e:
             raise MissingStimulusException(e.args)
@@ -303,16 +311,14 @@ class LocallySparseNoise(StimulusAnalysis):
         return lsn
 
     @staticmethod
-    def save_csid_receptive_field_analysis_dict(csid_receptive_field_analysis_data_dict, new_nwb):
-
-        prefix = 'receptive_field_analysis'
+    def save_cell_index_receptive_field_analysis_dict(cell_index_receptive_field_analysis_data_dict, new_nwb, prefix):
 
         attr_list = []
         file_handle = h5py.File(new_nwb.nwb_file, 'a')
         if prefix in file_handle['analysis']:
             del file_handle['analysis'][prefix]
         f = file_handle.create_group('analysis/%s' % prefix)
-        for x in dict_generator(csid_receptive_field_analysis_data_dict):
+        for x in dict_generator(cell_index_receptive_field_analysis_data_dict):
             if x[-2] == 'data':
                 f['/'.join(x[:-1])] = x[-1]
             elif x[-3] == 'attrs':
@@ -335,9 +341,7 @@ class LocallySparseNoise(StimulusAnalysis):
         
 
     @staticmethod
-    def read_csid_receptive_field_analysis_dict(file_handle, path=None):
-
-        prefix = 'receptive_field_analysis'
+    def read_cell_index_receptive_field_analysis_dict(file_handle, prefix, path=None):
 
         f = file_handle['analysis/%s' % prefix]
         if path is None:
@@ -346,3 +350,4 @@ class LocallySparseNoise(StimulusAnalysis):
             receptive_field_data_dict = read_h5_group(f[path])
 
         return receptive_field_data_dict
+
