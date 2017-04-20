@@ -16,7 +16,7 @@
 import pandas as pd
 from six import string_types
 from .rma_template import RmaTemplate
-from ..cache import cacheable
+from ..cache import cacheable, Cache
 from allensdk.config.manifest import Manifest
 import allensdk.brain_observatory.stimulus_info as stimulus_info
 import logging
@@ -127,6 +127,7 @@ class BrainObservatoryApi(RmaTemplate):
         super(BrainObservatoryApi, self).__init__(base_uri,
                                                   query_manifest=BrainObservatoryApi.rma_templates)
 
+    @cacheable()
     def get_ophys_experiments(self, ophys_experiment_ids=None):
         ''' Get OPhys Experiments by id
 
@@ -215,7 +216,7 @@ class BrainObservatoryApi(RmaTemplate):
 
         return data
 
-    # TODO: search by item type and level
+    @cacheable()
     def get_stimulus_mappings(self, stimulus_mapping_ids=None):
         ''' Get stimulus mappings by id
 
@@ -256,6 +257,7 @@ class BrainObservatoryApi(RmaTemplate):
 
         return data
 
+    @cacheable()
     def get_experiment_containers(self, experiment_container_ids=None):
         ''' Get experiment container by id
 
@@ -292,9 +294,9 @@ class BrainObservatoryApi(RmaTemplate):
 
         return data
 
+    @cacheable(strategy='create',
+               pathfinder=Cache.pathfinder(file_name_position=2))
     def save_ophys_experiment_data(self, ophys_experiment_id, file_name):
-        Manifest.safe_make_parent_dirs(file_name)
-
         data = self.template_query('brain_observatory_queries',
                                    'ophys_experiment_data',
                                    ophys_experiment_id=ophys_experiment_id)

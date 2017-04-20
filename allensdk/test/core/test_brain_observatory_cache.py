@@ -93,7 +93,9 @@ def test_get_all_targeted_structures(brain_observatory_cache):
 
         with patch('allensdk.core.json_utilities.write',
                    MagicMock(name='write_json')):
-            brain_observatory_cache.get_all_targeted_structures()
+            with patch('allensdk.core.json_utilities.read',
+                       MagicMock(name='read_json')):
+                brain_observatory_cache.get_all_targeted_structures()
 
         brain_observatory_cache.api.json_msg_query.assert_called_once_with(
             "http://api.brain-map.org/api/v2/data/query.json?q="
@@ -110,9 +112,11 @@ def test_get_experiment_containers(brain_observatory_cache):
 
         with patch('allensdk.core.json_utilities.write',
                    MagicMock(name='write_json')):
-            # Download experiment containers for VISp experiments
-            visp_ecs = brain_observatory_cache.get_experiment_containers(
-                targeted_structures=['VISp'])
+            with patch('allensdk.core.json_utilities.read',
+                       MagicMock(name='read_json')):
+                # Download experiment containers for VISp experiments
+                visp_ecs = brain_observatory_cache.get_experiment_containers(
+                    targeted_structures=['VISp'])
 
     brain_observatory_cache.api.json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
@@ -128,8 +132,10 @@ def test_get_all_cre_lines(brain_observatory_cache):
 
         with patch('allensdk.core.json_utilities.write',
                    MagicMock(name='write_json')):
-            # Download a list of all cre lines
-            tls = brain_observatory_cache.get_all_cre_lines()
+            with patch('allensdk.core.json_utilities.read',
+                       MagicMock(name='read_json')):
+                # Download a list of all cre lines
+                tls = brain_observatory_cache.get_all_cre_lines()
 
     brain_observatory_cache.api.json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
@@ -145,8 +151,10 @@ def test_get_ophys_experiments(brain_observatory_cache):
 
         with patch('allensdk.core.json_utilities.write',
                    MagicMock(name='write_json')):
-            # Download a list of all transgenic driver lines
-            tls = brain_observatory_cache.get_ophys_experiments()
+            with patch('allensdk.core.json_utilities.read',
+                       MagicMock(name='read_json')):
+                # Download a list of all transgenic driver lines
+                tls = brain_observatory_cache.get_ophys_experiments()
 
     brain_observatory_cache.api.json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
@@ -162,8 +170,10 @@ def test_get_all_session_types(brain_observatory_cache):
 
         with patch('allensdk.core.json_utilities.write',
                    MagicMock(name='write_json')):
-            # Download a list of all transgenic driver lines
-            tls = brain_observatory_cache.get_all_session_types()
+            with patch('allensdk.core.json_utilities.read',
+                       MagicMock(name='read_json')):
+                # Download a list of all transgenic driver lines
+                tls = brain_observatory_cache.get_all_session_types()
 
     brain_observatory_cache.api.json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
@@ -179,8 +189,10 @@ def test_get_stimulus_mappings(brain_observatory_cache):
 
         with patch('allensdk.core.json_utilities.write',
                    MagicMock(name='write_json')):
-            # Download a list of all transgenic driver lines
-            tls = brain_observatory_cache._get_stimulus_mappings()
+            with patch('allensdk.core.json_utilities.read',
+                       MagicMock(name='read_json')):
+                # Download a list of all transgenic driver lines
+                tls = brain_observatory_cache._get_stimulus_mappings()
 
     brain_observatory_cache.api.json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
