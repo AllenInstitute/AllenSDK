@@ -15,7 +15,7 @@
 
 from ..api import Api
 import os
-import json
+import simplejson as json
 from collections import OrderedDict
 from allensdk.config.manifest import Manifest
 
