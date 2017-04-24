@@ -400,8 +400,8 @@ class StaticGratings(StimulusAnalysis):
 
     def get_signal_corr(self, corr='spearman'):
 
-        response = self.response[:, :, :, :self.numbercells, 0] # orientation x freq x phase x cell
-        response = response.reshape(self.number_ori * self.number_sf * self.number_phase, self.numbercells).T
+        response = self.response[:, 1:, :, :self.numbercells, 0] # orientation x freq x phase x cell, no blank
+        response = response.reshape(self.number_ori * (self.number_sf-1) * self.number_phase, self.numbercells).T
         N, Nstim = response.shape
 
         signal_corr = np.zeros((N, N))
@@ -427,8 +427,8 @@ class StaticGratings(StimulusAnalysis):
 
     def get_representational_similarity(self, corr='spearman'):
 
-        response = self.response[:, :, :, :self.numbercells, 0] # orientation x freq x phase x cell
-        response = response.reshape(self.number_ori * self.number_sf * self.number_phase, self.numbercells)
+        response = self.response[:, 1:, :, :self.numbercells, 0] # orientation x freq x phase x cell
+        response = response.reshape(self.number_ori * (self.number_sf-1) * self.number_phase, self.numbercells)
         Nstim, N = response.shape
 
         rep_sim = np.zeros((Nstim, Nstim))

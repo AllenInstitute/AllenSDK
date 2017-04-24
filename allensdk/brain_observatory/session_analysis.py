@@ -232,9 +232,9 @@ class SessionAnalysis(object):
         self.verify_roi_lists_equal(sg.roi_id, ns.roi_id)
         self.metrics_b["roi_id"] = sg.roi_id
 
-        sg.noise_correlation = sg.get_noise_correlation()[0]
-        sg.signal_correlation = sg.get_signal_corr()[0]
-        sg.representational_similarity = sg.get_representational_similarity()[0]
+        sg.noise_correlation, _, _, _ = sg.get_noise_correlation()
+        sg.signal_correlation, _ = sg.get_signal_corr()
+        sg.representational_similarity, _ = sg.get_representational_similarity()
 
         ns.noise_correlation, _ = ns.get_noise_correlation()
         ns.signal_correlation, _ = ns.get_signal_corr()
