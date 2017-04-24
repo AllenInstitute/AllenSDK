@@ -300,7 +300,7 @@ class DriftingGratings(StimulusAnalysis):
         :return: response array in cells x stim x repetition for noise correlations
         '''
 
-        mean_sweep_response = self.mean_sweep_response.values[:, :self.numbercells].as_matrix()
+        mean_sweep_response = self.mean_sweep_response.values[:, :self.numbercells]
 
         reps = []
         stim_table = self.stim_table
@@ -310,7 +310,7 @@ class DriftingGratings(StimulusAnalysis):
 
         response_new = np.zeros((self.numbercells, self.number_ori, self.number_tf-1), dtype='object')
 
-        for i, ori in enumerate(self.ori_vals):
+        for i, ori in enumerate(self.orivals):
             for j, tf in enumerate(tfvals):
                     ind = (stim_table.orientation.values == ori) * (stim_table.temporal_frequency.values == tf)
                     for c in range(self.numbercells):
@@ -321,7 +321,7 @@ class DriftingGratings(StimulusAnalysis):
 
         return response_new, response_blank
 
-    def get_signal_corr(self, corr='pearson'):
+    def get_signal_corr(self, corr='spearman'):
 
         response = self.response[:, :, :self.numbercells, 0] # orientation x freq x cell
         response = response.reshape(self.number_ori * self.number_tf, self.numbercells).T
@@ -348,7 +348,7 @@ class DriftingGratings(StimulusAnalysis):
         return signal_corr, signal_p
 
 
-    def get_representational_similarity(self, corr='pearson'):
+    def get_representational_similarity(self, corr='spearman'):
 
         response = self.response[:, :, :self.numbercells, 0] # orientation x freq x phase x cell
         response = response.reshape(self.number_ori * self.number_tf, self.numbercells)
@@ -375,7 +375,7 @@ class DriftingGratings(StimulusAnalysis):
         return rep_sim, rep_sim_p
 
 
-    def get_noise_correlation(self, corr='pearson'):
+    def get_noise_correlation(self, corr='spearman'):
 
         response, response_blank = self.reshape_response_array()
         noise_corr = np.zeros((self.numbercells, self.numbercells, self.number_ori, self.number_tf-1))

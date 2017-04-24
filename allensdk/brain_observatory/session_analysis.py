@@ -107,7 +107,7 @@ class SessionAnalysis(object):
             ('binned_cells_sp', nm1.binned_cells_sp),
             ('binned_cells_vis', nm1.binned_cells_vis),
             ('binned_dx_sp', nm1.binned_dx_sp),
-            ('binned_dx_vis', nm1.binned_dx_vis)
+            ('binned_dx_vis', nm1.binned_dx_vis),
             ('noise_corr_sg', sg.noise_correlation),
             ('signal_corr_sg', sg.signal_correlation),
             ('rep_similarity_sg', sg.representational_similarity),
@@ -232,11 +232,11 @@ class SessionAnalysis(object):
         self.verify_roi_lists_equal(sg.roi_id, ns.roi_id)
         self.metrics_b["roi_id"] = sg.roi_id
 
-        sg.noise_correlation, _, _, _ = sg.get_noise_correlation()
-        sg.signal_correlation, _ = sg.get_signal_corr()
-        sg.representational_similarity, _ = sg.get_representational_similarity()
+        sg.noise_correlation = sg.get_noise_correlation()[0]
+        sg.signal_correlation = sg.get_signal_corr()[0]
+        sg.representational_similarity = sg.get_representational_similarity()[0]
 
-        ns.noise_correlation, _, _, _ = ns.get_noise_correlation()
+        ns.noise_correlation, _ = ns.get_noise_correlation()
         ns.signal_correlation, _ = ns.get_signal_corr()
         ns.representational_similarity, _ = ns.get_representational_similarity()
 
