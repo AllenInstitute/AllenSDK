@@ -406,7 +406,7 @@ class DriftingGratings(StimulusAnalysis):
                         for j in range(i, self.numbercells):
                             noise_corr[i, j, k, l], noise_corr_p[i, j, k, l] = st.spearmanr(response[i, k, l], response[j, k, l])
 
-                    noise_corr[:, :, k, l, m] = np.triu(noise_corr[:, :, k, l]) + np.triu(noise_corr[:, :, k, l], 1).T
+                    noise_corr[:, :, k, l] = np.triu(noise_corr[:, :, k, l]) + np.triu(noise_corr[:, :, k, l], 1).T
 
             for i in range(self.numbercells):
                 for j in range(i, self.numbercells):
