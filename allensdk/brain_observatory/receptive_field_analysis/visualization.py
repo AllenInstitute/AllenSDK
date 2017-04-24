@@ -52,9 +52,10 @@ def plot_receptive_field_data(receptive_field_data_dict, lsn, show=True, save_fi
     ax_list += [curr_axes]
     chi_squared_grid = receptive_field_data_dict['chi_squared_analysis']['pvalues']['data']
     chi_square_grid_NLL = pvalue_to_NLL(chi_squared_grid)
-    img = curr_axes.imshow(chi_square_grid_NLL, interpolation='none', origin='lower')
+    clim = (0, max(2,chi_square_grid_NLL.max()))
+    img = curr_axes.imshow(chi_square_grid_NLL, interpolation='none', origin='lower', clim=clim)
 
-    cb = curr_axes.figure.colorbar(img, ax=curr_axes)
+    cb = curr_axes.figure.colorbar(img, ax=curr_axes, ticks=clim)
     tick_locator = ticker.MaxNLocator(nbins=5)
     cb.locator = tick_locator
     cb.update_ticks()

@@ -2,13 +2,14 @@ from .utilities import smooth
 import numpy as np
 import scipy.stats as sps
 
-def detect_events_cache(csid):
-    return detect_events(csid)
+def detect_events(data, cell_index, stimulus, debug_plots=False):
 
-def detect_events(data, cell_index, stimulus):
+
 
     stimulus_table = data.get_stimulus_table(stimulus)
     dff_trace = data.get_dff_traces()[1][cell_index, :]
+
+
 
     k_min = 0
     k_max = 10
@@ -16,7 +17,10 @@ def detect_events(data, cell_index, stimulus):
 
     dff_trace = smooth(dff_trace, 5)
 
+
+
     var_dict = {}
+    debug_dict = {}
     for ii, fi in enumerate(stimulus_table['start'].values):
 
         if ii > 0 and stimulus_table.iloc[ii].start == stimulus_table.iloc[ii-1].end:
@@ -33,6 +37,7 @@ def detect_events(data, cell_index, stimulus):
                      (trace - trace[0])[delta + 4] - (trace - trace[0])[0 + 4])
 
             var_dict[ii] = (trace[0], trace[-1], xx, yy)
+            debug_dict[fi + k_min+1+offset] = (ii, trace)
 
     xx_list, yy_list = [], []
     for _, _, xx, yy in var_dict.itervalues():
@@ -85,9 +90,33 @@ def detect_events(data, cell_index, stimulus):
         else:
             no_set.add(ii)
 
+
+
     assert len(var_dict) == len(stimulus_table)
     b = np.zeros(len(stimulus_table), dtype=np.bool)
     for yi in yes_set:
         b[yi] = True
+
+    if debug_plots == True:
+        import matplotlib.pyplot as plt
+        fig, ax = plt.subplots(1,2)
+        # ax[0].plot(dff_trace)
+        for key, val in debug_dict.iteritems():
+            ti, trace = val
+            if ti in no_set:
+                ax[0].plot(np.arange(key, key+len(trace)), trace, 'b')
+            elif ti in yes_set:
+                ax[0].plot(np.arange(key, key + len(trace)), trace, 'r', linewidth=2)
+            else:
+                raise Exception
+
+        for ii in yes_set:
+            ax[1].plot([var_dict[ii][2]], [var_dict[ii][3]], 'r.')
+
+        for ii in no_set:
+            ax[1].plot([var_dict[ii][2]], [var_dict[ii][3]], 'b.')
+
+        print 'number_of_events:', b.sum()
+        plt.show()
 
     return b

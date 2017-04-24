@@ -181,7 +181,7 @@ class LocallySparseNoise(StimulusAnalysis):
         csid_receptive_field_data_dict = {}
         for cell_index in range(self.data_set.number_of_cells):
             csid_receptive_field_data_dict[str(cell_index)] = get_receptive_field_data_dict_with_postprocessing(
-                self.data_set, cell_index, self.stimulus, alpha=.05, number_of_shuffles=5000)
+                self.data_set, cell_index, self.stimulus, alpha=.05, number_of_shuffles=10000)
 
         return csid_receptive_field_data_dict
 
