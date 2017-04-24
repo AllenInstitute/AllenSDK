@@ -17,6 +17,7 @@
 from __future__ import division, print_function, absolute_import
 import re
 import operator as op
+from six import iteritems
 
 import numpy as np
 
@@ -292,7 +293,7 @@ class StructureTree( SimpleTree ):
         for ii, val in enumerate(structures):
 
             StructureTree.collect_sets(val)
-            structures[ii] = {k: field_whitelist[k](v) for k, v in val.iteritems()}
+            structures[ii] = {k: field_whitelist[k](v) for k, v in iteritems(val)}
 
         return structures
 
