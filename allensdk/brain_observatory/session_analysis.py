@@ -75,7 +75,6 @@ class SessionAnalysis(object):
             ('sweep_response_nm3', nm3.sweep_response))
 
         nwb.save_analysis_arrays(
-            ('celltraces_dff', nm1.dfftraces),
             ('response_dg', dg.response),
             ('binned_cells_sp', nm1.binned_cells_sp),
             ('binned_cells_vis', nm1.binned_cells_vis),
@@ -96,7 +95,6 @@ class SessionAnalysis(object):
             ('peak', peak))
 
         nwb.save_analysis_arrays(
-            ('celltraces_dff', nm1.dfftraces),
             ('response_sg', sg.response),
             ('response_ns', ns.response),
             ('binned_cells_sp', nm1.binned_cells_sp),
@@ -116,7 +114,6 @@ class SessionAnalysis(object):
 
         nwb.save_analysis_arrays(
             ('receptive_field_lsn', lsn.receptive_field),
-            ('celltraces_dff', nm1.dfftraces),
             ('binned_dx_sp', nm1.binned_dx_sp),
             ('binned_dx_vis', nm1.binned_dx_vis),
             ('binned_cells_sp', nm1.binned_cells_sp),
@@ -143,7 +140,6 @@ class SessionAnalysis(object):
             ('receptive_field_lsn4', lsn4.receptive_field),
             ('receptive_field_lsn8', lsn8.receptive_field),
             ('receptive_field_lsn', merged_receptive_field),
-            ('celltraces_dff', nm1.dfftraces),
             ('binned_dx_sp', nm1.binned_dx_sp),
             ('binned_dx_vis', nm1.binned_dx_vis),
             ('binned_cells_sp', nm1.binned_cells_sp),

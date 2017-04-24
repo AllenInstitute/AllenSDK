@@ -807,10 +807,11 @@ def make_display_mask(display_shape=(1920, 1200)):
     for i in range(off_warped_coords.shape[1]):
         used_coords.add((off_warped_coords[0, i], off_warped_coords[1, i]))
 
-    used_coords = (np.array([x for (x, y) in used_coords]),
-                   np.array([y for (x, y) in used_coords]))
+    used_coords = (np.array([x for (x, y) in used_coords]).astype(int),
+                   np.array([y for (x, y) in used_coords]).astype(int))
 
     mask = np.zeros(display_shape)
+
     mask[used_coords] = 1
 
     return mask
@@ -864,6 +865,7 @@ def _get_abstract_feature_series_stimulus_table(nwb_file, stimulus_name):
     stimulus table: pd.DataFrame
     '''
 
+
     k = "stimulus/presentation/%s" % stimulus_name
 
     with h5py.File(nwb_file, 'r') as f:
@@ -871,7 +873,7 @@ def _get_abstract_feature_series_stimulus_table(nwb_file, stimulus_name):
             raise MissingStimulusException(
                 "Stimulus not found: %s" % stimulus_name)
         stim_data = f[k + '/data'].value
-        features = f[k + '/features'].value
+        features = [ v.decode('UTF-8') for v in f[k + '/features'].value ]
         frame_dur = f[k + '/frame_duration'].value
 
     stimulus_table = pd.DataFrame(stim_data, columns=features)
