@@ -230,7 +230,8 @@ class NaturalScenes(StimulusAnalysis):
 
         return response_new
 
-    def get_signal_corr(self, corr='spearman'):
+    def get_signal_correlation(self, corr='spearman'):
+        logging.debug("Calculating signal correlations")
 
         response = self.response[:, :, 0].T
         response = response[:self.numbercells, :]
@@ -257,6 +258,7 @@ class NaturalScenes(StimulusAnalysis):
         return signal_corr, signal_p
 
     def get_representational_similarity(self, corr='spearman'):
+        logging.debug("Calculating representational similarity")
 
         response = self.response[:, :, 0]
         response = response[:, :self.numbercells]
@@ -283,6 +285,7 @@ class NaturalScenes(StimulusAnalysis):
         return rep_sim, rep_sim_p
 
     def get_noise_correlation(self, corr='spearman'):
+        logging.debug("Calculating noise correlations")
 
         response = self.reshape_response_array()
         noise_corr = np.zeros((self.numbercells, self.numbercells, self.number_scenes))

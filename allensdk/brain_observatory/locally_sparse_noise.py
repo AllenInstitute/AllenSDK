@@ -121,7 +121,7 @@ class LocallySparseNoise(StimulusAnalysis):
     def get_receptive_field(self):
         ''' Calculates receptive fields for each cell
         '''
-        print("Calculating mean responses")
+        logging.debug("Calculating mean responses")
         receptive_field = np.empty(
             (self.nrows, self.ncols, self.numbercells + 1, 2))
 

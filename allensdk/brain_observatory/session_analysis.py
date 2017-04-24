@@ -194,6 +194,10 @@ class SessionAnalysis(object):
         nm3 = NaturalMovie(self.nwb, 'natural_movie_three')
         dg = DriftingGratings(self.nwb)
 
+        dg.noise_correlation, _, _, _ = dg.get_noise_correlation()
+        dg.signal_correlation, _ = dg.get_signal_correlation()
+        dg.representational_similarity, _ = dg.get_representational_similarity()
+
         SessionAnalysis._log.info("Session A analyzed")
         peak = multi_dataframe_merge(
             [nm1.peak_run, dg.peak, nm1.peak, nm3.peak])
@@ -202,10 +206,6 @@ class SessionAnalysis(object):
         self.metrics_a["roi_id"] = dg.roi_id
 
         self.append_metadata(peak)
-
-        dg.noise_correlation, _, _, _ = dg.get_noise_correlation()
-        dg.signal_correlation, _ = dg.get_signal_corr()
-        dg.representational_similarity, _ = dg.get_representational_similarity()
 
         if save_flag:
             self.save_session_a(dg, nm1, nm3, peak)
@@ -229,11 +229,11 @@ class SessionAnalysis(object):
         self.metrics_b["roi_id"] = sg.roi_id
 
         sg.noise_correlation, _, _, _ = sg.get_noise_correlation()
-        sg.signal_correlation, _ = sg.get_signal_corr()
+        sg.signal_correlation, _ = sg.get_signal_correlation()
         sg.representational_similarity, _ = sg.get_representational_similarity()
 
         ns.noise_correlation, _ = ns.get_noise_correlation()
-        ns.signal_correlation, _ = ns.get_signal_corr()
+        ns.signal_correlation, _ = ns.get_signal_correlation()
         ns.representational_similarity, _ = ns.get_representational_similarity()
 
         if save_flag:
