@@ -79,7 +79,12 @@ class SessionAnalysis(object):
             ('binned_cells_sp', nm1.binned_cells_sp),
             ('binned_cells_vis', nm1.binned_cells_vis),
             ('binned_dx_sp', nm1.binned_dx_sp),
-            ('binned_dx_vis', nm1.binned_dx_vis))
+            ('binned_dx_vis', nm1.binned_dx_vis),
+            ('noise_corr_dg', dg.noise_correlation),
+            ('signal_corr_dg', dg.signal_correlation),
+            ('rep_similarity_dg', dg.representational_similarity)
+            )
+
 
     def save_session_b(self, sg, nm1, ns, peak):
         nwb = BrainObservatoryNwbDataSet(self.save_path)
@@ -100,7 +105,14 @@ class SessionAnalysis(object):
             ('binned_cells_sp', nm1.binned_cells_sp),
             ('binned_cells_vis', nm1.binned_cells_vis),
             ('binned_dx_sp', nm1.binned_dx_sp),
-            ('binned_dx_vis', nm1.binned_dx_vis))
+            ('binned_dx_vis', nm1.binned_dx_vis),
+            ('noise_corr_sg', sg.noise_correlation),
+            ('signal_corr_sg', sg.signal_correlation),
+            ('rep_similarity_sg', sg.representational_similarity),
+            ('noise_corr_ns', ns.noise_correlation),
+            ('signal_corr_ns', ns.signal_correlation),
+            ('rep_similarity_ns', ns.representational_similarity)
+            )
 
     def save_session_c(self, lsn, nm1, nm2, peak):
         nwb = BrainObservatoryNwbDataSet(self.save_path)
@@ -191,6 +203,10 @@ class SessionAnalysis(object):
 
         self.append_metadata(peak)
 
+        dg.noise_correlation, _, _, _ = dg.get_noise_correlation()
+        dg.signal_correlation, _ = dg.get_signal_corr()
+        dg.representational_similarity, _ = dg.get_representational_similarity()
+
         if save_flag:
             self.save_session_a(dg, nm1, nm3, peak)
 
@@ -211,6 +227,14 @@ class SessionAnalysis(object):
         self.append_metrics_natural_scene(self.metrics_b, ns)
         self.verify_roi_lists_equal(sg.roi_id, ns.roi_id)
         self.metrics_b["roi_id"] = sg.roi_id
+
+        sg.noise_correlation, _, _, _ = sg.get_noise_correlation()
+        sg.signal_correlation, _ = sg.get_signal_corr()
+        sg.representational_similarity, _ = sg.get_representational_similarity()
+
+        ns.noise_correlation, _ = ns.get_noise_correlation()
+        ns.signal_correlation, _ = ns.get_signal_corr()
+        ns.representational_similarity, _ = ns.get_representational_similarity()
 
         if save_flag:
             self.save_session_b(sg, nm1, ns, peak)

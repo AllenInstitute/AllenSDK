@@ -209,7 +209,108 @@ class NaturalScenes(StimulusAnalysis):
                 clim=[cmin, cmax])
         cp.show_arrow()
 
-    
+    def reshape_response_array(self):
+        '''
+        :return: response array in cells x stim x repetition for noise correlations
+        '''
+
+        mean_sweep_response = self.mean_sweep_response.values[:, :self.numbercells]
+
+        stim_table = self.stim_table
+        frames = np.unique(stim_table.frame.values)
+
+        reps = [len(np.where(stim_table.frame.values == frame)[0]) for frame in frames]
+        Nreps = min(reps) # just in case there are different numbers of repetitions
+
+        response_new = np.zeros((self.numbercells, self.number_scenes), dtype='object')
+        for i, frame in enumerate(frames):
+            ind = np.where(stim_table.frame.values == frame)[0][:Nreps]
+            for c in range(self.numbercells):
+                response_new[c, i] = mean_sweep_response[ind, c]
+
+        return response_new
+
+    def get_signal_corr(self, corr='spearman'):
+
+        response = self.response[:, :, 0].T
+        response = response[:self.numbercells, :]
+        N, Nstim = response.shape
+
+        signal_corr = np.zeros((N, N))
+        signal_p = np.empty((N, N))
+        if corr == 'pearson':
+            for i in range(N):
+                for j in range(i, N): # matrix is symmetric
+                    signal_corr[i, j], signal_p[i, j] = st.pearsonr(response[i], response[j])
+
+        elif corr == 'spearman':
+            for i in range(N):
+                for j in range(i, N): # matrix is symmetric
+                    signal_corr[i, j], signal_p[i, j] = st.spearmanr(response[i], response[j])
+
+        else:
+            raise Exception('correlation should be pearson or spearman')
+
+        signal_corr = np.triu(signal_corr) + np.triu(signal_corr, 1).T  # fill in lower triangle
+        signal_p = np.triu(signal_p) + np.triu(signal_p, 1).T  # fill in lower triangle
+
+        return signal_corr, signal_p
+
+    def get_representational_similarity(self, corr='spearman'):
+
+        response = self.response[:, :, 0]
+        response = response[:, :self.numbercells]
+        Nstim, N = response.shape
+
+        rep_sim = np.zeros((Nstim, Nstim))
+        rep_sim_p = np.empty((Nstim, Nstim))
+        if corr == 'pearson':
+            for i in range(Nstim):
+                for j in range(i, Nstim): # matrix is symmetric
+                    rep_sim[i, j], rep_sim_p[i, j] = st.pearsonr(response[i], response[j])
+
+        elif corr == 'spearman':
+            for i in range(Nstim):
+                for j in range(i, Nstim): # matrix is symmetric
+                    rep_sim[i, j], rep_sim_p[i, j] = st.spearmanr(response[i], response[j])
+
+        else:
+            raise Exception('correlation should be pearson or spearman')
+
+        rep_sim = np.triu(rep_sim) + np.triu(rep_sim, 1).T # fill in lower triangle
+        rep_sim_p = np.triu(rep_sim_p) + np.triu(rep_sim_p, 1).T  # fill in lower triangle
+
+        return rep_sim, rep_sim_p
+
+    def get_noise_correlation(self, corr='spearman'):
+
+        response = self.reshape_response_array()
+        noise_corr = np.zeros((self.numbercells, self.numbercells, self.number_scenes))
+        noise_corr_p = np.zeros((self.numbercells, self.numbercells, self.number_scenes))
+
+        if corr == 'pearson':
+            for k in range(self.number_scenes):
+                for i in range(self.numbercells):
+                    for j in range(i, self.numbercells):
+                        noise_corr[i, j, k], noise_corr_p[i, j, k] = st.pearsonr(response[i, k], response[j, k])
+
+                noise_corr[:, :, k] = np.triu(noise_corr[:, :, k]) + np.triu(noise_corr[:, :, k], 1).T
+                noise_corr_p[:, :, k] = np.triu(noise_corr_p[:, :, k]) + np.triu(noise_corr_p[:, :, k], 1).T
+
+        elif corr == 'spearman':
+            for k in range(self.number_scenes):
+                for i in range(self.numbercells):
+                    for j in range(i, self.numbercells):
+                        noise_corr[i, j, k], noise_corr_p[i, j, k] = st.spearmanr(response[i, k], response[j, k])
+
+                noise_corr[:, :, k] = np.triu(noise_corr[:, :, k]) + np.triu(noise_corr[:, :, k], 1).T
+                noise_corr_p[:, :, k] = np.triu(noise_corr_p[:, :, k]) + np.triu(noise_corr_p[:, :, k], 1).T
+
+        else:
+            raise Exception('correlation should be pearson or spearman')
+
+        return noise_corr, noise_corr_p
+
     @staticmethod
     def from_analysis_file(data_set, analysis_file):
         ns = NaturalScenes(data_set)
@@ -226,6 +327,14 @@ class NaturalScenes(StimulusAnalysis):
                 ns._binned_cells_sp = f["analysis/binned_cells_sp"].value
                 ns._binned_dx_vis = f["analysis/binned_dx_vis"].value
                 ns._binned_cells_vis = f["analysis/binned_cells_vis"].value
+
+                if "analysis/noise_corr_dg" in f:
+                    ns.noise_correlation = f["analysis/noise_corr_ns"].value
+                if "analysis/signal_corr_dg" in f:
+                    ns.signal_correlation = f["analysis/signal_corr_ns"].value
+                if "analysis/rep_similarity_dg" in f:
+                    ns.representational_similarity = f["analysis/rep_similarity_ns"].value
+
         except Exception as e:
             raise MissingStimulusException(e.args)
 
