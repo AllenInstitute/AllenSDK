@@ -107,11 +107,17 @@ def plot_radial_histogram(angles,
                           closed=False,
                           color=STIM_COLOR):
     if all_angles is None:
-        all_angles = angles
+        if len(angles) < 2:
+            all_angles = np.linspace(0, 315, 8)
+        else:
+            all_angles = angles
 
     dth = (all_angles[1] - all_angles[0]) * 0.5
 
-    max_count = max(counts)
+    if len(counts) == 0:
+        max_count = 1
+    else:
+        max_count = max(counts)
 
     wedges = []
     for count, angle in zip(counts, angles):
