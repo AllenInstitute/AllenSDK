@@ -68,7 +68,7 @@ def plot_condition_histogram(vals, bins, color=STIM_COLOR):
                                      align='left',
                                      normed=False,
                                      rwidth=.8,
-                                     color=color
+                                     color=color,
                                      zorder=3)
     else:
         hbins = np.arange(len(bins)+1)+1
