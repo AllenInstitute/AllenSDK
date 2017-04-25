@@ -517,6 +517,24 @@ class StimulusAnalysis(object):
         pval = sweep_response.applymap(do_p_value)
         return sweep_response, mean_sweep_response, pval
 
+    def plot_representational_similarity(self, repsim, stimulus=False):
+        if stimulus:
+            pass
+
+        ax = plt.gca()
+        ax.imshow(repsim, interpolation='nearest', cmap='plasma')
+
+    def plot_running_speed_histogram(self, xlim=None, nbins=None):
+        if xlim is None:
+            xlim = [0,80]
+        if nbins is None:
+            nbins = 20
+
+        ax = plt.gca()
+        ax.hist(self.dxcm, bins=nbins, range=xlim, color=oplots.STIM_COLOR)
+        ax.set_xlim(xlim)
+        plt.xlabel("running speed (cm/s)")
+
     def plot_speed_tuning(self, cell_specimen_id, 
                           evoked_color=oplots.EVOKED_COLOR, 
                           spontaneous_color=oplots.SPONTANEOUS_COLOR):
