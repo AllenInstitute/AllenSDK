@@ -166,8 +166,9 @@ class StaticGratings(StimulusAnalysis):
 
         return response
 
-    ''' Computes metrics related to each cell's peak response condition.
-
+    def get_peak(self):
+        ''' Computes metrics related to each cell's peak response condition.
+        
         Returns
         -------
         Panda data frame with the following fields (_sg suffix is
@@ -185,7 +186,8 @@ class StaticGratings(StimulusAnalysis):
         StaticGratings._log.info('Calculating peak response properties')
 
         peak = pd.DataFrame(index=range(self.numbercells), columns=('ori_sg', 'sf_sg', 'phase_sg', 'reliability_sg',
-                                                                    'osi_sg', 'peak_dff_sg', 'ptest_sg', 'time_to_peak_sg', 'duration_sg', 'cell_specimen_id','p_run_sg','run_modulation_sg', 'sf_index_dg'))
+                                                                    'osi_sg', 'peak_dff_sg', 'ptest_sg', 'time_to_peak_sg', 
+                                                                    'duration_sg', 'cell_specimen_id','p_run_sg','run_modulation_sg', 'sf_index_dg'))
         cids = self.data_set.get_cell_specimen_ids()
 
         for nc in range(self.numbercells):
