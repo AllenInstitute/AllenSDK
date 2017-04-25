@@ -201,7 +201,8 @@ def finalize_no_labels():
     ax.set_ylabel("")
     ax.set_xticklabels([])
     ax.set_yticklabels([])
-    ax.legend_.remove()
+    if ax.legend_ is not None:
+        ax.legend_.remove()
     plt.tight_layout(pad=.3)
 
 def plot_combined_speed(binned_resp_vis, binned_dx_vis, binned_resp_sp, binned_dx_sp,
