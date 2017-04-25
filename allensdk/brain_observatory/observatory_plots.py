@@ -89,9 +89,10 @@ def plot_selectivity_cumulative_histogram(sis,
     # yscale = float(num_cells) / len(osis)
 
     # orientation selectivity cumulative histogram
-    n, bins, patches = plt.hist(sis, normed=True, bins=bins, 
-                                cumulative=True, histtype='stepfilled', 
-                                color=color)
+    if len(sis) > 0:
+        n, bins, patches = plt.hist(sis, normed=True, bins=bins,
+                                    cumulative=True, histtype='stepfilled',
+                                    color=color)
     plt.xlim(si_range)
     plt.ylim([0,yscale])
     plt.yticks(yticks*yscale, yticks)
