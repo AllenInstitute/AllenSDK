@@ -62,13 +62,16 @@ def plot_mean_representational_similarity(rep_sims):
 
 def plot_condition_histogram(vals, bins, color=STIM_COLOR):
     plt.grid()
-    n, hbins, patches = plt.hist(vals, 
-                                 bins=np.arange(len(bins)+1)+1, 
-                                 align='left', 
-                                 normed=False, 
-                                 rwidth=.8, 
-                                 color=color,
-                                 zorder=3)
+    if len(vals) > 0:
+        n, hbins, patches = plt.hist(vals,
+                                     bins=np.arange(len(bins)+1)+1,
+                                     align='left',
+                                     normed=False,
+                                     rwidth=.8,
+                                     color=color
+                                     zorder=3)
+    else:
+        hbins = np.arange(len(bins)+1)+1
     plt.xticks(hbins[:-1], np.round(bins, 2))
    
 
