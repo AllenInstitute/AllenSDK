@@ -25,17 +25,7 @@ from .simple_tree import SimpleTree
 
 
 class StructureTree( SimpleTree ):
-
-    whitelist = {'acronym': str, 
-                 'color_hex_triplet': StructureTree.hex_to_rgb, 
-                 'graph_id': int, 
-                 'graph_order': int, 
-                 'id': int, 
-                 'name': str, 
-                 'structure_id_path': StructureTree.path_to_list, 
-                 'structure_set_ids': list}  
                  
-
     def __init__(self, nodes):
         '''A tree whose nodes are brain structures and whose edges indicate 
         physical containment.
@@ -288,7 +278,7 @@ class StructureTree( SimpleTree ):
         '''
 
         if field_whitelist is None:
-            field_whitelist = StructureTree.whitelist
+            field_whitelist = StructureTree.whitelist()
 
         for ii, val in enumerate(structures):
 
@@ -296,6 +286,18 @@ class StructureTree( SimpleTree ):
             structures[ii] = {k: field_whitelist[k](v) for k, v in iteritems(val)}
 
         return structures
+        
+        
+    @staticmethod
+    def whitelist():
+        return {'acronym': str, 
+                'color_hex_triplet': StructureTree.hex_to_rgb, 
+                'graph_id': int, 
+                'graph_order': int, 
+                'id': int, 
+                'name': str, 
+                'structure_id_path': StructureTree.path_to_list, 
+                'structure_set_ids': list}  
 
         
     @staticmethod
