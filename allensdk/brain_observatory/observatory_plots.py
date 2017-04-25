@@ -23,25 +23,34 @@ LSN_RF_ON_COLOR_MAP.set_bad((1,1,1,1),1.0)
 LSN_RF_OFF_COLOR_MAP = LinearSegmentedColormap.from_list('default', [[0.0,0.0,1.0,1.0],[1,1,1,1],[1.0,0,0.0,1]])
 LSN_RF_OFF_COLOR_MAP.set_bad((1,1,1,1),1.0)
 
-def plot_correlation_histogram(corrs, color=STIM_COLOR):
+def correlation_scatter(sig_corrs, noise_corrs, labels, colors, scale=15):
+    alpha = max(0.85 - 0.15 * (len(sig_corrs)-1), 0.2)
     ax = plt.gca()
-    vs = np.array([corr[~np.eye(len(corr), dtype=bool)] for corr in corrs])
-    ax.hist(vs.flat, range=[0,1], color=STIM_COLOR)
+    for sig_corr, noise_corr, color, label in zip(sig_corrs, noise_corrs, colors, labels):
+        inds = np.tril_indices(len(sig_corr))
+        ax.scatter(sig_corr[inds], noise_corr[inds], 
+                   s=scale,
+                   color=color, 
+                   linewidth=0.5, edgecolor='#333333', 
+                   label=label, 
+                   alpha=alpha)
+    ax.set_xlabel("signal correlation")
+    ax.set_ylabel("noise correlation")
+    ax.set_xlim([-1,1])
+    ax.set_ylim([-1,1])
+    ax.legend(loc='upper left')
 
 def plot_representational_similarity(rep_sims):
-    rs_shape = rep_sims[0].shape
-    n_cells = rs_shape[0]
-    N = n_cells * len(rep_sims)
-    
+    N = sum(rs.shape[0] for rs in rep_sims)
     m = np.zeros((N,N), dtype=float)
+    start = 0
     for i,rs in enumerate(rep_sims):
-        start = i*n_cells
-        end = start + n_cells
-        print start,end
+        end = start + rs.shape[0]
         m[start:end,start:end] = rs
+        start = end
 
     ax = plt.gca()
-    ax.imshow(m, interpolation='nearest', cmap='hot')
+    ax.imshow(m, interpolation='nearest', cmap='RdBu', clim=[-1,1])
 
 def plot_mean_representational_similarity(rep_sims):
     m = np.eye(len(rep_sims))
@@ -49,7 +58,7 @@ def plot_mean_representational_similarity(rep_sims):
         m[i,i] = rep_sims[i].mean()
 
     ax = plt.gca()
-    ax.imshow(m, interpolation='nearest', cmap='hot')
+    ax.imshow(m, interpolation='nearest', cmap='RdBu', clim=[-1,1])
 
 def plot_condition_histogram(vals, bins, color=STIM_COLOR):
     plt.grid()
@@ -186,6 +195,7 @@ def finalize_no_labels():
     ax.set_ylabel("")
     ax.set_xticklabels([])
     ax.set_yticklabels([])
+    ax.legend_.remove()
     plt.tight_layout(pad=.3)
 
 def plot_combined_speed(binned_resp_vis, binned_dx_vis, binned_resp_sp, binned_dx_sp,
