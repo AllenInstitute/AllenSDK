@@ -317,7 +317,10 @@ class StaticGratings(StimulusAnalysis):
                                      offset=180.0,
                                      color=color)
 
-        max_count = max(counts)
+        if len(counts) == 0:
+            max_count = 1
+        else:
+            max_count = max(counts)
 
         center_x = 0.0
         center_y = 0.5 * max_count

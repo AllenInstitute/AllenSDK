@@ -96,13 +96,16 @@ def plot_mean_representational_similarity(rep_sims):
 
 def plot_condition_histogram(vals, bins, color=STIM_COLOR):
     plt.grid()
-    n, hbins, patches = plt.hist(vals, 
-                                 bins=np.arange(len(bins)+1)+1, 
-                                 align='left', 
-                                 normed=False, 
-                                 rwidth=.8, 
-                                 color=color,
-                                 zorder=3)
+    if len(vals) > 0:
+        n, hbins, patches = plt.hist(vals,
+                                     bins=np.arange(len(bins)+1)+1,
+                                     align='left',
+                                     normed=False,
+                                     rwidth=.8,
+                                     color=color,
+                                     zorder=3)
+    else:
+        hbins = np.arange(len(bins)+1)+1
     plt.xticks(hbins[:-1], np.round(bins, 2))
    
 
@@ -120,9 +123,10 @@ def plot_selectivity_cumulative_histogram(sis,
     # yscale = float(num_cells) / len(osis)
 
     # orientation selectivity cumulative histogram
-    n, bins, patches = plt.hist(sis, normed=True, bins=bins, 
-                                cumulative=True, histtype='stepfilled', 
-                                color=color)
+    if len(sis) > 0:
+        n, bins, patches = plt.hist(sis, normed=True, bins=bins,
+                                    cumulative=True, histtype='stepfilled',
+                                    color=color)
     plt.xlim(si_range)
     plt.ylim([0,yscale])
     plt.yticks(yticks*yscale, yticks)
@@ -141,11 +145,17 @@ def plot_radial_histogram(angles,
                           closed=False,
                           color=STIM_COLOR):
     if all_angles is None:
-        all_angles = angles
+        if len(angles) < 2:
+            all_angles = np.linspace(0, 315, 8)
+        else:
+            all_angles = angles
 
     dth = (all_angles[1] - all_angles[0]) * 0.5
 
-    max_count = max(counts)
+    if len(counts) == 0:
+        max_count = 1
+    else:
+        max_count = max(counts)
 
     wedges = []
     for count, angle in zip(counts, angles):
@@ -233,7 +243,7 @@ def finalize_no_labels(pad=.3):
     ax.set_ylabel("")
     ax.set_xticklabels([])
     ax.set_yticklabels([])
-    if ax.legend_:
+    if ax.legend_ is not None:
         ax.legend_.remove()
     plt.tight_layout(pad=pad)
 
