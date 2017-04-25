@@ -166,8 +166,7 @@ class StaticGratings(StimulusAnalysis):
 
         return response
 
-    def get_peak(self):
-        ''' Computes metrics related to each cell's peak response condition.
+    ''' Computes metrics related to each cell's peak response condition.
 
         Returns
         -------
@@ -185,8 +184,8 @@ class StaticGratings(StimulusAnalysis):
         '''
         StaticGratings._log.info('Calculating peak response properties')
 
-        peak = pd.DataFrame(index=range(self.numbercells), columns=('ori_sg', 'sf_sg', 'phase_sg', 'response_reliability_sg',
-                                                                    'osi_sg', 'peak_dff_sg', 'ptest_sg', 'time_to_peak_sg', 'duration_sg', 'cell_specimen_id'))
+        peak = pd.DataFrame(index=range(self.numbercells), columns=('ori_sg', 'sf_sg', 'phase_sg', 'reliability_sg',
+                                                                    'osi_sg', 'peak_dff_sg', 'ptest_sg', 'time_to_peak_sg', 'duration_sg', 'cell_specimen_id','p_run_sg','run_modulation_sg', 'sf_index_dg'))
         cids = self.data_set.get_cell_specimen_ids()
 
         for nc in range(self.numbercells):
@@ -199,8 +198,8 @@ class StaticGratings(StimulusAnalysis):
             peak.ori_sg[nc] = pref_ori
             peak.sf_sg[nc] = pref_sf
             peak.phase_sg[nc] = pref_phase
-            peak.response_reliability_sg[nc] = self.response[
-                pref_ori, pref_sf, pref_phase, nc, 2] / 0.48  # TODO: check number of trials
+#            peak.response_reliability_sg[nc] = self.response[
+#                pref_ori, pref_sf, pref_phase, nc, 2] / 0.48  # TODO: check number of trials
             pref = self.response[pref_ori, pref_sf, pref_phase, nc, 0]
             orth = self.response[
                 np.mod(pref_ori + 3, 6), pref_sf, pref_phase, nc, 0]
@@ -240,6 +239,42 @@ class StaticGratings(StimulusAnalysis):
                     test2).max() / self.acquisition_rate
             except:
                 pass
+            
+            #running modulation
+            subset = self.mean_sweep_response_sg[(self.stim_table_sg.spatial_frequency==self.sfvals[pref_sf])&(self.stim_table_sg.orientation==self.orivals[pref_ori])&(self.stim_table_sg.phase==self.phasevals[pref_phase])]            
+            subset_run = subset[subset.dx>=1]
+            subset_stat = subset[subset.dx<1]
+            if (len(subset_run)>4) & (len(subset_stat)>4):
+                (_,peak.p_run_sg.iloc[nc]) = st.ttest_ind(subset_run[str(nc)], subset_stat[str(nc)], equal_var=False)
+                
+                if subset_run[str(nc)].mean()>subset_stat[str(nc)].mean():
+                    peak.run_modulation_sg.iloc[nc] = (subset_run[str(nc)].mean() - subset_stat[str(nc)].mean())/np.abs(subset_run[str(nc)].mean())
+                elif subset_run[str(nc)].mean()<subset_stat[str(nc)].mean():
+                    peak.run_modulation_sg.iloc[nc] = -1*((subset_stat[str(nc)].mean() - subset_run[str(nc)].mean())/np.abs(subset_stat[str(nc)].mean()))
+            else:
+                peak.p_run_sg.iloc[nc] = np.NaN
+                peak.run_modulation_sg.iloc[nc] = np.NaN                
+            
+            #reliability
+            subset = self.sweep_response_sg[(self.stim_table_sg.spatial_frequency==self.sfvals[pref_sf])&(self.stim_table_sg.orientation==self.orivals[pref_ori])&(self.stim_table_sg.phase==self.phasevals[pref_phase])]         
+            corr_matrix = np.empty((len(subset),len(subset)))
+            for i in range(len(subset)):
+                for j in range(len(subset)):
+                    r,p = st.pearsonr(subset[str(nc)].iloc[i][28:42], subset[str(nc)].iloc[j][28:42])
+                    corr_matrix[i,j] = r
+            mask = np.ones((len(subset), len(subset)))
+            for i in range(len(subset)):
+                for j in range(len(subset)):
+                    if i>=j:
+                        mask[i,j] = np.NaN
+            corr_matrix *= mask
+            peak.reliability_sg.iloc[nc] = np.nanmean(corr_matrix)
+
+            #SF index
+            sf_tuning = self.response[pref_ori,1:,pref_phase,nc,0]
+            trials = self.mean_sweep_response[(self.stim_table.spatial_frequency!=0)&(self.stim_table.orientation==self.orivals[pref_ori])&(self.stim_table.phase==self.phasevals[pref_phase])][str(nc)].values
+            SSE_part = np.sqrt(np.sum((trials-trials.mean())**2)/(len(trials)-5))
+            peak.sf_index_dg.iloc[nc] = (np.ptp(sf_tuning))/(np.ptp(sf_tuning) + 2*SSE_part)
 
         return peak
 
