@@ -518,11 +518,11 @@ class StaticGratings(StimulusAnalysis):
                 sg._binned_dx_vis = f["analysis/binned_dx_vis"].value
                 sg._binned_cells_vis = f["analysis/binned_cells_vis"].value
 
-                if "analysis/noise_corr_dg" in f:
+                if "analysis/noise_corr_sg" in f:
                     sg.noise_correlation = f["analysis/noise_corr_sg"].value
-                if "analysis/signal_corr_dg" in f:
+                if "analysis/signal_corr_sg" in f:
                     sg.signal_correlation = f["analysis/signal_corr_sg"].value
-                if "analysis/rep_similarity_dg" in f:
+                if "analysis/rep_similarity_sg" in f:
                     sg.representational_similarity = f["analysis/rep_similarity_sg"].value
 
         except Exception as e:

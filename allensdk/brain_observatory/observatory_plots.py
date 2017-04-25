@@ -23,6 +23,34 @@ LSN_RF_ON_COLOR_MAP.set_bad((1,1,1,1),1.0)
 LSN_RF_OFF_COLOR_MAP = LinearSegmentedColormap.from_list('default', [[0.0,0.0,1.0,1.0],[1,1,1,1],[1.0,0,0.0,1]])
 LSN_RF_OFF_COLOR_MAP.set_bad((1,1,1,1),1.0)
 
+def plot_correlation_histogram(corrs, color=STIM_COLOR):
+    ax = plt.gca()
+    vs = np.array([corr[~np.eye(len(corr), dtype=bool)] for corr in corrs])
+    ax.hist(vs.flat, range=[0,1], color=STIM_COLOR)
+
+def plot_representational_similarity(rep_sims):
+    rs_shape = rep_sims[0].shape
+    n_cells = rs_shape[0]
+    N = n_cells * len(rep_sims)
+    
+    m = np.zeros((N,N), dtype=float)
+    for i,rs in enumerate(rep_sims):
+        start = i*n_cells
+        end = start + n_cells
+        print start,end
+        m[start:end,start:end] = rs
+
+    ax = plt.gca()
+    ax.imshow(m, interpolation='nearest', cmap='hot')
+
+def plot_mean_representational_similarity(rep_sims):
+    m = np.eye(len(rep_sims))
+    for i,rs in enumerate(rep_sims):
+        m[i,i] = rep_sims[i].mean()
+
+    ax = plt.gca()
+    ax.imshow(m, interpolation='nearest', cmap='hot')
+
 def plot_condition_histogram(vals, bins, color=STIM_COLOR):
     plt.grid()
     n, hbins, patches = plt.hist(vals, 
@@ -159,7 +187,6 @@ def finalize_no_labels():
     ax.set_xticklabels([])
     ax.set_yticklabels([])
     plt.tight_layout(pad=.3)
-
 
 def plot_combined_speed(binned_resp_vis, binned_dx_vis, binned_resp_sp, binned_dx_sp,
                         evoked_color, spont_color):
