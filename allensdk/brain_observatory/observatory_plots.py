@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.collections import PatchCollection
 import matplotlib.patches as mpatches
@@ -23,7 +24,17 @@ LSN_RF_ON_COLOR_MAP.set_bad((1,1,1,1),1.0)
 LSN_RF_OFF_COLOR_MAP = LinearSegmentedColormap.from_list('default', [[0.0,0.0,1.0,1.0],[1,1,1,1],[1.0,0,0.0,1]])
 LSN_RF_OFF_COLOR_MAP.set_bad((1,1,1,1),1.0)
 
-def correlation_scatter(sig_corrs, noise_corrs, labels, colors, scale=15):
+def plot_cell_correlation(sig_corrs, labels, colors, scale=15):
+    alpha = 1.0 / len(sig_corrs)
+    ax = plt.gca()
+    for sig_corr, color, label in zip(sig_corrs, colors, labels):
+        ax.bar(range(len(sig_corr)), sig_corr, color=color, alpha=alpha, label=label)
+    ax.set_xlabel("cell")
+    ax.set_ylabel("signal correlation")
+    ax.set_ylim([-1,1])
+    ax.legend(loc='lower left')
+
+def population_correlation_scatter(sig_corrs, noise_corrs, labels, colors, scale=15):
     alpha = max(0.85 - 0.15 * (len(sig_corrs)-1), 0.2)
     ax = plt.gca()
     for sig_corr, noise_corr, color, label in zip(sig_corrs, noise_corrs, colors, labels):
@@ -40,35 +51,70 @@ def correlation_scatter(sig_corrs, noise_corrs, labels, colors, scale=15):
     ax.set_ylim([-1,1])
     ax.legend(loc='upper left')
 
-def plot_representational_similarity(rep_sims):
-    N = sum(rs.shape[0] for rs in rep_sims)
-    m = np.zeros((N,N), dtype=float)
-    start = 0
-    for i,rs in enumerate(rep_sims):
-        end = start + rs.shape[0]
-        m[start:end,start:end] = rs
-        start = end
+def plot_representational_similarity(rs, dims=None, dim_labels=None, colors=None, dim_order=None):
+    if dim_order is not None:
+        rsr = np.arange(len(rs)).reshape(*map(len,dims))
+        rsrt = rsr.transpose(dim_order)
+        ri = rsrt.flatten()
+        rs = rs[ri,:][:,ri]
+
+        dims = np.array(dims)[dim_order]
+        colors = np.array(colors)[dim_order]
+        dim_labels = np.array(dim_labels)[dim_order]
+    
+    rs = rs.copy()
+    np.fill_diagonal(rs, np.nan)
 
     ax = plt.gca()
-    ax.imshow(m, interpolation='nearest', cmap='RdBu', clim=[-1,1])
+    ax.imshow(rs, interpolation='nearest', cmap='RdBu_r')
+    if dims is not None:
+        n = len(rs)
+        for cell_i in range(n):
+            idx = np.unravel_index(cell_i, map(len, dims))
 
-def plot_mean_representational_similarity(rep_sims):
-    m = np.eye(len(rep_sims))
-    for i,rs in enumerate(rep_sims):
-        m[i,i] = rep_sims[i].mean()
+            start = -(len(dims))*2
+            width = 1.8
+            for dim_i, color in enumerate(colors):
+                v_i = idx[dim_i]
+                rgb = np.array(mcolors.colorConverter.to_rgb(color))
+                white = np.array([1.0,1.0,1.0])
+                t = float(v_i) / (len(dims[dim_i])+1)
+                rgb = t * white + (1.0 - t) * rgb
 
-    ax = plt.gca()
-    ax.imshow(m, interpolation='nearest', cmap='RdBu', clim=[-1,1])
+                r = mpatches.Rectangle((start + dim_i * width, cell_i-.5), 
+                                       width, 1.2, 
+                                       facecolor=rgb, linewidth=0)
+                r.set_clip_on(False)
+                ax.add_patch(r)
+
+                r = mpatches.Rectangle((cell_i-.5, start + dim_i * width), 
+                                       1.2, width,
+                                       facecolor=rgb, linewidth=0)
+                r.set_clip_on(False)
+                ax.add_patch(r)
+
+        patches = []
+        for label,color in  zip(dim_labels, colors):
+            p = mpatches.Patch(color=color, label=label)
+            patches.append(p)
+        ax.legend(handles=patches, loc=(0,-.1), ncol=len(dims), mode='expand')
+    ax.set_xticklabels([])
+    ax.set_yticklabels([])
+
+
 
 def plot_condition_histogram(vals, bins, color=STIM_COLOR):
     plt.grid()
-    n, hbins, patches = plt.hist(vals, 
-                                 bins=np.arange(len(bins)+1)+1, 
-                                 align='left', 
-                                 normed=False, 
-                                 rwidth=.8, 
-                                 color=color,
-                                 zorder=3)
+    if len(vals) > 0:
+        n, hbins, patches = plt.hist(vals,
+                                     bins=np.arange(len(bins)+1)+1,
+                                     align='left',
+                                     normed=False,
+                                     rwidth=.8,
+                                     color=color,
+                                     zorder=3)
+    else:
+        hbins = np.arange(len(bins)+1)+1
     plt.xticks(hbins[:-1], np.round(bins, 2))
    
 
@@ -86,9 +132,10 @@ def plot_selectivity_cumulative_histogram(sis,
     # yscale = float(num_cells) / len(osis)
 
     # orientation selectivity cumulative histogram
-    n, bins, patches = plt.hist(sis, normed=True, bins=bins, 
-                                cumulative=True, histtype='stepfilled', 
-                                color=color)
+    if len(sis) > 0:
+        n, bins, patches = plt.hist(sis, normed=True, bins=bins,
+                                    cumulative=True, histtype='stepfilled',
+                                    color=color)
     plt.xlim(si_range)
     plt.ylim([0,yscale])
     plt.yticks(yticks*yscale, yticks)
@@ -107,11 +154,17 @@ def plot_radial_histogram(angles,
                           closed=False,
                           color=STIM_COLOR):
     if all_angles is None:
-        all_angles = angles
+        if len(angles) < 2:
+            all_angles = np.linspace(0, 315, 8)
+        else:
+            all_angles = angles
 
     dth = (all_angles[1] - all_angles[0]) * 0.5
 
-    max_count = max(counts)
+    if len(counts) == 0:
+        max_count = 1
+    else:
+        max_count = max(counts)
 
     wedges = []
     for count, angle in zip(counts, angles):
@@ -156,12 +209,15 @@ def plot_radial_histogram(angles,
         
 def plot_time_to_peak(msrs, ttps, t_start, t_end, stim_start, stim_end, cmap):
     plt.plot(ttps, np.arange(msrs.shape[0],0,-1)-0.5, color='black')
-    plt.imshow(msrs, 
-               cmap=cmap, clim=[0,3], 
-               aspect=float((t_end-t_start) / msrs.shape[0]),  # float to get rid of MPL error
-               extent=[t_start, t_end, 0, msrs.shape[0]], interpolation='nearest')
+    if msrs.shape[0] > 0:
+        plt.imshow(msrs,
+                cmap=cmap, clim=[0,3],
+                aspect=float((t_end-t_start) / msrs.shape[0]),  # float to get rid of MPL error
+                extent=[t_start, t_end, 0, msrs.shape[0]], interpolation='nearest')
+        plt.ylim([0,msrs.shape[0]])
+    else:
+        plt.ylim([0, 1])
     plt.xlim([t_start, t_end])
-    plt.ylim([0,msrs.shape[0]])
 
     plt.axvline(stim_start, linestyle=':', color='black')
     plt.axvline(stim_end, linestyle=':', color='black')
@@ -182,21 +238,26 @@ def figure_in_px(w, h, file_name, dpi=96.0):
     plt.savefig(file_name, dpi=dpi)
     plt.close()
 
-def finalize_no_axes():
+def finalize_no_axes(pad=0.0):
     plt.axis('off')
-    plt.subplots_adjust(left=0.0, right=1.0, bottom=0.0, top=1.0, wspace=0.0, hspace=0.0)
+    plt.subplots_adjust(left=pad, 
+                        right=1.0-pad, 
+                        bottom=pad, 
+                        top=1.0-pad, 
+                        wspace=0.0, hspace=0.0)
 
-def finalize_with_axes():
-    plt.tight_layout(pad=.3)
+def finalize_with_axes(pad=.3):
+    plt.tight_layout(pad=pad)
 
-def finalize_no_labels():
+def finalize_no_labels(pad=.3):
     ax = plt.gca()
     ax.set_xlabel("")
     ax.set_ylabel("")
     ax.set_xticklabels([])
     ax.set_yticklabels([])
-    ax.legend_.remove()
-    plt.tight_layout(pad=.3)
+    if ax.legend_ is not None:
+        ax.legend_.remove()
+    plt.tight_layout(pad=pad)
 
 def plot_combined_speed(binned_resp_vis, binned_dx_vis, binned_resp_sp, binned_dx_sp,
                         evoked_color, spont_color):
@@ -249,8 +310,8 @@ def plot_receptive_field(rf, color_map=None, zlim=[-3,3], mask=None):
 
     zrf = zscore(rf)
 
-    if mask is not None:
-        zrf = np.ma.array(zrf, mask=~mask)
+    #if mask is not None:
+    #    zrf = np.ma.array(zrf, mask=~mask)
 
     plt.imshow(zrf, interpolation='nearest', cmap=color_map, clim=zlim)
 

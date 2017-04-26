@@ -498,8 +498,8 @@ class StimulusAnalysis(object):
             return p
 
         StimulusAnalysis._log.info('Calculating responses for each sweep')
-        sweep_response = pd.DataFrame(index=self.stim_table.index.values, columns=np.array(
-            range(self.numbercells + 1)).astype(str))
+        sweep_response = pd.DataFrame(index=self.stim_table.index.values, 
+                                      columns=map(str, range(self.numbercells + 1)))
         sweep_response.rename(
             columns={str(self.numbercells): 'dx'}, inplace=True)
         for index, row in self.stim_table.iterrows():
@@ -526,9 +526,9 @@ class StimulusAnalysis(object):
 
     def plot_running_speed_histogram(self, xlim=None, nbins=None):
         if xlim is None:
-            xlim = [0,80]
+            xlim = [-10,100]
         if nbins is None:
-            nbins = 20
+            nbins = 40
 
         ax = plt.gca()
         ax.hist(self.dxcm, bins=nbins, range=xlim, color=oplots.STIM_COLOR)
@@ -551,3 +551,4 @@ class StimulusAnalysis(object):
     @staticmethod
     def peak_row_from_csid(peak, csid):
         return peak[peak.cell_specimen_id == csid].index[0]
+    

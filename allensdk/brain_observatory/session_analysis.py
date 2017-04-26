@@ -175,6 +175,14 @@ class SessionAnalysis(object):
                                   for i in dg.peak["ori_dg"].values]
         metrics["pref_tf_dg"] = [dg.tfvals[i] for i in dg.peak["tf_dg"].values]
         metrics["p_dg"] = dg.peak["ptest_dg"]
+        metrics["cv_os_dg"] = dg.peak["cv_os_dg"]
+        metrics["cv_ds_dg"] = dg.peak["cv_ds_dg"]
+        metrics["reliability_dg"] = dg.peak["reliability_dg"]
+        metrics["tfdi_dg"] = dg.peak["tf_index_dg"]
+        metrics["run_mod_dg"] = dg.peak["run_modulation_dg"]
+        metrics["p_run_mod_dg"] = dg.peak["p_run_dg"]
+        metrics["peak_dff_dg"] = dg.peak["peak_dff_dg"]
+
 
     def append_metrics_static_grating(self, metrics, sg):
         metrics["osi_sg"] = sg.peak["osi_sg"]
@@ -185,11 +193,19 @@ class SessionAnalysis(object):
                                     for i in sg.peak["phase_sg"].values]
         metrics["p_sg"] = sg.peak["ptest_sg"]
         metrics["time_to_peak_sg"] = sg.peak["time_to_peak_sg"]
+        metrics["run_mod_sg"] = sg.peak["run_modulation_sg"]
+        metrics["p_run_mod_sg"] = sg.peak["p_run_sg"]
+        metrics["cv_os_sg"] = sg.peak["cv_os_sg"]
 
     def append_metrics_natural_scene(self, metrics, ns):
         metrics["pref_image_ns"] = ns.peak["scene_ns"]
         metrics["p_ns"] = ns.peak["ptest_ns"]
         metrics["time_to_peak_ns"] = ns.peak["time_to_peak_ns"]
+        metrics["image_sel_ns"] = ns.peak["image_selectivity_ns"]
+        metrics["reliability_ns"] = ns.peak["reliability_ns"]
+        metrics["run_mod_ns"] = ns.peak["run_modulation_ns"]
+        metrics["p_run_mod_ns"] = ns.peak["p_run_ns"]
+        metrics["peak_dff_ns"] = ns.peak["peak_dff_ns"]
 
     def verify_roi_lists_equal(self, roi1, roi2):
         if len(roi1) != len(roi2):
