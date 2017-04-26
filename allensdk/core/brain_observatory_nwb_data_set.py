@@ -524,7 +524,7 @@ class BrainObservatoryNwbDataSet(object):
 
             inds = None
             if cell_specimen_ids is None:
-                inds = range(len(self.get_cell_specimen_ids()))
+                inds = range(self.number_of_cells)
             else:
                 inds = self.get_cell_specimen_indices(cell_specimen_ids)
 
@@ -537,6 +537,14 @@ class BrainObservatoryNwbDataSet(object):
                 roi_array.append(m)
 
         return roi_array
+
+    @property
+    def number_of_cells(self):
+        '''Number of cells in the experiment'''
+
+        # Replace here is there is a better way to get this info:
+        return len(self.get_cell_specimen_ids())
+
 
     def get_metadata(self):
         ''' Returns a dictionary of meta data associated with each
@@ -683,7 +691,6 @@ class BrainObservatoryNwbDataSet(object):
                 if k in f['analysis']:
                     del f['analysis'][k]
                 f.create_dataset('analysis/%s' % k, data=v)
-
 
 def align_running_speed(dxcm, dxtime, timestamps):
     ''' If running speed timestamps differ from fluorescence

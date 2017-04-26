@@ -30,6 +30,7 @@ import logging
 import os
 
 
+
 def multi_dataframe_merge(dfs):
     out_df = None
     for _, df in enumerate(dfs):
@@ -126,10 +127,14 @@ class SessionAnalysis(object):
 
         nwb.save_analysis_arrays(
             ('receptive_field_lsn', lsn.receptive_field),
+            ('mean_response_lsn', lsn.mean_response),
+            ('celltraces_dff', nm1.dfftraces),
             ('binned_dx_sp', nm1.binned_dx_sp),
             ('binned_dx_vis', nm1.binned_dx_vis),
             ('binned_cells_sp', nm1.binned_cells_sp),
             ('binned_cells_vis', nm1.binned_cells_vis))
+
+        LocallySparseNoise.save_cell_index_receptive_field_analysis_dict(lsn.cell_index_receptive_field_analysis_data_dict, nwb, stimulus_info.LOCALLY_SPARSE_NOISE)
 
     def save_session_c2(self, lsn4, lsn8, nm1, nm2, peak):
         nwb = BrainObservatoryNwbDataSet(self.save_path)
@@ -144,18 +149,24 @@ class SessionAnalysis(object):
             ('mean_sweep_response_lsn4', lsn4.mean_sweep_response),
             ('mean_sweep_response_lsn8', lsn8.mean_sweep_response))
 
-        merged_receptive_field = LocallySparseNoise.merge_receptive_fields(
-            lsn4.receptive_field,
-            lsn8.receptive_field)
+        merge_mean_response = LocallySparseNoise.merge_mean_response(
+            lsn4.mean_response,
+            lsn8.mean_response)
 
         nwb.save_analysis_arrays(
+            ('mean_response_lsn4', lsn4.mean_response),
+            ('mean_response_lsn8', lsn8.mean_response),
             ('receptive_field_lsn4', lsn4.receptive_field),
             ('receptive_field_lsn8', lsn8.receptive_field),
-            ('receptive_field_lsn', merged_receptive_field),
+            ('merge_mean_response', merge_mean_response),
+            ('celltraces_dff', nm1.dfftraces),
             ('binned_dx_sp', nm1.binned_dx_sp),
             ('binned_dx_vis', nm1.binned_dx_vis),
             ('binned_cells_sp', nm1.binned_cells_sp),
             ('binned_cells_vis', nm1.binned_cells_vis))
+
+        LocallySparseNoise.save_cell_index_receptive_field_analysis_dict(lsn4.cell_index_receptive_field_analysis_data_dict, nwb, stimulus_info.LOCALLY_SPARSE_NOISE_4DEG)
+        LocallySparseNoise.save_cell_index_receptive_field_analysis_dict(lsn8.cell_index_receptive_field_analysis_data_dict, nwb, stimulus_info.LOCALLY_SPARSE_NOISE_8DEG)
 
     def append_metrics_drifting_grating(self, metrics, dg):
         metrics["osi_dg"] = dg.peak["osi_dg"]
@@ -258,6 +269,7 @@ class SessionAnalysis(object):
             cp.plot_sg_traces(sg, self.save_dir)
 
     def session_c(self, plot_flag=False, save_flag=True):
+
         lsn = LocallySparseNoise(self.nwb, stimulus_info.LOCALLY_SPARSE_NOISE)
         nm2 = NaturalMovie(self.nwb, 'natural_movie_two')
         nm1 = NaturalMovie(self.nwb, 'natural_movie_one')
@@ -275,8 +287,10 @@ class SessionAnalysis(object):
             cp.plot_lsn_traces(lsn, self.save_dir)
 
     def session_c2(self, plot_flag=False, save_flag=True):
+
         lsn4 = LocallySparseNoise(self.nwb, stimulus_info.LOCALLY_SPARSE_NOISE_4DEG)
         lsn8 = LocallySparseNoise(self.nwb, stimulus_info.LOCALLY_SPARSE_NOISE_8DEG)
+
         nm2 = NaturalMovie(self.nwb, 'natural_movie_two')
         nm1 = NaturalMovie(self.nwb, 'natural_movie_one')
         SessionAnalysis._log.info("Session C2 analyzed")
