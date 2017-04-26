@@ -164,6 +164,14 @@ class SessionAnalysis(object):
                                   for i in dg.peak["ori_dg"].values]
         metrics["pref_tf_dg"] = [dg.tfvals[i] for i in dg.peak["tf_dg"].values]
         metrics["p_dg"] = dg.peak["ptest_dg"]
+        metrics["cv_os_dg"] = dg.peak["cv_os_dg"]
+        metrics["cv_ds_dg"] = dg.peak["cv_ds_dg"]
+        metrics["reliability_dg"] = dg.peak["response_reliability_dg"]
+        metrics["tfdi_dg"] = dg.peak["tf_index_dg"]
+        metrics["run_mod_dg"] = dg.peak["run_modulation_dg"]
+        metrics["p_run_mod_dg"] = dg.peak["p_run_mod_dg"]
+        metrics["peak_dff_dg"] = dg.peak["peak_dff_dg"]
+
 
     def append_metrics_static_grating(self, metrics, sg):
         metrics["osi_sg"] = sg.peak["osi_sg"]

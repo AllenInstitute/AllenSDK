@@ -165,7 +165,7 @@ class NaturalScenes(StimulusAnalysis):
                 pass
             
             #running modulation
-            subset = self.mean_sweep_response_sg[self.stim_table.frame==nsp]            
+            subset = self.mean_sweep_response[self.stim_table.frame==nsp]            
             subset_run = subset[subset.dx>=1]
             subset_stat = subset[subset.dx<1]
             if (len(subset_run)>4) & (len(subset_stat)>4):
@@ -180,7 +180,7 @@ class NaturalScenes(StimulusAnalysis):
                 peak.run_modulation_ns.iloc[nc] = np.NaN                
             
             #reliability
-            subset = self.sweep_response_sg[self.stim_table.frame==nsp]            
+            subset = self.sweep_response[self.stim_table.frame==nsp]            
             corr_matrix = np.empty((len(subset),len(subset)))
             for i in range(len(subset)):
                 for j in range(len(subset)):

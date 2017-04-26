@@ -126,7 +126,7 @@ class DriftingGratings(StimulusAnalysis):
         for drifting grating):
             * ori_dg (orientation)
             * tf_dg (temporal frequency)
-            * response_reliability_dg
+            * reliability_dg
             * osi_dg (orientation selectivity index)
             * dsi_dg (direction selectivity index)
             * peak_dff_dg (peak dF/F)
