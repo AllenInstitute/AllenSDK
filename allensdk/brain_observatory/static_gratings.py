@@ -186,10 +186,11 @@ class StaticGratings(StimulusAnalysis):
 
         peak = pd.DataFrame(index=range(self.numbercells), columns=('ori_sg', 'sf_sg', 'phase_sg', 'reliability_sg',
                                                                     'osi_sg', 'peak_dff_sg', 'ptest_sg', 'time_to_peak_sg', 
-                                                                    'cell_specimen_id','p_run_sg',
+                                                                    'cell_specimen_id','p_run_sg', 'cv_os_sg',
                                                                     'run_modulation_sg', 'sf_index_sg'))
         cids = self.data_set.get_cell_specimen_ids()
 
+        orivals_rad = np.deg2rad(self.orivals)
         for nc in range(self.numbercells):
             cell_peak = np.where(self.response[:, 1:, :, nc, 0] == np.nanmax(
                 self.response[:, 1:, :, nc, 0]))
@@ -200,11 +201,20 @@ class StaticGratings(StimulusAnalysis):
             peak.ori_sg[nc] = pref_ori
             peak.sf_sg[nc] = pref_sf
             peak.phase_sg[nc] = pref_phase
+
 #            peak.response_reliability_sg[nc] = self.response[
 #                pref_ori, pref_sf, pref_phase, nc, 2] / 0.48  # TODO: check number of trials
+
             pref = self.response[pref_ori, pref_sf, pref_phase, nc, 0]
             orth = self.response[
                 np.mod(pref_ori + 3, 6), pref_sf, pref_phase, nc, 0]
+            tuning = self.response[:, pref_sf, nc, 0]
+            
+            CV_top_os = np.empty((6), dtype=np.complex128)
+            for i in range(6):
+                CV_top_os[i] = (tuning[i]*np.exp(1j*2*orivals_rad[i]))
+            peak.cv_os_sg.iloc[nc] = np.abs(CV_top_os.sum())/tuning.sum()
+                
             peak.osi_sg[nc] = (pref - orth) / (pref + orth)
             peak.peak_dff_sg[nc] = pref
             groups = []
