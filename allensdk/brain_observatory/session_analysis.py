@@ -177,7 +177,7 @@ class SessionAnalysis(object):
         metrics["p_dg"] = dg.peak["ptest_dg"]
         metrics["cv_os_dg"] = dg.peak["cv_os_dg"]
         metrics["cv_ds_dg"] = dg.peak["cv_ds_dg"]
-        metrics["reliability_dg"] = dg.peak["response_reliability_dg"]
+        metrics["reliability_dg"] = dg.peak["reliability_dg"]
         metrics["tfdi_dg"] = dg.peak["tf_index_dg"]
         metrics["run_mod_dg"] = dg.peak["run_modulation_dg"]
         metrics["p_run_mod_dg"] = dg.peak["p_run_mod_dg"]
