@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.collections import PatchCollection
 import matplotlib.patches as mpatches
@@ -50,8 +51,57 @@ def population_correlation_scatter(sig_corrs, noise_corrs, labels, colors, scale
     ax.set_ylim([-1,1])
     ax.legend(loc='upper left')
 
-def plot_representational_similarity(rs):
-    plt.imshow(rs, interpolation='nearest', cmap='RdBu')
+def plot_representational_similarity(rs, dims=None, dim_labels=None, colors=None, dim_order=None):
+    if dim_order is not None:
+        rsr = np.arange(len(rs)).reshape(*map(len,dims))
+        rsrt = rsr.transpose(dim_order)
+        ri = rsrt.flatten()
+        rs = rs[ri,:][:,ri]
+
+        dims = np.array(dims)[dim_order]
+        colors = np.array(colors)[dim_order]
+        dim_labels = np.array(dim_labels)[dim_order]
+    
+    rs = rs.copy()
+    np.fill_diagonal(rs, np.nan)
+
+    ax = plt.gca()
+    ax.imshow(rs, interpolation='nearest', cmap='RdBu_r')
+    if dims is not None:
+        n = len(rs)
+        for cell_i in range(n):
+            idx = np.unravel_index(cell_i, map(len, dims))
+
+            start = -(len(dims))*2
+            width = 1.8
+            for dim_i, color in enumerate(colors):
+                v_i = idx[dim_i]
+                rgb = np.array(mcolors.colorConverter.to_rgb(color))
+                white = np.array([1.0,1.0,1.0])
+                t = float(v_i) / (len(dims[dim_i])+1)
+                rgb = t * white + (1.0 - t) * rgb
+
+                r = mpatches.Rectangle((start + dim_i * width, cell_i-.5), 
+                                       width, 1.2, 
+                                       facecolor=rgb, linewidth=0)
+                r.set_clip_on(False)
+                ax.add_patch(r)
+
+                r = mpatches.Rectangle((cell_i-.5, start + dim_i * width), 
+                                       1.2, width,
+                                       facecolor=rgb, linewidth=0)
+                r.set_clip_on(False)
+                ax.add_patch(r)
+
+        patches = []
+        for label,color in  zip(dim_labels, colors):
+            p = mpatches.Patch(color=color, label=label)
+            patches.append(p)
+        ax.legend(handles=patches, loc=(0,-.1), ncol=len(dims), mode='expand')
+    ax.set_xticklabels([])
+    ax.set_yticklabels([])
+
+
 
 def plot_condition_histogram(vals, bins, color=STIM_COLOR):
     plt.grid()

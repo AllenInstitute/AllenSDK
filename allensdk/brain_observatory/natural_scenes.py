@@ -121,12 +121,11 @@ class NaturalScenes(StimulusAnalysis):
             * p_run_ns
             * run_modulation_ns
             * time_to_peak_ns
-            * duration_ns
         '''
         NaturalScenes._log.info('Calculating peak response properties')
         peak = pd.DataFrame(index=range(self.numbercells), columns=('scene_ns', 'reliability_ns', 'peak_dff_ns',
                                                                     'ptest_ns', 'p_run_ns', 'run_modulation_ns', 
-                                                                    'time_to_peak_ns', 'duration_ns', 
+                                                                    'time_to_peak_ns', 
                                                                     'cell_specimen_id','image_selectivity_ns'))
         cids = self.data_set.get_cell_specimen_ids()
 
@@ -158,12 +157,6 @@ class NaturalScenes(StimulusAnalysis):
                 self.stim_table.frame == nsp][str(nc)].mean()
             peak.time_to_peak_ns[nc] = (
                 np.argmax(test) - self.interlength) / self.acquisition_rate
-            test2 = np.where(test < (test.max() / 2))[0]
-            try:
-                peak.duration_ns[nc] = np.ediff1d(
-                    test2).max() / self.acquisition_rate
-            except:
-                pass
             
             #running modulation
             subset = self.mean_sweep_response[self.stim_table.frame==nsp]            
