@@ -210,7 +210,7 @@ class NaturalScenes(StimulusAnalysis):
                 rtj[j] = theta.mean()
             biga = rtj.mean()
             bigs = 1 - (2*biga)
-            peak.selectivity_ns.iloc[i] = bigs
+            peak.image_selectivity_ns.iloc[i] = bigs
 
         return peak
 
