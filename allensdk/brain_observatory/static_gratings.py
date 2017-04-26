@@ -188,7 +188,7 @@ class StaticGratings(StimulusAnalysis):
         peak = pd.DataFrame(index=range(self.numbercells), columns=('ori_sg', 'sf_sg', 'phase_sg', 'reliability_sg',
                                                                     'osi_sg', 'peak_dff_sg', 'ptest_sg', 'time_to_peak_sg', 
                                                                     'duration_sg', 'cell_specimen_id','p_run_sg',
-                                                                    'run_modulation_sg', 'sf_index_dg'))
+                                                                    'run_modulation_sg', 'sf_index_sg'))
         cids = self.data_set.get_cell_specimen_ids()
 
         for nc in range(self.numbercells):
@@ -244,7 +244,7 @@ class StaticGratings(StimulusAnalysis):
                 pass
             
             #running modulation
-            subset = self.mean_sweep_response[(self.stim_table_sg.spatial_frequency==self.sfvals[pref_sf])&(self.stim_table_sg.orientation==self.orivals[pref_ori])&(self.stim_table_sg.phase==self.phasevals[pref_phase])]            
+            subset = self.mean_sweep_response[(self.stim_table.spatial_frequency==self.sfvals[pref_sf])&(self.stim_table.orientation==self.orivals[pref_ori])&(self.stim_table.phase==self.phasevals[pref_phase])]            
             subset_run = subset[subset.dx>=1]
             subset_stat = subset[subset.dx<1]
             if (len(subset_run)>4) & (len(subset_stat)>4):
@@ -259,7 +259,7 @@ class StaticGratings(StimulusAnalysis):
                 peak.run_modulation_sg.iloc[nc] = np.NaN                
             
             #reliability
-            subset = self.sweep_response_sg[(self.stim_table_sg.spatial_frequency==self.sfvals[pref_sf])&(self.stim_table_sg.orientation==self.orivals[pref_ori])&(self.stim_table_sg.phase==self.phasevals[pref_phase])]         
+            subset = self.sweep_response[(self.stim_table.spatial_frequency==self.sfvals[pref_sf])&(self.stim_table.orientation==self.orivals[pref_ori])&(self.stim_table.phase==self.phasevals[pref_phase])]         
             corr_matrix = np.empty((len(subset),len(subset)))
             for i in range(len(subset)):
                 for j in range(len(subset)):
@@ -277,7 +277,7 @@ class StaticGratings(StimulusAnalysis):
             sf_tuning = self.response[pref_ori,1:,pref_phase,nc,0]
             trials = self.mean_sweep_response[(self.stim_table.spatial_frequency!=0)&(self.stim_table.orientation==self.orivals[pref_ori])&(self.stim_table.phase==self.phasevals[pref_phase])][str(nc)].values
             SSE_part = np.sqrt(np.sum((trials-trials.mean())**2)/(len(trials)-5))
-            peak.sf_index_dg.iloc[nc] = (np.ptp(sf_tuning))/(np.ptp(sf_tuning) + 2*SSE_part)
+            peak.sf_index_sg.iloc[nc] = (np.ptp(sf_tuning))/(np.ptp(sf_tuning) + 2*SSE_part)
 
         return peak
 
