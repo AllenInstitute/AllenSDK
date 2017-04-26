@@ -181,13 +181,12 @@ class StaticGratings(StimulusAnalysis):
             * peak_dff_sg (peak dF/F)
             * ptest_sg
             * time_to_peak_sg
-            * duration_sg
         '''
         StaticGratings._log.info('Calculating peak response properties')
 
         peak = pd.DataFrame(index=range(self.numbercells), columns=('ori_sg', 'sf_sg', 'phase_sg', 'reliability_sg',
                                                                     'osi_sg', 'peak_dff_sg', 'ptest_sg', 'time_to_peak_sg', 
-                                                                    'duration_sg', 'cell_specimen_id','p_run_sg',
+                                                                    'cell_specimen_id','p_run_sg',
                                                                     'run_modulation_sg', 'sf_index_sg'))
         cids = self.data_set.get_cell_specimen_ids()
 
@@ -236,13 +235,7 @@ class StaticGratings(StimulusAnalysis):
             test = self.sweep_response[test_rows][str(nc)].mean()
             peak.time_to_peak_sg[nc] = (
                 np.argmax(test) - self.interlength) / self.acquisition_rate
-            test2 = np.where(test < (test.max() / 2))[0]
-            try:
-                peak.duration_sg[nc] = np.ediff1d(
-                    test2).max() / self.acquisition_rate
-            except:
-                pass
-            
+
             #running modulation
             subset = self.mean_sweep_response[(self.stim_table.spatial_frequency==self.sfvals[pref_sf])&(self.stim_table.orientation==self.orivals[pref_ori])&(self.stim_table.phase==self.phasevals[pref_phase])]            
             subset_run = subset[subset.dx>=1]
