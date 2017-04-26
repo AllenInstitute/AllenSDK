@@ -50,49 +50,8 @@ def population_correlation_scatter(sig_corrs, noise_corrs, labels, colors, scale
     ax.set_ylim([-1,1])
     ax.legend(loc='upper left')
 
-def plot_representational_similarity(rep_sims, labels, colors, fontscale=1.0):
-    N = sum(rs.shape[0] for rs in rep_sims)
-    m = np.zeros((N,N), dtype=float)
-
-    ax = plt.gca()
-
-    legend_h = []
-    start = 0
-    for i,rs in enumerate(rep_sims):
-        end = start + rs.shape[0]
-        m[start:end,start:end] = rs
-
-        rect = mpatches.Rectangle((-10,start), 10, end-start, color=colors[i])
-        rect.set_clip_on(False)
-        ax.add_patch(rect)
-
-        rect = mpatches.Rectangle((start,-10), end-start, 10, color=colors[i])
-        rect.set_clip_on(False)
-        ax.add_patch(rect)
-
-        rect = mpatches.Rectangle((N,start), 10, end-start, color=colors[i]) 
-        rect.set_clip_on(False) 
-        ax.add_patch(rect)
-
-        rect = mpatches.Rectangle((start, N), end-start, 10, color=colors[i]) 
-        rect.set_clip_on(False) 
-        ax.add_patch(rect)
-
-        legend_h.append(mpatches.Patch(color=colors[i], label=labels[i]))
-
-        start = end
-
-    ax.imshow(m, interpolation='nearest', cmap='RdBu', clim=[-1,1])
-    ax.legend(handles=legend_h, fontsize=fontscale*16)
-    ax.set_axis_off()
-
-def plot_mean_representational_similarity(rep_sims):
-    m = np.eye(len(rep_sims))
-    for i,rs in enumerate(rep_sims):
-        m[i,i] = rep_sims[i].mean()
-
-    ax = plt.gca()
-    ax.imshow(m, interpolation='nearest', cmap='RdBu', clim=[-1,1])
+def plot_representational_similarity(rs):
+    plt.imshow(rs, interpolation='nearest', cmap='RdBu')
 
 def plot_condition_histogram(vals, bins, color=STIM_COLOR):
     plt.grid()
