@@ -23,7 +23,7 @@ def add_to_fit_parameters_dict_single(fit_parameters_dict, p):
     if (p[3] is None) or (p[4] is None):
         fit_parameters_dict['area'].append(None)
     else:
-        fit_parameters_dict['area'].append(np.pi * (2.355 / 2) ** 2 * np.abs(p[3]) * np.abs(p[4]))
+        fit_parameters_dict['area'].append(np.pi * (3./2) ** 2 * np.abs(p[3]) * np.abs(p[4]))
 
 def get_gaussian_fit_single_channel(rf, fit_parameters_dict):
 
