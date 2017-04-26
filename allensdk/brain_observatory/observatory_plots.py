@@ -166,12 +166,15 @@ def plot_radial_histogram(angles,
         
 def plot_time_to_peak(msrs, ttps, t_start, t_end, stim_start, stim_end, cmap):
     plt.plot(ttps, np.arange(msrs.shape[0],0,-1)-0.5, color='black')
-    plt.imshow(msrs, 
-               cmap=cmap, clim=[0,3], 
-               aspect=float((t_end-t_start) / msrs.shape[0]),  # float to get rid of MPL error
-               extent=[t_start, t_end, 0, msrs.shape[0]], interpolation='nearest')
+    if msrs.shape[0] > 0:
+        plt.imshow(msrs,
+                cmap=cmap, clim=[0,3],
+                aspect=float((t_end-t_start) / msrs.shape[0]),  # float to get rid of MPL error
+                extent=[t_start, t_end, 0, msrs.shape[0]], interpolation='nearest')
+        plt.ylim([0,msrs.shape[0]])
+    else:
+        plt.ylim([0, 1])
     plt.xlim([t_start, t_end])
-    plt.ylim([0,msrs.shape[0]])
 
     plt.axvline(stim_start, linestyle=':', color='black')
     plt.axvline(stim_end, linestyle=':', color='black')
