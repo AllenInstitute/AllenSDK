@@ -180,7 +180,7 @@ class SessionAnalysis(object):
         metrics["reliability_dg"] = dg.peak["reliability_dg"]
         metrics["tfdi_dg"] = dg.peak["tf_index_dg"]
         metrics["run_mod_dg"] = dg.peak["run_modulation_dg"]
-        metrics["p_run_mod_dg"] = dg.peak["p_run_mod_dg"]
+        metrics["p_run_mod_dg"] = dg.peak["p_run_dg"]
         metrics["peak_dff_dg"] = dg.peak["peak_dff_dg"]
 
 
@@ -193,6 +193,8 @@ class SessionAnalysis(object):
                                     for i in sg.peak["phase_sg"].values]
         metrics["p_sg"] = sg.peak["ptest_sg"]
         metrics["time_to_peak_sg"] = sg.peak["time_to_peak_sg"]
+        metrics["run_mod_sg"] = dg.peak["run_modulation_sg"]
+        metrics["p_run_mod_sg"] = dg.peak["p_run_sg"]
         metrics["cv_os_sg"] = dg.peak["cv_os_sg"]
 
     def append_metrics_natural_scene(self, metrics, ns):
