@@ -2,7 +2,50 @@ import matplotlib.pyplot as plt
 from matplotlib import ticker
 import numpy as np
 import matplotlib.gridspec as gridspec
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 
+def plot_ellipses(gaussian_fit_dict, ax=None, show=True, close=True, save_file_name=None, color='b'):
+    '''Example Usage:
+    oeid, cell_index, stimulus = 512176430, 12, 'locally_sparse_noise'
+    brain_observatory_cache = BrainObservatoryCache()
+    data_set = brain_observatory_cache.get_ophys_experiment_data(oeid)
+    lsn = LocallySparseNoise(data_set, stimulus)
+    result = get_receptive_field_data_dict_with_postprocessing(data_set, cell_index, stimulus, alpha=.05, number_of_shuffles=5000)
+    plot_ellipses(result['off']['gaussian_fit'], color='r')
+    '''
+
+    if ax is None:
+        fig, ax = plt.subplots(1)
+        ax.set_xlim(0, 130)
+        ax.set_ylim(0, 74)
+        plt.axis('off')
+
+    # try:
+    on_comp = len(gaussian_fit_dict['attrs']['center_x'])
+    for i in range(on_comp):
+        xy = (gaussian_fit_dict['attrs']['center_x'][i], gaussian_fit_dict['attrs']['center_y'][i])
+        width = 3 * np.abs(gaussian_fit_dict['attrs']['width_x'][i])
+        height = 3 * np.abs(gaussian_fit_dict['attrs']['width_y'][i])
+        angle = gaussian_fit_dict['attrs']['rotation'][i]
+        if np.logical_not(any(np.isnan(xy))):
+            ellipse = mpatches.Ellipse(xy, width=width, height=height, angle=angle, lw=2, edgecolor=color,
+                                       facecolor='none')
+            ax.add_artist(ellipse)
+
+    if not save_file_name is None:
+        fig.savefig(save_file_name)
+
+    if show == True:
+        plt.show()
+
+    if close:
+        plt.close(fig)
+
+    # except:
+    #     pass
+
+    return ax
 
 def pvalue_to_NLL(p_values,
                   max_NLL=10.0):
