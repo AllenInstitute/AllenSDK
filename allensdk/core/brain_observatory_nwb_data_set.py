@@ -672,20 +672,12 @@ class BrainObservatoryNwbDataSet(object):
         return motion_correction
 
     def save_analysis_dataframes(self, *tables):
-        # NOTE: should use NWB library to write data to NWB file. It is
-        #   designed to avoid possible corruption of the file in event
-        #   of a failed write
         store = pd.HDFStore(self.nwb_file, mode='a')
-
         for k, v in tables:
             store.put('analysis/%s' % (k), v)
-
         store.close()
 
     def save_analysis_arrays(self, *datasets):
-        # NOTE: should use NWB library to write data to NWB file. It is
-        #   designed to avoid possible corruption of the file in event
-        #   of a failed write
         with h5py.File(self.nwb_file, 'a') as f:
             for k, v in datasets:
                 if k in f['analysis']:

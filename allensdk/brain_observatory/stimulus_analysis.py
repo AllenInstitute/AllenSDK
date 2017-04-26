@@ -498,8 +498,8 @@ class StimulusAnalysis(object):
             return p
 
         StimulusAnalysis._log.info('Calculating responses for each sweep')
-        sweep_response = pd.DataFrame(index=self.stim_table.index.values, columns=np.array(
-            range(self.numbercells + 1)).astype(str))
+        sweep_response = pd.DataFrame(index=self.stim_table.index.values, 
+                                      columns=map(str, range(self.numbercells + 1)))
         sweep_response.rename(
             columns={str(self.numbercells): 'dx'}, inplace=True)
         for index, row in self.stim_table.iterrows():

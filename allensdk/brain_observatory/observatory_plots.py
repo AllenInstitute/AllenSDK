@@ -310,8 +310,8 @@ def plot_receptive_field(rf, color_map=None, zlim=[-3,3], mask=None):
 
     zrf = zscore(rf)
 
-    if mask is not None:
-        zrf = np.ma.array(zrf, mask=~mask)
+    #if mask is not None:
+    #    zrf = np.ma.array(zrf, mask=~mask)
 
     plt.imshow(zrf, interpolation='nearest', cmap=color_map, clim=zlim)
 

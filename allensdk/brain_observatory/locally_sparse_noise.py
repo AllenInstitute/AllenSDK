@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
 import allensdk.brain_observatory.stimulus_info as stimulus_info
 import h5py
 import numpy as np
@@ -233,17 +234,40 @@ class LocallySparseNoise(StimulusAnalysis):
 
         return rc1 + rc2_zoom
 
-    def plot_receptive_field(self, cell_specimen_id, on, color_map=None, zlim=[-3,3], mask=None):
+    def plot_cell_receptive_field(self, cell_specimen_id, on, color_map=None, zlim=[-3,3], mask=None):
         csids = self.data_set.get_cell_specimen_ids()
         cell_idx = np.where(csids == cell_specimen_id)[0][0]
+        receptive_field_data_dict = self._cell_index_receptive_field_analysis_data_dict[str(cell_idx)]
         
+        rf = receptive_field_data_dict["on" if on else "off"]['rts']['data']
+
         if color_map is None:
             color_map = oplots.LSN_RF_ON_COLOR_MAP if on else oplots.LSN_RF_OFF_COLOR_MAP
 
-        rf_idx = 0 if on else 1
-        cell_rf = self.receptive_field[:,:,cell_idx,rf_idx]
+        oplots.plot_receptive_field(rf, color_map, zlim, mask)
+
+    def plot_population_receptive_field(self, on, color_map=None, zlim=[-3,3], mask=None):
+        csids = self.data_set.get_cell_specimen_ids()
+        pop_rf = None
+        for csid in csids:
+            cell_idx = np.where(csids == csid)[0][0]
+            receptive_field_data_dict = self._cell_index_receptive_field_analysis_data_dict[str(cell_idx)]
         
-        oplots.plot_receptive_field(cell_rf, color_map, zlim, mask)
+            try:
+                cell_rf = receptive_field_data_dict["on" if on else "off"]['gaussian_fit']['data'].sum(axis=0)
+                logging.debug("cell %d has gaussian fit", csid)
+            except KeyError as e:
+                logging.debug("cell %d has NO gaussian fit", csid)
+                continue
+
+            if pop_rf is None:
+                pop_rf = np.zeros(cell_rf.shape, dtype=float)
+            pop_rf += cell_rf
+
+        if color_map is None:
+            color_map = oplots.LSN_RF_ON_COLOR_MAP if on else oplots.LSN_RF_OFF_COLOR_MAP
+
+        oplots.plot_receptive_field(pop_rf, color_map, zlim, mask)
 
     def sort_trials(self):
         ds = self.data_set
