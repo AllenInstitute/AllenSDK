@@ -138,7 +138,10 @@ class DriftingGratings(StimulusAnalysis):
         DriftingGratings._log.info('Calculating peak response properties')
 
         peak = pd.DataFrame(index=range(self.numbercells), columns=('ori_dg', 'tf_dg', 'reliability_dg',
-                                                                    'osi_dg', 'dsi_dg', 'peak_dff_dg', 'ptest_dg', 'p_run_dg', 'run_modulation_dg', 'cv_os_dg', 'cv_ds_dg', 'tf_index_dg', 'cell_specimen_id'))
+                                                                    'osi_dg', 'dsi_dg', 'peak_dff_dg', 
+                                                                    'ptest_dg', 'p_run_dg', 'run_modulation_dg', 
+                                                                    'cv_os_dg', 'cv_ds_dg', 'tf_index_dg', 
+                                                                    'cell_specimen_id'))
         cids = self.data_set.get_cell_specimen_ids()
 
         orivals_rad = np.deg2rad(self.orivals)        
@@ -164,7 +167,7 @@ class DriftingGratings(StimulusAnalysis):
             for i in range(8):
                 CV_top_os[i] = (tuning[i]*np.exp(1j*2*orivals_rad[i]))
                 CV_top_ds[i] = (tuning[i]*np.exp(1j*orivals_rad[i]))
-            peck.cv_os_dg.iloc[nc] = np.abs(CV_top_os.sum())/tuning.sum()
+            peak.cv_os_dg.iloc[nc] = np.abs(CV_top_os.sum())/tuning.sum()
             peak.cv_ds_dg.iloc[nc] = np.abs(CV_top_ds.sum())/tuning.sum()
             
             peak.osi_dg.iloc[nc] = (pref - orth) / (pref + orth)

@@ -187,7 +187,8 @@ class StaticGratings(StimulusAnalysis):
 
         peak = pd.DataFrame(index=range(self.numbercells), columns=('ori_sg', 'sf_sg', 'phase_sg', 'reliability_sg',
                                                                     'osi_sg', 'peak_dff_sg', 'ptest_sg', 'time_to_peak_sg', 
-                                                                    'duration_sg', 'cell_specimen_id','p_run_sg','run_modulation_sg', 'sf_index_dg'))
+                                                                    'duration_sg', 'cell_specimen_id','p_run_sg',
+                                                                    'run_modulation_sg', 'sf_index_dg'))
         cids = self.data_set.get_cell_specimen_ids()
 
         for nc in range(self.numbercells):
@@ -243,7 +244,7 @@ class StaticGratings(StimulusAnalysis):
                 pass
             
             #running modulation
-            subset = self.mean_sweep_response_sg[(self.stim_table_sg.spatial_frequency==self.sfvals[pref_sf])&(self.stim_table_sg.orientation==self.orivals[pref_ori])&(self.stim_table_sg.phase==self.phasevals[pref_phase])]            
+            subset = self.mean_sweep_response[(self.stim_table_sg.spatial_frequency==self.sfvals[pref_sf])&(self.stim_table_sg.orientation==self.orivals[pref_ori])&(self.stim_table_sg.phase==self.phasevals[pref_phase])]            
             subset_run = subset[subset.dx>=1]
             subset_stat = subset[subset.dx<1]
             if (len(subset_run)>4) & (len(subset_stat)>4):
