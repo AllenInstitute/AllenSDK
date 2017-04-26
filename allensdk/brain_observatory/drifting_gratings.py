@@ -126,7 +126,7 @@ class DriftingGratings(StimulusAnalysis):
         for drifting grating):
             * ori_dg (orientation)
             * tf_dg (temporal frequency)
-            * response_reliability_dg
+            * reliability_dg
             * osi_dg (orientation selectivity index)
             * dsi_dg (direction selectivity index)
             * peak_dff_dg (peak dF/F)
@@ -137,11 +137,14 @@ class DriftingGratings(StimulusAnalysis):
         '''
         DriftingGratings._log.info('Calculating peak response properties')
 
-        peak = pd.DataFrame(index=range(self.numbercells), columns=('ori_dg', 'tf_dg', 'response_reliability_dg',
-                                                                    'osi_dg', 'dsi_dg', 'peak_dff_dg', 'ptest_dg', 'p_run_dg', 'run_modulation_dg', 'cv_dg', 'cell_specimen_id'))
+        peak = pd.DataFrame(index=range(self.numbercells), columns=('ori_dg', 'tf_dg', 'reliability_dg',
+                                                                    'osi_dg', 'dsi_dg', 'peak_dff_dg', 
+                                                                    'ptest_dg', 'p_run_dg', 'run_modulation_dg', 
+                                                                    'cv_os_dg', 'cv_ds_dg', 'tf_index_dg', 
+                                                                    'cell_specimen_id'))
         cids = self.data_set.get_cell_specimen_ids()
 
-        orivals_rad = np.deg2rad(self.orivals)
+        orivals_rad = np.deg2rad(self.orivals)        
         for nc in range(self.numbercells):
             cell_peak = np.where(self.response[:, 1:, nc, 0] == np.nanmax(
                 self.response[:, 1:, nc, 0]))
@@ -150,8 +153,7 @@ class DriftingGratings(StimulusAnalysis):
             peak.cell_specimen_id.iloc[nc] = cids[nc]
             peak.ori_dg.iloc[nc] = prefori
             peak.tf_dg.iloc[nc] = preftf
-            peak.response_reliability_dg.iloc[
-                nc] = self.response[prefori, preftf, nc, 2] / 0.15
+
             pref = self.response[prefori, preftf, nc, 0]
             orth1 = self.response[np.mod(prefori + 2, 8), preftf, nc, 0]
             orth2 = self.response[np.mod(prefori - 2, 8), preftf, nc, 0]
@@ -159,11 +161,15 @@ class DriftingGratings(StimulusAnalysis):
             null = self.response[np.mod(prefori + 4, 8), preftf, nc, 0]
 
             tuning = self.response[:, preftf, nc, 0]
-            CV_top = np.empty((8))
+            #new circular variance below
+            CV_top_os = np.empty((8), dtype=np.complex128)
+            CV_top_ds = np.empty((8), dtype=np.complex128)
             for i in range(8):
-                CV_top[i] = (tuning[i] * np.exp(1j * 2 * orivals_rad[i])).real
-            peak.cv_dg.iloc[nc] = np.abs(CV_top.sum() / tuning.sum())
-
+                CV_top_os[i] = (tuning[i]*np.exp(1j*2*orivals_rad[i]))
+                CV_top_ds[i] = (tuning[i]*np.exp(1j*orivals_rad[i]))
+            peak.cv_os_dg.iloc[nc] = np.abs(CV_top_os.sum())/tuning.sum()
+            peak.cv_ds_dg.iloc[nc] = np.abs(CV_top_ds.sum())/tuning.sum()
+            
             peak.osi_dg.iloc[nc] = (pref - orth) / (pref + orth)
             peak.dsi_dg.iloc[nc] = (pref - null) / (pref + null)
             peak.peak_dff_dg.iloc[nc] = pref
@@ -180,16 +186,42 @@ class DriftingGratings(StimulusAnalysis):
 
             subset = self.mean_sweep_response[(self.stim_table.temporal_frequency == self.tfvals[
                                                preftf]) & (self.stim_table.orientation == self.orivals[prefori])]
+            #running modulation                                 
             subset_stat = subset[subset.dx < 1]
             subset_run = subset[subset.dx >= 1]
             if (len(subset_run) > 2) & (len(subset_stat) > 2):
-                (_, peak.p_run_dg.iloc[nc]) = st.ks_2samp(
-                    subset_run[str(nc)], subset_stat[str(nc)])
-                peak.run_modulation_dg.iloc[nc] = subset_run[
-                    str(nc)].mean() / subset_stat[str(nc)].mean()
+                (_,peak.p_run_dg.iloc[nc]) = st.ttest_ind(subset_run[str(nc)], subset_stat[str(nc)], equal_var=False)
+                
+                if subset_run[str(nc)].mean()>subset_stat[str(nc)].mean():
+                    peak.run_modulation_dg.iloc[nc] = (subset_run[str(nc)].mean() - subset_stat[str(nc)].mean())/np.abs(subset_run[str(nc)].mean())
+                elif subset_run[str(nc)].mean()<subset_stat[str(nc)].mean():
+                    peak.run_modulation_dg.iloc[nc] = -1*((subset_stat[str(nc)].mean() - subset_run[str(nc)].mean())/np.abs(subset_stat[str(nc)].mean()))
+
             else:
                 peak.p_run_dg.iloc[nc] = np.NaN
                 peak.run_modulation_dg.iloc[nc] = np.NaN
+            
+            #reliability 
+            subset = self.sweep_response[(self.stim_table.temporal_frequency == self.tfvals[
+                                               preftf]) & (self.stim_table.orientation == self.orivals[prefori])]
+            corr_matrix = np.empty((len(subset),len(subset)))
+            for i in range(len(subset)):
+                for j in range(len(subset)):
+                    r,p = st.pearsonr(subset[str(nc)].iloc[i][30:90], subset[str(nc)].iloc[j][30:90])
+                    corr_matrix[i,j] = r
+            mask = np.ones((len(subset), len(subset)))
+            for i in range(len(subset)):
+                for j in range(len(subset)):
+                    if i>=j:
+                        mask[i,j] = np.NaN
+            corr_matrix *= mask
+            peak.reliability_dg.iloc[nc] = np.nanmean(corr_matrix)
+            
+            #TF index
+            tf_tuning = self.response[prefori,1:,nc,0]
+            trials = self.mean_sweep_response[(self.stim_table.temporal_frequency!=0)&(self.stim_table.orientation==self.orivals[prefori])][str(nc)].values
+            SSE_part = np.sqrt(np.sum((trials-trials.mean())**2)/(len(trials)-5))
+            peak.tf_index_dg.iloc[nc] = (np.ptp(tf_tuning))/(np.ptp(tf_tuning) + 2*SSE_part)
 
         return peak
 

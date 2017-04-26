@@ -115,7 +115,7 @@ class NaturalScenes(StimulusAnalysis):
         Pandas data frame with the following fields ('_ns' suffix is for
         natural scene):
             * scene_ns (scene number)
-            * response_reliability_ns
+            * reliability_ns
             * peak_dff_ns (peak dF/F)
             * ptest_ns
             * p_run_ns
@@ -124,28 +124,30 @@ class NaturalScenes(StimulusAnalysis):
             * duration_ns
         '''
         NaturalScenes._log.info('Calculating peak response properties')
-        peak = pd.DataFrame(index=range(self.numbercells), columns=('scene_ns', 'response_reliability_ns', 'peak_dff_ns',
-                                                                    'ptest_ns', 'p_run_ns', 'run_modulation_ns', 'time_to_peak_ns', 'duration_ns', 'cell_specimen_id'))
+        peak = pd.DataFrame(index=range(self.numbercells), columns=('scene_ns', 'reliability_ns', 'peak_dff_ns',
+                                                                    'ptest_ns', 'p_run_ns', 'run_modulation_ns', 
+                                                                    'time_to_peak_ns', 'duration_ns', 
+                                                                    'cell_specimen_id','image_selectivity_ns'))
         cids = self.data_set.get_cell_specimen_ids()
 
         for nc in range(self.numbercells):
             nsp = np.argmax(self.response[1:, nc, 0])
             peak.cell_specimen_id.iloc[nc] = cids[nc]
             peak.scene_ns[nc] = nsp
-            peak.response_reliability_ns[nc] = self.response[
-                nsp + 1, nc, 2] / 0.50  # assume 50 trials
+#            peak.response_reliability_ns[nc] = self.response[
+#                nsp + 1, nc, 2] / 0.50  # assume 50 trials
             peak.peak_dff_ns[nc] = self.response[nsp + 1, nc, 0]
-            subset = self.mean_sweep_response[self.stim_table.frame == nsp]
-            subset_stat = subset[subset.dx < 2]
-            subset_run = subset[subset.dx >= 2]
-            if (len(subset_run) > 5) & (len(subset_stat) > 5):
-                (_, peak.p_run_ns[nc]) = st.ks_2samp(
-                    subset_run[str(nc)], subset_stat[str(nc)])
-                peak.run_modulation_ns[nc] = subset_run[
-                    str(nc)].mean() / subset_stat[str(nc)].mean()
-            else:
-                peak.p_run_ns[nc] = np.NaN
-                peak.run_modulation_ns[nc] = np.NaN
+#            subset = self.mean_sweep_response[self.stim_table.frame == nsp]
+#            subset_stat = subset[subset.dx < 2]
+#            subset_run = subset[subset.dx >= 2]
+#            if (len(subset_run) > 5) & (len(subset_stat) > 5):
+#                (_, peak.p_run_ns[nc]) = st.ks_2samp(
+#                    subset_run[str(nc)], subset_stat[str(nc)])
+#                peak.run_modulation_ns[nc] = subset_run[
+#                    str(nc)].mean() / subset_stat[str(nc)].mean()
+#            else:
+#                peak.p_run_ns[nc] = np.NaN
+#                peak.run_modulation_ns[nc] = np.NaN
             groups = []
             for im in range(self.number_scenes):
                 subset = self.mean_sweep_response[
@@ -162,6 +164,53 @@ class NaturalScenes(StimulusAnalysis):
                     test2).max() / self.acquisition_rate
             except:
                 pass
+            
+            #running modulation
+            subset = self.mean_sweep_response[self.stim_table.frame==nsp]            
+            subset_run = subset[subset.dx>=1]
+            subset_stat = subset[subset.dx<1]
+            if (len(subset_run)>4) & (len(subset_stat)>4):
+                (_,peak.p_run_ns.iloc[nc]) = st.ttest_ind(subset_run[str(nc)], subset_stat[str(nc)], equal_var=False)
+                
+                if subset_run[str(nc)].mean()>subset_stat[str(nc)].mean():
+                    peak.run_modulation_ns.iloc[nc] = (subset_run[str(nc)].mean() - subset_stat[str(nc)].mean())/np.abs(subset_run[str(nc)].mean())
+                elif subset_run[str(nc)].mean()<subset_stat[str(nc)].mean():
+                    peak.run_modulation_ns.iloc[nc] = -1*((subset_stat[str(nc)].mean() - subset_run[str(nc)].mean())/np.abs(subset_stat[str(nc)].mean()))
+            else:
+                peak.p_run_ns.iloc[nc] = np.NaN
+                peak.run_modulation_ns.iloc[nc] = np.NaN                
+            
+            #reliability
+            subset = self.sweep_response[self.stim_table.frame==nsp]            
+            corr_matrix = np.empty((len(subset),len(subset)))
+            for i in range(len(subset)):
+                for j in range(len(subset)):
+                    r,p = st.pearsonr(subset[str(nc)].iloc[i][28:42], subset[str(nc)].iloc[j][28:42])
+                    corr_matrix[i,j] = r
+            mask = np.ones((len(subset), len(subset)))
+            for i in range(len(subset)):
+                for j in range(len(subset)):
+                    if i>=j:
+                        mask[i,j] = np.NaN
+            corr_matrix *= mask
+            peak.reliability_ns.iloc[nc] = np.nanmean(corr_matrix)
+            
+            #image selectivity
+            fmin = self.response[1:,nc,0].min()
+            fmax = self.response[1:,nc,0].max()
+            rtj = np.empty((1000,1))
+            for j in range(1000):
+                thresh = fmin + j*((fmax-fmin)/1000.)
+                theta = np.empty((118,1))
+                for im in range(118):
+                    if self.response[im+1,nc,0] > thresh:  #im+1 to only look at images, not blanksweep
+                        theta[im] = 1
+                    else:
+                        theta[im] = 0
+                rtj[j] = theta.mean()
+            biga = rtj.mean()
+            bigs = 1 - (2*biga)
+            peak.image_selectivity_ns.iloc[i] = bigs
 
         return peak
 

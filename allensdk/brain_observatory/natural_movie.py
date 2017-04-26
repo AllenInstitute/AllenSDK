@@ -91,27 +91,44 @@ class NaturalMovie(StimulusAnalysis):
             'peak', 'response_reliability', 'cell_specimen_id'))
         cids = self.data_set.get_cell_specimen_ids()
 
+        mask = np.ones((10,10))
+        for i in range(10):
+            for j in range(10):
+                if i>=j:
+                    mask[i,j] = np.NaN        
+        
         for nc in range(self.numbercells):
             peak_movie.cell_specimen_id.iloc[nc] = cids[nc]
             meanresponse = self.sweep_response[str(nc)].mean()
-            movie_len = len(meanresponse) / 30
-            output = np.empty((movie_len, 10))
-            for tr in range(10):
-                test = self.sweep_response[str(nc)].iloc[tr]
-                for i in range(movie_len):
-                    _, p = st.ks_2samp(
-                        test[i * 30:(i + 1) * 30], test[(i + 1) * 30:(i + 2) * 30])
-                    output[i, tr] = p
-            output = np.where(output < 0.05, 1, 0)
-            ptime = np.sum(output, axis=1)
-            ptime *= 10
+            
+#            movie_len = len(meanresponse) / 30
+#            output = np.empty((movie_len, 10))
+#            for tr in range(10):
+#                test = self.sweep_response[str(nc)].iloc[tr]
+#                for i in range(movie_len):
+#                    _, p = st.ks_2samp(
+#                        test[i * 30:(i + 1) * 30], test[(i + 1) * 30:(i + 2) * 30])
+#                    output[i, tr] = p
+#            output = np.where(output < 0.05, 1, 0)
+#            ptime = np.sum(output, axis=1)
+#            ptime *= 10
             peak = np.argmax(meanresponse)
-            if peak > 30:
-                peak_movie.response_reliability.iloc[
-                    nc] = ptime[(peak - 30) / 30]
-            else:
-                peak_movie.response_reliability.iloc[nc] = ptime[0]
+#            if peak > 30:
+#                peak_movie.response_reliability.iloc[
+#                    nc] = ptime[(peak - 30) / 30]
+#            else:
+#                peak_movie.response_reliability.iloc[nc] = ptime[0]
             peak_movie.peak.iloc[nc] = peak
+            
+            #reliability
+            corr_matrix = np.empty((10,10))
+            for i in range(10):
+                for j in range(10):
+                    r,p = st.pearsonr(self.sweep_response[str(nc)].iloc[i], self.sweep_response[str(nc)].iloc[j])
+                    corr_matrix[i,j] = r
+            corr_matrix*=mask
+            peak_movie.response_reliability.iloc[nc] = np.nanmean(corr_matrix)
+            
         if self.movie_name == 'natural_movie_one':
             peak_movie.rename(columns={
                               'peak': 'peak_nm1', 'response_reliability': 'response_reliability_nm1'}, inplace=True)

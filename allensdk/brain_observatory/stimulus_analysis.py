@@ -526,9 +526,9 @@ class StimulusAnalysis(object):
 
     def plot_running_speed_histogram(self, xlim=None, nbins=None):
         if xlim is None:
-            xlim = [0,80]
+            xlim = [-10,100]
         if nbins is None:
-            nbins = 20
+            nbins = 40
 
         ax = plt.gca()
         ax.hist(self.dxcm, bins=nbins, range=xlim, color=oplots.STIM_COLOR)
@@ -551,3 +551,4 @@ class StimulusAnalysis(object):
     @staticmethod
     def peak_row_from_csid(peak, csid):
         return peak[peak.cell_specimen_id == csid].index[0]
+    

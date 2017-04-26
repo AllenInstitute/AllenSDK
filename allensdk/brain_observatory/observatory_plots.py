@@ -23,7 +23,17 @@ LSN_RF_ON_COLOR_MAP.set_bad((1,1,1,1),1.0)
 LSN_RF_OFF_COLOR_MAP = LinearSegmentedColormap.from_list('default', [[0.0,0.0,1.0,1.0],[1,1,1,1],[1.0,0,0.0,1]])
 LSN_RF_OFF_COLOR_MAP.set_bad((1,1,1,1),1.0)
 
-def correlation_scatter(sig_corrs, noise_corrs, labels, colors, scale=15):
+def plot_cell_correlation(sig_corrs, labels, colors, scale=15):
+    alpha = 1.0 / len(sig_corrs)
+    ax = plt.gca()
+    for sig_corr, color, label in zip(sig_corrs, colors, labels):
+        ax.bar(range(len(sig_corr)), sig_corr, color=color, alpha=alpha, label=label)
+    ax.set_xlabel("cell")
+    ax.set_ylabel("signal correlation")
+    ax.set_ylim([-1,1])
+    ax.legend(loc='lower left')
+
+def population_correlation_scatter(sig_corrs, noise_corrs, labels, colors, scale=15):
     alpha = max(0.85 - 0.15 * (len(sig_corrs)-1), 0.2)
     ax = plt.gca()
     for sig_corr, noise_corr, color, label in zip(sig_corrs, noise_corrs, colors, labels):
@@ -40,25 +50,8 @@ def correlation_scatter(sig_corrs, noise_corrs, labels, colors, scale=15):
     ax.set_ylim([-1,1])
     ax.legend(loc='upper left')
 
-def plot_representational_similarity(rep_sims):
-    N = sum(rs.shape[0] for rs in rep_sims)
-    m = np.zeros((N,N), dtype=float)
-    start = 0
-    for i,rs in enumerate(rep_sims):
-        end = start + rs.shape[0]
-        m[start:end,start:end] = rs
-        start = end
-
-    ax = plt.gca()
-    ax.imshow(m, interpolation='nearest', cmap='RdBu', clim=[-1,1])
-
-def plot_mean_representational_similarity(rep_sims):
-    m = np.eye(len(rep_sims))
-    for i,rs in enumerate(rep_sims):
-        m[i,i] = rep_sims[i].mean()
-
-    ax = plt.gca()
-    ax.imshow(m, interpolation='nearest', cmap='RdBu', clim=[-1,1])
+def plot_representational_similarity(rs):
+    plt.imshow(rs, interpolation='nearest', cmap='RdBu')
 
 def plot_condition_histogram(vals, bins, color=STIM_COLOR):
     plt.grid()
@@ -195,14 +188,18 @@ def figure_in_px(w, h, file_name, dpi=96.0):
     plt.savefig(file_name, dpi=dpi)
     plt.close()
 
-def finalize_no_axes():
+def finalize_no_axes(pad=0.0):
     plt.axis('off')
-    plt.subplots_adjust(left=0.0, right=1.0, bottom=0.0, top=1.0, wspace=0.0, hspace=0.0)
+    plt.subplots_adjust(left=pad, 
+                        right=1.0-pad, 
+                        bottom=pad, 
+                        top=1.0-pad, 
+                        wspace=0.0, hspace=0.0)
 
-def finalize_with_axes():
-    plt.tight_layout(pad=.3)
+def finalize_with_axes(pad=.3):
+    plt.tight_layout(pad=pad)
 
-def finalize_no_labels():
+def finalize_no_labels(pad=.3):
     ax = plt.gca()
     ax.set_xlabel("")
     ax.set_ylabel("")
@@ -210,7 +207,7 @@ def finalize_no_labels():
     ax.set_yticklabels([])
     if ax.legend_ is not None:
         ax.legend_.remove()
-    plt.tight_layout(pad=.3)
+    plt.tight_layout(pad=pad)
 
 def plot_combined_speed(binned_resp_vis, binned_dx_vis, binned_resp_sp, binned_dx_sp,
                         evoked_color, spont_color):
