@@ -187,6 +187,11 @@ class SessionAnalysis(object):
         metrics["pref_image_ns"] = ns.peak["scene_ns"]
         metrics["p_ns"] = ns.peak["ptest_ns"]
         metrics["time_to_peak_ns"] = ns.peak["time_to_peak_ns"]
+        metrics["image_sel_ns"] = ns.peak["image_selectivity_ns"]
+        metrics["reliability_ns"] = ns.peak["reliability_ns"]
+        metrics["run_mod_ns"] = ns.peak["run_modulation_ns"]
+        metrics["p_run_mod_ns"] = ns.peak["p_run_ns"]
+        metrics["peak_dff_ns"] = ns.peak["peak_dff_ns"]
 
     def verify_roi_lists_equal(self, roi1, roi2):
         if len(roi1) != len(roi2):
