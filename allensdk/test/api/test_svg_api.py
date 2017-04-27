@@ -2,8 +2,7 @@
 from allensdk.api.queries.svg_api import SvgApi
 import pytest
 import json
-import allensdk.core.json_utilities as ju
-from mock import MagicMock, patch, call
+from mock import MagicMock
 import StringIO
 import os
 
