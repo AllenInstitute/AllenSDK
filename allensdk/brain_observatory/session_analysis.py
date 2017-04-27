@@ -208,7 +208,7 @@ class SessionAnalysis(object):
         metrics["peak_dff_ns"] = ns.peak["peak_dff_ns"]
 
     def append_metrics_locally_sparse_noise(self, metrics, lsn):
-        metrics['rf_chi2_lsn'] = lsn.peak['chi_squared_analysis/min_p']
+        metrics['rf_chi2_lsn'] = lsn.peak['rf_chi2_lsn']
         metrics['rf_area_on_lsn'] = lsn.peak['rf_area_on_lsn']
         metrics['rf_center_on_x_lsn'] = lsn.peak['rf_center_on_x_lsn']
         metrics['rf_center_on_y_lsn'] = lsn.peak['rf_center_on_y_lsn']
