@@ -129,15 +129,21 @@ class NaturalMovie(StimulusAnalysis):
             corr_matrix*=mask
             peak_movie.response_reliability.iloc[nc] = np.nanmean(corr_matrix)
             
-        if self.movie_name == 'natural_movie_one':
+        if self.movie_name == stiminfo.NATURAL_MOVIE_ONE:
             peak_movie.rename(columns={
-                              'peak': 'peak_nm1', 'response_reliability': 'response_reliability_nm1'}, inplace=True)
-        elif self.movie_name == 'natural_movie_two':
+                              'peak': 'peak_'+stiminfo.NATURAL_MOVIE_ONE_SHORT, 
+                              'response_reliability': 'response_reliability_'++stiminfo.NATURAL_MOVIE_ONE_SHORT}, 
+                              inplace=True)
+        elif self.movie_name == stiminfo.NATURAL_MOVIE_TWO:
             peak_movie.rename(columns={
-                              'peak': 'peak_nm2', 'response_reliability': 'response_reliability_nm2'}, inplace=True)
-        elif self.movie_name == 'natural_movie_three':
+                              'peak': 'peak_'+stiminfo.NATURAL_MOVIE_TWO_SHORT, 
+                              'response_reliability': 'response_reliability_'+stiminfo.NATURAL_MOVIE_TWO_SHORT},
+                              inplace=True)
+        elif self.movie_name == stiminfo.NATURAL_MOVIE_THREE:
             peak_movie.rename(columns={
-                              'peak': 'peak_nm3', 'response_reliability': 'response_reliability_nm3'}, inplace=True)
+                              'peak': 'peak_'+stiminfo.NATURAL_MOVIE_THREE_SHORT, 
+                              'response_reliability': 'response_reliability_'+stiminfo.NATURAL_MOVIE_THREE_SHORT}, 
+                              inplace=True)
 
         return peak_movie
 
@@ -163,9 +169,9 @@ class NaturalMovie(StimulusAnalysis):
 
         # TODO: deal with this properly
         suffix_map = {
-            stiminfo.NATURAL_MOVIE_ONE: '_nm1',
-            stiminfo.NATURAL_MOVIE_TWO: '_nm2',
-            stiminfo.NATURAL_MOVIE_THREE: '_nm3',
+            stiminfo.NATURAL_MOVIE_ONE: '_'+stiminfo.NATURAL_MOVIE_ONE_SHORT,
+            stiminfo.NATURAL_MOVIE_TWO: '_'+stiminfo.NATURAL_MOVIE_TWO_SHORT,
+            stiminfo.NATURAL_MOVIE_THREE: '_'+stiminfo.NATURAL_MOVIE_THREE_SHORT
             }
 
         try:

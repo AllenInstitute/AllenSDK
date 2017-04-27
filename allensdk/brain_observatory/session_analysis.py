@@ -207,6 +207,17 @@ class SessionAnalysis(object):
         metrics["p_run_mod_ns"] = ns.peak["p_run_ns"]
         metrics["peak_dff_ns"] = ns.peak["peak_dff_ns"]
 
+    def append_metrics_locally_sparse_noise(self, metrics, lsn):
+        metrics['rf_chi2_lsn'] = lsn.peak['chi_squared_analysis/min_p']
+        metrics['rf_area_on_lsn'] = lsn.peak['rf_area_on_lsn']
+        metrics['rf_center_on_x_lsn'] = lsn.peak['rf_center_on_x_lsn']
+        metrics['rf_center_on_y_lsn'] = lsn.peak['rf_center_on_y_lsn']
+        metrics['rf_area_off_lsn'] = lsn.peak['rf_area_off_lsn']
+        metrics['rf_center_off_x_lsn'] = lsn.peak['rf_center_off_x_lsn']
+        metrics['rf_center_off_y_lsn'] = lsn.peak['rf_center_off_y_lsn']
+        metrics['rf_distance_lsn'] = lsn.peak['rf_distance_lsn']
+        metrics['rf_overlap_index_lsn'] = lsn.peak['rf_overlap_index_lsn']
+
     def verify_roi_lists_equal(self, roi1, roi2):
         if len(roi1) != len(roi2):
             raise BrainObservatoryAnalysisException(
@@ -277,9 +288,10 @@ class SessionAnalysis(object):
         nm2 = NaturalMovie(self.nwb, 'natural_movie_two')
         nm1 = NaturalMovie(self.nwb, 'natural_movie_one')
         SessionAnalysis._log.info("Session C analyzed")
-        peak = multi_dataframe_merge([nm1.peak_run, nm1.peak, nm2.peak])
+        peak = multi_dataframe_merge([nm1.peak_run, nm1.peak, nm2.peak, lsn.peak])
         self.append_metadata(peak)
 
+        self.append_metrics_locally_sparse_noise(self.metrics_c, lsn)
         self.metrics_c["roi_id"] = nm1.roi_id
 
         if save_flag:
@@ -297,9 +309,10 @@ class SessionAnalysis(object):
         nm2 = NaturalMovie(self.nwb, 'natural_movie_two')
         nm1 = NaturalMovie(self.nwb, 'natural_movie_one')
         SessionAnalysis._log.info("Session C2 analyzed")
-        peak = multi_dataframe_merge([nm1.peak_run, nm1.peak, nm2.peak])
+        peak = multi_dataframe_merge([nm1.peak_run, nm1.peak, nm2.peak, lsn.peak])
         self.append_metadata(peak)
 
+        self.append_metrics_locally_sparse_noise(self.metrics_c, lsn)
         self.metrics_c["roi_id"] = nm1.roi_id
 
         if save_flag:

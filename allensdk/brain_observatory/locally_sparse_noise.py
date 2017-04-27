@@ -133,6 +133,60 @@ class LocallySparseNoise(StimulusAnalysis):
 
         return self._mean_response
 
+
+    def get_peak(self):
+        LocallySparseNoise._log.info('Calculating peak response properties')
+
+        peak = pd.DataFrame(index=range(self.numbercells), columns=('rf_center_on_x_lsn', 'rf_center_on_y_lsn',
+                                                                    'rf_center_off_x_lsn', 'rf_center_off_y_lsn',
+                                                                    'rf_area_on_lsn', 'rf_area_off_lsn',
+                                                                    'rf_distance_lsn', 'rf_overlap_index_lsn',
+                                                                    'rf_chi2_lsn',
+                                                                    'cell_specimen_id'))
+        csids = self.data_set.get_cell_specimen_ids()
+
+        df = self.get_receptive_field_attribute_df()
+        peak.cell_specimen_id = csids
+
+        for nc in range(self.numbercells):
+            peak['rf_chi2_lsn'].iloc[nc] = df['chi_squared_analysis/min_p'].iloc[nc]
+
+            # find the index of the largest on subunit, if it exists
+            area_on = df['on/gaussian_fit/area'].iloc[nc]
+            on_i = np.argmax(area_on) if isinstance(area_on, np.ndarray) else None
+
+            if on_i is None:
+                peak['rf_area_on_lsn'].iloc[nc] = np.nan
+                peak['rf_center_on_x_lsn'].iloc[nc] = np.nan
+                peak['rf_center_on_y_lsn'].iloc[nc] = np.nan
+            else:
+                peak['rf_area_on_lsn'].iloc[nc] = df['on/gaussian_fit/area'].iloc[nc][on_i]
+                peak['rf_center_on_x_lsn'].iloc[nc] = df['on/gaussian_fit/center_x'].iloc[nc][on_i]
+                peak['rf_center_on_y_lsn'].iloc[nc] = df['on/gaussian_fit/center_y'].iloc[nc][on_i]
+
+            # find the index of the largest off subunit, if it exists
+            area_off = df['off/gaussian_fit/area'].iloc[nc]
+            off_i = np.argmax(area_off) if isinstance(area_off, np.ndarray) else None
+
+            if off_i is None:
+                peak['rf_area_off_lsn'].iloc[nc] = np.nan
+                peak['rf_center_off_x_lsn'].iloc[nc] = np.nan
+                peak['rf_center_off_y_lsn'].iloc[nc] = np.nan
+            else:
+                peak['rf_area_off_lsn'].iloc[nc] = df['off/gaussian_fit/area'].iloc[nc][off_i]
+                peak['rf_center_off_x_lsn'].iloc[nc] = df['off/gaussian_fit/center_x'].iloc[nc][off_i]
+                peak['rf_center_off_y_lsn'].iloc[nc] = df['off/gaussian_fit/center_y'].iloc[nc][off_i]
+
+
+            if on_i is not None and off_i is not None:
+                peak['rf_distance_lsn'].iloc[nc] = df['on/gaussian_fit/distance'].iloc[nc][on_i][off_i]
+                peak['rf_overlap_index_lsn'].iloc[nc] = df['on/gaussian_fit/overlap'].iloc[nc][on_i][off_i]
+            else:
+                peak['rf_distance_lsn'].iloc[nc] = np.nan
+                peak['rf_overlap_index_lsn'].iloc[nc] = np.nan
+
+        return peak
+
     def populate_stimulus_table(self):
         self._stim_table = self.data_set.get_stimulus_table(self.stimulus)
         self._LSN, self._LSN_mask = self.data_set.get_locally_sparse_noise_stimulus_template(
@@ -303,19 +357,19 @@ class LocallySparseNoise(StimulusAnalysis):
         lsn.populate_stimulus_table()
 
         if stimulus == stimulus_info.LOCALLY_SPARSE_NOISE:
-            stimulus_suffix = ''
+            stimulus_suffix = stimulus_info.LOCALLY_SPARSE_NOISE_SHORT
         elif stimulus == stimulus_info.LOCALLY_SPARSE_NOISE_4DEG:
-            stimulus_suffix = '4'
+            stimulus_suffix = stimulus_info.LOCALLY_SPARSE_NOISE_4DEG_SHORT
         elif stimulus == stimulus_info.LOCALLY_SPARSE_NOISE_8DEG:
-            stimulus_suffix = '8'
+            stimulus_suffix = stimulus_info.LOCALLY_SPARSE_NOISE_8DEG_SHORT
 
         try:
 
             with h5py.File(analysis_file, "r") as f:
-                lsn._mean_response = f["analysis/mean_response_lsn%s" % stimulus_suffix].value
+                lsn._mean_response = f["analysis/mean_response_%s" % stimulus_suffix].value
 
-            lsn._sweep_response = pd.read_hdf(analysis_file, "analysis/sweep_response_lsn%s" % stimulus_suffix)
-            lsn._mean_sweep_response = pd.read_hdf(analysis_file, "analysis/mean_sweep_response_lsn%s" % stimulus_suffix)
+            lsn._sweep_response = pd.read_hdf(analysis_file, "analysis/sweep_response_%s" % stimulus_suffix)
+            lsn._mean_sweep_response = pd.read_hdf(analysis_file, "analysis/mean_sweep_response_%s" % stimulus_suffix)
 
             with h5py.File(analysis_file, "r") as f:
                 lsn._cell_index_receptive_field_analysis_data_dict = LocallySparseNoise.read_cell_index_receptive_field_analysis_dict(f, stimulus)
