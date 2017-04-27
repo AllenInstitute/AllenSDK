@@ -132,7 +132,7 @@ class NaturalMovie(StimulusAnalysis):
         if self.movie_name == stiminfo.NATURAL_MOVIE_ONE:
             peak_movie.rename(columns={
                               'peak': 'peak_'+stiminfo.NATURAL_MOVIE_ONE_SHORT, 
-                              'response_reliability': 'response_reliability_'++stiminfo.NATURAL_MOVIE_ONE_SHORT}, 
+                              'response_reliability': 'response_reliability_'+stiminfo.NATURAL_MOVIE_ONE_SHORT}, 
                               inplace=True)
         elif self.movie_name == stiminfo.NATURAL_MOVIE_TWO:
             peak_movie.rename(columns={
