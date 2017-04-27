@@ -27,6 +27,9 @@ from . import observatory_plots as oplots
 from .brain_observatory_exceptions import MissingStimulusException
 from .stimulus_analysis import StimulusAnalysis
 from .receptive_field_analysis.tools import dict_generator, read_h5_group
+from scipy.stats.mstats import zscore
+
+import matplotlib.pyplot as plt
 
 class LocallySparseNoise(StimulusAnalysis):
     """ Perform tuning analysis specific to the locally sparse noise stimulus.
@@ -141,8 +144,7 @@ class LocallySparseNoise(StimulusAnalysis):
 
 
     def get_mean_response(self):
-
-        print("Calculating mean responses")
+        logging.debug("Calculating mean responses")
         mean_response = np.empty(
             (self.nrows, self.ncols, self.numbercells + 1, 2))
 
@@ -234,40 +236,28 @@ class LocallySparseNoise(StimulusAnalysis):
 
         return rc1 + rc2_zoom
 
-    def plot_cell_receptive_field(self, cell_specimen_id, on, color_map=None, zlim=[-3,3], mask=None):
+    def plot_cell_receptive_field(self, cell_specimen_id, on, color_map=None, clim=None, mask=None):
+        if color_map is None:
+            color_map = 'Reds' if on else 'Blues'
+
+        onst = 'on' if on else 'off'
         csids = self.data_set.get_cell_specimen_ids()
         cell_idx = np.where(csids == cell_specimen_id)[0][0]
-        receptive_field_data_dict = self._cell_index_receptive_field_analysis_data_dict[str(cell_idx)]
-        
-        rf = receptive_field_data_dict["on" if on else "off"]['rts']['data']
+        rf_dict = self.cell_index_receptive_field_analysis_data_dict[str(cell_idx)]
+        rts = rf_dict[onst]['rts']['data']
+        rts[np.logical_not(rf_dict[onst]['fdr_mask']['data'].sum(axis=0))] = np.nan
 
-        if color_map is None:
-            color_map = oplots.LSN_RF_ON_COLOR_MAP if on else oplots.LSN_RF_OFF_COLOR_MAP
+        oplots.plot_receptive_field(rts, 
+                                    color_map=color_map, 
+                                    clim=clim, 
+                                    mask=mask)
 
-        oplots.plot_receptive_field(rf, color_map, zlim, mask)
-
-    def plot_population_receptive_field(self, on, color_map=None, zlim=[-3,3], mask=None):
-        csids = self.data_set.get_cell_specimen_ids()
-        pop_rf = None
-        for csid in csids:
-            cell_idx = np.where(csids == csid)[0][0]
-            receptive_field_data_dict = self._cell_index_receptive_field_analysis_data_dict[str(cell_idx)]
-        
-            try:
-                cell_rf = receptive_field_data_dict["on" if on else "off"]['gaussian_fit']['data'].sum(axis=0)
-                logging.debug("cell %d has gaussian fit", csid)
-            except KeyError as e:
-                logging.debug("cell %d has NO gaussian fit", csid)
-                continue
-
-            if pop_rf is None:
-                pop_rf = np.zeros(cell_rf.shape, dtype=float)
-            pop_rf += cell_rf
-
-        if color_map is None:
-            color_map = oplots.LSN_RF_ON_COLOR_MAP if on else oplots.LSN_RF_OFF_COLOR_MAP
-
-        oplots.plot_receptive_field(pop_rf, color_map, zlim, mask)
+    def plot_population_receptive_field(self, color_map='RdPu', clim=None, mask=None):
+        rf = np.nansum(self.receptive_field, axis=(2,3))
+        oplots.plot_receptive_field(rf,
+                                    color_map=color_map,
+                                    clim=clim,
+                                    mask=mask)
 
     def sort_trials(self):
         ds = self.data_set

@@ -4,7 +4,6 @@ from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.collections import PatchCollection
 import matplotlib.patches as mpatches
 import scipy.interpolate as si
-from scipy.stats.mstats import zscore
 
 import allensdk.brain_observatory.circle_plots as cplots
 from contextlib import contextmanager
@@ -19,10 +18,6 @@ STIM_COLOR = "#ccccdd"
 STIMULUS_COLOR_MAP = LinearSegmentedColormap.from_list('default',[ [1.0,1.0,1.0,0.0], [.6,.6,.85,1.0] ])
 EVOKED_COLOR = "#b30000"
 SPONTANEOUS_COLOR = "#0000b3"
-LSN_RF_ON_COLOR_MAP = LinearSegmentedColormap.from_list('default', [[0.0,0.0,1.0,1.0],[1,1,1,1],[1.0,0,0.0,1]])
-LSN_RF_ON_COLOR_MAP.set_bad((1,1,1,1),1.0)
-LSN_RF_OFF_COLOR_MAP = LinearSegmentedColormap.from_list('default', [[0.0,0.0,1.0,1.0],[1,1,1,1],[1.0,0,0.0,1]])
-LSN_RF_OFF_COLOR_MAP.set_bad((1,1,1,1),1.0)
 
 def plot_cell_correlation(sig_corrs, labels, colors, scale=15):
     alpha = 1.0 / len(sig_corrs)
@@ -304,15 +299,18 @@ def plot_speed(binned_resp, binned_dx, num_bins, color):
     ax.plot(x, y, color=color)    
     ax.fill_between(x, y_down, y_up, facecolor=color, alpha=0.1)
 
-def plot_receptive_field(rf, color_map=None, zlim=[-3,3], mask=None):
-    if color_map is None:
-        color_map = LSN_RF_ON_COLOR_MAP if on else LSN_RF_OFF_COLOR_MAP
 
-    zrf = zscore(rf)
+def plot_receptive_field(rf, color_map=None, clim=None, mask=None):
+    if mask is not None:
+        rf = np.ma.array(rf, mask=~mask)
 
-    #if mask is not None:
-    #    zrf = np.ma.array(zrf, mask=~mask)
+    if clim is None:
+        clim = np.nanpercentile(rf, [1.0,99.0], axis=None)
 
-    plt.imshow(zrf, interpolation='nearest', cmap=color_map, clim=zlim)
+    plt.imshow(rf, interpolation='nearest', 
+               cmap=color_map, 
+               clim=clim,
+               origin='bottom')
+
 
 
