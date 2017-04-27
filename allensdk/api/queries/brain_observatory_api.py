@@ -295,7 +295,8 @@ class BrainObservatoryApi(RmaTemplate):
         return data
 
     @cacheable(strategy='create',
-               pathfinder=Cache.pathfinder(file_name_position=2))
+               pathfinder=Cache.pathfinder(file_name_position=2,
+                                           path_keyword='file_name'))
     def save_ophys_experiment_data(self, ophys_experiment_id, file_name):
         data = self.template_query('brain_observatory_queries',
                                    'ophys_experiment_data',

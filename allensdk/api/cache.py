@@ -337,18 +337,22 @@ class Cache(object):
 
     @staticmethod
     def pathfinder(file_name_position,
-                   secondary_file_name_position=None):
-        def pf(*args):
+                   secondary_file_name_position=None,
+                   path_keyword=None):
+        def pf(*args, **kwargs):
             file_name = None
 
-            if file_name_position < len(args):
-                file_name = args[file_name_position]
-        
-            if (file_name is None and
-                secondary_file_name_position and 
-                secondary_file_name_position < len(args)):
-                file_name = args[secondary_file_name_position]
-        
+            if path_keyword is not None and path_keyword in kwargs:
+                file_name = kwargs[path_keyword]
+            else:
+                if file_name_position < len(args):
+                    file_name = args[file_name_position]
+
+                if (file_name is None and
+                    secondary_file_name_position and 
+                    secondary_file_name_position < len(args)):
+                    file_name = args[secondary_file_name_position]
+
             return file_name
         return pf
 
@@ -477,7 +481,7 @@ def cacheable(strategy=None,
                 pathfinder = kwargs.pop('pathfinder', None)
 
             if pathfinder and not 'path' in kwargs:
-                found_path = pathfinder(*args)
+                found_path = pathfinder(*args, **kwargs)
                 
                 if found_path:
                     kwargs['path'] = found_path
