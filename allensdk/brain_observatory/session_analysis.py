@@ -317,10 +317,16 @@ class SessionAnalysis(object):
         nm2 = NaturalMovie(self.nwb, 'natural_movie_two')
         nm1 = NaturalMovie(self.nwb, 'natural_movie_one')
         SessionAnalysis._log.info("Session C2 analyzed")
-        peak = multi_dataframe_merge([nm1.peak_run, nm1.peak, nm2.peak, lsn.peak])
+
+        if self.nwb.get_metadata()['targeted_structure'] == 'VISp':
+            lsn_peak = lsn4.peak
+        else:
+            lsn_peak = lsn8.peak
+
+        peak = multi_dataframe_merge([nm1.peak_run, nm1.peak, nm2.peak, lsn_peak])
         self.append_metadata(peak)
 
-        self.append_metrics_locally_sparse_noise(self.metrics_c['cell'], lsn)
+        self.append_metrics_locally_sparse_noise(self.metrics_c['cell'], lsn_peak)
         self.append_experiment_metrics(self.metrics_c['experiment'])
         self.metrics_c['cell']['roi_id'] = nm1.roi_id
 
