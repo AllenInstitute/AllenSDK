@@ -73,6 +73,10 @@ endif
 	cd $(EXAMPLES)/nb/summer_workshop_2015 && find . -maxdepth 1 -name '*.ipynb' -exec jupyter-nbconvert --to html {} \;
 	cd doc && make html || true
 
+notebooks:
+	cd $(EXAMPLES)/nb && find . -maxdepth 1 -name '*.ipynb' -exec jupyter-nbconvert --to notebook --execute {} \;
+	cd $(EXAMPLES)/nb/summer_workshop_2015 && find . -maxdepth 1 -name '*.ipynb' -exec jupyter-nbconvert --to notebook --execute {} \;
+
 FORCE:
 
 clean:
