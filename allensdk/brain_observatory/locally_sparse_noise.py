@@ -336,16 +336,15 @@ class LocallySparseNoise(StimulusAnalysis):
         return trials, cell_baselines
 
 
-    def open_pincushion_plot(self, cell_specimen_id, on, color_map=None):
-        csids = self.data_set.get_cell_specimen_ids()
-        cell_id = np.where(csids == cell_specimen_id)[0][0]
+    def open_pincushion_plot(self, on, cell_specimen_id=None, color_map=None, cell_index=None):
+        cell_index = self.row_from_cell_id(cell_specimen_id, cell_index)
 
         trials, baselines = self.sort_trials()
-        data = self.mean_sweep_response[str(cell_id)].values
+        data = self.mean_sweep_response[str(cell_index)].values
         
         cplots.make_pincushion_plot(data, trials, on, 
                                     self.nrows, self.ncols,
-                                    clim=[ baselines[cell_id], data.mean() + data.std() * 3 ],
+                                    clim=[ baselines[cell_index], data.mean() + data.std() * 3 ],
                                     color_map=color_map,
                                     radius=1.0/16.0)
 
