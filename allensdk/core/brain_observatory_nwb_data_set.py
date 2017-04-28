@@ -641,6 +641,19 @@ class BrainObservatoryNwbDataSet(object):
 
         return dxcm, dxtime
 
+    def get_pupil_location(self):
+        '''Returns the x, y pupil location in visual degrees.
+        '''
+        with h5py.File(self.nwb_file, 'r') as f:
+            eye_tracking = f['processing'][self.PIPELINE_DATASET][
+                'EyeTracking']['pupil_location']
+            pupil_location = eye_tracking['data'].value
+            pupil_times = eye_tracking['timestamps'].value
+
+        #TODO: align with fluorescence
+
+        return pupil_location, pupil_times
+
     def get_motion_correction(self):
         ''' Returns a Panda DataFrame containing the x- and y- translation of each image used for image alignment
         '''
