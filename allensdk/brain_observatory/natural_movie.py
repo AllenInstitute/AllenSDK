@@ -147,10 +147,10 @@ class NaturalMovie(StimulusAnalysis):
 
         return peak_movie
 
-    def open_track_plot(self, cell_specimen_id):
-        cell_id = self.peak_row_from_csid(self.peak, cell_specimen_id)
+    def open_track_plot(self, cell_specimen_id=None, cell_index=None):
+        cell_index = self.row_from_cell_id(cell_specimen_id, cell_index)
 
-        cell_rows = self.sweep_response[str(cell_id)]
+        cell_rows = self.sweep_response[str(cell_index)]
         data = []
         for i in range(len(cell_rows)):
             data.append(cell_rows.iloc[i])

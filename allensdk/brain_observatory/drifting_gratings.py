@@ -225,16 +225,16 @@ class DriftingGratings(StimulusAnalysis):
 
         return peak
 
-    def open_star_plot(self, cell_specimen_id, include_labels=False):
-        cell_id = self.peak_row_from_csid(self.peak, cell_specimen_id)
+    def open_star_plot(self, cell_specimen_id=None, include_labels=False, cell_index=None):
+        cell_index = self.row_from_cell_id(cell_specimen_id, cell_index)
 
-        df = self.mean_sweep_response[str(cell_id)]
+        df = self.mean_sweep_response[str(cell_index)]
         st = self.data_set.get_stimulus_table('drifting_gratings')
         mask = st.dropna(subset=['orientation']).index
         
         data = df.values
     
-        cmin = self.response[0,0,cell_id,0]
+        cmin = self.response[0,0,cell_index,0]
         cmax = data.mean() + data.std()*3
 
         fp = cplots.FanPlotter.for_drifting_gratings()

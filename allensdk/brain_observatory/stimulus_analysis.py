@@ -535,20 +535,26 @@ class StimulusAnalysis(object):
         ax.set_xlim(xlim)
         plt.xlabel("running speed (cm/s)")
 
-    def plot_speed_tuning(self, cell_specimen_id, 
+    def plot_speed_tuning(self, cell_specimen_id=None, 
+                          cell_index=None,
                           evoked_color=oplots.EVOKED_COLOR, 
                           spontaneous_color=oplots.SPONTANEOUS_COLOR):
-        cell_id = self.peak_row_from_csid(self.peak, cell_specimen_id)
+        cell_index = self.row_from_cell_id(self.peak, cell_specimen_id, cell_index)
 
-        oplots.plot_combined_speed(self.binned_cells_vis[cell_id,:,:]*100, self.binned_dx_vis[:,:], 
-                                   self.binned_cells_sp[cell_id,:,:]*100, self.binned_dx_sp[:,:],
+        oplots.plot_combined_speed(self.binned_cells_vis[cell_index,:,:]*100, self.binned_dx_vis[:,:], 
+                                   self.binned_cells_sp[cell_index,:,:]*100, self.binned_dx_sp[:,:],
                                    evoked_color, spontaneous_color)
 
         ax = plt.gca()
         plt.xlabel("running speed (cm/s)")
         plt.ylabel("percent dF/F")
 
-    @staticmethod
-    def peak_row_from_csid(peak, csid):
-        return peak[peak.cell_specimen_id == csid].index[0]
+    def row_from_cell_id(self, csid=None, idx=None):
+
+        if csid is not None and not np.isnan(csid):
+            return self.data_set.get_cell_specimen_ids().tolist().index(csid)
+        elif idx is not None:
+            return idx
+        else:
+            raise Exception("Could not find row for csid(%s) idx(%s)" % (str(csid), str(idx)))
     

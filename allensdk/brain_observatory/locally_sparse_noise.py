@@ -290,13 +290,12 @@ class LocallySparseNoise(StimulusAnalysis):
 
         return rc1 + rc2_zoom
 
-    def plot_cell_receptive_field(self, cell_specimen_id, on, color_map=None, clim=None, mask=None):
+    def plot_cell_receptive_field(self, on, cell_specimen_id=None, color_map=None, clim=None, mask=None, cell_index=None):
         if color_map is None:
             color_map = 'Reds' if on else 'Blues'
 
         onst = 'on' if on else 'off'
-        csids = self.data_set.get_cell_specimen_ids()
-        cell_idx = np.where(csids == cell_specimen_id)[0][0]
+        cell_idx = self.row_from_cell_id(cell_specimen_id, cell_index)
         rf_dict = self.cell_index_receptive_field_analysis_data_dict[str(cell_idx)]
         rts = rf_dict[onst]['rts']['data']
         rts[np.logical_not(rf_dict[onst]['fdr_mask']['data'].sum(axis=0))] = np.nan
