@@ -4,6 +4,8 @@ from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.collections import PatchCollection
 import matplotlib.patches as mpatches
 import scipy.interpolate as si
+import matplotlib.colorbar as cbar
+from mpl_toolkits.axes_grid1 import ImageGrid
 
 import allensdk.brain_observatory.circle_plots as cplots
 from contextlib import contextmanager
@@ -46,7 +48,44 @@ def population_correlation_scatter(sig_corrs, noise_corrs, labels, colors, scale
     ax.set_ylim([-1,1])
     ax.legend(loc='upper left')
 
-def plot_representational_similarity(rs, dims=None, dim_labels=None, colors=None, dim_order=None):
+class DimensionPatchHandler(object):
+    def __init__(self, vals, start_color, end_color, *args, **kwargs):
+        super(DimensionPatchHandler, self).__init__(*args, **kwargs)
+        self.vals = vals
+        self.start_color = start_color
+        self.end_color = end_color
+
+    def legend_artist(self, legend, orig_handle, fontsize, handlebox):
+        x0, y0 = handlebox.xdescent, handlebox.ydescent
+        width, height = handlebox.width, handlebox.height
+
+        num_vals = len(self.vals)
+        sub_width = float(width) / num_vals
+        x = x0
+        for i in range(len(self.vals)):
+            rgb = self.dim_color(i)
+            r = mpatches.Rectangle((x+i*sub_width, y0), 
+                                   sub_width, y0+height, 
+                                   facecolor=rgb, linewidth=0)
+
+            r.set_clip_on(False)
+            handlebox.add_artist(r)
+        return r
+
+    def dim_color(self, index):
+        rgb1 = np.array(mcolors.colorConverter.to_rgb(self.start_color))
+        rgb2 = np.array(mcolors.colorConverter.to_rgb(self.end_color))
+        t = float(index) / (len(self.vals)+1)
+        rgb = t * rgb2 + (1.0 - t) * rgb1
+        return rgb
+
+def float_label(n):
+    if n.is_integer():
+        return str(int(n))
+    else:
+        return "%.2f" % n
+
+def plot_representational_similarity(rs, dims=None, dim_labels=None, colors=None, dim_order=None, labels=True):
     if dim_order is not None:
         rsr = np.arange(len(rs)).reshape(*map(len,dims))
         rsrt = rsr.transpose(dim_order)
@@ -59,10 +98,32 @@ def plot_representational_similarity(rs, dims=None, dim_labels=None, colors=None
     
     rs = rs.copy()
     np.fill_diagonal(rs, np.nan)
+ 
+    if labels:
+        grid = ImageGrid(plt.gcf(), 111,
+                         nrows_ncols=(1,1),
+                         cbar_location="right",
+                         cbar_mode="single",
+                         cbar_size="7%",
+                         cbar_pad=0.05)
+        
+        for ax in grid: pass
+    else:
+        ax = plt.gca()
 
-    ax = plt.gca()
-    ax.imshow(rs, interpolation='nearest', cmap='RdBu_r')
+    im = ax.imshow(rs, interpolation='nearest', cmap='RdBu_r')
+    ax.set_xticklabels([])
+    ax.set_yticklabels([])
+    ax.set_xticks([])
+    ax.set_yticks([])
+
+    if labels:
+        ax.cax.colorbar(im)
+    
     if dims is not None:
+        dim_labels = ["%s(%s)" % (dim_labels[i],','.join(map(float_label, dims[i].tolist()))) for i in range(len(dims)) ]
+        dim_handlers = [ DimensionPatchHandler(dims[i], colors[i], 'w') for i in range(len(dims)) ]
+
         n = len(rs)
         for cell_i in range(n):
             idx = np.unravel_index(cell_i, map(len, dims))
@@ -71,11 +132,7 @@ def plot_representational_similarity(rs, dims=None, dim_labels=None, colors=None
             width = 1.8
             for dim_i, color in enumerate(colors):
                 v_i = idx[dim_i]
-                rgb = np.array(mcolors.colorConverter.to_rgb(color))
-                white = np.array([1.0,1.0,1.0])
-                t = float(v_i) / (len(dims[dim_i])+1)
-                rgb = t * white + (1.0 - t) * rgb
-
+                rgb = dim_handlers[dim_i].dim_color(v_i)
                 r = mpatches.Rectangle((start + dim_i * width, cell_i-.5), 
                                        width, 1.2, 
                                        facecolor=rgb, linewidth=0)
@@ -88,13 +145,18 @@ def plot_representational_similarity(rs, dims=None, dim_labels=None, colors=None
                 r.set_clip_on(False)
                 ax.add_patch(r)
 
-        patches = []
-        for label,color in  zip(dim_labels, colors):
-            p = mpatches.Patch(color=color, label=label)
-            patches.append(p)
-        ax.legend(handles=patches, loc=(0,-.1), ncol=len(dims), mode='expand')
-    ax.set_xticklabels([])
-    ax.set_yticklabels([])
+        if labels:
+            patches = [ mpatches.Patch(label=dim_labels[i]) for i in range(len(dims)) ]
+            ax.legend(handles=patches, 
+                      handler_map=dict(zip(patches,dim_handlers)),
+                      loc='upper left',
+                      bbox_to_anchor=(0,0),
+                      ncol=2,
+                      fontsize=9,
+                      frameon=False)
+
+
+    
 
 
 

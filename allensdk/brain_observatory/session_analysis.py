@@ -184,7 +184,6 @@ class SessionAnalysis(object):
         metrics["p_run_mod_dg"] = dg.peak["p_run_dg"]
         metrics["peak_dff_dg"] = dg.peak["peak_dff_dg"]
 
-
     def append_metrics_static_grating(self, metrics, sg):
         metrics["osi_sg"] = sg.peak["osi_sg"]
         metrics["pref_ori_sg"] = [sg.orivals[i]
@@ -219,6 +218,15 @@ class SessionAnalysis(object):
         metrics['rf_distance_lsn'] = lsn.peak['rf_distance_lsn']
         metrics['rf_overlap_index_lsn'] = lsn.peak['rf_overlap_index_lsn']
 
+    def append_metrics_natural_movie_one(self, metrics, nma):
+        metrics['reliability_nm1'] = nma.peak['response_reliability_nm1']
+
+    def append_metrics_natural_movie_two(self, metrics, nma):
+        metrics['reliability_nm2'] = nma.peak['response_reliability_nm2']
+
+    def append_metrics_natural_movie_three(self, metrics, nma):
+        metrics['reliability_nm3'] = nma.peak['response_reliability_nm3']
+
     def append_experiment_metrics(self, metrics):
         dxcm, dxtime = self.nwb.get_running_speed()
         metrics['mean_running_speed'] = np.nanmean(dxcm)
@@ -246,6 +254,8 @@ class SessionAnalysis(object):
             [nm1.peak_run, dg.peak, nm1.peak, nm3.peak])
 
         self.append_metrics_drifting_grating(self.metrics_a['cell'], dg)
+        self.append_metrics_natural_movie_one(self.metrics_a['cell'], nm1)
+        self.append_metrics_natural_movie_three(self.metrics_a['cell'], nm3)
         self.append_experiment_metrics(self.metrics_a['experiment'])
         self.metrics_a['cell']['roi_id'] = dg.roi_id
 
@@ -270,6 +280,7 @@ class SessionAnalysis(object):
         self.append_metrics_static_grating(self.metrics_b['cell'], sg)
         self.append_metrics_natural_scene(self.metrics_b['cell'], ns)
         self.append_experiment_metrics(self.metrics_b['experiment'])
+        self.append_metrics_natural_movie_one(self.metrics_a['cell'], nm1)
         self.verify_roi_lists_equal(sg.roi_id, ns.roi_id)
         self.metrics_b['cell']['roi_id'] = sg.roi_id
 
@@ -299,6 +310,8 @@ class SessionAnalysis(object):
         self.append_metadata(peak)
 
         self.append_metrics_locally_sparse_noise(self.metrics_c['cell'], lsn)
+        self.append_metrics_natural_movie_one(self.metrics_a['cell'], nm1)
+        self.append_metrics_natural_movie_two(self.metrics_a['cell'], nm2)
         self.append_experiment_metrics(self.metrics_c['experiment'])
         self.metrics_c['cell']['roi_id'] = nm1.roi_id
 
@@ -327,6 +340,8 @@ class SessionAnalysis(object):
         self.append_metadata(peak)
 
         self.append_metrics_locally_sparse_noise(self.metrics_c['cell'], lsn_peak)
+        self.append_metrics_natural_movie_one(self.metrics_a['cell'], nm1)
+        self.append_metrics_natural_movie_two(self.metrics_a['cell'], nm2)
         self.append_experiment_metrics(self.metrics_c['experiment'])
         self.metrics_c['cell']['roi_id'] = nm1.roi_id
 
