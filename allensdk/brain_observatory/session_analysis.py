@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
+import numpy as np
 from .static_gratings import StaticGratings
 from .locally_sparse_noise import LocallySparseNoise
 from .natural_scenes import NaturalScenes
@@ -54,9 +55,9 @@ class SessionAnalysis(object):
         self.save_path = save_path
         self.save_dir = os.path.dirname(save_path)
 
-        self.metrics_a = {}
-        self.metrics_b = {}
-        self.metrics_c = {}
+        self.metrics_a = dict(cell={},experiment={})
+        self.metrics_b = dict(cell={},experiment={})
+        self.metrics_c = dict(cell={},experiment={})
 
         self.metadata = self.nwb.get_metadata()
 
@@ -218,6 +219,10 @@ class SessionAnalysis(object):
         metrics['rf_distance_lsn'] = lsn.peak['rf_distance_lsn']
         metrics['rf_overlap_index_lsn'] = lsn.peak['rf_overlap_index_lsn']
 
+    def append_experiment_metrics(self, metrics):
+        dxcm, dxtime = self.nwb.get_running_speed()
+        metrics['mean_running_speed'] = np.nanmean(dxcm)
+
     def verify_roi_lists_equal(self, roi1, roi2):
         if len(roi1) != len(roi2):
             raise BrainObservatoryAnalysisException(
@@ -240,8 +245,9 @@ class SessionAnalysis(object):
         peak = multi_dataframe_merge(
             [nm1.peak_run, dg.peak, nm1.peak, nm3.peak])
 
-        self.append_metrics_drifting_grating(self.metrics_a, dg)
-        self.metrics_a["roi_id"] = dg.roi_id
+        self.append_metrics_drifting_grating(self.metrics_a['cell'], dg)
+        self.append_experiment_metrics(self.metrics_a['experiment'])
+        self.metrics_a['cell']['roi_id'] = dg.roi_id
 
         self.append_metadata(peak)
 
@@ -261,10 +267,11 @@ class SessionAnalysis(object):
             [nm1.peak_run, sg.peak, ns.peak, nm1.peak])
         self.append_metadata(peak)
 
-        self.append_metrics_static_grating(self.metrics_b, sg)
-        self.append_metrics_natural_scene(self.metrics_b, ns)
+        self.append_metrics_static_grating(self.metrics_b['cell'], sg)
+        self.append_metrics_natural_scene(self.metrics_b['cell'], ns)
+        self.append_experiment_metrics(self.metrics_b['experiment'])
         self.verify_roi_lists_equal(sg.roi_id, ns.roi_id)
-        self.metrics_b["roi_id"] = sg.roi_id
+        self.metrics_b['cell']['roi_id'] = sg.roi_id
 
         sg.noise_correlation, _, _, _ = sg.get_noise_correlation()
         sg.signal_correlation, _ = sg.get_signal_correlation()
@@ -291,8 +298,9 @@ class SessionAnalysis(object):
         peak = multi_dataframe_merge([nm1.peak_run, nm1.peak, nm2.peak, lsn.peak])
         self.append_metadata(peak)
 
-        self.append_metrics_locally_sparse_noise(self.metrics_c, lsn)
-        self.metrics_c["roi_id"] = nm1.roi_id
+        self.append_metrics_locally_sparse_noise(self.metrics_c['cell'], lsn)
+        self.append_experiment_metrics(self.metrics_c['experiment'])
+        self.metrics_c['cell']['roi_id'] = nm1.roi_id
 
         if save_flag:
             self.save_session_c(lsn, nm1, nm2, peak)
@@ -312,8 +320,9 @@ class SessionAnalysis(object):
         peak = multi_dataframe_merge([nm1.peak_run, nm1.peak, nm2.peak, lsn.peak])
         self.append_metadata(peak)
 
-        self.append_metrics_locally_sparse_noise(self.metrics_c, lsn)
-        self.metrics_c["roi_id"] = nm1.roi_id
+        self.append_metrics_locally_sparse_noise(self.metrics_c['cell'], lsn)
+        self.append_experiment_metrics(self.metrics_c['experiment'])
+        self.metrics_c['cell']['roi_id'] = nm1.roi_id
 
         if save_flag:
             self.save_session_c2(lsn4, lsn8, nm1, nm2, peak)
