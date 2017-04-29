@@ -176,8 +176,8 @@ class SessionAnalysis(object):
                                   for i in dg.peak["ori_dg"].values]
         metrics["pref_tf_dg"] = [dg.tfvals[i] for i in dg.peak["tf_dg"].values]
         metrics["p_dg"] = dg.peak["ptest_dg"]
-        metrics["cv_os_dg"] = dg.peak["cv_os_dg"]
-        metrics["cv_ds_dg"] = dg.peak["cv_ds_dg"]
+        metrics["g_osi_dg"] = dg.peak["cv_os_dg"]
+        metrics["g_dsi_dg"] = dg.peak["cv_ds_dg"]
         metrics["reliability_dg"] = dg.peak["reliability_dg"]
         metrics["tfdi_dg"] = dg.peak["tf_index_dg"]
         metrics["run_mod_dg"] = dg.peak["run_modulation_dg"]
@@ -195,7 +195,7 @@ class SessionAnalysis(object):
         metrics["time_to_peak_sg"] = sg.peak["time_to_peak_sg"]
         metrics["run_mod_sg"] = sg.peak["run_modulation_sg"]
         metrics["p_run_mod_sg"] = sg.peak["p_run_sg"]
-        metrics["cv_os_sg"] = sg.peak["cv_os_sg"]
+        metrics["g_osi_sg"] = sg.peak["cv_os_sg"]
 
     def append_metrics_natural_scene(self, metrics, ns):
         metrics["pref_image_ns"] = ns.peak["scene_ns"]
