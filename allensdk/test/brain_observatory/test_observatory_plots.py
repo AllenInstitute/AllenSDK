@@ -228,6 +228,6 @@ def test_speed_tuning_plot(new_file, analysis, cell_specimen_id, shape=[500,500]
                            ('locally_sparse_noise_off.png', LOCALLY_SPARSE_NOISE, False, CELL_SPECIMEN_ID) ])
 def test_pincushion_plot(new_file, locally_sparse_noise, on, cell_specimen_id, shape=[500,877]):
     with oplots.figure_in_px(shape[1], shape[0], new_file) as fig:
-        locally_sparse_noise().open_pincushion_plot(cell_specimen_id, on=on)
+        locally_sparse_noise().open_pincushion_plot(on, cell_specimen_id)
         oplots.finalize_no_axes()
     assert_images_match(new_file, os.path.join(TEST_DATA_DIR, new_file), shape)

@@ -540,7 +540,7 @@ class StimulusAnalysis(object):
                           cell_index=None,
                           evoked_color=oplots.EVOKED_COLOR, 
                           spontaneous_color=oplots.SPONTANEOUS_COLOR):
-        cell_index = self.row_from_cell_id(self.peak, cell_specimen_id, cell_index)
+        cell_index = self.row_from_cell_id(cell_specimen_id, cell_index)
 
         oplots.plot_combined_speed(self.binned_cells_vis[cell_index,:,:]*100, self.binned_dx_vis[:,:], 
                                    self.binned_cells_sp[cell_index,:,:]*100, self.binned_dx_sp[:,:],

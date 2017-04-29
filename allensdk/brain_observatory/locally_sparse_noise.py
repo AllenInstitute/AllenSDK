@@ -364,7 +364,9 @@ class LocallySparseNoise(StimulusAnalysis):
         try:
 
             with h5py.File(analysis_file, "r") as f:
-                lsn._mean_response = f["analysis/mean_response_%s" % stimulus_suffix].value
+                k = "analysis/mean_response_%s" % stimulus_suffix
+                if k in f:
+                    lsn._mean_response = f[k].value
 
             lsn._sweep_response = pd.read_hdf(analysis_file, "analysis/sweep_response_%s" % stimulus_suffix)
             lsn._mean_sweep_response = pd.read_hdf(analysis_file, "analysis/mean_sweep_response_%s" % stimulus_suffix)
@@ -409,12 +411,17 @@ class LocallySparseNoise(StimulusAnalysis):
 
     @staticmethod
     def read_cell_index_receptive_field_analysis_dict(file_handle, prefix, path=None):
+        k = 'analysis/%s' % prefix
+        if k in file_handle:
+            f = file_handle['analysis/%s' % prefix]
+            if path is None:
+                receptive_field_data_dict = read_h5_group(f)
+            else:
+                receptive_field_data_dict = read_h5_group(f[path])
 
-        f = file_handle['analysis/%s' % prefix]
-        if path is None:
-            receptive_field_data_dict = read_h5_group(f)
+            return receptive_field_data_dict
         else:
-            receptive_field_data_dict = read_h5_group(f[path])
+            return None
 
-        return receptive_field_data_dict
+            
 
