@@ -534,6 +534,7 @@ class StimulusAnalysis(object):
         ax.hist(self.dxcm, bins=nbins, range=xlim, color=oplots.STIM_COLOR)
         ax.set_xlim(xlim)
         plt.xlabel("running speed (cm/s)")
+        plt.ylabel("time points")
 
     def plot_speed_tuning(self, cell_specimen_id=None, 
                           cell_index=None,

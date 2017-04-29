@@ -25,11 +25,13 @@ def plot_cell_correlation(sig_corrs, labels, colors, scale=15):
     alpha = 1.0 / len(sig_corrs)
     ax = plt.gca()
     for sig_corr, color, label in zip(sig_corrs, colors, labels):
-        ax.bar(range(len(sig_corr)), sig_corr, color=color, alpha=alpha, label=label)
+        ax.bar(range(len(sig_corr)), sig_corr, color=color, alpha=alpha, label=label, linewidth=0.5)
     ax.set_xlabel("cell")
     ax.set_ylabel("signal correlation")
     ax.set_ylim([-1,1])
-    ax.legend(loc='lower left')
+    leg = ax.legend(loc='lower left', frameon=False)
+    for i, t in enumerate(leg.get_texts()):
+        t.set_color(colors[i])
 
 def population_correlation_scatter(sig_corrs, noise_corrs, labels, colors, scale=15):
     alpha = max(0.85 - 0.15 * (len(sig_corrs)-1), 0.2)
@@ -46,7 +48,9 @@ def population_correlation_scatter(sig_corrs, noise_corrs, labels, colors, scale
     ax.set_ylabel("noise correlation")
     ax.set_xlim([-1,1])
     ax.set_ylim([-1,1])
-    ax.legend(loc='upper left')
+    leg = ax.legend(loc='upper left', frameon=False)
+    for i, t in enumerate(leg.get_texts()):
+        t.set_color(colors[i])
 
 class DimensionPatchHandler(object):
     def __init__(self, vals, start_color, end_color, *args, **kwargs):
@@ -118,7 +122,8 @@ def plot_representational_similarity(rs, dims=None, dim_labels=None, colors=None
     ax.set_yticks([])
 
     if labels:
-        ax.cax.colorbar(im)
+        cbar = ax.cax.colorbar(im)
+        cbar.set_label_text('Pearson r')
     
     if dims is not None:
         dim_labels = ["%s(%s)" % (dim_labels[i],','.join(map(float_label, dims[i].tolist()))) for i in range(len(dims)) ]
@@ -154,6 +159,11 @@ def plot_representational_similarity(rs, dims=None, dim_labels=None, colors=None
                       ncol=2,
                       fontsize=9,
                       frameon=False)
+
+    if labels:
+        plt.subplots_adjust(left=.05,
+                            right=.85,
+                            wspace=0.0, hspace=0.0)
 
 
     
