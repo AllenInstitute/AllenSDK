@@ -163,8 +163,8 @@ def plot_representational_similarity(rs, dims=None, dim_labels=None, colors=None
                       frameon=False)
 
     if labels:
-        plt.subplots_adjust(left=.05,
-                            right=.85,
+        plt.subplots_adjust(left=0.07,
+                            right=.88,
                             wspace=0.0, hspace=0.0)
 
 
