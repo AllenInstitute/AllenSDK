@@ -84,6 +84,8 @@ class DimensionPatchHandler(object):
         return rgb
 
 def float_label(n):
+    if isinstance(n, int):
+        return str(n)
     if n.is_integer():
         return str(int(n))
     else:
@@ -123,10 +125,10 @@ def plot_representational_similarity(rs, dims=None, dim_labels=None, colors=None
 
     if labels:
         cbar = ax.cax.colorbar(im)
-        cbar.set_label_text('Pearson r')
+        cbar.set_label_text('stimulus correlation')
     
     if dims is not None:
-        dim_labels = ["%s(%s)" % (dim_labels[i],','.join(map(float_label, dims[i].tolist()))) for i in range(len(dims)) ]
+        dim_labels = ["%s(%s)" % (dim_labels[i],', '.join(map(float_label, dims[i].tolist()))) for i in range(len(dims)) ]
         dim_handlers = [ DimensionPatchHandler(dims[i], colors[i], 'w') for i in range(len(dims)) ]
 
         n = len(rs)
