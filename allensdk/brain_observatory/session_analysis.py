@@ -129,7 +129,6 @@ class SessionAnalysis(object):
         nwb.save_analysis_arrays(
             ('receptive_field_lsn', lsn.receptive_field),
             ('mean_response_lsn', lsn.mean_response),
-            ('celltraces_dff', nm1.dfftraces),
             ('binned_dx_sp', nm1.binned_dx_sp),
             ('binned_dx_vis', nm1.binned_dx_vis),
             ('binned_cells_sp', nm1.binned_cells_sp),
@@ -160,7 +159,6 @@ class SessionAnalysis(object):
             ('receptive_field_lsn4', lsn4.receptive_field),
             ('receptive_field_lsn8', lsn8.receptive_field),
             ('merge_mean_response', merge_mean_response),
-            ('celltraces_dff', nm1.dfftraces),
             ('binned_dx_sp', nm1.binned_dx_sp),
             ('binned_dx_vis', nm1.binned_dx_vis),
             ('binned_cells_sp', nm1.binned_cells_sp),
