@@ -384,9 +384,14 @@ def plot_receptive_field(rf, color_map=None, clim=None, mask=None):
                origin='bottom')
 
 
-def plot_pupil_location(xy_deg, edgecolor=''):
+def plot_pupil_location(xy_deg, cmap="hot", edgecolor='',
+                        include_labels=True):
     xy_deg = xy_deg[~np.isnan(xy_deg).any(axis=1)]
     z = gaussian_kde(xy_deg.T)(xy_deg.T)
-    plt.scatter(xy_deg[:,0], xy_deg[:,1], c=z, edgecolor=edgecolor)
+    plt.scatter(xy_deg[:,0], xy_deg[:,1], c=z, cmap=cmap, edgecolor=edgecolor)
     plt.xlim(-70, 70)
     plt.ylim(-50, 50)
+
+    if include_labels:
+        plt.xlabel("gaze x (degrees)")
+        plt.ylabel("gaze y (degrees)")
