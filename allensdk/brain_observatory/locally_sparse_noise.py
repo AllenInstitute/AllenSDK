@@ -290,13 +290,12 @@ class LocallySparseNoise(StimulusAnalysis):
 
         return rc1 + rc2_zoom
 
-    def plot_cell_receptive_field(self, cell_specimen_id, on, color_map=None, clim=None, mask=None):
+    def plot_cell_receptive_field(self, on, cell_specimen_id=None, color_map=None, clim=None, mask=None, cell_index=None):
         if color_map is None:
             color_map = 'Reds' if on else 'Blues'
 
         onst = 'on' if on else 'off'
-        csids = self.data_set.get_cell_specimen_ids()
-        cell_idx = np.where(csids == cell_specimen_id)[0][0]
+        cell_idx = self.row_from_cell_id(cell_specimen_id, cell_index)
         rf_dict = self.cell_index_receptive_field_analysis_data_dict[str(cell_idx)]
         rts = rf_dict[onst]['rts']['data']
         rts[np.logical_not(rf_dict[onst]['fdr_mask']['data'].sum(axis=0))] = np.nan
@@ -337,16 +336,15 @@ class LocallySparseNoise(StimulusAnalysis):
         return trials, cell_baselines
 
 
-    def open_pincushion_plot(self, cell_specimen_id, on, color_map=None):
-        csids = self.data_set.get_cell_specimen_ids()
-        cell_id = np.where(csids == cell_specimen_id)[0][0]
+    def open_pincushion_plot(self, on, cell_specimen_id=None, color_map=None, cell_index=None):
+        cell_index = self.row_from_cell_id(cell_specimen_id, cell_index)
 
         trials, baselines = self.sort_trials()
-        data = self.mean_sweep_response[str(cell_id)].values
+        data = self.mean_sweep_response[str(cell_index)].values
         
         cplots.make_pincushion_plot(data, trials, on, 
                                     self.nrows, self.ncols,
-                                    clim=[ baselines[cell_id], data.mean() + data.std() * 3 ],
+                                    clim=[ baselines[cell_index], data.mean() + data.std() * 3 ],
                                     color_map=color_map,
                                     radius=1.0/16.0)
 
@@ -366,7 +364,9 @@ class LocallySparseNoise(StimulusAnalysis):
         try:
 
             with h5py.File(analysis_file, "r") as f:
-                lsn._mean_response = f["analysis/mean_response_%s" % stimulus_suffix].value
+                k = "analysis/mean_response_%s" % stimulus_suffix
+                if k in f:
+                    lsn._mean_response = f[k].value
 
             lsn._sweep_response = pd.read_hdf(analysis_file, "analysis/sweep_response_%s" % stimulus_suffix)
             lsn._mean_sweep_response = pd.read_hdf(analysis_file, "analysis/mean_sweep_response_%s" % stimulus_suffix)
@@ -411,12 +411,17 @@ class LocallySparseNoise(StimulusAnalysis):
 
     @staticmethod
     def read_cell_index_receptive_field_analysis_dict(file_handle, prefix, path=None):
+        k = 'analysis/%s' % prefix
+        if k in file_handle:
+            f = file_handle['analysis/%s' % prefix]
+            if path is None:
+                receptive_field_data_dict = read_h5_group(f)
+            else:
+                receptive_field_data_dict = read_h5_group(f[path])
 
-        f = file_handle['analysis/%s' % prefix]
-        if path is None:
-            receptive_field_data_dict = read_h5_group(f)
+            return receptive_field_data_dict
         else:
-            receptive_field_data_dict = read_h5_group(f[path])
+            return None
 
-        return receptive_field_data_dict
+            
 

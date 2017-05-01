@@ -201,9 +201,10 @@ class NaturalScenes(StimulusAnalysis):
                     else:
                         theta[im] = 0
                 rtj[j] = theta.mean()
+            
             biga = rtj.mean()
             bigs = 1 - (2*biga)
-            peak.image_selectivity_ns.iloc[i] = bigs
+            peak.image_selectivity_ns.iloc[nc] = bigs
 
         return peak
 
@@ -233,16 +234,16 @@ class NaturalScenes(StimulusAnalysis):
                                  (self.interlength + self.sweeplength) / self.acquisition_rate, 
                                  color_map)
 
-    def open_corona_plot(self, cell_specimen_id):
-        cell_id = self.peak_row_from_csid(self.peak, cell_specimen_id)
+    def open_corona_plot(self, cell_specimen_id=None, cell_index=None):
+        cell_index = self.row_from_cell_id(cell_specimen_id, cell_index)
 
-        df = self.mean_sweep_response[str(cell_id)]
+        df = self.mean_sweep_response[str(cell_index)]
         data = df.values
 
         st = self.data_set.get_stimulus_table('natural_scenes')
         mask = st[st.frame >= 0].index
 
-        cmin = self.response[0,cell_id,0]
+        cmin = self.response[0,cell_index,0]
         cmax = data.mean() + data.std()*3
 
         cp = cplots.CoronaPlotter()
