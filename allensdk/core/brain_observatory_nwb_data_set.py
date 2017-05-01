@@ -211,7 +211,7 @@ class BrainObservatoryNwbDataSet(object):
             ds = f['processing'][self.PIPELINE_DATASET][
                 'Fluorescence']['imaging_plane_1_demixed_signal']['data']
             if cell_specimen_ids is None:
-                np_traces = ds.value
+                traces = ds.value
             else:
                 inds = self.get_cell_specimen_indices(cell_specimen_ids)
                 traces = ds[inds, :]
