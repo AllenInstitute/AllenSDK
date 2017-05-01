@@ -384,11 +384,12 @@ def plot_receptive_field(rf, color_map=None, clim=None, mask=None):
                origin='bottom')
 
 
-def plot_pupil_location(xy_deg, cmap="hot", edgecolor='',
+def plot_pupil_location(xy_deg, c=None, cmap="hot", edgecolor='',
                         include_labels=True):
-    xy_deg = xy_deg[~np.isnan(xy_deg).any(axis=1)]
-    z = gaussian_kde(xy_deg.T)(xy_deg.T)
-    plt.scatter(xy_deg[:,0], xy_deg[:,1], c=z, cmap=cmap, edgecolor=edgecolor)
+    if c is None:
+        xy_deg = xy_deg[~np.isnan(xy_deg).any(axis=1)]
+        c = gaussian_kde(xy_deg.T)(xy_deg.T)
+    plt.scatter(xy_deg[:,0], xy_deg[:,1], c=c, cmap=cmap, edgecolor=edgecolor)
     plt.xlim(-70, 70)
     plt.ylim(-50, 50)
 
