@@ -4,6 +4,7 @@ from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.collections import PatchCollection
 import matplotlib.patches as mpatches
 import scipy.interpolate as si
+from scipy.stats import gaussian_kde
 
 import allensdk.brain_observatory.circle_plots as cplots
 from contextlib import contextmanager
@@ -313,4 +314,9 @@ def plot_receptive_field(rf, color_map=None, clim=None, mask=None):
                origin='bottom')
 
 
-
+def plot_pupil_location(xy_deg, edgecolor=''):
+    xy_deg = xy_deg[~np.isnan(xy_deg).any(axis=1)]
+    z = gaussian_kde(xy_deg.T)(xy_deg.T)
+    plt.scatter(xy_deg[:,0], xy_deg[:,1], c=z, edgecolor=edgecolor)
+    plt.xlim(-70, 70)
+    plt.ylim(-50, 50)
