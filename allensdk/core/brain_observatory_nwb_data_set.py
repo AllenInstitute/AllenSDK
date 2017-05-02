@@ -524,7 +524,7 @@ class BrainObservatoryNwbDataSet(object):
 
             inds = None
             if cell_specimen_ids is None:
-                inds = range(len(self.get_cell_specimen_ids()))
+                inds = range(self.number_of_cells)
             else:
                 inds = self.get_cell_specimen_indices(cell_specimen_ids)
 
@@ -537,6 +537,14 @@ class BrainObservatoryNwbDataSet(object):
                 roi_array.append(m)
 
         return roi_array
+
+    @property
+    def number_of_cells(self):
+        '''Number of cells in the experiment'''
+
+        # Replace here is there is a better way to get this info:
+        return len(self.get_cell_specimen_ids())
+
 
     def get_metadata(self):
         ''' Returns a dictionary of meta data associated with each
@@ -583,7 +591,8 @@ class BrainObservatoryNwbDataSet(object):
 
         # convert start time to a date object
         session_start_time = meta.get('session_start_time')
-        meta['session_start_time'] = dateutil.parser.parse(session_start_time) if session_start_time else None
+        if isinstance(session_start_time, basestring):
+            meta['session_start_time'] = dateutil.parser.parse(session_start_time)
 
         age = meta.pop('age', None)
         if age:
@@ -632,6 +641,19 @@ class BrainObservatoryNwbDataSet(object):
 
         return dxcm, dxtime
 
+    def get_pupil_location(self):
+        '''Returns the x, y pupil location in visual degrees.
+        '''
+        with h5py.File(self.nwb_file, 'r') as f:
+            eye_tracking = f['processing'][self.PIPELINE_DATASET][
+                'EyeTracking']['pupil_location']
+            pupil_location = eye_tracking['data'].value
+            pupil_times = eye_tracking['timestamps'].value
+
+        #TODO: align with fluorescence
+
+        return pupil_location, pupil_times
+
     def get_motion_correction(self):
         ''' Returns a Panda DataFrame containing the x- and y- translation of each image used for image alignment
         '''
@@ -664,26 +686,17 @@ class BrainObservatoryNwbDataSet(object):
         return motion_correction
 
     def save_analysis_dataframes(self, *tables):
-        # NOTE: should use NWB library to write data to NWB file. It is
-        #   designed to avoid possible corruption of the file in event
-        #   of a failed write
         store = pd.HDFStore(self.nwb_file, mode='a')
-
         for k, v in tables:
             store.put('analysis/%s' % (k), v)
-
         store.close()
 
     def save_analysis_arrays(self, *datasets):
-        # NOTE: should use NWB library to write data to NWB file. It is
-        #   designed to avoid possible corruption of the file in event
-        #   of a failed write
         with h5py.File(self.nwb_file, 'a') as f:
             for k, v in datasets:
                 if k in f['analysis']:
                     del f['analysis'][k]
                 f.create_dataset('analysis/%s' % k, data=v)
-
 
 def align_running_speed(dxcm, dxtime, timestamps):
     ''' If running speed timestamps differ from fluorescence
@@ -807,10 +820,11 @@ def make_display_mask(display_shape=(1920, 1200)):
     for i in range(off_warped_coords.shape[1]):
         used_coords.add((off_warped_coords[0, i], off_warped_coords[1, i]))
 
-    used_coords = (np.array([x for (x, y) in used_coords]),
-                   np.array([y for (x, y) in used_coords]))
+    used_coords = (np.array([x for (x, y) in used_coords]).astype(int),
+                   np.array([y for (x, y) in used_coords]).astype(int))
 
     mask = np.zeros(display_shape)
+
     mask[used_coords] = 1
 
     return mask
@@ -864,6 +878,7 @@ def _get_abstract_feature_series_stimulus_table(nwb_file, stimulus_name):
     stimulus table: pd.DataFrame
     '''
 
+
     k = "stimulus/presentation/%s" % stimulus_name
 
     with h5py.File(nwb_file, 'r') as f:
@@ -871,7 +886,7 @@ def _get_abstract_feature_series_stimulus_table(nwb_file, stimulus_name):
             raise MissingStimulusException(
                 "Stimulus not found: %s" % stimulus_name)
         stim_data = f[k + '/data'].value
-        features = f[k + '/features'].value
+        features = [ v.decode('UTF-8') for v in f[k + '/features'].value ]
         frame_dur = f[k + '/frame_duration'].value
 
     stimulus_table = pd.DataFrame(stim_data, columns=features)

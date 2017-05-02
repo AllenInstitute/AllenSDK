@@ -13,18 +13,48 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 import six
+import matplotlib.colors as mcolors
 
 # some handles for stimulus types
 DRIFTING_GRATINGS = 'drifting_gratings'
+DRIFTING_GRATINGS_SHORT = 'dg'
+DRIFTING_GRATINGS_COLOR = '#a6cee3'
+
 STATIC_GRATINGS = 'static_gratings'
+STATIC_GRATINGS_SHORT = 'sg'
+STATIC_GRATINGS_COLOR = '#1f78b4'
+
 NATURAL_MOVIE_ONE = 'natural_movie_one'
+NATURAL_MOVIE_ONE_SHORT = 'nm1'
+NATURAL_MOVIE_ONE_COLOR = '#b2df8a'
+
 NATURAL_MOVIE_TWO = 'natural_movie_two'
+NATURAL_MOVIE_TWO_SHORT = 'nm2'
+NATURAL_MOVIE_TWO_COLOR = '#33a02c'
+
 NATURAL_MOVIE_THREE = 'natural_movie_three'
+NATURAL_MOVIE_THREE_SHORT = 'nm3'
+NATURAL_MOVIE_THREE_COLOR = '#fb9a99'
+
 NATURAL_SCENES = 'natural_scenes'
+NATURAL_SCENES_SHORT = 'ns'
+NATURAL_SCENES_COLOR = '#e31a1c'
+
 LOCALLY_SPARSE_NOISE = 'locally_sparse_noise'
+LOCALLY_SPARSE_NOISE_SHORT = 'lsn'
+LOCALLY_SPARSE_NOISE_COLOR = '#fdbf6f'
+
 LOCALLY_SPARSE_NOISE_4DEG = 'locally_sparse_noise_4deg'
+LOCALLY_SPARSE_NOISE_4DEG_SHORT = 'lsn4'
+LOCALLY_SPARSE_NOISE_4DEG_COLOR = '#fdbf6f'
+
 LOCALLY_SPARSE_NOISE_8DEG = 'locally_sparse_noise_8deg'
+LOCALLY_SPARSE_NOISE_8DEG_SHORT = 'lsn8'
+LOCALLY_SPARSE_NOISE_8DEG_COLOR = '#ff7f00'
+
 SPONTANEOUS_ACTIVITY = 'spontaneous'
+SPONTANEOUS_ACTIVITY_SHORT = 'sp'
+SPONTANEOUS_ACTIVITY_COLOR = '#cab2d6'
 
 # handles for stimulus names
 THREE_SESSION_A = 'three_session_A'

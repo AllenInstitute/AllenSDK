@@ -498,8 +498,8 @@ class StimulusAnalysis(object):
             return p
 
         StimulusAnalysis._log.info('Calculating responses for each sweep')
-        sweep_response = pd.DataFrame(index=self.stim_table.index.values, columns=np.array(
-            range(self.numbercells + 1)).astype(str))
+        sweep_response = pd.DataFrame(index=self.stim_table.index.values, 
+                                      columns=map(str, range(self.numbercells + 1)))
         sweep_response.rename(
             columns={str(self.numbercells): 'dx'}, inplace=True)
         for index, row in self.stim_table.iterrows():
@@ -517,19 +517,45 @@ class StimulusAnalysis(object):
         pval = sweep_response.applymap(do_p_value)
         return sweep_response, mean_sweep_response, pval
 
-    def plot_speed_tuning(self, cell_specimen_id, 
+    def plot_representational_similarity(self, repsim, stimulus=False):
+        if stimulus:
+            pass
+
+        ax = plt.gca()
+        ax.imshow(repsim, interpolation='nearest', cmap='plasma')
+
+    def plot_running_speed_histogram(self, xlim=None, nbins=None):
+        if xlim is None:
+            xlim = [-10,100]
+        if nbins is None:
+            nbins = 40
+
+        ax = plt.gca()
+        ax.hist(self.dxcm, bins=nbins, range=xlim, color=oplots.STIM_COLOR)
+        ax.set_xlim(xlim)
+        plt.xlabel("running speed (cm/s)")
+        plt.ylabel("time points")
+
+    def plot_speed_tuning(self, cell_specimen_id=None, 
+                          cell_index=None,
                           evoked_color=oplots.EVOKED_COLOR, 
                           spontaneous_color=oplots.SPONTANEOUS_COLOR):
-        cell_id = self.peak_row_from_csid(self.peak, cell_specimen_id)
+        cell_index = self.row_from_cell_id(cell_specimen_id, cell_index)
 
-        oplots.plot_combined_speed(self.binned_cells_vis[cell_id,:,:]*100, self.binned_dx_vis[:,:], 
-                                   self.binned_cells_sp[cell_id,:,:]*100, self.binned_dx_sp[:,:],
+        oplots.plot_combined_speed(self.binned_cells_vis[cell_index,:,:]*100, self.binned_dx_vis[:,:], 
+                                   self.binned_cells_sp[cell_index,:,:]*100, self.binned_dx_sp[:,:],
                                    evoked_color, spontaneous_color)
 
         ax = plt.gca()
         plt.xlabel("running speed (cm/s)")
         plt.ylabel("percent dF/F")
 
-    @staticmethod
-    def peak_row_from_csid(peak, csid):
-        return peak[peak.cell_specimen_id == csid].index[0]
+    def row_from_cell_id(self, csid=None, idx=None):
+
+        if csid is not None and not np.isnan(csid):
+            return self.data_set.get_cell_specimen_ids().tolist().index(csid)
+        elif idx is not None:
+            return idx
+        else:
+            raise Exception("Could not find row for csid(%s) idx(%s)" % (str(csid), str(idx)))
+    
