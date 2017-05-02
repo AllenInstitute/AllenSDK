@@ -396,7 +396,8 @@ def plot_pupil_location(xy_deg, s=1, c=None, cmap=PUPIL_COLOR_MAP,
     if c is None:
         xy_deg = xy_deg[~np.isnan(xy_deg).any(axis=1)]
         c = gaussian_kde(xy_deg.T)(xy_deg.T)
-    plt.scatter(xy_deg[:,0], xy_deg[:,1], c=c, cmap=cmap, edgecolor=edgecolor)
+    plt.scatter(xy_deg[:,0], xy_deg[:,1], s=s, c=c, cmap=cmap,
+                edgecolor=edgecolor)
     plt.xlim(-70, 70)
     plt.ylim(-70, 70)
 
