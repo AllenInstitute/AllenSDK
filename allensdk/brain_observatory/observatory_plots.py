@@ -19,6 +19,13 @@ PEAK_DFF_MIN = 3
 N_HIST_BINS = 50
 STIM_COLOR = "#ccccdd"
 STIMULUS_COLOR_MAP = LinearSegmentedColormap.from_list('default',[ [1.0,1.0,1.0,0.0], [.6,.6,.85,1.0] ])
+PUPIL_COLOR_MAP = LinearSegmentedColormap.from_list(
+    'custom_plasma', [[0.050383, 0.029803, 0.527975],
+                      [0.417642, 0.000564, 0.658390],
+                      [0.692840, 0.165141, 0.564522],
+                      [0.881443, 0.392529, 0.383229],
+                      [0.988260, 0.652325, 0.211364],
+                      [0.940015, 0.975158, 0.131326]])
 EVOKED_COLOR = "#b30000"
 SPONTANEOUS_COLOR = "#0000b3"
 
@@ -384,14 +391,14 @@ def plot_receptive_field(rf, color_map=None, clim=None, mask=None):
                origin='bottom')
 
 
-def plot_pupil_location(xy_deg, c=None, cmap="hot", edgecolor='',
-                        include_labels=True):
+def plot_pupil_location(xy_deg, s=1, c=None, cmap=PUPIL_COLOR_MAP,
+                        edgecolor='', include_labels=True):
     if c is None:
         xy_deg = xy_deg[~np.isnan(xy_deg).any(axis=1)]
         c = gaussian_kde(xy_deg.T)(xy_deg.T)
     plt.scatter(xy_deg[:,0], xy_deg[:,1], c=c, cmap=cmap, edgecolor=edgecolor)
     plt.xlim(-70, 70)
-    plt.ylim(-50, 50)
+    plt.ylim(-70, 70)
 
     if include_labels:
         plt.xlabel("gaze x (degrees)")
