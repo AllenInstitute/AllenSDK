@@ -21,6 +21,8 @@ from allensdk.config.manifest_builder import ManifestBuilder
 from .brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
 import allensdk.brain_observatory.stimulus_info as stim_info
 import six
+from dateutil.parser import parse as parse_date
+
 
 
 class BrainObservatoryCache(Cache):
@@ -150,13 +152,9 @@ class BrainObservatoryCache(Cache):
         file_name = self.get_cache_path(
             file_name, self.EXPERIMENT_CONTAINERS_KEY)
 
-        if os.path.exists(file_name):
-            containers = ju.read(file_name)
-        else:
-            containers = self.api.get_experiment_containers()
-
-            if self.cache:
-                ju.write(file_name, containers)
+        containers = self.api.get_experiment_containers(path=file_name,
+                                                        strategy='lazy',
+                                                        **Cache.cache_json())
 
         transgenic_lines = _merge_transgenic_lines(cre_lines, transgenic_lines)
 
@@ -172,7 +170,6 @@ class BrainObservatoryCache(Cache):
                 'targeted_structure': c['targeted_structure']['acronym'],
                 'cre_line': _find_specimen_cre_line(c['specimen']),
                 'reporter_line': _find_specimen_reporter_line(c['specimen']),
-                'age_days': c['specimen']['donor']['age']['days'],
                 'donor_name': c['specimen']['donor']['external_donor_name'],
                 'specimen_name': c['specimen']['name']
             } for c in containers]
@@ -244,14 +241,10 @@ class BrainObservatoryCache(Cache):
         _assert_not_string(session_types, "session_types")
 
         file_name = self.get_cache_path(file_name, self.EXPERIMENTS_KEY)
-
-        if os.path.exists(file_name):
-            exps = ju.read(file_name)
-        else:
-            exps = self.api.get_ophys_experiments()
-
-            if self.cache:
-                ju.write(file_name, exps)
+        
+        exps = self.api.get_ophys_experiments(path=file_name, 
+                                              strategy='lazy', 
+                                              **Cache.cache_json())
 
         transgenic_lines = _merge_transgenic_lines(cre_lines, transgenic_lines)
 
@@ -266,17 +259,18 @@ class BrainObservatoryCache(Cache):
 
         if simple:
             exps = [{
-                'id': e['id'],
-                'imaging_depth': e['imaging_depth'],
-                'targeted_structure': e['targeted_structure']['acronym'],
-                'cre_line': _find_specimen_cre_line(e['specimen']),
-                'reporter_line': _find_specimen_reporter_line(e['specimen']),
-                'age_days': e['specimen']['donor']['age']['days'],
-                'experiment_container_id': e['experiment_container_id'],
-                'session_type': e['stimulus_name'],
-                'donor_name': e['specimen']['donor']['external_donor_name'],
-                'specimen_name': e['specimen']['name']
-            } for e in exps]
+                    'id': e['id'],
+                    'imaging_depth': e['imaging_depth'],
+                    'targeted_structure': e['targeted_structure']['acronym'],
+                    'cre_line': _find_specimen_cre_line(e['specimen']),
+                    'reporter_line': _find_specimen_reporter_line(e['specimen']),
+                    'acquisition_age_days': _find_experiment_acquisition_age(e),
+                    'experiment_container_id': e['experiment_container_id'],
+                    'session_type': e['stimulus_name'],
+                    'donor_name': e['specimen']['donor']['external_donor_name'],
+                    'specimen_name': e['specimen']['name']
+                    } for e in exps]
+            
         return exps
 
     def _get_stimulus_mappings(self, file_name=None):
@@ -284,13 +278,9 @@ class BrainObservatoryCache(Cache):
 
         file_name = self.get_cache_path(file_name, self.STIMULUS_MAPPINGS_KEY)
 
-        if os.path.exists(file_name):
-            mappings = ju.read(file_name)
-        else:
-            mappings = self.api.get_stimulus_mappings()
-
-            if self.cache:
-                ju.write(file_name, mappings)
+        mappings = self.api.get_stimulus_mappings(path=file_name,
+                                                  strategy='lazy',
+                                                  **Cache.cache_json())
 
         return mappings
 
@@ -338,13 +328,9 @@ class BrainObservatoryCache(Cache):
 
         file_name = self.get_cache_path(file_name, self.CELL_SPECIMENS_KEY)
 
-        if os.path.exists(file_name):
-            cell_specimens = ju.read(file_name)
-        else:
-            cell_specimens = self.api.get_cell_metrics()
-
-            if self.cache:
-                ju.write(file_name, cell_specimens)
+        cell_specimens = self.api.get_cell_metrics(path=file_name,
+                                                   strategy='lazy',
+                                                   **Cache.cache_json())
 
         cell_specimens = self.api.filter_cell_specimens(cell_specimens,
                                                         ids=ids,
@@ -383,8 +369,7 @@ class BrainObservatoryCache(Cache):
         file_name = self.get_cache_path(
             file_name, self.EXPERIMENT_DATA_KEY, ophys_experiment_id)
 
-        if not os.path.exists(file_name):
-            self.api.save_ophys_experiment_data(ophys_experiment_id, file_name)
+        self.api.save_ophys_experiment_data(ophys_experiment_id, file_name, strategy='lazy')
 
         return BrainObservatoryNwbDataSet(file_name)
 
@@ -426,6 +411,13 @@ def _find_specimen_cre_line(specimen):
 def _find_specimen_reporter_line(specimen):
     return next(tl['name'] for tl in specimen['donor']['transgenic_lines']
                 if tl['transgenic_line_type_name'] == 'reporter')
+
+
+def _find_experiment_acquisition_age(exp):
+    try:
+        return (parse_date(exp['date_of_acquisition']) - parse_date(exp['specimen']['donor']['date_of_birth'])).days
+    except KeyError as e:
+        return None
 
 
 def _merge_transgenic_lines(*lines_list):

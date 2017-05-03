@@ -17,6 +17,7 @@
 import functools
 import operator as op
 from collections import defaultdict
+from six import iteritems
 
 class SimpleTree( object ):
     def __init__(self, nodes, 
@@ -50,7 +51,7 @@ class SimpleTree( object ):
         '''
 
         self._nodes = defaultdict(lambda *x: None, { node_id_cb(n):n for n in nodes })
-        self._parent_ids = defaultdict(lambda *x: None, { nid:parent_id_cb(n) for nid,n in self._nodes.iteritems() })
+        self._parent_ids = defaultdict(lambda *x: None, { nid:parent_id_cb(n) for nid,n in iteritems(self._nodes) })
         self._child_ids = defaultdict(lambda *x: None, { nid:[] for nid in self._nodes })
 
         for nid in self._parent_ids:
@@ -74,7 +75,7 @@ class SimpleTree( object ):
         
         '''
     
-        return filter(criterion, self._nodes.values())
+        return list(filter(criterion, self._nodes.values()))
         
         
     def value_map(self, from_fn, to_fn):
@@ -219,7 +220,7 @@ class SimpleTree( object ):
             children = self.child_ids([nid])[0]
             
             if children:
-                current.extend(reduce(op.add, map(list, 
+                current.extend(functools.reduce(op.add, map(list, 
                                self.descendant_ids(children))))
                                
             out.append(current)
@@ -279,7 +280,7 @@ class SimpleTree( object ):
         
         '''
     
-        return map(self.node, self.child_ids(node_ids))
+        return list(map(self.node, self.child_ids(node_ids)))
 
 
     def descendants(self, node_ids):
@@ -297,7 +298,7 @@ class SimpleTree( object ):
         
         '''
         
-        return map(self.node, self.descendant_ids(node_ids))
+        return list(map(self.node, self.descendant_ids(node_ids)))
 
     
     def ancestors(self, node_ids):
@@ -315,5 +316,5 @@ class SimpleTree( object ):
         
         '''
     
-        return map(self.node, self.ancestor_ids(node_ids))
+        return list(map(self.node, self.ancestor_ids(node_ids)))
     
