@@ -27,6 +27,44 @@ import os
 from pkg_resources import parse_version
 from allensdk.brain_observatory.brain_observatory_exceptions import MissingStimulusException
 
+
+def get_epoch_mask_list(st, threshold, max_cuts=2):
+    '''Convenience function to cut a stim table into multiple epochs
+
+    :param st: input stimtable
+    :param threshold: threshold on the max duration of a subepoch
+    :param max_cuts: maximum number of allowed epochs to cut into
+    :return: epoch_mask_list, a list of indices that define the start and end of sub-epochs
+    '''
+
+    if threshold is None:
+        raise NotImplementedError('threshold not set for this type of session')
+
+    delta = (st.start.values[1:] - st.end.values[:-1])
+    cut_inds = np.where(delta > threshold)[0] + 1
+
+    epoch_mask_list = []
+
+    if len(cut_inds) > max_cuts:
+        raise Exception('more than 2 epochs cut')
+
+    for ii in range(len(cut_inds)+1):
+
+        if ii == 0:
+            first_ind = st.iloc[0].start
+        else:
+            first_ind = st.iloc[cut_inds[ii-1]].start
+
+        if ii == len(cut_inds):
+            last_ind_inclusive = st.iloc[-1].end
+        else:
+            last_ind_inclusive = st.iloc[cut_inds[ii]-1].end
+
+        epoch_mask_list.append((first_ind,last_ind_inclusive))
+
+    return epoch_mask_list
+
+
 class BrainObservatoryNwbDataSet(object):
     PIPELINE_DATASET = 'brain_observatory_pipeline'
     SUPPORTED_PIPELINE_VERSION = "2.0"
@@ -76,6 +114,72 @@ class BrainObservatoryNwbDataSet(object):
                     logging.warning("File %s has a pipeline version newer than the version supported by this class (%s vs %s)."
                                     " Please update your AllenSDK." % (nwb_file, pipeline_version_str, self.SUPPORTED_PIPELINE_VERSION))
 
+
+    def get_session_summary(self):
+        '''Returns a pandas dataframe that summarizes the stimulus epoch duration for each acquisition time index in
+        the experiment
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        timestamps: 2D numpy array
+            Timestamp for each fluorescence sample
+
+        traces: 2D numpy array
+            Fluorescence traces for each cell
+        '''
+
+        threshold_dict = {si.THREE_SESSION_A:31+7,
+                          si.THREE_SESSION_B:7,
+                          si.THREE_SESSION_C:7,
+                          si.THREE_SESSION_C2:7}
+
+        stimulus_table_dict = {}
+        for stimulus in self.list_stimuli():
+
+            stimulus_table_dict[stimulus] = self.get_stimulus_table(stimulus)
+
+            if stimulus == si.SPONTANEOUS_ACTIVITY:
+                stimulus_table_dict[stimulus]['frame'] = 0
+
+        interval_list = []
+        interval_stimulus_dict = {}
+        for stimulus in self.list_stimuli():
+            stimulus_interval_list = get_epoch_mask_list(stimulus_table_dict[stimulus], threshold=threshold_dict.get(self.get_session_type(), None))
+            for stimulus_interval in stimulus_interval_list:
+                interval_stimulus_dict[stimulus_interval] = stimulus
+            interval_list += stimulus_interval_list
+        interval_list.sort(key=lambda x: x[0])
+
+        stimulus_signature_list = ['gap']
+        duration_signature_list = [int(interval_list[0][0])]
+        interval_signature_list = [(0,int(interval_list[0][0]))]
+        for ii, interval in enumerate(interval_list):
+            stimulus_signature_list.append(interval_stimulus_dict[interval])
+            duration_signature_list.append(int(interval[1] - interval[0]))
+            interval_signature_list.append((int(interval[0]), int(interval[1])))
+
+            if ii != len(interval_list)-1:
+                stimulus_signature_list.append('gap')
+                duration_signature_list.append((int(interval_list[ii+1][0] - interval_list[ii][1])))
+                interval_signature_list.append((int(interval_list[ii][1]), int(interval_list[ii+1][0])))
+
+        stimulus_signature_list.append('gap')
+        interval_signature_list.append((int(interval_list[-1][1]), len(self.get_fluorescence_timestamps())))
+        duration_signature_list.append(interval_signature_list[-1][1]-interval_signature_list[-1][0])
+
+        interval_df = pd.DataFrame({'stimulus':stimulus_signature_list,
+                                    'duration':duration_signature_list,
+                                    'interval':interval_signature_list})
+
+        # Gaps are ininformative; remove them:
+        interval_df = interval_df[interval_df.stimulus != 'gap']
+
+        interval_df.reset_index(inplace=True, drop=True)
+        return interval_df
 
 
     def get_fluorescence_traces(self, cell_specimen_ids=None):
@@ -524,7 +628,7 @@ class BrainObservatoryNwbDataSet(object):
 
             inds = None
             if cell_specimen_ids is None:
-                inds = range(len(self.get_cell_specimen_ids()))
+                inds = range(self.number_of_cells)
             else:
                 inds = self.get_cell_specimen_indices(cell_specimen_ids)
 
@@ -537,6 +641,14 @@ class BrainObservatoryNwbDataSet(object):
                 roi_array.append(m)
 
         return roi_array
+
+    @property
+    def number_of_cells(self):
+        '''Number of cells in the experiment'''
+
+        # Replace here is there is a better way to get this info:
+        return len(self.get_cell_specimen_ids())
+
 
     def get_metadata(self):
         ''' Returns a dictionary of meta data associated with each
@@ -583,7 +695,8 @@ class BrainObservatoryNwbDataSet(object):
 
         # convert start time to a date object
         session_start_time = meta.get('session_start_time')
-        meta['session_start_time'] = dateutil.parser.parse(session_start_time) if session_start_time else None
+        if isinstance(session_start_time, basestring):
+            meta['session_start_time'] = dateutil.parser.parse(session_start_time)
 
         age = meta.pop('age', None)
         if age:
@@ -632,6 +745,19 @@ class BrainObservatoryNwbDataSet(object):
 
         return dxcm, dxtime
 
+    def get_pupil_location(self):
+        '''Returns the x, y pupil location in visual degrees.
+        '''
+        with h5py.File(self.nwb_file, 'r') as f:
+            eye_tracking = f['processing'][self.PIPELINE_DATASET][
+                'EyeTracking']['pupil_location']
+            pupil_location = eye_tracking['data'].value
+            pupil_times = eye_tracking['timestamps'].value
+
+        #TODO: align with fluorescence
+
+        return pupil_location, pupil_times
+
     def get_motion_correction(self):
         ''' Returns a Panda DataFrame containing the x- and y- translation of each image used for image alignment
         '''
@@ -664,26 +790,17 @@ class BrainObservatoryNwbDataSet(object):
         return motion_correction
 
     def save_analysis_dataframes(self, *tables):
-        # NOTE: should use NWB library to write data to NWB file. It is
-        #   designed to avoid possible corruption of the file in event
-        #   of a failed write
         store = pd.HDFStore(self.nwb_file, mode='a')
-
         for k, v in tables:
             store.put('analysis/%s' % (k), v)
-
         store.close()
 
     def save_analysis_arrays(self, *datasets):
-        # NOTE: should use NWB library to write data to NWB file. It is
-        #   designed to avoid possible corruption of the file in event
-        #   of a failed write
         with h5py.File(self.nwb_file, 'a') as f:
             for k, v in datasets:
                 if k in f['analysis']:
                     del f['analysis'][k]
                 f.create_dataset('analysis/%s' % k, data=v)
-
 
 def align_running_speed(dxcm, dxtime, timestamps):
     ''' If running speed timestamps differ from fluorescence
@@ -807,10 +924,11 @@ def make_display_mask(display_shape=(1920, 1200)):
     for i in range(off_warped_coords.shape[1]):
         used_coords.add((off_warped_coords[0, i], off_warped_coords[1, i]))
 
-    used_coords = (np.array([x for (x, y) in used_coords]),
-                   np.array([y for (x, y) in used_coords]))
+    used_coords = (np.array([x for (x, y) in used_coords]).astype(int),
+                   np.array([y for (x, y) in used_coords]).astype(int))
 
     mask = np.zeros(display_shape)
+
     mask[used_coords] = 1
 
     return mask
@@ -864,6 +982,7 @@ def _get_abstract_feature_series_stimulus_table(nwb_file, stimulus_name):
     stimulus table: pd.DataFrame
     '''
 
+
     k = "stimulus/presentation/%s" % stimulus_name
 
     with h5py.File(nwb_file, 'r') as f:
@@ -871,7 +990,7 @@ def _get_abstract_feature_series_stimulus_table(nwb_file, stimulus_name):
             raise MissingStimulusException(
                 "Stimulus not found: %s" % stimulus_name)
         stim_data = f[k + '/data'].value
-        features = f[k + '/features'].value
+        features = [ v.decode('UTF-8') for v in f[k + '/features'].value ]
         frame_dur = f[k + '/frame_duration'].value
 
     stimulus_table = pd.DataFrame(stim_data, columns=features)
@@ -903,4 +1022,3 @@ def _get_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
     stimulus_table.loc[:, 'end'] = frame_dur[:, 1].astype(int)
 
     return stimulus_table
-
