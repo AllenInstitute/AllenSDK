@@ -1,3 +1,5 @@
+.idea
+htmlcov
 .settings
 cell_types
 dist

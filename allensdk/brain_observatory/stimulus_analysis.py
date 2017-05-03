@@ -1,4 +1,4 @@
-# Copyright 2016 Allen Institute for Brain Science
+# Copyright 2016-2017 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -19,7 +19,8 @@ import pandas as pd
 import logging
 from .findlevel import findlevel
 from .brain_observatory_exceptions import BrainObservatoryAnalysisException
-
+from . import observatory_plots as oplots
+import matplotlib.pyplot as plt
 
 class StimulusAnalysis(object):
     """ Base class for all response analysis code. Subclasses are responsible
@@ -33,30 +34,201 @@ class StimulusAnalysis(object):
     ----------
     data_set: BrainObservatoryNwbDataSet instance
 
-    speed_tuning: boolean
+    speed_tuning: boolean, deprecated
        Whether or not to compute speed tuning histograms
 
     """
     _log = logging.getLogger('allensdk.brain_observatory.stimulus_analysis')
+    _PRELOAD = "PRELOAD"
 
-    def __init__(self, data_set, speed_tuning=False):
+    def __init__(self, data_set):
         self.data_set = data_set
+        self._timestamps = StimulusAnalysis._PRELOAD
+        self._celltraces = StimulusAnalysis._PRELOAD
+        self._acquisition_rate = StimulusAnalysis._PRELOAD
+        self._numbercells = StimulusAnalysis._PRELOAD
+        self._roi_id = StimulusAnalysis._PRELOAD
+        self._cell_id = StimulusAnalysis._PRELOAD
+        self._dfftraces = StimulusAnalysis._PRELOAD
+        self._dxcm = StimulusAnalysis._PRELOAD
+        self._dxtime = StimulusAnalysis._PRELOAD
+        self._binned_dx_sp = StimulusAnalysis._PRELOAD
+        self._binned_cells_sp = StimulusAnalysis._PRELOAD
+        self._binned_dx_vis = StimulusAnalysis._PRELOAD
+        self._binned_cells_vis = StimulusAnalysis._PRELOAD
+        self._peak_run = StimulusAnalysis._PRELOAD
+        self._binsize = 800
 
+        self._stim_table = StimulusAnalysis._PRELOAD
+        self._response = StimulusAnalysis._PRELOAD
+        self._sweep_response = StimulusAnalysis._PRELOAD
+        self._mean_sweep_response = StimulusAnalysis._PRELOAD
+        self._pval = StimulusAnalysis._PRELOAD
+        self._peak = StimulusAnalysis._PRELOAD
+
+    @property
+    def stim_table(self):
+        if self._stim_table is StimulusAnalysis._PRELOAD:
+            self.populate_stimulus_table()
+
+        return self._stim_table
+
+    @property
+    def sweep_response(self):
+        if self._sweep_response is StimulusAnalysis._PRELOAD:
+            self._sweep_response, self._mean_sweep_response, self._pval = \
+                self.get_sweep_response()
+
+        return self._sweep_response
+
+    @property
+    def mean_sweep_response(self):
+        if self._mean_sweep_response is StimulusAnalysis._PRELOAD:
+            self._sweep_response, self._mean_sweep_response, self._pval = \
+                self.get_sweep_response()
+
+        return self._mean_sweep_response
+
+    @property
+    def pval(self):
+        if self._pval is StimulusAnalysis._PRELOAD:
+            self._sweep_response, self._mean_sweep_response, self._pval = \
+                self.get_sweep_response()
+
+        return self._pval
+
+    @property
+    def response(self):
+        if self._response is StimulusAnalysis._PRELOAD:
+            self._response = self.get_response()
+
+        return self._response
+
+    @property
+    def peak(self):
+        if self._peak is StimulusAnalysis._PRELOAD:
+            self._peak = self.get_peak()
+
+        return self._peak
+
+    def get_fluorescence(self):
         # get fluorescence
-        self.timestamps, self.celltraces = self.data_set.get_corrected_fluorescence_traces()
-        self.numbercells = len(self.celltraces)  # number of cells in dataset
-        self.roi_id = self.data_set.get_roi_ids()
-        self.cell_id = self.data_set.get_cell_specimen_ids()
+        self._timestamps, self._celltraces = \
+            self.data_set.get_corrected_fluorescence_traces()
+        self._acquisition_rate = 1 / (self.timestamps[1] - self.timestamps[0])
+        self._numbercells = len(self.celltraces)  # number of cells in dataset
 
-        # get dF/F
-        _, self.dfftraces = self.data_set.get_dff_traces()
+    @property
+    def timestamps(self):
+        if self._timestamps is StimulusAnalysis._PRELOAD:
+            self.get_fluorescence()
 
-        self.acquisition_rate = 1 / (self.timestamps[1] - self.timestamps[0])
-        self.dxcm, self.dxtime = self.data_set.get_running_speed()
+        return self._timestamps
 
-        if speed_tuning:
-            self.binned_dx_sp, self.binned_cells_sp, self.binned_dx_vis, self.binned_cells_vis, self.peak_run = self.get_speed_tuning(
-                binsize=800)
+    @property
+    def celltraces(self):
+        if self._celltraces is StimulusAnalysis._PRELOAD:
+            self.get_fluorescence()
+
+        return self._celltraces
+
+    @property
+    def acquisition_rate(self):
+        if self._acquisition_rate is StimulusAnalysis._PRELOAD:
+            self.get_fluorescence()
+
+        return self._acquisition_rate
+
+    @property
+    def numbercells(self):
+        if self._numbercells is StimulusAnalysis._PRELOAD:
+            self.get_fluorescence()
+
+        return self._numbercells
+
+    @property
+    def roi_id(self):
+        if self._roi_id is StimulusAnalysis._PRELOAD:
+            self._roi_id = self.data_set.get_roi_ids()
+
+        return self._roi_id
+
+    @property
+    def cell_id(self):
+        if self._cell_id is StimulusAnalysis._PRELOAD:
+            self._cell_id = self.data_set.get_cell_specimen_ids()
+
+        return self._cell_id
+
+    @property
+    def dfftraces(self):
+        if self._dfftraces is StimulusAnalysis._PRELOAD:
+            _, self._dfftraces = self.data_set.get_dff_traces()
+
+        return self._dfftraces
+
+    @property
+    def dxcm(self):
+        if self._dxcm is StimulusAnalysis._PRELOAD:
+            self._dxcm, self._dxtime = self.data_set.get_running_speed()
+
+        return self._dxcm
+
+    @property
+    def dxtime(self):
+        if self._dxtime is StimulusAnalysis._PRELOAD:
+            self._dxcm, self._dxtime = self.data_set.get_running_speed()
+            
+        return self._dxtime
+
+    @property
+    def binned_dx_sp(self):
+        if self._binned_dx_sp is StimulusAnalysis._PRELOAD:
+            (self._binned_dx_sp, self._binned_cells_sp, self._binned_dx_vis,
+             self._binned_cells_vis, self._peak_run) = \
+                self.get_speed_tuning(binsize=self._binsize)
+
+        return self._binned_dx_sp
+
+    @property
+    def binned_cells_sp(self):
+        if self._binned_cells_sp is StimulusAnalysis._PRELOAD:
+            (self._binned_dx_sp, self._binned_cells_sp, self._binned_dx_vis,
+             self._binned_cells_vis, self._peak_run) = \
+                self.get_speed_tuning(binsize=self._binsize)
+
+        return self._binned_cells_sp
+
+    @property
+    def binned_dx_vis(self):
+        if self._binned_dx_vis is StimulusAnalysis._PRELOAD:
+            (self._binned_dx_sp, self._binned_cells_sp, self._binned_dx_vis,
+             self._binned_cells_vis, self._peak_run) = \
+                self.get_speed_tuning(binsize=self._binsize)
+
+        return self._binned_dx_vis
+
+    @property
+    def binned_cells_vis(self):
+        if self._binned_cells_vis is StimulusAnalysis._PRELOAD:
+            (self._binned_dx_sp, self._binned_cells_sp, self._binned_dx_vis,
+             self._binned_cells_vis, self._peak_run) = \
+                self.get_speed_tuning(binsize=self._binsize)
+
+        return self._binned_cells_vis
+
+    @property
+    def peak_run(self):
+        if self._peak_run is StimulusAnalysis._PRELOAD:
+            (self._binned_dx_sp, self._binned_cells_sp, self._binned_dx_vis,
+             self._binned_cells_vis, self._peak_run) = \
+                self.get_speed_tuning(binsize=self._binsize)
+
+        return self._peak_run
+
+    def populate_stimulus_table(self):
+        """ Implemented by subclasses. """
+        raise BrainObservatoryAnalysisException("populate_stimulus_table not implemented")
 
     def get_response(self):
         """ Implemented by subclasses. """
@@ -137,7 +309,7 @@ class StimulusAnalysis(object):
             offset = findlevel(dx_sorted, 1, 'up')
 
             if offset is None:
-                logging.info(
+                StimulusAnalysis._log.info(
                     "dx never crosses 1, all speed data going into single bin")
                 offset = len(dx_sorted)
 
@@ -169,7 +341,7 @@ class StimulusAnalysis(object):
                 offset = findlevel(dx_sorted, 1, 'up')
 
                 if offset is None:
-                    logging.info(
+                    StimulusAnalysis._log.info(
                         "dx never crosses 1, all speed data going into single bin")
                     offset = celltraces_shuffled_sorted.shape[1]
 
@@ -194,7 +366,7 @@ class StimulusAnalysis(object):
             offset = findlevel(dx_sorted, 1, 'up')
 
             if offset is None:
-                logging.info(
+                StimulusAnalysis._log.info(
                     "dx never crosses 1, all speed data going into single bin")
                 offset = len(dx_sorted)
 
@@ -226,7 +398,7 @@ class StimulusAnalysis(object):
                 offset = findlevel(dx_sorted, 1, 'up')
 
                 if offset is None:
-                    logging.info(
+                    StimulusAnalysis._log.info(
                         "dx never crosses 1, all speed data going into single bin")
                     offset = len(dx_sorted)
 
@@ -331,11 +503,11 @@ class StimulusAnalysis(object):
         sweep_response.rename(
             columns={str(self.numbercells): 'dx'}, inplace=True)
         for index, row in self.stim_table.iterrows():
-            start = row['start'] - self.interlength
-            end = row['start'] + self.sweeplength + self.interlength
+            start = int(row['start'] - self.interlength)
+            end = int(row['start'] + self.sweeplength + self.interlength)
 
             for nc in range(self.numbercells):
-                temp = self.celltraces[nc, start:end]
+                temp = self.celltraces[int(nc), start:end]
                 sweep_response[str(nc)][index] = 100 * \
                     ((temp / np.mean(temp[:self.interlength])) - 1)
             sweep_response['dx'][index] = self.dxcm[start:end]
@@ -344,3 +516,20 @@ class StimulusAnalysis(object):
 
         pval = sweep_response.applymap(do_p_value)
         return sweep_response, mean_sweep_response, pval
+
+    def plot_speed_tuning(self, cell_specimen_id, 
+                          evoked_color=oplots.EVOKED_COLOR, 
+                          spontaneous_color=oplots.SPONTANEOUS_COLOR):
+        cell_id = self.peak_row_from_csid(self.peak, cell_specimen_id)
+
+        oplots.plot_combined_speed(self.binned_cells_vis[cell_id,:,:]*100, self.binned_dx_vis[:,:], 
+                                   self.binned_cells_sp[cell_id,:,:]*100, self.binned_dx_sp[:,:],
+                                   evoked_color, spontaneous_color)
+
+        ax = plt.gca()
+        plt.xlabel("running speed (cm/s)")
+        plt.ylabel("percent dF/F")
+
+    @staticmethod
+    def peak_row_from_csid(peak, csid):
+        return peak[peak.cell_specimen_id == csid].index[0]

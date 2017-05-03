@@ -18,6 +18,7 @@ from .locally_sparse_noise import LocallySparseNoise
 from .natural_scenes import NaturalScenes
 from .drifting_gratings import DriftingGratings
 from .natural_movie import NaturalMovie
+import six
 from allensdk.core.brain_observatory_nwb_data_set \
     import BrainObservatoryNwbDataSet
 from . import stimulus_info
@@ -59,7 +60,7 @@ class SessionAnalysis(object):
         self.metadata = self.nwb.get_metadata()
 
     def append_metadata(self, df):
-        for k, v in self.metadata.iteritems():
+        for k, v in six.iteritems(self.metadata):
             df[k] = v
 
     def save_session_a(self, dg, nm1, nm3, peak):
@@ -121,6 +122,33 @@ class SessionAnalysis(object):
             ('binned_cells_sp', nm1.binned_cells_sp),
             ('binned_cells_vis', nm1.binned_cells_vis))
 
+    def save_session_c2(self, lsn4, lsn8, nm1, nm2, peak):
+        nwb = BrainObservatoryNwbDataSet(self.save_path)
+        nwb.save_analysis_dataframes(
+            ('stim_table_lsn4', lsn4.stim_table),
+            ('stim_table_lsn8', lsn8.stim_table),
+            ('sweep_response_nm1', nm1.sweep_response),
+            ('peak', peak),
+            ('sweep_response_nm2', nm2.sweep_response),
+            ('sweep_response_lsn4', lsn4.sweep_response),
+            ('sweep_response_lsn8', lsn8.sweep_response),
+            ('mean_sweep_response_lsn4', lsn4.mean_sweep_response),
+            ('mean_sweep_response_lsn8', lsn8.mean_sweep_response))
+
+        merged_receptive_field = LocallySparseNoise.merge_receptive_fields(
+            lsn4.receptive_field,
+            lsn8.receptive_field)
+
+        nwb.save_analysis_arrays(
+            ('receptive_field_lsn4', lsn4.receptive_field),
+            ('receptive_field_lsn8', lsn8.receptive_field),
+            ('receptive_field_lsn', merged_receptive_field),
+            ('celltraces_dff', nm1.dfftraces),
+            ('binned_dx_sp', nm1.binned_dx_sp),
+            ('binned_dx_vis', nm1.binned_dx_vis),
+            ('binned_cells_sp', nm1.binned_cells_sp),
+            ('binned_cells_vis', nm1.binned_cells_vis))
+
     def append_metrics_drifting_grating(self, metrics, dg):
         metrics["osi_dg"] = dg.peak["osi_dg"]
         metrics["dsi_dg"] = dg.peak["dsi_dg"]
@@ -154,7 +182,7 @@ class SessionAnalysis(object):
                     "Error -- ROI lists have different entries")
 
     def session_a(self, plot_flag=False, save_flag=True):
-        nm1 = NaturalMovie(self.nwb, 'natural_movie_one', speed_tuning=True)
+        nm1 = NaturalMovie(self.nwb, 'natural_movie_one')
         nm3 = NaturalMovie(self.nwb, 'natural_movie_three')
         dg = DriftingGratings(self.nwb)
 
@@ -177,7 +205,7 @@ class SessionAnalysis(object):
     def session_b(self, plot_flag=False, save_flag=True):
         ns = NaturalScenes(self.nwb)
         sg = StaticGratings(self.nwb)
-        nm1 = NaturalMovie(self.nwb, 'natural_movie_one', speed_tuning=True)
+        nm1 = NaturalMovie(self.nwb, 'natural_movie_one')
         SessionAnalysis._log.info("Session B analyzed")
         peak = multi_dataframe_merge(
             [nm1.peak_run, sg.peak, ns.peak, nm1.peak])
@@ -197,9 +225,9 @@ class SessionAnalysis(object):
             cp.plot_sg_traces(sg, self.save_dir)
 
     def session_c(self, plot_flag=False, save_flag=True):
-        lsn = LocallySparseNoise(self.nwb)
+        lsn = LocallySparseNoise(self.nwb, stimulus_info.LOCALLY_SPARSE_NOISE)
         nm2 = NaturalMovie(self.nwb, 'natural_movie_two')
-        nm1 = NaturalMovie(self.nwb, 'natural_movie_one', speed_tuning=True)
+        nm1 = NaturalMovie(self.nwb, 'natural_movie_one')
         SessionAnalysis._log.info("Session C analyzed")
         peak = multi_dataframe_merge([nm1.peak_run, nm1.peak, nm2.peak])
         self.append_metadata(peak)
@@ -212,6 +240,26 @@ class SessionAnalysis(object):
         if plot_flag:
             cp._plot_3sc(lsn, nm1, nm2, self.save_dir)
             cp.plot_lsn_traces(lsn, self.save_dir)
+
+    def session_c2(self, plot_flag=False, save_flag=True):
+        lsn4 = LocallySparseNoise(self.nwb, stimulus_info.LOCALLY_SPARSE_NOISE_4DEG)
+        lsn8 = LocallySparseNoise(self.nwb, stimulus_info.LOCALLY_SPARSE_NOISE_8DEG)
+        nm2 = NaturalMovie(self.nwb, 'natural_movie_two')
+        nm1 = NaturalMovie(self.nwb, 'natural_movie_one')
+        SessionAnalysis._log.info("Session C2 analyzed")
+        peak = multi_dataframe_merge([nm1.peak_run, nm1.peak, nm2.peak])
+        self.append_metadata(peak)
+
+        self.metrics_c["roi_id"] = nm1.roi_id
+
+        if save_flag:
+            self.save_session_c2(lsn4, lsn8, nm1, nm2, peak)
+
+        if plot_flag:
+            cp._plot_3sc(lsn4, nm1, nm2, self.save_dir, '_4deg')
+            cp._plot_3sc(lsn8, nm1, nm2, self.save_dir, '_8deg')
+            cp.plot_lsn_traces(lsn4, self.save_dir, '_4deg')
+            cp.plot_lsn_traces(lsn4, self.save_dir, '_8deg')
 
 
 def run_session_analysis(nwb_path, save_path, plot_flag=False, save_flag=True):
@@ -232,6 +280,9 @@ def run_session_analysis(nwb_path, save_path, plot_flag=False, save_flag=True):
         metrics = session_analysis.metrics_b
     elif session == stimulus_info.THREE_SESSION_C:
         session_analysis.session_c(plot_flag=plot_flag, save_flag=save_flag)
+        metrics = session_analysis.metrics_c
+    elif session == stimulus_info.THREE_SESSION_C2:
+        session_analysis.session_c2(plot_flag=plot_flag, save_flag=save_flag)
         metrics = session_analysis.metrics_c
     else:
         raise IndexError("Unknown session: %s" % session)

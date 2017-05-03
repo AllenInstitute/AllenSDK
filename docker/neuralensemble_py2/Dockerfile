@@ -20,7 +20,7 @@ ENV NRN=nrn-$NRN_VER NRN_RELEASE=7.4.rel-1370
 
 WORKDIR /home/docker/packages
 
-RUN wget https://neuron.yale.edu/ftp/neuron/versions/v$NRN_VER/v$NRN_RELEASE/nrn-$NRN_RELEASE.tar.gz;  \
+RUN wget https://www.neuron.yale.edu/ftp/neuron/versions/v$NRN_VER/v$NRN_RELEASE/nrn-$NRN_RELEASE.tar.gz;  \
     tar xzf nrn-$NRN_RELEASE.tar.gz; \
     rm nrn-$NRN_RELEASE.tar.gz
 
@@ -38,11 +38,12 @@ RUN apt-get -yq install unzip
 USER docker
 WORKDIR /home/docker
 
-RUN wget -O allensdk.zip wget -O allensdk.zip https://github.com/AllenInstitute/AllenSDK/archive/v0.12.4.zip; \
+# TODO: replace w/ install from Github
+RUN mkdir allensdk; \
+    cd allensdk; \
+    wget -O allensdk.zip http://stash.corp.alleninstitute.org/plugins/servlet/archive/projects/INF/repos/allensdk?at=refs%2Fheads%2Fdev; \
     unzip allensdk.zip; \
     rm allensdk.zip; \
-    mv AllenSDK-0.12.4 allensdk; \
-    cd allensdk; \
     $VENV/bin/pip install .; \
     $VENV/bin/pip install -r test_requirements.txt; \
     $VENV/bin/pip install jupyter; \

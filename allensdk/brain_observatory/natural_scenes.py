@@ -1,4 +1,4 @@
-# Copyright 2016 Allen Institute for Brain Science
+# Copyright 2016-2017 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -19,7 +19,10 @@ import numpy as np
 import pandas as pd
 from .stimulus_analysis import StimulusAnalysis
 import logging
-
+import h5py
+from . import observatory_plots as oplots
+from . import circle_plots as cplots
+from .brain_observatory_exceptions import MissingStimulusException
 
 class NaturalScenes(StimulusAnalysis):
     """ Perform tuning analysis specific to natural scenes stimulus.
@@ -33,15 +36,47 @@ class NaturalScenes(StimulusAnalysis):
 
     def __init__(self, data_set, **kwargs):
         super(NaturalScenes, self).__init__(data_set, **kwargs)
-        self.stim_table = self.data_set.get_stimulus_table('natural_scenes')
-        self.number_scenes = len(np.unique(self.stim_table.frame))
-        self.sweeplength = self.stim_table.end.iloc[
-            1] - self.stim_table.start.iloc[1]
-        self.interlength = 4 * self.sweeplength
-        self.extralength = self.sweeplength
-        self.sweep_response, self.mean_sweep_response, self.pval = self.get_sweep_response()
-        self.response = self.get_response()
-        self.peak = self.get_peak()
+
+        self._number_scenes = StimulusAnalysis._PRELOAD
+        self._sweeplength = StimulusAnalysis._PRELOAD
+        self._interlength = StimulusAnalysis._PRELOAD
+        self._extralength = StimulusAnalysis._PRELOAD
+
+    @property
+    def number_scenes(self):
+        if self._number_scenes is StimulusAnalysis._PRELOAD:
+            self.populate_stimulus_table()
+
+        return self._number_scenes
+
+    @property
+    def sweeplength(self):
+        if self._sweeplength is StimulusAnalysis._PRELOAD:
+            self.populate_stimulus_table()
+
+        return self._sweeplength
+
+    @property
+    def interlength(self):
+        if self._interlength is StimulusAnalysis._PRELOAD:
+            self.populate_stimulus_table()
+
+        return self._interlength
+
+    @property
+    def extralength(self):
+        if self._extralength is StimulusAnalysis._PRELOAD:
+            self.populate_stimulus_table()
+
+        return self._extralength
+
+    def populate_stimulus_table(self):
+        self._stim_table = self.data_set.get_stimulus_table('natural_scenes')
+        self._number_scenes = len(np.unique(self._stim_table.frame))
+        self._sweeplength = self._stim_table.end.iloc[
+            1] - self._stim_table.start.iloc[1]
+        self._interlength = 4 * self._sweeplength
+        self._extralength = self._sweeplength
 
     def get_response(self):
         ''' Computes the mean response for each cell to each stimulus condition.  Return is
@@ -129,3 +164,70 @@ class NaturalScenes(StimulusAnalysis):
                 pass
 
         return peak
+
+    def plot_time_to_peak(self, 
+                          p_value_max=oplots.P_VALUE_MAX, 
+                          color_map=oplots.STIMULUS_COLOR_MAP):
+        stimulus_table = self.data_set.get_stimulus_table('natural_scenes')
+
+        resps = []
+
+        for index, row in self.peak.iterrows():    
+            mean_response = self.sweep_response.ix[stimulus_table.frame==row.scene_ns][str(index)].mean()
+            resps.append((mean_response - mean_response.mean() / mean_response.std()))
+
+        mean_responses = np.array(resps)
+
+        sorted_table = self.peak[self.peak.ptest_ns < p_value_max].sort(columns='time_to_peak_ns')
+        cell_order = sorted_table.index
+
+        # time to peak is relative to stimulus start in seconds
+        ttps = sorted_table.time_to_peak_ns.values + self.interlength / self.acquisition_rate
+        msrs_sorted = mean_responses[cell_order,:]
+
+        oplots.plot_time_to_peak(msrs_sorted, ttps,
+                                 0, (2*self.interlength + self.sweeplength) / self.acquisition_rate,
+                                 (self.interlength) / self.acquisition_rate, 
+                                 (self.interlength + self.sweeplength) / self.acquisition_rate, 
+                                 color_map)
+
+    def open_corona_plot(self, cell_specimen_id):
+        cell_id = self.peak_row_from_csid(self.peak, cell_specimen_id)
+
+        df = self.mean_sweep_response[str(cell_id)]
+        data = df.values
+
+        st = self.data_set.get_stimulus_table('natural_scenes')
+        mask = st[st.frame >= 0].index
+
+        cmin = self.response[0,cell_id,0]
+        cmax = data.mean() + data.std()*3
+
+        cp = cplots.CoronaPlotter()
+        cp.plot(st.frame.ix[mask].values, 
+                data=df.ix[mask].values,
+                clim=[cmin, cmax])
+        cp.show_arrow()
+
+    
+    @staticmethod
+    def from_analysis_file(data_set, analysis_file):
+        ns = NaturalScenes(data_set)
+        ns.populate_stimulus_table()
+
+        try:
+            ns._sweep_response = pd.read_hdf(analysis_file, "analysis/sweep_response_ns")
+            ns._mean_sweep_response = pd.read_hdf(analysis_file, "analysis/mean_sweep_response_ns")
+            ns._peak = pd.read_hdf(analysis_file, "analysis/peak")
+
+            with h5py.File(analysis_file, "r") as f:
+                ns._response = f["analysis/response_ns"].value
+                ns._binned_dx_sp = f["analysis/binned_dx_sp"].value
+                ns._binned_cells_sp = f["analysis/binned_cells_sp"].value
+                ns._binned_dx_vis = f["analysis/binned_dx_vis"].value
+                ns._binned_cells_vis = f["analysis/binned_cells_vis"].value
+        except Exception as e:
+            raise MissingStimulusException(e.args)
+
+        return ns
+

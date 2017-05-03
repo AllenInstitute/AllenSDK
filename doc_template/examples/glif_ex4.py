@@ -6,8 +6,9 @@ neuron_config = json_utilities.read('neuron_config.json')
 ephys_sweeps = json_utilities.read('ephys_sweeps.json')
 ephys_file_name = 'stimulus.nwb'
 
-# pull out the stimulus for the first sweep
-ephys_sweep = ephys_sweeps[0]
+# pull out the stimulus for the current-clamp first sweep
+ephys_sweep = next( s for s in ephys_sweeps 
+                    if s['stimulus_units'] == 'Amps' )
 ds = NwbDataSet(ephys_file_name)
 data = ds.get_sweep(ephys_sweep['sweep_number']) 
 stimulus = data['stimulus']

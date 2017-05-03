@@ -13,20 +13,27 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
+
 import numpy as np
 from pkg_resources import resource_filename  # @UnresolvedImport
 from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
 import pytest
 import os
 
+
 NWB_FLAVORS = []
+
 
 if 'TEST_NWB_FILES' in os.environ:
     nwb_list_file = os.environ['TEST_NWB_FILES']
 else:
     nwb_list_file = resource_filename(__name__, 'nwb_files.txt')
-with open(nwb_list_file, 'r') as f:
-    NWB_FLAVORS = [l.strip() for l in f]
+
+if nwb_list_file == 'skip':
+    NWB_FLAVORS = []
+else:
+    with open(nwb_list_file, 'r') as f:
+        NWB_FLAVORS = [l.strip() for l in f]
 
 
 @pytest.fixture(params=NWB_FLAVORS)
@@ -49,6 +56,24 @@ def test_acceptance(data_set):
 def test_get_roi_ids(data_set):
     ids = data_set.get_roi_ids()
     assert len(ids) == len(data_set.get_cell_specimen_ids())
+
+@pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
+                    reason="test NWB file not available")
+def test_get_metadata(data_set):
+    md = data_set.get_metadata()
+
+    valid_fields = [ 'genotype', 'cre_line', 'imaging_depth_um', 'ophys_experiment_id', 'experiment_container_id',
+                     'session_start_time', 'age_days', 'device', 'device_name', 'pipeline_version', 'sex',
+                     'targeted_structure', 'excitation_lambda', 'indicator', 'fov', 'session_type', 'specimen_name' ]
+
+    invalid_fields = [ 'imaging_depth', 'age', 'device_string', 'generated_by' ]
+
+    for field in valid_fields:
+        assert md[field] is not None
+
+    for field in invalid_fields:
+        assert field not in md
+    
 
 
 @pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
@@ -113,6 +138,20 @@ def test_get_dff_traces(data_set):
     timestamps, traces = data_set.get_dff_traces([ids[0]])
     assert traces.shape[0] == 1
 
+@pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
+                    reason="test NWB file not available")
+def test_get_neuropil_r(data_set):
+
+    ids = data_set.get_cell_specimen_ids()
+    r = data_set.get_neuropil_r()
+    assert len(ids) == len(r)
+
+    r = data_set.get_neuropil_r(ids)
+    assert len(ids) == len(r)
+
+    short_list = [ids[0]]
+    r = data_set.get_neuropil_r(short_list)
+    assert len(short_list) == len(r)
 
 @pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
                     reason="test NWB file not available")
