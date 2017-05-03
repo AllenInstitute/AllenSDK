@@ -25,7 +25,8 @@ import dateutil
 import re
 import os
 from pkg_resources import parse_version
-from allensdk.brain_observatory.brain_observatory_exceptions import MissingStimulusException
+from allensdk.brain_observatory.brain_observatory_exceptions import (MissingStimulusException,
+                                                                     NoEyeTrackingException)
 
 class BrainObservatoryNwbDataSet(object):
     PIPELINE_DATASET = 'brain_observatory_pipeline'
@@ -644,11 +645,14 @@ class BrainObservatoryNwbDataSet(object):
     def get_pupil_location(self):
         '''Returns the x, y pupil location in visual degrees.
         '''
-        with h5py.File(self.nwb_file, 'r') as f:
-            eye_tracking = f['processing'][self.PIPELINE_DATASET][
-                'EyeTracking']['pupil_location']
-            pupil_location = eye_tracking['data'].value
-            pupil_times = eye_tracking['timestamps'].value
+        try:
+            with h5py.File(self.nwb_file, 'r') as f:
+                eye_tracking = f['processing'][self.PIPELINE_DATASET][
+                    'EyeTracking']['pupil_location']
+                pupil_location = eye_tracking['data'].value
+                pupil_times = eye_tracking['timestamps'].value
+        except KeyError:
+            raise NoEyeTrackingException("No eye tracking for this experiment.")
 
         #TODO: align with fluorescence
 
