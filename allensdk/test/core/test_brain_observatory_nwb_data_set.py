@@ -16,7 +16,7 @@
 
 import numpy as np
 from pkg_resources import resource_filename  # @UnresolvedImport
-from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
+from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet, si
 import pytest
 import os
 
@@ -200,3 +200,18 @@ def test_get_roi_mask_array(data_set):
         arr = data_set.get_roi_mask_array([0])
     except ValueError as e:
         assert str(e).startswith("Cell specimen not found")
+
+
+@pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
+                    reason="test NWB file not available")
+def test_get_session_summary(data_set):
+
+    summary_df = data_set.get_session_summary()
+
+    session_type = data_set.get_session_type()
+    if session_type == si.THREE_SESSION_A or si.THREE_SESSION_C:
+        assert len(summary_df) == 7
+    elif session_type == si.THREE_SESSION_B:
+        assert len(summary_df) == 8
+    else:
+        raise NotImplementedError('Code not tested for session of type: %s' % session_type)
