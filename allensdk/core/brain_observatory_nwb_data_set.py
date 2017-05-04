@@ -495,6 +495,7 @@ class BrainObservatoryNwbDataSet(object):
                     epoch_start_ind, epoch_end_ind = row['interval']
                     curr_subtable = curr_stimtable[(epoch_start_ind <= curr_stimtable['start']) &
                                                    (curr_stimtable['end'] <= epoch_end_ind)]
+                    curr_subtable['stimulus'] = stimulus
                     table_list.append(curr_subtable)
 
             table_list = sorted(table_list, key=lambda t: t.iloc[0]['start'])
@@ -1047,5 +1048,4 @@ def _get_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
     stimulus_table.loc[:, 'end'] = frame_dur[:, 1].astype(int)
 
     return stimulus_table
-
 
