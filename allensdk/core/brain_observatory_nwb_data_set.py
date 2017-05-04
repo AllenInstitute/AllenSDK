@@ -115,7 +115,7 @@ class BrainObservatoryNwbDataSet(object):
                                     " Please update your AllenSDK." % (nwb_file, pipeline_version_str, self.SUPPORTED_PIPELINE_VERSION))
 
 
-    def get_session_summary(self):
+    def get_stimulus_epoch_table(self):
         '''Returns a pandas dataframe that summarizes the stimulus epoch duration for each acquisition time index in
         the experiment
 
@@ -478,6 +478,31 @@ class BrainObservatoryNwbDataSet(object):
                 return _get_indexed_time_series_stimulus_table(self.nwb_file, stimulus_name)
         elif stimulus_name == 'spontaneous':
             return self.get_spontaneous_activity_stimulus_table()
+        elif stimulus_name == 'master':
+
+            epoch_table = self.get_stimulus_epoch_table()
+
+            stimulus_table_dict = {}
+            for stimulus in self.list_stimuli():
+                stimulus_table_dict[stimulus] = self.get_stimulus_table(stimulus)
+
+            table_list = []
+            for stimulus in self.list_stimuli():
+                curr_stimtable = stimulus_table_dict[stimulus]
+
+                for _, row in epoch_table[epoch_table['stimulus'] == stimulus].iterrows():
+
+                    epoch_start_ind, epoch_end_ind = row['interval']
+                    curr_subtable = curr_stimtable[(epoch_start_ind <= curr_stimtable['start']) &
+                                                   (curr_stimtable['end'] <= epoch_end_ind)]
+                    table_list.append(curr_subtable)
+
+            table_list = sorted(table_list, key=lambda t: t.iloc[0]['start'])
+
+            return pd.concat(table_list)
+
+
+
         else:
             raise IOError(
                 "Could not find a stimulus table named '%s'" % stimulus_name)
@@ -1022,3 +1047,5 @@ def _get_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
     stimulus_table.loc[:, 'end'] = frame_dur[:, 1].astype(int)
 
     return stimulus_table
+
+
