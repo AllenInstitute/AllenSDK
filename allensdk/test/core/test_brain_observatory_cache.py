@@ -101,7 +101,7 @@ def test_get_all_targeted_structures(brain_observatory_cache):
             "http://api.brain-map.org/api/v2/data/query.json?q="
             "model::ExperimentContainer,rma::include,"
             "ophys_experiments,isi_experiment,"
-            "specimen(donor(age,transgenic_lines)),"
+            "specimen(donor(conditions,age,transgenic_lines)),"
             "targeted_structure,"
             "rma::options[num_rows$eq'all'][count$eqfalse]")
 
@@ -122,7 +122,7 @@ def test_get_experiment_containers(brain_observatory_cache):
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::ExperimentContainer,rma::include,"
         "ophys_experiments,isi_experiment,"
-        "specimen(donor(age,transgenic_lines)),targeted_structure,"
+        "specimen(donor(conditions,age,transgenic_lines)),targeted_structure,"
         "rma::options[num_rows$eq'all'][count$eqfalse]")
 
 
@@ -141,7 +141,7 @@ def test_get_all_cre_lines(brain_observatory_cache):
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::ExperimentContainer,rma::include,"
         "ophys_experiments,isi_experiment,"
-        "specimen(donor(age,transgenic_lines)),targeted_structure,"
+        "specimen(donor(conditions,age,transgenic_lines)),targeted_structure,"
         "rma::options[num_rows$eq'all'][count$eqfalse]")
 
 
