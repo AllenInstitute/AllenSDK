@@ -194,6 +194,9 @@ class SessionAnalysis(object):
         metrics["run_mod_sg"] = sg.peak["run_modulation_sg"]
         metrics["p_run_mod_sg"] = sg.peak["p_run_sg"]
         metrics["g_osi_sg"] = sg.peak["cv_os_sg"]
+        metrics["sfdi_sg"] = sg.peak["sf_index_sg"]
+        metrics["peak_dff_sf"] = sg.peak["peak_dff_sg"]
+        metrics["reliability_sg"] = sg.peak["reliability_sg"]
 
     def append_metrics_natural_scene(self, metrics, ns):
         metrics["pref_image_ns"] = ns.peak["scene_ns"]
