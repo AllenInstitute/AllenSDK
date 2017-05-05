@@ -89,9 +89,9 @@ class BrainObservatoryNwbDataSet(object):
 
     STIMULUS_TABLE_TYPES = {
         'abstract_feature_series': [si.DRIFTING_GRATINGS, si.STATIC_GRATINGS],
-        'indexed_time_series': [si.NATURAL_MOVIE_ONE, si.NATURAL_MOVIE_TWO, si.NATURAL_MOVIE_THREE,
-                                si.NATURAL_SCENES, si.LOCALLY_SPARSE_NOISE, 
-                                si.LOCALLY_SPARSE_NOISE_4DEG, si.LOCALLY_SPARSE_NOISE_8DEG]
+        'indexed_time_series': [si.NATURAL_SCENES, si.LOCALLY_SPARSE_NOISE,
+                                si.LOCALLY_SPARSE_NOISE_4DEG, si.LOCALLY_SPARSE_NOISE_8DEG],
+        'repeated_indexed_time_series':[si.NATURAL_MOVIE_ONE, si.NATURAL_MOVIE_TWO, si.NATURAL_MOVIE_THREE]
 
     }
 
@@ -472,10 +472,9 @@ class BrainObservatoryNwbDataSet(object):
         if stimulus_name in self.STIMULUS_TABLE_TYPES['abstract_feature_series']:
             return _get_abstract_feature_series_stimulus_table(self.nwb_file, stimulus_name + "_stimulus")
         elif stimulus_name in self.STIMULUS_TABLE_TYPES['indexed_time_series']:
-            try:
-                return _get_indexed_time_series_stimulus_table(self.nwb_file, stimulus_name + "_stimulus")
-            except:
-                return _get_indexed_time_series_stimulus_table(self.nwb_file, stimulus_name)
+            return _get_indexed_time_series_stimulus_table(self.nwb_file, stimulus_name)
+        elif stimulus_name in self.STIMULUS_TABLE_TYPES['repeated_indexed_time_series']:
+            return _get_repeated_indexed_time_series_stimulus_table(self.nwb_file, stimulus_name)
         elif stimulus_name == 'spontaneous':
             return self.get_spontaneous_activity_stimulus_table()
         elif stimulus_name == 'master':
@@ -494,7 +493,7 @@ class BrainObservatoryNwbDataSet(object):
 
                     epoch_start_ind, epoch_end_ind = row['interval']
                     curr_subtable = curr_stimtable[(epoch_start_ind <= curr_stimtable['start']) &
-                                                   (curr_stimtable['end'] <= epoch_end_ind)]
+                                                   (curr_stimtable['end'] <= epoch_end_ind)].copy()
                     curr_subtable['stimulus'] = stimulus
                     table_list.append(curr_subtable)
 
@@ -1038,8 +1037,9 @@ def _get_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
 
     with h5py.File(nwb_file, 'r') as f:
         if k not in f:
-            raise MissingStimulusException(
-                "Stimulus not found: %s" % stimulus_name)
+            k = "stimulus/presentation/%s" % (stimulus_name + "_stimulus")
+            if k not in f:
+                raise MissingStimulusException("Stimulus not found: %s" % stimulus_name)
         inds = f[k + '/data'].value
         frame_dur = f[k + '/frame_duration'].value
 
@@ -1048,4 +1048,13 @@ def _get_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
     stimulus_table.loc[:, 'end'] = frame_dur[:, 1].astype(int)
 
     return stimulus_table
+
+def _get_repeated_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
+
+    stimulus_table = _get_indexed_time_series_stimulus_table(nwb_file, stimulus_name)
+    a = stimulus_table.groupby(by='frame')
+    stimulus_table['repeat'] = np.repeat(range(len(stimulus_table)/len(a)), len(a))
+
+    return stimulus_table
+
 
