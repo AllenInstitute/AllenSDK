@@ -141,7 +141,7 @@ def test_get_experiment_containers(bo_api):
         "http://testwarehouse:9000/api/v2/data/query.json?q="
         "model::ExperimentContainer,rma::criteria,[id$in511510753],"
         "rma::include,ophys_experiments,isi_experiment,"
-        "specimen(donor(age,transgenic_lines)),targeted_structure,"
+        "specimen(donor(conditions,age,transgenic_lines)),targeted_structure,"
         "rma::options[num_rows$eq'all'][count$eqfalse]")
 
 
