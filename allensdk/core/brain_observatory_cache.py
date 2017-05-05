@@ -107,6 +107,7 @@ class BrainObservatoryCache(Cache):
                                   imaging_depths=None,
                                   cre_lines=None,
                                   transgenic_lines=None,
+                                  include_failed=False,
                                   simple=True):
         """ Get a list of experiment containers matching certain criteria.
 
@@ -137,6 +138,9 @@ class BrainObservatoryCache(Cache):
             BrainObservatoryCache.get_all_cre_lines() or.
             BrainObservatoryCache.get_all_reporter_lines().
 
+        include_failed: boolean
+            Whether or not to include failed experiment containers.
+
         simple: boolean
             Whether or not to simplify the dictionary properties returned by this method
             to a more concise subset.
@@ -161,7 +165,8 @@ class BrainObservatoryCache(Cache):
         containers = self.api.filter_experiment_containers(containers, ids=ids,
                                                            targeted_structures=targeted_structures,
                                                            imaging_depths=imaging_depths,
-                                                           transgenic_lines=transgenic_lines)
+                                                           transgenic_lines=transgenic_lines,
+                                                           include_failed=include_failed)
 
         if simple:
             containers = [{
@@ -171,7 +176,9 @@ class BrainObservatoryCache(Cache):
                 'cre_line': _find_specimen_cre_line(c['specimen']),
                 'reporter_line': _find_specimen_reporter_line(c['specimen']),
                 'donor_name': c['specimen']['donor']['external_donor_name'],
-                'specimen_name': c['specimen']['name']
+                'specimen_name': c['specimen']['name'],
+                'tags': _find_container_tags(c),
+                'failed': c['failed']
             } for c in containers]
 
         return containers
@@ -433,6 +440,9 @@ def _merge_transgenic_lines(*lines_list):
     else:
         return None
 
+def _find_container_tags(container):
+    conditions = container['specimen']['donor']['conditions']
+    return [c['name'] for c in conditions if not c['name'].startswith('tissuecyte')]
 
 def _assert_not_string(arg, name):
     if isinstance(arg, six.string_types):
