@@ -177,8 +177,11 @@ class BrainObservatoryNwbDataSet(object):
 
         # Gaps are ininformative; remove them:
         interval_df = interval_df[interval_df.stimulus != 'gap']
+        interval_df['start'] = [x[0] for x in interval_df['interval'].values]
+        interval_df['end'] = [x[1] for x in interval_df['interval'].values]
 
         interval_df.reset_index(inplace=True, drop=True)
+        interval_df.drop(['interval', 'duration'], axis=1, inplace=True)
         return interval_df
 
 
@@ -491,7 +494,7 @@ class BrainObservatoryNwbDataSet(object):
 
                 for _, row in epoch_table[epoch_table['stimulus'] == stimulus].iterrows():
 
-                    epoch_start_ind, epoch_end_ind = row['interval']
+                    epoch_start_ind, epoch_end_ind = row['start'], row['end']
                     curr_subtable = curr_stimtable[(epoch_start_ind <= curr_stimtable['start']) &
                                                    (curr_stimtable['end'] <= epoch_end_ind)].copy()
                     curr_subtable['stimulus'] = stimulus
@@ -499,7 +502,10 @@ class BrainObservatoryNwbDataSet(object):
 
             table_list = sorted(table_list, key=lambda t: t.iloc[0]['start'])
 
-            return pd.concat(table_list)
+            new_table = pd.concat(table_list)
+            new_table.reset_index(drop=True, inplace=True)
+
+            return new_table
 
 
 
@@ -1053,8 +1059,10 @@ def _get_repeated_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
 
     stimulus_table = _get_indexed_time_series_stimulus_table(nwb_file, stimulus_name)
     a = stimulus_table.groupby(by='frame')
+
+    # If this ever occurs, the repeat counter cant be trusted!
+    assert np.floor(len(stimulus_table))/len(a) == int(len(stimulus_table))/len(a)
+
     stimulus_table['repeat'] = np.repeat(range(len(stimulus_table)/len(a)), len(a))
 
     return stimulus_table
-
-
