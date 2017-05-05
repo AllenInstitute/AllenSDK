@@ -90,9 +90,9 @@ class BrainObservatoryNwbDataSet(object):
 
     STIMULUS_TABLE_TYPES = {
         'abstract_feature_series': [si.DRIFTING_GRATINGS, si.STATIC_GRATINGS],
-        'indexed_time_series': [si.NATURAL_MOVIE_ONE, si.NATURAL_MOVIE_TWO, si.NATURAL_MOVIE_THREE,
-                                si.NATURAL_SCENES, si.LOCALLY_SPARSE_NOISE, 
-                                si.LOCALLY_SPARSE_NOISE_4DEG, si.LOCALLY_SPARSE_NOISE_8DEG]
+        'indexed_time_series': [si.NATURAL_SCENES, si.LOCALLY_SPARSE_NOISE,
+                                si.LOCALLY_SPARSE_NOISE_4DEG, si.LOCALLY_SPARSE_NOISE_8DEG],
+        'repeated_indexed_time_series':[si.NATURAL_MOVIE_ONE, si.NATURAL_MOVIE_TWO, si.NATURAL_MOVIE_THREE]
 
     }
 
@@ -116,7 +116,7 @@ class BrainObservatoryNwbDataSet(object):
                                     " Please update your AllenSDK." % (nwb_file, pipeline_version_str, self.SUPPORTED_PIPELINE_VERSION))
 
 
-    def get_session_summary(self):
+    def get_stimulus_epoch_table(self):
         '''Returns a pandas dataframe that summarizes the stimulus epoch duration for each acquisition time index in
         the experiment
 
@@ -178,8 +178,11 @@ class BrainObservatoryNwbDataSet(object):
 
         # Gaps are ininformative; remove them:
         interval_df = interval_df[interval_df.stimulus != 'gap']
+        interval_df['start'] = [x[0] for x in interval_df['interval'].values]
+        interval_df['end'] = [x[1] for x in interval_df['interval'].values]
 
         interval_df.reset_index(inplace=True, drop=True)
+        interval_df.drop(['interval', 'duration'], axis=1, inplace=True)
         return interval_df
 
 
@@ -473,12 +476,40 @@ class BrainObservatoryNwbDataSet(object):
         if stimulus_name in self.STIMULUS_TABLE_TYPES['abstract_feature_series']:
             return _get_abstract_feature_series_stimulus_table(self.nwb_file, stimulus_name + "_stimulus")
         elif stimulus_name in self.STIMULUS_TABLE_TYPES['indexed_time_series']:
-            try:
-                return _get_indexed_time_series_stimulus_table(self.nwb_file, stimulus_name + "_stimulus")
-            except:
-                return _get_indexed_time_series_stimulus_table(self.nwb_file, stimulus_name)
+            return _get_indexed_time_series_stimulus_table(self.nwb_file, stimulus_name)
+        elif stimulus_name in self.STIMULUS_TABLE_TYPES['repeated_indexed_time_series']:
+            return _get_repeated_indexed_time_series_stimulus_table(self.nwb_file, stimulus_name)
         elif stimulus_name == 'spontaneous':
             return self.get_spontaneous_activity_stimulus_table()
+        elif stimulus_name == 'master':
+
+            epoch_table = self.get_stimulus_epoch_table()
+
+            stimulus_table_dict = {}
+            for stimulus in self.list_stimuli():
+                stimulus_table_dict[stimulus] = self.get_stimulus_table(stimulus)
+
+            table_list = []
+            for stimulus in self.list_stimuli():
+                curr_stimtable = stimulus_table_dict[stimulus]
+
+                for _, row in epoch_table[epoch_table['stimulus'] == stimulus].iterrows():
+
+                    epoch_start_ind, epoch_end_ind = row['start'], row['end']
+                    curr_subtable = curr_stimtable[(epoch_start_ind <= curr_stimtable['start']) &
+                                                   (curr_stimtable['end'] <= epoch_end_ind)].copy()
+                    curr_subtable['stimulus'] = stimulus
+                    table_list.append(curr_subtable)
+
+            table_list = sorted(table_list, key=lambda t: t.iloc[0]['start'])
+
+            new_table = pd.concat(table_list)
+            new_table.reset_index(drop=True, inplace=True)
+
+            return new_table
+
+
+
         else:
             raise IOError(
                 "Could not find a stimulus table named '%s'" % stimulus_name)
@@ -1016,13 +1047,26 @@ def _get_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
 
     with h5py.File(nwb_file, 'r') as f:
         if k not in f:
-            raise MissingStimulusException(
-                "Stimulus not found: %s" % stimulus_name)
+            k = "stimulus/presentation/%s" % (stimulus_name + "_stimulus")
+            if k not in f:
+                raise MissingStimulusException("Stimulus not found: %s" % stimulus_name)
         inds = f[k + '/data'].value
         frame_dur = f[k + '/frame_duration'].value
 
     stimulus_table = pd.DataFrame(inds, columns=['frame'])
     stimulus_table.loc[:, 'start'] = frame_dur[:, 0].astype(int)
     stimulus_table.loc[:, 'end'] = frame_dur[:, 1].astype(int)
+
+    return stimulus_table
+
+def _get_repeated_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
+
+    stimulus_table = _get_indexed_time_series_stimulus_table(nwb_file, stimulus_name)
+    a = stimulus_table.groupby(by='frame')
+
+    # If this ever occurs, the repeat counter cant be trusted!
+    assert np.floor(len(stimulus_table))/len(a) == int(len(stimulus_table))/len(a)
+
+    stimulus_table['repeat'] = np.repeat(range(len(stimulus_table)/len(a)), len(a))
 
     return stimulus_table

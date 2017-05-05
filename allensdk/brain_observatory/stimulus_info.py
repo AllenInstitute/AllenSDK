@@ -100,3 +100,110 @@ def stimuli_in_session(session):
 def all_stimuli():
     """ Return a list of all stimuli in the data set """
     return set([v for k, vl in six.iteritems(SESSION_STIMULUS_MAP) for v in vl])
+
+class BinaryIntervalSearchTree(object):
+
+    @staticmethod
+    def from_df(input_df):
+        search_list = input_df.to_dict('records')
+
+
+
+        new_list = []
+        for x in search_list:
+            if x['start'] == x['end']:
+               new_list.append((x['start'], x['end'], x))
+            else:
+               # -.01 prevents endpoint-overlapping intervals; assigns ties to intervals that start at requested index
+               new_list.append((x['start'], x['end'] - .01, x))
+        return BinaryIntervalSearchTree(new_list)
+
+
+    def __init__(self, search_list):
+        """Create a binary tree to search for a point within a list of intervals.  Assumes that the intervals are
+        non-overlapping.  If two intervals share an endpoint, the left-side wins the tie.
+
+        :param search_list: list of interval tuples; in the tuple, first element is interval start, then interval
+        end (inclusive), then the return value for the lookup
+
+        Example:
+        bist = BinaryIntervalSearchTree([(0,.5,'A'), (1,2,'B')])
+        print bist.search(1.5)
+        """
+
+        # Double-check that the list is sorted
+        search_list = sorted(search_list, key=lambda x:x[0])
+
+        # Check that the intervals are non-overlapping (except potentially at the end point)
+        for x, y in zip(search_list[:-1], search_list[1:]):
+            assert x[1] < y[0]
+
+
+        self.data = {}
+        self.add(search_list)
+
+    def add(self, input_list, tmp=None):
+        if tmp is None:
+            tmp = []
+
+        if len(input_list) == 1:
+            self.data[tuple(tmp)] = input_list[0]
+        else:
+            self.add(input_list[:int(len(input_list)/2)], tmp=tmp+[0])
+            self.add(input_list[int(len(input_list)/2):], tmp=tmp+[1])
+            self.data[tuple(tmp)] = input_list[int(len(input_list)/2)-1]
+
+    def search(self, fi, tmp=None):
+        if tmp is None:
+            tmp = []
+
+        if (self.data[tuple(tmp)][0] <= fi) and (fi <= self.data[tuple(tmp)][1]):
+            return_val = self.data[tuple(tmp)]
+        elif fi < self.data[tuple(tmp)][1]:
+            return_val = self.search(fi, tmp=tmp + [0])
+        else:
+            return_val = self.search(fi, tmp=tmp + [1])
+
+        # print 'CHECKING:', return_val[0], fi, return_val[1], tmp
+        assert (return_val[0] <= fi) and (fi <= return_val[1])
+        return return_val
+
+class StimulusSearch(object):
+
+    def __init__(self, nwb_dataset):
+
+        self.nwb_data = nwb_dataset
+        self.epoch_df = nwb_dataset.get_stimulus_epoch_table()
+        self.master_df = nwb_dataset.get_stimulus_table('master')
+        self.epoch_bst = BinaryIntervalSearchTree.from_df(self.epoch_df)
+        self.master_bst = BinaryIntervalSearchTree.from_df(self.master_df)
+
+    def search(self, fi):
+
+        try:
+
+            # Look in fine-grain tree:
+            search_result = self.master_bst.search(fi)
+            return search_result
+        except KeyError:
+
+            # Current frame not found in a fine-grain interval;
+            #   see if it is unregistered to a coarse-grain epoch:
+            try:
+
+                # THis will thow KeyError if not in coarse-grain epoch
+                self.epoch_bst.search(fi)
+
+                # Frame is in a coarse-grain  epoch, but not a fine grain interval;
+                #   look backwards to find most recent find nearest matching interval
+                if fi < self.epoch_df.iloc[0]['start']:
+
+                    # Breakout if we go before the experiment:
+                    return None
+                else:
+                    return self.search(fi-1)
+
+            except KeyError:
+
+                # Frame is unregistered at the coarse level; return None
+                return None
