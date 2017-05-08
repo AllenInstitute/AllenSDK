@@ -410,14 +410,19 @@ class BrainObservatoryCache(Cache):
 
 
 def _find_specimen_cre_line(specimen):
-    return next(tl['name'] for tl in specimen['donor']['transgenic_lines']
-                if tl['transgenic_line_type_name'] == 'driver' and
-                'Cre' in tl['name'])
-
+    try:
+        return next(tl['name'] for tl in specimen['donor']['transgenic_lines']
+                    if tl['transgenic_line_type_name'] == 'driver' and
+                    'Cre' in tl['name'])
+    except StopIteration:
+        return None
 
 def _find_specimen_reporter_line(specimen):
-    return next(tl['name'] for tl in specimen['donor']['transgenic_lines']
-                if tl['transgenic_line_type_name'] == 'reporter')
+    try:
+        return next(tl['name'] for tl in specimen['donor']['transgenic_lines']
+                    if tl['transgenic_line_type_name'] == 'reporter')
+    except StopIteration:
+        return None
 
 
 def _find_experiment_acquisition_age(exp):
@@ -441,6 +446,8 @@ def _merge_transgenic_lines(*lines_list):
         return None
 
 def _find_container_tags(container):
+    """ Custom logic for extracting tags from donor conditions.  Filtering 
+    out tissuecyte tags. """
     conditions = container['specimen']['donor']['conditions']
     return [c['name'] for c in conditions if not c['name'].startswith('tissuecyte')]
 
