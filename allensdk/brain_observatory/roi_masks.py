@@ -16,6 +16,7 @@ import numpy as np
 import math
 import scipy.ndimage.morphology as morphology
 import logging
+import h5py
 
 # constants used for accessing border array
 RIGHT_SHIFT = 0
@@ -377,9 +378,12 @@ def calculate_traces(stack, mask_list):
                 mask = mask_list[i]
                 subframe = frame[mask.y:mask.y +
                                  mask.height, mask.x:mask.x + mask.width]
-                total = (subframe * mask.mask).sum(axis=-1).sum(axis=-1)
-                area = (mask.mask).sum(axis=-1).sum(axis=-1)
-                tvals = total / area
+
+                total = subframe[mask.mask].sum()
+                #total = (subframe * mask.mask).sum(axis=-1).sum(axis=-1)
+                area = mask.mask.sum()
+                #area = (mask.mask).sum(axis=-1).sum(axis=-1)
+                tvals = float(total) / float(area)
                 traces[i][frame_num] = tvals
         except:
             logging.error("Error encountered processing mask during frame %d" % frame_num)
@@ -395,7 +399,7 @@ def calculate_roi_and_neuropil_traces(movie_path, roi_mask_list, motion_border):
 
     # a combined binary mask for all ROIs (this is used to 
     #   subtracted ROIs from annuli
-    mask_array = roi_masks.create_roi_mask_array(roi_mask_list)
+    mask_array = create_roi_mask_array(roi_mask_list)
     combined_mask = mask_array.max(axis=0)
 
     logging.info("%d total ROIs" % len(roi_mask_list))
@@ -416,10 +420,10 @@ def calculate_roi_and_neuropil_traces(movie_path, roi_mask_list, motion_border):
         combined_list.append(n)
 
     with h5py.File(movie_path, "r") as movie_f:
-        stack_frames = movie_path["data"]
+        stack_frames = movie_f["data"]
 
         logging.info("Calculating %d traces (neuropil + ROI) over %d frames" % (len(combined_list), len(stack_frames)))
-        traces = roi_masks.calculate_traces(stack_frames, combined_list)
+        traces = calculate_traces(stack_frames, combined_list)
 
         roi_traces = traces[:len(roi_mask_list)]
         neuropil_traces = traces[len(roi_mask_list):]
@@ -450,3 +454,4 @@ def create_roi_mask_array(rois):
     else:
         masks = None
     return masks
+
