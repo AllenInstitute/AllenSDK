@@ -319,16 +319,8 @@ class StructureTree( SimpleTree ):
         
         '''
         
-        is_iterable = hasattr(hex_color, '__iter__') and not hasattr(hex_color, '__next__')
-        is_string = isinstance(hex_color, string_types)
-
-        if is_iterable and not is_string:
-
-            all_int = all([x % 1 == 0 for x in hex_color])
-
-            if all_int and len(hex_color) == 3:
-                return hex_color
-
+        if not isinstance(hex_color, string_types):
+            return list(hex_color)
 
         if hex_color[0] == '#':
             hex_color = hex_color[1:]
@@ -341,16 +333,9 @@ class StructureTree( SimpleTree ):
         '''Structure id paths are sometimes formatted as "/"-seperated strings. 
         This method converts them to a list of integers, if needed.
         '''
-        
-        is_iterable = hasattr(path, '__iter__') and not hasattr(path, '__next__')
-        is_string = isinstance(path, string_types)
 
-        if is_iterable and not is_string:
-
-            all_int = all([x % 1 == 0 for x in path])
-
-            if all_int:
-                return path
+        if not isinstance(path, string_types):
+            return list(path)
 
         return [int(stid) for stid in path.split('/') if stid != '']
 
