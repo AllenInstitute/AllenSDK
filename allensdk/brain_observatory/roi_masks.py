@@ -390,6 +390,43 @@ def calculate_traces(stack, mask_list):
             raise
     return traces
 
+def calculate_roi_and_neuropil_traces(movie_path, roi_mask_list, motion_border):
+    """ get roi and neuropil masks """
+
+    # a combined binary mask for all ROIs (this is used to 
+    #   subtracted ROIs from annuli
+    mask_array = roi_masks.create_roi_mask_array(roi_mask_list)
+    combined_mask = mask_array.max(axis=0)
+
+    logging.info("%d total ROIs" % len(roi_mask_list))
+
+    # create neuropil masks for the central ROIs
+    neuropil_masks = []
+    for m in roi_mask_list:
+        nmask = create_neuropil_mask(m, motion_border, combined_mask, "neuropil for " + m.label)
+        neuropil_masks.append(nmask)
+
+    # calculate fluorescence traces for valid ROI and neuropil masks
+    # create a combined list and calculate these together (this lets us
+    #   read the large image stack only once)
+    combined_list = []
+    for m in roi_mask_list:
+        combined_list.append(m)
+    for n in neuropil_masks:
+        combined_list.append(n)
+
+    with h5py.File(movie_path, "r") as movie_f:
+        stack_frames = movie_path["data"]
+
+        logging.info("Calculating %d traces (neuropil + ROI) over %d frames" % (len(combined_list), len(stack_frames)))
+        traces = roi_masks.calculate_traces(stack_frames, combined_list)
+
+        roi_traces = traces[:len(roi_mask_list)]
+        neuropil_traces = traces[len(roi_mask_list):]
+
+    return roi_traces, neuropil_traces
+
+
 
 def create_roi_mask_array(rois):
     '''Create full image mask array from list of RoiMasks.
