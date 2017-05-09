@@ -343,7 +343,7 @@ class NeuropilMask(Mask):
         self.mask = array[top:bottom + 1, left:right + 1]
 
 
-def calculate_traces(stack, mask_list):
+def calculate_traces(stack, mask_list, block_size=100):
     '''
     Calculates the average response of the specified masks in the
     image stack
@@ -361,40 +361,50 @@ def calculate_traces(stack, mask_list):
     float[number masks][number frames]
         This is the average response for each Mask in each image frame
     '''
-    traces = np.zeros((len(mask_list), stack.shape[0]))
+    traces = np.zeros((len(mask_list), stack.shape[0]), dtype=float)
     num_frames = stack.shape[0]
+
     # make sure masks are numpy objects
-    for mask in mask_list:
+    mask_areas = np.zeros(len(mask_list), dtype=float)
+    for i,mask in enumerate(mask_list):
         if not isinstance(mask.mask, np.ndarray):
             mask.mask = np.array(mask.mask)
+
+        # compute mask areas
+        mask_area = mask.mask.sum()
+        mask_areas[i] = mask_area
+
+        # if the mask is empty, the trace is nan
+        if mask_area == 0:
+            logging.warning("mask '%s' is empty", mask.label)
+            traces[i,:] = np.nan
+
     # calculate traces
-    for frame_num in range(num_frames):
+    for frame_num in range(0, num_frames, block_size):
         if frame_num % 1000 == 0:
             logging.debug("frame " + str(frame_num) + " of " + str(num_frames))
-        frame = stack[frame_num]
+        frames = stack[frame_num:frame_num+block_size]
         mask = None
         try:
             for i in range(len(mask_list)):
-                mask = mask_list[i]
-                subframe = frame[mask.y:mask.y +
-                                 mask.height, mask.x:mask.x + mask.width]
+                if mask_areas[i] == 0.0:
+                    continue
 
-                total = subframe[mask.mask].sum()
-                #total = (subframe * mask.mask).sum(axis=-1).sum(axis=-1)
-                area = mask.mask.sum()
-                #area = (mask.mask).sum(axis=-1).sum(axis=-1)
-                tvals = float(total) / float(area)
-                traces[i][frame_num] = tvals
-        except:
+                mask = mask_list[i]
+                subframe = frames[:,mask.y:mask.y + mask.height, 
+                                    mask.x:mask.x + mask.width]
+                total = subframe[:, mask.mask].sum(axis=1)
+                traces[i, frame_num:frame_num+block_size] = total / mask_areas[i]
+        except Exception as e:
             logging.error("Error encountered processing mask during frame %d" % frame_num)
             if mask is not None:
                 logging.error(subframe.shape)
                 logging.error(mask.mask.shape)
                 logging.error(mask)
-            raise
+            raise e
     return traces
 
-def calculate_roi_and_neuropil_traces(movie_path, roi_mask_list, motion_border):
+def calculate_roi_and_neuropil_traces(movie_h5, roi_mask_list, motion_border):
     """ get roi and neuropil masks """
 
     # a combined binary mask for all ROIs (this is used to 
@@ -419,7 +429,7 @@ def calculate_roi_and_neuropil_traces(movie_path, roi_mask_list, motion_border):
     for n in neuropil_masks:
         combined_list.append(n)
 
-    with h5py.File(movie_path, "r") as movie_f:
+    with h5py.File(movie_h5, "r") as movie_f:
         stack_frames = movie_f["data"]
 
         logging.info("Calculating %d traces (neuropil + ROI) over %d frames" % (len(combined_list), len(stack_frames)))
