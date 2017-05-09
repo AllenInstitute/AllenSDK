@@ -15,6 +15,7 @@
 import numpy as np
 import math
 import scipy.ndimage.morphology as morphology
+import logging
 
 # constants used for accessing border array
 RIGHT_SHIFT = 0
