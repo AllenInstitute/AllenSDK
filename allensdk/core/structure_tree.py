@@ -17,7 +17,7 @@
 from __future__ import division, print_function, absolute_import
 import re
 import operator as op
-from six import iteritems, string_types, integer_types
+from six import iteritems, string_types
 
 import numpy as np
 
@@ -324,7 +324,7 @@ class StructureTree( SimpleTree ):
 
         if is_iterable and not is_string:
 
-            all_int = all([isinstance(x, integer_types) for x in hex_color])
+            all_int = all([x % 1 == 0 for x in hex_color])
 
             if all_int and len(hex_color) == 3:
                 return hex_color
@@ -347,7 +347,7 @@ class StructureTree( SimpleTree ):
 
         if is_iterable and not is_string:
 
-            all_int = all([isinstance(x, integer_types) for x in path])
+            all_int = all([x % 1 == 0 for x in path])
 
             if all_int:
                 return path

@@ -177,3 +177,35 @@ def test_get_structure_sets(tree):
     expected = set([1, 2, 3, 4])
     obtained = tree.get_structure_sets()
     assert( expected == obtained )
+
+
+def test_clean_structures_weird_keys():
+    
+    dirty_node = {'id': 5, 'dummy_key': 'dummy_val'}
+    clean_node = StructureTree.clean_structures([dirty_node])[0]
+
+    assert( len(clean_node) == 2 )
+    assert( clean_node['id'] == 5 )
+
+
+@pytest.mark.parametrize('inp,out', [('990099', [153, 0, 153]), 
+                                     ('#990099', [153, 0, 153]), 
+                                     ([153, 0, 153], [153, 0, 153]), 
+                                     ((153., 0., 153.), [153, 0, 153]), 
+                                     ([long(153), long(0), long(153)], [153, 0, 153])])
+def test_hex_to_rgb(inp, out):
+    obt = StructureTree.hex_to_rgb(inp)
+    assert(allclose(obt, out))
+
+
+@pytest.mark.parametrize('inp,out', [('/1/2/3/', [1, 2, 3]),
+                                     ('1/2/3/', [1, 2, 3]), 
+                                     ('/1/2/3', [1, 2, 3]), 
+                                     ('1/2/3', [1, 2, 3]), 
+                                     ([1, 2, 3], [1, 2, 3]),
+                                     ([1.0, long(2), 3], [1, 2, 3]), 
+                                     ((1, 2, 3), [1, 2, 3]), 
+                                     ('', [])])
+def test_path_to_list(inp, out):
+    obt = StructureTree.path_to_list(inp)
+    assert(allclose(obt, out))
