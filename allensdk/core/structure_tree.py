@@ -17,7 +17,7 @@
 from __future__ import division, print_function, absolute_import
 import re
 import operator as op
-from six import iteritems
+from six import iteritems, string_types, integer_types
 
 import numpy as np
 
@@ -280,10 +280,11 @@ class StructureTree( SimpleTree ):
         if field_whitelist is None:
             field_whitelist = StructureTree.whitelist()
 
-        for ii, val in enumerate(structures):
+        for ii, st in enumerate(structures):
 
-            StructureTree.collect_sets(val)
-            structures[ii] = {k: field_whitelist[k](v) for k, v in iteritems(val)}
+            StructureTree.collect_sets(st)
+            structures[ii] = {wk: wf(st[wk]) for wk, wf 
+                              in iteritems(field_whitelist) if wk in st}
 
         return structures
         
@@ -308,7 +309,8 @@ class StructureTree( SimpleTree ):
         ----------
         hex_color : string 
             Must be 6 characters long, unless it is 7 long and the first 
-            character is #.
+            character is #. If hex_color is a triplet of int, it will be 
+            returned unchanged.
             
         Returns
         -------
@@ -317,6 +319,17 @@ class StructureTree( SimpleTree ):
         
         '''
         
+        is_iterable = hasattr(hex_color, '__iter__') and not hasattr(hex_color, '__next__')
+        is_string = isinstance(hex_color, string_types)
+
+        if is_iterable and not is_string:
+
+            all_int = all([isinstance(x, integer_types) for x in hex_color])
+
+            if all_int and len(hex_color) == 3:
+                return hex_color
+
+
         if hex_color[0] == '#':
             hex_color = hex_color[1:]
         
@@ -325,11 +338,30 @@ class StructureTree( SimpleTree ):
 
     @staticmethod
     def path_to_list(path):
-        return [int(stid) for stid in path.split('/') if stid != ''] 
+        '''Structure id paths are sometimes formatted as "/"-seperated strings. 
+        This method converts them to a list of integers, if needed.
+        '''
+        
+        is_iterable = hasattr(path, '__iter__') and not hasattr(path, '__next__')
+        is_string = isinstance(path, string_types)
+
+        if is_iterable and not is_string:
+
+            all_int = all([isinstance(x, integer_types) for x in path])
+
+            if all_int:
+                return path
+
+        return [int(stid) for stid in path.split('/') if stid != '']
 
 
     @staticmethod
     def collect_sets(structure):
+        '''Structure sets may be specified by full records or id. This method 
+        collects all of the structure set records/ids in a structure record and 
+        replaces them with a single list of id records.
+        '''
+
         if not 'structure_sets' in structure:
             structure['structure_sets'] = []
         if not 'structure_set_ids' in structure:
