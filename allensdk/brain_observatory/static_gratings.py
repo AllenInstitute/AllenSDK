@@ -168,7 +168,7 @@ class StaticGratings(StimulusAnalysis):
 
     def get_peak(self):
         ''' Computes metrics related to each cell's peak response condition.
-
+        
         Returns
         -------
         Panda data frame with the following fields (_sg suffix is
@@ -181,14 +181,16 @@ class StaticGratings(StimulusAnalysis):
             * peak_dff_sg (peak dF/F)
             * ptest_sg
             * time_to_peak_sg
-            * duration_sg
         '''
         StaticGratings._log.info('Calculating peak response properties')
 
-        peak = pd.DataFrame(index=range(self.numbercells), columns=('ori_sg', 'sf_sg', 'phase_sg', 'response_reliability_sg',
-                                                                    'osi_sg', 'peak_dff_sg', 'ptest_sg', 'time_to_peak_sg', 'duration_sg', 'cell_specimen_id'))
+        peak = pd.DataFrame(index=range(self.numbercells), columns=('ori_sg', 'sf_sg', 'phase_sg', 'reliability_sg',
+                                                                    'osi_sg', 'peak_dff_sg', 'ptest_sg', 'time_to_peak_sg', 
+                                                                    'cell_specimen_id','p_run_sg', 'cv_os_sg',
+                                                                    'run_modulation_sg', 'sf_index_sg'))
         cids = self.data_set.get_cell_specimen_ids()
 
+        orivals_rad = np.deg2rad(self.orivals)
         for nc in range(self.numbercells):
             cell_peak = np.where(self.response[:, 1:, :, nc, 0] == np.nanmax(
                 self.response[:, 1:, :, nc, 0]))
@@ -199,11 +201,20 @@ class StaticGratings(StimulusAnalysis):
             peak.ori_sg[nc] = pref_ori
             peak.sf_sg[nc] = pref_sf
             peak.phase_sg[nc] = pref_phase
-            peak.response_reliability_sg[nc] = self.response[
-                pref_ori, pref_sf, pref_phase, nc, 2] / 0.48  # TODO: check number of trials
+
+#            peak.response_reliability_sg[nc] = self.response[
+#                pref_ori, pref_sf, pref_phase, nc, 2] / 0.48  # TODO: check number of trials
+
             pref = self.response[pref_ori, pref_sf, pref_phase, nc, 0]
             orth = self.response[
                 np.mod(pref_ori + 3, 6), pref_sf, pref_phase, nc, 0]
+            tuning = self.response[:, pref_sf, pref_phase, nc, 0]
+            
+            CV_top_os = np.empty((6), dtype=np.complex128)
+            for i in range(6):
+                CV_top_os[i] = (tuning[i]*np.exp(1j*2*orivals_rad[i]))
+            peak.cv_os_sg.iloc[nc] = np.abs(CV_top_os.sum())/tuning.sum()
+                
             peak.osi_sg[nc] = (pref - orth) / (pref + orth)
             peak.peak_dff_sg[nc] = pref
             groups = []
@@ -234,12 +245,42 @@ class StaticGratings(StimulusAnalysis):
             test = self.sweep_response[test_rows][str(nc)].mean()
             peak.time_to_peak_sg[nc] = (
                 np.argmax(test) - self.interlength) / self.acquisition_rate
-            test2 = np.where(test < (test.max() / 2))[0]
-            try:
-                peak.duration_sg[nc] = np.ediff1d(
-                    test2).max() / self.acquisition_rate
-            except:
-                pass
+
+            #running modulation
+            subset = self.mean_sweep_response[(self.stim_table.spatial_frequency==self.sfvals[pref_sf])&(self.stim_table.orientation==self.orivals[pref_ori])&(self.stim_table.phase==self.phasevals[pref_phase])]            
+            subset_run = subset[subset.dx>=1]
+            subset_stat = subset[subset.dx<1]
+            if (len(subset_run)>4) & (len(subset_stat)>4):
+                (_,peak.p_run_sg.iloc[nc]) = st.ttest_ind(subset_run[str(nc)], subset_stat[str(nc)], equal_var=False)
+                
+                if subset_run[str(nc)].mean()>subset_stat[str(nc)].mean():
+                    peak.run_modulation_sg.iloc[nc] = (subset_run[str(nc)].mean() - subset_stat[str(nc)].mean())/np.abs(subset_run[str(nc)].mean())
+                elif subset_run[str(nc)].mean()<subset_stat[str(nc)].mean():
+                    peak.run_modulation_sg.iloc[nc] = -1*((subset_stat[str(nc)].mean() - subset_run[str(nc)].mean())/np.abs(subset_stat[str(nc)].mean()))
+            else:
+                peak.p_run_sg.iloc[nc] = np.NaN
+                peak.run_modulation_sg.iloc[nc] = np.NaN                
+            
+            #reliability
+            subset = self.sweep_response[(self.stim_table.spatial_frequency==self.sfvals[pref_sf])&(self.stim_table.orientation==self.orivals[pref_ori])&(self.stim_table.phase==self.phasevals[pref_phase])]         
+            corr_matrix = np.empty((len(subset),len(subset)))
+            for i in range(len(subset)):
+                for j in range(len(subset)):
+                    r,p = st.pearsonr(subset[str(nc)].iloc[i][28:42], subset[str(nc)].iloc[j][28:42])
+                    corr_matrix[i,j] = r
+            mask = np.ones((len(subset), len(subset)))
+            for i in range(len(subset)):
+                for j in range(len(subset)):
+                    if i>=j:
+                        mask[i,j] = np.NaN
+            corr_matrix *= mask
+            peak.reliability_sg.iloc[nc] = np.nanmean(corr_matrix)
+
+            #SF index
+            sf_tuning = self.response[pref_ori,1:,pref_phase,nc,0]
+            trials = self.mean_sweep_response[(self.stim_table.spatial_frequency!=0)&(self.stim_table.orientation==self.orivals[pref_ori])&(self.stim_table.phase==self.phasevals[pref_phase])][str(nc)].values
+            SSE_part = np.sqrt(np.sum((trials-trials.mean())**2)/(len(trials)-5))
+            peak.sf_index_sg.iloc[nc] = (np.ptp(sf_tuning))/(np.ptp(sf_tuning) + 2*SSE_part)
 
         return peak
 
@@ -317,7 +358,10 @@ class StaticGratings(StimulusAnalysis):
                                      offset=180.0,
                                      color=color)
 
-        max_count = max(counts)
+        if len(counts) == 0:
+            max_count = 1
+        else:
+            max_count = max(counts)
 
         center_x = 0.0
         center_y = 0.5 * max_count
@@ -346,16 +390,16 @@ class StaticGratings(StimulusAnalysis):
         plt.xlabel("spatial frequency (cycles/deg)")
         plt.ylabel("number of cells")
 
-    def open_fan_plot(self, cell_specimen_id, include_labels=False):
-        cell_id = self.peak_row_from_csid(self.peak, cell_specimen_id)
+    def open_fan_plot(self, cell_specimen_id=None, include_labels=False, cell_index=None):
+        cell_index = self.row_from_cell_id(cell_specimen_id, cell_index)
 
-        df = self.mean_sweep_response[str(cell_id)]
+        df = self.mean_sweep_response[str(cell_index)]
         st = self.data_set.get_stimulus_table('static_gratings')
         mask = st.dropna(subset=['orientation']).index
 
         data = df.values
 
-        cmin = self.response[0,0,0,cell_id,0]
+        cmin = self.response[0,0,0,cell_index,0]
         cmax = data.mean() + data.std()*3
 
         fp = cplots.FanPlotter.for_static_gratings()
@@ -369,6 +413,136 @@ class StaticGratings(StimulusAnalysis):
         if include_labels:
             fp.show_r_labels()
             fp.show_angle_labels()
+
+
+    def reshape_response_array(self):
+        '''
+        :return: response array in cells x stim conditions x repetition for noise correlations
+        this is a re-organization of the mean sweep response table
+        '''
+
+        mean_sweep_response = self.mean_sweep_response.values[:, :self.numbercells]
+
+        stim_table = self.stim_table
+        sfvals = self.sfvals
+        sfvals = sfvals[sfvals != 0] # blank sweep
+
+        response_new = np.zeros((self.numbercells, self.number_ori, self.number_sf-1, self.number_phase), dtype='object')
+
+        for i, ori in enumerate(self.orivals):
+            for j, sf in enumerate(sfvals):
+                for k, phase in enumerate(self.phasevals):
+                    ind = (stim_table.orientation.values == ori) * (stim_table.spatial_frequency.values == sf) * (stim_table.phase.values == phase)
+                    for c in range(self.numbercells):
+                        response_new[c, i, j, k] = mean_sweep_response[ind, c]
+
+        ind = (stim_table.spatial_frequency.values == 0)
+        response_blank = mean_sweep_response[ind, :].T
+
+        return response_new, response_blank
+
+
+    def get_signal_correlation(self, corr='spearman'):
+        logging.debug("Calculating signal correlation")
+
+        response = self.response[:, 1:, :, :self.numbercells, 0] # orientation x freq x phase x cell, no blank
+        response = response.reshape(self.number_ori * (self.number_sf-1) * self.number_phase, self.numbercells).T
+        N, Nstim = response.shape
+
+        signal_corr = np.zeros((N, N))
+        signal_p = np.empty((N, N))
+        if corr == 'pearson':
+            for i in range(N):
+                for j in range(i, N): # matrix is symmetric
+                    signal_corr[i, j], signal_p[i, j] = st.pearsonr(response[i], response[j])
+
+        elif corr == 'spearman':
+            for i in range(N):
+                for j in range(i, N): # matrix is symmetric
+                    signal_corr[i, j], signal_p[i, j] = st.spearmanr(response[i], response[j])
+
+        else:
+            raise Exception('correlation should be pearson or spearman')
+
+        signal_corr = np.triu(signal_corr) + np.triu(signal_corr, 1).T  # fill in lower triangle
+        signal_p = np.triu(signal_p) + np.triu(signal_p, 1).T  # fill in lower triangle
+
+        return signal_corr, signal_p
+
+
+    def get_representational_similarity(self, corr='spearman'):
+        logging.debug("Calculating representational similarity")
+
+        response = self.response[:, 1:, :, :self.numbercells, 0] # orientation x freq x phase x cell
+        response = response.reshape(self.number_ori * (self.number_sf-1) * self.number_phase, self.numbercells)
+        Nstim, N = response.shape
+
+        rep_sim = np.zeros((Nstim, Nstim))
+        rep_sim_p = np.empty((Nstim, Nstim))
+        if corr == 'pearson':
+            for i in range(Nstim):
+                for j in range(i, Nstim): # matrix is symmetric
+                    rep_sim[i, j], rep_sim_p[i, j] = st.pearsonr(response[i], response[j])
+
+        elif corr == 'spearman':
+            for i in range(Nstim):
+                for j in range(i, Nstim): # matrix is symmetric
+                    rep_sim[i, j], rep_sim_p[i, j] = st.spearmanr(response[i], response[j])
+
+        else:
+            raise Exception('correlation should be pearson or spearman')
+
+        rep_sim = np.triu(rep_sim) + np.triu(rep_sim, 1).T # fill in lower triangle
+        rep_sim_p = np.triu(rep_sim_p) + np.triu(rep_sim_p, 1).T  # fill in lower triangle
+
+        return rep_sim, rep_sim_p
+
+
+    def get_noise_correlation(self, corr='spearman'):
+        logging.debug("Calculating noise correlation")
+
+        response, response_blank = self.reshape_response_array()
+        noise_corr = np.zeros((self.numbercells, self.numbercells, self.number_ori, self.number_sf-1, self.number_phase))
+        noise_corr_p = np.zeros((self.numbercells, self.numbercells, self.number_ori, self.number_sf-1, self.number_phase))
+
+        noise_corr_blank = np.zeros((self.numbercells, self.numbercells))
+        noise_corr_blank_p = np.zeros((self.numbercells, self.numbercells))
+
+        if corr == 'pearson':
+            for k in range(self.number_ori):
+                for l in range(self.number_sf-1):
+                    for m in range(self.number_phase):
+                        for i in range(self.numbercells):
+                            for j in range(i, self.numbercells):
+                                noise_corr[i, j, k, l, m], noise_corr_p[i, j, k, l, m] = st.pearsonr(response[i, k, l, m], response[j, k, l, m])
+
+                        noise_corr[:, :, k, l, m] = np.triu(noise_corr[:, :, k, l, m]) + np.triu(noise_corr[:, :, k, l, m], 1).T
+
+            for i in range(self.numbercells):
+                for j in range(i, self.numbercells):
+                    noise_corr_blank[i, j], noise_corr_blank_p[i, j] = st.pearsonr(response_blank[i], response_blank[j])
+
+        elif corr == 'spearman':
+            for k in range(self.number_ori):
+                for l in range(self.number_sf-1):
+                    for m in range(self.number_phase):
+                        for i in range(self.numbercells):
+                            for j in range(i, self.numbercells):
+                                noise_corr[i, j, k, l, m], noise_corr_p[i, j, k, l, m] = st.spearmanr(response[i, k, l, m], response[j, k, l, m])
+
+                        noise_corr[:, :, k, l, m] = np.triu(noise_corr[:, :, k, l, m]) + np.triu(noise_corr[:, :, k, l, m], 1).T
+
+            for i in range(self.numbercells):
+                for j in range(i, self.numbercells):
+                    noise_corr_blank[i, j], noise_corr_blank_p[i, j] = st.spearmanr(response_blank[i], response_blank[j])
+
+        else:
+            raise Exception('correlation should be pearson or spearman')
+
+        noise_corr_blank[:, :] = np.triu(noise_corr_blank[:, :]) + np.triu(noise_corr_blank[:, :], 1).T
+
+        return noise_corr, noise_corr_p, noise_corr_blank, noise_corr_blank_p
+
 
     @staticmethod
     def from_analysis_file(data_set, analysis_file):
@@ -387,6 +561,14 @@ class StaticGratings(StimulusAnalysis):
                 sg._binned_cells_sp = f["analysis/binned_cells_sp"].value
                 sg._binned_dx_vis = f["analysis/binned_dx_vis"].value
                 sg._binned_cells_vis = f["analysis/binned_cells_vis"].value
+
+                if "analysis/noise_corr_sg" in f:
+                    sg.noise_correlation = f["analysis/noise_corr_sg"].value
+                if "analysis/signal_corr_sg" in f:
+                    sg.signal_correlation = f["analysis/signal_corr_sg"].value
+                if "analysis/rep_similarity_sg" in f:
+                    sg.representational_similarity = f["analysis/rep_similarity_sg"].value
+
         except Exception as e:
             raise MissingStimulusException(e.args)
 

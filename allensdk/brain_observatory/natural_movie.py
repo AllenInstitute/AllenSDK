@@ -91,43 +91,66 @@ class NaturalMovie(StimulusAnalysis):
             'peak', 'response_reliability', 'cell_specimen_id'))
         cids = self.data_set.get_cell_specimen_ids()
 
+        mask = np.ones((10,10))
+        for i in range(10):
+            for j in range(10):
+                if i>=j:
+                    mask[i,j] = np.NaN        
+        
         for nc in range(self.numbercells):
             peak_movie.cell_specimen_id.iloc[nc] = cids[nc]
             meanresponse = self.sweep_response[str(nc)].mean()
-            movie_len = len(meanresponse) / 30
-            output = np.empty((movie_len, 10))
-            for tr in range(10):
-                test = self.sweep_response[str(nc)].iloc[tr]
-                for i in range(movie_len):
-                    _, p = st.ks_2samp(
-                        test[i * 30:(i + 1) * 30], test[(i + 1) * 30:(i + 2) * 30])
-                    output[i, tr] = p
-            output = np.where(output < 0.05, 1, 0)
-            ptime = np.sum(output, axis=1)
-            ptime *= 10
+            
+#            movie_len = len(meanresponse) / 30
+#            output = np.empty((movie_len, 10))
+#            for tr in range(10):
+#                test = self.sweep_response[str(nc)].iloc[tr]
+#                for i in range(movie_len):
+#                    _, p = st.ks_2samp(
+#                        test[i * 30:(i + 1) * 30], test[(i + 1) * 30:(i + 2) * 30])
+#                    output[i, tr] = p
+#            output = np.where(output < 0.05, 1, 0)
+#            ptime = np.sum(output, axis=1)
+#            ptime *= 10
             peak = np.argmax(meanresponse)
-            if peak > 30:
-                peak_movie.response_reliability.iloc[
-                    nc] = ptime[(peak - 30) / 30]
-            else:
-                peak_movie.response_reliability.iloc[nc] = ptime[0]
+#            if peak > 30:
+#                peak_movie.response_reliability.iloc[
+#                    nc] = ptime[(peak - 30) / 30]
+#            else:
+#                peak_movie.response_reliability.iloc[nc] = ptime[0]
             peak_movie.peak.iloc[nc] = peak
-        if self.movie_name == 'natural_movie_one':
+            
+            #reliability
+            corr_matrix = np.empty((10,10))
+            for i in range(10):
+                for j in range(10):
+                    r,p = st.pearsonr(self.sweep_response[str(nc)].iloc[i], self.sweep_response[str(nc)].iloc[j])
+                    corr_matrix[i,j] = r
+            corr_matrix*=mask
+            peak_movie.response_reliability.iloc[nc] = np.nanmean(corr_matrix)
+            
+        if self.movie_name == stiminfo.NATURAL_MOVIE_ONE:
             peak_movie.rename(columns={
-                              'peak': 'peak_nm1', 'response_reliability': 'response_reliability_nm1'}, inplace=True)
-        elif self.movie_name == 'natural_movie_two':
+                              'peak': 'peak_'+stiminfo.NATURAL_MOVIE_ONE_SHORT, 
+                              'response_reliability': 'response_reliability_'+stiminfo.NATURAL_MOVIE_ONE_SHORT}, 
+                              inplace=True)
+        elif self.movie_name == stiminfo.NATURAL_MOVIE_TWO:
             peak_movie.rename(columns={
-                              'peak': 'peak_nm2', 'response_reliability': 'response_reliability_nm2'}, inplace=True)
-        elif self.movie_name == 'natural_movie_three':
+                              'peak': 'peak_'+stiminfo.NATURAL_MOVIE_TWO_SHORT, 
+                              'response_reliability': 'response_reliability_'+stiminfo.NATURAL_MOVIE_TWO_SHORT},
+                              inplace=True)
+        elif self.movie_name == stiminfo.NATURAL_MOVIE_THREE:
             peak_movie.rename(columns={
-                              'peak': 'peak_nm3', 'response_reliability': 'response_reliability_nm3'}, inplace=True)
+                              'peak': 'peak_'+stiminfo.NATURAL_MOVIE_THREE_SHORT, 
+                              'response_reliability': 'response_reliability_'+stiminfo.NATURAL_MOVIE_THREE_SHORT}, 
+                              inplace=True)
 
         return peak_movie
 
-    def open_track_plot(self, cell_specimen_id):
-        cell_id = self.peak_row_from_csid(self.peak, cell_specimen_id)
+    def open_track_plot(self, cell_specimen_id=None, cell_index=None):
+        cell_index = self.row_from_cell_id(cell_specimen_id, cell_index)
 
-        cell_rows = self.sweep_response[str(cell_id)]
+        cell_rows = self.sweep_response[str(cell_index)]
         data = []
         for i in range(len(cell_rows)):
             data.append(cell_rows.iloc[i])
@@ -146,9 +169,9 @@ class NaturalMovie(StimulusAnalysis):
 
         # TODO: deal with this properly
         suffix_map = {
-            stiminfo.NATURAL_MOVIE_ONE: '_nm1',
-            stiminfo.NATURAL_MOVIE_TWO: '_nm2',
-            stiminfo.NATURAL_MOVIE_THREE: '_nm3',
+            stiminfo.NATURAL_MOVIE_ONE: '_'+stiminfo.NATURAL_MOVIE_ONE_SHORT,
+            stiminfo.NATURAL_MOVIE_TWO: '_'+stiminfo.NATURAL_MOVIE_TWO_SHORT,
+            stiminfo.NATURAL_MOVIE_THREE: '_'+stiminfo.NATURAL_MOVIE_THREE_SHORT
             }
 
         try:

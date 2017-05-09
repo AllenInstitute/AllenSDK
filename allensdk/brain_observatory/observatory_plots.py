@@ -1,9 +1,12 @@
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.collections import PatchCollection
 import matplotlib.patches as mpatches
 import scipy.interpolate as si
-from scipy.stats.mstats import zscore
+from scipy.stats import gaussian_kde
+import matplotlib.colorbar as cbar
+from mpl_toolkits.axes_grid1 import ImageGrid
 
 import allensdk.brain_observatory.circle_plots as cplots
 from contextlib import contextmanager
@@ -16,22 +19,175 @@ PEAK_DFF_MIN = 3
 N_HIST_BINS = 50
 STIM_COLOR = "#ccccdd"
 STIMULUS_COLOR_MAP = LinearSegmentedColormap.from_list('default',[ [1.0,1.0,1.0,0.0], [.6,.6,.85,1.0] ])
+PUPIL_COLOR_MAP = LinearSegmentedColormap.from_list(
+    'custom_plasma', [[0.050383, 0.029803, 0.527975],
+                      [0.417642, 0.000564, 0.658390],
+                      [0.692840, 0.165141, 0.564522],
+                      [0.881443, 0.392529, 0.383229],
+                      [0.988260, 0.652325, 0.211364],
+                      [0.940015, 0.975158, 0.131326]])
 EVOKED_COLOR = "#b30000"
 SPONTANEOUS_COLOR = "#0000b3"
-LSN_RF_ON_COLOR_MAP = LinearSegmentedColormap.from_list('default', [[0.0,0.0,1.0,1.0],[1,1,1,1],[1.0,0,0.0,1]])
-LSN_RF_ON_COLOR_MAP.set_bad((1,1,1,1),1.0)
-LSN_RF_OFF_COLOR_MAP = LinearSegmentedColormap.from_list('default', [[0.0,0.0,1.0,1.0],[1,1,1,1],[1.0,0,0.0,1]])
-LSN_RF_OFF_COLOR_MAP.set_bad((1,1,1,1),1.0)
+
+def plot_cell_correlation(sig_corrs, labels, colors, scale=15):
+    alpha = 1.0 / len(sig_corrs)
+    ax = plt.gca()
+    for sig_corr, color, label in zip(sig_corrs, colors, labels):
+        ax.bar(range(len(sig_corr)), sig_corr, color=color, alpha=alpha, label=label, linewidth=0.5)
+    ax.set_xlabel("cell")
+    ax.set_ylabel("signal correlation")
+    ax.set_ylim([-1,1])
+    leg = ax.legend(loc='lower left', frameon=False)
+    for i, t in enumerate(leg.get_texts()):
+        t.set_color(colors[i])
+
+def population_correlation_scatter(sig_corrs, noise_corrs, labels, colors, scale=15):
+    alpha = max(0.85 - 0.15 * (len(sig_corrs)-1), 0.2)
+    ax = plt.gca()
+    for sig_corr, noise_corr, color, label in zip(sig_corrs, noise_corrs, colors, labels):
+        inds = np.tril_indices(len(sig_corr))
+        ax.scatter(sig_corr[inds], noise_corr[inds], 
+                   s=scale,
+                   color=color, 
+                   linewidth=0.5, edgecolor='#333333', 
+                   label=label, 
+                   alpha=alpha)
+    ax.set_xlabel("signal correlation")
+    ax.set_ylabel("noise correlation")
+    ax.set_xlim([-1,1])
+    ax.set_ylim([-1,1])
+    leg = ax.legend(loc='upper left', frameon=False)
+    for i, t in enumerate(leg.get_texts()):
+        t.set_color(colors[i])
+
+class DimensionPatchHandler(object):
+    def __init__(self, vals, start_color, end_color, *args, **kwargs):
+        super(DimensionPatchHandler, self).__init__(*args, **kwargs)
+        self.vals = vals
+        self.start_color = start_color
+        self.end_color = end_color
+
+    def legend_artist(self, legend, orig_handle, fontsize, handlebox):
+        x0, y0 = handlebox.xdescent, handlebox.ydescent
+        width, height = handlebox.width, handlebox.height
+
+        num_vals = len(self.vals)
+        sub_width = float(width) / num_vals
+        x = x0
+        for i in range(len(self.vals)):
+            rgb = self.dim_color(i)
+            r = mpatches.Rectangle((x+i*sub_width, y0), 
+                                   sub_width, y0+height, 
+                                   facecolor=rgb, linewidth=0)
+
+            r.set_clip_on(False)
+            handlebox.add_artist(r)
+        return r
+
+    def dim_color(self, index):
+        rgb1 = np.array(mcolors.colorConverter.to_rgb(self.start_color))
+        rgb2 = np.array(mcolors.colorConverter.to_rgb(self.end_color))
+        t = float(index) / (len(self.vals)+1)
+        rgb = t * rgb2 + (1.0 - t) * rgb1
+        return rgb
+
+def float_label(n):
+    if isinstance(n, int):
+        return str(n)
+    if n.is_integer():
+        return str(int(n))
+    else:
+        return "%.2f" % n
+
+def plot_representational_similarity(rs, dims=None, dim_labels=None, colors=None, dim_order=None, labels=True):
+    if dim_order is not None:
+        rsr = np.arange(len(rs)).reshape(*map(len,dims))
+        rsrt = rsr.transpose(dim_order)
+        ri = rsrt.flatten()
+        rs = rs[ri,:][:,ri]
+
+        dims = np.array(dims)[dim_order]
+        colors = np.array(colors)[dim_order]
+        dim_labels = np.array(dim_labels)[dim_order]
+    
+    rs = rs.copy()
+    np.fill_diagonal(rs, np.nan)
+ 
+    if labels:
+        grid = ImageGrid(plt.gcf(), 111,
+                         nrows_ncols=(1,1),
+                         cbar_location="right",
+                         cbar_mode="single",
+                         cbar_size="7%",
+                         cbar_pad=0.05)
+        
+        for ax in grid: pass
+    else:
+        ax = plt.gca()
+
+    im = ax.imshow(rs, interpolation='nearest', cmap='RdBu_r')
+    ax.set_xticklabels([])
+    ax.set_yticklabels([])
+    ax.set_xticks([])
+    ax.set_yticks([])
+
+    if labels:
+        cbar = ax.cax.colorbar(im)
+        cbar.set_label_text('stimulus correlation')
+    
+    if dims is not None:
+        dim_labels = ["%s(%s)" % (dim_labels[i],', '.join(map(float_label, dims[i].tolist()))) for i in range(len(dims)) ]
+        dim_handlers = [ DimensionPatchHandler(dims[i], colors[i], 'w') for i in range(len(dims)) ]
+
+        n = len(rs)
+        for cell_i in range(n):
+            idx = np.unravel_index(cell_i, map(len, dims))
+
+            start = -(len(dims))*2
+            width = 1.8
+            for dim_i, color in enumerate(colors):
+                v_i = idx[dim_i]
+                rgb = dim_handlers[dim_i].dim_color(v_i)
+                r = mpatches.Rectangle((start + dim_i * width, cell_i-.5), 
+                                       width, 1.2, 
+                                       facecolor=rgb, linewidth=0)
+                r.set_clip_on(False)
+                ax.add_patch(r)
+
+                r = mpatches.Rectangle((cell_i-.5, start + dim_i * width), 
+                                       1.2, width,
+                                       facecolor=rgb, linewidth=0)
+                r.set_clip_on(False)
+                ax.add_patch(r)
+
+        if labels:
+            patches = [ mpatches.Patch(label=dim_labels[i]) for i in range(len(dims)) ]
+            ax.legend(handles=patches, 
+                      handler_map=dict(zip(patches,dim_handlers)),
+                      loc='upper left',
+                      bbox_to_anchor=(0,0),
+                      ncol=2,
+                      fontsize=9,
+                      frameon=False)
+
+    if labels:
+        plt.subplots_adjust(left=0.07,
+                            right=.88,
+                            wspace=0.0, hspace=0.0)
+
 
 def plot_condition_histogram(vals, bins, color=STIM_COLOR):
     plt.grid()
-    n, hbins, patches = plt.hist(vals, 
-                                 bins=np.arange(len(bins)+1)+1, 
-                                 align='left', 
-                                 normed=False, 
-                                 rwidth=.8, 
-                                 color=color,
-                                 zorder=3)
+    if len(vals) > 0:
+        n, hbins, patches = plt.hist(vals,
+                                     bins=np.arange(len(bins)+1)+1,
+                                     align='left',
+                                     normed=False,
+                                     rwidth=.8,
+                                     color=color,
+                                     zorder=3)
+    else:
+        hbins = np.arange(len(bins)+1)+1
     plt.xticks(hbins[:-1], np.round(bins, 2))
    
 
@@ -49,9 +205,10 @@ def plot_selectivity_cumulative_histogram(sis,
     # yscale = float(num_cells) / len(osis)
 
     # orientation selectivity cumulative histogram
-    n, bins, patches = plt.hist(sis, normed=True, bins=bins, 
-                                cumulative=True, histtype='stepfilled', 
-                                color=color)
+    if len(sis) > 0:
+        n, bins, patches = plt.hist(sis, normed=True, bins=bins,
+                                    cumulative=True, histtype='stepfilled',
+                                    color=color)
     plt.xlim(si_range)
     plt.ylim([0,yscale])
     plt.yticks(yticks*yscale, yticks)
@@ -70,11 +227,17 @@ def plot_radial_histogram(angles,
                           closed=False,
                           color=STIM_COLOR):
     if all_angles is None:
-        all_angles = angles
+        if len(angles) < 2:
+            all_angles = np.linspace(0, 315, 8)
+        else:
+            all_angles = angles
 
     dth = (all_angles[1] - all_angles[0]) * 0.5
 
-    max_count = max(counts)
+    if len(counts) == 0:
+        max_count = 1
+    else:
+        max_count = max(counts)
 
     wedges = []
     for count, angle in zip(counts, angles):
@@ -119,12 +282,15 @@ def plot_radial_histogram(angles,
         
 def plot_time_to_peak(msrs, ttps, t_start, t_end, stim_start, stim_end, cmap):
     plt.plot(ttps, np.arange(msrs.shape[0],0,-1)-0.5, color='black')
-    plt.imshow(msrs, 
-               cmap=cmap, clim=[0,3], 
-               aspect=float((t_end-t_start) / msrs.shape[0]),  # float to get rid of MPL error
-               extent=[t_start, t_end, 0, msrs.shape[0]], interpolation='nearest')
+    if msrs.shape[0] > 0:
+        plt.imshow(msrs,
+                cmap=cmap, clim=[0,3],
+                aspect=float((t_end-t_start) / msrs.shape[0]),  # float to get rid of MPL error
+                extent=[t_start, t_end, 0, msrs.shape[0]], interpolation='nearest')
+        plt.ylim([0,msrs.shape[0]])
+    else:
+        plt.ylim([0, 1])
     plt.xlim([t_start, t_end])
-    plt.ylim([0,msrs.shape[0]])
 
     plt.axvline(stim_start, linestyle=':', color='black')
     plt.axvline(stim_end, linestyle=':', color='black')
@@ -145,21 +311,26 @@ def figure_in_px(w, h, file_name, dpi=96.0):
     plt.savefig(file_name, dpi=dpi)
     plt.close()
 
-def finalize_no_axes():
+def finalize_no_axes(pad=0.0):
     plt.axis('off')
-    plt.subplots_adjust(left=0.0, right=1.0, bottom=0.0, top=1.0, wspace=0.0, hspace=0.0)
+    plt.subplots_adjust(left=pad, 
+                        right=1.0-pad, 
+                        bottom=pad, 
+                        top=1.0-pad, 
+                        wspace=0.0, hspace=0.0)
 
-def finalize_with_axes():
-    plt.tight_layout(pad=.3)
+def finalize_with_axes(pad=.3):
+    plt.tight_layout(pad=pad)
 
-def finalize_no_labels():
+def finalize_no_labels(pad=.3):
     ax = plt.gca()
     ax.set_xlabel("")
     ax.set_ylabel("")
     ax.set_xticklabels([])
     ax.set_yticklabels([])
-    plt.tight_layout(pad=.3)
-
+    if ax.legend_ is not None:
+        ax.legend_.remove()
+    plt.tight_layout(pad=pad)
 
 def plot_combined_speed(binned_resp_vis, binned_dx_vis, binned_resp_sp, binned_dx_sp,
                         evoked_color, spont_color):
@@ -206,15 +377,30 @@ def plot_speed(binned_resp, binned_dx, num_bins, color):
     ax.plot(x, y, color=color)    
     ax.fill_between(x, y_down, y_up, facecolor=color, alpha=0.1)
 
-def plot_receptive_field(rf, color_map=None, zlim=[-3,3], mask=None):
-    if color_map is None:
-        color_map = LSN_RF_ON_COLOR_MAP if on else LSN_RF_OFF_COLOR_MAP
 
-    zrf = zscore(rf)
-
+def plot_receptive_field(rf, color_map=None, clim=None, mask=None):
     if mask is not None:
-        zrf = np.ma.array(zrf, mask=~mask)
+        rf = np.ma.array(rf, mask=~mask)
 
-    plt.imshow(zrf, interpolation='nearest', cmap=color_map, clim=zlim)
+    if clim is None:
+        clim = np.nanpercentile(rf, [1.0,99.0], axis=None)
+
+    plt.imshow(rf, interpolation='nearest', 
+               cmap=color_map, 
+               clim=clim,
+               origin='bottom')
 
 
+def plot_pupil_location(xy_deg, s=1, c=None, cmap=PUPIL_COLOR_MAP,
+                        edgecolor='', include_labels=True):
+    if c is None:
+        xy_deg = xy_deg[~np.isnan(xy_deg).any(axis=1)]
+        c = gaussian_kde(xy_deg.T)(xy_deg.T)
+    plt.scatter(xy_deg[:,0], xy_deg[:,1], s=s, c=c, cmap=cmap,
+                edgecolor=edgecolor)
+    plt.xlim(-70, 70)
+    plt.ylim(-70, 70)
+
+    if include_labels:
+        plt.xlabel("gaze x (degrees)")
+        plt.ylabel("gaze y (degrees)")
