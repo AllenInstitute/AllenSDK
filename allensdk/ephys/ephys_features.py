@@ -198,7 +198,7 @@ def refine_threshold_indexes(v, t, upstroke_indexes, thresh_frac=0.05, filter=10
     return np.array(threshold_indexes)
 
 
-def check_thresholds_and_peaks(v, t, spike_indexes, peak_indexes, upstroke_indexes,
+def check_thresholds_and_peaks(v, t, spike_indexes, peak_indexes, upstroke_indexes, end=None,
                                max_interval=0.005, thresh_frac=0.05, filter=10., dvdt=None):
     """Validate thresholds and peaks for set of spikes
 
@@ -225,6 +225,9 @@ def check_thresholds_and_peaks(v, t, spike_indexes, peak_indexes, upstroke_index
     peak_indexes : numpy array of modified spike peak indexes
     upstroke_indexes : numpy array of modified spike upstroke indexes
     """
+
+    if not end:
+        end = t[-1]
 
     overlaps = np.flatnonzero(spike_indexes[1:] <= peak_indexes[:-1])
     if overlaps.size:
@@ -280,10 +283,22 @@ def check_thresholds_and_peaks(v, t, spike_indexes, peak_indexes, upstroke_index
             else:
                 spike_indexes[i] = upstroke_indexes[i] - below_target[0]
 
+
         if drop_spikes:
             spike_indexes = np.delete(spike_indexes, drop_spikes)
             peak_indexes = np.delete(peak_indexes, drop_spikes)
             upstroke_indexes = np.delete(upstroke_indexes, drop_spikes)
+
+    # Check that last spike was not cut off too early by end of stimulus
+    # by checking that the membrane potential returned to at least the threshold
+    # voltage - otherwise, drop it
+    end_index = find_time_index(t, end)
+    if not np.any(v[peak_indexes[-1]:end_index + 1] <= v[spike_indexes[-1]]):
+        logging.info("Failed to return to threshold voltage ({:0.2f}) after last spike (min {:0.2f}) - dropping last spike".format(v[spike_indexes[-1]], v[peak_indexes[-1]:end_index + 1].min()))
+        spike_indexes = spike_indexes[:-1]
+        peak_indexes = peak_indexes[:-1]
+        upstroke_indexes = upstroke_indexes[:-1]
+
 
     return spike_indexes, peak_indexes, upstroke_indexes
 
@@ -529,10 +544,26 @@ def analyze_trough_details(v, t, spike_indexes, peak_indexes, end=None, filter=1
             slow_trough_indexes.append(np.nan)
 
     # If we had to kick some spikes out before, need to add nans at the end
-    output = map(np.array, (isi_types, fast_trough_indexes, adp_indexes, slow_trough_indexes))
+    output = []
+    output.append(np.array(isi_types))
+    for d in (fast_trough_indexes, adp_indexes, slow_trough_indexes):
+        output.append(np.array(d, dtype=float))
+
     if orig_len > len(isi_types):
         extra = np.zeros(orig_len - len(isi_types)) * np.nan
         output = tuple((np.append(o, extra) for o in output))
+
+    # The ADP and slow trough for the last spike in a train are not reliably
+    # calculated, and usually extreme when wrong, so we will NaN them out.
+    #
+    # Note that this will result in a 0 value when delta V or delta T is
+    # calculated, which may not be strictly accurate to the trace, but the
+    # magnitude of the difference will be less than in many of the erroneous
+    # cases seen otherwise
+
+    output[2][-1] = np.nan # ADP
+    output[3][-1] = np.nan # slow trough
+
     return output
 
 

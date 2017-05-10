@@ -98,7 +98,7 @@ class EphysSweepFeatureExtractor:
         thresholds = ft.refine_threshold_indexes(v, t, upstrokes, self.thresh_frac,
                                                  self.filter, dvdt)
         thresholds, peaks, upstrokes = ft.check_thresholds_and_peaks(v, t, thresholds, peaks,
-                                                                     upstrokes, self.max_interval)
+                                                                     upstrokes, self.end, self.max_interval)
 
         if not thresholds.size:
             # Save time if no spikes detected
@@ -204,7 +204,7 @@ class EphysSweepFeatureExtractor:
                 "adapt": ft.adaptation_index(isis),
                 "latency": ft.latency(t, thresholds, self.start),
                 "isi_cv": (isis.std() / isis.mean()) if len(isis) >= 1 else np.nan,
-                "mean_isi": isis.mean(),
+                "mean_isi": isis.mean() if len(isis) > 0 else np.nan,
                 "median_isi": np.median(isis),
                 "first_isi": isis[0] if len(isis) >= 1 else np.nan,
                 "avg_rate": ft.average_rate(t, thresholds, self.start, self.end),
