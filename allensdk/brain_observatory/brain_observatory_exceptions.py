@@ -16,3 +16,5 @@
 class BrainObservatoryAnalysisException(Exception): pass
 
 class MissingStimulusException(Exception): pass
+
+class NoEyeTrackingException(Exception): pass

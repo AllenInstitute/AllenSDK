@@ -21,6 +21,19 @@ import functools
 import os
 from allensdk.deprecated import deprecated
 
+def memoize(f):
+    """ Memoization decorator for a function taking one or more arguments. """
+    class memodict(dict):
+        def __getitem__(self, *key, **kwargs):
+            return dict.__getitem__(self, (key, tuple(kwargs.items())))
+
+        def __missing__(self, key):
+
+            ret = self[key] = f(*key[0], **dict(key[1]))
+            return ret
+
+    return memodict().__getitem__
+
 class Cache(object):
     def __init__(self,
                  manifest=None,

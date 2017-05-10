@@ -89,7 +89,7 @@ class BrainObservatoryApi(RmaTemplate):
              'description': 'see name',
              'model': 'ExperimentContainer',
              'criteria': '{% if experiment_container_ids is defined %}[id$in{{ experiment_container_ids }}]{%endif%}',
-             'include': 'ophys_experiments,isi_experiment,specimen(donor(age,transgenic_lines)),targeted_structure',
+             'include': 'ophys_experiments,isi_experiment,specimen(donor(conditions,age,transgenic_lines)),targeted_structure',
              'num_rows': 'all',
              'count': False,
              'criteria_params': ['experiment_container_ids']
@@ -317,7 +317,11 @@ class BrainObservatoryApi(RmaTemplate):
                                      ids=None,
                                      targeted_structures=None,
                                      imaging_depths=None,
-                                     transgenic_lines=None):
+                                     transgenic_lines=None,
+                                     include_failed=False):
+
+        if not include_failed:
+            containers = [c for c in containers if not c.get('failed', False)]
 
         if ids is not None:
             containers = [c for c in containers if c['id'] in ids]

@@ -35,7 +35,7 @@ pypi_deploy:
 	python setup.py sdist upload --repository https://testpypi.python.org/pypi
 
 pytest_lax:
-	py.test  --boxed --cov=allensdk --cov-report html --junitxml=test-reports/test.xml
+	py.test -s --boxed --cov=allensdk --cov-report html --junitxml=test-reports/test.xml
 
 pytest: pytest_lax
 

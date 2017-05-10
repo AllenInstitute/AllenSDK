@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
+import numpy as np
 from .static_gratings import StaticGratings
 from .locally_sparse_noise import LocallySparseNoise
 from .natural_scenes import NaturalScenes
@@ -28,6 +29,7 @@ from . import brain_observatory_plotting as cp
 import argparse
 import logging
 import os
+
 
 
 def multi_dataframe_merge(dfs):
@@ -53,9 +55,9 @@ class SessionAnalysis(object):
         self.save_path = save_path
         self.save_dir = os.path.dirname(save_path)
 
-        self.metrics_a = {}
-        self.metrics_b = {}
-        self.metrics_c = {}
+        self.metrics_a = dict(cell={},experiment={})
+        self.metrics_b = dict(cell={},experiment={})
+        self.metrics_c = dict(cell={},experiment={})
 
         self.metadata = self.nwb.get_metadata()
 
@@ -75,12 +77,16 @@ class SessionAnalysis(object):
             ('sweep_response_nm3', nm3.sweep_response))
 
         nwb.save_analysis_arrays(
-            ('celltraces_dff', nm1.dfftraces),
             ('response_dg', dg.response),
             ('binned_cells_sp', nm1.binned_cells_sp),
             ('binned_cells_vis', nm1.binned_cells_vis),
             ('binned_dx_sp', nm1.binned_dx_sp),
-            ('binned_dx_vis', nm1.binned_dx_vis))
+            ('binned_dx_vis', nm1.binned_dx_vis),
+            ('noise_corr_dg', dg.noise_correlation),
+            ('signal_corr_dg', dg.signal_correlation),
+            ('rep_similarity_dg', dg.representational_similarity)
+            )
+
 
     def save_session_b(self, sg, nm1, ns, peak):
         nwb = BrainObservatoryNwbDataSet(self.save_path)
@@ -96,13 +102,19 @@ class SessionAnalysis(object):
             ('peak', peak))
 
         nwb.save_analysis_arrays(
-            ('celltraces_dff', nm1.dfftraces),
             ('response_sg', sg.response),
             ('response_ns', ns.response),
             ('binned_cells_sp', nm1.binned_cells_sp),
             ('binned_cells_vis', nm1.binned_cells_vis),
             ('binned_dx_sp', nm1.binned_dx_sp),
-            ('binned_dx_vis', nm1.binned_dx_vis))
+            ('binned_dx_vis', nm1.binned_dx_vis),
+            ('noise_corr_sg', sg.noise_correlation),
+            ('signal_corr_sg', sg.signal_correlation),
+            ('rep_similarity_sg', sg.representational_similarity),
+            ('noise_corr_ns', ns.noise_correlation),
+            ('signal_corr_ns', ns.signal_correlation),
+            ('rep_similarity_ns', ns.representational_similarity)
+            )
 
     def save_session_c(self, lsn, nm1, nm2, peak):
         nwb = BrainObservatoryNwbDataSet(self.save_path)
@@ -116,11 +128,13 @@ class SessionAnalysis(object):
 
         nwb.save_analysis_arrays(
             ('receptive_field_lsn', lsn.receptive_field),
-            ('celltraces_dff', nm1.dfftraces),
+            ('mean_response_lsn', lsn.mean_response),
             ('binned_dx_sp', nm1.binned_dx_sp),
             ('binned_dx_vis', nm1.binned_dx_vis),
             ('binned_cells_sp', nm1.binned_cells_sp),
             ('binned_cells_vis', nm1.binned_cells_vis))
+
+        LocallySparseNoise.save_cell_index_receptive_field_analysis_dict(lsn.cell_index_receptive_field_analysis_data_dict, nwb, stimulus_info.LOCALLY_SPARSE_NOISE)
 
     def save_session_c2(self, lsn4, lsn8, nm1, nm2, peak):
         nwb = BrainObservatoryNwbDataSet(self.save_path)
@@ -135,19 +149,23 @@ class SessionAnalysis(object):
             ('mean_sweep_response_lsn4', lsn4.mean_sweep_response),
             ('mean_sweep_response_lsn8', lsn8.mean_sweep_response))
 
-        merged_receptive_field = LocallySparseNoise.merge_receptive_fields(
-            lsn4.receptive_field,
-            lsn8.receptive_field)
+        merge_mean_response = LocallySparseNoise.merge_mean_response(
+            lsn4.mean_response,
+            lsn8.mean_response)
 
         nwb.save_analysis_arrays(
+            ('mean_response_lsn4', lsn4.mean_response),
+            ('mean_response_lsn8', lsn8.mean_response),
             ('receptive_field_lsn4', lsn4.receptive_field),
             ('receptive_field_lsn8', lsn8.receptive_field),
-            ('receptive_field_lsn', merged_receptive_field),
-            ('celltraces_dff', nm1.dfftraces),
+            ('merge_mean_response', merge_mean_response),
             ('binned_dx_sp', nm1.binned_dx_sp),
             ('binned_dx_vis', nm1.binned_dx_vis),
             ('binned_cells_sp', nm1.binned_cells_sp),
             ('binned_cells_vis', nm1.binned_cells_vis))
+
+        LocallySparseNoise.save_cell_index_receptive_field_analysis_dict(lsn4.cell_index_receptive_field_analysis_data_dict, nwb, stimulus_info.LOCALLY_SPARSE_NOISE_4DEG)
+        LocallySparseNoise.save_cell_index_receptive_field_analysis_dict(lsn8.cell_index_receptive_field_analysis_data_dict, nwb, stimulus_info.LOCALLY_SPARSE_NOISE_8DEG)
 
     def append_metrics_drifting_grating(self, metrics, dg):
         metrics["osi_dg"] = dg.peak["osi_dg"]
@@ -156,6 +174,13 @@ class SessionAnalysis(object):
                                   for i in dg.peak["ori_dg"].values]
         metrics["pref_tf_dg"] = [dg.tfvals[i] for i in dg.peak["tf_dg"].values]
         metrics["p_dg"] = dg.peak["ptest_dg"]
+        metrics["g_osi_dg"] = dg.peak["cv_os_dg"]
+        metrics["g_dsi_dg"] = dg.peak["cv_ds_dg"]
+        metrics["reliability_dg"] = dg.peak["reliability_dg"]
+        metrics["tfdi_dg"] = dg.peak["tf_index_dg"]
+        metrics["run_mod_dg"] = dg.peak["run_modulation_dg"]
+        metrics["p_run_mod_dg"] = dg.peak["p_run_dg"]
+        metrics["peak_dff_dg"] = dg.peak["peak_dff_dg"]
 
     def append_metrics_static_grating(self, metrics, sg):
         metrics["osi_sg"] = sg.peak["osi_sg"]
@@ -166,11 +191,46 @@ class SessionAnalysis(object):
                                     for i in sg.peak["phase_sg"].values]
         metrics["p_sg"] = sg.peak["ptest_sg"]
         metrics["time_to_peak_sg"] = sg.peak["time_to_peak_sg"]
+        metrics["run_mod_sg"] = sg.peak["run_modulation_sg"]
+        metrics["p_run_mod_sg"] = sg.peak["p_run_sg"]
+        metrics["g_osi_sg"] = sg.peak["cv_os_sg"]
+        metrics["sfdi_sg"] = sg.peak["sf_index_sg"]
+        metrics["peak_dff_sg"] = sg.peak["peak_dff_sg"]
+        metrics["reliability_sg"] = sg.peak["reliability_sg"]
 
     def append_metrics_natural_scene(self, metrics, ns):
         metrics["pref_image_ns"] = ns.peak["scene_ns"]
         metrics["p_ns"] = ns.peak["ptest_ns"]
         metrics["time_to_peak_ns"] = ns.peak["time_to_peak_ns"]
+        metrics["image_sel_ns"] = ns.peak["image_selectivity_ns"]
+        metrics["reliability_ns"] = ns.peak["reliability_ns"]
+        metrics["run_mod_ns"] = ns.peak["run_modulation_ns"]
+        metrics["p_run_mod_ns"] = ns.peak["p_run_ns"]
+        metrics["peak_dff_ns"] = ns.peak["peak_dff_ns"]
+
+    def append_metrics_locally_sparse_noise(self, metrics, lsn):
+        metrics['rf_chi2_lsn'] = lsn.peak['rf_chi2_lsn']
+        metrics['rf_area_on_lsn'] = lsn.peak['rf_area_on_lsn']
+        metrics['rf_center_on_x_lsn'] = lsn.peak['rf_center_on_x_lsn']
+        metrics['rf_center_on_y_lsn'] = lsn.peak['rf_center_on_y_lsn']
+        metrics['rf_area_off_lsn'] = lsn.peak['rf_area_off_lsn']
+        metrics['rf_center_off_x_lsn'] = lsn.peak['rf_center_off_x_lsn']
+        metrics['rf_center_off_y_lsn'] = lsn.peak['rf_center_off_y_lsn']
+        metrics['rf_distance_lsn'] = lsn.peak['rf_distance_lsn']
+        metrics['rf_overlap_index_lsn'] = lsn.peak['rf_overlap_index_lsn']
+
+    def append_metrics_natural_movie_one(self, metrics, nma):
+        metrics['reliability_nm1'] = nma.peak['response_reliability_nm1']
+
+    def append_metrics_natural_movie_two(self, metrics, nma):
+        metrics['reliability_nm2'] = nma.peak['response_reliability_nm2']
+
+    def append_metrics_natural_movie_three(self, metrics, nma):
+        metrics['reliability_nm3'] = nma.peak['response_reliability_nm3']
+
+    def append_experiment_metrics(self, metrics):
+        dxcm, dxtime = self.nwb.get_running_speed()
+        metrics['mean_running_speed'] = np.nanmean(dxcm)
 
     def verify_roi_lists_equal(self, roi1, roi2):
         if len(roi1) != len(roi2):
@@ -186,12 +246,19 @@ class SessionAnalysis(object):
         nm3 = NaturalMovie(self.nwb, 'natural_movie_three')
         dg = DriftingGratings(self.nwb)
 
+        dg.noise_correlation, _, _, _ = dg.get_noise_correlation()
+        dg.signal_correlation, _ = dg.get_signal_correlation()
+        dg.representational_similarity, _ = dg.get_representational_similarity()
+
         SessionAnalysis._log.info("Session A analyzed")
         peak = multi_dataframe_merge(
             [nm1.peak_run, dg.peak, nm1.peak, nm3.peak])
 
-        self.append_metrics_drifting_grating(self.metrics_a, dg)
-        self.metrics_a["roi_id"] = dg.roi_id
+        self.append_metrics_drifting_grating(self.metrics_a['cell'], dg)
+        self.append_metrics_natural_movie_one(self.metrics_a['cell'], nm1)
+        self.append_metrics_natural_movie_three(self.metrics_a['cell'], nm3)
+        self.append_experiment_metrics(self.metrics_a['experiment'])
+        self.metrics_a['cell']['roi_id'] = dg.roi_id
 
         self.append_metadata(peak)
 
@@ -211,10 +278,20 @@ class SessionAnalysis(object):
             [nm1.peak_run, sg.peak, ns.peak, nm1.peak])
         self.append_metadata(peak)
 
-        self.append_metrics_static_grating(self.metrics_b, sg)
-        self.append_metrics_natural_scene(self.metrics_b, ns)
+        self.append_metrics_static_grating(self.metrics_b['cell'], sg)
+        self.append_metrics_natural_scene(self.metrics_b['cell'], ns)
+        self.append_metrics_natural_movie_one(self.metrics_b['cell'], nm1)
+        self.append_experiment_metrics(self.metrics_b['experiment'])
         self.verify_roi_lists_equal(sg.roi_id, ns.roi_id)
-        self.metrics_b["roi_id"] = sg.roi_id
+        self.metrics_b['cell']['roi_id'] = sg.roi_id
+
+        sg.noise_correlation, _, _, _ = sg.get_noise_correlation()
+        sg.signal_correlation, _ = sg.get_signal_correlation()
+        sg.representational_similarity, _ = sg.get_representational_similarity()
+
+        ns.noise_correlation, _ = ns.get_noise_correlation()
+        ns.signal_correlation, _ = ns.get_signal_correlation()
+        ns.representational_similarity, _ = ns.get_representational_similarity()
 
         if save_flag:
             self.save_session_b(sg, nm1, ns, peak)
@@ -225,14 +302,19 @@ class SessionAnalysis(object):
             cp.plot_sg_traces(sg, self.save_dir)
 
     def session_c(self, plot_flag=False, save_flag=True):
+
         lsn = LocallySparseNoise(self.nwb, stimulus_info.LOCALLY_SPARSE_NOISE)
         nm2 = NaturalMovie(self.nwb, 'natural_movie_two')
         nm1 = NaturalMovie(self.nwb, 'natural_movie_one')
         SessionAnalysis._log.info("Session C analyzed")
-        peak = multi_dataframe_merge([nm1.peak_run, nm1.peak, nm2.peak])
+        peak = multi_dataframe_merge([nm1.peak_run, nm1.peak, nm2.peak, lsn.peak])
         self.append_metadata(peak)
 
-        self.metrics_c["roi_id"] = nm1.roi_id
+        self.append_metrics_locally_sparse_noise(self.metrics_c['cell'], lsn)
+        self.append_metrics_natural_movie_one(self.metrics_c['cell'], nm1)
+        self.append_metrics_natural_movie_two(self.metrics_c['cell'], nm2)
+        self.append_experiment_metrics(self.metrics_c['experiment'])
+        self.metrics_c['cell']['roi_id'] = nm1.roi_id
 
         if save_flag:
             self.save_session_c(lsn, nm1, nm2, peak)
@@ -242,15 +324,27 @@ class SessionAnalysis(object):
             cp.plot_lsn_traces(lsn, self.save_dir)
 
     def session_c2(self, plot_flag=False, save_flag=True):
+
         lsn4 = LocallySparseNoise(self.nwb, stimulus_info.LOCALLY_SPARSE_NOISE_4DEG)
         lsn8 = LocallySparseNoise(self.nwb, stimulus_info.LOCALLY_SPARSE_NOISE_8DEG)
+
         nm2 = NaturalMovie(self.nwb, 'natural_movie_two')
         nm1 = NaturalMovie(self.nwb, 'natural_movie_one')
         SessionAnalysis._log.info("Session C2 analyzed")
-        peak = multi_dataframe_merge([nm1.peak_run, nm1.peak, nm2.peak])
+
+        if self.nwb.get_metadata()['targeted_structure'] == 'VISp':
+            lsn_peak = lsn4
+        else:
+            lsn_peak = lsn8
+
+        peak = multi_dataframe_merge([nm1.peak_run, nm1.peak, nm2.peak, lsn_peak.peak])
         self.append_metadata(peak)
 
-        self.metrics_c["roi_id"] = nm1.roi_id
+        self.append_metrics_locally_sparse_noise(self.metrics_c['cell'], lsn_peak)
+        self.append_metrics_natural_movie_one(self.metrics_c['cell'], nm1)
+        self.append_metrics_natural_movie_two(self.metrics_c['cell'], nm2)
+        self.append_experiment_metrics(self.metrics_c['experiment'])
+        self.metrics_c['cell']['roi_id'] = nm1.roi_id
 
         if save_flag:
             self.save_session_c2(lsn4, lsn8, nm1, nm2, peak)
