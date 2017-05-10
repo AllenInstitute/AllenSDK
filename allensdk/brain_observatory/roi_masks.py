@@ -66,7 +66,7 @@ class Mask(object):
         self.y = 0
         self.height = 0
         self.mask = None
-        self.valid = True
+        self.overlaps_motion_border = False
         # label is for distinguishing neuropil from ROI, in case
         #   these masks are mixed together
         self.label = label
@@ -90,7 +90,7 @@ class Mask(object):
             List of pixel coordinates (x,y) that define the mask
         '''
         assert pix_list.shape[1] == 2, "Pixel list not properly formed"
-        array = np.zeros((self.img_rows, self.img_cols))
+        array = np.zeros((self.img_rows, self.img_cols), dtype=bool)
 
         # pix_list stores array of [x,y] coordinates
         array[pix_list[:, 1], pix_list[:, 0]] = 1
@@ -216,9 +216,9 @@ class RoiMask(Mask):
 
         # if ROI crosses border, it's considered invalid
         if left < l_inset or right > r_inset:
-            self.valid = False
+            self.overlaps_motion_border = True
         if top < t_inset or bottom > b_inset:
-            self.valid = False
+            self.overlaps_motion_border = True
         #
         self.x = left
         self.width = right - left + 1
@@ -366,42 +366,43 @@ def calculate_traces(stack, mask_list, block_size=100):
 
     # make sure masks are numpy objects
     mask_areas = np.zeros(len(mask_list), dtype=float)
+    valid_masks = np.ones(len(mask_list), dtype=bool)
+
     for i,mask in enumerate(mask_list):
         if not isinstance(mask.mask, np.ndarray):
             mask.mask = np.array(mask.mask)
 
         # compute mask areas
-        mask_area = mask.mask.sum()
-        mask_areas[i] = mask_area
+        mask_areas[i] = mask.mask.sum()
 
         # if the mask is empty, the trace is nan
-        if mask_area == 0:
-            logging.warning("mask '%s' is empty", mask.label)
+        if mask_areas[i] == 0:
+            logging.warning("mask '%d/%s' is empty", i, mask.label)
             traces[i,:] = np.nan
+            valid_masks[i] = False
+
+        # if the mask overlaps the motion border, the trace is nan
+        if mask.overlaps_motion_border:
+            logging.warning("mask '%d/%s' overlaps with motion border", i, mask.label)
+            traces[i,:] = np.nan
+            valid_masks[i] = False
 
     # calculate traces
     for frame_num in range(0, num_frames, block_size):
         if frame_num % 1000 == 0:
             logging.debug("frame " + str(frame_num) + " of " + str(num_frames))
         frames = stack[frame_num:frame_num+block_size]
-        mask = None
-        try:
-            for i in range(len(mask_list)):
-                if mask_areas[i] == 0.0:
-                    continue
 
-                mask = mask_list[i]
-                subframe = frames[:,mask.y:mask.y + mask.height, 
-                                    mask.x:mask.x + mask.width]
-                total = subframe[:, mask.mask].sum(axis=1)
-                traces[i, frame_num:frame_num+block_size] = total / mask_areas[i]
-        except Exception as e:
-            logging.error("Error encountered processing mask during frame %d" % frame_num)
-            if mask is not None:
-                logging.error(subframe.shape)
-                logging.error(mask.mask.shape)
-                logging.error(mask)
-            raise e
+        for i in range(len(mask_list)):
+            if valid_masks[i] is False:
+                continue
+
+            mask = mask_list[i]
+            subframe = frames[:,mask.y:mask.y + mask.height, 
+                                mask.x:mask.x + mask.width]
+
+            total = subframe[:, mask.mask].sum(axis=1)
+            traces[i, frame_num:frame_num+block_size] = total / mask_areas[i]
     return traces
 
 def calculate_roi_and_neuropil_traces(movie_h5, roi_mask_list, motion_border):
