@@ -17,6 +17,7 @@
 from __future__ import division, print_function, absolute_import
 import re
 import operator as op
+from six import iteritems, string_types
 
 import numpy as np
 
@@ -24,10 +25,7 @@ from .simple_tree import SimpleTree
 
 
 class StructureTree( SimpleTree ):
-
-    FIELDS = ['acronym', 'color_hex_triplet', 'graph_id', 'graph_order', 
-              'id', 'name', 'structure_id_path', 'structure_set_ids']
-
+                 
     def __init__(self, nodes):
         '''A tree whose nodes are brain structures and whose edges indicate 
         physical containment.
@@ -268,8 +266,9 @@ class StructureTree( SimpleTree ):
         structures : list of dict
             Each element describes a structure. Should have a structure id path 
             field (str values) and a structure_sets field (list of dict).
-        field_whitelist : list of str, optional
-           Each record should keep only fields in this list
+        field_whitelist : dict maps str to fn, optional
+           Input fields are filtered to keys of this dict and passed through 
+           the value functions
            
         Returns
         -------
@@ -279,20 +278,28 @@ class StructureTree( SimpleTree ):
         '''
 
         if field_whitelist is None:
-            field_whitelist = StructureTree.FIELDS
+            field_whitelist = StructureTree.whitelist()
 
-        for ii, val in enumerate(structures):
+        for ii, st in enumerate(structures):
 
-            val['structure_id_path'] = [int(stid) for stid 
-                                        in val['structure_id_path'].split('/')
-                                        if stid != ''] 
-   
-            val['structure_set_ids'] = [sts['id'] for sts in val['structure_sets']]
-
-            structures[ii] = StructureTree.filter_dict(val, *field_whitelist)
+            StructureTree.collect_sets(st)
+            structures[ii] = {wk: wf(st[wk]) for wk, wf 
+                              in iteritems(field_whitelist) if wk in st}
 
         return structures
         
+        
+    @staticmethod
+    def whitelist():
+        return {'acronym': str, 
+                'color_hex_triplet': StructureTree.hex_to_rgb, 
+                'graph_id': int, 
+                'graph_order': int, 
+                'id': int, 
+                'name': str, 
+                'structure_id_path': StructureTree.path_to_list, 
+                'structure_set_ids': list}  
+
         
     @staticmethod
     def hex_to_rgb(hex_color):
@@ -302,7 +309,8 @@ class StructureTree( SimpleTree ):
         ----------
         hex_color : string 
             Must be 6 characters long, unless it is 7 long and the first 
-            character is #.
+            character is #. If hex_color is a triplet of int, it will be 
+            returned unchanged.
             
         Returns
         -------
@@ -311,13 +319,42 @@ class StructureTree( SimpleTree ):
         
         '''
         
+        if not isinstance(hex_color, string_types):
+            return list(hex_color)
+
         if hex_color[0] == '#':
             hex_color = hex_color[1:]
         
-        return [int(hex_color[a * 2: a*2 + 2], 16) for a in xrange(3)]
+        return [int(hex_color[a * 2: a*2 + 2], 16) for a in xrange(3)] 
+    
+
+    @staticmethod
+    def path_to_list(path):
+        '''Structure id paths are sometimes formatted as "/"-seperated strings. 
+        This method converts them to a list of integers, if needed.
+        '''
+
+        if not isinstance(path, string_types):
+            return list(path)
+
+        return [int(stid) for stid in path.split('/') if stid != '']
 
 
     @staticmethod
-    def filter_dict(dictionary, *pass_keys):
-        return {k:v for k, v in dictionary.iteritems() if k in pass_keys}
+    def collect_sets(structure):
+        '''Structure sets may be specified by full records or id. This method 
+        collects all of the structure set records/ids in a structure record and 
+        replaces them with a single list of id records.
+        '''
+
+        if not 'structure_sets' in structure:
+            structure['structure_sets'] = []
+        if not 'structure_set_ids' in structure:
+            structure['structure_set_ids'] = []    
+        
+        structure['structure_set_ids'].extend([sts['id'] for sts 
+                                               in structure['structure_sets']])
+        structure['structure_set_ids'] = list(set(structure['structure_set_ids']))
+        
+        del structure['structure_sets']
     

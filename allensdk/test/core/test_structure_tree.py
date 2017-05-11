@@ -117,8 +117,59 @@ def test_clean_structures(nodes):
                   'color_hex_triplet': '000000', 'acronym': 'rt', 
                   'name': 'root', 'structure_sets':[{'id': 1}, {'id': 4}]}
                   
+    clean_node = StructureTree.clean_structures([dirty_node])[0]
+    assert( isinstance(clean_node['color_hex_triplet'], list) )
+    assert( isinstance(clean_node['structure_id_path'], list) )
+    
+    
+def test_clean_structures_no_sets():
+    
+    dirty_node = {'id': 0, 'structure_id_path': '/0/', 
+                  'color_hex_triplet': '000000', 'acronym': 'rt', 
+                  'name': 'root'}
+    
     clean_node = StructureTree.clean_structures([dirty_node])
-    assert( repr(clean_node[0]) == repr(nodes[0]) )
+    st = StructureTree(clean_node)
+    
+    assert( len(clean_node[0]['structure_set_ids']) == 0 )
+    
+    
+def test_clean_structures_only_ids():
+    
+    dirty_node = {'id': 0, 'structure_id_path': '/0/', 
+                  'color_hex_triplet': '000000', 'acronym': 'rt', 
+                  'name': 'root', 'structure_set_ids': [1, 2, 3] }
+    
+    clean_node = StructureTree.clean_structures([dirty_node])
+    st = StructureTree(clean_node)
+    
+    assert( len(clean_node[0]['structure_set_ids']) == 3 )
+    
+    
+def test_clean_structures_ids_sets():
+    
+    dirty_node = {'id': 0, 'structure_id_path': '/0/', 
+                  'color_hex_triplet': '000000', 'acronym': 'rt', 
+                  'name': 'root', 'structure_set_ids': [1, 2, 3], 
+                  'structure_sets': [{'id': 1}, {'id': 4}] }
+    
+    clean_node = StructureTree.clean_structures([dirty_node])
+    st = StructureTree(clean_node)
+    
+    assert( len(clean_node[0]['structure_set_ids']) == 4 )
+    
+    
+def test_clean_structures_str_id():
+
+    dirty_node = {'id': '0', 'structure_id_path': '/0/', 
+                  'color_hex_triplet': '000000', 'acronym': 'rt', 
+                  'name': 'root', 'structure_set_ids': [1, 2, 3], 
+                  'structure_sets': [{'id': 1}, {'id': 4}] }
+    
+    clean_node = StructureTree.clean_structures([dirty_node])
+    st = StructureTree(clean_node)
+    
+    assert( set(st.node_ids()) == set([0]) )
     
     
 def test_get_structure_sets(tree):
@@ -126,3 +177,35 @@ def test_get_structure_sets(tree):
     expected = set([1, 2, 3, 4])
     obtained = tree.get_structure_sets()
     assert( expected == obtained )
+
+
+def test_clean_structures_weird_keys():
+    
+    dirty_node = {'id': 5, 'dummy_key': 'dummy_val'}
+    clean_node = StructureTree.clean_structures([dirty_node])[0]
+
+    assert( len(clean_node) == 2 )
+    assert( clean_node['id'] == 5 )
+
+
+@pytest.mark.parametrize('inp,out', [('990099', [153, 0, 153]), 
+                                     ('#990099', [153, 0, 153]), 
+                                     ([153, 0, 153], [153, 0, 153]), 
+                                     ((153., 0., 153.), [153, 0, 153]), 
+                                     ([long(153), long(0), long(153)], [153, 0, 153])])
+def test_hex_to_rgb(inp, out):
+    obt = StructureTree.hex_to_rgb(inp)
+    assert(allclose(obt, out))
+
+
+@pytest.mark.parametrize('inp,out', [('/1/2/3/', [1, 2, 3]),
+                                     ('1/2/3/', [1, 2, 3]), 
+                                     ('/1/2/3', [1, 2, 3]), 
+                                     ('1/2/3', [1, 2, 3]), 
+                                     ([1, 2, 3], [1, 2, 3]),
+                                     ([1.0, long(2), 3], [1, 2, 3]), 
+                                     ((1, 2, 3), [1, 2, 3]), 
+                                     ('', [])])
+def test_path_to_list(inp, out):
+    obt = StructureTree.path_to_list(inp)
+    assert(allclose(obt, out))
