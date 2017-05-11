@@ -209,7 +209,7 @@ class StaticGratings(StimulusAnalysis):
             orth = self.response[
                 np.mod(pref_ori + 3, 6), pref_sf, pref_phase, nc, 0]
             tuning = self.response[:, pref_sf, pref_phase, nc, 0]
-            
+            tuning = np.where(tuning>0, tuning, 0)
             CV_top_os = np.empty((6), dtype=np.complex128)
             for i in range(6):
                 CV_top_os[i] = (tuning[i]*np.exp(1j*2*orivals_rad[i]))
