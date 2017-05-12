@@ -48,17 +48,18 @@ def plot_cell_correlation(sig_corrs, labels, colors, scale=15):
                   
     ax.set_xlabel("signal correlation")
     ax.set_ylabel("cell count")
+    ax.xaxis.grid(True)
     
     leg = ax.legend(loc='upper left', frameon=False)
     for i, t in enumerate(leg.get_texts()):
         t.set_color(colors[i])
         
-    plt.text(.15, .5, u'\u2014', transform=ax.transAxes, 
+    plt.text(.125, .5, u'\u2014', transform=ax.transAxes, 
               horizontalalignment='center', verticalalignment='center',
-              weight='bold', size='large')
-    plt.text(.85, .5, '+', transform=ax.transAxes, 
+              weight='bold', size='xx-large')
+    plt.text(.875, .5, '+', transform=ax.transAxes, 
               horizontalalignment='center', verticalalignment='center',
-              weight='bold', size='large')
+              weight='bold', size='xx-large')
 
 def population_correlation_scatter(sig_corrs, noise_corrs, labels, colors, scale=15):
     alpha = max(0.85 - 0.15 * (len(sig_corrs)-1), 0.2)
