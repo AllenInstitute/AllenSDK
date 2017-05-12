@@ -37,6 +37,7 @@ def plot_cell_correlation(sig_corrs, labels, colors, scale=15):
     ax.set_xlabel("cell")
     ax.set_ylabel("signal correlation")
     ax.set_ylim([-1,1])
+    ax.set_xlim([0, len(sig_corr)])
     leg = ax.legend(loc='lower left', frameon=False)
     for i, t in enumerate(leg.get_texts()):
         t.set_color(colors[i])

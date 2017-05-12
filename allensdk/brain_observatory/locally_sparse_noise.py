@@ -169,7 +169,7 @@ class LocallySparseNoise(StimulusAnalysis):
                 peak['rf_center_on_y_lsn'].iloc[nc] = df['on/gaussian_fit/center_y'].iloc[nc][on_i]
 
             # find the index of the largest off subunit, if it exists
-                if 'off/gaussian_fit/area' in df.columns:
+            if 'off/gaussian_fit/area' in df.columns:
                 area_off = df['off/gaussian_fit/area'].iloc[nc]
                 # watch out for NaNs
                 off_i = np.argmax(area_off) if isinstance(area_off, np.ndarray) else None
