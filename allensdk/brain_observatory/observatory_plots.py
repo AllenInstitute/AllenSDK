@@ -425,5 +425,5 @@ def plot_pupil_location(xy_deg, s=1, c=None, cmap=PUPIL_COLOR_MAP,
     plt.ylim(-70, 70)
 
     if include_labels:
-        plt.xlabel("gaze x (degrees)")
-        plt.ylabel("gaze y (degrees)")
+        plt.xlabel("azimuth (degrees)")
+        plt.ylabel("altitude (degrees)")
