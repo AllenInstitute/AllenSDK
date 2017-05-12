@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.collections import PatchCollection
+import matplotlib.lines as mlines
 import matplotlib.patches as mpatches
 import scipy.interpolate as si
 from scipy.stats import gaussian_kde
