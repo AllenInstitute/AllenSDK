@@ -152,8 +152,11 @@ class LocallySparseNoise(StimulusAnalysis):
             peak['rf_chi2_lsn'].iloc[nc] = df['chi_squared_analysis/min_p'].iloc[nc]
 
             # find the index of the largest on subunit, if it exists
-            area_on = df['on/gaussian_fit/area'].iloc[nc]
-            on_i = np.argmax(area_on) if isinstance(area_on, np.ndarray) else None
+            if 'on/gaussian_fit/area' in df.columns:
+                area_on = df['on/gaussian_fit/area'].iloc[nc]
+                on_i = np.argmax(area_on) if isinstance(area_on, np.ndarray) else None
+            else:
+                on_i = None
 
             if on_i is None:
                 peak['rf_area_on_lsn'].iloc[nc] = np.nan
@@ -165,8 +168,11 @@ class LocallySparseNoise(StimulusAnalysis):
                 peak['rf_center_on_y_lsn'].iloc[nc] = df['on/gaussian_fit/center_y'].iloc[nc][on_i]
 
             # find the index of the largest off subunit, if it exists
-            area_off = df['off/gaussian_fit/area'].iloc[nc]
-            off_i = np.argmax(area_off) if isinstance(area_off, np.ndarray) else None
+            if 'off/gaussian_fit/area' in df.columns:
+                area_off = df['off/gaussian_fit/area'].iloc[nc]
+                off_i = np.argmax(area_off) if isinstance(area_off, np.ndarray) else None
+            else:
+                off_i = None
 
             if off_i is None:
                 peak['rf_area_off_lsn'].iloc[nc] = np.nan

@@ -60,6 +60,22 @@ def population_correlation_scatter(sig_corrs, noise_corrs, labels, colors, scale
     for i, t in enumerate(leg.get_texts()):
         t.set_color(colors[i])
 
+
+def plot_mask_outline(mask, ax, color='k'):
+    pad_mask = np.pad(mask, 1, 'constant', constant_values=(0,0))
+    hedges = np.argwhere(np.diff(pim, axis=0))
+    vedges = np.argwhere(np.diff(pim, axis=1))
+    hlines = [ [ [r-.5, c-1.5], [r-.5, c-.5] ] for r,c in hedges ]
+    vlines = [ [ [r-1.5, c-.5], [r-.5, c-.5] ] for r,c in vedges ]
+    
+    for p1,p2 in hlines + vlines:
+        ax.add_line(mlines.Line2D([ p1[1], p2[1] ], 
+                                  [ p1[0], p2[0] ], 
+                                  linewidth=3, 
+                                  color=color, 
+                                  clip_on=False))
+        
+
 class DimensionPatchHandler(object):
     def __init__(self, vals, start_color, end_color, *args, **kwargs):
         super(DimensionPatchHandler, self).__init__(*args, **kwargs)
@@ -378,7 +394,8 @@ def plot_speed(binned_resp, binned_dx, num_bins, color):
     ax.fill_between(x, y_down, y_up, facecolor=color, alpha=0.1)
 
 
-def plot_receptive_field(rf, color_map=None, clim=None, mask=None):
+def plot_receptive_field(rf, color_map=None, clim=None, 
+                         mask=None, mask_outline_color='k'):
     if mask is not None:
         rf = np.ma.array(rf, mask=~mask)
 
@@ -389,6 +406,12 @@ def plot_receptive_field(rf, color_map=None, clim=None, mask=None):
                cmap=color_map, 
                clim=clim,
                origin='bottom')
+
+    if mask is not None:
+        plot_mask_outline(~mask, plt.gca(), mask_outline_color)
+
+
+
 
 
 def plot_pupil_location(xy_deg, s=1, c=None, cmap=PUPIL_COLOR_MAP,
