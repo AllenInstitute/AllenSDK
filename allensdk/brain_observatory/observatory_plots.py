@@ -419,9 +419,6 @@ def plot_receptive_field(rf, color_map=None, clim=None,
         plot_mask_outline(mask, plt.gca(), mask_outline_color)
 
 
-
-
-
 def plot_pupil_location(xy_deg, s=1, c=None, cmap=PUPIL_COLOR_MAP,
                         edgecolor='', include_labels=True):
     if c is None:
