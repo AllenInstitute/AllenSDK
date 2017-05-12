@@ -273,7 +273,8 @@ class LocallySparseNoise(StimulusAnalysis):
 
             attribute_df = pd.concat(df_list)
 
-        return attribute_df
+
+        return attribute_df.sort_values(by='cell_index')
 
     @staticmethod
     def merge_mean_response(rc1, rc2):
