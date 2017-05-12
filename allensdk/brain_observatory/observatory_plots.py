@@ -416,7 +416,7 @@ def plot_receptive_field(rf, color_map=None, clim=None,
                origin='bottom')
 
     if mask is not None:
-        plot_mask_outline(~mask, plt.gca(), mask_outline_color)
+        plot_mask_outline(mask, plt.gca(), mask_outline_color)
 
 
 
