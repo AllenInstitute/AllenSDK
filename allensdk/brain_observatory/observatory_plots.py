@@ -34,10 +34,11 @@ def plot_cell_correlation(sig_corrs, labels, colors, scale=15):
     ax = plt.gca()
     for sig_corr, color, label in zip(sig_corrs, colors, labels):
         ax.bar(range(len(sig_corr)), sig_corr, color=color, alpha=alpha, label=label, linewidth=0.5)
+        ax.bar(range(len(sig_corr)), sig_corr, color=color, alpha=alpha, label=label, linewidth=0.5)
     ax.set_xlabel("cell")
     ax.set_ylabel("signal correlation")
     ax.set_ylim([-1,1])
-    ax.set_xlim([0, len(sig_corr)])
+    #ax.set_xlim([0, len(sig_corr)])
     leg = ax.legend(loc='lower left', frameon=False)
     for i, t in enumerate(leg.get_texts()):
         t.set_color(colors[i])
@@ -63,7 +64,7 @@ def population_correlation_scatter(sig_corrs, noise_corrs, labels, colors, scale
 
 
 def plot_mask_outline(mask, ax, color='k'):
-    pad_mask = np.pad(mask, 1, 'constant', constant_values=(0,0))
+    pim = np.pad(mask, 1, 'constant', constant_values=(0,0))
     hedges = np.argwhere(np.diff(pim, axis=0))
     vedges = np.argwhere(np.diff(pim, axis=1))
     hlines = [ [ [r-.5, c-1.5], [r-.5, c-.5] ] for r,c in hedges ]
