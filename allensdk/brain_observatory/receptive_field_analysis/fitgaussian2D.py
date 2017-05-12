@@ -88,7 +88,7 @@ def fitgaussian2D(data):
 
         return (val**2).sum()
 
-    res = optimize.minimize(errorfunction, params)
+    res = optimize.minimize(errorfunction, params, method='Nelder-Mead', options={'maxfev':2500})
     p = res.x
     p2 = np.array([p[0], p[1], p[2], np.abs(p[3]), np.abs(p[4]), p[5]])
     success = res.success
