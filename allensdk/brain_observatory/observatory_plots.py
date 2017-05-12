@@ -126,6 +126,11 @@ def plot_representational_similarity(rs, dims=None, dim_labels=None, colors=None
         colors = np.array(colors)[dim_order]
         dim_labels = np.array(dim_labels)[dim_order]
     
+    # force the color map to be centered at zero
+    clim = np.nanpercentile(rs, [1.0,99.0], axis=None)
+    vmax = max(abs(clim[0]), abs(clim[1]))
+    clim = [-vmax, vmax]
+
     rs = rs.copy()
     np.fill_diagonal(rs, np.nan)
  
