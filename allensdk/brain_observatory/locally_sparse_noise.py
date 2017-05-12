@@ -299,7 +299,7 @@ class LocallySparseNoise(StimulusAnalysis):
 
         return rc1 + rc2_zoom
 
-    def plot_cell_receptive_field(self, on, cell_specimen_id=None, color_map=None, clim=None, mask=None, cell_index=None):
+    def plot_cell_receptive_field(self, on, cell_specimen_id=None, color_map=None, clim=None, mask=None, cell_index=None, scalebar=True):
         if color_map is None:
             color_map = 'Reds' if on else 'Blues'
 
@@ -312,14 +312,16 @@ class LocallySparseNoise(StimulusAnalysis):
         oplots.plot_receptive_field(rts, 
                                     color_map=color_map, 
                                     clim=clim, 
-                                    mask=mask)
+                                    mask=mask,
+                                    scalebar=scalebar)
 
-    def plot_population_receptive_field(self, color_map='RdPu', clim=None, mask=None):
+    def plot_population_receptive_field(self, color_map='RdPu', clim=None, mask=None, scalebar=True):
         rf = np.nansum(self.receptive_field, axis=(2,3))
         oplots.plot_receptive_field(rf,
                                     color_map=color_map,
                                     clim=clim,
-                                    mask=mask)
+                                    mask=mask,
+                                    scalebar=scalebar)
 
     def sort_trials(self):
         ds = self.data_set

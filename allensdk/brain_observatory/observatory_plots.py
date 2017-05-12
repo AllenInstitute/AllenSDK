@@ -31,18 +31,34 @@ EVOKED_COLOR = "#b30000"
 SPONTANEOUS_COLOR = "#0000b3"
 
 def plot_cell_correlation(sig_corrs, labels, colors, scale=15):
-    alpha = 1.0 / len(sig_corrs)
+    if len(sig_corrs) > 1:
+        alpha = 1.0 / (len(sig_corrs) + 1)
+    else:
+        alpha = 1.0
+
     ax = plt.gca()
+    ps = []
     for sig_corr, color, label in zip(sig_corrs, colors, labels):
-        ax.bar(range(len(sig_corr)), sig_corr, color=color, alpha=alpha, label=label, linewidth=0.5)
-        ax.bar(range(len(sig_corr)), sig_corr, color=color, alpha=alpha, label=label, linewidth=0.5)
-    ax.set_xlabel("cell")
-    ax.set_ylabel("signal correlation")
-    ax.set_ylim([-1,1])
-    #ax.set_xlim([0, len(sig_corr)])
-    leg = ax.legend(loc='lower left', frameon=False)
+        ax.hist(sig_corr, bins=30, range=[-1,1],
+                histtype='stepfilled',
+                facecolor=(.6,.6,.6,alpha), 
+                edgecolor=color,
+                linewidth=1.5,
+                label=label)
+                  
+    ax.set_xlabel("signal correlation")
+    ax.set_ylabel("cell count")
+    
+    leg = ax.legend(loc='upper left', frameon=False)
     for i, t in enumerate(leg.get_texts()):
         t.set_color(colors[i])
+        
+    plt.text(.15, .5, u'\u2014', transform=ax.transAxes, 
+              horizontalalignment='center', verticalalignment='center',
+              weight='bold', size='large')
+    plt.text(.85, .5, '+', transform=ax.transAxes, 
+              horizontalalignment='center', verticalalignment='center',
+              weight='bold', size='large')
 
 def population_correlation_scatter(sig_corrs, noise_corrs, labels, colors, scale=15):
     alpha = max(0.85 - 0.15 * (len(sig_corrs)-1), 0.2)
@@ -130,9 +146,8 @@ def plot_representational_similarity(rs, dims=None, dim_labels=None, colors=None
         dim_labels = np.array(dim_labels)[dim_order]
     
     # force the color map to be centered at zero
-    clim = np.nanpercentile(rs, [1.0,99.0], axis=None)
-    vmax = max(abs(clim[0]), abs(clim[1]))
-    clim = [-vmax, vmax]
+    clim = np.nanpercentile(rs, [5.0,95.0], axis=None)
+    vrange = max(abs(clim[0]), abs(clim[1]))
 
     rs = rs.copy()
     np.fill_diagonal(rs, np.nan)
@@ -149,7 +164,7 @@ def plot_representational_similarity(rs, dims=None, dim_labels=None, colors=None
     else:
         ax = plt.gca()
 
-    im = ax.imshow(rs, interpolation='nearest', cmap='RdBu_r')
+    im = ax.imshow(rs, interpolation='nearest', cmap='RdBu_r', vmin=-vrange, vmax=vrange)
     ax.set_xticklabels([])
     ax.set_yticklabels([])
     ax.set_xticks([])
@@ -198,7 +213,6 @@ def plot_representational_similarity(rs, dims=None, dim_labels=None, colors=None
         plt.subplots_adjust(left=0.07,
                             right=.88,
                             wspace=0.0, hspace=0.0)
-
 
 def plot_condition_histogram(vals, bins, color=STIM_COLOR):
     plt.grid()
@@ -327,12 +341,12 @@ def plot_time_to_peak(msrs, ttps, t_start, t_end, stim_start, stim_end, cmap):
     plt.ylabel("cell number")
 
 @contextmanager
-def figure_in_px(w, h, file_name, dpi=96.0):
+def figure_in_px(w, h, file_name, dpi=96.0, transparent=False):
     fig = plt.figure(figsize=(w/dpi, h/dpi), dpi=dpi)
 
     yield fig
   
-    plt.savefig(file_name, dpi=dpi)
+    plt.savefig(file_name, dpi=dpi, transparent=transparent)
     plt.close()
 
 def finalize_no_axes(pad=0.0):
@@ -346,13 +360,13 @@ def finalize_no_axes(pad=0.0):
 def finalize_with_axes(pad=.3):
     plt.tight_layout(pad=pad)
 
-def finalize_no_labels(pad=.3):
+def finalize_no_labels(pad=.3, legend=False):
     ax = plt.gca()
     ax.set_xlabel("")
     ax.set_ylabel("")
     ax.set_xticklabels([])
     ax.set_yticklabels([])
-    if ax.legend_ is not None:
+    if not legend and ax.legend_ is not None:
         ax.legend_.remove()
     plt.tight_layout(pad=pad)
 
@@ -403,7 +417,8 @@ def plot_speed(binned_resp, binned_dx, num_bins, color):
 
 
 def plot_receptive_field(rf, color_map=None, clim=None, 
-                         mask=None, mask_outline_color='k'):
+                         mask=None, outline_color='#cccccc',
+                         scalebar=True):
     if mask is not None:
         rf = np.ma.array(rf, mask=~mask)
 
@@ -416,7 +431,26 @@ def plot_receptive_field(rf, color_map=None, clim=None,
                origin='bottom')
 
     if mask is not None:
-        plot_mask_outline(mask, plt.gca(), mask_outline_color)
+        plot_mask_outline(mask, plt.gca(), outline_color)
+
+    if scalebar:
+        scale_dims = np.array([ 28.0, 16.0 ])
+        scale_p = [ 26.8, 14.8 ] 
+        text_p = [ scale_p[0]+0.5, scale_p[1]-0.5 ]
+        
+        
+        ax = plt.gca()
+        ax.add_patch(mpatches.Rectangle(scale_p / scale_dims, 
+                                        1.0/scale_dims[0], 1.0/scale_dims[1], 
+                                        facecolor='w',
+                                        transform=ax.transAxes,
+                                        linewidth=1.0,
+                                        edgecolor=outline_color))
+        plt.text(text_p[0] / scale_dims[0], text_p[1] / scale_dims[1], "4deg",
+                 horizontalalignment='center',
+                 verticalalignment='center',
+                 transform=ax.transAxes)
+        
 
 
 
