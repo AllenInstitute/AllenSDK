@@ -152,8 +152,12 @@ class LocallySparseNoise(StimulusAnalysis):
             peak['rf_chi2_lsn'].iloc[nc] = df['chi_squared_analysis/min_p'].iloc[nc]
 
             # find the index of the largest on subunit, if it exists
-            area_on = df['on/gaussian_fit/area'].iloc[nc]
-            on_i = np.argmax(area_on) if isinstance(area_on, np.ndarray) else None
+            if 'on/gaussian_fit/area' in df.columns:
+                area_on = df['on/gaussian_fit/area'].iloc[nc]
+                # watch out for NaNs
+                on_i = np.argmax(area_on) if isinstance(area_on, np.ndarray) else None
+            else:
+                on_i = None
 
             if on_i is None:
                 peak['rf_area_on_lsn'].iloc[nc] = np.nan
@@ -165,8 +169,12 @@ class LocallySparseNoise(StimulusAnalysis):
                 peak['rf_center_on_y_lsn'].iloc[nc] = df['on/gaussian_fit/center_y'].iloc[nc][on_i]
 
             # find the index of the largest off subunit, if it exists
-            area_off = df['off/gaussian_fit/area'].iloc[nc]
-            off_i = np.argmax(area_off) if isinstance(area_off, np.ndarray) else None
+            if 'off/gaussian_fit/area' in df.columns:
+                area_off = df['off/gaussian_fit/area'].iloc[nc]
+                # watch out for NaNs
+                off_i = np.argmax(area_off) if isinstance(area_off, np.ndarray) else None
+            else:
+                off_i = None
 
             if off_i is None:
                 peak['rf_area_off_lsn'].iloc[nc] = np.nan
@@ -273,7 +281,8 @@ class LocallySparseNoise(StimulusAnalysis):
 
             attribute_df = pd.concat(df_list)
 
-        return attribute_df
+
+        return attribute_df.sort(columns=['cell_index'])
 
     @staticmethod
     def merge_mean_response(rc1, rc2):
@@ -290,7 +299,7 @@ class LocallySparseNoise(StimulusAnalysis):
 
         return rc1 + rc2_zoom
 
-    def plot_cell_receptive_field(self, on, cell_specimen_id=None, color_map=None, clim=None, mask=None, cell_index=None):
+    def plot_cell_receptive_field(self, on, cell_specimen_id=None, color_map=None, clim=None, mask=None, cell_index=None, scalebar=True):
         if color_map is None:
             color_map = 'Reds' if on else 'Blues'
 
@@ -303,14 +312,16 @@ class LocallySparseNoise(StimulusAnalysis):
         oplots.plot_receptive_field(rts, 
                                     color_map=color_map, 
                                     clim=clim, 
-                                    mask=mask)
+                                    mask=mask,
+                                    scalebar=scalebar)
 
-    def plot_population_receptive_field(self, color_map='RdPu', clim=None, mask=None):
+    def plot_population_receptive_field(self, color_map='RdPu', clim=None, mask=None, scalebar=True):
         rf = np.nansum(self.receptive_field, axis=(2,3))
         oplots.plot_receptive_field(rf,
                                     color_map=color_map,
                                     clim=clim,
-                                    mask=mask)
+                                    mask=mask,
+                                    scalebar=scalebar)
 
     def sort_trials(self):
         ds = self.data_set

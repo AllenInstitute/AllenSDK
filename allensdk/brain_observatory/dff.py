@@ -197,6 +197,11 @@ def compute_dff(traces, save_plot_dir=None, mode_kernelsize=5400, mean_kernelsiz
     logging.debug("computing df/f")
 
     for n in range(0, traces.shape[0]):
+        if np.any(np.isnan(traces[n])):
+            logging.warning("trace for roi %d contains NaNs, setting to NaN", n)
+            dff[n,:] = np.nan
+            continue
+
         movingmode_fast(traces[n, :], mode_kernelsize, modeline[:])
         movingaverage(modeline[:], mean_kernelsize, modelineLP[:])
         dff[n, :] = (traces[n, :] - modelineLP[:]) / modelineLP[:]
