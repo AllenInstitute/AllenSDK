@@ -76,21 +76,21 @@ def moments2(data):
     # import sys
     # sys.exit()
 
-    return height, y, x, width_y, width_x, 0.0    
+    return height, y, x, width_y, width_x, None
     
 def fitgaussian2D(data):
-
     params = moments2(data)
     def errorfunction(p):
-        p2 = np.array([p[0], params[1], params[2], np.abs(p[3]), np.abs(p[4]), p[5]])
+        p2 = np.array([p[0], params[1], params[2], np.abs(p[1]), np.abs(p[2]), p[3]])
+
 
         val = np.ravel(gaussian2D(*p2)(*np.indices(data.shape)) - data)
 
         return (val**2).sum()
 
-    res = optimize.minimize(errorfunction, params)
+    res = optimize.minimize(errorfunction, [ params[0], params[3], params[4], 0.0 ], method='Nelder-Mead', options={'maxfev':2500})
     p = res.x
-    p2 = np.array([p[0], p[1], p[2], np.abs(p[3]), np.abs(p[4]), p[5]])
+    p2 = np.array([p[0], params[1], params[2], np.abs(p[1]), np.abs(p[2]), p[3]])
     success = res.success
     if not success and res.status != 2: # Status 2 is loss of precision; might need to handle this separately instead of passing...
         print success
