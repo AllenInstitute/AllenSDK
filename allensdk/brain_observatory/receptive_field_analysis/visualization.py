@@ -1,3 +1,18 @@
+# Copyright 2017 Allen Institute for Brain Science
+# This file is part of Allen SDK.
+#
+# Allen SDK is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 3 of the License.
+#
+# Allen SDK is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
+
 import matplotlib.pyplot as plt
 from matplotlib import ticker
 import numpy as np
@@ -23,7 +38,6 @@ def plot_ellipses(gaussian_fit_dict, ax=None, show=True, close=True, save_file_n
         ax.set_ylim(0, 74)
         plt.axis('off')
 
-    # try:
     on_comp = len(gaussian_fit_dict['attrs']['center_x'])
     for i in range(on_comp):
         xy = (gaussian_fit_dict['attrs']['center_x'][i], gaussian_fit_dict['attrs']['center_y'][i])
@@ -43,9 +57,6 @@ def plot_ellipses(gaussian_fit_dict, ax=None, show=True, close=True, save_file_n
 
     if close:
         plt.close(fig)
-
-    # except:
-    #     pass
 
     return ax
 
