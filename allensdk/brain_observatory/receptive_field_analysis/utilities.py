@@ -241,10 +241,10 @@ def get_components(receptive_field_data):
 
     return return_array, len(component_list)
 
-def get_attribute_dict(receptive_field_data_dict):
+def get_attribute_dict(rf):
 
     attribute_dict = {}
-    for x in dict_generator(receptive_field_data_dict):
+    for x in dict_generator(rf):
         if x[-3] == 'attrs':
             if len(x[:-3]) == 0:
                 key = x[-2]

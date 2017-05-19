@@ -192,6 +192,7 @@ class BrainObservatoryCache(Cache):
                               transgenic_lines=None,
                               stimuli=None,
                               session_types=None,
+                              cell_specimen_ids=None,
                               simple=True):
         """ Get a list of ophys experiments matching certain criteria.
 
@@ -233,6 +234,9 @@ class BrainObservatoryCache(Cache):
             List of stimulus session type names.  Must be in the list returned by
             BrainObservatoryCache.get_all_session_types().
 
+        cell_specimen_ids: list
+            Only include experiments that contain cells with these ids.
+
         simple: boolean
             Whether or not to simplify the dictionary properties returned by this method
             to a more concise subset.
@@ -254,6 +258,14 @@ class BrainObservatoryCache(Cache):
                                               **Cache.cache_json())
 
         transgenic_lines = _merge_transgenic_lines(cre_lines, transgenic_lines)
+
+        if cell_specimen_ids is not None:
+            cells = self.get_cell_specimens(ids=cell_specimen_ids)
+            cell_container_ids = set([cell['experiment_container_id'] for cell in cells])
+            if experiment_container_ids is not None:
+                experiment_container_ids = list(set(experiment_container_ids) - cell_container_ids)
+            else:
+                experiment_container_ids = list(cell_container_ids)
 
         exps = self.api.filter_ophys_experiments(exps,
                                                  ids=ids,
@@ -354,6 +366,7 @@ class BrainObservatoryCache(Cache):
                     del cs[t]
 
         return cell_specimens
+
 
     def get_ophys_experiment_data(self, ophys_experiment_id, file_name=None):
         """ Download the NWB file for an ophys_experiment (if it hasn't already been

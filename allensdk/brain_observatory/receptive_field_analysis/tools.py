@@ -1,11 +1,3 @@
-import tempfile
-import os
-from functools import wraps
-import scipy.sparse as sps
-import numpy as np
-import pandas as pd
-import json
-
 def list_of_dicts_to_dict_of_lists(list_of_dicts):
     return {key:[item[key] for item in list_of_dicts] for key in list_of_dicts[0].keys() }
 
@@ -38,16 +30,3 @@ def read_h5_group(g):
 
     return return_dict
 
-if __name__ == "__main__":
-
-    import numpy as np
-
-    # @memoize
-    @cache(strategy='lazy')
-    def f(x):
-        return 5
-
-    # print f
-    print f(5)
-
-    print list_of_dicts_to_dict_of_lists([{'a':1, 'b':0},{'a':5, 'b':7}])

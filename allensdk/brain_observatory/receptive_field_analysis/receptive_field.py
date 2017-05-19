@@ -24,7 +24,7 @@ def events_to_pvalues_no_fdr_correction(data, event_vector, A, number_of_shuffle
 
     return np.array(p_value_list)
 
-def run_receptive_field_computation(data, cell_index, stimulus, **kwargs):
+def compute_receptive_field(data, cell_index, stimulus, **kwargs):
 
     alpha = kwargs.pop('alpha')
 
@@ -86,17 +86,16 @@ def run_receptive_field_computation(data, cell_index, stimulus, **kwargs):
 
     return result_dict
 
-def get_receptive_field_data_dict_with_postprocessing(data, cell_index, stimulus, **kwargs):
+def compute_receptive_field_with_postprocessing(data, cell_index, stimulus, **kwargs):
+    rf = compute_receptive_field(data, cell_index, stimulus, **kwargs)
+    rf = run_postprocessing(data, rf)
 
-    receptive_field_data_dict = run_receptive_field_computation(data, cell_index, stimulus, **kwargs)
-    receptive_field_data_dict = run_postprocessing(data, receptive_field_data_dict)
+    return rf
 
-    return receptive_field_data_dict
-
-def get_attribute_dict(receptive_field_data_dict):
+def get_attribute_dict(rf):
 
     attribute_dict = {}
-    for x in dict_generator(receptive_field_data_dict):
+    for x in dict_generator(rf):
         if x[-3] == 'attrs':
             if len(x[:-3]) == 0:
                 key = x[-2]
@@ -107,15 +106,15 @@ def get_attribute_dict(receptive_field_data_dict):
     return attribute_dict
 
 
-def print_summary(receptive_field_data_dict):
-    for key_val in sorted(get_attribute_dict(receptive_field_data_dict).iteritems(), key=lambda x:x[0]):
+def print_summary(rf):
+    for key_val in sorted(get_attribute_dict(rf).iteritems(), key=lambda x:x[0]):
         print "%s : %s" % key_val
 
-def write_receptive_field_data_dict_to_h5(receptive_field_data_dict, file_name, prefix=''):
+def write_receptive_field_to_h5(rf, file_name, prefix=''):
 
     attr_list = []
     f = h5py.File(file_name, 'a')
-    for x in dict_generator(receptive_field_data_dict):
+    for x in dict_generator(rf):
 
         if x[-2] == 'data':
             f['/'.join([prefix]+x[:-1])] = x[-1]
@@ -155,16 +154,16 @@ def read_h5_group(g):
 
     return return_dict
 
-def read_receptive_field_data_dict_from_h5(file_name, path=None):
+def read_receptive_field_from_h5(file_name, path=None):
 
     f = h5py.File(file_name, 'r')
     if path is None:
-        receptive_field_data_dict = read_h5_group(f)
+        rf = read_h5_group(f)
     else:
-        receptive_field_data_dict = read_h5_group(f[path])
+        rf = read_h5_group(f[path])
     f.close()
 
-    return receptive_field_data_dict
+    return rf
 
 
 
