@@ -183,6 +183,17 @@ class BrainObservatoryCache(Cache):
 
         return containers
 
+    def get_ophys_experiment_stimuli(self, experiment_id):
+        """ For a single experiment, return the list of stimuli present in that experiment. """
+        exps = self.get_ophys_experiments(ids=[experiment_id])
+
+        if len(exps) == 0:
+            return None
+
+        return stim_info.stimuli_in_session(exps[0]['session_type'])
+
+        
+        
     def get_ophys_experiments(self, file_name=None,
                               ids=None,
                               experiment_container_ids=None,

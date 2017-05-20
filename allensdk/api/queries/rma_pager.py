@@ -76,6 +76,6 @@ def pageable(pages=None,
             result = RmaPager.pager(func,
                                     *args,
                                     **kwargs)
-            return list(result)
+            return result
         return w
     return decor
