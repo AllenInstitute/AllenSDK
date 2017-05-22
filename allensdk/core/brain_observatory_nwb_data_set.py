@@ -115,6 +115,7 @@ class BrainObservatoryNwbDataSet(object):
                     logging.warning("File %s has a pipeline version newer than the version supported by this class (%s vs %s)."
                                     " Please update your AllenSDK." % (nwb_file, pipeline_version_str, self.SUPPORTED_PIPELINE_VERSION))
 
+        self._stimulus_search = None
 
     def get_stimulus_epoch_table(self):
         '''Returns a pandas dataframe that summarizes the stimulus epoch duration for each acquisition time index in
@@ -837,6 +838,20 @@ class BrainObservatoryNwbDataSet(object):
                     del f['analysis'][k]
                 f.create_dataset('analysis/%s' % k, data=v)
 
+    @property
+    def stimulus_search(self):
+
+        if self._stimulus_search is None:
+            self._stimulus_search = si.StimulusSearch(self)
+        return self._stimulus_search
+
+    def get_stimulus(self, frame_ind):
+
+        start, end, data = self.stimulus_search.search(frame_ind)
+        print start, end
+        assert start <= frame_ind and frame_ind <= end
+        return data
+
 def align_running_speed(dxcm, dxtime, timestamps):
     ''' If running speed timestamps differ from fluorescence
     timestamps, adjust by inserting NaNs to running speed.
@@ -1070,3 +1085,4 @@ def _get_repeated_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
     stimulus_table['repeat'] = np.repeat(range(len(stimulus_table)/len(a)), len(a))
 
     return stimulus_table
+
