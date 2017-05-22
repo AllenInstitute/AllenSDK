@@ -90,9 +90,11 @@ See the `mouse connectivity section <connectivity.html>`_ for more details.
 What's New - Release 0.13.2 (June 15th, 2017)
 ----------------------------------------------
 
-The 0.13.2 release is a major update for the Brain Observatory modules and data.  All Brain Observatory NWB files have been regenerated, and a large number of new experiments have been released.  All NWB files now contain demixed traces (accessible via :py:meth:`allensdk.core.brain_observatory_nwb_data_set.get_demixed_traces`).  These traces are used for neuropil subtraction and dF/F computation, so those traces are affected as well.  
+The 0.13.2 release is a major update for the Brain Observatory modules and data.  All Brain Observatory NWB files have been regenerated, and a large number of new experiments have been released.  All NWB files now contain demixed traces (accessible via :py:meth:`allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_demixed_traces`).  These traces are used for neuropil subtraction and dF/F computation, so those traces are affected as well.  
 
-The cross-session alignment has been updated and re-run, so **all cell specimen IDs have changed**.  We have built a mapping table to help map from previous cell IDs to new cell IDs available here: **TODO MAKE LINK**.
+To get new lists of experiments and metadata, please delete/rename the directory container the Brain Observatory manifest.  The new files are a bit larger because of the new traces.
+
+The cross-session alignment algorithm has been updated and re-run, so **all cell specimen IDs have changed**.  We have built a mapping table to help map from previous cell IDs to new cell IDs available here: **TODO MAKE LINK**.
 
 Code changes include:
     * a new receptive field analysis module (:py:mod:`allensdk.brain_observatory.receptive_field_analysis`)
