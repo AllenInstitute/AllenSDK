@@ -3,31 +3,9 @@ import scipy.linalg as linalg
 import numpy as np
 import os
 import matplotlib.pyplot as plt
-import allensdk.internal.brain_observatory.mask_set as mask_set
 import logging
 import matplotlib.colors as colors
 from allensdk.config.manifest import Manifest
-
-def identify_valid_masks(mask_array):
-    ms = mask_set.MaskSet(masks=mask_array.astype(bool))
-    valid_masks = np.ones(mask_array.shape[0]).astype(bool)
-
-    # detect duplicates
-    duplicates = ms.detect_duplicates(overlap_threshold=0.9)
-    if len(duplicates) > 0:
-        valid_masks[duplicates.keys()] = False
-        
-    # detect unions, only for remaining valid masks
-    valid_idxs = np.where(valid_masks)
-    ms = mask_set.MaskSet(masks=mask_array[valid_idxs].astype(bool))
-    unions = ms.detect_unions()
-
-    if len(unions) > 0:
-        un_idxs = unions.keys()
-        valid_masks[valid_idxs[0][un_idxs]] = False
-
-    return valid_masks
-
 
 def demix_time_dep_masks(raw_traces, stack, masks):
     '''
