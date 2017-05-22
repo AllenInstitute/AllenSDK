@@ -6,6 +6,8 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - BrainObservatoryNwbDataSet.get_demixed_traces
+- allensdk.brain_observatory.receptive_field_analysis
+- allensdk.brain_observatory.demixer
 
 ### Changed
 
