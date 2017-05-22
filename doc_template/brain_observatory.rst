@@ -37,7 +37,9 @@ All traces and masks for segmented cells in an experiment are stored in a Neurod
 Stored traces include the raw fluoresence trace, neuropil trace, demixed trace, and dF/F trace.  Code for extracting neuropil-corrected
 fluorescence traces, computing dF/F, and computing tuning metrics is available in the SDK.  
 
-**Note:** trace demixing is a new addition as of June 2017.  All past data was reprocessed using the new demixing algorithm.
+**New in June 2017:** Trace demixing is a new addition as of June 2017.  All past data was reprocessed using the new demixing algorithm. 
+We have also developed a new module to better characterize a cell's receptive field.  Take a look at the  
+`receptive field analysis example notebook <_static/examples/nb/receptive_field_analysis.html>`_ 
 
 For more information about data processing, please `read the technical whitepapers <http://help.brain-map.org/display/observatory/Documentation>`_.
 
