@@ -87,25 +87,17 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
-What's New - Release 0.13.1 (March 24th, 2017)
+What's New - Release 0.13.2 (June 15th, 2017)
 ----------------------------------------------
 
-The 0.13.1 release features a new set of classes for manipulating structure ontologies (:py:class:`~allensdk.core.structure_tree.StructureTree`) and annotated reference spaces like the CCF (:py:class:`~allensdk.core.reference_space.ReferenceSpace`).  These were designed based on feedback from the community that more regular, specifically named functions would be valuable.  The :py:class:`~allensdk.core.ontology.Ontology` class is now deprecated in favor of :py:class:`~allensdk.core.structure_tree.StructureTree`.  Take a look at the `Reference Space documentation page <reference_space.html>`_.  
+The 0.13.2 release is a major update for the Brain Observatory modules and data.  All Brain Observatory NWB files have been regenerated, and a large number of new experiments have been released.  All NWB files now contain demixed traces (accessible via :py:meth:`allensdk.core.brain_observatory_nwb_data_set.get_demixed_traces`).  These traces are used for neuropil subtraction and dF/F computation, so those traces are affected as well.  
 
-This release also addresses several issues:
+The cross-session alignment has been updated and re-run, so **all cell specimen IDs have changed**.  We have built a mapping table to help map from previous cell IDs to new cell IDs available here: **TODO MAKE LINK**.
 
-    * issue #35: structure masks at different resolutions were overwriting each other
-    * issue #37: updating cell types notebook to use new feature extractor
-    * issue #34: deprecated stateful methods in :py:class:`~allensdk.api.queries.glif_api.GlifApi` in favor of stateless versions.
-    * issue #42: broken caching behavior in MouseConnectivityCache
-    * broken GLIF documentation/examples
-
-Note that because of the change to the structure mask paths, users will need to regenerate their MouseConnectivityCache manifests.  Also, if you don't want to regenerate all of your masks, please move them from here: 
-
-    * `manifest_dir/structure_masks/`
-
-To here (with the appropriate CCF/resolution strings):
-
-    * `manifest_dir/annotation/ccf_2016/resolution_25/structure_masks/`
-
+Code changes include:
+    * a new receptive field analysis module (:py:mod:`allensdk.brain_observatory.receptive_field_analysis`)
+    * a trace demixing algorithm (:py:mod:`allensdk.brain_observatory.demixer`)
+    * a new convenience method: :py:meth:`allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiment_stimuli` 
+    * :py:meth:`allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiments` accepts a list of `cell_specimen_ids` as an additional filter
+        
 To find out more, take a look at our `CHANGELOG <http://github.com/AllenInstitute/AllenSDK/blob/master/CHANGELOG.md>`_. 
