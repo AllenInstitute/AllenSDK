@@ -12,9 +12,9 @@ an experiment container have different stimulus protocols, but cover the same im
 .. image:: /_static/container_session_layout.png
    :align: center
 
-Data collected after September 2016 uses a new session C stimulus designed to better-characterize spatial receptive fields in 
+**Note:** Data collected after September 2016 uses a new session C stimulus designed to better-characterize spatial receptive fields in 
 higher visual areas.  The original locally sparse noise stimulus used 4 visual degree pixels.  Session C2 broke that stimulus 
-blocks into two separate stimuli: one with 4 degree pixels and one with 8 degree pixels.  
+ into two separate stimulus blocks: one with 4 degree pixels and one with 8 degree pixels.  
 
 For more information on experimental design and a data overview, please visit the `Allen Brain Observatory data portal <http://observatory.brain-map.org/visualcoding>`_.  
 
@@ -28,8 +28,8 @@ For all data in Allen Brain Observatory, we perform the following processing:
    2. Associate cells from experiments belonging to the same experiment container and assign unique IDs
    3. Extract each cell's mean fluorescence trace
    4. Extract mean fluorescence traces from each cell's surrounding neuropil
-   5. Estimate neuropil-corrected fluorescence traces
-   6. Demix traces from overlapping ROIs
+   5. Demix traces from overlapping ROIs
+   6. Estimate neuropil-corrected fluorescence traces
    7. Compute dF/F 
    8. Compute stimulus-specific tuning metrics 
 
