@@ -45,17 +45,24 @@ SESSION_STIMULUS_MAP = {
     THREE_SESSION_C2: [LOCALLY_SPARSE_NOISE_4DEG, LOCALLY_SPARSE_NOISE_8DEG, NATURAL_MOVIE_ONE, NATURAL_MOVIE_TWO, SPONTANEOUS_ACTIVITY]
 }
 
+LOCALLY_SPARSE_NOISE_STIMULUS_TYPES = [LOCALLY_SPARSE_NOISE, LOCALLY_SPARSE_NOISE_4DEG, LOCALLY_SPARSE_NOISE_8DEG]
+NATURAL_MOVIE_STIMULUS_TYPES = [NATURAL_MOVIE_ONE, NATURAL_MOVIE_TWO, NATURAL_MOVIE_THREE]
+
 LOCALLY_SPARSE_NOISE_DIMENSIONS = {
     LOCALLY_SPARSE_NOISE: [ 16, 28 ],
     LOCALLY_SPARSE_NOISE_4DEG: [ 16, 28 ],
     LOCALLY_SPARSE_NOISE_8DEG: [ 8, 14 ],
     }
 
-LOCALLY_SPARSE_NOISE_PIXELS = 45
-LOCALLY_SPARSE_NOISE_PIXELS_4DEG = 45
-LOCALLY_SPARSE_NOISE_PIXELS_8DEG = 90
+LOCALLY_SPARSE_NOISE_PIXELS = {
+    LOCALLY_SPARSE_NOISE: 45,
+    LOCALLY_SPARSE_NOISE_4DEG: 45,
+    LOCALLY_SPARSE_NOISE_8DEG: 90,
+    }
+
 NATURAL_SCENES_PIXELS = (918, 1174)
 NATURAL_MOVIE_PIXELS = (1080, 1920)
+NATURAL_MOVIE_DIMENSIONS = (304, 608)
 
 MONITOR_DIMENSIONS = (1200, 1920)
 MONITOR_DISTANCE = 15
@@ -229,9 +236,9 @@ def get_spatio_temporal_grating(t, temporal_frequency=None, **kwargs):
 
     return get_spatial_grating(**kwargs)
 
-def map_image_coordinate_to_monitor_coordinate(img_coord, monitor_shape, template_shape):
+def map_template_coordinate_to_monitor_coordinate(template_coord, monitor_shape, template_shape):
 
-    rx, cx = img_coord
+    rx, cx = template_coord
     n_pixels_r, n_pixels_c = monitor_shape
     tr, tc = template_shape
 
@@ -240,22 +247,84 @@ def map_image_coordinate_to_monitor_coordinate(img_coord, monitor_shape, templat
 
     return rx_new, cx_new
 
-def lsn_coordinate_to_monitor_coordinate(lsn_coordinate, monitor_shape, template_shape, pixels_per_patch):
+def map_monitor_coordinate_to_template_coordinate(monitor_coord, monitor_shape, template_shape):
+
+    rx, cx = monitor_coord
+    n_pixels_r, n_pixels_c = monitor_shape
+    tr, tc = template_shape
+
+    rx_new =  rx - float((n_pixels_r - tr) / 2)
+    cx_new =  cx - float((n_pixels_c - tc) / 2)
+
+    return rx_new, cx_new
+
+def lsn_coordinate_to_monitor_coordinate(lsn_coordinate, monitor_shape, stimulus_type):
+
+    template_shape = LOCALLY_SPARSE_NOISE_DIMENSIONS[stimulus_type]
+    pixels_per_patch = LOCALLY_SPARSE_NOISE_PIXELS[stimulus_type]
 
     rx, cx = lsn_coordinate
     tr, tc = template_shape
 
-    return map_image_coordinate_to_monitor_coordinate((rx*pixels_per_patch, cx*pixels_per_patch),
+    return map_template_coordinate_to_monitor_coordinate((rx*pixels_per_patch, cx*pixels_per_patch),
                                                       monitor_shape,
                                                       (tr*pixels_per_patch, tc*pixels_per_patch))
 
+def monitor_coordinate_to_lsn_coordinate(monitor_coordinate, monitor_shape, stimulus_type):
+
+    pixels_per_patch = LOCALLY_SPARSE_NOISE_PIXELS[stimulus_type]
+    tr, tc = LOCALLY_SPARSE_NOISE_DIMENSIONS[stimulus_type]
+
+    rx, cx = map_monitor_coordinate_to_template_coordinate(monitor_coordinate, monitor_shape, (tr*pixels_per_patch, tc*pixels_per_patch))
+
+    return (rx/pixels_per_patch, cx/pixels_per_patch)
+
 def natural_scene_coordinate_to_monitor_coordinate(natural_scene_coordinate, monitor_shape):
 
-    return map_image_coordinate_to_monitor_coordinate(natural_scene_coordinate, monitor_shape, NATURAL_SCENES_PIXELS)
+    return map_template_coordinate_to_monitor_coordinate(natural_scene_coordinate, monitor_shape, NATURAL_SCENES_PIXELS)
 
 def natural_movie_coordinate_to_monitor_coordinate(natural_movie_coordinate, monitor_shape):
 
-    return map_image_coordinate_to_monitor_coordinate(natural_movie_coordinate, monitor_shape, NATURAL_MOVIE_PIXELS)
+    local_y = 1.*NATURAL_MOVIE_PIXELS[0]*natural_movie_coordinate[0]/NATURAL_MOVIE_DIMENSIONS[0]
+    local_x = 1. * NATURAL_MOVIE_PIXELS[1] * natural_movie_coordinate[1] / NATURAL_MOVIE_DIMENSIONS[1]
+
+    return map_template_coordinate_to_monitor_coordinate((local_y, local_x), monitor_shape, NATURAL_MOVIE_PIXELS)
+
+def map_stimulus_coordinate_to_monitor_coordinate(template_coordinate, monitor_shape, stimulus_type):
+
+    if stimulus_type in LOCALLY_SPARSE_NOISE_STIMULUS_TYPES:
+        return lsn_coordinate_to_monitor_coordinate(template_coordinate, monitor_shape, stimulus_type)
+    elif stimulus_type in NATURAL_MOVIE_STIMULUS_TYPES:
+        return natural_movie_coordinate_to_monitor_coordinate(template_coordinate, monitor_shape)
+    elif stimulus_type == NATURAL_SCENES:
+        return natural_scene_coordinate_to_monitor_coordinate(template_coordinate, monitor_shape)
+    elif stimulus_type in [DRIFTING_GRATINGS, STATIC_GRATINGS, SPONTANEOUS_ACTIVITY]:
+        return template_coordinate
+    else:
+        raise NotImplementedError
+
+def monitor_coordinate_to_natural_movie_coordinate(monitor_coordinate, monitor_shape):
+
+    local_y, local_x = map_monitor_coordinate_to_template_coordinate(monitor_coordinate, monitor_shape, NATURAL_MOVIE_PIXELS)
+
+    return float(NATURAL_MOVIE_DIMENSIONS[0])*local_y/NATURAL_MOVIE_PIXELS[0], float(NATURAL_MOVIE_DIMENSIONS[1])*local_x/NATURAL_MOVIE_PIXELS[1]
+
+def map_monitor_coordinate_to_stimulus_coordinate(monitor_coordinate, monitor_shape, stimulus_type):
+
+    if stimulus_type in LOCALLY_SPARSE_NOISE_STIMULUS_TYPES:
+        return monitor_coordinate_to_lsn_coordinate(monitor_coordinate, monitor_shape, stimulus_type)
+    elif stimulus_type == NATURAL_SCENES:
+        return map_monitor_coordinate_to_template_coordinate(monitor_coordinate, monitor_shape, NATURAL_SCENES_PIXELS)
+    elif stimulus_type in NATURAL_MOVIE_STIMULUS_TYPES:
+        return monitor_coordinate_to_natural_movie_coordinate(monitor_coordinate, monitor_shape)
+    elif stimulus_type in [DRIFTING_GRATINGS, STATIC_GRATINGS, SPONTANEOUS_ACTIVITY]:
+        return monitor_coordinate
+    else:
+        raise NotImplementedError
+
+def map_stimulus(source_stimulus_coordinate, source_stimulus_type, target_stimulus_type, monitor_shape):
+    mc = map_stimulus_coordinate_to_monitor_coordinate(source_stimulus_coordinate, monitor_shape, source_stimulus_type)
+    return map_monitor_coordinate_to_stimulus_coordinate(mc, monitor_shape, target_stimulus_type)
 
 class Monitor(object):
 
@@ -309,19 +378,28 @@ class Monitor(object):
         else:
             return 2*np.arctan(n*1./2*self.pixel_size / distance_from_monitor) * 57.2958  # radians to degrees
 
-    def lsn_image_to_screen(self, img, pixels_per_patch):
+    def lsn_image_to_screen(self, img, stimulus_type, origin='lower'):
 
         assert img.dtype == np.uint8
 
+        pixels_per_patch = LOCALLY_SPARSE_NOISE_PIXELS[stimulus_type]
+
         full_image = np.full((self.n_pixels_r, self.n_pixels_c), STIMULUS_GRAY, dtype=np.uint8)
         img_full_res = imresize(img, float(pixels_per_patch), interp='nearest')
-        mr, mc = lsn_coordinate_to_monitor_coordinate((0, 0), (self.n_pixels_r, self.n_pixels_c), img.shape, pixels_per_patch)
-        Mr, Mc = lsn_coordinate_to_monitor_coordinate(img.shape, (self.n_pixels_r, self.n_pixels_c), img.shape, pixels_per_patch)
+        mr, mc = lsn_coordinate_to_monitor_coordinate((0, 0), (self.n_pixels_r, self.n_pixels_c), stimulus_type)
+        Mr, Mc = lsn_coordinate_to_monitor_coordinate(img.shape, (self.n_pixels_r, self.n_pixels_c), stimulus_type)
         full_image[int(mr):int(Mr), int(mc):int(Mc)] = img_full_res
+
+        if origin == 'lower':
+            return full_image
+        elif origin == 'upper':
+            return np.flipud(full_image)
+        else:
+            raise Exception
 
         return full_image
 
-    def natural_scene_image_to_screen(self, img):
+    def natural_scene_image_to_screen(self, img, origin='lower'):
 
         assert img.dtype == np.float32
         img = img.astype(np.uint8)
@@ -330,21 +408,31 @@ class Monitor(object):
         mr, mc = natural_scene_coordinate_to_monitor_coordinate((0, 0), (self.n_pixels_r, self.n_pixels_c))
         Mr, Mc = natural_scene_coordinate_to_monitor_coordinate((img.shape[0], img.shape[1]), (self.n_pixels_r, self.n_pixels_c))
         full_image[int(mr):int(Mr), int(mc):int(Mc)] = img
+        if origin == 'lower':
+            return np.flipud(full_image)
+        elif origin == 'upper':
+            return full_image
+        else:
+            raise Exception
 
-        return np.flipud(full_image)
-
-    def natural_movie_image_to_screen(self, img):
+    def natural_movie_image_to_screen(self, img, origin='lower'):
 
         img = imresize(img, NATURAL_MOVIE_PIXELS)
 
         assert img.dtype == np.uint8
 
         full_image = np.full((self.n_pixels_r, self.n_pixels_c), 127, dtype=np.uint8)
-        mr, mc = natural_movie_coordinate_to_monitor_coordinate((0, 0), (self.n_pixels_r, self.n_pixels_c))
-        Mr, Mc = natural_movie_coordinate_to_monitor_coordinate((img.shape[0], img.shape[1]), (self.n_pixels_r, self.n_pixels_c))
+        mr, mc = map_template_coordinate_to_monitor_coordinate((0, 0), (self.n_pixels_r, self.n_pixels_c), NATURAL_MOVIE_PIXELS)
+        Mr, Mc = map_template_coordinate_to_monitor_coordinate((img.shape[0], img.shape[1]), (self.n_pixels_r, self.n_pixels_c), NATURAL_MOVIE_PIXELS)
+
         full_image[int(mr):int(Mr), int(mc):int(Mc)] = img
 
-        return np.flipud(full_image)
+        if origin == 'lower':
+            return np.flipud(full_image)
+        elif origin == 'upper':
+            return full_image
+        else:
+            raise Exception
 
     def spatial_frequency_to_pix_per_cycle(self, spatial_frequency, distance_from_monitor):
 
@@ -383,7 +471,7 @@ class Monitor(object):
 
         return mask
 
-    def show_image(self, img, ax=None, show=True, mask=False, warp=False):
+    def show_image(self, img, ax=None, show=True, mask=False, warp=False, origin='lower'):
 
         from allensdk.core.brain_observatory_nwb_data_set import make_display_mask
 
@@ -398,20 +486,32 @@ class Monitor(object):
         if warp == True:
             assert mask == False
 
-        ax.imshow(img, origin='lower', cmap=plt.cm.gray, interpolation='none')
+        ax.imshow(img, origin=origin, cmap=plt.cm.gray, interpolation='none')
 
         if mask == True:
             mask = make_display_mask(display_shape=(self.n_pixels_c, self.n_pixels_r)).T
             alpha_mask = np.zeros((mask.shape[0], mask.shape[1], 4))
             alpha_mask[:, :, 2] = 1 - mask
             alpha_mask[:, :, 3] = .4
-            ax.imshow(alpha_mask, origin='lower', interpolation='none')
+            ax.imshow(alpha_mask, origin=origin, interpolation='none')
 
         ax.axes.get_xaxis().set_visible(False)
         ax.axes.get_yaxis().set_visible(False)
 
+        if origin == 'upper':
+            ax.set_ylim((img.shape[0], 0))
+        elif origin == 'lower':
+            ax.set_ylim((0, img.shape[0]))
+        else:
+            raise Exception
+        ax.set_xlim((0, img.shape[1]))
+
         if show == True:
             plt.show()
+
+    def map_stimulus(self, source_stimulus_coordinate, source_stimulus_type, target_stimulus_type):
+        monitor_shape = (self.n_pixels_r, self.n_pixels_c)
+        return map_stimulus(source_stimulus_coordinate, source_stimulus_type, target_stimulus_type, monitor_shape)
 
 class ExperimentGeometry(object):
 
@@ -470,14 +570,14 @@ class BrainObservatoryMonitor(Monitor):
         else:
             self.experiment_geometry = experiment_geometry
 
-    def lsn_image_to_screen(self, img):
+    def lsn_image_to_screen(self, img, **kwargs):
 
         if img.shape == tuple(LOCALLY_SPARSE_NOISE_DIMENSIONS[LOCALLY_SPARSE_NOISE]):
-            return super(BrainObservatoryMonitor, self).lsn_image_to_screen(img, LOCALLY_SPARSE_NOISE_PIXELS)
+            return super(BrainObservatoryMonitor, self).lsn_image_to_screen(img, LOCALLY_SPARSE_NOISE, **kwargs)
         elif img.shape == tuple(LOCALLY_SPARSE_NOISE_DIMENSIONS[LOCALLY_SPARSE_NOISE_4DEG]):
-            return super(BrainObservatoryMonitor, self).lsn_image_to_screen(img, LOCALLY_SPARSE_NOISE_PIXELS_4DEG)
+            return super(BrainObservatoryMonitor, self).lsn_image_to_screen(img, LOCALLY_SPARSE_NOISE_4DEG, **kwargs)
         elif img.shape == tuple(LOCALLY_SPARSE_NOISE_DIMENSIONS[LOCALLY_SPARSE_NOISE_8DEG]):
-            return super(BrainObservatoryMonitor, self).lsn_image_to_screen(img, LOCALLY_SPARSE_NOISE_PIXELS_8DEG)
+            return super(BrainObservatoryMonitor, self).lsn_image_to_screen(img, LOCALLY_SPARSE_NOISE_8DEG, **kwargs)
         else:
             raise RuntimeError
 
