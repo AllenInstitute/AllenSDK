@@ -39,7 +39,7 @@ fluorescence traces, computing dF/F, and computing tuning metrics is available i
 
 **New in June 2017:** Trace demixing is a new addition as of June 2017.  All past data was reprocessed using the new demixing algorithm. 
 We have also developed a new module to better characterize a cell's receptive field.  Take a look at the  
-`receptive field analysis example notebook <_static/examples/nb/receptive_field_analysis.html>`_ 
+`receptive field analysis example notebook <_static/examples/nb/receptive_fields.html>`_ 
 
 For more information about data processing, please `read the technical whitepapers <http://help.brain-map.org/display/observatory/Documentation>`_.
 
@@ -61,7 +61,7 @@ The code used to analyze and visualize data in the `Allen Brain Observatory data
 is available as part of the SDK.  Take a look at this `Jupyter notebook <_static/examples/nb/brain_observatory_analysis.html>`_ to find out how to:
 
     - `Plot cell's response to its preferred stimulus condition <_static/examples/nb/brain_observatory_analysis.html#Drifting-Gratings>`_    
-    - `Compute a cell's on/off receptive field based on the locally sparse noise stimulus <_static/examples/nb/receptive_field_analysis.html>`_ 
+    - `Compute a cell's on/off receptive field based on the locally sparse noise stimulus <_static/examples/nb/receptive_fields.html>`_ 
 
 More detailed documentation is available demonstrating how to: 
 
