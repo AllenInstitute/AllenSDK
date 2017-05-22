@@ -95,7 +95,7 @@ def plot_fields(on_data, off_data, on_axes, off_axes, clim=None, cmap=DEFAULT_CM
     cbar_axes = on_axes.figure.add_axes([0.93, 0.37, 0.02, .28])
     
     if clim is None:
-        clim_max = max(on_data.max(), off_data.max())
+        clim_max = max(np.nanmax(on_data), np.nanmax(off_data))
         clim = (0,clim_max)
     on_axes.imshow(on_data, clim=clim, cmap=cmap, interpolation='none', origin='lower')
     on_axes.set_title("on")
