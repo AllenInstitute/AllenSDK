@@ -13,8 +13,8 @@ an experiment container have different stimulus protocols, but cover the same im
    :align: center
 
 **Note:** Data collected after September 2016 uses a new session C stimulus designed to better-characterize spatial receptive fields in 
-higher visual areas.  The original locally sparse noise stimulus used 4 visual degree pixels.  Session C2 broke that stimulus 
- into two separate stimulus blocks: one with 4 degree pixels and one with 8 degree pixels.  
+higher visual areas.  The original locally sparse noise stimulus used 4 visual degree pixels.  Session C2 broke that stimulus
+into two separate stimulus blocks: one with 4 degree pixels and one with 8 degree pixels.  
 
 For more information on experimental design and a data overview, please visit the `Allen Brain Observatory data portal <http://observatory.brain-map.org/visualcoding>`_.  
 

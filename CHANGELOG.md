@@ -1,12 +1,18 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [0.13.xxx] - ????-??-??
+## [0.13.2] - 2017-06-15
+
+### Added
+
+- BrainObservatoryNwbDataSet.get_demixed_traces
 
 ### Changed
 
 - BrainObservatoryCache.get_ophys_experiments returns "acquisition_age_days" instead of "age_days".  The new field describes the age of the animal on the day of experiment acquisition.
 - BrainObservatoryCache.get_experiment_containers no longer returns "age_days".
+- BrainObservatoryCache.get_ophys_experiments accepts a list of cell_specimen_ids for additional filtering
+
 
 ## [0.13.1] - 2017-03-20
 
