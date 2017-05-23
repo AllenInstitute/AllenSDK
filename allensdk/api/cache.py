@@ -352,6 +352,24 @@ class Cache(object):
     def pathfinder(file_name_position,
                    secondary_file_name_position=None,
                    path_keyword=None):
+        '''helper method to find path argument in legacy methods written
+        prior to the @cacheable decorator.  Do not use for new @cacheable methods.
+        
+        Parameters
+        ----------
+        file_name_position : integer
+            zero indexed position in the decorated method args where file path may be found.
+        secondary_file_name_position : integer
+            zero indexed position in the decorated method args where tha file path may be found.
+        path_keyword : string
+            kwarg that may have the file path.
+        
+        Notes
+        -----
+        This method is only intended to provide backward-compatibility for some
+        methods that otherwise do not follow the path conventions of the @cacheable
+        decorator.
+        '''
         def pf(*args, **kwargs):
             file_name = None
 
