@@ -19,7 +19,9 @@ import pandas as pd
 import pandas.io.json as pj
 import functools
 import os
+import logging
 from allensdk.deprecated import deprecated
+import csv
 
 def memoize(f):
     """ Memoization decorator for a function taking one or more arguments. """
@@ -35,6 +37,8 @@ def memoize(f):
     return memodict().__getitem__
 
 class Cache(object):
+    _log = logging.getLogger('allensdk.api.cache')
+
     def __init__(self,
                  manifest=None,
                  cache=True,
@@ -302,16 +306,37 @@ class Cache(object):
         return
 
     @staticmethod
+    def csv_writer(pth, gen):
+        csv_writer = None
+    
+        first_row = True
+        row_count = 1
+    
+        with open(pth, 'w') as output:
+            for row in gen:
+                if first_row:
+                    field_names = map(str, row.keys())
+                    csv_writer = csv.DictWriter(output,
+                                                fieldnames=field_names,
+                                                delimiter=',',
+                                                quoting=csv.QUOTE_ALL)
+                    csv_writer.writeheader()
+                    first_row = False
+                Cache._log.info('row: {}'.format(row_count))
+                row_count = row_count + 1
+                csv_writer.writerow(row)
+
+    @staticmethod
     def cache_csv_json():
         return {
-             'writer': lambda p, x : pd.DataFrame(x).to_csv(p),
+             'writer': Cache.csv_writer,
              'reader': lambda f: pd.DataFrame.from_csv(f).to_dict('records')
         }
 
     @staticmethod
     def cache_csv_dataframe():
         return {
-             'writer': lambda p, x : pd.DataFrame(x).to_csv(p),
+             'writer': Cache.csv_writer,
              'reader' : pd.DataFrame.from_csv
         }
 
@@ -343,9 +368,8 @@ class Cache(object):
     @staticmethod
     def cache_csv():
         return {
-             'pre': pd.DataFrame,
-             'writer': lambda p, x : x.to_csv(p),
-             'reader': pd.DataFrame.from_csv
+            'writer': Cache.csv_writer,
+            'reader': pd.DataFrame.from_csv
         }
 
     @staticmethod

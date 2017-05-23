@@ -1,3 +1,18 @@
+# Copyright 2017 Allen Institute for Brain Science
+# This file is part of Allen SDK.
+#
+# Allen SDK is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 3 of the License.
+#
+# Allen SDK is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
+
 import matplotlib.pyplot as plt
 from matplotlib import ticker
 import numpy as np
@@ -5,13 +20,15 @@ import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
+DEFAULT_CMAP = 'magma'
+
 def plot_ellipses(gaussian_fit_dict, ax=None, show=True, close=True, save_file_name=None, color='b'):
     '''Example Usage:
     oeid, cell_index, stimulus = 512176430, 12, 'locally_sparse_noise'
     brain_observatory_cache = BrainObservatoryCache()
     data_set = brain_observatory_cache.get_ophys_experiment_data(oeid)
     lsn = LocallySparseNoise(data_set, stimulus)
-    result = get_receptive_field_data_dict_with_postprocessing(data_set, cell_index, stimulus, alpha=.05, number_of_shuffles=5000)
+    result = compute_receptive_field_with_postprocessing(data_set, cell_index, stimulus, alpha=.05, number_of_shuffles=5000)
     plot_ellipses(result['off']['gaussian_fit'], color='r')
     '''
 
@@ -21,7 +38,6 @@ def plot_ellipses(gaussian_fit_dict, ax=None, show=True, close=True, save_file_n
         ax.set_ylim(0, 74)
         plt.axis('off')
 
-    # try:
     on_comp = len(gaussian_fit_dict['attrs']['center_x'])
     for i in range(on_comp):
         xy = (gaussian_fit_dict['attrs']['center_x'][i], gaussian_fit_dict['attrs']['center_y'][i])
@@ -42,136 +58,176 @@ def plot_ellipses(gaussian_fit_dict, ax=None, show=True, close=True, save_file_n
     if close:
         plt.close(fig)
 
-    # except:
-    #     pass
-
     return ax
 
 def pvalue_to_NLL(p_values,
                   max_NLL=10.0):
     return np.where(p_values == 0.0, max_NLL, -np.log10(p_values))
 
-def plot_receptive_field_data(receptive_field_data_dict, lsn, show=True, save_file_name=None, close=True):
+def plot_chi_square_summary(rf_data, ax=None, cax=None, cmap=DEFAULT_CMAP):
+    if ax is None:
+        ax = plt.gca()
 
-    cell_index = receptive_field_data_dict['attrs']['cell_index']
+    chi_squared_grid = rf_data['chi_squared_analysis']['pvalues']['data']
+    chi_square_grid_NLL = pvalue_to_NLL(chi_squared_grid)
+    clim = (0, max(2,chi_square_grid_NLL.max()))
+    img = ax.imshow(chi_square_grid_NLL, interpolation='none', origin='lower', clim=clim, cmap=cmap)
 
-    rts_on = receptive_field_data_dict['on']['rts']['data']
-    rts_off = receptive_field_data_dict['off']['rts']['data']
+    if cax is None:
+        cb = ax.figure.colorbar(img, ax=ax, ticks=clim)
+    else:
+        cb = ax.figure.colorbar(img, cax=cax, ticks=clim)
 
-    rts_on_blur = receptive_field_data_dict['on']['rts_convolution']['data']
-    rts_off_blur = receptive_field_data_dict['off']['rts_convolution']['data']
+    tick_locator = ticker.MaxNLocator(nbins=5)
+    cb.locator = tick_locator
+    cb.update_ticks()
+    ax.axes.get_xaxis().set_visible(False)
+    ax.axes.get_yaxis().set_visible(False)
+    ax.set_title('Significant: %s (min_p=%s)' % (rf_data['chi_squared_analysis']['attrs']['significant'], 
+                                                 rf_data['chi_squared_analysis']['attrs']['min_p']) )    
 
-    pvalues_on = receptive_field_data_dict['on']['pvalues']['data']
-    pvalues_off = receptive_field_data_dict['off']['pvalues']['data']
+def plot_msr_summary(lsn, cell_index, ax_on, ax_off, ax_cbar=None, cmap=None):
+    min_clim = lsn.mean_response[:, :, cell_index,:].min()
+    max_clim = lsn.mean_response[:, :, cell_index,:].max()
+    plot_fields(lsn.mean_response[:, :, cell_index, 0], 
+                lsn.mean_response[:, :, cell_index, 1], 
+                ax_on, ax_off, clim=(min_clim, max_clim), cmap=cmap, cbar_axes=ax_cbar)
+
+def plot_fields(on_data, off_data, on_axes, off_axes, cbar_axes=None, clim=None, cmap=DEFAULT_CMAP):
+    if cbar_axes is None:
+        on_axes.figure.subplots_adjust(right=0.9)
+        cbar_axes = on_axes.figure.add_axes([0.93, 0.37, 0.02, .28])
+    
+    if clim is None:
+        clim_max = max(np.nanmax(on_data), np.nanmax(off_data))
+        clim = (0,clim_max)
+    on_axes.imshow(on_data, clim=clim, cmap=cmap, interpolation='none', origin='lower')
+    on_axes.set_title("on")
+    img = off_axes.imshow(off_data, clim=clim, cmap=cmap, interpolation='none', origin='lower')
+    off_axes.set_title("off")
+    cb = cbar_axes.figure.colorbar(img, cax=cbar_axes, ticks=clim)
+    tick_locator = ticker.MaxNLocator(nbins=5)
+    cb.locator = tick_locator
+    cb.update_ticks()
+    for frame in [on_axes, off_axes]:
+        frame.axes.get_xaxis().set_visible(False)
+        frame.axes.get_yaxis().set_visible(False)
+
+def plot_rts_summary(rf_data, ax_on, ax_off, ax_cbar=None, cmap=DEFAULT_CMAP):
+    rts_on = rf_data['on']['rts']['data']
+    rts_off = rf_data['off']['rts']['data']
+    plot_fields(rts_on, rts_off, ax_on, ax_off, cbar_axes=ax_cbar, cmap=cmap)
+
+def plot_rts_blur_summary(rf_data, ax_on, ax_off, ax_cbar=None, cmap=DEFAULT_CMAP):
+    rts_on_blur = rf_data['on']['rts_convolution']['data']
+    rts_off_blur = rf_data['off']['rts_convolution']['data']
+    plot_fields(rts_on_blur, rts_off_blur, ax_on, ax_off, cbar_axes=ax_cbar, cmap=cmap)
+
+def plot_p_values(rf_data, ax_on, ax_off, ax_cbar=None, cmap=DEFAULT_CMAP):
+    pvalues_on = rf_data['on']['pvalues']['data']
+    pvalues_off = rf_data['off']['pvalues']['data']
+    clim_max = max(pvalues_on.max(), pvalues_off.max())
+    plot_fields(pvalues_on, pvalues_off, ax_on, ax_off, cbar_axes=ax_cbar, clim=(0, clim_max/2), cmap=cmap)
+
+def plot_mask(rf_data, ax_on, ax_off, ax_cbar=None, cmap=DEFAULT_CMAP):
+    pvalues_on = rf_data['on']['pvalues']['data']
+    pvalues_off = rf_data['off']['pvalues']['data']
 
     rf_on = pvalues_on.copy()
     rf_off = pvalues_off.copy()
 
-    rf_on[np.logical_not(receptive_field_data_dict['on']['fdr_mask']['data'].sum(axis=0))] = np.nan
-    rf_off[np.logical_not(receptive_field_data_dict['off']['fdr_mask']['data'].sum(axis=0))] = np.nan
+    rf_on[np.logical_not(rf_data['on']['fdr_mask']['data'].sum(axis=0))] = np.nan
+    rf_off[np.logical_not(rf_data['off']['fdr_mask']['data'].sum(axis=0))] = np.nan
 
-    def plot_fields(on_data, off_data, on_axes, off_axes, clim=None):
-        if clim is None:
-            clim_max = max(on_data.max(), off_data.max())
-            clim = (0,clim_max)
-        on_axes.imshow(on_data, clim=clim, interpolation='none', origin='lower')
-        img = off_axes.imshow(off_data, clim=clim, interpolation='none', origin='lower')
-        cb = on_axes.figure.colorbar(img, ax=off_axes, ticks=clim)
-        tick_locator = ticker.MaxNLocator(nbins=5)
-        cb.locator = tick_locator
-        cb.update_ticks()
-        for frame in [on_axes, off_axes]:
-            frame.axes.get_xaxis().set_visible(False)
-            frame.axes.get_yaxis().set_visible(False)
+    plot_fields(rf_on, rf_off, ax_on, ax_off, cbar_axes=ax_cbar, cmap=cmap)
 
-    # Prepare plotting figure:
-    number_of_major_rows = 7
-    fig = plt.figure(figsize=(4*1.9, number_of_major_rows*2))
-    gs = gridspec.GridSpec(number_of_major_rows*2,4)
+def plot_gaussian_fit(rf_data, ax_on, ax_off, ax_cbar=None, cmap=DEFAULT_CMAP):
+
+    gf_on_exists = 'gaussian_fit' in rf_data['on']
+    gf_off_exists = 'gaussian_fit' in rf_data['off']
+
+    if not gf_on_exists and not gf_off_exists:
+        return
+
+    img_data_on = rf_data['on']['gaussian_fit']['data'].sum(axis=0) if gf_on_exists else None
+    img_data_off = rf_data['off']['gaussian_fit']['data'].sum(axis=0) if gf_off_exists else None
+
+    if gf_on_exists and gf_off_exists:
+        plot_fields(img_data_on, img_data_off, ax_on, ax_off, cbar_axes=ax_cbar, cmap=cmap)
+    else:
+        if gf_on_exists:
+            img_data_off = np.zeros(img_data_on.shape)
+        else:
+            img_data_on = np.zeros(img_data_off.shape)
+
+        plot_fields(img_data_on, img_data_off, ax_on, ax_off, cbar_axes=ax_cbar, cmap=cmap)
+
+def plot_receptive_field_data(rf, lsn, show=True, save_file_name=None, close=True, cmap=DEFAULT_CMAP):
+    cell_index = rf['attrs']['cell_index']
+
+    # Prepare plotting figure:n
+    number_of_major_rows = 7 if lsn else 6
+    pwidth = 1.7
+    pheight = 1.0
+    fig = plt.figure(figsize=(pwidth*2.3, pheight*number_of_major_rows))
+    gsp = gridspec.GridSpec(number_of_major_rows, 3, width_ratios=[1,1,.1], right=0.9)
     ax_list = []
 
     # Plot chi-square summary:
-    curr_axes = fig.add_subplot(gs[0:2, 1:3])
+    row = 0
+    curr_axes = fig.add_subplot(gsp[row,:2])
+    cbar_axes = fig.add_subplot(gsp[row,-1])
     ax_list += [curr_axes]
-    chi_squared_grid = receptive_field_data_dict['chi_squared_analysis']['pvalues']['data']
-    chi_square_grid_NLL = pvalue_to_NLL(chi_squared_grid)
-    clim = (0, max(2,chi_square_grid_NLL.max()))
-    img = curr_axes.imshow(chi_square_grid_NLL, interpolation='none', origin='lower', clim=clim)
-
-    cb = curr_axes.figure.colorbar(img, ax=curr_axes, ticks=clim)
-    tick_locator = ticker.MaxNLocator(nbins=5)
-    cb.locator = tick_locator
-    cb.update_ticks()
-    curr_axes.axes.get_xaxis().set_visible(False)
-    curr_axes.axes.get_yaxis().set_visible(False)
-    curr_axes.set_title('Significant: %s (min_p=%s)' % (receptive_field_data_dict['chi_squared_analysis']['attrs']['significant'], receptive_field_data_dict['chi_squared_analysis']['attrs']['min_p']) )
+    plot_chi_square_summary(rf, ax=curr_axes, cax=cbar_axes, cmap=cmap)
 
     # MSR plot:
     if not lsn is None:
-        curr_on_axes = fig.add_subplot(gs[2:4, 0:2])
-        curr_off_axes = fig.add_subplot(gs[2:4, 2:4])
+        row += 1
+        curr_on_axes = fig.add_subplot(gsp[row, 0])
+        curr_off_axes = fig.add_subplot(gsp[row, 1])
+        cbar_axes = fig.add_subplot(gsp[row, 2])
         ax_list += [curr_on_axes, curr_off_axes]
-        min_clim = lsn.mean_response[:, :, cell_index,:].min()
-        max_clim = lsn.mean_response[:, :, cell_index,:].max()
-        plot_fields(lsn.mean_response[:, :, cell_index, 0], lsn.mean_response[:, :, cell_index, 1], curr_on_axes, curr_off_axes, clim=(min_clim, max_clim))
+        plot_msr_summary(lsn, cell_index, curr_on_axes, curr_off_axes, cbar_axes, cmap=cmap)
 
     # RTS no blur:
-    curr_on_axes = fig.add_subplot(gs[4:6, 0:2])
-    curr_off_axes = fig.add_subplot(gs[4:6, 2:4])
+    row += 1
+    curr_on_axes = fig.add_subplot(gsp[row, 0])
+    curr_off_axes = fig.add_subplot(gsp[row, 1])
+    cbar_axes = fig.add_subplot(gsp[row,2])
     ax_list += [curr_on_axes, curr_off_axes]
-    plot_fields(rts_on, rts_off, curr_on_axes, curr_off_axes)
+    plot_rts_summary(rf, curr_on_axes, curr_off_axes, cbar_axes, cmap=cmap)
 
     # RTS no blur:
-    curr_on_axes = fig.add_subplot(gs[6:8, 0:2])
-    curr_off_axes = fig.add_subplot(gs[6:8, 2:4])
+    row += 1
+    curr_on_axes = fig.add_subplot(gsp[row, 0])
+    curr_off_axes = fig.add_subplot(gsp[row, 1])
+    cbar_axes = fig.add_subplot(gsp[row,2])
     ax_list += [curr_on_axes, curr_off_axes]
-    plot_fields(rts_on_blur, rts_off_blur, curr_on_axes, curr_off_axes)
+    plot_rts_blur_summary(rf, curr_on_axes, curr_off_axes, cbar_axes, cmap=cmap)
 
     # PValues:
-    curr_on_axes = fig.add_subplot(gs[8:10, 0:2])
-    curr_off_axes = fig.add_subplot(gs[8:10, 2:4])
+    row += 1
+    curr_on_axes = fig.add_subplot(gsp[row, 0])
+    curr_off_axes = fig.add_subplot(gsp[row, 1])
+    cbar_axes = fig.add_subplot(gsp[row,2])
     ax_list += [curr_on_axes, curr_off_axes]
-    clim_max = max(pvalues_on.max(), pvalues_off.max())
-    plot_fields(pvalues_on, pvalues_off, curr_on_axes, curr_off_axes, clim=(0, clim_max/2))
+    plot_p_values(rf, curr_on_axes, curr_off_axes, cbar_axes, cmap=cmap)
 
     # Mask:
-    curr_on_axes = fig.add_subplot(gs[10:12, 0:2])
-    curr_off_axes = fig.add_subplot(gs[10:12, 2:4])
+    row += 1
+    curr_on_axes = fig.add_subplot(gsp[row, 0])
+    curr_off_axes = fig.add_subplot(gsp[row, 1])
+    cbar_axes = fig.add_subplot(gsp[row,2])
     ax_list += [curr_on_axes, curr_off_axes]
-    plot_fields(rf_on, rf_off, curr_on_axes, curr_off_axes)
-
+    plot_mask(rf, curr_on_axes, curr_off_axes, cbar_axes, cmap=cmap)
 
     # Gaussian fit:
-    gf_on_exists = receptive_field_data_dict['on'].get('gaussian_fit',None)
-    gf_off_exists = receptive_field_data_dict['off'].get('gaussian_fit', None)
-
-    if gf_on_exists is None and gf_off_exists is None:
-        pass
-    elif (not gf_on_exists is None) and (not gf_off_exists is None):
-        curr_on_axes = fig.add_subplot(gs[12:14, 0:2])
-        curr_off_axes = fig.add_subplot(gs[12:14, 2:4])
-        ax_list += [curr_on_axes, curr_off_axes]
-        img_data_on = receptive_field_data_dict['on']['gaussian_fit']['data'].sum(axis=0)
-        img_data_off = receptive_field_data_dict['off']['gaussian_fit']['data'].sum(axis=0)
-        plot_fields(img_data_on, img_data_off, curr_on_axes, curr_off_axes)
-
-    else:
-        if not gf_on_exists is None:
-            img_data = receptive_field_data_dict['on']['gaussian_fit']['data'].sum(axis=0)
-            curr_axes = fig.add_subplot(gs[12:14, 0:2])
-        else:
-            img_data = receptive_field_data_dict['off']['gaussian_fit']['data'].sum(axis=0)
-            curr_axes = fig.add_subplot(gs[12:14, 2:4])
-        clim = (0, img_data.max())
-        ax_list += [curr_axes]
-        img = curr_axes.imshow(img_data, interpolation='none', origin='lower', clim=clim)
-        cb = curr_axes.figure.colorbar(img, ax=curr_axes, ticks=clim)
-        tick_locator = ticker.MaxNLocator(nbins=5)
-        cb.locator = tick_locator
-        cb.update_ticks()
-        curr_axes.axes.get_xaxis().set_visible(False)
-        curr_axes.axes.get_yaxis().set_visible(False)
-
+    row += 1
+    curr_on_axes = fig.add_subplot(gsp[row, 0])
+    curr_off_axes = fig.add_subplot(gsp[row, 1])
+    cbar_axes = fig.add_subplot(gsp[row,2])
+    ax_list += [curr_on_axes, curr_off_axes]
+    plot_gaussian_fit(rf, curr_on_axes, curr_off_axes, cbar_axes, cmap=cmap)
 
     # gs.tight_layout(fig)
 

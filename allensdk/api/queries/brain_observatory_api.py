@@ -17,6 +17,7 @@ import pandas as pd
 from six import string_types
 from .rma_template import RmaTemplate
 from ..cache import cacheable, Cache
+from .rma_pager import pageable
 from allensdk.config.manifest import Manifest
 import allensdk.brain_observatory.stimulus_info as stimulus_info
 import logging
@@ -106,8 +107,6 @@ class BrainObservatoryApi(RmaTemplate):
              'description': 'see name',
              'model': 'ApiCamCellMetric',
              'criteria': '{% if cell_specimen_ids is defined %}[cell_specimen_id$in{{ cell_specimen_ids }}]{%endif%}',
-             'num_rows': 'all',
-             'count': False,
              'criteria_params': ['cell_specimen_ids']
              }
         ]}
@@ -123,9 +122,11 @@ class BrainObservatoryApi(RmaTemplate):
         "is": '({0} == {1})'
     }
 
-    def __init__(self, base_uri=None):
+    def __init__(self, base_uri=None, datacube_uri=None):
         super(BrainObservatoryApi, self).__init__(base_uri,
                                                   query_manifest=BrainObservatoryApi.rma_templates)
+
+        self.datacube_uri = datacube_uri
 
     @cacheable()
     def get_ophys_experiments(self, ophys_experiment_ids=None):
@@ -236,7 +237,8 @@ class BrainObservatoryApi(RmaTemplate):
         return data
 
     @cacheable()
-    def get_cell_metrics(self, cell_specimen_ids=None):
+    @pageable(num_rows=2000, total_rows='all')
+    def get_cell_metrics(self, cell_specimen_ids=None, *args, **kwargs):
         ''' Get cell metrics by id
 
         Parameters
@@ -248,12 +250,11 @@ class BrainObservatoryApi(RmaTemplate):
         -------
         dict : cell metric metadata
         '''
-        self._log.warning(
-            "Downloading metrics and metadata for all cells. This can take some time.")
-
         data = self.template_query('brain_observatory_queries',
                                    'cell_metric',
-                                   cell_specimen_ids=cell_specimen_ids)
+                                   cell_specimen_ids=cell_specimen_ids,
+                                   *args,
+                                   **kwargs)
 
         return data
 
