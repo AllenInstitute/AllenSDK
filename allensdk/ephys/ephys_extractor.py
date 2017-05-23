@@ -667,10 +667,9 @@ class EphysSweepSetFeatureExtractor:
 class EphysCellFeatureExtractor:
     # Class constants for specific processing
     SUBTHRESH_MAX_AMP = 0
-    SUBTHRESH_MIN_AMP = -100
     SAG_TARGET = -100.
 
-    def __init__(self, ramps_ext, short_squares_ext, long_squares_ext):
+    def __init__(self, ramps_ext, short_squares_ext, long_squares_ext, subthresh_min_amp=-100):
         """Initialize EphysCellFeatureExtractor object from EphysSweepSetExtractors for
         ramp, short square, and long square sweeps.
 
@@ -685,6 +684,8 @@ class EphysCellFeatureExtractor:
         self._ramps_ext = ramps_ext
         self._short_squares_ext = short_squares_ext
         self._long_squares_ext = long_squares_ext
+
+        self._subthresh_min_amp = subthresh_min_amp
 
         self._features = {
             "ramps": {},
@@ -816,7 +817,7 @@ class EphysCellFeatureExtractor:
 
         calc_subthresh_sweeps = [sweep for sweep in subthresh_sweeps if
                                  sweep.sweep_feature("stim_amp") < self.SUBTHRESH_MAX_AMP and
-                                 sweep.sweep_feature("stim_amp") > self.SUBTHRESH_MIN_AMP]
+                                 sweep.sweep_feature("stim_amp") > self._subthresh_min_amp]
 
         calc_subthresh_ext = EphysSweepSetFeatureExtractor.from_sweeps(calc_subthresh_sweeps)
         self._subthreshold_membrane_property_ext = calc_subthresh_ext
@@ -938,7 +939,7 @@ def fit_fi_slope(ext):
     return m
 
 
-def cell_extractor_for_nwb(dataset, ramps, short_squares, long_squares):
+def cell_extractor_for_nwb(dataset, ramps, short_squares, long_squares, subthresh_min_amp=-100):
     """Initialize EphysCellFeatureExtractor object from NWB data set
 
     Parameters
@@ -973,7 +974,7 @@ def cell_extractor_for_nwb(dataset, ramps, short_squares, long_squares):
                                                 fixed_start=LONG_SQUARES_START,
                                                 fixed_end=LONG_SQUARES_END)
 
-    return EphysCellFeatureExtractor(ramps_ext, short_squares_ext, long_squares_ext)
+    return EphysCellFeatureExtractor(ramps_ext, short_squares_ext, long_squares_ext, subthresh_min_amp)
 
 
 def extractor_for_nwb_sweeps(dataset, sweep_numbers,
