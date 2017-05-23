@@ -212,6 +212,7 @@ class LocallySparseNoise(StimulusAnalysis):
 
         for xp in range(self.nrows):
             for yp in range(self.ncols):
+                logging.debug("  for pixel (%d,%d)" % (xp, yp))
                 on_frame = np.where(self.LSN[:, xp, yp] == self.LSN_ON)[0]
                 off_frame = np.where(self.LSN[:, xp, yp] == self.LSN_OFF)[0]
                 subset_on = self.mean_sweep_response[
