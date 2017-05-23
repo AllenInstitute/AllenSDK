@@ -350,18 +350,40 @@ class Cache(object):
 
     @staticmethod
     def pathfinder(file_name_position,
-                   secondary_file_name_position=None):
-        def pf(*args):
+                   secondary_file_name_position=None,
+                   path_keyword=None):
+        '''helper method to find path argument in legacy methods written
+        prior to the @cacheable decorator.  Do not use for new @cacheable methods.
+        
+        Parameters
+        ----------
+        file_name_position : integer
+            zero indexed position in the decorated method args where file path may be found.
+        secondary_file_name_position : integer
+            zero indexed position in the decorated method args where tha file path may be found.
+        path_keyword : string
+            kwarg that may have the file path.
+        
+        Notes
+        -----
+        This method is only intended to provide backward-compatibility for some
+        methods that otherwise do not follow the path conventions of the @cacheable
+        decorator.
+        '''
+        def pf(*args, **kwargs):
             file_name = None
 
-            if file_name_position < len(args):
-                file_name = args[file_name_position]
-        
-            if (file_name is None and
-                secondary_file_name_position and 
-                secondary_file_name_position < len(args)):
-                file_name = args[secondary_file_name_position]
-        
+            if path_keyword is not None and path_keyword in kwargs:
+                file_name = kwargs[path_keyword]
+            else:
+                if file_name_position < len(args):
+                    file_name = args[file_name_position]
+
+                if (file_name is None and
+                    secondary_file_name_position and 
+                    secondary_file_name_position < len(args)):
+                    file_name = args[secondary_file_name_position]
+
             return file_name
         return pf
 
@@ -490,7 +512,7 @@ def cacheable(strategy=None,
                 pathfinder = kwargs.pop('pathfinder', None)
 
             if pathfinder and not 'path' in kwargs:
-                found_path = pathfinder(*args)
+                found_path = pathfinder(*args, **kwargs)
                 
                 if found_path:
                     kwargs['path'] = found_path

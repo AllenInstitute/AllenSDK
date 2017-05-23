@@ -225,6 +225,51 @@ def test_file_download_cached_file(mock_imports,
     assert not Manifest.safe_mkdir.called, 'safe_mkdir should not have been called.'
     nrrd_read.assert_called_once_with('volumetric.nrrd')
 
+
+@pytest.mark.parametrize("file_exists",
+                         (True, False))
+def test_file_kwarg(mock_imports,
+                    mca,
+                    cache,
+                    file_exists):
+    nrrd_read, MCA = mock_imports
+
+    @cacheable(reader=nrrd_read,
+               pathfinder=Cache.pathfinder(file_name_position=3,
+                                           secondary_file_name_position=1,
+                                           path_keyword='save_file_path'))
+    def download_volumetric_data(data_path,
+                                 file_name,
+                                 voxel_resolution=None,
+                                 save_file_path=None,
+                                 release=None,
+                                 coordinate_framework=None):
+        url = mca.build_volumetric_data_download_url(data_path,
+                                                     file_name,
+                                                     voxel_resolution,
+                                                     release,
+                                                     coordinate_framework)
+
+        mca.retrieve_file_over_http(url, save_file_path)
+
+    with patch('os.path.exists',
+               Mock(name="os.path.exists",
+                    return_value=file_exists)) as mkdir:
+        nrrd_read.reset_mock()
+
+        download_volumetric_data(MCA.AVERAGE_TEMPLATE,
+                                 'annotation_10.nrrd',
+                                 MCA.VOXEL_RESOLUTION_10_MICRONS,
+                                 'volumetric.nrrd',
+                                 MCA.CCF_2016,
+                                 strategy='file',
+                                 save_file_path='file.nrrd' )
+
+    assert not mca.retrieve_file_over_http.called, 'server should not have been called'
+    assert not Manifest.safe_mkdir.called, 'safe_mkdir should not have been called.'
+    nrrd_read.assert_called_once_with('file.nrrd')
+
+
 @pytest.mark.run('last')
 def test_cleanup():
     import allensdk.api.queries.mouse_connectivity_api
