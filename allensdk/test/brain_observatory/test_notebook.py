@@ -186,6 +186,7 @@ def test_brain_observatory_experiment_containers_notebook(boc):
     # Fluorescence
     dsi_cell_id = dsi_cell['cell_specimen_id']
     time, raw_traces = data_set.get_fluorescence_traces(cell_specimen_ids=[dsi_cell_id])
+    _, demixed_traces = data_set.get_demixed_traces(cell_specimen_ids=[dsi_cell_id])
     _, neuropil_traces = data_set.get_neuropil_traces(cell_specimen_ids=[dsi_cell_id])
     _, corrected_traces = data_set.get_corrected_fluorescence_traces(cell_specimen_ids=[dsi_cell_id])
     _, dff_traces = data_set.get_dff_traces(cell_specimen_ids=[dsi_cell_id])
@@ -229,15 +230,15 @@ def test_brain_observatory_experiment_containers_notebook(boc):
     max_count = max(os.max(), ds.max())
 
     # Neuropil correction
-    data_set = boc.get_ophys_experiment_data(510221121)
+    data_set = boc.get_ophys_experiment_data(569407590)
     csid = data_set.get_cell_specimen_ids()[0]
 
-    time, raw_traces = data_set.get_fluorescence_traces(
+    time, demixed_traces = data_set.get_demixed_traces(
         cell_specimen_ids=[csid])
     _, neuropil_traces = data_set.get_neuropil_traces(cell_specimen_ids=[csid])
 
-    results = estimate_contamination_ratios(raw_traces[0], neuropil_traces[0])
-    correction = raw_traces[0] - results['r'] * neuropil_traces[0]
+    results = estimate_contamination_ratios(demixed_traces[0], neuropil_traces[0])
+    correction = demixed_traces[0] - results['r'] * neuropil_traces[0]
     _, corrected_traces = data_set.get_corrected_fluorescence_traces(
         cell_specimen_ids=[csid])
     
