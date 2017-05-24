@@ -193,31 +193,31 @@ def test_get_stimulus_mappings_two_ids(bo_api):
 
 
 def test_get_cell_metrics_no_ids(bo_api):
-    bo_api.get_cell_metrics()
+    list(bo_api.get_cell_metrics())
     bo_api.json_msg_query.assert_called_once_with(
         "http://testwarehouse:9000/api/v2/data/query.json?q="
         "model::ApiCamCellMetric,"
-        "rma::options[num_rows$eq'all'][count$eqfalse]")
+        "rma::options[num_rows$eq2000][start_row$eq0][count$eqfalse]")
 
 
 def test_get_cell_metrics_one_ids(bo_api):
     tid = 517394843
-    bo_api.get_cell_metrics(cell_specimen_ids=tid)
+    list(bo_api.get_cell_metrics(cell_specimen_ids=tid))
     bo_api.json_msg_query.assert_called_once_with(
         "http://testwarehouse:9000/api/v2/data/query.json?q="
         "model::ApiCamCellMetric,"
         "rma::criteria,[cell_specimen_id$in517394843],"
-        "rma::options[num_rows$eq'all'][count$eqfalse]")
+        "rma::options[num_rows$eq2000][start_row$eq0][count$eqfalse]")
 
 
 def test_get_cell_metrics_two_ids(bo_api):
     ids = [517394843, 517394850]
-    bo_api.get_cell_metrics(cell_specimen_ids=ids)
+    res = list(bo_api.get_cell_metrics(cell_specimen_ids=ids))
     bo_api.json_msg_query.assert_called_once_with(
         "http://testwarehouse:9000/api/v2/data/query.json?q="
         "model::ApiCamCellMetric,"
         "rma::criteria,[cell_specimen_id$in517394843,517394850],"
-        "rma::options[num_rows$eq'all'][count$eqfalse]")
+        "rma::options[num_rows$eq2000][start_row$eq0][count$eqfalse]")
 
 
 def test_filter_experiment_containers_no_filters(bo_api, mock_containers):
