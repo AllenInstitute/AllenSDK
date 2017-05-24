@@ -20,7 +20,7 @@ import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
-DEFAULT_CMAP = 'viridis'
+DEFAULT_CMAP = 'magma'
 
 def plot_ellipses(gaussian_fit_dict, ax=None, show=True, close=True, save_file_name=None, color='b'):
     '''Example Usage:
@@ -64,7 +64,7 @@ def pvalue_to_NLL(p_values,
                   max_NLL=10.0):
     return np.where(p_values == 0.0, max_NLL, -np.log10(p_values))
 
-def plot_chi_square_summary(rf_data, ax=None, cmap=DEFAULT_CMAP):
+def plot_chi_square_summary(rf_data, ax=None, cax=None, cmap=DEFAULT_CMAP):
     if ax is None:
         ax = plt.gca()
 
@@ -73,7 +73,11 @@ def plot_chi_square_summary(rf_data, ax=None, cmap=DEFAULT_CMAP):
     clim = (0, max(2,chi_square_grid_NLL.max()))
     img = ax.imshow(chi_square_grid_NLL, interpolation='none', origin='lower', clim=clim, cmap=cmap)
 
-    cb = ax.figure.colorbar(img, ax=ax, ticks=clim, fraction=0.024, pad=0.04)
+    if cax is None:
+        cb = ax.figure.colorbar(img, ax=ax, ticks=clim)
+    else:
+        cb = ax.figure.colorbar(img, cax=cax, ticks=clim)
+
     tick_locator = ticker.MaxNLocator(nbins=5)
     cb.locator = tick_locator
     cb.update_ticks()
@@ -82,17 +86,17 @@ def plot_chi_square_summary(rf_data, ax=None, cmap=DEFAULT_CMAP):
     ax.set_title('Significant: %s (min_p=%s)' % (rf_data['chi_squared_analysis']['attrs']['significant'], 
                                                  rf_data['chi_squared_analysis']['attrs']['min_p']) )    
 
-def plot_msr_summary(lsn, cell_index, ax_on, ax_off):
-    ax_list += [curr_on_axes, curr_off_axes]
+def plot_msr_summary(lsn, cell_index, ax_on, ax_off, ax_cbar=None, cmap=None):
     min_clim = lsn.mean_response[:, :, cell_index,:].min()
     max_clim = lsn.mean_response[:, :, cell_index,:].max()
     plot_fields(lsn.mean_response[:, :, cell_index, 0], 
                 lsn.mean_response[:, :, cell_index, 1], 
-                curr_on_axes, curr_off_axes, clim=(min_clim, max_clim))
+                ax_on, ax_off, clim=(min_clim, max_clim), cmap=cmap, cbar_axes=ax_cbar)
 
-def plot_fields(on_data, off_data, on_axes, off_axes, clim=None, cmap=DEFAULT_CMAP):
-    on_axes.figure.subplots_adjust(right=0.9)
-    cbar_axes = on_axes.figure.add_axes([0.93, 0.37, 0.02, .28])
+def plot_fields(on_data, off_data, on_axes, off_axes, cbar_axes=None, clim=None, cmap=DEFAULT_CMAP):
+    if cbar_axes is None:
+        on_axes.figure.subplots_adjust(right=0.9)
+        cbar_axes = on_axes.figure.add_axes([0.93, 0.37, 0.02, .28])
     
     if clim is None:
         clim_max = max(np.nanmax(on_data), np.nanmax(off_data))
@@ -109,23 +113,23 @@ def plot_fields(on_data, off_data, on_axes, off_axes, clim=None, cmap=DEFAULT_CM
         frame.axes.get_xaxis().set_visible(False)
         frame.axes.get_yaxis().set_visible(False)
 
-def plot_rts_summary(rf_data, ax_on, ax_off, cmap=DEFAULT_CMAP):
+def plot_rts_summary(rf_data, ax_on, ax_off, ax_cbar=None, cmap=DEFAULT_CMAP):
     rts_on = rf_data['on']['rts']['data']
     rts_off = rf_data['off']['rts']['data']
-    plot_fields(rts_on, rts_off, ax_on, ax_off, cmap=cmap)
+    plot_fields(rts_on, rts_off, ax_on, ax_off, cbar_axes=ax_cbar, cmap=cmap)
 
-def plot_rts_blur_summary(rf_data, ax_on, ax_off, cmap=DEFAULT_CMAP):
+def plot_rts_blur_summary(rf_data, ax_on, ax_off, ax_cbar=None, cmap=DEFAULT_CMAP):
     rts_on_blur = rf_data['on']['rts_convolution']['data']
     rts_off_blur = rf_data['off']['rts_convolution']['data']
-    plot_fields(rts_on_blur, rts_off_blur, ax_on, ax_off, cmap=cmap)
+    plot_fields(rts_on_blur, rts_off_blur, ax_on, ax_off, cbar_axes=ax_cbar, cmap=cmap)
 
-def plot_p_values(rf_data, ax_on, ax_off, cmap=DEFAULT_CMAP):
+def plot_p_values(rf_data, ax_on, ax_off, ax_cbar=None, cmap=DEFAULT_CMAP):
     pvalues_on = rf_data['on']['pvalues']['data']
     pvalues_off = rf_data['off']['pvalues']['data']
     clim_max = max(pvalues_on.max(), pvalues_off.max())
-    plot_fields(pvalues_on, pvalues_off, ax_on, ax_off, clim=(0, clim_max/2), cmap=cmap)
+    plot_fields(pvalues_on, pvalues_off, ax_on, ax_off, cbar_axes=ax_cbar, clim=(0, clim_max/2), cmap=cmap)
 
-def plot_mask(rf_data, ax_on, ax_off, cmap=DEFAULT_CMAP):
+def plot_mask(rf_data, ax_on, ax_off, ax_cbar=None, cmap=DEFAULT_CMAP):
     pvalues_on = rf_data['on']['pvalues']['data']
     pvalues_off = rf_data['off']['pvalues']['data']
 
@@ -135,9 +139,9 @@ def plot_mask(rf_data, ax_on, ax_off, cmap=DEFAULT_CMAP):
     rf_on[np.logical_not(rf_data['on']['fdr_mask']['data'].sum(axis=0))] = np.nan
     rf_off[np.logical_not(rf_data['off']['fdr_mask']['data'].sum(axis=0))] = np.nan
 
-    plot_fields(rf_on, rf_off, ax_on, ax_off, cmap=cmap)
+    plot_fields(rf_on, rf_off, ax_on, ax_off, cbar_axes=ax_cbar, cmap=cmap)
 
-def plot_gaussian_fit(rf_data, ax_on, ax_off, cmap=DEFAULT_CMAP):
+def plot_gaussian_fit(rf_data, ax_on, ax_off, ax_cbar=None, cmap=DEFAULT_CMAP):
 
     gf_on_exists = 'gaussian_fit' in rf_data['on']
     gf_off_exists = 'gaussian_fit' in rf_data['off']
@@ -149,65 +153,81 @@ def plot_gaussian_fit(rf_data, ax_on, ax_off, cmap=DEFAULT_CMAP):
     img_data_off = rf_data['off']['gaussian_fit']['data'].sum(axis=0) if gf_off_exists else None
 
     if gf_on_exists and gf_off_exists:
-        plot_fields(img_data_on, img_data_off, ax_on, ax_off, cmap=cmap)
+        plot_fields(img_data_on, img_data_off, ax_on, ax_off, cbar_axes=ax_cbar, cmap=cmap)
     else:
         if gf_on_exists:
             img_data_off = np.zeros(img_data_on.shape)
         else:
             img_data_on = np.zeros(img_data_off.shape)
 
-        plot_fields(img_data_on, img_data_off, ax_on, ax_off, cmap=cmap)
+        plot_fields(img_data_on, img_data_off, ax_on, ax_off, cbar_axes=ax_cbar, cmap=cmap)
 
 def plot_receptive_field_data(rf, lsn, show=True, save_file_name=None, close=True, cmap=DEFAULT_CMAP):
     cell_index = rf['attrs']['cell_index']
 
-    # Prepare plotting figure:
-    number_of_major_rows = 7
-    fig = plt.figure(figsize=(4*1.9, number_of_major_rows*2))
-    gs = gridspec.GridSpec(number_of_major_rows*2,4)
+    # Prepare plotting figure:n
+    number_of_major_rows = 7 if lsn else 6
+    pwidth = 1.7
+    pheight = 1.0
+    fig = plt.figure(figsize=(pwidth*2.3, pheight*number_of_major_rows))
+    gsp = gridspec.GridSpec(number_of_major_rows, 3, width_ratios=[1,1,.1], right=0.9)
     ax_list = []
 
     # Plot chi-square summary:
-    curr_axes = fig.add_subplot(gs[0:2, 1:3])
+    row = 0
+    curr_axes = fig.add_subplot(gsp[row,:2])
+    cbar_axes = fig.add_subplot(gsp[row,-1])
     ax_list += [curr_axes]
-    plot_chi_square_summary(rf, ax=curr_axes, cmap=cmap)
+    plot_chi_square_summary(rf, ax=curr_axes, cax=cbar_axes, cmap=cmap)
 
     # MSR plot:
     if not lsn is None:
-        curr_on_axes = fig.add_subplot(gs[2:4, 0:2])
-        curr_off_axes = fig.add_subplot(gs[2:4, 2:4])
+        row += 1
+        curr_on_axes = fig.add_subplot(gsp[row, 0])
+        curr_off_axes = fig.add_subplot(gsp[row, 1])
+        cbar_axes = fig.add_subplot(gsp[row, 2])
         ax_list += [curr_on_axes, curr_off_axes]
-        plot_msr_summary(lsn, cell_index, curr_on_axes, curr_off_axes, cmap=cmap)
+        plot_msr_summary(lsn, cell_index, curr_on_axes, curr_off_axes, cbar_axes, cmap=cmap)
 
     # RTS no blur:
-    curr_on_axes = fig.add_subplot(gs[4:6, 0:2])
-    curr_off_axes = fig.add_subplot(gs[4:6, 2:4])
+    row += 1
+    curr_on_axes = fig.add_subplot(gsp[row, 0])
+    curr_off_axes = fig.add_subplot(gsp[row, 1])
+    cbar_axes = fig.add_subplot(gsp[row,2])
     ax_list += [curr_on_axes, curr_off_axes]
-    plot_rts_summary(rf, curr_on_axes, curr_off_axes, cmap=cmap)
+    plot_rts_summary(rf, curr_on_axes, curr_off_axes, cbar_axes, cmap=cmap)
 
     # RTS no blur:
-    curr_on_axes = fig.add_subplot(gs[6:8, 0:2])
-    curr_off_axes = fig.add_subplot(gs[6:8, 2:4])
+    row += 1
+    curr_on_axes = fig.add_subplot(gsp[row, 0])
+    curr_off_axes = fig.add_subplot(gsp[row, 1])
+    cbar_axes = fig.add_subplot(gsp[row,2])
     ax_list += [curr_on_axes, curr_off_axes]
-    plot_rts_blur_summary(rf, curr_on_axes, curr_off_axes, cmap=cmap)
+    plot_rts_blur_summary(rf, curr_on_axes, curr_off_axes, cbar_axes, cmap=cmap)
 
     # PValues:
-    curr_on_axes = fig.add_subplot(gs[8:10, 0:2])
-    curr_off_axes = fig.add_subplot(gs[8:10, 2:4])
+    row += 1
+    curr_on_axes = fig.add_subplot(gsp[row, 0])
+    curr_off_axes = fig.add_subplot(gsp[row, 1])
+    cbar_axes = fig.add_subplot(gsp[row,2])
     ax_list += [curr_on_axes, curr_off_axes]
-    plot_p_values(rf, curr_on_axes, curr_off_axes, cmap=cmap)
+    plot_p_values(rf, curr_on_axes, curr_off_axes, cbar_axes, cmap=cmap)
 
     # Mask:
-    curr_on_axes = fig.add_subplot(gs[10:12, 0:2])
-    curr_off_axes = fig.add_subplot(gs[10:12, 2:4])
+    row += 1
+    curr_on_axes = fig.add_subplot(gsp[row, 0])
+    curr_off_axes = fig.add_subplot(gsp[row, 1])
+    cbar_axes = fig.add_subplot(gsp[row,2])
     ax_list += [curr_on_axes, curr_off_axes]
-    plot_mask(rf, curr_on_axes, curr_off_axes, cmap=cmap)
+    plot_mask(rf, curr_on_axes, curr_off_axes, cbar_axes, cmap=cmap)
 
     # Gaussian fit:
-    curr_on_axes = fig.add_subplot(gs[12:14, 0:2])
-    curr_off_axes = fig.add_subplot(gs[12:14, 2:4])
+    row += 1
+    curr_on_axes = fig.add_subplot(gsp[row, 0])
+    curr_off_axes = fig.add_subplot(gsp[row, 1])
+    cbar_axes = fig.add_subplot(gsp[row,2])
     ax_list += [curr_on_axes, curr_off_axes]
-    plot_gaussian_fit(rf, curr_on_axes, curr_off_axes, cmap=cmap)
+    plot_gaussian_fit(rf, curr_on_axes, curr_off_axes, cbar_axes, cmap=cmap)
 
     # gs.tight_layout(fig)
 
