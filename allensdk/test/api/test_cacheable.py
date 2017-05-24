@@ -15,13 +15,12 @@
 
 
 import pytest
-from mock import MagicMock, patch
+from mock import MagicMock, patch, mock_open
 from allensdk.api.cache import Cache, cacheable
 from allensdk.api.queries.rma_api import RmaApi
 import allensdk.core.json_utilities as ju
 import pandas as pd
 import pandas.io.json as pj
-from mock.mock import mock_open
 from six.moves import builtins
 from allensdk.config.manifest import Manifest
 
