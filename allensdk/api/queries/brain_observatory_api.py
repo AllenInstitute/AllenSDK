@@ -373,6 +373,7 @@ class BrainObservatoryApi(RmaTemplate):
     def filter_cell_specimens(self, cell_specimens,
                               ids=None,
                               experiment_container_ids=None,
+                              include_failed=False,
                               filters=None):
         """
         Filter a list of cell specimen records returned from the get_cell_metrics method according 
@@ -389,12 +390,19 @@ class BrainObservatoryApi(RmaTemplate):
         experiment_container_ids: list of integers
             Return only records for cells that belong to experiment container ids in this list
 
+        include_failed: bool
+            Whether to include cells from failed experiment containers
+
         filters: list of dicts
             Custom query used to reproduce filter sets created in the Allen Brain Observatory
             web application.  The general form is a list of dictionaries each of which
             describes a filtering operation based on a metric.  For more information, see
             dataframe_query.  
         """
+
+        if not include_failed:
+            cell_specimens = [c for c in cell_specimens if not c.get(
+                    'failed_experiment_container', False)]
 
         if ids is not None:
             cell_specimens = [c for c in cell_specimens if c[

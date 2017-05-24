@@ -318,6 +318,7 @@ class BrainObservatoryCache(Cache):
                            file_name=None,
                            ids=None,
                            experiment_container_ids=None,
+                           include_failed=False,
                            simple=True,
                            filters=None):
         """ Return cell specimens that have certain properies.
@@ -334,6 +335,9 @@ class BrainObservatoryCache(Cache):
 
         experiment_container_ids: list
             List of experiment container ids.
+
+        include_failed: bool
+            Whether to include cells from failed experiment containers
 
         simple: boolean
             Whether or not to simplify the dictionary properties returned by this method
@@ -365,6 +369,7 @@ class BrainObservatoryCache(Cache):
         cell_specimens = self.api.filter_cell_specimens(cell_specimens,
                                                         ids=ids,
                                                         experiment_container_ids=experiment_container_ids,
+                                                        include_failed=include_failed,
                                                         filters=filters)
 
         # drop the thumbnail columns
