@@ -28,7 +28,7 @@ import os
 
 @pytest.fixture
 def boc():
-    boc =  BrainObservatoryCache(manifest_file='boc/manifest.json')
+    boc =  BrainObservatoryCache(manifest_file='boc/manifest.json', base_uri='http://testwarehouse:9000')
     
     return boc
 
@@ -43,7 +43,7 @@ def test_brain_observatory_trace_analysis_notebook(boc):
     
     cell_loc = np.argwhere(specimen_ids==specimen_id)[0][0]
 
-    assert cell_loc == 46
+    assert cell_loc == 97
     
     # temporal frequency plot
     response = dg.response[:,1:,cell_loc,0]
@@ -56,17 +56,17 @@ def test_brain_observatory_trace_analysis_notebook(boc):
     # trials for cell's preferred condition
     pref_ori = dg.orivals[dg.peak.ori_dg[cell_loc]]
     pref_tf = dg.tfvals[dg.peak.tf_dg[cell_loc]]
-    assert pref_ori == 270  
-    assert pref_tf == 1
+    assert pref_ori == 180
+    assert pref_tf == 2
 
     pref_trials = dg.stim_table[(dg.stim_table.orientation==pref_ori)&(dg.stim_table.temporal_frequency==pref_tf)]
-    assert pref_trials.loc[3,'start'] == 1017
-    assert pref_trials.loc[3,'end'] == 1076
+    assert pref_trials.loc[1,'start'] == 836
+    assert pref_trials.loc[1,'end'] == 896
 
     # mean sweep response
     subset = dg.sweep_response[(dg.stim_table.orientation==pref_ori)&(dg.stim_table.temporal_frequency==pref_tf)]
     subset_mean = dg.mean_sweep_response[(dg.stim_table.orientation==pref_ori)&(dg.stim_table.temporal_frequency==pref_tf)]
-    assert np.isclose(subset_mean.loc[3,'dx'], 4.130509)
+    assert np.isclose(subset_mean.loc[1,'dx'], 0.920868)
 
     # response to each trial
     trial_timestamps = np.arange(-1*dg.interlength, dg.interlength+dg.sweeplength, 1.)/dg.acquisition_rate
@@ -79,8 +79,8 @@ def test_brain_observatory_static_gratings_notebook(boc):
     sg = StaticGratings(data_set)
 
     peak_head = sg.peak.head()
-    assert peak_head.loc[0,'cell_specimen_id'] == 517399193
-    assert np.isclose(peak_head.loc[0,'duration_sg'], 0.03317)
+    assert peak_head.loc[0,'cell_specimen_id'] == 517399188
+    assert np.isclose(peak_head.loc[0,'reliability_sg'], 0.0113189)
 
 
 @pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
@@ -90,8 +90,8 @@ def test_brain_observatory_natural_scenes_notebook(boc):
     ns = NaturalScenes(data_set)
     ns_head = ns.peak.head()
     
-    assert np.isclose(ns_head.loc[0,'peak_dff_ns'], 4.22083)
-    assert ns_head.loc[0,'cell_specimen_id'] == 517399193
+    assert np.isclose(ns_head.loc[0,'peak_dff_ns'], 4.91692)
+    assert ns_head.loc[0,'cell_specimen_id'] == 517399188
 
 @pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
                     reason="partial testing")
@@ -121,14 +121,13 @@ def test_brain_observatory_experiment_containers_notebook(boc):
     stims = boc.get_all_stimuli()
     cre_lines = boc.get_all_cre_lines()
     cux2_ecs = boc.get_experiment_containers(cre_lines=['Cux2-CreERT2'])
-    cux2_ec_id = cux2_ecs[0]['id']
+    cux2_ec_id = cux2_ecs[-1]['id']
     exps = boc.get_ophys_experiments(experiment_container_ids=[cux2_ec_id])
-    cux2_ec_id = cux2_ecs[0]['id']
     exp = boc.get_ophys_experiments(experiment_container_ids=[cux2_ec_id], 
                                     stimuli=[stim_info.STATIC_GRATINGS])[0]
     exp = boc.get_ophys_experiment_data(exp['id'])
 
-    assert set(depths) == set([175, 250, 275, 335, 350, 375])
+    assert set(depths) == set([175, 265, 275, 300, 320, 325, 335, 350, 365, 375, 435])
     expected_stimuli = ['drifting_gratings',
                         'locally_sparse_noise',
                         'locally_sparse_noise_4deg',
@@ -243,7 +242,7 @@ def test_brain_observatory_experiment_containers_notebook(boc):
         cell_specimen_ids=[csid])
     
     # Running Speed and Motion Correction
-    data_set = boc.get_ophys_experiment_data(501940850)
+    data_set = boc.get_ophys_experiment_data(512326618)
     dxcm, dxtime = data_set.get_running_speed()
     mc = data_set.get_motion_correction()
 

@@ -58,13 +58,13 @@ def mock_containers():
 
 @pytest.fixture
 def mock_ophys_experiments():
-    containers = [
+    experiments = [
         {'experiment_container_id': 1,
          'targeted_structure': {'acronym': 'CBS'},
          'imaging_depth': 100,
          'specimen': {'donor': {
              'transgenic_lines': [{'name': 'Shiny'}]}},
-         'stimulus_name': 'three_session_B'
+         'stimulus_name': 'three_session_B',
          },
         {'experiment_container_id': 2,
          'targeted_structure': {'acronym': 'NBC'},
@@ -75,7 +75,7 @@ def mock_ophys_experiments():
          }
     ]
 
-    return containers
+    return experiments
 
 
 @pytest.fixture
@@ -85,10 +85,12 @@ def mock_specimens():
          "cell_specimen_id": 517394843
          },
         {"experiment_container_id": 511498742,
-         "cell_specimen_id": 517398740
+         "cell_specimen_id": 517398740,
+         "failed_experiment_container": False
          },
-        {"experiment_container_id": 511498500,
-         "cell_specimen_id": 517394874
+        {"experiment_container_id": 511498501,
+         "cell_specimen_id": 517394874,
+         "failed_experiment_container": True
          }
     ]
     return specimens
@@ -266,8 +268,11 @@ def test_filter_ophys_experiments_stimuli(bo_api, mock_ophys_experiments):
 
 
 def test_filter_cell_specimens(bo_api, mock_specimens):
-    specimens = bo_api.filter_cell_specimens(mock_specimens)
+    specimens = bo_api.filter_cell_specimens(mock_specimens, include_failed=True)
     assert specimens == mock_specimens
+
+    specimens = bo_api.filter_cell_specimens(mock_specimens)
+    assert len(specimens) == 2
 
     specimens = bo_api.filter_cell_specimens(
         mock_specimens, ids=[mock_specimens[0]['cell_specimen_id']])
