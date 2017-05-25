@@ -87,7 +87,16 @@ def mock_ophys_experiments():
          'imaging_depth': 200,
          'specimen': {'donor': {
              'transgenic_lines': [{'name': 'Don'}]}},
-         'stimulus_name': 'three_session_C'
+         'stimulus_name': 'three_session_C',
+         'experiment_container': { 'failed': False }
+         },
+        {'experiment_container_id': 2,
+         'targeted_structure': {'acronym': 'NBC'},
+         'imaging_depth': 200,
+         'specimen': {'donor': {
+             'transgenic_lines': [{'name': 'Don'}]}},
+         'stimulus_name': 'three_session_C',
+         'experiment_container': { 'failed': True }
          }
     ]
 
@@ -136,7 +145,7 @@ def test_get_ophys_experiments_one_id(bo_api):
     bo_api.json_msg_query.assert_called_once_with(
         "http://testwarehouse:9000/api/v2/data/query.json?q="
         "model::OphysExperiment,rma::criteria,[id$in502066273],"
-        "rma::include,"
+        "rma::include,experiment_container,"
         "well_known_files(well_known_file_type),targeted_structure,"
         "specimen(donor(age,transgenic_lines)),"
         "rma::options[num_rows$eq'all'][count$eqfalse]")

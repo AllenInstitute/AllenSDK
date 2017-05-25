@@ -50,7 +50,7 @@ class BrainObservatoryApi(RmaTemplate):
              'description': 'see name',
              'model': 'OphysExperiment',
              'criteria': '{% if ophys_experiment_ids is defined %}[id$in{{ ophys_experiment_ids }}]{%endif%}',
-             'include': 'well_known_files(well_known_file_type),targeted_structure,specimen(donor(age,transgenic_lines))',
+             'include': 'experiment_container,well_known_files(well_known_file_type),targeted_structure,specimen(donor(age,transgenic_lines))',
              'num_rows': 'all',
              'count': False,
              'criteria_params': ['ophys_experiment_ids']
@@ -347,7 +347,8 @@ class BrainObservatoryApi(RmaTemplate):
                                  imaging_depths=None,
                                  transgenic_lines=None,
                                  stimuli=None,
-                                 session_types=None):
+                                 session_types=None,
+                                 include_failed=False):
 
         # re-using the code from above
         experiments = self.filter_experiment_containers(experiments,
@@ -355,6 +356,10 @@ class BrainObservatoryApi(RmaTemplate):
                                                         targeted_structures=targeted_structures,
                                                         imaging_depths=imaging_depths,
                                                         transgenic_lines=transgenic_lines)
+
+        if not include_failed:
+            experiments = [e for e in experiments 
+                           if not e.get('experiment_container',{}).get('failed', False)]
 
         if experiment_container_ids is not None:
             experiments = [e for e in experiments if e[
