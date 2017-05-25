@@ -16,7 +16,7 @@
 
 from allensdk.api.queries.brain_observatory_api import BrainObservatoryApi
 import pytest
-from mock import patch, MagicMock
+from mock import patch, MagicMock, call
 from collections import Counter
 
 
@@ -26,6 +26,22 @@ def bo_api():
     bo.json_msg_query = MagicMock(name='json_msg_query')
 
     return bo
+
+
+@pytest.fixture
+def bo_api5():
+    rows_per_message = 2000
+    num_messages = 5
+    _msg = [{'whatever': True}] * rows_per_message
+    import allensdk.core.json_utilities as ju
+    ju.read_url_get = MagicMock(name='json_msg_query',
+                                side_effect = [{'msg': _msg}] * num_messages)
+
+    from allensdk.api.queries.brain_observatory_api import BrainObservatoryApi
+    bo = BrainObservatoryApi('http://testwarehouse:9000')
+
+    return { 'read_url_get': ju.read_url_get,
+             'bo': bo }
 
 
 @pytest.fixture
@@ -58,13 +74,13 @@ def mock_containers():
 
 @pytest.fixture
 def mock_ophys_experiments():
-    containers = [
+    experiments = [
         {'experiment_container_id': 1,
          'targeted_structure': {'acronym': 'CBS'},
          'imaging_depth': 100,
          'specimen': {'donor': {
              'transgenic_lines': [{'name': 'Shiny'}]}},
-         'stimulus_name': 'three_session_B'
+         'stimulus_name': 'three_session_B',
          },
         {'experiment_container_id': 2,
          'targeted_structure': {'acronym': 'NBC'},
@@ -75,7 +91,7 @@ def mock_ophys_experiments():
          }
     ]
 
-    return containers
+    return experiments
 
 
 @pytest.fixture
@@ -85,10 +101,12 @@ def mock_specimens():
          "cell_specimen_id": 517394843
          },
         {"experiment_container_id": 511498742,
-         "cell_specimen_id": 517398740
+         "cell_specimen_id": 517398740,
+         "failed_experiment_container": False
          },
-        {"experiment_container_id": 511498500,
-         "cell_specimen_id": 517394874
+        {"experiment_container_id": 511498501,
+         "cell_specimen_id": 517394874,
+         "failed_experiment_container": True
          }
     ]
     return specimens
@@ -193,31 +211,46 @@ def test_get_stimulus_mappings_two_ids(bo_api):
 
 
 def test_get_cell_metrics_no_ids(bo_api):
-    bo_api.get_cell_metrics()
+    list(bo_api.get_cell_metrics())
     bo_api.json_msg_query.assert_called_once_with(
         "http://testwarehouse:9000/api/v2/data/query.json?q="
         "model::ApiCamCellMetric,"
-        "rma::options[num_rows$eq'all'][count$eqfalse]")
+        "rma::options[num_rows$eq2000][start_row$eq0][count$eqfalse]")
 
 
 def test_get_cell_metrics_one_ids(bo_api):
     tid = 517394843
-    bo_api.get_cell_metrics(cell_specimen_ids=tid)
+    list(bo_api.get_cell_metrics(cell_specimen_ids=tid))
     bo_api.json_msg_query.assert_called_once_with(
         "http://testwarehouse:9000/api/v2/data/query.json?q="
         "model::ApiCamCellMetric,"
         "rma::criteria,[cell_specimen_id$in517394843],"
-        "rma::options[num_rows$eq'all'][count$eqfalse]")
+        "rma::options[num_rows$eq2000][start_row$eq0][count$eqfalse]")
 
 
 def test_get_cell_metrics_two_ids(bo_api):
     ids = [517394843, 517394850]
-    bo_api.get_cell_metrics(cell_specimen_ids=ids)
+    res = list(bo_api.get_cell_metrics(cell_specimen_ids=ids))
     bo_api.json_msg_query.assert_called_once_with(
         "http://testwarehouse:9000/api/v2/data/query.json?q="
         "model::ApiCamCellMetric,"
         "rma::criteria,[cell_specimen_id$in517394843,517394850],"
-        "rma::options[num_rows$eq'all'][count$eqfalse]")
+        "rma::options[num_rows$eq2000][start_row$eq0][count$eqfalse]")
+
+
+def test_get_cell_metrics_five_messages(bo_api5):
+    ids = [517394843, 517394850]
+    list(bo_api5['bo'].get_cell_metrics(cell_specimen_ids=ids))
+
+    base_query = \
+       ('http://testwarehouse:9000/api/v2/data/query.json?q='
+        'model::ApiCamCellMetric,'
+        'rma::criteria,%5Bcell_specimen_id$in517394843,517394850%5D,'
+        'rma::options%5Bnum_rows$eq2000%5D%5Bstart_row$eq{}%5D%5Bcount$eqfalse%5D')
+    expected_calls = map(lambda c: call(base_query.format(c)),
+                         [0, 2000, 4000, 6000, 8000, 10000])
+
+    assert bo_api5['read_url_get'].call_args_list == expected_calls
 
 
 def test_filter_experiment_containers_no_filters(bo_api, mock_containers):
@@ -266,8 +299,11 @@ def test_filter_ophys_experiments_stimuli(bo_api, mock_ophys_experiments):
 
 
 def test_filter_cell_specimens(bo_api, mock_specimens):
-    specimens = bo_api.filter_cell_specimens(mock_specimens)
+    specimens = bo_api.filter_cell_specimens(mock_specimens, include_failed=True)
     assert specimens == mock_specimens
+
+    specimens = bo_api.filter_cell_specimens(mock_specimens)
+    assert len(specimens) == 2
 
     specimens = bo_api.filter_cell_specimens(
         mock_specimens, ids=[mock_specimens[0]['cell_specimen_id']])

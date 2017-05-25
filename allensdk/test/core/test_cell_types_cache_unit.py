@@ -18,7 +18,8 @@ from allensdk.core.cell_types_cache import ReporterStatus as RS
 import pytest
 from pandas.core.frame import DataFrame
 from allensdk.config import enable_console_log
-from mock import Mock, MagicMock, patch, call
+from mock import MagicMock, patch, call, mock_open
+from six.moves import builtins
 import itertools as it
 import allensdk.core.json_utilities as ju
 import pandas.io.json as pj
@@ -454,14 +455,17 @@ def test_get_ephys_features_with_api(cache_fixture,
     mock_data = [{'lorem': 1,
                   'ipsum': 2 },
                  {'lorem': 3,
-                  'imsum': 4 }]
+                  'ipsum': 4 }]
 
     with patch('allensdk.api.queries.cell_types_api.CellTypesApi.model_query',
                MagicMock(name='model query',
                          return_value=mock_data)) as query_mock:
         with patch('os.path.exists', MagicMock(return_value=path_exists)) as ope:
-            with patch('allensdk.config.manifest.Manifest.safe_make_parent_dirs') as mkd:
-                _ = ctc.get_ephys_features(dataframe=df)
+            with patch(builtins.__name__ + '.open',
+                       mock_open(),
+                       create=True) as open_mock:
+                with patch('allensdk.config.manifest.Manifest.safe_make_parent_dirs') as mkd:
+                    _ = ctc.get_ephys_features(dataframe=df)
 
     if path_exists:
         DataFrame.from_csv.assert_called_once_with(_MOCK_PATH)
@@ -484,11 +488,14 @@ def test_get_morphology_features(cache_fixture,
     
     with patch('os.path.exists', MagicMock(return_value=path_exists)) as ope:
         with patch('allensdk.config.manifest.Manifest.safe_make_parent_dirs') as mkd:
-            with patch('allensdk.api.queries.cell_types_api.CellTypesApi.model_query',
-                       MagicMock(name='model query',
-                                 return_value=json_data)) as query_mock:
-                data = ctc.get_morphology_features(df,
-                                                   _MOCK_PATH)
+            with patch(builtins.__name__ + '.open',
+                       mock_open(),
+                       create=True) as open_mock:
+                with patch('allensdk.api.queries.cell_types_api.CellTypesApi.model_query',
+                           MagicMock(name='model query',
+                                     return_value=json_data)) as query_mock:
+                    data = ctc.get_morphology_features(df,
+                                                       _MOCK_PATH)
 
     if df:
         assert ('stuff' in data) == True
@@ -581,9 +588,12 @@ def test_get_all_features(mock_merge,
                 with patch('allensdk.config.manifest.Manifest.safe_make_parent_dirs'):
                     with patch('allensdk.core.json_utilities.read',
                                return_value=return_dicts) as ju_read:
-                        with patch('allensdk.core.json_utilities.write') as ju_write:
-                            _ = ctc.get_all_features(
-                                require_reconstruction=require_reconstruction)
+                        with patch(builtins.__name__ + '.open',
+                                   mock_open(),
+                                   create=True) as open_mock:
+                            with patch('allensdk.core.json_utilities.write') as ju_write:
+                                _ = ctc.get_all_features(
+                                    require_reconstruction=require_reconstruction)
 
     if path_exists:
         assert DataFrame.from_csv.called
