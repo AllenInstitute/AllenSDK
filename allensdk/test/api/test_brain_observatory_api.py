@@ -356,7 +356,7 @@ def test_get_cell_specimen_id_mapping(bo_api_save_ophys):
     with patch('pandas.read_csv') as readcsv:
         bo_api.retrieve_file_over_http = \
             MagicMock(name='retrieve_file_over_http')
-        bo_api.get_cell_specimen_id_mapping('/path/to/filename')
+        bo_api.get_cell_specimen_id_mapping('/path/to/filename', 1)
 
         readcsv.assert_called_once_with('/path/to/filename')
 
@@ -364,7 +364,7 @@ def test_get_cell_specimen_id_mapping(bo_api_save_ophys):
         "http://testwarehouse:9000/api/v2/data/query.json?q="
         "model::WellKnownFile,"
         "rma::criteria,"
-        "well_known_file_type[name$eqOphysCellSpecimenIdMapping],"
+        "[id$eq1],well_known_file_type[name$eqOphysCellSpecimenIdMapping],"
         "rma::options[num_rows$eq'all'][count$eqfalse]")
     bo_api.retrieve_file_over_http.assert_called_with(
         'http://testwarehouse:9000/url/path/to/file',

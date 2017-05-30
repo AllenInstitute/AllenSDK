@@ -27,6 +27,7 @@ class BrainObservatoryApi(RmaTemplate):
     _log = logging.getLogger('allensdk.api.queries.brain_observatory_api')
 
     NWB_FILE_TYPE = 'NWBOphys'
+    CELL_MAPPING_ID = 590985414
 
     rma_templates = \
         {"brain_observatory_queries": [
@@ -112,9 +113,10 @@ class BrainObservatoryApi(RmaTemplate):
             {'name': 'cell_specimen_id_mapping_table',
              'description': 'see name',
              'model': 'WellKnownFile',
-             'criteria': 'well_known_file_type[name$eqOphysCellSpecimenIdMapping]',
+             'criteria': '[id$eq{{ mapping_table_id }}],well_known_file_type[name$eqOphysCellSpecimenIdMapping]',
              'num_rows': 'all',
-             'count': False}
+             'count': False,
+             'criteria_params': ['mapping_table_id']}
         ]}
 
     _QUERY_TEMPLATES = {
@@ -493,26 +495,31 @@ class BrainObservatoryApi(RmaTemplate):
 
         return result
 
-    def get_cell_specimen_id_mapping(self, file_name):
+    def get_cell_specimen_id_mapping(self, file_name, mapping_table_id=None):
         '''Download mapping table from old to new cell specimen IDs.
 
-        The mapping table is a CSV file that maps cell specimen ids from
-        the Brain Observatory pipeline version 1.0 to new ids that were
-        generated during reprocessing in pipeline version 2.0, if
-        applicable.
+        The mapping table is a CSV file that maps cell specimen ids
+        that have changed between processing runs of the Brain
+        Observatory pipeline.
 
         Parameters
         ----------
         file_name : string
             Filename to save locally.
+        mapping_table_id : integer
+            ID of the mapping table file. Defaults to the most recent
+            mapping table. 
 
         Returns
         -------
         pandas.DataFrame
             Mapping table as a DataFrame.
         '''
+        if mapping_table_id is None:
+            mapping_table_id = self.CELL_MAPPING_ID
         data = self.template_query('brain_observatory_queries',
-                                   'cell_specimen_id_mapping_table')
+                                   'cell_specimen_id_mapping_table',
+                                   mapping_table_id=mapping_table_id)
 
         try:
             file_url = data[0]['download_link']
