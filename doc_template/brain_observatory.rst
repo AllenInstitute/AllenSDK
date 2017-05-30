@@ -60,7 +60,7 @@ started with the available data:
 The code used to analyze and visualize data in the `Allen Brain Observatory data portal <http://observatory.brain-map.org/visualcoding>`_ 
 is available as part of the SDK.  Take a look at this `Jupyter notebook <_static/examples/nb/brain_observatory_analysis.html>`_ to find out how to:
 
-    - `Plot cell's response to it s preferred stimulus condition <_static/examples/nb/brain_observatory_analysis.html#Drifting-Gratings>`_    
+    - `Plot cell's response to its preferred stimulus condition <_static/examples/nb/brain_observatory_analysis.html#Drifting-Gratings>`_    
     - `Compute a cell's on/off receptive field based on the locally sparse noise stimulus <_static/examples/nb/receptive_fields.html>`_ 
 
 More detailed documentation is available demonstrating how to: 
