@@ -108,7 +108,13 @@ class BrainObservatoryApi(RmaTemplate):
              'model': 'ApiCamCellMetric',
              'criteria': '{% if cell_specimen_ids is defined %}[cell_specimen_id$in{{ cell_specimen_ids }}]{%endif%}',
              'criteria_params': ['cell_specimen_ids']
-             }
+             },
+            {'name': 'cell_specimen_id_mapping_table',
+             'description': 'see name',
+             'model': 'WellKnownFile',
+             'criteria': 'well_known_file_type[name$eqOphysCellSpecimenIdMapping]',
+             'num_rows': 'all',
+             'count': False}
         ]}
 
     _QUERY_TEMPLATES = {
@@ -486,3 +492,32 @@ class BrainObservatoryApi(RmaTemplate):
                   in result_keys]
 
         return result
+
+    def get_cell_specimen_id_mapping(self, file_name):
+        '''Download mapping table from old to new cell specimen IDs.
+
+        The mapping table is a CSV file that maps cell specimen ids from
+        the Brain Observatory pipeline version 1.0 to new ids that were
+        generated during reprocessing in pipeline version 2.0, if
+        applicable.
+
+        Parameters
+        ----------
+        file_name : string
+            Filename to save locally.
+
+        Returns
+        -------
+        pandas.DataFrame
+            Mapping table as a DataFrame.
+        '''
+        data = self.template_query('brain_observatory_queries',
+                                   'cell_specimen_id_mapping_table')
+
+        try:
+            file_url = data[0]['download_link']
+        except Exception as _:
+            raise Exception("No OphysCellSpecimenIdMapping file found.")
+
+        self.retrieve_file_over_http(self.api_url + file_url, file_name)
+        return pd.read_csv(file_name)
