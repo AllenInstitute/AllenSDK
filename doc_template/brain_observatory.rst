@@ -54,8 +54,9 @@ started with the available data:
     - `Find cells with specific response properties, like direction tuning <_static/examples/nb/brain_observatory.html#Find-Cells-of-Interest>`_
     - `Download data for an experiment <_static/examples/nb/brain_observatory.html#Download-Experiment-Data-for-a-Cell>`_
     - `Plot raw fluorescences traces, neuropil-corrected traces, and dF/F <_static/examples/nb/brain_observatory.html#Fluorescence-Traces>`_
-    - `Find the ROI mask for a given cell <_static/examples/nb/brain_observatory.html#ROI-Masks>`_    
+    - `Find the ROI mask for a given cell <_static/examples/nb/brain_observatory.html#ROI-Masks>`_
     - `Run neuropil correction <_static/examples/nb/brain_observatory.html#Neuropil-Correction>`_
+    - `Get pupil location and size <_static/examples/nb/brain_observatory.html#Eye-Tracking>`_
 
 The code used to analyze and visualize data in the `Allen Brain Observatory data portal <http://observatory.brain-map.org/visualcoding>`_ 
 is available as part of the SDK.  Take a look at this `Jupyter notebook <_static/examples/nb/brain_observatory_analysis.html>`_ to find out how to:
@@ -66,7 +67,8 @@ is available as part of the SDK.  Take a look at this `Jupyter notebook <_static
 More detailed documentation is available demonstrating how to: 
 
     - `Read and visualize the stimulus presentation tables in the NWB files <_static/examples/nb/brain_observatory_stimuli.html>`_
-    - `Understand the layout of Brain Observatory NWB files <brain_observatory_nwb.html>`_ 
+    - `Understand the layout of Brain Observatory NWB files <brain_observatory_nwb.html>`_
+    - `Map previous cell specimen IDs to current cell specimen IDs <_static/examples/nb/cell_specimen_mapping.html>`_
 
 Precomputed Cell Metrics
 ------------------------
