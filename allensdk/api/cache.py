@@ -21,18 +21,21 @@ import functools
 import os
 from allensdk.deprecated import deprecated
 
+from functools import wraps
+
 def memoize(f):
-    """ Memoization decorator for a function taking one or more arguments. """
-    class memodict(dict):
-        def __getitem__(self, *key, **kwargs):
-            return dict.__getitem__(self, (key, tuple(kwargs.items())))
+   memodict = dict()
 
-        def __missing__(self, key):
+   @wraps(f)
+   def wrapper(*args, **kwargs):
+       key = (args, tuple(kwargs.items()))
 
-            ret = self[key] = f(*key[0], **dict(key[1]))
-            return ret
+       if key not in memodict:
+           memodict[key] = f(*args, **kwargs)
 
-    return memodict().__getitem__
+       return memodict[key]
+
+   return wrapper
 
 class Cache(object):
     def __init__(self,
