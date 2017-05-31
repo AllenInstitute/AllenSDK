@@ -101,7 +101,9 @@ The cell specimens table now has a large number of new features.  Read the `tech
 Code changes include:
     * a new receptive field analysis module (:py:mod:`~allensdk.brain_observatory.receptive_field_analysis`)
     * a trace demixing algorithm (:py:mod:`~allensdk.brain_observatory.demixer`)
-    * a new convenience method: :py:mod:`~allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiment_stimuli`
+    * a new convenience method: :py:meth:`~allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiment_stimuli`
+    * a new method to get the cell specimen mapping table: :py:meth:`allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.get_cell_specimen_id_mapping`
+    * new methods :py:meth:`allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_pupil_location` and :py:meth:`allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_pupil_size` to get pupil position and size for experiments with eye tracking data.
     * :py:meth:`~allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiments` accepts a list of ``cell_specimen_ids`` as an additional filter
     * :py:meth:`~allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiments` returns "acquisition_age_days" instead of "age_days".  The new field describes the age of the animal on the day of experiment acquisition.
     * :py:meth:`~allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_experiment_containers` no longer returns "age_days".
