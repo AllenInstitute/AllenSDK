@@ -161,6 +161,7 @@ class DriftingGratings(StimulusAnalysis):
             null = self.response[np.mod(prefori + 4, 8), preftf, nc, 0]
 
             tuning = self.response[:, preftf, nc, 0]
+            tuning = np.where(tuning>0, tuning, 0)
             #new circular variance below
             CV_top_os = np.empty((8), dtype=np.complex128)
             CV_top_ds = np.empty((8), dtype=np.complex128)

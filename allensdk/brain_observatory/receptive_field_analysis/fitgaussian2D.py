@@ -1,21 +1,22 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Sep 25 15:37:12 2013
-Using code primarily from here: https://gist.github.com/andrewgiessel/6122739
-with some modifications.
-
-@author: saskiad
-"""
+# Copyright 2017 Allen Institute for Brain Science
+# This file is part of Allen SDK.
+#
+# Allen SDK is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 3 of the License.
+#
+# Allen SDK is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy as np
 from scipy import optimize
 
-class GaussianFitError(RuntimeError):
-
-    def __init__(self, *args, **kwargs):
-        super(GaussianFitError, self).__init__(*args, **kwargs)
-
-
+class GaussianFitError(RuntimeError): pass
 
 def gaussian2D(height, center_x, center_y, width_x, width_y, rotation):
     width_x = float(width_x)
@@ -76,21 +77,21 @@ def moments2(data):
     # import sys
     # sys.exit()
 
-    return height, y, x, width_y, width_x, 0.0    
+    return height, y, x, width_y, width_x, None
     
 def fitgaussian2D(data):
-
     params = moments2(data)
     def errorfunction(p):
-        p2 = np.array([p[0], params[1], params[2], np.abs(p[3]), np.abs(p[4]), p[5]])
+        p2 = np.array([p[0], params[1], params[2], np.abs(p[1]), np.abs(p[2]), p[3]])
+
 
         val = np.ravel(gaussian2D(*p2)(*np.indices(data.shape)) - data)
 
         return (val**2).sum()
 
-    res = optimize.minimize(errorfunction, params)
+    res = optimize.minimize(errorfunction, [ params[0], params[3], params[4], 0.0 ], method='Nelder-Mead', options={'maxfev':2500})
     p = res.x
-    p2 = np.array([p[0], p[1], p[2], np.abs(p[3]), np.abs(p[4]), p[5]])
+    p2 = np.array([p[0], params[1], params[2], np.abs(p[1]), np.abs(p[2]), p[3]])
     success = res.success
     if not success and res.status != 2: # Status 2 is loss of precision; might need to handle this separately instead of passing...
         print success

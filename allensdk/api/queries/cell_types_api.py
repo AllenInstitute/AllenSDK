@@ -162,7 +162,8 @@ class CellTypesApi(RmaApi):
             num_rows='all')
 
     @cacheable(strategy='create',
-               pathfinder=Cache.pathfinder(file_name_position=2))
+               pathfinder=Cache.pathfinder(file_name_position=2,
+                                           path_keyword='file_name'))
     def save_ephys_data(self, specimen_id, file_name):
         """
         Save the electrophysology recordings for a cell as an NWB file.

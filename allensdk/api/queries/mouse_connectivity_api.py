@@ -47,7 +47,8 @@ class MouseConnectivityApi(RmaApi):
 
     @cacheable(strategy='create',
                reader=nrrd.read,
-               pathfinder=Cache.pathfinder(file_name_position=3))
+               pathfinder=Cache.pathfinder(file_name_position=3,
+                                           path_keyword='file_name'))
     def download_annotation_volume(self,
                                    ccf_version,
                                    resolution,
@@ -77,7 +78,8 @@ class MouseConnectivityApi(RmaApi):
 
     @cacheable(strategy='create',
                reader=nrrd.read,
-               pathfinder=Cache.pathfinder(file_name_position=2))
+               pathfinder=Cache.pathfinder(file_name_position=2,
+                                           path_keyword='file_name'))
     def download_template_volume(self, resolution, file_name):
         '''
         Download the registration template volume at a particular resolution.
@@ -555,25 +557,29 @@ class MouseConnectivityApi(RmaApi):
             count=False)
 
     @cacheable(strategy='create', 
-               pathfinder=Cache.pathfinder(file_name_position=1))
+               pathfinder=Cache.pathfinder(file_name_position=1,
+                                           path_keyword='path'))
     def download_injection_density(self, path, experiment_id, resolution):
         GridDataApi(base_uri=self.api_url).download_projection_grid_data(
             experiment_id, [GridDataApi.INJECTION_DENSITY], resolution, path)
 
     @cacheable(strategy='create', 
-               pathfinder=Cache.pathfinder(file_name_position=1))
+               pathfinder=Cache.pathfinder(file_name_position=1,
+                                           path_keyword='path'))
     def download_projection_density(self, path, experiment_id, resolution):
         GridDataApi(base_uri=self.api_url).download_projection_grid_data(
             experiment_id, [GridDataApi.PROJECTION_DENSITY], resolution, path)
 
     @cacheable(strategy='create', 
-               pathfinder=Cache.pathfinder(file_name_position=1))
+               pathfinder=Cache.pathfinder(file_name_position=1,
+                                           path_keyword='path'))
     def download_injection_fraction(self, path, experiment_id, resolution):
         GridDataApi(base_uri=self.api_url).download_projection_grid_data(
             experiment_id, [GridDataApi.INJECTION_FRACTION], resolution, path)
 
     @cacheable(strategy='create', 
-               pathfinder=Cache.pathfinder(file_name_position=1))
+               pathfinder=Cache.pathfinder(file_name_position=1,
+                                           path_keyword='path'))
     def download_data_mask(self, path, experiment_id, resolution):
         GridDataApi(base_uri=self.api_url).download_projection_grid_data(
             experiment_id, [GridDataApi.DATA_MASK], resolution, path)

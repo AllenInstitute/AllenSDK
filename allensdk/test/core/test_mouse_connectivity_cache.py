@@ -20,26 +20,26 @@ import numpy as np
 import nrrd
 import pandas as pd
 
+
 from allensdk.core.mouse_connectivity_cache import MouseConnectivityCache
 from allensdk.core.structure_tree import StructureTree
-
 from allensdk.test_utilities.temp_dir import fn_temp_dir
 
 
-@pytest.fixture(scope='function')    
+@pytest.fixture(scope='function')
 def mcc(fn_temp_dir):
 
     manifest_path = os.path.join(fn_temp_dir, 'manifest.json')
     return MouseConnectivityCache(manifest_file=manifest_path)
-    
-    
+
+
 @pytest.fixture(scope='function')
 def new_nodes():
 
     return [{'id': 0, 'structure_id_path': '/0/', 
              'color_hex_triplet': '000000', 'acronym': 'rt', 
              'name': 'root', 'structure_sets':[{'id': 1}, {'id': 4}]}]
-             
+
 
 @pytest.fixture(scope='function')
 def old_nodes():
@@ -47,16 +47,16 @@ def old_nodes():
     return [{'id': 0, 'structure_id_path': '/0/', 
              'color_hex_triplet': '000000', 'acronym': 'rt', 
              'name': 'root', 'parent_structure_id': 12}]
-             
-             
+
+
 @pytest.fixture(scope='function')
 def experiments():
 
     return [{'num-voxels': 100, 'injection-volume': 99, 'sum': 98, 
              'name': 'foo', 'transgenic-line': 'most_creish', 
              'structure-id': 97,}]
-             
-             
+
+
 @pytest.fixture(scope='function')
 def unionizes():
 
@@ -83,14 +83,14 @@ def unionizes():
              "sum_pixel_intensity": 261941000.0, "sum_pixels": 7198050.0,
              "sum_projection_pixel_intensity": 14114200.0,
              "sum_projection_pixels": 120934.0, "volume": 0.0881761}]
-    
-    
+
+
 def test_init(mcc, fn_temp_dir):
 
     manifest_path = os.path.join(fn_temp_dir, 'manifest.json')
     assert( os.path.exists(manifest_path) )
-    
-    
+
+
 def test_get_annotation_volume(mcc, fn_temp_dir):
 
     eye = np.eye(100)
@@ -99,15 +99,15 @@ def test_get_annotation_volume(mcc, fn_temp_dir):
 
     mcc.api.retrieve_file_over_http = lambda a, b: nrrd.write(b, eye)
     obtained, _ = mcc.get_annotation_volume()
-    
+
     mcc.api.retrieve_file_over_http = mock.MagicMock()
     mcc.get_annotation_volume()
-    
+
     mcc.api.retrieve_file_over_http.assert_not_called()
     assert( np.allclose(obtained, eye) ) 
     assert( os.path.exists(path) )
-    
-    
+
+
 def test_get_template_volume(mcc, fn_temp_dir):
 
     eye = np.eye(100)
@@ -115,112 +115,112 @@ def test_get_template_volume(mcc, fn_temp_dir):
 
     mcc.api.retrieve_file_over_http = lambda a, b: nrrd.write(b, eye)
     obtained, _ = mcc.get_template_volume()
-    
+
     mcc.api.retrieve_file_over_http = mock.MagicMock()
     mcc.get_template_volume()
-    
+
     mcc.api.retrieve_file_over_http.assert_not_called()
     assert( np.allclose(obtained, eye) )            
     assert( os.path.exists(path) )
-    
-    
+
+
 def test_get_projection_density(mcc, fn_temp_dir):
 
     eye = np.eye(100)
     eid = 123456789
     path = os.path.join(fn_temp_dir, 'experiment_{0}'.format(eid), 
                         'projection_density_25.nrrd')
-                        
+
     with mock.patch('allensdk.api.queries.grid_data_api.GridDataApi.'
                     'retrieve_file_over_http', 
                     new=lambda a, b, c: nrrd.write(c, eye)):
         obtained, _ = mcc.get_projection_density(eid)
-    
+
     mcc.api.retrieve_file_over_http = mock.MagicMock()
     mcc.get_projection_density(eid)
-    
+
     mcc.api.retrieve_file_over_http.assert_not_called()
     assert( np.allclose(obtained, eye) )            
     assert( os.path.exists(path) )
-    
-    
+
+
 def test_get_injection_density(mcc, fn_temp_dir):
 
     eye = np.eye(100)
     eid = 123456789
     path = os.path.join(fn_temp_dir, 'experiment_{0}'.format(eid), 
                         'injection_density_25.nrrd')
-                        
+
     with mock.patch('allensdk.api.queries.grid_data_api.GridDataApi.'
                     'retrieve_file_over_http', 
                     new=lambda a, b, c: nrrd.write(c, eye)):
         obtained, _ = mcc.get_injection_density(eid)
-    
+
     mcc.api.retrieve_file_over_http = mock.MagicMock()
     mcc.get_injection_density(eid)
-    
+
     mcc.api.retrieve_file_over_http.assert_not_called()
     assert( np.allclose(obtained, eye) )            
     assert( os.path.exists(path) )
-    
-    
+
+
 def test_get_injection_fraction(mcc, fn_temp_dir):
 
     eye = np.eye(100)
     eid = 123456789
     path = os.path.join(fn_temp_dir, 'experiment_{0}'.format(eid), 
                         'injection_fraction_25.nrrd')
-                            
+
     with mock.patch('allensdk.api.queries.grid_data_api.GridDataApi.'
                     'retrieve_file_over_http', 
                     new=lambda a, b, c: nrrd.write(c, eye)):
         obtained, _ = mcc.get_injection_fraction(eid)
-    
+
     mcc.api.retrieve_file_over_http = mock.MagicMock()
     mcc.get_injection_fraction(eid)
-    
+
     mcc.api.retrieve_file_over_http.assert_not_called()
     assert( np.allclose(obtained, eye) )            
     assert( os.path.exists(path) )
-    
-    
+
+
 def test_get_data_mask(mcc, fn_temp_dir):
 
     eye = np.eye(100)
     eid = 123456789
     path = os.path.join(fn_temp_dir, 'experiment_{0}'.format(eid), 
                         'data_mask_25.nrrd')
-                        
+
     with mock.patch('allensdk.api.queries.grid_data_api.GridDataApi.'
                     'retrieve_file_over_http', 
                     new=lambda a, b, c: nrrd.write(c, eye)):
         obtained, _ = mcc.get_data_mask(eid)
-    
+
     mcc.api.retrieve_file_over_http = mock.MagicMock()
     mcc.get_data_mask(eid)
-    
+
     mcc.api.retrieve_file_over_http.assert_not_called()
     assert( np.allclose(obtained, eye) )            
     assert( os.path.exists(path) )
-    
-    
+
+
 def test_get_structure_tree(mcc, fn_temp_dir, new_nodes):
-            
+
     path = os.path.join(fn_temp_dir, 'structures.json')
-    
+
     with mock.patch('allensdk.api.queries.ontologies_api.'
                     'OntologiesApi.model_query', 
                     return_value=new_nodes) as p:
-                    
+
         obtained = mcc.get_structure_tree()
-        
+
         mcc.get_structure_tree()
         p.assert_called_once()
-        
+
     assert(obtained.node_ids()[0] == 0)
     assert( os.path.exists(path) )
-    
-    
+
+
 def test_get_ontology(mcc, fn_temp_dir, old_nodes):
 
     with warnings.catch_warnings(record=True) as c:
@@ -229,16 +229,15 @@ def test_get_ontology(mcc, fn_temp_dir, old_nodes):
         with mock.patch('allensdk.api.queries.ontologies_api.'
                         'OntologiesApi.model_query', 
                         return_value=old_nodes) as p:
-                
+
             mcc.get_ontology()
             mcc.get_ontology()
-            
+
             p.assert_called_once()
             assert(len(c) == 6)
-            
-            
-def test_get_structures(mcc, fn_temp_dir, old_nodes):
 
+
+def test_get_structures(mcc, fn_temp_dir, old_nodes):
 
     with warnings.catch_warnings(record=True) as c:
         warnings.simplefilter('always')
@@ -246,38 +245,38 @@ def test_get_structures(mcc, fn_temp_dir, old_nodes):
         with mock.patch('allensdk.api.queries.ontologies_api.'
                         'OntologiesApi.model_query', 
                         return_value=old_nodes) as p:
-                
+
             obtained = mcc.get_structures()
             mcc.get_structures()
-    
+
             p.assert_called_once()
-            assert( obtained.loc[0, 'acronym'] == old_nodes[0]['acronym'] )
-            assert(len(c) == 2)
-            
-            
+            assert obtained['acronym'][0] == old_nodes[0]['acronym']
+            assert len(c) == 2
+
+
 def test_get_experiments(mcc, fn_temp_dir, experiments):
 
     file_path = os.path.join(fn_temp_dir, 'experiments.json')
-    
+
     mcc.api.service_query = lambda a, parameters: experiments    
     obtained = mcc.get_experiments()
-    
+
     mcc.api.service_query = mock.MagicMock()
     mcc.get_experiments()
-    
+
     mcc.api.service_query.assert_not_called()
-    assert( os.path.exists(file_path) )
-    assert( 'num_voxels' not in obtained[0] )
-    assert( obtained[0]['transgenic-line'] == 'most_creish' ) 
-    
-    
+    assert os.path.exists(file_path)
+    assert 'num_voxels' not in obtained[0]
+    assert obtained[0]['transgenic-line'] == 'most_creish' 
+
+
 def test_filter_experiments(mcc, fn_temp_dir, experiments):
 
     pass_line = mcc.filter_experiments(experiments, cre=True)
     fail_line = mcc.filter_experiments(experiments, cre=False)
-    
-    assert( len(pass_line) == 1 )
-    assert( len(fail_line) == 0 )
+
+    assert len(pass_line) == 1
+    assert len(fail_line) == 0
 
 
 def test_get_experiment_structure_unionizes(mcc, fn_temp_dir, unionizes):
@@ -288,13 +287,13 @@ def test_get_experiment_structure_unionizes(mcc, fn_temp_dir, unionizes):
 
     mcc.api.model_query = lambda *args, **kwargs: unionizes
     obtained = mcc.get_experiment_structure_unionizes(eid)
-        
+
     mcc.api.model_query = mock.MagicMock()
     mcc.get_experiment_structure_unionizes(eid)
-    
+
     mcc.api.model_query.assert_not_called()
-    assert( obtained.loc[0, 'projection_intensity'] == 263.231 )
-    assert( os.path.exists(path) )
+    assert obtained.loc[0, 'projection_intensity'] == 263.231
+    assert os.path.exists(path)
 
 
 def test_filter_structure_unionizes(mcc, unionizes):
@@ -302,21 +301,21 @@ def test_filter_structure_unionizes(mcc, unionizes):
     obtained = mcc.filter_structure_unionizes(pd.DataFrame(unionizes), 
                                               hemisphere_ids=[1])
 
-    assert( obtained.loc[0, 'volume'] == 0.016032 )
-    
+    assert obtained.loc[0, 'volume'] == 0.016032
+
 
 def test_get_structure_unionizes(mcc, unionizes):
 
     mcc.get_experiment_structure_unionizes = \
         lambda *a, **k: pd.DataFrame(unionizes)
     obtained = mcc.get_structure_unionizes([1, 2, 3])
-    
-    assert( obtained.shape[0] == 6 )
-    
-    
+
+    assert obtained.shape[0] == 6
+
+
 def test_get_projection_matrix(mcc):
     # yup
-    
+
     unionizes = [{'experiment_id': 1, 
                   'structure_id': 2, 
                   'hemisphere_id': 1, 
@@ -325,31 +324,31 @@ def test_get_projection_matrix(mcc):
                   'structure_id': 2, 
                   'hemisphere_id': 2, 
                   'value': 40},]
-    
+
     mcc.get_structure_unionizes = lambda *a, **k: pd.DataFrame(unionizes)
-    
+
     class FakeTree(object):
         def value_map(*a, **k):
             return {1: 'one', 2: 'two'}
     mcc.get_structure_tree = lambda *a, **k: FakeTree()
-    
+
     obtained = mcc.get_projection_matrix([1], [2], [1, 2], ['value'])
-    
-    assert( np.allclose(obtained['matrix'], np.array([[30, 40]])) )
-    assert( np.array_equal([ii['label'] for ii in obtained['columns']], 
-                           ['two-L', 'two-R']) )
-                           
-                           
+
+    assert np.allclose(obtained['matrix'], np.array([[30, 40]]))
+    assert np.array_equal([ii['label'] for ii in obtained['columns']], 
+                          ['two-L', 'two-R'])
+
+
 def test_get_reference_space(mcc, new_nodes):
 
     tree = StructureTree(StructureTree.clean_structures(new_nodes))
     mcc.get_structure_tree = lambda *a, **k: tree
-    
+
     annot = np.arange(125).reshape((5, 5, 5))
     mcc.get_annotation_volume = lambda *a, **k: (annot, 'foo')
-    
+
     rsp_obt = mcc.get_reference_space()
-    
+
     assert( np.allclose(rsp_obt.resolution, [25, 25, 25]) )
     assert( np.allclose( rsp_obt.annotation, annot ) ) 
 
@@ -363,18 +362,18 @@ def test_get_structure_mask(mcc, fn_temp_dir):
 
     annot = np.arange(125).reshape((5, 5, 5))
     mcc.get_annotation_volume = lambda *a, **k: (annot, 'foo')
-    
+
     path = os.path.join(fn_temp_dir, 'annotation', 'ccf_2016', 'structure_masks', 
                         'resolution_25', 'structure_{0}.nrrd'.format(12))
 
     with warnings.catch_warnings(record=True) as c:
         warnings.simplefilter('always')
-    
+
         mask, _ = mcc.get_structure_mask(12)
 
         # also make sure we can do this for pd.Series input for backwards compatibility
         mask, _ = mcc.get_structure_mask(pd.Series([12]))
-        
+
     assert( mask.sum() == 1 )
     #assert( len(c) == 2 )
     assert( os.path.exists(path) )
@@ -382,19 +381,16 @@ def test_get_structure_mask(mcc, fn_temp_dir):
     with pytest.raises(ValueError):
         mask, _ = mcc.get_structure_mask("fish")
 
-    
-    
+
 def test_make_structure_mask(mcc):
 
     annot = np.arange(125).reshape((5, 5, 5))
     sids = [0, 1, 2, 3, 4]
-    
+
     with warnings.catch_warnings(record=True) as c:
         warnings.simplefilter('always')
-    
-        mask = mcc.make_structure_mask(sids, annot)
-        
-    #assert(len(c) == 1)
-    assert( mask.sum() == 5 )
-    
 
+        mask = mcc.make_structure_mask(sids, annot)
+
+    #assert(len(c) == 1)
+    assert mask.sum() == 5

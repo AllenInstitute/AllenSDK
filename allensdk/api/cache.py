@@ -19,7 +19,9 @@ import pandas as pd
 import pandas.io.json as pj
 import functools
 import os
+import logging
 from allensdk.deprecated import deprecated
+import csv
 
 from functools import wraps
 
@@ -38,6 +40,8 @@ def memoize(f):
    return wrapper
 
 class Cache(object):
+    _log = logging.getLogger('allensdk.api.cache')
+
     def __init__(self,
                  manifest=None,
                  cache=True,
@@ -305,16 +309,37 @@ class Cache(object):
         return
 
     @staticmethod
+    def csv_writer(pth, gen):
+        csv_writer = None
+    
+        first_row = True
+        row_count = 1
+    
+        with open(pth, 'w') as output:
+            for row in gen:
+                if first_row:
+                    field_names = map(str, row.keys())
+                    csv_writer = csv.DictWriter(output,
+                                                fieldnames=field_names,
+                                                delimiter=',',
+                                                quoting=csv.QUOTE_ALL)
+                    csv_writer.writeheader()
+                    first_row = False
+                Cache._log.info('row: {}'.format(row_count))
+                row_count = row_count + 1
+                csv_writer.writerow(row)
+
+    @staticmethod
     def cache_csv_json():
         return {
-             'writer': lambda p, x : pd.DataFrame(x).to_csv(p),
+             'writer': Cache.csv_writer,
              'reader': lambda f: pd.DataFrame.from_csv(f).to_dict('records')
         }
 
     @staticmethod
     def cache_csv_dataframe():
         return {
-             'writer': lambda p, x : pd.DataFrame(x).to_csv(p),
+             'writer': Cache.csv_writer,
              'reader' : pd.DataFrame.from_csv
         }
 
@@ -346,25 +371,46 @@ class Cache(object):
     @staticmethod
     def cache_csv():
         return {
-             'pre': pd.DataFrame,
-             'writer': lambda p, x : x.to_csv(p),
-             'reader': pd.DataFrame.from_csv
+            'writer': Cache.csv_writer,
+            'reader': pd.DataFrame.from_csv
         }
 
     @staticmethod
     def pathfinder(file_name_position,
-                   secondary_file_name_position=None):
-        def pf(*args):
+                   secondary_file_name_position=None,
+                   path_keyword=None):
+        '''helper method to find path argument in legacy methods written
+        prior to the @cacheable decorator.  Do not use for new @cacheable methods.
+        
+        Parameters
+        ----------
+        file_name_position : integer
+            zero indexed position in the decorated method args where file path may be found.
+        secondary_file_name_position : integer
+            zero indexed position in the decorated method args where tha file path may be found.
+        path_keyword : string
+            kwarg that may have the file path.
+        
+        Notes
+        -----
+        This method is only intended to provide backward-compatibility for some
+        methods that otherwise do not follow the path conventions of the @cacheable
+        decorator.
+        '''
+        def pf(*args, **kwargs):
             file_name = None
 
-            if file_name_position < len(args):
-                file_name = args[file_name_position]
-        
-            if (file_name is None and
-                secondary_file_name_position and 
-                secondary_file_name_position < len(args)):
-                file_name = args[secondary_file_name_position]
-        
+            if path_keyword is not None and path_keyword in kwargs:
+                file_name = kwargs[path_keyword]
+            else:
+                if file_name_position < len(args):
+                    file_name = args[file_name_position]
+
+                if (file_name is None and
+                    secondary_file_name_position and 
+                    secondary_file_name_position < len(args)):
+                    file_name = args[secondary_file_name_position]
+
             return file_name
         return pf
 
@@ -493,7 +539,7 @@ def cacheable(strategy=None,
                 pathfinder = kwargs.pop('pathfinder', None)
 
             if pathfinder and not 'path' in kwargs:
-                found_path = pathfinder(*args)
+                found_path = pathfinder(*args, **kwargs)
                 
                 if found_path:
                     kwargs['path'] = found_path

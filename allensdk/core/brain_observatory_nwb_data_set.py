@@ -779,21 +779,57 @@ class BrainObservatoryNwbDataSet(object):
 
         return dxcm, dxtime
 
-    def get_pupil_location(self):
-        '''Returns the x, y pupil location in visual degrees.
+    def get_pupil_location(self, as_spherical=True):
+        '''Returns the x, y pupil location.
+
+        Parameters
+        ----------
+        as_spherical : bool
+            Whether to return the location as spherical (default) or
+            not. If true, the result is altitude and azimuth in
+            degrees, otherwise it is x, y in centimeters. (0,0) is
+            the center of the monitor.
+
+        Returns
+        -------
+        (timestamps, location)
+            Timestamps is an (Nx1) array of timestamps in seconds.
+            Location is an (Nx2) array of spatial location.
         '''
+        if as_spherical:
+            location_key = "pupil_location_spherical"
+        else:
+            location_key = "pupil_location"
         try:
             with h5py.File(self.nwb_file, 'r') as f:
                 eye_tracking = f['processing'][self.PIPELINE_DATASET][
-                    'EyeTracking']['pupil_location']
+                    'EyeTracking'][location_key]
                 pupil_location = eye_tracking['data'].value
                 pupil_times = eye_tracking['timestamps'].value
         except KeyError:
             raise NoEyeTrackingException("No eye tracking for this experiment.")
 
-        #TODO: align with fluorescence
+        return pupil_times, pupil_location
 
-        return pupil_location, pupil_times
+    def get_pupil_size(self):
+        '''Returns the pupil area in pixels.
+
+        Returns
+        -------
+        (timestamps, areas)
+            Timestamps is an (Nx1) array of timestamps in seconds.
+            Areas is an (Nx1) array of pupil areas in pixels.
+        '''
+        try:
+            with h5py.File(self.nwb_file, 'r') as f:
+                pupil_tracking = f['processing'][self.PIPELINE_DATASET][
+                    'PupilTracking']['pupil_size']
+                pupil_size = pupil_tracking['data'].value
+                pupil_times = pupil_tracking['timestamps'].value
+        except KeyError:
+            raise NoEyeTrackingException("No pupil tracking for this experiment.")
+
+        return pupil_times, pupil_size
 
     def get_motion_correction(self):
         ''' Returns a Panda DataFrame containing the x- and y- translation of each image used for image alignment
