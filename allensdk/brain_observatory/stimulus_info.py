@@ -19,6 +19,7 @@ import numpy as np
 import scipy.ndimage.interpolation as spndi
 from scipy.misc import imresize
 import matplotlib.pyplot as plt
+from allensdk.api.cache import memoize
 import itertools
 
 # some handles for stimulus types
@@ -203,6 +204,7 @@ class StimulusSearch(object):
         self.epoch_bst = BinaryIntervalSearchTree.from_df(self.epoch_df)
         self.master_bst = BinaryIntervalSearchTree.from_df(self.master_df)
 
+    @memoize
     def search(self, fi):
 
         try:
@@ -408,13 +410,13 @@ class Monitor(object):
         else:
             return 2*np.arctan(n*1./2*self.pixel_size / distance_from_monitor) * 57.2958  # radians to degrees
 
-    def lsn_image_to_screen(self, img, stimulus_type, origin='lower'):
+    def lsn_image_to_screen(self, img, stimulus_type, origin='lower', background_color=STIMULUS_GRAY):
 
         assert img.dtype == np.uint8
 
         pixels_per_patch = LOCALLY_SPARSE_NOISE_PIXELS[stimulus_type]
 
-        full_image = np.full((self.n_pixels_r, self.n_pixels_c), STIMULUS_GRAY, dtype=np.uint8)
+        full_image = np.full((self.n_pixels_r, self.n_pixels_c), background_color, dtype=np.uint8)
         img_full_res = imresize(img, float(pixels_per_patch), interp='nearest')
         mr, mc = lsn_coordinate_to_monitor_coordinate((0, 0), (self.n_pixels_r, self.n_pixels_c), stimulus_type)
         Mr, Mc = lsn_coordinate_to_monitor_coordinate(img.shape, (self.n_pixels_r, self.n_pixels_c), stimulus_type)
@@ -431,8 +433,8 @@ class Monitor(object):
 
     def natural_scene_image_to_screen(self, img, origin='lower'):
 
-        assert img.dtype == np.float32
-        img = img.astype(np.uint8)
+        # assert img.dtype == np.float32
+        # img = img.astype(np.uint8)
 
         full_image = np.full((self.n_pixels_r, self.n_pixels_c), 127, dtype=np.uint8)
         mr, mc = natural_scene_coordinate_to_monitor_coordinate((0, 0), (self.n_pixels_r, self.n_pixels_c))
@@ -505,7 +507,7 @@ class Monitor(object):
 
         from allensdk.core.brain_observatory_nwb_data_set import make_display_mask
 
-        assert img.shape == (self.n_pixels_r, self.n_pixels_c)
+        assert img.shape == (self.n_pixels_r, self.n_pixels_c) or img.shape == (self.n_pixels_r, self.n_pixels_c, 4)
 
         if ax is None:
             fig, ax = plt.subplots(1, 1)
@@ -623,3 +625,7 @@ class BrainObservatoryMonitor(Monitor):
         return super(BrainObservatoryMonitor, self).grating_to_screen(phase, spatial_frequency, orientation,
                                                                       self.experiment_geometry.distance,
                                                                       p2p_amp = 256, baseline = 127)
+
+    def pixels_to_visual_degrees(self, n, **kwargs):
+
+        return super(BrainObservatoryMonitor, self).pixels_to_visual_degrees(self, n, self.experiment_geometry.distance, **kwargs)

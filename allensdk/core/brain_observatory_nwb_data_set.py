@@ -27,7 +27,7 @@ import os
 from pkg_resources import parse_version
 from allensdk.brain_observatory.brain_observatory_exceptions import (MissingStimulusException,
                                                                      NoEyeTrackingException)
-
+from allensdk.api.cache import memoize
 
 def get_epoch_mask_list(st, threshold, max_cuts=2):
     '''Convenience function to cut a stim table into multiple epochs
@@ -135,7 +135,7 @@ class BrainObservatoryNwbDataSet(object):
         '''
 
         threshold_dict = {si.THREE_SESSION_A:31+7,
-                          si.THREE_SESSION_B:7,
+                          si.THREE_SESSION_B:15,
                           si.THREE_SESSION_C:7,
                           si.THREE_SESSION_C2:7}
 
@@ -541,6 +541,7 @@ class BrainObservatoryNwbDataSet(object):
 
         return stimulus_table
 
+    @memoize
     def get_stimulus_template(self, stimulus_name):
         ''' Return an array of the stimulus template for the specified stimulus.
 
@@ -847,10 +848,19 @@ class BrainObservatoryNwbDataSet(object):
 
     def get_stimulus(self, frame_ind):
 
-        start, end, data = self.stimulus_search.search(frame_ind)
-        print start, end
-        assert start <= frame_ind and frame_ind <= end
-        return data
+        search_result = self.stimulus_search.search(frame_ind)
+
+        if search_result is None or search_result[2]['stimulus'] == si.SPONTANEOUS_ACTIVITY:
+            return None, None
+
+        else:
+
+            curr_stimulus = search_result[2]['stimulus']
+            if curr_stimulus in si.LOCALLY_SPARSE_NOISE_STIMULUS_TYPES + si.NATURAL_MOVIE_STIMULUS_TYPES + [si.NATURAL_SCENES]:
+                curr_frame = search_result[2]['frame']
+                return search_result, self.get_stimulus_template(curr_stimulus)[int(curr_frame), :, :]
+            elif curr_stimulus == si.STATIC_GRATINGS or curr_stimulus == si.DRIFTING_GRATINGS:
+                return search_result, None
 
 def align_running_speed(dxcm, dxtime, timestamps):
     ''' If running speed timestamps differ from fluorescence
