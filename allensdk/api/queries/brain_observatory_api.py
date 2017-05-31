@@ -27,6 +27,7 @@ class BrainObservatoryApi(RmaTemplate):
     _log = logging.getLogger('allensdk.api.queries.brain_observatory_api')
 
     NWB_FILE_TYPE = 'NWBOphys'
+    CELL_MAPPING_ID = 590985414
 
     rma_templates = \
         {"brain_observatory_queries": [
@@ -50,7 +51,7 @@ class BrainObservatoryApi(RmaTemplate):
              'description': 'see name',
              'model': 'OphysExperiment',
              'criteria': '{% if ophys_experiment_ids is defined %}[id$in{{ ophys_experiment_ids }}]{%endif%}',
-             'include': 'well_known_files(well_known_file_type),targeted_structure,specimen(donor(age,transgenic_lines))',
+             'include': 'experiment_container,well_known_files(well_known_file_type),targeted_structure,specimen(donor(age,transgenic_lines))',
              'num_rows': 'all',
              'count': False,
              'criteria_params': ['ophys_experiment_ids']
@@ -108,7 +109,14 @@ class BrainObservatoryApi(RmaTemplate):
              'model': 'ApiCamCellMetric',
              'criteria': '{% if cell_specimen_ids is defined %}[cell_specimen_id$in{{ cell_specimen_ids }}]{%endif%}',
              'criteria_params': ['cell_specimen_ids']
-             }
+             },
+            {'name': 'cell_specimen_id_mapping_table',
+             'description': 'see name',
+             'model': 'WellKnownFile',
+             'criteria': '[id$eq{{ mapping_table_id }}],well_known_file_type[name$eqOphysCellSpecimenIdMapping]',
+             'num_rows': 'all',
+             'count': False,
+             'criteria_params': ['mapping_table_id']}
         ]}
 
     _QUERY_TEMPLATES = {
@@ -348,7 +356,8 @@ class BrainObservatoryApi(RmaTemplate):
                                  imaging_depths=None,
                                  transgenic_lines=None,
                                  stimuli=None,
-                                 session_types=None):
+                                 session_types=None,
+                                 include_failed=False):
 
         # re-using the code from above
         experiments = self.filter_experiment_containers(experiments,
@@ -356,6 +365,10 @@ class BrainObservatoryApi(RmaTemplate):
                                                         targeted_structures=targeted_structures,
                                                         imaging_depths=imaging_depths,
                                                         transgenic_lines=transgenic_lines)
+
+        if not include_failed:
+            experiments = [e for e in experiments 
+                           if not e.get('experiment_container',{}).get('failed', False)]
 
         if experiment_container_ids is not None:
             experiments = [e for e in experiments if e[
@@ -482,3 +495,37 @@ class BrainObservatoryApi(RmaTemplate):
                   in result_keys]
 
         return result
+
+    def get_cell_specimen_id_mapping(self, file_name, mapping_table_id=None):
+        '''Download mapping table from old to new cell specimen IDs.
+
+        The mapping table is a CSV file that maps cell specimen ids
+        that have changed between processing runs of the Brain
+        Observatory pipeline.
+
+        Parameters
+        ----------
+        file_name : string
+            Filename to save locally.
+        mapping_table_id : integer
+            ID of the mapping table file. Defaults to the most recent
+            mapping table. 
+
+        Returns
+        -------
+        pandas.DataFrame
+            Mapping table as a DataFrame.
+        '''
+        if mapping_table_id is None:
+            mapping_table_id = self.CELL_MAPPING_ID
+        data = self.template_query('brain_observatory_queries',
+                                   'cell_specimen_id_mapping_table',
+                                   mapping_table_id=mapping_table_id)
+
+        try:
+            file_url = data[0]['download_link']
+        except Exception as _:
+            raise Exception("No OphysCellSpecimenIdMapping file found.")
+
+        self.retrieve_file_over_http(self.api_url + file_url, file_name)
+        return pd.read_csv(file_name)

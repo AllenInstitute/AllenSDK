@@ -87,7 +87,16 @@ def mock_ophys_experiments():
          'imaging_depth': 200,
          'specimen': {'donor': {
              'transgenic_lines': [{'name': 'Don'}]}},
-         'stimulus_name': 'three_session_C'
+         'stimulus_name': 'three_session_C',
+         'experiment_container': { 'failed': False }
+         },
+        {'experiment_container_id': 2,
+         'targeted_structure': {'acronym': 'NBC'},
+         'imaging_depth': 200,
+         'specimen': {'donor': {
+             'transgenic_lines': [{'name': 'Don'}]}},
+         'stimulus_name': 'three_session_C',
+         'experiment_container': { 'failed': True }
          }
     ]
 
@@ -136,7 +145,7 @@ def test_get_ophys_experiments_one_id(bo_api):
     bo_api.json_msg_query.assert_called_once_with(
         "http://testwarehouse:9000/api/v2/data/query.json?q="
         "model::OphysExperiment,rma::criteria,[id$in502066273],"
-        "rma::include,"
+        "rma::include,experiment_container,"
         "well_known_files(well_known_file_type),targeted_structure,"
         "specimen(donor(age,transgenic_lines)),"
         "rma::options[num_rows$eq'all'][count$eqfalse]")
@@ -336,6 +345,26 @@ def test_save_ophys_experiment_data(bo_api_save_ophys):
         "model::WellKnownFile,"
         "rma::criteria,"
         "[attachable_id$eq1],well_known_file_type[name$eqNWBOphys],"
+        "rma::options[num_rows$eq'all'][count$eqfalse]")
+    bo_api.retrieve_file_over_http.assert_called_with(
+        'http://testwarehouse:9000/url/path/to/file',
+        '/path/to/filename')
+
+def test_get_cell_specimen_id_mapping(bo_api_save_ophys):
+    bo_api = bo_api_save_ophys
+
+    with patch('pandas.read_csv') as readcsv:
+        bo_api.retrieve_file_over_http = \
+            MagicMock(name='retrieve_file_over_http')
+        bo_api.get_cell_specimen_id_mapping('/path/to/filename', 1)
+
+        readcsv.assert_called_once_with('/path/to/filename')
+
+    bo_api.json_msg_query.assert_called_once_with(
+        "http://testwarehouse:9000/api/v2/data/query.json?q="
+        "model::WellKnownFile,"
+        "rma::criteria,"
+        "[id$eq1],well_known_file_type[name$eqOphysCellSpecimenIdMapping],"
         "rma::options[num_rows$eq'all'][count$eqfalse]")
     bo_api.retrieve_file_over_http.assert_called_with(
         'http://testwarehouse:9000/url/path/to/file',
