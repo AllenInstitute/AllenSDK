@@ -23,28 +23,19 @@ from allensdk.deprecated import deprecated
 
 from functools import wraps
 
-class memodict(dict):
-
-    def __init__(self, f):
-        self.f = f
-
-    def __getitem__(self, *key, **kwargs):
-        return dict.__getitem__(self, (key, tuple(kwargs.items())))
-
-    def __missing__(self, key):
-        ret = self[key] = self.f(*key[0], **dict(key[1]))
-        return ret
-
 def memoize(f):
-    """ Memoization decorator for a function taking one or more arguments. """
+   memodict = dict()
 
-    M = memodict(f)
+   @wraps(f)
+   def wrapper(*args, **kwargs):
+       key = (args, tuple(kwargs.items()))
 
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        return M.__getitem__(*args, **kwargs)
+       if key not in memodict:
+           memodict[key] = f(*args, **kwargs)
 
-    return wrapper
+       return memodict[key]
+
+   return wrapper
 
 class Cache(object):
     def __init__(self,
