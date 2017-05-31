@@ -66,7 +66,8 @@ is available as part of the SDK.  Take a look at this `Jupyter notebook <_static
 More detailed documentation is available demonstrating how to: 
 
     - `Read and visualize the stimulus presentation tables in the NWB files <_static/examples/nb/brain_observatory_stimuli.html>`_
-    - `Understand the layout of Brain Observatory NWB files <brain_observatory_nwb.html>`_ 
+    - `Understand the layout of Brain Observatory NWB files <brain_observatory_nwb.html>`_
+    - `Map previous cell specimen IDs to current cell specimen IDs <_static/examples/nb/cell_specimen_mapping.html>`_
 
 Precomputed Cell Metrics
 ------------------------
