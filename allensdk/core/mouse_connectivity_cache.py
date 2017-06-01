@@ -485,10 +485,11 @@ class MouseConnectivityCache(Cache):
                                       
         return self.api.get_structure_unionizes([experiment_id], 
                                                 path=file_name,
-                                                strategy='lazy',  
-                                                pre=col_rn, 
-                                                post=filter_fn, 
-                                                **Cache.cache_csv_dataframe())
+                                                strategy='lazy',
+                                                pre=col_rn,
+                                                post=filter_fn,
+                                                writer=lambda p, x : pd.DataFrame(x).to_csv(p),
+                                                reader=pd.DataFrame.from_csv)
 
     def filter_structure_unionizes(self, unionizes, 
                                    is_injection=None, 

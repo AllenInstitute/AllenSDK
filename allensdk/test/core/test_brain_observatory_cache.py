@@ -163,7 +163,7 @@ def test_get_ophys_experiments(brain_observatory_cache):
 
     brain_observatory_cache.api.json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
-        "model::OphysExperiment,rma::include,"
+        "model::OphysExperiment,rma::include,experiment_container,"
         "well_known_files(well_known_file_type),targeted_structure,"
         "specimen(donor(age,transgenic_lines)),"
         "rma::options[num_rows$eq'all'][count$eqfalse]")
@@ -182,7 +182,7 @@ def test_get_all_session_types(brain_observatory_cache):
 
     brain_observatory_cache.api.json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
-        "model::OphysExperiment,rma::include,"
+        "model::OphysExperiment,rma::include,experiment_container,"
         "well_known_files(well_known_file_type),targeted_structure,"
         "specimen(donor(age,transgenic_lines)),"
         "rma::options[num_rows$eq'all'][count$eqfalse]")

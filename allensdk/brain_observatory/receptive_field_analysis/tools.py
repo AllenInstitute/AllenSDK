@@ -1,10 +1,17 @@
-import tempfile
-import os
-from functools import wraps
-import scipy.sparse as sps
-import numpy as np
-import pandas as pd
-import json
+# Copyright 2017 Allen Institute for Brain Science
+# This file is part of Allen SDK.
+#
+# Allen SDK is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 3 of the License.
+#
+# Allen SDK is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 def list_of_dicts_to_dict_of_lists(list_of_dicts):
     return {key:[item[key] for item in list_of_dicts] for key in list_of_dicts[0].keys() }
@@ -38,16 +45,3 @@ def read_h5_group(g):
 
     return return_dict
 
-if __name__ == "__main__":
-
-    import numpy as np
-
-    # @memoize
-    @cache(strategy='lazy')
-    def f(x):
-        return 5
-
-    # print f
-    print f(5)
-
-    print list_of_dicts_to_dict_of_lists([{'a':1, 'b':0},{'a':5, 'b':7}])

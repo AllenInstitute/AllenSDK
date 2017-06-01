@@ -54,7 +54,8 @@ def write_string(obj):
     return json.dumps(obj,
                       indent=2,
                       ignore_nan=True,
-                      default=json_handler)
+                      default=json_handler,
+                      iterable_as_array=True)
 
 
 def read_url(url, method='POST'):

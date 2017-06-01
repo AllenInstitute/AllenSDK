@@ -375,12 +375,20 @@ class GlifNeuron( object ):
                 # TODO MAYBE ONE LAST NAN SHOULD BE INSERTED AND THIS VALUE SHOULD BE RECORDED FOR CONSISTANCY
                 if self.spike_cut_length > 0:
                     n = self.spike_cut_length
+
+                    cut_past_end = (time_step + n) >= len(voltage_out)
+                    if cut_past_end:
+                        n = len(voltage_out) - time_step
+                        
                     voltage_out[time_step:time_step+n] = np.nan
                     threshold_out[time_step:time_step+n] = np.nan
                     AScurrents_out[time_step:time_step+n,:] = np.nan
-                    voltage_out[time_step+n] = voltage_t0 
-                    threshold_out[time_step+n] = threshold_t0
-                    AScurrents_out[time_step+n,:] = AScurrents_t0                    
+
+                    if not cut_past_end:
+                        voltage_out[time_step+n] = voltage_t0 
+                        threshold_out[time_step+n] = threshold_t0
+                        AScurrents_out[time_step+n,:] = AScurrents_t0                    
+
                     time_step += self.spike_cut_length+1
                 else:  
                     voltage_out[time_step] = voltage_t0 
