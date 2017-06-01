@@ -79,15 +79,25 @@ def extract_sweep_features(data_set, sweeps_by_type):
 
     return sweep_features
 
+# if subthreshold minimum amplitude is known (e.g., for human cells) then
+#   specify it. otherwise the default value will be used
 def extract_cell_features(data_set,
                           ramp_sweep_numbers,
                           short_square_sweep_numbers,
-                          long_square_sweep_numbers):
+                          long_square_sweep_numbers,
+                          subthresh_min_amp = None):
 
-    fex = efex.cell_extractor_for_nwb(data_set,
-                                      ramp_sweep_numbers,
-                                      short_square_sweep_numbers,
-                                      long_square_sweep_numbers)
+    if subthresh_min_amp is None:
+        fex = efex.cell_extractor_for_nwb(data_set,
+                                          ramp_sweep_numbers,
+                                          short_square_sweep_numbers,
+                                          long_square_sweep_numbers)
+    else:
+        fex = efex.cell_extractor_for_nwb(data_set,
+                                          ramp_sweep_numbers,
+                                          short_square_sweep_numbers,
+                                          long_square_sweep_numbers,
+                                          subthresh_min_amp)
 
     fex.process()
 
