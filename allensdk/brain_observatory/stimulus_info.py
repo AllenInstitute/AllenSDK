@@ -75,6 +75,13 @@ LOCALLY_SPARSE_NOISE_DIMENSIONS = {
     LOCALLY_SPARSE_NOISE_8DEG: [ 8, 14 ],
     }
 
+# Note: the "8deg" stimulus is actually 9.3 visual degrees on a side
+LOCALLY_SPARSE_NOISE_PIXEL_SIZE = {
+    LOCALLY_SPARSE_NOISE: 4.65,
+    LOCALLY_SPARSE_NOISE_4DEG: 4.65,
+    LOCALLY_SPARSE_NOISE_8DEG: 9.3 
+}
+
 def sessions_with_stimulus(stimulus):
     """ Return the names of the sessions that contain a given stimulus. """
     
