@@ -151,6 +151,9 @@ def json_handler(obj):
           isinstance(obj, np.uint16) or
           isinstance(obj, np.uint8)):
         return long(obj)
+    elif (isinstance(obj, np.bool) or
+          isinstance(obj, np.bool_)):
+        return bool(obj)
     elif hasattr(obj, 'isoformat'):
         return obj.isoformat()
     else:
