@@ -99,7 +99,7 @@ def stimuli_in_session(session):
     Parameters
     ----------
     session: string
-        Must be one of: [stimulus_info.THREE_SESSION_A, stimulus_info.THREE_SESSION_B, stimulus_info.THREE_SESSION_C]
+        Must be one of: [stimulus_info.THREE_SESSION_A, stimulus_info.THREE_SESSION_B, stimulus_info.THREE_SESSION_C, stimulus_info.THREE_SESSION_C2]
     """
     return SESSION_STIMULUS_MAP[session]
 
