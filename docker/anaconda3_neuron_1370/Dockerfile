@@ -8,16 +8,20 @@ FROM continuumio/anaconda3
 MAINTAINER Tim Fliss <timf@alleninstitute.org>
 
 # neuron installation
-WORKDIR /root
-RUN wget http://www.neuron.yale.edu/ftp/neuron/versions/v7.4/v7.4.rel-1370/nrn-7.4.rel-1370.x86_64.deb; \
-    dpkg -i nrn-7.4.rel-1370.x86_64.deb; \
-    apt-get install -f; \
-    dpkg -i nrn-7.4.rel-1370.x86_64.deb; \
-    apt-get install -yq unzip make 
-
+WORKDIR root
+COPY shared shared
 COPY requirements.txt test_requirements.txt ./
-RUN  pip install -r requirements.txt; \
-     pip install -r test_requirements.txt
+RUN /bin/bash shared/apt_get_dependencies.sh
+RUN /bin/bash shared/conda_27.sh
+RUN /bin/bash --login shared/jupyterhub.sh
+RUN /bin/bash --login shared/build_nrn.sh
+RUN /bin/bash --login shared/tensorflow.sh
+RUN /bin/bash --login shared/users.sh
+
+RUN shared/build_DiPDE.sh -e py27
+RUN shared/build_NEST.sh -e py27
+RUN shared/build_NEURON.sh -e py27
+#RUN shared/build_Tensorflow.sh -e py27
 
 ENV PYTHONPATH /usr/local/nrn/lib/python
 ENV PATH /usr/local/nrn/x86_64/bin:$PATH
