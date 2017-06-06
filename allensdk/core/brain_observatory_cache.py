@@ -482,7 +482,7 @@ def _merge_transgenic_lines(*lines_list):
 def _find_container_tags(container):
     """ Custom logic for extracting tags from donor conditions.  Filtering 
     out tissuecyte tags. """
-    conditions = container['specimen']['donor']['conditions']
+    conditions = container['specimen']['donor'].get('conditions', [])
     return [c['name'] for c in conditions if not c['name'].startswith('tissuecyte')]
 
 def _assert_not_string(arg, name):
