@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [0.13.xxx] - ????-??-??
+## [0.13.2] - 2017-06-06
 
 ### Changed
 
