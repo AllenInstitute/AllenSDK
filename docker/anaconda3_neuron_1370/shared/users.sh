@@ -1,4 +1,4 @@
-for USER in timf davidf nikah nicholasc lukec forrestc nileg
+for USER in timf davidf nikah nicholasc lukec forrestc nileg justink
 do
   useradd $USER
   echo "$USER:log${USER}in" | chpasswd
