@@ -28,13 +28,13 @@ COPY shared/users.sh shared/
 RUN /bin/bash --login shared/users.sh
 
 COPY shared/build_DiPDE.sh shared/
-#RUN shared/build_DiPDE.sh -e py27
+#RUN mkdir -p /root/build_dipde && shared/build_DiPDE.sh -b /root/build_dipde -e py27
 COPY shared/build_NEST.sh shared/
-RUN shared/build_NEST.sh -e py27
+RUN mkdir -p /root/build_nest && shared/build_NEST.sh -b /root/build_nest -e py27
 COPY shared/build_NEURON.sh shared/
-#RUN shared/build_NEURON.sh -e py27
+#RUN mkdir -p /root/build_neuron && shared/build_NEURON.sh -b /root/build_neuron -e py27
 COPY shared/build_Tensorflow.sh shared/
-#RUN shared/build_Tensorflow.sh -e py27
+#RUN mkdir -p /root/build_tensorflow && shared/build_Tensorflow.sh -b /root/build_tensorflow -e py27
 
 RUN /bin/bash shared/aws_dependencies.sh
 
