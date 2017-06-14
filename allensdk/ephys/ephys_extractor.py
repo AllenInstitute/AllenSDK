@@ -97,22 +97,22 @@ class EphysSweepFeatureExtractor:
         upstrokes = ft.find_upstroke_indexes(v, t, putative_spikes, peaks, self.filter, dvdt)
         thresholds = ft.refine_threshold_indexes(v, t, upstrokes, self.thresh_frac,
                                                  self.filter, dvdt)
-        thresholds, peaks, upstrokes = ft.check_thresholds_and_peaks(v, t, thresholds, peaks,
+        thresholds, peaks, upstrokes, clipped = ft.check_thresholds_and_peaks(v, t, thresholds, peaks,
                                                                      upstrokes, self.end, self.max_interval)
-
         if not thresholds.size:
             # Save time if no spikes detected
             self._spikes_df = DataFrame()
             return
 
-
         # Spike list and thresholds have been refined - now find other features
         upstrokes = ft.find_upstroke_indexes(v, t, thresholds, peaks, self.filter, dvdt)
-        troughs = ft.find_trough_indexes(v, t, thresholds, peaks, self.end)
-        downstrokes = ft.find_downstroke_indexes(v, t, peaks, troughs, self.filter, dvdt)
-        trough_details = ft.analyze_trough_details(v, t, thresholds, peaks, self.end,
-                                                   self.filter, dvdt=dvdt)
-        widths = ft.find_widths(v, t, thresholds, peaks, trough_details[1])
+        troughs = ft.find_trough_indexes(v, t, thresholds, peaks, clipped, self.end)
+        downstrokes = ft.find_downstroke_indexes(v, t, peaks, troughs, clipped, self.filter, dvdt)
+        trough_details, clipped = ft.analyze_trough_details(v, t, thresholds, peaks, clipped, self.end,
+                                                            self.filter, dvdt=dvdt)
+        widths = ft.find_widths(v, t, thresholds, peaks, trough_details[1], clipped)
+
+        base_clipped_list = []
 
         # Points where we care about t, v, and i if available
         vit_data_indexes = {
@@ -120,70 +120,102 @@ class EphysSweepFeatureExtractor:
             "peak": peaks,
             "trough": troughs,
         }
+        base_clipped_list += ["trough"]
 
         # Points where we care about t and dv/dt
         dvdt_data_indexes = {
             "upstroke": upstrokes,
             "downstroke": downstrokes
         }
+        base_clipped_list += ["downstroke"]
 
         # Trough details
         isi_types = trough_details[0]
         trough_detail_indexes = dict(zip(["fast_trough", "adp", "slow_trough"], trough_details[1:]))
+        base_clipped_list += ["fast_trough", "adp", "slow_trough"]
 
         # Redundant, but ensures that DataFrame has right number of rows
         # Any better way to do it?
         spikes_df = DataFrame(data=thresholds, columns=["threshold_index"])
+        spikes_df["clipped"] = clipped
+        self._affected_by_clipping = []
 
-        for k, vals in vit_data_indexes.iteritems():
+        for k, all_vals in vit_data_indexes.iteritems():
+            valid_ind = ~np.isnan(all_vals)
+            vals = all_vals[valid_ind].astype(int)
             spikes_df[k + "_index"] = np.nan
             spikes_df[k + "_t"] = np.nan
             spikes_df[k + "_v"] = np.nan
 
             if len(vals) > 0:
-                spikes_df.ix[:len(vals) - 1, k + "_index"] = vals
-                spikes_df.ix[:len(vals) - 1, k + "_t"] = t[vals]
-                spikes_df.ix[:len(vals) - 1, k + "_v"] = v[vals]
+                spikes_df.ix[valid_ind, k + "_index"] = vals
+                spikes_df.ix[valid_ind, k + "_t"] = t[vals]
+                spikes_df.ix[valid_ind, k + "_v"] = v[vals]
 
             if self.i is not None:
                 spikes_df[k + "_i"] = np.nan
                 if len(vals) > 0:
-                    spikes_df.ix[:len(vals) - 1, k + "_i"] = self.i[vals]
+                    spikes_df.ix[valid_ind, k + "_i"] = self.i[vals]
 
-        for k, vals in dvdt_data_indexes.iteritems():
+            if k in base_clipped_list:
+                self._affected_by_clipping += [
+                    k + "_index",
+                    k + "_t",
+                    k + "_v",
+                    k + "_i",
+                ]
+
+        for k, all_vals in dvdt_data_indexes.iteritems():
+            valid_ind = ~np.isnan(all_vals)
+            vals = all_vals[valid_ind].astype(int)
             spikes_df[k + "_index"] = np.nan
             spikes_df[k] = np.nan
             if len(vals) > 0:
-                spikes_df.ix[:len(vals) - 1, k + "_index"] = vals
-                spikes_df.ix[:len(vals) - 1, k + "_t"] = t[vals]
-                spikes_df.ix[:len(vals) - 1, k + "_v"] = v[vals]
-                spikes_df.ix[:len(vals) - 1, k] = dvdt[vals]
+                spikes_df.ix[valid_ind, k + "_index"] = vals
+                spikes_df.ix[valid_ind, k + "_t"] = t[vals]
+                spikes_df.ix[valid_ind, k + "_v"] = v[vals]
+                spikes_df.ix[valid_ind, k] = dvdt[vals]
+
+                if k in base_clipped_list:
+                    self._affected_by_clipping += [
+                    k + "_index",
+                    k + "_t",
+                    k + "_v",
+                    k,
+                ]
 
         spikes_df["isi_type"] = isi_types
+        self._affected_by_clipping += ["isi_type"]
 
-        for k, vals in trough_detail_indexes.iteritems():
+        for k, all_vals in trough_detail_indexes.iteritems():
+            valid_ind = ~np.isnan(all_vals)
+            vals = all_vals[valid_ind].astype(int)
             spikes_df[k + "_index"] = np.nan
-            if np.any(~np.isnan(vals)):
-                spikes_df.ix[~np.isnan(vals), k + "_index"] = vals[~np.isnan(vals)]
-
             spikes_df[k + "_t"] = np.nan
-            if np.any(~np.isnan(vals)):
-                spikes_df.ix[~np.isnan(vals), k + "_t"] = t[vals[~np.isnan(vals)].astype(int)]
-
             spikes_df[k + "_v"] = np.nan
-            if np.any(~np.isnan(vals)):
-                spikes_df.ix[~np.isnan(vals), k + "_v"] = v[vals[~np.isnan(vals)].astype(int)]
+            if len(vals) > 0:
+                spikes_df.ix[valid_ind, k + "_index"] = vals
+                spikes_df.ix[valid_ind, k + "_t"] = t[vals]
+                spikes_df.ix[valid_ind, k + "_v"] = v[vals]
 
             if self.i is not None:
                 spikes_df[k + "_i"] = np.nan
-                if np.any(~np.isnan(vals)):
-                    spikes_df.ix[~np.isnan(vals), k + "_i"] = self.i[vals[~np.isnan(vals)].astype(int)]
+                if len(vals) > 0:
+                    spikes_df.ix[valid_ind, k + "_i"] = self.i[vals]
 
-        spikes_df["width"] = np.nan
-        spikes_df.ix[:len(widths)-1, "width"] = widths
+            if k in base_clipped_list:
+                self._affected_by_clipping += [
+                    k + "_index",
+                    k + "_t",
+                    k + "_v",
+                    k + "_i",
+                ]
 
+        spikes_df["width"] = widths
+        self._affected_by_clipping += ["width"]
 
         spikes_df["upstroke_downstroke_ratio"] = spikes_df["upstroke"] / -spikes_df["downstroke"]
+        self._affected_by_clipping += ["upstroke_downstroke_ratio"]
 
         self._spikes_df = spikes_df
 
@@ -448,17 +480,21 @@ class EphysSweepFeatureExtractor:
         """Get all features for each spike as a list of records."""
         return self._spikes_df.to_dict('records')
 
-    def spike_feature(self, key):
+    def spike_feature(self, key, include_clipped=False):
         """Get specified feature for every spike.
 
         Parameters
         ----------
         key : feature name
+        include_clipped: return values for every identified spike, even when clipping means they will be incorrect/undefined
 
         Returns
         -------
         spike_feature_values : ndarray of features for each spike
         """
+
+        if not hasattr(self, "_spikes_df"):
+            raise AttributeError("EphysSweepFeatureExtractor instance attribute with spike information does not exist yet - have spikes been processed?")
 
         if len(self._spikes_df) == 0:
             return np.array([])
@@ -466,7 +502,12 @@ class EphysSweepFeatureExtractor:
         if key not in self._spikes_df.columns:
             raise KeyError("requested feature '{:s}' not available".format(key))
 
-        return self._spikes_df[key].values
+        values = self._spikes_df[key].values
+
+        if not include_clipped and key in self._affected_by_clipping:
+            values = values[~self._spikes_df["clipped"].values]
+
+        return values
 
     def spike_feature_keys(self):
         """Get list of every available spike feature."""
@@ -507,7 +548,7 @@ class EphysSweepFeatureExtractor:
 
         return self._sweep_features[key]
 
-    def process_new_spike_feature(self, feature_name, feature_func):
+    def process_new_spike_feature(self, feature_name, feature_func, affected_by_clipping=False):
         """Add new spike-level feature calculation function
 
            The function should take this sweep extractor as its argument. Its results
@@ -517,9 +558,10 @@ class EphysSweepFeatureExtractor:
         if feature_name in self._spikes_df.columns:
             raise KeyError("Feature {:s} already exists for sweep".format(feature_name))
 
-        features = feature_func(self)
-        self._spikes_df[feature_name] = np.nan
-        self._spikes_df.ix[:len(features) - 1, feature_name] = features
+        self._spikes_df[feature_name] = feature_func(self)
+
+        if affected_by_clipping:
+            self._affected_by_clipping.append(feature_name)
 
     def process_new_sweep_feature(self, feature_name, feature_func):
         """Add new sweep-level feature calculation function
