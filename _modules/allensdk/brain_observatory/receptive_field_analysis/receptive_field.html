@@ -1,0 +1,329 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>allensdk.brain_observatory.receptive_field_analysis.receptive_field &mdash; Allen SDK 0.13.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/aibs_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '0.13.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="top" title="Allen SDK 0.13.1 documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" /> 
+  </head>
+  <body role="document">
+<link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
+<script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var _pSupressBrowserFlashWarning = true;
+    var _pTabId = "pHome";
+    var _pMoreProjectsId = "pMoreProjects";
+    var _pImagePath = "http://www.brain-map.org/assets/images/";
+    var _pSiteWarnings = function() {
+        this.show_warning() = {};
+    }
+</script>
+<script type="text/javascript">
+    function initialize() {
+        /*** do your stuff, then initialize the portal plugin ***/
+        _pPortalOnLoad();
+    }
+</script>
+<style>
+  #header_content > a {
+  display: inline-block;
+  width: 250px;
+  height: 75px;
+  background-image:url("/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-size: 235px 37px;
+  background-position: 0px 20px;
+  background-repeat: no-repeat;
+  }
+</style>
+
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
+
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for allensdk.brain_observatory.receptive_field_analysis.receptive_field</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2017 Allen Institute for Brain Science</span>
+<span class="c1"># This file is part of Allen SDK.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, version 3 of the License.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+
+<span class="kn">from</span> <span class="nn">.eventdetection</span> <span class="kn">import</span> <span class="n">detect_events</span>
+<span class="kn">from</span> <span class="nn">statsmodels.sandbox.stats.multicomp</span> <span class="kn">import</span> <span class="n">multipletests</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">.utilities</span> <span class="kn">import</span> <span class="n">get_A</span><span class="p">,</span> <span class="n">get_A_blur</span><span class="p">,</span> <span class="n">get_shuffle_matrix</span><span class="p">,</span> <span class="n">get_components</span><span class="p">,</span> <span class="n">dict_generator</span>
+<span class="kn">from</span> <span class="nn">.postprocessing</span> <span class="kn">import</span> <span class="n">run_postprocessing</span>
+<span class="kn">import</span> <span class="nn">h5py</span>
+
+<div class="viewcode-block" id="events_to_pvalues_no_fdr_correction"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.receptive_field.events_to_pvalues_no_fdr_correction">[docs]</a><span class="k">def</span> <span class="nf">events_to_pvalues_no_fdr_correction</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">event_vector</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">number_of_shuffles</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">response_detection_error_std_dev</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+
+    <span class="n">number_of_pixels</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span>
+
+    <span class="c1"># Initializations:</span>
+    <span class="n">number_of_events</span> <span class="o">=</span> <span class="n">event_vector</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+
+    <span class="n">shuffle_data</span> <span class="o">=</span> <span class="n">get_shuffle_matrix</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">event_vector</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">number_of_shuffles</span><span class="o">=</span><span class="n">number_of_shuffles</span><span class="p">,</span> <span class="n">response_detection_error_std_dev</span><span class="o">=</span><span class="n">response_detection_error_std_dev</span><span class="p">)</span>
+
+    <span class="c1"># Build list of p-values:</span>
+    <span class="n">response_triggered_stimulus_vector</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">event_vector</span><span class="p">)</span><span class="o">/</span><span class="n">number_of_events</span>
+    <span class="n">p_value_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">pi</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">number_of_pixels</span><span class="p">):</span>
+        <span class="n">curr_p_value</span> <span class="o">=</span> <span class="mi">1</span><span class="o">-</span><span class="p">(</span><span class="n">shuffle_data</span><span class="p">[</span><span class="n">pi</span><span class="p">,</span> <span class="p">:]</span> <span class="o">&lt;</span> <span class="n">response_triggered_stimulus_vector</span><span class="p">[</span><span class="n">pi</span><span class="p">])</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">*</span><span class="mf">1.</span><span class="o">/</span><span class="n">number_of_shuffles</span>
+        <span class="n">p_value_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">curr_p_value</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">p_value_list</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="compute_receptive_field"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.receptive_field.compute_receptive_field">[docs]</a><span class="k">def</span> <span class="nf">compute_receptive_field</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">cell_index</span><span class="p">,</span> <span class="n">stimulus</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;alpha&#39;</span><span class="p">)</span>
+
+    <span class="n">event_vector</span> <span class="o">=</span> <span class="n">detect_events</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">cell_index</span><span class="p">,</span> <span class="n">stimulus</span><span class="p">)</span>
+
+    <span class="n">A_blur</span> <span class="o">=</span> <span class="n">get_A_blur</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">stimulus</span><span class="p">)</span>
+    <span class="n">number_of_pixels</span> <span class="o">=</span> <span class="n">A_blur</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span>
+
+    <span class="n">pvalues</span> <span class="o">=</span> <span class="n">events_to_pvalues_no_fdr_correction</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">event_vector</span><span class="p">,</span> <span class="n">A_blur</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+    <span class="n">stimulus_table</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_stimulus_table</span><span class="p">(</span><span class="n">stimulus</span><span class="p">)</span>
+    <span class="n">stimulus_template</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_stimulus_template</span><span class="p">(</span><span class="n">stimulus</span><span class="p">)[</span><span class="n">stimulus_table</span><span class="p">[</span><span class="s1">&#39;frame&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+    <span class="n">s1</span><span class="p">,</span> <span class="n">s2</span> <span class="o">=</span> <span class="n">stimulus_template</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">stimulus_template</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">pvalues_on</span><span class="p">,</span> <span class="n">pvalues_off</span> <span class="o">=</span> <span class="n">pvalues</span><span class="p">[:</span><span class="n">number_of_pixels</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">),</span> <span class="n">pvalues</span><span class="p">[</span><span class="n">number_of_pixels</span><span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">)</span>
+
+
+
+    <span class="n">fdr_corrected_pvalues</span> <span class="o">=</span> <span class="n">multipletests</span><span class="p">(</span><span class="n">pvalues</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">fdr_corrected_pvalues_on</span> <span class="o">=</span> <span class="n">fdr_corrected_pvalues</span><span class="p">[:</span><span class="n">number_of_pixels</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">)</span>
+    <span class="n">_fdr_mask_on</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">pvalues_on</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
+    <span class="n">_fdr_mask_on</span><span class="p">[</span><span class="n">fdr_corrected_pvalues_on</span> <span class="o">&lt;</span> <span class="n">alpha</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">components_on</span><span class="p">,</span> <span class="n">number_of_components_on</span> <span class="o">=</span> <span class="n">get_components</span><span class="p">(</span><span class="n">_fdr_mask_on</span><span class="p">)</span>
+
+    <span class="n">fdr_corrected_pvalues_off</span> <span class="o">=</span> <span class="n">fdr_corrected_pvalues</span><span class="p">[</span><span class="n">number_of_pixels</span><span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">)</span>
+    <span class="n">_fdr_mask_off</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">pvalues_off</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
+    <span class="n">_fdr_mask_off</span><span class="p">[</span><span class="n">fdr_corrected_pvalues_off</span> <span class="o">&lt;</span> <span class="n">alpha</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">components_off</span><span class="p">,</span> <span class="n">number_of_components_off</span> <span class="o">=</span> <span class="n">get_components</span><span class="p">(</span><span class="n">_fdr_mask_off</span><span class="p">)</span>
+
+    <span class="n">A</span> <span class="o">=</span> <span class="n">get_A</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">stimulus</span><span class="p">)</span>
+    <span class="n">A_blur</span> <span class="o">=</span> <span class="n">get_A_blur</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">stimulus</span><span class="p">)</span>
+
+    <span class="n">response_triggered_stimulus_field</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">event_vector</span><span class="p">)</span>
+    <span class="n">response_triggered_stimulus_field_on</span> <span class="o">=</span> <span class="n">response_triggered_stimulus_field</span><span class="p">[:</span><span class="n">number_of_pixels</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">)</span>
+    <span class="n">response_triggered_stimulus_field_off</span> <span class="o">=</span> <span class="n">response_triggered_stimulus_field</span><span class="p">[</span><span class="n">number_of_pixels</span><span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">)</span>
+
+    <span class="n">response_triggered_stimulus_field_convolution</span> <span class="o">=</span> <span class="n">A_blur</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">event_vector</span><span class="p">)</span>
+    <span class="n">response_triggered_stimulus_field_convolution_on</span> <span class="o">=</span> <span class="n">response_triggered_stimulus_field_convolution</span><span class="p">[:</span><span class="n">number_of_pixels</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">)</span>
+    <span class="n">response_triggered_stimulus_field_convolution_off</span> <span class="o">=</span> <span class="n">response_triggered_stimulus_field_convolution</span><span class="p">[</span><span class="n">number_of_pixels</span><span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">)</span>
+
+    <span class="n">on_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;pvalues&#39;</span><span class="p">:{</span><span class="s1">&#39;data&#39;</span><span class="p">:</span><span class="n">pvalues_on</span><span class="p">},</span>
+               <span class="s1">&#39;fdr_corrected&#39;</span><span class="p">:{</span><span class="s1">&#39;data&#39;</span><span class="p">:</span><span class="n">fdr_corrected_pvalues_on</span><span class="p">,</span> <span class="s1">&#39;attrs&#39;</span><span class="p">:{</span><span class="s1">&#39;alpha&#39;</span><span class="p">:</span><span class="n">alpha</span><span class="p">,</span> <span class="s1">&#39;min_p&#39;</span><span class="p">:</span><span class="n">fdr_corrected_pvalues_on</span><span class="o">.</span><span class="n">min</span><span class="p">()}},</span>
+               <span class="s1">&#39;fdr_mask&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;data&#39;</span><span class="p">:</span><span class="n">components_on</span><span class="p">,</span> <span class="s1">&#39;attrs&#39;</span><span class="p">:{</span><span class="s1">&#39;alpha&#39;</span><span class="p">:</span><span class="n">alpha</span><span class="p">,</span> <span class="s1">&#39;number_of_components&#39;</span><span class="p">:</span><span class="n">number_of_components_on</span><span class="p">,</span> <span class="s1">&#39;number_of_pixels&#39;</span><span class="p">:</span><span class="n">components_on</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)}},</span>
+               <span class="s1">&#39;rts_convolution&#39;</span><span class="p">:{</span><span class="s1">&#39;data&#39;</span><span class="p">:</span><span class="n">response_triggered_stimulus_field_convolution_on</span><span class="p">},</span>
+               <span class="s1">&#39;rts&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="n">response_triggered_stimulus_field_on</span><span class="p">}</span>
+               <span class="p">}</span>
+    <span class="n">off_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;pvalues&#39;</span><span class="p">:{</span><span class="s1">&#39;data&#39;</span><span class="p">:</span><span class="n">pvalues_off</span><span class="p">},</span>
+               <span class="s1">&#39;fdr_corrected&#39;</span><span class="p">:{</span><span class="s1">&#39;data&#39;</span><span class="p">:</span><span class="n">fdr_corrected_pvalues_off</span><span class="p">,</span> <span class="s1">&#39;attrs&#39;</span><span class="p">:{</span><span class="s1">&#39;alpha&#39;</span><span class="p">:</span><span class="n">alpha</span><span class="p">,</span> <span class="s1">&#39;min_p&#39;</span><span class="p">:</span><span class="n">fdr_corrected_pvalues_off</span><span class="o">.</span><span class="n">min</span><span class="p">()}},</span>
+               <span class="s1">&#39;fdr_mask&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;data&#39;</span><span class="p">:</span><span class="n">components_off</span><span class="p">,</span> <span class="s1">&#39;attrs&#39;</span><span class="p">:{</span><span class="s1">&#39;alpha&#39;</span><span class="p">:</span><span class="n">alpha</span><span class="p">,</span> <span class="s1">&#39;number_of_components&#39;</span><span class="p">:</span><span class="n">number_of_components_off</span><span class="p">,</span> <span class="s1">&#39;number_of_pixels&#39;</span><span class="p">:</span><span class="n">components_off</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)}},</span>
+               <span class="s1">&#39;rts_convolution&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="n">response_triggered_stimulus_field_convolution_off</span><span class="p">},</span>
+               <span class="s1">&#39;rts&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="n">response_triggered_stimulus_field_off</span><span class="p">}</span>
+                <span class="p">}</span>
+
+    <span class="n">result_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;event_vector&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;data&#39;</span><span class="p">:</span><span class="n">event_vector</span><span class="p">,</span> <span class="s1">&#39;attrs&#39;</span><span class="p">:{</span><span class="s1">&#39;number_of_events&#39;</span><span class="p">:</span><span class="n">event_vector</span><span class="o">.</span><span class="n">sum</span><span class="p">()}},</span>
+                   <span class="s1">&#39;on&#39;</span><span class="p">:</span><span class="n">on_dict</span><span class="p">,</span>
+                   <span class="s1">&#39;off&#39;</span><span class="p">:</span><span class="n">off_dict</span><span class="p">,</span>
+                   <span class="s1">&#39;attrs&#39;</span><span class="p">:{</span><span class="s1">&#39;cell_index&#39;</span><span class="p">:</span><span class="n">cell_index</span><span class="p">,</span> <span class="s1">&#39;stimulus&#39;</span><span class="p">:</span><span class="n">stimulus</span><span class="p">}}</span>
+
+    <span class="k">return</span> <span class="n">result_dict</span></div>
+
+<div class="viewcode-block" id="compute_receptive_field_with_postprocessing"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.receptive_field.compute_receptive_field_with_postprocessing">[docs]</a><span class="k">def</span> <span class="nf">compute_receptive_field_with_postprocessing</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">cell_index</span><span class="p">,</span> <span class="n">stimulus</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">rf</span> <span class="o">=</span> <span class="n">compute_receptive_field</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">cell_index</span><span class="p">,</span> <span class="n">stimulus</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">rf</span> <span class="o">=</span> <span class="n">run_postprocessing</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">rf</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">rf</span></div>
+
+<div class="viewcode-block" id="get_attribute_dict"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.receptive_field.get_attribute_dict">[docs]</a><span class="k">def</span> <span class="nf">get_attribute_dict</span><span class="p">(</span><span class="n">rf</span><span class="p">):</span>
+
+    <span class="n">attribute_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">dict_generator</span><span class="p">(</span><span class="n">rf</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;attrs&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">x</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]),</span> <span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]])</span>
+            <span class="n">attribute_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">attribute_dict</span></div>
+
+
+<div class="viewcode-block" id="print_summary"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.receptive_field.print_summary">[docs]</a><span class="k">def</span> <span class="nf">print_summary</span><span class="p">(</span><span class="n">rf</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">key_val</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">get_attribute_dict</span><span class="p">(</span><span class="n">rf</span><span class="p">)</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="k">print</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> : </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">key_val</span></div>
+
+<div class="viewcode-block" id="write_receptive_field_to_h5"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.receptive_field.write_receptive_field_to_h5">[docs]</a><span class="k">def</span> <span class="nf">write_receptive_field_to_h5</span><span class="p">(</span><span class="n">rf</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+
+    <span class="n">attr_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">dict_generator</span><span class="p">(</span><span class="n">rf</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;data&#39;</span><span class="p">:</span>
+            <span class="n">f</span><span class="p">[</span><span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">prefix</span><span class="p">]</span><span class="o">+</span><span class="n">x</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;attrs&#39;</span><span class="p">:</span>
+            <span class="n">attr_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span>
+
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">attr_list</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">f</span><span class="p">[</span><span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">prefix</span><span class="p">]</span><span class="o">+</span><span class="n">x</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">])]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span>
+            <span class="k">if</span> <span class="n">prefix</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+
+                <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="n">f</span><span class="p">[</span><span class="n">prefix</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">f</span><span class="p">[</span><span class="n">prefix</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="read_h5_group"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.receptive_field.read_h5_group">[docs]</a><span class="k">def</span> <span class="nf">read_h5_group</span><span class="p">(</span><span class="n">g</span><span class="p">):</span>
+    <span class="n">return_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">attrs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">return_dict</span><span class="p">[</span><span class="s1">&#39;attrs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">attrs</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">g</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;data&#39;</span><span class="p">:</span>
+            <span class="n">return_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">g</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">return_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">read_h5_group</span><span class="p">(</span><span class="n">g</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">return_dict</span></div>
+
+<div class="viewcode-block" id="read_receptive_field_from_h5"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.receptive_field.read_receptive_field_from_h5">[docs]</a><span class="k">def</span> <span class="nf">read_receptive_field_from_h5</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+
+    <span class="n">f</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">rf</span> <span class="o">=</span> <span class="n">read_h5_group</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">rf</span> <span class="o">=</span> <span class="n">read_h5_group</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="n">path</span><span class="p">])</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">rf</span></div>
+
+
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../../../../index.html">Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Install Guide</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../brain_observatory.html">Brain Observatory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../connectivity.html">Mouse Connectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../reference_space.html">Reference Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../data_api_client.html">API Access</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../glif_models.html">Generalized LIF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../biophysical_models.html">Biophysical</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../allensdk.html">Source Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.config.html">allensdk.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.ephys.html">allensdk.ephys package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.morphology.html">allensdk.morphology package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
+</ul>
+
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allen-sdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    </div>
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalFooter.js"></script>
+
+
+  </body>
+</html>

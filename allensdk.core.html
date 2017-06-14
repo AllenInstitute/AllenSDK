@@ -31,6 +31,7 @@
   <body role="document">
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
 <script type="text/javascript">
     var _pSupressBrowserFlashWarning = true;
     var _pTabId = "pHome";
@@ -201,7 +202,7 @@ in the function call (e.g. get_ophys_experiment_data(file_name=&#8217;file.nwb&#
 
 <dl class="method">
 <dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_cell_specimens">
-<code class="descname">get_cell_specimens</code><span class="sig-paren">(</span><em>file_name=None</em>, <em>ids=None</em>, <em>experiment_container_ids=None</em>, <em>simple=True</em>, <em>filters=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.get_cell_specimens"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_cell_specimens" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_cell_specimens</code><span class="sig-paren">(</span><em>file_name=None</em>, <em>ids=None</em>, <em>experiment_container_ids=None</em>, <em>include_failed=False</em>, <em>simple=True</em>, <em>filters=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.get_cell_specimens"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_cell_specimens" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return cell specimens that have certain properies.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -220,6 +221,10 @@ is disabled, no file will be saved. Default is None.</p>
 <p><strong>experiment_container_ids: list</strong></p>
 <blockquote>
 <div><p>List of experiment container ids.</p>
+</div></blockquote>
+<p><strong>include_failed: bool</strong></p>
+<blockquote>
+<div><p>Whether to include cells from failed experiment containers</p>
 </div></blockquote>
 <p><strong>simple: boolean</strong></p>
 <blockquote>
@@ -249,7 +254,7 @@ For more detail on the filter syntax, see BrainObservatoryApi.dataframe_query.</
 
 <dl class="method">
 <dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_experiment_containers">
-<code class="descname">get_experiment_containers</code><span class="sig-paren">(</span><em>file_name=None</em>, <em>ids=None</em>, <em>targeted_structures=None</em>, <em>imaging_depths=None</em>, <em>cre_lines=None</em>, <em>transgenic_lines=None</em>, <em>simple=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.get_experiment_containers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_experiment_containers" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_experiment_containers</code><span class="sig-paren">(</span><em>file_name=None</em>, <em>ids=None</em>, <em>targeted_structures=None</em>, <em>imaging_depths=None</em>, <em>cre_lines=None</em>, <em>transgenic_lines=None</em>, <em>include_failed=False</em>, <em>simple=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.get_experiment_containers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_experiment_containers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a list of experiment containers matching certain criteria.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -285,6 +290,10 @@ BrainObservatoryCache.get_all_cre_lines().</p>
 <div><p>List of transgenic lines. Must be in the list returned by
 BrainObservatoryCache.get_all_cre_lines() or.
 BrainObservatoryCache.get_all_reporter_lines().</p>
+</div></blockquote>
+<p><strong>include_failed: boolean</strong></p>
+<blockquote>
+<div><p>Whether or not to include failed experiment containers.</p>
 </div></blockquote>
 <p><strong>simple: boolean</strong></p>
 <blockquote>
@@ -329,8 +338,14 @@ is disabled, no file will be saved. Default is None.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiment_stimuli">
+<code class="descname">get_ophys_experiment_stimuli</code><span class="sig-paren">(</span><em>experiment_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.get_ophys_experiment_stimuli"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiment_stimuli" title="Permalink to this definition">¶</a></dt>
+<dd><p>For a single experiment, return the list of stimuli present in that experiment.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiments">
-<code class="descname">get_ophys_experiments</code><span class="sig-paren">(</span><em>file_name=None</em>, <em>ids=None</em>, <em>experiment_container_ids=None</em>, <em>targeted_structures=None</em>, <em>imaging_depths=None</em>, <em>cre_lines=None</em>, <em>transgenic_lines=None</em>, <em>stimuli=None</em>, <em>session_types=None</em>, <em>simple=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.get_ophys_experiments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiments" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_ophys_experiments</code><span class="sig-paren">(</span><em>file_name=None</em>, <em>ids=None</em>, <em>experiment_container_ids=None</em>, <em>targeted_structures=None</em>, <em>imaging_depths=None</em>, <em>cre_lines=None</em>, <em>transgenic_lines=None</em>, <em>stimuli=None</em>, <em>session_types=None</em>, <em>cell_specimen_ids=None</em>, <em>include_failed=False</em>, <em>simple=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.get_ophys_experiments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiments" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a list of ophys experiments matching certain criteria.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -381,6 +396,14 @@ BrainObservatoryCache.get_all_stimuli().</p>
 <div><p>List of stimulus session type names.  Must be in the list returned by
 BrainObservatoryCache.get_all_session_types().</p>
 </div></blockquote>
+<p><strong>cell_specimen_ids: list</strong></p>
+<blockquote>
+<div><p>Only include experiments that contain cells with these ids.</p>
+</div></blockquote>
+<p><strong>include_failed: boolean</strong></p>
+<blockquote>
+<div><p>Whether or not to include experiments from failed experiment containers.</p>
+</div></blockquote>
 <p><strong>simple: boolean</strong></p>
 <blockquote>
 <div><p>Whether or not to simplify the dictionary properties returned by this method
@@ -426,7 +449,7 @@ to a more concise subset.</p>
 
 <dl class="attribute">
 <dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.SUPPORTED_PIPELINE_VERSION">
-<code class="descname">SUPPORTED_PIPELINE_VERSION</code><em class="property"> = '1.0'</em><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.SUPPORTED_PIPELINE_VERSION" title="Permalink to this definition">¶</a></dt>
+<code class="descname">SUPPORTED_PIPELINE_VERSION</code><em class="property"> = '2.0'</em><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.SUPPORTED_PIPELINE_VERSION" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -460,7 +483,7 @@ to a more concise subset.</p>
 <dl class="method">
 <dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_corrected_fluorescence_traces">
 <code class="descname">get_corrected_fluorescence_traces</code><span class="sig-paren">(</span><em>cell_specimen_ids=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#BrainObservatoryNwbDataSet.get_corrected_fluorescence_traces"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_corrected_fluorescence_traces" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an array of neuropil-corrected fluorescence traces
+<dd><p>Returns an array of demixed and neuropil-corrected fluorescence traces
 for all ROIs and the timestamps for each datapoint</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -480,6 +503,36 @@ then all are returned</p>
 <p>traces: 2D numpy array</p>
 <blockquote class="last">
 <div><p>Corrected fluorescence traces for each cell</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_demixed_traces">
+<code class="descname">get_demixed_traces</code><span class="sig-paren">(</span><em>cell_specimen_ids=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#BrainObservatoryNwbDataSet.get_demixed_traces"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_demixed_traces" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array of demixed fluorescence traces for all ROIs
+and the timestamps for each datapoint</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>cell_specimen_ids: list or array (optional)</strong></p>
+<blockquote>
+<div><p>List of cell IDs to return traces for. If this is None (default)
+then all are returned</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">timestamps: 2D numpy array</p>
+<blockquote>
+<div><p>Timestamp for each fluorescence sample</p>
+</div></blockquote>
+<p>traces: 2D numpy array</p>
+<blockquote class="last">
+<div><p>Demixed fluorescence traces for each cell</p>
 </div></blockquote>
 </td>
 </tr>
@@ -648,7 +701,7 @@ then results for all are returned</p>
 <dl class="method">
 <dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_neuropil_traces">
 <code class="descname">get_neuropil_traces</code><span class="sig-paren">(</span><em>cell_specimen_ids=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#BrainObservatoryNwbDataSet.get_neuropil_traces"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_neuropil_traces" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an array of fluorescence traces for all ROIs
+<dd><p>Returns an array of neuropil fluorescence traces for all ROIs
 and the timestamps for each datapoint</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -668,6 +721,53 @@ then all are returned</p>
 <p>traces: 2D numpy array</p>
 <blockquote class="last">
 <div><p>Neuropil fluorescence traces for each cell</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_pupil_location">
+<code class="descname">get_pupil_location</code><span class="sig-paren">(</span><em>as_spherical=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#BrainObservatoryNwbDataSet.get_pupil_location"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_pupil_location" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the x, y pupil location.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>as_spherical</strong> : bool</p>
+<blockquote>
+<div><p>Whether to return the location as spherical (default) or
+not. If true, the result is altitude and azimuth in
+degrees, otherwise it is x, y in centimeters. (0,0) is
+the center of the monitor.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">(timestamps, location)</p>
+<blockquote class="last">
+<div><p>Timestamps is an (Nx1) array of timestamps in seconds.
+Location is an (Nx2) array of spatial location.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_pupil_size">
+<code class="descname">get_pupil_size</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#BrainObservatoryNwbDataSet.get_pupil_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_pupil_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the pupil area in pixels.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">(timestamps, areas)</p>
+<blockquote class="last">
+<div><p>Timestamps is an (Nx1) array of timestamps in seconds.
+Areas is an (Nx1) array of pupil areas in pixels.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -807,6 +907,12 @@ following: three_session_A, three_session_B, three_session_C</p>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.number_of_cells">
+<code class="descname">number_of_cells</code><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.number_of_cells" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of cells in the experiment</p>
 </dd></dl>
 
 <dl class="method">
@@ -2081,6 +2187,16 @@ in a list of structure ids.</p>
 </table>
 </dd></dl>
 
+<dl class="staticmethod">
+<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.validate_structure_id">
+<em class="property">static </em><code class="descname">validate_structure_id</code><span class="sig-paren">(</span><em>structure_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.validate_structure_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.validate_structure_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.validate_structure_ids">
+<em class="property">static </em><code class="descname">validate_structure_ids</code><span class="sig-paren">(</span><em>structure_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.validate_structure_ids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.validate_structure_ids" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 </div>
@@ -3029,11 +3145,6 @@ defined by to_fn across nodes.</p>
 <dt id="allensdk.core.structure_tree.StructureTree">
 <em class="property">class </em><code class="descclassname">allensdk.core.structure_tree.</code><code class="descname">StructureTree</code><span class="sig-paren">(</span><em>nodes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/structure_tree.html#StructureTree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.structure_tree.StructureTree" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#allensdk.core.simple_tree.SimpleTree" title="allensdk.core.simple_tree.SimpleTree"><code class="xref py py-class docutils literal"><span class="pre">allensdk.core.simple_tree.SimpleTree</span></code></a></p>
-<dl class="attribute">
-<dt id="allensdk.core.structure_tree.StructureTree.FIELDS">
-<code class="descname">FIELDS</code><em class="property"> = ['acronym', 'color_hex_triplet', 'graph_id', 'graph_order', 'id', 'name', 'structure_id_path', 'structure_set_ids']</em><a class="headerlink" href="#allensdk.core.structure_tree.StructureTree.FIELDS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 <dl class="staticmethod">
 <dt id="allensdk.core.structure_tree.StructureTree.clean_structures">
 <em class="property">static </em><code class="descname">clean_structures</code><span class="sig-paren">(</span><em>structures</em>, <em>field_whitelist=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/structure_tree.html#StructureTree.clean_structures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.structure_tree.StructureTree.clean_structures" title="Permalink to this definition">¶</a></dt>
@@ -3048,9 +3159,10 @@ used to construct a StructureTree</p>
 <div><p>Each element describes a structure. Should have a structure id path 
 field (str values) and a structure_sets field (list of dict).</p>
 </div></blockquote>
-<p><strong>field_whitelist</strong> : list of str, optional</p>
+<p><strong>field_whitelist</strong> : dict maps str to fn, optional</p>
 <blockquote>
-<div><p>Each record should keep only fields in this list</p>
+<div><p>Input fields are filtered to keys of this dict and passed through 
+the value functions</p>
 </div></blockquote>
 </td>
 </tr>
@@ -3065,9 +3177,12 @@ field (str values) and a structure_sets field (list of dict).</p>
 </dd></dl>
 
 <dl class="staticmethod">
-<dt id="allensdk.core.structure_tree.StructureTree.filter_dict">
-<em class="property">static </em><code class="descname">filter_dict</code><span class="sig-paren">(</span><em>dictionary</em>, <em>*pass_keys</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/structure_tree.html#StructureTree.filter_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.structure_tree.StructureTree.filter_dict" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="allensdk.core.structure_tree.StructureTree.collect_sets">
+<em class="property">static </em><code class="descname">collect_sets</code><span class="sig-paren">(</span><em>structure</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/structure_tree.html#StructureTree.collect_sets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.structure_tree.StructureTree.collect_sets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Structure sets may be specified by full records or id. This method 
+collects all of the structure set records/ids in a structure record and 
+replaces them with a single list of id records.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="allensdk.core.structure_tree.StructureTree.get_ancestor_id_map">
@@ -3295,7 +3410,8 @@ the supplied set.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>hex_color</strong> : string</p>
 <blockquote>
 <div><p>Must be 6 characters long, unless it is 7 long and the first 
-character is #.</p>
+character is #. If hex_color is a triplet of int, it will be 
+returned unchanged.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -3307,6 +3423,13 @@ character is #.</p>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="allensdk.core.structure_tree.StructureTree.path_to_list">
+<em class="property">static </em><code class="descname">path_to_list</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/structure_tree.html#StructureTree.path_to_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.structure_tree.StructureTree.path_to_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Structure id paths are sometimes formatted as &#8220;/&#8221;-seperated strings. 
+This method converts them to a list of integers, if needed.</p>
 </dd></dl>
 
 <dl class="method">
@@ -3337,6 +3460,11 @@ the one specified by parent_id. Otherwise False.</p>
 </tbody>
 </table>
 </dd></dl>
+
+<dl class="staticmethod">
+<dt id="allensdk.core.structure_tree.StructureTree.whitelist">
+<em class="property">static </em><code class="descname">whitelist</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/structure_tree.html#StructureTree.whitelist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.structure_tree.StructureTree.whitelist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -3938,7 +4066,7 @@ Each tree has exactly one root.</p>
 <h3> Questions </h3>
 <p class="questions">
   Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
-  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allensdk' tag.
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allen-sdk' tag.
 </p>
 
 <p class="questions">

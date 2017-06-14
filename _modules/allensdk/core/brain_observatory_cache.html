@@ -29,6 +29,7 @@
   <body role="document">
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
 <script type="text/javascript">
     var _pSupressBrowserFlashWarning = true;
     var _pTabId = "pHome";
@@ -91,6 +92,8 @@
 <span class="kn">from</span> <span class="nn">.brain_observatory_nwb_data_set</span> <span class="kn">import</span> <span class="n">BrainObservatoryNwbDataSet</span>
 <span class="kn">import</span> <span class="nn">allensdk.brain_observatory.stimulus_info</span> <span class="kn">as</span> <span class="nn">stim_info</span>
 <span class="kn">import</span> <span class="nn">six</span>
+<span class="kn">from</span> <span class="nn">dateutil.parser</span> <span class="kn">import</span> <span class="n">parse</span> <span class="k">as</span> <span class="n">parse_date</span>
+
 
 
 <div class="viewcode-block" id="BrainObservatoryCache"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_cache.BrainObservatoryCache">[docs]</a><span class="k">class</span> <span class="nc">BrainObservatoryCache</span><span class="p">(</span><span class="n">Cache</span><span class="p">):</span>
@@ -175,6 +178,7 @@
                                   <span class="n">imaging_depths</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                                   <span class="n">cre_lines</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                                   <span class="n">transgenic_lines</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                                  <span class="n">include_failed</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
                                   <span class="n">simple</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get a list of experiment containers matching certain criteria.</span>
 
@@ -205,6 +209,9 @@
 <span class="sd">            BrainObservatoryCache.get_all_cre_lines() or.</span>
 <span class="sd">            BrainObservatoryCache.get_all_reporter_lines().</span>
 
+<span class="sd">        include_failed: boolean</span>
+<span class="sd">            Whether or not to include failed experiment containers.</span>
+
 <span class="sd">        simple: boolean</span>
 <span class="sd">            Whether or not to simplify the dictionary properties returned by this method</span>
 <span class="sd">            to a more concise subset.</span>
@@ -220,20 +227,17 @@
         <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cache_path</span><span class="p">(</span>
             <span class="n">file_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">EXPERIMENT_CONTAINERS_KEY</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
-            <span class="n">containers</span> <span class="o">=</span> <span class="n">ju</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">containers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">get_experiment_containers</span><span class="p">()</span>
-
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
-                <span class="n">ju</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">containers</span><span class="p">)</span>
+        <span class="n">containers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">get_experiment_containers</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">file_name</span><span class="p">,</span>
+                                                        <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;lazy&#39;</span><span class="p">,</span>
+                                                        <span class="o">**</span><span class="n">Cache</span><span class="o">.</span><span class="n">cache_json</span><span class="p">())</span>
 
         <span class="n">transgenic_lines</span> <span class="o">=</span> <span class="n">_merge_transgenic_lines</span><span class="p">(</span><span class="n">cre_lines</span><span class="p">,</span> <span class="n">transgenic_lines</span><span class="p">)</span>
 
         <span class="n">containers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">filter_experiment_containers</span><span class="p">(</span><span class="n">containers</span><span class="p">,</span> <span class="n">ids</span><span class="o">=</span><span class="n">ids</span><span class="p">,</span>
                                                            <span class="n">targeted_structures</span><span class="o">=</span><span class="n">targeted_structures</span><span class="p">,</span>
                                                            <span class="n">imaging_depths</span><span class="o">=</span><span class="n">imaging_depths</span><span class="p">,</span>
-                                                           <span class="n">transgenic_lines</span><span class="o">=</span><span class="n">transgenic_lines</span><span class="p">)</span>
+                                                           <span class="n">transgenic_lines</span><span class="o">=</span><span class="n">transgenic_lines</span><span class="p">,</span>
+                                                           <span class="n">include_failed</span><span class="o">=</span><span class="n">include_failed</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">simple</span><span class="p">:</span>
             <span class="n">containers</span> <span class="o">=</span> <span class="p">[{</span>
@@ -242,13 +246,25 @@
                 <span class="s1">&#39;targeted_structure&#39;</span><span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;targeted_structure&#39;</span><span class="p">][</span><span class="s1">&#39;acronym&#39;</span><span class="p">],</span>
                 <span class="s1">&#39;cre_line&#39;</span><span class="p">:</span> <span class="n">_find_specimen_cre_line</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s1">&#39;specimen&#39;</span><span class="p">]),</span>
                 <span class="s1">&#39;reporter_line&#39;</span><span class="p">:</span> <span class="n">_find_specimen_reporter_line</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s1">&#39;specimen&#39;</span><span class="p">]),</span>
-                <span class="s1">&#39;age_days&#39;</span><span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;specimen&#39;</span><span class="p">][</span><span class="s1">&#39;donor&#39;</span><span class="p">][</span><span class="s1">&#39;age&#39;</span><span class="p">][</span><span class="s1">&#39;days&#39;</span><span class="p">],</span>
                 <span class="s1">&#39;donor_name&#39;</span><span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;specimen&#39;</span><span class="p">][</span><span class="s1">&#39;donor&#39;</span><span class="p">][</span><span class="s1">&#39;external_donor_name&#39;</span><span class="p">],</span>
-                <span class="s1">&#39;specimen_name&#39;</span><span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;specimen&#39;</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+                <span class="s1">&#39;specimen_name&#39;</span><span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;specimen&#39;</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;tags&#39;</span><span class="p">:</span> <span class="n">_find_container_tags</span><span class="p">(</span><span class="n">c</span><span class="p">),</span>
+                <span class="s1">&#39;failed&#39;</span><span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;failed&#39;</span><span class="p">]</span>
             <span class="p">}</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">containers</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">containers</span></div>
 
+<div class="viewcode-block" id="BrainObservatoryCache.get_ophys_experiment_stimuli"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiment_stimuli">[docs]</a>    <span class="k">def</span> <span class="nf">get_ophys_experiment_stimuli</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; For a single experiment, return the list of stimuli present in that experiment. &quot;&quot;&quot;</span>
+        <span class="n">exps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_ophys_experiments</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="p">[</span><span class="n">experiment_id</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">exps</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+
+        <span class="k">return</span> <span class="n">stim_info</span><span class="o">.</span><span class="n">stimuli_in_session</span><span class="p">(</span><span class="n">exps</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;session_type&#39;</span><span class="p">])</span></div>
+
+        
+        
 <div class="viewcode-block" id="BrainObservatoryCache.get_ophys_experiments"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiments">[docs]</a>    <span class="k">def</span> <span class="nf">get_ophys_experiments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                               <span class="n">ids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                               <span class="n">experiment_container_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
@@ -258,6 +274,8 @@
                               <span class="n">transgenic_lines</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                               <span class="n">stimuli</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                               <span class="n">session_types</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                              <span class="n">cell_specimen_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                              <span class="n">include_failed</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
                               <span class="n">simple</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get a list of ophys experiments matching certain criteria.</span>
 
@@ -299,6 +317,12 @@
 <span class="sd">            List of stimulus session type names.  Must be in the list returned by</span>
 <span class="sd">            BrainObservatoryCache.get_all_session_types().</span>
 
+<span class="sd">        cell_specimen_ids: list</span>
+<span class="sd">            Only include experiments that contain cells with these ids.</span>
+
+<span class="sd">        include_failed: boolean</span>
+<span class="sd">            Whether or not to include experiments from failed experiment containers.</span>
+
 <span class="sd">        simple: boolean</span>
 <span class="sd">            Whether or not to simplify the dictionary properties returned by this method</span>
 <span class="sd">            to a more concise subset.</span>
@@ -314,16 +338,20 @@
         <span class="n">_assert_not_string</span><span class="p">(</span><span class="n">session_types</span><span class="p">,</span> <span class="s2">&quot;session_types&quot;</span><span class="p">)</span>
 
         <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cache_path</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">EXPERIMENTS_KEY</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
-            <span class="n">exps</span> <span class="o">=</span> <span class="n">ju</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">exps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">get_ophys_experiments</span><span class="p">()</span>
-
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
-                <span class="n">ju</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">exps</span><span class="p">)</span>
+        
+        <span class="n">exps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">get_ophys_experiments</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">file_name</span><span class="p">,</span> 
+                                              <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;lazy&#39;</span><span class="p">,</span> 
+                                              <span class="o">**</span><span class="n">Cache</span><span class="o">.</span><span class="n">cache_json</span><span class="p">())</span>
 
         <span class="n">transgenic_lines</span> <span class="o">=</span> <span class="n">_merge_transgenic_lines</span><span class="p">(</span><span class="n">cre_lines</span><span class="p">,</span> <span class="n">transgenic_lines</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">cell_specimen_ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">cells</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cell_specimens</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="n">cell_specimen_ids</span><span class="p">)</span>
+            <span class="n">cell_container_ids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">cell</span><span class="p">[</span><span class="s1">&#39;experiment_container_id&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">cells</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">experiment_container_ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">experiment_container_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">experiment_container_ids</span><span class="p">)</span> <span class="o">-</span> <span class="n">cell_container_ids</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">experiment_container_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">cell_container_ids</span><span class="p">)</span>
 
         <span class="n">exps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">filter_ophys_experiments</span><span class="p">(</span><span class="n">exps</span><span class="p">,</span>
                                                  <span class="n">ids</span><span class="o">=</span><span class="n">ids</span><span class="p">,</span>
@@ -332,21 +360,23 @@
                                                  <span class="n">imaging_depths</span><span class="o">=</span><span class="n">imaging_depths</span><span class="p">,</span>
                                                  <span class="n">transgenic_lines</span><span class="o">=</span><span class="n">transgenic_lines</span><span class="p">,</span>
                                                  <span class="n">stimuli</span><span class="o">=</span><span class="n">stimuli</span><span class="p">,</span>
-                                                 <span class="n">session_types</span><span class="o">=</span><span class="n">session_types</span><span class="p">)</span>
+                                                 <span class="n">session_types</span><span class="o">=</span><span class="n">session_types</span><span class="p">,</span>
+                                                 <span class="n">include_failed</span><span class="o">=</span><span class="n">include_failed</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">simple</span><span class="p">:</span>
             <span class="n">exps</span> <span class="o">=</span> <span class="p">[{</span>
-                <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">],</span>
-                <span class="s1">&#39;imaging_depth&#39;</span><span class="p">:</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;imaging_depth&#39;</span><span class="p">],</span>
-                <span class="s1">&#39;targeted_structure&#39;</span><span class="p">:</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;targeted_structure&#39;</span><span class="p">][</span><span class="s1">&#39;acronym&#39;</span><span class="p">],</span>
-                <span class="s1">&#39;cre_line&#39;</span><span class="p">:</span> <span class="n">_find_specimen_cre_line</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="s1">&#39;specimen&#39;</span><span class="p">]),</span>
-                <span class="s1">&#39;reporter_line&#39;</span><span class="p">:</span> <span class="n">_find_specimen_reporter_line</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="s1">&#39;specimen&#39;</span><span class="p">]),</span>
-                <span class="s1">&#39;age_days&#39;</span><span class="p">:</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;specimen&#39;</span><span class="p">][</span><span class="s1">&#39;donor&#39;</span><span class="p">][</span><span class="s1">&#39;age&#39;</span><span class="p">][</span><span class="s1">&#39;days&#39;</span><span class="p">],</span>
-                <span class="s1">&#39;experiment_container_id&#39;</span><span class="p">:</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;experiment_container_id&#39;</span><span class="p">],</span>
-                <span class="s1">&#39;session_type&#39;</span><span class="p">:</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;stimulus_name&#39;</span><span class="p">],</span>
-                <span class="s1">&#39;donor_name&#39;</span><span class="p">:</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;specimen&#39;</span><span class="p">][</span><span class="s1">&#39;donor&#39;</span><span class="p">][</span><span class="s1">&#39;external_donor_name&#39;</span><span class="p">],</span>
-                <span class="s1">&#39;specimen_name&#39;</span><span class="p">:</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;specimen&#39;</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
-            <span class="p">}</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">exps</span><span class="p">]</span>
+                    <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;imaging_depth&#39;</span><span class="p">:</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;imaging_depth&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;targeted_structure&#39;</span><span class="p">:</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;targeted_structure&#39;</span><span class="p">][</span><span class="s1">&#39;acronym&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;cre_line&#39;</span><span class="p">:</span> <span class="n">_find_specimen_cre_line</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="s1">&#39;specimen&#39;</span><span class="p">]),</span>
+                    <span class="s1">&#39;reporter_line&#39;</span><span class="p">:</span> <span class="n">_find_specimen_reporter_line</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="s1">&#39;specimen&#39;</span><span class="p">]),</span>
+                    <span class="s1">&#39;acquisition_age_days&#39;</span><span class="p">:</span> <span class="n">_find_experiment_acquisition_age</span><span class="p">(</span><span class="n">e</span><span class="p">),</span>
+                    <span class="s1">&#39;experiment_container_id&#39;</span><span class="p">:</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;experiment_container_id&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;session_type&#39;</span><span class="p">:</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;stimulus_name&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;donor_name&#39;</span><span class="p">:</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;specimen&#39;</span><span class="p">][</span><span class="s1">&#39;donor&#39;</span><span class="p">][</span><span class="s1">&#39;external_donor_name&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;specimen_name&#39;</span><span class="p">:</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;specimen&#39;</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+                    <span class="p">}</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">exps</span><span class="p">]</span>
+            
         <span class="k">return</span> <span class="n">exps</span></div>
 
     <span class="k">def</span> <span class="nf">_get_stimulus_mappings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
@@ -354,13 +384,9 @@
 
         <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cache_path</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">STIMULUS_MAPPINGS_KEY</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
-            <span class="n">mappings</span> <span class="o">=</span> <span class="n">ju</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">mappings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">get_stimulus_mappings</span><span class="p">()</span>
-
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
-                <span class="n">ju</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">mappings</span><span class="p">)</span>
+        <span class="n">mappings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">get_stimulus_mappings</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">file_name</span><span class="p">,</span>
+                                                  <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;lazy&#39;</span><span class="p">,</span>
+                                                  <span class="o">**</span><span class="n">Cache</span><span class="o">.</span><span class="n">cache_json</span><span class="p">())</span>
 
         <span class="k">return</span> <span class="n">mappings</span>
 
@@ -368,6 +394,7 @@
                            <span class="n">file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                            <span class="n">ids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                            <span class="n">experiment_container_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                           <span class="n">include_failed</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
                            <span class="n">simple</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
                            <span class="n">filters</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Return cell specimens that have certain properies.</span>
@@ -384,6 +411,9 @@
 
 <span class="sd">        experiment_container_ids: list</span>
 <span class="sd">            List of experiment container ids.</span>
+
+<span class="sd">        include_failed: bool</span>
+<span class="sd">            Whether to include cells from failed experiment containers</span>
 
 <span class="sd">        simple: boolean</span>
 <span class="sd">            Whether or not to simplify the dictionary properties returned by this method</span>
@@ -408,17 +438,14 @@
 
         <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cache_path</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">CELL_SPECIMENS_KEY</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
-            <span class="n">cell_specimens</span> <span class="o">=</span> <span class="n">ju</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">cell_specimens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">get_cell_metrics</span><span class="p">()</span>
-
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
-                <span class="n">ju</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">cell_specimens</span><span class="p">)</span>
+        <span class="n">cell_specimens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">get_cell_metrics</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">file_name</span><span class="p">,</span>
+                                                   <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;lazy&#39;</span><span class="p">,</span>
+                                                   <span class="o">**</span><span class="n">Cache</span><span class="o">.</span><span class="n">cache_json</span><span class="p">())</span>
 
         <span class="n">cell_specimens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">filter_cell_specimens</span><span class="p">(</span><span class="n">cell_specimens</span><span class="p">,</span>
                                                         <span class="n">ids</span><span class="o">=</span><span class="n">ids</span><span class="p">,</span>
                                                         <span class="n">experiment_container_ids</span><span class="o">=</span><span class="n">experiment_container_ids</span><span class="p">,</span>
+                                                        <span class="n">include_failed</span><span class="o">=</span><span class="n">include_failed</span><span class="p">,</span>
                                                         <span class="n">filters</span><span class="o">=</span><span class="n">filters</span><span class="p">)</span>
 
         <span class="c1"># drop the thumbnail columns</span>
@@ -431,6 +458,7 @@
                     <span class="k">del</span> <span class="n">cs</span><span class="p">[</span><span class="n">t</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">cell_specimens</span></div>
+
 
 <div class="viewcode-block" id="BrainObservatoryCache.get_ophys_experiment_data"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiment_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_ophys_experiment_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ophys_experiment_id</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Download the NWB file for an ophys_experiment (if it hasn&#39;t already been</span>
@@ -453,8 +481,7 @@
         <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cache_path</span><span class="p">(</span>
             <span class="n">file_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">EXPERIMENT_DATA_KEY</span><span class="p">,</span> <span class="n">ophys_experiment_id</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">save_ophys_experiment_data</span><span class="p">(</span><span class="n">ophys_experiment_id</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">save_ophys_experiment_data</span><span class="p">(</span><span class="n">ophys_experiment_id</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;lazy&#39;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">BrainObservatoryNwbDataSet</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span></div>
 
@@ -488,14 +515,26 @@
 
 
 <span class="k">def</span> <span class="nf">_find_specimen_cre_line</span><span class="p">(</span><span class="n">specimen</span><span class="p">):</span>
-    <span class="k">return</span> <span class="nb">next</span><span class="p">(</span><span class="n">tl</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">tl</span> <span class="ow">in</span> <span class="n">specimen</span><span class="p">[</span><span class="s1">&#39;donor&#39;</span><span class="p">][</span><span class="s1">&#39;transgenic_lines&#39;</span><span class="p">]</span>
-                <span class="k">if</span> <span class="n">tl</span><span class="p">[</span><span class="s1">&#39;transgenic_line_type_name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;driver&#39;</span> <span class="ow">and</span>
-                <span class="s1">&#39;Cre&#39;</span> <span class="ow">in</span> <span class="n">tl</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
-
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">next</span><span class="p">(</span><span class="n">tl</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">tl</span> <span class="ow">in</span> <span class="n">specimen</span><span class="p">[</span><span class="s1">&#39;donor&#39;</span><span class="p">][</span><span class="s1">&#39;transgenic_lines&#39;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">tl</span><span class="p">[</span><span class="s1">&#39;transgenic_line_type_name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;driver&#39;</span> <span class="ow">and</span>
+                    <span class="s1">&#39;Cre&#39;</span> <span class="ow">in</span> <span class="n">tl</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+    <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
 
 <span class="k">def</span> <span class="nf">_find_specimen_reporter_line</span><span class="p">(</span><span class="n">specimen</span><span class="p">):</span>
-    <span class="k">return</span> <span class="nb">next</span><span class="p">(</span><span class="n">tl</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">tl</span> <span class="ow">in</span> <span class="n">specimen</span><span class="p">[</span><span class="s1">&#39;donor&#39;</span><span class="p">][</span><span class="s1">&#39;transgenic_lines&#39;</span><span class="p">]</span>
-                <span class="k">if</span> <span class="n">tl</span><span class="p">[</span><span class="s1">&#39;transgenic_line_type_name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;reporter&#39;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">next</span><span class="p">(</span><span class="n">tl</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">tl</span> <span class="ow">in</span> <span class="n">specimen</span><span class="p">[</span><span class="s1">&#39;donor&#39;</span><span class="p">][</span><span class="s1">&#39;transgenic_lines&#39;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">tl</span><span class="p">[</span><span class="s1">&#39;transgenic_line_type_name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;reporter&#39;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+
+<span class="k">def</span> <span class="nf">_find_experiment_acquisition_age</span><span class="p">(</span><span class="n">exp</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">parse_date</span><span class="p">(</span><span class="n">exp</span><span class="p">[</span><span class="s1">&#39;date_of_acquisition&#39;</span><span class="p">])</span> <span class="o">-</span> <span class="n">parse_date</span><span class="p">(</span><span class="n">exp</span><span class="p">[</span><span class="s1">&#39;specimen&#39;</span><span class="p">][</span><span class="s1">&#39;donor&#39;</span><span class="p">][</span><span class="s1">&#39;date_of_birth&#39;</span><span class="p">]))</span><span class="o">.</span><span class="n">days</span>
+    <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
 
 
 <span class="k">def</span> <span class="nf">_merge_transgenic_lines</span><span class="p">(</span><span class="o">*</span><span class="n">lines_list</span><span class="p">):</span>
@@ -511,6 +550,11 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">None</span>
 
+<span class="k">def</span> <span class="nf">_find_container_tags</span><span class="p">(</span><span class="n">container</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Custom logic for extracting tags from donor conditions.  Filtering </span>
+<span class="sd">    out tissuecyte tags. &quot;&quot;&quot;</span>
+    <span class="n">conditions</span> <span class="o">=</span> <span class="n">container</span><span class="p">[</span><span class="s1">&#39;specimen&#39;</span><span class="p">][</span><span class="s1">&#39;donor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;conditions&#39;</span><span class="p">,</span> <span class="p">[])</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">c</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">conditions</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;tissuecyte&#39;</span><span class="p">)]</span>
 
 <span class="k">def</span> <span class="nf">_assert_not_string</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">six</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
@@ -560,7 +604,7 @@
 <h3> Questions </h3>
 <p class="questions">
   Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
-  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allensdk' tag.
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allen-sdk' tag.
 </p>
 
 <p class="questions">

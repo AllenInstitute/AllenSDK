@@ -29,6 +29,7 @@
   <body role="document">
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
 <script type="text/javascript">
     var _pSupressBrowserFlashWarning = true;
     var _pTabId = "pHome";
@@ -267,6 +268,11 @@
     <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;computing df/f&quot;</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">traces</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">traces</span><span class="p">[</span><span class="n">n</span><span class="p">])):</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;trace for roi </span><span class="si">%d</span><span class="s2"> contains NaNs, setting to NaN&quot;</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+            <span class="n">dff</span><span class="p">[</span><span class="n">n</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="k">continue</span>
+
         <span class="n">movingmode_fast</span><span class="p">(</span><span class="n">traces</span><span class="p">[</span><span class="n">n</span><span class="p">,</span> <span class="p">:],</span> <span class="n">mode_kernelsize</span><span class="p">,</span> <span class="n">modeline</span><span class="p">[:])</span>
         <span class="n">movingaverage</span><span class="p">(</span><span class="n">modeline</span><span class="p">[:],</span> <span class="n">mean_kernelsize</span><span class="p">,</span> <span class="n">modelineLP</span><span class="p">[:])</span>
         <span class="n">dff</span><span class="p">[</span><span class="n">n</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">(</span><span class="n">traces</span><span class="p">[</span><span class="n">n</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">modelineLP</span><span class="p">[:])</span> <span class="o">/</span> <span class="n">modelineLP</span><span class="p">[:]</span>
@@ -358,7 +364,7 @@
 <h3> Questions </h3>
 <p class="questions">
   Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
-  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allensdk' tag.
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allen-sdk' tag.
 </p>
 
 <p class="questions">

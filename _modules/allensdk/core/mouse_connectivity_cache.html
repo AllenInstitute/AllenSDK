@@ -29,6 +29,7 @@
   <body role="document">
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
 <script type="text/javascript">
     var _pSupressBrowserFlashWarning = true;
     var _pTabId = "pHome";
@@ -493,6 +494,8 @@
                 <span class="s1">&#39;transgenic-line&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">cre</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">injection_structure_ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">structure_ids</span> <span class="o">=</span> <span class="n">MouseConnectivityCache</span><span class="o">.</span><span class="n">validate_structure_ids</span><span class="p">(</span><span class="n">injection_structure_ids</span><span class="p">)</span>
+
             <span class="n">descendant_ids</span> <span class="o">=</span> <span class="nb">reduce</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">add</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_structure_tree</span><span class="p">()</span>\
                                     <span class="o">.</span><span class="n">descendant_ids</span><span class="p">(</span><span class="n">injection_structure_ids</span><span class="p">))</span>
             <span class="n">experiments</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">experiments</span> 
@@ -555,10 +558,11 @@
                                       
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">get_structure_unionizes</span><span class="p">([</span><span class="n">experiment_id</span><span class="p">],</span> 
                                                 <span class="n">path</span><span class="o">=</span><span class="n">file_name</span><span class="p">,</span>
-                                                <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;lazy&#39;</span><span class="p">,</span>  
-                                                <span class="n">pre</span><span class="o">=</span><span class="n">col_rn</span><span class="p">,</span> 
-                                                <span class="n">post</span><span class="o">=</span><span class="n">filter_fn</span><span class="p">,</span> 
-                                                <span class="o">**</span><span class="n">Cache</span><span class="o">.</span><span class="n">cache_csv_dataframe</span><span class="p">())</span></div>
+                                                <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;lazy&#39;</span><span class="p">,</span>
+                                                <span class="n">pre</span><span class="o">=</span><span class="n">col_rn</span><span class="p">,</span>
+                                                <span class="n">post</span><span class="o">=</span><span class="n">filter_fn</span><span class="p">,</span>
+                                                <span class="n">writer</span><span class="o">=</span><span class="k">lambda</span> <span class="n">p</span><span class="p">,</span> <span class="n">x</span> <span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">p</span><span class="p">),</span>
+                                                <span class="n">reader</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_csv</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MouseConnectivityCache.filter_structure_unionizes"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.filter_structure_unionizes">[docs]</a>    <span class="k">def</span> <span class="nf">filter_structure_unionizes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unionizes</span><span class="p">,</span> 
                                    <span class="n">is_injection</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
@@ -592,6 +596,8 @@
             <span class="n">unionizes</span> <span class="o">=</span> <span class="n">unionizes</span><span class="p">[</span><span class="n">unionizes</span><span class="o">.</span><span class="n">is_injection</span> <span class="o">==</span> <span class="n">is_injection</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">structure_ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">structure_ids</span> <span class="o">=</span> <span class="n">MouseConnectivityCache</span><span class="o">.</span><span class="n">validate_structure_ids</span><span class="p">(</span><span class="n">structure_ids</span><span class="p">)</span>
+
             <span class="k">if</span> <span class="n">include_descendants</span><span class="p">:</span>
                 <span class="n">structure_ids</span> <span class="o">=</span> <span class="nb">reduce</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">add</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_structure_tree</span><span class="p">()</span><span class="o">.</span><span class="n">descendant_ids</span><span class="p">(</span><span class="n">structure_ids</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
@@ -759,11 +765,8 @@
 <span class="sd">            it will be read from this file.  If file_name is None, the</span>
 <span class="sd">            file_name will be pulled out of the manifest.  Default is None.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">structure_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">structure_id</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid structure_id (</span><span class="si">%s</span><span class="s2">): could not convert to integer.&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">structure_id</span><span class="p">))</span>
-        
+        <span class="n">structure_id</span> <span class="o">=</span> <span class="n">MouseConnectivityCache</span><span class="o">.</span><span class="n">validate_structure_id</span><span class="p">(</span><span class="n">structure_id</span><span class="p">)</span>
+
         <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cache_path</span><span class="p">(</span>
             <span class="n">file_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">STRUCTURE_MASK_KEY</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ccf_version</span><span class="p">,</span> 
             <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">,</span> <span class="n">structure_id</span><span class="p">)</span>
@@ -881,8 +884,27 @@
                                   <span class="n">parent_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">CCF_VERSION_KEY</span><span class="p">,</span>
                                   <span class="n">typename</span><span class="o">=</span><span class="s1">&#39;file&#39;</span><span class="p">)</span>
 
-        <span class="n">manifest_builder</span><span class="o">.</span><span class="n">write_json_file</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span></div></div>
-        
+        <span class="n">manifest_builder</span><span class="o">.</span><span class="n">write_json_file</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span></div>
+       
+ 
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="MouseConnectivityCache.validate_structure_id"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.validate_structure_id">[docs]</a>    <span class="k">def</span> <span class="nf">validate_structure_id</span><span class="p">(</span><span class="n">structure_id</span><span class="p">):</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">structure_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">structure_id</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid structure_id (</span><span class="si">%s</span><span class="s2">): could not convert to integer.&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">structure_id</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">structure_id</span></div>
+
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="MouseConnectivityCache.validate_structure_ids"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.validate_structure_ids">[docs]</a>    <span class="k">def</span> <span class="nf">validate_structure_ids</span><span class="p">(</span><span class="n">structure_ids</span><span class="p">):</span>
+
+        <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">sid</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">structure_ids</span><span class="p">):</span>
+            <span class="n">structure_ids</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="o">=</span> <span class="n">MouseConnectivityCache</span><span class="o">.</span><span class="n">validate_structure_id</span><span class="p">(</span><span class="n">sid</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">structure_ids</span></div></div>
 </pre></div>
 
           </div>
@@ -927,7 +949,7 @@
 <h3> Questions </h3>
 <p class="questions">
   Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
-  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allensdk' tag.
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allen-sdk' tag.
 </p>
 
 <p class="questions">

@@ -1,0 +1,464 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>allensdk.brain_observatory.receptive_field_analysis.chisquarerf &mdash; Allen SDK 0.13.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/aibs_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '0.13.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="top" title="Allen SDK 0.13.1 documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" /> 
+  </head>
+  <body role="document">
+<link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
+<script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var _pSupressBrowserFlashWarning = true;
+    var _pTabId = "pHome";
+    var _pMoreProjectsId = "pMoreProjects";
+    var _pImagePath = "http://www.brain-map.org/assets/images/";
+    var _pSiteWarnings = function() {
+        this.show_warning() = {};
+    }
+</script>
+<script type="text/javascript">
+    function initialize() {
+        /*** do your stuff, then initialize the portal plugin ***/
+        _pPortalOnLoad();
+    }
+</script>
+<style>
+  #header_content > a {
+  display: inline-block;
+  width: 250px;
+  height: 75px;
+  background-image:url("/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-size: 235px 37px;
+  background-position: 0px 20px;
+  background-repeat: no-repeat;
+  }
+</style>
+
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
+
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for allensdk.brain_observatory.receptive_field_analysis.chisquarerf</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2017 Allen Institute for Brain Science</span>
+<span class="c1"># This file is part of Allen SDK.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, version 3 of the License.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.interpolate</span> <span class="kn">as</span> <span class="nn">si</span>
+<span class="kn">import</span> <span class="nn">scipy.ndimage.filters</span> <span class="kn">as</span> <span class="nn">filt</span>
+<span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="kn">as</span> <span class="nn">stats</span>
+
+<div class="viewcode-block" id="chi_square_binary"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.chi_square_binary">[docs]</a><span class="k">def</span> <span class="nf">chi_square_binary</span><span class="p">(</span><span class="n">events</span><span class="p">,</span> <span class="n">LSN_template</span><span class="p">):</span>
+    <span class="c1"># note: can only be applied to binary events for trial responses</span>
+    <span class="c1">#</span>
+    <span class="c1"># *****INPUT*****</span>
+    <span class="c1"># events: 2D numpy bool with shape (num_trials,num_cells) for presence</span>
+    <span class="c1">#   or absence of response on a given trial</span>
+    <span class="c1"># LSN_template: 3D numpy int8 with shape (num_trials,num_y_pixels,num_x_pixels)</span>
+    <span class="c1">#   for luminance at each pixel location</span>
+    <span class="c1">#</span>
+    <span class="c1"># *****OUTPUT*****</span>
+    <span class="c1"># chi_square_grid_NLL: 3D numpy float with shape (num_cells,num_y_pixels,num_x_pixels)</span>
+    <span class="c1">#   that gives the negative log-likelihood that a receptive field is contained</span>
+    <span class="c1">#   within a 7x7 pixel mask centered on a given pixel location as measured</span>
+    <span class="c1">#   by a chi-square test for the responses among the pixels (both on and off)</span>
+    <span class="c1">#   that fall within the mask.</span>
+
+    <span class="n">num_trials</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">events</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">num_cells</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">events</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">num_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">LSN_template</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">num_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">LSN_template</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="c1"># for each pixel location, get a mask that is centered on that location</span>
+    <span class="c1">#    disc_masks has shape (num_y,num_x,num_y,num_x)</span>
+    <span class="n">disc_masks</span> <span class="o">=</span> <span class="n">get_disc_masks</span><span class="p">(</span><span class="n">LSN_template</span><span class="p">)</span>
+
+    <span class="c1"># determine which trials each pixel is active (i.e not gray),</span>
+    <span class="c1">#   broken up by ON and OFF pixels.</span>
+    <span class="c1">#   trial_matrix has shape (num_y,num_x,2,num_trials)</span>
+    <span class="n">trial_matrix</span> <span class="o">=</span> <span class="n">build_trial_matrix</span><span class="p">(</span><span class="n">LSN_template</span><span class="p">,</span> <span class="n">num_trials</span><span class="p">)</span>
+
+    <span class="c1"># get the total number of trials each pixel is active (i.e. not gray)</span>
+    <span class="c1">#   trials_per_pixel has shape (num_y,num_x,2)</span>
+    <span class="n">trials_per_pixel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">trial_matrix</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+    <span class="c1"># get the sum of the number of events across all trials that each pixel is active</span>
+    <span class="c1">#   events_per_pixel has shape (num_cells,num_y,num_x,2)</span>
+    <span class="n">events_per_pixel</span> <span class="o">=</span> <span class="n">get_events_per_pixel</span><span class="p">(</span><span class="n">events</span><span class="p">,</span> <span class="n">trial_matrix</span><span class="p">)</span>
+
+    <span class="c1"># smooth stimulus-triggered average spatially with a gaussian</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_cells</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">on_off</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+            <span class="n">events_per_pixel</span><span class="p">[</span><span class="n">n</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="n">on_off</span><span class="p">]</span> <span class="o">=</span> <span class="n">smooth_STA</span><span class="p">(</span><span class="n">events_per_pixel</span><span class="p">[</span><span class="n">n</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="n">on_off</span><span class="p">])</span>
+
+    <span class="c1"># calculate the p_value for each exclusion region</span>
+    <span class="n">chi_square_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_cells</span><span class="p">,</span> <span class="n">num_y</span><span class="p">,</span> <span class="n">num_x</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_y</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_x</span><span class="p">):</span>
+            <span class="n">exclusion_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">num_y</span><span class="p">,</span> <span class="n">num_x</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">*</span> <span class="n">disc_masks</span><span class="p">[</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_y</span><span class="p">,</span> <span class="n">num_x</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">p_vals</span><span class="p">,</span> <span class="n">__</span> <span class="o">=</span> <span class="n">chi_square_within_mask</span><span class="p">(</span><span class="n">exclusion_mask</span><span class="p">,</span> <span class="n">events_per_pixel</span><span class="p">,</span> <span class="n">trials_per_pixel</span><span class="p">)</span>
+            <span class="n">chi_square_grid</span><span class="p">[:,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">p_vals</span>
+
+    <span class="c1"># convert p-values to negative log-likelihood</span>
+    <span class="c1"># chi_square_grid_NLL = pvalue_to_NLL(chi_square_grid)</span>
+
+    <span class="k">return</span> <span class="n">chi_square_grid</span></div>
+
+
+
+<div class="viewcode-block" id="get_peak_significance"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.get_peak_significance">[docs]</a><span class="k">def</span> <span class="nf">get_peak_significance</span><span class="p">(</span><span class="n">chi_square_grid_NLL</span><span class="p">,</span>
+                          <span class="n">LSN_template</span><span class="p">,</span>
+                          <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
+    <span class="c1"># ****INPUT*****</span>
+    <span class="c1"># chi_square_grid_NLL: result of chi_square_binary(events,LSN_template)</span>
+    <span class="c1"># LSN_template: 3D numpy int8 with shape (num_trials,num_y_pixels,num_x_pixels)</span>
+    <span class="c1">#   for luminance at each pixel location</span>
+    <span class="c1">#</span>
+    <span class="c1"># *****OUTPUT*****</span>
+    <span class="c1"># significant_cells: 1D numpy bool with shape (num_cells,) that indicates</span>
+    <span class="c1">#   whether or not each cell has a location with a significant chance of a</span>
+    <span class="c1">#   true receptive field</span>
+    <span class="c1"># best_exclusion_region_list: list of 2D numpy bool with len (num_cells). For each cell,</span>
+    <span class="c1">#   the array is a mask for the best pixel, or all false</span>
+
+    <span class="n">num_cells</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">chi_square_grid_NLL</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">num_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">chi_square_grid_NLL</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">num_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">chi_square_grid_NLL</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="n">chi_square_grid</span> <span class="o">=</span> <span class="n">NLL_to_pvalue</span><span class="p">(</span><span class="n">chi_square_grid_NLL</span><span class="p">)</span>
+
+    <span class="c1"># get the average size of all masks in units of number of pixels</span>
+    <span class="n">disc_masks</span> <span class="o">=</span> <span class="n">get_disc_masks</span><span class="p">(</span><span class="n">LSN_template</span><span class="p">)</span>
+    <span class="n">pixels_per_mask_per_pixel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">disc_masks</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="c1"># find the smallest p-value and determine if it&#39;s significant</span>
+    <span class="n">significant_cells</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_cells</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="n">best_p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_cells</span><span class="p">))</span>
+    <span class="n">p_value_correction_factor_per_pixel</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">*</span> <span class="n">num_y</span> <span class="o">*</span> <span class="n">num_x</span> <span class="o">/</span> <span class="n">pixels_per_mask_per_pixel</span><span class="p">)</span>
+
+    <span class="n">best_exclusion_region_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">corrected_p_value_array_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_cells</span><span class="p">):</span>
+
+        <span class="c1"># Sidak correction:</span>
+        <span class="n">p_value_corrected_per_pixel</span> <span class="o">=</span> <span class="mi">1</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">((</span><span class="mi">1</span><span class="o">-</span><span class="n">chi_square_grid</span><span class="p">[</span><span class="n">n</span><span class="p">,</span> <span class="p">:,:]),</span> <span class="n">p_value_correction_factor_per_pixel</span><span class="p">)</span>
+        <span class="n">corrected_p_value_array_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p_value_corrected_per_pixel</span><span class="p">)</span>
+
+        <span class="n">y</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">p_value_corrected_per_pixel</span><span class="o">.</span><span class="n">argmin</span><span class="p">(),</span> <span class="p">(</span><span class="n">num_y</span><span class="p">,</span> <span class="n">num_x</span><span class="p">))</span>
+
+        <span class="c1"># if more than one p-value that maxes out, use the median location</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">p_value_corrected_per_pixel</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+
+            <span class="n">y</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">p_value_corrected_per_pixel</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">)[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="n">num_y</span><span class="p">,</span> <span class="n">num_x</span><span class="p">))</span>
+
+            <span class="n">med_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">med_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+            <span class="n">center_x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">center_y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)):</span>
+                <span class="n">dx</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">med_x</span>
+                <span class="n">dy</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">med_y</span>
+                <span class="n">dc_x</span> <span class="o">=</span> <span class="n">center_x</span> <span class="o">-</span> <span class="n">med_x</span>
+                <span class="n">dc_y</span> <span class="o">=</span> <span class="n">center_y</span> <span class="o">-</span> <span class="n">med_y</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dx</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">dy</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dc_x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">dc_y</span> <span class="o">**</span> <span class="mi">2</span><span class="p">):</span>
+                    <span class="n">center_x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                    <span class="n">center_y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">center_x</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">center_y</span>
+
+        <span class="n">best_p</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">p_value_corrected_per_pixel</span><span class="p">[</span><span class="n">y</span><span class="p">,</span><span class="n">x</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">best_p</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">alpha</span><span class="p">:</span>
+            <span class="n">significant_cells</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="n">best_exclusion_region_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">disc_masks</span><span class="p">[</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="p">:,:]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">best_exclusion_region_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">disc_masks</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">disc_masks</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">significant_cells</span><span class="p">,</span> <span class="n">best_p</span><span class="p">,</span> <span class="n">corrected_p_value_array_list</span><span class="p">,</span> <span class="n">best_exclusion_region_list</span></div>
+
+
+<div class="viewcode-block" id="pvalue_to_NLL"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.pvalue_to_NLL">[docs]</a><span class="k">def</span> <span class="nf">pvalue_to_NLL</span><span class="p">(</span><span class="n">p_values</span><span class="p">,</span>
+                  <span class="n">max_NLL</span><span class="o">=</span><span class="mf">10.0</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">p_values</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">max_NLL</span><span class="p">,</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">p_values</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="NLL_to_pvalue"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.NLL_to_pvalue">[docs]</a><span class="k">def</span> <span class="nf">NLL_to_pvalue</span><span class="p">(</span><span class="n">NLLs</span><span class="p">,</span>
+                  <span class="n">log_base</span><span class="o">=</span><span class="mf">10.0</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">log_base</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="n">NLLs</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="get_events_per_pixel"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.get_events_per_pixel">[docs]</a><span class="k">def</span> <span class="nf">get_events_per_pixel</span><span class="p">(</span><span class="n">responses_np</span><span class="p">,</span>
+                         <span class="n">trial_matrix</span><span class="p">):</span>
+    <span class="n">num_cells</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">responses_np</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">num_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">trial_matrix</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">num_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">trial_matrix</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">events_per_pixel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_cells</span><span class="p">,</span> <span class="n">num_y</span><span class="p">,</span> <span class="n">num_x</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_y</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_x</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">on_off</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+                <span class="n">frames</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">trial_matrix</span><span class="p">[</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">on_off</span><span class="p">,</span> <span class="p">:])[:,</span> <span class="mi">0</span><span class="p">]</span>
+                <span class="n">events_per_pixel</span><span class="p">[:,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">on_off</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">responses_np</span><span class="p">[</span><span class="n">frames</span><span class="p">,</span> <span class="p">:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">events_per_pixel</span></div>
+
+
+<div class="viewcode-block" id="smooth_STA"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.smooth_STA">[docs]</a><span class="k">def</span> <span class="nf">smooth_STA</span><span class="p">(</span><span class="n">STA</span><span class="p">,</span>
+               <span class="n">gauss_std</span><span class="o">=</span><span class="mf">0.75</span><span class="p">):</span>
+
+    <span class="n">deg_per_pnt</span> <span class="o">=</span> <span class="mi">64</span><span class="o">/</span><span class="n">STA</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">STA_interpolated</span> <span class="o">=</span> <span class="n">interpolate_RF</span><span class="p">(</span><span class="n">STA</span><span class="p">,</span> <span class="n">deg_per_pnt</span><span class="p">)</span>
+    <span class="n">STA_interpolated_smoothed</span> <span class="o">=</span> <span class="n">filt</span><span class="o">.</span><span class="n">gaussian_filter</span><span class="p">(</span><span class="n">STA_interpolated</span><span class="p">,</span> <span class="n">gauss_std</span><span class="p">)</span>
+    <span class="n">STA_smoothed</span> <span class="o">=</span> <span class="n">deinterpolate_RF</span><span class="p">(</span><span class="n">STA_interpolated_smoothed</span><span class="p">,</span> <span class="n">STA</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">STA</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">deg_per_pnt</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">STA_smoothed</span></div>
+
+
+<div class="viewcode-block" id="interpolate_RF"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.interpolate_RF">[docs]</a><span class="k">def</span> <span class="nf">interpolate_RF</span><span class="p">(</span><span class="n">rf_map</span><span class="p">,</span>
+                   <span class="n">deg_per_pnt</span><span class="p">):</span>
+    <span class="n">x_pnts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">rf_map</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">y_pnts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">rf_map</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">x_coor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">x_pnts</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">deg_per_pnt</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">x_pnts</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">deg_per_pnt</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">deg_per_pnt</span><span class="p">)</span>
+    <span class="n">y_coor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">y_pnts</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">deg_per_pnt</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">y_pnts</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">deg_per_pnt</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">deg_per_pnt</span><span class="p">)</span>
+
+    <span class="n">x_interpolated</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">x_pnts</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">deg_per_pnt</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">deg_per_pnt</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">x_pnts</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">deg_per_pnt</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">y_interpolated</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">y_pnts</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">deg_per_pnt</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">deg_per_pnt</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">y_pnts</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">deg_per_pnt</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">interpolated</span> <span class="o">=</span> <span class="n">si</span><span class="o">.</span><span class="n">interp2d</span><span class="p">(</span><span class="n">x_coor</span><span class="p">,</span> <span class="n">y_coor</span><span class="p">,</span> <span class="n">rf_map</span><span class="p">)</span>
+    <span class="n">interpolated</span> <span class="o">=</span> <span class="n">interpolated</span><span class="p">(</span><span class="n">x_interpolated</span><span class="p">,</span> <span class="n">y_interpolated</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">interpolated</span></div>
+
+
+<div class="viewcode-block" id="deinterpolate_RF"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.deinterpolate_RF">[docs]</a><span class="k">def</span> <span class="nf">deinterpolate_RF</span><span class="p">(</span><span class="n">rf_map</span><span class="p">,</span> <span class="n">x_pnts</span><span class="p">,</span> <span class="n">y_pnts</span><span class="p">,</span> <span class="n">deg_per_pnt</span><span class="p">):</span>
+
+    <span class="c1"># x_pnts = 28</span>
+    <span class="c1"># y_pnts = 16</span>
+
+    <span class="n">x_interpolated</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">x_pnts</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">deg_per_pnt</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">deg_per_pnt</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">x_pnts</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">deg_per_pnt</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">y_interpolated</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">y_pnts</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">deg_per_pnt</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">deg_per_pnt</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">y_pnts</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">deg_per_pnt</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">x_deinterpolate</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">x_interpolated</span><span class="p">),</span> <span class="n">deg_per_pnt</span><span class="p">)</span>
+    <span class="n">y_deinterpolate</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_interpolated</span><span class="p">),</span> <span class="n">deg_per_pnt</span><span class="p">)</span>
+
+    <span class="n">sampled_y</span> <span class="o">=</span> <span class="n">rf_map</span><span class="p">[</span><span class="n">y_deinterpolate</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">sampled_yx</span> <span class="o">=</span> <span class="n">sampled_y</span><span class="p">[:,</span> <span class="n">x_deinterpolate</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">sampled_yx</span></div>
+
+
+<div class="viewcode-block" id="chi_square_within_mask"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.chi_square_within_mask">[docs]</a><span class="k">def</span> <span class="nf">chi_square_within_mask</span><span class="p">(</span><span class="n">exclusion_mask</span><span class="p">,</span>
+                           <span class="n">events_per_pixel</span><span class="p">,</span>
+                           <span class="n">trials_per_pixel</span><span class="p">):</span>
+    <span class="n">num_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">exclusion_mask</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">num_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">exclusion_mask</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">num_cells</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">events_per_pixel</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># d.f. is number of pixels in mask minus one</span>
+    <span class="n">degrees_of_freedom</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">exclusion_mask</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span>
+
+    <span class="c1"># calculate expected number of events per pixel</span>
+    <span class="c1">#   expected_by_pixel has shape (num_cells,num_y,num_x,2)</span>
+    <span class="n">num_trials_by_pixel</span> <span class="o">=</span> <span class="n">exclusion_mask</span> <span class="o">*</span> <span class="n">trials_per_pixel</span>  <span class="c1"># shape is (num_y,num_x,2)</span>
+    <span class="n">total_trials_in_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">num_trials_by_pixel</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">events_by_pixel_in_mask</span> <span class="o">=</span> <span class="n">exclusion_mask</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_y</span><span class="p">,</span> <span class="n">num_x</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">events_per_pixel</span>
+    <span class="n">total_events_in_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">events_by_pixel_in_mask</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">expected_per_trial</span> <span class="o">=</span> <span class="n">total_events_in_mask</span> <span class="o">/</span> <span class="n">total_trials_in_mask</span>  <span class="c1"># shape is (num_cells,)</span>
+    <span class="n">expected_by_pixel</span> <span class="o">=</span> <span class="n">num_trials_by_pixel</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_y</span><span class="p">,</span> <span class="n">num_x</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">expected_per_trial</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_cells</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># calculate observed number of events per pixel</span>
+    <span class="c1">#   observed_by_pixel has shape (num_cells,num_y,num_x,2)</span>
+    <span class="n">observed_by_pixel</span> <span class="o">=</span> <span class="p">(</span><span class="n">events_per_pixel</span> <span class="o">*</span> <span class="n">exclusion_mask</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_y</span><span class="p">,</span> <span class="n">num_x</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="c1"># calculate test statistic given observed and expected</span>
+    <span class="n">residual_by_pixel</span> <span class="o">=</span> <span class="n">observed_by_pixel</span> <span class="o">-</span> <span class="n">expected_by_pixel</span>
+    <span class="n">chi</span> <span class="o">=</span> <span class="p">(</span><span class="n">residual_by_pixel</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">expected_by_pixel</span>
+    <span class="n">chi_sum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">chi</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+
+    <span class="c1"># get p-value given test statistic and degrees of freedom</span>
+    <span class="n">p_vals</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">stats</span><span class="o">.</span><span class="n">chi2</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">chi_sum</span><span class="p">,</span> <span class="n">degrees_of_freedom</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">p_vals</span><span class="p">,</span> <span class="n">chi</span></div>
+
+
+<div class="viewcode-block" id="build_trial_matrix"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.build_trial_matrix">[docs]</a><span class="k">def</span> <span class="nf">build_trial_matrix</span><span class="p">(</span><span class="n">LSN_template</span><span class="p">,</span>
+                       <span class="n">num_trials</span><span class="p">):</span>
+    <span class="n">num_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">LSN_template</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">num_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">LSN_template</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">on_off_luminance</span> <span class="o">=</span> <span class="p">[</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">trial_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_y</span><span class="p">,</span> <span class="n">num_x</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">num_trials</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_y</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_x</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">on_off</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+                <span class="n">frame</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">LSN_template</span><span class="p">[:</span><span class="n">num_trials</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">]</span> <span class="o">==</span> <span class="n">on_off_luminance</span><span class="p">[</span><span class="n">on_off</span><span class="p">])[:,</span> <span class="mi">0</span><span class="p">]</span>
+                <span class="n">trial_mat</span><span class="p">[</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">on_off</span><span class="p">,</span> <span class="n">frame</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+
+    <span class="k">return</span> <span class="n">trial_mat</span></div>
+
+
+<div class="viewcode-block" id="get_disc_masks"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.get_disc_masks">[docs]</a><span class="k">def</span> <span class="nf">get_disc_masks</span><span class="p">(</span><span class="n">LSN_template</span><span class="p">,</span>
+                   <span class="n">radius</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+    <span class="n">on_luminance</span> <span class="o">=</span> <span class="mi">255</span>
+    <span class="n">off_luminance</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">num_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">LSN_template</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">num_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">LSN_template</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="c1"># convert template to true on trials a pixel is not gray and false when gray</span>
+    <span class="n">LSN_binary</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">LSN_template</span> <span class="o">==</span> <span class="n">off_luminance</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">LSN_template</span><span class="p">)</span>
+    <span class="n">LSN_binary</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">LSN_binary</span> <span class="o">==</span> <span class="n">on_luminance</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">LSN_binary</span><span class="p">)</span>
+    <span class="n">LSN_binary</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">LSN_binary</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+
+    <span class="c1"># get number of trials each pixel is not gray</span>
+    <span class="n">on_trials</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">LSN_binary</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>  <span class="c1"># shape is (num_y,num_x)</span>
+
+    <span class="n">masks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_y</span><span class="p">,</span> <span class="n">num_x</span><span class="p">,</span> <span class="n">num_y</span><span class="p">,</span> <span class="n">num_x</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_y</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_x</span><span class="p">):</span>
+            <span class="n">trials_not_gray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">LSN_binary</span><span class="p">[:,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)[:,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="n">raw_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">LSN_binary</span><span class="p">[</span><span class="n">trials_not_gray</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">on_trials</span><span class="p">)</span>
+
+            <span class="n">center_y</span><span class="p">,</span> <span class="n">center_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">raw_mask</span><span class="o">.</span><span class="n">argmax</span><span class="p">(),</span> <span class="p">(</span><span class="n">num_y</span><span class="p">,</span> <span class="n">num_x</span><span class="p">))</span>
+
+            <span class="c1"># include center pixel in mask</span>
+            <span class="n">raw_mask</span><span class="p">[</span><span class="n">center_y</span><span class="p">,</span> <span class="n">center_x</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+            <span class="n">x_max</span> <span class="o">=</span> <span class="n">center_x</span> <span class="o">+</span> <span class="n">radius</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">x_max</span> <span class="o">&gt;</span> <span class="n">num_x</span><span class="p">:</span>
+                <span class="n">x_max</span> <span class="o">=</span> <span class="n">num_x</span>
+            <span class="n">x_min</span> <span class="o">=</span> <span class="n">center_x</span> <span class="o">-</span> <span class="n">radius</span>
+            <span class="k">if</span> <span class="n">x_min</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">x_min</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">y_max</span> <span class="o">=</span> <span class="n">center_y</span> <span class="o">+</span> <span class="n">radius</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">y_max</span> <span class="o">&gt;</span> <span class="n">num_y</span><span class="p">:</span>
+                <span class="n">y_max</span> <span class="o">=</span> <span class="n">num_y</span>
+            <span class="n">y_min</span> <span class="o">=</span> <span class="n">center_y</span> <span class="o">-</span> <span class="n">radius</span>
+            <span class="k">if</span> <span class="n">y_min</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">y_min</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="c1"># don&#39;t include far away pixels that just happen</span>
+            <span class="c1"># to not have any trials in common with center pixel</span>
+            <span class="n">clean_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">raw_mask</span><span class="p">))</span>
+            <span class="n">clean_mask</span><span class="p">[</span><span class="n">y_min</span><span class="p">:</span><span class="n">y_max</span><span class="p">,</span> <span class="n">x_min</span><span class="p">:</span><span class="n">x_max</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_mask</span><span class="p">[</span><span class="n">y_min</span><span class="p">:</span><span class="n">y_max</span><span class="p">,</span> <span class="n">x_min</span><span class="p">:</span><span class="n">x_max</span><span class="p">]</span>
+
+            <span class="n">masks</span><span class="p">[</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">clean_mask</span>
+
+    <span class="n">masks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">masks</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">masks</span></div>
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../../../../index.html">Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Install Guide</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../brain_observatory.html">Brain Observatory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../connectivity.html">Mouse Connectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../reference_space.html">Reference Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../data_api_client.html">API Access</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../glif_models.html">Generalized LIF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../biophysical_models.html">Biophysical</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../allensdk.html">Source Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.config.html">allensdk.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.ephys.html">allensdk.ephys package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.morphology.html">allensdk.morphology package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
+</ul>
+
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allen-sdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    </div>
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalFooter.js"></script>
+
+
+  </body>
+</html>

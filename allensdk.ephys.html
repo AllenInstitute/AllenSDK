@@ -31,6 +31,7 @@
   <body role="document">
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
 <script type="text/javascript">
     var _pSupressBrowserFlashWarning = true;
     var _pTabId = "pHome";
@@ -78,7 +79,7 @@
 <span id="allensdk-ephys-ephys-extractor-module"></span><h2>allensdk.ephys.ephys_extractor module<a class="headerlink" href="#module-allensdk.ephys.ephys_extractor" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor">
-<em class="property">class </em><code class="descclassname">allensdk.ephys.ephys_extractor.</code><code class="descname">EphysCellFeatureExtractor</code><span class="sig-paren">(</span><em>ramps_ext</em>, <em>short_squares_ext</em>, <em>long_squares_ext</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysCellFeatureExtractor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">allensdk.ephys.ephys_extractor.</code><code class="descname">EphysCellFeatureExtractor</code><span class="sig-paren">(</span><em>ramps_ext</em>, <em>short_squares_ext</em>, <em>long_squares_ext</em>, <em>subthresh_min_amp=-100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysCellFeatureExtractor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="attribute">
 <dt id="allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.SAG_TARGET">
 <code class="descname">SAG_TARGET</code><em class="property"> = -100.0</em><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.SAG_TARGET" title="Permalink to this definition">¶</a></dt>
@@ -87,11 +88,6 @@
 <dl class="attribute">
 <dt id="allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.SUBTHRESH_MAX_AMP">
 <code class="descname">SUBTHRESH_MAX_AMP</code><em class="property"> = 0</em><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.SUBTHRESH_MAX_AMP" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.SUBTHRESH_MIN_AMP">
-<code class="descname">SUBTHRESH_MIN_AMP</code><em class="property"> = -100</em><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.SUBTHRESH_MIN_AMP" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -388,7 +384,7 @@ sweep feature extractor objects.</p>
 
 <dl class="function">
 <dt id="allensdk.ephys.ephys_extractor.cell_extractor_for_nwb">
-<code class="descclassname">allensdk.ephys.ephys_extractor.</code><code class="descname">cell_extractor_for_nwb</code><span class="sig-paren">(</span><em>dataset</em>, <em>ramps</em>, <em>short_squares</em>, <em>long_squares</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#cell_extractor_for_nwb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.cell_extractor_for_nwb" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">allensdk.ephys.ephys_extractor.</code><code class="descname">cell_extractor_for_nwb</code><span class="sig-paren">(</span><em>dataset</em>, <em>ramps</em>, <em>short_squares</em>, <em>long_squares</em>, <em>subthresh_min_amp=-100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#cell_extractor_for_nwb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.cell_extractor_for_nwb" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize EphysCellFeatureExtractor object from NWB data set</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -936,7 +932,7 @@ and exceeds this limit, the faster one will be considered the dominant one</p>
 <span id="allensdk-ephys-extract-cell-features-module"></span><h2>allensdk.ephys.extract_cell_features module<a class="headerlink" href="#module-allensdk.ephys.extract_cell_features" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="allensdk.ephys.extract_cell_features.extract_cell_features">
-<code class="descclassname">allensdk.ephys.extract_cell_features.</code><code class="descname">extract_cell_features</code><span class="sig-paren">(</span><em>data_set</em>, <em>ramp_sweep_numbers</em>, <em>short_square_sweep_numbers</em>, <em>long_square_sweep_numbers</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/extract_cell_features.html#extract_cell_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.extract_cell_features.extract_cell_features" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">allensdk.ephys.extract_cell_features.</code><code class="descname">extract_cell_features</code><span class="sig-paren">(</span><em>data_set</em>, <em>ramp_sweep_numbers</em>, <em>short_square_sweep_numbers</em>, <em>long_square_sweep_numbers</em>, <em>subthresh_min_amp=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/extract_cell_features.html#extract_cell_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.extract_cell_features.extract_cell_features" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
@@ -1081,7 +1077,7 @@ This assumes that there is a test pulse followed by the stimulus square.</p>
 <h3> Questions </h3>
 <p class="questions">
   Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
-  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allensdk' tag.
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allen-sdk' tag.
 </p>
 
 <p class="questions">

@@ -11826,6 +11826,13 @@ div#notebook {
 
 
 <div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>WARNING:allensdk.api.queries.brain_observatory_api:Downloading ophys_experiment 501940850 NWB. This can take some time.
+</pre>
+</div>
+</div>
+
+<div class="output_area"><div class="prompt"></div>
 
 
 <div class="output_png output_subarea ">
@@ -14344,14 +14351,15 @@ AAAASUVORK5CYII=
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">data_set</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_ophys_experiment_data</span><span class="p">(</span><span class="mi">505693621</span><span class="p">)</span>
 
 <span class="c1"># read in the locally sparse noise stimulus movie.  </span>
 <span class="c1"># the &#39;mask_offscreen&#39; argument will set off-screen grid locations to LocallySparseNoise.LSN_OFF_SCREEN</span>
-<span class="n">lsn_movie</span><span class="p">,</span> <span class="n">offscreen_mask</span> <span class="o">=</span> <span class="n">data_set</span><span class="o">.</span><span class="n">get_locally_sparse_noise_stimulus_template</span><span class="p">(</span><span class="n">mask_off_screen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">lsn_movie</span><span class="p">,</span> <span class="n">offscreen_mask</span> <span class="o">=</span> <span class="n">data_set</span><span class="o">.</span><span class="n">get_locally_sparse_noise_stimulus_template</span><span class="p">(</span><span class="s1">&#39;locally_sparse_noise&#39;</span><span class="p">,</span>
+                                                                                <span class="n">mask_off_screen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="c1"># show a single frame of the stimulus for reference</span>
 <span class="n">frame</span> <span class="o">=</span> <span class="mi">200</span>
@@ -14368,13 +14376,6 @@ AAAASUVORK5CYII=
 <div class="output_wrapper">
 <div class="output">
 
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>WARNING:allensdk.api.queries.brain_observatory_api:Downloading ophys_experiment 505693621 NWB. This can take some time.
-</pre>
-</div>
-</div>
 
 <div class="output_area"><div class="prompt"></div>
 

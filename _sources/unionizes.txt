@@ -39,7 +39,7 @@ projection_intensity           sum_projection_pixel_intensity / sum_projection_p
 projection_energy              projection_density * projection_intensity
 volume                         volume of valid pixels in structure. Valid pixels are those not manually annotated as invalid data.
 projection_volume              volume of projection signal in structure in mm3
-normalized_projection_volume   projection_volume / total volume of signal in brain
+normalized_projection_volume   projection_volume / total volume of signal in the injection site.
 max_voxel_density              density of projection signal in 10um3 grid voxel with largest density.
 max_voxel_x                    x coordinate in um of grid voxel with largest density.
 max_voxel_y                    y coordinate in um of grid voxel with largest density.

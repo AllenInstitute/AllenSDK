@@ -60,7 +60,7 @@ example Dockerfiles are available.
  
      Anaconda::
 
-         docker pull alleninsitute/allensdk
+         docker pull alleninstitute/allensdk
  
      Other docker configurations are also available under docker directory in the source repository.
  

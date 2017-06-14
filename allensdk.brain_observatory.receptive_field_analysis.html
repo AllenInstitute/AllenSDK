@@ -1,0 +1,476 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>allensdk.brain_observatory.receptive_field_analysis package &mdash; Allen SDK 0.13.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.13.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Allen SDK 0.13.1 documentation" href="index.html" />
+    <link rel="up" title="allensdk.brain_observatory package" href="allensdk.brain_observatory.html" />
+    <link rel="next" title="allensdk.config package" href="allensdk.config.html" />
+    <link rel="prev" title="allensdk.brain_observatory package" href="allensdk.brain_observatory.html" /> 
+  </head>
+  <body role="document">
+<link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
+<script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var _pSupressBrowserFlashWarning = true;
+    var _pTabId = "pHome";
+    var _pMoreProjectsId = "pMoreProjects";
+    var _pImagePath = "http://www.brain-map.org/assets/images/";
+    var _pSiteWarnings = function() {
+        this.show_warning() = {};
+    }
+</script>
+<script type="text/javascript">
+    function initialize() {
+        /*** do your stuff, then initialize the portal plugin ***/
+        _pPortalOnLoad();
+    }
+</script>
+<style>
+  #header_content > a {
+  display: inline-block;
+  width: 250px;
+  height: 75px;
+  background-image:url("/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-size: 235px 37px;
+  background-position: 0px 20px;
+  background-repeat: no-repeat;
+  }
+</style>
+
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
+
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="allensdk-brain-observatory-receptive-field-analysis-package">
+<h1>allensdk.brain_observatory.receptive_field_analysis package<a class="headerlink" href="#allensdk-brain-observatory-receptive-field-analysis-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-allensdk.brain_observatory.receptive_field_analysis.chisquarerf">
+<span id="allensdk-brain-observatory-receptive-field-analysis-chisquarerf-module"></span><h2>allensdk.brain_observatory.receptive_field_analysis.chisquarerf module<a class="headerlink" href="#module-allensdk.brain_observatory.receptive_field_analysis.chisquarerf" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.chisquarerf.NLL_to_pvalue">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.chisquarerf.</code><code class="descname">NLL_to_pvalue</code><span class="sig-paren">(</span><em>NLLs</em>, <em>log_base=10.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/chisquarerf.html#NLL_to_pvalue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.NLL_to_pvalue" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.chisquarerf.build_trial_matrix">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.chisquarerf.</code><code class="descname">build_trial_matrix</code><span class="sig-paren">(</span><em>LSN_template</em>, <em>num_trials</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/chisquarerf.html#build_trial_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.build_trial_matrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.chisquarerf.chi_square_binary">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.chisquarerf.</code><code class="descname">chi_square_binary</code><span class="sig-paren">(</span><em>events</em>, <em>LSN_template</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/chisquarerf.html#chi_square_binary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.chi_square_binary" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.chisquarerf.chi_square_within_mask">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.chisquarerf.</code><code class="descname">chi_square_within_mask</code><span class="sig-paren">(</span><em>exclusion_mask</em>, <em>events_per_pixel</em>, <em>trials_per_pixel</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/chisquarerf.html#chi_square_within_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.chi_square_within_mask" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.chisquarerf.deinterpolate_RF">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.chisquarerf.</code><code class="descname">deinterpolate_RF</code><span class="sig-paren">(</span><em>rf_map</em>, <em>x_pnts</em>, <em>y_pnts</em>, <em>deg_per_pnt</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/chisquarerf.html#deinterpolate_RF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.deinterpolate_RF" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.chisquarerf.get_disc_masks">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.chisquarerf.</code><code class="descname">get_disc_masks</code><span class="sig-paren">(</span><em>LSN_template</em>, <em>radius=3</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/chisquarerf.html#get_disc_masks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.get_disc_masks" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.chisquarerf.get_events_per_pixel">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.chisquarerf.</code><code class="descname">get_events_per_pixel</code><span class="sig-paren">(</span><em>responses_np</em>, <em>trial_matrix</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/chisquarerf.html#get_events_per_pixel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.get_events_per_pixel" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.chisquarerf.get_peak_significance">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.chisquarerf.</code><code class="descname">get_peak_significance</code><span class="sig-paren">(</span><em>chi_square_grid_NLL</em>, <em>LSN_template</em>, <em>alpha=0.05</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/chisquarerf.html#get_peak_significance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.get_peak_significance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.chisquarerf.interpolate_RF">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.chisquarerf.</code><code class="descname">interpolate_RF</code><span class="sig-paren">(</span><em>rf_map</em>, <em>deg_per_pnt</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/chisquarerf.html#interpolate_RF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.interpolate_RF" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.chisquarerf.pvalue_to_NLL">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.chisquarerf.</code><code class="descname">pvalue_to_NLL</code><span class="sig-paren">(</span><em>p_values</em>, <em>max_NLL=10.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/chisquarerf.html#pvalue_to_NLL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.pvalue_to_NLL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.chisquarerf.smooth_STA">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.chisquarerf.</code><code class="descname">smooth_STA</code><span class="sig-paren">(</span><em>STA</em>, <em>gauss_std=0.75</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/chisquarerf.html#smooth_STA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.smooth_STA" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-allensdk.brain_observatory.receptive_field_analysis.eventdetection">
+<span id="allensdk-brain-observatory-receptive-field-analysis-eventdetection-module"></span><h2>allensdk.brain_observatory.receptive_field_analysis.eventdetection module<a class="headerlink" href="#module-allensdk.brain_observatory.receptive_field_analysis.eventdetection" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.eventdetection.detect_events">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.eventdetection.</code><code class="descname">detect_events</code><span class="sig-paren">(</span><em>data</em>, <em>cell_index</em>, <em>stimulus</em>, <em>debug_plots=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/eventdetection.html#detect_events"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.eventdetection.detect_events" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-allensdk.brain_observatory.receptive_field_analysis.fit_parameters">
+<span id="allensdk-brain-observatory-receptive-field-analysis-fit-parameters-module"></span><h2>allensdk.brain_observatory.receptive_field_analysis.fit_parameters module<a class="headerlink" href="#module-allensdk.brain_observatory.receptive_field_analysis.fit_parameters" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.fit_parameters.add_to_fit_parameters_dict_single">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.fit_parameters.</code><code class="descname">add_to_fit_parameters_dict_single</code><span class="sig-paren">(</span><em>fit_parameters_dict</em>, <em>p</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/fit_parameters.html#add_to_fit_parameters_dict_single"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.fit_parameters.add_to_fit_parameters_dict_single" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.fit_parameters.compute_distance">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.fit_parameters.</code><code class="descname">compute_distance</code><span class="sig-paren">(</span><em>center_on</em>, <em>center_off</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/fit_parameters.html#compute_distance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.fit_parameters.compute_distance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.fit_parameters.compute_overlap">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.fit_parameters.</code><code class="descname">compute_overlap</code><span class="sig-paren">(</span><em>data_fitted_on</em>, <em>data_fitted_off</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/fit_parameters.html#compute_overlap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.fit_parameters.compute_overlap" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.fit_parameters.get_gaussian_fit_single_channel">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.fit_parameters.</code><code class="descname">get_gaussian_fit_single_channel</code><span class="sig-paren">(</span><em>rf</em>, <em>fit_parameters_dict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/fit_parameters.html#get_gaussian_fit_single_channel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.fit_parameters.get_gaussian_fit_single_channel" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-allensdk.brain_observatory.receptive_field_analysis.fitgaussian2D">
+<span id="allensdk-brain-observatory-receptive-field-analysis-fitgaussian2d-module"></span><h2>allensdk.brain_observatory.receptive_field_analysis.fitgaussian2D module<a class="headerlink" href="#module-allensdk.brain_observatory.receptive_field_analysis.fitgaussian2D" title="Permalink to this headline">¶</a></h2>
+<dl class="exception">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.fitgaussian2D.GaussianFitError">
+<em class="property">exception </em><code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.fitgaussian2D.</code><code class="descname">GaussianFitError</code><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/fitgaussian2D.html#GaussianFitError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.fitgaussian2D.GaussianFitError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.RuntimeError</span></code></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.fitgaussian2D.fitgaussian2D">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.fitgaussian2D.</code><code class="descname">fitgaussian2D</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/fitgaussian2D.html#fitgaussian2D"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.fitgaussian2D.fitgaussian2D" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.fitgaussian2D.fitgaussian2D_fixedcenter">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.fitgaussian2D.</code><code class="descname">fitgaussian2D_fixedcenter</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/fitgaussian2D.html#fitgaussian2D_fixedcenter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.fitgaussian2D.fitgaussian2D_fixedcenter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.fitgaussian2D.gaussian2D">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.fitgaussian2D.</code><code class="descname">gaussian2D</code><span class="sig-paren">(</span><em>height</em>, <em>center_x</em>, <em>center_y</em>, <em>width_x</em>, <em>width_y</em>, <em>rotation</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/fitgaussian2D.html#gaussian2D"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.fitgaussian2D.gaussian2D" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.fitgaussian2D.moments2">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.fitgaussian2D.</code><code class="descname">moments2</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/fitgaussian2D.html#moments2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.fitgaussian2D.moments2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-allensdk.brain_observatory.receptive_field_analysis.postprocessing">
+<span id="allensdk-brain-observatory-receptive-field-analysis-postprocessing-module"></span><h2>allensdk.brain_observatory.receptive_field_analysis.postprocessing module<a class="headerlink" href="#module-allensdk.brain_observatory.receptive_field_analysis.postprocessing" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.postprocessing.get_gaussian_fit">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.postprocessing.</code><code class="descname">get_gaussian_fit</code><span class="sig-paren">(</span><em>rf</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/postprocessing.html#get_gaussian_fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.postprocessing.get_gaussian_fit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.postprocessing.run_postprocessing">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.postprocessing.</code><code class="descname">run_postprocessing</code><span class="sig-paren">(</span><em>data</em>, <em>rf</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/postprocessing.html#run_postprocessing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.postprocessing.run_postprocessing" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-allensdk.brain_observatory.receptive_field_analysis.receptive_field">
+<span id="allensdk-brain-observatory-receptive-field-analysis-receptive-field-module"></span><h2>allensdk.brain_observatory.receptive_field_analysis.receptive_field module<a class="headerlink" href="#module-allensdk.brain_observatory.receptive_field_analysis.receptive_field" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.receptive_field.compute_receptive_field">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.receptive_field.</code><code class="descname">compute_receptive_field</code><span class="sig-paren">(</span><em>data</em>, <em>cell_index</em>, <em>stimulus</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/receptive_field.html#compute_receptive_field"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.receptive_field.compute_receptive_field" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.receptive_field.compute_receptive_field_with_postprocessing">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.receptive_field.</code><code class="descname">compute_receptive_field_with_postprocessing</code><span class="sig-paren">(</span><em>data</em>, <em>cell_index</em>, <em>stimulus</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/receptive_field.html#compute_receptive_field_with_postprocessing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.receptive_field.compute_receptive_field_with_postprocessing" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.receptive_field.events_to_pvalues_no_fdr_correction">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.receptive_field.</code><code class="descname">events_to_pvalues_no_fdr_correction</code><span class="sig-paren">(</span><em>data</em>, <em>event_vector</em>, <em>A</em>, <em>number_of_shuffles=5000</em>, <em>response_detection_error_std_dev=0.1</em>, <em>seed=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/receptive_field.html#events_to_pvalues_no_fdr_correction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.receptive_field.events_to_pvalues_no_fdr_correction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.receptive_field.get_attribute_dict">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.receptive_field.</code><code class="descname">get_attribute_dict</code><span class="sig-paren">(</span><em>rf</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/receptive_field.html#get_attribute_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.receptive_field.get_attribute_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.receptive_field.print_summary">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.receptive_field.</code><code class="descname">print_summary</code><span class="sig-paren">(</span><em>rf</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/receptive_field.html#print_summary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.receptive_field.print_summary" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.receptive_field.read_h5_group">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.receptive_field.</code><code class="descname">read_h5_group</code><span class="sig-paren">(</span><em>g</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/receptive_field.html#read_h5_group"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.receptive_field.read_h5_group" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.receptive_field.read_receptive_field_from_h5">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.receptive_field.</code><code class="descname">read_receptive_field_from_h5</code><span class="sig-paren">(</span><em>file_name</em>, <em>path=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/receptive_field.html#read_receptive_field_from_h5"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.receptive_field.read_receptive_field_from_h5" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.receptive_field.write_receptive_field_to_h5">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.receptive_field.</code><code class="descname">write_receptive_field_to_h5</code><span class="sig-paren">(</span><em>rf</em>, <em>file_name</em>, <em>prefix=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/receptive_field.html#write_receptive_field_to_h5"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.receptive_field.write_receptive_field_to_h5" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-allensdk.brain_observatory.receptive_field_analysis.tools">
+<span id="allensdk-brain-observatory-receptive-field-analysis-tools-module"></span><h2>allensdk.brain_observatory.receptive_field_analysis.tools module<a class="headerlink" href="#module-allensdk.brain_observatory.receptive_field_analysis.tools" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.tools.dict_generator">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.tools.</code><code class="descname">dict_generator</code><span class="sig-paren">(</span><em>indict</em>, <em>pre=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/tools.html#dict_generator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.tools.dict_generator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.tools.list_of_dicts_to_dict_of_lists">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.tools.</code><code class="descname">list_of_dicts_to_dict_of_lists</code><span class="sig-paren">(</span><em>list_of_dicts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/tools.html#list_of_dicts_to_dict_of_lists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.tools.list_of_dicts_to_dict_of_lists" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.tools.read_h5_group">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.tools.</code><code class="descname">read_h5_group</code><span class="sig-paren">(</span><em>g</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/tools.html#read_h5_group"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.tools.read_h5_group" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-allensdk.brain_observatory.receptive_field_analysis.utilities">
+<span id="allensdk-brain-observatory-receptive-field-analysis-utilities-module"></span><h2>allensdk.brain_observatory.receptive_field_analysis.utilities module<a class="headerlink" href="#module-allensdk.brain_observatory.receptive_field_analysis.utilities" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.utilities.convolve">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.utilities.</code><code class="descname">convolve</code><span class="sig-paren">(</span><em>img</em>, <em>sigma=4</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/utilities.html#convolve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.utilities.convolve" title="Permalink to this definition">¶</a></dt>
+<dd><p>2D Gaussian convolution</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.utilities.get_attribute_dict">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.utilities.</code><code class="descname">get_attribute_dict</code><span class="sig-paren">(</span><em>rf</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/utilities.html#get_attribute_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.utilities.get_attribute_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.utilities.get_components">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.utilities.</code><code class="descname">get_components</code><span class="sig-paren">(</span><em>receptive_field_data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/utilities.html#get_components"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.utilities.get_components" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.utilities.get_shuffle_matrix">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.utilities.</code><code class="descname">get_shuffle_matrix</code><span class="sig-paren">(</span><em>data</em>, <em>event_vector</em>, <em>A</em>, <em>number_of_shuffles=5000</em>, <em>response_detection_error_std_dev=0.1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/utilities.html#get_shuffle_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.utilities.get_shuffle_matrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.utilities.get_sparse_noise_epoch_mask_list">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.utilities.</code><code class="descname">get_sparse_noise_epoch_mask_list</code><span class="sig-paren">(</span><em>st</em>, <em>number_of_acquisition_frames</em>, <em>threshold=7</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/utilities.html#get_sparse_noise_epoch_mask_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.utilities.get_sparse_noise_epoch_mask_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.utilities.smooth">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.utilities.</code><code class="descname">smooth</code><span class="sig-paren">(</span><em>x</em>, <em>window_len=11</em>, <em>window='hanning'</em>, <em>mode='valid'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/utilities.html#smooth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.utilities.smooth" title="Permalink to this definition">¶</a></dt>
+<dd><p>smooth the data using a window with requested size.</p>
+<p>This method is based on the convolution of a scaled window with the signal.
+The signal is prepared by introducing reflected copies of the signal
+(with the window size) in both ends so that transient parts are minimized
+in the begining and end part of the output signal.</p>
+<dl class="docutils">
+<dt>input:</dt>
+<dd><p class="first">x: the input signal
+window_len: the dimension of the smoothing window; should be an odd integer
+window: the type of window from &#8216;flat&#8217;, &#8216;hanning&#8217;, &#8216;hamming&#8217;, &#8216;bartlett&#8217;, &#8216;blackman&#8217;</p>
+<blockquote class="last">
+<div>flat window will produce a moving average smoothing.</div></blockquote>
+</dd>
+<dt>output:</dt>
+<dd>the smoothed signal</dd>
+</dl>
+<p>example:</p>
+<p>t=linspace(-2,2,0.1)
+x=sin(t)+randn(len(t))*0.1
+y=smooth(x)</p>
+<p>see also:</p>
+<p>numpy.hanning, numpy.hamming, numpy.bartlett, numpy.blackman, numpy.convolve
+scipy.signal.lfilter</p>
+<p>TODO: the window parameter could be the window itself if an array instead of a string
+NOTE: length(output) != length(input), to correct this: return y[(window_len/2-1):-(window_len/2)] instead of just y.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.utilities.upsample_image_to_degrees">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.utilities.</code><code class="descname">upsample_image_to_degrees</code><span class="sig-paren">(</span><em>img</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/utilities.html#upsample_image_to_degrees"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.utilities.upsample_image_to_degrees" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-allensdk.brain_observatory.receptive_field_analysis.visualization">
+<span id="allensdk-brain-observatory-receptive-field-analysis-visualization-module"></span><h2>allensdk.brain_observatory.receptive_field_analysis.visualization module<a class="headerlink" href="#module-allensdk.brain_observatory.receptive_field_analysis.visualization" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.visualization.plot_chi_square_summary">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.visualization.</code><code class="descname">plot_chi_square_summary</code><span class="sig-paren">(</span><em>rf_data</em>, <em>ax=None</em>, <em>cax=None</em>, <em>cmap='magma'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/visualization.html#plot_chi_square_summary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.visualization.plot_chi_square_summary" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.visualization.plot_ellipses">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.visualization.</code><code class="descname">plot_ellipses</code><span class="sig-paren">(</span><em>gaussian_fit_dict</em>, <em>ax=None</em>, <em>show=True</em>, <em>close=True</em>, <em>save_file_name=None</em>, <em>color='b'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/visualization.html#plot_ellipses"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.visualization.plot_ellipses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Example Usage:
+oeid, cell_index, stimulus = 512176430, 12, &#8216;locally_sparse_noise&#8217;
+brain_observatory_cache = BrainObservatoryCache()
+data_set = brain_observatory_cache.get_ophys_experiment_data(oeid)
+lsn = LocallySparseNoise(data_set, stimulus)
+result = compute_receptive_field_with_postprocessing(data_set, cell_index, stimulus, alpha=.05, number_of_shuffles=5000)
+plot_ellipses(result[&#8216;off&#8217;][&#8216;gaussian_fit&#8217;], color=&#8217;r&#8217;)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.visualization.plot_fields">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.visualization.</code><code class="descname">plot_fields</code><span class="sig-paren">(</span><em>on_data</em>, <em>off_data</em>, <em>on_axes</em>, <em>off_axes</em>, <em>cbar_axes=None</em>, <em>clim=None</em>, <em>cmap='magma'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/visualization.html#plot_fields"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.visualization.plot_fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.visualization.plot_gaussian_fit">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.visualization.</code><code class="descname">plot_gaussian_fit</code><span class="sig-paren">(</span><em>rf_data</em>, <em>ax_on</em>, <em>ax_off</em>, <em>ax_cbar=None</em>, <em>cmap='magma'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/visualization.html#plot_gaussian_fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.visualization.plot_gaussian_fit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.visualization.plot_mask">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.visualization.</code><code class="descname">plot_mask</code><span class="sig-paren">(</span><em>rf_data</em>, <em>ax_on</em>, <em>ax_off</em>, <em>ax_cbar=None</em>, <em>cmap='magma'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/visualization.html#plot_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.visualization.plot_mask" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.visualization.plot_msr_summary">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.visualization.</code><code class="descname">plot_msr_summary</code><span class="sig-paren">(</span><em>lsn</em>, <em>cell_index</em>, <em>ax_on</em>, <em>ax_off</em>, <em>ax_cbar=None</em>, <em>cmap=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/visualization.html#plot_msr_summary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.visualization.plot_msr_summary" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.visualization.plot_p_values">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.visualization.</code><code class="descname">plot_p_values</code><span class="sig-paren">(</span><em>rf_data</em>, <em>ax_on</em>, <em>ax_off</em>, <em>ax_cbar=None</em>, <em>cmap='magma'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/visualization.html#plot_p_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.visualization.plot_p_values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.visualization.plot_receptive_field_data">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.visualization.</code><code class="descname">plot_receptive_field_data</code><span class="sig-paren">(</span><em>rf</em>, <em>lsn</em>, <em>show=True</em>, <em>save_file_name=None</em>, <em>close=True</em>, <em>cmap='magma'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/visualization.html#plot_receptive_field_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.visualization.plot_receptive_field_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.visualization.plot_rts_blur_summary">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.visualization.</code><code class="descname">plot_rts_blur_summary</code><span class="sig-paren">(</span><em>rf_data</em>, <em>ax_on</em>, <em>ax_off</em>, <em>ax_cbar=None</em>, <em>cmap='magma'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/visualization.html#plot_rts_blur_summary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.visualization.plot_rts_blur_summary" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.visualization.plot_rts_summary">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.visualization.</code><code class="descname">plot_rts_summary</code><span class="sig-paren">(</span><em>rf_data</em>, <em>ax_on</em>, <em>ax_off</em>, <em>ax_cbar=None</em>, <em>cmap='magma'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/visualization.html#plot_rts_summary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.visualization.plot_rts_summary" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.visualization.pvalue_to_NLL">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.visualization.</code><code class="descname">pvalue_to_NLL</code><span class="sig-paren">(</span><em>p_values</em>, <em>max_NLL=10.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/visualization.html#pvalue_to_NLL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.visualization.pvalue_to_NLL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-allensdk.brain_observatory.receptive_field_analysis">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-allensdk.brain_observatory.receptive_field_analysis" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_space.html">Reference Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="glif_models.html">Generalized LIF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html">Biophysical</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
+</ul>
+
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allen-sdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    </div>
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalFooter.js"></script>
+
+
+  </body>
+</html>

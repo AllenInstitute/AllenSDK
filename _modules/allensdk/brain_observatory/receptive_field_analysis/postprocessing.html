@@ -1,0 +1,262 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>allensdk.brain_observatory.receptive_field_analysis.postprocessing &mdash; Allen SDK 0.13.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/aibs_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '0.13.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="top" title="Allen SDK 0.13.1 documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" /> 
+  </head>
+  <body role="document">
+<link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
+<script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var _pSupressBrowserFlashWarning = true;
+    var _pTabId = "pHome";
+    var _pMoreProjectsId = "pMoreProjects";
+    var _pImagePath = "http://www.brain-map.org/assets/images/";
+    var _pSiteWarnings = function() {
+        this.show_warning() = {};
+    }
+</script>
+<script type="text/javascript">
+    function initialize() {
+        /*** do your stuff, then initialize the portal plugin ***/
+        _pPortalOnLoad();
+    }
+</script>
+<style>
+  #header_content > a {
+  display: inline-block;
+  width: 250px;
+  height: 75px;
+  background-image:url("/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-size: 235px 37px;
+  background-position: 0px 20px;
+  background-repeat: no-repeat;
+  }
+</style>
+
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
+
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for allensdk.brain_observatory.receptive_field_analysis.postprocessing</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2017 Allen Institute for Brain Science</span>
+<span class="c1"># This file is part of Allen SDK.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, version 3 of the License.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+
+<span class="kn">from</span> <span class="nn">.fit_parameters</span> <span class="kn">import</span> <span class="n">get_gaussian_fit_single_channel</span><span class="p">,</span> <span class="n">compute_distance</span><span class="p">,</span> <span class="n">compute_overlap</span>
+<span class="kn">from</span> <span class="nn">.chisquarerf</span> <span class="kn">import</span> <span class="n">chi_square_binary</span><span class="p">,</span> <span class="n">get_peak_significance</span><span class="p">,</span> <span class="n">pvalue_to_NLL</span>
+<span class="kn">from</span> <span class="nn">.utilities</span> <span class="kn">import</span> <span class="n">upsample_image_to_degrees</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<div class="viewcode-block" id="get_gaussian_fit"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.postprocessing.get_gaussian_fit">[docs]</a><span class="k">def</span> <span class="nf">get_gaussian_fit</span><span class="p">(</span><span class="n">rf</span><span class="p">):</span>
+
+    <span class="n">fit_parameters_dict_combined</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;on&#39;</span><span class="p">:</span><span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">),</span> <span class="s1">&#39;off&#39;</span><span class="p">:</span><span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)}</span>
+    <span class="n">counter</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;on&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;off&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">}</span>
+    <span class="k">for</span> <span class="n">on_off_key</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;on&#39;</span><span class="p">,</span> <span class="s1">&#39;off&#39;</span><span class="p">]:</span>
+        <span class="n">fit_parameters_dict</span> <span class="o">=</span> <span class="n">fit_parameters_dict_combined</span><span class="p">[</span><span class="n">on_off_key</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">ci</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">rf</span><span class="p">[</span><span class="n">on_off_key</span><span class="p">][</span><span class="s1">&#39;fdr_mask&#39;</span><span class="p">][</span><span class="s1">&#39;attrs&#39;</span><span class="p">][</span><span class="s1">&#39;number_of_components&#39;</span><span class="p">]):</span>
+            <span class="n">curr_component_mask</span> <span class="o">=</span> <span class="n">upsample_image_to_degrees</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">rf</span><span class="p">[</span><span class="n">on_off_key</span><span class="p">][</span><span class="s1">&#39;fdr_mask&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="n">ci</span><span class="p">,:,:]))</span> <span class="o">&gt;</span> <span class="o">.</span><span class="mi">5</span>
+            <span class="n">rf_response</span> <span class="o">=</span> <span class="n">upsample_image_to_degrees</span><span class="p">(</span><span class="n">rf</span><span class="p">[</span><span class="n">on_off_key</span><span class="p">][</span><span class="s1">&#39;rts_convolution&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+            <span class="n">rf_response</span><span class="p">[</span><span class="n">curr_component_mask</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="k">if</span> <span class="n">rf_response</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">get_gaussian_fit_single_channel</span><span class="p">(</span><span class="n">rf_response</span><span class="p">,</span> <span class="n">fit_parameters_dict</span><span class="p">)</span>
+                <span class="n">counter</span><span class="p">[</span><span class="n">on_off_key</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">for</span> <span class="n">ii_off</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">counter</span><span class="p">[</span><span class="s1">&#39;on&#39;</span><span class="p">]):</span>
+        <span class="n">fit_parameters_dict_combined</span><span class="p">[</span><span class="s1">&#39;on&#39;</span><span class="p">][</span><span class="s1">&#39;distance&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="bp">None</span><span class="p">]</span><span class="o">*</span><span class="n">counter</span><span class="p">[</span><span class="s1">&#39;off&#39;</span><span class="p">])</span>
+        <span class="n">fit_parameters_dict_combined</span><span class="p">[</span><span class="s1">&#39;on&#39;</span><span class="p">][</span><span class="s1">&#39;overlap&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="bp">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">counter</span><span class="p">[</span><span class="s1">&#39;off&#39;</span><span class="p">])</span>
+
+    <span class="k">for</span> <span class="n">ii_off</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">counter</span><span class="p">[</span><span class="s1">&#39;off&#39;</span><span class="p">]):</span>
+        <span class="n">fit_parameters_dict_combined</span><span class="p">[</span><span class="s1">&#39;off&#39;</span><span class="p">][</span><span class="s1">&#39;distance&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="bp">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">counter</span><span class="p">[</span><span class="s1">&#39;on&#39;</span><span class="p">])</span>
+        <span class="n">fit_parameters_dict_combined</span><span class="p">[</span><span class="s1">&#39;off&#39;</span><span class="p">][</span><span class="s1">&#39;overlap&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="bp">None</span><span class="p">]</span><span class="o">*</span><span class="n">counter</span><span class="p">[</span><span class="s1">&#39;on&#39;</span><span class="p">])</span>
+
+
+    <span class="k">for</span> <span class="n">ii_on</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">counter</span><span class="p">[</span><span class="s1">&#39;on&#39;</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">ii_off</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">counter</span><span class="p">[</span><span class="s1">&#39;off&#39;</span><span class="p">]):</span>
+            <span class="n">center_on</span> <span class="o">=</span> <span class="n">fit_parameters_dict_combined</span><span class="p">[</span><span class="s1">&#39;on&#39;</span><span class="p">][</span><span class="s1">&#39;center_x&#39;</span><span class="p">][</span><span class="n">ii_on</span><span class="p">],</span> <span class="n">fit_parameters_dict_combined</span><span class="p">[</span><span class="s1">&#39;on&#39;</span><span class="p">][</span><span class="s1">&#39;center_y&#39;</span><span class="p">][</span><span class="n">ii_on</span><span class="p">]</span>
+            <span class="n">center_off</span> <span class="o">=</span> <span class="n">fit_parameters_dict_combined</span><span class="p">[</span><span class="s1">&#39;off&#39;</span><span class="p">][</span><span class="s1">&#39;center_x&#39;</span><span class="p">][</span><span class="n">ii_off</span><span class="p">],</span> <span class="n">fit_parameters_dict_combined</span><span class="p">[</span><span class="s1">&#39;off&#39;</span><span class="p">][</span><span class="s1">&#39;center_y&#39;</span><span class="p">][</span><span class="n">ii_off</span><span class="p">]</span>
+            <span class="n">curr_distance</span> <span class="o">=</span> <span class="n">compute_distance</span><span class="p">(</span><span class="n">center_on</span><span class="p">,</span> <span class="n">center_off</span><span class="p">)</span>
+            <span class="n">fit_parameters_dict_combined</span><span class="p">[</span><span class="s1">&#39;on&#39;</span><span class="p">][</span><span class="s1">&#39;distance&#39;</span><span class="p">][</span><span class="n">ii_on</span><span class="p">][</span><span class="n">ii_off</span><span class="p">]</span> <span class="o">=</span> <span class="n">curr_distance</span>
+            <span class="n">fit_parameters_dict_combined</span><span class="p">[</span><span class="s1">&#39;off&#39;</span><span class="p">][</span><span class="s1">&#39;distance&#39;</span><span class="p">][</span><span class="n">ii_off</span><span class="p">][</span><span class="n">ii_on</span><span class="p">]</span> <span class="o">=</span> <span class="n">curr_distance</span>
+
+            <span class="n">data_on</span> <span class="o">=</span> <span class="n">fit_parameters_dict_combined</span><span class="p">[</span><span class="s1">&#39;on&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="n">ii_on</span><span class="p">]</span>
+            <span class="n">data_off</span> <span class="o">=</span> <span class="n">fit_parameters_dict_combined</span><span class="p">[</span><span class="s1">&#39;off&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="n">ii_off</span><span class="p">]</span>
+            <span class="n">curr_overlap</span> <span class="o">=</span> <span class="n">compute_overlap</span><span class="p">(</span><span class="n">data_on</span><span class="p">,</span> <span class="n">data_off</span><span class="p">)</span>
+            <span class="n">fit_parameters_dict_combined</span><span class="p">[</span><span class="s1">&#39;on&#39;</span><span class="p">][</span><span class="s1">&#39;overlap&#39;</span><span class="p">][</span><span class="n">ii_on</span><span class="p">][</span><span class="n">ii_off</span><span class="p">]</span> <span class="o">=</span> <span class="n">curr_overlap</span>
+            <span class="n">fit_parameters_dict_combined</span><span class="p">[</span><span class="s1">&#39;off&#39;</span><span class="p">][</span><span class="s1">&#39;overlap&#39;</span><span class="p">][</span><span class="n">ii_off</span><span class="p">][</span><span class="n">ii_on</span><span class="p">]</span> <span class="o">=</span> <span class="n">curr_overlap</span>
+
+    <span class="k">return</span> <span class="n">fit_parameters_dict_combined</span><span class="p">,</span> <span class="n">counter</span></div>
+
+<div class="viewcode-block" id="run_postprocessing"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.postprocessing.run_postprocessing">[docs]</a><span class="k">def</span> <span class="nf">run_postprocessing</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">rf</span><span class="p">):</span>
+
+    <span class="n">stimulus</span> <span class="o">=</span> <span class="n">rf</span><span class="p">[</span><span class="s1">&#39;attrs&#39;</span><span class="p">][</span><span class="s1">&#39;stimulus&#39;</span><span class="p">]</span>
+
+    <span class="c1"># Gaussian fit postprocessing:</span>
+    <span class="n">fit_parameters_dict_combined</span><span class="p">,</span> <span class="n">counter</span> <span class="o">=</span> <span class="n">get_gaussian_fit</span><span class="p">(</span><span class="n">rf</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">on_off_key</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;on&#39;</span><span class="p">,</span> <span class="s1">&#39;off&#39;</span><span class="p">]:</span>
+
+        <span class="k">if</span> <span class="n">counter</span><span class="p">[</span><span class="n">on_off_key</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+
+            <span class="n">rf</span><span class="p">[</span><span class="n">on_off_key</span><span class="p">][</span><span class="s1">&#39;gaussian_fit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">rf</span><span class="p">[</span><span class="n">on_off_key</span><span class="p">][</span><span class="s1">&#39;gaussian_fit&#39;</span><span class="p">][</span><span class="s1">&#39;attrs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+            <span class="n">fit_parameters_dict</span> <span class="o">=</span> <span class="n">fit_parameters_dict_combined</span><span class="p">[</span><span class="n">on_off_key</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">fit_parameters_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+
+                <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;data&#39;</span><span class="p">:</span>
+                    <span class="n">rf</span><span class="p">[</span><span class="n">on_off_key</span><span class="p">][</span><span class="s1">&#39;gaussian_fit&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">rf</span><span class="p">[</span><span class="n">on_off_key</span><span class="p">][</span><span class="s1">&#39;gaussian_fit&#39;</span><span class="p">][</span><span class="s1">&#39;attrs&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+
+    <span class="c1"># Chi squared test statistic postprocessing:</span>
+    <span class="n">cell_index</span> <span class="o">=</span> <span class="n">rf</span><span class="p">[</span><span class="s1">&#39;attrs&#39;</span><span class="p">][</span><span class="s1">&#39;cell_index&#39;</span><span class="p">]</span>
+    <span class="n">locally_sparse_noise_template</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_stimulus_template</span><span class="p">(</span><span class="n">stimulus</span><span class="p">)</span>
+
+    <span class="n">event_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">rf</span><span class="p">[</span><span class="s1">&#39;event_vector&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
+    <span class="n">event_array</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">rf</span><span class="p">[</span><span class="s1">&#39;event_vector&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
+
+    <span class="n">chi_squared_grid</span> <span class="o">=</span> <span class="n">chi_square_binary</span><span class="p">(</span><span class="n">event_array</span><span class="p">,</span> <span class="n">locally_sparse_noise_template</span><span class="p">)</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">rf</span><span class="p">[</span><span class="s1">&#39;on&#39;</span><span class="p">][</span><span class="s1">&#39;fdr_mask&#39;</span><span class="p">][</span><span class="s1">&#39;attrs&#39;</span><span class="p">][</span><span class="s1">&#39;alpha&#39;</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">rf</span><span class="p">[</span><span class="s1">&#39;off&#39;</span><span class="p">][</span><span class="s1">&#39;fdr_mask&#39;</span><span class="p">][</span><span class="s1">&#39;attrs&#39;</span><span class="p">][</span><span class="s1">&#39;alpha&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">alpha</span>
+    <span class="n">chi_square_grid_NLL</span> <span class="o">=</span> <span class="n">pvalue_to_NLL</span><span class="p">(</span><span class="n">chi_squared_grid</span><span class="p">)</span>
+
+    <span class="n">peak_significance</span> <span class="o">=</span> <span class="n">get_peak_significance</span><span class="p">(</span><span class="n">chi_square_grid_NLL</span><span class="p">,</span> <span class="n">locally_sparse_noise_template</span><span class="p">,</span>  <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">)</span>
+    <span class="n">significant</span> <span class="o">=</span> <span class="n">peak_significance</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">min_p</span> <span class="o">=</span> <span class="n">peak_significance</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">pvalues_chi_square</span> <span class="o">=</span> <span class="n">peak_significance</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">best_exclusion_region_mask</span> <span class="o">=</span> <span class="n">peak_significance</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">chi_squared_grid_dict</span> <span class="o">=</span> <span class="p">{</span>
+                             <span class="s1">&#39;best_exclusion_region_mask&#39;</span><span class="p">:{</span><span class="s1">&#39;data&#39;</span><span class="p">:</span><span class="n">best_exclusion_region_mask</span><span class="p">},</span>
+                             <span class="s1">&#39;attrs&#39;</span><span class="p">:{</span><span class="s1">&#39;significant&#39;</span><span class="p">:</span><span class="n">significant</span><span class="p">,</span> <span class="s1">&#39;alpha&#39;</span><span class="p">:</span> <span class="n">alpha</span><span class="p">,</span> <span class="s1">&#39;min_p&#39;</span><span class="p">:</span><span class="n">min_p</span><span class="p">},</span>
+                             <span class="s1">&#39;pvalues&#39;</span><span class="p">:{</span><span class="s1">&#39;data&#39;</span><span class="p">:</span><span class="n">pvalues_chi_square</span><span class="p">}</span>
+                             <span class="p">}</span>
+
+    <span class="n">rf</span><span class="p">[</span><span class="s1">&#39;chi_squared_analysis&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">chi_squared_grid_dict</span>
+
+    <span class="k">return</span> <span class="n">rf</span></div>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="c1"># csid = 517472416 # triple!</span>
+    <span class="n">csid</span> <span class="o">=</span> <span class="mi">517526760</span> <span class="c1"># two ON</span>
+    <span class="c1"># csid = 539917553</span>
+    <span class="c1"># csid = 540988186</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../../../../index.html">Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Install Guide</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../brain_observatory.html">Brain Observatory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../connectivity.html">Mouse Connectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../reference_space.html">Reference Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../data_api_client.html">API Access</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../glif_models.html">Generalized LIF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../biophysical_models.html">Biophysical</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../allensdk.html">Source Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.config.html">allensdk.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.ephys.html">allensdk.ephys package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.morphology.html">allensdk.morphology package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
+</ul>
+
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allen-sdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    </div>
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalFooter.js"></script>
+
+
+  </body>
+</html>

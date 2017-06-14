@@ -29,6 +29,7 @@
   <body role="document">
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
 <script type="text/javascript">
     var _pSupressBrowserFlashWarning = true;
     var _pTabId = "pHome";
@@ -83,6 +84,7 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">.static_gratings</span> <span class="kn">import</span> <span class="n">StaticGratings</span>
 <span class="kn">from</span> <span class="nn">.locally_sparse_noise</span> <span class="kn">import</span> <span class="n">LocallySparseNoise</span>
 <span class="kn">from</span> <span class="nn">.natural_scenes</span> <span class="kn">import</span> <span class="n">NaturalScenes</span>
@@ -100,7 +102,11 @@
 <span class="kn">import</span> <span class="nn">os</span>
 
 
+
 <div class="viewcode-block" id="multi_dataframe_merge"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.multi_dataframe_merge">[docs]</a><span class="k">def</span> <span class="nf">multi_dataframe_merge</span><span class="p">(</span><span class="n">dfs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; merge a number of pd.DataFrames into a single dataframe on their index columns. </span>
+<span class="sd">    If any columns are duplicated, prefer the first occuring instance of the column &quot;&quot;&quot;</span>
+
     <span class="n">out_df</span> <span class="o">=</span> <span class="bp">None</span>
     <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">df</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dfs</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">out_df</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
@@ -116,6 +122,16 @@
 
 
 <div class="viewcode-block" id="SessionAnalysis"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis">[docs]</a><span class="k">class</span> <span class="nc">SessionAnalysis</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    Run all of the stimulus-specific analyses associated with a single experiment session. </span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nwb_path: string, path to NWB file</span>
+
+<span class="sd">    save_path: string, path to HDF5 file to store outputs.  Recommended NOT to modify the NWB file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">_log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;allensdk.brain_observatory.session_analysis&#39;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nwb_path</span><span class="p">,</span> <span class="n">save_path</span><span class="p">):</span>
@@ -123,18 +139,39 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">save_path</span> <span class="o">=</span> <span class="n">save_path</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">save_path</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">metrics_a</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">metrics_b</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">metrics_c</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics_a</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">cell</span><span class="o">=</span><span class="p">{},</span><span class="n">experiment</span><span class="o">=</span><span class="p">{})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics_b</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">cell</span><span class="o">=</span><span class="p">{},</span><span class="n">experiment</span><span class="o">=</span><span class="p">{})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics_c</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">cell</span><span class="o">=</span><span class="p">{},</span><span class="n">experiment</span><span class="o">=</span><span class="p">{})</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nwb</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">()</span>
 
 <div class="viewcode-block" id="SessionAnalysis.append_metadata"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">append_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Append the metadata fields from the NWB file as columns to a pd.DataFrame &quot;&quot;&quot;</span>
+
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">):</span>
             <span class="n">df</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span></div>
 
 <div class="viewcode-block" id="SessionAnalysis.save_session_a"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.save_session_a">[docs]</a>    <span class="k">def</span> <span class="nf">save_session_a</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dg</span><span class="p">,</span> <span class="n">nm1</span><span class="p">,</span> <span class="n">nm3</span><span class="p">,</span> <span class="n">peak</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Save the output of session A analysis to self.save_path.  </span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dg: DriftingGratings instance</span>
+
+<span class="sd">        nm1: NaturalMovie instance</span>
+<span class="sd">            This NaturalMovie instance should have been created with</span>
+<span class="sd">            movie_name = stimulus_info.NATURAL_MOVIE_ONE</span>
+
+<span class="sd">        nm3: NaturalMovie instance</span>
+<span class="sd">            This NaturalMovie instance should have been created with</span>
+<span class="sd">            movie_name = stimulus_info.NATURAL_MOVIE_THREE</span>
+
+<span class="sd">        peak: pd.DataFrame</span>
+<span class="sd">            The combined peak response property table created in self.session_a().</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">nwb</span> <span class="o">=</span> <span class="n">BrainObservatoryNwbDataSet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_path</span><span class="p">)</span>
+
         <span class="n">nwb</span><span class="o">.</span><span class="n">save_analysis_dataframes</span><span class="p">(</span>
             <span class="p">(</span><span class="s1">&#39;stim_table_dg&#39;</span><span class="p">,</span> <span class="n">dg</span><span class="o">.</span><span class="n">stim_table</span><span class="p">),</span>
             <span class="p">(</span><span class="s1">&#39;sweep_response_dg&#39;</span><span class="p">,</span> <span class="n">dg</span><span class="o">.</span><span class="n">sweep_response</span><span class="p">),</span>
@@ -145,15 +182,36 @@
             <span class="p">(</span><span class="s1">&#39;sweep_response_nm3&#39;</span><span class="p">,</span> <span class="n">nm3</span><span class="o">.</span><span class="n">sweep_response</span><span class="p">))</span>
 
         <span class="n">nwb</span><span class="o">.</span><span class="n">save_analysis_arrays</span><span class="p">(</span>
-            <span class="p">(</span><span class="s1">&#39;celltraces_dff&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">dfftraces</span><span class="p">),</span>
             <span class="p">(</span><span class="s1">&#39;response_dg&#39;</span><span class="p">,</span> <span class="n">dg</span><span class="o">.</span><span class="n">response</span><span class="p">),</span>
             <span class="p">(</span><span class="s1">&#39;binned_cells_sp&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_cells_sp</span><span class="p">),</span>
             <span class="p">(</span><span class="s1">&#39;binned_cells_vis&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_cells_vis</span><span class="p">),</span>
             <span class="p">(</span><span class="s1">&#39;binned_dx_sp&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_dx_sp</span><span class="p">),</span>
-            <span class="p">(</span><span class="s1">&#39;binned_dx_vis&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_dx_vis</span><span class="p">))</span></div>
+            <span class="p">(</span><span class="s1">&#39;binned_dx_vis&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_dx_vis</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;noise_corr_dg&#39;</span><span class="p">,</span> <span class="n">dg</span><span class="o">.</span><span class="n">noise_correlation</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;signal_corr_dg&#39;</span><span class="p">,</span> <span class="n">dg</span><span class="o">.</span><span class="n">signal_correlation</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;rep_similarity_dg&#39;</span><span class="p">,</span> <span class="n">dg</span><span class="o">.</span><span class="n">representational_similarity</span><span class="p">)</span>
+            <span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="SessionAnalysis.save_session_b"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.save_session_b">[docs]</a>    <span class="k">def</span> <span class="nf">save_session_b</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sg</span><span class="p">,</span> <span class="n">nm1</span><span class="p">,</span> <span class="n">ns</span><span class="p">,</span> <span class="n">peak</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Save the output of session B analysis to self.save_path.  </span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sg: StaticGratings instance</span>
+
+<span class="sd">        nm1: NaturalMovie instance</span>
+<span class="sd">            This NaturalMovie instance should have been created with</span>
+<span class="sd">            movie_name = stimulus_info.NATURAL_MOVIE_ONE</span>
+
+<span class="sd">        ns: NaturalScenes instance</span>
+
+<span class="sd">        peak: pd.DataFrame</span>
+<span class="sd">            The combined peak response property table created in self.session_b().</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">nwb</span> <span class="o">=</span> <span class="n">BrainObservatoryNwbDataSet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_path</span><span class="p">)</span>
+
         <span class="n">nwb</span><span class="o">.</span><span class="n">save_analysis_dataframes</span><span class="p">(</span>
             <span class="p">(</span><span class="s1">&#39;stim_table_sg&#39;</span><span class="p">,</span> <span class="n">sg</span><span class="o">.</span><span class="n">stim_table</span><span class="p">),</span>
             <span class="p">(</span><span class="s1">&#39;sweep_response_sg&#39;</span><span class="p">,</span> <span class="n">sg</span><span class="o">.</span><span class="n">sweep_response</span><span class="p">),</span>
@@ -166,16 +224,41 @@
             <span class="p">(</span><span class="s1">&#39;peak&#39;</span><span class="p">,</span> <span class="n">peak</span><span class="p">))</span>
 
         <span class="n">nwb</span><span class="o">.</span><span class="n">save_analysis_arrays</span><span class="p">(</span>
-            <span class="p">(</span><span class="s1">&#39;celltraces_dff&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">dfftraces</span><span class="p">),</span>
             <span class="p">(</span><span class="s1">&#39;response_sg&#39;</span><span class="p">,</span> <span class="n">sg</span><span class="o">.</span><span class="n">response</span><span class="p">),</span>
             <span class="p">(</span><span class="s1">&#39;response_ns&#39;</span><span class="p">,</span> <span class="n">ns</span><span class="o">.</span><span class="n">response</span><span class="p">),</span>
             <span class="p">(</span><span class="s1">&#39;binned_cells_sp&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_cells_sp</span><span class="p">),</span>
             <span class="p">(</span><span class="s1">&#39;binned_cells_vis&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_cells_vis</span><span class="p">),</span>
             <span class="p">(</span><span class="s1">&#39;binned_dx_sp&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_dx_sp</span><span class="p">),</span>
-            <span class="p">(</span><span class="s1">&#39;binned_dx_vis&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_dx_vis</span><span class="p">))</span></div>
+            <span class="p">(</span><span class="s1">&#39;binned_dx_vis&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_dx_vis</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;noise_corr_sg&#39;</span><span class="p">,</span> <span class="n">sg</span><span class="o">.</span><span class="n">noise_correlation</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;signal_corr_sg&#39;</span><span class="p">,</span> <span class="n">sg</span><span class="o">.</span><span class="n">signal_correlation</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;rep_similarity_sg&#39;</span><span class="p">,</span> <span class="n">sg</span><span class="o">.</span><span class="n">representational_similarity</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;noise_corr_ns&#39;</span><span class="p">,</span> <span class="n">ns</span><span class="o">.</span><span class="n">noise_correlation</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;signal_corr_ns&#39;</span><span class="p">,</span> <span class="n">ns</span><span class="o">.</span><span class="n">signal_correlation</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;rep_similarity_ns&#39;</span><span class="p">,</span> <span class="n">ns</span><span class="o">.</span><span class="n">representational_similarity</span><span class="p">)</span>
+            <span class="p">)</span></div>
 
 <div class="viewcode-block" id="SessionAnalysis.save_session_c"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.save_session_c">[docs]</a>    <span class="k">def</span> <span class="nf">save_session_c</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lsn</span><span class="p">,</span> <span class="n">nm1</span><span class="p">,</span> <span class="n">nm2</span><span class="p">,</span> <span class="n">peak</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Save the output of session C analysis to self.save_path.  </span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        lsn: LocallySparseNoise instance</span>
+
+<span class="sd">        nm1: NaturalMovie instance</span>
+<span class="sd">            This NaturalMovie instance should have been created with</span>
+<span class="sd">            movie_name = stimulus_info.NATURAL_MOVIE_ONE</span>
+
+<span class="sd">        nm2: NaturalMovie instance</span>
+<span class="sd">            This NaturalMovie instance should have been created with</span>
+<span class="sd">            movie_name = stimulus_info.NATURAL_MOVIE_TWO</span>
+
+<span class="sd">        peak: pd.DataFrame</span>
+<span class="sd">            The combined peak response property table created in self.session_c().</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">nwb</span> <span class="o">=</span> <span class="n">BrainObservatoryNwbDataSet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_path</span><span class="p">)</span>
+
         <span class="n">nwb</span><span class="o">.</span><span class="n">save_analysis_dataframes</span><span class="p">(</span>
             <span class="p">(</span><span class="s1">&#39;stim_table_lsn&#39;</span><span class="p">,</span> <span class="n">lsn</span><span class="o">.</span><span class="n">stim_table</span><span class="p">),</span>
             <span class="p">(</span><span class="s1">&#39;sweep_response_nm1&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">sweep_response</span><span class="p">),</span>
@@ -186,14 +269,41 @@
 
         <span class="n">nwb</span><span class="o">.</span><span class="n">save_analysis_arrays</span><span class="p">(</span>
             <span class="p">(</span><span class="s1">&#39;receptive_field_lsn&#39;</span><span class="p">,</span> <span class="n">lsn</span><span class="o">.</span><span class="n">receptive_field</span><span class="p">),</span>
-            <span class="p">(</span><span class="s1">&#39;celltraces_dff&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">dfftraces</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;mean_response_lsn&#39;</span><span class="p">,</span> <span class="n">lsn</span><span class="o">.</span><span class="n">mean_response</span><span class="p">),</span>
             <span class="p">(</span><span class="s1">&#39;binned_dx_sp&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_dx_sp</span><span class="p">),</span>
             <span class="p">(</span><span class="s1">&#39;binned_dx_vis&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_dx_vis</span><span class="p">),</span>
             <span class="p">(</span><span class="s1">&#39;binned_cells_sp&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_cells_sp</span><span class="p">),</span>
-            <span class="p">(</span><span class="s1">&#39;binned_cells_vis&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_cells_vis</span><span class="p">))</span></div>
+            <span class="p">(</span><span class="s1">&#39;binned_cells_vis&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_cells_vis</span><span class="p">))</span>
 
-<div class="viewcode-block" id="SessionAnalysis.save_session_c2"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.save_session_c2">[docs]</a>    <span class="k">def</span> <span class="nf">save_session_c2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lsn4</span><span class="p">,</span> <span class="n">lsn8</span><span class="p">,</span> <span class="n">nm1</span><span class="p">,</span> <span class="n">nm2</span><span class="p">,</span> <span class="n">peak</span><span class="p">):</span>
+        <span class="n">LocallySparseNoise</span><span class="o">.</span><span class="n">save_cell_index_receptive_field_analysis</span><span class="p">(</span><span class="n">lsn</span><span class="o">.</span><span class="n">cell_index_receptive_field_analysis_data</span><span class="p">,</span> <span class="n">nwb</span><span class="p">,</span> <span class="n">stimulus_info</span><span class="o">.</span><span class="n">LOCALLY_SPARSE_NOISE</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SessionAnalysis.save_session_c2"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.save_session_c2">[docs]</a>    <span class="k">def</span> <span class="nf">save_session_c2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lsn4</span><span class="p">,</span> <span class="n">lsn8</span><span class="p">,</span> <span class="n">nm1</span><span class="p">,</span> <span class="n">nm2</span><span class="p">,</span> <span class="n">peak</span><span class="p">):</span>        
+        <span class="sd">&quot;&quot;&quot; Save the output of session C2 analysis to self.save_path. </span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        lsn4: LocallySparseNoise instance</span>
+<span class="sd">            This LocallySparseNoise instance should have been created with </span>
+<span class="sd">            self.stimulus = stimulus_info.LOCALLY_SPARSE_NOISE_4DEG.</span>
+
+<span class="sd">        lsn8: LocallySparseNoise instance</span>
+<span class="sd">            This LocallySparseNoise instance should have been created with </span>
+<span class="sd">            self.stimulus = stimulus_info.LOCALLY_SPARSE_NOISE_8DEG.</span>
+
+<span class="sd">        nm1: NaturalMovie instance</span>
+<span class="sd">            This NaturalMovie instance should have been created with</span>
+<span class="sd">            movie_name = stimulus_info.NATURAL_MOVIE_ONE</span>
+
+<span class="sd">        nm2: NaturalMovie instance</span>
+<span class="sd">            This NaturalMovie instance should have been created with</span>
+<span class="sd">            movie_name = stimulus_info.NATURAL_MOVIE_TWO</span>
+
+<span class="sd">        peak: pd.DataFrame</span>
+<span class="sd">            The combined peak response property table created in self.session_c2().</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">nwb</span> <span class="o">=</span> <span class="n">BrainObservatoryNwbDataSet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_path</span><span class="p">)</span>
+
         <span class="n">nwb</span><span class="o">.</span><span class="n">save_analysis_dataframes</span><span class="p">(</span>
             <span class="p">(</span><span class="s1">&#39;stim_table_lsn4&#39;</span><span class="p">,</span> <span class="n">lsn4</span><span class="o">.</span><span class="n">stim_table</span><span class="p">),</span>
             <span class="p">(</span><span class="s1">&#39;stim_table_lsn8&#39;</span><span class="p">,</span> <span class="n">lsn8</span><span class="o">.</span><span class="n">stim_table</span><span class="p">),</span>
@@ -205,29 +315,44 @@
             <span class="p">(</span><span class="s1">&#39;mean_sweep_response_lsn4&#39;</span><span class="p">,</span> <span class="n">lsn4</span><span class="o">.</span><span class="n">mean_sweep_response</span><span class="p">),</span>
             <span class="p">(</span><span class="s1">&#39;mean_sweep_response_lsn8&#39;</span><span class="p">,</span> <span class="n">lsn8</span><span class="o">.</span><span class="n">mean_sweep_response</span><span class="p">))</span>
 
-        <span class="n">merged_receptive_field</span> <span class="o">=</span> <span class="n">LocallySparseNoise</span><span class="o">.</span><span class="n">merge_receptive_fields</span><span class="p">(</span>
-            <span class="n">lsn4</span><span class="o">.</span><span class="n">receptive_field</span><span class="p">,</span>
-            <span class="n">lsn8</span><span class="o">.</span><span class="n">receptive_field</span><span class="p">)</span>
+        <span class="n">merge_mean_response</span> <span class="o">=</span> <span class="n">LocallySparseNoise</span><span class="o">.</span><span class="n">merge_mean_response</span><span class="p">(</span>
+            <span class="n">lsn4</span><span class="o">.</span><span class="n">mean_response</span><span class="p">,</span>
+            <span class="n">lsn8</span><span class="o">.</span><span class="n">mean_response</span><span class="p">)</span>
 
         <span class="n">nwb</span><span class="o">.</span><span class="n">save_analysis_arrays</span><span class="p">(</span>
+            <span class="p">(</span><span class="s1">&#39;mean_response_lsn4&#39;</span><span class="p">,</span> <span class="n">lsn4</span><span class="o">.</span><span class="n">mean_response</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;mean_response_lsn8&#39;</span><span class="p">,</span> <span class="n">lsn8</span><span class="o">.</span><span class="n">mean_response</span><span class="p">),</span>
             <span class="p">(</span><span class="s1">&#39;receptive_field_lsn4&#39;</span><span class="p">,</span> <span class="n">lsn4</span><span class="o">.</span><span class="n">receptive_field</span><span class="p">),</span>
             <span class="p">(</span><span class="s1">&#39;receptive_field_lsn8&#39;</span><span class="p">,</span> <span class="n">lsn8</span><span class="o">.</span><span class="n">receptive_field</span><span class="p">),</span>
-            <span class="p">(</span><span class="s1">&#39;receptive_field_lsn&#39;</span><span class="p">,</span> <span class="n">merged_receptive_field</span><span class="p">),</span>
-            <span class="p">(</span><span class="s1">&#39;celltraces_dff&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">dfftraces</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;merge_mean_response&#39;</span><span class="p">,</span> <span class="n">merge_mean_response</span><span class="p">),</span>
             <span class="p">(</span><span class="s1">&#39;binned_dx_sp&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_dx_sp</span><span class="p">),</span>
             <span class="p">(</span><span class="s1">&#39;binned_dx_vis&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_dx_vis</span><span class="p">),</span>
             <span class="p">(</span><span class="s1">&#39;binned_cells_sp&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_cells_sp</span><span class="p">),</span>
-            <span class="p">(</span><span class="s1">&#39;binned_cells_vis&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_cells_vis</span><span class="p">))</span></div>
+            <span class="p">(</span><span class="s1">&#39;binned_cells_vis&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_cells_vis</span><span class="p">))</span>
+
+        <span class="n">LocallySparseNoise</span><span class="o">.</span><span class="n">save_cell_index_receptive_field_analysis</span><span class="p">(</span><span class="n">lsn4</span><span class="o">.</span><span class="n">cell_index_receptive_field_analysis_data</span><span class="p">,</span> <span class="n">nwb</span><span class="p">,</span> <span class="n">stimulus_info</span><span class="o">.</span><span class="n">LOCALLY_SPARSE_NOISE_4DEG</span><span class="p">)</span>
+        <span class="n">LocallySparseNoise</span><span class="o">.</span><span class="n">save_cell_index_receptive_field_analysis</span><span class="p">(</span><span class="n">lsn8</span><span class="o">.</span><span class="n">cell_index_receptive_field_analysis_data</span><span class="p">,</span> <span class="n">nwb</span><span class="p">,</span> <span class="n">stimulus_info</span><span class="o">.</span><span class="n">LOCALLY_SPARSE_NOISE_8DEG</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SessionAnalysis.append_metrics_drifting_grating"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_drifting_grating">[docs]</a>    <span class="k">def</span> <span class="nf">append_metrics_drifting_grating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">dg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Extract metrics from the DriftingGratings peak response table into a dictionary. &quot;&quot;&quot;</span>
+
         <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;osi_dg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;osi_dg&quot;</span><span class="p">]</span>
         <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;dsi_dg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;dsi_dg&quot;</span><span class="p">]</span>
         <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;pref_dir_dg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">dg</span><span class="o">.</span><span class="n">orivals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
                                   <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">dg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;ori_dg&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
         <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;pref_tf_dg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">dg</span><span class="o">.</span><span class="n">tfvals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">dg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;tf_dg&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
-        <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;p_dg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;ptest_dg&quot;</span><span class="p">]</span></div>
+        <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;p_dg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;ptest_dg&quot;</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;g_osi_dg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;cv_os_dg&quot;</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;g_dsi_dg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;cv_ds_dg&quot;</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;reliability_dg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;reliability_dg&quot;</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;tfdi_dg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;tf_index_dg&quot;</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;run_mod_dg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;run_modulation_dg&quot;</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;p_run_mod_dg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;p_run_dg&quot;</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;peak_dff_dg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;peak_dff_dg&quot;</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="SessionAnalysis.append_metrics_static_grating"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_static_grating">[docs]</a>    <span class="k">def</span> <span class="nf">append_metrics_static_grating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">sg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Extract metrics from the StaticGratings peak response table into a dictionary. &quot;&quot;&quot;</span>
+
         <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;osi_sg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;osi_sg&quot;</span><span class="p">]</span>
         <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;pref_ori_sg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">sg</span><span class="o">.</span><span class="n">orivals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
                                   <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">sg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;ori_sg&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
@@ -235,33 +360,98 @@
         <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;pref_phase_sg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">sg</span><span class="o">.</span><span class="n">phasevals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
                                     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">sg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;phase_sg&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
         <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;p_sg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;ptest_sg&quot;</span><span class="p">]</span>
-        <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;time_to_peak_sg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;time_to_peak_sg&quot;</span><span class="p">]</span></div>
+        <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;time_to_peak_sg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;time_to_peak_sg&quot;</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;run_mod_sg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;run_modulation_sg&quot;</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;p_run_mod_sg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;p_run_sg&quot;</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;g_osi_sg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;cv_os_sg&quot;</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;sfdi_sg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;sf_index_sg&quot;</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;peak_dff_sg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;peak_dff_sg&quot;</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;reliability_sg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;reliability_sg&quot;</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="SessionAnalysis.append_metrics_natural_scene"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_natural_scene">[docs]</a>    <span class="k">def</span> <span class="nf">append_metrics_natural_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">ns</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Extract metrics from the NaturalScenes peak response table into a dictionary. &quot;&quot;&quot;</span>
+
         <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;pref_image_ns&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;scene_ns&quot;</span><span class="p">]</span>
         <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;p_ns&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;ptest_ns&quot;</span><span class="p">]</span>
-        <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;time_to_peak_ns&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;time_to_peak_ns&quot;</span><span class="p">]</span></div>
+        <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;time_to_peak_ns&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;time_to_peak_ns&quot;</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;image_sel_ns&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;image_selectivity_ns&quot;</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;reliability_ns&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;reliability_ns&quot;</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;run_mod_ns&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;run_modulation_ns&quot;</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;p_run_mod_ns&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;p_run_ns&quot;</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;peak_dff_ns&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;peak_dff_ns&quot;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="SessionAnalysis.append_metrics_locally_sparse_noise"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_locally_sparse_noise">[docs]</a>    <span class="k">def</span> <span class="nf">append_metrics_locally_sparse_noise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">lsn</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Extract metrics from the LocallySparseNoise peak response table into a dictionary. &quot;&quot;&quot;</span>
+
+        <span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;rf_chi2_lsn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lsn</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s1">&#39;rf_chi2_lsn&#39;</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;rf_area_on_lsn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lsn</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s1">&#39;rf_area_on_lsn&#39;</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;rf_center_on_x_lsn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lsn</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s1">&#39;rf_center_on_x_lsn&#39;</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;rf_center_on_y_lsn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lsn</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s1">&#39;rf_center_on_y_lsn&#39;</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;rf_area_off_lsn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lsn</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s1">&#39;rf_area_off_lsn&#39;</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;rf_center_off_x_lsn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lsn</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s1">&#39;rf_center_off_x_lsn&#39;</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;rf_center_off_y_lsn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lsn</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s1">&#39;rf_center_off_y_lsn&#39;</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;rf_distance_lsn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lsn</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s1">&#39;rf_distance_lsn&#39;</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;rf_overlap_index_lsn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lsn</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s1">&#39;rf_overlap_index_lsn&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="SessionAnalysis.append_metrics_natural_movie_one"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_natural_movie_one">[docs]</a>    <span class="k">def</span> <span class="nf">append_metrics_natural_movie_one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">nma</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Extract metrics from the NaturalMovie(stimulus_info.NATURAL_MOVIE_ONE) peak response table into a dictionary. &quot;&quot;&quot;</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;reliability_nm1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nma</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s1">&#39;response_reliability_nm1&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="SessionAnalysis.append_metrics_natural_movie_two"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_natural_movie_two">[docs]</a>    <span class="k">def</span> <span class="nf">append_metrics_natural_movie_two</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">nma</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Extract metrics from the NaturalMovie(stimulus_info.NATURAL_MOVIE_TWO) peak response table into a dictionary. &quot;&quot;&quot;</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;reliability_nm2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nma</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s1">&#39;response_reliability_nm2&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="SessionAnalysis.append_metrics_natural_movie_three"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_natural_movie_three">[docs]</a>    <span class="k">def</span> <span class="nf">append_metrics_natural_movie_three</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">nma</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Extract metrics from the NaturalMovie(stimulus_info.NATURAL_MOVIE_THREE) peak response table into a dictionary. &quot;&quot;&quot;</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;reliability_nm3&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nma</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s1">&#39;response_reliability_nm3&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="SessionAnalysis.append_experiment_metrics"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_experiment_metrics">[docs]</a>    <span class="k">def</span> <span class="nf">append_experiment_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Extract stimulus-agnostic metrics from an experiment into a dictionary &quot;&quot;&quot;</span>
+        <span class="n">dxcm</span><span class="p">,</span> <span class="n">dxtime</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nwb</span><span class="o">.</span><span class="n">get_running_speed</span><span class="p">()</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;mean_running_speed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">dxcm</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SessionAnalysis.verify_roi_lists_equal"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.verify_roi_lists_equal">[docs]</a>    <span class="k">def</span> <span class="nf">verify_roi_lists_equal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">roi1</span><span class="p">,</span> <span class="n">roi2</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; TODO: replace this with simpler numpy comparisons &quot;&quot;&quot;</span>
+
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">roi1</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">roi2</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">BrainObservatoryAnalysisException</span><span class="p">(</span>
                 <span class="s2">&quot;Error -- ROI lists are of different length&quot;</span><span class="p">)</span>
+
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">roi1</span><span class="p">)):</span>
             <span class="k">if</span> <span class="n">roi1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">roi2</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
                 <span class="k">raise</span> <span class="n">BrainObservatoryAnalysisException</span><span class="p">(</span>
                     <span class="s2">&quot;Error -- ROI lists have different entries&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SessionAnalysis.session_a"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.session_a">[docs]</a>    <span class="k">def</span> <span class="nf">session_a</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plot_flag</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">save_flag</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Run stimulus-specific analysis for natural movie one, natural movie three, and drifting gratings.</span>
+<span class="sd">        The input NWB be for a stimulus_info.THREE_SESSION_A experiment.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        plot_flag: bool</span>
+<span class="sd">            Whether to generate brain_observatory_plotting work plots after running analysis.</span>
+
+<span class="sd">        save_flag: bool</span>
+<span class="sd">            Whether to save the output of analysis to self.save_path upon completion.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">nm1</span> <span class="o">=</span> <span class="n">NaturalMovie</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb</span><span class="p">,</span> <span class="s1">&#39;natural_movie_one&#39;</span><span class="p">)</span>
         <span class="n">nm3</span> <span class="o">=</span> <span class="n">NaturalMovie</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb</span><span class="p">,</span> <span class="s1">&#39;natural_movie_three&#39;</span><span class="p">)</span>
         <span class="n">dg</span> <span class="o">=</span> <span class="n">DriftingGratings</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb</span><span class="p">)</span>
+
+        <span class="n">dg</span><span class="o">.</span><span class="n">noise_correlation</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">get_noise_correlation</span><span class="p">()</span>
+        <span class="n">dg</span><span class="o">.</span><span class="n">signal_correlation</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">get_signal_correlation</span><span class="p">()</span>
+        <span class="n">dg</span><span class="o">.</span><span class="n">representational_similarity</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">get_representational_similarity</span><span class="p">()</span>
 
         <span class="n">SessionAnalysis</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Session A analyzed&quot;</span><span class="p">)</span>
         <span class="n">peak</span> <span class="o">=</span> <span class="n">multi_dataframe_merge</span><span class="p">(</span>
             <span class="p">[</span><span class="n">nm1</span><span class="o">.</span><span class="n">peak_run</span><span class="p">,</span> <span class="n">dg</span><span class="o">.</span><span class="n">peak</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">peak</span><span class="p">,</span> <span class="n">nm3</span><span class="o">.</span><span class="n">peak</span><span class="p">])</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">append_metrics_drifting_grating</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics_a</span><span class="p">,</span> <span class="n">dg</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">metrics_a</span><span class="p">[</span><span class="s2">&quot;roi_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">roi_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">append_metrics_drifting_grating</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics_a</span><span class="p">[</span><span class="s1">&#39;cell&#39;</span><span class="p">],</span> <span class="n">dg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">append_metrics_natural_movie_one</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics_a</span><span class="p">[</span><span class="s1">&#39;cell&#39;</span><span class="p">],</span> <span class="n">nm1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">append_metrics_natural_movie_three</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics_a</span><span class="p">[</span><span class="s1">&#39;cell&#39;</span><span class="p">],</span> <span class="n">nm3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">append_experiment_metrics</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics_a</span><span class="p">[</span><span class="s1">&#39;experiment&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics_a</span><span class="p">[</span><span class="s1">&#39;cell&#39;</span><span class="p">][</span><span class="s1">&#39;roi_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">roi_id</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">append_metadata</span><span class="p">(</span><span class="n">peak</span><span class="p">)</span>
 
@@ -273,6 +463,18 @@
             <span class="n">cp</span><span class="o">.</span><span class="n">plot_drifting_grating_traces</span><span class="p">(</span><span class="n">dg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SessionAnalysis.session_b"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.session_b">[docs]</a>    <span class="k">def</span> <span class="nf">session_b</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plot_flag</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">save_flag</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Run stimulus-specific analysis for natural scenes, static gratings, and natural movie one.</span>
+<span class="sd">        The input NWB be for a stimulus_info.THREE_SESSION_B experiment.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        plot_flag: bool</span>
+<span class="sd">            Whether to generate brain_observatory_plotting work plots after running analysis.</span>
+
+<span class="sd">        save_flag: bool</span>
+<span class="sd">            Whether to save the output of analysis to self.save_path upon completion.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">ns</span> <span class="o">=</span> <span class="n">NaturalScenes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb</span><span class="p">)</span>
         <span class="n">sg</span> <span class="o">=</span> <span class="n">StaticGratings</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb</span><span class="p">)</span>
         <span class="n">nm1</span> <span class="o">=</span> <span class="n">NaturalMovie</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb</span><span class="p">,</span> <span class="s1">&#39;natural_movie_one&#39;</span><span class="p">)</span>
@@ -281,10 +483,20 @@
             <span class="p">[</span><span class="n">nm1</span><span class="o">.</span><span class="n">peak_run</span><span class="p">,</span> <span class="n">sg</span><span class="o">.</span><span class="n">peak</span><span class="p">,</span> <span class="n">ns</span><span class="o">.</span><span class="n">peak</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">peak</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">append_metadata</span><span class="p">(</span><span class="n">peak</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">append_metrics_static_grating</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics_b</span><span class="p">,</span> <span class="n">sg</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">append_metrics_natural_scene</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics_b</span><span class="p">,</span> <span class="n">ns</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">append_metrics_static_grating</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics_b</span><span class="p">[</span><span class="s1">&#39;cell&#39;</span><span class="p">],</span> <span class="n">sg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">append_metrics_natural_scene</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics_b</span><span class="p">[</span><span class="s1">&#39;cell&#39;</span><span class="p">],</span> <span class="n">ns</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">append_metrics_natural_movie_one</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics_b</span><span class="p">[</span><span class="s1">&#39;cell&#39;</span><span class="p">],</span> <span class="n">nm1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">append_experiment_metrics</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics_b</span><span class="p">[</span><span class="s1">&#39;experiment&#39;</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_roi_lists_equal</span><span class="p">(</span><span class="n">sg</span><span class="o">.</span><span class="n">roi_id</span><span class="p">,</span> <span class="n">ns</span><span class="o">.</span><span class="n">roi_id</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">metrics_b</span><span class="p">[</span><span class="s2">&quot;roi_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">roi_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics_b</span><span class="p">[</span><span class="s1">&#39;cell&#39;</span><span class="p">][</span><span class="s1">&#39;roi_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">roi_id</span>
+
+        <span class="n">sg</span><span class="o">.</span><span class="n">noise_correlation</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">get_noise_correlation</span><span class="p">()</span>
+        <span class="n">sg</span><span class="o">.</span><span class="n">signal_correlation</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">get_signal_correlation</span><span class="p">()</span>
+        <span class="n">sg</span><span class="o">.</span><span class="n">representational_similarity</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">get_representational_similarity</span><span class="p">()</span>
+
+        <span class="n">ns</span><span class="o">.</span><span class="n">noise_correlation</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">get_noise_correlation</span><span class="p">()</span>
+        <span class="n">ns</span><span class="o">.</span><span class="n">signal_correlation</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">get_signal_correlation</span><span class="p">()</span>
+        <span class="n">ns</span><span class="o">.</span><span class="n">representational_similarity</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">get_representational_similarity</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">save_flag</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">save_session_b</span><span class="p">(</span><span class="n">sg</span><span class="p">,</span> <span class="n">nm1</span><span class="p">,</span> <span class="n">ns</span><span class="p">,</span> <span class="n">peak</span><span class="p">)</span>
@@ -295,14 +507,30 @@
             <span class="n">cp</span><span class="o">.</span><span class="n">plot_sg_traces</span><span class="p">(</span><span class="n">sg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SessionAnalysis.session_c"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.session_c">[docs]</a>    <span class="k">def</span> <span class="nf">session_c</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plot_flag</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">save_flag</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Run stimulus-specific analysis for natural movie one, natural movie two, and locally sparse noise.</span>
+<span class="sd">        The input NWB be for a stimulus_info.THREE_SESSION_C experiment.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        plot_flag: bool</span>
+<span class="sd">            Whether to generate brain_observatory_plotting work plots after running analysis.</span>
+
+<span class="sd">        save_flag: bool</span>
+<span class="sd">            Whether to save the output of analysis to self.save_path upon completion.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">lsn</span> <span class="o">=</span> <span class="n">LocallySparseNoise</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb</span><span class="p">,</span> <span class="n">stimulus_info</span><span class="o">.</span><span class="n">LOCALLY_SPARSE_NOISE</span><span class="p">)</span>
         <span class="n">nm2</span> <span class="o">=</span> <span class="n">NaturalMovie</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb</span><span class="p">,</span> <span class="s1">&#39;natural_movie_two&#39;</span><span class="p">)</span>
         <span class="n">nm1</span> <span class="o">=</span> <span class="n">NaturalMovie</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb</span><span class="p">,</span> <span class="s1">&#39;natural_movie_one&#39;</span><span class="p">)</span>
         <span class="n">SessionAnalysis</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Session C analyzed&quot;</span><span class="p">)</span>
-        <span class="n">peak</span> <span class="o">=</span> <span class="n">multi_dataframe_merge</span><span class="p">([</span><span class="n">nm1</span><span class="o">.</span><span class="n">peak_run</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">peak</span><span class="p">,</span> <span class="n">nm2</span><span class="o">.</span><span class="n">peak</span><span class="p">])</span>
+        <span class="n">peak</span> <span class="o">=</span> <span class="n">multi_dataframe_merge</span><span class="p">([</span><span class="n">nm1</span><span class="o">.</span><span class="n">peak_run</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">peak</span><span class="p">,</span> <span class="n">nm2</span><span class="o">.</span><span class="n">peak</span><span class="p">,</span> <span class="n">lsn</span><span class="o">.</span><span class="n">peak</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">append_metadata</span><span class="p">(</span><span class="n">peak</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">metrics_c</span><span class="p">[</span><span class="s2">&quot;roi_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nm1</span><span class="o">.</span><span class="n">roi_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">append_metrics_locally_sparse_noise</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics_c</span><span class="p">[</span><span class="s1">&#39;cell&#39;</span><span class="p">],</span> <span class="n">lsn</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">append_metrics_natural_movie_one</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics_c</span><span class="p">[</span><span class="s1">&#39;cell&#39;</span><span class="p">],</span> <span class="n">nm1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">append_metrics_natural_movie_two</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics_c</span><span class="p">[</span><span class="s1">&#39;cell&#39;</span><span class="p">],</span> <span class="n">nm2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">append_experiment_metrics</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics_c</span><span class="p">[</span><span class="s1">&#39;experiment&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics_c</span><span class="p">[</span><span class="s1">&#39;cell&#39;</span><span class="p">][</span><span class="s1">&#39;roi_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nm1</span><span class="o">.</span><span class="n">roi_id</span>
 
         <span class="k">if</span> <span class="n">save_flag</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">save_session_c</span><span class="p">(</span><span class="n">lsn</span><span class="p">,</span> <span class="n">nm1</span><span class="p">,</span> <span class="n">nm2</span><span class="p">,</span> <span class="n">peak</span><span class="p">)</span>
@@ -312,15 +540,38 @@
             <span class="n">cp</span><span class="o">.</span><span class="n">plot_lsn_traces</span><span class="p">(</span><span class="n">lsn</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SessionAnalysis.session_c2"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.session_c2">[docs]</a>    <span class="k">def</span> <span class="nf">session_c2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plot_flag</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">save_flag</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Run stimulus-specific analysis for locally sparse noise (4 deg.), locally sparse noise (8 deg.),</span>
+<span class="sd">        natural movie one, and natural movie two. The input NWB be for a stimulus_info.THREE_SESSION_C2 experiment.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        plot_flag: bool</span>
+<span class="sd">            Whether to generate brain_observatory_plotting work plots after running analysis.</span>
+
+<span class="sd">        save_flag: bool</span>
+<span class="sd">            Whether to save the output of analysis to self.save_path upon completion.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">lsn4</span> <span class="o">=</span> <span class="n">LocallySparseNoise</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb</span><span class="p">,</span> <span class="n">stimulus_info</span><span class="o">.</span><span class="n">LOCALLY_SPARSE_NOISE_4DEG</span><span class="p">)</span>
         <span class="n">lsn8</span> <span class="o">=</span> <span class="n">LocallySparseNoise</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb</span><span class="p">,</span> <span class="n">stimulus_info</span><span class="o">.</span><span class="n">LOCALLY_SPARSE_NOISE_8DEG</span><span class="p">)</span>
+
         <span class="n">nm2</span> <span class="o">=</span> <span class="n">NaturalMovie</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb</span><span class="p">,</span> <span class="s1">&#39;natural_movie_two&#39;</span><span class="p">)</span>
         <span class="n">nm1</span> <span class="o">=</span> <span class="n">NaturalMovie</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb</span><span class="p">,</span> <span class="s1">&#39;natural_movie_one&#39;</span><span class="p">)</span>
         <span class="n">SessionAnalysis</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Session C2 analyzed&quot;</span><span class="p">)</span>
-        <span class="n">peak</span> <span class="o">=</span> <span class="n">multi_dataframe_merge</span><span class="p">([</span><span class="n">nm1</span><span class="o">.</span><span class="n">peak_run</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">peak</span><span class="p">,</span> <span class="n">nm2</span><span class="o">.</span><span class="n">peak</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nwb</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">()[</span><span class="s1">&#39;targeted_structure&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;VISp&#39;</span><span class="p">:</span>
+            <span class="n">lsn_peak</span> <span class="o">=</span> <span class="n">lsn4</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lsn_peak</span> <span class="o">=</span> <span class="n">lsn8</span>
+
+        <span class="n">peak</span> <span class="o">=</span> <span class="n">multi_dataframe_merge</span><span class="p">([</span><span class="n">nm1</span><span class="o">.</span><span class="n">peak_run</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">peak</span><span class="p">,</span> <span class="n">nm2</span><span class="o">.</span><span class="n">peak</span><span class="p">,</span> <span class="n">lsn_peak</span><span class="o">.</span><span class="n">peak</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">append_metadata</span><span class="p">(</span><span class="n">peak</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">metrics_c</span><span class="p">[</span><span class="s2">&quot;roi_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nm1</span><span class="o">.</span><span class="n">roi_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">append_metrics_locally_sparse_noise</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics_c</span><span class="p">[</span><span class="s1">&#39;cell&#39;</span><span class="p">],</span> <span class="n">lsn_peak</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">append_metrics_natural_movie_one</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics_c</span><span class="p">[</span><span class="s1">&#39;cell&#39;</span><span class="p">],</span> <span class="n">nm1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">append_metrics_natural_movie_two</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics_c</span><span class="p">[</span><span class="s1">&#39;cell&#39;</span><span class="p">],</span> <span class="n">nm2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">append_experiment_metrics</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics_c</span><span class="p">[</span><span class="s1">&#39;experiment&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics_c</span><span class="p">[</span><span class="s1">&#39;cell&#39;</span><span class="p">][</span><span class="s1">&#39;roi_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nm1</span><span class="o">.</span><span class="n">roi_id</span>
 
         <span class="k">if</span> <span class="n">save_flag</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">save_session_c2</span><span class="p">(</span><span class="n">lsn4</span><span class="p">,</span> <span class="n">lsn8</span><span class="p">,</span> <span class="n">nm1</span><span class="p">,</span> <span class="n">nm2</span><span class="p">,</span> <span class="n">peak</span><span class="p">)</span>
@@ -333,6 +584,24 @@
 
 
 <div class="viewcode-block" id="run_session_analysis"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.run_session_analysis">[docs]</a><span class="k">def</span> <span class="nf">run_session_analysis</span><span class="p">(</span><span class="n">nwb_path</span><span class="p">,</span> <span class="n">save_path</span><span class="p">,</span> <span class="n">plot_flag</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">save_flag</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Inspect an NWB file to determine which experiment session was run</span>
+<span class="sd">    and compute all stimulus-specific analyses.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nwb_path: string</span>
+<span class="sd">        Path to NWB file.</span>
+
+<span class="sd">    save_path: string</span>
+<span class="sd">        path to save results. Recommended NOT to use NWB file.</span>
+
+<span class="sd">    plot_flag: bool</span>
+<span class="sd">        Whether to save brain_observatory_plotting work plots.</span>
+
+<span class="sd">    save_flag: bool</span>
+<span class="sd">        Whether to save results to save_path.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">save_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">save_path</span><span class="p">))</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">save_dir</span><span class="p">):</span>
@@ -420,7 +689,7 @@
 <h3> Questions </h3>
 <p class="questions">
   Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
-  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allensdk' tag.
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allen-sdk' tag.
 </p>
 
 <p class="questions">

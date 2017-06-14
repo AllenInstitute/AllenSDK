@@ -25,12 +25,13 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Allen SDK 0.13.1 documentation" href="index.html" />
     <link rel="up" title="allensdk package" href="allensdk.html" />
-    <link rel="next" title="allensdk.config package" href="allensdk.config.html" />
+    <link rel="next" title="allensdk.brain_observatory.receptive_field_analysis package" href="allensdk.brain_observatory.receptive_field_analysis.html" />
     <link rel="prev" title="allensdk.api.queries package" href="allensdk.api.queries.html" /> 
   </head>
   <body role="document">
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
 <script type="text/javascript">
     var _pSupressBrowserFlashWarning = true;
     var _pTabId = "pHome";
@@ -71,6 +72,27 @@
             
   <div class="section" id="allensdk-brain-observatory-package">
 <h1>allensdk.brain_observatory package<a class="headerlink" href="#allensdk-brain-observatory-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="allensdk.brain_observatory.receptive_field_analysis.html">allensdk.brain_observatory.receptive_field_analysis package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.receptive_field_analysis.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.receptive_field_analysis.html#module-allensdk.brain_observatory.receptive_field_analysis.chisquarerf">allensdk.brain_observatory.receptive_field_analysis.chisquarerf module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.receptive_field_analysis.html#module-allensdk.brain_observatory.receptive_field_analysis.eventdetection">allensdk.brain_observatory.receptive_field_analysis.eventdetection module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.receptive_field_analysis.html#module-allensdk.brain_observatory.receptive_field_analysis.fit_parameters">allensdk.brain_observatory.receptive_field_analysis.fit_parameters module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.receptive_field_analysis.html#module-allensdk.brain_observatory.receptive_field_analysis.fitgaussian2D">allensdk.brain_observatory.receptive_field_analysis.fitgaussian2D module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.receptive_field_analysis.html#module-allensdk.brain_observatory.receptive_field_analysis.postprocessing">allensdk.brain_observatory.receptive_field_analysis.postprocessing module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.receptive_field_analysis.html#module-allensdk.brain_observatory.receptive_field_analysis.receptive_field">allensdk.brain_observatory.receptive_field_analysis.receptive_field module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.receptive_field_analysis.html#module-allensdk.brain_observatory.receptive_field_analysis.tools">allensdk.brain_observatory.receptive_field_analysis.tools module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.receptive_field_analysis.html#module-allensdk.brain_observatory.receptive_field_analysis.utilities">allensdk.brain_observatory.receptive_field_analysis.utilities module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.receptive_field_analysis.html#module-allensdk.brain_observatory.receptive_field_analysis.visualization">allensdk.brain_observatory.receptive_field_analysis.visualization module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.receptive_field_analysis.html#module-allensdk.brain_observatory.receptive_field_analysis">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
@@ -85,6 +107,12 @@
 <dl class="exception">
 <dt id="allensdk.brain_observatory.brain_observatory_exceptions.MissingStimulusException">
 <em class="property">exception </em><code class="descclassname">allensdk.brain_observatory.brain_observatory_exceptions.</code><code class="descname">MissingStimulusException</code><a class="reference internal" href="_modules/allensdk/brain_observatory/brain_observatory_exceptions.html#MissingStimulusException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.brain_observatory_exceptions.MissingStimulusException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="allensdk.brain_observatory.brain_observatory_exceptions.NoEyeTrackingException">
+<em class="property">exception </em><code class="descclassname">allensdk.brain_observatory.brain_observatory_exceptions.</code><code class="descname">NoEyeTrackingException</code><a class="reference internal" href="_modules/allensdk/brain_observatory/brain_observatory_exceptions.html#NoEyeTrackingException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.brain_observatory_exceptions.NoEyeTrackingException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
 </dd></dl>
 
@@ -319,6 +347,90 @@ to an array of x,y coordinates.</p>
 <dd></dd></dl>
 
 </div>
+<div class="section" id="module-allensdk.brain_observatory.demixer">
+<span id="allensdk-brain-observatory-demixer-module"></span><h2>allensdk.brain_observatory.demixer module<a class="headerlink" href="#module-allensdk.brain_observatory.demixer" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="allensdk.brain_observatory.demixer.demix_time_dep_masks">
+<code class="descclassname">allensdk.brain_observatory.demixer.</code><code class="descname">demix_time_dep_masks</code><span class="sig-paren">(</span><em>raw_traces</em>, <em>stack</em>, <em>masks</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/demixer.html#demix_time_dep_masks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.demixer.demix_time_dep_masks" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>raw_traces</strong> &#8211; extracted traces</li>
+<li><strong>stack</strong> &#8211; movie (same length as traces)</li>
+<li><strong>masks</strong> &#8211; binary roi masks</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">demixed traces</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.demixer.find_negative_baselines">
+<code class="descclassname">allensdk.brain_observatory.demixer.</code><code class="descname">find_negative_baselines</code><span class="sig-paren">(</span><em>trace</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/demixer.html#find_negative_baselines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.demixer.find_negative_baselines" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.demixer.find_negative_transients_threshold">
+<code class="descclassname">allensdk.brain_observatory.demixer.</code><code class="descname">find_negative_transients_threshold</code><span class="sig-paren">(</span><em>trace</em>, <em>window=500</em>, <em>length=10</em>, <em>std_devs=3</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/demixer.html#find_negative_transients_threshold"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.demixer.find_negative_transients_threshold" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.demixer.find_zero_baselines">
+<code class="descclassname">allensdk.brain_observatory.demixer.</code><code class="descname">find_zero_baselines</code><span class="sig-paren">(</span><em>traces</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/demixer.html#find_zero_baselines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.demixer.find_zero_baselines" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.demixer.plot_negative_baselines">
+<code class="descclassname">allensdk.brain_observatory.demixer.</code><code class="descname">plot_negative_baselines</code><span class="sig-paren">(</span><em>raw_traces</em>, <em>demix_traces</em>, <em>mask_array</em>, <em>roi_ids_mask</em>, <em>plot_dir</em>, <em>ext='png'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/demixer.html#plot_negative_baselines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.demixer.plot_negative_baselines" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.demixer.plot_negative_transients">
+<code class="descclassname">allensdk.brain_observatory.demixer.</code><code class="descname">plot_negative_transients</code><span class="sig-paren">(</span><em>raw_traces</em>, <em>demix_traces</em>, <em>valid_roi</em>, <em>mask_array</em>, <em>roi_ids_mask</em>, <em>plot_dir</em>, <em>ext='png'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/demixer.html#plot_negative_transients"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.demixer.plot_negative_transients" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.demixer.plot_overlap_masks_lengthOne">
+<code class="descclassname">allensdk.brain_observatory.demixer.</code><code class="descname">plot_overlap_masks_lengthOne</code><span class="sig-paren">(</span><em>roi_ind</em>, <em>masks</em>, <em>savefile=None</em>, <em>weighted=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/demixer.html#plot_overlap_masks_lengthOne"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.demixer.plot_overlap_masks_lengthOne" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.demixer.plot_traces">
+<code class="descclassname">allensdk.brain_observatory.demixer.</code><code class="descname">plot_traces</code><span class="sig-paren">(</span><em>raw_trace</em>, <em>demix_trace</em>, <em>roi_id</em>, <em>roi_ind</em>, <em>save_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/demixer.html#plot_traces"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.demixer.plot_traces" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.demixer.plot_transients">
+<code class="descclassname">allensdk.brain_observatory.demixer.</code><code class="descname">plot_transients</code><span class="sig-paren">(</span><em>roi_ind</em>, <em>t_trans</em>, <em>masks</em>, <em>traces</em>, <em>demix_traces</em>, <em>savefile</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/demixer.html#plot_transients"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.demixer.plot_transients" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.demixer.rolling_window">
+<code class="descclassname">allensdk.brain_observatory.demixer.</code><code class="descname">rolling_window</code><span class="sig-paren">(</span><em>trace</em>, <em>window=500</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/demixer.html#rolling_window"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.demixer.rolling_window" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>trace</strong> &#8211; </li>
+<li><strong>window</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
 <div class="section" id="module-allensdk.brain_observatory.dff">
 <span id="allensdk-brain-observatory-dff-module"></span><h2>allensdk.brain_observatory.dff module<a class="headerlink" href="#module-allensdk.brain_observatory.dff" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
@@ -435,6 +547,11 @@ the histogram.</p>
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="allensdk.brain_observatory.drifting_gratings.DriftingGratings.get_noise_correlation">
+<code class="descname">get_noise_correlation</code><span class="sig-paren">(</span><em>corr='spearman'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/drifting_gratings.html#DriftingGratings.get_noise_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.drifting_gratings.DriftingGratings.get_noise_correlation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="allensdk.brain_observatory.drifting_gratings.DriftingGratings.get_peak">
 <code class="descname">get_peak</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/drifting_gratings.html#DriftingGratings.get_peak"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.drifting_gratings.DriftingGratings.get_peak" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes metrics related to each cell&#8217;s peak response condition.</p>
@@ -448,7 +565,7 @@ the histogram.</p>
 <div><ul class="simple">
 <li>ori_dg (orientation)</li>
 <li>tf_dg (temporal frequency)</li>
-<li>response_reliability_dg</li>
+<li>reliability_dg</li>
 <li>osi_dg (orientation selectivity index)</li>
 <li>dsi_dg (direction selectivity index)</li>
 <li>peak_dff_dg (peak dF/F)</li>
@@ -463,6 +580,11 @@ the histogram.</p>
 </tbody>
 </table>
 </dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.drifting_gratings.DriftingGratings.get_representational_similarity">
+<code class="descname">get_representational_similarity</code><span class="sig-paren">(</span><em>corr='spearman'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/drifting_gratings.html#DriftingGratings.get_representational_similarity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.drifting_gratings.DriftingGratings.get_representational_similarity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="allensdk.brain_observatory.drifting_gratings.DriftingGratings.get_response">
@@ -482,6 +604,11 @@ to that condition (index 2).</p>
 </table>
 </dd></dl>
 
+<dl class="method">
+<dt id="allensdk.brain_observatory.drifting_gratings.DriftingGratings.get_signal_correlation">
+<code class="descname">get_signal_correlation</code><span class="sig-paren">(</span><em>corr='spearman'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/drifting_gratings.html#DriftingGratings.get_signal_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.drifting_gratings.DriftingGratings.get_signal_correlation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="attribute">
 <dt id="allensdk.brain_observatory.drifting_gratings.DriftingGratings.number_ori">
 <code class="descname">number_ori</code><a class="headerlink" href="#allensdk.brain_observatory.drifting_gratings.DriftingGratings.number_ori" title="Permalink to this definition">¶</a></dt>
@@ -494,7 +621,7 @@ to that condition (index 2).</p>
 
 <dl class="method">
 <dt id="allensdk.brain_observatory.drifting_gratings.DriftingGratings.open_star_plot">
-<code class="descname">open_star_plot</code><span class="sig-paren">(</span><em>cell_specimen_id</em>, <em>include_labels=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/drifting_gratings.html#DriftingGratings.open_star_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.drifting_gratings.DriftingGratings.open_star_plot" title="Permalink to this definition">¶</a></dt>
+<code class="descname">open_star_plot</code><span class="sig-paren">(</span><em>cell_specimen_id=None</em>, <em>include_labels=False</em>, <em>cell_index=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/drifting_gratings.html#DriftingGratings.open_star_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.drifting_gratings.DriftingGratings.open_star_plot" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -526,6 +653,19 @@ to that condition (index 2).</p>
 <dt id="allensdk.brain_observatory.drifting_gratings.DriftingGratings.populate_stimulus_table">
 <code class="descname">populate_stimulus_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/drifting_gratings.html#DriftingGratings.populate_stimulus_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.drifting_gratings.DriftingGratings.populate_stimulus_table" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.drifting_gratings.DriftingGratings.reshape_response_array">
+<code class="descname">reshape_response_array</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/drifting_gratings.html#DriftingGratings.reshape_response_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.drifting_gratings.DriftingGratings.reshape_response_array" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">response array in cells x stim x repetition for noise correlations</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="allensdk.brain_observatory.drifting_gratings.DriftingGratings.tfvals">
@@ -602,6 +742,11 @@ to that condition (index 2).</p>
 <dd></dd></dl>
 
 <dl class="attribute">
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.cell_index_receptive_field_analysis_data">
+<code class="descname">cell_index_receptive_field_analysis_data</code><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.cell_index_receptive_field_analysis_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.extralength">
 <code class="descname">extralength</code><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.extralength" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -612,30 +757,66 @@ to that condition (index 2).</p>
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.get_mean_response">
+<code class="descname">get_mean_response</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/locally_sparse_noise.html#LocallySparseNoise.get_mean_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.get_mean_response" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.get_peak">
+<code class="descname">get_peak</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/locally_sparse_noise.html#LocallySparseNoise.get_peak"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.get_peak" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.get_receptive_field">
 <code class="descname">get_receptive_field</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/locally_sparse_noise.html#LocallySparseNoise.get_receptive_field"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.get_receptive_field" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates receptive fields for each cell</p>
 </dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.get_receptive_field_analysis_data">
+<code class="descname">get_receptive_field_analysis_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/locally_sparse_noise.html#LocallySparseNoise.get_receptive_field_analysis_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.get_receptive_field_analysis_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates receptive fields for each cell</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.get_receptive_field_attribute_df">
+<code class="descname">get_receptive_field_attribute_df</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/locally_sparse_noise.html#LocallySparseNoise.get_receptive_field_attribute_df"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.get_receptive_field_attribute_df" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="attribute">
 <dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.interlength">
 <code class="descname">interlength</code><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.interlength" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.mean_response">
+<code class="descname">mean_response</code><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.mean_response" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="staticmethod">
-<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.merge_receptive_fields">
-<em class="property">static </em><code class="descname">merge_receptive_fields</code><span class="sig-paren">(</span><em>rc1</em>, <em>rc2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/locally_sparse_noise.html#LocallySparseNoise.merge_receptive_fields"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.merge_receptive_fields" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.merge_mean_response">
+<em class="property">static </em><code class="descname">merge_mean_response</code><span class="sig-paren">(</span><em>rc1</em>, <em>rc2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/locally_sparse_noise.html#LocallySparseNoise.merge_mean_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.merge_mean_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move out of this class, to session analysis</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.open_pincushion_plot">
-<code class="descname">open_pincushion_plot</code><span class="sig-paren">(</span><em>cell_specimen_id</em>, <em>on</em>, <em>color_map=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/locally_sparse_noise.html#LocallySparseNoise.open_pincushion_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.open_pincushion_plot" title="Permalink to this definition">¶</a></dt>
+<code class="descname">open_pincushion_plot</code><span class="sig-paren">(</span><em>on</em>, <em>cell_specimen_id=None</em>, <em>color_map=None</em>, <em>cell_index=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/locally_sparse_noise.html#LocallySparseNoise.open_pincushion_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.open_pincushion_plot" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.plot_receptive_field">
-<code class="descname">plot_receptive_field</code><span class="sig-paren">(</span><em>cell_specimen_id, on, color_map=None, zlim=[-3, 3], mask=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/locally_sparse_noise.html#LocallySparseNoise.plot_receptive_field"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.plot_receptive_field" title="Permalink to this definition">¶</a></dt>
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.plot_cell_receptive_field">
+<code class="descname">plot_cell_receptive_field</code><span class="sig-paren">(</span><em>on</em>, <em>cell_specimen_id=None</em>, <em>color_map=None</em>, <em>clim=None</em>, <em>mask=None</em>, <em>cell_index=None</em>, <em>scalebar=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/locally_sparse_noise.html#LocallySparseNoise.plot_cell_receptive_field"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.plot_cell_receptive_field" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.plot_population_receptive_field">
+<code class="descname">plot_population_receptive_field</code><span class="sig-paren">(</span><em>color_map='RdPu'</em>, <em>clim=None</em>, <em>mask=None</em>, <em>scalebar=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/locally_sparse_noise.html#LocallySparseNoise.plot_population_receptive_field"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.plot_population_receptive_field" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.plot_receptive_field_analysis_data">
+<code class="descname">plot_receptive_field_analysis_data</code><span class="sig-paren">(</span><em>cell_index</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/locally_sparse_noise.html#LocallySparseNoise.plot_receptive_field_analysis_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.plot_receptive_field_analysis_data" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -643,9 +824,19 @@ to that condition (index 2).</p>
 <code class="descname">populate_stimulus_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/locally_sparse_noise.html#LocallySparseNoise.populate_stimulus_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.populate_stimulus_table" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="staticmethod">
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.read_cell_index_receptive_field_analysis">
+<em class="property">static </em><code class="descname">read_cell_index_receptive_field_analysis</code><span class="sig-paren">(</span><em>file_handle</em>, <em>prefix</em>, <em>path=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/locally_sparse_noise.html#LocallySparseNoise.read_cell_index_receptive_field_analysis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.read_cell_index_receptive_field_analysis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="attribute">
 <dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.receptive_field">
 <code class="descname">receptive_field</code><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.receptive_field" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.save_cell_index_receptive_field_analysis">
+<em class="property">static </em><code class="descname">save_cell_index_receptive_field_analysis</code><span class="sig-paren">(</span><em>cell_index_receptive_field_analysis_data</em>, <em>new_nwb</em>, <em>prefix</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/locally_sparse_noise.html#LocallySparseNoise.save_cell_index_receptive_field_analysis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.save_cell_index_receptive_field_analysis" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -728,7 +919,7 @@ to that condition (index 2).</p>
 
 <dl class="method">
 <dt id="allensdk.brain_observatory.natural_movie.NaturalMovie.open_track_plot">
-<code class="descname">open_track_plot</code><span class="sig-paren">(</span><em>cell_specimen_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/natural_movie.html#NaturalMovie.open_track_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.natural_movie.NaturalMovie.open_track_plot" title="Permalink to this definition">¶</a></dt>
+<code class="descname">open_track_plot</code><span class="sig-paren">(</span><em>cell_specimen_id=None</em>, <em>cell_index=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/natural_movie.html#NaturalMovie.open_track_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.natural_movie.NaturalMovie.open_track_plot" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -775,6 +966,11 @@ to that condition (index 2).</p>
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="allensdk.brain_observatory.natural_scenes.NaturalScenes.get_noise_correlation">
+<code class="descname">get_noise_correlation</code><span class="sig-paren">(</span><em>corr='spearman'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/natural_scenes.html#NaturalScenes.get_noise_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.natural_scenes.NaturalScenes.get_noise_correlation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="allensdk.brain_observatory.natural_scenes.NaturalScenes.get_peak">
 <code class="descname">get_peak</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/natural_scenes.html#NaturalScenes.get_peak"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.natural_scenes.NaturalScenes.get_peak" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes metrics about peak response condition for each cell.</p>
@@ -787,13 +983,12 @@ to that condition (index 2).</p>
 <blockquote class="last">
 <div><ul class="simple">
 <li>scene_ns (scene number)</li>
-<li>response_reliability_ns</li>
+<li>reliability_ns</li>
 <li>peak_dff_ns (peak dF/F)</li>
 <li>ptest_ns</li>
 <li>p_run_ns</li>
 <li>run_modulation_ns</li>
 <li>time_to_peak_ns</li>
-<li>duration_ns</li>
 </ul>
 </div></blockquote>
 </td>
@@ -801,6 +996,11 @@ to that condition (index 2).</p>
 </tbody>
 </table>
 </dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.natural_scenes.NaturalScenes.get_representational_similarity">
+<code class="descname">get_representational_similarity</code><span class="sig-paren">(</span><em>corr='spearman'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/natural_scenes.html#NaturalScenes.get_representational_similarity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.natural_scenes.NaturalScenes.get_representational_similarity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="allensdk.brain_observatory.natural_scenes.NaturalScenes.get_response">
@@ -820,6 +1020,11 @@ to that condition (index 2).</p>
 </table>
 </dd></dl>
 
+<dl class="method">
+<dt id="allensdk.brain_observatory.natural_scenes.NaturalScenes.get_signal_correlation">
+<code class="descname">get_signal_correlation</code><span class="sig-paren">(</span><em>corr='spearman'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/natural_scenes.html#NaturalScenes.get_signal_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.natural_scenes.NaturalScenes.get_signal_correlation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="attribute">
 <dt id="allensdk.brain_observatory.natural_scenes.NaturalScenes.interlength">
 <code class="descname">interlength</code><a class="headerlink" href="#allensdk.brain_observatory.natural_scenes.NaturalScenes.interlength" title="Permalink to this definition">¶</a></dt>
@@ -832,7 +1037,7 @@ to that condition (index 2).</p>
 
 <dl class="method">
 <dt id="allensdk.brain_observatory.natural_scenes.NaturalScenes.open_corona_plot">
-<code class="descname">open_corona_plot</code><span class="sig-paren">(</span><em>cell_specimen_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/natural_scenes.html#NaturalScenes.open_corona_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.natural_scenes.NaturalScenes.open_corona_plot" title="Permalink to this definition">¶</a></dt>
+<code class="descname">open_corona_plot</code><span class="sig-paren">(</span><em>cell_specimen_id=None</em>, <em>cell_index=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/natural_scenes.html#NaturalScenes.open_corona_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.natural_scenes.NaturalScenes.open_corona_plot" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -845,6 +1050,19 @@ to that condition (index 2).</p>
 <code class="descname">populate_stimulus_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/natural_scenes.html#NaturalScenes.populate_stimulus_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.natural_scenes.NaturalScenes.populate_stimulus_table" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="method">
+<dt id="allensdk.brain_observatory.natural_scenes.NaturalScenes.reshape_response_array">
+<code class="descname">reshape_response_array</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/natural_scenes.html#NaturalScenes.reshape_response_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.natural_scenes.NaturalScenes.reshape_response_array" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">response array in cells x stim x repetition for noise correlations</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="allensdk.brain_observatory.natural_scenes.NaturalScenes.sweeplength">
 <code class="descname">sweeplength</code><a class="headerlink" href="#allensdk.brain_observatory.natural_scenes.NaturalScenes.sweeplength" title="Permalink to this definition">¶</a></dt>
@@ -855,6 +1073,22 @@ to that condition (index 2).</p>
 </div>
 <div class="section" id="module-allensdk.brain_observatory.observatory_plots">
 <span id="allensdk-brain-observatory-observatory-plots-module"></span><h2>allensdk.brain_observatory.observatory_plots module<a class="headerlink" href="#module-allensdk.brain_observatory.observatory_plots" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="allensdk.brain_observatory.observatory_plots.DimensionPatchHandler">
+<em class="property">class </em><code class="descclassname">allensdk.brain_observatory.observatory_plots.</code><code class="descname">DimensionPatchHandler</code><span class="sig-paren">(</span><em>vals</em>, <em>start_color</em>, <em>end_color</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/observatory_plots.html#DimensionPatchHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.observatory_plots.DimensionPatchHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="allensdk.brain_observatory.observatory_plots.DimensionPatchHandler.dim_color">
+<code class="descname">dim_color</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/observatory_plots.html#DimensionPatchHandler.dim_color"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.observatory_plots.DimensionPatchHandler.dim_color" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.observatory_plots.DimensionPatchHandler.legend_artist">
+<code class="descname">legend_artist</code><span class="sig-paren">(</span><em>legend</em>, <em>orig_handle</em>, <em>fontsize</em>, <em>handlebox</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/observatory_plots.html#DimensionPatchHandler.legend_artist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.observatory_plots.DimensionPatchHandler.legend_artist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 <dl class="function">
 <dt id="allensdk.brain_observatory.observatory_plots.figure_in_px">
 <code class="descclassname">allensdk.brain_observatory.observatory_plots.</code><code class="descname">figure_in_px</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwds</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/observatory_plots.html#figure_in_px"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.observatory_plots.figure_in_px" title="Permalink to this definition">¶</a></dt>
@@ -862,17 +1096,27 @@ to that condition (index 2).</p>
 
 <dl class="function">
 <dt id="allensdk.brain_observatory.observatory_plots.finalize_no_axes">
-<code class="descclassname">allensdk.brain_observatory.observatory_plots.</code><code class="descname">finalize_no_axes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/observatory_plots.html#finalize_no_axes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.observatory_plots.finalize_no_axes" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">allensdk.brain_observatory.observatory_plots.</code><code class="descname">finalize_no_axes</code><span class="sig-paren">(</span><em>pad=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/observatory_plots.html#finalize_no_axes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.observatory_plots.finalize_no_axes" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="allensdk.brain_observatory.observatory_plots.finalize_no_labels">
-<code class="descclassname">allensdk.brain_observatory.observatory_plots.</code><code class="descname">finalize_no_labels</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/observatory_plots.html#finalize_no_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.observatory_plots.finalize_no_labels" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">allensdk.brain_observatory.observatory_plots.</code><code class="descname">finalize_no_labels</code><span class="sig-paren">(</span><em>pad=0.3</em>, <em>legend=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/observatory_plots.html#finalize_no_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.observatory_plots.finalize_no_labels" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="allensdk.brain_observatory.observatory_plots.finalize_with_axes">
-<code class="descclassname">allensdk.brain_observatory.observatory_plots.</code><code class="descname">finalize_with_axes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/observatory_plots.html#finalize_with_axes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.observatory_plots.finalize_with_axes" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">allensdk.brain_observatory.observatory_plots.</code><code class="descname">finalize_with_axes</code><span class="sig-paren">(</span><em>pad=0.3</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/observatory_plots.html#finalize_with_axes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.observatory_plots.finalize_with_axes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.observatory_plots.float_label">
+<code class="descclassname">allensdk.brain_observatory.observatory_plots.</code><code class="descname">float_label</code><span class="sig-paren">(</span><em>n</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/observatory_plots.html#float_label"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.observatory_plots.float_label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.observatory_plots.plot_cell_correlation">
+<code class="descclassname">allensdk.brain_observatory.observatory_plots.</code><code class="descname">plot_cell_correlation</code><span class="sig-paren">(</span><em>sig_corrs</em>, <em>labels</em>, <em>colors</em>, <em>scale=15</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/observatory_plots.html#plot_cell_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.observatory_plots.plot_cell_correlation" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
@@ -886,13 +1130,28 @@ to that condition (index 2).</p>
 <dd></dd></dl>
 
 <dl class="function">
+<dt id="allensdk.brain_observatory.observatory_plots.plot_mask_outline">
+<code class="descclassname">allensdk.brain_observatory.observatory_plots.</code><code class="descname">plot_mask_outline</code><span class="sig-paren">(</span><em>mask</em>, <em>ax</em>, <em>color='k'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/observatory_plots.html#plot_mask_outline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.observatory_plots.plot_mask_outline" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.observatory_plots.plot_pupil_location">
+<code class="descclassname">allensdk.brain_observatory.observatory_plots.</code><code class="descname">plot_pupil_location</code><span class="sig-paren">(</span><em>xy_deg</em>, <em>s=1</em>, <em>c=None</em>, <em>cmap=&lt;matplotlib.colors.LinearSegmentedColormap object&gt;</em>, <em>edgecolor=''</em>, <em>include_labels=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/observatory_plots.html#plot_pupil_location"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.observatory_plots.plot_pupil_location" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
 <dt id="allensdk.brain_observatory.observatory_plots.plot_radial_histogram">
 <code class="descclassname">allensdk.brain_observatory.observatory_plots.</code><code class="descname">plot_radial_histogram</code><span class="sig-paren">(</span><em>angles</em>, <em>counts</em>, <em>all_angles=None</em>, <em>include_labels=False</em>, <em>offset=180.0</em>, <em>direction=-1</em>, <em>closed=False</em>, <em>color='#ccccdd'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/observatory_plots.html#plot_radial_histogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.observatory_plots.plot_radial_histogram" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="allensdk.brain_observatory.observatory_plots.plot_receptive_field">
-<code class="descclassname">allensdk.brain_observatory.observatory_plots.</code><code class="descname">plot_receptive_field</code><span class="sig-paren">(</span><em>rf, color_map=None, zlim=[-3, 3], mask=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/observatory_plots.html#plot_receptive_field"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.observatory_plots.plot_receptive_field" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">allensdk.brain_observatory.observatory_plots.</code><code class="descname">plot_receptive_field</code><span class="sig-paren">(</span><em>rf</em>, <em>color_map=None</em>, <em>clim=None</em>, <em>mask=None</em>, <em>outline_color='#cccccc'</em>, <em>scalebar=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/observatory_plots.html#plot_receptive_field"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.observatory_plots.plot_receptive_field" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.observatory_plots.plot_representational_similarity">
+<code class="descclassname">allensdk.brain_observatory.observatory_plots.</code><code class="descname">plot_representational_similarity</code><span class="sig-paren">(</span><em>rs</em>, <em>dims=None</em>, <em>dim_labels=None</em>, <em>colors=None</em>, <em>dim_order=None</em>, <em>labels=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/observatory_plots.html#plot_representational_similarity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.observatory_plots.plot_representational_similarity" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
@@ -908,6 +1167,11 @@ to that condition (index 2).</p>
 <dl class="function">
 <dt id="allensdk.brain_observatory.observatory_plots.plot_time_to_peak">
 <code class="descclassname">allensdk.brain_observatory.observatory_plots.</code><code class="descname">plot_time_to_peak</code><span class="sig-paren">(</span><em>msrs</em>, <em>ttps</em>, <em>t_start</em>, <em>t_end</em>, <em>stim_start</em>, <em>stim_end</em>, <em>cmap</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/observatory_plots.html#plot_time_to_peak"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.observatory_plots.plot_time_to_peak" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.observatory_plots.population_correlation_scatter">
+<code class="descclassname">allensdk.brain_observatory.observatory_plots.</code><code class="descname">population_correlation_scatter</code><span class="sig-paren">(</span><em>sig_corrs</em>, <em>noise_corrs</em>, <em>labels</em>, <em>colors</em>, <em>scale=15</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/observatory_plots.html#population_correlation_scatter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.observatory_plots.population_correlation_scatter" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -1309,6 +1573,30 @@ mask should have values &gt;0. Background pixels must be zero</p>
 </table>
 </dd></dl>
 
+<dl class="function">
+<dt id="allensdk.brain_observatory.roi_masks.create_roi_mask_array">
+<code class="descclassname">allensdk.brain_observatory.roi_masks.</code><code class="descname">create_roi_mask_array</code><span class="sig-paren">(</span><em>rois</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/roi_masks.html#create_roi_mask_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.roi_masks.create_roi_mask_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create full image mask array from list of RoiMasks.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>rois: list&lt;RoiMask&gt;</strong></p>
+<blockquote>
+<div><p>List of roi masks.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">np.ndarray: NxWxH array</p>
+<blockquote class="last">
+<div><p>Boolean array of of len(rois) image masks.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 <div class="section" id="module-allensdk.brain_observatory.session_analysis">
 <span id="allensdk-brain-observatory-session-analysis-module"></span><h2>allensdk.brain_observatory.session_analysis module<a class="headerlink" href="#module-allensdk.brain_observatory.session_analysis" title="Permalink to this headline">¶</a></h2>
@@ -1316,70 +1604,289 @@ mask should have values &gt;0. Background pixels must be zero</p>
 <dt id="allensdk.brain_observatory.session_analysis.SessionAnalysis">
 <em class="property">class </em><code class="descclassname">allensdk.brain_observatory.session_analysis.</code><code class="descname">SessionAnalysis</code><span class="sig-paren">(</span><em>nwb_path</em>, <em>save_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#SessionAnalysis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.SessionAnalysis" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Run all of the stimulus-specific analyses associated with a single experiment session.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>nwb_path: string, path to NWB file</strong></p>
+<p class="last"><strong>save_path: string, path to HDF5 file to store outputs.  Recommended NOT to modify the NWB file.</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="allensdk.brain_observatory.session_analysis.SessionAnalysis.append_experiment_metrics">
+<code class="descname">append_experiment_metrics</code><span class="sig-paren">(</span><em>metrics</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#SessionAnalysis.append_experiment_metrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_experiment_metrics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract stimulus-agnostic metrics from an experiment into a dictionary</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metadata">
 <code class="descname">append_metadata</code><span class="sig-paren">(</span><em>df</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#SessionAnalysis.append_metadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metadata" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Append the metadata fields from the NWB file as columns to a pd.DataFrame</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_drifting_grating">
 <code class="descname">append_metrics_drifting_grating</code><span class="sig-paren">(</span><em>metrics</em>, <em>dg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#SessionAnalysis.append_metrics_drifting_grating"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_drifting_grating" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Extract metrics from the DriftingGratings peak response table into a dictionary.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_locally_sparse_noise">
+<code class="descname">append_metrics_locally_sparse_noise</code><span class="sig-paren">(</span><em>metrics</em>, <em>lsn</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#SessionAnalysis.append_metrics_locally_sparse_noise"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_locally_sparse_noise" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract metrics from the LocallySparseNoise peak response table into a dictionary.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_natural_movie_one">
+<code class="descname">append_metrics_natural_movie_one</code><span class="sig-paren">(</span><em>metrics</em>, <em>nma</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#SessionAnalysis.append_metrics_natural_movie_one"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_natural_movie_one" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract metrics from the NaturalMovie(stimulus_info.NATURAL_MOVIE_ONE) peak response table into a dictionary.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_natural_movie_three">
+<code class="descname">append_metrics_natural_movie_three</code><span class="sig-paren">(</span><em>metrics</em>, <em>nma</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#SessionAnalysis.append_metrics_natural_movie_three"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_natural_movie_three" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract metrics from the NaturalMovie(stimulus_info.NATURAL_MOVIE_THREE) peak response table into a dictionary.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_natural_movie_two">
+<code class="descname">append_metrics_natural_movie_two</code><span class="sig-paren">(</span><em>metrics</em>, <em>nma</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#SessionAnalysis.append_metrics_natural_movie_two"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_natural_movie_two" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract metrics from the NaturalMovie(stimulus_info.NATURAL_MOVIE_TWO) peak response table into a dictionary.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_natural_scene">
 <code class="descname">append_metrics_natural_scene</code><span class="sig-paren">(</span><em>metrics</em>, <em>ns</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#SessionAnalysis.append_metrics_natural_scene"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_natural_scene" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Extract metrics from the NaturalScenes peak response table into a dictionary.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_static_grating">
 <code class="descname">append_metrics_static_grating</code><span class="sig-paren">(</span><em>metrics</em>, <em>sg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#SessionAnalysis.append_metrics_static_grating"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_static_grating" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Extract metrics from the StaticGratings peak response table into a dictionary.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="allensdk.brain_observatory.session_analysis.SessionAnalysis.save_session_a">
 <code class="descname">save_session_a</code><span class="sig-paren">(</span><em>dg</em>, <em>nm1</em>, <em>nm3</em>, <em>peak</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#SessionAnalysis.save_session_a"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.SessionAnalysis.save_session_a" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Save the output of session A analysis to self.save_path.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dg: DriftingGratings instance</strong></p>
+<p><strong>nm1: NaturalMovie instance</strong></p>
+<blockquote>
+<div><p>This NaturalMovie instance should have been created with
+movie_name = stimulus_info.NATURAL_MOVIE_ONE</p>
+</div></blockquote>
+<p><strong>nm3: NaturalMovie instance</strong></p>
+<blockquote>
+<div><p>This NaturalMovie instance should have been created with
+movie_name = stimulus_info.NATURAL_MOVIE_THREE</p>
+</div></blockquote>
+<p><strong>peak: pd.DataFrame</strong></p>
+<blockquote class="last">
+<div><p>The combined peak response property table created in self.session_a().</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="allensdk.brain_observatory.session_analysis.SessionAnalysis.save_session_b">
 <code class="descname">save_session_b</code><span class="sig-paren">(</span><em>sg</em>, <em>nm1</em>, <em>ns</em>, <em>peak</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#SessionAnalysis.save_session_b"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.SessionAnalysis.save_session_b" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Save the output of session B analysis to self.save_path.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>sg: StaticGratings instance</strong></p>
+<p><strong>nm1: NaturalMovie instance</strong></p>
+<blockquote>
+<div><p>This NaturalMovie instance should have been created with
+movie_name = stimulus_info.NATURAL_MOVIE_ONE</p>
+</div></blockquote>
+<p><strong>ns: NaturalScenes instance</strong></p>
+<p><strong>peak: pd.DataFrame</strong></p>
+<blockquote class="last">
+<div><p>The combined peak response property table created in self.session_b().</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="allensdk.brain_observatory.session_analysis.SessionAnalysis.save_session_c">
 <code class="descname">save_session_c</code><span class="sig-paren">(</span><em>lsn</em>, <em>nm1</em>, <em>nm2</em>, <em>peak</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#SessionAnalysis.save_session_c"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.SessionAnalysis.save_session_c" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Save the output of session C analysis to self.save_path.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>lsn: LocallySparseNoise instance</strong></p>
+<p><strong>nm1: NaturalMovie instance</strong></p>
+<blockquote>
+<div><p>This NaturalMovie instance should have been created with
+movie_name = stimulus_info.NATURAL_MOVIE_ONE</p>
+</div></blockquote>
+<p><strong>nm2: NaturalMovie instance</strong></p>
+<blockquote>
+<div><p>This NaturalMovie instance should have been created with
+movie_name = stimulus_info.NATURAL_MOVIE_TWO</p>
+</div></blockquote>
+<p><strong>peak: pd.DataFrame</strong></p>
+<blockquote class="last">
+<div><p>The combined peak response property table created in self.session_c().</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="allensdk.brain_observatory.session_analysis.SessionAnalysis.save_session_c2">
 <code class="descname">save_session_c2</code><span class="sig-paren">(</span><em>lsn4</em>, <em>lsn8</em>, <em>nm1</em>, <em>nm2</em>, <em>peak</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#SessionAnalysis.save_session_c2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.SessionAnalysis.save_session_c2" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Save the output of session C2 analysis to self.save_path.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>lsn4: LocallySparseNoise instance</strong></p>
+<blockquote>
+<div><p>This LocallySparseNoise instance should have been created with 
+self.stimulus = stimulus_info.LOCALLY_SPARSE_NOISE_4DEG.</p>
+</div></blockquote>
+<p><strong>lsn8: LocallySparseNoise instance</strong></p>
+<blockquote>
+<div><p>This LocallySparseNoise instance should have been created with 
+self.stimulus = stimulus_info.LOCALLY_SPARSE_NOISE_8DEG.</p>
+</div></blockquote>
+<p><strong>nm1: NaturalMovie instance</strong></p>
+<blockquote>
+<div><p>This NaturalMovie instance should have been created with
+movie_name = stimulus_info.NATURAL_MOVIE_ONE</p>
+</div></blockquote>
+<p><strong>nm2: NaturalMovie instance</strong></p>
+<blockquote>
+<div><p>This NaturalMovie instance should have been created with
+movie_name = stimulus_info.NATURAL_MOVIE_TWO</p>
+</div></blockquote>
+<p><strong>peak: pd.DataFrame</strong></p>
+<blockquote class="last">
+<div><p>The combined peak response property table created in self.session_c2().</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="allensdk.brain_observatory.session_analysis.SessionAnalysis.session_a">
 <code class="descname">session_a</code><span class="sig-paren">(</span><em>plot_flag=False</em>, <em>save_flag=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#SessionAnalysis.session_a"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.SessionAnalysis.session_a" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Run stimulus-specific analysis for natural movie one, natural movie three, and drifting gratings.
+The input NWB be for a stimulus_info.THREE_SESSION_A experiment.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>plot_flag: bool</strong></p>
+<blockquote>
+<div><p>Whether to generate brain_observatory_plotting work plots after running analysis.</p>
+</div></blockquote>
+<p><strong>save_flag: bool</strong></p>
+<blockquote class="last">
+<div><p>Whether to save the output of analysis to self.save_path upon completion.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="allensdk.brain_observatory.session_analysis.SessionAnalysis.session_b">
 <code class="descname">session_b</code><span class="sig-paren">(</span><em>plot_flag=False</em>, <em>save_flag=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#SessionAnalysis.session_b"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.SessionAnalysis.session_b" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Run stimulus-specific analysis for natural scenes, static gratings, and natural movie one.
+The input NWB be for a stimulus_info.THREE_SESSION_B experiment.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>plot_flag: bool</strong></p>
+<blockquote>
+<div><p>Whether to generate brain_observatory_plotting work plots after running analysis.</p>
+</div></blockquote>
+<p><strong>save_flag: bool</strong></p>
+<blockquote class="last">
+<div><p>Whether to save the output of analysis to self.save_path upon completion.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="allensdk.brain_observatory.session_analysis.SessionAnalysis.session_c">
 <code class="descname">session_c</code><span class="sig-paren">(</span><em>plot_flag=False</em>, <em>save_flag=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#SessionAnalysis.session_c"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.SessionAnalysis.session_c" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Run stimulus-specific analysis for natural movie one, natural movie two, and locally sparse noise.
+The input NWB be for a stimulus_info.THREE_SESSION_C experiment.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>plot_flag: bool</strong></p>
+<blockquote>
+<div><p>Whether to generate brain_observatory_plotting work plots after running analysis.</p>
+</div></blockquote>
+<p><strong>save_flag: bool</strong></p>
+<blockquote class="last">
+<div><p>Whether to save the output of analysis to self.save_path upon completion.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="allensdk.brain_observatory.session_analysis.SessionAnalysis.session_c2">
 <code class="descname">session_c2</code><span class="sig-paren">(</span><em>plot_flag=False</em>, <em>save_flag=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#SessionAnalysis.session_c2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.SessionAnalysis.session_c2" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Run stimulus-specific analysis for locally sparse noise (4 deg.), locally sparse noise (8 deg.),
+natural movie one, and natural movie two. The input NWB be for a stimulus_info.THREE_SESSION_C2 experiment.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>plot_flag: bool</strong></p>
+<blockquote>
+<div><p>Whether to generate brain_observatory_plotting work plots after running analysis.</p>
+</div></blockquote>
+<p><strong>save_flag: bool</strong></p>
+<blockquote class="last">
+<div><p>Whether to save the output of analysis to self.save_path upon completion.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="allensdk.brain_observatory.session_analysis.SessionAnalysis.verify_roi_lists_equal">
 <code class="descname">verify_roi_lists_equal</code><span class="sig-paren">(</span><em>roi1</em>, <em>roi2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#SessionAnalysis.verify_roi_lists_equal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.SessionAnalysis.verify_roi_lists_equal" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>TODO: replace this with simpler numpy comparisons</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -1391,12 +1898,40 @@ mask should have values &gt;0. Background pixels must be zero</p>
 <dl class="function">
 <dt id="allensdk.brain_observatory.session_analysis.multi_dataframe_merge">
 <code class="descclassname">allensdk.brain_observatory.session_analysis.</code><code class="descname">multi_dataframe_merge</code><span class="sig-paren">(</span><em>dfs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#multi_dataframe_merge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.multi_dataframe_merge" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>merge a number of pd.DataFrames into a single dataframe on their index columns. 
+If any columns are duplicated, prefer the first occuring instance of the column</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="allensdk.brain_observatory.session_analysis.run_session_analysis">
 <code class="descclassname">allensdk.brain_observatory.session_analysis.</code><code class="descname">run_session_analysis</code><span class="sig-paren">(</span><em>nwb_path</em>, <em>save_path</em>, <em>plot_flag=False</em>, <em>save_flag=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#run_session_analysis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.run_session_analysis" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Inspect an NWB file to determine which experiment session was run
+and compute all stimulus-specific analyses.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>nwb_path: string</strong></p>
+<blockquote>
+<div><p>Path to NWB file.</p>
+</div></blockquote>
+<p><strong>save_path: string</strong></p>
+<blockquote>
+<div><p>path to save results. Recommended NOT to use NWB file.</p>
+</div></blockquote>
+<p><strong>plot_flag: bool</strong></p>
+<blockquote>
+<div><p>Whether to save brain_observatory_plotting work plots.</p>
+</div></blockquote>
+<p><strong>save_flag: bool</strong></p>
+<blockquote class="last">
+<div><p>Whether to save results to save_path.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </div>
 <div class="section" id="module-allensdk.brain_observatory.static_gratings">
@@ -1425,6 +1960,11 @@ mask should have values &gt;0. Background pixels must be zero</p>
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="allensdk.brain_observatory.static_gratings.StaticGratings.get_noise_correlation">
+<code class="descname">get_noise_correlation</code><span class="sig-paren">(</span><em>corr='spearman'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/static_gratings.html#StaticGratings.get_noise_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.static_gratings.StaticGratings.get_noise_correlation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="allensdk.brain_observatory.static_gratings.StaticGratings.get_peak">
 <code class="descname">get_peak</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/static_gratings.html#StaticGratings.get_peak"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.static_gratings.StaticGratings.get_peak" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes metrics related to each cell&#8217;s peak response condition.</p>
@@ -1444,7 +1984,6 @@ mask should have values &gt;0. Background pixels must be zero</p>
 <li>peak_dff_sg (peak dF/F)</li>
 <li>ptest_sg</li>
 <li>time_to_peak_sg</li>
-<li>duration_sg</li>
 </ul>
 </div></blockquote>
 </td>
@@ -1452,6 +1991,11 @@ mask should have values &gt;0. Background pixels must be zero</p>
 </tbody>
 </table>
 </dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.static_gratings.StaticGratings.get_representational_similarity">
+<code class="descname">get_representational_similarity</code><span class="sig-paren">(</span><em>corr='spearman'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/static_gratings.html#StaticGratings.get_representational_similarity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.static_gratings.StaticGratings.get_representational_similarity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="allensdk.brain_observatory.static_gratings.StaticGratings.get_response">
@@ -1470,6 +2014,11 @@ to that condition (index 2).</p>
 </tbody>
 </table>
 </dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.static_gratings.StaticGratings.get_signal_correlation">
+<code class="descname">get_signal_correlation</code><span class="sig-paren">(</span><em>corr='spearman'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/static_gratings.html#StaticGratings.get_signal_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.static_gratings.StaticGratings.get_signal_correlation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="attribute">
 <dt id="allensdk.brain_observatory.static_gratings.StaticGratings.interlength">
@@ -1493,7 +2042,7 @@ to that condition (index 2).</p>
 
 <dl class="method">
 <dt id="allensdk.brain_observatory.static_gratings.StaticGratings.open_fan_plot">
-<code class="descname">open_fan_plot</code><span class="sig-paren">(</span><em>cell_specimen_id</em>, <em>include_labels=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/static_gratings.html#StaticGratings.open_fan_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.static_gratings.StaticGratings.open_fan_plot" title="Permalink to this definition">¶</a></dt>
+<code class="descname">open_fan_plot</code><span class="sig-paren">(</span><em>cell_specimen_id=None</em>, <em>include_labels=False</em>, <em>cell_index=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/static_gratings.html#StaticGratings.open_fan_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.static_gratings.StaticGratings.open_fan_plot" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -1530,6 +2079,20 @@ to that condition (index 2).</p>
 <dt id="allensdk.brain_observatory.static_gratings.StaticGratings.populate_stimulus_table">
 <code class="descname">populate_stimulus_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/static_gratings.html#StaticGratings.populate_stimulus_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.static_gratings.StaticGratings.populate_stimulus_table" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.static_gratings.StaticGratings.reshape_response_array">
+<code class="descname">reshape_response_array</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/static_gratings.html#StaticGratings.reshape_response_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.static_gratings.StaticGratings.reshape_response_array" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">response array in cells x stim conditions x repetition for noise correlations</td>
+</tr>
+</tbody>
+</table>
+<p>this is a re-organization of the mean sweep response table</p>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="allensdk.brain_observatory.static_gratings.StaticGratings.sfvals">
@@ -1703,19 +2266,24 @@ The return is a 3-tuple of:</p>
 <code class="descname">peak</code><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.peak" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="staticmethod">
-<dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.peak_row_from_csid">
-<em class="property">static </em><code class="descname">peak_row_from_csid</code><span class="sig-paren">(</span><em>peak</em>, <em>csid</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_analysis.html#StimulusAnalysis.peak_row_from_csid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.peak_row_from_csid" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 <dl class="attribute">
 <dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.peak_run">
 <code class="descname">peak_run</code><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.peak_run" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.plot_representational_similarity">
+<code class="descname">plot_representational_similarity</code><span class="sig-paren">(</span><em>repsim</em>, <em>stimulus=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_analysis.html#StimulusAnalysis.plot_representational_similarity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.plot_representational_similarity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.plot_running_speed_histogram">
+<code class="descname">plot_running_speed_histogram</code><span class="sig-paren">(</span><em>xlim=None</em>, <em>nbins=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_analysis.html#StimulusAnalysis.plot_running_speed_histogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.plot_running_speed_histogram" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.plot_speed_tuning">
-<code class="descname">plot_speed_tuning</code><span class="sig-paren">(</span><em>cell_specimen_id</em>, <em>evoked_color='#b30000'</em>, <em>spontaneous_color='#0000b3'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_analysis.html#StimulusAnalysis.plot_speed_tuning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.plot_speed_tuning" title="Permalink to this definition">¶</a></dt>
+<code class="descname">plot_speed_tuning</code><span class="sig-paren">(</span><em>cell_specimen_id=None</em>, <em>cell_index=None</em>, <em>evoked_color='#b30000'</em>, <em>spontaneous_color='#0000b3'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_analysis.html#StimulusAnalysis.plot_speed_tuning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.plot_speed_tuning" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1737,6 +2305,11 @@ The return is a 3-tuple of:</p>
 <dl class="attribute">
 <dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.roi_id">
 <code class="descname">roi_id</code><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.roi_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.row_from_cell_id">
+<code class="descname">row_from_cell_id</code><span class="sig-paren">(</span><em>csid=None</em>, <em>idx=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_analysis.html#StimulusAnalysis.row_from_cell_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.row_from_cell_id" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -1781,7 +2354,7 @@ The return is a 3-tuple of:</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>session: string</strong></p>
 <blockquote class="last">
-<div><p>Must be one of: [stimulus_info.THREE_SESSION_A, stimulus_info.THREE_SESSION_B, stimulus_info.THREE_SESSION_C]</p>
+<div><p>Must be one of: [stimulus_info.THREE_SESSION_A, stimulus_info.THREE_SESSION_B, stimulus_info.THREE_SESSION_C, stimulus_info.THREE_SESSION_C2]</p>
 </div></blockquote>
 </td>
 </tr>
@@ -1838,7 +2411,7 @@ The return is a 3-tuple of:</p>
 <h3> Questions </h3>
 <p class="questions">
   Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
-  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allensdk' tag.
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allen-sdk' tag.
 </p>
 
 <p class="questions">

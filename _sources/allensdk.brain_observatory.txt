@@ -1,6 +1,13 @@
 allensdk.brain_observatory package
 ==================================
 
+Subpackages
+-----------
+
+.. toctree::
+
+    allensdk.brain_observatory.receptive_field_analysis
+
 Submodules
 ----------
 
@@ -24,6 +31,14 @@ allensdk.brain_observatory.circle_plots module
 ----------------------------------------------
 
 .. automodule:: allensdk.brain_observatory.circle_plots
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.brain_observatory.demixer module
+-----------------------------------------
+
+.. automodule:: allensdk.brain_observatory.demixer
     :members:
     :undoc-members:
     :show-inheritance:

@@ -31,6 +31,7 @@
   <body role="document">
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
 <script type="text/javascript">
     var _pSupressBrowserFlashWarning = true;
     var _pTabId = "pHome";
@@ -562,6 +563,11 @@ None generates the data and bypasses all caching behavior</p>
 </table>
 </dd></dl>
 
+<dl class="staticmethod">
+<dt id="allensdk.api.cache.Cache.csv_writer">
+<em class="property">static </em><code class="descname">csv_writer</code><span class="sig-paren">(</span><em>pth</em>, <em>gen</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/cache.html#Cache.csv_writer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.cache.Cache.csv_writer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="allensdk.api.cache.Cache.get_cache_path">
 <code class="descname">get_cache_path</code><span class="sig-paren">(</span><em>file_name</em>, <em>manifest_key</em>, <em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/cache.html#Cache.get_cache_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.cache.Cache.get_cache_path" title="Permalink to this definition">¶</a></dt>
@@ -692,8 +698,34 @@ None generates the data and bypasses all caching behavior</p>
 
 <dl class="staticmethod">
 <dt id="allensdk.api.cache.Cache.pathfinder">
-<em class="property">static </em><code class="descname">pathfinder</code><span class="sig-paren">(</span><em>file_name_position</em>, <em>secondary_file_name_position=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/cache.html#Cache.pathfinder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.cache.Cache.pathfinder" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<em class="property">static </em><code class="descname">pathfinder</code><span class="sig-paren">(</span><em>file_name_position</em>, <em>secondary_file_name_position=None</em>, <em>path_keyword=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/cache.html#Cache.pathfinder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.cache.Cache.pathfinder" title="Permalink to this definition">¶</a></dt>
+<dd><p>helper method to find path argument in legacy methods written
+prior to the &#64;cacheable decorator.  Do not use for new &#64;cacheable methods.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>file_name_position</strong> : integer</p>
+<blockquote>
+<div><p>zero indexed position in the decorated method args where file path may be found.</p>
+</div></blockquote>
+<p><strong>secondary_file_name_position</strong> : integer</p>
+<blockquote>
+<div><p>zero indexed position in the decorated method args where tha file path may be found.</p>
+</div></blockquote>
+<p><strong>path_keyword</strong> : string</p>
+<blockquote class="last">
+<div><p>kwarg that may have the file path.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This method is only intended to provide backward-compatibility for some
+methods that otherwise do not follow the path conventions of the &#64;cacheable
+decorator.</p>
+</dd></dl>
 
 <dl class="staticmethod">
 <dt id="allensdk.api.cache.Cache.remove_keys">
@@ -833,6 +865,12 @@ None queries the server and bypasses all caching behavior</p>
 <p>Column renaming happens after the file is reloaded for json</p>
 </dd></dl>
 
+<dl class="function">
+<dt id="allensdk.api.cache.memoize">
+<code class="descclassname">allensdk.api.cache.</code><code class="descname">memoize</code><span class="sig-paren">(</span><em>f</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/cache.html#memoize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.cache.memoize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Memoization decorator for a function taking one or more arguments.</p>
+</dd></dl>
+
 </div>
 <div class="section" id="module-allensdk.api">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-allensdk.api" title="Permalink to this headline">¶</a></h2>
@@ -884,7 +922,7 @@ None queries the server and bypasses all caching behavior</p>
 <h3> Questions </h3>
 <p class="questions">
   Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
-  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allensdk' tag.
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allen-sdk' tag.
 </p>
 
 <p class="questions">

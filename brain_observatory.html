@@ -31,6 +31,7 @@
   <body role="document">
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
 <script type="text/javascript">
     var _pSupressBrowserFlashWarning = true;
     var _pTabId = "pHome";
@@ -78,6 +79,10 @@ tuning, spatial and temporal frequency tuning, temporal dynamics, and spatial re
 experiments with the same targeted imaging area, imaging depth, and Cre line.  The individual experiments within
 an experiment container have different stimulus protocols, but cover the same imaging field of view.</p>
 <img alt="_images/container_session_layout.png" class="align-center" src="_images/container_session_layout.png" />
+<p><strong>Note:</strong> Data collected after September 2016 uses a new session C stimulus designed to better-characterize spatial receptive fields in
+higher visual areas.  The original locally sparse noise stimulus used 4.65 visual degree pixels.  Session C2 broke that stimulus
+into two separate stimulus blocks: one with 4.65 degree pixels and one with 9.3 degree pixels.  Note that the <a class="reference internal" href="allensdk.brain_observatory.html#module-allensdk.brain_observatory.stimulus_info" title="allensdk.brain_observatory.stimulus_info"><code class="xref py py-mod docutils literal"><span class="pre">stimulus_info</span></code></a>
+module refers to these as <cite>locally_sparse_noise_4deg</cite> and <cite>locally_sparse_noise_8deg</cite>, respectively.</p>
 <p>For more information on experimental design and a data overview, please visit the <a class="reference external" href="http://observatory.brain-map.org/visualcoding">Allen Brain Observatory data portal</a>.</p>
 <div class="section" id="data-processing">
 <h2>Data Processing<a class="headerlink" href="#data-processing" title="Permalink to this headline">¶</a></h2>
@@ -88,14 +93,18 @@ an experiment container have different stimulus protocols, but cover the same im
 <li>Associate cells from experiments belonging to the same experiment container and assign unique IDs</li>
 <li>Extract each cell&#8217;s mean fluorescence trace</li>
 <li>Extract mean fluorescence traces from each cell&#8217;s surrounding neuropil</li>
+<li>Demix traces from overlapping ROIs</li>
 <li>Estimate neuropil-corrected fluorescence traces</li>
 <li>Compute dF/F</li>
 <li>Compute stimulus-specific tuning metrics</li>
 </ol>
 </div></blockquote>
 <p>All traces and masks for segmented cells in an experiment are stored in a Neurodata Without Borders (NWB) file.
-Stored traces include the raw fluoresence trace, neuropil trace, and dF/F trace.  Code for extracting neuropil-corrected
+Stored traces include the raw fluoresence trace, neuropil trace, demixed trace, and dF/F trace.  Code for extracting neuropil-corrected
 fluorescence traces, computing dF/F, and computing tuning metrics is available in the SDK.</p>
+<p><strong>New in June 2017:</strong> Trace demixing is a new addition as of June 2017.  All past data was reprocessed using the new demixing algorithm.
+We have also developed a new module to better characterize a cell&#8217;s receptive field.  Take a look at the
+<a class="reference external" href="_static/examples/nb/receptive_fields.html">receptive field analysis example notebook</a></p>
 <p>For more information about data processing, please <a class="reference external" href="http://help.brain-map.org/display/observatory/Documentation">read the technical whitepapers</a>.</p>
 </div>
 <div class="section" id="getting-started">
@@ -110,6 +119,7 @@ started with the available data:</p>
 <li><a class="reference external" href="_static/examples/nb/brain_observatory.html#Fluorescence-Traces">Plot raw fluorescences traces, neuropil-corrected traces, and dF/F</a></li>
 <li><a class="reference external" href="_static/examples/nb/brain_observatory.html#ROI-Masks">Find the ROI mask for a given cell</a></li>
 <li><a class="reference external" href="_static/examples/nb/brain_observatory.html#Neuropil-Correction">Run neuropil correction</a></li>
+<li><a class="reference external" href="_static/examples/nb/brain_observatory.html#Eye-Tracking">Get pupil location and size</a></li>
 </ul>
 </div></blockquote>
 <p>The code used to analyze and visualize data in the <a class="reference external" href="http://observatory.brain-map.org/visualcoding">Allen Brain Observatory data portal</a>
@@ -117,7 +127,7 @@ is available as part of the SDK.  Take a look at this <a class="reference extern
 <blockquote>
 <div><ul class="simple">
 <li><a class="reference external" href="_static/examples/nb/brain_observatory_analysis.html#Drifting-Gratings">Plot cell&#8217;s response to its preferred stimulus condition</a></li>
-<li><a class="reference external" href="_static/examples/nb/brain_observatory_analysis.html#Locally-Sparse-Noise">Compute a cell&#8217;s on/off receptive field based on the locally sparse noise stimulus</a></li>
+<li><a class="reference external" href="_static/examples/nb/receptive_fields.html">Compute a cell&#8217;s on/off receptive field based on the locally sparse noise stimulus</a></li>
 </ul>
 </div></blockquote>
 <p>More detailed documentation is available demonstrating how to:</p>
@@ -125,8 +135,167 @@ is available as part of the SDK.  Take a look at this <a class="reference extern
 <div><ul class="simple">
 <li><a class="reference external" href="_static/examples/nb/brain_observatory_stimuli.html">Read and visualize the stimulus presentation tables in the NWB files</a></li>
 <li><a class="reference external" href="brain_observatory_nwb.html">Understand the layout of Brain Observatory NWB files</a></li>
+<li><a class="reference external" href="_static/examples/nb/cell_specimen_mapping.html">Map previous cell specimen IDs to current cell specimen IDs</a></li>
 </ul>
 </div></blockquote>
+</div>
+<div class="section" id="precomputed-cell-metrics">
+<h2>Precomputed Cell Metrics<a class="headerlink" href="#precomputed-cell-metrics" title="Permalink to this headline">¶</a></h2>
+<p>A large table of precomputed metrics are available for download to support population analysis and filtering.  The table below describes
+all of the metrics in the table.  The <a class="reference internal" href="allensdk.core.html#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_cell_specimens" title="allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_cell_specimens"><code class="xref py py-meth docutils literal"><span class="pre">get_cell_specimens()</span></code></a> method
+will download this table as a list of dictionaries which can be converted to a pandas DataFrame as shown in this
+<a class="reference external" href="_static/examples/nb/brain_observatory.html#Find-Cells-of-Interest">Jupyter notebook</a>.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="24%" />
+<col width="38%" />
+<col width="38%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Stimulus</th>
+<th class="head">Metric</th>
+<th class="head">Field Name</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td rowspan="12">drifting gratings</td>
+<td>orientation selectivity</td>
+<td>osi_dg</td>
+</tr>
+<tr class="row-odd"><td>direction selectivity</td>
+<td>dsi_dg</td>
+</tr>
+<tr class="row-even"><td>preferred direction</td>
+<td>pref_dir_dg</td>
+</tr>
+<tr class="row-odd"><td>preferred temporal frequency</td>
+<td>pref_tf_dg</td>
+</tr>
+<tr class="row-even"><td>response p value</td>
+<td>p_dg</td>
+</tr>
+<tr class="row-odd"><td>global ori. selectivity</td>
+<td>g_osi_dg</td>
+</tr>
+<tr class="row-even"><td>global dir. selectivity</td>
+<td>g_dsi_dg</td>
+</tr>
+<tr class="row-odd"><td>response reliability</td>
+<td>reliability_dg</td>
+</tr>
+<tr class="row-even"><td>running modulation</td>
+<td>run_mod_dg</td>
+</tr>
+<tr class="row-odd"><td>running modulation p value</td>
+<td>p_run_mod_dg</td>
+</tr>
+<tr class="row-even"><td>pref. condition mean df/f</td>
+<td>peak_dff_dg</td>
+</tr>
+<tr class="row-odd"><td>TF discrimination index</td>
+<td>tfdi_dg</td>
+</tr>
+<tr class="row-even"><td rowspan="12">static gratings</td>
+<td>orientation selectivity</td>
+<td>osi_sg</td>
+</tr>
+<tr class="row-odd"><td>preferred orientation</td>
+<td>pref_ori_sg</td>
+</tr>
+<tr class="row-even"><td>preferred spatial frequency</td>
+<td>pref_sf_sg</td>
+</tr>
+<tr class="row-odd"><td>preferred phase</td>
+<td>pref_phase_sg</td>
+</tr>
+<tr class="row-even"><td>mean time to peak response</td>
+<td>time_to_peak_sg</td>
+</tr>
+<tr class="row-odd"><td>response p value</td>
+<td>p_sg</td>
+</tr>
+<tr class="row-even"><td>global ori. selectivity</td>
+<td>g_osi_sg</td>
+</tr>
+<tr class="row-odd"><td>reponse reliability</td>
+<td>reliability_sg</td>
+</tr>
+<tr class="row-even"><td>running modulation</td>
+<td>run_mod_sg</td>
+</tr>
+<tr class="row-odd"><td>running modulation p value</td>
+<td>p_run_mod_sg</td>
+</tr>
+<tr class="row-even"><td>pref. condition mean df/f</td>
+<td>peak_dff_ns</td>
+</tr>
+<tr class="row-odd"><td>SF discrimiation index</td>
+<td>sfdi_sg</td>
+</tr>
+<tr class="row-even"><td rowspan="7">natural scenes</td>
+<td>mean time to peak response</td>
+<td>time_to_peak_ns</td>
+</tr>
+<tr class="row-odd"><td>preferred scene index</td>
+<td>pref_scene_ns</td>
+</tr>
+<tr class="row-even"><td>response p value</td>
+<td>p_ns</td>
+</tr>
+<tr class="row-odd"><td>image selectivity</td>
+<td>image_sel_ns</td>
+</tr>
+<tr class="row-even"><td>running modulation</td>
+<td>run_mod_ns</td>
+</tr>
+<tr class="row-odd"><td>running modulation p value</td>
+<td>p_run_mod_ns</td>
+</tr>
+<tr class="row-even"><td>pref. condition mean df/f</td>
+<td>peak_dff_ns</td>
+</tr>
+<tr class="row-odd"><td rowspan="3">natural movie 1</td>
+<td>response reliability (session A)</td>
+<td>reliability_nm1_a</td>
+</tr>
+<tr class="row-even"><td>response reliability (session B)</td>
+<td>reliability_nm1_b</td>
+</tr>
+<tr class="row-odd"><td>response reliability (session C)</td>
+<td>reliability_nm1_c</td>
+</tr>
+<tr class="row-even"><td>natural movie 2</td>
+<td>response reliability</td>
+<td>reliability_nm2</td>
+</tr>
+<tr class="row-odd"><td>natural movie 3</td>
+<td>response reliability</td>
+<td>reliability_nm3</td>
+</tr>
+<tr class="row-even"><td rowspan="7">locally sparse noise</td>
+<td>RF area (on subunit)</td>
+<td>rf_area_on_lsn</td>
+</tr>
+<tr class="row-odd"><td>RF area (off subunit)</td>
+<td>rf_area_off_lsn</td>
+</tr>
+<tr class="row-even"><td>RF center (on subunit)</td>
+<td>rf_center_on_x, rf_center_on_y</td>
+</tr>
+<tr class="row-odd"><td>RF center (off subunit)</td>
+<td>rf_center_off_x, rf_center_off_y</td>
+</tr>
+<tr class="row-even"><td>RF chi^2</td>
+<td>rf_chi2_lsn</td>
+</tr>
+<tr class="row-odd"><td>RF on-off subunit distance</td>
+<td>rf_distance_lsn</td>
+</tr>
+<tr class="row-even"><td>RF on-off subunit overlap index</td>
+<td>rf_overlap_lsn</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 
@@ -173,7 +342,7 @@ is available as part of the SDK.  Take a look at this <a class="reference extern
 <h3> Questions </h3>
 <p class="questions">
   Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
-  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allensdk' tag.
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allen-sdk' tag.
 </p>
 
 <p class="questions">

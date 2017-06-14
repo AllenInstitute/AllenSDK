@@ -11812,14 +11812,14 @@ div#notebook {
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>[{u&#39;acronym&#39;: u&#39;AUDd&#39;,
-  u&#39;color_hex_triplet&#39;: u&#39;019399&#39;,
-  u&#39;graph_id&#39;: 1,
-  u&#39;graph_order&#39;: 122,
-  u&#39;id&#39;: 1011,
-  u&#39;name&#39;: u&#39;Dorsal auditory area&#39;,
-  u&#39;structure_id_path&#39;: [997, 8, 567, 688, 695, 315, 247, 1011],
-  &#39;structure_set_ids&#39;: [112905828, 12, 114512891, 167587189, 184527634]}]</pre>
+<pre>[{&#39;acronym&#39;: &#39;AUDd&#39;,
+  &#39;color_hex_triplet&#39;: [1, 147, 153],
+  &#39;graph_id&#39;: 1,
+  &#39;graph_order&#39;: 122,
+  &#39;id&#39;: 1011,
+  &#39;name&#39;: &#39;Dorsal auditory area&#39;,
+  &#39;structure_id_path&#39;: [997, 8, 567, 688, 695, 315, 247, 1011],
+  &#39;structure_set_ids&#39;: [12, 184527634, 114512891, 112905828, 167587189]}]</pre>
 </div>
 
 </div>
@@ -11877,14 +11877,14 @@ div#notebook {
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>[{u&#39;acronym&#39;: u&#39;AUD&#39;,
-  u&#39;color_hex_triplet&#39;: u&#39;019399&#39;,
-  u&#39;graph_id&#39;: 1,
-  u&#39;graph_order&#39;: 121,
-  u&#39;id&#39;: 247,
-  u&#39;name&#39;: u&#39;Auditory areas&#39;,
-  u&#39;structure_id_path&#39;: [997, 8, 567, 688, 695, 315, 247],
-  &#39;structure_set_ids&#39;: [12, 3, 184527634, 112905828, 114512891]}]</pre>
+<pre>[{&#39;acronym&#39;: &#39;AUD&#39;,
+  &#39;color_hex_triplet&#39;: [1, 147, 153],
+  &#39;graph_id&#39;: 1,
+  &#39;graph_order&#39;: 121,
+  &#39;id&#39;: 247,
+  &#39;name&#39;: &#39;Auditory areas&#39;,
+  &#39;structure_id_path&#39;: [997, 8, 567, 688, 695, 315, 247],
+  &#39;structure_set_ids&#39;: [112905828, 184527634, 3, 12, 114512891]}]</pre>
 </div>
 
 </div>
@@ -11916,7 +11916,7 @@ div#notebook {
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>u&#39;Auditory areas&#39;</pre>
+<pre>&#39;Auditory areas&#39;</pre>
 </div>
 
 </div>
@@ -12000,7 +12000,9 @@ div#notebook {
 
 <pre><code>* Anterior -&gt; Posterior
 * Superior -&gt; Inferior
-* Left -&gt; Right</code></pre>
+* Left -&gt; Right
+</code></pre>
+<p>This is the no-frills way to download an annotation volume. See the <a href='_static/examples/nb/mouse_connectivity.html#Manipulating-Grid-Data'>mouse connectivity</a> examples if you want to properly cache the downloaded data.</p>
 
 </div>
 </div>
@@ -12022,10 +12024,7 @@ div#notebook {
 <span class="n">annotation_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">annotation_dir</span><span class="p">,</span> <span class="s1">&#39;annotation.nrrd&#39;</span><span class="p">)</span>
 
 <span class="n">mcapi</span> <span class="o">=</span> <span class="n">MouseConnectivityApi</span><span class="p">()</span>
-<span class="n">mcapi</span><span class="o">.</span><span class="n">download_annotation_volume</span><span class="p">(</span><span class="n">ccf_version</span><span class="o">=</span><span class="s1">&#39;annotation/ccf_2016&#39;</span><span class="p">,</span> 
-                                 <span class="n">resolution</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> 
-                                 <span class="n">file_name</span><span class="o">=</span><span class="n">annotation_path</span><span class="p">,</span> 
-                                 <span class="n">reader</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">mcapi</span><span class="o">.</span><span class="n">download_annotation_volume</span><span class="p">(</span><span class="s1">&#39;annotation/ccf_2016&#39;</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="n">annotation_path</span><span class="p">)</span>
 
 <span class="n">annotation</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> <span class="n">nrrd</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">annotation_path</span><span class="p">)</span>
 </pre></div>
@@ -12108,7 +12107,7 @@ div#notebook {
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&lt;matplotlib.image.AxesImage at 0x7f6caf8bb050&gt;</pre>
+<pre>&lt;matplotlib.image.AxesImage at 0x7fc351381350&gt;</pre>
 </div>
 
 </div>
@@ -12300,7 +12299,7 @@ ToIUAEAnQQoAoJMgBQDQ6f8DefymIDZ2cJMAAAAASUVORK5CYII=
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&lt;matplotlib.image.AxesImage at 0x7f6cb1f87e50&gt;</pre>
+<pre>&lt;matplotlib.image.AxesImage at 0x7fc34c9d55d0&gt;</pre>
 </div>
 
 </div>
@@ -12593,7 +12592,7 @@ made mask for structure 1097.
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&lt;matplotlib.image.AxesImage at 0x7f6cb8bead90&gt;</pre>
+<pre>&lt;matplotlib.image.AxesImage at 0x7fc34c970590&gt;</pre>
 </div>
 
 </div>
@@ -13217,7 +13216,7 @@ EELmUBgQQgghZA6FASGEEELmUBgQQgghZM7/AzVU+QUMibisAAAAAElFTkSuQmCC
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="Downsample-the-space">Downsample the space<a class="anchor-link" href="#Downsample-the-space">&#182;</a></h4><p>If you want an annotation at a resolution we don't provide, you can make one with the downsample method:</p>
+<h4 id="Downsample-the-space">Downsample the space<a class="anchor-link" href="#Downsample-the-space">&#182;</a></h4><p>If you want an annotation at a resolution we don't provide, you can make one with the downsample method.</p>
 
 </div>
 </div>
@@ -13227,9 +13226,18 @@ EELmUBgQQgghZA6FASGEEELmUBgQQgghZM7/AzVU+QUMibisAAAAAElFTkSuQmCC
 <div class="prompt input_prompt">In&nbsp;[14]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">target_resolution</span> <span class="o">=</span> <span class="p">[</span><span class="mi">75</span><span class="p">,</span> <span class="mi">75</span><span class="p">,</span> <span class="mi">75</span><span class="p">]</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="n">target_resolution</span> <span class="o">=</span> <span class="p">[</span><span class="mi">75</span><span class="p">,</span> <span class="mi">75</span><span class="p">,</span> <span class="mi">75</span><span class="p">]</span>
+
+<span class="c1"># in some versions of scipy, scipy.ndimage.zoom raises a helpful but distracting </span>
+<span class="c1"># warning about the method used to truncate integers. </span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
 
 <span class="n">sf_rsp</span> <span class="o">=</span> <span class="n">rsp</span><span class="o">.</span><span class="n">downsample</span><span class="p">(</span><span class="n">target_resolution</span><span class="p">)</span>
+
+<span class="c1"># re-enable warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span> <span class="n">rsp</span><span class="o">.</span><span class="n">annotation</span><span class="o">.</span><span class="n">shape</span> <span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span> <span class="n">sf_rsp</span><span class="o">.</span><span class="n">annotation</span><span class="o">.</span><span class="n">shape</span> <span class="p">)</span>
@@ -13247,14 +13255,6 @@ EELmUBgQQgghZA6FASGEEELmUBgQQgghZM7/AzVU+QUMibisAAAAAElFTkSuQmCC
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>(528, 320, 456)
 (176, 107, 152)
-</pre>
-</div>
-</div>
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>/shared/utils.x86_64/python-2.7/lib/python2.7/site-packages/scipy/ndimage/interpolation.py:549: UserWarning: From scipy 0.13.0, the output shape of zoom() is calculated with round() instead of int() - for these inputs the size of the returned array has changed.
-  &#34;the returned array has changed.&#34;, UserWarning)
 </pre>
 </div>
 </div>
@@ -13294,7 +13294,7 @@ EELmUBgQQgghZA6FASGEEELmUBgQQgghZM7/AzVU+QUMibisAAAAAElFTkSuQmCC
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&lt;matplotlib.image.AxesImage at 0x7f6c80a15110&gt;</pre>
+<pre>&lt;matplotlib.image.AxesImage at 0x7fc34c726490&gt;</pre>
 </div>
 
 </div>

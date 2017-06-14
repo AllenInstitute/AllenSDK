@@ -29,6 +29,7 @@
   <body role="document">
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
 <script type="text/javascript">
     var _pSupressBrowserFlashWarning = true;
     var _pTabId = "pHome";
@@ -117,7 +118,8 @@
 
     <span class="nd">@cacheable</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;create&#39;</span><span class="p">,</span>
                <span class="n">reader</span><span class="o">=</span><span class="n">nrrd</span><span class="o">.</span><span class="n">read</span><span class="p">,</span>
-               <span class="n">pathfinder</span><span class="o">=</span><span class="n">Cache</span><span class="o">.</span><span class="n">pathfinder</span><span class="p">(</span><span class="n">file_name_position</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+               <span class="n">pathfinder</span><span class="o">=</span><span class="n">Cache</span><span class="o">.</span><span class="n">pathfinder</span><span class="p">(</span><span class="n">file_name_position</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                                           <span class="n">path_keyword</span><span class="o">=</span><span class="s1">&#39;file_name&#39;</span><span class="p">))</span>
 <div class="viewcode-block" id="MouseConnectivityApi.download_annotation_volume"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_annotation_volume">[docs]</a>    <span class="k">def</span> <span class="nf">download_annotation_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                    <span class="n">ccf_version</span><span class="p">,</span>
                                    <span class="n">resolution</span><span class="p">,</span>
@@ -147,7 +149,8 @@
 
     <span class="nd">@cacheable</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;create&#39;</span><span class="p">,</span>
                <span class="n">reader</span><span class="o">=</span><span class="n">nrrd</span><span class="o">.</span><span class="n">read</span><span class="p">,</span>
-               <span class="n">pathfinder</span><span class="o">=</span><span class="n">Cache</span><span class="o">.</span><span class="n">pathfinder</span><span class="p">(</span><span class="n">file_name_position</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+               <span class="n">pathfinder</span><span class="o">=</span><span class="n">Cache</span><span class="o">.</span><span class="n">pathfinder</span><span class="p">(</span><span class="n">file_name_position</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                                           <span class="n">path_keyword</span><span class="o">=</span><span class="s1">&#39;file_name&#39;</span><span class="p">))</span>
 <div class="viewcode-block" id="MouseConnectivityApi.download_template_volume"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_template_volume">[docs]</a>    <span class="k">def</span> <span class="nf">download_template_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Download the registration template volume at a particular resolution.</span>
@@ -625,25 +628,29 @@
             <span class="n">count</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span></div>
 
     <span class="nd">@cacheable</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;create&#39;</span><span class="p">,</span> 
-               <span class="n">pathfinder</span><span class="o">=</span><span class="n">Cache</span><span class="o">.</span><span class="n">pathfinder</span><span class="p">(</span><span class="n">file_name_position</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+               <span class="n">pathfinder</span><span class="o">=</span><span class="n">Cache</span><span class="o">.</span><span class="n">pathfinder</span><span class="p">(</span><span class="n">file_name_position</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                                           <span class="n">path_keyword</span><span class="o">=</span><span class="s1">&#39;path&#39;</span><span class="p">))</span>
 <div class="viewcode-block" id="MouseConnectivityApi.download_injection_density"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_injection_density">[docs]</a>    <span class="k">def</span> <span class="nf">download_injection_density</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">,</span> <span class="n">resolution</span><span class="p">):</span>
         <span class="n">GridDataApi</span><span class="p">(</span><span class="n">base_uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_url</span><span class="p">)</span><span class="o">.</span><span class="n">download_projection_grid_data</span><span class="p">(</span>
             <span class="n">experiment_id</span><span class="p">,</span> <span class="p">[</span><span class="n">GridDataApi</span><span class="o">.</span><span class="n">INJECTION_DENSITY</span><span class="p">],</span> <span class="n">resolution</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span></div>
 
     <span class="nd">@cacheable</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;create&#39;</span><span class="p">,</span> 
-               <span class="n">pathfinder</span><span class="o">=</span><span class="n">Cache</span><span class="o">.</span><span class="n">pathfinder</span><span class="p">(</span><span class="n">file_name_position</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+               <span class="n">pathfinder</span><span class="o">=</span><span class="n">Cache</span><span class="o">.</span><span class="n">pathfinder</span><span class="p">(</span><span class="n">file_name_position</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                                           <span class="n">path_keyword</span><span class="o">=</span><span class="s1">&#39;path&#39;</span><span class="p">))</span>
 <div class="viewcode-block" id="MouseConnectivityApi.download_projection_density"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_projection_density">[docs]</a>    <span class="k">def</span> <span class="nf">download_projection_density</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">,</span> <span class="n">resolution</span><span class="p">):</span>
         <span class="n">GridDataApi</span><span class="p">(</span><span class="n">base_uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_url</span><span class="p">)</span><span class="o">.</span><span class="n">download_projection_grid_data</span><span class="p">(</span>
             <span class="n">experiment_id</span><span class="p">,</span> <span class="p">[</span><span class="n">GridDataApi</span><span class="o">.</span><span class="n">PROJECTION_DENSITY</span><span class="p">],</span> <span class="n">resolution</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span></div>
 
     <span class="nd">@cacheable</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;create&#39;</span><span class="p">,</span> 
-               <span class="n">pathfinder</span><span class="o">=</span><span class="n">Cache</span><span class="o">.</span><span class="n">pathfinder</span><span class="p">(</span><span class="n">file_name_position</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+               <span class="n">pathfinder</span><span class="o">=</span><span class="n">Cache</span><span class="o">.</span><span class="n">pathfinder</span><span class="p">(</span><span class="n">file_name_position</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                                           <span class="n">path_keyword</span><span class="o">=</span><span class="s1">&#39;path&#39;</span><span class="p">))</span>
 <div class="viewcode-block" id="MouseConnectivityApi.download_injection_fraction"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_injection_fraction">[docs]</a>    <span class="k">def</span> <span class="nf">download_injection_fraction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">,</span> <span class="n">resolution</span><span class="p">):</span>
         <span class="n">GridDataApi</span><span class="p">(</span><span class="n">base_uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_url</span><span class="p">)</span><span class="o">.</span><span class="n">download_projection_grid_data</span><span class="p">(</span>
             <span class="n">experiment_id</span><span class="p">,</span> <span class="p">[</span><span class="n">GridDataApi</span><span class="o">.</span><span class="n">INJECTION_FRACTION</span><span class="p">],</span> <span class="n">resolution</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span></div>
 
     <span class="nd">@cacheable</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;create&#39;</span><span class="p">,</span> 
-               <span class="n">pathfinder</span><span class="o">=</span><span class="n">Cache</span><span class="o">.</span><span class="n">pathfinder</span><span class="p">(</span><span class="n">file_name_position</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+               <span class="n">pathfinder</span><span class="o">=</span><span class="n">Cache</span><span class="o">.</span><span class="n">pathfinder</span><span class="p">(</span><span class="n">file_name_position</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                                           <span class="n">path_keyword</span><span class="o">=</span><span class="s1">&#39;path&#39;</span><span class="p">))</span>
 <div class="viewcode-block" id="MouseConnectivityApi.download_data_mask"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_data_mask">[docs]</a>    <span class="k">def</span> <span class="nf">download_data_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">,</span> <span class="n">resolution</span><span class="p">):</span>
         <span class="n">GridDataApi</span><span class="p">(</span><span class="n">base_uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_url</span><span class="p">)</span><span class="o">.</span><span class="n">download_projection_grid_data</span><span class="p">(</span>
             <span class="n">experiment_id</span><span class="p">,</span> <span class="p">[</span><span class="n">GridDataApi</span><span class="o">.</span><span class="n">DATA_MASK</span><span class="p">],</span> <span class="n">resolution</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span></div>
@@ -724,7 +731,7 @@
 <h3> Questions </h3>
 <p class="questions">
   Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
-  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allensdk' tag.
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allen-sdk' tag.
 </p>
 
 <p class="questions">
