@@ -412,7 +412,7 @@ class Monitor(object):
 
     def lsn_image_to_screen(self, img, stimulus_type, origin='lower', background_color=STIMULUS_GRAY):
 
-        assert img.dtype == np.uint8
+        # assert img.dtype == np.uint8
 
         pixels_per_patch = LOCALLY_SPARSE_NOISE_PIXELS[stimulus_type]
 
