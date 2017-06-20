@@ -30,7 +30,7 @@ RUN /bin/bash --login shared/users.sh
 COPY shared/build_DiPDE.sh shared/
 #RUN mkdir -p /root/build_dipde && shared/build_DiPDE.sh -b /root/build_dipde -e py27
 COPY shared/build_NEST.sh shared/
-RUN mkdir -p /root/build_nest && conda install libcc && /bin/bash --login shared/build_NEST.sh -b /root/build_nest -e py27
+RUN mkdir -p /root/build_nest && /bin/bash --login shared/build_NEST.sh -b /root/build_nest -e py27
 COPY shared/build_NEURON.sh shared/
 #RUN mkdir -p /root/build_neuron && shared/build_NEURON.sh -b /root/build_neuron -e py27
 COPY shared/build_Tensorflow.sh shared/
