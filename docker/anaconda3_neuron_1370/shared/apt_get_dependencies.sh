@@ -3,7 +3,7 @@ apt-get -yq install \
  pkg-config \
  libfreetype6-dev \
  build-essential \
- cmake \
+ make \
  automake \
  libtool \
  bison \
@@ -18,8 +18,11 @@ apt-get -yq install \
  unzip \
  vim \
  libffi-dev \
- python-pip \
- python-scipy \
- python-matplotlib \
- python-pandas \
- python-dev
+ libstdc++
+wget http://www.cmake.org/files/v3.4/cmake-3.4.1.tar.gz 
+tar -xvzf cmake-3.4.1.tar.gz 
+cd cmake-3.4.1/ 
+./configure 
+make
+make install
+update-alternatives --install /usr/bin/cmake cmake /usr/local/bin/cmake 1 --force
