@@ -71,6 +71,7 @@ class EphysSweepFeatureExtractor:
         self.stimulus_amplitude_calculator = None
 
         self._sweep_features = {}
+        self._affected_by_clipping = []
 
     def process_spikes(self):
         """Perform spike-related feature analysis"""
@@ -138,7 +139,6 @@ class EphysSweepFeatureExtractor:
         # Any better way to do it?
         spikes_df = DataFrame(data=thresholds, columns=["threshold_index"])
         spikes_df["clipped"] = clipped
-        self._affected_by_clipping = []
 
         for k, all_vals in vit_data_indexes.iteritems():
             valid_ind = ~np.isnan(all_vals)
