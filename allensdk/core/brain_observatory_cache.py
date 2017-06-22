@@ -204,6 +204,7 @@ class BrainObservatoryCache(Cache):
                               stimuli=None,
                               session_types=None,
                               cell_specimen_ids=None,
+                              include_failed=False,
                               simple=True):
         """ Get a list of ophys experiments matching certain criteria.
 
@@ -248,6 +249,9 @@ class BrainObservatoryCache(Cache):
         cell_specimen_ids: list
             Only include experiments that contain cells with these ids.
 
+        include_failed: boolean
+            Whether or not to include experiments from failed experiment containers.
+
         simple: boolean
             Whether or not to simplify the dictionary properties returned by this method
             to a more concise subset.
@@ -285,7 +289,8 @@ class BrainObservatoryCache(Cache):
                                                  imaging_depths=imaging_depths,
                                                  transgenic_lines=transgenic_lines,
                                                  stimuli=stimuli,
-                                                 session_types=session_types)
+                                                 session_types=session_types,
+                                                 include_failed=include_failed)
 
         if simple:
             exps = [{
@@ -477,7 +482,7 @@ def _merge_transgenic_lines(*lines_list):
 def _find_container_tags(container):
     """ Custom logic for extracting tags from donor conditions.  Filtering 
     out tissuecyte tags. """
-    conditions = container['specimen']['donor']['conditions']
+    conditions = container['specimen']['donor'].get('conditions', [])
     return [c['name'] for c in conditions if not c['name'].startswith('tissuecyte')]
 
 def _assert_not_string(arg, name):

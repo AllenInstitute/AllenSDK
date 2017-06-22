@@ -33,6 +33,9 @@ import os
 
 
 def multi_dataframe_merge(dfs):
+    """ merge a number of pd.DataFrames into a single dataframe on their index columns. 
+    If any columns are duplicated, prefer the first occuring instance of the column """
+
     out_df = None
     for _, df in enumerate(dfs):
         if out_df is None:
@@ -48,6 +51,16 @@ def multi_dataframe_merge(dfs):
 
 
 class SessionAnalysis(object):
+    """ 
+    Run all of the stimulus-specific analyses associated with a single experiment session. 
+
+    Parameters
+    ----------
+    nwb_path: string, path to NWB file
+
+    save_path: string, path to HDF5 file to store outputs.  Recommended NOT to modify the NWB file.
+    """
+
     _log = logging.getLogger('allensdk.brain_observatory.session_analysis')
 
     def __init__(self, nwb_path, save_path):
@@ -62,11 +75,32 @@ class SessionAnalysis(object):
         self.metadata = self.nwb.get_metadata()
 
     def append_metadata(self, df):
+        """ Append the metadata fields from the NWB file as columns to a pd.DataFrame """
+
         for k, v in six.iteritems(self.metadata):
             df[k] = v
 
     def save_session_a(self, dg, nm1, nm3, peak):
+        """ Save the output of session A analysis to self.save_path.  
+
+        Parameters
+        ----------
+        dg: DriftingGratings instance
+
+        nm1: NaturalMovie instance
+            This NaturalMovie instance should have been created with
+            movie_name = stimulus_info.NATURAL_MOVIE_ONE
+
+        nm3: NaturalMovie instance
+            This NaturalMovie instance should have been created with
+            movie_name = stimulus_info.NATURAL_MOVIE_THREE
+
+        peak: pd.DataFrame
+            The combined peak response property table created in self.session_a().
+        """
+
         nwb = BrainObservatoryNwbDataSet(self.save_path)
+
         nwb.save_analysis_dataframes(
             ('stim_table_dg', dg.stim_table),
             ('sweep_response_dg', dg.sweep_response),
@@ -89,7 +123,24 @@ class SessionAnalysis(object):
 
 
     def save_session_b(self, sg, nm1, ns, peak):
+        """ Save the output of session B analysis to self.save_path.  
+
+        Parameters
+        ----------
+        sg: StaticGratings instance
+
+        nm1: NaturalMovie instance
+            This NaturalMovie instance should have been created with
+            movie_name = stimulus_info.NATURAL_MOVIE_ONE
+
+        ns: NaturalScenes instance
+
+        peak: pd.DataFrame
+            The combined peak response property table created in self.session_b().
+        """
+
         nwb = BrainObservatoryNwbDataSet(self.save_path)
+
         nwb.save_analysis_dataframes(
             ('stim_table_sg', sg.stim_table),
             ('sweep_response_sg', sg.sweep_response),
@@ -117,7 +168,26 @@ class SessionAnalysis(object):
             )
 
     def save_session_c(self, lsn, nm1, nm2, peak):
+        """ Save the output of session C analysis to self.save_path.  
+
+        Parameters
+        ----------
+        lsn: LocallySparseNoise instance
+
+        nm1: NaturalMovie instance
+            This NaturalMovie instance should have been created with
+            movie_name = stimulus_info.NATURAL_MOVIE_ONE
+
+        nm2: NaturalMovie instance
+            This NaturalMovie instance should have been created with
+            movie_name = stimulus_info.NATURAL_MOVIE_TWO
+
+        peak: pd.DataFrame
+            The combined peak response property table created in self.session_c().
+        """
+
         nwb = BrainObservatoryNwbDataSet(self.save_path)
+
         nwb.save_analysis_dataframes(
             ('stim_table_lsn', lsn.stim_table),
             ('sweep_response_nm1', nm1.sweep_response),
@@ -134,10 +204,35 @@ class SessionAnalysis(object):
             ('binned_cells_sp', nm1.binned_cells_sp),
             ('binned_cells_vis', nm1.binned_cells_vis))
 
-        LocallySparseNoise.save_cell_index_receptive_field_analysis_dict(lsn.cell_index_receptive_field_analysis_data_dict, nwb, stimulus_info.LOCALLY_SPARSE_NOISE)
+        LocallySparseNoise.save_cell_index_receptive_field_analysis(lsn.cell_index_receptive_field_analysis_data, nwb, stimulus_info.LOCALLY_SPARSE_NOISE)
 
-    def save_session_c2(self, lsn4, lsn8, nm1, nm2, peak):
+    def save_session_c2(self, lsn4, lsn8, nm1, nm2, peak):        
+        """ Save the output of session C2 analysis to self.save_path. 
+
+        Parameters
+        ----------
+        lsn4: LocallySparseNoise instance
+            This LocallySparseNoise instance should have been created with 
+            self.stimulus = stimulus_info.LOCALLY_SPARSE_NOISE_4DEG.
+
+        lsn8: LocallySparseNoise instance
+            This LocallySparseNoise instance should have been created with 
+            self.stimulus = stimulus_info.LOCALLY_SPARSE_NOISE_8DEG.
+
+        nm1: NaturalMovie instance
+            This NaturalMovie instance should have been created with
+            movie_name = stimulus_info.NATURAL_MOVIE_ONE
+
+        nm2: NaturalMovie instance
+            This NaturalMovie instance should have been created with
+            movie_name = stimulus_info.NATURAL_MOVIE_TWO
+
+        peak: pd.DataFrame
+            The combined peak response property table created in self.session_c2().
+        """
+
         nwb = BrainObservatoryNwbDataSet(self.save_path)
+
         nwb.save_analysis_dataframes(
             ('stim_table_lsn4', lsn4.stim_table),
             ('stim_table_lsn8', lsn8.stim_table),
@@ -164,10 +259,12 @@ class SessionAnalysis(object):
             ('binned_cells_sp', nm1.binned_cells_sp),
             ('binned_cells_vis', nm1.binned_cells_vis))
 
-        LocallySparseNoise.save_cell_index_receptive_field_analysis_dict(lsn4.cell_index_receptive_field_analysis_data_dict, nwb, stimulus_info.LOCALLY_SPARSE_NOISE_4DEG)
-        LocallySparseNoise.save_cell_index_receptive_field_analysis_dict(lsn8.cell_index_receptive_field_analysis_data_dict, nwb, stimulus_info.LOCALLY_SPARSE_NOISE_8DEG)
+        LocallySparseNoise.save_cell_index_receptive_field_analysis(lsn4.cell_index_receptive_field_analysis_data, nwb, stimulus_info.LOCALLY_SPARSE_NOISE_4DEG)
+        LocallySparseNoise.save_cell_index_receptive_field_analysis(lsn8.cell_index_receptive_field_analysis_data, nwb, stimulus_info.LOCALLY_SPARSE_NOISE_8DEG)
 
     def append_metrics_drifting_grating(self, metrics, dg):
+        """ Extract metrics from the DriftingGratings peak response table into a dictionary. """
+
         metrics["osi_dg"] = dg.peak["osi_dg"]
         metrics["dsi_dg"] = dg.peak["dsi_dg"]
         metrics["pref_dir_dg"] = [dg.orivals[i]
@@ -183,6 +280,8 @@ class SessionAnalysis(object):
         metrics["peak_dff_dg"] = dg.peak["peak_dff_dg"]
 
     def append_metrics_static_grating(self, metrics, sg):
+        """ Extract metrics from the StaticGratings peak response table into a dictionary. """
+
         metrics["osi_sg"] = sg.peak["osi_sg"]
         metrics["pref_ori_sg"] = [sg.orivals[i]
                                   for i in sg.peak["ori_sg"].values]
@@ -199,6 +298,8 @@ class SessionAnalysis(object):
         metrics["reliability_sg"] = sg.peak["reliability_sg"]
 
     def append_metrics_natural_scene(self, metrics, ns):
+        """ Extract metrics from the NaturalScenes peak response table into a dictionary. """
+
         metrics["pref_image_ns"] = ns.peak["scene_ns"]
         metrics["p_ns"] = ns.peak["ptest_ns"]
         metrics["time_to_peak_ns"] = ns.peak["time_to_peak_ns"]
@@ -209,6 +310,8 @@ class SessionAnalysis(object):
         metrics["peak_dff_ns"] = ns.peak["peak_dff_ns"]
 
     def append_metrics_locally_sparse_noise(self, metrics, lsn):
+        """ Extract metrics from the LocallySparseNoise peak response table into a dictionary. """
+
         metrics['rf_chi2_lsn'] = lsn.peak['rf_chi2_lsn']
         metrics['rf_area_on_lsn'] = lsn.peak['rf_area_on_lsn']
         metrics['rf_center_on_x_lsn'] = lsn.peak['rf_center_on_x_lsn']
@@ -220,28 +323,47 @@ class SessionAnalysis(object):
         metrics['rf_overlap_index_lsn'] = lsn.peak['rf_overlap_index_lsn']
 
     def append_metrics_natural_movie_one(self, metrics, nma):
+        """ Extract metrics from the NaturalMovie(stimulus_info.NATURAL_MOVIE_ONE) peak response table into a dictionary. """
         metrics['reliability_nm1'] = nma.peak['response_reliability_nm1']
 
     def append_metrics_natural_movie_two(self, metrics, nma):
+        """ Extract metrics from the NaturalMovie(stimulus_info.NATURAL_MOVIE_TWO) peak response table into a dictionary. """
         metrics['reliability_nm2'] = nma.peak['response_reliability_nm2']
 
     def append_metrics_natural_movie_three(self, metrics, nma):
+        """ Extract metrics from the NaturalMovie(stimulus_info.NATURAL_MOVIE_THREE) peak response table into a dictionary. """
         metrics['reliability_nm3'] = nma.peak['response_reliability_nm3']
 
     def append_experiment_metrics(self, metrics):
+        """ Extract stimulus-agnostic metrics from an experiment into a dictionary """
         dxcm, dxtime = self.nwb.get_running_speed()
         metrics['mean_running_speed'] = np.nanmean(dxcm)
 
     def verify_roi_lists_equal(self, roi1, roi2):
+        """ TODO: replace this with simpler numpy comparisons """
+
         if len(roi1) != len(roi2):
             raise BrainObservatoryAnalysisException(
                 "Error -- ROI lists are of different length")
+
         for i in range(len(roi1)):
             if roi1[i] != roi2[i]:
                 raise BrainObservatoryAnalysisException(
                     "Error -- ROI lists have different entries")
 
     def session_a(self, plot_flag=False, save_flag=True):
+        """ Run stimulus-specific analysis for natural movie one, natural movie three, and drifting gratings.
+        The input NWB be for a stimulus_info.THREE_SESSION_A experiment.
+
+        Parameters
+        ----------
+        plot_flag: bool
+            Whether to generate brain_observatory_plotting work plots after running analysis.
+
+        save_flag: bool
+            Whether to save the output of analysis to self.save_path upon completion.
+        """
+
         nm1 = NaturalMovie(self.nwb, 'natural_movie_one')
         nm3 = NaturalMovie(self.nwb, 'natural_movie_three')
         dg = DriftingGratings(self.nwb)
@@ -270,6 +392,18 @@ class SessionAnalysis(object):
             cp.plot_drifting_grating_traces(dg, self.save_dir)
 
     def session_b(self, plot_flag=False, save_flag=True):
+        """ Run stimulus-specific analysis for natural scenes, static gratings, and natural movie one.
+        The input NWB be for a stimulus_info.THREE_SESSION_B experiment.
+
+        Parameters
+        ----------
+        plot_flag: bool
+            Whether to generate brain_observatory_plotting work plots after running analysis.
+
+        save_flag: bool
+            Whether to save the output of analysis to self.save_path upon completion.
+        """
+
         ns = NaturalScenes(self.nwb)
         sg = StaticGratings(self.nwb)
         nm1 = NaturalMovie(self.nwb, 'natural_movie_one')
@@ -302,6 +436,17 @@ class SessionAnalysis(object):
             cp.plot_sg_traces(sg, self.save_dir)
 
     def session_c(self, plot_flag=False, save_flag=True):
+        """ Run stimulus-specific analysis for natural movie one, natural movie two, and locally sparse noise.
+        The input NWB be for a stimulus_info.THREE_SESSION_C experiment.
+
+        Parameters
+        ----------
+        plot_flag: bool
+            Whether to generate brain_observatory_plotting work plots after running analysis.
+
+        save_flag: bool
+            Whether to save the output of analysis to self.save_path upon completion.
+        """
 
         lsn = LocallySparseNoise(self.nwb, stimulus_info.LOCALLY_SPARSE_NOISE)
         nm2 = NaturalMovie(self.nwb, 'natural_movie_two')
@@ -324,6 +469,17 @@ class SessionAnalysis(object):
             cp.plot_lsn_traces(lsn, self.save_dir)
 
     def session_c2(self, plot_flag=False, save_flag=True):
+        """ Run stimulus-specific analysis for locally sparse noise (4 deg.), locally sparse noise (8 deg.),
+        natural movie one, and natural movie two. The input NWB be for a stimulus_info.THREE_SESSION_C2 experiment.
+
+        Parameters
+        ----------
+        plot_flag: bool
+            Whether to generate brain_observatory_plotting work plots after running analysis.
+
+        save_flag: bool
+            Whether to save the output of analysis to self.save_path upon completion.
+        """
 
         lsn4 = LocallySparseNoise(self.nwb, stimulus_info.LOCALLY_SPARSE_NOISE_4DEG)
         lsn8 = LocallySparseNoise(self.nwb, stimulus_info.LOCALLY_SPARSE_NOISE_8DEG)
@@ -357,6 +513,24 @@ class SessionAnalysis(object):
 
 
 def run_session_analysis(nwb_path, save_path, plot_flag=False, save_flag=True):
+    """ Inspect an NWB file to determine which experiment session was run
+    and compute all stimulus-specific analyses.
+
+    Parameters
+    ----------
+    nwb_path: string
+        Path to NWB file.
+
+    save_path: string
+        path to save results. Recommended NOT to use NWB file.
+
+    plot_flag: bool
+        Whether to save brain_observatory_plotting work plots.
+
+    save_flag: bool
+        Whether to save results to save_path.
+    """
+
     save_dir = os.path.abspath(os.path.dirname(save_path))
 
     if not os.path.exists(save_dir):

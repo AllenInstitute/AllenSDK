@@ -28,9 +28,8 @@ import os
 
 @pytest.fixture
 def boc():
-    boc =  BrainObservatoryCache(manifest_file='boc/manifest.json', base_uri='http://testwarehouse:9000')
-    
-    return boc
+    endpoint = os.environ['TEST_API_ENDPOINT'] if 'TEST_API_ENDPOINT' in os.environ else 'http://twarehouse-backup'
+    return BrainObservatoryCache(manifest_file='boc/manifest.json', base_uri=endpoint)
 
 @pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
                     reason="partial testing")

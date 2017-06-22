@@ -91,7 +91,6 @@ def brain_observatory_cache():
 
     return boc
 
-
 def test_get_all_targeted_structures(brain_observatory_cache):
     with patch('os.path.exists') as m:
         m.return_value = False
@@ -163,7 +162,7 @@ def test_get_ophys_experiments(brain_observatory_cache):
 
     brain_observatory_cache.api.json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
-        "model::OphysExperiment,rma::include,"
+        "model::OphysExperiment,rma::include,experiment_container,"
         "well_known_files(well_known_file_type),targeted_structure,"
         "specimen(donor(age,transgenic_lines)),"
         "rma::options[num_rows$eq'all'][count$eqfalse]")
@@ -182,7 +181,7 @@ def test_get_all_session_types(brain_observatory_cache):
 
     brain_observatory_cache.api.json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
-        "model::OphysExperiment,rma::include,"
+        "model::OphysExperiment,rma::include,experiment_container,"
         "well_known_files(well_known_file_type),targeted_structure,"
         "specimen(donor(age,transgenic_lines)),"
         "rma::options[num_rows$eq'all'][count$eqfalse]")
@@ -274,6 +273,11 @@ def test_find_container_tags():
     tags = _find_container_tags(c)
     assert len(tags) == 0
 
+    # no conditions is okay
+    c = { "specimen": { "donor": { } } }
+    tags = _find_container_tags(c)
+    assert len(tags) == 0
+
     # everything else goes through
     c = { "specimen": { "donor": { "conditions": [ { "name": "fish" } ] } } }
     tags = _find_container_tags(c)
@@ -332,4 +336,6 @@ def test_find_specimen_reporter_line():
     s = { "donor": { "transgenic_lines": [ { "transgenic_line_type_name": "driver", "name": "bananaCre" } ] } }
     cre = _find_specimen_reporter_line(s)
     assert cre is None
+
+
     

@@ -6,6 +6,9 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - BrainObservatoryNwbDataSet.get_demixed_traces
+- BrainObservatoryNwbDataSet.get_pupil_location
+- BrainObservatoryNwbDataSet.get_pupil_size
+- BrainObservatoryApi.get_cell_specimen_id_mapping
 - allensdk.brain_observatory.receptive_field_analysis
 - allensdk.brain_observatory.demixer
 
@@ -15,7 +18,6 @@ All notable changes to this project will be documented in this file.
 - BrainObservatoryCache.get_experiment_containers no longer returns "age_days".
 - BrainObservatoryCache.get_ophys_experiments accepts a list of cell_specimen_ids for additional filtering
 - json_utilities uses simplejson for better NaN handling
-
 
 ## [0.13.1] - 2017-03-20
 

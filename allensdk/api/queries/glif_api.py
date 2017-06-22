@@ -36,7 +36,7 @@ class GlifApi(RmaTemplate):
             {'name': 'neuronal_models',
              'description': 'see name',
              'model': 'Specimen',
-             'include': 'neuronal_models(well_known_files)',
+             'include': 'neuronal_models(well_known_files,neuronal_model_template,neuronal_model_runs(well_known_files))',
              'criteria':'[id$in{{ ephys_experiment_ids }}]',
              'num_rows': 'all',
              'criteria_params':['ephys_experiment_ids'],
@@ -63,7 +63,6 @@ class GlifApi(RmaTemplate):
                                    'neuronal_model_templates')
 
     def get_neuronal_models(self, ephys_experiment_ids=None):
-
         return self.template_query('glif_queries',
                                    'neuronal_models', ephys_experiment_ids=ephys_experiment_ids)
 

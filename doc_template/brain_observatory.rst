@@ -13,8 +13,9 @@ an experiment container have different stimulus protocols, but cover the same im
    :align: center
 
 **Note:** Data collected after September 2016 uses a new session C stimulus designed to better-characterize spatial receptive fields in 
-higher visual areas.  The original locally sparse noise stimulus used 4 visual degree pixels.  Session C2 broke that stimulus
-into two separate stimulus blocks: one with 4 degree pixels and one with 8 degree pixels.  
+higher visual areas.  The original locally sparse noise stimulus used 4.65 visual degree pixels.  Session C2 broke that stimulus
+into two separate stimulus blocks: one with 4.65 degree pixels and one with 9.3 degree pixels.  Note that the :py:mod:`~allensdk.brain_observatory.stimulus_info`
+module refers to these as `locally_sparse_noise_4deg` and `locally_sparse_noise_8deg`, respectively.
 
 For more information on experimental design and a data overview, please visit the `Allen Brain Observatory data portal <http://observatory.brain-map.org/visualcoding>`_.  
 
@@ -54,19 +55,21 @@ started with the available data:
     - `Find cells with specific response properties, like direction tuning <_static/examples/nb/brain_observatory.html#Find-Cells-of-Interest>`_
     - `Download data for an experiment <_static/examples/nb/brain_observatory.html#Download-Experiment-Data-for-a-Cell>`_
     - `Plot raw fluorescences traces, neuropil-corrected traces, and dF/F <_static/examples/nb/brain_observatory.html#Fluorescence-Traces>`_
-    - `Find the ROI mask for a given cell <_static/examples/nb/brain_observatory.html#ROI-Masks>`_    
+    - `Find the ROI mask for a given cell <_static/examples/nb/brain_observatory.html#ROI-Masks>`_
     - `Run neuropil correction <_static/examples/nb/brain_observatory.html#Neuropil-Correction>`_
+    - `Get pupil location and size <_static/examples/nb/brain_observatory.html#Eye-Tracking>`_
 
 The code used to analyze and visualize data in the `Allen Brain Observatory data portal <http://observatory.brain-map.org/visualcoding>`_ 
 is available as part of the SDK.  Take a look at this `Jupyter notebook <_static/examples/nb/brain_observatory_analysis.html>`_ to find out how to:
 
-    - `Plot cell's response to it s preferred stimulus condition <_static/examples/nb/brain_observatory_analysis.html#Drifting-Gratings>`_    
+    - `Plot cell's response to its preferred stimulus condition <_static/examples/nb/brain_observatory_analysis.html#Drifting-Gratings>`_    
     - `Compute a cell's on/off receptive field based on the locally sparse noise stimulus <_static/examples/nb/receptive_fields.html>`_ 
 
 More detailed documentation is available demonstrating how to: 
 
     - `Read and visualize the stimulus presentation tables in the NWB files <_static/examples/nb/brain_observatory_stimuli.html>`_
-    - `Understand the layout of Brain Observatory NWB files <brain_observatory_nwb.html>`_ 
+    - `Understand the layout of Brain Observatory NWB files <brain_observatory_nwb.html>`_
+    - `Map previous cell specimen IDs to current cell specimen IDs <_static/examples/nb/cell_specimen_mapping.html>`_
 
 Precomputed Cell Metrics
 ------------------------
@@ -77,95 +80,95 @@ will download this table as a list of dictionaries which can be converted to a p
 `Jupyter notebook <_static/examples/nb/brain_observatory.html#Find-Cells-of-Interest>`_.
 
 
-+----------------------+---------------------------------+----------------------------------+
-| Stimulus             | Metric                          | Field Name                       |
-+======================+=================================+==================================+
-| drifting gratings    | orientation selectivity         | osi_dg                           |
-|                      +---------------------------------+----------------------------------+        
-|                      | direction selectivity           | dsi_dg                           |
-|                      +---------------------------------+----------------------------------+        
-|                      | preferred direction             | pref_dir_dg                      |
-|                      +---------------------------------+----------------------------------+        
-|                      | preferred temporal frequency    | pref_tf_dg                       |
-|                      +---------------------------------+----------------------------------+        
-|                      | response p value                | p_dg                             |
-|                      +---------------------------------+----------------------------------+        
-|                      | global ori. selectivity         | g_osi_dg                         |
-|                      +---------------------------------+----------------------------------+        
-|                      | global dir. selectivity         | g_dsi_dg                         |
-|                      +---------------------------------+----------------------------------+        
-|                      | response reliability            | reliability_dg                   |
-|                      +---------------------------------+----------------------------------+        
-|                      | running modulation              | run_mod_dg                       |
-|                      +---------------------------------+----------------------------------+        
-|                      | running modulation p value      | p_run_mod_dg                     |
-|                      +---------------------------------+----------------------------------+        
-|                      | pref. condition mean df/f       | peak_dff_dg                      |
-|                      +---------------------------------+----------------------------------+        
-|                      | TF discrimination index         | tfdi_dg                          |
-+----------------------+---------------------------------+----------------------------------+
-| static gratings      | orientation selectivity         | osi_sg                           |
-|                      +---------------------------------+----------------------------------+        
-|                      | preferred orientation           | pref_ori_sg                      |
-|                      +---------------------------------+----------------------------------+        
-|                      | preferred spatial frequency     | pref_sf_sg                       |
-|                      +---------------------------------+----------------------------------+        
-|                      | preferred phase                 | pref_phase_sg                    |
-|                      +---------------------------------+----------------------------------+        
-|                      | mean time to peak response      | time_to_peak_sg                  |
-|                      +---------------------------------+----------------------------------+        
-|                      | response p value                | p_sg                             |
-|                      +---------------------------------+----------------------------------+        
-|                      | global ori. selectivity         | g_osi_sg                         |
-|                      +---------------------------------+----------------------------------+        
-|                      | reponse reliability             | reliability_sg                   |
-|                      +---------------------------------+----------------------------------+        
-|                      | running modulation              | run_mod_sg                       |
-|                      +---------------------------------+----------------------------------+        
-|                      | running modulation p value      | p_run_mod_sg                     |
-|                      +---------------------------------+----------------------------------+        
-|                      | pref. condition mean df/f       | peak_dff_ns                      |
-|                      +---------------------------------+----------------------------------+        
-|                      | SF discrimiation index          | sfdi_sg                          |
-+----------------------+---------------------------------+----------------------------------+        
-| natural scenes       |  mean time to peak response     | time_to_peak_ns                  |
-|                      +---------------------------------+----------------------------------+        
-|                      | preferred scene index           | pref_scene_ns                    | 
-|                      +---------------------------------+----------------------------------+        
-|                      | response p value                | p_ns                             |
-|                      +---------------------------------+----------------------------------+        
-|                      | image selectivity               | image_sel_ns                     |
-|                      +---------------------------------+----------------------------------+        
-|                      | running modulation              | run_mod_ns                       |
-|                      +---------------------------------+----------------------------------+        
-|                      | running modulation p value      | p_run_mod_ns                     |
-|                      +---------------------------------+----------------------------------+        
-|                      | pref. condition mean df/f       | peak_dff_ns                      |
-+----------------------+---------------------------------+----------------------------------+        
-| natural movie 1      | response reliability sess. a    | reliability_nm1_a                |
-|                      +---------------------------------+----------------------------------+        
-|                      | response reliability sess. b    | reliability_nm1_a                |
-|                      +---------------------------------+----------------------------------+        
-|                      | response reliability sess. c    | reliability_nm1_c                |
-+----------------------+---------------------------------+----------------------------------+        
-| natural movie 2      | response reliability            | reliability_nm2                  |
-+----------------------+---------------------------------+----------------------------------+        
-| natural movie 3      | response reliability            | reliability_nm3                  |
-+----------------------+---------------------------------+----------------------------------+        
-| locally sparse noise | RF area (on subunit)            | rf_area_on_lsn                   |
-|                      +---------------------------------+----------------------------------+        
-|                      | RF area (off subunit)           | rf_area_off_lsn                  |
-|                      +---------------------------------+----------------------------------+        
-|                      | RF center (on subunit)          | rf_center_on_x, rf_center_on_y   |
-|                      +---------------------------------+----------------------------------+        
-|                      | RF center (off subunit)         | rf_center_off_x, rf_center_off_y |
-|                      +---------------------------------+----------------------------------+        
-|                      | RF chi^2                        | rf_chi2_lsn                      |
-|                      +---------------------------------+----------------------------------+        
-|                      | RF on-off subunit distance      | rf_distance_lsn                  |
-|                      +---------------------------------+----------------------------------+        
-|                      | RF on-off subunit overlap index | rf_overlap_lsn                   |
-+----------------------+---------------------------------+----------------------------------+        
++----------------------+----------------------------------+----------------------------------+
+| Stimulus             | Metric                           | Field Name                       |
++======================+==================================+==================================+
+| drifting gratings    | orientation selectivity          | osi_dg                           |
+|                      +----------------------------------+----------------------------------+        
+|                      | direction selectivity            | dsi_dg                           |
+|                      +----------------------------------+----------------------------------+        
+|                      | preferred direction              | pref_dir_dg                      |
+|                      +----------------------------------+----------------------------------+        
+|                      | preferred temporal frequency     | pref_tf_dg                       |
+|                      +----------------------------------+----------------------------------+        
+|                      | response p value                 | p_dg                             |
+|                      +----------------------------------+----------------------------------+        
+|                      | global ori. selectivity          | g_osi_dg                         |
+|                      +----------------------------------+----------------------------------+        
+|                      | global dir. selectivity          | g_dsi_dg                         |
+|                      +----------------------------------+----------------------------------+        
+|                      | response reliability             | reliability_dg                   |
+|                      +----------------------------------+----------------------------------+        
+|                      | running modulation               | run_mod_dg                       |
+|                      +----------------------------------+----------------------------------+        
+|                      | running modulation p value       | p_run_mod_dg                     |
+|                      +----------------------------------+----------------------------------+        
+|                      | pref. condition mean df/f        | peak_dff_dg                      |
+|                      +----------------------------------+----------------------------------+        
+|                      | TF discrimination index          | tfdi_dg                          |
++----------------------+----------------------------------+----------------------------------+
+| static gratings      | orientation selectivity          | osi_sg                           |
+|                      +----------------------------------+----------------------------------+        
+|                      | preferred orientation            | pref_ori_sg                      |
+|                      +----------------------------------+----------------------------------+        
+|                      | preferred spatial frequency      | pref_sf_sg                       |
+|                      +----------------------------------+----------------------------------+        
+|                      | preferred phase                  | pref_phase_sg                    |
+|                      +----------------------------------+----------------------------------+        
+|                      | mean time to peak response       | time_to_peak_sg                  |
+|                      +----------------------------------+----------------------------------+        
+|                      | response p value                 | p_sg                             |
+|                      +----------------------------------+----------------------------------+        
+|                      | global ori. selectivity          | g_osi_sg                         |
+|                      +----------------------------------+----------------------------------+        
+|                      | reponse reliability              | reliability_sg                   |
+|                      +----------------------------------+----------------------------------+        
+|                      | running modulation               | run_mod_sg                       |
+|                      +----------------------------------+----------------------------------+        
+|                      | running modulation p value       | p_run_mod_sg                     |
+|                      +----------------------------------+----------------------------------+        
+|                      | pref. condition mean df/f        | peak_dff_ns                      |
+|                      +----------------------------------+----------------------------------+        
+|                      | SF discrimiation index           | sfdi_sg                          |
++----------------------+----------------------------------+----------------------------------+        
+| natural scenes       |  mean time to peak response      | time_to_peak_ns                  |
+|                      +----------------------------------+----------------------------------+        
+|                      | preferred scene index            | pref_scene_ns                    | 
+|                      +----------------------------------+----------------------------------+        
+|                      | response p value                 | p_ns                             |
+|                      +----------------------------------+----------------------------------+        
+|                      | image selectivity                | image_sel_ns                     |
+|                      +----------------------------------+----------------------------------+        
+|                      | running modulation               | run_mod_ns                       |
+|                      +----------------------------------+----------------------------------+        
+|                      | running modulation p value       | p_run_mod_ns                     |
+|                      +----------------------------------+----------------------------------+        
+|                      | pref. condition mean df/f        | peak_dff_ns                      |
++----------------------+----------------------------------+----------------------------------+        
+| natural movie 1      | response reliability (session A) | reliability_nm1_a                |
+|                      +----------------------------------+----------------------------------+        
+|                      | response reliability (session B) | reliability_nm1_b                |
+|                      +----------------------------------+----------------------------------+        
+|                      | response reliability (session C) | reliability_nm1_c                |
++----------------------+----------------------------------+----------------------------------+        
+| natural movie 2      | response reliability             | reliability_nm2                  |
++----------------------+----------------------------------+----------------------------------+        
+| natural movie 3      | response reliability             | reliability_nm3                  |
++----------------------+----------------------------------+----------------------------------+        
+| locally sparse noise | RF area (on subunit)             | rf_area_on_lsn                   |
+|                      +----------------------------------+----------------------------------+        
+|                      | RF area (off subunit)            | rf_area_off_lsn                  |
+|                      +----------------------------------+----------------------------------+        
+|                      | RF center (on subunit)           | rf_center_on_x, rf_center_on_y   |
+|                      +----------------------------------+----------------------------------+        
+|                      | RF center (off subunit)          | rf_center_off_x, rf_center_off_y |
+|                      +----------------------------------+----------------------------------+        
+|                      | RF chi^2                         | rf_chi2_lsn                      |
+|                      +----------------------------------+----------------------------------+        
+|                      | RF on-off subunit distance       | rf_distance_lsn                  |
+|                      +----------------------------------+----------------------------------+        
+|                      | RF on-off subunit overlap index  | rf_overlap_lsn                   |
++----------------------+----------------------------------+----------------------------------+        
 
 
 
