@@ -14,4 +14,4 @@ cd s3fs-fuse
 make
 make install
 
-pip install boto3 bokeh awscli
+pip install boto3 bokeh=0.12.6 awscli

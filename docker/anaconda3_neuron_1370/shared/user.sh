@@ -6,4 +6,4 @@ chsh -s /bin/bash $USER
 mkdir /home/$USER
 cp -R /root/allensdk /home/$USER
 chown -R ${USER}.$USER /home/$USER
-cat source /home/shared/nets/bin/nest_vars.sh >> ~/.bashrc
+echo source /home/shared/nest/bin/nest_vars.sh >> /home/${USER}/.bashrc
