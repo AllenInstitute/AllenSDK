@@ -10,7 +10,7 @@ MAINTAINER Tim Fliss <timf@alleninstitute.org>
 # neuron installation
 WORKDIR root
 COPY requirements.txt test_requirements.txt ./
-COPY shared/* ./
+COPY shared/* ./shared/
 RUN /bin/bash shared/apt_get_dependencies.sh; \
  /bin/bash shared/conda_27.sh; \
  /bin/bash --login shared/allensdk_install.sh; \
