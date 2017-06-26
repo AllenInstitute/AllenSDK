@@ -17,8 +17,7 @@ RUN /bin/bash shared/apt_get_dependencies.sh; \
  /bin/bash --login shared/jupyterhub.sh; \
  /bin/bash --login shared/build_nrn.sh; \
  /bin/bash --login shared/tensorflow.sh; \
- /bin/bash --login shared/aws_dependencies.sh; \
- /bin/bash --login shared/users.sh; \
+ /bin/bash --login shared/aws_dependencies.sh
  mkdir -p /root/build_nest && /bin/bash --login shared/build_NEST.sh -b /root/build_nest -e py27; \
  /bin/bash shared/aws_dependencies.sh
 #RUN mkdir -p /root/build_dipde && shared/build_DiPDE.sh -b /root/build_dipde -e py27
