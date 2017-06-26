@@ -13,13 +13,12 @@ COPY requirements.txt test_requirements.txt ./
 COPY shared/* ./shared/
 RUN /bin/bash shared/apt_get_dependencies.sh; \
  /bin/bash shared/conda_27.sh; \
- /bin/bash --login shared/allensdk_install.sh; \
- /bin/bash --login shared/jupyterhub.sh; \
- /bin/bash --login shared/build_nrn.sh; \
  /bin/bash --login shared/tensorflow.sh; \
- /bin/bash --login shared/aws_dependencies.sh
+ /bin/bash --login shared/aws_dependencies.sh; \
  mkdir -p /root/build_nest && /bin/bash --login shared/build_NEST.sh -b /root/build_nest -e py27; \
- /bin/bash shared/aws_dependencies.sh
+ /bin/bash --login shared/build_nrn.sh; \
+ /bin/bash --login shared/jupyterhub.sh
+RUN /bin/bash --login shared/allensdk_install.sh
 #RUN mkdir -p /root/build_dipde && shared/build_DiPDE.sh -b /root/build_dipde -e py27
 #RUN mkdir -p /root/build_neuron && shared/build_NEURON.sh -b /root/build_neuron -e py27
 #RUN mkdir -p /root/build_tensorflow && shared/build_Tensorflow.sh -b /root/build_tensorflow -e py27
