@@ -94,9 +94,9 @@ def fitgaussian2D(data):
     p2 = np.array([p[0], params[1], params[2], np.abs(p[1]), np.abs(p[2]), p[3]])
     success = res.success
     if not success and res.status != 2: # Status 2 is loss of precision; might need to handle this separately instead of passing...
-        print success
-        print res.message
-        print res.status
+        print(success)
+        print(res.message)
+        print(res.status)
         raise GaussianFitError('Gaussian optimization failed to converge:\n%s' % res.message)
 
     return p2

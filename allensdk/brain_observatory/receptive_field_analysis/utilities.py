@@ -123,7 +123,7 @@ def get_sparse_noise_epoch_mask_list(st, number_of_acquisition_frames, threshold
 
     if len(cut_inds) > 2:
         warnings.warn('more than 2 epochs cut')
-        print '    ', len(delta), cut_inds
+        print('    ', len(delta), cut_inds)
 
     for ii in range(len(cut_inds)+1):
 
