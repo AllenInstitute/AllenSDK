@@ -41,6 +41,7 @@ def read(file_name):
 
     return json_obj
 
+
 def write(file_name, obj):
     """ Shortcut for writing JSON to a file.  This also takes care of serializing numpy and data types. """
     with open(file_name, 'wb') as f:

@@ -371,6 +371,7 @@ class CellTypesCache(Cache):
                     typename='file', parent_key='BASEDIR')
         mb.add_path(self.EPHYS_SWEEPS_KEY, 'specimen_%d/ephys_sweeps.json',
                     typename='file', parent_key='BASEDIR')
+
         mb.write_json_file(file_name)
 
 
