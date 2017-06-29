@@ -17,18 +17,23 @@ body {
 
 /* :::: LAYOUT :::: */
 
+div.document {
+    position: absolute;
+}
+
 div.documentwrapper {
-    float: left;
-    width: 100%;
+    float: right;
+//    position: absolute;
+    width: calc(100% - {{ theme_sidebarwidth }}px);
 }
 
 div.bodywrapper {
-    margin: 0 0 0 {{ theme_sidebarwidth }}px;
+//    margin: 0 0 0 {{ theme_sidebarwidth }}px;
 }
 
 div.body {
     background-color: white;
-    padding: 20px 50px 30px 0px;
+    padding: 3px 50px 30px 0px;
     font-family: Verdana, sans-serif;
 }
 
@@ -39,8 +44,11 @@ div.sphinxsidebarwrapper {
 }
 
 div.sphinxsidebar {
+    //position: absolute;
     float: left;
-    margin-left: -100%;
+    top: 0;
+    left: 0;
+    margin-left: 0;
     width: {{ theme_sidebarwidth }}px;
     font-family: Verdana, sans-serif;
 }
@@ -825,3 +833,28 @@ td.field-body > p > strong {
    padding: 3px;
    border-left: 2px solid #d0d0d0;
 }
+
+
+  div.document {
+  position:relative !important;
+  }
+
+  img#portal_logo{
+  display:none;
+  }
+  
+  #header_content{
+  height:75px !important;
+  }
+
+  #header_content > a:hover {
+  background-color: transparent !important;
+  }
+
+  #portal_tabs {
+  display:none !important;;
+  }
+
+  #portal_search_input_group {
+  display:none !important;
+  }

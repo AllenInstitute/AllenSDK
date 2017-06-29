@@ -13,10 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import pandas as pd
 from six import string_types
 from .rma_template import RmaTemplate
+from ..cache import cacheable, Cache
+from .rma_pager import pageable
 from allensdk.config.manifest import Manifest
 import allensdk.brain_observatory.stimulus_info as stimulus_info
 import logging
@@ -26,6 +27,7 @@ class BrainObservatoryApi(RmaTemplate):
     _log = logging.getLogger('allensdk.api.queries.brain_observatory_api')
 
     NWB_FILE_TYPE = 'NWBOphys'
+    CELL_MAPPING_ID = 590985414
 
     rma_templates = \
         {"brain_observatory_queries": [
@@ -49,7 +51,7 @@ class BrainObservatoryApi(RmaTemplate):
              'description': 'see name',
              'model': 'OphysExperiment',
              'criteria': '{% if ophys_experiment_ids is defined %}[id$in{{ ophys_experiment_ids }}]{%endif%}',
-             'include': 'well_known_files(well_known_file_type),targeted_structure,specimen(donor(age,transgenic_lines))',
+             'include': 'experiment_container,well_known_files(well_known_file_type),targeted_structure,specimen(donor(age,transgenic_lines))',
              'num_rows': 'all',
              'count': False,
              'criteria_params': ['ophys_experiment_ids']
@@ -89,7 +91,7 @@ class BrainObservatoryApi(RmaTemplate):
              'description': 'see name',
              'model': 'ExperimentContainer',
              'criteria': '{% if experiment_container_ids is defined %}[id$in{{ experiment_container_ids }}]{%endif%}',
-             'include': 'ophys_experiments,isi_experiment,specimen(donor(age,transgenic_lines)),targeted_structure',
+             'include': 'ophys_experiments,isi_experiment,specimen(donor(conditions,age,transgenic_lines)),targeted_structure',
              'num_rows': 'all',
              'count': False,
              'criteria_params': ['experiment_container_ids']
@@ -106,10 +108,15 @@ class BrainObservatoryApi(RmaTemplate):
              'description': 'see name',
              'model': 'ApiCamCellMetric',
              'criteria': '{% if cell_specimen_ids is defined %}[cell_specimen_id$in{{ cell_specimen_ids }}]{%endif%}',
+             'criteria_params': ['cell_specimen_ids']
+             },
+            {'name': 'cell_specimen_id_mapping_table',
+             'description': 'see name',
+             'model': 'WellKnownFile',
+             'criteria': '[id$eq{{ mapping_table_id }}],well_known_file_type[name$eqOphysCellSpecimenIdMapping]',
              'num_rows': 'all',
              'count': False,
-             'criteria_params': ['cell_specimen_ids']
-             }
+             'criteria_params': ['mapping_table_id']}
         ]}
 
     _QUERY_TEMPLATES = {
@@ -123,10 +130,13 @@ class BrainObservatoryApi(RmaTemplate):
         "is": '({0} == {1})'
     }
 
-    def __init__(self, base_uri=None):
+    def __init__(self, base_uri=None, datacube_uri=None):
         super(BrainObservatoryApi, self).__init__(base_uri,
                                                   query_manifest=BrainObservatoryApi.rma_templates)
 
+        self.datacube_uri = datacube_uri
+
+    @cacheable()
     def get_ophys_experiments(self, ophys_experiment_ids=None):
         ''' Get OPhys Experiments by id
 
@@ -215,7 +225,7 @@ class BrainObservatoryApi(RmaTemplate):
 
         return data
 
-    # TODO: search by item type and level
+    @cacheable()
     def get_stimulus_mappings(self, stimulus_mapping_ids=None):
         ''' Get stimulus mappings by id
 
@@ -234,7 +244,9 @@ class BrainObservatoryApi(RmaTemplate):
 
         return data
 
-    def get_cell_metrics(self, cell_specimen_ids=None):
+    @cacheable()
+    @pageable(num_rows=2000, total_rows='all')
+    def get_cell_metrics(self, cell_specimen_ids=None, *args, **kwargs):
         ''' Get cell metrics by id
 
         Parameters
@@ -246,15 +258,15 @@ class BrainObservatoryApi(RmaTemplate):
         -------
         dict : cell metric metadata
         '''
-        self._log.warning(
-            "Downloading metrics and metadata for all cells. This can take some time.")
-
         data = self.template_query('brain_observatory_queries',
                                    'cell_metric',
-                                   cell_specimen_ids=cell_specimen_ids)
+                                   cell_specimen_ids=cell_specimen_ids,
+                                   *args,
+                                   **kwargs)
 
         return data
 
+    @cacheable()
     def get_experiment_containers(self, experiment_container_ids=None):
         ''' Get experiment container by id
 
@@ -291,9 +303,10 @@ class BrainObservatoryApi(RmaTemplate):
 
         return data
 
+    @cacheable(strategy='create',
+               pathfinder=Cache.pathfinder(file_name_position=2,
+                                           path_keyword='file_name'))
     def save_ophys_experiment_data(self, ophys_experiment_id, file_name):
-        Manifest.safe_make_parent_dirs(file_name)
-
         data = self.template_query('brain_observatory_queries',
                                    'ophys_experiment_data',
                                    ophys_experiment_id=ophys_experiment_id)
@@ -313,7 +326,11 @@ class BrainObservatoryApi(RmaTemplate):
                                      ids=None,
                                      targeted_structures=None,
                                      imaging_depths=None,
-                                     transgenic_lines=None):
+                                     transgenic_lines=None,
+                                     include_failed=False):
+
+        if not include_failed:
+            containers = [c for c in containers if not c.get('failed', False)]
 
         if ids is not None:
             containers = [c for c in containers if c['id'] in ids]
@@ -339,7 +356,8 @@ class BrainObservatoryApi(RmaTemplate):
                                  imaging_depths=None,
                                  transgenic_lines=None,
                                  stimuli=None,
-                                 session_types=None):
+                                 session_types=None,
+                                 include_failed=False):
 
         # re-using the code from above
         experiments = self.filter_experiment_containers(experiments,
@@ -347,6 +365,10 @@ class BrainObservatoryApi(RmaTemplate):
                                                         targeted_structures=targeted_structures,
                                                         imaging_depths=imaging_depths,
                                                         transgenic_lines=transgenic_lines)
+
+        if not include_failed:
+            experiments = [e for e in experiments 
+                           if not e.get('experiment_container',{}).get('failed', False)]
 
         if experiment_container_ids is not None:
             experiments = [e for e in experiments if e[
@@ -365,6 +387,7 @@ class BrainObservatoryApi(RmaTemplate):
     def filter_cell_specimens(self, cell_specimens,
                               ids=None,
                               experiment_container_ids=None,
+                              include_failed=False,
                               filters=None):
         """
         Filter a list of cell specimen records returned from the get_cell_metrics method according 
@@ -381,12 +404,19 @@ class BrainObservatoryApi(RmaTemplate):
         experiment_container_ids: list of integers
             Return only records for cells that belong to experiment container ids in this list
 
+        include_failed: bool
+            Whether to include cells from failed experiment containers
+
         filters: list of dicts
             Custom query used to reproduce filter sets created in the Allen Brain Observatory
             web application.  The general form is a list of dictionaries each of which
             describes a filtering operation based on a metric.  For more information, see
             dataframe_query.  
         """
+
+        if not include_failed:
+            cell_specimens = [c for c in cell_specimens if not c.get(
+                    'failed_experiment_container', False)]
 
         if ids is not None:
             cell_specimens = [c for c in cell_specimens if c[
@@ -420,7 +450,7 @@ class BrainObservatoryApi(RmaTemplate):
             if op == 'in':
                 query_args = [field, str(value)]
             elif type(value) is list:
-                query_args = [field] + map(_quote_string, value)
+                query_args = [field] + list(map(_quote_string, value))
             else:
                 query_args = [field, str(value)]
 
@@ -465,3 +495,37 @@ class BrainObservatoryApi(RmaTemplate):
                   in result_keys]
 
         return result
+
+    def get_cell_specimen_id_mapping(self, file_name, mapping_table_id=None):
+        '''Download mapping table from old to new cell specimen IDs.
+
+        The mapping table is a CSV file that maps cell specimen ids
+        that have changed between processing runs of the Brain
+        Observatory pipeline.
+
+        Parameters
+        ----------
+        file_name : string
+            Filename to save locally.
+        mapping_table_id : integer
+            ID of the mapping table file. Defaults to the most recent
+            mapping table. 
+
+        Returns
+        -------
+        pandas.DataFrame
+            Mapping table as a DataFrame.
+        '''
+        if mapping_table_id is None:
+            mapping_table_id = self.CELL_MAPPING_ID
+        data = self.template_query('brain_observatory_queries',
+                                   'cell_specimen_id_mapping_table',
+                                   mapping_table_id=mapping_table_id)
+
+        try:
+            file_url = data[0]['download_link']
+        except Exception as _:
+            raise Exception("No OphysCellSpecimenIdMapping file found.")
+
+        self.retrieve_file_over_http(self.api_url + file_url, file_name)
+        return pd.read_csv(file_name)

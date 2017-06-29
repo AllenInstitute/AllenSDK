@@ -87,16 +87,25 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
-What's New - Release 0.12.4 (October 28th, 2016)
-------------------------------------------------
+What's New - Release 0.13.2 (June 15th, 2017)
+----------------------------------------------
 
-The 0.12.4 release features a new 2016 version of the Allen Mouse Common Coordinate Framework.  This primarily affects Mouse Connectivity Atlas `structure unionize records <unionizes.html>`_ and structure masks.  All structure unionize records downloaded via the MouseConnectivityCache or API now correspond to the new CCF.  More details on CCF construction can be found in the `CCF technical whitepaper <http://help.brain-map.org/download/attachments/2818171/Mouse_Common_Coordinate_Framework.pdf?version=2&modificationDate=1477414987120>`_.  Users can download the old `unionize records here <http://download.alleninstitute.org/informatics-archive/june-2016/mouse_projection/>`_.
+The 0.13.2 release is a major update for the Brain Observatory modules and data.  All Brain Observatory NWB files have been regenerated, and a large number of new experiments have been released.  All NWB files now contain demixed traces.  These traces are used for neuropil subtraction and dF/F computation, so those traces are affected as well.  
 
-This release also addresses issues from the Github issue tracker:
-  
-    * issues #23, #28 - added a new dependency "requests_toolbelt" and upgraded API database for more reliable large file downloads.
-    * issue #27 - MouseConnectivityCache.get_structure_unionizes returns only requested structures, not all descendants.  Added a separate argument for descendant inclusion.
-    * issue #26 - documentation for structure unionize records `here <unionizes.html>`_.
-    * issue #25 - documentation errors in brain observatory analysis.
+To get new lists of experiments and metadata, please delete/rename the directory container the Brain Observatory manifest.  The new files are a bit larger because of the new traces.
 
+The cross-session alignment algorithm has been updated and re-run, so **all cell specimen IDs have changed**.  We have built a mapping table to help map from previous cell IDs to new cell IDs available here: `cell_specimen_mapping.csv <http://api.brain-map.org/api/v2/well_known_file_download/590985414>`_. For examples of how to download the file with the SDK and use it to map between IDs, see this `notebook <_static/examples/nb/cell_specimen_mapping.html>`_.
+
+The cell specimens table now has a large number of new features.  Read the `technical whitepapers <http://help.brain-map.org/display/observatory/Documentation>`_ on stimulus analysis to learn more.
+
+Code changes include:
+    * a new receptive field analysis module (:py:mod:`~allensdk.brain_observatory.receptive_field_analysis`)
+    * a trace demixing algorithm (:py:mod:`~allensdk.brain_observatory.demixer`)
+    * a new convenience method: :py:meth:`~allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiment_stimuli`
+    * a new method to get the cell specimen mapping table: :py:meth:`~allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.get_cell_specimen_id_mapping`
+    * new methods :py:meth:`~allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_pupil_location` and :py:meth:`~allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_pupil_size` to get pupil position and size for experiments with eye tracking data.
+    * :py:meth:`~allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiments` accepts a list of ``cell_specimen_ids`` as an additional filter
+    * :py:meth:`~allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiments` returns "acquisition_age_days" instead of "age_days".  The new field describes the age of the animal on the day of experiment acquisition.
+    * :py:meth:`~allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_experiment_containers` no longer returns "age_days".
+        
 To find out more, take a look at our `CHANGELOG <http://github.com/AllenInstitute/AllenSDK/blob/master/CHANGELOG.md>`_. 

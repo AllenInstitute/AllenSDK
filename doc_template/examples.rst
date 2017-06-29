@@ -11,6 +11,9 @@ Introduction to the Cell Types Database               `Jupyter notebook <_static
 Introduction to the Brain Observatory                 `Jupyter notebook <_static/examples/nb/brain_observatory.html>`_ `(download .ipynb) <_static/examples/nb/brain_observatory.ipynb>`_
 Brain Observatory Stimulus Manipulation               `Jupyter notebook <_static/examples/nb/brain_observatory_stimuli.html>`_ `(download .ipynb) <_static/examples/nb/brain_observatory_stimuli.ipynb>`_
 Brain Observatory Tuning Analysis                     `Jupyter notebook <_static/examples/nb/brain_observatory_analysis.html>`_ `(download .ipynb) <_static/examples/nb/brain_observatory_analysis.ipynb>`_
+Brain Observatory Receptive Field Analysis            `Jupyter notebook <_static/examples/nb/receptive_fields.html>`_ `(download .ipynb) <_static/examples/nb/receptive_fields.ipynb>`_
+Brain Observatory Cell Specimen ID Mapping            `Jupyter notebook <_static/examples/nb/cell_specimen_mapping.html>`_ `(download .ipynb) <_static/examples/nb/cell_specimen_mapping.ipynb>`_
 Dynamic Brain Workshop 2015 experiment detail         `Jupyter notebook <_static/examples/nb/summer_workshop_2015/experiment_detail_example.html>`_ `(download .ipynb) <_static/examples/nb/summer_workshop_2015/experiment_detail_example.ipynb>`_
 Stimulating a biophysical model with a square pulse   `Jupyter notebook <_static/examples/nb/pulse_stimulus.html>`_ `(download .ipynb) <_static/examples/nb/pulse_stimulus.ipynb>`_
+Using a Reference Space                               `Jupyter notebook <_static/examples/nb/reference_space.html>`_ `(download .ipynb) <_static/examples/nb/reference_space.ipynb>`_  
 ===================================================== ====

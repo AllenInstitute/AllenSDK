@@ -15,6 +15,7 @@
 import numpy as np
 import math
 import scipy.ndimage.morphology as morphology
+import logging
 
 # constants used for accessing border array
 RIGHT_SHIFT = 0
@@ -365,10 +366,10 @@ def calculate_traces(stack, mask_list):
     for mask in mask_list:
         if not isinstance(mask.mask, np.ndarray):
             mask.mask = np.array(mask.mask)
-    # calcualte traces
+    # calculate traces
     for frame_num in range(num_frames):
         if frame_num % 1000 == 0:
-            print("frame " + str(frame_num) + " of " + str(num_frames))
+            logging.debug("frame " + str(frame_num) + " of " + str(num_frames))
         frame = stack[frame_num]
         mask = None
         try:
@@ -381,10 +382,34 @@ def calculate_traces(stack, mask_list):
                 tvals = total / area
                 traces[i][frame_num] = tvals
         except:
-            print("Error encountered processing mask during frame %d" % frame_num)
+            logging.error("Error encountered processing mask during frame %d" % frame_num)
             if mask is not None:
-                print(subframe.shape)
-                print(mask.mask.shape)
-                print(mask)
+                logging.error(subframe.shape)
+                logging.error(mask.mask.shape)
+                logging.error(mask)
             raise
     return traces
+
+
+def create_roi_mask_array(rois):
+    '''Create full image mask array from list of RoiMasks.
+
+    Parameters
+    ----------
+    rois: list<RoiMask>
+        List of roi masks.
+
+    Returns
+    -------
+    np.ndarray: NxWxH array
+        Boolean array of of len(rois) image masks.
+    '''
+    if rois:
+        height = rois[0].img_rows
+        width = rois[0].img_cols
+        masks = np.zeros((len(rois), height, width), dtype=np.uint8)
+        for i, roi in enumerate(rois):
+            masks[i, :, :] = roi.get_mask_plane()
+    else:
+        masks = None
+    return masks

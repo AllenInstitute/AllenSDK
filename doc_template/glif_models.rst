@@ -44,10 +44,10 @@ for a cell has a neuronal model download link.  Specifically:
    3. Choose a GLIF model from the 'Show model responses' dropdown.
    4. Scroll down to the model response click 'Download model'.
 
-One such link (for a simple LIF neuronal model, ID 472423251), would look
+One such link (for a simple LIF neuronal model, ID 566302806), would look
 like this::
 
-   http://api.brain-map.org/neuronal_model/download/472423251
+   http://api.brain-map.org/neuronal_model/download/566302806
 
 This link returns .zip archive containing the neuron configuration file 
 and sweep metadata required to simulate the model with stimuli applied to 
@@ -192,8 +192,6 @@ other function parameters must be fixed using the GlifNeuronMethod class.  They 
 updated voltage value.
 
    :py:meth:`allensdk.model.glif.glif_neuron_methods.dynamics_voltage_linear_forward_euler`
-   
-   :py:meth:`allensdk.model.glif.glif_neuron_methods.dynamics_voltage_linear_exact`
 
 **Threshold Dynamics Rules**
 
@@ -202,8 +200,6 @@ threshold and voltage values of the simulation to be passed in by the GlifNeuron
 other function parameters must be fixed using the GlifNeuronMethod class.  They all return an 
 updated threshold value.
 
-    :py:meth:`allensdk.model.glif.glif_neuron_methods.dynamics_threshold_three_components_forward`
-    
     :py:meth:`allensdk.model.glif.glif_neuron_methods.dynamics_threshold_three_components_exact`
     
     :py:meth:`allensdk.model.glif.glif_neuron_methods.dynamics_threshold_spike_component`

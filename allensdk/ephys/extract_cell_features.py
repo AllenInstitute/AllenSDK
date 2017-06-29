@@ -15,6 +15,7 @@
 
 import numpy as np
 import logging
+import six
 from . import ephys_extractor as efex
 from . import ephys_features as ft
 
@@ -27,7 +28,7 @@ SHORT_SQUARE_TYPES = ["Short Square",
                       "Short Square - Hold -70mv",
                       "Short Square - Hold -80mv"]
 
-SHORT_SQUARE_MAX_THRESH_FRAC = 0.1
+SHORT_SQUARE_THRESH_FRAC_FLOOR = 0.1
 
 MEAN_FEATURES = [ "upstroke_downstroke_ratio", "peak_v", "peak_t", "trough_v", "trough_t",
                   "fast_trough_v", "fast_trough_t", "slow_trough_v", "slow_trough_t",
@@ -38,18 +39,34 @@ def extract_sweep_features(data_set, sweeps_by_type):
     # extract sweep-level features
     sweep_features = {}
 
-    for stimulus_type, sweep_numbers in sweeps_by_type.iteritems():
+    for stimulus_type, sweep_numbers in six.iteritems(sweeps_by_type):
         logging.debug("%s:%s" % (stimulus_type, ','.join(map(str, sweep_numbers))))
 
-        if stimulus_type in SHORT_SQUARE_TYPES:
+        if stimulus_type == "Short Square - Triple":
             tmp_ext = efex.extractor_for_nwb_sweeps(data_set, sweep_numbers)
             t_set = [s.t for s in tmp_ext.sweeps()]
             v_set = [s.v for s in tmp_ext.sweeps()]
 
-            cutoff, thresh_frac = ft.estimate_adjusted_detection_parameters(v_set, t_set,
-                                                                            efex.SHORT_SQUARES_WINDOW_START,
-                                                                            efex.SHORT_SQUARES_WINDOW_END)
-            thresh_frac = max(SHORT_SQUARE_MAX_THRESH_FRAC, thresh_frac)
+            # IT-14530
+            # triple-sweeps to use different window
+            win_start = efex.SHORT_SQUARE_TRIPLE_WINDOW_START
+            win_end = efex.SHORT_SQUARE_TRIPLE_WINDOW_END
+            cutoff, thresh_frac = ft.estimate_adjusted_detection_parameters(
+                                    v_set, t_set, win_start, win_end)
+            thresh_frac = max(SHORT_SQUARE_THRESH_FRAC_FLOOR, thresh_frac)
+
+            fex = efex.extractor_for_nwb_sweeps(data_set, sweep_numbers,
+                                    dv_cutoff=cutoff, thresh_frac=thresh_frac)
+        elif stimulus_type in SHORT_SQUARE_TYPES:
+            tmp_ext = efex.extractor_for_nwb_sweeps(data_set, sweep_numbers)
+            t_set = [s.t for s in tmp_ext.sweeps()]
+            v_set = [s.v for s in tmp_ext.sweeps()]
+
+            win_start = efex.SHORT_SQUARES_WINDOW_START
+            win_end = efex.SHORT_SQUARES_WINDOW_END
+            cutoff, thresh_frac = ft.estimate_adjusted_detection_parameters(
+                                     v_set, t_set, win_start, win_end)
+            thresh_frac = max(SHORT_SQUARE_THRESH_FRAC_FLOOR, thresh_frac)
 
             fex = efex.extractor_for_nwb_sweeps(data_set, sweep_numbers,
                                                 dv_cutoff=cutoff, thresh_frac=thresh_frac)
@@ -62,15 +79,25 @@ def extract_sweep_features(data_set, sweeps_by_type):
 
     return sweep_features
 
+# if subthreshold minimum amplitude is known (e.g., for human cells) then
+#   specify it. otherwise the default value will be used
 def extract_cell_features(data_set,
                           ramp_sweep_numbers,
                           short_square_sweep_numbers,
-                          long_square_sweep_numbers):
+                          long_square_sweep_numbers,
+                          subthresh_min_amp = None):
 
-    fex = efex.cell_extractor_for_nwb(data_set,
-                                      ramp_sweep_numbers,
-                                      short_square_sweep_numbers,
-                                      long_square_sweep_numbers)
+    if subthresh_min_amp is None:
+        fex = efex.cell_extractor_for_nwb(data_set,
+                                          ramp_sweep_numbers,
+                                          short_square_sweep_numbers,
+                                          long_square_sweep_numbers)
+    else:
+        fex = efex.cell_extractor_for_nwb(data_set,
+                                          ramp_sweep_numbers,
+                                          short_square_sweep_numbers,
+                                          long_square_sweep_numbers,
+                                          subthresh_min_amp)
 
     fex.process()
 
@@ -181,6 +208,3 @@ def get_square_stim_characteristics(i, t, no_test_pulse=False):
     stim_amp = float(i[start_idx])
 
     return (stim_start, stim_dur, stim_amp, start_idx, end_idx)
-
-
-

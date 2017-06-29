@@ -1,11 +1,54 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [0.13.2] - 2017-06-15
+
+### Added
+
+- BrainObservatoryNwbDataSet.get_demixed_traces
+- BrainObservatoryNwbDataSet.get_pupil_location
+- BrainObservatoryNwbDataSet.get_pupil_size
+- BrainObservatoryApi.get_cell_specimen_id_mapping
+- allensdk.brain_observatory.receptive_field_analysis
+- allensdk.brain_observatory.demixer
+
+### Changed
+
+- BrainObservatoryCache.get_ophys_experiments returns "acquisition_age_days" instead of "age_days".  The new field describes the age of the animal on the day of experiment acquisition.
+- BrainObservatoryCache.get_experiment_containers no longer returns "age_days".
+- BrainObservatoryCache.get_ophys_experiments accepts a list of cell_specimen_ids for additional filtering
+- json_utilities uses simplejson for better NaN handling
+
+## [0.13.1] - 2017-03-20
+
+### Fixed
+
+- issue #42: Caching behavior in MouseConnectivityCache for CCF volumes fixed
+- GLIF examples, documentation fixed
+
+## [0.13.0] - 2017-03-16
+
+### Added
+
+- ReferenceSpace is a new class for relating structure graphs and annotation volumes.
+- Standardized caching and paging decorators
+
+### Changed
+
+- Ontology has been deprecated in favor of StructureTree. 
+- MouseConnectivityCache uses StructureTree internally (ontology-based methods are deprecated)
+- CellTypesCache and MouseConnectivityCache use cacher decorator
+- GlifApi has stateless methods now.  Old methods are deprecated.  
+
+### Fixed
+
+- Github issue #35 - MouseConnectivityCache's manifest now uses CCF-version- and resolution-specific file names for masks.  The masks now live inside the CCF version directory.  Users must download a new manifest.
+
 ## [0.12.4] - 2016-10-28
 
 ### Fixed
 
-- Gitub issues #23, #28 - added a new dependency "requests_toolbelt" and upgraded API database for more reliable large file downloads.
+- Github issues #23, #28 - added a new dependency "requests_toolbelt" and upgraded API database for more reliable large file downloads.
 - Github issue #26 - better documentation for structure unionize records.
 - Github issue #25 - documentation errors in brain observatory analysis.
 

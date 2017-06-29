@@ -15,7 +15,12 @@
 
 import pytest
 from mock import patch, mock_open, MagicMock
-from allensdk.core.brain_observatory_cache import BrainObservatoryCache
+from allensdk.core.brain_observatory_cache import (BrainObservatoryCache, 
+                                                   _find_container_tags,
+                                                   _merge_transgenic_lines,
+                                                   _find_specimen_cre_line,
+                                                   _find_specimen_reporter_line)
+
 try:
     import __builtin__ as builtins  # @UnresolvedImport
 except:
@@ -86,20 +91,21 @@ def brain_observatory_cache():
 
     return boc
 
-
 def test_get_all_targeted_structures(brain_observatory_cache):
     with patch('os.path.exists') as m:
         m.return_value = False
 
         with patch('allensdk.core.json_utilities.write',
                    MagicMock(name='write_json')):
-            brain_observatory_cache.get_all_targeted_structures()
+            with patch('allensdk.core.json_utilities.read',
+                       MagicMock(name='read_json')):
+                brain_observatory_cache.get_all_targeted_structures()
 
         brain_observatory_cache.api.json_msg_query.assert_called_once_with(
             "http://api.brain-map.org/api/v2/data/query.json?q="
             "model::ExperimentContainer,rma::include,"
             "ophys_experiments,isi_experiment,"
-            "specimen(donor(age,transgenic_lines)),"
+            "specimen(donor(conditions,age,transgenic_lines)),"
             "targeted_structure,"
             "rma::options[num_rows$eq'all'][count$eqfalse]")
 
@@ -110,15 +116,17 @@ def test_get_experiment_containers(brain_observatory_cache):
 
         with patch('allensdk.core.json_utilities.write',
                    MagicMock(name='write_json')):
-            # Download experiment containers for VISp experiments
-            visp_ecs = brain_observatory_cache.get_experiment_containers(
-                targeted_structures=['VISp'])
+            with patch('allensdk.core.json_utilities.read',
+                       MagicMock(name='read_json')):
+                # Download experiment containers for VISp experiments
+                visp_ecs = brain_observatory_cache.get_experiment_containers(
+                    targeted_structures=['VISp'])
 
     brain_observatory_cache.api.json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::ExperimentContainer,rma::include,"
         "ophys_experiments,isi_experiment,"
-        "specimen(donor(age,transgenic_lines)),targeted_structure,"
+        "specimen(donor(conditions,age,transgenic_lines)),targeted_structure,"
         "rma::options[num_rows$eq'all'][count$eqfalse]")
 
 
@@ -128,14 +136,16 @@ def test_get_all_cre_lines(brain_observatory_cache):
 
         with patch('allensdk.core.json_utilities.write',
                    MagicMock(name='write_json')):
-            # Download a list of all cre lines
-            tls = brain_observatory_cache.get_all_cre_lines()
+            with patch('allensdk.core.json_utilities.read',
+                       MagicMock(name='read_json')):
+                # Download a list of all cre lines
+                tls = brain_observatory_cache.get_all_cre_lines()
 
     brain_observatory_cache.api.json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::ExperimentContainer,rma::include,"
         "ophys_experiments,isi_experiment,"
-        "specimen(donor(age,transgenic_lines)),targeted_structure,"
+        "specimen(donor(conditions,age,transgenic_lines)),targeted_structure,"
         "rma::options[num_rows$eq'all'][count$eqfalse]")
 
 
@@ -145,12 +155,14 @@ def test_get_ophys_experiments(brain_observatory_cache):
 
         with patch('allensdk.core.json_utilities.write',
                    MagicMock(name='write_json')):
-            # Download a list of all transgenic driver lines
-            tls = brain_observatory_cache.get_ophys_experiments()
+            with patch('allensdk.core.json_utilities.read',
+                       MagicMock(name='read_json')):
+                # Download a list of all transgenic driver lines
+                tls = brain_observatory_cache.get_ophys_experiments()
 
     brain_observatory_cache.api.json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
-        "model::OphysExperiment,rma::include,"
+        "model::OphysExperiment,rma::include,experiment_container,"
         "well_known_files(well_known_file_type),targeted_structure,"
         "specimen(donor(age,transgenic_lines)),"
         "rma::options[num_rows$eq'all'][count$eqfalse]")
@@ -162,12 +174,14 @@ def test_get_all_session_types(brain_observatory_cache):
 
         with patch('allensdk.core.json_utilities.write',
                    MagicMock(name='write_json')):
-            # Download a list of all transgenic driver lines
-            tls = brain_observatory_cache.get_all_session_types()
+            with patch('allensdk.core.json_utilities.read',
+                       MagicMock(name='read_json')):
+                # Download a list of all transgenic driver lines
+                tls = brain_observatory_cache.get_all_session_types()
 
     brain_observatory_cache.api.json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
-        "model::OphysExperiment,rma::include,"
+        "model::OphysExperiment,rma::include,experiment_container,"
         "well_known_files(well_known_file_type),targeted_structure,"
         "specimen(donor(age,transgenic_lines)),"
         "rma::options[num_rows$eq'all'][count$eqfalse]")
@@ -179,8 +193,10 @@ def test_get_stimulus_mappings(brain_observatory_cache):
 
         with patch('allensdk.core.json_utilities.write',
                    MagicMock(name='write_json')):
-            # Download a list of all transgenic driver lines
-            tls = brain_observatory_cache._get_stimulus_mappings()
+            with patch('allensdk.core.json_utilities.read',
+                       MagicMock(name='read_json')):
+                # Download a list of all transgenic driver lines
+                tls = brain_observatory_cache._get_stimulus_mappings()
 
     brain_observatory_cache.api.json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
@@ -245,3 +261,81 @@ def test_string_argument_errors(brain_observatory_cache):
 
     with pytest.raises(TypeError):
         boc.get_ophys_experiments(session_types='str')
+
+def test_find_container_tags():
+    # no conditions no tags
+    c = { "specimen": { "donor": { "conditions": [] } } }
+    tags = _find_container_tags(c)
+    assert len(tags) == 0
+
+    # tissue tags are ignored
+    c = { "specimen": { "donor": { "conditions": [ { "name": "tissuecyte" } ] } } }
+    tags = _find_container_tags(c)
+    assert len(tags) == 0
+
+    # no conditions is okay
+    c = { "specimen": { "donor": { } } }
+    tags = _find_container_tags(c)
+    assert len(tags) == 0
+
+    # everything else goes through
+    c = { "specimen": { "donor": { "conditions": [ { "name": "fish" } ] } } }
+    tags = _find_container_tags(c)
+    assert len(tags) == 1
+
+def test_merge_transgenic_lines():
+    # None is allowed and should be ignored
+    t1 = [ "a", "b", "c" ]
+    t2 = None
+    tm = _merge_transgenic_lines(t1,t2)
+    assert sorted(tm) == [ "a", "b", "c"]
+
+    # otherwise it's just a merge
+    t1 = [ "a", "b", "c" ]
+    t2 = [ "c", "d" ]
+    tm = _merge_transgenic_lines(t1,t2)
+    assert sorted(tm) == [ "a", "b", "c", "d"]
+
+    # one list is fine
+    t1 = [ "a", "b", "c" ]
+    tm = _merge_transgenic_lines(t1)
+    assert sorted(tm) == [ "a", "b", "c" ]
+
+def test_find_specimen_cre_line():
+    # None if no TLs
+    s = { "donor": { "transgenic_lines": [ ] } }
+    cre = _find_specimen_cre_line(s)
+    assert cre is None
+
+    # None if no 'Cre'
+    s = { "donor": { "transgenic_lines": [ { "transgenic_line_type_name": "driver", "name": "banana" } ] } }
+    cre = _find_specimen_cre_line(s)
+    assert cre is None
+
+    # None if no 'Cre'
+    s = { "donor": { "transgenic_lines": [ { "transgenic_line_type_name": "driver", "name": "bananaCre" } ] } }
+    cre = _find_specimen_cre_line(s)
+    assert cre == "bananaCre"
+
+    # None if no 'driver'
+    s = { "donor": { "transgenic_lines": [ { "transgenic_line_type_name": "reporter", "name": "bananaCre" } ] } }
+    cre = _find_specimen_cre_line(s)
+    assert cre == None
+
+def test_find_specimen_reporter_line():
+    # None if no TLs
+    s = { "donor": { "transgenic_lines": [ ] } }
+    cre = _find_specimen_reporter_line(s)
+    assert cre is None
+
+    s = { "donor": { "transgenic_lines": [ { "transgenic_line_type_name": "reporter", "name": "banana" } ] } }
+    cre = _find_specimen_reporter_line(s)
+    assert cre == "banana"
+
+    # None if no "reporter"
+    s = { "donor": { "transgenic_lines": [ { "transgenic_line_type_name": "driver", "name": "bananaCre" } ] } }
+    cre = _find_specimen_reporter_line(s)
+    assert cre is None
+
+
+    

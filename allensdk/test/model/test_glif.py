@@ -19,20 +19,22 @@ import allensdk.core.json_utilities as json_utilities
 from allensdk.model.glif.glif_neuron import GlifNeuron
 from allensdk.model.glif.simulate_neuron import simulate_neuron
 from allensdk.core.nwb_data_set import NwbDataSet
-# import numpy as np
+import os
 # import matplotlib.pyplot as plt
-
 
 @pytest.fixture
 def glif_api():
-    glif_api = GlifApi()
+    endpoint = None
 
-    return glif_api
-
+    if 'TEST_API_ENDPOINT' in os.environ:
+        endpoint = os.environ['TEST_API_ENDPOINT']
+        return GlifApi(endpoint)
+    else:
+        return GlifApi()
 
 @pytest.fixture
 def neuronal_model_id():
-    neuronal_model_id = 472423251
+    neuronal_model_id = 566302806
 
     return neuronal_model_id
 

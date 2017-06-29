@@ -14,6 +14,8 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 from allensdk.api.queries.ontologies_api import OntologiesApi
+import pandas as pd
+from numpy import allclose
 import pytest
 from mock import MagicMock
 
@@ -44,12 +46,19 @@ def test_list_structure_graphs(ontologies):
         "rma::options[num_rows$eq'all'][count$eqfalse]")
 
 
-def test_list_structure_sets(ontologies):
+def test_list_structure_sets_noarg(ontologies):
     ontologies.get_structure_sets()
-
     ontologies.json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::StructureSet,rma::options[num_rows$eq'all'][count$eqfalse]")
+        
+        
+def test_list_structure_sets_args(ontologies):
+    ontologies.get_structure_sets([2, 3])
+    ontologies.json_msg_query.assert_called_once_with(
+        "http://api.brain-map.org/api/v2/data/query.json?q="
+        "model::StructureSet,rma::criteria,[id$in2,3],"
+        "rma::options[num_rows$eq'all'][count$eqfalse]")
 
 
 def test_list_atlases(ontologies):
@@ -155,3 +164,22 @@ def test_atlas_verbose(ontologies):
         "structure_graph(ontology),graphic_group_labels,"
         "rma::include,structure_graph(ontology),graphic_group_labels,"
         "rma::options[num_rows$eq'all'][count$eqfalse]")
+        
+        
+def test_get_structures_with_sets(ontologies):
+    ontologies.get_structures_with_sets(1)
+    ontologies.json_msg_query.assert_called_once_with(
+        "http://api.brain-map.org/api/v2/data/query.json?q="
+        "model::Structure,rma::criteria,[graph_id$in1],"
+        "rma::include,structure_sets,"
+        "rma::options[num_rows$eq'all'][order$eqstructures.graph_order]"
+        "[count$eqfalse]")
+        
+        
+def test_unpack_structure_set_ancestors(ontologies):
+
+    sdf = pd.DataFrame([{'structure_id_path': '/1/2/3/'}])
+    ontologies.unpack_structure_set_ancestors(sdf)
+    
+    assert( 'structure_set_ancestor' in sdf.columns.values )
+    assert( allclose(sdf['structure_set_ancestor'].values[0], [1, 2, 3]) )

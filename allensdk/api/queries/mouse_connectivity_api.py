@@ -15,9 +15,10 @@
 
 from .rma_api import RmaApi
 from .grid_data_api import GridDataApi
+from ..cache import cacheable, Cache
 import numpy as np
-import os
 import nrrd
+import six
 
 
 class MouseConnectivityApi(RmaApi):
@@ -44,6 +45,10 @@ class MouseConnectivityApi(RmaApi):
     VOXEL_RESOLUTION_50_MICRONS = 50
     VOXEL_RESOLUTION_100_MICRONS = 100
 
+    @cacheable(strategy='create',
+               reader=nrrd.read,
+               pathfinder=Cache.pathfinder(file_name_position=3,
+                                           path_keyword='file_name'))
     def download_annotation_volume(self,
                                    ccf_version,
                                    resolution,
@@ -53,31 +58,28 @@ class MouseConnectivityApi(RmaApi):
 
         Parameters
         ----------
-
+        ccf_version: string
+            MouseConnectivityApi.CCF_2016 (default) or MouseConnectivityApi.CCF_2015
         resolution: int
             Desired resolution to download in microns.
             Must be 10, 25, 50, or 100.
-
         file_name: string
             Where to save the annotation volume.
+        
+        Note: the parameters must be used as positional parameters, not keywords
         '''
 
         if ccf_version is None:
             ccf_version = MouseConnectivityApi.CCF_VERSION_DEFAULT
 
-        try:
-            os.makedirs(os.path.dirname(file_name))
-        except:
-            pass
-
         self.download_volumetric_data(ccf_version,
-                                      'annotation_%d.nrrd' % resolution,
+                                      'annotation_%d.nrrd' % resolution, 
                                       save_file_path=file_name)
 
-        annotation_data, annotation_image = nrrd.read(file_name)
-
-        return annotation_data, annotation_image
-
+    @cacheable(strategy='create',
+               reader=nrrd.read,
+               pathfinder=Cache.pathfinder(file_name_position=2,
+                                           path_keyword='file_name'))
     def download_template_volume(self, resolution, file_name):
         '''
         Download the registration template volume at a particular resolution.
@@ -91,19 +93,12 @@ class MouseConnectivityApi(RmaApi):
         file_name: string
             Where to save the registration template volume.
         '''
-        try:
-            os.makedirs(os.path.dirname(file_name))
-        except:
-            pass
-
         self.download_volumetric_data(MouseConnectivityApi.AVERAGE_TEMPLATE,
-                                      'average_template_%d.nrrd' % resolution,
+                                      'average_template_%d.nrrd' % resolution, 
                                       save_file_path=file_name)
 
-        annotation_data, annotation_image = nrrd.read(file_name)
 
-        return annotation_data, annotation_image
-
+    @cacheable()
     def get_experiments(self,
                         structure_ids,
                         **kwargs):
@@ -131,11 +126,11 @@ class MouseConnectivityApi(RmaApi):
 
         criteria_string = ','.join(criteria_list)
 
-        data = self.model_query('SectionDataSet',
+        return self.model_query('SectionDataSet',
                                 criteria=criteria_string,
                                 **kwargs)
-        return data
 
+    @cacheable()
     def get_manual_injection_summary(self, experiment_id):
         ''' Retrieve manual injection summary. '''
 
@@ -181,6 +176,7 @@ class MouseConnectivityApi(RmaApi):
                                 include=include,
                                 only=only)
 
+    @cacheable()
     def get_experiment_detail(self, experiment_id):
         '''Retrieve the experiments data.'''
 
@@ -195,6 +191,7 @@ class MouseConnectivityApi(RmaApi):
                                 include=include,
                                 order=order)
 
+    @cacheable()
     def get_projection_image_info(self,
                                   experiment_id,
                                   section_number):
@@ -262,6 +259,7 @@ class MouseConnectivityApi(RmaApi):
 
         return url
 
+
     def download_volumetric_data(self,
                                  data_path,
                                  file_name,
@@ -276,7 +274,7 @@ class MouseConnectivityApi(RmaApi):
         data_path : string
             'average_template', 'ara_nissl', 'annotation/ccf_2015', 'annotation/mouse_2011', or 'annotation/devmouse_2012'
         file_name : string
-
+            server-side file name. 'annotation_10.nrrd' for example.
         voxel_resolution : int
             10, 25, 50 or 100
         coordinate_framework : string
@@ -300,6 +298,7 @@ class MouseConnectivityApi(RmaApi):
             save_file_path = 'volumetric_data.nrrd'
 
         self.retrieve_file_over_http(url, save_file_path)
+        
 
     def download_reference_aligned_image_channel_volumes(self,
                                                          data_set_id,
@@ -396,7 +395,7 @@ class MouseConnectivityApi(RmaApi):
         `service::mouse_connectivity_injection_structure <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivityinjectionstructure>`_.
 
         '''
-        tuples = [(k, v) for k, v in kwargs.iteritems()]
+        tuples = [(k, v) for k, v in six.iteritems(kwargs)]
         return self.service_query('mouse_connectivity_injection_structure', parameters=tuples)
 
     def experiment_spatial_search(self, **kwargs):
@@ -432,7 +431,7 @@ class MouseConnectivityApi(RmaApi):
 
         '''
 
-        tuples = [(k, v) for k, v in kwargs.iteritems()]
+        tuples = [(k, v) for k, v in six.iteritems(kwargs)]
         return self.service_query('mouse_connectivity_target_spatial', parameters=tuples)
 
     def experiment_injection_coordinate_search(self, **kwargs):
@@ -463,7 +462,7 @@ class MouseConnectivityApi(RmaApi):
         `service::mouse_connectivity_injection_coordinate <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivityinjectioncoordinate>`_.
 
         '''
-        tuples = [(k, v) for k, v in kwargs.iteritems()]
+        tuples = [(k, v) for k, v in six.iteritems(kwargs)]
         return self.service_query('mouse_connectivity_injection_coordinate', parameters=tuples)
 
     def experiment_correlation_search(self, **kwargs):
@@ -498,9 +497,11 @@ class MouseConnectivityApi(RmaApi):
         `service::mouse_connectivity_correlation <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivitycorrelation>`_.
 
         '''
-        tuples = [(k, v) for k, v in kwargs.iteritems()]
-        return self.service_query('mouse_connectivity_correlation', parameters=tuples)
+        tuples = sorted(six.iteritems(kwargs))
+        return self.service_query('mouse_connectivity_correlation',
+                                  parameters=tuples)
 
+    @cacheable()
     def get_structure_unionizes(self,
                                 experiment_ids,
                                 is_injection=None,
@@ -555,20 +556,32 @@ class MouseConnectivityApi(RmaApi):
             debug=debug,
             count=False)
 
+    @cacheable(strategy='create', 
+               pathfinder=Cache.pathfinder(file_name_position=1,
+                                           path_keyword='path'))
     def download_injection_density(self, path, experiment_id, resolution):
-        return GridDataApi(base_uri=self.api_url).download_projection_grid_data(
+        GridDataApi(base_uri=self.api_url).download_projection_grid_data(
             experiment_id, [GridDataApi.INJECTION_DENSITY], resolution, path)
 
+    @cacheable(strategy='create', 
+               pathfinder=Cache.pathfinder(file_name_position=1,
+                                           path_keyword='path'))
     def download_projection_density(self, path, experiment_id, resolution):
-        return GridDataApi(base_uri=self.api_url).download_projection_grid_data(
+        GridDataApi(base_uri=self.api_url).download_projection_grid_data(
             experiment_id, [GridDataApi.PROJECTION_DENSITY], resolution, path)
 
+    @cacheable(strategy='create', 
+               pathfinder=Cache.pathfinder(file_name_position=1,
+                                           path_keyword='path'))
     def download_injection_fraction(self, path, experiment_id, resolution):
-        return GridDataApi(base_uri=self.api_url).download_projection_grid_data(
+        GridDataApi(base_uri=self.api_url).download_projection_grid_data(
             experiment_id, [GridDataApi.INJECTION_FRACTION], resolution, path)
 
+    @cacheable(strategy='create', 
+               pathfinder=Cache.pathfinder(file_name_position=1,
+                                           path_keyword='path'))
     def download_data_mask(self, path, experiment_id, resolution):
-        return GridDataApi(base_uri=self.api_url).download_projection_grid_data(
+        GridDataApi(base_uri=self.api_url).download_projection_grid_data(
             experiment_id, [GridDataApi.DATA_MASK], resolution, path)
 
     def calculate_injection_centroid(self,
@@ -598,7 +611,7 @@ class MouseConnectivityApi(RmaApi):
         # compute centroid in CCF coordinates
         if sum_density > 0:
             centroid = np.dot(injection_density_computed,
-                              zip(*injection_voxels)) / sum_density * resolution
+                              list(zip(*injection_voxels))) / sum_density * resolution
         else:
             centroid = None
 
