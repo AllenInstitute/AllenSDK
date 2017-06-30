@@ -14,3 +14,5 @@ $HOME/packages/$NRN/configure --with-paranrn \
  --disable-rx3d --without-iv --prefix=$VENV
 make; make install 
 cd src/nrnpython; $VENV/bin/python setup.py install
+ln -s $VENV/x86_64/bin/nrniv $VENV/bin/nrniv
+ln -s $VENV/x86_64/bin/nrnivmodl $VENV/bin/nrnivmodl
