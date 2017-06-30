@@ -23,6 +23,8 @@ RUN /bin/bash --login shared/allensdk_install.sh
 #RUN mkdir -p /root/build_dipde && shared/build_DiPDE.sh -b /root/build_dipde -e py27
 #RUN mkdir -p /root/build_neuron && shared/build_NEURON.sh -b /root/build_neuron -e py27
 #RUN mkdir -p /root/build_tensorflow && shared/build_Tensorflow.sh -b /root/build_tensorflow -e py27
+COPY shared/modelingsdk_install.sh ./shared/
+RUN /bin/bash shared/modelingsdk_install.sh
 
 
 ENV PYTHONPATH /usr/local/nrn/lib/python
