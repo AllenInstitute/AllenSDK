@@ -1,4 +1,4 @@
-conda update -y conada
+conda update -y conda
 source activate root
 pip install -r requirements.txt
 pip install -r test_requirements.txt
