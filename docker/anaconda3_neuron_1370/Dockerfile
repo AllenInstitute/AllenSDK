@@ -17,7 +17,7 @@ COPY shared/tensorflow.sh ./shared/
 RUN /bin/bash --login shared/tensorflow.sh
 COPY shared/aws_dependencies.sh ./shared/
 RUN /bin/bash --login shared/aws_dependencies.sh
-COPY shared/build_nest.sh ./shared/
+COPY shared/build_NEST.sh ./shared/
 RUN mkdir -p /root/build_nest && /bin/bash --login shared/build_NEST.sh -b /root/build_nest -e py27
 COPY shared/build_nrn.sh ./shared/
 RUN /bin/bash --login shared/build_nrn.sh
