@@ -1,4 +1,5 @@
 import pytest
+import numpy as np
 import os
 from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet, si
 import numpy as np
@@ -29,6 +30,10 @@ def test_BinaryIntervalSearchTree():
     assert bist.search(0)[2] == 'A'
     assert bist.search(2.5)[2] == 'C'
     assert bist.search(3.5)[2] == 'D'
+
+def test_pixels_to_visual_degrees():
+    m = si.BrainObservatoryMonitor()
+    np.testing.assert_almost_equal(m.pixels_to_visual_degrees(1), 0.103270443661,10)
 
 @pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
                     reason="test NWB file not available")

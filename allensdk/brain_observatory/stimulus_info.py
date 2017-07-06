@@ -629,4 +629,4 @@ class BrainObservatoryMonitor(Monitor):
 
     def pixels_to_visual_degrees(self, n, **kwargs):
 
-        return super(BrainObservatoryMonitor, self).pixels_to_visual_degrees(self, n, self.experiment_geometry.distance, **kwargs)
+        return super(BrainObservatoryMonitor, self).pixels_to_visual_degrees(n, self.experiment_geometry.distance, **kwargs)
