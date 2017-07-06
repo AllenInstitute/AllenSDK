@@ -69,6 +69,8 @@ THREE_SESSION_B = 'three_session_B'
 THREE_SESSION_C = 'three_session_C'
 THREE_SESSION_C2 = 'three_session_C2'
 
+SESSION_LIST = [THREE_SESSION_A, THREE_SESSION_B, THREE_SESSION_C, THREE_SESSION_C2]
+
 SESSION_STIMULUS_MAP = {
     THREE_SESSION_A: [DRIFTING_GRATINGS, NATURAL_MOVIE_ONE, NATURAL_MOVIE_THREE, SPONTANEOUS_ACTIVITY],
     THREE_SESSION_B: [STATIC_GRATINGS, NATURAL_SCENES, NATURAL_MOVIE_ONE, SPONTANEOUS_ACTIVITY],
@@ -224,8 +226,6 @@ class StimulusSearch(object):
                 # Frame is in a coarse-grain  epoch, but not a fine grain interval;
                 #   look backwards to find most recent find nearest matching interval
                 if fi < self.epoch_df.iloc[0]['start']:
-
-                    # Breakout if we go before the experiment:
                     return None
                 else:
                     return self.search(fi-1)
@@ -260,6 +260,7 @@ def get_spatial_grating(height=None, aspect_ratio=None, ori=None, pix_per_cycle=
     Xp, Yp = rotate(X, Y, theta)
 
     img = np.cos(2.0 * np.pi * Xp * sf + ph)
+
     return (p2p_amp/2.)*spndi.zoom(img, height/float(_height_prime)) + baseline
 
 def get_spatio_temporal_grating(t, temporal_frequency=None, **kwargs):
@@ -333,7 +334,7 @@ def map_stimulus_coordinate_to_monitor_coordinate(template_coordinate, monitor_s
     elif stimulus_type in [DRIFTING_GRATINGS, STATIC_GRATINGS, SPONTANEOUS_ACTIVITY]:
         return template_coordinate
     else:
-        raise NotImplementedError
+        raise NotImplementedError       # pragma: no cover
 
 def monitor_coordinate_to_natural_movie_coordinate(monitor_coordinate, monitor_shape):
 
@@ -352,7 +353,7 @@ def map_monitor_coordinate_to_stimulus_coordinate(monitor_coordinate, monitor_sh
     elif stimulus_type in [DRIFTING_GRATINGS, STATIC_GRATINGS, SPONTANEOUS_ACTIVITY]:
         return monitor_coordinate
     else:
-        raise NotImplementedError
+        raise NotImplementedError       # pragma: no cover
 
 def map_stimulus(source_stimulus_coordinate, source_stimulus_type, target_stimulus_type, monitor_shape):
     mc = map_stimulus_coordinate_to_monitor_coordinate(source_stimulus_coordinate, monitor_shape, source_stimulus_type)
@@ -366,7 +367,7 @@ class Monitor(object):
         if spatial_unit == 'cm':
             self.spatial_conversion_factor = 1.
         else:
-            raise NotImplementedError
+            raise NotImplementedError       # pragma: no cover
 
         self._panel_size = panel_size
         self.n_pixels_r = n_pixels_r
@@ -396,7 +397,7 @@ class Monitor(object):
         elif new_unit == 'cm' and self.spatial_unit == 'inch':
             self.spatial_conversion_factor *= 1./.393701
         else:
-            raise NotImplementedError
+            raise NotImplementedError   # pragma: no cover
         self.spatial_unit = new_unit
 
     @property
