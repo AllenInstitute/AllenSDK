@@ -35,6 +35,7 @@ RUN /bin/bash --login shared/allensdk_install.sh
 COPY shared/modelingsdk_install.sh ./shared/
 COPY modelingsdk ./modelingsdk/
 RUN /bin/bash shared/modelingsdk_install.sh
+COPY brain_stim ./brain_stim/
 
 
 ENV PYTHONPATH /usr/local/nrn/lib/python
