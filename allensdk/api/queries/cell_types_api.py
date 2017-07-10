@@ -88,10 +88,7 @@ class CellTypesApi(RmaApi):
             cell['reporter_status'] = cell['cell_reporter']['name']
 
         result = self.filter_cells(cells, require_morphology, require_reconstruction, reporter_status)
-        if id:
-            return result[0]
-        else:
-            return result
+        return result
 
     def get_cell(self, id):
         '''
@@ -104,7 +101,9 @@ class CellTypesApi(RmaApi):
             Meta data for one cell.
         '''
 
-        return self.list_cells(id=id)
+        cells = self.list_cells(id=id)
+        cell = None if not cells else cells[0]
+        return cell
 
     @cacheable()
     def get_ephys_sweeps(self, specimen_id):
