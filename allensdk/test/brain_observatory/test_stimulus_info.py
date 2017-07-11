@@ -241,26 +241,107 @@ def test_monitor_basic_spatial_unit():
     np.testing.assert_almost_equal(m.pixel_size, .01)
 
 
+def test_pixels_to_visual_degrees():
+
+    m = si.BrainObservatoryMonitor()
+
+    np.testing.assert_almost_equal(m.pixels_to_visual_degrees(45), 4.64716996476)
+    np.testing.assert_almost_equal(m.pixels_to_visual_degrees(45, small_angle_approximation=False), 4.64462483116)
+
+    np.testing.assert_almost_equal(m.pixels_to_visual_degrees(1), 0.103270443661)
+    np.testing.assert_almost_equal(m.pixels_to_visual_degrees(1, small_angle_approximation=False), 0.103270415704)
+    raise Exception('Not Yet Double Checked')
 
 
+@pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
+                    reason="test NWB file not available")
+def test_lsn_image_to_screen(data_set):
 
+    compare_set = set(data_set.list_stimuli()).intersection(si.LOCALLY_SPARSE_NOISE_STIMULUS_TYPES)
+    if len(compare_set) > 0:
+        for stimulus_type in compare_set:
 
+            template = data_set.get_stimulus_template(stimulus_type)
+            m = si.BrainObservatoryMonitor()
+            m.lsn_image_to_screen(template[0,:,:]).shape == si.MONITOR_DIMENSIONS
 
+@pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
+                    reason="test NWB file not available")
+def test_natural_movie_image_to_screen(data_set):
 
+    compare_set = set(data_set.list_stimuli()).intersection(si.NATURAL_MOVIE_STIMULUS_TYPES)
+    if len(compare_set) > 0:
+        for stimulus_type in compare_set:
 
+            template = data_set.get_stimulus_template(stimulus_type)
+            m = si.BrainObservatoryMonitor()
+            m.natural_movie_image_to_screen(template[0, :, :]).shape == si.MONITOR_DIMENSIONS
 
+@pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
+                    reason="test NWB file not available")
+def test_grating_to_screen(data_set):
+
+    compare_set = set(data_set.list_stimuli()).intersection([si.STATIC_GRATINGS, si.DRIFTING_GRATINGS])
+    if len(compare_set) > 0:
+
+        for stimulus_type in compare_set:
+            m = si.BrainObservatoryMonitor()
+            curr_row = data_set.get_stimulus_table(stimulus_type).iloc[10]
+            phase = 0
+            spatial_frequency = .04
+            orientation = curr_row.orientation
+            template =  m.grating_to_screen(phase, spatial_frequency, orientation)
+            assert m.natural_movie_image_to_screen(template).shape == si.MONITOR_DIMENSIONS
+
+def test_get_mask():
+    m = si.BrainObservatoryMonitor()
+    mask = m.get_mask()
+
+    assert mask.sum() == 931286
+    assert mask.shape == si.MONITOR_DIMENSIONS
+
+def test_spatial_frequency_to_pix_per_cycle():
+
+    m = si.BrainObservatoryMonitor()
+
+    x1 = m.spatial_frequency_to_pix_per_cycle(.1, 15.0)
+    x2 = m.spatial_frequency_to_pix_per_cycle(.05, 15.0)
+
+    np.testing.assert_almost_equal(x1, 97.7072500845)
+    np.testing.assert_almost_equal(x2/x1, 2)
+
+def test_show_image():
+
+    m = si.BrainObservatoryMonitor()
+
+    img = np.zeros(si.MONITOR_DIMENSIONS)
+    m.show_image(img, show=False, warp=True, mask=False)
+    m.show_image(img, show=False, warp=False, mask=True)
+
+def test_map_stimulus():
+
+    m = si.BrainObservatoryMonitor()
+
+    for source_stimulus in si.all_stimuli():
+        for target_stimulus in si.all_stimuli():
+
+            tmp = m.map_stimulus((0,0), source_stimulus, target_stimulus)
+            np.testing.assert_array_almost_equal(m.map_stimulus(tmp, target_stimulus, source_stimulus), np.array([0,0]))
 
 
 if __name__ == "__main__":
+#
+    with open(nwb_list_file, 'r') as f:
+        NWB_FLAVORS = [l.strip() for l in f]
 
-    # with open(nwb_list_file, 'r') as f:
-    #     NWB_FLAVORS = [l.strip() for l in f]
-    #
-    # print NWB_FLAVORS
-    # data_set = BrainObservatoryNwbDataSet(request.param)
+    for nwb_file_location in NWB_FLAVORS:
+        data_set = BrainObservatoryNwbDataSet(nwb_file_location)
+        # test_lsn_image_to_screen(data_set)
+        # test_natural_movie_image_to_screen(data_set)
+        # test_grating_to_screen(data_set)
+
     # test_StimulusSearch()
     # test_BinaryIntervalSearchTree()
-
     # test_sessions_with_stimulus()
     # test_stimuli_in_session()
     # test_all_stimuli()
@@ -271,4 +352,8 @@ if __name__ == "__main__":
     # test_natural_scene_monitor()
     # test_bijective_all_stimuli()
     # test_monitor_basic_spatial_unit()
-    test_brain_observatory_monitor()
+    # test_brain_observatory_monitor()
+    # test_spatial_frequency_to_pix_per_cycle()
+    # test_get_mask()
+    # test_show_image()
+    test_map_stimulus()

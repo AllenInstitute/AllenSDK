@@ -611,8 +611,8 @@ class BrainObservatoryMonitor(Monitor):
             return super(BrainObservatoryMonitor, self).lsn_image_to_screen(img, LOCALLY_SPARSE_NOISE_4DEG, **kwargs)
         elif img.shape == tuple(LOCALLY_SPARSE_NOISE_DIMENSIONS[LOCALLY_SPARSE_NOISE_8DEG]):
             return super(BrainObservatoryMonitor, self).lsn_image_to_screen(img, LOCALLY_SPARSE_NOISE_8DEG, **kwargs)
-        else:
-            raise RuntimeError
+        else:                        # pragma: no cover
+            raise RuntimeError       # pragma: no cover
 
     def warp_image(self, img, **kwargs):
 
