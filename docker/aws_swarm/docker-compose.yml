@@ -1,0 +1,29 @@
+version: "3"
+
+services:
+
+  sdk:
+    image: alleninstitute/anaconda3_neuron_1370
+    networks:
+      - frontend
+    deploy:
+      mode: replicated
+      replicas: 4
+      placement:
+        constraints: [node.role == worker]
+
+  jupyterhub:
+    image: alleninstitute/anaconda3_neuron_1370
+    command: /bin/bash -c "/bin/bash -c "jupyterhub --ip=0.0.0.0 --Spawner.notebook_dir=allensdk/doc_template/examples/nb"
+    ports:
+      - "8010:8888"
+    networks:
+      - frontend
+    volumes:
+      - /home/docker/allensdk:/root/allensdk
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+networks:
+    frontend:

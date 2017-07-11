@@ -423,6 +423,8 @@ class MouseConnectivityCache(Cache):
                 'transgenic-line'] in cre]
 
         if injection_structure_ids is not None:
+            structure_ids = MouseConnectivityCache.validate_structure_ids(injection_structure_ids)
+
             descendant_ids = reduce(op.add, self.get_structure_tree()\
                                     .descendant_ids(injection_structure_ids))
             experiments = [e for e in experiments 
@@ -523,6 +525,8 @@ class MouseConnectivityCache(Cache):
             unionizes = unionizes[unionizes.is_injection == is_injection]
 
         if structure_ids is not None:
+            structure_ids = MouseConnectivityCache.validate_structure_ids(structure_ids)
+
             if include_descendants:
                 structure_ids = reduce(op.add, self.get_structure_tree().descendant_ids(structure_ids))
             else:
@@ -690,11 +694,8 @@ class MouseConnectivityCache(Cache):
             it will be read from this file.  If file_name is None, the
             file_name will be pulled out of the manifest.  Default is None.
         """
-        try:
-            structure_id = int(structure_id)
-        except ValueError as e:
-            raise ValueError("Invalid structure_id (%s): could not convert to integer." % str(structure_id))
-        
+        structure_id = MouseConnectivityCache.validate_structure_id(structure_id)
+
         file_name = self.get_cache_path(
             file_name, self.STRUCTURE_MASK_KEY, self.ccf_version, 
             self.resolution, structure_id)
@@ -813,4 +814,23 @@ class MouseConnectivityCache(Cache):
                                   typename='file')
 
         manifest_builder.write_json_file(file_name)
-        
+       
+ 
+    @staticmethod
+    def validate_structure_id(structure_id):
+
+        try:
+            structure_id = int(structure_id)
+        except ValueError as e:
+            raise ValueError("Invalid structure_id (%s): could not convert to integer." % str(structure_id))
+
+        return structure_id
+
+
+    @staticmethod
+    def validate_structure_ids(structure_ids):
+
+        for ii, sid in enumerate(structure_ids):
+            structure_ids[ii] = MouseConnectivityCache.validate_structure_id(sid)
+
+        return structure_ids

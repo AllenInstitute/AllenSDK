@@ -28,9 +28,8 @@ import os
 
 @pytest.fixture
 def boc():
-    boc =  BrainObservatoryCache(manifest_file='boc/manifest.json', base_uri='http://testwarehouse:9000')
-    
-    return boc
+    endpoint = os.environ['TEST_API_ENDPOINT'] if 'TEST_API_ENDPOINT' in os.environ else 'http://twarehouse-backup'
+    return BrainObservatoryCache(manifest_file='boc/manifest.json', base_uri=endpoint)
 
 @pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
                     reason="partial testing")
@@ -43,7 +42,7 @@ def test_brain_observatory_trace_analysis_notebook(boc):
     
     cell_loc = np.argwhere(specimen_ids==specimen_id)[0][0]
 
-    assert cell_loc == 97
+    assert cell_loc == 46
     
     # temporal frequency plot
     response = dg.response[:,1:,cell_loc,0]
@@ -56,17 +55,17 @@ def test_brain_observatory_trace_analysis_notebook(boc):
     # trials for cell's preferred condition
     pref_ori = dg.orivals[dg.peak.ori_dg[cell_loc]]
     pref_tf = dg.tfvals[dg.peak.tf_dg[cell_loc]]
-    assert pref_ori == 180
-    assert pref_tf == 2
+    assert pref_ori == 270
+    assert pref_tf == 1
 
     pref_trials = dg.stim_table[(dg.stim_table.orientation==pref_ori)&(dg.stim_table.temporal_frequency==pref_tf)]
-    assert pref_trials.loc[1,'start'] == 836
-    assert pref_trials.loc[1,'end'] == 896
+    assert pref_trials['start'][3] == 1017
+    assert pref_trials['end'][3] == 1076
 
     # mean sweep response
     subset = dg.sweep_response[(dg.stim_table.orientation==pref_ori)&(dg.stim_table.temporal_frequency==pref_tf)]
     subset_mean = dg.mean_sweep_response[(dg.stim_table.orientation==pref_ori)&(dg.stim_table.temporal_frequency==pref_tf)]
-    assert np.isclose(subset_mean.loc[1,'dx'], 0.920868)
+    assert np.isclose(subset_mean['dx'][1], 0.920868)
 
     # response to each trial
     trial_timestamps = np.arange(-1*dg.interlength, dg.interlength+dg.sweeplength, 1.)/dg.acquisition_rate
@@ -79,8 +78,8 @@ def test_brain_observatory_static_gratings_notebook(boc):
     sg = StaticGratings(data_set)
 
     peak_head = sg.peak.head()
-    assert peak_head.loc[0,'cell_specimen_id'] == 517399188
-    assert np.isclose(peak_head.loc[0,'reliability_sg'], 0.0113189)
+    assert peak_head['cell_specimen_id'][0] == 517399193
+    assert np.isclose(peak_head['reliability_sg'][0], -0.0003922755)
 
 
 @pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
@@ -90,8 +89,8 @@ def test_brain_observatory_natural_scenes_notebook(boc):
     ns = NaturalScenes(data_set)
     ns_head = ns.peak.head()
     
-    assert np.isclose(ns_head.loc[0,'peak_dff_ns'], 4.91692)
-    assert ns_head.loc[0,'cell_specimen_id'] == 517399188
+    assert np.isclose(ns_head['peak_dff_ns'][0], 4.22082782)
+    assert ns_head['cell_specimen_id'][0] == 517399193
 
 @pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
                     reason="partial testing")

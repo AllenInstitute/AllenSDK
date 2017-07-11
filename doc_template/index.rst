@@ -94,14 +94,16 @@ The 0.13.2 release is a major update for the Brain Observatory modules and data.
 
 To get new lists of experiments and metadata, please delete/rename the directory container the Brain Observatory manifest.  The new files are a bit larger because of the new traces.
 
-The cross-session alignment algorithm has been updated and re-run, so **all cell specimen IDs have changed**.  We have built a mapping table to help map from previous cell IDs to new cell IDs available here: `**TODO MAKE LINK** <http://api.brain-map.org/api/v2/data/>`_.
+The cross-session alignment algorithm has been updated and re-run, so **all cell specimen IDs have changed**.  We have built a mapping table to help map from previous cell IDs to new cell IDs available here: `cell_specimen_mapping.csv <http://api.brain-map.org/api/v2/well_known_file_download/590985414>`_. For examples of how to download the file with the SDK and use it to map between IDs, see this `notebook <_static/examples/nb/cell_specimen_mapping.html>`_.
 
 The cell specimens table now has a large number of new features.  Read the `technical whitepapers <http://help.brain-map.org/display/observatory/Documentation>`_ on stimulus analysis to learn more.
 
 Code changes include:
     * a new receptive field analysis module (:py:mod:`~allensdk.brain_observatory.receptive_field_analysis`)
     * a trace demixing algorithm (:py:mod:`~allensdk.brain_observatory.demixer`)
-    * a new convenience method: :py:mod:`~allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiment_stimuli` 
+    * a new convenience method: :py:meth:`~allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiment_stimuli`
+    * a new method to get the cell specimen mapping table: :py:meth:`~allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.get_cell_specimen_id_mapping`
+    * new methods :py:meth:`~allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_pupil_location` and :py:meth:`~allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_pupil_size` to get pupil position and size for experiments with eye tracking data.
     * :py:meth:`~allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiments` accepts a list of ``cell_specimen_ids`` as an additional filter
     * :py:meth:`~allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiments` returns "acquisition_age_days" instead of "age_days".  The new field describes the age of the animal on the day of experiment acquisition.
     * :py:meth:`~allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_experiment_containers` no longer returns "age_days".

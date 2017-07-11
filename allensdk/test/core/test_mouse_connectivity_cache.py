@@ -394,3 +394,28 @@ def test_make_structure_mask(mcc):
 
     #assert(len(c) == 1)
     assert mask.sum() == 5
+
+@pytest.mark.parametrize('inp,fails', [(1, False), 
+                                        (pd.Series([2]), False), 
+                                        ('qwerty', True)])
+def test_validate_structure_id(inp, fails):
+
+    if fails:
+        with pytest.raises(ValueError) as exc:
+            MouseConnectivityCache.validate_structure_id(inp)
+    else:
+        out = MouseConnectivityCache.validate_structure_id(inp)
+        assert( out == int(inp) )
+
+
+@pytest.mark.parametrize('inp,fails', [([1, 2, 3], False), 
+                                        ([pd.Series([2]), pd.Series([3])], False), 
+                                        (['qwerty', 1], True)])
+def test_validate_structure_ids(inp, fails):
+
+    if fails:
+        with pytest.raises(ValueError) as exc:
+            MouseConnectivityCache.validate_structure_ids(inp)
+    else:
+        out = MouseConnectivityCache.validate_structure_ids(inp)
+        assert( out == map(int, inp) )

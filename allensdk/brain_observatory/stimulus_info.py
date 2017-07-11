@@ -103,6 +103,13 @@ MONITOR_DISTANCE = 15
 STIMULUS_GRAY = 127
 STIMULUS_BITDEPTH = 8
 
+# Note: the "8deg" stimulus is actually 9.3 visual degrees on a side
+LOCALLY_SPARSE_NOISE_PIXEL_SIZE = {
+    LOCALLY_SPARSE_NOISE: 4.65,
+    LOCALLY_SPARSE_NOISE_4DEG: 4.65,
+    LOCALLY_SPARSE_NOISE_8DEG: 9.3 
+}
+
 def sessions_with_stimulus(stimulus):
     """ Return the names of the sessions that contain a given stimulus. """
     
@@ -120,7 +127,7 @@ def stimuli_in_session(session):
     Parameters
     ----------
     session: string
-        Must be one of: [stimulus_info.THREE_SESSION_A, stimulus_info.THREE_SESSION_B, stimulus_info.THREE_SESSION_C]
+        Must be one of: [stimulus_info.THREE_SESSION_A, stimulus_info.THREE_SESSION_B, stimulus_info.THREE_SESSION_C, stimulus_info.THREE_SESSION_C2]
     """
     return SESSION_STIMULUS_MAP[session]
 
