@@ -250,8 +250,6 @@ def test_pixels_to_visual_degrees():
 
     np.testing.assert_almost_equal(m.pixels_to_visual_degrees(1), 0.103270443661)
     np.testing.assert_almost_equal(m.pixels_to_visual_degrees(1, small_angle_approximation=False), 0.103270415704)
-    raise Exception('Not Yet Double Checked')
-
 
 @pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
                     reason="test NWB file not available")
