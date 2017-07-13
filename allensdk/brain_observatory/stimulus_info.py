@@ -243,9 +243,9 @@ class StimulusSearch(object):
                 return None
 
 def rotate(X, Y, theta):
-    Xp = X * np.cos(theta) - Y * np.sin(theta)
-    Yp = X * np.sin(theta) + Y * np.cos(theta)
-    return Xp, Yp
+    x = np.array([X, Y])
+    M = np.array([[np.cos(theta),-np.sin(theta)],[np.sin(theta), np.cos(theta)]])
+    return M.dot(x)
 
 def get_spatial_grating(height=None, aspect_ratio=None, ori=None, pix_per_cycle=None, phase=None, p2p_amp=2, baseline=0):
 

@@ -134,6 +134,11 @@ class BrainObservatoryNwbDataSet(object):
             Fluorescence traces for each cell
         '''
 
+
+        # These are thresholds used by get_epoch_mask_list to set a maximum limit on the delta aqusistion frames to
+        #  count as different trials (rows in the stim table).  This helps account for dropped frames, so that they dont
+        #  cause the cutting of an entire experiment into too many stimulus epochs.  If these thresholds are too low,
+        #  the assert statment in get_epoch_mask_list will halt execution.  In that case, make a bug report!.
         threshold_dict = {si.THREE_SESSION_A:31+7,
                           si.THREE_SESSION_B:15,
                           si.THREE_SESSION_C:7,
