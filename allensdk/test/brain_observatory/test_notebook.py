@@ -55,8 +55,8 @@ def test_brain_observatory_trace_analysis_notebook(boc):
     # trials for cell's preferred condition
     pref_ori = dg.orivals[dg.peak.ori_dg[cell_loc]]
     pref_tf = dg.tfvals[dg.peak.tf_dg[cell_loc]]
-    assert pref_ori == 270 
-    assert pref_tf == 1
+    assert pref_ori == 180 
+    assert pref_tf == 2
 
     pref_trials = dg.stim_table[(dg.stim_table.orientation==pref_ori)&(dg.stim_table.temporal_frequency==pref_tf)]
     assert pref_trials['start'][3] == 1017
@@ -79,7 +79,7 @@ def test_brain_observatory_static_gratings_notebook(boc):
 
     peak_head = sg.peak.head()
     assert peak_head['cell_specimen_id'][0] == 517399188
-    assert np.isclose(peak_head['reliability_sg'][0], -0.0003922755)
+    assert np.isclose(peak_head['reliability_sg'][0], 0.011318858489782238)
 
 
 @pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
@@ -89,7 +89,7 @@ def test_brain_observatory_natural_scenes_notebook(boc):
     ns = NaturalScenes(data_set)
     ns_head = ns.peak.head()
     
-    assert np.isclose(ns_head['peak_dff_ns'][0], 4.91692)
+    assert np.isclose(ns_head['peak_dff_ns'][0], 4.9169226656)
     assert ns_head['cell_specimen_id'][0] == 517399188
 
 @pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
