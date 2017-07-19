@@ -59,8 +59,8 @@ def test_brain_observatory_trace_analysis_notebook(boc):
     assert pref_tf == 2
 
     pref_trials = dg.stim_table[(dg.stim_table.orientation==pref_ori)&(dg.stim_table.temporal_frequency==pref_tf)]
-    assert pref_trials['start'][3] == 1017
-    assert pref_trials['end'][3] == 1076
+    assert pref_trials['start'][1] == 836 
+    assert pref_trials['end'][1] == 896 
 
     # mean sweep response
     subset = dg.sweep_response[(dg.stim_table.orientation==pref_ori)&(dg.stim_table.temporal_frequency==pref_tf)]
