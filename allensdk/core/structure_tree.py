@@ -283,8 +283,21 @@ class StructureTree( SimpleTree ):
         for ii, st in enumerate(structures):
 
             StructureTree.collect_sets(st)
-            structures[ii] = {wk: wf(st[wk]) for wk, wf 
-                              in iteritems(field_whitelist) if wk in st}
+            record = {}
+
+            for wk, wf in iteritems(field_whitelist):
+
+                if not wk in st:
+                    continue
+
+                new = wf(st[wk])
+
+                if wk == 'color_hex_triplet':
+                    wk = 'color_uint8_triplet'
+
+                record[wk] = new
+
+            structures[ii] = record
 
         return structures
         
