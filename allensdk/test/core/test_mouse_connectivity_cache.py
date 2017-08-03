@@ -37,7 +37,7 @@ def mcc(fn_temp_dir):
 def new_nodes():
 
     return [{'id': 0, 'structure_id_path': '/0/', 
-             'color_hex_triplet': '000000', 'acronym': 'rt', 
+             'rgb_triplet': '000000', 'acronym': 'rt', 
              'name': 'root', 'structure_sets':[{'id': 1}, {'id': 4}]}]
 
 
@@ -45,7 +45,7 @@ def new_nodes():
 def old_nodes():
 
     return [{'id': 0, 'structure_id_path': '/0/', 
-             'color_hex_triplet': '000000', 'acronym': 'rt', 
+             'rgb_triplet': '000000', 'acronym': 'rt', 
              'name': 'root', 'parent_structure_id': 12}]
 
 
