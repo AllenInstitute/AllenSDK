@@ -37,8 +37,8 @@ class StructureTree( SimpleTree ):
             
             'acronym' : str
                 Abbreviated name for the structure.
-            'color_hex_triplet' : str
-                Canonical RGB hexidecimal color assigned to this structure
+            'rgb_triplet' : str
+                Canonical RGB uint8 color assigned to this structure
             'graph_id' : int
                 Specifies the structure graph containing this structure.
             'graph_order' : int
