@@ -26,7 +26,7 @@ from allensdk.core.structure_tree import StructureTree
 def nodes():
 
     return [{'id': 0, 'structure_id_path': [0], 'rgb_triplet': [0, 0, 0], 'acronym': 'rt', 'name': 'root', 'structure_set_ids':[1, 4]}, 
-            {'id': 1, 'structure_id_path': [0, 1], 'rgb_triplet': [0, 15], 'acronym': 'a', 'name': 'alpha', 'structure_set_ids': [1, 3]}, 
+            {'id': 1, 'structure_id_path': [0, 1], 'rgb_triplet': [0, 15, 255], 'acronym': 'a', 'name': 'alpha', 'structure_set_ids': [1, 3]}, 
             {'id': 2, 'structure_id_path': [0, 2], 'rgb_triplet': [255, 255, 255], 'acronym': 'b', 'name': 'beta', 'structure_set_ids': [1, 2]}]
 
 
