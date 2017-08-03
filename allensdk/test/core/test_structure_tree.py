@@ -118,7 +118,7 @@ def test_clean_structures(nodes):
                   'name': 'root', 'structure_sets':[{'id': 1}, {'id': 4}]}
                   
     clean_node = StructureTree.clean_structures([dirty_node])[0]
-    assert( isinstance(clean_node['color_uint8_triplet'], list) )
+    assert( isinstance(clean_node['rgb_triplet'], list) )
     assert( isinstance(clean_node['structure_id_path'], list) )
     
     

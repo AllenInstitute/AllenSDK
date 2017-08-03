@@ -257,7 +257,7 @@ class StructureTree( SimpleTree ):
         
 
     @staticmethod
-    def clean_structures(structures, field_whitelist=None):
+    def clean_structures(structures):
         '''Convert structures_with_sets query results into a form that can be 
         used to construct a StructureTree
         
@@ -266,10 +266,6 @@ class StructureTree( SimpleTree ):
         structures : list of dict
             Each element describes a structure. Should have a structure id path 
             field (str values) and a structure_sets field (list of dict).
-        field_whitelist : dict maps str to fn, optional
-           Input fields are filtered to keys of this dict and passed through 
-           the value functions
-           
         Returns
         -------
         list of dict : 
@@ -277,42 +273,48 @@ class StructureTree( SimpleTree ):
         
         '''
 
-        if field_whitelist is None:
-            field_whitelist = StructureTree.whitelist()
+        whitelist = StructureTree.whitelist()
+        transforms = StructureTree.data_transforms()
+        renames = StructureTree.renames()
 
         for ii, st in enumerate(structures):
 
             StructureTree.collect_sets(st)
             record = {}
 
-            for wk, wf in iteritems(field_whitelist):
-
-                if not wk in st:
+            for name in whitelist:
+                
+                if name not in st:
                     continue
+                data = st[name]
+            
+                if name in transforms:
+                    data = transforms[name](data)
 
-                new = wf(st[wk])
+                if name in renames:
+                    name = renames[name]
 
-                if wk == 'color_hex_triplet':
-                    wk = 'color_uint8_triplet'
-
-                record[wk] = new
+                record[name] = data
 
             structures[ii] = record
 
         return structures
-        
-        
+       
+    @staticmethod
+    def data_transforms():
+        return  {'color_hex_triplet': StructureTree.hex_to_rgb, 
+                 'structure_id_path': StructureTree.path_to_list}
+
+
+    @staticmethod
+    def renames():
+        return {'color_hex_triplet': 'rgb_triplet'}
+
     @staticmethod
     def whitelist():
-        return {'acronym': str, 
-                'color_hex_triplet': StructureTree.hex_to_rgb, 
-                'graph_id': int, 
-                'graph_order': int, 
-                'id': int, 
-                'name': str, 
-                'structure_id_path': StructureTree.path_to_list, 
-                'structure_set_ids': list}  
-
+        return ['acronym', 'color_hex_triplet', 'graph_id', 'graph_order', 'id', 
+                'name', 'structure_id_path', 'structure_set_ids'] 
+    
         
     @staticmethod
     def hex_to_rgb(hex_color):
