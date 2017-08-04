@@ -114,7 +114,7 @@ def test_has_overlaps(tree):
 def test_clean_structures(nodes):
 
     dirty_node = {'id': 0, 'structure_id_path': '/0/', 
-                  'color_hex_triplet': '000000', 'acronym': 'rt', 
+                  'rgb_triplet': [0, 0, 0], 'acronym': 'rt', 
                   'name': 'root', 'structure_sets':[{'id': 1}, {'id': 4}]}
                   
     clean_node = StructureTree.clean_structures([dirty_node])[0]
@@ -125,7 +125,7 @@ def test_clean_structures(nodes):
 def test_clean_structures_no_sets():
     
     dirty_node = {'id': 0, 'structure_id_path': '/0/', 
-                  'color_hex_triplet': '000000', 'acronym': 'rt', 
+                  'rgb_triplet': [0, 0, 0], 'acronym': 'rt', 
                   'name': 'root'}
     
     clean_node = StructureTree.clean_structures([dirty_node])
@@ -137,7 +137,7 @@ def test_clean_structures_no_sets():
 def test_clean_structures_only_ids():
     
     dirty_node = {'id': 0, 'structure_id_path': '/0/', 
-                  'color_hex_triplet': '000000', 'acronym': 'rt', 
+                  'rgb_triplet': [0, 0, 0], 'acronym': 'rt', 
                   'name': 'root', 'structure_set_ids': [1, 2, 3] }
     
     clean_node = StructureTree.clean_structures([dirty_node])
@@ -149,7 +149,7 @@ def test_clean_structures_only_ids():
 def test_clean_structures_ids_sets():
     
     dirty_node = {'id': 0, 'structure_id_path': '/0/', 
-                  'color_hex_triplet': '000000', 'acronym': 'rt', 
+                  'rgb_triplet': [0, 0, 0], 'acronym': 'rt', 
                   'name': 'root', 'structure_set_ids': [1, 2, 3], 
                   'structure_sets': [{'id': 1}, {'id': 4}] }
     
@@ -162,7 +162,7 @@ def test_clean_structures_ids_sets():
 def test_clean_structures_str_id():
 
     dirty_node = {'id': '0', 'structure_id_path': '/0/', 
-                  'color_hex_triplet': '000000', 'acronym': 'rt', 
+                  'rgb_triplet': [0, 0, 0], 'acronym': 'rt', 
                   'name': 'root', 'structure_set_ids': [1, 2, 3], 
                   'structure_sets': [{'id': 1}, {'id': 4}] }
     
