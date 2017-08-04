@@ -290,7 +290,7 @@ class ReferenceSpace(object):
             In microns. Take the slice from this far along the specified axis.
         cmap : dict, optional
             Keys are structure ids, values are rgb triplets. Defaults to 
-            structure color_hex_triplets. 
+            structure rgb_triplets. 
             
         Returns
         -------
