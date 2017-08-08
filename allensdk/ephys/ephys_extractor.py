@@ -480,7 +480,7 @@ class EphysSweepFeatureExtractor:
         """Get all features for each spike as a list of records."""
         return self._spikes_df.to_dict('records')
 
-    def spike_feature(self, key, include_clipped=False):
+    def spike_feature(self, key, include_clipped=False, force_exclude_clipped=False):
         """Get specified feature for every spike.
 
         Parameters
@@ -504,10 +504,18 @@ class EphysSweepFeatureExtractor:
 
         values = self._spikes_df[key].values
 
-        if not include_clipped and key in self._affected_by_clipping:
+        if include_clipped and force_exclude_clipped:
+            raise ValueError("include_clipped and force_exclude_clipped cannot both be true")
+
+        if not include_clipped and self.is_spike_feature_affected_by_clipping(key):
+            values = values[~self._spikes_df["clipped"].values]
+        elif force_exclude_clipped:
             values = values[~self._spikes_df["clipped"].values]
 
         return values
+
+    def is_spike_feature_affected_by_clipping(self, key):
+        return key in self._affected_by_clipping
 
     def spike_feature_keys(self):
         """Get list of every available spike feature."""
