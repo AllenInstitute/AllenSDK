@@ -44,7 +44,7 @@ def test_init_by_pixels_with_border():
     assert m.width == 2
     assert m.y == 1
     assert m.height == 1
-    assert m.valid is False
+    assert m.overlaps_motion_border is True
 
 
 def test_init_by_pixels_large():
@@ -56,3 +56,4 @@ def test_init_by_pixels_large():
 
     npx = len(np.where(a)[0])
     assert npx == len(np.where(m.get_mask_plane())[0])
+
