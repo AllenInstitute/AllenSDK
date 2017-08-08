@@ -294,7 +294,7 @@ def check_thresholds_and_peaks(v, t, spike_indexes, peak_indexes, upstroke_index
     # voltage - otherwise, drop it
     clipped = np.zeros_like(spike_indexes, dtype=bool)
     end_index = find_time_index(t, end)
-    if not np.any(v[peak_indexes[-1]:end_index + 1] <= v[spike_indexes[-1]]):
+    if len(spike_indexes) > 0 and not np.any(v[peak_indexes[-1]:end_index + 1] <= v[spike_indexes[-1]]):
         logging.debug("Failed to return to threshold voltage (%f) after last spike (min %f) - marking last spike as clipped", v[spike_indexes[-1]], v[peak_indexes[-1]:end_index + 1].min())
         clipped[-1] = True
 
