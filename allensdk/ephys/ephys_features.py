@@ -224,6 +224,7 @@ def check_thresholds_and_peaks(v, t, spike_indexes, peak_indexes, upstroke_index
     spike_indexes : numpy array of modified spike indexes
     peak_indexes : numpy array of modified spike peak indexes
     upstroke_indexes : numpy array of modified spike upstroke indexes
+    clipped : numpy array of clippped status of spikes
     """
 
     if not end:
@@ -329,7 +330,8 @@ def find_trough_indexes(v, t, spike_indexes, peak_indexes, clipped=None, end=Non
     end_index = find_time_index(t, end)
 
     trough_indexes = np.zeros_like(spike_indexes, dtype=float)
-    trough_indexes[:-1] = [v[peak:spk].argmin() + peak for peak, spk in zip(peak_indexes[:-1], spike_indexes[1:])]
+    trough_indexes[:-1] = [v[peak:spk].argmin() + peak for peak, spk
+                           in zip(peak_indexes[:-1], spike_indexes[1:])]
 
     if clipped[-1]:
         # If last spike is cut off by the end of the window, trough is undefined
@@ -1061,7 +1063,7 @@ def estimate_adjusted_detection_parameters(v_set, t_set, interval_start, interva
     new_dv_cutoff : adjusted dv/dt cutoff (V/s)
     new_thresh_frac : adjusted fraction of avg upstroke to find threshold
     """
-    
+
     if type(v_set) is not list:
         v_set = list(v_set)
 
