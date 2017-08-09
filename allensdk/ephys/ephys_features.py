@@ -198,7 +198,7 @@ def refine_threshold_indexes(v, t, upstroke_indexes, thresh_frac=0.05, filter=10
     return np.array(threshold_indexes)
 
 
-def check_thresholds_and_peaks(v, t, spike_indexes, peak_indexes, upstroke_indexes,
+def check_thresholds_and_peaks(v, t, spike_indexes, peak_indexes, upstroke_indexes, end=None,
                                max_interval=0.005, thresh_frac=0.05, filter=10., dvdt=None):
     """Validate thresholds and peaks for set of spikes
 
@@ -225,6 +225,9 @@ def check_thresholds_and_peaks(v, t, spike_indexes, peak_indexes, upstroke_index
     peak_indexes : numpy array of modified spike peak indexes
     upstroke_indexes : numpy array of modified spike upstroke indexes
     """
+
+    if not end:
+        end = t[-1]
 
     overlaps = np.flatnonzero(spike_indexes[1:] <= peak_indexes[:-1])
     if overlaps.size:
@@ -280,15 +283,25 @@ def check_thresholds_and_peaks(v, t, spike_indexes, peak_indexes, upstroke_index
             else:
                 spike_indexes[i] = upstroke_indexes[i] - below_target[0]
 
+
         if drop_spikes:
             spike_indexes = np.delete(spike_indexes, drop_spikes)
             peak_indexes = np.delete(peak_indexes, drop_spikes)
             upstroke_indexes = np.delete(upstroke_indexes, drop_spikes)
 
-    return spike_indexes, peak_indexes, upstroke_indexes
+    # Check that last spike was not cut off too early by end of stimulus
+    # by checking that the membrane potential returned to at least the threshold
+    # voltage - otherwise, drop it
+    clipped = np.zeros_like(spike_indexes, dtype=bool)
+    end_index = find_time_index(t, end)
+    if len(spike_indexes) > 0 and not np.any(v[peak_indexes[-1]:end_index + 1] <= v[spike_indexes[-1]]):
+        logging.debug("Failed to return to threshold voltage (%f) after last spike (min %f) - marking last spike as clipped", v[spike_indexes[-1]], v[peak_indexes[-1]:end_index + 1].min())
+        clipped[-1] = True
+
+    return spike_indexes, peak_indexes, upstroke_indexes, clipped
 
 
-def find_trough_indexes(v, t, spike_indexes, peak_indexes, end=None):
+def find_trough_indexes(v, t, spike_indexes, peak_indexes, clipped=None, end=None):
     """
     Find indexes of minimum voltage (trough) between spikes.
 
@@ -308,26 +321,31 @@ def find_trough_indexes(v, t, spike_indexes, peak_indexes, end=None):
     if not spike_indexes.size or not peak_indexes.size:
         return np.array([])
 
+    if clipped is None:
+        clipped = np.zeros_like(spike_indexes, dtype=bool)
+
     if end is None:
         end = t[-1]
     end_index = find_time_index(t, end)
 
-    trough_indexes = np.zeros_like(spike_indexes)
+    trough_indexes = np.zeros_like(spike_indexes, dtype=float)
     trough_indexes[:-1] = [v[peak:spk].argmin() + peak for peak, spk in zip(peak_indexes[:-1], spike_indexes[1:])]
 
-    if peak_indexes[-1] >= end_index:
-        # If peak of last spike is the last point available, drop last point (since no trough exists)
-        trough_indexes = trough_indexes[:-1]
+    if clipped[-1]:
+        # If last spike is cut off by the end of the window, trough is undefined
+        trough_indexes[-1] = np.nan
     else:
         trough_indexes[-1] = v[peak_indexes[-1]:end_index].argmin() + peak_indexes[-1]
 
+    # nwg - trying to remove this next part for now - can't figure out if this will be needed with new "clipped" method
+
     # If peak is the same point as the trough, drop that point
-    trough_indexes = trough_indexes[np.where(peak_indexes[:len(trough_indexes)] != trough_indexes)]
+#     trough_indexes = trough_indexes[np.where(peak_indexes[:len(trough_indexes)] != trough_indexes)]
 
     return trough_indexes
 
 
-def find_downstroke_indexes(v, t, peak_indexes, trough_indexes, filter=10., dvdt=None):
+def find_downstroke_indexes(v, t, peak_indexes, trough_indexes, clipped=None, filter=10., dvdt=None):
     """Find indexes of minimum voltage (troughs) between spikes.
 
     Parameters
@@ -336,6 +354,7 @@ def find_downstroke_indexes(v, t, peak_indexes, trough_indexes, filter=10., dvdt
     t : numpy array of times in seconds
     peak_indexes : numpy array of spike peak indexes
     trough_indexes : numpy array of threshold indexes
+    clipped: boolean array - False if spike not clipped by edge of window
     filter : cutoff frequency for 4-pole low-pass Bessel filter in kHz (optional, default 10)
     dvdt : pre-calculated time-derivative of voltage (optional)
 
@@ -350,19 +369,26 @@ def find_downstroke_indexes(v, t, peak_indexes, trough_indexes, filter=10., dvdt
     if dvdt is None:
         dvdt = calculate_dvdt(v, t, filter)
 
+    if clipped is None:
+        clipped = np.zeros_like(peak_indexes, dtype=bool)
+
     if len(peak_indexes) < len(trough_indexes):
         raise FeatureError("Cannot have more troughs than peaks")
+# Taking this out...with clipped info, should always have the same number of points
+#     peak_indexes = peak_indexes[:len(trough_indexes)]
 
-    peak_indexes = peak_indexes[:len(trough_indexes)]
+    valid_peak_indexes = peak_indexes[~clipped].astype(int)
+    valid_trough_indexes = trough_indexes[~clipped].astype(int)
 
-    # Can't handle cases where peak is
-    downstroke_indexes = [np.argmin(dvdt[peak:trough]) + peak for peak, trough
-                         in zip(peak_indexes, trough_indexes)]
+    downstroke_indexes = np.zeros_like(peak_indexes) * np.nan
+    downstroke_index_values = [np.argmin(dvdt[peak:trough]) + peak for peak, trough
+                         in zip(valid_peak_indexes, valid_trough_indexes)]
+    downstroke_indexes[~clipped] = downstroke_index_values
 
-    return np.array(downstroke_indexes)
+    return downstroke_indexes
 
 
-def find_widths(v, t, spike_indexes, peak_indexes, trough_indexes):
+def find_widths(v, t, spike_indexes, peak_indexes, trough_indexes, clipped=None):
     """Find widths at half-height for spikes.
 
     Widths are only returned when heights are defined
@@ -386,7 +412,11 @@ def find_widths(v, t, spike_indexes, peak_indexes, trough_indexes):
     if len(spike_indexes) < len(trough_indexes):
         raise FeatureError("Cannot have more troughs than spikes")
 
+    if clipped is None:
+        clipped = np.zeros_like(spike_indexes, dtype=bool)
+
     use_indexes = ~np.isnan(trough_indexes)
+    use_indexes[clipped] = False
 
     heights = np.zeros_like(trough_indexes) * np.nan
     heights[use_indexes] = v[peak_indexes[use_indexes]] - v[trough_indexes[use_indexes].astype(int)]
@@ -407,9 +437,10 @@ def find_widths(v, t, spike_indexes, peak_indexes, trough_indexes):
                     np.flatnonzero(v[pk:spk:-1] <= wl).size > 0 else np.nan for pk, spk, wl
                     in zip(peak_indexes[use_indexes], spike_indexes[use_indexes], width_levels[use_indexes])])
     width_ends = np.zeros_like(trough_indexes) * np.nan
+
     width_ends[use_indexes] = np.array([pk + np.flatnonzero(v[pk:tr] <= wl)[0] if
                     np.flatnonzero(v[pk:tr] <= wl).size > 0 else np.nan for pk, tr, wl
-                    in zip(peak_indexes[use_indexes], trough_indexes[use_indexes], width_levels[use_indexes])])
+                    in zip(peak_indexes[use_indexes], trough_indexes[use_indexes].astype(int), width_levels[use_indexes])])
 
     missing_widths = np.isnan(width_starts) | np.isnan(width_ends)
     widths = np.zeros_like(width_starts, dtype=np.float64)
@@ -421,9 +452,9 @@ def find_widths(v, t, spike_indexes, peak_indexes, trough_indexes):
     return widths
 
 
-def analyze_trough_details(v, t, spike_indexes, peak_indexes, end=None, filter=10.,
+def analyze_trough_details(v, t, spike_indexes, peak_indexes, clipped=None, end=None, filter=10.,
                            heavy_filter=1., term_frac=0.01, adp_thresh=0.5, tol=0.5,
-                           flat_interval=0.002, dvdt=None):
+                           flat_interval=0.002, adp_max_delta_t=0.005, adp_max_delta_v=10., dvdt=None):
     """Analyze trough to determine if an ADP exists and whether the reset is a 'detour' or 'direct'
 
     Parameters
@@ -438,7 +469,9 @@ def analyze_trough_details(v, t, spike_indexes, peak_indexes, end=None, filter=1
     thresh_frac : fraction of average upstroke for threshold calculation (optional, default 0.05)
     adp_thresh: minimum dV/dt in V/s to exceed to be considered to have an ADP (optional, default 1.5)
     tol : tolerance for evaluating whether Vm drops appreciably further after end of spike (default 1.0 mV)
-    flat_interval: if the trace is flat for this duration, stop looking for an ADP (default 0.002)
+    flat_interval: if the trace is flat for this duration, stop looking for an ADP (default 0.002 s)
+    adp_max_delta_t: max possible ADP delta t (default 0.005 s)
+    adp_max_delta_v: max possible ADP delta v (default 10 mV)
     dvdt : pre-calculated time-derivative of voltage (optional)
 
     Returns
@@ -454,11 +487,13 @@ def analyze_trough_details(v, t, spike_indexes, peak_indexes, end=None, filter=1
         end = t[-1]
     end_index = find_time_index(t, end)
 
-    # Can't evaluate peaks that occur at or past end of the analysis interval
+    if clipped is None:
+        clipped = np.zeros_like(peak_indexes)
+
+    # Can't evaluate for spikes that are clipped by the window
     orig_len = len(peak_indexes)
-    peak_mask = peak_indexes < end_index
-    spike_indexes = spike_indexes[peak_mask]
-    peak_indexes = peak_indexes[peak_mask]
+    valid_spike_indexes = spike_indexes[~clipped]
+    valid_peak_indexes = peak_indexes[~clipped]
 
     if dvdt is None:
         dvdt = calculate_dvdt(v, t, filter)
@@ -471,18 +506,22 @@ def analyze_trough_details(v, t, spike_indexes, peak_indexes, end=None, filter=1
     slow_trough_indexes = []
     isi_types = []
 
-    for peak, next_spk in zip(peak_indexes, np.append(spike_indexes[1:], end_index)):
+    update_clipped = []
+    for peak, next_spk in zip(valid_peak_indexes, np.append(valid_spike_indexes[1:], end_index)):
         downstroke = dvdt[peak:next_spk].argmin() + peak
         target = term_frac * dvdt[downstroke]
 
         terminated_points = np.flatnonzero(dvdt[downstroke:next_spk] >= target)
         if terminated_points.size:
             terminated = terminated_points[0] + downstroke
+            update_clipped.append(False)
         else:
+            logging.debug("Could not identify fast trough - marking spike as clipped")
             isi_types.append(np.nan)
             fast_trough_indexes.append(np.nan)
             adp_indexes.append(np.nan)
             slow_trough_indexes.append(np.nan)
+            update_clipped.append(True)
             continue
 
         # Could there be an ADP?
@@ -500,7 +539,9 @@ def analyze_trough_details(v, t, spike_indexes, peak_indexes, end=None, filter=1
                 if zero_return_vals.size:
                     putative_adp_index = zero_return_vals[0] + cross
                     min_index = v[putative_adp_index:next_spk].argmin() + putative_adp_index
-                    if v[putative_adp_index] - v[min_index] >= tol:
+                    if (v[putative_adp_index] - v[min_index] >= tol and
+                            v[putative_adp_index] - v[terminated] <= adp_max_delta_v and
+                            t[putative_adp_index] - t[terminated] <= adp_max_delta_t):
                         adp_index = putative_adp_index
                         slow_phase_min_index = min_index
                         isi_type = "detour"
@@ -524,11 +565,28 @@ def analyze_trough_details(v, t, spike_indexes, peak_indexes, end=None, filter=1
             slow_trough_indexes.append(np.nan)
 
     # If we had to kick some spikes out before, need to add nans at the end
-    output = map(np.array, (isi_types, fast_trough_indexes, adp_indexes, slow_trough_indexes))
+    output = []
+    output.append(np.array(isi_types))
+    for d in (fast_trough_indexes, adp_indexes, slow_trough_indexes):
+        output.append(np.array(d, dtype=float))
+
     if orig_len > len(isi_types):
         extra = np.zeros(orig_len - len(isi_types)) * np.nan
         output = tuple((np.append(o, extra) for o in output))
-    return output
+
+    # The ADP and slow trough for the last spike in a train are not reliably
+    # calculated, and usually extreme when wrong, so we will NaN them out.
+    #
+    # Note that this will result in a 0 value when delta V or delta T is
+    # calculated, which may not be strictly accurate to the trace, but the
+    # magnitude of the difference will be less than in many of the erroneous
+    # cases seen otherwise
+
+    output[2][-1] = np.nan # ADP
+    output[3][-1] = np.nan # slow trough
+
+    clipped[~clipped] = update_clipped
+    return output, clipped
 
 
 def find_time_index(t, t_0):
@@ -691,7 +749,7 @@ def has_fixed_dt(t):
     return np.allclose(dt, np.ones_like(dt) * dt[0])
 
 
-def fit_membrane_time_constant(v, t, start, end):
+def fit_membrane_time_constant(v, t, start, end, min_rsme=1e-4):
     """Fit an exponential to estimate membrane time constant between start and end
 
     Parameters
@@ -700,6 +758,7 @@ def fit_membrane_time_constant(v, t, start, end):
     t : numpy array of times in seconds
     start : start of time window for exponential fit
     end : end of time window for exponential fit
+    min_rsme: minimal acceptable root mean square error (default 1e-4)
 
     Returns
     -------
@@ -718,6 +777,12 @@ def fit_membrane_time_constant(v, t, start, end):
         popt, pcov = curve_fit(_exp_curve, t_window, v_window, p0=guess)
     except RuntimeError:
         logging.info("Curve fit for membrane time constant failed")
+        return np.nan, np.nan, np.nan
+
+    pred = _exp_curve(t_window, *popt)
+    rsme = np.sqrt(np.mean(pred - v_window))
+    if rsme > min_rsme:
+        logging.debug("Curve fit for membrane time constant did not meet RSME standard")
         return np.nan, np.nan, np.nan
 
     return popt

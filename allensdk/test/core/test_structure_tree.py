@@ -25,9 +25,9 @@ from allensdk.core.structure_tree import StructureTree
 @pytest.fixture
 def nodes():
 
-    return [{'id': 0, 'structure_id_path': [0], 'color_hex_triplet': '000000', 'acronym': 'rt', 'name': 'root', 'structure_set_ids':[1, 4]}, 
-            {'id': 1, 'structure_id_path': [0, 1], 'color_hex_triplet': '000fff', 'acronym': 'a', 'name': 'alpha', 'structure_set_ids': [1, 3]}, 
-            {'id': 2, 'structure_id_path': [0, 2], 'color_hex_triplet': 'ffffff', 'acronym': 'b', 'name': 'beta', 'structure_set_ids': [1, 2]}]
+    return [{'id': 0, 'structure_id_path': [0], 'rgb_triplet': [0, 0, 0], 'acronym': 'rt', 'name': 'root', 'structure_set_ids':[1, 4]}, 
+            {'id': 1, 'structure_id_path': [0, 1], 'rgb_triplet': [0, 15, 255], 'acronym': 'a', 'name': 'alpha', 'structure_set_ids': [1, 3]}, 
+            {'id': 2, 'structure_id_path': [0, 2], 'rgb_triplet': [255, 255, 255], 'acronym': 'b', 'name': 'beta', 'structure_set_ids': [1, 2]}]
 
 
 @pytest.fixture
@@ -118,7 +118,7 @@ def test_clean_structures(nodes):
                   'name': 'root', 'structure_sets':[{'id': 1}, {'id': 4}]}
                   
     clean_node = StructureTree.clean_structures([dirty_node])[0]
-    assert( isinstance(clean_node['color_hex_triplet'], list) )
+    assert( isinstance(clean_node['rgb_triplet'], list) )
     assert( isinstance(clean_node['structure_id_path'], list) )
     
     

@@ -42,7 +42,7 @@ def test_brain_observatory_trace_analysis_notebook(boc):
     
     cell_loc = np.argwhere(specimen_ids==specimen_id)[0][0]
 
-    assert cell_loc == 46
+    assert cell_loc == 97 
     
     # temporal frequency plot
     response = dg.response[:,1:,cell_loc,0]
@@ -55,12 +55,12 @@ def test_brain_observatory_trace_analysis_notebook(boc):
     # trials for cell's preferred condition
     pref_ori = dg.orivals[dg.peak.ori_dg[cell_loc]]
     pref_tf = dg.tfvals[dg.peak.tf_dg[cell_loc]]
-    assert pref_ori == 270
-    assert pref_tf == 1
+    assert pref_ori == 180 
+    assert pref_tf == 2
 
     pref_trials = dg.stim_table[(dg.stim_table.orientation==pref_ori)&(dg.stim_table.temporal_frequency==pref_tf)]
-    assert pref_trials['start'][3] == 1017
-    assert pref_trials['end'][3] == 1076
+    assert pref_trials['start'][1] == 836 
+    assert pref_trials['end'][1] == 896 
 
     # mean sweep response
     subset = dg.sweep_response[(dg.stim_table.orientation==pref_ori)&(dg.stim_table.temporal_frequency==pref_tf)]
@@ -78,8 +78,8 @@ def test_brain_observatory_static_gratings_notebook(boc):
     sg = StaticGratings(data_set)
 
     peak_head = sg.peak.head()
-    assert peak_head['cell_specimen_id'][0] == 517399193
-    assert np.isclose(peak_head['reliability_sg'][0], -0.0003922755)
+    assert peak_head['cell_specimen_id'][0] == 517399188
+    assert np.isclose(peak_head['reliability_sg'][0], 0.011318858489782238)
 
 
 @pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
@@ -89,8 +89,8 @@ def test_brain_observatory_natural_scenes_notebook(boc):
     ns = NaturalScenes(data_set)
     ns_head = ns.peak.head()
     
-    assert np.isclose(ns_head['peak_dff_ns'][0], 4.22082782)
-    assert ns_head['cell_specimen_id'][0] == 517399193
+    assert np.isclose(ns_head['peak_dff_ns'][0], 4.9169226656)
+    assert ns_head['cell_specimen_id'][0] == 517399188
 
 @pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
                     reason="partial testing")
@@ -126,7 +126,7 @@ def test_brain_observatory_experiment_containers_notebook(boc):
                                     stimuli=[stim_info.STATIC_GRATINGS])[0]
     exp = boc.get_ophys_experiment_data(exp['id'])
 
-    assert set(depths) == set([175, 265, 275, 300, 320, 325, 335, 350, 365, 375, 435])
+    assert set(depths) == set([175, 265, 275, 300, 320, 325, 335, 350, 365, 375])
     expected_stimuli = ['drifting_gratings',
                         'locally_sparse_noise',
                         'locally_sparse_noise_4deg',
