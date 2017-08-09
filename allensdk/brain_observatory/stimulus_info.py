@@ -107,12 +107,12 @@ STIMULUS_BITDEPTH = 8
 LOCALLY_SPARSE_NOISE_PIXEL_SIZE = {
     LOCALLY_SPARSE_NOISE: 4.65,
     LOCALLY_SPARSE_NOISE_4DEG: 4.65,
-    LOCALLY_SPARSE_NOISE_8DEG: 9.3 
+    LOCALLY_SPARSE_NOISE_8DEG: 9.3
 }
 
 def sessions_with_stimulus(stimulus):
     """ Return the names of the sessions that contain a given stimulus. """
-    
+
     sessions = set()
     for session, session_stimuli in six.iteritems(SESSION_STIMULUS_MAP):
         if stimulus in session_stimuli:
@@ -245,7 +245,15 @@ class StimulusSearch(object):
 def rotate(X, Y, theta):
     x = np.array([X, Y])
     M = np.array([[np.cos(theta),-np.sin(theta)],[np.sin(theta), np.cos(theta)]])
-    return M.dot(x)
+    if len(x.shape) in [1,2]:
+        assert x.shape[0] == 2
+        return M.dot(x)
+    elif len(x.shape) == 3:
+        M2 = M[:, :, np.newaxis, np.newaxis]
+        x2 = x[np.newaxis, :, :]
+        return (M2*x2).sum(axis=1)
+    else:
+        raise NotImplementedError
 
 def get_spatial_grating(height=None, aspect_ratio=None, ori=None, pix_per_cycle=None, phase=None, p2p_amp=2, baseline=0):
 
@@ -574,8 +582,6 @@ class ExperimentGeometry(object):
 
     def generate_warp_coordinates(self):
 
-        from allensdk.core.brain_observatory_nwb_data_set import warp_stimulus_coords
-
         display_shape=self.mon_res
         x = np.array(range(display_shape[0])) - display_shape[0] / 2
         y = np.array(range(display_shape[1])) - display_shape[1] / 2
@@ -637,3 +643,155 @@ class BrainObservatoryMonitor(Monitor):
     def pixels_to_visual_degrees(self, n, **kwargs):
 
         return super(BrainObservatoryMonitor, self).pixels_to_visual_degrees(n, self.experiment_geometry.distance, **kwargs)
+
+def warp_stimulus_coords(vertices,
+                         distance=15.0,
+                         mon_height_cm=32.5,
+                         mon_width_cm=51.0,
+                         mon_res=(1920, 1200),
+                         eyepoint=(0.5, 0.5)):
+    '''
+    For a list of screen vertices, provides a corresponding list of texture coordinates.
+
+    Parameters
+    ----------
+    vertices: numpy.ndarray
+        [[x0,y0], [x1,y1], ...] A set of vertices to  convert to texture positions.
+    distance: float
+        distance from the monitor in cm.
+    mon_height_cm: float
+        monitor height in cm
+    mon_width_cm: float
+        monitor width in cm
+    mon_res: tuple
+        monitor resolution (x,y)
+    eyepoint: tuple
+
+    Returns
+    -------
+    np.ndarray
+        x,y coordinates shaped like the input that describe what pixel coordinates
+        are displayed an the input coordinates after warping the stimulus.
+
+    '''
+
+    mon_width_cm = float(mon_width_cm)
+    mon_height_cm = float(mon_height_cm)
+    distance = float(distance)
+    mon_res_x, mon_res_y = float(mon_res[0]), float(mon_res[1])
+
+    vertices = vertices.astype(np.float)
+
+    # from pixels (-1920/2 -> 1920/2) to stimulus space (-0.5->0.5)
+    vertices[:, 0] = vertices[:, 0] / mon_res_x
+    vertices[:, 1] = vertices[:, 1] / mon_res_y
+
+    x = (vertices[:, 0] + 0.5) * mon_width_cm
+    y = (vertices[:, 1] + 0.5) * mon_height_cm
+
+    xEye = eyepoint[0] * mon_width_cm
+    yEye = eyepoint[1] * mon_height_cm
+
+    x = x - xEye
+    y = y - yEye
+
+    r = np.sqrt(np.square(x) + np.square(y) + np.square(distance))
+
+    azimuth = np.arctan(x / distance)
+    altitude = np.arcsin(y / r)
+
+    # calculate the texture coordinates
+    tx = distance * (1 + x / r) - distance
+    ty = distance * (1 + y / r) - distance
+
+    # prevent div0
+    azimuth[azimuth == 0] = np.finfo(np.float32).eps
+    altitude[altitude == 0] = np.finfo(np.float32).eps
+
+    # the texture coordinates (which are now lying on the sphere)
+    # need to be remapped back onto the plane of the display.
+    # This effectively stretches the coordinates away from the eyepoint.
+
+    centralAngle = np.arccos(np.cos(altitude) * np.cos(np.abs(azimuth)))
+    # distance from eyepoint to texture vertex
+    arcLength = centralAngle * distance
+    # remap the texture coordinate
+    theta = np.arctan2(ty, tx)
+    tx = arcLength * np.cos(theta)
+    ty = arcLength * np.sin(theta)
+
+    u_coords = tx / mon_width_cm
+    v_coords = ty / mon_height_cm
+
+    retCoords = np.column_stack((u_coords, v_coords))
+
+    # back to pixels
+    retCoords[:, 0] = retCoords[:, 0] * mon_res_x
+    retCoords[:, 1] = retCoords[:, 1] * mon_res_y
+
+    return retCoords
+
+
+def make_display_mask(display_shape=(1920, 1200)):
+    ''' Build a display-shaped mask that indicates which pixels are on screen after warping the stimulus. '''
+    x = np.array(range(display_shape[0])) - display_shape[0] / 2
+    y = np.array(range(display_shape[1])) - display_shape[1] / 2
+    display_coords = np.array(list(itertools.product(x, y)))
+
+    warped_coords = warp_stimulus_coords(display_coords).astype(int)
+
+    off_warped_coords = np.array([warped_coords[:, 0] + display_shape[0] / 2,
+                                  warped_coords[:, 1] + display_shape[1] / 2])
+
+    used_coords = set()
+    for i in range(off_warped_coords.shape[1]):
+        used_coords.add((off_warped_coords[0, i], off_warped_coords[1, i]))
+
+    used_coords = (np.array([x for (x, y) in used_coords]).astype(int),
+                   np.array([y for (x, y) in used_coords]).astype(int))
+
+    mask = np.zeros(display_shape)
+
+    mask[used_coords] = 1
+
+    return mask
+
+
+def mask_stimulus_template(template_display_coords, template_shape, display_mask=None, threshold=1.0):
+    ''' Build a mask for a stimulus template of a given shape and display coordinates that indicates
+    which part of the template is on screen after warping.
+
+    Parameters
+    ----------
+    template_display_coords: list
+        list of (x,y) display coordinates
+
+    template_shape: tuple
+        (width,height) of the display template
+
+    display_mask: np.ndarray
+        boolean 2D mask indicating which display coordinates are on screen after warping.
+
+    threshold: float
+        Fraction of pixels associated with a template display coordinate that should remain
+        on screen to count as belonging to the mask.
+
+    Returns
+    -------
+    tuple: (template mask, pixel fraction)
+    '''
+    if display_mask is None:
+        display_mask = make_display_mask()
+
+    frac = np.zeros(template_shape)
+    mask = np.zeros(template_shape, dtype=bool)
+    for y in range(template_shape[1]):
+        for x in range(template_shape[0]):
+            tdcm = np.where((template_display_coords[0, :, :] == x) & (
+                template_display_coords[1, :, :] == y))
+            v = display_mask[tdcm]
+            f = np.sum(v) / len(v)
+            frac[x, y] = f
+            mask[x, y] = f >= threshold
+
+    return mask, frac
