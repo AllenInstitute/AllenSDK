@@ -7,7 +7,6 @@ from allensdk.test_utilities.temp_dir import fn_temp_dir
                     reason="partial testing")
 def test_notebook(fn_temp_dir):
 
-
     # coding: utf-8
 
     # # Reference Space
@@ -46,7 +45,7 @@ def test_notebook(fn_temp_dir):
 
     # The fields are:
     #     * acronym: a shortened name for the structure
-    #     * color_hex_triplet: each structure is assigned a consistent color for visualizations
+    #     * rgb_triplet: each structure is assigned a consistent color for visualizations
     #     * graph_id: the structure graph to which this structure belongs
     #     * graph_order: each structure is assigned a consistent position in the flattened graph
     #     * id: a unique integer identifier
@@ -98,6 +97,7 @@ def test_notebook(fn_temp_dir):
     #     * Anterior -> Posterior
     #     * Superior -> Inferior
     #     * Left -> Right
+    # This is the no-frills way to download an annotation volume. See the <a href='_static/examples/nb/mouse_connectivity.html#Manipulating-Grid-Data'>mouse connectivity</a> examples if you want to properly cache the downloaded data.
 
     # In[7]:
 
@@ -110,13 +110,10 @@ def test_notebook(fn_temp_dir):
     annotation_dir = 'annotation'
     Manifest.safe_mkdir(annotation_dir)
 
-    annotation_path = os.path.join(fn_temp_dir, annotation_dir, 'annotation.nrrd')
+    annotation_path = os.path.join(annotation_dir, 'annotation.nrrd')
 
     mcapi = MouseConnectivityApi()
-    mcapi.download_annotation_volume(ccf_version='annotation/ccf_2016', 
-                                     resolution=25, 
-                                     file_name=annotation_path, 
-                                     reader=None)
+    mcapi.download_annotation_volume('annotation/ccf_2016', 25, annotation_path)
 
     annotation, meta = nrrd.read(annotation_path)
 
@@ -140,12 +137,10 @@ def test_notebook(fn_temp_dir):
 
     # In[9]:
 
-
-
     # A complete mask for one structure
     whole_cortex_mask = rsp.make_structure_mask([315])
 
-
+    # view in coronal section
 
 
     # What if you want a mask for a whole collection of ontologically disparate structures? Just pass more structure ids to make_structure_masks:
@@ -158,8 +153,7 @@ def test_notebook(fn_temp_dir):
 
     brain_observatory_mask = rsp.make_structure_mask(brain_observatory_ids)
 
-
-
+    # view in horizontal section
 
     # You can also make and store a number of structure_masks at once:
 
@@ -208,17 +202,24 @@ def test_notebook(fn_temp_dir):
     import numpy as np
 
 
-
-
     # #### Downsample the space
     # 
-    # If you want an annotation at a resolution we don't provide, you can make one with the downsample method:
+    # If you want an annotation at a resolution we don't provide, you can make one with the downsample method.
 
     # In[14]:
 
+    import warnings
+
     target_resolution = [75, 75, 75]
 
+    # in some versions of scipy, scipy.ndimage.zoom raises a helpful but distracting 
+    # warning about the method used to truncate integers. 
+    warnings.simplefilter('ignore')
+
     sf_rsp = rsp.downsample(target_resolution)
+
+    # re-enable warnings
+    warnings.simplefilter('default')
 
     print( rsp.annotation.shape )
     print( sf_rsp.annotation.shape )
@@ -227,5 +228,4 @@ def test_notebook(fn_temp_dir):
     # Now view the downsampled space:
 
     # In[15]:
-
 

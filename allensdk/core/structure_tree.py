@@ -37,8 +37,8 @@ class StructureTree( SimpleTree ):
             
             'acronym' : str
                 Abbreviated name for the structure.
-            'color_hex_triplet' : str
-                Canonical RGB hexidecimal color assigned to this structure
+            'rgb_triplet' : str
+                Canonical RGB uint8 color assigned to this structure
             'graph_id' : int
                 Specifies the structure graph containing this structure.
             'graph_order' : int
@@ -150,7 +150,7 @@ class StructureTree( SimpleTree ):
         '''
     
         return self.value_map(lambda x: x['id'], 
-                              lambda y: StructureTree.hex_to_rgb(y['color_hex_triplet']))
+                              lambda y: y['rgb_triplet'])
 
                               
                               
@@ -257,7 +257,7 @@ class StructureTree( SimpleTree ):
         
 
     @staticmethod
-    def clean_structures(structures, field_whitelist=None):
+    def clean_structures(structures, whitelist=None, data_transforms=None, renames=None):
         '''Convert structures_with_sets query results into a form that can be 
         used to construct a StructureTree
         
@@ -266,10 +266,17 @@ class StructureTree( SimpleTree ):
         structures : list of dict
             Each element describes a structure. Should have a structure id path 
             field (str values) and a structure_sets field (list of dict).
-        field_whitelist : dict maps str to fn, optional
-           Input fields are filtered to keys of this dict and passed through 
-           the value functions
-           
+        whitelist : list of str, optional
+            Only these fields will be included in the final structure record. Default is 
+            the output of StructureTree.whitelist.
+        data_transforms : dict, optional
+            Keys are str field names. Values are functions which will be applied to the 
+            data associated with those fields. Default is to map colors from hex to rgb and 
+            convert the structure id path to a list of int.
+        renames : dict, optional
+            Controls the field names that appear in the output structure records. Default is 
+            to map 'color_hex_triplet' to 'rgb_triplet'.
+            
         Returns
         -------
         list of dict : 
@@ -277,29 +284,53 @@ class StructureTree( SimpleTree ):
         
         '''
 
-        if field_whitelist is None:
-            field_whitelist = StructureTree.whitelist()
+        if whitelist is None:
+            whitelist = StructureTree.whitelist()
+
+        if data_transforms is None:
+            data_transforms = StructureTree.data_transforms()
+
+        if renames is None:        
+            renames = StructureTree.renames()
 
         for ii, st in enumerate(structures):
 
             StructureTree.collect_sets(st)
-            structures[ii] = {wk: wf(st[wk]) for wk, wf 
-                              in iteritems(field_whitelist) if wk in st}
+            record = {}
+
+            for name in whitelist:
+                
+                if name not in st:
+                    continue
+                data = st[name]
+            
+                if name in data_transforms:
+                    data = data_transforms[name](data)
+
+                if name in renames:
+                    name = renames[name]
+
+                record[name] = data
+
+            structures[ii] = record
 
         return structures
-        
-        
+       
+    @staticmethod
+    def data_transforms():
+        return  {'color_hex_triplet': StructureTree.hex_to_rgb, 
+                 'structure_id_path': StructureTree.path_to_list}
+
+
+    @staticmethod
+    def renames():
+        return {'color_hex_triplet': 'rgb_triplet'}
+
     @staticmethod
     def whitelist():
-        return {'acronym': str, 
-                'color_hex_triplet': StructureTree.hex_to_rgb, 
-                'graph_id': int, 
-                'graph_order': int, 
-                'id': int, 
-                'name': str, 
-                'structure_id_path': StructureTree.path_to_list, 
-                'structure_set_ids': list}  
-
+        return ['acronym', 'color_hex_triplet', 'graph_id', 'graph_order', 'id', 
+                'name', 'structure_id_path', 'structure_set_ids'] 
+    
         
     @staticmethod
     def hex_to_rgb(hex_color):

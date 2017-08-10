@@ -152,7 +152,7 @@ def test_check_spikes_and_peaks():
     peaks = np.array([10, 15])
     upstrokes = np.array([3, 13])
 
-    new_spikes, new_peaks, new_upstrokes = ft.check_thresholds_and_peaks(v, t, spikes, peaks, upstrokes)
+    new_spikes, new_peaks, new_upstrokes, clipped = ft.check_thresholds_and_peaks(v, t, spikes, peaks, upstrokes)
     assert np.allclose(new_spikes, spikes[:-1])
     assert np.allclose(new_peaks, peaks[1:])
 
@@ -174,9 +174,11 @@ def test_troughs_with_peak_at_end():
     v = data[:, 1]
     spikes = np.array([725, 3382])
     peaks = np.array([812, 3478])
+    clipped = np.array([False, True])
 
-    troughs = ft.find_trough_indexes(v[:peaks[-1]], t[:peaks[-1]], spikes, peaks)
-    assert len(troughs) == len(peaks) - 1
+    troughs = ft.find_trough_indexes(v[:peaks[-1]], t[:peaks[-1]],
+                                     spikes, peaks, clipped=clipped)
+    assert np.isnan(troughs[-1])
 
 
 def test_downstrokes():
