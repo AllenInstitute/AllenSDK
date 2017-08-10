@@ -395,7 +395,6 @@ def test_make_structure_mask(mcc):
     #assert(len(c) == 1)
     assert mask.sum() == 5
 
-
 @pytest.mark.parametrize('inp,fails', [(1, False), 
                                         (pd.Series([2]), False), 
                                         ('qwerty', True)])

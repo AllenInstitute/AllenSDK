@@ -19,6 +19,7 @@ All notable changes to this project will be documented in this file.
 - BrainObservatoryCache.get_ophys_experiments accepts a list of cell_specimen_ids for additional filtering
 - json_utilities uses simplejson for better NaN handling
 
+
 ## [0.13.1] - 2017-03-20
 
 ### Fixed
