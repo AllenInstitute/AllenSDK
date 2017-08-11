@@ -1,6 +1,14 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [0.13.3] - 2017-08-14
+
+### Added
+
+### Changed
+
+- Changed license to Allen Institute License (2-clause BSD non-commercial use)
+
 ## [0.13.2] - 2017-06-15
 
 ### Added
