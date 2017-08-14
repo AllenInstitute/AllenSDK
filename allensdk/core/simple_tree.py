@@ -50,9 +50,9 @@ class SimpleTree( object ):
              
         '''
 
-        self._nodes = defaultdict(lambda *x: None, { node_id_cb(n):n for n in nodes })
-        self._parent_ids = defaultdict(lambda *x: None, { nid:parent_id_cb(n) for nid,n in iteritems(self._nodes) })
-        self._child_ids = defaultdict(lambda *x: None, { nid:[] for nid in self._nodes })
+        self._nodes = { node_id_cb(n):n for n in nodes }
+        self._parent_ids = { nid:parent_id_cb(n) for nid,n in iteritems(self._nodes) }
+        self._child_ids = { nid:[] for nid in self._nodes }
 
         for nid in self._parent_ids:
             pid = self._parent_ids[nid]
@@ -244,7 +244,7 @@ class SimpleTree( object ):
         if node_ids is None:
             node_ids = self.node_ids()
     
-        return [ self._nodes[nid] for nid in node_ids ]
+        return [ self._nodes[nid] if nid in self._nodes else None for nid in node_ids]
 
 
     def parent(self, node_ids):
