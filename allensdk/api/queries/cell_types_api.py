@@ -27,15 +27,19 @@ class CellTypesApi(RmaApi):
     def __init__(self, base_uri=None):
         super(CellTypesApi, self).__init__(base_uri)
 
-    def list_cells(self,
-                   require_morphology=False,
-                   require_reconstruction=False,
+    def list_cells(self, 
+                   id=None, 
+                   require_morphology=False, 
+                   require_reconstruction=False, 
                    reporter_status=None):
         """
         Query the API for a list of all cells in the Cell Types Database.
 
         Parameters
         ----------
+        id: int
+            ID of a cell.  If not provided returns all matching cells.  
+
         require_morphology: boolean
             Only return cells that have morphology images.
 
@@ -51,8 +55,11 @@ class CellTypesApi(RmaApi):
             Meta data for all cells.
         """
 
-        criteria = "[is_cell_specimen$eq'true'],products[name$eq'Mouse Cell Types'],ephys_result[failed$eqfalse]"
-
+        if id:
+            criteria = "[id$eq'%d']" % id
+        else:
+            criteria = "[is_cell_specimen$eq'true'],products[name$eq'Mouse Cell Types'],ephys_result[failed$eqfalse]"
+        
         include = ('structure,donor(transgenic_lines),specimen_tags,cell_soma_locations,' +
                    'ephys_features,data_sets,neuron_reconstructions,cell_reporter')
 
@@ -80,7 +87,23 @@ class CellTypesApi(RmaApi):
             # cell reporter status
             cell['reporter_status'] = cell['cell_reporter']['name']
 
-        return self.filter_cells(cells, require_morphology, require_reconstruction, reporter_status)
+        result = self.filter_cells(cells, require_morphology, require_reconstruction, reporter_status)
+        return result
+
+    def get_cell(self, id):
+        '''
+        Query the API for a one cells in the Cell Types Database.
+
+        
+        Returns
+        -------
+        list
+            Meta data for one cell.
+        '''
+
+        cells = self.list_cells(id=id)
+        cell = None if not cells else cells[0]
+        return cell
 
     @cacheable()
     def get_ephys_sweeps(self, specimen_id):
@@ -89,7 +112,6 @@ class CellTypesApi(RmaApi):
 
         Parameters
         ----------
-
         specimen_id: int
             Specimen ID of a cell.
 
