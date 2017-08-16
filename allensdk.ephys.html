@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.ephys package &mdash; Allen SDK 0.13.1 documentation</title>
+    <title>allensdk.ephys package &mdash; Allen SDK 0.13.2 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.13.1',
+        VERSION:     '0.13.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.13.1 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.13.2 documentation" href="index.html" />
     <link rel="up" title="allensdk package" href="allensdk.html" />
     <link rel="next" title="allensdk.model package" href="allensdk.model.html" />
     <link rel="prev" title="allensdk.core package" href="allensdk.core.html" /> 
@@ -119,7 +119,7 @@
 
 <dl class="method">
 <dt id="allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.ramps_features">
-<code class="descname">ramps_features</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysCellFeatureExtractor.ramps_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.ramps_features" title="Permalink to this definition">¶</a></dt>
+<code class="descname">ramps_features</code><span class="sig-paren">(</span><em>all=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysCellFeatureExtractor.ramps_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.ramps_features" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -203,6 +203,11 @@ single exponential.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.is_spike_feature_affected_by_clipping">
+<code class="descname">is_spike_feature_affected_by_clipping</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysSweepFeatureExtractor.is_spike_feature_affected_by_clipping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.is_spike_feature_affected_by_clipping" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.pause_metrics">
 <code class="descname">pause_metrics</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysSweepFeatureExtractor.pause_metrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.pause_metrics" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimate average number of pauses and average fraction of time spent in a pause</p>
@@ -224,7 +229,7 @@ single exponential.</p>
 
 <dl class="method">
 <dt id="allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.process_new_spike_feature">
-<code class="descname">process_new_spike_feature</code><span class="sig-paren">(</span><em>feature_name</em>, <em>feature_func</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysSweepFeatureExtractor.process_new_spike_feature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.process_new_spike_feature" title="Permalink to this definition">¶</a></dt>
+<code class="descname">process_new_spike_feature</code><span class="sig-paren">(</span><em>feature_name</em>, <em>feature_func</em>, <em>affected_by_clipping=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysSweepFeatureExtractor.process_new_spike_feature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.process_new_spike_feature" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add new spike-level feature calculation function</p>
 <p>The function should take this sweep extractor as its argument. Its results
 can be accessed by calling the method spike_feature(&lt;feature_name&gt;).</p>
@@ -251,15 +256,18 @@ can be accessed by calling the method sweep_feature(&lt;feature_name&gt;).</p>
 
 <dl class="method">
 <dt id="allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.spike_feature">
-<code class="descname">spike_feature</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysSweepFeatureExtractor.spike_feature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.spike_feature" title="Permalink to this definition">¶</a></dt>
+<code class="descname">spike_feature</code><span class="sig-paren">(</span><em>key</em>, <em>include_clipped=False</em>, <em>force_exclude_clipped=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysSweepFeatureExtractor.spike_feature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.spike_feature" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get specified feature for every spike.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> : feature name</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>key</strong> : feature name</p>
+<p><strong>include_clipped: return values for every identified spike, even when clipping means they will be incorrect/undefined</strong></p>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>spike_feature_values</strong> : ndarray of features for each spike</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>spike_feature_values</strong> : ndarray of features for each spike</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -424,6 +432,11 @@ are hyperpolarizing responses.</p>
 <dd><p>Average the membrane time constant values estimated from each sweep in passed extractor.</p>
 </dd></dl>
 
+<dl class="function">
+<dt id="allensdk.ephys.ephys_extractor.reset_long_squares_start">
+<code class="descclassname">allensdk.ephys.ephys_extractor.</code><code class="descname">reset_long_squares_start</code><span class="sig-paren">(</span><em>when</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#reset_long_squares_start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.reset_long_squares_start" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 <div class="section" id="module-allensdk.ephys.ephys_features">
 <span id="allensdk-ephys-ephys-features-module"></span><h2>allensdk.ephys.ephys_features module<a class="headerlink" href="#module-allensdk.ephys.ephys_features" title="Permalink to this headline">¶</a></h2>
@@ -442,7 +455,7 @@ are hyperpolarizing responses.</p>
 
 <dl class="function">
 <dt id="allensdk.ephys.ephys_features.analyze_trough_details">
-<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">analyze_trough_details</code><span class="sig-paren">(</span><em>v</em>, <em>t</em>, <em>spike_indexes</em>, <em>peak_indexes</em>, <em>end=None</em>, <em>filter=10.0</em>, <em>heavy_filter=1.0</em>, <em>term_frac=0.01</em>, <em>adp_thresh=0.5</em>, <em>tol=0.5</em>, <em>flat_interval=0.002</em>, <em>dvdt=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#analyze_trough_details"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.analyze_trough_details" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">analyze_trough_details</code><span class="sig-paren">(</span><em>v</em>, <em>t</em>, <em>spike_indexes</em>, <em>peak_indexes</em>, <em>clipped=None</em>, <em>end=None</em>, <em>filter=10.0</em>, <em>heavy_filter=1.0</em>, <em>term_frac=0.01</em>, <em>adp_thresh=0.5</em>, <em>tol=0.5</em>, <em>flat_interval=0.002</em>, <em>adp_max_delta_t=0.005</em>, <em>adp_max_delta_v=10.0</em>, <em>dvdt=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#analyze_trough_details"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.analyze_trough_details" title="Permalink to this definition">¶</a></dt>
 <dd><p>Analyze trough to determine if an ADP exists and whether the reset is a &#8216;detour&#8217; or &#8216;direct&#8217;</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -458,7 +471,9 @@ are hyperpolarizing responses.</p>
 <p><strong>thresh_frac</strong> : fraction of average upstroke for threshold calculation (optional, default 0.05)</p>
 <p><strong>adp_thresh: minimum dV/dt in V/s to exceed to be considered to have an ADP (optional, default 1.5)</strong></p>
 <p><strong>tol</strong> : tolerance for evaluating whether Vm drops appreciably further after end of spike (default 1.0 mV)</p>
-<p><strong>flat_interval: if the trace is flat for this duration, stop looking for an ADP (default 0.002)</strong></p>
+<p><strong>flat_interval: if the trace is flat for this duration, stop looking for an ADP (default 0.002 s)</strong></p>
+<p><strong>adp_max_delta_t: max possible ADP delta t (default 0.005 s)</strong></p>
+<p><strong>adp_max_delta_v: max possible ADP delta v (default 10 mV)</strong></p>
 <p><strong>dvdt</strong> : pre-calculated time-derivative of voltage (optional)</p>
 </td>
 </tr>
@@ -539,7 +554,7 @@ are hyperpolarizing responses.</p>
 
 <dl class="function">
 <dt id="allensdk.ephys.ephys_features.check_thresholds_and_peaks">
-<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">check_thresholds_and_peaks</code><span class="sig-paren">(</span><em>v</em>, <em>t</em>, <em>spike_indexes</em>, <em>peak_indexes</em>, <em>upstroke_indexes</em>, <em>max_interval=0.005</em>, <em>thresh_frac=0.05</em>, <em>filter=10.0</em>, <em>dvdt=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#check_thresholds_and_peaks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.check_thresholds_and_peaks" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">check_thresholds_and_peaks</code><span class="sig-paren">(</span><em>v</em>, <em>t</em>, <em>spike_indexes</em>, <em>peak_indexes</em>, <em>upstroke_indexes</em>, <em>end=None</em>, <em>max_interval=0.005</em>, <em>thresh_frac=0.05</em>, <em>filter=10.0</em>, <em>dvdt=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#check_thresholds_and_peaks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.check_thresholds_and_peaks" title="Permalink to this definition">¶</a></dt>
 <dd><p>Validate thresholds and peaks for set of spikes</p>
 <p>Check that peaks and thresholds for consecutive spikes do not overlap
 Spikes with overlapping thresholds and peaks will be merged.</p>
@@ -561,7 +576,8 @@ Spikes with overlapping thresholds and peaks will be merged.</p>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>spike_indexes</strong> : numpy array of modified spike indexes</p>
 <p><strong>peak_indexes</strong> : numpy array of modified spike peak indexes</p>
-<p class="last"><strong>upstroke_indexes</strong> : numpy array of modified spike upstroke indexes</p>
+<p><strong>upstroke_indexes</strong> : numpy array of modified spike upstroke indexes</p>
+<p class="last"><strong>clipped</strong> : numpy array of clippped status of spikes</p>
 </td>
 </tr>
 </tbody>
@@ -709,7 +725,7 @@ in spurious spike detection results.</p>
 
 <dl class="function">
 <dt id="allensdk.ephys.ephys_features.find_downstroke_indexes">
-<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">find_downstroke_indexes</code><span class="sig-paren">(</span><em>v</em>, <em>t</em>, <em>peak_indexes</em>, <em>trough_indexes</em>, <em>filter=10.0</em>, <em>dvdt=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#find_downstroke_indexes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.find_downstroke_indexes" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">find_downstroke_indexes</code><span class="sig-paren">(</span><em>v</em>, <em>t</em>, <em>peak_indexes</em>, <em>trough_indexes</em>, <em>clipped=None</em>, <em>filter=10.0</em>, <em>dvdt=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#find_downstroke_indexes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.find_downstroke_indexes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find indexes of minimum voltage (troughs) between spikes.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -719,6 +735,7 @@ in spurious spike detection results.</p>
 <p><strong>t</strong> : numpy array of times in seconds</p>
 <p><strong>peak_indexes</strong> : numpy array of spike peak indexes</p>
 <p><strong>trough_indexes</strong> : numpy array of threshold indexes</p>
+<p><strong>clipped: boolean array - False if spike not clipped by edge of window</strong></p>
 <p><strong>filter</strong> : cutoff frequency for 4-pole low-pass Bessel filter in kHz (optional, default 10)</p>
 <p><strong>dvdt</strong> : pre-calculated time-derivative of voltage (optional)</p>
 </td>
@@ -756,7 +773,7 @@ in spurious spike detection results.</p>
 
 <dl class="function">
 <dt id="allensdk.ephys.ephys_features.find_trough_indexes">
-<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">find_trough_indexes</code><span class="sig-paren">(</span><em>v</em>, <em>t</em>, <em>spike_indexes</em>, <em>peak_indexes</em>, <em>end=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#find_trough_indexes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.find_trough_indexes" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">find_trough_indexes</code><span class="sig-paren">(</span><em>v</em>, <em>t</em>, <em>spike_indexes</em>, <em>peak_indexes</em>, <em>clipped=None</em>, <em>end=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#find_trough_indexes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.find_trough_indexes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find indexes of minimum voltage (trough) between spikes.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -801,7 +818,7 @@ in spurious spike detection results.</p>
 
 <dl class="function">
 <dt id="allensdk.ephys.ephys_features.find_widths">
-<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">find_widths</code><span class="sig-paren">(</span><em>v</em>, <em>t</em>, <em>spike_indexes</em>, <em>peak_indexes</em>, <em>trough_indexes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#find_widths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.find_widths" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">find_widths</code><span class="sig-paren">(</span><em>v</em>, <em>t</em>, <em>spike_indexes</em>, <em>peak_indexes</em>, <em>trough_indexes</em>, <em>clipped=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#find_widths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.find_widths" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find widths at half-height for spikes.</p>
 <p>Widths are only returned when heights are defined</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -824,7 +841,7 @@ in spurious spike detection results.</p>
 
 <dl class="function">
 <dt id="allensdk.ephys.ephys_features.fit_membrane_time_constant">
-<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">fit_membrane_time_constant</code><span class="sig-paren">(</span><em>v</em>, <em>t</em>, <em>start</em>, <em>end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#fit_membrane_time_constant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.fit_membrane_time_constant" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">fit_membrane_time_constant</code><span class="sig-paren">(</span><em>v</em>, <em>t</em>, <em>start</em>, <em>end</em>, <em>min_rsme=0.0001</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#fit_membrane_time_constant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.fit_membrane_time_constant" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fit an exponential to estimate membrane time constant between start and end</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -834,6 +851,7 @@ in spurious spike detection results.</p>
 <p><strong>t</strong> : numpy array of times in seconds</p>
 <p><strong>start</strong> : start of time window for exponential fit</p>
 <p><strong>end</strong> : end of time window for exponential fit</p>
+<p><strong>min_rsme: minimal acceptable root mean square error (default 1e-4)</strong></p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>a, inv_tau, y0</strong> : Coeffients of equation y0 + a * exp(-inv_tau * x)</p>

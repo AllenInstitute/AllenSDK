@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.brain_observatory package &mdash; Allen SDK 0.13.1 documentation</title>
+    <title>allensdk.brain_observatory package &mdash; Allen SDK 0.13.2 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.13.1',
+        VERSION:     '0.13.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.13.1 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.13.2 documentation" href="index.html" />
     <link rel="up" title="allensdk package" href="allensdk.html" />
     <link rel="next" title="allensdk.brain_observatory.receptive_field_analysis package" href="allensdk.brain_observatory.receptive_field_analysis.html" />
     <link rel="prev" title="allensdk.api.queries package" href="allensdk.api.queries.html" /> 
@@ -1445,8 +1445,14 @@ mask should have values &gt;0. Background pixels must be zero</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="allensdk.brain_observatory.roi_masks.calculate_roi_and_neuropil_traces">
+<code class="descclassname">allensdk.brain_observatory.roi_masks.</code><code class="descname">calculate_roi_and_neuropil_traces</code><span class="sig-paren">(</span><em>movie_h5</em>, <em>roi_mask_list</em>, <em>motion_border</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/roi_masks.html#calculate_roi_and_neuropil_traces"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.roi_masks.calculate_roi_and_neuropil_traces" title="Permalink to this definition">¶</a></dt>
+<dd><p>get roi and neuropil masks</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="allensdk.brain_observatory.roi_masks.calculate_traces">
-<code class="descclassname">allensdk.brain_observatory.roi_masks.</code><code class="descname">calculate_traces</code><span class="sig-paren">(</span><em>stack</em>, <em>mask_list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/roi_masks.html#calculate_traces"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.roi_masks.calculate_traces" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">allensdk.brain_observatory.roi_masks.</code><code class="descname">calculate_traces</code><span class="sig-paren">(</span><em>stack</em>, <em>mask_list</em>, <em>block_size=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/roi_masks.html#calculate_traces"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.roi_masks.calculate_traces" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the average response of the specified masks in the
 image stack</p>
 <table class="docutils field-list" frame="void" rules="none">

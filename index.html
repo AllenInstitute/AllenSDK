@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Welcome to the Allen SDK &mdash; Allen SDK 0.13.1 documentation</title>
+    <title>Welcome to the Allen SDK &mdash; Allen SDK 0.13.2 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.13.1',
+        VERSION:     '0.13.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.13.1 documentation" href="#" />
+    <link rel="top" title="Allen SDK 0.13.2 documentation" href="#" />
     <link rel="next" title="Install Guide" href="install.html" /> 
   </head>
   <body role="document">
@@ -122,26 +122,15 @@ your own simulations using stimuli from the Allen Cell Types Database or custom 
 <p>The Allen SDK provides Python code for accessing experimental metadata along with projection signal volumes registered to a common coordinate framework.  This framework has structural annotations, which allows users to compute structure-level signal statistics.</p>
 <p>See the <a class="reference external" href="connectivity.html">mouse connectivity section</a> for more details.</p>
 </div>
-<div class="section" id="what-s-new-release-0-13-2-june-15th-2017">
-<h2>What&#8217;s New - Release 0.13.2 (June 15th, 2017)<a class="headerlink" href="#what-s-new-release-0-13-2-june-15th-2017" title="Permalink to this headline">¶</a></h2>
-<p>The 0.13.2 release is a major update for the Brain Observatory modules and data.  All Brain Observatory NWB files have been regenerated, and a large number of new experiments have been released.  All NWB files now contain demixed traces.  These traces are used for neuropil subtraction and dF/F computation, so those traces are affected as well.</p>
-<p>To get new lists of experiments and metadata, please delete/rename the directory container the Brain Observatory manifest.  The new files are a bit larger because of the new traces.</p>
-<p>The cross-session alignment algorithm has been updated and re-run, so <strong>all cell specimen IDs have changed</strong>.  We have built a mapping table to help map from previous cell IDs to new cell IDs available here: <a class="reference external" href="http://api.brain-map.org/api/v2/well_known_file_download/590985414">cell_specimen_mapping.csv</a>. For examples of how to download the file with the SDK and use it to map between IDs, see this <a class="reference external" href="_static/examples/nb/cell_specimen_mapping.html">notebook</a>.</p>
-<p>The cell specimens table now has a large number of new features.  Read the <a class="reference external" href="http://help.brain-map.org/display/observatory/Documentation">technical whitepapers</a> on stimulus analysis to learn more.</p>
-<dl class="docutils">
-<dt>Code changes include:</dt>
-<dd><ul class="first last simple">
-<li>a new receptive field analysis module (<a class="reference internal" href="allensdk.brain_observatory.receptive_field_analysis.html#module-allensdk.brain_observatory.receptive_field_analysis" title="allensdk.brain_observatory.receptive_field_analysis"><code class="xref py py-mod docutils literal"><span class="pre">receptive_field_analysis</span></code></a>)</li>
-<li>a trace demixing algorithm (<a class="reference internal" href="allensdk.brain_observatory.html#module-allensdk.brain_observatory.demixer" title="allensdk.brain_observatory.demixer"><code class="xref py py-mod docutils literal"><span class="pre">demixer</span></code></a>)</li>
-<li>a new convenience method: <a class="reference internal" href="allensdk.core.html#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiment_stimuli" title="allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiment_stimuli"><code class="xref py py-meth docutils literal"><span class="pre">get_ophys_experiment_stimuli()</span></code></a></li>
-<li>a new method to get the cell specimen mapping table: <a class="reference internal" href="allensdk.api.queries.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.get_cell_specimen_id_mapping" title="allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.get_cell_specimen_id_mapping"><code class="xref py py-meth docutils literal"><span class="pre">get_cell_specimen_id_mapping()</span></code></a></li>
-<li>new methods <a class="reference internal" href="allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_pupil_location" title="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_pupil_location"><code class="xref py py-meth docutils literal"><span class="pre">get_pupil_location()</span></code></a> and <a class="reference internal" href="allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_pupil_size" title="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_pupil_size"><code class="xref py py-meth docutils literal"><span class="pre">get_pupil_size()</span></code></a> to get pupil position and size for experiments with eye tracking data.</li>
-<li><a class="reference internal" href="allensdk.core.html#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiments" title="allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiments"><code class="xref py py-meth docutils literal"><span class="pre">get_ophys_experiments()</span></code></a> accepts a list of <code class="docutils literal"><span class="pre">cell_specimen_ids</span></code> as an additional filter</li>
-<li><a class="reference internal" href="allensdk.core.html#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiments" title="allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiments"><code class="xref py py-meth docutils literal"><span class="pre">get_ophys_experiments()</span></code></a> returns &#8220;acquisition_age_days&#8221; instead of &#8220;age_days&#8221;.  The new field describes the age of the animal on the day of experiment acquisition.</li>
-<li><a class="reference internal" href="allensdk.core.html#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_experiment_containers" title="allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_experiment_containers"><code class="xref py py-meth docutils literal"><span class="pre">get_experiment_containers()</span></code></a> no longer returns &#8220;age_days&#8221;.</li>
-</ul>
-</dd>
-</dl>
+<div class="section" id="what-s-new-release-0-14-0-august-16th-2017">
+<h2>What&#8217;s New - Release 0.14.0 (August 16th, 2017)<a class="headerlink" href="#what-s-new-release-0-14-0-august-16th-2017" title="Permalink to this headline">¶</a></h2>
+<p>The 0.14.0  release is primarily a change in our open source license.
+We are now using a 2-clause BSD license with an additional clause
+related to commercial use.  If you have any questions, please contact us on our
+<a class="reference external" href="https://gitter.im/AllenInstitute/AllenSDK">Gitter channel</a>
+or <a class="reference external" href="http://allins.convio.net/site/PageServer?pagename=send_us_a_message">send us a message</a>.</p>
+<p>This release also includes code in the BrainObservatory for mapping stimuli to screens.
+See <a class="reference external" href="http://alleninstitute.github.io/AllenSDK/_static/examples/nb/brain_observatory_monitor.html">this Jupyter example notebook</a> for details.</p>
 <p>To find out more, take a look at our <a class="reference external" href="http://github.com/AllenInstitute/AllenSDK/blob/master/CHANGELOG.md">CHANGELOG</a>.</p>
 </div>
 </div>

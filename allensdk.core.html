@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.core package &mdash; Allen SDK 0.13.1 documentation</title>
+    <title>allensdk.core package &mdash; Allen SDK 0.13.2 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.13.1',
+        VERSION:     '0.13.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.13.1 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.13.2 documentation" href="index.html" />
     <link rel="up" title="allensdk package" href="allensdk.html" />
     <link rel="next" title="allensdk.ephys package" href="allensdk.ephys.html" />
     <link rel="prev" title="allensdk.config.model.formats package" href="allensdk.config.model.formats.html" /> 
@@ -2647,7 +2647,7 @@ horizontal, and 2 is sagittal.</p>
 <p><strong>cmap</strong> : dict, optional</p>
 <blockquote>
 <div><p>Keys are structure ids, values are rgb triplets. Defaults to 
-structure color_hex_triplets.</p>
+structure rgb_triplets.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -3147,7 +3147,7 @@ defined by to_fn across nodes.</p>
 <dd><p>Bases: <a class="reference internal" href="#allensdk.core.simple_tree.SimpleTree" title="allensdk.core.simple_tree.SimpleTree"><code class="xref py py-class docutils literal"><span class="pre">allensdk.core.simple_tree.SimpleTree</span></code></a></p>
 <dl class="staticmethod">
 <dt id="allensdk.core.structure_tree.StructureTree.clean_structures">
-<em class="property">static </em><code class="descname">clean_structures</code><span class="sig-paren">(</span><em>structures</em>, <em>field_whitelist=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/structure_tree.html#StructureTree.clean_structures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.structure_tree.StructureTree.clean_structures" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">clean_structures</code><span class="sig-paren">(</span><em>structures</em>, <em>whitelist=None</em>, <em>data_transforms=None</em>, <em>renames=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/structure_tree.html#StructureTree.clean_structures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.structure_tree.StructureTree.clean_structures" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert structures_with_sets query results into a form that can be 
 used to construct a StructureTree</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -3159,10 +3159,21 @@ used to construct a StructureTree</p>
 <div><p>Each element describes a structure. Should have a structure id path 
 field (str values) and a structure_sets field (list of dict).</p>
 </div></blockquote>
-<p><strong>field_whitelist</strong> : dict maps str to fn, optional</p>
+<p><strong>whitelist</strong> : list of str, optional</p>
 <blockquote>
-<div><p>Input fields are filtered to keys of this dict and passed through 
-the value functions</p>
+<div><p>Only these fields will be included in the final structure record. Default is 
+the output of StructureTree.whitelist.</p>
+</div></blockquote>
+<p><strong>data_transforms</strong> : dict, optional</p>
+<blockquote>
+<div><p>Keys are str field names. Values are functions which will be applied to the 
+data associated with those fields. Default is to map colors from hex to rgb and 
+convert the structure id path to a list of int.</p>
+</div></blockquote>
+<p><strong>renames</strong> : dict, optional</p>
+<blockquote>
+<div><p>Controls the field names that appear in the output structure records. Default is 
+to map &#8216;color_hex_triplet&#8217; to &#8216;rgb_triplet&#8217;.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -3183,6 +3194,11 @@ the value functions</p>
 collects all of the structure set records/ids in a structure record and 
 replaces them with a single list of id records.</p>
 </dd></dl>
+
+<dl class="staticmethod">
+<dt id="allensdk.core.structure_tree.StructureTree.data_transforms">
+<em class="property">static </em><code class="descname">data_transforms</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/structure_tree.html#StructureTree.data_transforms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.structure_tree.StructureTree.data_transforms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="allensdk.core.structure_tree.StructureTree.get_ancestor_id_map">
@@ -3431,6 +3447,11 @@ returned unchanged.</p>
 <dd><p>Structure id paths are sometimes formatted as &#8220;/&#8221;-seperated strings. 
 This method converts them to a list of integers, if needed.</p>
 </dd></dl>
+
+<dl class="staticmethod">
+<dt id="allensdk.core.structure_tree.StructureTree.renames">
+<em class="property">static </em><code class="descname">renames</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/structure_tree.html#StructureTree.renames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.structure_tree.StructureTree.renames" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="allensdk.core.structure_tree.StructureTree.structure_descends_from">

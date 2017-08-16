@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.ephys.ephys_extractor &mdash; Allen SDK 0.13.1 documentation</title>
+    <title>allensdk.ephys.ephys_extractor &mdash; Allen SDK 0.13.2 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.13.1',
+        VERSION:     '0.13.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.13.1 documentation" href="../../../index.html" />
+    <link rel="top" title="Allen SDK 0.13.2 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body role="document">
@@ -69,28 +69,48 @@
           <div class="body" role="main">
             
   <h1>Source code for allensdk.ephys.ephys_extractor</h1><div class="highlight"><pre>
-<span></span><span class="c1"># Copyright 2015-2016 Allen Institute for Brain Science</span>
-<span class="c1"># This file is part of Allen SDK.</span>
+<span></span><span class="c1"># Allen Institute Software License - This software license is the 2-clause BSD</span>
+<span class="c1"># license plus a third clause that prohibits redistribution for commercial</span>
+<span class="c1"># purposes without further permission.</span>
 <span class="c1">#</span>
-<span class="c1"># Allen SDK is free software: you can redistribute it and/or modify</span>
-<span class="c1"># it under the terms of the GNU General Public License as published by</span>
-<span class="c1"># the Free Software Foundation, version 3 of the License.</span>
+<span class="c1"># Copyright 2015-2016. Allen Institute. All rights reserved.</span>
 <span class="c1">#</span>
-<span class="c1"># Allen SDK is distributed in the hope that it will be useful,</span>
-<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
-<span class="c1"># Merchantability Or Fitness FOR A PARTICULAR PURPOSE.  See the</span>
-<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1"># Redistribution and use in source and binary forms, with or without</span>
+<span class="c1"># modification, are permitted provided that the following conditions are met:</span>
 <span class="c1">#</span>
-<span class="c1"># You should have received a copy of the GNU General Public License</span>
-<span class="c1"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
-
+<span class="c1"># 1. Redistributions of source code must retain the above copyright notice,</span>
+<span class="c1"># this list of conditions and the following disclaimer.</span>
+<span class="c1">#</span>
+<span class="c1"># 2. Redistributions in binary form must reproduce the above copyright notice,</span>
+<span class="c1"># this list of conditions and the following disclaimer in the documentation</span>
+<span class="c1"># and/or other materials provided with the distribution.</span>
+<span class="c1">#</span>
+<span class="c1"># 3. Redistributions for commercial purposes are not permitted without the</span>
+<span class="c1"># Allen Institute&#39;s written permission.</span>
+<span class="c1"># For purposes of this license, commercial purposes is the incorporation of the</span>
+<span class="c1"># Allen Institute&#39;s software into anything for which you will charge fees or</span>
+<span class="c1"># other compensation. Contact terms@alleninstitute.org for commercial licensing</span>
+<span class="c1"># opportunities.</span>
+<span class="c1">#</span>
+<span class="c1"># THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</span>
+<span class="c1"># AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</span>
+<span class="c1"># IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE</span>
+<span class="c1"># ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE</span>
+<span class="c1"># LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR</span>
+<span class="c1"># CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF</span>
+<span class="c1"># SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS</span>
+<span class="c1"># INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN</span>
+<span class="c1"># CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)</span>
+<span class="c1"># ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
+<span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
+<span class="c1">#</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
 
-<span class="kn">import</span> <span class="nn">ephys_features</span> <span class="kn">as</span> <span class="nn">ft</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">ephys_features</span> <span class="k">as</span> <span class="n">ft</span>
 <span class="kn">import</span> <span class="nn">six</span>
 
 <span class="c1"># Constants for stimulus-specific analysis</span>
@@ -144,6 +164,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">stimulus_amplitude_calculator</span> <span class="o">=</span> <span class="bp">None</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_features</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_affected_by_clipping</span> <span class="o">=</span> <span class="p">[]</span>
 
 <div class="viewcode-block" id="EphysSweepFeatureExtractor.process_spikes"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.process_spikes">[docs]</a>    <span class="k">def</span> <span class="nf">process_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Perform spike-related feature analysis&quot;&quot;&quot;</span>
@@ -170,22 +191,22 @@
         <span class="n">upstrokes</span> <span class="o">=</span> <span class="n">ft</span><span class="o">.</span><span class="n">find_upstroke_indexes</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">putative_spikes</span><span class="p">,</span> <span class="n">peaks</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">,</span> <span class="n">dvdt</span><span class="p">)</span>
         <span class="n">thresholds</span> <span class="o">=</span> <span class="n">ft</span><span class="o">.</span><span class="n">refine_threshold_indexes</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">upstrokes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">thresh_frac</span><span class="p">,</span>
                                                  <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">,</span> <span class="n">dvdt</span><span class="p">)</span>
-        <span class="n">thresholds</span><span class="p">,</span> <span class="n">peaks</span><span class="p">,</span> <span class="n">upstrokes</span> <span class="o">=</span> <span class="n">ft</span><span class="o">.</span><span class="n">check_thresholds_and_peaks</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">thresholds</span><span class="p">,</span> <span class="n">peaks</span><span class="p">,</span>
-                                                                     <span class="n">upstrokes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_interval</span><span class="p">)</span>
-
+        <span class="n">thresholds</span><span class="p">,</span> <span class="n">peaks</span><span class="p">,</span> <span class="n">upstrokes</span><span class="p">,</span> <span class="n">clipped</span> <span class="o">=</span> <span class="n">ft</span><span class="o">.</span><span class="n">check_thresholds_and_peaks</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">thresholds</span><span class="p">,</span> <span class="n">peaks</span><span class="p">,</span>
+                                                                     <span class="n">upstrokes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_interval</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">thresholds</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
             <span class="c1"># Save time if no spikes detected</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">()</span>
             <span class="k">return</span>
 
-
         <span class="c1"># Spike list and thresholds have been refined - now find other features</span>
         <span class="n">upstrokes</span> <span class="o">=</span> <span class="n">ft</span><span class="o">.</span><span class="n">find_upstroke_indexes</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">thresholds</span><span class="p">,</span> <span class="n">peaks</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">,</span> <span class="n">dvdt</span><span class="p">)</span>
-        <span class="n">troughs</span> <span class="o">=</span> <span class="n">ft</span><span class="o">.</span><span class="n">find_trough_indexes</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">thresholds</span><span class="p">,</span> <span class="n">peaks</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">)</span>
-        <span class="n">downstrokes</span> <span class="o">=</span> <span class="n">ft</span><span class="o">.</span><span class="n">find_downstroke_indexes</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">peaks</span><span class="p">,</span> <span class="n">troughs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">,</span> <span class="n">dvdt</span><span class="p">)</span>
-        <span class="n">trough_details</span> <span class="o">=</span> <span class="n">ft</span><span class="o">.</span><span class="n">analyze_trough_details</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">thresholds</span><span class="p">,</span> <span class="n">peaks</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">,</span>
-                                                   <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">,</span> <span class="n">dvdt</span><span class="o">=</span><span class="n">dvdt</span><span class="p">)</span>
-        <span class="n">widths</span> <span class="o">=</span> <span class="n">ft</span><span class="o">.</span><span class="n">find_widths</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">thresholds</span><span class="p">,</span> <span class="n">peaks</span><span class="p">,</span> <span class="n">trough_details</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">troughs</span> <span class="o">=</span> <span class="n">ft</span><span class="o">.</span><span class="n">find_trough_indexes</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">thresholds</span><span class="p">,</span> <span class="n">peaks</span><span class="p">,</span> <span class="n">clipped</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">)</span>
+        <span class="n">downstrokes</span> <span class="o">=</span> <span class="n">ft</span><span class="o">.</span><span class="n">find_downstroke_indexes</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">peaks</span><span class="p">,</span> <span class="n">troughs</span><span class="p">,</span> <span class="n">clipped</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">,</span> <span class="n">dvdt</span><span class="p">)</span>
+        <span class="n">trough_details</span><span class="p">,</span> <span class="n">clipped</span> <span class="o">=</span> <span class="n">ft</span><span class="o">.</span><span class="n">analyze_trough_details</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">thresholds</span><span class="p">,</span> <span class="n">peaks</span><span class="p">,</span> <span class="n">clipped</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">,</span>
+                                                            <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">,</span> <span class="n">dvdt</span><span class="o">=</span><span class="n">dvdt</span><span class="p">)</span>
+        <span class="n">widths</span> <span class="o">=</span> <span class="n">ft</span><span class="o">.</span><span class="n">find_widths</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">thresholds</span><span class="p">,</span> <span class="n">peaks</span><span class="p">,</span> <span class="n">trough_details</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">clipped</span><span class="p">)</span>
+
+        <span class="n">base_clipped_list</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="c1"># Points where we care about t, v, and i if available</span>
         <span class="n">vit_data_indexes</span> <span class="o">=</span> <span class="p">{</span>
@@ -193,70 +214,101 @@
             <span class="s2">&quot;peak&quot;</span><span class="p">:</span> <span class="n">peaks</span><span class="p">,</span>
             <span class="s2">&quot;trough&quot;</span><span class="p">:</span> <span class="n">troughs</span><span class="p">,</span>
         <span class="p">}</span>
+        <span class="n">base_clipped_list</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;trough&quot;</span><span class="p">]</span>
 
         <span class="c1"># Points where we care about t and dv/dt</span>
         <span class="n">dvdt_data_indexes</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;upstroke&quot;</span><span class="p">:</span> <span class="n">upstrokes</span><span class="p">,</span>
             <span class="s2">&quot;downstroke&quot;</span><span class="p">:</span> <span class="n">downstrokes</span>
         <span class="p">}</span>
+        <span class="n">base_clipped_list</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;downstroke&quot;</span><span class="p">]</span>
 
         <span class="c1"># Trough details</span>
         <span class="n">isi_types</span> <span class="o">=</span> <span class="n">trough_details</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">trough_detail_indexes</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">([</span><span class="s2">&quot;fast_trough&quot;</span><span class="p">,</span> <span class="s2">&quot;adp&quot;</span><span class="p">,</span> <span class="s2">&quot;slow_trough&quot;</span><span class="p">],</span> <span class="n">trough_details</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
+        <span class="n">base_clipped_list</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;fast_trough&quot;</span><span class="p">,</span> <span class="s2">&quot;adp&quot;</span><span class="p">,</span> <span class="s2">&quot;slow_trough&quot;</span><span class="p">]</span>
 
         <span class="c1"># Redundant, but ensures that DataFrame has right number of rows</span>
         <span class="c1"># Any better way to do it?</span>
         <span class="n">spikes_df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">thresholds</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;threshold_index&quot;</span><span class="p">])</span>
+        <span class="n">spikes_df</span><span class="p">[</span><span class="s2">&quot;clipped&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">clipped</span>
 
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">vals</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">vit_data_indexes</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">all_vals</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">vit_data_indexes</span><span class="p">):</span>
+            <span class="n">valid_ind</span> <span class="o">=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">all_vals</span><span class="p">)</span>
+            <span class="n">vals</span> <span class="o">=</span> <span class="n">all_vals</span><span class="p">[</span><span class="n">valid_ind</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
             <span class="n">spikes_df</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
             <span class="n">spikes_df</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_t&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
             <span class="n">spikes_df</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
 
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vals</span>
-                <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_t&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">vals</span><span class="p">]</span>
-                <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">vals</span><span class="p">]</span>
+                <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">valid_ind</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vals</span>
+                <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">valid_ind</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_t&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">vals</span><span class="p">]</span>
+                <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">valid_ind</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">vals</span><span class="p">]</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">i</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="n">spikes_df</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_i&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_i&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="p">[</span><span class="n">vals</span><span class="p">]</span>
+                    <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">valid_ind</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_i&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="p">[</span><span class="n">vals</span><span class="p">]</span>
 
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">vals</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">dvdt_data_indexes</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">base_clipped_list</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_affected_by_clipping</span> <span class="o">+=</span> <span class="p">[</span>
+                    <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_index&quot;</span><span class="p">,</span>
+                    <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_t&quot;</span><span class="p">,</span>
+                    <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_v&quot;</span><span class="p">,</span>
+                    <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_i&quot;</span><span class="p">,</span>
+                <span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">all_vals</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">dvdt_data_indexes</span><span class="p">):</span>
+            <span class="n">valid_ind</span> <span class="o">=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">all_vals</span><span class="p">)</span>
+            <span class="n">vals</span> <span class="o">=</span> <span class="n">all_vals</span><span class="p">[</span><span class="n">valid_ind</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
             <span class="n">spikes_df</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
             <span class="n">spikes_df</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vals</span>
-                <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_t&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">vals</span><span class="p">]</span>
-                <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">vals</span><span class="p">]</span>
-                <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">dvdt</span><span class="p">[</span><span class="n">vals</span><span class="p">]</span>
+                <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">valid_ind</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vals</span>
+                <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">valid_ind</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_t&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">vals</span><span class="p">]</span>
+                <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">valid_ind</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">vals</span><span class="p">]</span>
+                <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">valid_ind</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">dvdt</span><span class="p">[</span><span class="n">vals</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">base_clipped_list</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_affected_by_clipping</span> <span class="o">+=</span> <span class="p">[</span>
+                    <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_index&quot;</span><span class="p">,</span>
+                    <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_t&quot;</span><span class="p">,</span>
+                    <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_v&quot;</span><span class="p">,</span>
+                    <span class="n">k</span><span class="p">,</span>
+                <span class="p">]</span>
 
         <span class="n">spikes_df</span><span class="p">[</span><span class="s2">&quot;isi_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">isi_types</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_affected_by_clipping</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;isi_type&quot;</span><span class="p">]</span>
 
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">vals</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">trough_detail_indexes</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">all_vals</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">trough_detail_indexes</span><span class="p">):</span>
+            <span class="n">valid_ind</span> <span class="o">=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">all_vals</span><span class="p">)</span>
+            <span class="n">vals</span> <span class="o">=</span> <span class="n">all_vals</span><span class="p">[</span><span class="n">valid_ind</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
             <span class="n">spikes_df</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">vals</span><span class="p">)):</span>
-                <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">vals</span><span class="p">),</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vals</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">vals</span><span class="p">)]</span>
-
             <span class="n">spikes_df</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_t&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">vals</span><span class="p">)):</span>
-                <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">vals</span><span class="p">),</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_t&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">vals</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">vals</span><span class="p">)]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)]</span>
-
             <span class="n">spikes_df</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">vals</span><span class="p">)):</span>
-                <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">vals</span><span class="p">),</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">vals</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">vals</span><span class="p">)]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">valid_ind</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vals</span>
+                <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">valid_ind</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_t&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">vals</span><span class="p">]</span>
+                <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">valid_ind</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">vals</span><span class="p">]</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">i</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="n">spikes_df</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_i&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">vals</span><span class="p">)):</span>
-                    <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">vals</span><span class="p">),</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_i&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="p">[</span><span class="n">vals</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">vals</span><span class="p">)]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">valid_ind</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_i&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="p">[</span><span class="n">vals</span><span class="p">]</span>
 
-        <span class="n">spikes_df</span><span class="p">[</span><span class="s2">&quot;width&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-        <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">widths</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;width&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">widths</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">base_clipped_list</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_affected_by_clipping</span> <span class="o">+=</span> <span class="p">[</span>
+                    <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_index&quot;</span><span class="p">,</span>
+                    <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_t&quot;</span><span class="p">,</span>
+                    <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_v&quot;</span><span class="p">,</span>
+                    <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_i&quot;</span><span class="p">,</span>
+                <span class="p">]</span>
 
+        <span class="n">spikes_df</span><span class="p">[</span><span class="s2">&quot;width&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">widths</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_affected_by_clipping</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;width&quot;</span><span class="p">]</span>
 
         <span class="n">spikes_df</span><span class="p">[</span><span class="s2">&quot;upstroke_downstroke_ratio&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">spikes_df</span><span class="p">[</span><span class="s2">&quot;upstroke&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="o">-</span><span class="n">spikes_df</span><span class="p">[</span><span class="s2">&quot;downstroke&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_affected_by_clipping</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;upstroke_downstroke_ratio&quot;</span><span class="p">]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span> <span class="o">=</span> <span class="n">spikes_df</span>
 
@@ -277,7 +329,7 @@
                 <span class="s2">&quot;adapt&quot;</span><span class="p">:</span> <span class="n">ft</span><span class="o">.</span><span class="n">adaptation_index</span><span class="p">(</span><span class="n">isis</span><span class="p">),</span>
                 <span class="s2">&quot;latency&quot;</span><span class="p">:</span> <span class="n">ft</span><span class="o">.</span><span class="n">latency</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">thresholds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">),</span>
                 <span class="s2">&quot;isi_cv&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">isis</span><span class="o">.</span><span class="n">std</span><span class="p">()</span> <span class="o">/</span> <span class="n">isis</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">isis</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
-                <span class="s2">&quot;mean_isi&quot;</span><span class="p">:</span> <span class="n">isis</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span>
+                <span class="s2">&quot;mean_isi&quot;</span><span class="p">:</span> <span class="n">isis</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">isis</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
                 <span class="s2">&quot;median_isi&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">isis</span><span class="p">),</span>
                 <span class="s2">&quot;first_isi&quot;</span><span class="p">:</span> <span class="n">isis</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">isis</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
                 <span class="s2">&quot;avg_rate&quot;</span><span class="p">:</span> <span class="n">ft</span><span class="o">.</span><span class="n">average_rate</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">thresholds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">),</span>
@@ -521,17 +573,21 @@
         <span class="sd">&quot;&quot;&quot;Get all features for each spike as a list of records.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s1">&#39;records&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="EphysSweepFeatureExtractor.spike_feature"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.spike_feature">[docs]</a>    <span class="k">def</span> <span class="nf">spike_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+<div class="viewcode-block" id="EphysSweepFeatureExtractor.spike_feature"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.spike_feature">[docs]</a>    <span class="k">def</span> <span class="nf">spike_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">include_clipped</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">force_exclude_clipped</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get specified feature for every spike.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        key : feature name</span>
+<span class="sd">        include_clipped: return values for every identified spike, even when clipping means they will be incorrect/undefined</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        spike_feature_values : ndarray of features for each spike</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_spikes_df&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;EphysSweepFeatureExtractor instance attribute with spike information does not exist yet - have spikes been processed?&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
@@ -539,7 +595,20 @@
         <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;requested feature &#39;{:s}&#39; not available&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">values</span></div>
+        <span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+
+        <span class="k">if</span> <span class="n">include_clipped</span> <span class="ow">and</span> <span class="n">force_exclude_clipped</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;include_clipped and force_exclude_clipped cannot both be true&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">include_clipped</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_spike_feature_affected_by_clipping</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="p">[</span><span class="s2">&quot;clipped&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">force_exclude_clipped</span><span class="p">:</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="p">[</span><span class="s2">&quot;clipped&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">values</span></div>
+
+<div class="viewcode-block" id="EphysSweepFeatureExtractor.is_spike_feature_affected_by_clipping"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.is_spike_feature_affected_by_clipping">[docs]</a>    <span class="k">def</span> <span class="nf">is_spike_feature_affected_by_clipping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_affected_by_clipping</span></div>
 
 <div class="viewcode-block" id="EphysSweepFeatureExtractor.spike_feature_keys"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.spike_feature_keys">[docs]</a>    <span class="k">def</span> <span class="nf">spike_feature_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get list of every available spike feature.&quot;&quot;&quot;</span>
@@ -580,7 +649,7 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_features</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="EphysSweepFeatureExtractor.process_new_spike_feature"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.process_new_spike_feature">[docs]</a>    <span class="k">def</span> <span class="nf">process_new_spike_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feature_name</span><span class="p">,</span> <span class="n">feature_func</span><span class="p">):</span>
+<div class="viewcode-block" id="EphysSweepFeatureExtractor.process_new_spike_feature"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.process_new_spike_feature">[docs]</a>    <span class="k">def</span> <span class="nf">process_new_spike_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feature_name</span><span class="p">,</span> <span class="n">feature_func</span><span class="p">,</span> <span class="n">affected_by_clipping</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Add new spike-level feature calculation function</span>
 
 <span class="sd">           The function should take this sweep extractor as its argument. Its results</span>
@@ -590,9 +659,10 @@
         <span class="k">if</span> <span class="n">feature_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Feature {:s} already exists for sweep&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">feature_name</span><span class="p">))</span>
 
-        <span class="n">features</span> <span class="o">=</span> <span class="n">feature_func</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="p">[</span><span class="n">feature_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">features</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">feature_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">features</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="p">[</span><span class="n">feature_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">feature_func</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">affected_by_clipping</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_affected_by_clipping</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">feature_name</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="EphysSweepFeatureExtractor.process_new_sweep_feature"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.process_new_sweep_feature">[docs]</a>    <span class="k">def</span> <span class="nf">process_new_sweep_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feature_name</span><span class="p">,</span> <span class="n">feature_func</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Add new sweep-level feature calculation function</span>
@@ -792,6 +862,8 @@
         <span class="n">ext</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ramps_ext</span>
         <span class="n">ext</span><span class="o">.</span><span class="n">process_spikes</span><span class="p">()</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">_all_ramps_ext</span> <span class="o">=</span> <span class="n">ext</span>
+
         <span class="c1"># pull out the spiking sweeps</span>
         <span class="n">spiking_sweeps</span> <span class="o">=</span> <span class="p">[</span> <span class="n">sweep</span> <span class="k">for</span> <span class="n">sweep</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ramps_ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">()</span> <span class="k">if</span> <span class="n">sweep</span><span class="o">.</span><span class="n">sweep_feature</span><span class="p">(</span><span class="s2">&quot;avg_rate&quot;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">]</span>
         <span class="n">ext</span> <span class="o">=</span> <span class="n">EphysSweepSetFeatureExtractor</span><span class="o">.</span><span class="n">from_sweeps</span><span class="p">(</span><span class="n">spiking_sweeps</span><span class="p">)</span>
@@ -799,9 +871,11 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s2">&quot;ramps&quot;</span><span class="p">][</span><span class="s2">&quot;spiking_sweeps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">()</span>
 
-
-<div class="viewcode-block" id="EphysCellFeatureExtractor.ramps_features"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.ramps_features">[docs]</a>    <span class="k">def</span> <span class="nf">ramps_features</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ramps_ext</span></div>
+<div class="viewcode-block" id="EphysCellFeatureExtractor.ramps_features"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.ramps_features">[docs]</a>    <span class="k">def</span> <span class="nf">ramps_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">all</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_ramps_ext</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ramps_ext</span></div>
 
     <span class="k">def</span> <span class="nf">_analyze_short_squares</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">ext</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_short_squares_ext</span>
@@ -886,16 +960,18 @@
         <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s2">&quot;long_squares&quot;</span><span class="p">][</span><span class="s2">&quot;subthreshold_sweeps&quot;</span><span class="p">]:</span>
             <span class="n">s</span><span class="o">.</span><span class="n">set_stimulus_amplitude_calculator</span><span class="p">(</span><span class="n">_step_stim_amp</span><span class="p">)</span>
 
+        <span class="k">print</span> <span class="s2">&quot;subthresh_sweeps&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">subthresh_sweeps</span><span class="p">)</span> <span class="c1"># DEBUG</span>
         <span class="n">calc_subthresh_sweeps</span> <span class="o">=</span> <span class="p">[</span><span class="n">sweep</span> <span class="k">for</span> <span class="n">sweep</span> <span class="ow">in</span> <span class="n">subthresh_sweeps</span> <span class="k">if</span>
                                  <span class="n">sweep</span><span class="o">.</span><span class="n">sweep_feature</span><span class="p">(</span><span class="s2">&quot;stim_amp&quot;</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">SUBTHRESH_MAX_AMP</span> <span class="ow">and</span>
                                  <span class="n">sweep</span><span class="o">.</span><span class="n">sweep_feature</span><span class="p">(</span><span class="s2">&quot;stim_amp&quot;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subthresh_min_amp</span><span class="p">]</span>
 
+        <span class="k">print</span> <span class="s2">&quot;calc_subthresh_sweeps&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">calc_subthresh_sweeps</span><span class="p">)</span> <span class="c1"># DEBUG</span>
         <span class="n">calc_subthresh_ext</span> <span class="o">=</span> <span class="n">EphysSweepSetFeatureExtractor</span><span class="o">.</span><span class="n">from_sweeps</span><span class="p">(</span><span class="n">calc_subthresh_sweeps</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_subthreshold_membrane_property_ext</span> <span class="o">=</span> <span class="n">calc_subthresh_ext</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s2">&quot;long_squares&quot;</span><span class="p">][</span><span class="s2">&quot;subthreshold_membrane_property_sweeps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">calc_subthresh_ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s2">&quot;long_squares&quot;</span><span class="p">][</span><span class="s2">&quot;input_resistance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">input_resistance</span><span class="p">(</span><span class="n">calc_subthresh_ext</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s2">&quot;long_squares&quot;</span><span class="p">][</span><span class="s2">&quot;tau&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">membrane_time_constant</span><span class="p">(</span><span class="n">calc_subthresh_ext</span><span class="p">)</span>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s2">&quot;long_squares&quot;</span><span class="p">][</span><span class="s2">&quot;v_baseline&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">ext</span><span class="o">.</span><span class="n">sweep_features</span><span class="p">(</span><span class="s2">&quot;v_baseline&quot;</span><span class="p">))</span>
 
 <div class="viewcode-block" id="EphysCellFeatureExtractor.long_squares_features"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.long_squares_features">[docs]</a>    <span class="k">def</span> <span class="nf">long_squares_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">option</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="n">option_table</span> <span class="o">=</span> <span class="p">{</span>
@@ -1008,6 +1084,16 @@
     <span class="n">m</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">y</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="k">return</span> <span class="n">m</span></div>
+
+
+<div class="viewcode-block" id="reset_long_squares_start"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.reset_long_squares_start">[docs]</a><span class="k">def</span> <span class="nf">reset_long_squares_start</span><span class="p">(</span><span class="n">when</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">LONG_SQUARES_START</span><span class="p">,</span> <span class="n">LONG_SQUARES_END</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="n">LONG_SQUARES_END</span> <span class="o">-</span> <span class="n">LONG_SQUARES_START</span>
+    <span class="k">print</span> <span class="n">delta</span>
+    <span class="k">print</span> <span class="n">when</span>
+    <span class="n">LONG_SQUARES_START</span> <span class="o">=</span> <span class="n">when</span>
+    <span class="k">print</span> <span class="n">LONG_SQUARES_START</span>
+    <span class="n">LONG_SQUARES_END</span> <span class="o">=</span> <span class="n">when</span> <span class="o">+</span> <span class="n">delta</span></div>
 
 
 <div class="viewcode-block" id="cell_extractor_for_nwb"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.cell_extractor_for_nwb">[docs]</a><span class="k">def</span> <span class="nf">cell_extractor_for_nwb</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">ramps</span><span class="p">,</span> <span class="n">short_squares</span><span class="p">,</span> <span class="n">long_squares</span><span class="p">,</span> <span class="n">subthresh_min_amp</span><span class="o">=-</span><span class="mi">100</span><span class="p">):</span>

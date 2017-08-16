@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.api.queries package &mdash; Allen SDK 0.13.1 documentation</title>
+    <title>allensdk.api.queries package &mdash; Allen SDK 0.13.2 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.13.1',
+        VERSION:     '0.13.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.13.1 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.13.2 documentation" href="index.html" />
     <link rel="up" title="allensdk.api package" href="allensdk.api.html" />
     <link rel="next" title="allensdk.brain_observatory package" href="allensdk.brain_observatory.html" />
     <link rel="prev" title="allensdk.api package" href="allensdk.api.html" /> 
@@ -743,6 +743,24 @@ or have morphological reconstructions.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="allensdk.api.queries.cell_types_api.CellTypesApi.get_cell">
+<code class="descname">get_cell</code><span class="sig-paren">(</span><em>id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/cell_types_api.html#CellTypesApi.get_cell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.cell_types_api.CellTypesApi.get_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Query the API for a one cells in the Cell Types Database.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list</p>
+<blockquote class="last">
+<div><p>Meta data for one cell.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="allensdk.api.queries.cell_types_api.CellTypesApi.get_ephys_features">
 <code class="descname">get_ephys_features</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/cell_types_api.html#CellTypesApi.get_ephys_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.cell_types_api.CellTypesApi.get_ephys_features" title="Permalink to this definition">¶</a></dt>
 <dd><p>Query the API for the full table of EphysFeatures for all cells.</p>
@@ -779,13 +797,17 @@ or have morphological reconstructions.</p>
 
 <dl class="method">
 <dt id="allensdk.api.queries.cell_types_api.CellTypesApi.list_cells">
-<code class="descname">list_cells</code><span class="sig-paren">(</span><em>require_morphology=False</em>, <em>require_reconstruction=False</em>, <em>reporter_status=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/cell_types_api.html#CellTypesApi.list_cells"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.cell_types_api.CellTypesApi.list_cells" title="Permalink to this definition">¶</a></dt>
+<code class="descname">list_cells</code><span class="sig-paren">(</span><em>id=None</em>, <em>require_morphology=False</em>, <em>require_reconstruction=False</em>, <em>reporter_status=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/cell_types_api.html#CellTypesApi.list_cells"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.cell_types_api.CellTypesApi.list_cells" title="Permalink to this definition">¶</a></dt>
 <dd><p>Query the API for a list of all cells in the Cell Types Database.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>require_morphology: boolean</strong></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>id: int</strong></p>
+<blockquote>
+<div><p>ID of a cell.  If not provided returns all matching cells.</p>
+</div></blockquote>
+<p><strong>require_morphology: boolean</strong></p>
 <blockquote>
 <div><p>Only return cells that have morphology images.</p>
 </div></blockquote>
