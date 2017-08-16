@@ -315,8 +315,7 @@ class MouseConnectivityCache(Cache):
         return OntologiesApi(self.api.api_url).get_structures_with_sets(
             strategy='lazy',
             path=file_name,
-            pre=StructureTree.clean_structures, 
-            post=StructureTree, 
+            post=lambda x: StructureTree(StructureTree.clean_structures(x)), 
             structure_graph_ids=1,
             **Cache.cache_json())
 
