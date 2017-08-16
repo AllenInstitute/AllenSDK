@@ -55,6 +55,8 @@ def read(file_name):
     """ Shortcut reading JSON from a file. """
     with open(file_name, 'rb') as f:
         json_string = f.read().decode('utf-8')
+        if len(json_string)==0: # If empty file
+            json_string='{}' # Create a string that will give an empty JSON object instead of an error
         json_obj = json.loads(json_string)
 
     return json_obj

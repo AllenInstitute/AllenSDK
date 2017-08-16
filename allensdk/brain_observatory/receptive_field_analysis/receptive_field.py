@@ -143,7 +143,7 @@ def get_attribute_dict(rf):
 
 def print_summary(rf):
     for key_val in sorted(get_attribute_dict(rf).iteritems(), key=lambda x:x[0]):
-        print "%s : %s" % key_val
+        print("%s : %s" % key_val)
 
 def write_receptive_field_to_h5(rf, file_name, prefix=''):
 

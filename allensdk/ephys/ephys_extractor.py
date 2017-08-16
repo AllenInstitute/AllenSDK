@@ -39,7 +39,7 @@ import warnings
 import logging
 from collections import Counter
 
-import ephys_features as ft
+from . import ephys_features as ft
 import six
 
 # Constants for stimulus-specific analysis
