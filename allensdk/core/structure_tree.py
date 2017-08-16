@@ -311,6 +311,7 @@ class StructureTree( SimpleTree ):
 
         if renames is None:        
             renames = StructureTree.renames()
+            whitelist.extend(renames.values())
 
         for ii, st in enumerate(structures):
 
