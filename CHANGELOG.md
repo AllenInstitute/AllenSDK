@@ -5,9 +5,16 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- ABS-64; Jupyterhub Dockerfiles
+- PR # 13; Manifest error check
+
 ### Changed
 
-- Changed license to Allen Institute License (2-clause BSD non-commercial use)
+ABS-132; changed to Allen Institute Software License
+ABS-129; StructureTree converts color hex triplet to 8-bit color triplet
+ABS-125; update expected data for unmocked tests
+PBS-358; update extract_trace module to deal with motion border case
+ABS-85; allow variable long square start time in ephys feature extractor
 
 ## [0.13.2] - 2017-06-15
 
