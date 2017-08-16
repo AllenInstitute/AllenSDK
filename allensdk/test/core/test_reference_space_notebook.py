@@ -1,3 +1,38 @@
+# Allen Institute Software License - This software license is the 2-clause BSD
+# license plus a third clause that prohibits redistribution for commercial
+# purposes without further permission.
+#
+# Copyright 2017. Allen Institute. All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+#
+# 3. Redistributions for commercial purposes are not permitted without the
+# Allen Institute's written permission.
+# For purposes of this license, commercial purposes is the incorporation of the
+# Allen Institute's software into anything for which you will charge fees or
+# other compensation. Contact terms@alleninstitute.org for commercial licensing
+# opportunities.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
 import pytest
 
 import os
@@ -10,17 +45,17 @@ def test_notebook(fn_temp_dir):
     # coding: utf-8
 
     # # Reference Space
-    # 
+    #
     # This notebook contains example code demonstrating the use of the StructureTree and ReferenceSpace classes. These classes provide methods for interacting with the 3d spaces to which Allen Institute data and atlases are registered.
-    # 
+    #
     # Unlike the AllenSDK cache classes, StructureTree and ReferenceSpace operate entirely in memory. We recommend using json files to store text and nrrd files to store volumetric images.
-    # 
+    #
     # The MouseConnectivityCache class has methods for downloading, storing, and constructing StructureTrees and ReferenceSpaces. Please see [here](https://alleninstitute.github.io/AllenSDK/_static/examples/nb/mouse_connectivity.html) for examples.
 
     # ## Constructing a StructureTree
-    # 
+    #
     # A StructureTree object is a wrapper around a structure graph - a list of dictionaries documenting brain structures and their containment relationships. To build a structure tree, you will first need to obtain a structure graph.
-    # 
+    #
     # For a list of atlases and corresponding structure graph ids, see [here](http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies).
 
     # In[1]:
@@ -92,7 +127,7 @@ def test_notebook(fn_temp_dir):
 
 
     # ## Downloading an annotation volume
-    # 
+    #
     # This code snippet will download and store a nrrd file containing the Allen Common Coordinate Framework annotation. We have requested an annotation with 25-micron isometric spacing. The orientation of this space is:
     #     * Anterior -> Posterior
     #     * Superior -> Inferior
@@ -132,7 +167,7 @@ def test_notebook(fn_temp_dir):
     # ## Using a ReferenceSpace
 
     # #### making structure masks
-    # 
+    #
     # The simplest use of a Reference space is to build binary indicator masks for structures or groups of structures.
 
     # In[9]:
@@ -179,7 +214,7 @@ def test_notebook(fn_temp_dir):
     # #### Removing unassigned structures
 
     # A structure graph may contain structures that are not used in a particular reference space. Having these around can complicate use of the reference space, so we generally want to remove them.
-    # 
+    #
     # We'll try this using "Somatosensory areas, layer 6a" as a test case. In the 2016 ccf space, this structure is unused in favor of finer distinctions (e.g. "Primary somatosensory area, barrel field, layer 6a").
 
     # In[12]:
@@ -203,7 +238,7 @@ def test_notebook(fn_temp_dir):
 
 
     # #### Downsample the space
-    # 
+    #
     # If you want an annotation at a resolution we don't provide, you can make one with the downsample method.
 
     # In[14]:
