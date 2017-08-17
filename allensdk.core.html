@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.core package &mdash; Allen SDK 0.13.2 documentation</title>
+    <title>allensdk.core package &mdash; Allen SDK 0.14.1 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.13.2',
+        VERSION:     '0.14.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.13.2 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.14.1 documentation" href="index.html" />
     <link rel="up" title="allensdk package" href="allensdk.html" />
     <link rel="next" title="allensdk.ephys package" href="allensdk.ephys.html" />
     <link rel="prev" title="allensdk.config.model.formats package" href="allensdk.config.model.formats.html" /> 
@@ -444,7 +444,7 @@ to a more concise subset.</p>
 
 <dl class="attribute">
 <dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.STIMULUS_TABLE_TYPES">
-<code class="descname">STIMULUS_TABLE_TYPES</code><em class="property"> = {'abstract_feature_series': ['drifting_gratings', 'static_gratings'], 'indexed_time_series': ['natural_movie_one', 'natural_movie_two', 'natural_movie_three', 'natural_scenes', 'locally_sparse_noise', 'locally_sparse_noise_4deg', 'locally_sparse_noise_8deg']}</em><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.STIMULUS_TABLE_TYPES" title="Permalink to this definition">¶</a></dt>
+<code class="descname">STIMULUS_TABLE_TYPES</code><em class="property"> = {'abstract_feature_series': ['drifting_gratings', 'static_gratings'], 'repeated_indexed_time_series': ['natural_movie_one', 'natural_movie_two', 'natural_movie_three'], 'indexed_time_series': ['natural_scenes', 'locally_sparse_noise', 'locally_sparse_noise_4deg', 'locally_sparse_noise_8deg']}</em><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.STIMULUS_TABLE_TYPES" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -617,7 +617,7 @@ then all are returned</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>stimulus: string</strong></p>
 <blockquote>
 <div><dl class="docutils">
-<dt>Which locally sparse noise stimulus to retrieve.  Must be one of: </dt>
+<dt>Which locally sparse noise stimulus to retrieve.  Must be one of:</dt>
 <dd><p class="first last">stimulus_info.LOCALLY_SPARSE_NOISE
 stimulus_info.LOCALLY_SPARSE_NOISE_4DEG
 stimulus_info.LOCALLY_SPARSE_NOISE_8DEG</p>
@@ -869,6 +869,37 @@ following: three_session_A, three_session_B, three_session_C</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_stimulus">
+<code class="descname">get_stimulus</code><span class="sig-paren">(</span><em>frame_ind</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#BrainObservatoryNwbDataSet.get_stimulus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_stimulus" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_stimulus_epoch_table">
+<code class="descname">get_stimulus_epoch_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#BrainObservatoryNwbDataSet.get_stimulus_epoch_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_stimulus_epoch_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a pandas dataframe that summarizes the stimulus epoch duration for each acquisition time index in
+the experiment</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">timestamps: 2D numpy array</p>
+<blockquote>
+<div><p>Timestamp for each fluorescence sample</p>
+</div></blockquote>
+<p>traces: 2D numpy array</p>
+<blockquote class="last">
+<div><p>Fluorescence traces for each cell</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_stimulus_table">
 <code class="descname">get_stimulus_table</code><span class="sig-paren">(</span><em>stimulus_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#BrainObservatoryNwbDataSet.get_stimulus_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_stimulus_table" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a stimulus table given a stimulus name</p>
@@ -876,7 +907,7 @@ following: three_session_A, three_session_B, three_session_C</p>
 
 <dl class="method">
 <dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_stimulus_template">
-<code class="descname">get_stimulus_template</code><span class="sig-paren">(</span><em>stimulus_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#BrainObservatoryNwbDataSet.get_stimulus_template"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_stimulus_template" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_stimulus_template</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#BrainObservatoryNwbDataSet.get_stimulus_template"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_stimulus_template" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an array of the stimulus template for the specified stimulus.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -925,6 +956,11 @@ following: three_session_A, three_session_B, three_session_C</p>
 <code class="descname">save_analysis_dataframes</code><span class="sig-paren">(</span><em>*tables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#BrainObservatoryNwbDataSet.save_analysis_dataframes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.save_analysis_dataframes" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="attribute">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.stimulus_search">
+<code class="descname">stimulus_search</code><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.stimulus_search" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="function">
@@ -943,87 +979,41 @@ timestamps, adjust by inserting NaNs to running speed.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="allensdk.core.brain_observatory_nwb_data_set.make_display_mask">
-<code class="descclassname">allensdk.core.brain_observatory_nwb_data_set.</code><code class="descname">make_display_mask</code><span class="sig-paren">(</span><em>display_shape=(1920</em>, <em>1200)</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#make_display_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.make_display_mask" title="Permalink to this definition">¶</a></dt>
-<dd><p>Build a display-shaped mask that indicates which pixels are on screen after warping the stimulus.</p>
+<dt id="allensdk.core.brain_observatory_nwb_data_set.get_epoch_mask_list">
+<code class="descclassname">allensdk.core.brain_observatory_nwb_data_set.</code><code class="descname">get_epoch_mask_list</code><span class="sig-paren">(</span><em>st</em>, <em>threshold</em>, <em>max_cuts=2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#get_epoch_mask_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.get_epoch_mask_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convenience function to cut a stim table into multiple epochs</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>st</strong> &#8211; input stimtable</li>
+<li><strong>threshold</strong> &#8211; threshold on the max duration of a subepoch</li>
+<li><strong>max_cuts</strong> &#8211; maximum number of allowed epochs to cut into</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">epoch_mask_list, a list of indices that define the start and end of sub-epochs</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
+
+<dl class="function">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.make_display_mask">
+<code class="descclassname">allensdk.core.brain_observatory_nwb_data_set.</code><code class="descname">make_display_mask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#make_display_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.make_display_mask" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="function">
 <dt id="allensdk.core.brain_observatory_nwb_data_set.mask_stimulus_template">
-<code class="descclassname">allensdk.core.brain_observatory_nwb_data_set.</code><code class="descname">mask_stimulus_template</code><span class="sig-paren">(</span><em>template_display_coords</em>, <em>template_shape</em>, <em>display_mask=None</em>, <em>threshold=1.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#mask_stimulus_template"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.mask_stimulus_template" title="Permalink to this definition">¶</a></dt>
-<dd><p>Build a mask for a stimulus template of a given shape and display coordinates that indicates
-which part of the template is on screen after warping.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>template_display_coords: list</strong></p>
-<blockquote>
-<div><p>list of (x,y) display coordinates</p>
-</div></blockquote>
-<p><strong>template_shape: tuple</strong></p>
-<blockquote>
-<div><p>(width,height) of the display template</p>
-</div></blockquote>
-<p><strong>display_mask: np.ndarray</strong></p>
-<blockquote>
-<div><p>boolean 2D mask indicating which display coordinates are on screen after warping.</p>
-</div></blockquote>
-<p><strong>threshold: float</strong></p>
-<blockquote>
-<div><p>Fraction of pixels associated with a template display coordinate that should remain
-on screen to count as belonging to the mask.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">tuple: (template mask, pixel fraction)</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
+<code class="descclassname">allensdk.core.brain_observatory_nwb_data_set.</code><code class="descname">mask_stimulus_template</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#mask_stimulus_template"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.mask_stimulus_template" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="function">
 <dt id="allensdk.core.brain_observatory_nwb_data_set.warp_stimulus_coords">
-<code class="descclassname">allensdk.core.brain_observatory_nwb_data_set.</code><code class="descname">warp_stimulus_coords</code><span class="sig-paren">(</span><em>vertices</em>, <em>distance=15.0</em>, <em>mon_height_cm=32.5</em>, <em>mon_width_cm=51.0</em>, <em>mon_res=(1920</em>, <em>1200)</em>, <em>eyepoint=(0.5</em>, <em>0.5)</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#warp_stimulus_coords"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.warp_stimulus_coords" title="Permalink to this definition">¶</a></dt>
-<dd><p>For a list of screen vertices, provides a corresponding list of texture coordinates.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>vertices: numpy.ndarray</strong></p>
-<blockquote>
-<div><p>[[x0,y0], [x1,y1], ...] A set of vertices to  convert to texture positions.</p>
-</div></blockquote>
-<p><strong>distance: float</strong></p>
-<blockquote>
-<div><p>distance from the monitor in cm.</p>
-</div></blockquote>
-<p><strong>mon_height_cm: float</strong></p>
-<blockquote>
-<div><p>monitor height in cm</p>
-</div></blockquote>
-<p><strong>mon_width_cm: float</strong></p>
-<blockquote>
-<div><p>monitor width in cm</p>
-</div></blockquote>
-<p><strong>mon_res: tuple</strong></p>
-<blockquote>
-<div><p>monitor resolution (x,y)</p>
-</div></blockquote>
-<p><strong>eyepoint: tuple</strong></p>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">np.ndarray</p>
-<blockquote class="last">
-<div><p>x,y coordinates shaped like the input that describe what pixel coordinates
-are displayed an the input coordinates after warping the stimulus.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
+<code class="descclassname">allensdk.core.brain_observatory_nwb_data_set.</code><code class="descname">warp_stimulus_coords</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#warp_stimulus_coords"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.warp_stimulus_coords" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </div>
 <div class="section" id="module-allensdk.core.cell_types_cache">

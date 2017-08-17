@@ -87,10 +87,10 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
-What's New - Release 0.14.0 (August 16th, 2017)
+What's New - Release 0.14.2 (August 17th, 2017)
 -----------------------------------------------
 
-The 0.14.0  release is primarily a change in our open source license.
+The 0.14.2  release is primarily a change in our open source license.
 We are now using a 2-clause BSD license with an additional clause
 related to commercial use.  If you have any questions, please contact us on our
 `Gitter channel <https://gitter.im/AllenInstitute/AllenSDK>`_

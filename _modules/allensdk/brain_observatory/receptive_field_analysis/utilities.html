@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.brain_observatory.receptive_field_analysis.utilities &mdash; Allen SDK 0.13.2 documentation</title>
+    <title>allensdk.brain_observatory.receptive_field_analysis.utilities &mdash; Allen SDK 0.14.1 documentation</title>
     
     <link rel="stylesheet" href="../../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '0.13.2',
+        VERSION:     '0.14.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.13.2 documentation" href="../../../../index.html" />
+    <link rel="top" title="Allen SDK 0.14.1 documentation" href="../../../../index.html" />
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
   <body role="document">
@@ -159,7 +159,7 @@
 
 
 <span class="nd">@memoize</span>
-<span class="k">def</span> <span class="nf">get_A</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">stimulus</span><span class="p">):</span>
+<div class="viewcode-block" id="get_A"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.utilities.get_A">[docs]</a><span class="k">def</span> <span class="nf">get_A</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">stimulus</span><span class="p">):</span>
 
     <span class="n">stimulus_table</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_stimulus_table</span><span class="p">(</span><span class="n">stimulus</span><span class="p">)</span>
     <span class="n">stimulus_template</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_stimulus_template</span><span class="p">(</span><span class="n">stimulus</span><span class="p">)[</span><span class="n">stimulus_table</span><span class="p">[</span><span class="s1">&#39;frame&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="p">:,:]</span>
@@ -171,10 +171,10 @@
         <span class="n">A</span><span class="p">[:</span><span class="n">number_of_pixels</span><span class="p">,</span> <span class="n">fi</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">stimulus_template</span><span class="p">[</span><span class="n">fi</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">127</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
         <span class="n">A</span><span class="p">[</span><span class="n">number_of_pixels</span><span class="p">:,</span> <span class="n">fi</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">stimulus_template</span><span class="p">[</span><span class="n">fi</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">127</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">A</span>
+    <span class="k">return</span> <span class="n">A</span></div>
 
 <span class="nd">@memoize</span>
-<span class="k">def</span> <span class="nf">get_A_blur</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">stimulus</span><span class="p">):</span>
+<div class="viewcode-block" id="get_A_blur"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.utilities.get_A_blur">[docs]</a><span class="k">def</span> <span class="nf">get_A_blur</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">stimulus</span><span class="p">):</span>
 
     <span class="n">stimulus_table</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_stimulus_table</span><span class="p">(</span><span class="n">stimulus</span><span class="p">)</span>
     <span class="n">stimulus_template</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_stimulus_template</span><span class="p">(</span><span class="n">stimulus</span><span class="p">)[</span><span class="n">stimulus_table</span><span class="p">[</span><span class="s1">&#39;frame&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
@@ -188,7 +188,7 @@
         <span class="n">A</span><span class="p">[</span><span class="n">number_of_pixels</span><span class="p">:,</span><span class="n">fi</span><span class="p">]</span> <span class="o">=</span> <span class="n">convolve</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="n">number_of_pixels</span><span class="p">:,</span> <span class="n">fi</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">stimulus_template</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">stimulus_template</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
 
 
-    <span class="k">return</span> <span class="n">A</span>
+    <span class="k">return</span> <span class="n">A</span></div>
 
 <div class="viewcode-block" id="get_shuffle_matrix"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.utilities.get_shuffle_matrix">[docs]</a><span class="k">def</span> <span class="nf">get_shuffle_matrix</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">event_vector</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">number_of_shuffles</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">response_detection_error_std_dev</span><span class="o">=.</span><span class="mi">1</span><span class="p">):</span>
 

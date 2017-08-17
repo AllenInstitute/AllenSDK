@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.brain_observatory.stimulus_info &mdash; Allen SDK 0.13.2 documentation</title>
+    <title>allensdk.brain_observatory.stimulus_info &mdash; Allen SDK 0.14.1 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.13.2',
+        VERSION:     '0.14.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.13.2 documentation" href="../../../index.html" />
+    <link rel="top" title="Allen SDK 0.14.1 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body role="document">
@@ -106,6 +106,12 @@
 <span class="c1">#</span>
 <span class="kn">import</span> <span class="nn">six</span>
 <span class="kn">import</span> <span class="nn">matplotlib.colors</span> <span class="kn">as</span> <span class="nn">mcolors</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.ndimage.interpolation</span> <span class="kn">as</span> <span class="nn">spndi</span>
+<span class="kn">from</span> <span class="nn">scipy.misc</span> <span class="kn">import</span> <span class="n">imresize</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">allensdk.api.cache</span> <span class="kn">import</span> <span class="n">memoize</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
 
 <span class="c1"># some handles for stimulus types</span>
 <span class="n">DRIFTING_GRATINGS</span> <span class="o">=</span> <span class="s1">&#39;drifting_gratings&#39;</span>
@@ -154,6 +160,8 @@
 <span class="n">THREE_SESSION_C</span> <span class="o">=</span> <span class="s1">&#39;three_session_C&#39;</span>
 <span class="n">THREE_SESSION_C2</span> <span class="o">=</span> <span class="s1">&#39;three_session_C2&#39;</span>
 
+<span class="n">SESSION_LIST</span> <span class="o">=</span> <span class="p">[</span><span class="n">THREE_SESSION_A</span><span class="p">,</span> <span class="n">THREE_SESSION_B</span><span class="p">,</span> <span class="n">THREE_SESSION_C</span><span class="p">,</span> <span class="n">THREE_SESSION_C2</span><span class="p">]</span>
+
 <span class="n">SESSION_STIMULUS_MAP</span> <span class="o">=</span> <span class="p">{</span>
     <span class="n">THREE_SESSION_A</span><span class="p">:</span> <span class="p">[</span><span class="n">DRIFTING_GRATINGS</span><span class="p">,</span> <span class="n">NATURAL_MOVIE_ONE</span><span class="p">,</span> <span class="n">NATURAL_MOVIE_THREE</span><span class="p">,</span> <span class="n">SPONTANEOUS_ACTIVITY</span><span class="p">],</span>
     <span class="n">THREE_SESSION_B</span><span class="p">:</span> <span class="p">[</span><span class="n">STATIC_GRATINGS</span><span class="p">,</span> <span class="n">NATURAL_SCENES</span><span class="p">,</span> <span class="n">NATURAL_MOVIE_ONE</span><span class="p">,</span> <span class="n">SPONTANEOUS_ACTIVITY</span><span class="p">],</span>
@@ -161,22 +169,41 @@
     <span class="n">THREE_SESSION_C2</span><span class="p">:</span> <span class="p">[</span><span class="n">LOCALLY_SPARSE_NOISE_4DEG</span><span class="p">,</span> <span class="n">LOCALLY_SPARSE_NOISE_8DEG</span><span class="p">,</span> <span class="n">NATURAL_MOVIE_ONE</span><span class="p">,</span> <span class="n">NATURAL_MOVIE_TWO</span><span class="p">,</span> <span class="n">SPONTANEOUS_ACTIVITY</span><span class="p">]</span>
 <span class="p">}</span>
 
+<span class="n">LOCALLY_SPARSE_NOISE_STIMULUS_TYPES</span> <span class="o">=</span> <span class="p">[</span><span class="n">LOCALLY_SPARSE_NOISE</span><span class="p">,</span> <span class="n">LOCALLY_SPARSE_NOISE_4DEG</span><span class="p">,</span> <span class="n">LOCALLY_SPARSE_NOISE_8DEG</span><span class="p">]</span>
+<span class="n">NATURAL_MOVIE_STIMULUS_TYPES</span> <span class="o">=</span> <span class="p">[</span><span class="n">NATURAL_MOVIE_ONE</span><span class="p">,</span> <span class="n">NATURAL_MOVIE_TWO</span><span class="p">,</span> <span class="n">NATURAL_MOVIE_THREE</span><span class="p">]</span>
+
 <span class="n">LOCALLY_SPARSE_NOISE_DIMENSIONS</span> <span class="o">=</span> <span class="p">{</span>
     <span class="n">LOCALLY_SPARSE_NOISE</span><span class="p">:</span> <span class="p">[</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">28</span> <span class="p">],</span>
-    <span class="n">LOCALLY_SPARSE_NOISE_4DEG</span><span class="p">:</span> <span class="p">[</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">28</span> <span class="p">],</span>    
+    <span class="n">LOCALLY_SPARSE_NOISE_4DEG</span><span class="p">:</span> <span class="p">[</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">28</span> <span class="p">],</span>
     <span class="n">LOCALLY_SPARSE_NOISE_8DEG</span><span class="p">:</span> <span class="p">[</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">14</span> <span class="p">],</span>
     <span class="p">}</span>
+
+<span class="n">LOCALLY_SPARSE_NOISE_PIXELS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">LOCALLY_SPARSE_NOISE</span><span class="p">:</span> <span class="mi">45</span><span class="p">,</span>
+    <span class="n">LOCALLY_SPARSE_NOISE_4DEG</span><span class="p">:</span> <span class="mi">45</span><span class="p">,</span>
+    <span class="n">LOCALLY_SPARSE_NOISE_8DEG</span><span class="p">:</span> <span class="mi">90</span><span class="p">,</span>
+    <span class="p">}</span>
+
+<span class="n">NATURAL_SCENES_PIXELS</span> <span class="o">=</span> <span class="p">(</span><span class="mi">918</span><span class="p">,</span> <span class="mi">1174</span><span class="p">)</span>
+<span class="n">NATURAL_MOVIE_PIXELS</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1080</span><span class="p">,</span> <span class="mi">1920</span><span class="p">)</span>
+<span class="n">NATURAL_MOVIE_DIMENSIONS</span> <span class="o">=</span> <span class="p">(</span><span class="mi">304</span><span class="p">,</span> <span class="mi">608</span><span class="p">)</span>
+
+<span class="n">MONITOR_DIMENSIONS</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1200</span><span class="p">,</span> <span class="mi">1920</span><span class="p">)</span>
+<span class="n">MONITOR_DISTANCE</span> <span class="o">=</span> <span class="mi">15</span>
+
+<span class="n">STIMULUS_GRAY</span> <span class="o">=</span> <span class="mi">127</span>
+<span class="n">STIMULUS_BITDEPTH</span> <span class="o">=</span> <span class="mi">8</span>
 
 <span class="c1"># Note: the &quot;8deg&quot; stimulus is actually 9.3 visual degrees on a side</span>
 <span class="n">LOCALLY_SPARSE_NOISE_PIXEL_SIZE</span> <span class="o">=</span> <span class="p">{</span>
     <span class="n">LOCALLY_SPARSE_NOISE</span><span class="p">:</span> <span class="mf">4.65</span><span class="p">,</span>
     <span class="n">LOCALLY_SPARSE_NOISE_4DEG</span><span class="p">:</span> <span class="mf">4.65</span><span class="p">,</span>
-    <span class="n">LOCALLY_SPARSE_NOISE_8DEG</span><span class="p">:</span> <span class="mf">9.3</span> 
+    <span class="n">LOCALLY_SPARSE_NOISE_8DEG</span><span class="p">:</span> <span class="mf">9.3</span>
 <span class="p">}</span>
 
 <div class="viewcode-block" id="sessions_with_stimulus"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.sessions_with_stimulus">[docs]</a><span class="k">def</span> <span class="nf">sessions_with_stimulus</span><span class="p">(</span><span class="n">stimulus</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Return the names of the sessions that contain a given stimulus. &quot;&quot;&quot;</span>
-    
+
     <span class="n">sessions</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">session</span><span class="p">,</span> <span class="n">session_stimuli</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">SESSION_STIMULUS_MAP</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">stimulus</span> <span class="ow">in</span> <span class="n">session_stimuli</span><span class="p">:</span>
@@ -199,6 +226,666 @@
 <div class="viewcode-block" id="all_stimuli"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.all_stimuli">[docs]</a><span class="k">def</span> <span class="nf">all_stimuli</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot; Return a list of all stimuli in the data set &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="nb">set</span><span class="p">([</span><span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">vl</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">SESSION_STIMULUS_MAP</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">vl</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="BinaryIntervalSearchTree"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.BinaryIntervalSearchTree">[docs]</a><span class="k">class</span> <span class="nc">BinaryIntervalSearchTree</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="BinaryIntervalSearchTree.from_df"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.BinaryIntervalSearchTree.from_df">[docs]</a>    <span class="k">def</span> <span class="nf">from_df</span><span class="p">(</span><span class="n">input_df</span><span class="p">):</span>
+        <span class="n">search_list</span> <span class="o">=</span> <span class="n">input_df</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s1">&#39;records&#39;</span><span class="p">)</span>
+
+
+
+        <span class="n">new_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">search_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;end&#39;</span><span class="p">]:</span>
+               <span class="n">new_list</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;end&#39;</span><span class="p">],</span> <span class="n">x</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+               <span class="c1"># -.01 prevents endpoint-overlapping intervals; assigns ties to intervals that start at requested index</span>
+               <span class="n">new_list</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;end&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="o">.</span><span class="mo">01</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">BinaryIntervalSearchTree</span><span class="p">(</span><span class="n">new_list</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search_list</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a binary tree to search for a point within a list of intervals.  Assumes that the intervals are</span>
+<span class="sd">        non-overlapping.  If two intervals share an endpoint, the left-side wins the tie.</span>
+
+<span class="sd">        :param search_list: list of interval tuples; in the tuple, first element is interval start, then interval</span>
+<span class="sd">        end (inclusive), then the return value for the lookup</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">        bist = BinaryIntervalSearchTree([(0,.5,&#39;A&#39;), (1,2,&#39;B&#39;)])</span>
+<span class="sd">        print bist.search(1.5)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Double-check that the list is sorted</span>
+        <span class="n">search_list</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">search_list</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="c1"># Check that the intervals are non-overlapping (except potentially at the end point)</span>
+        <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">search_list</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">search_list</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+            <span class="k">assert</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">search_list</span><span class="p">)</span>
+
+<div class="viewcode-block" id="BinaryIntervalSearchTree.add"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.BinaryIntervalSearchTree.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_list</span><span class="p">,</span> <span class="n">tmp</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">tmp</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">tmp</span><span class="p">)]</span> <span class="o">=</span> <span class="n">input_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">input_list</span><span class="p">[:</span><span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">input_list</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)],</span> <span class="n">tmp</span><span class="o">=</span><span class="n">tmp</span><span class="o">+</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">input_list</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">input_list</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">):],</span> <span class="n">tmp</span><span class="o">=</span><span class="n">tmp</span><span class="o">+</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">tmp</span><span class="p">)]</span> <span class="o">=</span> <span class="n">input_list</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">input_list</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="BinaryIntervalSearchTree.search"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.BinaryIntervalSearchTree.search">[docs]</a>    <span class="k">def</span> <span class="nf">search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fi</span><span class="p">,</span> <span class="n">tmp</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">tmp</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">tmp</span><span class="p">)][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">fi</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">fi</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">tmp</span><span class="p">)][</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="n">return_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">tmp</span><span class="p">)]</span>
+        <span class="k">elif</span> <span class="n">fi</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">tmp</span><span class="p">)][</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">return_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">fi</span><span class="p">,</span> <span class="n">tmp</span><span class="o">=</span><span class="n">tmp</span> <span class="o">+</span> <span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">return_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">fi</span><span class="p">,</span> <span class="n">tmp</span><span class="o">=</span><span class="n">tmp</span> <span class="o">+</span> <span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="c1"># print &#39;CHECKING:&#39;, return_val[0], fi, return_val[1], tmp</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="n">return_val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">fi</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">fi</span> <span class="o">&lt;=</span> <span class="n">return_val</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">return_val</span></div></div>
+
+<div class="viewcode-block" id="StimulusSearch"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.StimulusSearch">[docs]</a><span class="k">class</span> <span class="nc">StimulusSearch</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nwb_dataset</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">nwb_data</span> <span class="o">=</span> <span class="n">nwb_dataset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">epoch_df</span> <span class="o">=</span> <span class="n">nwb_dataset</span><span class="o">.</span><span class="n">get_stimulus_epoch_table</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">master_df</span> <span class="o">=</span> <span class="n">nwb_dataset</span><span class="o">.</span><span class="n">get_stimulus_table</span><span class="p">(</span><span class="s1">&#39;master&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">epoch_bst</span> <span class="o">=</span> <span class="n">BinaryIntervalSearchTree</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">epoch_df</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">master_bst</span> <span class="o">=</span> <span class="n">BinaryIntervalSearchTree</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">master_df</span><span class="p">)</span>
+
+    <span class="nd">@memoize</span>
+<div class="viewcode-block" id="StimulusSearch.search"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.StimulusSearch.search">[docs]</a>    <span class="k">def</span> <span class="nf">search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fi</span><span class="p">):</span>
+
+        <span class="k">try</span><span class="p">:</span>
+
+            <span class="c1"># Look in fine-grain tree:</span>
+            <span class="n">search_result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">master_bst</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">fi</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">search_result</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+
+            <span class="c1"># Current frame not found in a fine-grain interval;</span>
+            <span class="c1">#   see if it is unregistered to a coarse-grain epoch:</span>
+            <span class="k">try</span><span class="p">:</span>
+
+                <span class="c1"># THis will thow KeyError if not in coarse-grain epoch</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">epoch_bst</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">fi</span><span class="p">)</span>
+
+                <span class="c1"># Frame is in a coarse-grain  epoch, but not a fine grain interval;</span>
+                <span class="c1">#   look backwards to find most recent find nearest matching interval</span>
+                <span class="k">if</span> <span class="n">fi</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">epoch_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;start&#39;</span><span class="p">]:</span>
+                    <span class="k">return</span> <span class="bp">None</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">fi</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+
+                <span class="c1"># Frame is unregistered at the coarse level; return None</span>
+                <span class="k">return</span> <span class="bp">None</span></div></div>
+
+<div class="viewcode-block" id="rotate"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.rotate">[docs]</a><span class="k">def</span> <span class="nf">rotate</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">theta</span><span class="p">):</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">])</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)],[</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)]])</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]:</span>
+        <span class="k">assert</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span>
+        <span class="k">return</span> <span class="n">M</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">M2</span> <span class="o">=</span> <span class="n">M</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+        <span class="n">x2</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">M2</span><span class="o">*</span><span class="n">x2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="get_spatial_grating"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.get_spatial_grating">[docs]</a><span class="k">def</span> <span class="nf">get_spatial_grating</span><span class="p">(</span><span class="n">height</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">aspect_ratio</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">ori</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">pix_per_cycle</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">phase</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">p2p_amp</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">baseline</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+
+    <span class="n">aspect_ratio</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">aspect_ratio</span><span class="p">)</span>
+    <span class="n">_height_prime</span> <span class="o">=</span> <span class="mi">100</span>
+
+    <span class="n">sf</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">/</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">pix_per_cycle</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">height</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">_height_prime</span><span class="p">)))</span>
+
+    <span class="c1"># Final height set by zoom below:</span>
+    <span class="n">y</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">_height_prime</span><span class="p">,</span><span class="n">_height_prime</span><span class="o">*</span><span class="n">aspect_ratio</span><span class="p">)</span>
+
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">ori</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mf">180.0</span>  <span class="c1"># convert to radians</span>
+
+    <span class="n">ph</span> <span class="o">=</span> <span class="n">phase</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="mf">2.0</span>
+
+    <span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">X</span> <span class="o">-</span> <span class="n">x</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">Y</span> <span class="o">-</span> <span class="n">y</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">Xp</span><span class="p">,</span> <span class="n">Yp</span> <span class="o">=</span> <span class="n">rotate</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">theta</span><span class="p">)</span>
+
+    <span class="n">img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">Xp</span> <span class="o">*</span> <span class="n">sf</span> <span class="o">+</span> <span class="n">ph</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">p2p_amp</span><span class="o">/</span><span class="mf">2.</span><span class="p">)</span><span class="o">*</span><span class="n">spndi</span><span class="o">.</span><span class="n">zoom</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">height</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">_height_prime</span><span class="p">))</span> <span class="o">+</span> <span class="n">baseline</span></div>
+
+<div class="viewcode-block" id="get_spatio_temporal_grating"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.get_spatio_temporal_grating">[docs]</a><span class="k">def</span> <span class="nf">get_spatio_temporal_grating</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">temporal_frequency</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;phase&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;phase&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">*</span><span class="n">temporal_frequency</span><span class="p">)</span><span class="o">%</span><span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">get_spatial_grating</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="map_template_coordinate_to_monitor_coordinate"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.map_template_coordinate_to_monitor_coordinate">[docs]</a><span class="k">def</span> <span class="nf">map_template_coordinate_to_monitor_coordinate</span><span class="p">(</span><span class="n">template_coord</span><span class="p">,</span> <span class="n">monitor_shape</span><span class="p">,</span> <span class="n">template_shape</span><span class="p">):</span>
+
+    <span class="n">rx</span><span class="p">,</span> <span class="n">cx</span> <span class="o">=</span> <span class="n">template_coord</span>
+    <span class="n">n_pixels_r</span><span class="p">,</span> <span class="n">n_pixels_c</span> <span class="o">=</span> <span class="n">monitor_shape</span>
+    <span class="n">tr</span><span class="p">,</span> <span class="n">tc</span> <span class="o">=</span> <span class="n">template_shape</span>
+
+    <span class="n">rx_new</span> <span class="o">=</span> <span class="nb">float</span><span class="p">((</span><span class="n">n_pixels_r</span> <span class="o">-</span> <span class="n">tr</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">rx</span>
+    <span class="n">cx_new</span> <span class="o">=</span> <span class="nb">float</span><span class="p">((</span><span class="n">n_pixels_c</span> <span class="o">-</span> <span class="n">tc</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">cx</span>
+
+    <span class="k">return</span> <span class="n">rx_new</span><span class="p">,</span> <span class="n">cx_new</span></div>
+
+<div class="viewcode-block" id="map_monitor_coordinate_to_template_coordinate"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.map_monitor_coordinate_to_template_coordinate">[docs]</a><span class="k">def</span> <span class="nf">map_monitor_coordinate_to_template_coordinate</span><span class="p">(</span><span class="n">monitor_coord</span><span class="p">,</span> <span class="n">monitor_shape</span><span class="p">,</span> <span class="n">template_shape</span><span class="p">):</span>
+
+    <span class="n">rx</span><span class="p">,</span> <span class="n">cx</span> <span class="o">=</span> <span class="n">monitor_coord</span>
+    <span class="n">n_pixels_r</span><span class="p">,</span> <span class="n">n_pixels_c</span> <span class="o">=</span> <span class="n">monitor_shape</span>
+    <span class="n">tr</span><span class="p">,</span> <span class="n">tc</span> <span class="o">=</span> <span class="n">template_shape</span>
+
+    <span class="n">rx_new</span> <span class="o">=</span>  <span class="n">rx</span> <span class="o">-</span> <span class="nb">float</span><span class="p">((</span><span class="n">n_pixels_r</span> <span class="o">-</span> <span class="n">tr</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">cx_new</span> <span class="o">=</span>  <span class="n">cx</span> <span class="o">-</span> <span class="nb">float</span><span class="p">((</span><span class="n">n_pixels_c</span> <span class="o">-</span> <span class="n">tc</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">rx_new</span><span class="p">,</span> <span class="n">cx_new</span></div>
+
+<div class="viewcode-block" id="lsn_coordinate_to_monitor_coordinate"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.lsn_coordinate_to_monitor_coordinate">[docs]</a><span class="k">def</span> <span class="nf">lsn_coordinate_to_monitor_coordinate</span><span class="p">(</span><span class="n">lsn_coordinate</span><span class="p">,</span> <span class="n">monitor_shape</span><span class="p">,</span> <span class="n">stimulus_type</span><span class="p">):</span>
+
+    <span class="n">template_shape</span> <span class="o">=</span> <span class="n">LOCALLY_SPARSE_NOISE_DIMENSIONS</span><span class="p">[</span><span class="n">stimulus_type</span><span class="p">]</span>
+    <span class="n">pixels_per_patch</span> <span class="o">=</span> <span class="n">LOCALLY_SPARSE_NOISE_PIXELS</span><span class="p">[</span><span class="n">stimulus_type</span><span class="p">]</span>
+
+    <span class="n">rx</span><span class="p">,</span> <span class="n">cx</span> <span class="o">=</span> <span class="n">lsn_coordinate</span>
+    <span class="n">tr</span><span class="p">,</span> <span class="n">tc</span> <span class="o">=</span> <span class="n">template_shape</span>
+
+    <span class="k">return</span> <span class="n">map_template_coordinate_to_monitor_coordinate</span><span class="p">((</span><span class="n">rx</span><span class="o">*</span><span class="n">pixels_per_patch</span><span class="p">,</span> <span class="n">cx</span><span class="o">*</span><span class="n">pixels_per_patch</span><span class="p">),</span>
+                                                      <span class="n">monitor_shape</span><span class="p">,</span>
+                                                      <span class="p">(</span><span class="n">tr</span><span class="o">*</span><span class="n">pixels_per_patch</span><span class="p">,</span> <span class="n">tc</span><span class="o">*</span><span class="n">pixels_per_patch</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="monitor_coordinate_to_lsn_coordinate"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.monitor_coordinate_to_lsn_coordinate">[docs]</a><span class="k">def</span> <span class="nf">monitor_coordinate_to_lsn_coordinate</span><span class="p">(</span><span class="n">monitor_coordinate</span><span class="p">,</span> <span class="n">monitor_shape</span><span class="p">,</span> <span class="n">stimulus_type</span><span class="p">):</span>
+
+    <span class="n">pixels_per_patch</span> <span class="o">=</span> <span class="n">LOCALLY_SPARSE_NOISE_PIXELS</span><span class="p">[</span><span class="n">stimulus_type</span><span class="p">]</span>
+    <span class="n">tr</span><span class="p">,</span> <span class="n">tc</span> <span class="o">=</span> <span class="n">LOCALLY_SPARSE_NOISE_DIMENSIONS</span><span class="p">[</span><span class="n">stimulus_type</span><span class="p">]</span>
+
+    <span class="n">rx</span><span class="p">,</span> <span class="n">cx</span> <span class="o">=</span> <span class="n">map_monitor_coordinate_to_template_coordinate</span><span class="p">(</span><span class="n">monitor_coordinate</span><span class="p">,</span> <span class="n">monitor_shape</span><span class="p">,</span> <span class="p">(</span><span class="n">tr</span><span class="o">*</span><span class="n">pixels_per_patch</span><span class="p">,</span> <span class="n">tc</span><span class="o">*</span><span class="n">pixels_per_patch</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">rx</span><span class="o">/</span><span class="n">pixels_per_patch</span><span class="p">,</span> <span class="n">cx</span><span class="o">/</span><span class="n">pixels_per_patch</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="natural_scene_coordinate_to_monitor_coordinate"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.natural_scene_coordinate_to_monitor_coordinate">[docs]</a><span class="k">def</span> <span class="nf">natural_scene_coordinate_to_monitor_coordinate</span><span class="p">(</span><span class="n">natural_scene_coordinate</span><span class="p">,</span> <span class="n">monitor_shape</span><span class="p">):</span>
+
+    <span class="k">return</span> <span class="n">map_template_coordinate_to_monitor_coordinate</span><span class="p">(</span><span class="n">natural_scene_coordinate</span><span class="p">,</span> <span class="n">monitor_shape</span><span class="p">,</span> <span class="n">NATURAL_SCENES_PIXELS</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="natural_movie_coordinate_to_monitor_coordinate"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.natural_movie_coordinate_to_monitor_coordinate">[docs]</a><span class="k">def</span> <span class="nf">natural_movie_coordinate_to_monitor_coordinate</span><span class="p">(</span><span class="n">natural_movie_coordinate</span><span class="p">,</span> <span class="n">monitor_shape</span><span class="p">):</span>
+
+    <span class="n">local_y</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">*</span><span class="n">NATURAL_MOVIE_PIXELS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">natural_movie_coordinate</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">NATURAL_MOVIE_DIMENSIONS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">local_x</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">*</span> <span class="n">NATURAL_MOVIE_PIXELS</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">natural_movie_coordinate</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">NATURAL_MOVIE_DIMENSIONS</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">map_template_coordinate_to_monitor_coordinate</span><span class="p">((</span><span class="n">local_y</span><span class="p">,</span> <span class="n">local_x</span><span class="p">),</span> <span class="n">monitor_shape</span><span class="p">,</span> <span class="n">NATURAL_MOVIE_PIXELS</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="map_stimulus_coordinate_to_monitor_coordinate"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.map_stimulus_coordinate_to_monitor_coordinate">[docs]</a><span class="k">def</span> <span class="nf">map_stimulus_coordinate_to_monitor_coordinate</span><span class="p">(</span><span class="n">template_coordinate</span><span class="p">,</span> <span class="n">monitor_shape</span><span class="p">,</span> <span class="n">stimulus_type</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="n">stimulus_type</span> <span class="ow">in</span> <span class="n">LOCALLY_SPARSE_NOISE_STIMULUS_TYPES</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">lsn_coordinate_to_monitor_coordinate</span><span class="p">(</span><span class="n">template_coordinate</span><span class="p">,</span> <span class="n">monitor_shape</span><span class="p">,</span> <span class="n">stimulus_type</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">stimulus_type</span> <span class="ow">in</span> <span class="n">NATURAL_MOVIE_STIMULUS_TYPES</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">natural_movie_coordinate_to_monitor_coordinate</span><span class="p">(</span><span class="n">template_coordinate</span><span class="p">,</span> <span class="n">monitor_shape</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">stimulus_type</span> <span class="o">==</span> <span class="n">NATURAL_SCENES</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">natural_scene_coordinate_to_monitor_coordinate</span><span class="p">(</span><span class="n">template_coordinate</span><span class="p">,</span> <span class="n">monitor_shape</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">stimulus_type</span> <span class="ow">in</span> <span class="p">[</span><span class="n">DRIFTING_GRATINGS</span><span class="p">,</span> <span class="n">STATIC_GRATINGS</span><span class="p">,</span> <span class="n">SPONTANEOUS_ACTIVITY</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">template_coordinate</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>       <span class="c1"># pragma: no cover</span></div>
+
+<div class="viewcode-block" id="monitor_coordinate_to_natural_movie_coordinate"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.monitor_coordinate_to_natural_movie_coordinate">[docs]</a><span class="k">def</span> <span class="nf">monitor_coordinate_to_natural_movie_coordinate</span><span class="p">(</span><span class="n">monitor_coordinate</span><span class="p">,</span> <span class="n">monitor_shape</span><span class="p">):</span>
+
+    <span class="n">local_y</span><span class="p">,</span> <span class="n">local_x</span> <span class="o">=</span> <span class="n">map_monitor_coordinate_to_template_coordinate</span><span class="p">(</span><span class="n">monitor_coordinate</span><span class="p">,</span> <span class="n">monitor_shape</span><span class="p">,</span> <span class="n">NATURAL_MOVIE_PIXELS</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">NATURAL_MOVIE_DIMENSIONS</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="n">local_y</span><span class="o">/</span><span class="n">NATURAL_MOVIE_PIXELS</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">float</span><span class="p">(</span><span class="n">NATURAL_MOVIE_DIMENSIONS</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">*</span><span class="n">local_x</span><span class="o">/</span><span class="n">NATURAL_MOVIE_PIXELS</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="map_monitor_coordinate_to_stimulus_coordinate"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.map_monitor_coordinate_to_stimulus_coordinate">[docs]</a><span class="k">def</span> <span class="nf">map_monitor_coordinate_to_stimulus_coordinate</span><span class="p">(</span><span class="n">monitor_coordinate</span><span class="p">,</span> <span class="n">monitor_shape</span><span class="p">,</span> <span class="n">stimulus_type</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="n">stimulus_type</span> <span class="ow">in</span> <span class="n">LOCALLY_SPARSE_NOISE_STIMULUS_TYPES</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">monitor_coordinate_to_lsn_coordinate</span><span class="p">(</span><span class="n">monitor_coordinate</span><span class="p">,</span> <span class="n">monitor_shape</span><span class="p">,</span> <span class="n">stimulus_type</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">stimulus_type</span> <span class="o">==</span> <span class="n">NATURAL_SCENES</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">map_monitor_coordinate_to_template_coordinate</span><span class="p">(</span><span class="n">monitor_coordinate</span><span class="p">,</span> <span class="n">monitor_shape</span><span class="p">,</span> <span class="n">NATURAL_SCENES_PIXELS</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">stimulus_type</span> <span class="ow">in</span> <span class="n">NATURAL_MOVIE_STIMULUS_TYPES</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">monitor_coordinate_to_natural_movie_coordinate</span><span class="p">(</span><span class="n">monitor_coordinate</span><span class="p">,</span> <span class="n">monitor_shape</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">stimulus_type</span> <span class="ow">in</span> <span class="p">[</span><span class="n">DRIFTING_GRATINGS</span><span class="p">,</span> <span class="n">STATIC_GRATINGS</span><span class="p">,</span> <span class="n">SPONTANEOUS_ACTIVITY</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">monitor_coordinate</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>       <span class="c1"># pragma: no cover</span></div>
+
+<div class="viewcode-block" id="map_stimulus"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.map_stimulus">[docs]</a><span class="k">def</span> <span class="nf">map_stimulus</span><span class="p">(</span><span class="n">source_stimulus_coordinate</span><span class="p">,</span> <span class="n">source_stimulus_type</span><span class="p">,</span> <span class="n">target_stimulus_type</span><span class="p">,</span> <span class="n">monitor_shape</span><span class="p">):</span>
+    <span class="n">mc</span> <span class="o">=</span> <span class="n">map_stimulus_coordinate_to_monitor_coordinate</span><span class="p">(</span><span class="n">source_stimulus_coordinate</span><span class="p">,</span> <span class="n">monitor_shape</span><span class="p">,</span> <span class="n">source_stimulus_type</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">map_monitor_coordinate_to_stimulus_coordinate</span><span class="p">(</span><span class="n">mc</span><span class="p">,</span> <span class="n">monitor_shape</span><span class="p">,</span> <span class="n">target_stimulus_type</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Monitor"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.Monitor">[docs]</a><span class="k">class</span> <span class="nc">Monitor</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_pixels_r</span><span class="p">,</span> <span class="n">n_pixels_c</span><span class="p">,</span> <span class="n">panel_size</span><span class="p">,</span> <span class="n">spatial_unit</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">spatial_unit</span> <span class="o">=</span> <span class="n">spatial_unit</span>
+        <span class="k">if</span> <span class="n">spatial_unit</span> <span class="o">==</span> <span class="s1">&#39;cm&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spatial_conversion_factor</span> <span class="o">=</span> <span class="mf">1.</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span>       <span class="c1"># pragma: no cover</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_panel_size</span> <span class="o">=</span> <span class="n">panel_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_r</span> <span class="o">=</span> <span class="n">n_pixels_r</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_c</span> <span class="o">=</span> <span class="n">n_pixels_c</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">panel_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_panel_size</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">spatial_conversion_factor</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">aspect_ratio</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_c</span><span class="p">)</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_r</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">height</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">spatial_conversion_factor</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">panel_size</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">aspect_ratio</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">width</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">aspect_ratio</span>
+
+<div class="viewcode-block" id="Monitor.set_spatial_unit"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.Monitor.set_spatial_unit">[docs]</a>    <span class="k">def</span> <span class="nf">set_spatial_unit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_unit</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">new_unit</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">spatial_unit</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="n">new_unit</span> <span class="o">==</span> <span class="s1">&#39;inch&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">spatial_unit</span> <span class="o">==</span> <span class="s1">&#39;cm&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spatial_conversion_factor</span> <span class="o">*=</span> <span class="o">.</span><span class="mi">393701</span>
+        <span class="k">elif</span> <span class="n">new_unit</span> <span class="o">==</span> <span class="s1">&#39;cm&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">spatial_unit</span> <span class="o">==</span> <span class="s1">&#39;inch&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spatial_conversion_factor</span> <span class="o">*=</span> <span class="mf">1.</span><span class="o">/.</span><span class="mi">393701</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span>   <span class="c1"># pragma: no cover</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spatial_unit</span> <span class="o">=</span> <span class="n">new_unit</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">pixel_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">)</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_c</span>
+
+<div class="viewcode-block" id="Monitor.pixels_to_visual_degrees"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.Monitor.pixels_to_visual_degrees">[docs]</a>    <span class="k">def</span> <span class="nf">pixels_to_visual_degrees</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">distance_from_monitor</span><span class="p">,</span> <span class="n">small_angle_approximation</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">small_angle_approximation</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">n</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">pixel_size</span><span class="o">/</span><span class="n">distance_from_monitor</span><span class="o">*</span><span class="mf">57.2958</span> <span class="c1"># radians to degrees</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">(</span><span class="n">n</span><span class="o">*</span><span class="mf">1.</span><span class="o">/</span><span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">pixel_size</span> <span class="o">/</span> <span class="n">distance_from_monitor</span><span class="p">)</span> <span class="o">*</span> <span class="mf">57.2958</span>  <span class="c1"># radians to degrees</span></div>
+
+<div class="viewcode-block" id="Monitor.lsn_image_to_screen"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.Monitor.lsn_image_to_screen">[docs]</a>    <span class="k">def</span> <span class="nf">lsn_image_to_screen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">stimulus_type</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">,</span> <span class="n">background_color</span><span class="o">=</span><span class="n">STIMULUS_GRAY</span><span class="p">):</span>
+
+        <span class="c1"># assert img.dtype == np.uint8</span>
+
+        <span class="n">pixels_per_patch</span> <span class="o">=</span> <span class="n">LOCALLY_SPARSE_NOISE_PIXELS</span><span class="p">[</span><span class="n">stimulus_type</span><span class="p">]</span>
+
+        <span class="n">full_image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_r</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_c</span><span class="p">),</span> <span class="n">background_color</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+        <span class="n">img_full_res</span> <span class="o">=</span> <span class="n">imresize</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">pixels_per_patch</span><span class="p">),</span> <span class="n">interp</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">)</span>
+        <span class="n">mr</span><span class="p">,</span> <span class="n">mc</span> <span class="o">=</span> <span class="n">lsn_coordinate_to_monitor_coordinate</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_r</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_c</span><span class="p">),</span> <span class="n">stimulus_type</span><span class="p">)</span>
+        <span class="n">Mr</span><span class="p">,</span> <span class="n">Mc</span> <span class="o">=</span> <span class="n">lsn_coordinate_to_monitor_coordinate</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_r</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_c</span><span class="p">),</span> <span class="n">stimulus_type</span><span class="p">)</span>
+        <span class="n">full_image</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">mr</span><span class="p">):</span><span class="nb">int</span><span class="p">(</span><span class="n">Mr</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">mc</span><span class="p">):</span><span class="nb">int</span><span class="p">(</span><span class="n">Mc</span><span class="p">)]</span> <span class="o">=</span> <span class="n">img_full_res</span>
+
+        <span class="k">if</span> <span class="n">origin</span> <span class="o">==</span> <span class="s1">&#39;lower&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">full_image</span>
+        <span class="k">elif</span> <span class="n">origin</span> <span class="o">==</span> <span class="s1">&#39;upper&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">full_image</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span>
+
+        <span class="k">return</span> <span class="n">full_image</span></div>
+
+<div class="viewcode-block" id="Monitor.natural_scene_image_to_screen"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.Monitor.natural_scene_image_to_screen">[docs]</a>    <span class="k">def</span> <span class="nf">natural_scene_image_to_screen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">):</span>
+
+        <span class="c1"># assert img.dtype == np.float32</span>
+        <span class="c1"># img = img.astype(np.uint8)</span>
+
+        <span class="n">full_image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_r</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_c</span><span class="p">),</span> <span class="mi">127</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+        <span class="n">mr</span><span class="p">,</span> <span class="n">mc</span> <span class="o">=</span> <span class="n">natural_scene_coordinate_to_monitor_coordinate</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_r</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_c</span><span class="p">))</span>
+        <span class="n">Mr</span><span class="p">,</span> <span class="n">Mc</span> <span class="o">=</span> <span class="n">natural_scene_coordinate_to_monitor_coordinate</span><span class="p">((</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_r</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_c</span><span class="p">))</span>
+        <span class="n">full_image</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">mr</span><span class="p">):</span><span class="nb">int</span><span class="p">(</span><span class="n">Mr</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">mc</span><span class="p">):</span><span class="nb">int</span><span class="p">(</span><span class="n">Mc</span><span class="p">)]</span> <span class="o">=</span> <span class="n">img</span>
+        <span class="k">if</span> <span class="n">origin</span> <span class="o">==</span> <span class="s1">&#39;lower&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">full_image</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">origin</span> <span class="o">==</span> <span class="s1">&#39;upper&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">full_image</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span></div>
+
+<div class="viewcode-block" id="Monitor.natural_movie_image_to_screen"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.Monitor.natural_movie_image_to_screen">[docs]</a>    <span class="k">def</span> <span class="nf">natural_movie_image_to_screen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">):</span>
+
+        <span class="n">img</span> <span class="o">=</span> <span class="n">imresize</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">NATURAL_MOVIE_PIXELS</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="n">img</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span>
+
+        <span class="n">full_image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_r</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_c</span><span class="p">),</span> <span class="mi">127</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+        <span class="n">mr</span><span class="p">,</span> <span class="n">mc</span> <span class="o">=</span> <span class="n">map_template_coordinate_to_monitor_coordinate</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_r</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_c</span><span class="p">),</span> <span class="n">NATURAL_MOVIE_PIXELS</span><span class="p">)</span>
+        <span class="n">Mr</span><span class="p">,</span> <span class="n">Mc</span> <span class="o">=</span> <span class="n">map_template_coordinate_to_monitor_coordinate</span><span class="p">((</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_r</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_c</span><span class="p">),</span> <span class="n">NATURAL_MOVIE_PIXELS</span><span class="p">)</span>
+
+        <span class="n">full_image</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">mr</span><span class="p">):</span><span class="nb">int</span><span class="p">(</span><span class="n">Mr</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">mc</span><span class="p">):</span><span class="nb">int</span><span class="p">(</span><span class="n">Mc</span><span class="p">)]</span> <span class="o">=</span> <span class="n">img</span>
+
+        <span class="k">if</span> <span class="n">origin</span> <span class="o">==</span> <span class="s1">&#39;lower&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">full_image</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">origin</span> <span class="o">==</span> <span class="s1">&#39;upper&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">full_image</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span></div>
+
+<div class="viewcode-block" id="Monitor.spatial_frequency_to_pix_per_cycle"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.Monitor.spatial_frequency_to_pix_per_cycle">[docs]</a>    <span class="k">def</span> <span class="nf">spatial_frequency_to_pix_per_cycle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spatial_frequency</span><span class="p">,</span> <span class="n">distance_from_monitor</span><span class="p">):</span>
+
+        <span class="c1"># How many cycles do I want to see post warp:</span>
+        <span class="n">number_of_cycles</span> <span class="o">=</span> <span class="n">spatial_frequency</span><span class="o">*</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="o">/</span><span class="mf">2.</span><span class="o">/</span><span class="n">distance_from_monitor</span><span class="p">))</span>
+
+        <span class="c1"># How many pixels to I have pre-warp to place my cycles on:</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_mask</span><span class="p">()</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">m_col</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">number_of_pixels</span> <span class="o">=</span> <span class="p">(</span><span class="n">m_col</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">m_col</span><span class="o">.</span><span class="n">min</span><span class="p">())</span>
+
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">number_of_pixels</span><span class="p">)</span><span class="o">/</span><span class="n">number_of_cycles</span></div>
+
+
+<div class="viewcode-block" id="Monitor.grating_to_screen"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.Monitor.grating_to_screen">[docs]</a>    <span class="k">def</span> <span class="nf">grating_to_screen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">spatial_frequency</span><span class="p">,</span> <span class="n">orientation</span><span class="p">,</span> <span class="n">distance_from_monitor</span><span class="p">,</span> <span class="n">p2p_amp</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">baseline</span><span class="o">=</span><span class="mi">127</span><span class="p">):</span>
+
+        <span class="n">pix_per_cycle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spatial_frequency_to_pix_per_cycle</span><span class="p">(</span><span class="n">spatial_frequency</span><span class="p">,</span> <span class="n">distance_from_monitor</span><span class="p">)</span>
+
+        <span class="n">grating</span> <span class="o">=</span> <span class="n">get_spatial_grating</span><span class="p">(</span><span class="n">height</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_r</span><span class="p">,</span>
+                                      <span class="n">aspect_ratio</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">aspect_ratio</span><span class="p">,</span>
+                                      <span class="n">ori</span><span class="o">=</span><span class="n">orientation</span><span class="p">,</span>
+                                      <span class="n">pix_per_cycle</span><span class="o">=</span><span class="n">pix_per_cycle</span><span class="p">,</span>
+                                      <span class="n">phase</span><span class="o">=</span><span class="n">phase</span><span class="p">,</span>
+                                      <span class="n">p2p_amp</span><span class="o">=</span><span class="n">p2p_amp</span><span class="p">,</span>
+                                      <span class="n">baseline</span><span class="o">=</span><span class="n">baseline</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">grating</span></div>
+
+<div class="viewcode-block" id="Monitor.get_mask"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.Monitor.get_mask">[docs]</a>    <span class="k">def</span> <span class="nf">get_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="kn">from</span> <span class="nn">allensdk.core.brain_observatory_nwb_data_set</span> <span class="kn">import</span> <span class="n">make_display_mask</span>
+
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">make_display_mask</span><span class="p">(</span><span class="n">display_shape</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_c</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_r</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+        <span class="k">assert</span> <span class="n">mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_r</span>
+        <span class="k">assert</span> <span class="n">mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_c</span>
+
+        <span class="k">return</span> <span class="n">mask</span></div>
+
+<div class="viewcode-block" id="Monitor.show_image"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.Monitor.show_image">[docs]</a>    <span class="k">def</span> <span class="nf">show_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">warp</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">):</span>
+
+        <span class="kn">from</span> <span class="nn">allensdk.core.brain_observatory_nwb_data_set</span> <span class="kn">import</span> <span class="n">make_display_mask</span>
+
+        <span class="k">assert</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_r</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_c</span><span class="p">)</span> <span class="ow">or</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_r</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_c</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">warp</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="n">img</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">warp_image</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">warp</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">mask</span> <span class="o">==</span> <span class="bp">False</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="n">origin</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">gray</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">mask</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">make_display_mask</span><span class="p">(</span><span class="n">display_shape</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_c</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_r</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+            <span class="n">alpha_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">4</span><span class="p">))</span>
+            <span class="n">alpha_mask</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">mask</span>
+            <span class="n">alpha_mask</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="o">.</span><span class="mi">4</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">alpha_mask</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="n">origin</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">get_xaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">get_yaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">origin</span> <span class="o">==</span> <span class="s1">&#39;upper&#39;</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">((</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">origin</span> <span class="o">==</span> <span class="s1">&#39;lower&#39;</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+        <span class="k">if</span> <span class="n">show</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Monitor.map_stimulus"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.Monitor.map_stimulus">[docs]</a>    <span class="k">def</span> <span class="nf">map_stimulus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_stimulus_coordinate</span><span class="p">,</span> <span class="n">source_stimulus_type</span><span class="p">,</span> <span class="n">target_stimulus_type</span><span class="p">):</span>
+        <span class="n">monitor_shape</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_r</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_c</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">map_stimulus</span><span class="p">(</span><span class="n">source_stimulus_coordinate</span><span class="p">,</span> <span class="n">source_stimulus_type</span><span class="p">,</span> <span class="n">target_stimulus_type</span><span class="p">,</span> <span class="n">monitor_shape</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="ExperimentGeometry"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.ExperimentGeometry">[docs]</a><span class="k">class</span> <span class="nc">ExperimentGeometry</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">distance</span><span class="p">,</span> <span class="n">mon_height_cm</span><span class="p">,</span> <span class="n">mon_width_cm</span><span class="p">,</span> <span class="n">mon_res</span><span class="p">,</span> <span class="n">eyepoint</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">distance</span> <span class="o">=</span> <span class="n">distance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mon_height_cm</span> <span class="o">=</span> <span class="n">mon_height_cm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mon_width_cm</span> <span class="o">=</span> <span class="n">mon_width_cm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mon_res</span> <span class="o">=</span> <span class="n">mon_res</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eyepoint</span> <span class="o">=</span> <span class="n">eyepoint</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_warp_coordinates</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">warp_coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_warp_coordinates</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_warp_coordinates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_warp_coordinates</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_warp_coordinates</span>
+
+<div class="viewcode-block" id="ExperimentGeometry.generate_warp_coordinates"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.ExperimentGeometry.generate_warp_coordinates">[docs]</a>    <span class="k">def</span> <span class="nf">generate_warp_coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">display_shape</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mon_res</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">display_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span> <span class="o">-</span> <span class="n">display_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">display_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span> <span class="o">-</span> <span class="n">display_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="n">display_coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)))</span>
+
+        <span class="n">warp_coorinates</span> <span class="o">=</span> <span class="n">warp_stimulus_coords</span><span class="p">(</span><span class="n">display_coords</span><span class="p">,</span>
+                                               <span class="n">distance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">distance</span><span class="p">,</span>
+                                               <span class="n">mon_height_cm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mon_height_cm</span><span class="p">,</span>
+                                               <span class="n">mon_width_cm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mon_width_cm</span><span class="p">,</span>
+                                               <span class="n">mon_res</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mon_res</span><span class="p">,</span>
+                                               <span class="n">eyepoint</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">eyepoint</span><span class="p">)</span>
+
+        <span class="n">warp_coorinates</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="n">display_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="n">warp_coorinates</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">display_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span>
+
+        <span class="k">return</span> <span class="n">warp_coorinates</span></div></div>
+
+<div class="viewcode-block" id="BrainObservatoryMonitor"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.BrainObservatoryMonitor">[docs]</a><span class="k">class</span> <span class="nc">BrainObservatoryMonitor</span><span class="p">(</span><span class="n">Monitor</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    http://help.brain-map.org/display/observatory/Documentation?preview=/10616846/10813485/VisualCoding_VisualStimuli.pdf</span>
+<span class="sd">    https://www.cnet.com/products/asus-pa248q/specs/</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">experiment_geometry</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+
+        <span class="n">height</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="n">MONITOR_DIMENSIONS</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">BrainObservatoryMonitor</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="mf">61.214</span><span class="p">,</span> <span class="s1">&#39;cm&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">experiment_geometry</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">experiment_geometry</span> <span class="o">=</span> <span class="n">ExperimentGeometry</span><span class="p">(</span><span class="n">distance</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">MONITOR_DISTANCE</span><span class="p">),</span> <span class="n">mon_height_cm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="n">mon_width_cm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">mon_res</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_c</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_r</span><span class="p">),</span> <span class="n">eyepoint</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">experiment_geometry</span> <span class="o">=</span> <span class="n">experiment_geometry</span>
+
+<div class="viewcode-block" id="BrainObservatoryMonitor.lsn_image_to_screen"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.BrainObservatoryMonitor.lsn_image_to_screen">[docs]</a>    <span class="k">def</span> <span class="nf">lsn_image_to_screen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">LOCALLY_SPARSE_NOISE_DIMENSIONS</span><span class="p">[</span><span class="n">LOCALLY_SPARSE_NOISE</span><span class="p">]):</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">BrainObservatoryMonitor</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">lsn_image_to_screen</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">LOCALLY_SPARSE_NOISE</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">LOCALLY_SPARSE_NOISE_DIMENSIONS</span><span class="p">[</span><span class="n">LOCALLY_SPARSE_NOISE_4DEG</span><span class="p">]):</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">BrainObservatoryMonitor</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">lsn_image_to_screen</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">LOCALLY_SPARSE_NOISE_4DEG</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">LOCALLY_SPARSE_NOISE_DIMENSIONS</span><span class="p">[</span><span class="n">LOCALLY_SPARSE_NOISE_8DEG</span><span class="p">]):</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">BrainObservatoryMonitor</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">lsn_image_to_screen</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">LOCALLY_SPARSE_NOISE_8DEG</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>                        <span class="c1"># pragma: no cover</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span>       <span class="c1"># pragma: no cover</span></div>
+
+<div class="viewcode-block" id="BrainObservatoryMonitor.warp_image"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.BrainObservatoryMonitor.warp_image">[docs]</a>    <span class="k">def</span> <span class="nf">warp_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="k">assert</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_r</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_c</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">spatial_unit</span> <span class="o">==</span> <span class="s1">&#39;cm&#39;</span>
+
+        <span class="k">return</span> <span class="n">spndi</span><span class="o">.</span><span class="n">map_coordinates</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiment_geometry</span><span class="o">.</span><span class="n">warp_coordinates</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_r</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_c</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="BrainObservatoryMonitor.grating_to_screen"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.BrainObservatoryMonitor.grating_to_screen">[docs]</a>    <span class="k">def</span> <span class="nf">grating_to_screen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">spatial_frequency</span><span class="p">,</span> <span class="n">orientation</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">BrainObservatoryMonitor</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">grating_to_screen</span><span class="p">(</span><span class="n">phase</span><span class="p">,</span> <span class="n">spatial_frequency</span><span class="p">,</span> <span class="n">orientation</span><span class="p">,</span>
+                                                                      <span class="bp">self</span><span class="o">.</span><span class="n">experiment_geometry</span><span class="o">.</span><span class="n">distance</span><span class="p">,</span>
+                                                                      <span class="n">p2p_amp</span> <span class="o">=</span> <span class="mi">256</span><span class="p">,</span> <span class="n">baseline</span> <span class="o">=</span> <span class="mi">127</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BrainObservatoryMonitor.pixels_to_visual_degrees"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.BrainObservatoryMonitor.pixels_to_visual_degrees">[docs]</a>    <span class="k">def</span> <span class="nf">pixels_to_visual_degrees</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">BrainObservatoryMonitor</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">pixels_to_visual_degrees</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiment_geometry</span><span class="o">.</span><span class="n">distance</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="warp_stimulus_coords"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.warp_stimulus_coords">[docs]</a><span class="k">def</span> <span class="nf">warp_stimulus_coords</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span>
+                         <span class="n">distance</span><span class="o">=</span><span class="mf">15.0</span><span class="p">,</span>
+                         <span class="n">mon_height_cm</span><span class="o">=</span><span class="mf">32.5</span><span class="p">,</span>
+                         <span class="n">mon_width_cm</span><span class="o">=</span><span class="mf">51.0</span><span class="p">,</span>
+                         <span class="n">mon_res</span><span class="o">=</span><span class="p">(</span><span class="mi">1920</span><span class="p">,</span> <span class="mi">1200</span><span class="p">),</span>
+                         <span class="n">eyepoint</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    For a list of screen vertices, provides a corresponding list of texture coordinates.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    vertices: numpy.ndarray</span>
+<span class="sd">        [[x0,y0], [x1,y1], ...] A set of vertices to  convert to texture positions.</span>
+<span class="sd">    distance: float</span>
+<span class="sd">        distance from the monitor in cm.</span>
+<span class="sd">    mon_height_cm: float</span>
+<span class="sd">        monitor height in cm</span>
+<span class="sd">    mon_width_cm: float</span>
+<span class="sd">        monitor width in cm</span>
+<span class="sd">    mon_res: tuple</span>
+<span class="sd">        monitor resolution (x,y)</span>
+<span class="sd">    eyepoint: tuple</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        x,y coordinates shaped like the input that describe what pixel coordinates</span>
+<span class="sd">        are displayed an the input coordinates after warping the stimulus.</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">mon_width_cm</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">mon_width_cm</span><span class="p">)</span>
+    <span class="n">mon_height_cm</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">mon_height_cm</span><span class="p">)</span>
+    <span class="n">distance</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">distance</span><span class="p">)</span>
+    <span class="n">mon_res_x</span><span class="p">,</span> <span class="n">mon_res_y</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">mon_res</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">mon_res</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="n">vertices</span> <span class="o">=</span> <span class="n">vertices</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+
+    <span class="c1"># from pixels (-1920/2 -&gt; 1920/2) to stimulus space (-0.5-&gt;0.5)</span>
+    <span class="n">vertices</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">vertices</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">mon_res_x</span>
+    <span class="n">vertices</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">vertices</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">mon_res_y</span>
+
+    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">vertices</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">mon_width_cm</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">vertices</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">mon_height_cm</span>
+
+    <span class="n">xEye</span> <span class="o">=</span> <span class="n">eyepoint</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">mon_width_cm</span>
+    <span class="n">yEye</span> <span class="o">=</span> <span class="n">eyepoint</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">mon_height_cm</span>
+
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-</span> <span class="n">xEye</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">yEye</span>
+
+    <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">distance</span><span class="p">))</span>
+
+    <span class="n">azimuth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">(</span><span class="n">x</span> <span class="o">/</span> <span class="n">distance</span><span class="p">)</span>
+    <span class="n">altitude</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arcsin</span><span class="p">(</span><span class="n">y</span> <span class="o">/</span> <span class="n">r</span><span class="p">)</span>
+
+    <span class="c1"># calculate the texture coordinates</span>
+    <span class="n">tx</span> <span class="o">=</span> <span class="n">distance</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">x</span> <span class="o">/</span> <span class="n">r</span><span class="p">)</span> <span class="o">-</span> <span class="n">distance</span>
+    <span class="n">ty</span> <span class="o">=</span> <span class="n">distance</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">y</span> <span class="o">/</span> <span class="n">r</span><span class="p">)</span> <span class="o">-</span> <span class="n">distance</span>
+
+    <span class="c1"># prevent div0</span>
+    <span class="n">azimuth</span><span class="p">[</span><span class="n">azimuth</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+    <span class="n">altitude</span><span class="p">[</span><span class="n">altitude</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+
+    <span class="c1"># the texture coordinates (which are now lying on the sphere)</span>
+    <span class="c1"># need to be remapped back onto the plane of the display.</span>
+    <span class="c1"># This effectively stretches the coordinates away from the eyepoint.</span>
+
+    <span class="n">centralAngle</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">altitude</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">azimuth</span><span class="p">)))</span>
+    <span class="c1"># distance from eyepoint to texture vertex</span>
+    <span class="n">arcLength</span> <span class="o">=</span> <span class="n">centralAngle</span> <span class="o">*</span> <span class="n">distance</span>
+    <span class="c1"># remap the texture coordinate</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">ty</span><span class="p">,</span> <span class="n">tx</span><span class="p">)</span>
+    <span class="n">tx</span> <span class="o">=</span> <span class="n">arcLength</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+    <span class="n">ty</span> <span class="o">=</span> <span class="n">arcLength</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+
+    <span class="n">u_coords</span> <span class="o">=</span> <span class="n">tx</span> <span class="o">/</span> <span class="n">mon_width_cm</span>
+    <span class="n">v_coords</span> <span class="o">=</span> <span class="n">ty</span> <span class="o">/</span> <span class="n">mon_height_cm</span>
+
+    <span class="n">retCoords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">u_coords</span><span class="p">,</span> <span class="n">v_coords</span><span class="p">))</span>
+
+    <span class="c1"># back to pixels</span>
+    <span class="n">retCoords</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">retCoords</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">mon_res_x</span>
+    <span class="n">retCoords</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">retCoords</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">mon_res_y</span>
+
+    <span class="k">return</span> <span class="n">retCoords</span></div>
+
+
+<div class="viewcode-block" id="make_display_mask"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.make_display_mask">[docs]</a><span class="k">def</span> <span class="nf">make_display_mask</span><span class="p">(</span><span class="n">display_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1920</span><span class="p">,</span> <span class="mi">1200</span><span class="p">)):</span>
+    <span class="sd">&#39;&#39;&#39; Build a display-shaped mask that indicates which pixels are on screen after warping the stimulus. &#39;&#39;&#39;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">display_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span> <span class="o">-</span> <span class="n">display_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">display_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span> <span class="o">-</span> <span class="n">display_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">display_coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)))</span>
+
+    <span class="n">warped_coords</span> <span class="o">=</span> <span class="n">warp_stimulus_coords</span><span class="p">(</span><span class="n">display_coords</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="n">off_warped_coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">warped_coords</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">display_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
+                                  <span class="n">warped_coords</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">display_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span><span class="p">])</span>
+
+    <span class="n">used_coords</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">off_warped_coords</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+        <span class="n">used_coords</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">off_warped_coords</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">],</span> <span class="n">off_warped_coords</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">i</span><span class="p">]))</span>
+
+    <span class="n">used_coords</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span> <span class="k">for</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="ow">in</span> <span class="n">used_coords</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">),</span>
+                   <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">y</span> <span class="k">for</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="ow">in</span> <span class="n">used_coords</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">))</span>
+
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">display_shape</span><span class="p">)</span>
+
+    <span class="n">mask</span><span class="p">[</span><span class="n">used_coords</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">mask</span></div>
+
+
+<div class="viewcode-block" id="mask_stimulus_template"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.mask_stimulus_template">[docs]</a><span class="k">def</span> <span class="nf">mask_stimulus_template</span><span class="p">(</span><span class="n">template_display_coords</span><span class="p">,</span> <span class="n">template_shape</span><span class="p">,</span> <span class="n">display_mask</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Build a mask for a stimulus template of a given shape and display coordinates that indicates</span>
+<span class="sd">    which part of the template is on screen after warping.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    template_display_coords: list</span>
+<span class="sd">        list of (x,y) display coordinates</span>
+
+<span class="sd">    template_shape: tuple</span>
+<span class="sd">        (width,height) of the display template</span>
+
+<span class="sd">    display_mask: np.ndarray</span>
+<span class="sd">        boolean 2D mask indicating which display coordinates are on screen after warping.</span>
+
+<span class="sd">    threshold: float</span>
+<span class="sd">        Fraction of pixels associated with a template display coordinate that should remain</span>
+<span class="sd">        on screen to count as belonging to the mask.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tuple: (template mask, pixel fraction)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">display_mask</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">display_mask</span> <span class="o">=</span> <span class="n">make_display_mask</span><span class="p">()</span>
+
+    <span class="n">frac</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">template_shape</span><span class="p">)</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">template_shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">template_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">template_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">tdcm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">template_display_coords</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">==</span> <span class="n">x</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span>
+                <span class="n">template_display_coords</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">==</span> <span class="n">y</span><span class="p">))</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">display_mask</span><span class="p">[</span><span class="n">tdcm</span><span class="p">]</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="n">frac</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span>
+            <span class="n">mask</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span> <span class="o">&gt;=</span> <span class="n">threshold</span>
+
+    <span class="k">return</span> <span class="n">mask</span><span class="p">,</span> <span class="n">frac</span></div>
 </pre></div>
 
           </div>

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.core.mouse_connectivity_cache &mdash; Allen SDK 0.13.2 documentation</title>
+    <title>allensdk.core.mouse_connectivity_cache &mdash; Allen SDK 0.14.1 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.13.2',
+        VERSION:     '0.14.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.13.2 documentation" href="../../../index.html" />
+    <link rel="top" title="Allen SDK 0.14.1 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body role="document">
@@ -386,8 +386,8 @@
         <span class="k">return</span> <span class="n">OntologiesApi</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">api_url</span><span class="p">)</span><span class="o">.</span><span class="n">get_structures_with_sets</span><span class="p">(</span>
             <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;lazy&#39;</span><span class="p">,</span>
             <span class="n">path</span><span class="o">=</span><span class="n">file_name</span><span class="p">,</span>
-            <span class="n">pre</span><span class="o">=</span><span class="n">StructureTree</span><span class="o">.</span><span class="n">clean_structures</span><span class="p">,</span> 
-            <span class="n">post</span><span class="o">=</span><span class="n">StructureTree</span><span class="p">,</span> 
+            <span class="n">pre</span><span class="o">=</span><span class="n">StructureTree</span><span class="o">.</span><span class="n">clean_structures</span><span class="p">,</span>
+            <span class="n">post</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">StructureTree</span><span class="p">(</span><span class="n">StructureTree</span><span class="o">.</span><span class="n">clean_structures</span><span class="p">(</span><span class="n">x</span><span class="p">)),</span> 
             <span class="n">structure_graph_ids</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
             <span class="o">**</span><span class="n">Cache</span><span class="o">.</span><span class="n">cache_json</span><span class="p">())</span></div>
 

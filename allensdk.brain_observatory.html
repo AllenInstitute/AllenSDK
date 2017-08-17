@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.brain_observatory package &mdash; Allen SDK 0.13.2 documentation</title>
+    <title>allensdk.brain_observatory package &mdash; Allen SDK 0.14.1 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.13.2',
+        VERSION:     '0.14.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.13.2 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.14.1 documentation" href="index.html" />
     <link rel="up" title="allensdk package" href="allensdk.html" />
     <link rel="next" title="allensdk.brain_observatory.receptive_field_analysis package" href="allensdk.brain_observatory.receptive_field_analysis.html" />
     <link rel="prev" title="allensdk.api.queries package" href="allensdk.api.queries.html" /> 
@@ -2338,11 +2338,274 @@ The return is a 3-tuple of:</p>
 </div>
 <div class="section" id="module-allensdk.brain_observatory.stimulus_info">
 <span id="allensdk-brain-observatory-stimulus-info-module"></span><h2>allensdk.brain_observatory.stimulus_info module<a class="headerlink" href="#module-allensdk.brain_observatory.stimulus_info" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="allensdk.brain_observatory.stimulus_info.BinaryIntervalSearchTree">
+<em class="property">class </em><code class="descclassname">allensdk.brain_observatory.stimulus_info.</code><code class="descname">BinaryIntervalSearchTree</code><span class="sig-paren">(</span><em>search_list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#BinaryIntervalSearchTree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.BinaryIntervalSearchTree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="allensdk.brain_observatory.stimulus_info.BinaryIntervalSearchTree.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>input_list</em>, <em>tmp=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#BinaryIntervalSearchTree.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.BinaryIntervalSearchTree.add" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="allensdk.brain_observatory.stimulus_info.BinaryIntervalSearchTree.from_df">
+<em class="property">static </em><code class="descname">from_df</code><span class="sig-paren">(</span><em>input_df</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#BinaryIntervalSearchTree.from_df"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.BinaryIntervalSearchTree.from_df" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.stimulus_info.BinaryIntervalSearchTree.search">
+<code class="descname">search</code><span class="sig-paren">(</span><em>fi</em>, <em>tmp=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#BinaryIntervalSearchTree.search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.BinaryIntervalSearchTree.search" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="allensdk.brain_observatory.stimulus_info.BrainObservatoryMonitor">
+<em class="property">class </em><code class="descclassname">allensdk.brain_observatory.stimulus_info.</code><code class="descname">BrainObservatoryMonitor</code><span class="sig-paren">(</span><em>experiment_geometry=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#BrainObservatoryMonitor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.BrainObservatoryMonitor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#allensdk.brain_observatory.stimulus_info.Monitor" title="allensdk.brain_observatory.stimulus_info.Monitor"><code class="xref py py-class docutils literal"><span class="pre">allensdk.brain_observatory.stimulus_info.Monitor</span></code></a></p>
+<p><a class="reference external" href="http://help.brain-map.org/display/observatory/Documentation?preview=/10616846/10813485/VisualCoding_VisualStimuli.pdf">http://help.brain-map.org/display/observatory/Documentation?preview=/10616846/10813485/VisualCoding_VisualStimuli.pdf</a>
+<a class="reference external" href="https://www.cnet.com/products/asus-pa248q/specs/">https://www.cnet.com/products/asus-pa248q/specs/</a></p>
+<dl class="method">
+<dt id="allensdk.brain_observatory.stimulus_info.BrainObservatoryMonitor.grating_to_screen">
+<code class="descname">grating_to_screen</code><span class="sig-paren">(</span><em>phase</em>, <em>spatial_frequency</em>, <em>orientation</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#BrainObservatoryMonitor.grating_to_screen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.BrainObservatoryMonitor.grating_to_screen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.stimulus_info.BrainObservatoryMonitor.lsn_image_to_screen">
+<code class="descname">lsn_image_to_screen</code><span class="sig-paren">(</span><em>img</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#BrainObservatoryMonitor.lsn_image_to_screen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.BrainObservatoryMonitor.lsn_image_to_screen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.stimulus_info.BrainObservatoryMonitor.pixels_to_visual_degrees">
+<code class="descname">pixels_to_visual_degrees</code><span class="sig-paren">(</span><em>n</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#BrainObservatoryMonitor.pixels_to_visual_degrees"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.BrainObservatoryMonitor.pixels_to_visual_degrees" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.stimulus_info.BrainObservatoryMonitor.warp_image">
+<code class="descname">warp_image</code><span class="sig-paren">(</span><em>img</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#BrainObservatoryMonitor.warp_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.BrainObservatoryMonitor.warp_image" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="allensdk.brain_observatory.stimulus_info.ExperimentGeometry">
+<em class="property">class </em><code class="descclassname">allensdk.brain_observatory.stimulus_info.</code><code class="descname">ExperimentGeometry</code><span class="sig-paren">(</span><em>distance</em>, <em>mon_height_cm</em>, <em>mon_width_cm</em>, <em>mon_res</em>, <em>eyepoint</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#ExperimentGeometry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.ExperimentGeometry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="allensdk.brain_observatory.stimulus_info.ExperimentGeometry.generate_warp_coordinates">
+<code class="descname">generate_warp_coordinates</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#ExperimentGeometry.generate_warp_coordinates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.ExperimentGeometry.generate_warp_coordinates" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.stimulus_info.ExperimentGeometry.warp_coordinates">
+<code class="descname">warp_coordinates</code><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.ExperimentGeometry.warp_coordinates" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="allensdk.brain_observatory.stimulus_info.Monitor">
+<em class="property">class </em><code class="descclassname">allensdk.brain_observatory.stimulus_info.</code><code class="descname">Monitor</code><span class="sig-paren">(</span><em>n_pixels_r</em>, <em>n_pixels_c</em>, <em>panel_size</em>, <em>spatial_unit</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#Monitor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.Monitor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.stimulus_info.Monitor.aspect_ratio">
+<code class="descname">aspect_ratio</code><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.Monitor.aspect_ratio" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.stimulus_info.Monitor.get_mask">
+<code class="descname">get_mask</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#Monitor.get_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.Monitor.get_mask" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.stimulus_info.Monitor.grating_to_screen">
+<code class="descname">grating_to_screen</code><span class="sig-paren">(</span><em>phase</em>, <em>spatial_frequency</em>, <em>orientation</em>, <em>distance_from_monitor</em>, <em>p2p_amp=256</em>, <em>baseline=127</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#Monitor.grating_to_screen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.Monitor.grating_to_screen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.stimulus_info.Monitor.height">
+<code class="descname">height</code><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.Monitor.height" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.stimulus_info.Monitor.lsn_image_to_screen">
+<code class="descname">lsn_image_to_screen</code><span class="sig-paren">(</span><em>img</em>, <em>stimulus_type</em>, <em>origin='lower'</em>, <em>background_color=127</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#Monitor.lsn_image_to_screen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.Monitor.lsn_image_to_screen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.stimulus_info.Monitor.map_stimulus">
+<code class="descname">map_stimulus</code><span class="sig-paren">(</span><em>source_stimulus_coordinate</em>, <em>source_stimulus_type</em>, <em>target_stimulus_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#Monitor.map_stimulus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.Monitor.map_stimulus" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.stimulus_info.Monitor.natural_movie_image_to_screen">
+<code class="descname">natural_movie_image_to_screen</code><span class="sig-paren">(</span><em>img</em>, <em>origin='lower'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#Monitor.natural_movie_image_to_screen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.Monitor.natural_movie_image_to_screen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.stimulus_info.Monitor.natural_scene_image_to_screen">
+<code class="descname">natural_scene_image_to_screen</code><span class="sig-paren">(</span><em>img</em>, <em>origin='lower'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#Monitor.natural_scene_image_to_screen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.Monitor.natural_scene_image_to_screen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.stimulus_info.Monitor.panel_size">
+<code class="descname">panel_size</code><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.Monitor.panel_size" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.stimulus_info.Monitor.pixel_size">
+<code class="descname">pixel_size</code><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.Monitor.pixel_size" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.stimulus_info.Monitor.pixels_to_visual_degrees">
+<code class="descname">pixels_to_visual_degrees</code><span class="sig-paren">(</span><em>n</em>, <em>distance_from_monitor</em>, <em>small_angle_approximation=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#Monitor.pixels_to_visual_degrees"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.Monitor.pixels_to_visual_degrees" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.stimulus_info.Monitor.set_spatial_unit">
+<code class="descname">set_spatial_unit</code><span class="sig-paren">(</span><em>new_unit</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#Monitor.set_spatial_unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.Monitor.set_spatial_unit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.stimulus_info.Monitor.show_image">
+<code class="descname">show_image</code><span class="sig-paren">(</span><em>img</em>, <em>ax=None</em>, <em>show=True</em>, <em>mask=False</em>, <em>warp=False</em>, <em>origin='lower'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#Monitor.show_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.Monitor.show_image" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.stimulus_info.Monitor.spatial_frequency_to_pix_per_cycle">
+<code class="descname">spatial_frequency_to_pix_per_cycle</code><span class="sig-paren">(</span><em>spatial_frequency</em>, <em>distance_from_monitor</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#Monitor.spatial_frequency_to_pix_per_cycle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.Monitor.spatial_frequency_to_pix_per_cycle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.stimulus_info.Monitor.width">
+<code class="descname">width</code><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.Monitor.width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="allensdk.brain_observatory.stimulus_info.StimulusSearch">
+<em class="property">class </em><code class="descclassname">allensdk.brain_observatory.stimulus_info.</code><code class="descname">StimulusSearch</code><span class="sig-paren">(</span><em>nwb_dataset</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#StimulusSearch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.StimulusSearch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="allensdk.brain_observatory.stimulus_info.StimulusSearch.search">
+<code class="descname">search</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#StimulusSearch.search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.StimulusSearch.search" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 <dl class="function">
 <dt id="allensdk.brain_observatory.stimulus_info.all_stimuli">
 <code class="descclassname">allensdk.brain_observatory.stimulus_info.</code><code class="descname">all_stimuli</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#all_stimuli"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.all_stimuli" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a list of all stimuli in the data set</p>
 </dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.stimulus_info.get_spatial_grating">
+<code class="descclassname">allensdk.brain_observatory.stimulus_info.</code><code class="descname">get_spatial_grating</code><span class="sig-paren">(</span><em>height=None</em>, <em>aspect_ratio=None</em>, <em>ori=None</em>, <em>pix_per_cycle=None</em>, <em>phase=None</em>, <em>p2p_amp=2</em>, <em>baseline=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#get_spatial_grating"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.get_spatial_grating" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.stimulus_info.get_spatio_temporal_grating">
+<code class="descclassname">allensdk.brain_observatory.stimulus_info.</code><code class="descname">get_spatio_temporal_grating</code><span class="sig-paren">(</span><em>t</em>, <em>temporal_frequency=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#get_spatio_temporal_grating"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.get_spatio_temporal_grating" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.stimulus_info.lsn_coordinate_to_monitor_coordinate">
+<code class="descclassname">allensdk.brain_observatory.stimulus_info.</code><code class="descname">lsn_coordinate_to_monitor_coordinate</code><span class="sig-paren">(</span><em>lsn_coordinate</em>, <em>monitor_shape</em>, <em>stimulus_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#lsn_coordinate_to_monitor_coordinate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.lsn_coordinate_to_monitor_coordinate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.stimulus_info.make_display_mask">
+<code class="descclassname">allensdk.brain_observatory.stimulus_info.</code><code class="descname">make_display_mask</code><span class="sig-paren">(</span><em>display_shape=(1920</em>, <em>1200)</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#make_display_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.make_display_mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a display-shaped mask that indicates which pixels are on screen after warping the stimulus.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.stimulus_info.map_monitor_coordinate_to_stimulus_coordinate">
+<code class="descclassname">allensdk.brain_observatory.stimulus_info.</code><code class="descname">map_monitor_coordinate_to_stimulus_coordinate</code><span class="sig-paren">(</span><em>monitor_coordinate</em>, <em>monitor_shape</em>, <em>stimulus_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#map_monitor_coordinate_to_stimulus_coordinate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.map_monitor_coordinate_to_stimulus_coordinate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.stimulus_info.map_monitor_coordinate_to_template_coordinate">
+<code class="descclassname">allensdk.brain_observatory.stimulus_info.</code><code class="descname">map_monitor_coordinate_to_template_coordinate</code><span class="sig-paren">(</span><em>monitor_coord</em>, <em>monitor_shape</em>, <em>template_shape</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#map_monitor_coordinate_to_template_coordinate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.map_monitor_coordinate_to_template_coordinate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.stimulus_info.map_stimulus">
+<code class="descclassname">allensdk.brain_observatory.stimulus_info.</code><code class="descname">map_stimulus</code><span class="sig-paren">(</span><em>source_stimulus_coordinate</em>, <em>source_stimulus_type</em>, <em>target_stimulus_type</em>, <em>monitor_shape</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#map_stimulus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.map_stimulus" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.stimulus_info.map_stimulus_coordinate_to_monitor_coordinate">
+<code class="descclassname">allensdk.brain_observatory.stimulus_info.</code><code class="descname">map_stimulus_coordinate_to_monitor_coordinate</code><span class="sig-paren">(</span><em>template_coordinate</em>, <em>monitor_shape</em>, <em>stimulus_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#map_stimulus_coordinate_to_monitor_coordinate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.map_stimulus_coordinate_to_monitor_coordinate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.stimulus_info.map_template_coordinate_to_monitor_coordinate">
+<code class="descclassname">allensdk.brain_observatory.stimulus_info.</code><code class="descname">map_template_coordinate_to_monitor_coordinate</code><span class="sig-paren">(</span><em>template_coord</em>, <em>monitor_shape</em>, <em>template_shape</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#map_template_coordinate_to_monitor_coordinate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.map_template_coordinate_to_monitor_coordinate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.stimulus_info.mask_stimulus_template">
+<code class="descclassname">allensdk.brain_observatory.stimulus_info.</code><code class="descname">mask_stimulus_template</code><span class="sig-paren">(</span><em>template_display_coords</em>, <em>template_shape</em>, <em>display_mask=None</em>, <em>threshold=1.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#mask_stimulus_template"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.mask_stimulus_template" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a mask for a stimulus template of a given shape and display coordinates that indicates
+which part of the template is on screen after warping.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>template_display_coords: list</strong></p>
+<blockquote>
+<div><p>list of (x,y) display coordinates</p>
+</div></blockquote>
+<p><strong>template_shape: tuple</strong></p>
+<blockquote>
+<div><p>(width,height) of the display template</p>
+</div></blockquote>
+<p><strong>display_mask: np.ndarray</strong></p>
+<blockquote>
+<div><p>boolean 2D mask indicating which display coordinates are on screen after warping.</p>
+</div></blockquote>
+<p><strong>threshold: float</strong></p>
+<blockquote>
+<div><p>Fraction of pixels associated with a template display coordinate that should remain
+on screen to count as belonging to the mask.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">tuple: (template mask, pixel fraction)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.stimulus_info.monitor_coordinate_to_lsn_coordinate">
+<code class="descclassname">allensdk.brain_observatory.stimulus_info.</code><code class="descname">monitor_coordinate_to_lsn_coordinate</code><span class="sig-paren">(</span><em>monitor_coordinate</em>, <em>monitor_shape</em>, <em>stimulus_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#monitor_coordinate_to_lsn_coordinate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.monitor_coordinate_to_lsn_coordinate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.stimulus_info.monitor_coordinate_to_natural_movie_coordinate">
+<code class="descclassname">allensdk.brain_observatory.stimulus_info.</code><code class="descname">monitor_coordinate_to_natural_movie_coordinate</code><span class="sig-paren">(</span><em>monitor_coordinate</em>, <em>monitor_shape</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#monitor_coordinate_to_natural_movie_coordinate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.monitor_coordinate_to_natural_movie_coordinate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.stimulus_info.natural_movie_coordinate_to_monitor_coordinate">
+<code class="descclassname">allensdk.brain_observatory.stimulus_info.</code><code class="descname">natural_movie_coordinate_to_monitor_coordinate</code><span class="sig-paren">(</span><em>natural_movie_coordinate</em>, <em>monitor_shape</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#natural_movie_coordinate_to_monitor_coordinate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.natural_movie_coordinate_to_monitor_coordinate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.stimulus_info.natural_scene_coordinate_to_monitor_coordinate">
+<code class="descclassname">allensdk.brain_observatory.stimulus_info.</code><code class="descname">natural_scene_coordinate_to_monitor_coordinate</code><span class="sig-paren">(</span><em>natural_scene_coordinate</em>, <em>monitor_shape</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#natural_scene_coordinate_to_monitor_coordinate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.natural_scene_coordinate_to_monitor_coordinate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.stimulus_info.rotate">
+<code class="descclassname">allensdk.brain_observatory.stimulus_info.</code><code class="descname">rotate</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>theta</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#rotate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.rotate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="function">
 <dt id="allensdk.brain_observatory.stimulus_info.sessions_with_stimulus">
@@ -2361,6 +2624,48 @@ The return is a 3-tuple of:</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>session: string</strong></p>
 <blockquote class="last">
 <div><p>Must be one of: [stimulus_info.THREE_SESSION_A, stimulus_info.THREE_SESSION_B, stimulus_info.THREE_SESSION_C, stimulus_info.THREE_SESSION_C2]</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.stimulus_info.warp_stimulus_coords">
+<code class="descclassname">allensdk.brain_observatory.stimulus_info.</code><code class="descname">warp_stimulus_coords</code><span class="sig-paren">(</span><em>vertices</em>, <em>distance=15.0</em>, <em>mon_height_cm=32.5</em>, <em>mon_width_cm=51.0</em>, <em>mon_res=(1920</em>, <em>1200)</em>, <em>eyepoint=(0.5</em>, <em>0.5)</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#warp_stimulus_coords"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.warp_stimulus_coords" title="Permalink to this definition">¶</a></dt>
+<dd><p>For a list of screen vertices, provides a corresponding list of texture coordinates.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>vertices: numpy.ndarray</strong></p>
+<blockquote>
+<div><p>[[x0,y0], [x1,y1], ...] A set of vertices to  convert to texture positions.</p>
+</div></blockquote>
+<p><strong>distance: float</strong></p>
+<blockquote>
+<div><p>distance from the monitor in cm.</p>
+</div></blockquote>
+<p><strong>mon_height_cm: float</strong></p>
+<blockquote>
+<div><p>monitor height in cm</p>
+</div></blockquote>
+<p><strong>mon_width_cm: float</strong></p>
+<blockquote>
+<div><p>monitor width in cm</p>
+</div></blockquote>
+<p><strong>mon_res: tuple</strong></p>
+<blockquote>
+<div><p>monitor resolution (x,y)</p>
+</div></blockquote>
+<p><strong>eyepoint: tuple</strong></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">np.ndarray</p>
+<blockquote class="last">
+<div><p>x,y coordinates shaped like the input that describe what pixel coordinates
+are displayed an the input coordinates after warping the stimulus.</p>
 </div></blockquote>
 </td>
 </tr>
