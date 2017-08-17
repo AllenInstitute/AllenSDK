@@ -239,6 +239,10 @@ def test_get_structure_tree(mcc, fn_temp_dir, new_nodes):
         p.assert_called_once()
 
     assert(obtained.node_ids()[0] == 0)
+    
+    cm_obt = obtained.get_colormap()
+    assert(len(cm_obt[0]) == 3)
+
     assert( os.path.exists(path) )
 
 
