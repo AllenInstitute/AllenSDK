@@ -44,7 +44,8 @@ import warnings
 
 
 class Api(object):
-    _log = logging.getLogger(__name__)
+    _log = logging.getLogger('allensdk.api.api')
+    _file_download_log = logging.getLogger('allensdk.api.api.retrieve_file_over_http')
     default_api_url = 'http://api.brain-map.org'
     download_url = 'http://download.alleninstitute.org'
 
@@ -302,7 +303,7 @@ class Api(object):
         .. [1] Allen Brain Atlas Data Portal: `Downloading a WellKnownFile <http://help.brain-map.org/display/api/Downloading+a+WellKnownFile>`_.
         '''
 
-        self._log.info("Downloading URL: %s", url)
+        self._file_download_log.info("Downloading URL: %s", url)
         
         from requests_toolbelt import exceptions
         from requests_toolbelt.downloadutils import stream
@@ -315,23 +316,23 @@ class Api(object):
                 with open(file_path, 'wb') as f:
                     stream.stream_response_to_file(response, path=f)
         except exceptions.StreamingError as e:
-            self._log.error("Couldn't retrieve file %s from %s (streaming)." % (file_path,url))
+            self._file_download_log.error("Couldn't retrieve file %s from %s (streaming)." % (file_path,url))
             self.cleanup_truncated_file(file_path)
             raise
         except requests.exceptions.ConnectionError as e:
-            self._log.error("Couldn't retrieve file %s from %s (connection)." % (file_path,url))
+            self._file_download_log.error("Couldn't retrieve file %s from %s (connection)." % (file_path,url))
             self.cleanup_truncated_file(file_path)
             raise
         except requests.exceptions.ReadTimeout as e:
-            self._log.error("Couldn't retrieve file %s from %s (timeout)." % (file_path,url))
+            self._file_download_log.error("Couldn't retrieve file %s from %s (timeout)." % (file_path,url))
             self.cleanup_truncated_file(file_path)
             raise
         except requests.exceptions.RequestException as e:
-            self._log.error("Couldn't retrieve file %s from %s (request)." % (file_path,url))
+            self._file_download_log.error("Couldn't retrieve file %s from %s (request)." % (file_path,url))
             self.cleanup_truncated_file(file_path)
             raise
         except Exception as e:
-            self._log.error("Couldn't retrieve file %s from %s" % (file_path, url))
+            self._file_download_log.error("Couldn't retrieve file %s from %s" % (file_path, url))
             self.cleanup_truncated_file(file_path)
             raise
 

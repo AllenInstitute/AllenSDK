@@ -45,3 +45,12 @@ except ImportError:
             pass
 
 logging.getLogger(__name__).addHandler(NullHandler())
+
+if True:
+    file_download_log = logging.getLogger(
+        'allensdk.api.api.retrieve_file_over_http')
+    file_download_log.setLevel(logging.INFO)
+    console = logging.StreamHandler()
+    formatter = logging.Formatter('%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
+    console.setFormatter(formatter)
+    file_download_log.addHandler(console)
