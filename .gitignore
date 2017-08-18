@@ -1,3 +1,5 @@
+allensdk/internal
+.cache
 .idea
 htmlcov
 .settings

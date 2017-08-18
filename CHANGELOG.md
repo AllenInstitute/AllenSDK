@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [0.14.1] - 2017-08-16
+## [0.14.2] - 2017-08-17
 
 ### Added
 
@@ -33,6 +33,7 @@ ABS-85; allow variable long square start time in ephys feature extractor
 - BrainObservatoryCache.get_experiment_containers no longer returns "age_days".
 - BrainObservatoryCache.get_ophys_experiments accepts a list of cell_specimen_ids for additional filtering
 - json_utilities uses simplejson for better NaN handling
+
 
 ## [0.13.1] - 2017-03-20
 

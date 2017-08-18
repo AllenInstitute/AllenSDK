@@ -41,7 +41,7 @@ import pandas.io.json as pj
 import pytest
 from mock import MagicMock
 
-from allensdk.api.cache import Cache
+from allensdk.api.cache import Cache, memoize
 from allensdk.api.queries.rma_api import RmaApi
 import allensdk.core.json_utilities as ju
 from allensdk.config.manifest import ManifestVersionError
@@ -130,3 +130,31 @@ def test_wrap_dataframe(rma, cache):
         'http://api.brain-map.org/api/v2/data/query.json?q=model::Hemisphere')
     ju.write.assert_called_once_with('example.txt', msg)
     pj.read_json.assert_called_once_with('example.txt', orient='records')
+
+def test_memoize():
+
+        import time
+
+        @memoize
+        def f(x):
+            time.sleep(1)
+            return x
+
+        for ii in range(2):
+            t0 = time.time()
+            print f(0), time.time() - t0
+
+        class FooBar(object):
+
+            def __init__(self): pass
+
+            @memoize
+            def f(self, x):
+                time.sleep(.1)
+                return 1
+
+        fb = FooBar()
+
+        for ii in range(2):
+            t0 = time.time()
+            fb.f(0), time.time() - t0
