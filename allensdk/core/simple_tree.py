@@ -38,6 +38,8 @@ import operator as op
 from collections import defaultdict
 from six import iteritems
 
+from allensdk.deprecated import deprecated
+
 class SimpleTree( object ):
     def __init__(self, nodes, 
                  node_id_cb, 
@@ -137,8 +139,13 @@ class SimpleTree( object ):
     
         return self._nodes.keys()
 
-
+    
+    @deprecated("Use SimpleTree.parent_ids instead.")
     def parent_id(self, node_ids):
+        return self.parent_ids(node_ids)
+
+    
+    def parent_ids(self, node_ids):
         '''Obtain the ids of one or more nodes' parents
         
         Parameters
@@ -234,7 +241,7 @@ class SimpleTree( object ):
     
         out = []
         for ii, nid in enumerate(node_ids):
-        
+            
             current = [nid]
             children = self.child_ids([nid])[0]
             
@@ -244,9 +251,14 @@ class SimpleTree( object ):
                                
             out.append(current)
         return out
-            
 
+    
+    @deprecated("Use SimpleTree.nodes instead")
     def node(self, node_ids=None):
+        return self.nodes(node_ids)
+
+    
+    def nodes(self, node_ids=None):
         '''Get one or more nodes' full dictionaries from their ids.
         
         Parameters
@@ -266,7 +278,12 @@ class SimpleTree( object ):
         return [ self._nodes[nid] for nid in node_ids ]
 
 
+    @deprecated("Use SimpleTrees instead")
     def parent(self, node_ids):
+        return self.parents(node_ids)
+
+
+    def parents(self, node_ids):
         '''Get one or mode nodes' parent nodes
         
         Parameters
@@ -278,10 +295,10 @@ class SimpleTree( object ):
         -------
         list of dict : 
             Items are parents of nodes corresponding to argued ids.
-        
+    
         '''
         
-        return self.node([self._parent_ids[nid] for nid in node_ids])
+        return self.nodes([self._parent_ids[nid] for nid in node_ids])
 
 
     def children(self, node_ids):

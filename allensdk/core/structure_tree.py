@@ -99,7 +99,7 @@ class StructureTree( SimpleTree ):
         
         '''
     
-        return self.filter_nodes(lambda x: x['id'] in structure_ids)
+        return self.nodes(structure_ids)
         
     
     def get_structures_by_name(self, names):
