@@ -210,7 +210,7 @@ class SimpleTree( object ):
         
             current = [nid]
             while current[-1] is not None:
-                current.extend(self.parent_id([current[-1]]))
+                current.extend(self.parent_ids([current[-1]]))
             out.append(current[:-1])
                 
         return out
