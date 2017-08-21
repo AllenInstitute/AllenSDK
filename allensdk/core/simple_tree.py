@@ -278,7 +278,7 @@ class SimpleTree( object ):
         return [ self._nodes[nid] for nid in node_ids ]
 
 
-    @deprecated("Use SimpleTrees instead")
+    @deprecated("Use SimpleTree.parents instead")
     def parent(self, node_ids):
         return self.parents(node_ids)
 
