@@ -74,11 +74,10 @@ def test_movingmode_fast():
 
     assert np.all(x == y)
 
-def test_compute_dff(self):
-    x = np.array([1, 5, 0, 0, 1, 10, 0, 0, 30, 5])
-    raised = False
+def test_compute_dff():
+    x = np.array([[1, 5, 0, 0, 1, 10, 0, 0, 30, 5]])
+
     try:
         dff.compute_dff(x)
     except:
-        raised = True
-    self.assertFalse(raised, "compute_dff() raised ExceptionType unexpectedly!")
+        raise Exception("Unexpected Exception!")
