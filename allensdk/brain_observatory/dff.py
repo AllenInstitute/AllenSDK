@@ -198,11 +198,10 @@ def compute_dff(traces, save_plot_dir=None, mode_kernelsize=5400, mean_kernelsiz
     """
 
     if mode_kernelsize >= traces.shape[1]:
-        raise Exception("Cannot compute dF/F: mode filter size (%d) longer than trace (%d)" %
-                        (mode_kernelsize, traces.shape[1]))
+        mode_kernelsize = traces.shape[1]//2 # make mode_kernelsize smaller than lenght of trace
+
     if mean_kernelsize >= traces.shape[1]:
-        raise Exception("Cannot compute dF/F: mean filter size (%d) longer than trace (%d)" %
-                        (mean_kernelsize, traces.shape[1]))
+        mean_kernelsize = traces.shape[1]//4 # make mean_kernelsize smaller than lenght of trace
 
     if save_plot_dir is not None and not os.path.exists(save_plot_dir):
         os.makedirs(save_plot_dir)
