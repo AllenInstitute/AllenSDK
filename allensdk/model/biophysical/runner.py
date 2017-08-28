@@ -52,17 +52,18 @@ def run(description, sweeps=None):
     if sweeps is None:
         sweeps = run_params['sweeps']
     sweeps_by_type = run_params['sweeps_by_type']
-    junction_potential = description.data['fitting'][0]['junction_potential']
-    mV = 1.0e-3
 
     prepare_nwb_output(manifest.get_path('stimulus_path'),
                        manifest.get_path('output_path'))
 
+    output_path = manifest.get_path("output_path")
+
     # run sweeps
     for sweep in sweeps:
-        _runner_log.info("Running sweep: %d" % (sweep))
+        _runner_log.info("Loading sweep: %d" % (sweep))
         utils.setup_iclamp(stimulus_path, sweep=sweep)
-        _runner_log.info("Done loading sweep: %d" % (sweep))
+
+        _runner_log.info("Simulating sweep: %d" % (sweep))
         vec = utils.record_values()
         tstart = time.time()
         h.finitialize()
@@ -71,11 +72,9 @@ def run(description, sweeps=None):
         _runner_log.info("Time: %f" % (tstop - tstart))
 
         # write to an NWB File
-        output_data = (numpy.array(vec['v']) - junction_potential) * mV
-
-        output_path = manifest.get_path("output_path")
-
-        save_nwb(output_path, output_data, sweep, sweeps_by_type)
+        _runner_log.info("Writing sweep: %d" % (sweep))
+        recorded_data = utils.get_recorded_data(vec)
+        save_nwb(output_path, recorded_data["v"], sweep, sweeps_by_type)
 
 
 def prepare_nwb_output(nwb_stimulus_path,

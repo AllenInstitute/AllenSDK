@@ -19,6 +19,7 @@ from ..biophys_sim.neuron.hoc_utils import HocUtils
 from allensdk.core.nwb_data_set import NwbDataSet
 from fractions import gcd
 from skimage.measure import block_reduce
+import numpy as np
 
 PERISOMATIC_TYPE = "Biophysical - perisomatic"
 ALL_ACTIVE_TYPE = "Biophysical - all active"
@@ -142,10 +143,11 @@ class Utils(HocUtils):
         # just set to be really big; doesn't need to match the waveform
         self.stim.dur = 1e12
 
+        self.read_stimulus(stimulus_path, sweep=sweep)
+
         # NEURON's dt is in milliseconds
         dt = 1.0e3 / self.sampling_rate
 
-        self.read_stimulus(stimulus_path, sweep=sweep)
         self.h.dt = dt
         stim_vec = self.h.Vector(self.stim_curr)
         stim_vec.play(self.stim._ref_amp, dt)
@@ -179,7 +181,7 @@ class Utils(HocUtils):
         hz = int(sweep_data['sampling_rate'])
         neuron_hz = Utils.nearest_neuron_sampling_rate(hz)
         if hz != neuron_hz:
-            _log.debug("changing sampling rate from %d to %d to avoid NEURON aliasing", hz, neuron_hz)
+            Utils._log.debug("changing sampling rate from %d to %d to avoid NEURON aliasing", hz, neuron_hz)
 
         self.sampling_rate_conversion_factor = neuron_hz / hz
         self.sampling_rate = neuron_hz
@@ -192,17 +194,28 @@ class Utils(HocUtils):
         vec["v"].record(self.h.soma[0](0.5)._ref_v)
         vec["t"].record(self.h._ref_t)
 
-        if self.sampling_rate_conversion_factor > 1:
-            _log.debug("subsampling recorded traces by %dX", self.sampling_rate_conversion_factor)
-            vec["v"] = block_reduce(np.array(vec["v"]), self.sampling_rate_conversion_factor, np.mean)
-            vec["t"] = block_reduce(np.array(vec["t"]), self.sampling_rate_conversion_factor, np.min)
-
         return vec
+
+    def get_recorded_data(self, vec):
+        junction_potential = self.description.data['fitting'][0]['junction_potential']
+        mV = 1.0e-3
+
+        v = np.array(vec["v"])
+        t = np.array(vec["t"])
+
+        if self.sampling_rate_conversion_factor > 1:
+            Utils._log.debug("subsampling recorded traces by %dX", self.sampling_rate_conversion_factor)
+            v = block_reduce(v, (self.sampling_rate_conversion_factor,), np.mean)
+            t = block_reduce(t, (self.sampling_rate_conversion_factor,), np.min)
+
+        v = (v - junction_potential) * mV
+        
+        return { "v": v, "t": t }
 
     @staticmethod
     def nearest_neuron_sampling_rate(hz, target_hz=40000):
         div = gcd(hz, target_hz)
-        new_hz = hz * target_hz / dev
+        new_hz = hz * target_hz / div
         return new_hz
 
 
