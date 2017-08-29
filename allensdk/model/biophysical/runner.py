@@ -22,11 +22,38 @@ import numpy
 import logging
 import time
 import os
+import multiprocessing as mp
+from functools import partial
 
 _runner_log = logging.getLogger('allensdk.model.biophysical.runner')
 
+_lock = None
 
-def run(description, sweeps=None):
+def _init_lock(lock):
+    global _lock
+    _lock = lock
+
+def run(description, sweeps=None, procs=4):
+    prepare_nwb_output(description.manifest.get_path('stimulus_path'),
+                       description.manifest.get_path('output_path'))
+
+    if procs == 1:
+        run_sync(description, sweeps)
+        return
+
+    if sweeps is None:
+        stimulus_path = description.manifest.get_path('stimulus_path')
+        run_params = description.data['runs'][0]
+        sweeps = run_params['sweeps']
+
+    lock = mp.Lock()
+    pool = mp.Pool(procs, initializer=_init_lock, initargs=(lock,))
+    pool.map(partial(run_sync, description), [[sweep] for sweep in sweeps])
+    pool.close()
+    pool.join()
+
+
+def run_sync(description, sweeps=None):
     '''Main function for running a biophysical experiment.
 
     Parameters
@@ -53,9 +80,6 @@ def run(description, sweeps=None):
         sweeps = run_params['sweeps']
     sweeps_by_type = run_params['sweeps_by_type']
 
-    prepare_nwb_output(manifest.get_path('stimulus_path'),
-                       manifest.get_path('output_path'))
-
     output_path = manifest.get_path("output_path")
 
     # run sweeps
@@ -74,7 +98,12 @@ def run(description, sweeps=None):
         # write to an NWB File
         _runner_log.info("Writing sweep: %d" % (sweep))
         recorded_data = utils.get_recorded_data(vec)
+
+        if _lock is not None:
+            _lock.acquire()
         save_nwb(output_path, recorded_data["v"], sweep, sweeps_by_type)
+        if _lock is not None:
+            _lock.release()
 
 
 def prepare_nwb_output(nwb_stimulus_path,
