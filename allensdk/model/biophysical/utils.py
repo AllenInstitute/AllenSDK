@@ -56,8 +56,8 @@ class Utils(HocUtils):
         super(Utils, self).__init__(description)
         self.stim = None
         self.stim_curr = None
-        self.sampling_rate = None
-        self.sampling_rate_conversion_factor = None
+        self.simulation_sampling_rate = None
+        self.stimulus_sampling_rate = None
 
         self.stim_vec_list = []
 
@@ -147,15 +147,16 @@ class Utils(HocUtils):
         self.read_stimulus(stimulus_path, sweep=sweep)
 
         # NEURON's dt is in milliseconds
-        dt = 1.0e3 / self.sampling_rate
-        self._log.debug("Using dt %f", dt)
+        simulation_dt = 1.0e3 / self.simulation_sampling_rate
+        stimulus_dt = 1.0e3 / self.stimulus_sampling_rate
+        self._log.debug("Using simulation dt %f, stimulus dt %f", simulation_dt, stimulus_dt)
 
-        self.h.dt = dt
+        self.h.dt = simulation_dt
         stim_vec = self.h.Vector(self.stim_curr)
-        stim_vec.play(self.stim._ref_amp, dt)
+        stim_vec.play(self.stim._ref_amp, stimulus_dt)
 
         stimulus_stop_index = len(self.stim_curr) - 1
-        self.h.tstop = stimulus_stop_index * dt
+        self.h.tstop = stimulus_stop_index * stimulus_dt
         self.stim_vec_list.append(stim_vec)
 
     def read_stimulus(self, stimulus_path, sweep=0):
@@ -183,15 +184,11 @@ class Utils(HocUtils):
         hz = int(sweep_data['sampling_rate'])
         neuron_hz = Utils.nearest_neuron_sampling_rate(hz)
 
-        self.sampling_rate_conversion_factor = neuron_hz / hz
-        self.sampling_rate = neuron_hz
+        self.simulation_sampling_rate = neuron_hz
+        self.stimulus_sampling_rate = hz
 
         if hz != neuron_hz:
             Utils._log.debug("changing sampling rate from %d to %d to avoid NEURON aliasing", hz, neuron_hz)
-            x = np.linspace(0, 1.0, len(self.stim_curr), endpoint=True)
-            f = scipy.interpolate.interp1d(x, self.stim_curr, kind='nearest')
-            self.stim_curr = f(np.linspace(0, 1.0, len(self.stim_curr)*self.sampling_rate_conversion_factor, endpoint=True))
-
 
     def record_values(self):
         '''Set up output voltage recording.'''
@@ -205,16 +202,18 @@ class Utils(HocUtils):
 
     def get_recorded_data(self, vec):
         junction_potential = self.description.data['fitting'][0]['junction_potential']
-        mV = 1.0e-3
-
+        
         v = np.array(vec["v"])
         t = np.array(vec["t"])
 
-        if self.sampling_rate_conversion_factor > 1:
-            Utils._log.debug("subsampling recorded traces by %dX", self.sampling_rate_conversion_factor)
-            v = block_reduce(v, (self.sampling_rate_conversion_factor,), np.mean)
-            t = block_reduce(t, (self.sampling_rate_conversion_factor,), np.min)
+        if self.stimulus_sampling_rate < self.simulation_sampling_rate:
+            factor = self.simulation_sampling_rate / self.stimulus_sampling_rate
+                
+            Utils._log.debug("subsampling recorded traces by %dX", factor)
+            v = block_reduce(v, (factor,), np.mean)[:len(self.stim_curr)]
+            t = block_reduce(t, (factor,), np.min)[:len(self.stim_curr)]
 
+        mV = 1.0e-3
         v = (v - junction_potential) * mV
         
         return { "v": v, "t": t }
