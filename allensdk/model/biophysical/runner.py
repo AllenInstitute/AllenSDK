@@ -34,6 +34,18 @@ def _init_lock(lock):
     _lock = lock
 
 def run(description, sweeps=None, procs=6):
+    '''Main function for simulating sweeps in a biophysical experiment.
+
+    Parameters
+    ----------
+    description : Config
+        All information needed to run the experiment.
+    procs : int
+        number of sweeps to simulate simultaneously.
+    sweeps : list
+        list of experiment sweep numbers to simulate.  If None, simulate all sweeps.
+    '''
+
     prepare_nwb_output(description.manifest.get_path('stimulus_path'),
                        description.manifest.get_path('output_path'))
 
@@ -54,12 +66,14 @@ def run(description, sweeps=None, procs=6):
 
 
 def run_sync(description, sweeps=None):
-    '''Main function for running a biophysical experiment.
+    '''Single-process main function for simulating sweeps in a biophysical experiment.
 
     Parameters
     ----------
     description : Config
         All information needed to run the experiment.
+    sweeps : list
+        list of experiment sweep numbers to simulate.  If None, simulate all sweeps.
     '''
     model_type = description.data['biophys'][0]['model_type']
 

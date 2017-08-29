@@ -27,6 +27,20 @@ ALL_ACTIVE_TYPE = "Biophysical - all active"
 
 
 def create_utils(description, model_type=None):
+    ''' Factory method to create a Utils subclass.
+
+    Parameters
+    ----------
+    description : Config instance
+        used to initialize Utils subclass
+
+    model_type : string
+        Must be one of [PERISOMATIC_TYPE, ALL_ACTIVE_TYPE].  If none, defaults to PERISOMATIC_TYPE
+
+    Returns
+    -------
+    Utils instance    
+    '''
     if model_type is None:
         model_type = PERISOMATIC_TYPE
 
@@ -201,6 +215,20 @@ class Utils(HocUtils):
         return vec
 
     def get_recorded_data(self, vec):
+        '''Extract recorded voltages and timestamps given the recorded Vector instance.  
+        If self.stimulus_sampling_rate is smaller than self.simulation_sampling_rate, 
+        resample to self.stimulus_sampling_rate.
+
+        Parameters
+        ----------
+        vec : neuron.Vector 
+           constructed by self.record_values
+
+        Returns
+        -------
+        dict with two keys: 'v' = numpy.ndarray with voltages, 't' = numpy.ndarray with timestamps
+
+        '''
         junction_potential = self.description.data['fitting'][0]['junction_potential']
         
         v = np.array(vec["v"])
