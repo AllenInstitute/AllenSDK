@@ -145,7 +145,7 @@ class Utils(HocUtils):
     def setup_iclamp(self,
                      stimulus_path,
                      sweep=0):
-        '''Assign a current waveform as input stimulus.
+        '''Assign a current waveform as input stimulus. 
 
         Parameters
         ----------
@@ -174,7 +174,12 @@ class Utils(HocUtils):
         self.stim_vec_list.append(stim_vec)
 
     def read_stimulus(self, stimulus_path, sweep=0):
-        '''load current values for a specific experiment sweep.
+        '''Load current values for a specific experiment sweep and setup simulation
+        and stimulus sampling rates.
+
+        NOTE: NEURON only allows simulation timestamps of multiples of 40KHz.  To 
+        avoid aliasing, we set the simulation sampling rate to the least common
+        multiple of the stimulus sampling rate and 40KHz.
 
         Parameters
         ----------
