@@ -33,7 +33,7 @@ def _init_lock(lock):
     global _lock
     _lock = lock
 
-def run(description, sweeps=None, procs=4):
+def run(description, sweeps=None, procs=6):
     prepare_nwb_output(description.manifest.get_path('stimulus_path'),
                        description.manifest.get_path('output_path'))
 

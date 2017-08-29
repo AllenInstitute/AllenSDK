@@ -19,6 +19,7 @@ from ..biophys_sim.neuron.hoc_utils import HocUtils
 from allensdk.core.nwb_data_set import NwbDataSet
 from fractions import gcd
 from skimage.measure import block_reduce
+import scipy.interpolate
 import numpy as np
 
 PERISOMATIC_TYPE = "Biophysical - perisomatic"
@@ -147,6 +148,7 @@ class Utils(HocUtils):
 
         # NEURON's dt is in milliseconds
         dt = 1.0e3 / self.sampling_rate
+        self._log.debug("Using dt %f", dt)
 
         self.h.dt = dt
         stim_vec = self.h.Vector(self.stim_curr)
@@ -180,11 +182,16 @@ class Utils(HocUtils):
         # convert from Hz
         hz = int(sweep_data['sampling_rate'])
         neuron_hz = Utils.nearest_neuron_sampling_rate(hz)
-        if hz != neuron_hz:
-            Utils._log.debug("changing sampling rate from %d to %d to avoid NEURON aliasing", hz, neuron_hz)
 
         self.sampling_rate_conversion_factor = neuron_hz / hz
         self.sampling_rate = neuron_hz
+
+        if hz != neuron_hz:
+            Utils._log.debug("changing sampling rate from %d to %d to avoid NEURON aliasing", hz, neuron_hz)
+            x = np.linspace(0, 1.0, len(self.stim_curr), endpoint=True)
+            f = scipy.interpolate.interp1d(x, self.stim_curr, kind='nearest')
+            self.stim_curr = f(np.linspace(0, 1.0, len(self.stim_curr)*self.sampling_rate_conversion_factor, endpoint=True))
+
 
     def record_values(self):
         '''Set up output voltage recording.'''
