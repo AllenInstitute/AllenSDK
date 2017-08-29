@@ -17,12 +17,30 @@ import logging
 import os
 from ..biophys_sim.neuron.hoc_utils import HocUtils
 from allensdk.core.nwb_data_set import NwbDataSet
+from fractions import gcd
+from skimage.measure import block_reduce
+import scipy.interpolate
+import numpy as np
 
 PERISOMATIC_TYPE = "Biophysical - perisomatic"
 ALL_ACTIVE_TYPE = "Biophysical - all active"
 
 
 def create_utils(description, model_type=None):
+    ''' Factory method to create a Utils subclass.
+
+    Parameters
+    ----------
+    description : Config instance
+        used to initialize Utils subclass
+
+    model_type : string
+        Must be one of [PERISOMATIC_TYPE, ALL_ACTIVE_TYPE].  If none, defaults to PERISOMATIC_TYPE
+
+    Returns
+    -------
+    Utils instance    
+    '''
     if model_type is None:
         model_type = PERISOMATIC_TYPE
 
@@ -52,7 +70,8 @@ class Utils(HocUtils):
         super(Utils, self).__init__(description)
         self.stim = None
         self.stim_curr = None
-        self.sampling_rate = None
+        self.simulation_sampling_rate = None
+        self.stimulus_sampling_rate = None
 
         self.stim_vec_list = []
 
@@ -126,7 +145,7 @@ class Utils(HocUtils):
     def setup_iclamp(self,
                      stimulus_path,
                      sweep=0):
-        '''Assign a current waveform as input stimulus.
+        '''Assign a current waveform as input stimulus. 
 
         Parameters
         ----------
@@ -140,16 +159,27 @@ class Utils(HocUtils):
         self.stim.dur = 1e12
 
         self.read_stimulus(stimulus_path, sweep=sweep)
-        self.h.dt = self.sampling_rate
+
+        # NEURON's dt is in milliseconds
+        simulation_dt = 1.0e3 / self.simulation_sampling_rate
+        stimulus_dt = 1.0e3 / self.stimulus_sampling_rate
+        self._log.debug("Using simulation dt %f, stimulus dt %f", simulation_dt, stimulus_dt)
+
+        self.h.dt = simulation_dt
         stim_vec = self.h.Vector(self.stim_curr)
-        stim_vec.play(self.stim._ref_amp, self.sampling_rate)
+        stim_vec.play(self.stim._ref_amp, stimulus_dt)
 
         stimulus_stop_index = len(self.stim_curr) - 1
-        self.h.tstop = stimulus_stop_index * self.sampling_rate
+        self.h.tstop = stimulus_stop_index * stimulus_dt
         self.stim_vec_list.append(stim_vec)
 
     def read_stimulus(self, stimulus_path, sweep=0):
-        '''load current values for a specific experiment sweep.
+        '''Load current values for a specific experiment sweep and setup simulation
+        and stimulus sampling rates.
+
+        NOTE: NEURON only allows simulation timestamps of multiples of 40KHz.  To 
+        avoid aliasing, we set the simulation sampling rate to the least common
+        multiple of the stimulus sampling rate and 40KHz.
 
         Parameters
         ----------
@@ -170,7 +200,14 @@ class Utils(HocUtils):
         self.stim_curr = sweep_data['stimulus'] * 1.0e9
 
         # convert from Hz
-        self.sampling_rate = 1.0e3 / sweep_data['sampling_rate']
+        hz = int(sweep_data['sampling_rate'])
+        neuron_hz = Utils.nearest_neuron_sampling_rate(hz)
+
+        self.simulation_sampling_rate = neuron_hz
+        self.stimulus_sampling_rate = hz
+
+        if hz != neuron_hz:
+            Utils._log.debug("changing sampling rate from %d to %d to avoid NEURON aliasing", hz, neuron_hz)
 
     def record_values(self):
         '''Set up output voltage recording.'''
@@ -181,6 +218,44 @@ class Utils(HocUtils):
         vec["t"].record(self.h._ref_t)
 
         return vec
+
+    def get_recorded_data(self, vec):
+        '''Extract recorded voltages and timestamps given the recorded Vector instance.  
+        If self.stimulus_sampling_rate is smaller than self.simulation_sampling_rate, 
+        resample to self.stimulus_sampling_rate.
+
+        Parameters
+        ----------
+        vec : neuron.Vector 
+           constructed by self.record_values
+
+        Returns
+        -------
+        dict with two keys: 'v' = numpy.ndarray with voltages, 't' = numpy.ndarray with timestamps
+
+        '''
+        junction_potential = self.description.data['fitting'][0]['junction_potential']
+        
+        v = np.array(vec["v"])
+        t = np.array(vec["t"])
+
+        if self.stimulus_sampling_rate < self.simulation_sampling_rate:
+            factor = self.simulation_sampling_rate / self.stimulus_sampling_rate
+                
+            Utils._log.debug("subsampling recorded traces by %dX", factor)
+            v = block_reduce(v, (factor,), np.mean)[:len(self.stim_curr)]
+            t = block_reduce(t, (factor,), np.min)[:len(self.stim_curr)]
+
+        mV = 1.0e-3
+        v = (v - junction_potential) * mV
+        
+        return { "v": v, "t": t }
+
+    @staticmethod
+    def nearest_neuron_sampling_rate(hz, target_hz=40000):
+        div = gcd(hz, target_hz)
+        new_hz = hz * target_hz / div
+        return new_hz
 
 
 class AllActiveUtils(Utils):
