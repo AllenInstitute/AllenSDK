@@ -106,6 +106,14 @@ def unionizes():
              "sum_projection_pixels": 120934.0, "volume": 0.0881761}]
 
 
+@pytest.fixture(scope='function')
+def top_injection_unionizes():
+    return pd.DataFrame([{'experiment_id': 1, 'is_injection': True, 'hemisphere_id': 1, 'structure_id': 10, 'normalized_projection_volume': 0.75}, 
+                         {'experiment_id': 1, 'is_injection': True, 'hemisphere_id': 2, 'structure_id': 15, 'normalized_projection_volume': 0.25}, 
+                         {'experiment_id': 1, 'is_injection': False, 'hemisphere_id': 1, 'structure_id': 10, 'normalized_projection_volume': 2.0}, 
+                         {'experiment_id': 1, 'is_injection': False, 'hemisphere_id': 2, 'structure_id': 11, 'normalized_projection_volume': 0.001}])
+
+
 def test_init(mcc, fn_temp_dir):
 
     manifest_path = os.path.join(fn_temp_dir, 'manifest.json')
@@ -302,6 +310,23 @@ def test_filter_experiments(mcc, fn_temp_dir, experiments):
 
     assert len(pass_line) == 1
     assert len(fail_line) == 0
+
+
+def test_rank_structures(mcc, top_injection_unionizes, fn_temp_dir):
+
+    path = os.path.join(fn_temp_dir, 'experiment_{0}'.format(1), 
+                        'structure_unionizes.csv')
+
+    mcc.api.model_query = lambda *args, **kwargs: top_injection_unionizes
+
+    obt = mcc.rank_structures([1], True, [15], [1, 2])
+
+    assert(len(obt) == 1)
+    exp = obt[0]
+    assert(len(exp) == 1)
+    st = exp[0]
+    assert(st['structure_id'] == 15)
+    assert(st['normalized_projection_volume'] == 0.25)
 
 
 def test_get_experiment_structure_unionizes(mcc, fn_temp_dir, unionizes):

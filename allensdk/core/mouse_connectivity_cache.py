@@ -513,6 +513,64 @@ class MouseConnectivityCache(Cache):
                                                 writer=lambda p, x : pd.DataFrame(x).to_csv(p),
                                                 reader=pd.DataFrame.from_csv)
 
+    def rank_structures(self, experiment_ids, is_injection, structure_ids, hemisphere_ids=None, 
+                        rank_on='normalized_projection_volume', n=5, threshold=10**-2):
+        '''Produces one or more (per experiment) ranked lists of brain structures, using a specified
+
+        Parameters
+        ----------
+        experiment_ids : list of int
+            Obtain injection_structures for these experiments.
+        is_injection : boolean
+            Use data from only injection (or non-injection) unionizes
+        structure_ids : list of int
+            Consider only these structures. It is a good idea to make sure that these structures are not spatially 
+            overlapping; otherwise your results will contain redundant information.
+        hemisphere_ids : list of int, optional
+            Consider only these hemispheres (1: left, 2: right, 3: both). Like with structures, 
+            you might get redundant results if you select overlapping options.
+        rank_on : str, optional
+            Rank unionize data using this field (descending). Defaults to normalized_projection_volume.
+        n : int, optional
+            Return only the top n structures
+        threshold : float, optional
+            Consider only records whose normalized projection volume exceeds this value.
+
+        Returns
+        -------
+        list : 
+            Each element (1 for each input experiment) is a list of dictionaries. The dictionaries describe the top
+            injection structures in descending order. They are specified by their structure and hemisphere id fields and 
+            additionally report the fraction of the injection that they contain in the normalized projection volume field.
+
+        '''
+
+        output_keys = ['experiment_id', rank_on, 'hemisphere_id', 'structure_id']
+        filter_fields = lambda fieldname: fieldname in output_keys
+        if hemisphere_ids is None:
+            hemisphere_ids = [1, 2]
+
+        unionizes = self.get_structure_unionizes(experiment_ids, 
+                                                 is_injection=is_injection, 
+                                                 structure_ids=structure_ids, 
+                                                 hemisphere_ids=hemisphere_ids, 
+                                                 include_descendants=False)
+        unionizes = unionizes[unionizes['normalized_projection_volume'] > threshold] 
+
+        results = []
+        for eid in experiment_ids:
+
+            this_experiment_unionizes = unionizes[unionizes['experiment_id'] == eid]
+            this_experiment_unionizes = this_experiment_unionizes.sort_values(by=rank_on, ascending=False)
+            this_experiment_unionizes = this_experiment_unionizes.select(filter_fields, axis=1)
+            
+            records = this_experiment_unionizes.to_dict('record')
+            if len(records) > n:
+                records = records[:n]
+            results.append(records)
+
+        return results
+
     def filter_structure_unionizes(self, unionizes, 
                                    is_injection=None, 
                                    structure_ids=None, 
