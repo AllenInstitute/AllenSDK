@@ -534,14 +534,14 @@ class MouseConnectivityCache(Cache):
         n : int, optional
             Return only the top n structures
         threshold : float, optional
-            Consider only records whose data value - specified by the rank_on parameter exceeds this value.
+            Consider only records whose data value - specified by the rank_on parameter - exceeds this value.
 
         Returns
         -------
         list : 
             Each element (1 for each input experiment) is a list of dictionaries. The dictionaries describe the top
             injection structures in descending order. They are specified by their structure and hemisphere id fields and 
-            additionally report the fraction of the injection that they contain in the normalized projection volume field.
+            additionally report the value specified by the rank_on parameter.
 
         '''
 
