@@ -293,7 +293,7 @@ class NwbDataSet(object):
                       for e in f['epochs'].keys() if e.startswith('Experiment_')]
             return sweeps
 
-    def fill_sweep_responses(self, fill_value=0.0, sweep_numbers=None):
+    def fill_sweep_responses(self, fill_value=0.0, sweep_numbers=None, extend_experiment=False):
         """ Fill sweep response arrays with a single value.
 
         Parameters
@@ -304,21 +304,31 @@ class NwbDataSet(object):
         sweep_numbers: list
             List of integer sweep numbers to be filled (default all sweeps)
 
+        extend_experiment: bool
+            If True, extend experiment epoch length to the end of the sweep (undo any truncation)
+
         """
 
         with h5py.File(self.file_name, 'a') as f:
             if sweep_numbers is None:
-                # no sweep numbers given, grab all of them
-                epochs = [k for k in f[
-                    'epochs'].keys() if k.startswith('Sweep_')]
-            else:
-                epochs = ['Sweep_%d' %
-                          sweep_number for sweep_number in sweep_numbers]
+                sweep_numbers = self.get_sweep_numbers()
 
-            for epoch in epochs:
+            for sweep_number in sweep_numbers:
+                epoch = "Sweep_%d" % sweep_number
                 if epoch in f['epochs']:
                     f['epochs'][epoch]['response'][
                         'timeseries']['data'][...] = fill_value
+
+                if extend_experiment:
+                    epoch = "Experiment_%d" % sweep_number
+                    if epoch in f['epochs']:
+                        idx_start = f['epochs'][epoch]['stimulus']['idx_start'].value
+                        count = f['epochs'][epoch]['stimulus']['timeseries']['data'].shape[0]
+
+                        old_count = f['epochs'][epoch]['stimulus']['count'].value
+                        del f['epochs'][epoch]['stimulus']['count']
+                        f['epochs'][epoch]['stimulus']['count'] = count - idx_start
+
 
     def get_sweep_metadata(self, sweep_number):
         """ Retrieve the sweep level metadata associated with each sweep.

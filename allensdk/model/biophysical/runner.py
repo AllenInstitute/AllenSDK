@@ -138,7 +138,7 @@ def prepare_nwb_output(nwb_stimulus_path,
 
     copy(nwb_stimulus_path, nwb_result_path)
     data_set = NwbDataSet(nwb_result_path)
-    data_set.fill_sweep_responses(0.0)
+    data_set.fill_sweep_responses(0.0, extend_experiment=True)
     for sweep in data_set.get_sweep_numbers():
         data_set.set_spike_times(sweep, [])
 
