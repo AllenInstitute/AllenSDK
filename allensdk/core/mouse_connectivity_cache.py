@@ -555,7 +555,7 @@ class MouseConnectivityCache(Cache):
                                                  structure_ids=structure_ids, 
                                                  hemisphere_ids=hemisphere_ids, 
                                                  include_descendants=False)
-        unionizes = unionizes[unionizes['normalized_projection_volume'] > threshold] 
+        unionizes = unionizes[unionizes[rank_on] > threshold] 
 
         results = []
         for eid in experiment_ids:
