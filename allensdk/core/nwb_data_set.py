@@ -325,7 +325,6 @@ class NwbDataSet(object):
                         idx_start = f['epochs'][epoch]['stimulus']['idx_start'].value
                         count = f['epochs'][epoch]['stimulus']['timeseries']['data'].shape[0]
 
-                        old_count = f['epochs'][epoch]['stimulus']['count'].value
                         del f['epochs'][epoch]['stimulus']['count']
                         f['epochs'][epoch]['stimulus']['count'] = count - idx_start
 
