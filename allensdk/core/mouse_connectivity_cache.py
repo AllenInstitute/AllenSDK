@@ -515,7 +515,7 @@ class MouseConnectivityCache(Cache):
 
     def rank_structures(self, experiment_ids, is_injection, structure_ids, hemisphere_ids=None, 
                         rank_on='normalized_projection_volume', n=5, threshold=10**-2):
-        '''Produces one or more (per experiment) ranked lists of brain structures, using a specified
+        '''Produces one or more (per experiment) ranked lists of brain structures, using a specified data field.
 
         Parameters
         ----------
