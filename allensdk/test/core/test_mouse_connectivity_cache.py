@@ -59,7 +59,7 @@ def new_nodes():
 
     return [{'id': 0, 'structure_id_path': '/0/', 
              'color_hex_triplet': '000000', 'acronym': 'rt', 
-             'name': 'root', 'structure_sets':[{'id': 1}, {'id': 4}]}]
+             'name': 'root', 'structure_sets':[{'id': 1}, {'id': 4}, {'id': 167587189}] }]
 
 
 @pytest.fixture(scope='function')
@@ -327,6 +327,19 @@ def test_rank_structures(mcc, top_injection_unionizes, fn_temp_dir):
     st = exp[0]
     assert(st['structure_id'] == 15)
     assert(st['normalized_projection_volume'] == 0.25)
+
+
+def test_default_structure_ids(mcc, fn_temp_dir, new_nodes):
+
+    path = os.path.join(fn_temp_dir, 'structures.json')
+
+    with mock.patch('allensdk.api.queries.ontologies_api.'
+                    'OntologiesApi.model_query', 
+                    return_value=new_nodes) as p:
+
+        default_structure_ids = mcc.default_structure_ids
+        assert(len(default_structure_ids) == 1)
+        assert(default_structure_ids[0] == 0)
 
 
 def test_get_experiment_structure_unionizes(mcc, fn_temp_dir, unionizes):

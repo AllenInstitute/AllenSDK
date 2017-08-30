@@ -110,6 +110,18 @@ class MouseConnectivityCache(Cache):
     STRUCTURE_TREE_KEY = 'STRUCTURE_TREE'
     STRUCTURE_MASK_KEY = 'STRUCTURE_MASK'
     MANIFEST_VERSION = 1.0
+    SUMMARY_STRUCTURE_SET_ID = 167587189
+    DEFAULT_STRUCTURE_SET_IDS = tuple([SUMMARY_STRUCTURE_SET_ID])
+
+    @property
+    def default_structure_ids(self):
+
+        if not hasattr(self, '_default_structure_ids'):
+            tree = self.get_structure_tree()
+            default_structures = tree.get_structures_by_set_id(MouseConnectivityCache.DEFAULT_STRUCTURE_SET_IDS)
+            self._default_structure_ids = [st['id'] for st in default_structures]
+
+        return self._default_structure_ids
 
     def __init__(self,
                  resolution=None,
@@ -513,7 +525,7 @@ class MouseConnectivityCache(Cache):
                                                 writer=lambda p, x : pd.DataFrame(x).to_csv(p),
                                                 reader=pd.DataFrame.from_csv)
 
-    def rank_structures(self, experiment_ids, is_injection, structure_ids, hemisphere_ids=None, 
+    def rank_structures(self, experiment_ids, is_injection, structure_ids=None, hemisphere_ids=None, 
                         rank_on='normalized_projection_volume', n=5, threshold=10**-2):
         '''Produces one or more (per experiment) ranked lists of brain structures, using a specified data field.
 
@@ -523,9 +535,10 @@ class MouseConnectivityCache(Cache):
             Obtain injection_structures for these experiments.
         is_injection : boolean
             Use data from only injection (or non-injection) unionizes.
-        structure_ids : list of int
+        structure_ids : list of int, optional
             Consider only these structures. It is a good idea to make sure that these structures are not spatially 
-            overlapping; otherwise your results will contain redundant information.
+            overlapping; otherwise your results will contain redundant information. Defaults to the summary 
+            structures - a brain-wide list of nonoverlapping mid-level structures.
         hemisphere_ids : list of int, optional
             Consider only these hemispheres (1: left, 2: right, 3: both). Like with structures, 
             you might get redundant results if you select overlapping options. Defaults to [1, 2].
@@ -547,8 +560,11 @@ class MouseConnectivityCache(Cache):
 
         output_keys = ['experiment_id', rank_on, 'hemisphere_id', 'structure_id']
         filter_fields = lambda fieldname: fieldname in output_keys
+
         if hemisphere_ids is None:
             hemisphere_ids = [1, 2]
+        if structure_ids is None:
+            structure_ids = self.default_structure_ids
 
         unionizes = self.get_structure_unionizes(experiment_ids, 
                                                  is_injection=is_injection, 
@@ -662,10 +678,13 @@ class MouseConnectivityCache(Cache):
         return pd.concat(unionizes, ignore_index=True)
 
     def get_projection_matrix(self, experiment_ids, 
-                              projection_structure_ids,
+                              projection_structure_ids=None,
                               hemisphere_ids=None, 
                               parameter='projection_volume', 
                               dataframe=False):
+
+        if projection_structure_ids is None:
+            projection_structure_ids = self.default_structure_ids
 
         unionizes = self.get_structure_unionizes(experiment_ids,
                                                  is_injection=False,
