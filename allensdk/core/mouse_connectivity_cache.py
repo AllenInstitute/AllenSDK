@@ -522,17 +522,17 @@ class MouseConnectivityCache(Cache):
         experiment_ids : list of int
             Obtain injection_structures for these experiments.
         is_injection : boolean
-            Use data from only injection (or non-injection) unionizes
+            Use data from only injection (or non-injection) unionizes.
         structure_ids : list of int
             Consider only these structures. It is a good idea to make sure that these structures are not spatially 
             overlapping; otherwise your results will contain redundant information.
         hemisphere_ids : list of int, optional
             Consider only these hemispheres (1: left, 2: right, 3: both). Like with structures, 
-            you might get redundant results if you select overlapping options.
+            you might get redundant results if you select overlapping options. Defaults to [1, 2].
         rank_on : str, optional
             Rank unionize data using this field (descending). Defaults to normalized_projection_volume.
         n : int, optional
-            Return only the top n structures
+            Return only the top n structures.
         threshold : float, optional
             Consider only records whose data value - specified by the rank_on parameter - exceeds this value.
 
