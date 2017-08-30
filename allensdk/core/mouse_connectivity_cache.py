@@ -534,7 +534,7 @@ class MouseConnectivityCache(Cache):
         n : int, optional
             Return only the top n structures
         threshold : float, optional
-            Consider only records whose normalized projection volume exceeds this value.
+            Consider only records whose data value - specified by the rank_on parameter exceeds this value.
 
         Returns
         -------
