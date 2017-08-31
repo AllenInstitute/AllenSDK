@@ -110,6 +110,18 @@ class MouseConnectivityCache(Cache):
     STRUCTURE_TREE_KEY = 'STRUCTURE_TREE'
     STRUCTURE_MASK_KEY = 'STRUCTURE_MASK'
     MANIFEST_VERSION = 1.0
+    SUMMARY_STRUCTURE_SET_ID = 167587189
+    DEFAULT_STRUCTURE_SET_IDS = tuple([SUMMARY_STRUCTURE_SET_ID])
+
+    @property
+    def default_structure_ids(self):
+
+        if not hasattr(self, '_default_structure_ids'):
+            tree = self.get_structure_tree()
+            default_structures = tree.get_structures_by_set_id(MouseConnectivityCache.DEFAULT_STRUCTURE_SET_IDS)
+            self._default_structure_ids = [st['id'] for st in default_structures]
+
+        return self._default_structure_ids
 
     def __init__(self,
                  resolution=None,
@@ -513,6 +525,68 @@ class MouseConnectivityCache(Cache):
                                                 writer=lambda p, x : pd.DataFrame(x).to_csv(p),
                                                 reader=pd.DataFrame.from_csv)
 
+    def rank_structures(self, experiment_ids, is_injection, structure_ids=None, hemisphere_ids=None, 
+                        rank_on='normalized_projection_volume', n=5, threshold=10**-2):
+        '''Produces one or more (per experiment) ranked lists of brain structures, using a specified data field.
+
+        Parameters
+        ----------
+        experiment_ids : list of int
+            Obtain injection_structures for these experiments.
+        is_injection : boolean
+            Use data from only injection (or non-injection) unionizes.
+        structure_ids : list of int, optional
+            Consider only these structures. It is a good idea to make sure that these structures are not spatially 
+            overlapping; otherwise your results will contain redundant information. Defaults to the summary 
+            structures - a brain-wide list of nonoverlapping mid-level structures.
+        hemisphere_ids : list of int, optional
+            Consider only these hemispheres (1: left, 2: right, 3: both). Like with structures, 
+            you might get redundant results if you select overlapping options. Defaults to [1, 2].
+        rank_on : str, optional
+            Rank unionize data using this field (descending). Defaults to normalized_projection_volume.
+        n : int, optional
+            Return only the top n structures.
+        threshold : float, optional
+            Consider only records whose data value - specified by the rank_on parameter - exceeds this value.
+
+        Returns
+        -------
+        list : 
+            Each element (1 for each input experiment) is a list of dictionaries. The dictionaries describe the top
+            injection structures in descending order. They are specified by their structure and hemisphere id fields and 
+            additionally report the value specified by the rank_on parameter.
+
+        '''
+
+        output_keys = ['experiment_id', rank_on, 'hemisphere_id', 'structure_id']
+        filter_fields = lambda fieldname: fieldname in output_keys
+
+        if hemisphere_ids is None:
+            hemisphere_ids = [1, 2]
+        if structure_ids is None:
+            structure_ids = self.default_structure_ids
+
+        unionizes = self.get_structure_unionizes(experiment_ids, 
+                                                 is_injection=is_injection, 
+                                                 structure_ids=structure_ids, 
+                                                 hemisphere_ids=hemisphere_ids, 
+                                                 include_descendants=False)
+        unionizes = unionizes[unionizes[rank_on] > threshold] 
+
+        results = []
+        for eid in experiment_ids:
+
+            this_experiment_unionizes = unionizes[unionizes['experiment_id'] == eid]
+            this_experiment_unionizes = this_experiment_unionizes.sort_values(by=rank_on, ascending=False)
+            this_experiment_unionizes = this_experiment_unionizes.select(filter_fields, axis=1)
+            
+            records = this_experiment_unionizes.to_dict('record')
+            if len(records) > n:
+                records = records[:n]
+            results.append(records)
+
+        return results
+
     def filter_structure_unionizes(self, unionizes, 
                                    is_injection=None, 
                                    structure_ids=None, 
@@ -604,10 +678,13 @@ class MouseConnectivityCache(Cache):
         return pd.concat(unionizes, ignore_index=True)
 
     def get_projection_matrix(self, experiment_ids, 
-                              projection_structure_ids,
+                              projection_structure_ids=None,
                               hemisphere_ids=None, 
                               parameter='projection_volume', 
                               dataframe=False):
+
+        if projection_structure_ids is None:
+            projection_structure_ids = self.default_structure_ids
 
         unionizes = self.get_structure_unionizes(experiment_ids,
                                                  is_injection=False,
