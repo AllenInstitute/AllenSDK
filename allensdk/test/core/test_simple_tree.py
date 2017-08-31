@@ -83,10 +83,10 @@ def test_node_ids(tree):
     assert( set(obtained) == set(expected) )  
     
     
-def test_parent_id(tree):
+def test_parent_ids(tree):
 
     nodes = [5, 4, 2]
-    obtained = tree.parent_id(nodes)
+    obtained = tree.parent_ids(nodes)
     
     assert( allclose([2, 1, 0], obtained) )
     
@@ -116,24 +116,24 @@ def test_descendant_ids(tree):
     assert( set(obtained[1]) == set([3]) )
     
     
-def test_node(tree):
+def test_nodes(tree):
     
-    obtained = tree.node([0, 1])
+    obtained = tree.nodes([0, 1])
     
     assert( len(obtained) == 2 )
     assert( obtained[0]['parent'] is None )
     assert( obtained[1]['id'] == 1 )
     
     
-def test_node_default(tree):
+def test_nodes_default(tree):
 
-    obtained = tree.node()
+    obtained = tree.nodes()
     assert( len(obtained) == 6 )
     
 
-def test_parent(tree):
+def test_parents(tree):
 
-    obtained = tree.parent([0, 1])
+    obtained = tree.parents([0, 1])
     assert( len(obtained) == 2 )
     assert( obtained[0] is None )
 
