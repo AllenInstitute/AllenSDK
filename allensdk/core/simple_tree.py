@@ -1,23 +1,44 @@
-# Copyright 2017 Allen Institute for Brain Science
-# This file is part of Allen SDK.
+# Allen Institute Software License - This software license is the 2-clause BSD
+# license plus a third clause that prohibits redistribution for commercial
+# purposes without further permission.
 #
-# Allen SDK is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, version 3 of the License.
+# Copyright 2017. Allen Institute. All rights reserved.
 #
-# Allen SDK is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# Merchantability Or Fitness FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
 #
-# You should have received a copy of the GNU General Public License
-# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
-
-
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+#
+# 3. Redistributions for commercial purposes are not permitted without the
+# Allen Institute's written permission.
+# For purposes of this license, commercial purposes is the incorporation of the
+# Allen Institute's software into anything for which you will charge fees or
+# other compensation. Contact terms@alleninstitute.org for commercial licensing
+# opportunities.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
 import functools
 import operator as op
 from collections import defaultdict
 from six import iteritems
+
+from allensdk.deprecated import deprecated
 
 class SimpleTree( object ):
     def __init__(self, nodes, 
@@ -118,8 +139,13 @@ class SimpleTree( object ):
     
         return self._nodes.keys()
 
-
+    
+    @deprecated("Use SimpleTree.parent_ids instead.")
     def parent_id(self, node_ids):
+        return self.parent_ids(node_ids)
+
+    
+    def parent_ids(self, node_ids):
         '''Obtain the ids of one or more nodes' parents
         
         Parameters
@@ -184,7 +210,7 @@ class SimpleTree( object ):
         
             current = [nid]
             while current[-1] is not None:
-                current.extend(self.parent_id([current[-1]]))
+                current.extend(self.parent_ids([current[-1]]))
             out.append(current[:-1])
                 
         return out
@@ -215,7 +241,7 @@ class SimpleTree( object ):
     
         out = []
         for ii, nid in enumerate(node_ids):
-        
+            
             current = [nid]
             children = self.child_ids([nid])[0]
             
@@ -225,9 +251,14 @@ class SimpleTree( object ):
                                
             out.append(current)
         return out
-            
 
+    
+    @deprecated("Use SimpleTree.nodes instead")
     def node(self, node_ids=None):
+        return self.nodes(node_ids)
+
+    
+    def nodes(self, node_ids=None):
         '''Get one or more nodes' full dictionaries from their ids.
         
         Parameters
@@ -247,7 +278,12 @@ class SimpleTree( object ):
         return [ self._nodes[nid] if nid in self._nodes else None for nid in node_ids]
 
 
+    @deprecated("Use SimpleTree.parents instead")
     def parent(self, node_ids):
+        return self.parents(node_ids)
+
+
+    def parents(self, node_ids):
         '''Get one or mode nodes' parent nodes
         
         Parameters
@@ -259,10 +295,10 @@ class SimpleTree( object ):
         -------
         list of dict : 
             Items are parents of nodes corresponding to argued ids.
-        
+    
         '''
         
-        return self.node([self._parent_ids[nid] for nid in node_ids])
+        return self.nodes([self._parent_ids[nid] for nid in node_ids])
 
 
     def children(self, node_ids):

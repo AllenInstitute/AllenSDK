@@ -1,18 +1,38 @@
-# Copyright 2015-2016 Allen Institute for Brain Science
-# This file is part of Allen SDK.
+# Allen Institute Software License - This software license is the 2-clause BSD
+# license plus a third clause that prohibits redistribution for commercial
+# purposes without further permission.
 #
-# Allen SDK is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, version 3 of the License.
+# Copyright 2015-2016. Allen Institute. All rights reserved.
 #
-# Allen SDK is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
 #
-# You should have received a copy of the GNU General Public License
-# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
-
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+#
+# 3. Redistributions for commercial purposes are not permitted without the
+# Allen Institute's written permission.
+# For purposes of this license, commercial purposes is the incorporation of the
+# Allen Institute's software into anything for which you will charge fees or
+# other compensation. Contact terms@alleninstitute.org for commercial licensing
+# opportunities.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
 from allensdk.config.manifest_builder import ManifestBuilder
 from allensdk.api.cache import Cache
 from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
@@ -90,6 +110,18 @@ class MouseConnectivityCache(Cache):
     STRUCTURE_TREE_KEY = 'STRUCTURE_TREE'
     STRUCTURE_MASK_KEY = 'STRUCTURE_MASK'
     MANIFEST_VERSION = 1.0
+    SUMMARY_STRUCTURE_SET_ID = 167587189
+    DEFAULT_STRUCTURE_SET_IDS = tuple([SUMMARY_STRUCTURE_SET_ID])
+
+    @property
+    def default_structure_ids(self):
+
+        if not hasattr(self, '_default_structure_ids'):
+            tree = self.get_structure_tree()
+            default_structures = tree.get_structures_by_set_id(MouseConnectivityCache.DEFAULT_STRUCTURE_SET_IDS)
+            self._default_structure_ids = [st['id'] for st in default_structures]
+
+        return self._default_structure_ids
 
     def __init__(self,
                  resolution=None,
@@ -295,8 +327,8 @@ class MouseConnectivityCache(Cache):
         return OntologiesApi(self.api.api_url).get_structures_with_sets(
             strategy='lazy',
             path=file_name,
-            pre=StructureTree.clean_structures, 
-            post=StructureTree, 
+            pre=StructureTree.clean_structures,
+            post=lambda x: StructureTree(StructureTree.clean_structures(x)), 
             structure_graph_ids=1,
             **Cache.cache_json())
 
@@ -493,6 +525,68 @@ class MouseConnectivityCache(Cache):
                                                 writer=lambda p, x : pd.DataFrame(x).to_csv(p),
                                                 reader=pd.DataFrame.from_csv)
 
+    def rank_structures(self, experiment_ids, is_injection, structure_ids=None, hemisphere_ids=None, 
+                        rank_on='normalized_projection_volume', n=5, threshold=10**-2):
+        '''Produces one or more (per experiment) ranked lists of brain structures, using a specified data field.
+
+        Parameters
+        ----------
+        experiment_ids : list of int
+            Obtain injection_structures for these experiments.
+        is_injection : boolean
+            Use data from only injection (or non-injection) unionizes.
+        structure_ids : list of int, optional
+            Consider only these structures. It is a good idea to make sure that these structures are not spatially 
+            overlapping; otherwise your results will contain redundant information. Defaults to the summary 
+            structures - a brain-wide list of nonoverlapping mid-level structures.
+        hemisphere_ids : list of int, optional
+            Consider only these hemispheres (1: left, 2: right, 3: both). Like with structures, 
+            you might get redundant results if you select overlapping options. Defaults to [1, 2].
+        rank_on : str, optional
+            Rank unionize data using this field (descending). Defaults to normalized_projection_volume.
+        n : int, optional
+            Return only the top n structures.
+        threshold : float, optional
+            Consider only records whose data value - specified by the rank_on parameter - exceeds this value.
+
+        Returns
+        -------
+        list : 
+            Each element (1 for each input experiment) is a list of dictionaries. The dictionaries describe the top
+            injection structures in descending order. They are specified by their structure and hemisphere id fields and 
+            additionally report the value specified by the rank_on parameter.
+
+        '''
+
+        output_keys = ['experiment_id', rank_on, 'hemisphere_id', 'structure_id']
+        filter_fields = lambda fieldname: fieldname in output_keys
+
+        if hemisphere_ids is None:
+            hemisphere_ids = [1, 2]
+        if structure_ids is None:
+            structure_ids = self.default_structure_ids
+
+        unionizes = self.get_structure_unionizes(experiment_ids, 
+                                                 is_injection=is_injection, 
+                                                 structure_ids=structure_ids, 
+                                                 hemisphere_ids=hemisphere_ids, 
+                                                 include_descendants=False)
+        unionizes = unionizes[unionizes[rank_on] > threshold] 
+
+        results = []
+        for eid in experiment_ids:
+
+            this_experiment_unionizes = unionizes[unionizes['experiment_id'] == eid]
+            this_experiment_unionizes = this_experiment_unionizes.sort_values(by=rank_on, ascending=False)
+            this_experiment_unionizes = this_experiment_unionizes.select(filter_fields, axis=1)
+            
+            records = this_experiment_unionizes.to_dict('record')
+            if len(records) > n:
+                records = records[:n]
+            results.append(records)
+
+        return results
+
     def filter_structure_unionizes(self, unionizes, 
                                    is_injection=None, 
                                    structure_ids=None, 
@@ -584,10 +678,13 @@ class MouseConnectivityCache(Cache):
         return pd.concat(unionizes, ignore_index=True)
 
     def get_projection_matrix(self, experiment_ids, 
-                              projection_structure_ids,
+                              projection_structure_ids=None,
                               hemisphere_ids=None, 
                               parameter='projection_volume', 
                               dataframe=False):
+
+        if projection_structure_ids is None:
+            projection_structure_ids = self.default_structure_ids
 
         unionizes = self.get_structure_unionizes(experiment_ids,
                                                  is_injection=False,
