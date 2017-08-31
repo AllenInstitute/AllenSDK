@@ -261,7 +261,7 @@ def test_get_cell_metrics_five_messages(bo_api5):
     expected_calls = map(lambda c: call(base_query.format(c)),
                          [0, 2000, 4000, 6000, 8000, 10000])
 
-    assert bo_api5['read_url_get'].call_args_list == expected_calls
+    assert bo_api5['read_url_get'].call_args_list == list(expected_calls)
 
 
 def test_filter_experiment_containers_no_filters(bo_api, mock_containers):
