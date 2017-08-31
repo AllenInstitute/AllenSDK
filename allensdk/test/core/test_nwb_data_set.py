@@ -89,6 +89,45 @@ def mock_data_set():
     return data_set
 
 
+def test_fill_sweep_responses_extend(mock_data_set):
+    data_set = mock_data_set
+    DATA_LENGTH = 5
+
+    class H5Scalar(object):
+        def __init__(self, i):
+            self.i = i
+            self.value = i
+        def __eq__(self, j):
+            return j == self.i
+        
+    h5 = {
+        'epochs': {
+            'Sweep_1': {
+                'response': {
+                    'timeseries': {
+                        'data': np.ones(DATA_LENGTH)
+                    }
+                }
+            },
+            'Experiment_1': {
+                'stimulus': {
+                    'idx_start': H5Scalar(1),
+                    'count': H5Scalar(3), # truncation is here
+                    'timeseries': {
+                        'data': np.ones(DATA_LENGTH)
+                        }
+                    }
+                }
+        }
+        }
+
+    with patch('h5py.File', mock_h5py_file(data=h5)):
+        data_set.fill_sweep_responses(0.0, [1], extend_experiment=True)
+
+    assert h5['epochs']['Experiment_1']['stimulus']['count'] == 4
+    assert h5['epochs']['Experiment_1']['stimulus']['idx_start'] == 1
+    assert np.all(h5['epochs']['Sweep_1']['response']['timeseries']['data']== 0.0)
+
 def test_fill_sweep_responses(mock_data_set):
     data_set = mock_data_set
     DATA_LENGTH = 5
@@ -118,7 +157,7 @@ def test_fill_sweep_responses(mock_data_set):
                 }
             }
         }
-    }
+        }
 
     with patch('h5py.File', mock_h5py_file(data=h5)):
         data_set.fill_sweep_responses(0.0, [1])
