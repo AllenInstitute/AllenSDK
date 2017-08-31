@@ -217,7 +217,7 @@ def test_get_structure_tree(mcc, fn_temp_dir, new_nodes):
         mcc.get_structure_tree()
         p.assert_called_once()
 
-    assert(obtained.node_ids()[0] == 0)
+    assert( obtained.node_ids()[0] == 0 )
     assert( os.path.exists(path) )
 
 
@@ -234,6 +234,7 @@ def test_get_ontology(mcc, fn_temp_dir, old_nodes):
             mcc.get_ontology()
 
             p.assert_called_once()
+
             assert(len(c) == 6)
 
 
@@ -418,4 +419,4 @@ def test_validate_structure_ids(inp, fails):
             MouseConnectivityCache.validate_structure_ids(inp)
     else:
         out = MouseConnectivityCache.validate_structure_ids(inp)
-        assert( out == map(int, inp) )
+        assert( out == [ int(i) for i in inp ] )

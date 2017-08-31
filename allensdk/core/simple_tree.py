@@ -116,7 +116,7 @@ class SimpleTree( object ):
         
         '''
     
-        return self._nodes.keys()
+        return list(self._nodes)
 
 
     def parent_id(self, node_ids):
