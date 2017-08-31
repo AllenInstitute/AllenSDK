@@ -131,7 +131,7 @@ def detect_events(data, cell_index, stimulus, debug_plots=False):
         for ii in no_set:
             ax[1].plot([var_dict[ii][2]], [var_dict[ii][3]], 'b.')
 
-        print 'number_of_events:', b.sum()
+        print('number_of_events: %d' % b.sum())
         plt.show()
 
     return b
