@@ -18,6 +18,7 @@ from __future__ import division, print_function, absolute_import
 import re
 import operator as op
 from six import iteritems, string_types
+import functools
 
 import numpy as np
 
@@ -229,8 +230,8 @@ class StructureTree( SimpleTree ):
         
         '''
         
-        return set(reduce(op.add, map(lambda x: x['structure_set_ids'], 
-                                      self.node())))
+        return set(functools.reduce(op.add, map(lambda x: x['structure_set_ids'], 
+                                                self.node())))
         
         
     def has_overlaps(self, structure_ids):
@@ -250,7 +251,7 @@ class StructureTree( SimpleTree ):
         
         '''
     
-        ancestor_ids = reduce(op.add, 
+        ancestor_ids = functools.reduce(op.add, 
                               map(lambda x: x[1:], 
                                   self.ancestor_ids(structure_ids)))
         return (set(ancestor_ids) & set(structure_ids))
