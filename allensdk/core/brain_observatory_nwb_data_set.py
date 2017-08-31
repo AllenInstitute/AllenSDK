@@ -741,7 +741,7 @@ class BrainObservatoryNwbDataSet(object):
 
         # convert start time to a date object
         session_start_time = meta.get('session_start_time')
-        if isinstance(session_start_time, basestring):
+        if isinstance(session_start_time, str) or isinstance(session_start_time, unicode):
             meta['session_start_time'] = dateutil.parser.parse(session_start_time)
 
         age = meta.pop('age', None)
