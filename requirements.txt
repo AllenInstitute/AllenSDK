@@ -1,5 +1,5 @@
 h5py>=2.3.1
-matplotlib>=1.4.3
+matplotlib>=1.4.3,<2.0.0
 numpy>=1.9.2
 pandas>=0.16.2,<0.20.0
 jinja2>=2.7.3
@@ -10,3 +10,5 @@ future >= 0.14.3
 requests
 requests-toolbelt
 simplejson>=3.10.0
+scikit-image>=0.13.0
+statsmodels>=0.8.0

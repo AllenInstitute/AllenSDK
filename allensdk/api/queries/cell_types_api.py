@@ -1,18 +1,38 @@
-# Copyright 2015-2016 Allen Institute for Brain Science
-# This file is part of Allen SDK.
+# Allen Institute Software License - This software license is the 2-clause BSD
+# license plus a third clause that prohibits redistribution for commercial
+# purposes without further permission.
 #
-# Allen SDK is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, version 3 of the License.
+# Copyright 2015-2016. Allen Institute. All rights reserved.
 #
-# Allen SDK is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
 #
-# You should have received a copy of the GNU General Public License
-# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
-
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+#
+# 3. Redistributions for commercial purposes are not permitted without the
+# Allen Institute's written permission.
+# For purposes of this license, commercial purposes is the incorporation of the
+# Allen Institute's software into anything for which you will charge fees or
+# other compensation. Contact terms@alleninstitute.org for commercial licensing
+# opportunities.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
 from .rma_api import RmaApi
 from ..cache import cacheable
 from allensdk.config.manifest import Manifest
@@ -27,15 +47,19 @@ class CellTypesApi(RmaApi):
     def __init__(self, base_uri=None):
         super(CellTypesApi, self).__init__(base_uri)
 
-    def list_cells(self,
-                   require_morphology=False,
-                   require_reconstruction=False,
+    def list_cells(self, 
+                   id=None, 
+                   require_morphology=False, 
+                   require_reconstruction=False, 
                    reporter_status=None):
         """
         Query the API for a list of all cells in the Cell Types Database.
 
         Parameters
         ----------
+        id: int
+            ID of a cell.  If not provided returns all matching cells.  
+
         require_morphology: boolean
             Only return cells that have morphology images.
 
@@ -51,8 +75,11 @@ class CellTypesApi(RmaApi):
             Meta data for all cells.
         """
 
-        criteria = "[is_cell_specimen$eq'true'],products[name$eq'Mouse Cell Types'],ephys_result[failed$eqfalse]"
-
+        if id:
+            criteria = "[id$eq'%d']" % id
+        else:
+            criteria = "[is_cell_specimen$eq'true'],products[name$eq'Mouse Cell Types'],ephys_result[failed$eqfalse]"
+        
         include = ('structure,donor(transgenic_lines),specimen_tags,cell_soma_locations,' +
                    'ephys_features,data_sets,neuron_reconstructions,cell_reporter')
 
@@ -80,7 +107,23 @@ class CellTypesApi(RmaApi):
             # cell reporter status
             cell['reporter_status'] = cell['cell_reporter']['name']
 
-        return self.filter_cells(cells, require_morphology, require_reconstruction, reporter_status)
+        result = self.filter_cells(cells, require_morphology, require_reconstruction, reporter_status)
+        return result
+
+    def get_cell(self, id):
+        '''
+        Query the API for a one cells in the Cell Types Database.
+
+        
+        Returns
+        -------
+        list
+            Meta data for one cell.
+        '''
+
+        cells = self.list_cells(id=id)
+        cell = None if not cells else cells[0]
+        return cell
 
     @cacheable()
     def get_ephys_sweeps(self, specimen_id):
@@ -89,7 +132,6 @@ class CellTypesApi(RmaApi):
 
         Parameters
         ----------
-
         specimen_id: int
             Specimen ID of a cell.
 
