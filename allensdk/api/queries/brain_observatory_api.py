@@ -388,8 +388,8 @@ class BrainObservatoryApi(RmaTemplate):
                                                         transgenic_lines=transgenic_lines)
 
         if require_eye_tracking:
-            experiments = [e fo e in experiments
-                           if e.get('fail_eye_tracking', None) is False)]
+            experiments = [e for e in experiments
+                           if e.get('fail_eye_tracking', None) is False]
         if not include_failed:
             experiments = [e for e in experiments 
                            if not e.get('experiment_container',{}).get('failed', False)]
