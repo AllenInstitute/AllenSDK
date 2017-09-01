@@ -225,6 +225,7 @@ class BrainObservatoryCache(Cache):
                               session_types=None,
                               cell_specimen_ids=None,
                               include_failed=False,
+                              require_eye_tracking=False, 
                               simple=True):
         """ Get a list of ophys experiments matching certain criteria.
 
@@ -276,6 +277,9 @@ class BrainObservatoryCache(Cache):
             Whether or not to simplify the dictionary properties returned by this method
             to a more concise subset.
 
+        require_eye_tracking: boolean
+            If True, only return experiments that have eye tracking results. Default: False.
+
         Returns
         -------
         list of dictionaries
@@ -310,7 +314,8 @@ class BrainObservatoryCache(Cache):
                                                  transgenic_lines=transgenic_lines,
                                                  stimuli=stimuli,
                                                  session_types=session_types,
-                                                 include_failed=include_failed)
+                                                 include_failed=include_failed,
+                                                 require_eye_tracking=require_eye_tracking)
 
         if simple:
             exps = [{
