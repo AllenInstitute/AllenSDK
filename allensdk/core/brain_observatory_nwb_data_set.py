@@ -74,6 +74,11 @@ def get_epoch_mask_list(st, threshold, max_cuts=2):
     epoch_mask_list = []
 
     if len(cut_inds) > max_cuts:
+        
+        import matplotlib.pyplot as plt
+        plt.plot(delta)
+        plt.show()
+
         raise Exception('more than 2 epochs cut')
 
     for ii in range(len(cut_inds)+1):
@@ -166,7 +171,7 @@ class BrainObservatoryNwbDataSet(object):
         #  count as different trials (rows in the stim table).  This helps account for dropped frames, so that they dont
         #  cause the cutting of an entire experiment into too many stimulus epochs.  If these thresholds are too low,
         #  the assert statment in get_epoch_mask_list will halt execution.  In that case, make a bug report!.
-        threshold_dict = {si.THREE_SESSION_A:31+7,
+        threshold_dict = {si.THREE_SESSION_A:32+7,
                           si.THREE_SESSION_B:15,
                           si.THREE_SESSION_C:7,
                           si.THREE_SESSION_C2:7}
