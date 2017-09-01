@@ -59,7 +59,7 @@ def new_nodes():
 
     return [{'id': 0, 'structure_id_path': '/0/', 
              'color_hex_triplet': '000000', 'acronym': 'rt', 
-             'name': 'root', 'structure_sets':[{'id': 1}, {'id': 4}]}]
+             'name': 'root', 'structure_sets':[{'id': 1}, {'id': 4}, {'id': 167587189}] }]
 
 
 @pytest.fixture(scope='function')
@@ -104,6 +104,14 @@ def unionizes():
              "sum_pixel_intensity": 261941000.0, "sum_pixels": 7198050.0,
              "sum_projection_pixel_intensity": 14114200.0,
              "sum_projection_pixels": 120934.0, "volume": 0.0881761}]
+
+
+@pytest.fixture(scope='function')
+def top_injection_unionizes():
+    return pd.DataFrame([{'experiment_id': 1, 'is_injection': True, 'hemisphere_id': 1, 'structure_id': 10, 'normalized_projection_volume': 0.75}, 
+                         {'experiment_id': 1, 'is_injection': True, 'hemisphere_id': 2, 'structure_id': 15, 'normalized_projection_volume': 0.25}, 
+                         {'experiment_id': 1, 'is_injection': False, 'hemisphere_id': 1, 'structure_id': 10, 'normalized_projection_volume': 2.0}, 
+                         {'experiment_id': 1, 'is_injection': False, 'hemisphere_id': 2, 'structure_id': 11, 'normalized_projection_volume': 0.001}])
 
 
 def test_init(mcc, fn_temp_dir):
@@ -302,6 +310,36 @@ def test_filter_experiments(mcc, fn_temp_dir, experiments):
 
     assert len(pass_line) == 1
     assert len(fail_line) == 0
+
+
+def test_rank_structures(mcc, top_injection_unionizes, fn_temp_dir):
+
+    path = os.path.join(fn_temp_dir, 'experiment_{0}'.format(1), 
+                        'structure_unionizes.csv')
+
+    mcc.api.model_query = lambda *args, **kwargs: top_injection_unionizes
+
+    obt = mcc.rank_structures([1], True, [15], [1, 2])
+
+    assert(len(obt) == 1)
+    exp = obt[0]
+    assert(len(exp) == 1)
+    st = exp[0]
+    assert(st['structure_id'] == 15)
+    assert(st['normalized_projection_volume'] == 0.25)
+
+
+def test_default_structure_ids(mcc, fn_temp_dir, new_nodes):
+
+    path = os.path.join(fn_temp_dir, 'structures.json')
+
+    with mock.patch('allensdk.api.queries.ontologies_api.'
+                    'OntologiesApi.model_query', 
+                    return_value=new_nodes) as p:
+
+        default_structure_ids = mcc.default_structure_ids
+        assert(len(default_structure_ids) == 1)
+        assert(default_structure_ids[0] == 0)
 
 
 def test_get_experiment_structure_unionizes(mcc, fn_temp_dir, unionizes):
