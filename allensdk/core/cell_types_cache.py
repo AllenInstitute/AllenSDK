@@ -83,7 +83,7 @@ class CellTypesCache(Cache):
     EPHYS_SWEEPS_KEY = 'EPHYS_SWEEPS'
     RECONSTRUCTION_KEY = 'RECONSTRUCTION'
     MARKER_KEY = 'MARKER'
-    MANIFEST_VERSION = None
+    MANIFEST_VERSION = "1.0"
 
     def __init__(self, cache=True, manifest_file='cell_types_manifest.json', base_uri=None):
         super(CellTypesCache, self).__init__(
@@ -93,7 +93,8 @@ class CellTypesCache(Cache):
     def get_cells(self, file_name=None,
                   require_morphology=False,
                   require_reconstruction=False,
-                  reporter_status=None):
+                  reporter_status=None,
+                  species=None):
         """
         Download metadata for all cells in the database and optionally return a
         subset filtered by whether or not they have a morphology or reconstruction.
@@ -114,6 +115,10 @@ class CellTypesCache(Cache):
 
         reporter_status: list
             Filter for cells that have one or more cell reporter statuses.
+
+        species: list
+            Filter for cells that belong to one or more species.  If None, return all.
+            Must be one of [ CellTypesApi.MOUSE, CellTypesApi.HUMAN ].
         """
 
         file_name = self.get_cache_path(file_name, self.CELLS_KEY)
@@ -133,7 +138,8 @@ class CellTypesCache(Cache):
         return self.api.filter_cells(cells,
                                      require_morphology,
                                      require_reconstruction,
-                                     reporter_status)
+                                     reporter_status,
+                                     species)
         
 
     def get_ephys_sweeps(self, specimen_id, file_name=None):
