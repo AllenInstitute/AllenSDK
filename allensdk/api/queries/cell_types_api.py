@@ -88,7 +88,7 @@ class CellTypesApi(RmaApi):
         else:
             criteria = "[is_cell_specimen$eq'true'],products[name$eq'Mouse Cell Types'],ephys_result[failed$eqfalse]"
         
-        include = ('structure,donor(transgenic_lines,organism),specimen_tags,cell_soma_locations,' +
+        include = ('structure,cortex_layer,donor(transgenic_lines,organism),specimen_tags,cell_soma_locations,' +
                    'ephys_features,data_sets,neuron_reconstructions,cell_reporter')
 
         cells = self.model_query(

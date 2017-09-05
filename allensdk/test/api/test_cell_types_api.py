@@ -1,4 +1,4 @@
-import pytest
+import pytest, os
 from mock import patch, mock_open, MagicMock
 from allensdk.api.queries.cell_types_api import CellTypesApi
 
@@ -35,10 +35,23 @@ def mock_cells():
             },
         ]
 
-def test_list_cells_unmocked():
-    ctapi = CellTypesApi()
-    # acceptance test
-    cells = ctapi.list_cells()
+@pytest.fixture
+def cell_types_api():
+    endpoint = None
+    
+    if 'TEST_API_ENDPOINT' in os.environ:
+        endpoint = os.environ['TEST_API_ENDPOINT']
+        return CellTypesApi(endpoint)
+    else:
+        return None
+
+@pytest.mark.skipif(cell_types_api() is None, reason='No TEST_API_ENDPOINT set.')
+def test_list_cells_unmocked(cell_types_api):
+    from allensdk.config import enable_console_log
+    enable_console_log()
+
+    # this test will always require the latest warehouse
+    cells = cell_types_api.list_cells()
 
 def test_list_cells_mocked(mock_cells):
     ctapi = CellTypesApi()
