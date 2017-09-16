@@ -377,7 +377,8 @@ class BrainObservatoryApi(RmaTemplate):
                                  transgenic_lines=None,
                                  stimuli=None,
                                  session_types=None,
-                                 include_failed=False):
+                                 include_failed=False,
+                                 require_eye_tracking=False):
 
         # re-using the code from above
         experiments = self.filter_experiment_containers(experiments,
@@ -386,6 +387,9 @@ class BrainObservatoryApi(RmaTemplate):
                                                         imaging_depths=imaging_depths,
                                                         transgenic_lines=transgenic_lines)
 
+        if require_eye_tracking:
+            experiments = [e for e in experiments
+                           if e.get('fail_eye_tracking', None) is False]
         if not include_failed:
             experiments = [e for e in experiments 
                            if not e.get('experiment_container',{}).get('failed', False)]

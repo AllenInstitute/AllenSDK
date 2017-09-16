@@ -187,7 +187,6 @@ def test_get_ophys_experiments(brain_observatory_cache):
         "specimen(donor(age,transgenic_lines)),"
         "rma::options[num_rows$eq'all'][count$eqfalse]")
 
-
 def test_get_all_session_types(brain_observatory_cache):
     with patch('os.path.exists') as m:
         m.return_value = False
