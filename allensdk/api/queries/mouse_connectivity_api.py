@@ -96,6 +96,38 @@ class MouseConnectivityApi(RmaApi):
                                       'annotation_%d.nrrd' % resolution, 
                                       save_file_path=file_name)
 
+
+    @cacheables(strategy='create', 
+                reader=nrrd.read, 
+                pathfinder=Cache.pathfinder(file_name_position=4, 
+                                            path_keyword='file_name'))
+    def download_structure_mask(self, structure_id, ccf_version, resolution, file_name):
+        '''Download an indicator mask for a specific structure.
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+
+        Notes
+        -----
+        The download is carried out by constructing a string of the form:
+        "{informatics_archive_endpoint}/annotation/ccf_{year}/structure_masks/structure_masks_{resolution}/structure_{structure_id}.nrrd"
+
+        '''
+
+        if ccf_version  is None:
+            ccf_version = MouseConnectivityApi.CCF_VERSION_DEFAULT
+
+        structure_mask_dir = 'structure_masks_{0}'.format(resolution)
+        data_path = '{0}/{1}/{2}'.format(ccf_version, 'structure_masks', structure_mask_dir)        
+        remote_file_name = 'structure_{0}.nrrd'.format(structure_id)
+
+        self.download_volumetric_data(data_path, remote_file_name, save_file_path=file_name)
+
+
+
     @cacheable(strategy='create',
                reader=nrrd.read,
                pathfinder=Cache.pathfinder(file_name_position=2,
@@ -603,6 +635,10 @@ class MouseConnectivityApi(RmaApi):
     def download_data_mask(self, path, experiment_id, resolution):
         GridDataApi(base_uri=self.api_url).download_projection_grid_data(
             experiment_id, [GridDataApi.DATA_MASK], resolution, path)
+
+
+        
+
 
     def calculate_injection_centroid(self,
                                      injection_density,
