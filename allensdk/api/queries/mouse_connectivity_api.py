@@ -97,10 +97,10 @@ class MouseConnectivityApi(RmaApi):
                                       save_file_path=file_name)
 
 
-    @cacheables(strategy='create', 
-                reader=nrrd.read, 
-                pathfinder=Cache.pathfinder(file_name_position=4, 
-                                            path_keyword='file_name'))
+    @cacheable(strategy='create', 
+               reader=nrrd.read, 
+               pathfinder=Cache.pathfinder(file_name_position=4, 
+                                           path_keyword='file_name'))
     def download_structure_mask(self, structure_id, ccf_version, resolution, file_name):
         '''Download an indicator mask for a specific structure.
 

@@ -33,6 +33,8 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
+import os
+
 import pytest
 from mock import patch, Mock
 import itertools as it
@@ -203,27 +205,31 @@ def test_download_annotation_volume_default(os_makedirs,
     os_makedirs.assert_any_call('/path/to')
 
 
+@pytest.mark.parametrize("resolution",
+                         RESOLUTIONS())
 @patch('os.makedirs')
 def test_download_structure_mask(os_makedirs, 
                                  nrrd_read, 
                                  MCA, 
                                  connectivity, 
-                                 resolution, 
-                                 structure_id):
+                                 resolution):
+
+    structure_id = 12
+
     connectivity.retrieve_file_over_http.reset_mock()
 
-    a, b = connectivity.download_annotation_volume(structure_id, None, resolution, '/path/to/foo.nrrd')
+    a, b = connectivity.download_structure_mask(structure_id, None, resolution, '/path/to/foo.nrrd')
     
     assert a
     assert b
     
-    expected = 'http://download.alleninsititute.org/informatics-archive/'\
+    expected = 'http://download.alleninstitute.org/informatics-archive/'\
                'current-release/mouse_ccf/{0}/structure_masks/'\
                'structure_masks_{1}/structure_{2}.nrrd'.format(MCA.MouseConnectivityApi.CCF_VERSION_DEFAULT, 
                                                                resolution, 
                                                                structure_id)
     connectivity.retrieve_file_over_http.assert_called_once_with(expected, '/path/to/foo.nrrd')
-    os.maskedirs.assert_any_call('/path/to')
+    os.makedirs.assert_any_call('/path/to')
 
 
 @pytest.mark.parametrize("resolution",
