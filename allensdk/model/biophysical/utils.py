@@ -61,8 +61,14 @@ def create_utils(description, model_type=None):
     -------
     Utils instance    
     '''
+
+    
+
     if model_type is None:
-        model_type = PERISOMATIC_TYPE
+        try:
+            model_type = description.data['biophys'][0]['model_type']
+        except KeyError as e:
+            logging.error("Could not infer model type from description")
 
     if model_type == PERISOMATIC_TYPE:
         return Utils(description)

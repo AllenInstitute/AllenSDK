@@ -95,10 +95,9 @@ def run_sync(description, sweeps=None):
     sweeps : list
         list of experiment sweep numbers to simulate.  If None, simulate all sweeps.
     '''
-    model_type = description.data['biophys'][0]['model_type']
 
     # configure NEURON
-    utils = create_utils(description, model_type)
+    utils = create_utils(description)
     h = utils.h
 
     # configure model

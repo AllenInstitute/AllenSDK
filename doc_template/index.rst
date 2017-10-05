@@ -87,16 +87,16 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
-What's New - Release 0.14.2 (August 17th, 2017)
+What's New - Release 0.14.3 (October 19th, 2017)
 -----------------------------------------------
 
-The 0.14.2  release is primarily a change in our open source license.
-We are now using a 2-clause BSD license with an additional clause
-related to commercial use.  If you have any questions, please contact us on our
-`Gitter channel <https://gitter.im/AllenInstitute/AllenSDK>`_
-or `send us a message <http://allins.convio.net/site/PageServer?pagename=send_us_a_message>`_.
+The 0.14.3 release coincides with the first release of human data and models in the Allen Cell Types Database and a complete requantification of 3D grids and unionize
+records in the Allen Mouse Brain Connectivity Atlas based on a new revision of Common Coordinate Framework voxel annotations.  
 
-This release also includes code in the BrainObservatory for mapping stimuli to screens.
-See `this Jupyter example notebook <http://alleninstitute.github.io/AllenSDK/_static/examples/nb/brain_observatory_monitor.html>`_ for details.
+Users of the `CellTypesCache` can filter for cells based on the species of the cell's donor using the `species` argument of `CellTypesCache.get_cells`.  Examples of this
+are shown in the metadata filtering section of the example Jupyter notebook.
+
+connectivity stuff goes here
+
 
 To find out more, take a look at our `CHANGELOG <http://github.com/AllenInstitute/AllenSDK/blob/master/CHANGELOG.md>`_. 
