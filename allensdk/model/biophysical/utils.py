@@ -94,7 +94,7 @@ class Utils(HocUtils):
     _log = logging.getLogger(__name__)
 
     def __init__(self, description):                    
-        self.update_default_cell_hoc()
+        self.update_default_cell_hoc(description)
 
         super(Utils, self).__init__(description)
         self.stim = None
