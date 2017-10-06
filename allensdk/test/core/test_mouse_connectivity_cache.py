@@ -417,46 +417,23 @@ def test_get_reference_space(mcc, new_nodes):
 
 
 def test_get_structure_mask(mcc, fn_temp_dir):
+  
+    sid = 12
 
-    class FakeTree(object):
-        def descendant_ids(self, list_of_things):
-            return [list_of_things]
-    mcc.get_structure_tree = lambda *a, **k: FakeTree()
-
-    annot = np.arange(125).reshape((5, 5, 5))
-    mcc.get_annotation_volume = lambda *a, **k: (annot, 'foo')
-
+    eye = np.eye(100)
     path = os.path.join(fn_temp_dir, 'annotation', 'ccf_2016', 'structure_masks', 
-                        'resolution_25', 'structure_{0}.nrrd'.format(12))
+                        'resolution_25', 'structure_{0}.nrrd'.format(sid))
 
-    with warnings.catch_warnings(record=True) as c:
-        warnings.simplefilter('always')
+    mcc.api.retrieve_file_over_http = lambda a, b: nrrd.write(b, eye)
+    obtained, _ = mcc.get_structure_mask(sid)
 
-        mask, _ = mcc.get_structure_mask(12)
+    mcc.api.retrieve_file_over_http = mock.MagicMock()
+    mcc.get_structure_mask(sid)
 
-        # also make sure we can do this for pd.Series input for backwards compatibility
-        mask, _ = mcc.get_structure_mask(pd.Series([12]))
-
-    assert( mask.sum() == 1 )
-    #assert( len(c) == 2 )
+    mcc.api.retrieve_file_over_http.assert_not_called()
+    assert( np.allclose(obtained, eye) ) 
     assert( os.path.exists(path) )
 
-    with pytest.raises(ValueError):
-        mask, _ = mcc.get_structure_mask("fish")
-
-
-def test_make_structure_mask(mcc):
-
-    annot = np.arange(125).reshape((5, 5, 5))
-    sids = [0, 1, 2, 3, 4]
-
-    with warnings.catch_warnings(record=True) as c:
-        warnings.simplefilter('always')
-
-        mask = mcc.make_structure_mask(sids, annot)
-
-    #assert(len(c) == 1)
-    assert mask.sum() == 5
 
 @pytest.mark.parametrize('inp,fails', [(1, False), 
                                         (pd.Series([2]), False), 
