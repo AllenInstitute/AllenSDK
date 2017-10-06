@@ -114,10 +114,14 @@ class Utils(HocUtils):
             hfi = hoc_files.index(default_cell_hoc)
 
             if not os.path.exists(default_cell_hoc):
-                abspath_ch = resource_filename(allensdk.model.biophysical.run_simulate.__name__, 
+                abspath_ch = resource_filename(__name__, 
                                                default_cell_hoc)
-                hoc_files[hfi] = abs_path_ch
-                logging.warning("Using cell.hoc from the following location: %s", abspath_ch)
+                hoc_files[hfi] = abspath_ch
+
+                if not os.path.exists(abspath_ch):
+                    raise IOError("cell.hoc does not exist!")
+
+                self._log.warning("Using cell.hoc from the following location: %s", abspath_ch)
         except ValueError as e:
             pass
 
