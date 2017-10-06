@@ -2,7 +2,7 @@
 # license plus a third clause that prohibits redistribution for commercial
 # purposes without further permission.
 #
-# Copyright 2015-2016. Allen Institute. All rights reserved.
+# Copyright 2015-2017. Allen Institute. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -41,6 +41,7 @@ from fractions import gcd
 from skimage.measure import block_reduce
 import scipy.interpolate
 import numpy as np
+from pkg_resources import resource_filename #@UnresolvedImport
 
 PERISOMATIC_TYPE = "Biophysical - perisomatic"
 ALL_ACTIVE_TYPE = "Biophysical - all active"
@@ -92,7 +93,9 @@ class Utils(HocUtils):
 
     _log = logging.getLogger(__name__)
 
-    def __init__(self, description):
+    def __init__(self, description):                    
+        self.update_default_cell_hoc()
+
         super(Utils, self).__init__(description)
         self.stim = None
         self.stim_curr = None
@@ -100,6 +103,24 @@ class Utils(HocUtils):
         self.stimulus_sampling_rate = None
 
         self.stim_vec_list = []
+        
+
+    def update_default_cell_hoc(self, description, default_cell_hoc='cell.hoc'):
+        ''' replace the default 'cell.hoc' path in the manifest with 'cell.hoc' packaged
+        within AllenSDK if it does not exist '''
+
+        hoc_files = description.data['neuron'][0]['hoc']
+        try:
+            hfi = hoc_files.index(default_cell_hoc)
+
+            if not os.path.exists(default_cell_hoc):
+                abspath_ch = resource_filename(allensdk.model.biophysical.run_simulate.__name__, 
+                                               default_cell_hoc)
+                hoc_files[hfi] = abs_path_ch
+                logging.warning("Using cell.hoc from the following location: %s", abspath_ch)
+        except ValueError as e:
+            pass
+
 
     def generate_morphology(self, morph_filename):
         '''Load a swc-format cell morphology file.
