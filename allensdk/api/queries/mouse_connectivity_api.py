@@ -58,7 +58,8 @@ class MouseConnectivityApi(RmaApi):
     DEVMOUSE_2012 = 'annotation/devmouse_2012'
     CCF_2015 = 'annotation/ccf_2015'
     CCF_2016 = 'annotation/ccf_2016'
-    CCF_VERSION_DEFAULT = CCF_2016
+    CCF_2017 = 'annotation/ccf_2017'
+    CCF_VERSION_DEFAULT = CCF_2017
 
     VOXEL_RESOLUTION_10_MICRONS = 10
     VOXEL_RESOLUTION_25_MICRONS = 25
@@ -106,14 +107,13 @@ class MouseConnectivityApi(RmaApi):
 
         Parameters
         ----------
-
-        Returns
-        -------
-
-        Notes
-        -----
-        The download is carried out by constructing a string of the form:
-        "{informatics_archive_endpoint}/annotation/ccf_{year}/structure_masks/structure_masks_{resolution}/structure_{structure_id}.nrrd"
+        structure_id : int
+        ccf_version : string
+            Which version of the CCF annotation to use. Defaults to MouseConnectivityApi.CCF_2017
+        resolution : int
+            Desired resolution to download in microns.  Must be 10, 25, 50, or 100.
+        file_name : string
+             Where to save the downloaded mask.
 
         '''
 
