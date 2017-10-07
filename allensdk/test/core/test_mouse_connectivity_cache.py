@@ -123,7 +123,7 @@ def test_init(mcc, fn_temp_dir):
 def test_get_annotation_volume(mcc, fn_temp_dir):
 
     eye = np.eye(100)
-    path = os.path.join(fn_temp_dir, 'annotation', 'ccf_2016', 
+    path = os.path.join(fn_temp_dir, 'annotation', 'ccf_2017', 
                         'annotation_25.nrrd')
 
     mcc.api.retrieve_file_over_http = lambda a, b: nrrd.write(b, eye)
@@ -421,7 +421,7 @@ def test_get_structure_mask(mcc, fn_temp_dir):
     sid = 12
 
     eye = np.eye(100)
-    path = os.path.join(fn_temp_dir, 'annotation', 'ccf_2016', 'structure_masks', 
+    path = os.path.join(fn_temp_dir, 'annotation', 'ccf_2017', 'structure_masks', 
                         'resolution_25', 'structure_{0}.nrrd'.format(sid))
 
     mcc.api.retrieve_file_over_http = lambda a, b: nrrd.write(b, eye)
