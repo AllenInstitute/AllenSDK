@@ -124,8 +124,13 @@ class MouseConnectivityApi(RmaApi):
         data_path = '{0}/{1}/{2}'.format(ccf_version, 'structure_masks', structure_mask_dir)        
         remote_file_name = 'structure_{0}.nrrd'.format(structure_id)
 
-        self.download_volumetric_data(data_path, remote_file_name, save_file_path=file_name)
-
+        try:
+            self.download_volumetric_data(data_path, remote_file_name, save_file_path=file_name)
+        except Exception as e:
+            self._file_download_log.error('''We weren't able to download a structure mask for structure {0}. 
+                                             You can instead build the mask locally using 
+                                             ReferenceSpace.many_structure_masks''')
+            raise
 
 
     @cacheable(strategy='create',
