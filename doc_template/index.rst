@@ -90,13 +90,18 @@ See the `mouse connectivity section <connectivity.html>`_ for more details.
 What's New - Release 0.14.3 (October 19th, 2017)
 -----------------------------------------------
 
-The 0.14.3 release coincides with the first release of human data and models in the Allen Cell Types Database and a complete requantification of 3D grids and unionize
+The 0.14.3 release coincides with the first release of human data and models in the Allen Cell Types Database and a complete requantification of structure unionize
 records in the Allen Mouse Brain Connectivity Atlas based on a new revision of Common Coordinate Framework voxel annotations.  
 
-Users of the `CellTypesCache` can filter for cells based on the species of the cell's donor using the `species` argument of `CellTypesCache.get_cells`.  Examples of this
-are shown in the metadata filtering section of the example Jupyter notebook.
+Users of the :py:class:`~allensdk.core.cell_types_cache.CellTypesCache` can filter for cells based on the species of the cell's donor using the `species` argument of 
+:py:meth:`~allensdk.core.cell_types_cache.CellTypesCache.get_cells`.  Examples of this are shown in the metadata filtering section of the example 
+`Jupyter notebooke <_static/examples/nb/cell_types.html>`_
 
-connectivity stuff goes here
+The connectivity atlas contains 300 new data sets and structure unionize records have been completely reprocessed with updated 3D annotations of the Common Coordinate Framework.  
+This means that the :py:meth:`~allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_annotation_volume` method will by default return a new volume by default.  You can
+choose which version of annotations you would like using the `ccf_version` :py:class:`~allensdk.core.mouse_connectivity_cache.MouseConnectivityCache` constructor.  
 
+To access all of this new data, you will need to remove the cached `experiments.json` and `structures.json` files in the directory containing your `MouseConnectivityCache` manifest file.
+Also remove the `structure_unionizes.csv` files within experiment subdirectories.
 
 To find out more, take a look at our `CHANGELOG <http://github.com/AllenInstitute/AllenSDK/blob/master/CHANGELOG.md>`_. 
