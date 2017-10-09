@@ -642,9 +642,6 @@ class MouseConnectivityApi(RmaApi):
             experiment_id, [GridDataApi.DATA_MASK], resolution, path)
 
 
-        
-
-
     def calculate_injection_centroid(self,
                                      injection_density,
                                      injection_fraction,
