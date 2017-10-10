@@ -88,7 +88,7 @@ class CellTypesApi(RmaApi):
         else:
             criteria = "[is_cell_specimen$eq'true'],products[name$eq'Mouse Cell Types'],ephys_result[failed$eqfalse]"
         
-        include = ('structure,cortex_layer,donor(transgenic_lines,organism),specimen_tags,cell_soma_locations,' +
+        include = ('structure,cortex_layer,donor(transgenic_lines,organism,conditions),specimen_tags,cell_soma_locations,' +
                    'ephys_features,data_sets,neuron_reconstructions,cell_reporter')
 
         cells = self.model_query(
@@ -115,7 +115,24 @@ class CellTypesApi(RmaApi):
             # cell reporter status
             cell['reporter_status'] = cell.get('cell_reporter', {}).get('name', None)
 
+            # species
+            cell['species'] = cell.get('donor',{}).get('organism',{}).get('name', None)
+
+            # conditions (whitelist)
+            condition_types = [ 'disease categories' ]
+            condition_keys = dict(zip(condition_types, 
+                                      [ ct.replace(' ', '_') for ct in condition_types ]))
+            for ct, ck in condition_keys.items():
+                cell[ck] = []
+
+            conditions = cell.get('donor',{}).get('conditions', [])
+            for condition in conditions:
+                c_type, c_val = condition['name'].split(' - ')
+                if c_type in condition_keys:
+                    cell[condition_keys[c_type]].append(c_val)
+
         result = self.filter_cells(cells, require_morphology, require_reconstruction, reporter_status, species)
+
         return result
 
     def get_cell(self, id):
