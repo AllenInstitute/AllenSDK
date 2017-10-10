@@ -91,14 +91,14 @@ What's New - Release 0.14.3 (October 19th, 2017)
 -----------------------------------------------
 
 The 0.14.3 release coincides with the first release of human data and models in the Allen Cell Types Database and a complete requantification of structure unionize
-records in the Allen Mouse Brain Connectivity Atlas based on a new revision of Common Coordinate Framework voxel annotations.  
+records in the Allen Mouse Brain Connectivity Atlas based on a new revision of Common Coordinate Framework structure ontology and voxel annotations.
 
 Users of the :py:class:`~allensdk.core.cell_types_cache.CellTypesCache` can filter for cells based on the species of the cell's donor using the ``species`` argument of 
 :py:meth:`~allensdk.core.cell_types_cache.CellTypesCache.get_cells`.  Examples of this are shown in the metadata filtering section of the example 
 `Jupyter notebook <_static/examples/nb/cell_types.html>`_
 
 The Allen Mouse Brain Connectivity Atlas contains over 350 new data sets and structure unionize records have been completely reprocessed with updated 3D annotations of the Common Coordinate Framework.
-Subcortical annotations have changed the most.  :py:meth:`~allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_annotation_volume` method will by default return a new volume by default.  You can choose which version of annotations you would like using the ``ccf_version`` :py:class:`~allensdk.core.mouse_connectivity_cache.MouseConnectivityCache` constructor.
+The structure ontology contains new structures, with annotations have changing the most.  :py:meth:`~allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_annotation_volume` method will by default return a new volume by default.  You can choose which version of annotations you would like using the ``ccf_version`` :py:class:`~allensdk.core.mouse_connectivity_cache.MouseConnectivityCache` constructor.
 
 To access new experiments and unionize records, you will need to remove a number of files in your manifest directory so that 
 :py:class:`~allensdk.core.mouse_connectivity_cache.MouseConnectivityCache` will know to download the new copies:
