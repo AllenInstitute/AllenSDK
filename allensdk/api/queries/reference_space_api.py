@@ -135,7 +135,7 @@ class ReferenceSpaceApi(RmaApi):
         '''
 
         if ccf_version  is None:
-            ccf_version = MouseConnectivityApi.CCF_VERSION_DEFAULT
+            ccf_version = ReferenceSpaceApi.CCF_VERSION_DEFAULT
 
         structure_mask_dir = 'structure_masks_{0}'.format(resolution)
         data_path = '{0}/{1}/{2}'.format(ccf_version, 'structure_masks', structure_mask_dir)        
