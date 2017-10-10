@@ -125,8 +125,8 @@ read in from the command line at the very bottom of the script.
 :py:meth:`~allensdk.model.biophysical.runner.run`:
 ::
 
-    # configure NEURON
-    utils = Utils(description)
+    # configure NEURON -- this will infer model type (perisomatic vs. all-active)
+    utils = Utils.create_utils(description)
     h = utils.h
 
 The next step is to get the path of the morphology file and pass it to NEURON.

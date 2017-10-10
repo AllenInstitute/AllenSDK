@@ -1,7 +1,7 @@
 Cell Types
 ==========
 
-The Allen Cell Types data set is a database of neuronal cell types based on multimodal characterization
+The Allen Cell Types data set is a database of mouse and human neuronal cell types based on multimodal characterization
 of single cells to enable data-driven approaches to classification and is fully integrated with other
 Allen Brain Atlas resources.  The database currently includes:
 
