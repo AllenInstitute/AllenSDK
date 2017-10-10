@@ -91,7 +91,7 @@ What's New - Release 0.14.3 (October 19th, 2017)
 -----------------------------------------------
 
 The 0.14.3 release coincides with the first release of human data and models in the Allen Cell Types Database and a complete requantification of structure unionize
-records in the Allen Mouse Brain Connectivity Atlas based on a new revision of Common Coordinate Framework structure ontology and voxel annotations.
+records in the Allen Mouse Brain Connectivity Atlas based on a new revision of the Common Coordinate Framework structure ontology and voxel annotations.
 
 Users of the :py:class:`~allensdk.core.cell_types_cache.CellTypesCache` can filter for cells based on the species of the cell's donor using the ``species`` argument of 
 :py:meth:`~allensdk.core.cell_types_cache.CellTypesCache.get_cells`.  Examples of this are shown in the metadata filtering section of the example 
