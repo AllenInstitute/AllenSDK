@@ -772,8 +772,8 @@ class MouseConnectivityCache(Cache):
 
         Notes
         -----
-        If you are making large numbers of masks, there is a faster structure mask generator in 
-        ReferenceSpace.many_structure_masks.  We will be migrating this function in a future release.
+        This method downloads structure masks from the Allen Institute. To make your own locally, see 
+        ReferenceSpace.many_structure_masks.
         
         Parameters
         ----------
@@ -797,42 +797,12 @@ class MouseConnectivityCache(Cache):
             file_name, self.STRUCTURE_MASK_KEY, self.ccf_version, 
             self.resolution, structure_id)
 
-        if os.path.exists(file_name):
-            return nrrd.read(file_name)
-        else:
-            st = self.get_structure_tree()
-            structure_ids = st.descendant_ids([structure_id])[0]
-            annotation, _ = self.get_annotation_volume(annotation_file_name)
-            mask = self.make_structure_mask(structure_ids, annotation)
-
-            if self.cache:
-                Manifest.safe_make_parent_dirs(file_name)
-                nrrd.write(file_name, mask)
-
-            return mask, None
-
-    def make_structure_mask(self, structure_ids, annotation):
-        """
-        Look at an annotation volume and identify voxels that have values
-        in a list of structure ids.
-
-        Parameters
-        ----------
-
-        structure_ids: list
-            List of IDs to look for in the annotation volume
-
-        annotation: np.ndarray
-            Numpy array filled with IDs.
-
-        """
-
-        m = np.zeros(annotation.shape, dtype=np.uint8)
-
-        for _, sid in enumerate(structure_ids):
-            m[annotation == sid] = 1
-
-        return m
+        return self.api.download_structure_mask(structure_id, 
+                                                self.ccf_version,
+                                                self.resolution,
+                                                file_name, 
+                                                strategy='lazy')
+    
 
     def build_manifest(self, file_name):
         """

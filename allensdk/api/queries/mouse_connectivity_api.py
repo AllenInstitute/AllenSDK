@@ -58,7 +58,8 @@ class MouseConnectivityApi(RmaApi):
     DEVMOUSE_2012 = 'annotation/devmouse_2012'
     CCF_2015 = 'annotation/ccf_2015'
     CCF_2016 = 'annotation/ccf_2016'
-    CCF_VERSION_DEFAULT = CCF_2016
+    CCF_2017 = 'annotation/ccf_2017'
+    CCF_VERSION_DEFAULT = CCF_2017
 
     VOXEL_RESOLUTION_10_MICRONS = 10
     VOXEL_RESOLUTION_25_MICRONS = 25
@@ -95,6 +96,42 @@ class MouseConnectivityApi(RmaApi):
         self.download_volumetric_data(ccf_version,
                                       'annotation_%d.nrrd' % resolution, 
                                       save_file_path=file_name)
+
+
+    @cacheable(strategy='create', 
+               reader=nrrd.read, 
+               pathfinder=Cache.pathfinder(file_name_position=4, 
+                                           path_keyword='file_name'))
+    def download_structure_mask(self, structure_id, ccf_version, resolution, file_name):
+        '''Download an indicator mask for a specific structure.
+
+        Parameters
+        ----------
+        structure_id : int
+        ccf_version : string
+            Which version of the CCF annotation to use. Defaults to MouseConnectivityApi.CCF_2017
+        resolution : int
+            Desired resolution to download in microns.  Must be 10, 25, 50, or 100.
+        file_name : string
+             Where to save the downloaded mask.
+
+        '''
+
+        if ccf_version  is None:
+            ccf_version = MouseConnectivityApi.CCF_VERSION_DEFAULT
+
+        structure_mask_dir = 'structure_masks_{0}'.format(resolution)
+        data_path = '{0}/{1}/{2}'.format(ccf_version, 'structure_masks', structure_mask_dir)        
+        remote_file_name = 'structure_{0}.nrrd'.format(structure_id)
+
+        try:
+            self.download_volumetric_data(data_path, remote_file_name, save_file_path=file_name)
+        except Exception as e:
+            self._file_download_log.error('''We weren't able to download a structure mask for structure {0}. 
+                                             You can instead build the mask locally using 
+                                             ReferenceSpace.many_structure_masks''')
+            raise
+
 
     @cacheable(strategy='create',
                reader=nrrd.read,
@@ -603,6 +640,7 @@ class MouseConnectivityApi(RmaApi):
     def download_data_mask(self, path, experiment_id, resolution):
         GridDataApi(base_uri=self.api_url).download_projection_grid_data(
             experiment_id, [GridDataApi.DATA_MASK], resolution, path)
+
 
     def calculate_injection_centroid(self,
                                      injection_density,

@@ -249,7 +249,7 @@ class StructureTree( SimpleTree ):
         '''
         
         return set(reduce(op.add, map(lambda x: x['structure_set_ids'], 
-                                      self.node())))
+                                      self.nodes())))
         
         
     def has_overlaps(self, structure_ids):
