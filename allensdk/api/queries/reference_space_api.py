@@ -43,7 +43,6 @@ import six
 
 class ReferenceSpaceApi(RmaApi):
 
-
     AVERAGE_TEMPLATE = 'average_template'
     ARA_NISSL = 'ara_nissl'
     MOUSE_2011 = 'annotation/mouse_2011'
@@ -77,7 +76,7 @@ class ReferenceSpaceApi(RmaApi):
         Parameters
         ----------
         ccf_version: string
-            Which version to download. Defaults to ReferenceSpaceApi.CCF_2017
+            Which reference space version to download. Defaults to "annotation/ccf_2017"
         resolution: int
             Desired resolution to download in microns.
             Must be 10, 25, 50, or 100.
@@ -127,7 +126,7 @@ class ReferenceSpaceApi(RmaApi):
         ----------
         structure_id : int
         ccf_version : string
-            Which version of the CCF annotation to use. Defaults to MouseConnectivityApi.CCF_2017
+            Which reference space version to download. Defaults to "annotation/ccf_2017"
         resolution : int
             Desired resolution to download in microns.  Must be 10, 25, 50, or 100.
         file_name : string
@@ -162,7 +161,8 @@ class ReferenceSpaceApi(RmaApi):
         Parameters
         ----------
         data_path : string
-            'average_template', 'ara_nissl', 'annotation/ccf_2015', 'annotation/mouse_2011', or 'annotation/devmouse_2012'
+            'average_template', 'ara_nissl', 'annotation/ccf_{year}', 
+            'annotation/mouse_2011', or 'annotation/devmouse_2012'
         voxel_resolution : int
             10, 25, 50 or 100
         coordinate_framework : string
@@ -204,7 +204,8 @@ class ReferenceSpaceApi(RmaApi):
         Parameters
         ----------
         data_path : string
-            'average_template', 'ara_nissl', 'annotation/ccf_2015', 'annotation/mouse_2011', or 'annotation/devmouse_2012'
+            'average_template', 'ara_nissl', 'annotation/ccf_{year}', 
+            'annotation/mouse_2011', or 'annotation/devmouse_2012'
         file_name : string
             server-side file name. 'annotation_10.nrrd' for example.
         voxel_resolution : int
