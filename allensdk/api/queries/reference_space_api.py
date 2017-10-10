@@ -2,7 +2,7 @@
 # license plus a third clause that prohibits redistribution for commercial
 # purposes without further permission.
 #
-# Copyright 2015-2016. Allen Institute. All rights reserved.
+# Copyright 2015-2017. Allen Institute. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -50,7 +50,8 @@ class ReferenceSpaceApi(RmaApi):
     DEVMOUSE_2012 = 'annotation/devmouse_2012'
     CCF_2015 = 'annotation/ccf_2015'
     CCF_2016 = 'annotation/ccf_2016'
-    CCF_VERSION_DEFAULT = CCF_2016
+    CCF_2017 = 'annotation/ccf_2017'
+    CCF_VERSION_DEFAULT = CCF_2017
 
     VOXEL_RESOLUTION_10_MICRONS = 10
     VOXEL_RESOLUTION_25_MICRONS = 25
@@ -76,7 +77,7 @@ class ReferenceSpaceApi(RmaApi):
         Parameters
         ----------
         ccf_version: string
-            ReferenceSpaceApi.CCF_2016 (default) or ReferenceSpaceApi.CCF_2015
+            Which version to download. Defaults to ReferenceSpaceApi.CCF_2017
         resolution: int
             Desired resolution to download in microns.
             Must be 10, 25, 50, or 100.
