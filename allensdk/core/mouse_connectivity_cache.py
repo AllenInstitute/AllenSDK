@@ -2,7 +2,7 @@
 # license plus a third clause that prohibits redistribution for commercial
 # purposes without further permission.
 #
-# Copyright 2015-2016. Allen Institute. All rights reserved.
+# Copyright 2015-2017. Allen Institute. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -141,54 +141,6 @@ class MouseConnectivityCache(Cache):
         if ccf_version is None:
             ccf_version = MouseConnectivityApi.CCF_VERSION_DEFAULT
         self.ccf_version = ccf_version
-        
-    def get_annotation_volume(self, file_name=None):
-        """
-        Read the annotation volume.  Download it first if it doesn't exist.
-
-        Parameters
-        ----------
-
-        file_name: string
-            File name to store the annotation volume.  If it already exists,
-            it will be read from this file.  If file_name is None, the
-            file_name will be pulled out of the manifest.  Default is None.
-
-        """
-
-        file_name = self.get_cache_path(
-            file_name, self.ANNOTATION_KEY, self.ccf_version, self.resolution)
-
-        annotation, info = self.api.download_annotation_volume(
-            self.ccf_version,
-            self.resolution,
-            file_name, 
-            strategy='lazy')
-
-        return annotation, info
-
-    def get_template_volume(self, file_name=None):
-        """
-        Read the template volume.  Download it first if it doesn't exist.
-
-        Parameters
-        ----------
-
-        file_name: string
-            File name to store the template volume.  If it already exists,
-            it will be read from this file.  If file_name is None, the
-            file_name will be pulled out of the manifest.  Default is None.
-
-        """
-
-        file_name = self.get_cache_path(
-            file_name, self.TEMPLATE_KEY, self.resolution)
-
-        template, info = self.api.download_template_volume(self.resolution, 
-                                                           file_name, 
-                                                           strategy='lazy')
-
-        return template, info
 
     def get_projection_density(self, experiment_id, file_name=None):
         """
@@ -307,67 +259,6 @@ class MouseConnectivityCache(Cache):
             file_name, experiment_id, self.resolution, strategy='lazy')
 
         return nrrd.read(file_name)
-
-    def get_structure_tree(self, file_name=None):
-        """
-        Read the list of adult mouse structures and return an StructureTree 
-        instance.
-
-        Parameters
-        ----------
-
-        file_name: string
-            File name to save/read the structures table.  If file_name is None,
-            the file_name will be pulled out of the manifest.  If caching
-            is disabled, no file will be saved. Default is None.
-        """
-        
-        file_name = self.get_cache_path(file_name, self.STRUCTURE_TREE_KEY)
-
-        return OntologiesApi(self.api.api_url).get_structures_with_sets(
-            strategy='lazy',
-            path=file_name,
-            pre=StructureTree.clean_structures,
-            post=lambda x: StructureTree(StructureTree.clean_structures(x)), 
-            structure_graph_ids=1,
-            **Cache.cache_json())
-
-    @deprecated('Use get_structure_tree instead.')
-    def get_ontology(self, file_name=None):
-        """
-        Read the list of adult mouse structures and return an Ontology instance.
-
-        Parameters
-        ----------
-
-        file_name: string
-            File name to save/read the structures table.  If file_name is None,
-            the file_name will be pulled out of the manifest.  If caching
-            is disabled, no file will be saved. Default is None.
-        """
-
-        return Ontology(self.get_structures(file_name))
-
-    @deprecated('Use get_structure_tree instead.')
-    def get_structures(self, file_name=None):
-        """
-        Read the list of adult mouse structures and return a Pandas DataFrame.
-
-        Parameters
-        ----------
-
-        file_name: string
-            File name to save/read the structures table.  If file_name is None,
-            the file_name will be pulled out of the manifest.  If caching
-            is disabled, no file will be saved. Default is None.
-        """
-        file_name = self.get_cache_path(file_name, self.STRUCTURES_KEY)
-
-        return OntologiesApi(base_uri=self.api.api_url).get_structures(
-            1,
-            strategy='lazy',
-            path=file_name,
-            **Cache.cache_csv_dataframe())
 
 
     def get_experiments(self, dataframe=False, file_name=None, cre=None, injection_structure_ids=None):
@@ -738,70 +629,6 @@ class MouseConnectivityCache(Cache):
             return {'matrix': matrix, 'rows': rows_df, 'columns': cols_df}
         else:
             return {'matrix': matrix, 'rows': experiment_ids, 'columns': columns}
-
-    def get_reference_space(self, structure_file_name=None, 
-                            annotation_file_name=None):
-        """
-        Build a ReferenceSpace from this cache's annotation volume and 
-        structure tree. The ReferenceSpace does operations that relate brain 
-        structures to spatial domains.
-        
-        Parameters
-        ----------
-        
-        structure_file_name: string
-            File name to save/read the structures table.  If file_name is None,
-            the file_name will be pulled out of the manifest.  If caching
-            is disabled, no file will be saved. Default is None.
-            
-        annotation_file_name: string
-            File name to store the annotation volume.  If it already exists,
-            it will be read from this file.  If file_name is None, the
-            file_name will be pulled out of the manifest.  Default is None.
-        
-        """
-        
-        return ReferenceSpace(self.get_structure_tree(structure_file_name), 
-                              self.get_annotation_volume(annotation_file_name)[0], 
-                              [self.resolution] * 3)
-
-    def get_structure_mask(self, structure_id, file_name=None, annotation_file_name=None):
-        """
-        Read a 3D numpy array shaped like the annotation volume that has non-zero values where
-        voxels belong to a particular structure.  This will take care of identifying substructures.
-
-        Notes
-        -----
-        This method downloads structure masks from the Allen Institute. To make your own locally, see 
-        ReferenceSpace.many_structure_masks.
-        
-        Parameters
-        ----------
-
-        structure_id: int
-            ID of a structure.
-
-        file_name: string
-            File name to store the structure mask.  If it already exists,
-            it will be read from this file.  If file_name is None, the
-            file_name will be pulled out of the manifest.  Default is None.
-
-        annotation_file_name: string
-            File name to store the annotation volume.  If it already exists,
-            it will be read from this file.  If file_name is None, the
-            file_name will be pulled out of the manifest.  Default is None.
-        """
-        structure_id = MouseConnectivityCache.validate_structure_id(structure_id)
-
-        file_name = self.get_cache_path(
-            file_name, self.STRUCTURE_MASK_KEY, self.ccf_version, 
-            self.resolution, structure_id)
-
-        return self.api.download_structure_mask(structure_id, 
-                                                self.ccf_version,
-                                                self.resolution,
-                                                file_name, 
-                                                strategy='lazy')
     
 
     def build_manifest(self, file_name):
