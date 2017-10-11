@@ -47,7 +47,7 @@ from .reference_space import ReferenceSpace
 class ReferenceSpaceCache(Cache):
 
 
-    CCF_VERSION_KEY = 'CCF_VERSION'
+    REFERENCE_SPACE_VERSION_KEY = 'CCF_VERSION'
     ANNOTATION_KEY = 'ANNOTATION'
     TEMPLATE_KEY = 'TEMPLATE'
     STRUCTURES_KEY = 'STRUCTURES'
@@ -286,14 +286,14 @@ class ReferenceSpaceCache(Cache):
                                   parent_key='BASEDIR',
                                   typename='file')
 
-        manifest_builder.add_path(self.CCF_VERSION_KEY,
+        manifest_builder.add_path(self.REFERENCE_SPACE_VERSION_KEY,
                                   '%s',
                                   parent_key='BASEDIR',
                                   typename='dir')
 
         manifest_builder.add_path(self.ANNOTATION_KEY,
                                   'annotation_%d.nrrd',
-                                  parent_key=self.CCF_VERSION_KEY,
+                                  parent_key=self.REFERENCE_SPACE_VERSION_KEY,
                                   typename='file')
 
         manifest_builder.add_path(self.TEMPLATE_KEY,
@@ -303,7 +303,7 @@ class ReferenceSpaceCache(Cache):
 
         manifest_builder.add_path(self.STRUCTURE_MASK_KEY,
                                   'structure_masks/resolution_%d/structure_%d.nrrd',
-                                  parent_key=self.CCF_VERSION_KEY,
+                                  parent_key=self.REFERENCE_SPACE_VERSION_KEY,
                                   typename='file')
 
         return manifest_builder
