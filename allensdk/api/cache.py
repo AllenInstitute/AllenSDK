@@ -66,7 +66,8 @@ class Cache(object):
     def __init__(self,
                  manifest=None,
                  cache=True,
-                 version=None):
+                 version=None, 
+                 **kwargs):
         self.cache = cache
         self.load_manifest(manifest, version)
 

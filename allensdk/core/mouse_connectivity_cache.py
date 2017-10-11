@@ -127,16 +127,15 @@ class MouseConnectivityCache(ReferenceSpaceCache):
         if version is None:
             version = self.MANIFEST_VERSION
 
-        super(MouseConnectivityCache, self).__init__(
-            resolution, ccf_version, cache=cache, manifest=manifest_file, version=version)
-
         if resolution is None:
             resolution = MouseConnectivityApi.VOXEL_RESOLUTION_25_MICRONS
-        self.resolution = resolution
 
         if ccf_version is None:
             ccf_version = MouseConnectivityApi.CCF_VERSION_DEFAULT
-        self.ccf_version = ccf_version
+        
+        super(MouseConnectivityCache, self).__init__(
+            resolution, reference_space_key=ccf_version, cache=cache, 
+            manifest=manifest_file, version=version)
 
         self.api = MouseConnectivityApi(base_uri=base_uri)
 

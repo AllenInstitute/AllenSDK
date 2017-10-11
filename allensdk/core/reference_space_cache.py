@@ -59,22 +59,21 @@ class ReferenceSpaceCache(Cache):
 
     def __init__(self, 
                  resolution, 
-                 ccf_version,
-                 cache=True, 
-                 manifest='reference_space_manifest.json',  
-                 base_uri=None, 
-                 version=None):
+                 reference_space_key,
+                 **kwargs):
 
-        if version is None:
-            version = self.MANIFEST_VERSION
+        if not 'version' in kwargs:
+            kwargs['version'] = self.MANIFEST_VERSION
 
-        super(ReferenceSpaceCache, self).__init__(
-            manifest=manifest, cache=cache, version=version)
+        if not 'base_uri' in kwargs:
+            kwargs['base_uri'] = None
+
+        super(ReferenceSpaceCache, self).__init__(**kwargs)
 
         self.resolution = resolution
-        self.ccf_version = ccf_version        
+        self.reference_space_key = reference_space_key        
         
-        self.api = ReferenceSpaceApi(base_uri=base_uri)
+        self.api = ReferenceSpaceApi(base_uri=kwargs['base_uri'])
 
         
     def get_annotation_volume(self, file_name=None):
@@ -92,10 +91,10 @@ class ReferenceSpaceCache(Cache):
         """
 
         file_name = self.get_cache_path(
-            file_name, self.ANNOTATION_KEY, self.ccf_version, self.resolution)
+            file_name, self.ANNOTATION_KEY, self.reference_space_key, self.resolution)
 
         annotation, info = self.api.download_annotation_volume(
-            self.ccf_version,
+            self.reference_space_key,
             self.resolution,
             file_name, 
             strategy='lazy')
@@ -127,7 +126,7 @@ class ReferenceSpaceCache(Cache):
         return template, info
 
 
-    def get_structure_tree(self, file_name=None):
+    def get_structure_tree(self, file_name=None, structure_graph_id=1):
         """
         Read the list of adult mouse structures and return an StructureTree 
         instance.
@@ -139,6 +138,8 @@ class ReferenceSpaceCache(Cache):
             File name to save/read the structures table.  If file_name is None,
             the file_name will be pulled out of the manifest.  If caching
             is disabled, no file will be saved. Default is None.
+        structure_graph_id: int
+            Build a tree using structure only from the identified structure graph.
         """
         
         file_name = self.get_cache_path(file_name, self.STRUCTURE_TREE_KEY)
@@ -148,7 +149,7 @@ class ReferenceSpaceCache(Cache):
             path=file_name,
             pre=StructureTree.clean_structures,
             post=lambda x: StructureTree(StructureTree.clean_structures(x)), 
-            structure_graph_ids=1,
+            structure_graph_ids=structure_graph_id,
             **Cache.cache_json())
 
 
@@ -246,11 +247,11 @@ class ReferenceSpaceCache(Cache):
         structure_id = ReferenceSpaceCache.validate_structure_id(structure_id)
 
         file_name = self.get_cache_path(
-            file_name, self.STRUCTURE_MASK_KEY, self.ccf_version, 
+            file_name, self.STRUCTURE_MASK_KEY, self.reference_space_key, 
             self.resolution, structure_id)
 
         return self.api.download_structure_mask(structure_id, 
-                                                self.ccf_version,
+                                                self.reference_space_key,
                                                 self.resolution,
                                                 file_name, 
                                                 strategy='lazy')
