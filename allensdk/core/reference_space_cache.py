@@ -33,15 +33,48 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-
-
 from allensdk.config.manifest_builder import ManifestBuilder
 from allensdk.api.cache import Cache
 from allensdk.api.queries.reference_space_api import ReferenceSpaceApi
+from allensdk.api.queries.ontologies_api import OntologiesApi
+from allensdk.deprecated import deprecated
+
+from .ontology import Ontology
+from .structure_tree import StructureTree
+from .reference_space import ReferenceSpace
 
 
-class ReferenceSpaceCache(cache):
+class ReferenceSpaceCache(Cache):
 
+
+    CCF_VERSION_KEY = 'CCF_VERSION'
+    ANNOTATION_KEY = 'ANNOTATION'
+    TEMPLATE_KEY = 'TEMPLATE'
+    STRUCTURES_KEY = 'STRUCTURES'
+    STRUCTURE_TREE_KEY = 'STRUCTURE_TREE'
+    STRUCTURE_MASK_KEY = 'STRUCTURE_MASK'
+
+    MANIFEST_VERSION = 1.1
+
+
+    def __init__(self, 
+                 resolution, 
+                 ccf_version,
+                 cache=True, 
+                 manifest='reference_space_manifest.json',  
+                 base_uri=None, 
+                 version=None):
+
+        if version is None:
+            version = self.MANIFEST_VERSION
+
+        super(ReferenceSpaceCache, self).__init__(
+            manifest=manifest, cache=cache, version=version)
+
+        self.resolution = resolution
+        self.ccf_version = ccf_version        
+        
+        self.api = ReferenceSpaceApi(base_uri=base_uri)
 
         
     def get_annotation_volume(self, file_name=None):
@@ -210,7 +243,7 @@ class ReferenceSpaceCache(cache):
             it will be read from this file.  If file_name is None, the
             file_name will be pulled out of the manifest.  Default is None.
         """
-        structure_id = MouseConnectivityCache.validate_structure_id(structure_id)
+        structure_id = ReferenceSpaceCache.validate_structure_id(structure_id)
 
         file_name = self.get_cache_path(
             file_name, self.STRUCTURE_MASK_KEY, self.ccf_version, 
@@ -221,3 +254,77 @@ class ReferenceSpaceCache(cache):
                                                 self.resolution,
                                                 file_name, 
                                                 strategy='lazy')
+
+
+    def add_manifest_paths(self, manifest_builder):
+        """
+        Construct a manifest for this Cache class and save it in a file.
+
+        Parameters
+        ----------
+
+        file_name: string
+            File location to save the manifest.
+
+        """
+
+        manifest_builder = super(ReferenceSpaceCache, self).add_manifest_paths(manifest_builder)
+
+        manifest_builder.add_path(self.EXPERIMENTS_KEY,
+                                  'experiments.json',
+                                  parent_key='BASEDIR',
+                                  typename='file')
+
+        manifest_builder.add_path(self.STRUCTURES_KEY,
+                                  'structures.csv',
+                                  parent_key='BASEDIR',
+                                  typename='file')
+                                  
+        manifest_builder.add_path(self.STRUCTURE_TREE_KEY,
+                                  'structures.json',
+                                  parent_key='BASEDIR',
+                                  typename='file')
+
+        manifest_builder.add_path(self.CCF_VERSION_KEY,
+                                  '%s',
+                                  parent_key='BASEDIR',
+                                  typename='dir')
+
+        manifest_builder.add_path(self.ANNOTATION_KEY,
+                                  'annotation_%d.nrrd',
+                                  parent_key=self.CCF_VERSION_KEY,
+                                  typename='file')
+
+        manifest_builder.add_path(self.TEMPLATE_KEY,
+                                  'average_template_%d.nrrd',
+                                  parent_key='BASEDIR',
+                                  typename='file')
+
+        manifest_builder.add_path(self.STRUCTURE_MASK_KEY,
+                                  'structure_masks/resolution_%d/structure_%d.nrrd',
+                                  parent_key=self.CCF_VERSION_KEY,
+                                  typename='file')
+
+        return manifest_builder
+
+
+       
+ 
+    @classmethod
+    def validate_structure_id(cls, structure_id):
+
+        try:
+            structure_id = int(structure_id)
+        except ValueError as e:
+            raise ValueError("Invalid structure_id (%s): could not convert to integer." % str(structure_id))
+
+        return structure_id
+
+
+    @classmethod
+    def validate_structure_ids(cls, structure_ids):
+
+        for ii, sid in enumerate(structure_ids):
+            structure_ids[ii] = cls.validate_structure_id(sid)
+
+        return structure_ids

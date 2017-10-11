@@ -36,13 +36,10 @@
 from allensdk.config.manifest_builder import ManifestBuilder
 from allensdk.api.cache import Cache
 from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
-from allensdk.api.queries.ontologies_api import OntologiesApi
 from allensdk.deprecated import deprecated
 
 from . import json_utilities
-from .ontology import Ontology
-from .structure_tree import StructureTree
-from .reference_space import ReferenceSpace
+from .reference_space_cache import ReferenceSpaceCache
 
 import nrrd
 import os
@@ -54,7 +51,7 @@ import operator as op
 import functools
 
 
-class MouseConnectivityCache(Cache):
+class MouseConnectivityCache(ReferenceSpaceCache):
     """
     Cache class for storing and accessing data related to the adult mouse
     Connectivity Atlas.  By default, this class will cache any downloaded
@@ -97,19 +94,15 @@ class MouseConnectivityCache(Cache):
 
     """
 
-    CCF_VERSION_KEY = 'CCF_VERSION'
-    ANNOTATION_KEY = 'ANNOTATION'
-    TEMPLATE_KEY = 'TEMPLATE'
     PROJECTION_DENSITY_KEY = 'PROJECTION_DENSITY'
     INJECTION_DENSITY_KEY = 'INJECTION_DENSITY'
     INJECTION_FRACTION_KEY = 'INJECTION_FRACTION'
     DATA_MASK_KEY = 'DATA_MASK'
     STRUCTURE_UNIONIZES_KEY = 'STRUCTURE_UNIONIZES'
     EXPERIMENTS_KEY = 'EXPERIMENTS'
-    STRUCTURES_KEY = 'STRUCTURES'
-    STRUCTURE_TREE_KEY = 'STRUCTURE_TREE'
-    STRUCTURE_MASK_KEY = 'STRUCTURE_MASK'
-    MANIFEST_VERSION = 1.0
+
+    MANIFEST_VERSION = 1.1
+
     SUMMARY_STRUCTURE_SET_ID = 167587189
     DEFAULT_STRUCTURE_SET_IDS = tuple([SUMMARY_STRUCTURE_SET_ID])
 
@@ -128,19 +121,25 @@ class MouseConnectivityCache(Cache):
                  cache=True,
                  manifest_file='mouse_connectivity_manifest.json',
                  ccf_version=None,
-                 base_uri=None):
+                 base_uri=None, 
+                 version=None):
+
+        if version is None:
+            version = self.MANIFEST_VERSION
+
         super(MouseConnectivityCache, self).__init__(
-            manifest=manifest_file, cache=cache, version=self.MANIFEST_VERSION)
+            resolution, ccf_version, cache=cache, manifest=manifest_file, version=version)
 
         if resolution is None:
-            self.resolution = MouseConnectivityApi.VOXEL_RESOLUTION_25_MICRONS
-        else:
-            self.resolution = resolution
-        self.api = MouseConnectivityApi(base_uri=base_uri)
+            resolution = MouseConnectivityApi.VOXEL_RESOLUTION_25_MICRONS
+        self.resolution = resolution
 
         if ccf_version is None:
             ccf_version = MouseConnectivityApi.CCF_VERSION_DEFAULT
         self.ccf_version = ccf_version
+
+        self.api = MouseConnectivityApi(base_uri=base_uri)
+
 
     def get_projection_density(self, experiment_id, file_name=None):
         """
@@ -650,33 +649,8 @@ class MouseConnectivityCache(Cache):
                                   parent_key='BASEDIR',
                                   typename='file')
 
-        manifest_builder.add_path(self.STRUCTURES_KEY,
-                                  'structures.csv',
-                                  parent_key='BASEDIR',
-                                  typename='file')
-                                  
-        manifest_builder.add_path(self.STRUCTURE_TREE_KEY,
-                                  'structures.json',
-                                  parent_key='BASEDIR',
-                                  typename='file')
-
         manifest_builder.add_path(self.STRUCTURE_UNIONIZES_KEY,
                                   'experiment_%d/structure_unionizes.csv',
-                                  parent_key='BASEDIR',
-                                  typename='file')
-
-        manifest_builder.add_path(self.CCF_VERSION_KEY,
-                                  '%s',
-                                  parent_key='BASEDIR',
-                                  typename='dir')
-
-        manifest_builder.add_path(self.ANNOTATION_KEY,
-                                  'annotation_%d.nrrd',
-                                  parent_key=self.CCF_VERSION_KEY,
-                                  typename='file')
-
-        manifest_builder.add_path(self.TEMPLATE_KEY,
-                                  'average_template_%d.nrrd',
                                   parent_key='BASEDIR',
                                   typename='file')
 
@@ -700,29 +674,4 @@ class MouseConnectivityCache(Cache):
                                   parent_key='BASEDIR',
                                   typename='file')
 
-        manifest_builder.add_path(self.STRUCTURE_MASK_KEY,
-                                  'structure_masks/resolution_%d/structure_%d.nrrd',
-                                  parent_key=self.CCF_VERSION_KEY,
-                                  typename='file')
-
         return manifest_builder
-       
- 
-    @staticmethod
-    def validate_structure_id(structure_id):
-
-        try:
-            structure_id = int(structure_id)
-        except ValueError as e:
-            raise ValueError("Invalid structure_id (%s): could not convert to integer." % str(structure_id))
-
-        return structure_id
-
-
-    @staticmethod
-    def validate_structure_ids(structure_ids):
-
-        for ii, sid in enumerate(structure_ids):
-            structure_ids[ii] = MouseConnectivityCache.validate_structure_id(sid)
-
-        return structure_ids
