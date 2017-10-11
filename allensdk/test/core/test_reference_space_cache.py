@@ -62,6 +62,13 @@ def old_nodes():
              'name': 'root', 'parent_structure_id': 12}]
 
 
+@pytest.fixture(scope='function')
+def new_nodes():
+
+    return [{'id': 0, 'structure_id_path': '/0/', 
+             'color_hex_triplet': '000000', 'acronym': 'rt', 
+             'name': 'root', 'structure_sets':[{'id': 1}, {'id': 4}, {'id': 167587189}] }]
+
 
 @pytest.fixture(scope='function')
 def rsp(fn_temp_dir, rsp_version, resolution):
@@ -111,8 +118,7 @@ def test_get_template_volume(rsp, fn_temp_dir, resolution):
     assert( os.path.exists(path) )
 
 
-'''
-def test_get_structure_tree(mcc, fn_temp_dir, new_nodes):
+def test_get_structure_tree(rsp, fn_temp_dir, new_nodes):
 
     path = os.path.join(fn_temp_dir, 'structures.json')
 
@@ -120,9 +126,9 @@ def test_get_structure_tree(mcc, fn_temp_dir, new_nodes):
                     'OntologiesApi.model_query', 
                     return_value=new_nodes) as p:
 
-        obtained = mcc.get_structure_tree()
+        obtained = rsp.get_structure_tree()
 
-        mcc.get_structure_tree()
+        rsp.get_structure_tree()
         p.assert_called_once()
 
     assert(obtained.node_ids()[0] == 0)
@@ -131,35 +137,3 @@ def test_get_structure_tree(mcc, fn_temp_dir, new_nodes):
     assert(len(cm_obt[0]) == 3)
 
     assert( os.path.exists(path) )
-
-
-def test_get_ontology(mcc, fn_temp_dir, old_nodes):
-
-    with warnings.catch_warnings(record=True) as c:
-        warnings.simplefilter('always')
-
-        with mock.patch('allensdk.api.queries.ontologies_api.'
-                        'OntologiesApi.model_query', 
-                        return_value=old_nodes) as p:
-
-            mcc.get_ontology()
-            mcc.get_ontology()
-
-            p.assert_called_once()
-            assert(len(c) == 6)
-
-
-def test_get_structures(mcc, fn_temp_dir, old_nodes):
-
-    with warnings.catch_warnings(record=True) as c:
-        warnings.simplefilter('always')
-
-        with mock.patch('allensdk.api.queries.ontologies_api.'
-                        'OntologiesApi.model_query', 
-                        return_value=old_nodes) as p:
-
-            obtained = mcc.get_structures()
-            mcc.get_structures()
-
-            p.assert_called_once()
-'''
