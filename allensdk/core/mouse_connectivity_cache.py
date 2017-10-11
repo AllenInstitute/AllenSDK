@@ -631,7 +631,7 @@ class MouseConnectivityCache(Cache):
             return {'matrix': matrix, 'rows': experiment_ids, 'columns': columns}
     
 
-    def build_manifest(self, file_name):
+    def add_manifest_paths(self, manifest_builder):
         """
         Construct a manifest for this Cache class and save it in a file.
 
@@ -643,9 +643,7 @@ class MouseConnectivityCache(Cache):
 
         """
 
-        manifest_builder = ManifestBuilder()
-        manifest_builder.set_version(self.MANIFEST_VERSION)
-        manifest_builder.add_path('BASEDIR', '.')
+        manifest_builder = super(MouseConnectivityCache, self).add_manifest_paths(manifest_builder)
 
         manifest_builder.add_path(self.EXPERIMENTS_KEY,
                                   'experiments.json',
@@ -707,7 +705,7 @@ class MouseConnectivityCache(Cache):
                                   parent_key=self.CCF_VERSION_KEY,
                                   typename='file')
 
-        manifest_builder.write_json_file(file_name)
+        return manifest_builder
        
  
     @staticmethod
