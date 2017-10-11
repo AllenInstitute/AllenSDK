@@ -38,3 +38,11 @@ class BrainObservatoryAnalysisException(Exception): pass
 class MissingStimulusException(Exception): pass
 
 class NoEyeTrackingException(Exception): pass
+
+class EpochSeparationException(Exception):
+
+    def __init__(self, *args,  **kwargs):
+
+        self.delta = kwargs.pop('delta')
+
+        super(EpochSeparationException, self).__init__(*args, **kwargs)
