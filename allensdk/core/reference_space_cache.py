@@ -46,8 +46,7 @@ from .reference_space import ReferenceSpace
 
 class ReferenceSpaceCache(Cache):
 
-
-    REFERENCE_SPACE_VERSION_KEY = 'CCF_VERSION'
+    REFERENCE_SPACE_VERSION_KEY = 'REFERENCE_SPACE_VERSION'
     ANNOTATION_KEY = 'ANNOTATION'
     TEMPLATE_KEY = 'TEMPLATE'
     STRUCTURES_KEY = 'STRUCTURES'
@@ -55,7 +54,6 @@ class ReferenceSpaceCache(Cache):
     STRUCTURE_MASK_KEY = 'STRUCTURE_MASK'
 
     MANIFEST_VERSION = 1.1
-
 
     def __init__(self, 
                  resolution, 
