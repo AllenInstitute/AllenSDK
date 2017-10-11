@@ -151,45 +151,6 @@ class ReferenceSpaceCache(Cache):
             **Cache.cache_json())
 
 
-    @deprecated('Use get_structure_tree instead.')
-    def get_ontology(self, file_name=None):
-        """
-        Read the list of adult mouse structures and return an Ontology instance.
-
-        Parameters
-        ----------
-
-        file_name: string
-            File name to save/read the structures table.  If file_name is None,
-            the file_name will be pulled out of the manifest.  If caching
-            is disabled, no file will be saved. Default is None.
-        """
-
-        return Ontology(self.get_structures(file_name))
-
-
-    @deprecated('Use get_structure_tree instead.')
-    def get_structures(self, file_name=None):
-        """
-        Read the list of adult mouse structures and return a Pandas DataFrame.
-
-        Parameters
-        ----------
-
-        file_name: string
-            File name to save/read the structures table.  If file_name is None,
-            the file_name will be pulled out of the manifest.  If caching
-            is disabled, no file will be saved. Default is None.
-        """
-        file_name = self.get_cache_path(file_name, self.STRUCTURES_KEY)
-
-        return OntologiesApi(base_uri=self.api.api_url).get_structures(
-            1,
-            strategy='lazy',
-            path=file_name,
-            **Cache.cache_csv_dataframe())
-
-
     def get_reference_space(self, structure_file_name=None, 
                             annotation_file_name=None):
         """
@@ -268,11 +229,6 @@ class ReferenceSpaceCache(Cache):
         """
 
         manifest_builder = super(ReferenceSpaceCache, self).add_manifest_paths(manifest_builder)
-
-        manifest_builder.add_path(self.STRUCTURES_KEY,
-                                  'structures.csv',
-                                  parent_key='BASEDIR',
-                                  typename='file')
                                   
         manifest_builder.add_path(self.STRUCTURE_TREE_KEY,
                                   'structures.json',

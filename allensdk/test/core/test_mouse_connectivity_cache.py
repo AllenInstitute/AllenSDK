@@ -254,39 +254,6 @@ def test_get_structure_tree(mcc, fn_temp_dir, new_nodes):
     assert( os.path.exists(path) )
 
 
-def test_get_ontology(mcc, fn_temp_dir, old_nodes):
-
-    with warnings.catch_warnings(record=True) as c:
-        warnings.simplefilter('always')
-
-        with mock.patch('allensdk.api.queries.ontologies_api.'
-                        'OntologiesApi.model_query', 
-                        return_value=old_nodes) as p:
-
-            mcc.get_ontology()
-            mcc.get_ontology()
-
-            p.assert_called_once()
-            assert(len(c) == 6)
-
-
-def test_get_structures(mcc, fn_temp_dir, old_nodes):
-
-    with warnings.catch_warnings(record=True) as c:
-        warnings.simplefilter('always')
-
-        with mock.patch('allensdk.api.queries.ontologies_api.'
-                        'OntologiesApi.model_query', 
-                        return_value=old_nodes) as p:
-
-            obtained = mcc.get_structures()
-            mcc.get_structures()
-
-            p.assert_called_once()
-            assert obtained['acronym'][0] == old_nodes[0]['acronym']
-            assert len(c) == 2
-
-
 def test_get_experiments(mcc, fn_temp_dir, experiments):
 
     file_path = os.path.join(fn_temp_dir, 'experiments.json')
