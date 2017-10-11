@@ -74,22 +74,10 @@ def get_epoch_mask_list(st, threshold, max_cuts=2):
     epoch_mask_list = []
 
     if len(cut_inds) > max_cuts:
-<<<<<<< HEAD
 
         # See: https://gist.github.com/nicain/bce66cd073e422f07cf337b476c63be7
         #      https://github.com/AllenInstitute/AllenSDK/issues/66
         raise EpochSeparationException('more than 2 epochs cut', delta=delta)
-=======
-        raise Exception('more than 2 epochs cut')
-
-        # Use this little snippet to help set a new high-water mark (so increase threshold) if exception occurs
-        # See https://github.com/AllenInstitute/AllenSDK/issues/66 for more info
-        '''
-        import matplotlib.pyplot as plt
-        plt.plot(delta)
-        plt.show()
-        '''
->>>>>>> fce2ba4763bb8b1b59cd099dc0946528d2d649df
 
     for ii in range(len(cut_inds)+1):
 
