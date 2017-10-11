@@ -310,7 +310,14 @@ def test_filter_experiment_containers_lines_all_filters(bo_api, mock_containers)
                                             imaging_depths=[200],
                                             targeted_structures=['NBC'],
                                             transgenic_lines=['Don'])
+
     assert len(containers) == 1
+
+def test_filter_experiment_containers_caseless(bo_api, mock_containers):
+    containers = \
+        bo_api.filter_experiment_containers(mock_containers, transgenic_lines=['DON'])
+    assert len(containers) == 1
+
 
 
 def test_filter_ophys_experiments_no_filters(bo_api, mock_ophys_experiments):
