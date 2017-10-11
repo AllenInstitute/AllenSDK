@@ -269,11 +269,6 @@ class ReferenceSpaceCache(Cache):
 
         manifest_builder = super(ReferenceSpaceCache, self).add_manifest_paths(manifest_builder)
 
-        manifest_builder.add_path(self.EXPERIMENTS_KEY,
-                                  'experiments.json',
-                                  parent_key='BASEDIR',
-                                  typename='file')
-
         manifest_builder.add_path(self.STRUCTURES_KEY,
                                   'structures.csv',
                                   parent_key='BASEDIR',
