@@ -39,9 +39,11 @@ import pytest
 import mock
 import numpy as np
 import nrrd
+import pandas as pd
 
 from allensdk.core.reference_space_cache import ReferenceSpaceCache
 from allensdk.test_utilities.temp_dir import fn_temp_dir
+from allensdk.core.structure_tree import StructureTree
 
 
 @pytest.fixture()
@@ -137,3 +139,62 @@ def test_get_structure_tree(rsp, fn_temp_dir, new_nodes):
     assert(len(cm_obt[0]) == 3)
 
     assert( os.path.exists(path) )
+
+
+def test_get_reference_space(rsp, new_nodes):
+
+    tree = StructureTree(StructureTree.clean_structures(new_nodes))
+    rsp.get_structure_tree = lambda *a, **k: tree
+
+    annot = np.arange(125).reshape((5, 5, 5))
+    rsp.get_annotation_volume = lambda *a, **k: (annot, 'foo')
+
+    rsp_obt = rsp.get_reference_space()
+
+    assert( np.allclose(rsp_obt.resolution, [25, 25, 25]) )
+    assert( np.allclose( rsp_obt.annotation, annot ) ) 
+
+
+def test_get_structure_mask(rsp, fn_temp_dir, rsp_version):
+  
+    sid = 12
+
+    eye = np.eye(100)
+    path = os.path.join(fn_temp_dir, rsp_version, 'structure_masks', 
+                        'resolution_25', 'structure_{0}.nrrd'.format(sid))
+
+    rsp.api.retrieve_file_over_http = lambda a, b: nrrd.write(b, eye)
+    obtained, _ = rsp.get_structure_mask(sid)
+
+    rsp.api.retrieve_file_over_http = mock.MagicMock()
+    rsp.get_structure_mask(sid)
+
+    rsp.api.retrieve_file_over_http.assert_not_called()
+    assert( np.allclose(obtained, eye) ) 
+    assert( os.path.exists(path) )
+
+
+@pytest.mark.parametrize('inp,fails', [(1, False), 
+                                        (pd.Series([2]), False), 
+                                        ('qwerty', True)])
+def test_validate_structure_id(inp, fails):
+
+    if fails:
+        with pytest.raises(ValueError) as exc:
+            ReferenceSpaceCache.validate_structure_id(inp)
+    else:
+        out = ReferenceSpaceCache.validate_structure_id(inp)
+        assert( out == int(inp) )
+
+
+@pytest.mark.parametrize('inp,fails', [([1, 2, 3], False), 
+                                        ([pd.Series([2]), pd.Series([3])], False), 
+                                        (['qwerty', 1], True)])
+def test_validate_structure_ids(inp, fails):
+
+    if fails:
+        with pytest.raises(ValueError) as exc:
+            ReferenceSpaceCache.validate_structure_ids(inp)
+    else:
+        out = ReferenceSpaceCache.validate_structure_ids(inp)
+        assert( out == map(int, inp) )
