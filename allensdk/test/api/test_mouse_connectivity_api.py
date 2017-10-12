@@ -58,7 +58,9 @@ def nrrd_read():
                                   'mock_annotation_image'))) as nrrd_read:
         import allensdk.core.mouse_connectivity_cache as MCC
         import allensdk.api.queries.mouse_connectivity_api as MCA
+        import allensdk.api.queries.reference_space_api as RSA
         reload(MCC)
+        reload(RSA)
         reload(MCA)
 
     return nrrd_read
@@ -251,6 +253,7 @@ def test_download_template_volume(os_makedirs,
         "/path/to/average_template_%d.nrrd" % (resolution))
 
     os_makedirs.assert_any_call('/path/to')
+
 
 
 def test_get_experiments_no_ids(connectivity):
