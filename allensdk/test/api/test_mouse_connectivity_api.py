@@ -121,6 +121,141 @@ MOCK_ANNOTATION_DATA = 'mock_annotation_data'
 MOCK_ANNOTATION_IMAGE = 'mock_annotation_image'
 
 
+@pytest.mark.parametrize("data_path,resolution",
+                         it.product(DATA_PATHS(),
+                                    RESOLUTIONS()))
+def test_download_volumetric_data(nrrd_read,
+                                  connectivity,
+                                  data_path,
+                                  resolution):
+    cache_filename = "annotation_%d.nrrd" % (resolution)
+
+    nrrd_read.reset_mock()
+    connectivity.retrieve_file_over_http.reset_mock()
+
+    connectivity.download_volumetric_data(data_path,
+                                          cache_filename,
+                                          resolution)
+
+    connectivity.retrieve_file_over_http.assert_called_once_with(
+        "http://download.alleninstitute.org/informatics-archive/"
+        "current-release/mouse_ccf/%s/annotation_%d.nrrd" % 
+        (data_path,
+         resolution),
+        cache_filename)
+
+
+@pytest.mark.parametrize("ccf_version,resolution",
+                         it.product(CCF_VERSIONS(),
+                                    RESOLUTIONS()))
+@patch('os.makedirs')
+def test_download_annotation_volume(os_makedirs,
+                                    nrrd_read,
+                                    connectivity,
+                                    ccf_version,
+                                    resolution):
+    nrrd_read.reset_mock()
+    connectivity.retrieve_file_over_http.reset_mock()
+
+    cache_file = '/path/to/annotation_%d.nrrd' % (resolution)
+
+    connectivity.download_annotation_volume(
+        ccf_version,
+        resolution,
+        cache_file)
+
+    nrrd_read.assert_called_once_with(cache_file)
+
+    connectivity.retrieve_file_over_http.assert_called_once_with(
+        "http://download.alleninstitute.org/informatics-archive/"
+        "current-release/mouse_ccf/%s/annotation_%d.nrrd" % 
+        (ccf_version,
+         resolution),
+        "/path/to/annotation_%d.nrrd" % (resolution))
+
+    os_makedirs.assert_any_call('/path/to')
+
+
+@pytest.mark.parametrize("resolution",
+                         RESOLUTIONS())
+@patch('os.makedirs')
+def test_download_annotation_volume_default(os_makedirs,
+                                            nrrd_read,
+                                            MCA,
+                                            connectivity,
+                                            resolution):
+    connectivity.retrieve_file_over_http.reset_mock()
+
+    a, b = connectivity.download_annotation_volume(
+        None,
+        resolution,
+        '/path/to/annotation_%d.nrrd' % (resolution),
+        reader=nrrd_read)
+    
+    assert a
+    assert b
+
+    print(connectivity.retrieve_file_over_http.call_args_list)
+
+    connectivity.retrieve_file_over_http.assert_called_once_with(
+        "http://download.alleninstitute.org/informatics-archive/"
+        "current-release/mouse_ccf/%s/annotation_%d.nrrd" % 
+        (MCA.MouseConnectivityApi.CCF_VERSION_DEFAULT,
+         resolution),
+        "/path/to/annotation_%d.nrrd" % (resolution))
+
+    os_makedirs.assert_any_call('/path/to')
+
+
+@pytest.mark.parametrize("resolution",
+                         RESOLUTIONS())
+@patch('os.makedirs')
+def test_download_structure_mask(os_makedirs, 
+                                 nrrd_read, 
+                                 MCA, 
+                                 connectivity, 
+                                 resolution):
+
+    structure_id = 12
+
+    connectivity.retrieve_file_over_http.reset_mock()
+
+    a, b = connectivity.download_structure_mask(structure_id, None, resolution, '/path/to/foo.nrrd')
+    
+    assert a
+    assert b
+    
+    expected = 'http://download.alleninstitute.org/informatics-archive/'\
+               'current-release/mouse_ccf/{0}/structure_masks/'\
+               'structure_masks_{1}/structure_{2}.nrrd'.format(MCA.MouseConnectivityApi.CCF_VERSION_DEFAULT, 
+                                                               resolution, 
+                                                               structure_id)
+    connectivity.retrieve_file_over_http.assert_called_once_with(expected, '/path/to/foo.nrrd')
+    os.makedirs.assert_any_call('/path/to')
+
+
+@pytest.mark.parametrize("resolution",
+                         RESOLUTIONS())
+@patch('os.makedirs')
+def test_download_template_volume(os_makedirs,
+                                  connectivity,
+                                  resolution):
+    connectivity.retrieve_file_over_http.reset_mock()
+
+    connectivity.download_template_volume(
+        resolution,
+        '/path/to/average_template_%d.nrrd' % (resolution))
+
+    connectivity.retrieve_file_over_http.assert_called_once_with(
+        "http://download.alleninstitute.org/informatics-archive/"
+        "current-release/mouse_ccf/average_template/average_template_%d.nrrd" % 
+        (resolution),
+        "/path/to/average_template_%d.nrrd" % (resolution))
+
+    os_makedirs.assert_any_call('/path/to')
+
+
+
 def test_get_experiments_no_ids(connectivity):
     connectivity.get_experiments(None)
 
@@ -360,142 +495,6 @@ def test_calculate_injection_centroid(connectivity):
         density, fraction, resolution=25)
     
     assert np.array_equal(centroid, [37.5, 37.5])
-
-
-@pytest.mark.parametrize("data_path,resolution",
-                         it.product(DATA_PATHS(),
-                                    RESOLUTIONS()))
-def test_download_volumetric_data(nrrd_read,
-                                  connectivity,
-                                  data_path,
-                                  resolution):
-    cache_filename = "annotation_%d.nrrd" % (resolution)
-
-    nrrd_read.reset_mock()
-    connectivity.retrieve_file_over_http.reset_mock()
-
-    connectivity.download_volumetric_data(data_path,
-                                          cache_filename,
-                                          resolution)
-
-    connectivity.retrieve_file_over_http.assert_called_once_with(
-        "http://download.alleninstitute.org/informatics-archive/"
-        "current-release/mouse_ccf/%s/annotation_%d.nrrd" % 
-        (data_path,
-         resolution),
-        cache_filename)
-
-
-@pytest.mark.parametrize("ccf_version,resolution",
-                         it.product(CCF_VERSIONS(),
-                                    RESOLUTIONS()))
-@patch('os.makedirs')
-def test_download_annotation_volume(os_makedirs,
-                                    nrrd_read,
-                                    connectivity,
-                                    ccf_version,
-                                    resolution):
-    nrrd_read.reset_mock()
-    connectivity.retrieve_file_over_http.reset_mock()
-
-    cache_file = '/path/to/annotation_%d.nrrd' % (resolution)
-
-    connectivity.download_annotation_volume(
-        ccf_version,
-        resolution,
-        cache_file)
-
-    nrrd_read.assert_called_once_with(cache_file)
-
-    connectivity.retrieve_file_over_http.assert_called_once_with(
-        "http://download.alleninstitute.org/informatics-archive/"
-        "current-release/mouse_ccf/%s/annotation_%d.nrrd" % 
-        (ccf_version,
-         resolution),
-        "/path/to/annotation_%d.nrrd" % (resolution))
-
-    os_makedirs.assert_any_call('/path/to')
-
-
-@pytest.mark.parametrize("resolution",
-                         RESOLUTIONS())
-@patch('os.makedirs')
-def test_download_annotation_volume_default(os_makedirs,
-                                            nrrd_read,
-                                            MCA,
-                                            connectivity,
-                                            resolution):
-    connectivity.retrieve_file_over_http.reset_mock()
-
-    a, b = connectivity.download_annotation_volume(
-        None,
-        resolution,
-        '/path/to/annotation_%d.nrrd' % (resolution),
-        reader=nrrd_read)
-    
-    assert a
-    assert b
-
-    print(connectivity.retrieve_file_over_http.call_args_list)
-
-    connectivity.retrieve_file_over_http.assert_called_once_with(
-        "http://download.alleninstitute.org/informatics-archive/"
-        "current-release/mouse_ccf/%s/annotation_%d.nrrd" % 
-        (MCA.MouseConnectivityApi.CCF_VERSION_DEFAULT,
-         resolution),
-        "/path/to/annotation_%d.nrrd" % (resolution))
-
-    os_makedirs.assert_any_call('/path/to')
-
-
-@pytest.mark.parametrize("resolution",
-                         RESOLUTIONS())
-@patch('os.makedirs')
-def test_download_structure_mask(os_makedirs, 
-                                 nrrd_read, 
-                                 MCA, 
-                                 connectivity, 
-                                 resolution):
-
-    structure_id = 12
-
-    connectivity.retrieve_file_over_http.reset_mock()
-
-    a, b = connectivity.download_structure_mask(structure_id, None, resolution, '/path/to/foo.nrrd')
-    
-    assert a
-    assert b
-    
-    expected = 'http://download.alleninstitute.org/informatics-archive/'\
-               'current-release/mouse_ccf/{0}/structure_masks/'\
-               'structure_masks_{1}/structure_{2}.nrrd'.format(MCA.MouseConnectivityApi.CCF_VERSION_DEFAULT, 
-                                                               resolution, 
-                                                               structure_id)
-    connectivity.retrieve_file_over_http.assert_called_once_with(expected, '/path/to/foo.nrrd')
-    os.makedirs.assert_any_call('/path/to')
-
-
-@pytest.mark.parametrize("resolution",
-                         RESOLUTIONS())
-@patch('os.makedirs')
-def test_download_template_volume(os_makedirs,
-                                  connectivity,
-                                  resolution):
-    connectivity.retrieve_file_over_http.reset_mock()
-
-    connectivity.download_template_volume(
-        resolution,
-        '/path/to/average_template_%d.nrrd' % (resolution))
-
-    connectivity.retrieve_file_over_http.assert_called_once_with(
-        "http://download.alleninstitute.org/informatics-archive/"
-        "current-release/mouse_ccf/average_template/average_template_%d.nrrd" % 
-        (resolution),
-        "/path/to/average_template_%d.nrrd" % (resolution))
-
-    os_makedirs.assert_any_call('/path/to')
-
-
 
 
 @pytest.mark.run('last')
