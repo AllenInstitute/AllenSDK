@@ -86,7 +86,7 @@ class CellTypesApi(RmaApi):
         if id:
             criteria = "[id$eq'%d']" % id
         else:
-            criteria = "[is_cell_specimen$eq'true'],products[name$eq'Mouse Cell Types'],ephys_result[failed$eqfalse]"
+            criteria = "[is_cell_specimen$eq'true'],products[name$in'Mouse Cell Types','Human Cell Types'],ephys_result[failed$eqfalse]"
         
         include = ('structure,cortex_layer,donor(transgenic_lines,organism,conditions),specimen_tags,cell_soma_locations,' +
                    'ephys_features,data_sets,neuron_reconstructions,cell_reporter')
