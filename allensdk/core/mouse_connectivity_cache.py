@@ -340,8 +340,8 @@ class MouseConnectivityCache(ReferenceSpaceCache):
         elif cre is False:
             experiments = [e for e in experiments if not e['transgenic-line']]
         elif cre is not None:
-            experiments = [e for e in experiments if e[
-                'transgenic-line'] in cre]
+            cre = [ c.lower() for c in cre ]
+            experiments = [e for e in experiments if e['transgenic-line'].lower() in cre]
 
         if injection_structure_ids is not None:
             structure_ids = MouseConnectivityCache.validate_structure_ids(injection_structure_ids)

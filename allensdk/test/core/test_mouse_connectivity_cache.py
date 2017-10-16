@@ -269,6 +269,9 @@ def test_get_experiments(mcc, fn_temp_dir, experiments):
     assert 'num_voxels' not in obtained[0]
     assert obtained[0]['transgenic-line'] == 'most_creish' 
 
+    obtained = mcc.get_experiments(cre=['MOST_CREISH'])
+    assert len(obtained) == 1
+
 
 def test_filter_experiments(mcc, fn_temp_dir, experiments):
 

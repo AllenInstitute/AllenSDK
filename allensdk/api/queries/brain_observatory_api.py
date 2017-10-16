@@ -364,8 +364,9 @@ class BrainObservatoryApi(RmaTemplate):
                 'imaging_depth'] in imaging_depths]
 
         if transgenic_lines is not None:
+            tls = [ tl.lower() for tl in transgenic_lines ]
             containers = [c for c in containers for tl in c['specimen'][
-                'donor']['transgenic_lines'] if tl['name'] in transgenic_lines]
+                'donor']['transgenic_lines'] if tl['name'].lower() in tls]
 
         return containers
 
