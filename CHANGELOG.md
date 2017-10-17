@@ -1,12 +1,22 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [0.14.3] - 2017-10-19
+
+### Added
+
+- CellTypesCache.get_cells has a new `species` argument.
+
+### Changed
+
+- MouseConnectivityCache downloads structure masks instead of computing them.
+
 ## [0.14.2] - 2017-08-17
 
 ### Added
 
 - ABS-64; Jupyterhub Dockerfiles
-- PR # 13; Manifest error check
+- PR #13; Manifest error check
 
 ### Changed
 

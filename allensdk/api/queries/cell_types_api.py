@@ -44,6 +44,9 @@ class CellTypesApi(RmaApi):
     SWC_FILE_TYPE = '3DNeuronReconstruction'
     MARKER_FILE_TYPE = '3DNeuronMarker'
 
+    MOUSE = 'Mus musculus'
+    HUMAN = 'Homo Sapiens'
+
     def __init__(self, base_uri=None):
         super(CellTypesApi, self).__init__(base_uri)
 
@@ -51,7 +54,8 @@ class CellTypesApi(RmaApi):
                    id=None, 
                    require_morphology=False, 
                    require_reconstruction=False, 
-                   reporter_status=None):
+                   reporter_status=None, 
+                   species=None):
         """
         Query the API for a list of all cells in the Cell Types Database.
 
@@ -69,6 +73,10 @@ class CellTypesApi(RmaApi):
         reporter_status: list
             Return cells that have a particular cell reporter status.
 
+        species: list
+            Filter for cells that belong to one or more species.  If None, return all.
+            Must be one of [ CellTypesApi.MOUSE, CellTypesApi.HUMAN ].
+
         Returns
         -------
         list
@@ -78,9 +86,9 @@ class CellTypesApi(RmaApi):
         if id:
             criteria = "[id$eq'%d']" % id
         else:
-            criteria = "[is_cell_specimen$eq'true'],products[name$eq'Mouse Cell Types'],ephys_result[failed$eqfalse]"
+            criteria = "[is_cell_specimen$eq'true'],products[name$in'Mouse Cell Types','Human Cell Types'],ephys_result[failed$eqfalse]"
         
-        include = ('structure,donor(transgenic_lines),specimen_tags,cell_soma_locations,' +
+        include = ('structure,cortex_layer,donor(transgenic_lines,organism,conditions),specimen_tags,cell_soma_locations,' +
                    'ephys_features,data_sets,neuron_reconstructions,cell_reporter')
 
         cells = self.model_query(
@@ -105,9 +113,26 @@ class CellTypesApi(RmaApi):
                     cell['transgenic_line'] = tl['name']
 
             # cell reporter status
-            cell['reporter_status'] = cell['cell_reporter']['name']
+            cell['reporter_status'] = cell.get('cell_reporter', {}).get('name', None)
 
-        result = self.filter_cells(cells, require_morphology, require_reconstruction, reporter_status)
+            # species
+            cell['species'] = cell.get('donor',{}).get('organism',{}).get('name', None)
+
+            # conditions (whitelist)
+            condition_types = [ 'disease categories' ]
+            condition_keys = dict(zip(condition_types, 
+                                      [ ct.replace(' ', '_') for ct in condition_types ]))
+            for ct, ck in condition_keys.items():
+                cell[ck] = []
+
+            conditions = cell.get('donor',{}).get('conditions', [])
+            for condition in conditions:
+                c_type, c_val = condition['name'].split(' - ')
+                if c_type in condition_keys:
+                    cell[condition_keys[c_type]].append(c_val)
+
+        result = self.filter_cells(cells, require_morphology, require_reconstruction, reporter_status, species)
+
         return result
 
     def get_cell(self, id):
@@ -144,7 +169,7 @@ class CellTypesApi(RmaApi):
             'EphysSweep', criteria=criteria, num_rows='all')
         return sorted(sweeps, key=lambda x: x['sweep_number'])
 
-    def filter_cells(self, cells, require_morphology, require_reconstruction, reporter_status):
+    def filter_cells(self, cells, require_morphology, require_reconstruction, reporter_status, species):
         """
         Filter a list of cell specimens to those that optionally have morphologies
         or have morphological reconstructions.
@@ -163,6 +188,10 @@ class CellTypesApi(RmaApi):
 
         reporter_status: list
             Filter for cells that have a particular cell reporter status
+
+        species: list
+            Filter for cells that belong to one or more species.  If None, return all.
+            Must be one of [ CellTypesApi.MOUSE, CellTypesApi.HUMAN ].
         """
 
         if require_morphology:
@@ -174,6 +203,10 @@ class CellTypesApi(RmaApi):
         if reporter_status:
             cells = [c for c in cells if c[
                 'reporter_status'] in reporter_status]
+
+        if species:
+            species_lower = [ s.lower() for s in species ]
+            cells = [c for c in cells if c['donor']['organism']['name'].lower() in species_lower]
 
         return cells
 

@@ -27,7 +27,7 @@ Richard Gerkin @rgerkin
 
 Nathan Gouwens @gouwens
 
-Nile Graddis
+Nile Graddis @nilegraddis
 
 Gabe Ocker
 

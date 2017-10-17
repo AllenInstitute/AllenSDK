@@ -34,6 +34,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 from allensdk.config.manifest import Manifest, ManifestVersionError
+from allensdk.config.manifest_builder import ManifestBuilder
 import allensdk.core.json_utilities as ju
 import pandas as pd
 import pandas.io.json as pj
@@ -65,7 +66,8 @@ class Cache(object):
     def __init__(self,
                  manifest=None,
                  cache=True,
-                 version=None):
+                 version=None, 
+                 **kwargs):
         self.cache = cache
         self.load_manifest(manifest, version)
 
@@ -128,15 +130,29 @@ class Cache(object):
             self.manifest = None
 
     def build_manifest(self, file_name):
-        '''Creation of default path speifications.
+        '''Creation of default path specifications.
 
         Parameters
         ----------
         file_name : string
             where to save it
         '''
-        raise Exception(
-            "This function must be defined in the appropriate subclass")
+
+        manifest_builder = ManifestBuilder()
+        manifest_builder.set_version(self.MANIFEST_VERSION)
+        
+        manifest_builder = self.add_manifest_paths(manifest_builder)
+
+        manifest_builder.write_json_file(file_name)
+
+
+    def add_manifest_paths(self, manifest_builder):
+        '''Add cache-class specific paths to the manifest. In derived classes, 
+        should call super.
+        '''
+        manifest_builder.add_path('BASEDIR', '.')
+        return manifest_builder
+
 
     def manifest_dataframe(self):
         '''Convenience method to view manifest as a pandas dataframe.

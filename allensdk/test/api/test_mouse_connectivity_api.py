@@ -33,6 +33,8 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
+import os
+
 import pytest
 from mock import patch, Mock
 import itertools as it
@@ -56,7 +58,9 @@ def nrrd_read():
                                   'mock_annotation_image'))) as nrrd_read:
         import allensdk.core.mouse_connectivity_cache as MCC
         import allensdk.api.queries.mouse_connectivity_api as MCA
+        import allensdk.api.queries.reference_space_api as RSA
         reload(MCC)
+        reload(RSA)
         reload(MCA)
 
     return nrrd_read
@@ -206,6 +210,33 @@ def test_download_annotation_volume_default(os_makedirs,
 @pytest.mark.parametrize("resolution",
                          RESOLUTIONS())
 @patch('os.makedirs')
+def test_download_structure_mask(os_makedirs, 
+                                 nrrd_read, 
+                                 MCA, 
+                                 connectivity, 
+                                 resolution):
+
+    structure_id = 12
+
+    connectivity.retrieve_file_over_http.reset_mock()
+
+    a, b = connectivity.download_structure_mask(structure_id, None, resolution, '/path/to/foo.nrrd')
+    
+    assert a
+    assert b
+    
+    expected = 'http://download.alleninstitute.org/informatics-archive/'\
+               'current-release/mouse_ccf/{0}/structure_masks/'\
+               'structure_masks_{1}/structure_{2}.nrrd'.format(MCA.MouseConnectivityApi.CCF_VERSION_DEFAULT, 
+                                                               resolution, 
+                                                               structure_id)
+    connectivity.retrieve_file_over_http.assert_called_once_with(expected, '/path/to/foo.nrrd')
+    os.makedirs.assert_any_call('/path/to')
+
+
+@pytest.mark.parametrize("resolution",
+                         RESOLUTIONS())
+@patch('os.makedirs')
 def test_download_template_volume(os_makedirs,
                                   connectivity,
                                   resolution):
@@ -222,6 +253,7 @@ def test_download_template_volume(os_makedirs,
         "/path/to/average_template_%d.nrrd" % (resolution))
 
     os_makedirs.assert_any_call('/path/to')
+
 
 
 def test_get_experiments_no_ids(connectivity):

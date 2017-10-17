@@ -124,13 +124,15 @@ def get_shuffle_matrix(data, event_vector, A, number_of_shuffles=5000, response_
     number_of_events = event_vector.sum()
     number_of_pixels = A.shape[0] / 2
     shuffle_data = np.zeros((2*number_of_pixels, number_of_shuffles))
+    evr = range(len(event_vector))
     for ii in range(number_of_shuffles):
 
         size = number_of_events + int(np.round(response_detection_error_std_dev*number_of_events*np.random.randn()))
-        shuffled_event_inds = np.random.choice(range(len(event_vector)), size=size, replace=False)
-        b_tmp = np.zeros(len(event_vector))
-        b_tmp[shuffled_event_inds] = 1
-        shuffle_data[:, ii] = A.dot(b_tmp)/float(size)
+        shuffled_event_inds = np.random.choice(evr, size=size, replace=False)
+
+        b_tmp = np.zeros(len(event_vector), dtype=np.bool)
+        b_tmp[shuffled_event_inds] = True
+        shuffle_data[:, ii] = A[:,b_tmp].sum(axis=1)/float(size)
 
     return shuffle_data
 
