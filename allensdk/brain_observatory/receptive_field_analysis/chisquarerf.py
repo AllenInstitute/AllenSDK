@@ -195,7 +195,7 @@ def get_events_per_pixel(responses_np,
 def smooth_STA(STA,
                gauss_std=0.75):
 
-    deg_per_pnt = 64/STA.shape[0]
+    deg_per_pnt = 64 // STA.shape[0]
     STA_interpolated = interpolate_RF(STA, deg_per_pnt)
     STA_interpolated_smoothed = filt.gaussian_filter(STA_interpolated, gauss_std)
     STA_smoothed = deinterpolate_RF(STA_interpolated_smoothed, STA.shape[1], STA.shape[0], deg_per_pnt)
