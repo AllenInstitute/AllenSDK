@@ -29,7 +29,7 @@ setup(
     author = 'David Feng',
     author_email = 'davidf@alleninstitute.org',
     packages = prepend_find_packages('allensdk'),
-    package_data={'': ['*.conf', '*.cfg', '*.md', '*.json', '*.dat', '*.env', '*.sh', '*.txt', 'bps', 'Makefile', 'COPYING'] },
+    package_data={'': ['*.conf', '*.cfg', '*.md', '*.json', '*.dat', '*.env', '*.sh', '*.txt', 'bps', 'Makefile', 'LICENSE'] },
     description = 'core libraries for the allensdk.',
     install_requires = required,
     tests_require=test_required,
