@@ -76,6 +76,14 @@ allensdk.core.reference_space module
     :undoc-members:
     :show-inheritance:
 
+allensdk.core.reference_space_cache module
+------------------------------------------
+
+.. automodule:: allensdk.core.reference_space_cache
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 allensdk.core.simple_tree module
 --------------------------------
 

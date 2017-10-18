@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.api.cache &mdash; Allen SDK 0.14.2 documentation</title>
+    <title>allensdk.api.cache &mdash; Allen SDK 0.14.3 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.14.2',
+        VERSION:     '0.14.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.14.2 documentation" href="../../../index.html" />
+    <link rel="top" title="Allen SDK 0.14.3 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body role="document">
@@ -105,6 +105,7 @@
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="c1">#</span>
 <span class="kn">from</span> <span class="nn">allensdk.config.manifest</span> <span class="kn">import</span> <span class="n">Manifest</span><span class="p">,</span> <span class="n">ManifestVersionError</span>
+<span class="kn">from</span> <span class="nn">allensdk.config.manifest_builder</span> <span class="kn">import</span> <span class="n">ManifestBuilder</span>
 <span class="kn">import</span> <span class="nn">allensdk.core.json_utilities</span> <span class="kn">as</span> <span class="nn">ju</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">pandas.io.json</span> <span class="kn">as</span> <span class="nn">pj</span>
@@ -136,7 +137,8 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">manifest</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                  <span class="n">cache</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-                 <span class="n">version</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+                 <span class="n">version</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="n">cache</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">load_manifest</span><span class="p">(</span><span class="n">manifest</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
 
@@ -199,15 +201,29 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span> <span class="o">=</span> <span class="bp">None</span></div>
 
 <div class="viewcode-block" id="Cache.build_manifest"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.Cache.build_manifest">[docs]</a>    <span class="k">def</span> <span class="nf">build_manifest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Creation of default path speifications.</span>
+        <span class="sd">&#39;&#39;&#39;Creation of default path specifications.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        file_name : string</span>
 <span class="sd">            where to save it</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
-            <span class="s2">&quot;This function must be defined in the appropriate subclass&quot;</span><span class="p">)</span></div>
+
+        <span class="n">manifest_builder</span> <span class="o">=</span> <span class="n">ManifestBuilder</span><span class="p">()</span>
+        <span class="n">manifest_builder</span><span class="o">.</span><span class="n">set_version</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MANIFEST_VERSION</span><span class="p">)</span>
+        
+        <span class="n">manifest_builder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_manifest_paths</span><span class="p">(</span><span class="n">manifest_builder</span><span class="p">)</span>
+
+        <span class="n">manifest_builder</span><span class="o">.</span><span class="n">write_json_file</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Cache.add_manifest_paths"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.Cache.add_manifest_paths">[docs]</a>    <span class="k">def</span> <span class="nf">add_manifest_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">manifest_builder</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Add cache-class specific paths to the manifest. In derived classes, </span>
+<span class="sd">        should call super.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">manifest_builder</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="s1">&#39;BASEDIR&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">manifest_builder</span></div>
+
 
 <div class="viewcode-block" id="Cache.manifest_dataframe"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.Cache.manifest_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">manifest_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Convenience method to view manifest as a pandas dataframe.</span>

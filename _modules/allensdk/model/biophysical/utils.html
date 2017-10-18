@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.model.biophysical.utils &mdash; Allen SDK 0.14.2 documentation</title>
+    <title>allensdk.model.biophysical.utils &mdash; Allen SDK 0.14.3 documentation</title>
     
     <link rel="stylesheet" href="../../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '0.14.2',
+        VERSION:     '0.14.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.14.2 documentation" href="../../../../index.html" />
+    <link rel="top" title="Allen SDK 0.14.3 documentation" href="../../../../index.html" />
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
   <body role="document">
@@ -73,7 +73,7 @@
 <span class="c1"># license plus a third clause that prohibits redistribution for commercial</span>
 <span class="c1"># purposes without further permission.</span>
 <span class="c1">#</span>
-<span class="c1"># Copyright 2015-2016. Allen Institute. All rights reserved.</span>
+<span class="c1"># Copyright 2015-2017. Allen Institute. All rights reserved.</span>
 <span class="c1">#</span>
 <span class="c1"># Redistribution and use in source and binary forms, with or without</span>
 <span class="c1"># modification, are permitted provided that the following conditions are met:</span>
@@ -108,14 +108,39 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">..biophys_sim.neuron.hoc_utils</span> <span class="kn">import</span> <span class="n">HocUtils</span>
 <span class="kn">from</span> <span class="nn">allensdk.core.nwb_data_set</span> <span class="kn">import</span> <span class="n">NwbDataSet</span>
+<span class="kn">from</span> <span class="nn">fractions</span> <span class="kn">import</span> <span class="n">gcd</span>
+<span class="kn">from</span> <span class="nn">skimage.measure</span> <span class="kn">import</span> <span class="n">block_reduce</span>
+<span class="kn">import</span> <span class="nn">scipy.interpolate</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="kn">import</span> <span class="n">resource_filename</span> <span class="c1">#@UnresolvedImport</span>
 
 <span class="n">PERISOMATIC_TYPE</span> <span class="o">=</span> <span class="s2">&quot;Biophysical - perisomatic&quot;</span>
 <span class="n">ALL_ACTIVE_TYPE</span> <span class="o">=</span> <span class="s2">&quot;Biophysical - all active&quot;</span>
 
 
 <div class="viewcode-block" id="create_utils"><a class="viewcode-back" href="../../../../allensdk.model.biophysical.html#allensdk.model.biophysical.utils.create_utils">[docs]</a><span class="k">def</span> <span class="nf">create_utils</span><span class="p">(</span><span class="n">description</span><span class="p">,</span> <span class="n">model_type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Factory method to create a Utils subclass.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    description : Config instance</span>
+<span class="sd">        used to initialize Utils subclass</span>
+
+<span class="sd">    model_type : string</span>
+<span class="sd">        Must be one of [PERISOMATIC_TYPE, ALL_ACTIVE_TYPE].  If none, defaults to PERISOMATIC_TYPE</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Utils instance    </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    
+
     <span class="k">if</span> <span class="n">model_type</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-        <span class="n">model_type</span> <span class="o">=</span> <span class="n">PERISOMATIC_TYPE</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">model_type</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;biophys&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;model_type&#39;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Could not infer model type from description&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">model_type</span> <span class="o">==</span> <span class="n">PERISOMATIC_TYPE</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">Utils</span><span class="p">(</span><span class="n">description</span><span class="p">)</span>
@@ -139,13 +164,38 @@
 
     <span class="n">_log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>                    
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_default_cell_hoc</span><span class="p">(</span><span class="n">description</span><span class="p">)</span>
+
         <span class="nb">super</span><span class="p">(</span><span class="n">Utils</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">description</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stim</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stim_curr</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sampling_rate</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_sampling_rate</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stimulus_sampling_rate</span> <span class="o">=</span> <span class="bp">None</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">stim_vec_list</span> <span class="o">=</span> <span class="p">[]</span>
+        
+
+<div class="viewcode-block" id="Utils.update_default_cell_hoc"><a class="viewcode-back" href="../../../../allensdk.model.biophysical.html#allensdk.model.biophysical.utils.Utils.update_default_cell_hoc">[docs]</a>    <span class="k">def</span> <span class="nf">update_default_cell_hoc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">default_cell_hoc</span><span class="o">=</span><span class="s1">&#39;cell.hoc&#39;</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; replace the default &#39;cell.hoc&#39; path in the manifest with &#39;cell.hoc&#39; packaged</span>
+<span class="sd">        within AllenSDK if it does not exist &#39;&#39;&#39;</span>
+
+        <span class="n">hoc_files</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;neuron&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;hoc&#39;</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">hfi</span> <span class="o">=</span> <span class="n">hoc_files</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">default_cell_hoc</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">default_cell_hoc</span><span class="p">):</span>
+                <span class="n">abspath_ch</span> <span class="o">=</span> <span class="n">resource_filename</span><span class="p">(</span><span class="n">__name__</span><span class="p">,</span> 
+                                               <span class="n">default_cell_hoc</span><span class="p">)</span>
+                <span class="n">hoc_files</span><span class="p">[</span><span class="n">hfi</span><span class="p">]</span> <span class="o">=</span> <span class="n">abspath_ch</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">abspath_ch</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;cell.hoc does not exist!&quot;</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Using cell.hoc from the following location: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">abspath_ch</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">pass</span></div>
+
 
 <div class="viewcode-block" id="Utils.generate_morphology"><a class="viewcode-back" href="../../../../allensdk.model.biophysical.html#allensdk.model.biophysical.utils.Utils.generate_morphology">[docs]</a>    <span class="k">def</span> <span class="nf">generate_morphology</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">morph_filename</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Load a swc-format cell morphology file.</span>
@@ -217,7 +267,7 @@
 <div class="viewcode-block" id="Utils.setup_iclamp"><a class="viewcode-back" href="../../../../allensdk.model.biophysical.html#allensdk.model.biophysical.utils.Utils.setup_iclamp">[docs]</a>    <span class="k">def</span> <span class="nf">setup_iclamp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                      <span class="n">stimulus_path</span><span class="p">,</span>
                      <span class="n">sweep</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Assign a current waveform as input stimulus.</span>
+        <span class="sd">&#39;&#39;&#39;Assign a current waveform as input stimulus. </span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -231,16 +281,27 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">stim</span><span class="o">.</span><span class="n">dur</span> <span class="o">=</span> <span class="mf">1e12</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">read_stimulus</span><span class="p">(</span><span class="n">stimulus_path</span><span class="p">,</span> <span class="n">sweep</span><span class="o">=</span><span class="n">sweep</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_rate</span>
+
+        <span class="c1"># NEURON&#39;s dt is in milliseconds</span>
+        <span class="n">simulation_dt</span> <span class="o">=</span> <span class="mf">1.0e3</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulation_sampling_rate</span>
+        <span class="n">stimulus_dt</span> <span class="o">=</span> <span class="mf">1.0e3</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">stimulus_sampling_rate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Using simulation dt </span><span class="si">%f</span><span class="s2">, stimulus dt </span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">simulation_dt</span><span class="p">,</span> <span class="n">stimulus_dt</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">simulation_dt</span>
         <span class="n">stim_vec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stim_curr</span><span class="p">)</span>
-        <span class="n">stim_vec</span><span class="o">.</span><span class="n">play</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stim</span><span class="o">.</span><span class="n">_ref_amp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_rate</span><span class="p">)</span>
+        <span class="n">stim_vec</span><span class="o">.</span><span class="n">play</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stim</span><span class="o">.</span><span class="n">_ref_amp</span><span class="p">,</span> <span class="n">stimulus_dt</span><span class="p">)</span>
 
         <span class="n">stimulus_stop_index</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stim_curr</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">tstop</span> <span class="o">=</span> <span class="n">stimulus_stop_index</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_rate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">tstop</span> <span class="o">=</span> <span class="n">stimulus_stop_index</span> <span class="o">*</span> <span class="n">stimulus_dt</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stim_vec_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stim_vec</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Utils.read_stimulus"><a class="viewcode-back" href="../../../../allensdk.model.biophysical.html#allensdk.model.biophysical.utils.Utils.read_stimulus">[docs]</a>    <span class="k">def</span> <span class="nf">read_stimulus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stimulus_path</span><span class="p">,</span> <span class="n">sweep</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;load current values for a specific experiment sweep.</span>
+        <span class="sd">&#39;&#39;&#39;Load current values for a specific experiment sweep and setup simulation</span>
+<span class="sd">        and stimulus sampling rates.</span>
+
+<span class="sd">        NOTE: NEURON only allows simulation timestamps of multiples of 40KHz.  To </span>
+<span class="sd">        avoid aliasing, we set the simulation sampling rate to the least common</span>
+<span class="sd">        multiple of the stimulus sampling rate and 40KHz.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -261,7 +322,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">stim_curr</span> <span class="o">=</span> <span class="n">sweep_data</span><span class="p">[</span><span class="s1">&#39;stimulus&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mf">1.0e9</span>
 
         <span class="c1"># convert from Hz</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sampling_rate</span> <span class="o">=</span> <span class="mf">1.0e3</span> <span class="o">/</span> <span class="n">sweep_data</span><span class="p">[</span><span class="s1">&#39;sampling_rate&#39;</span><span class="p">]</span></div>
+        <span class="n">hz</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sweep_data</span><span class="p">[</span><span class="s1">&#39;sampling_rate&#39;</span><span class="p">])</span>
+        <span class="n">neuron_hz</span> <span class="o">=</span> <span class="n">Utils</span><span class="o">.</span><span class="n">nearest_neuron_sampling_rate</span><span class="p">(</span><span class="n">hz</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_sampling_rate</span> <span class="o">=</span> <span class="n">neuron_hz</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stimulus_sampling_rate</span> <span class="o">=</span> <span class="n">hz</span>
+
+        <span class="k">if</span> <span class="n">hz</span> <span class="o">!=</span> <span class="n">neuron_hz</span><span class="p">:</span>
+            <span class="n">Utils</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;changing sampling rate from </span><span class="si">%d</span><span class="s2"> to </span><span class="si">%d</span><span class="s2"> to avoid NEURON aliasing&quot;</span><span class="p">,</span> <span class="n">hz</span><span class="p">,</span> <span class="n">neuron_hz</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Utils.record_values"><a class="viewcode-back" href="../../../../allensdk.model.biophysical.html#allensdk.model.biophysical.utils.Utils.record_values">[docs]</a>    <span class="k">def</span> <span class="nf">record_values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Set up output voltage recording.&#39;&#39;&#39;</span>
@@ -271,7 +339,45 @@
         <span class="n">vec</span><span class="p">[</span><span class="s2">&quot;v&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">soma</span><span class="p">[</span><span class="mi">0</span><span class="p">](</span><span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">_ref_v</span><span class="p">)</span>
         <span class="n">vec</span><span class="p">[</span><span class="s2">&quot;t&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">_ref_t</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">vec</span></div></div>
+        <span class="k">return</span> <span class="n">vec</span></div>
+
+<div class="viewcode-block" id="Utils.get_recorded_data"><a class="viewcode-back" href="../../../../allensdk.model.biophysical.html#allensdk.model.biophysical.utils.Utils.get_recorded_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_recorded_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vec</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Extract recorded voltages and timestamps given the recorded Vector instance.  </span>
+<span class="sd">        If self.stimulus_sampling_rate is smaller than self.simulation_sampling_rate, </span>
+<span class="sd">        resample to self.stimulus_sampling_rate.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        vec : neuron.Vector </span>
+<span class="sd">           constructed by self.record_values</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict with two keys: &#39;v&#39; = numpy.ndarray with voltages, &#39;t&#39; = numpy.ndarray with timestamps</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">junction_potential</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;fitting&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;junction_potential&#39;</span><span class="p">]</span>
+        
+        <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vec</span><span class="p">[</span><span class="s2">&quot;v&quot;</span><span class="p">])</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vec</span><span class="p">[</span><span class="s2">&quot;t&quot;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stimulus_sampling_rate</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulation_sampling_rate</span><span class="p">:</span>
+            <span class="n">factor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulation_sampling_rate</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">stimulus_sampling_rate</span>
+                
+            <span class="n">Utils</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;subsampling recorded traces by </span><span class="si">%d</span><span class="s2">X&quot;</span><span class="p">,</span> <span class="n">factor</span><span class="p">)</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">block_reduce</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="p">(</span><span class="n">factor</span><span class="p">,),</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">)[:</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stim_curr</span><span class="p">)]</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">block_reduce</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="p">(</span><span class="n">factor</span><span class="p">,),</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">)[:</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stim_curr</span><span class="p">)]</span>
+
+        <span class="n">mV</span> <span class="o">=</span> <span class="mf">1.0e-3</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="p">(</span><span class="n">v</span> <span class="o">-</span> <span class="n">junction_potential</span><span class="p">)</span> <span class="o">*</span> <span class="n">mV</span>
+        
+        <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;v&quot;</span><span class="p">:</span> <span class="n">v</span><span class="p">,</span> <span class="s2">&quot;t&quot;</span><span class="p">:</span> <span class="n">t</span> <span class="p">}</span></div>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="Utils.nearest_neuron_sampling_rate"><a class="viewcode-back" href="../../../../allensdk.model.biophysical.html#allensdk.model.biophysical.utils.Utils.nearest_neuron_sampling_rate">[docs]</a>    <span class="k">def</span> <span class="nf">nearest_neuron_sampling_rate</span><span class="p">(</span><span class="n">hz</span><span class="p">,</span> <span class="n">target_hz</span><span class="o">=</span><span class="mi">40000</span><span class="p">):</span>
+        <span class="n">div</span> <span class="o">=</span> <span class="n">gcd</span><span class="p">(</span><span class="n">hz</span><span class="p">,</span> <span class="n">target_hz</span><span class="p">)</span>
+        <span class="n">new_hz</span> <span class="o">=</span> <span class="n">hz</span> <span class="o">*</span> <span class="n">target_hz</span> <span class="o">/</span> <span class="n">div</span>
+        <span class="k">return</span> <span class="n">new_hz</span></div></div>
 
 
 <div class="viewcode-block" id="AllActiveUtils"><a class="viewcode-back" href="../../../../allensdk.model.biophysical.html#allensdk.model.biophysical.utils.AllActiveUtils">[docs]</a><span class="k">class</span> <span class="nc">AllActiveUtils</span><span class="p">(</span><span class="n">Utils</span><span class="p">):</span>

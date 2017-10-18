@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.core.nwb_data_set &mdash; Allen SDK 0.14.2 documentation</title>
+    <title>allensdk.core.nwb_data_set &mdash; Allen SDK 0.14.3 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.14.2',
+        VERSION:     '0.14.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.14.2 documentation" href="../../../index.html" />
+    <link rel="top" title="Allen SDK 0.14.3 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body role="document">
@@ -384,7 +384,7 @@
                       <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;epochs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;Experiment_&#39;</span><span class="p">)]</span>
             <span class="k">return</span> <span class="n">sweeps</span></div>
 
-<div class="viewcode-block" id="NwbDataSet.fill_sweep_responses"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.nwb_data_set.NwbDataSet.fill_sweep_responses">[docs]</a>    <span class="k">def</span> <span class="nf">fill_sweep_responses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">sweep_numbers</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="NwbDataSet.fill_sweep_responses"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.nwb_data_set.NwbDataSet.fill_sweep_responses">[docs]</a>    <span class="k">def</span> <span class="nf">fill_sweep_responses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">sweep_numbers</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">extend_experiment</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Fill sweep response arrays with a single value.</span>
 
 <span class="sd">        Parameters</span>
@@ -395,21 +395,30 @@
 <span class="sd">        sweep_numbers: list</span>
 <span class="sd">            List of integer sweep numbers to be filled (default all sweeps)</span>
 
+<span class="sd">        extend_experiment: bool</span>
+<span class="sd">            If True, extend experiment epoch length to the end of the sweep (undo any truncation)</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">sweep_numbers</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="c1"># no sweep numbers given, grab all of them</span>
-                <span class="n">epochs</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">f</span><span class="p">[</span>
-                    <span class="s1">&#39;epochs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;Sweep_&#39;</span><span class="p">)]</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">epochs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Sweep_</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span>
-                          <span class="n">sweep_number</span> <span class="k">for</span> <span class="n">sweep_number</span> <span class="ow">in</span> <span class="n">sweep_numbers</span><span class="p">]</span>
+                <span class="n">sweep_numbers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sweep_numbers</span><span class="p">()</span>
 
-            <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="n">epochs</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">sweep_number</span> <span class="ow">in</span> <span class="n">sweep_numbers</span><span class="p">:</span>
+                <span class="n">epoch</span> <span class="o">=</span> <span class="s2">&quot;Sweep_</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">sweep_number</span>
                 <span class="k">if</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;epochs&#39;</span><span class="p">]:</span>
                     <span class="n">f</span><span class="p">[</span><span class="s1">&#39;epochs&#39;</span><span class="p">][</span><span class="n">epoch</span><span class="p">][</span><span class="s1">&#39;response&#39;</span><span class="p">][</span>
-                        <span class="s1">&#39;timeseries&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">fill_value</span></div>
+                        <span class="s1">&#39;timeseries&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">fill_value</span>
+
+                <span class="k">if</span> <span class="n">extend_experiment</span><span class="p">:</span>
+                    <span class="n">epoch</span> <span class="o">=</span> <span class="s2">&quot;Experiment_</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">sweep_number</span>
+                    <span class="k">if</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;epochs&#39;</span><span class="p">]:</span>
+                        <span class="n">idx_start</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;epochs&#39;</span><span class="p">][</span><span class="n">epoch</span><span class="p">][</span><span class="s1">&#39;stimulus&#39;</span><span class="p">][</span><span class="s1">&#39;idx_start&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+                        <span class="n">count</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;epochs&#39;</span><span class="p">][</span><span class="n">epoch</span><span class="p">][</span><span class="s1">&#39;stimulus&#39;</span><span class="p">][</span><span class="s1">&#39;timeseries&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+                        <span class="k">del</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;epochs&#39;</span><span class="p">][</span><span class="n">epoch</span><span class="p">][</span><span class="s1">&#39;stimulus&#39;</span><span class="p">][</span><span class="s1">&#39;count&#39;</span><span class="p">]</span>
+                        <span class="n">f</span><span class="p">[</span><span class="s1">&#39;epochs&#39;</span><span class="p">][</span><span class="n">epoch</span><span class="p">][</span><span class="s1">&#39;stimulus&#39;</span><span class="p">][</span><span class="s1">&#39;count&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">count</span> <span class="o">-</span> <span class="n">idx_start</span></div>
+
 
 <div class="viewcode-block" id="NwbDataSet.get_sweep_metadata"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.nwb_data_set.NwbDataSet.get_sweep_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">get_sweep_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sweep_number</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Retrieve the sweep level metadata associated with each sweep.</span>

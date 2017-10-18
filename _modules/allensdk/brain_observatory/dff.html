@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.brain_observatory.dff &mdash; Allen SDK 0.14.2 documentation</title>
+    <title>allensdk.brain_observatory.dff &mdash; Allen SDK 0.14.3 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.14.2',
+        VERSION:     '0.14.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.14.2 documentation" href="../../../index.html" />
+    <link rel="top" title="Allen SDK 0.14.3 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body role="document">
@@ -269,11 +269,15 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="n">mode_kernelsize</span> <span class="o">&gt;=</span> <span class="n">traces</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Cannot compute dF/F: mode filter size (</span><span class="si">%d</span><span class="s2">) longer than trace (</span><span class="si">%d</span><span class="s2">)&quot;</span> <span class="o">%</span>
-                        <span class="p">(</span><span class="n">mode_kernelsize</span><span class="p">,</span> <span class="n">traces</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">mode_kernelsize</span> <span class="o">=</span> <span class="n">traces</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span> <span class="c1"># make mode_kernelsize smaller than lenght of trace</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Changing mode_kernelsize to &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">mode_kernelsize</span><span class="p">))</span>
+
     <span class="k">if</span> <span class="n">mean_kernelsize</span> <span class="o">&gt;=</span> <span class="n">traces</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Cannot compute dF/F: mean filter size (</span><span class="si">%d</span><span class="s2">) longer than trace (</span><span class="si">%d</span><span class="s2">)&quot;</span> <span class="o">%</span>
-                        <span class="p">(</span><span class="n">mean_kernelsize</span><span class="p">,</span> <span class="n">traces</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">mean_kernelsize</span> <span class="o">=</span> <span class="n">traces</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">//</span><span class="mi">4</span> <span class="c1"># make mean_kernelsize smaller than lenght of trace</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Changing mean_kernelsize to &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">mean_kernelsize</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">mode_kernelsize</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">mean_kernelsize</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Kernel length is 0!&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">save_plot_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">save_plot_dir</span><span class="p">):</span>
         <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">save_plot_dir</span><span class="p">)</span>

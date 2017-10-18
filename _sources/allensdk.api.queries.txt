@@ -84,6 +84,14 @@ allensdk.api.queries.ontologies_api module
     :undoc-members:
     :show-inheritance:
 
+allensdk.api.queries.reference_space_api module
+-----------------------------------------------
+
+.. automodule:: allensdk.api.queries.reference_space_api
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 allensdk.api.queries.rma_api module
 -----------------------------------
 

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.model.biophysical package &mdash; Allen SDK 0.14.2 documentation</title>
+    <title>allensdk.model.biophysical package &mdash; Allen SDK 0.14.3 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.14.2',
+        VERSION:     '0.14.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.14.2 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.14.3 documentation" href="index.html" />
     <link rel="up" title="allensdk.model package" href="allensdk.model.html" />
     <link rel="next" title="allensdk.model.glif package" href="allensdk.model.glif.html" />
     <link rel="prev" title="allensdk.model.biophys_sim.scripts package" href="allensdk.model.biophys_sim.scripts.html" /> 
@@ -161,15 +161,45 @@
 
 <dl class="function">
 <dt id="allensdk.model.biophysical.runner.run">
-<code class="descclassname">allensdk.model.biophysical.runner.</code><code class="descname">run</code><span class="sig-paren">(</span><em>description</em>, <em>sweeps=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/model/biophysical/runner.html#run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.model.biophysical.runner.run" title="Permalink to this definition">¶</a></dt>
-<dd><p>Main function for running a biophysical experiment.</p>
+<code class="descclassname">allensdk.model.biophysical.runner.</code><code class="descname">run</code><span class="sig-paren">(</span><em>description</em>, <em>sweeps=None</em>, <em>procs=6</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/model/biophysical/runner.html#run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.model.biophysical.runner.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main function for simulating sweeps in a biophysical experiment.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>description</strong> : Config</p>
-<blockquote class="last">
+<blockquote>
 <div><p>All information needed to run the experiment.</p>
+</div></blockquote>
+<p><strong>procs</strong> : int</p>
+<blockquote>
+<div><p>number of sweeps to simulate simultaneously.</p>
+</div></blockquote>
+<p><strong>sweeps</strong> : list</p>
+<blockquote class="last">
+<div><p>list of experiment sweep numbers to simulate.  If None, simulate all sweeps.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.model.biophysical.runner.run_sync">
+<code class="descclassname">allensdk.model.biophysical.runner.</code><code class="descname">run_sync</code><span class="sig-paren">(</span><em>description</em>, <em>sweeps=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/model/biophysical/runner.html#run_sync"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.model.biophysical.runner.run_sync" title="Permalink to this definition">¶</a></dt>
+<dd><p>Single-process main function for simulating sweeps in a biophysical experiment.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>description</strong> : Config</p>
+<blockquote>
+<div><p>All information needed to run the experiment.</p>
+</div></blockquote>
+<p><strong>sweeps</strong> : list</p>
+<blockquote class="last">
+<div><p>list of experiment sweep numbers to simulate.  If None, simulate all sweeps.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -280,15 +310,47 @@ biophysical simulations.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="allensdk.model.biophysical.utils.Utils.get_recorded_data">
+<code class="descname">get_recorded_data</code><span class="sig-paren">(</span><em>vec</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/model/biophysical/utils.html#Utils.get_recorded_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.model.biophysical.utils.Utils.get_recorded_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract recorded voltages and timestamps given the recorded Vector instance.  
+If self.stimulus_sampling_rate is smaller than self.simulation_sampling_rate, 
+resample to self.stimulus_sampling_rate.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>vec</strong> : neuron.Vector</p>
+<blockquote>
+<div><p>constructed by self.record_values</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">dict with two keys: &#8216;v&#8217; = numpy.ndarray with voltages, &#8216;t&#8217; = numpy.ndarray with timestamps</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="allensdk.model.biophysical.utils.Utils.load_cell_parameters">
 <code class="descname">load_cell_parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/model/biophysical/utils.html#Utils.load_cell_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.model.biophysical.utils.Utils.load_cell_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Configure a neuron after the cell morphology has been loaded.</p>
 </dd></dl>
 
+<dl class="staticmethod">
+<dt id="allensdk.model.biophysical.utils.Utils.nearest_neuron_sampling_rate">
+<em class="property">static </em><code class="descname">nearest_neuron_sampling_rate</code><span class="sig-paren">(</span><em>hz</em>, <em>target_hz=40000</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/model/biophysical/utils.html#Utils.nearest_neuron_sampling_rate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.model.biophysical.utils.Utils.nearest_neuron_sampling_rate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="allensdk.model.biophysical.utils.Utils.read_stimulus">
 <code class="descname">read_stimulus</code><span class="sig-paren">(</span><em>stimulus_path</em>, <em>sweep=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/model/biophysical/utils.html#Utils.read_stimulus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.model.biophysical.utils.Utils.read_stimulus" title="Permalink to this definition">¶</a></dt>
-<dd><p>load current values for a specific experiment sweep.</p>
+<dd><p>Load current values for a specific experiment sweep and setup simulation
+and stimulus sampling rates.</p>
+<p>NOTE: NEURON only allows simulation timestamps of multiples of 40KHz.  To 
+avoid aliasing, we set the simulation sampling rate to the least common
+multiple of the stimulus sampling rate and 40KHz.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -331,12 +393,39 @@ biophysical simulations.</p>
 </table>
 </dd></dl>
 
+<dl class="method">
+<dt id="allensdk.model.biophysical.utils.Utils.update_default_cell_hoc">
+<code class="descname">update_default_cell_hoc</code><span class="sig-paren">(</span><em>description</em>, <em>default_cell_hoc='cell.hoc'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/model/biophysical/utils.html#Utils.update_default_cell_hoc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.model.biophysical.utils.Utils.update_default_cell_hoc" title="Permalink to this definition">¶</a></dt>
+<dd><p>replace the default &#8216;cell.hoc&#8217; path in the manifest with &#8216;cell.hoc&#8217; packaged
+within AllenSDK if it does not exist</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="function">
 <dt id="allensdk.model.biophysical.utils.create_utils">
 <code class="descclassname">allensdk.model.biophysical.utils.</code><code class="descname">create_utils</code><span class="sig-paren">(</span><em>description</em>, <em>model_type=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/model/biophysical/utils.html#create_utils"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.model.biophysical.utils.create_utils" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Factory method to create a Utils subclass.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>description</strong> : Config instance</p>
+<blockquote>
+<div><p>used to initialize Utils subclass</p>
+</div></blockquote>
+<p><strong>model_type</strong> : string</p>
+<blockquote>
+<div><p>Must be one of [PERISOMATIC_TYPE, ALL_ACTIVE_TYPE].  If none, defaults to PERISOMATIC_TYPE</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Utils instance</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </div>
 <div class="section" id="module-allensdk.model.biophysical">

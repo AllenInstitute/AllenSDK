@@ -1,0 +1,378 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>allensdk.api.queries.reference_space_api &mdash; Allen SDK 0.14.3 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/aibs_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '0.14.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="top" title="Allen SDK 0.14.3 documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" /> 
+  </head>
+  <body role="document">
+<link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
+<script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var _pSupressBrowserFlashWarning = true;
+    var _pTabId = "pHome";
+    var _pMoreProjectsId = "pMoreProjects";
+    var _pImagePath = "http://www.brain-map.org/assets/images/";
+    var _pSiteWarnings = function() {
+        this.show_warning() = {};
+    }
+</script>
+<script type="text/javascript">
+    function initialize() {
+        /*** do your stuff, then initialize the portal plugin ***/
+        _pPortalOnLoad();
+    }
+</script>
+<style>
+  #header_content > a {
+  display: inline-block;
+  width: 250px;
+  height: 75px;
+  background-image:url("/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-size: 235px 37px;
+  background-position: 0px 20px;
+  background-repeat: no-repeat;
+  }
+</style>
+
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
+
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for allensdk.api.queries.reference_space_api</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Allen Institute Software License - This software license is the 2-clause BSD</span>
+<span class="c1"># license plus a third clause that prohibits redistribution for commercial</span>
+<span class="c1"># purposes without further permission.</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2015-2017. Allen Institute. All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Redistribution and use in source and binary forms, with or without</span>
+<span class="c1"># modification, are permitted provided that the following conditions are met:</span>
+<span class="c1">#</span>
+<span class="c1"># 1. Redistributions of source code must retain the above copyright notice,</span>
+<span class="c1"># this list of conditions and the following disclaimer.</span>
+<span class="c1">#</span>
+<span class="c1"># 2. Redistributions in binary form must reproduce the above copyright notice,</span>
+<span class="c1"># this list of conditions and the following disclaimer in the documentation</span>
+<span class="c1"># and/or other materials provided with the distribution.</span>
+<span class="c1">#</span>
+<span class="c1"># 3. Redistributions for commercial purposes are not permitted without the</span>
+<span class="c1"># Allen Institute&#39;s written permission.</span>
+<span class="c1"># For purposes of this license, commercial purposes is the incorporation of the</span>
+<span class="c1"># Allen Institute&#39;s software into anything for which you will charge fees or</span>
+<span class="c1"># other compensation. Contact terms@alleninstitute.org for commercial licensing</span>
+<span class="c1"># opportunities.</span>
+<span class="c1">#</span>
+<span class="c1"># THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</span>
+<span class="c1"># AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</span>
+<span class="c1"># IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE</span>
+<span class="c1"># ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE</span>
+<span class="c1"># LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR</span>
+<span class="c1"># CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF</span>
+<span class="c1"># SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS</span>
+<span class="c1"># INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN</span>
+<span class="c1"># CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)</span>
+<span class="c1"># ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
+<span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
+<span class="c1">#</span>
+<span class="kn">from</span> <span class="nn">.rma_api</span> <span class="kn">import</span> <span class="n">RmaApi</span>
+<span class="kn">from</span> <span class="nn">..cache</span> <span class="kn">import</span> <span class="n">cacheable</span><span class="p">,</span> <span class="n">Cache</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">nrrd</span>
+<span class="kn">import</span> <span class="nn">six</span>
+
+
+
+<div class="viewcode-block" id="ReferenceSpaceApi"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.reference_space_api.ReferenceSpaceApi">[docs]</a><span class="k">class</span> <span class="nc">ReferenceSpaceApi</span><span class="p">(</span><span class="n">RmaApi</span><span class="p">):</span>
+
+    <span class="n">AVERAGE_TEMPLATE</span> <span class="o">=</span> <span class="s1">&#39;average_template&#39;</span>
+    <span class="n">ARA_NISSL</span> <span class="o">=</span> <span class="s1">&#39;ara_nissl&#39;</span>
+    <span class="n">MOUSE_2011</span> <span class="o">=</span> <span class="s1">&#39;annotation/mouse_2011&#39;</span>
+    <span class="n">DEVMOUSE_2012</span> <span class="o">=</span> <span class="s1">&#39;annotation/devmouse_2012&#39;</span>
+    <span class="n">CCF_2015</span> <span class="o">=</span> <span class="s1">&#39;annotation/ccf_2015&#39;</span>
+    <span class="n">CCF_2016</span> <span class="o">=</span> <span class="s1">&#39;annotation/ccf_2016&#39;</span>
+    <span class="n">CCF_2017</span> <span class="o">=</span> <span class="s1">&#39;annotation/ccf_2017&#39;</span>
+    <span class="n">CCF_VERSION_DEFAULT</span> <span class="o">=</span> <span class="n">CCF_2017</span>
+
+    <span class="n">VOXEL_RESOLUTION_10_MICRONS</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">VOXEL_RESOLUTION_25_MICRONS</span> <span class="o">=</span> <span class="mi">25</span>
+    <span class="n">VOXEL_RESOLUTION_50_MICRONS</span> <span class="o">=</span> <span class="mi">50</span>
+    <span class="n">VOXEL_RESOLUTION_100_MICRONS</span> <span class="o">=</span> <span class="mi">100</span>
+
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ReferenceSpaceApi</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">base_uri</span><span class="p">)</span>
+
+
+    <span class="nd">@cacheable</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;create&#39;</span><span class="p">,</span>
+               <span class="n">reader</span><span class="o">=</span><span class="n">nrrd</span><span class="o">.</span><span class="n">read</span><span class="p">,</span>
+               <span class="n">pathfinder</span><span class="o">=</span><span class="n">Cache</span><span class="o">.</span><span class="n">pathfinder</span><span class="p">(</span><span class="n">file_name_position</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                                           <span class="n">path_keyword</span><span class="o">=</span><span class="s1">&#39;file_name&#39;</span><span class="p">))</span>
+<div class="viewcode-block" id="ReferenceSpaceApi.download_annotation_volume"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.reference_space_api.ReferenceSpaceApi.download_annotation_volume">[docs]</a>    <span class="k">def</span> <span class="nf">download_annotation_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                                   <span class="n">ccf_version</span><span class="p">,</span>
+                                   <span class="n">resolution</span><span class="p">,</span>
+                                   <span class="n">file_name</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Download the annotation volume at a particular resolution.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ccf_version: string</span>
+<span class="sd">            Which reference space version to download. Defaults to &quot;annotation/ccf_2017&quot;</span>
+<span class="sd">        resolution: int</span>
+<span class="sd">            Desired resolution to download in microns.</span>
+<span class="sd">            Must be 10, 25, 50, or 100.</span>
+<span class="sd">        file_name: string</span>
+<span class="sd">            Where to save the annotation volume.</span>
+<span class="sd">        </span>
+<span class="sd">        Note: the parameters must be used as positional parameters, not keywords</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="n">ccf_version</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">ccf_version</span> <span class="o">=</span> <span class="n">ReferenceSpaceApi</span><span class="o">.</span><span class="n">CCF_VERSION_DEFAULT</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">download_volumetric_data</span><span class="p">(</span><span class="n">ccf_version</span><span class="p">,</span>
+                                      <span class="s1">&#39;annotation_</span><span class="si">%d</span><span class="s1">.nrrd&#39;</span> <span class="o">%</span> <span class="n">resolution</span><span class="p">,</span> 
+                                      <span class="n">save_file_path</span><span class="o">=</span><span class="n">file_name</span><span class="p">)</span></div>
+
+
+    <span class="nd">@cacheable</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;create&#39;</span><span class="p">,</span>
+               <span class="n">reader</span><span class="o">=</span><span class="n">nrrd</span><span class="o">.</span><span class="n">read</span><span class="p">,</span>
+               <span class="n">pathfinder</span><span class="o">=</span><span class="n">Cache</span><span class="o">.</span><span class="n">pathfinder</span><span class="p">(</span><span class="n">file_name_position</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                                           <span class="n">path_keyword</span><span class="o">=</span><span class="s1">&#39;file_name&#39;</span><span class="p">))</span>
+<div class="viewcode-block" id="ReferenceSpaceApi.download_template_volume"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.reference_space_api.ReferenceSpaceApi.download_template_volume">[docs]</a>    <span class="k">def</span> <span class="nf">download_template_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Download the registration template volume at a particular resolution.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        resolution: int</span>
+<span class="sd">            Desired resolution to download in microns.  Must be 10, 25, 50, or 100.</span>
+
+<span class="sd">        file_name: string</span>
+<span class="sd">            Where to save the registration template volume.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">download_volumetric_data</span><span class="p">(</span><span class="n">ReferenceSpaceApi</span><span class="o">.</span><span class="n">AVERAGE_TEMPLATE</span><span class="p">,</span>
+                                      <span class="s1">&#39;average_template_</span><span class="si">%d</span><span class="s1">.nrrd&#39;</span> <span class="o">%</span> <span class="n">resolution</span><span class="p">,</span> 
+                                      <span class="n">save_file_path</span><span class="o">=</span><span class="n">file_name</span><span class="p">)</span></div>
+
+    <span class="nd">@cacheable</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;create&#39;</span><span class="p">,</span> 
+               <span class="n">reader</span><span class="o">=</span><span class="n">nrrd</span><span class="o">.</span><span class="n">read</span><span class="p">,</span> 
+               <span class="n">pathfinder</span><span class="o">=</span><span class="n">Cache</span><span class="o">.</span><span class="n">pathfinder</span><span class="p">(</span><span class="n">file_name_position</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> 
+                                           <span class="n">path_keyword</span><span class="o">=</span><span class="s1">&#39;file_name&#39;</span><span class="p">))</span>
+<div class="viewcode-block" id="ReferenceSpaceApi.download_structure_mask"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.reference_space_api.ReferenceSpaceApi.download_structure_mask">[docs]</a>    <span class="k">def</span> <span class="nf">download_structure_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_id</span><span class="p">,</span> <span class="n">ccf_version</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Download an indicator mask for a specific structure.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        structure_id : int</span>
+<span class="sd">        ccf_version : string</span>
+<span class="sd">            Which reference space version to download. Defaults to &quot;annotation/ccf_2017&quot;</span>
+<span class="sd">        resolution : int</span>
+<span class="sd">            Desired resolution to download in microns.  Must be 10, 25, 50, or 100.</span>
+<span class="sd">        file_name : string</span>
+<span class="sd">             Where to save the downloaded mask.</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="n">ccf_version</span>  <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">ccf_version</span> <span class="o">=</span> <span class="n">ReferenceSpaceApi</span><span class="o">.</span><span class="n">CCF_VERSION_DEFAULT</span>
+
+        <span class="n">structure_mask_dir</span> <span class="o">=</span> <span class="s1">&#39;structure_masks_{0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">resolution</span><span class="p">)</span>
+        <span class="n">data_path</span> <span class="o">=</span> <span class="s1">&#39;{0}/{1}/{2}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ccf_version</span><span class="p">,</span> <span class="s1">&#39;structure_masks&#39;</span><span class="p">,</span> <span class="n">structure_mask_dir</span><span class="p">)</span>        
+        <span class="n">remote_file_name</span> <span class="o">=</span> <span class="s1">&#39;structure_{0}.nrrd&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">structure_id</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">download_volumetric_data</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="n">remote_file_name</span><span class="p">,</span> <span class="n">save_file_path</span><span class="o">=</span><span class="n">file_name</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_file_download_log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;We weren&#39;t able to download a structure mask for structure {0}. </span>
+<span class="s1">                                             You can instead build the mask locally using </span>
+<span class="s1">                                             ReferenceSpace.many_structure_masks&#39;&#39;&#39;</span><span class="p">)</span>
+            <span class="k">raise</span></div>
+
+
+<div class="viewcode-block" id="ReferenceSpaceApi.build_volumetric_data_download_url"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.reference_space_api.ReferenceSpaceApi.build_volumetric_data_download_url">[docs]</a>    <span class="k">def</span> <span class="nf">build_volumetric_data_download_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                                           <span class="n">data_path</span><span class="p">,</span>
+                                           <span class="n">file_name</span><span class="p">,</span>
+                                           <span class="n">voxel_resolution</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                                           <span class="n">release</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                                           <span class="n">coordinate_framework</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Construct url to download 3D reference model in NRRD format.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data_path : string</span>
+<span class="sd">            &#39;average_template&#39;, &#39;ara_nissl&#39;, &#39;annotation/ccf_{year}&#39;, </span>
+<span class="sd">            &#39;annotation/mouse_2011&#39;, or &#39;annotation/devmouse_2012&#39;</span>
+<span class="sd">        voxel_resolution : int</span>
+<span class="sd">            10, 25, 50 or 100</span>
+<span class="sd">        coordinate_framework : string</span>
+<span class="sd">            &#39;mouse_ccf&#39; (default) or &#39;mouse_annotation&#39;</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        See: `3-D Reference Models &lt;http://help.brain-map.org/display/mouseconnectivity/API#API-3DReferenceModels&gt;`_</span>
+<span class="sd">        for additional documentation.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="n">voxel_resolution</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">voxel_resolution</span> <span class="o">=</span> <span class="n">ReferenceSpaceApi</span><span class="o">.</span><span class="n">VOXEL_RESOLUTION_10_MICRONS</span>
+
+        <span class="k">if</span> <span class="n">release</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">release</span> <span class="o">=</span> <span class="s1">&#39;current-release&#39;</span>
+
+        <span class="k">if</span> <span class="n">coordinate_framework</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">coordinate_framework</span> <span class="o">=</span> <span class="s1">&#39;mouse_ccf&#39;</span>
+
+        <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">informatics_archive_endpoint</span><span class="p">,</span>
+                       <span class="s1">&#39;/</span><span class="si">%s</span><span class="s1">/</span><span class="si">%s</span><span class="s1">/&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">release</span><span class="p">,</span> <span class="n">coordinate_framework</span><span class="p">),</span>
+                       <span class="n">data_path</span><span class="p">,</span>
+                       <span class="s1">&#39;/&#39;</span><span class="p">,</span>
+                       <span class="n">file_name</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">url</span></div>
+
+
+<div class="viewcode-block" id="ReferenceSpaceApi.download_volumetric_data"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.reference_space_api.ReferenceSpaceApi.download_volumetric_data">[docs]</a>    <span class="k">def</span> <span class="nf">download_volumetric_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                                 <span class="n">data_path</span><span class="p">,</span>
+                                 <span class="n">file_name</span><span class="p">,</span>
+                                 <span class="n">voxel_resolution</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                                 <span class="n">save_file_path</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                                 <span class="n">release</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                                 <span class="n">coordinate_framework</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Download 3D reference model in NRRD format.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data_path : string</span>
+<span class="sd">            &#39;average_template&#39;, &#39;ara_nissl&#39;, &#39;annotation/ccf_{year}&#39;, </span>
+<span class="sd">            &#39;annotation/mouse_2011&#39;, or &#39;annotation/devmouse_2012&#39;</span>
+<span class="sd">        file_name : string</span>
+<span class="sd">            server-side file name. &#39;annotation_10.nrrd&#39; for example.</span>
+<span class="sd">        voxel_resolution : int</span>
+<span class="sd">            10, 25, 50 or 100</span>
+<span class="sd">        coordinate_framework : string</span>
+<span class="sd">            &#39;mouse_ccf&#39; (default) or &#39;mouse_annotation&#39;</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        See: `3-D Reference Models &lt;http://help.brain-map.org/display/mouseconnectivity/API#API-3DReferenceModels&gt;`_</span>
+<span class="sd">        for additional documentation.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_volumetric_data_download_url</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span>
+                                                      <span class="n">file_name</span><span class="p">,</span>
+                                                      <span class="n">voxel_resolution</span><span class="p">,</span>
+                                                      <span class="n">release</span><span class="p">,</span>
+                                                      <span class="n">coordinate_framework</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">save_file_path</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">save_file_path</span> <span class="o">=</span> <span class="n">file_name</span>
+
+        <span class="k">if</span> <span class="n">save_file_path</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">save_file_path</span> <span class="o">=</span> <span class="s1">&#39;volumetric_data.nrrd&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_file_over_http</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">save_file_path</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../../../../index.html">Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Install Guide</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../brain_observatory.html">Brain Observatory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../connectivity.html">Mouse Connectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../reference_space.html">Reference Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../data_api_client.html">API Access</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../glif_models.html">Generalized LIF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../biophysical_models.html">Biophysical</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../allensdk.html">Source Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.config.html">allensdk.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.ephys.html">allensdk.ephys package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.morphology.html">allensdk.morphology package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
+</ul>
+
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allen-sdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    </div>
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalFooter.js"></script>
+
+
+  </body>
+</html>

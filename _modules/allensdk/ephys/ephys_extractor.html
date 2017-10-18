@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.ephys.ephys_extractor &mdash; Allen SDK 0.14.2 documentation</title>
+    <title>allensdk.ephys.ephys_extractor &mdash; Allen SDK 0.14.3 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.14.2',
+        VERSION:     '0.14.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.14.2 documentation" href="../../../index.html" />
+    <link rel="top" title="Allen SDK 0.14.3 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body role="document">
@@ -960,12 +960,12 @@
         <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s2">&quot;long_squares&quot;</span><span class="p">][</span><span class="s2">&quot;subthreshold_sweeps&quot;</span><span class="p">]:</span>
             <span class="n">s</span><span class="o">.</span><span class="n">set_stimulus_amplitude_calculator</span><span class="p">(</span><span class="n">_step_stim_amp</span><span class="p">)</span>
 
-        <span class="k">print</span> <span class="s2">&quot;subthresh_sweeps&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">subthresh_sweeps</span><span class="p">)</span> <span class="c1"># DEBUG</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;subthresh_sweeps: </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">subthresh_sweeps</span><span class="p">))</span>
         <span class="n">calc_subthresh_sweeps</span> <span class="o">=</span> <span class="p">[</span><span class="n">sweep</span> <span class="k">for</span> <span class="n">sweep</span> <span class="ow">in</span> <span class="n">subthresh_sweeps</span> <span class="k">if</span>
                                  <span class="n">sweep</span><span class="o">.</span><span class="n">sweep_feature</span><span class="p">(</span><span class="s2">&quot;stim_amp&quot;</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">SUBTHRESH_MAX_AMP</span> <span class="ow">and</span>
                                  <span class="n">sweep</span><span class="o">.</span><span class="n">sweep_feature</span><span class="p">(</span><span class="s2">&quot;stim_amp&quot;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subthresh_min_amp</span><span class="p">]</span>
 
-        <span class="k">print</span> <span class="s2">&quot;calc_subthresh_sweeps&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">calc_subthresh_sweeps</span><span class="p">)</span> <span class="c1"># DEBUG</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;calc_subthresh_sweeps: </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">calc_subthresh_sweeps</span><span class="p">))</span>
         <span class="n">calc_subthresh_ext</span> <span class="o">=</span> <span class="n">EphysSweepSetFeatureExtractor</span><span class="o">.</span><span class="n">from_sweeps</span><span class="p">(</span><span class="n">calc_subthresh_sweeps</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_subthreshold_membrane_property_ext</span> <span class="o">=</span> <span class="n">calc_subthresh_ext</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s2">&quot;long_squares&quot;</span><span class="p">][</span><span class="s2">&quot;subthreshold_membrane_property_sweeps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">calc_subthresh_ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">()</span>
@@ -1089,10 +1089,7 @@
 <div class="viewcode-block" id="reset_long_squares_start"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.reset_long_squares_start">[docs]</a><span class="k">def</span> <span class="nf">reset_long_squares_start</span><span class="p">(</span><span class="n">when</span><span class="p">):</span>
     <span class="k">global</span> <span class="n">LONG_SQUARES_START</span><span class="p">,</span> <span class="n">LONG_SQUARES_END</span>
     <span class="n">delta</span> <span class="o">=</span> <span class="n">LONG_SQUARES_END</span> <span class="o">-</span> <span class="n">LONG_SQUARES_START</span>
-    <span class="k">print</span> <span class="n">delta</span>
-    <span class="k">print</span> <span class="n">when</span>
     <span class="n">LONG_SQUARES_START</span> <span class="o">=</span> <span class="n">when</span>
-    <span class="k">print</span> <span class="n">LONG_SQUARES_START</span>
     <span class="n">LONG_SQUARES_END</span> <span class="o">=</span> <span class="n">when</span> <span class="o">+</span> <span class="n">delta</span></div>
 
 

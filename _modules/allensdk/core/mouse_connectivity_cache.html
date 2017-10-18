@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.core.mouse_connectivity_cache &mdash; Allen SDK 0.14.2 documentation</title>
+    <title>allensdk.core.mouse_connectivity_cache &mdash; Allen SDK 0.14.3 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.14.2',
+        VERSION:     '0.14.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.14.2 documentation" href="../../../index.html" />
+    <link rel="top" title="Allen SDK 0.14.3 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body role="document">
@@ -73,7 +73,7 @@
 <span class="c1"># license plus a third clause that prohibits redistribution for commercial</span>
 <span class="c1"># purposes without further permission.</span>
 <span class="c1">#</span>
-<span class="c1"># Copyright 2015-2016. Allen Institute. All rights reserved.</span>
+<span class="c1"># Copyright 2015-2017. Allen Institute. All rights reserved.</span>
 <span class="c1">#</span>
 <span class="c1"># Redistribution and use in source and binary forms, with or without</span>
 <span class="c1"># modification, are permitted provided that the following conditions are met:</span>
@@ -107,13 +107,10 @@
 <span class="kn">from</span> <span class="nn">allensdk.config.manifest_builder</span> <span class="kn">import</span> <span class="n">ManifestBuilder</span>
 <span class="kn">from</span> <span class="nn">allensdk.api.cache</span> <span class="kn">import</span> <span class="n">Cache</span>
 <span class="kn">from</span> <span class="nn">allensdk.api.queries.mouse_connectivity_api</span> <span class="kn">import</span> <span class="n">MouseConnectivityApi</span>
-<span class="kn">from</span> <span class="nn">allensdk.api.queries.ontologies_api</span> <span class="kn">import</span> <span class="n">OntologiesApi</span>
 <span class="kn">from</span> <span class="nn">allensdk.deprecated</span> <span class="kn">import</span> <span class="n">deprecated</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">json_utilities</span>
-<span class="kn">from</span> <span class="nn">.ontology</span> <span class="kn">import</span> <span class="n">Ontology</span>
-<span class="kn">from</span> <span class="nn">.structure_tree</span> <span class="kn">import</span> <span class="n">StructureTree</span>
-<span class="kn">from</span> <span class="nn">.reference_space</span> <span class="kn">import</span> <span class="n">ReferenceSpace</span>
+<span class="kn">from</span> <span class="nn">.reference_space_cache</span> <span class="kn">import</span> <span class="n">ReferenceSpaceCache</span>
 
 <span class="kn">import</span> <span class="nn">nrrd</span>
 <span class="kn">import</span> <span class="nn">os</span>
@@ -125,7 +122,7 @@
 <span class="kn">import</span> <span class="nn">functools</span>
 
 
-<div class="viewcode-block" id="MouseConnectivityCache"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache">[docs]</a><span class="k">class</span> <span class="nc">MouseConnectivityCache</span><span class="p">(</span><span class="n">Cache</span><span class="p">):</span>
+<div class="viewcode-block" id="MouseConnectivityCache"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache">[docs]</a><span class="k">class</span> <span class="nc">MouseConnectivityCache</span><span class="p">(</span><span class="n">ReferenceSpaceCache</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Cache class for storing and accessing data related to the adult mouse</span>
 <span class="sd">    Connectivity Atlas.  By default, this class will cache any downloaded</span>
@@ -168,86 +165,51 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">CCF_VERSION_KEY</span> <span class="o">=</span> <span class="s1">&#39;CCF_VERSION&#39;</span>
-    <span class="n">ANNOTATION_KEY</span> <span class="o">=</span> <span class="s1">&#39;ANNOTATION&#39;</span>
-    <span class="n">TEMPLATE_KEY</span> <span class="o">=</span> <span class="s1">&#39;TEMPLATE&#39;</span>
     <span class="n">PROJECTION_DENSITY_KEY</span> <span class="o">=</span> <span class="s1">&#39;PROJECTION_DENSITY&#39;</span>
     <span class="n">INJECTION_DENSITY_KEY</span> <span class="o">=</span> <span class="s1">&#39;INJECTION_DENSITY&#39;</span>
     <span class="n">INJECTION_FRACTION_KEY</span> <span class="o">=</span> <span class="s1">&#39;INJECTION_FRACTION&#39;</span>
     <span class="n">DATA_MASK_KEY</span> <span class="o">=</span> <span class="s1">&#39;DATA_MASK&#39;</span>
     <span class="n">STRUCTURE_UNIONIZES_KEY</span> <span class="o">=</span> <span class="s1">&#39;STRUCTURE_UNIONIZES&#39;</span>
     <span class="n">EXPERIMENTS_KEY</span> <span class="o">=</span> <span class="s1">&#39;EXPERIMENTS&#39;</span>
-    <span class="n">STRUCTURES_KEY</span> <span class="o">=</span> <span class="s1">&#39;STRUCTURES&#39;</span>
-    <span class="n">STRUCTURE_TREE_KEY</span> <span class="o">=</span> <span class="s1">&#39;STRUCTURE_TREE&#39;</span>
-    <span class="n">STRUCTURE_MASK_KEY</span> <span class="o">=</span> <span class="s1">&#39;STRUCTURE_MASK&#39;</span>
-    <span class="n">MANIFEST_VERSION</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+    <span class="n">MANIFEST_VERSION</span> <span class="o">=</span> <span class="mf">1.1</span>
+
+    <span class="n">SUMMARY_STRUCTURE_SET_ID</span> <span class="o">=</span> <span class="mi">167587189</span>
+    <span class="n">DEFAULT_STRUCTURE_SET_IDS</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">SUMMARY_STRUCTURE_SET_ID</span><span class="p">])</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">default_structure_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_default_structure_ids&#39;</span><span class="p">):</span>
+            <span class="n">tree</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_structure_tree</span><span class="p">()</span>
+            <span class="n">default_structures</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">get_structures_by_set_id</span><span class="p">(</span><span class="n">MouseConnectivityCache</span><span class="o">.</span><span class="n">DEFAULT_STRUCTURE_SET_IDS</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_default_structure_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">st</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">st</span> <span class="ow">in</span> <span class="n">default_structures</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_structure_ids</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">resolution</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                  <span class="n">cache</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
                  <span class="n">manifest_file</span><span class="o">=</span><span class="s1">&#39;mouse_connectivity_manifest.json&#39;</span><span class="p">,</span>
                  <span class="n">ccf_version</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                 <span class="n">base_uri</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">MouseConnectivityCache</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span>
-            <span class="n">manifest</span><span class="o">=</span><span class="n">manifest_file</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="n">cache</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">MANIFEST_VERSION</span><span class="p">)</span>
+                 <span class="n">base_uri</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
+                 <span class="n">version</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">version</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MANIFEST_VERSION</span>
 
         <span class="k">if</span> <span class="n">resolution</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span> <span class="o">=</span> <span class="n">MouseConnectivityApi</span><span class="o">.</span><span class="n">VOXEL_RESOLUTION_25_MICRONS</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span> <span class="o">=</span> <span class="n">resolution</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">api</span> <span class="o">=</span> <span class="n">MouseConnectivityApi</span><span class="p">(</span><span class="n">base_uri</span><span class="o">=</span><span class="n">base_uri</span><span class="p">)</span>
+            <span class="n">resolution</span> <span class="o">=</span> <span class="n">MouseConnectivityApi</span><span class="o">.</span><span class="n">VOXEL_RESOLUTION_25_MICRONS</span>
 
         <span class="k">if</span> <span class="n">ccf_version</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">ccf_version</span> <span class="o">=</span> <span class="n">MouseConnectivityApi</span><span class="o">.</span><span class="n">CCF_VERSION_DEFAULT</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ccf_version</span> <span class="o">=</span> <span class="n">ccf_version</span>
         
-<div class="viewcode-block" id="MouseConnectivityCache.get_annotation_volume"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_annotation_volume">[docs]</a>    <span class="k">def</span> <span class="nf">get_annotation_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Read the annotation volume.  Download it first if it doesn&#39;t exist.</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MouseConnectivityCache</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span>
+            <span class="n">resolution</span><span class="p">,</span> <span class="n">reference_space_key</span><span class="o">=</span><span class="n">ccf_version</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="n">cache</span><span class="p">,</span> 
+            <span class="n">manifest</span><span class="o">=</span><span class="n">manifest_file</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="n">version</span><span class="p">)</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span> <span class="o">=</span> <span class="n">MouseConnectivityApi</span><span class="p">(</span><span class="n">base_uri</span><span class="o">=</span><span class="n">base_uri</span><span class="p">)</span>
 
-<span class="sd">        file_name: string</span>
-<span class="sd">            File name to store the annotation volume.  If it already exists,</span>
-<span class="sd">            it will be read from this file.  If file_name is None, the</span>
-<span class="sd">            file_name will be pulled out of the manifest.  Default is None.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cache_path</span><span class="p">(</span>
-            <span class="n">file_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ANNOTATION_KEY</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ccf_version</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">)</span>
-
-        <span class="n">annotation</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">download_annotation_volume</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">ccf_version</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">,</span>
-            <span class="n">file_name</span><span class="p">,</span> 
-            <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;lazy&#39;</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">annotation</span><span class="p">,</span> <span class="n">info</span></div>
-
-<div class="viewcode-block" id="MouseConnectivityCache.get_template_volume"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_template_volume">[docs]</a>    <span class="k">def</span> <span class="nf">get_template_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Read the template volume.  Download it first if it doesn&#39;t exist.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-
-<span class="sd">        file_name: string</span>
-<span class="sd">            File name to store the template volume.  If it already exists,</span>
-<span class="sd">            it will be read from this file.  If file_name is None, the</span>
-<span class="sd">            file_name will be pulled out of the manifest.  Default is None.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cache_path</span><span class="p">(</span>
-            <span class="n">file_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">TEMPLATE_KEY</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">)</span>
-
-        <span class="n">template</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">download_template_volume</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">,</span> 
-                                                           <span class="n">file_name</span><span class="p">,</span> 
-                                                           <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;lazy&#39;</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">template</span><span class="p">,</span> <span class="n">info</span></div>
 
 <div class="viewcode-block" id="MouseConnectivityCache.get_projection_density"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_projection_density">[docs]</a>    <span class="k">def</span> <span class="nf">get_projection_density</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -367,67 +329,6 @@
 
         <span class="k">return</span> <span class="n">nrrd</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MouseConnectivityCache.get_structure_tree"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_structure_tree">[docs]</a>    <span class="k">def</span> <span class="nf">get_structure_tree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Read the list of adult mouse structures and return an StructureTree </span>
-<span class="sd">        instance.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-
-<span class="sd">        file_name: string</span>
-<span class="sd">            File name to save/read the structures table.  If file_name is None,</span>
-<span class="sd">            the file_name will be pulled out of the manifest.  If caching</span>
-<span class="sd">            is disabled, no file will be saved. Default is None.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        
-        <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cache_path</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">STRUCTURE_TREE_KEY</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">OntologiesApi</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">api_url</span><span class="p">)</span><span class="o">.</span><span class="n">get_structures_with_sets</span><span class="p">(</span>
-            <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;lazy&#39;</span><span class="p">,</span>
-            <span class="n">path</span><span class="o">=</span><span class="n">file_name</span><span class="p">,</span>
-            <span class="n">pre</span><span class="o">=</span><span class="n">StructureTree</span><span class="o">.</span><span class="n">clean_structures</span><span class="p">,</span>
-            <span class="n">post</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">StructureTree</span><span class="p">(</span><span class="n">StructureTree</span><span class="o">.</span><span class="n">clean_structures</span><span class="p">(</span><span class="n">x</span><span class="p">)),</span> 
-            <span class="n">structure_graph_ids</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">Cache</span><span class="o">.</span><span class="n">cache_json</span><span class="p">())</span></div>
-
-    <span class="nd">@deprecated</span><span class="p">(</span><span class="s1">&#39;Use get_structure_tree instead.&#39;</span><span class="p">)</span>
-<div class="viewcode-block" id="MouseConnectivityCache.get_ontology"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_ontology">[docs]</a>    <span class="k">def</span> <span class="nf">get_ontology</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Read the list of adult mouse structures and return an Ontology instance.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-
-<span class="sd">        file_name: string</span>
-<span class="sd">            File name to save/read the structures table.  If file_name is None,</span>
-<span class="sd">            the file_name will be pulled out of the manifest.  If caching</span>
-<span class="sd">            is disabled, no file will be saved. Default is None.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="k">return</span> <span class="n">Ontology</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_structures</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span></div>
-
-    <span class="nd">@deprecated</span><span class="p">(</span><span class="s1">&#39;Use get_structure_tree instead.&#39;</span><span class="p">)</span>
-<div class="viewcode-block" id="MouseConnectivityCache.get_structures"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_structures">[docs]</a>    <span class="k">def</span> <span class="nf">get_structures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Read the list of adult mouse structures and return a Pandas DataFrame.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-
-<span class="sd">        file_name: string</span>
-<span class="sd">            File name to save/read the structures table.  If file_name is None,</span>
-<span class="sd">            the file_name will be pulled out of the manifest.  If caching</span>
-<span class="sd">            is disabled, no file will be saved. Default is None.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cache_path</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">STRUCTURES_KEY</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">OntologiesApi</span><span class="p">(</span><span class="n">base_uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">api_url</span><span class="p">)</span><span class="o">.</span><span class="n">get_structures</span><span class="p">(</span>
-            <span class="mi">1</span><span class="p">,</span>
-            <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;lazy&#39;</span><span class="p">,</span>
-            <span class="n">path</span><span class="o">=</span><span class="n">file_name</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">Cache</span><span class="o">.</span><span class="n">cache_csv_dataframe</span><span class="p">())</span></div>
-
 
 <div class="viewcode-block" id="MouseConnectivityCache.get_experiments"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_experiments">[docs]</a>    <span class="k">def</span> <span class="nf">get_experiments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataframe</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">cre</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">injection_structure_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -510,8 +411,8 @@
         <span class="k">elif</span> <span class="n">cre</span> <span class="ow">is</span> <span class="bp">False</span><span class="p">:</span>
             <span class="n">experiments</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">experiments</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;transgenic-line&#39;</span><span class="p">]]</span>
         <span class="k">elif</span> <span class="n">cre</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">experiments</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">experiments</span> <span class="k">if</span> <span class="n">e</span><span class="p">[</span>
-                <span class="s1">&#39;transgenic-line&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">cre</span><span class="p">]</span>
+            <span class="n">cre</span> <span class="o">=</span> <span class="p">[</span> <span class="n">c</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cre</span> <span class="p">]</span>
+            <span class="n">experiments</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">experiments</span> <span class="k">if</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;transgenic-line&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">cre</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">injection_structure_ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">structure_ids</span> <span class="o">=</span> <span class="n">MouseConnectivityCache</span><span class="o">.</span><span class="n">validate_structure_ids</span><span class="p">(</span><span class="n">injection_structure_ids</span><span class="p">)</span>
@@ -583,6 +484,68 @@
                                                 <span class="n">post</span><span class="o">=</span><span class="n">filter_fn</span><span class="p">,</span>
                                                 <span class="n">writer</span><span class="o">=</span><span class="k">lambda</span> <span class="n">p</span><span class="p">,</span> <span class="n">x</span> <span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">p</span><span class="p">),</span>
                                                 <span class="n">reader</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_csv</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MouseConnectivityCache.rank_structures"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.rank_structures">[docs]</a>    <span class="k">def</span> <span class="nf">rank_structures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">experiment_ids</span><span class="p">,</span> <span class="n">is_injection</span><span class="p">,</span> <span class="n">structure_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">hemisphere_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
+                        <span class="n">rank_on</span><span class="o">=</span><span class="s1">&#39;normalized_projection_volume&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">10</span><span class="o">**-</span><span class="mi">2</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Produces one or more (per experiment) ranked lists of brain structures, using a specified data field.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        experiment_ids : list of int</span>
+<span class="sd">            Obtain injection_structures for these experiments.</span>
+<span class="sd">        is_injection : boolean</span>
+<span class="sd">            Use data from only injection (or non-injection) unionizes.</span>
+<span class="sd">        structure_ids : list of int, optional</span>
+<span class="sd">            Consider only these structures. It is a good idea to make sure that these structures are not spatially </span>
+<span class="sd">            overlapping; otherwise your results will contain redundant information. Defaults to the summary </span>
+<span class="sd">            structures - a brain-wide list of nonoverlapping mid-level structures.</span>
+<span class="sd">        hemisphere_ids : list of int, optional</span>
+<span class="sd">            Consider only these hemispheres (1: left, 2: right, 3: both). Like with structures, </span>
+<span class="sd">            you might get redundant results if you select overlapping options. Defaults to [1, 2].</span>
+<span class="sd">        rank_on : str, optional</span>
+<span class="sd">            Rank unionize data using this field (descending). Defaults to normalized_projection_volume.</span>
+<span class="sd">        n : int, optional</span>
+<span class="sd">            Return only the top n structures.</span>
+<span class="sd">        threshold : float, optional</span>
+<span class="sd">            Consider only records whose data value - specified by the rank_on parameter - exceeds this value.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list : </span>
+<span class="sd">            Each element (1 for each input experiment) is a list of dictionaries. The dictionaries describe the top</span>
+<span class="sd">            injection structures in descending order. They are specified by their structure and hemisphere id fields and </span>
+<span class="sd">            additionally report the value specified by the rank_on parameter.</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">output_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;experiment_id&#39;</span><span class="p">,</span> <span class="n">rank_on</span><span class="p">,</span> <span class="s1">&#39;hemisphere_id&#39;</span><span class="p">,</span> <span class="s1">&#39;structure_id&#39;</span><span class="p">]</span>
+        <span class="n">filter_fields</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">fieldname</span><span class="p">:</span> <span class="n">fieldname</span> <span class="ow">in</span> <span class="n">output_keys</span>
+
+        <span class="k">if</span> <span class="n">hemisphere_ids</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">hemisphere_ids</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">structure_ids</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">structure_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_structure_ids</span>
+
+        <span class="n">unionizes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_structure_unionizes</span><span class="p">(</span><span class="n">experiment_ids</span><span class="p">,</span> 
+                                                 <span class="n">is_injection</span><span class="o">=</span><span class="n">is_injection</span><span class="p">,</span> 
+                                                 <span class="n">structure_ids</span><span class="o">=</span><span class="n">structure_ids</span><span class="p">,</span> 
+                                                 <span class="n">hemisphere_ids</span><span class="o">=</span><span class="n">hemisphere_ids</span><span class="p">,</span> 
+                                                 <span class="n">include_descendants</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="n">unionizes</span> <span class="o">=</span> <span class="n">unionizes</span><span class="p">[</span><span class="n">unionizes</span><span class="p">[</span><span class="n">rank_on</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">threshold</span><span class="p">]</span> 
+
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">eid</span> <span class="ow">in</span> <span class="n">experiment_ids</span><span class="p">:</span>
+
+            <span class="n">this_experiment_unionizes</span> <span class="o">=</span> <span class="n">unionizes</span><span class="p">[</span><span class="n">unionizes</span><span class="p">[</span><span class="s1">&#39;experiment_id&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">eid</span><span class="p">]</span>
+            <span class="n">this_experiment_unionizes</span> <span class="o">=</span> <span class="n">this_experiment_unionizes</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">rank_on</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+            <span class="n">this_experiment_unionizes</span> <span class="o">=</span> <span class="n">this_experiment_unionizes</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">filter_fields</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            
+            <span class="n">records</span> <span class="o">=</span> <span class="n">this_experiment_unionizes</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s1">&#39;record&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">records</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">n</span><span class="p">:</span>
+                <span class="n">records</span> <span class="o">=</span> <span class="n">records</span><span class="p">[:</span><span class="n">n</span><span class="p">]</span>
+            <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">records</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">results</span></div>
 
 <div class="viewcode-block" id="MouseConnectivityCache.filter_structure_unionizes"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.filter_structure_unionizes">[docs]</a>    <span class="k">def</span> <span class="nf">filter_structure_unionizes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unionizes</span><span class="p">,</span> 
                                    <span class="n">is_injection</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
@@ -675,10 +638,13 @@
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">unionizes</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MouseConnectivityCache.get_projection_matrix"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_projection_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">get_projection_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">experiment_ids</span><span class="p">,</span> 
-                              <span class="n">projection_structure_ids</span><span class="p">,</span>
+                              <span class="n">projection_structure_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                               <span class="n">hemisphere_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
                               <span class="n">parameter</span><span class="o">=</span><span class="s1">&#39;projection_volume&#39;</span><span class="p">,</span> 
                               <span class="n">dataframe</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">projection_structure_ids</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">projection_structure_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_structure_ids</span>
 
         <span class="n">unionizes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_structure_unionizes</span><span class="p">(</span><span class="n">experiment_ids</span><span class="p">,</span>
                                                  <span class="n">is_injection</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
@@ -732,103 +698,9 @@
             <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;matrix&#39;</span><span class="p">:</span> <span class="n">matrix</span><span class="p">,</span> <span class="s1">&#39;rows&#39;</span><span class="p">:</span> <span class="n">rows_df</span><span class="p">,</span> <span class="s1">&#39;columns&#39;</span><span class="p">:</span> <span class="n">cols_df</span><span class="p">}</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;matrix&#39;</span><span class="p">:</span> <span class="n">matrix</span><span class="p">,</span> <span class="s1">&#39;rows&#39;</span><span class="p">:</span> <span class="n">experiment_ids</span><span class="p">,</span> <span class="s1">&#39;columns&#39;</span><span class="p">:</span> <span class="n">columns</span><span class="p">}</span></div>
+    
 
-<div class="viewcode-block" id="MouseConnectivityCache.get_reference_space"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_reference_space">[docs]</a>    <span class="k">def</span> <span class="nf">get_reference_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
-                            <span class="n">annotation_file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Build a ReferenceSpace from this cache&#39;s annotation volume and </span>
-<span class="sd">        structure tree. The ReferenceSpace does operations that relate brain </span>
-<span class="sd">        structures to spatial domains.</span>
-<span class="sd">        </span>
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        </span>
-<span class="sd">        structure_file_name: string</span>
-<span class="sd">            File name to save/read the structures table.  If file_name is None,</span>
-<span class="sd">            the file_name will be pulled out of the manifest.  If caching</span>
-<span class="sd">            is disabled, no file will be saved. Default is None.</span>
-<span class="sd">            </span>
-<span class="sd">        annotation_file_name: string</span>
-<span class="sd">            File name to store the annotation volume.  If it already exists,</span>
-<span class="sd">            it will be read from this file.  If file_name is None, the</span>
-<span class="sd">            file_name will be pulled out of the manifest.  Default is None.</span>
-<span class="sd">        </span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        
-        <span class="k">return</span> <span class="n">ReferenceSpace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_structure_tree</span><span class="p">(</span><span class="n">structure_file_name</span><span class="p">),</span> 
-                              <span class="bp">self</span><span class="o">.</span><span class="n">get_annotation_volume</span><span class="p">(</span><span class="n">annotation_file_name</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> 
-                              <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="MouseConnectivityCache.get_structure_mask"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_structure_mask">[docs]</a>    <span class="k">def</span> <span class="nf">get_structure_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_id</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">annotation_file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Read a 3D numpy array shaped like the annotation volume that has non-zero values where</span>
-<span class="sd">        voxels belong to a particular structure.  This will take care of identifying substructures.</span>
-
-<span class="sd">        Notes</span>
-<span class="sd">        -----</span>
-<span class="sd">        If you are making large numbers of masks, there is a faster structure mask generator in </span>
-<span class="sd">        ReferenceSpace.many_structure_masks.  We will be migrating this function in a future release.</span>
-<span class="sd">        </span>
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-
-<span class="sd">        structure_id: int</span>
-<span class="sd">            ID of a structure.</span>
-
-<span class="sd">        file_name: string</span>
-<span class="sd">            File name to store the structure mask.  If it already exists,</span>
-<span class="sd">            it will be read from this file.  If file_name is None, the</span>
-<span class="sd">            file_name will be pulled out of the manifest.  Default is None.</span>
-
-<span class="sd">        annotation_file_name: string</span>
-<span class="sd">            File name to store the annotation volume.  If it already exists,</span>
-<span class="sd">            it will be read from this file.  If file_name is None, the</span>
-<span class="sd">            file_name will be pulled out of the manifest.  Default is None.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">structure_id</span> <span class="o">=</span> <span class="n">MouseConnectivityCache</span><span class="o">.</span><span class="n">validate_structure_id</span><span class="p">(</span><span class="n">structure_id</span><span class="p">)</span>
-
-        <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cache_path</span><span class="p">(</span>
-            <span class="n">file_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">STRUCTURE_MASK_KEY</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ccf_version</span><span class="p">,</span> 
-            <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">,</span> <span class="n">structure_id</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">nrrd</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">st</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_structure_tree</span><span class="p">()</span>
-            <span class="n">structure_ids</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">descendant_ids</span><span class="p">([</span><span class="n">structure_id</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">annotation</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_annotation_volume</span><span class="p">(</span><span class="n">annotation_file_name</span><span class="p">)</span>
-            <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_structure_mask</span><span class="p">(</span><span class="n">structure_ids</span><span class="p">,</span> <span class="n">annotation</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
-                <span class="n">Manifest</span><span class="o">.</span><span class="n">safe_make_parent_dirs</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
-                <span class="n">nrrd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
-
-            <span class="k">return</span> <span class="n">mask</span><span class="p">,</span> <span class="bp">None</span></div>
-
-<div class="viewcode-block" id="MouseConnectivityCache.make_structure_mask"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.make_structure_mask">[docs]</a>    <span class="k">def</span> <span class="nf">make_structure_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_ids</span><span class="p">,</span> <span class="n">annotation</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Look at an annotation volume and identify voxels that have values</span>
-<span class="sd">        in a list of structure ids.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-
-<span class="sd">        structure_ids: list</span>
-<span class="sd">            List of IDs to look for in the annotation volume</span>
-
-<span class="sd">        annotation: np.ndarray</span>
-<span class="sd">            Numpy array filled with IDs.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="n">m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">annotation</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
-
-        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">sid</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">structure_ids</span><span class="p">):</span>
-            <span class="n">m</span><span class="p">[</span><span class="n">annotation</span> <span class="o">==</span> <span class="n">sid</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-
-        <span class="k">return</span> <span class="n">m</span></div>
-
-<div class="viewcode-block" id="MouseConnectivityCache.build_manifest"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.build_manifest">[docs]</a>    <span class="k">def</span> <span class="nf">build_manifest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
+<div class="viewcode-block" id="MouseConnectivityCache.add_manifest_paths"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.add_manifest_paths">[docs]</a>    <span class="k">def</span> <span class="nf">add_manifest_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">manifest_builder</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Construct a manifest for this Cache class and save it in a file.</span>
 
@@ -840,42 +712,15 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">manifest_builder</span> <span class="o">=</span> <span class="n">ManifestBuilder</span><span class="p">()</span>
-        <span class="n">manifest_builder</span><span class="o">.</span><span class="n">set_version</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MANIFEST_VERSION</span><span class="p">)</span>
-        <span class="n">manifest_builder</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="s1">&#39;BASEDIR&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+        <span class="n">manifest_builder</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">MouseConnectivityCache</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">add_manifest_paths</span><span class="p">(</span><span class="n">manifest_builder</span><span class="p">)</span>
 
         <span class="n">manifest_builder</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">EXPERIMENTS_KEY</span><span class="p">,</span>
                                   <span class="s1">&#39;experiments.json&#39;</span><span class="p">,</span>
                                   <span class="n">parent_key</span><span class="o">=</span><span class="s1">&#39;BASEDIR&#39;</span><span class="p">,</span>
                                   <span class="n">typename</span><span class="o">=</span><span class="s1">&#39;file&#39;</span><span class="p">)</span>
 
-        <span class="n">manifest_builder</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">STRUCTURES_KEY</span><span class="p">,</span>
-                                  <span class="s1">&#39;structures.csv&#39;</span><span class="p">,</span>
-                                  <span class="n">parent_key</span><span class="o">=</span><span class="s1">&#39;BASEDIR&#39;</span><span class="p">,</span>
-                                  <span class="n">typename</span><span class="o">=</span><span class="s1">&#39;file&#39;</span><span class="p">)</span>
-                                  
-        <span class="n">manifest_builder</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">STRUCTURE_TREE_KEY</span><span class="p">,</span>
-                                  <span class="s1">&#39;structures.json&#39;</span><span class="p">,</span>
-                                  <span class="n">parent_key</span><span class="o">=</span><span class="s1">&#39;BASEDIR&#39;</span><span class="p">,</span>
-                                  <span class="n">typename</span><span class="o">=</span><span class="s1">&#39;file&#39;</span><span class="p">)</span>
-
         <span class="n">manifest_builder</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">STRUCTURE_UNIONIZES_KEY</span><span class="p">,</span>
                                   <span class="s1">&#39;experiment_</span><span class="si">%d</span><span class="s1">/structure_unionizes.csv&#39;</span><span class="p">,</span>
-                                  <span class="n">parent_key</span><span class="o">=</span><span class="s1">&#39;BASEDIR&#39;</span><span class="p">,</span>
-                                  <span class="n">typename</span><span class="o">=</span><span class="s1">&#39;file&#39;</span><span class="p">)</span>
-
-        <span class="n">manifest_builder</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CCF_VERSION_KEY</span><span class="p">,</span>
-                                  <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
-                                  <span class="n">parent_key</span><span class="o">=</span><span class="s1">&#39;BASEDIR&#39;</span><span class="p">,</span>
-                                  <span class="n">typename</span><span class="o">=</span><span class="s1">&#39;dir&#39;</span><span class="p">)</span>
-
-        <span class="n">manifest_builder</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ANNOTATION_KEY</span><span class="p">,</span>
-                                  <span class="s1">&#39;annotation_</span><span class="si">%d</span><span class="s1">.nrrd&#39;</span><span class="p">,</span>
-                                  <span class="n">parent_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">CCF_VERSION_KEY</span><span class="p">,</span>
-                                  <span class="n">typename</span><span class="o">=</span><span class="s1">&#39;file&#39;</span><span class="p">)</span>
-
-        <span class="n">manifest_builder</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TEMPLATE_KEY</span><span class="p">,</span>
-                                  <span class="s1">&#39;average_template_</span><span class="si">%d</span><span class="s1">.nrrd&#39;</span><span class="p">,</span>
                                   <span class="n">parent_key</span><span class="o">=</span><span class="s1">&#39;BASEDIR&#39;</span><span class="p">,</span>
                                   <span class="n">typename</span><span class="o">=</span><span class="s1">&#39;file&#39;</span><span class="p">)</span>
 
@@ -899,32 +744,7 @@
                                   <span class="n">parent_key</span><span class="o">=</span><span class="s1">&#39;BASEDIR&#39;</span><span class="p">,</span>
                                   <span class="n">typename</span><span class="o">=</span><span class="s1">&#39;file&#39;</span><span class="p">)</span>
 
-        <span class="n">manifest_builder</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">STRUCTURE_MASK_KEY</span><span class="p">,</span>
-                                  <span class="s1">&#39;structure_masks/resolution_</span><span class="si">%d</span><span class="s1">/structure_</span><span class="si">%d</span><span class="s1">.nrrd&#39;</span><span class="p">,</span>
-                                  <span class="n">parent_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">CCF_VERSION_KEY</span><span class="p">,</span>
-                                  <span class="n">typename</span><span class="o">=</span><span class="s1">&#39;file&#39;</span><span class="p">)</span>
-
-        <span class="n">manifest_builder</span><span class="o">.</span><span class="n">write_json_file</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span></div>
-       
- 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="MouseConnectivityCache.validate_structure_id"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.validate_structure_id">[docs]</a>    <span class="k">def</span> <span class="nf">validate_structure_id</span><span class="p">(</span><span class="n">structure_id</span><span class="p">):</span>
-
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">structure_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">structure_id</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid structure_id (</span><span class="si">%s</span><span class="s2">): could not convert to integer.&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">structure_id</span><span class="p">))</span>
-
-        <span class="k">return</span> <span class="n">structure_id</span></div>
-
-
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="MouseConnectivityCache.validate_structure_ids"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.validate_structure_ids">[docs]</a>    <span class="k">def</span> <span class="nf">validate_structure_ids</span><span class="p">(</span><span class="n">structure_ids</span><span class="p">):</span>
-
-        <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">sid</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">structure_ids</span><span class="p">):</span>
-            <span class="n">structure_ids</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="o">=</span> <span class="n">MouseConnectivityCache</span><span class="o">.</span><span class="n">validate_structure_id</span><span class="p">(</span><span class="n">sid</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">structure_ids</span></div></div>
+        <span class="k">return</span> <span class="n">manifest_builder</span></div></div>
 </pre></div>
 
           </div>

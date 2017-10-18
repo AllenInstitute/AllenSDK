@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Welcome to the Allen SDK &mdash; Allen SDK 0.14.2 documentation</title>
+    <title>Welcome to the Allen SDK &mdash; Allen SDK 0.14.3 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.14.2',
+        VERSION:     '0.14.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.14.2 documentation" href="#" />
+    <link rel="top" title="Allen SDK 0.14.3 documentation" href="#" />
     <link rel="next" title="Install Guide" href="install.html" /> 
   </head>
   <body role="document">
@@ -122,15 +122,27 @@ your own simulations using stimuli from the Allen Cell Types Database or custom 
 <p>The Allen SDK provides Python code for accessing experimental metadata along with projection signal volumes registered to a common coordinate framework.  This framework has structural annotations, which allows users to compute structure-level signal statistics.</p>
 <p>See the <a class="reference external" href="connectivity.html">mouse connectivity section</a> for more details.</p>
 </div>
-<div class="section" id="what-s-new-release-0-14-2-august-17th-2017">
-<h2>What&#8217;s New - Release 0.14.2 (August 17th, 2017)<a class="headerlink" href="#what-s-new-release-0-14-2-august-17th-2017" title="Permalink to this headline">¶</a></h2>
-<p>The 0.14.2  release is primarily a change in our open source license.
-We are now using a 2-clause BSD license with an additional clause
-related to commercial use.  If you have any questions, please contact us on our
-<a class="reference external" href="https://gitter.im/AllenInstitute/AllenSDK">Gitter channel</a>
-or <a class="reference external" href="http://allins.convio.net/site/PageServer?pagename=send_us_a_message">send us a message</a>.</p>
-<p>This release also includes code in the BrainObservatory for mapping stimuli to screens.
-See <a class="reference external" href="http://alleninstitute.github.io/AllenSDK/_static/examples/nb/brain_observatory_monitor.html">this Jupyter example notebook</a> for details.</p>
+<div class="section" id="what-s-new-release-0-14-3-october-19th-2017">
+<h2>What&#8217;s New - Release 0.14.3 (October 19th, 2017)<a class="headerlink" href="#what-s-new-release-0-14-3-october-19th-2017" title="Permalink to this headline">¶</a></h2>
+<p>The 0.14.3 release coincides with the first release of human data and models in the Allen Cell Types Database and a complete requantification of structure unionize
+records in the Allen Mouse Brain Connectivity Atlas based on a new revision of the Common Coordinate Framework structure ontology and voxel annotations.  For details
+on what types of data were added to the two atlases, take a look at the <a class="reference external" href="https://github.com/AllenInstitute/AllenSDK/wiki/Release-Notes-(0.14.3)">data release notes</a>.</p>
+<p>Users of the <a class="reference internal" href="allensdk.core.html#allensdk.core.cell_types_cache.CellTypesCache" title="allensdk.core.cell_types_cache.CellTypesCache"><code class="xref py py-class docutils literal"><span class="pre">CellTypesCache</span></code></a> can filter for cells based on the species of the cell&#8217;s donor using the <code class="docutils literal"><span class="pre">species</span></code> argument of
+<a class="reference internal" href="allensdk.core.html#allensdk.core.cell_types_cache.CellTypesCache.get_cells" title="allensdk.core.cell_types_cache.CellTypesCache.get_cells"><code class="xref py py-meth docutils literal"><span class="pre">get_cells()</span></code></a>.  Examples of this are shown in the metadata filtering section of the example
+<a class="reference external" href="_static/examples/nb/cell_types.html">Jupyter notebook</a></p>
+<p>The Allen Mouse Brain Connectivity Atlas contains over 350 new data sets and structure unionize records have been completely reprocessed with updated 3D annotations of the Common Coordinate Framework.
+The structure ontology contains new structures, with annotations have changing the most.  The <a class="reference internal" href="allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache" title="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache"><code class="xref py py-class docutils literal"><span class="pre">MouseConnectivityCache</span></code></a> <code class="code docutils literal"><span class="pre">get_annotation_volume</span></code> method will by default return a new volume by default.  You can choose which version of annotations you would like using the <code class="docutils literal"><span class="pre">ccf_version</span></code> <a class="reference internal" href="allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache" title="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache"><code class="xref py py-class docutils literal"><span class="pre">MouseConnectivityCache</span></code></a> constructor.</p>
+<p>To access new experiments and unionize records, you will need to remove a number of files in your manifest directory so that
+<a class="reference internal" href="allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache" title="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache"><code class="xref py py-class docutils literal"><span class="pre">MouseConnectivityCache</span></code></a> will know to download the new copies:</p>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache" title="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache"><code class="xref py py-class docutils literal"><span class="pre">MouseConnectivityCache</span></code></a> manifest JSON</li>
+<li><code class="docutils literal"><span class="pre">experiments.json</span></code></li>
+<li><code class="docutils literal"><span class="pre">structures.json</span></code></li>
+<li><code class="docutils literal"><span class="pre">structure_unionizes.csv</span></code> (one per experiment within experiment subdirectories)</li>
+</ul>
+</div></blockquote>
+<p>You can then call the <a class="reference internal" href="allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache" title="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache"><code class="xref py py-class docutils literal"><span class="pre">MouseConnectivityCache</span></code></a> <code class="code docutils literal"><span class="pre">get_experiments</span></code>, <code class="code docutils literal"><span class="pre">get_structure_tree</span></code>, and <code class="code docutils literal"><span class="pre">get_structure_unionizes</span></code> methods to download the files above.</p>
 <p>To find out more, take a look at our <a class="reference external" href="http://github.com/AllenInstitute/AllenSDK/blob/master/CHANGELOG.md">CHANGELOG</a>.</p>
 </div>
 </div>

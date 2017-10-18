@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.api.queries.brain_observatory_api &mdash; Allen SDK 0.14.2 documentation</title>
+    <title>allensdk.api.queries.brain_observatory_api &mdash; Allen SDK 0.14.3 documentation</title>
     
     <link rel="stylesheet" href="../../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '0.14.2',
+        VERSION:     '0.14.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.14.2 documentation" href="../../../../index.html" />
+    <link rel="top" title="Allen SDK 0.14.3 documentation" href="../../../../index.html" />
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
   <body role="document">
@@ -435,8 +435,9 @@
                 <span class="s1">&#39;imaging_depth&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">imaging_depths</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">transgenic_lines</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">tls</span> <span class="o">=</span> <span class="p">[</span> <span class="n">tl</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">tl</span> <span class="ow">in</span> <span class="n">transgenic_lines</span> <span class="p">]</span>
             <span class="n">containers</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">containers</span> <span class="k">for</span> <span class="n">tl</span> <span class="ow">in</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;specimen&#39;</span><span class="p">][</span>
-                <span class="s1">&#39;donor&#39;</span><span class="p">][</span><span class="s1">&#39;transgenic_lines&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">tl</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">transgenic_lines</span><span class="p">]</span>
+                <span class="s1">&#39;donor&#39;</span><span class="p">][</span><span class="s1">&#39;transgenic_lines&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">tl</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">tls</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">containers</span></div>
 
@@ -448,7 +449,8 @@
                                  <span class="n">transgenic_lines</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                                  <span class="n">stimuli</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                                  <span class="n">session_types</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                                 <span class="n">include_failed</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+                                 <span class="n">include_failed</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                                 <span class="n">require_eye_tracking</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
 
         <span class="c1"># re-using the code from above</span>
         <span class="n">experiments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_experiment_containers</span><span class="p">(</span><span class="n">experiments</span><span class="p">,</span>
@@ -457,6 +459,9 @@
                                                         <span class="n">imaging_depths</span><span class="o">=</span><span class="n">imaging_depths</span><span class="p">,</span>
                                                         <span class="n">transgenic_lines</span><span class="o">=</span><span class="n">transgenic_lines</span><span class="p">)</span>
 
+        <span class="k">if</span> <span class="n">require_eye_tracking</span><span class="p">:</span>
+            <span class="n">experiments</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">experiments</span>
+                           <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;fail_eye_tracking&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">False</span><span class="p">]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">include_failed</span><span class="p">:</span>
             <span class="n">experiments</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">experiments</span> 
                            <span class="k">if</span> <span class="ow">not</span> <span class="n">e</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;experiment_container&#39;</span><span class="p">,{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;failed&#39;</span><span class="p">,</span> <span class="bp">False</span><span class="p">)]</span>

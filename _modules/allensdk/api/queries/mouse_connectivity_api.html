@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.api.queries.mouse_connectivity_api &mdash; Allen SDK 0.14.2 documentation</title>
+    <title>allensdk.api.queries.mouse_connectivity_api &mdash; Allen SDK 0.14.3 documentation</title>
     
     <link rel="stylesheet" href="../../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '0.14.2',
+        VERSION:     '0.14.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.14.2 documentation" href="../../../../index.html" />
+    <link rel="top" title="Allen SDK 0.14.3 documentation" href="../../../../index.html" />
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
   <body role="document">
@@ -73,7 +73,7 @@
 <span class="c1"># license plus a third clause that prohibits redistribution for commercial</span>
 <span class="c1"># purposes without further permission.</span>
 <span class="c1">#</span>
-<span class="c1"># Copyright 2015-2016. Allen Institute. All rights reserved.</span>
+<span class="c1"># Copyright 2015-2017. Allen Institute. All rights reserved.</span>
 <span class="c1">#</span>
 <span class="c1"># Redistribution and use in source and binary forms, with or without</span>
 <span class="c1"># modification, are permitted provided that the following conditions are met:</span>
@@ -104,7 +104,7 @@
 <span class="c1"># ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="c1">#</span>
-<span class="kn">from</span> <span class="nn">.rma_api</span> <span class="kn">import</span> <span class="n">RmaApi</span>
+<span class="kn">from</span> <span class="nn">.reference_space_api</span> <span class="kn">import</span> <span class="n">ReferenceSpaceApi</span>
 <span class="kn">from</span> <span class="nn">.grid_data_api</span> <span class="kn">import</span> <span class="n">GridDataApi</span>
 <span class="kn">from</span> <span class="nn">..cache</span> <span class="kn">import</span> <span class="n">cacheable</span><span class="p">,</span> <span class="n">Cache</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
@@ -112,7 +112,7 @@
 <span class="kn">import</span> <span class="nn">six</span>
 
 
-<div class="viewcode-block" id="MouseConnectivityApi"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi">[docs]</a><span class="k">class</span> <span class="nc">MouseConnectivityApi</span><span class="p">(</span><span class="n">RmaApi</span><span class="p">):</span>
+<div class="viewcode-block" id="MouseConnectivityApi"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi">[docs]</a><span class="k">class</span> <span class="nc">MouseConnectivityApi</span><span class="p">(</span><span class="n">ReferenceSpaceApi</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    HTTP Client for the Allen Mouse Brain Connectivity Atlas.</span>
 
@@ -122,71 +122,6 @@
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">MouseConnectivityApi</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">base_uri</span><span class="p">)</span>
-
-    <span class="n">AVERAGE_TEMPLATE</span> <span class="o">=</span> <span class="s1">&#39;average_template&#39;</span>
-    <span class="n">ARA_NISSL</span> <span class="o">=</span> <span class="s1">&#39;ara_nissl&#39;</span>
-    <span class="n">MOUSE_2011</span> <span class="o">=</span> <span class="s1">&#39;annotation/mouse_2011&#39;</span>
-    <span class="n">DEVMOUSE_2012</span> <span class="o">=</span> <span class="s1">&#39;annotation/devmouse_2012&#39;</span>
-    <span class="n">CCF_2015</span> <span class="o">=</span> <span class="s1">&#39;annotation/ccf_2015&#39;</span>
-    <span class="n">CCF_2016</span> <span class="o">=</span> <span class="s1">&#39;annotation/ccf_2016&#39;</span>
-    <span class="n">CCF_VERSION_DEFAULT</span> <span class="o">=</span> <span class="n">CCF_2016</span>
-
-    <span class="n">VOXEL_RESOLUTION_10_MICRONS</span> <span class="o">=</span> <span class="mi">10</span>
-    <span class="n">VOXEL_RESOLUTION_25_MICRONS</span> <span class="o">=</span> <span class="mi">25</span>
-    <span class="n">VOXEL_RESOLUTION_50_MICRONS</span> <span class="o">=</span> <span class="mi">50</span>
-    <span class="n">VOXEL_RESOLUTION_100_MICRONS</span> <span class="o">=</span> <span class="mi">100</span>
-
-    <span class="nd">@cacheable</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;create&#39;</span><span class="p">,</span>
-               <span class="n">reader</span><span class="o">=</span><span class="n">nrrd</span><span class="o">.</span><span class="n">read</span><span class="p">,</span>
-               <span class="n">pathfinder</span><span class="o">=</span><span class="n">Cache</span><span class="o">.</span><span class="n">pathfinder</span><span class="p">(</span><span class="n">file_name_position</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-                                           <span class="n">path_keyword</span><span class="o">=</span><span class="s1">&#39;file_name&#39;</span><span class="p">))</span>
-<div class="viewcode-block" id="MouseConnectivityApi.download_annotation_volume"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_annotation_volume">[docs]</a>    <span class="k">def</span> <span class="nf">download_annotation_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                                   <span class="n">ccf_version</span><span class="p">,</span>
-                                   <span class="n">resolution</span><span class="p">,</span>
-                                   <span class="n">file_name</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Download the annotation volume at a particular resolution.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        ccf_version: string</span>
-<span class="sd">            MouseConnectivityApi.CCF_2016 (default) or MouseConnectivityApi.CCF_2015</span>
-<span class="sd">        resolution: int</span>
-<span class="sd">            Desired resolution to download in microns.</span>
-<span class="sd">            Must be 10, 25, 50, or 100.</span>
-<span class="sd">        file_name: string</span>
-<span class="sd">            Where to save the annotation volume.</span>
-<span class="sd">        </span>
-<span class="sd">        Note: the parameters must be used as positional parameters, not keywords</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-
-        <span class="k">if</span> <span class="n">ccf_version</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">ccf_version</span> <span class="o">=</span> <span class="n">MouseConnectivityApi</span><span class="o">.</span><span class="n">CCF_VERSION_DEFAULT</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">download_volumetric_data</span><span class="p">(</span><span class="n">ccf_version</span><span class="p">,</span>
-                                      <span class="s1">&#39;annotation_</span><span class="si">%d</span><span class="s1">.nrrd&#39;</span> <span class="o">%</span> <span class="n">resolution</span><span class="p">,</span> 
-                                      <span class="n">save_file_path</span><span class="o">=</span><span class="n">file_name</span><span class="p">)</span></div>
-
-    <span class="nd">@cacheable</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;create&#39;</span><span class="p">,</span>
-               <span class="n">reader</span><span class="o">=</span><span class="n">nrrd</span><span class="o">.</span><span class="n">read</span><span class="p">,</span>
-               <span class="n">pathfinder</span><span class="o">=</span><span class="n">Cache</span><span class="o">.</span><span class="n">pathfinder</span><span class="p">(</span><span class="n">file_name_position</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-                                           <span class="n">path_keyword</span><span class="o">=</span><span class="s1">&#39;file_name&#39;</span><span class="p">))</span>
-<div class="viewcode-block" id="MouseConnectivityApi.download_template_volume"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_template_volume">[docs]</a>    <span class="k">def</span> <span class="nf">download_template_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Download the registration template volume at a particular resolution.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-
-<span class="sd">        resolution: int</span>
-<span class="sd">            Desired resolution to download in microns.  Must be 10, 25, 50, or 100.</span>
-
-<span class="sd">        file_name: string</span>
-<span class="sd">            Where to save the registration template volume.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">download_volumetric_data</span><span class="p">(</span><span class="n">MouseConnectivityApi</span><span class="o">.</span><span class="n">AVERAGE_TEMPLATE</span><span class="p">,</span>
-                                      <span class="s1">&#39;average_template_</span><span class="si">%d</span><span class="s1">.nrrd&#39;</span> <span class="o">%</span> <span class="n">resolution</span><span class="p">,</span> 
-                                      <span class="n">save_file_path</span><span class="o">=</span><span class="n">file_name</span><span class="p">)</span></div>
 
 
     <span class="nd">@cacheable</span><span class="p">()</span>
@@ -309,86 +244,6 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s1">&#39;SectionDataSet&#39;</span><span class="p">,</span>
                                 <span class="n">criteria</span><span class="o">=</span><span class="n">criteria</span><span class="p">,</span>
                                 <span class="n">include</span><span class="o">=</span><span class="n">include</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="MouseConnectivityApi.build_volumetric_data_download_url"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.build_volumetric_data_download_url">[docs]</a>    <span class="k">def</span> <span class="nf">build_volumetric_data_download_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                                           <span class="n">data_path</span><span class="p">,</span>
-                                           <span class="n">file_name</span><span class="p">,</span>
-                                           <span class="n">voxel_resolution</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                                           <span class="n">release</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                                           <span class="n">coordinate_framework</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Construct url to download 3D reference model in NRRD format.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        data_path : string</span>
-<span class="sd">            &#39;average_template&#39;, &#39;ara_nissl&#39;, &#39;annotation/ccf_2015&#39;, &#39;annotation/mouse_2011&#39;, or &#39;annotation/devmouse_2012&#39;</span>
-<span class="sd">        voxel_resolution : int</span>
-<span class="sd">            10, 25, 50 or 100</span>
-<span class="sd">        coordinate_framework : string</span>
-<span class="sd">            &#39;mouse_ccf&#39; (default) or &#39;mouse_annotation&#39;</span>
-
-<span class="sd">        Notes</span>
-<span class="sd">        -----</span>
-<span class="sd">        See: `3-D Reference Models &lt;http://help.brain-map.org/display/mouseconnectivity/API#API-3DReferenceModels&gt;`_</span>
-<span class="sd">        for additional documentation.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-
-        <span class="k">if</span> <span class="n">voxel_resolution</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">voxel_resolution</span> <span class="o">=</span> <span class="n">MouseConnectivityApi</span><span class="o">.</span><span class="n">VOXEL_RESOLUTION_10_MICRONS</span>
-
-        <span class="k">if</span> <span class="n">release</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">release</span> <span class="o">=</span> <span class="s1">&#39;current-release&#39;</span>
-
-        <span class="k">if</span> <span class="n">coordinate_framework</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">coordinate_framework</span> <span class="o">=</span> <span class="s1">&#39;mouse_ccf&#39;</span>
-
-        <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">informatics_archive_endpoint</span><span class="p">,</span>
-                       <span class="s1">&#39;/</span><span class="si">%s</span><span class="s1">/</span><span class="si">%s</span><span class="s1">/&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">release</span><span class="p">,</span> <span class="n">coordinate_framework</span><span class="p">),</span>
-                       <span class="n">data_path</span><span class="p">,</span>
-                       <span class="s1">&#39;/&#39;</span><span class="p">,</span>
-                       <span class="n">file_name</span><span class="p">])</span>
-
-        <span class="k">return</span> <span class="n">url</span></div>
-
-
-<div class="viewcode-block" id="MouseConnectivityApi.download_volumetric_data"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_volumetric_data">[docs]</a>    <span class="k">def</span> <span class="nf">download_volumetric_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                                 <span class="n">data_path</span><span class="p">,</span>
-                                 <span class="n">file_name</span><span class="p">,</span>
-                                 <span class="n">voxel_resolution</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                                 <span class="n">save_file_path</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                                 <span class="n">release</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                                 <span class="n">coordinate_framework</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Download 3D reference model in NRRD format.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        data_path : string</span>
-<span class="sd">            &#39;average_template&#39;, &#39;ara_nissl&#39;, &#39;annotation/ccf_2015&#39;, &#39;annotation/mouse_2011&#39;, or &#39;annotation/devmouse_2012&#39;</span>
-<span class="sd">        file_name : string</span>
-<span class="sd">            server-side file name. &#39;annotation_10.nrrd&#39; for example.</span>
-<span class="sd">        voxel_resolution : int</span>
-<span class="sd">            10, 25, 50 or 100</span>
-<span class="sd">        coordinate_framework : string</span>
-<span class="sd">            &#39;mouse_ccf&#39; (default) or &#39;mouse_annotation&#39;</span>
-
-<span class="sd">        Notes</span>
-<span class="sd">        -----</span>
-<span class="sd">        See: `3-D Reference Models &lt;http://help.brain-map.org/display/mouseconnectivity/API#API-3DReferenceModels&gt;`_</span>
-<span class="sd">        for additional documentation.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_volumetric_data_download_url</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span>
-                                                      <span class="n">file_name</span><span class="p">,</span>
-                                                      <span class="n">voxel_resolution</span><span class="p">,</span>
-                                                      <span class="n">release</span><span class="p">,</span>
-                                                      <span class="n">coordinate_framework</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">save_file_path</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">save_file_path</span> <span class="o">=</span> <span class="n">file_name</span>
-
-        <span class="k">if</span> <span class="n">save_file_path</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">save_file_path</span> <span class="o">=</span> <span class="s1">&#39;volumetric_data.nrrd&#39;</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_file_over_http</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">save_file_path</span><span class="p">)</span></div>
         
 
 <div class="viewcode-block" id="MouseConnectivityApi.download_reference_aligned_image_channel_volumes"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_reference_aligned_image_channel_volumes">[docs]</a>    <span class="k">def</span> <span class="nf">download_reference_aligned_image_channel_volumes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>

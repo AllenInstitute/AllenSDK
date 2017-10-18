@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.api.queries.cell_types_api &mdash; Allen SDK 0.14.2 documentation</title>
+    <title>allensdk.api.queries.cell_types_api &mdash; Allen SDK 0.14.3 documentation</title>
     
     <link rel="stylesheet" href="../../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '0.14.2',
+        VERSION:     '0.14.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.14.2 documentation" href="../../../../index.html" />
+    <link rel="top" title="Allen SDK 0.14.3 documentation" href="../../../../index.html" />
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
   <body role="document">
@@ -115,6 +115,9 @@
     <span class="n">SWC_FILE_TYPE</span> <span class="o">=</span> <span class="s1">&#39;3DNeuronReconstruction&#39;</span>
     <span class="n">MARKER_FILE_TYPE</span> <span class="o">=</span> <span class="s1">&#39;3DNeuronMarker&#39;</span>
 
+    <span class="n">MOUSE</span> <span class="o">=</span> <span class="s1">&#39;Mus musculus&#39;</span>
+    <span class="n">HUMAN</span> <span class="o">=</span> <span class="s1">&#39;Homo Sapiens&#39;</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">CellTypesApi</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">base_uri</span><span class="p">)</span>
 
@@ -122,7 +125,8 @@
                    <span class="nb">id</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
                    <span class="n">require_morphology</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> 
                    <span class="n">require_reconstruction</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> 
-                   <span class="n">reporter_status</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+                   <span class="n">reporter_status</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
+                   <span class="n">species</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Query the API for a list of all cells in the Cell Types Database.</span>
 
@@ -140,6 +144,10 @@
 <span class="sd">        reporter_status: list</span>
 <span class="sd">            Return cells that have a particular cell reporter status.</span>
 
+<span class="sd">        species: list</span>
+<span class="sd">            Filter for cells that belong to one or more species.  If None, return all.</span>
+<span class="sd">            Must be one of [ CellTypesApi.MOUSE, CellTypesApi.HUMAN ].</span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        list</span>
@@ -149,9 +157,9 @@
         <span class="k">if</span> <span class="nb">id</span><span class="p">:</span>
             <span class="n">criteria</span> <span class="o">=</span> <span class="s2">&quot;[id$eq&#39;</span><span class="si">%d</span><span class="s2">&#39;]&quot;</span> <span class="o">%</span> <span class="nb">id</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">criteria</span> <span class="o">=</span> <span class="s2">&quot;[is_cell_specimen$eq&#39;true&#39;],products[name$eq&#39;Mouse Cell Types&#39;],ephys_result[failed$eqfalse]&quot;</span>
+            <span class="n">criteria</span> <span class="o">=</span> <span class="s2">&quot;[is_cell_specimen$eq&#39;true&#39;],products[name$in&#39;Mouse Cell Types&#39;,&#39;Human Cell Types&#39;],ephys_result[failed$eqfalse]&quot;</span>
         
-        <span class="n">include</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;structure,donor(transgenic_lines),specimen_tags,cell_soma_locations,&#39;</span> <span class="o">+</span>
+        <span class="n">include</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;structure,cortex_layer,donor(transgenic_lines,organism,conditions),specimen_tags,cell_soma_locations,&#39;</span> <span class="o">+</span>
                    <span class="s1">&#39;ephys_features,data_sets,neuron_reconstructions,cell_reporter&#39;</span><span class="p">)</span>
 
         <span class="n">cells</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span>
@@ -176,9 +184,26 @@
                     <span class="n">cell</span><span class="p">[</span><span class="s1">&#39;transgenic_line&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tl</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
 
             <span class="c1"># cell reporter status</span>
-            <span class="n">cell</span><span class="p">[</span><span class="s1">&#39;reporter_status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell</span><span class="p">[</span><span class="s1">&#39;cell_reporter&#39;</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+            <span class="n">cell</span><span class="p">[</span><span class="s1">&#39;reporter_status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;cell_reporter&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
 
-        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_cells</span><span class="p">(</span><span class="n">cells</span><span class="p">,</span> <span class="n">require_morphology</span><span class="p">,</span> <span class="n">require_reconstruction</span><span class="p">,</span> <span class="n">reporter_status</span><span class="p">)</span>
+            <span class="c1"># species</span>
+            <span class="n">cell</span><span class="p">[</span><span class="s1">&#39;species&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;donor&#39;</span><span class="p">,{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;organism&#39;</span><span class="p">,{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+
+            <span class="c1"># conditions (whitelist)</span>
+            <span class="n">condition_types</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;disease categories&#39;</span> <span class="p">]</span>
+            <span class="n">condition_keys</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">condition_types</span><span class="p">,</span> 
+                                      <span class="p">[</span> <span class="n">ct</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">ct</span> <span class="ow">in</span> <span class="n">condition_types</span> <span class="p">]))</span>
+            <span class="k">for</span> <span class="n">ct</span><span class="p">,</span> <span class="n">ck</span> <span class="ow">in</span> <span class="n">condition_keys</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">cell</span><span class="p">[</span><span class="n">ck</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="n">conditions</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;donor&#39;</span><span class="p">,{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;conditions&#39;</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="k">for</span> <span class="n">condition</span> <span class="ow">in</span> <span class="n">conditions</span><span class="p">:</span>
+                <span class="n">c_type</span><span class="p">,</span> <span class="n">c_val</span> <span class="o">=</span> <span class="n">condition</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; - &#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">c_type</span> <span class="ow">in</span> <span class="n">condition_keys</span><span class="p">:</span>
+                    <span class="n">cell</span><span class="p">[</span><span class="n">condition_keys</span><span class="p">[</span><span class="n">c_type</span><span class="p">]]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c_val</span><span class="p">)</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_cells</span><span class="p">(</span><span class="n">cells</span><span class="p">,</span> <span class="n">require_morphology</span><span class="p">,</span> <span class="n">require_reconstruction</span><span class="p">,</span> <span class="n">reporter_status</span><span class="p">,</span> <span class="n">species</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">result</span></div>
 
 <div class="viewcode-block" id="CellTypesApi.get_cell"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.cell_types_api.CellTypesApi.get_cell">[docs]</a>    <span class="k">def</span> <span class="nf">get_cell</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
@@ -215,7 +240,7 @@
             <span class="s1">&#39;EphysSweep&#39;</span><span class="p">,</span> <span class="n">criteria</span><span class="o">=</span><span class="n">criteria</span><span class="p">,</span> <span class="n">num_rows</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">sweeps</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;sweep_number&#39;</span><span class="p">])</span></div>
 
-<div class="viewcode-block" id="CellTypesApi.filter_cells"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.cell_types_api.CellTypesApi.filter_cells">[docs]</a>    <span class="k">def</span> <span class="nf">filter_cells</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cells</span><span class="p">,</span> <span class="n">require_morphology</span><span class="p">,</span> <span class="n">require_reconstruction</span><span class="p">,</span> <span class="n">reporter_status</span><span class="p">):</span>
+<div class="viewcode-block" id="CellTypesApi.filter_cells"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.cell_types_api.CellTypesApi.filter_cells">[docs]</a>    <span class="k">def</span> <span class="nf">filter_cells</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cells</span><span class="p">,</span> <span class="n">require_morphology</span><span class="p">,</span> <span class="n">require_reconstruction</span><span class="p">,</span> <span class="n">reporter_status</span><span class="p">,</span> <span class="n">species</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Filter a list of cell specimens to those that optionally have morphologies</span>
 <span class="sd">        or have morphological reconstructions.</span>
@@ -234,6 +259,10 @@
 
 <span class="sd">        reporter_status: list</span>
 <span class="sd">            Filter for cells that have a particular cell reporter status</span>
+
+<span class="sd">        species: list</span>
+<span class="sd">            Filter for cells that belong to one or more species.  If None, return all.</span>
+<span class="sd">            Must be one of [ CellTypesApi.MOUSE, CellTypesApi.HUMAN ].</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">require_morphology</span><span class="p">:</span>
@@ -245,6 +274,10 @@
         <span class="k">if</span> <span class="n">reporter_status</span><span class="p">:</span>
             <span class="n">cells</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cells</span> <span class="k">if</span> <span class="n">c</span><span class="p">[</span>
                 <span class="s1">&#39;reporter_status&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">reporter_status</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">species</span><span class="p">:</span>
+            <span class="n">species_lower</span> <span class="o">=</span> <span class="p">[</span> <span class="n">s</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">species</span> <span class="p">]</span>
+            <span class="n">cells</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cells</span> <span class="k">if</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;donor&#39;</span><span class="p">][</span><span class="s1">&#39;organism&#39;</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">species_lower</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">cells</span></div>
 

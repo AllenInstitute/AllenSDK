@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.core.brain_observatory_nwb_data_set &mdash; Allen SDK 0.14.2 documentation</title>
+    <title>allensdk.core.brain_observatory_nwb_data_set &mdash; Allen SDK 0.14.3 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.14.2',
+        VERSION:     '0.14.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.14.2 documentation" href="../../../index.html" />
+    <link rel="top" title="Allen SDK 0.14.3 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body role="document">
@@ -125,7 +125,7 @@
 <span class="kn">from</span> <span class="nn">allensdk.brain_observatory.stimulus_info</span> <span class="kn">import</span> <span class="n">warp_stimulus_coords</span> <span class="k">as</span> <span class="n">si_warp_stimulus_coords</span>
 <span class="kn">from</span> <span class="nn">allensdk.brain_observatory.stimulus_info</span> <span class="kn">import</span> <span class="n">make_display_mask</span> <span class="k">as</span> <span class="n">si_make_display_mask</span>
 <span class="kn">from</span> <span class="nn">allensdk.brain_observatory.stimulus_info</span> <span class="kn">import</span> <span class="n">mask_stimulus_template</span> <span class="k">as</span> <span class="n">si_mask_stimulus_template</span>
-
+<span class="kn">from</span> <span class="nn">allensdk.brain_observatory.brain_observatory_exceptions</span> <span class="kn">import</span> <span class="n">EpochSeparationException</span>
 
 <div class="viewcode-block" id="get_epoch_mask_list"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.get_epoch_mask_list">[docs]</a><span class="k">def</span> <span class="nf">get_epoch_mask_list</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">max_cuts</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;Convenience function to cut a stim table into multiple epochs</span>
@@ -145,7 +145,10 @@
     <span class="n">epoch_mask_list</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cut_inds</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">max_cuts</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;more than 2 epochs cut&#39;</span><span class="p">)</span>
+
+        <span class="c1"># See: https://gist.github.com/nicain/bce66cd073e422f07cf337b476c63be7</span>
+        <span class="c1">#      https://github.com/AllenInstitute/AllenSDK/issues/66</span>
+        <span class="k">raise</span> <span class="n">EpochSeparationException</span><span class="p">(</span><span class="s1">&#39;more than 2 epochs cut&#39;</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="n">delta</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cut_inds</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
 
@@ -237,7 +240,7 @@
         <span class="c1">#  count as different trials (rows in the stim table).  This helps account for dropped frames, so that they dont</span>
         <span class="c1">#  cause the cutting of an entire experiment into too many stimulus epochs.  If these thresholds are too low,</span>
         <span class="c1">#  the assert statment in get_epoch_mask_list will halt execution.  In that case, make a bug report!.</span>
-        <span class="n">threshold_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">si</span><span class="o">.</span><span class="n">THREE_SESSION_A</span><span class="p">:</span><span class="mi">31</span><span class="o">+</span><span class="mi">7</span><span class="p">,</span>
+        <span class="n">threshold_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">si</span><span class="o">.</span><span class="n">THREE_SESSION_A</span><span class="p">:</span><span class="mi">32</span><span class="o">+</span><span class="mi">7</span><span class="p">,</span>
                           <span class="n">si</span><span class="o">.</span><span class="n">THREE_SESSION_B</span><span class="p">:</span><span class="mi">15</span><span class="p">,</span>
                           <span class="n">si</span><span class="o">.</span><span class="n">THREE_SESSION_C</span><span class="p">:</span><span class="mi">7</span><span class="p">,</span>
                           <span class="n">si</span><span class="o">.</span><span class="n">THREE_SESSION_C2</span><span class="p">:</span><span class="mi">7</span><span class="p">}</span>

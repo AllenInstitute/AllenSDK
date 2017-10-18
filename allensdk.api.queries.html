@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.api.queries package &mdash; Allen SDK 0.14.2 documentation</title>
+    <title>allensdk.api.queries package &mdash; Allen SDK 0.14.3 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.14.2',
+        VERSION:     '0.14.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.14.2 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.14.3 documentation" href="index.html" />
     <link rel="up" title="allensdk.api package" href="allensdk.api.html" />
     <link rel="next" title="allensdk.brain_observatory package" href="allensdk.brain_observatory.html" />
     <link rel="prev" title="allensdk.api package" href="allensdk.api.html" /> 
@@ -460,7 +460,7 @@ dataframe_query.</p>
 
 <dl class="method">
 <dt id="allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.filter_ophys_experiments">
-<code class="descname">filter_ophys_experiments</code><span class="sig-paren">(</span><em>experiments</em>, <em>ids=None</em>, <em>experiment_container_ids=None</em>, <em>targeted_structures=None</em>, <em>imaging_depths=None</em>, <em>transgenic_lines=None</em>, <em>stimuli=None</em>, <em>session_types=None</em>, <em>include_failed=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/brain_observatory_api.html#BrainObservatoryApi.filter_ophys_experiments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.filter_ophys_experiments" title="Permalink to this definition">¶</a></dt>
+<code class="descname">filter_ophys_experiments</code><span class="sig-paren">(</span><em>experiments</em>, <em>ids=None</em>, <em>experiment_container_ids=None</em>, <em>targeted_structures=None</em>, <em>imaging_depths=None</em>, <em>transgenic_lines=None</em>, <em>stimuli=None</em>, <em>session_types=None</em>, <em>include_failed=False</em>, <em>require_eye_tracking=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/brain_observatory_api.html#BrainObservatoryApi.filter_ophys_experiments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.filter_ophys_experiments" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -697,8 +697,18 @@ mapping table.</p>
 <em class="property">class </em><code class="descclassname">allensdk.api.queries.cell_types_api.</code><code class="descname">CellTypesApi</code><span class="sig-paren">(</span><em>base_uri=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/cell_types_api.html#CellTypesApi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.cell_types_api.CellTypesApi" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#allensdk.api.queries.rma_api.RmaApi" title="allensdk.api.queries.rma_api.RmaApi"><code class="xref py py-class docutils literal"><span class="pre">allensdk.api.queries.rma_api.RmaApi</span></code></a></p>
 <dl class="attribute">
+<dt id="allensdk.api.queries.cell_types_api.CellTypesApi.HUMAN">
+<code class="descname">HUMAN</code><em class="property"> = 'Homo Sapiens'</em><a class="headerlink" href="#allensdk.api.queries.cell_types_api.CellTypesApi.HUMAN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt id="allensdk.api.queries.cell_types_api.CellTypesApi.MARKER_FILE_TYPE">
 <code class="descname">MARKER_FILE_TYPE</code><em class="property"> = '3DNeuronMarker'</em><a class="headerlink" href="#allensdk.api.queries.cell_types_api.CellTypesApi.MARKER_FILE_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.cell_types_api.CellTypesApi.MOUSE">
+<code class="descname">MOUSE</code><em class="property"> = 'Mus musculus'</em><a class="headerlink" href="#allensdk.api.queries.cell_types_api.CellTypesApi.MOUSE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -713,7 +723,7 @@ mapping table.</p>
 
 <dl class="method">
 <dt id="allensdk.api.queries.cell_types_api.CellTypesApi.filter_cells">
-<code class="descname">filter_cells</code><span class="sig-paren">(</span><em>cells</em>, <em>require_morphology</em>, <em>require_reconstruction</em>, <em>reporter_status</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/cell_types_api.html#CellTypesApi.filter_cells"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.cell_types_api.CellTypesApi.filter_cells" title="Permalink to this definition">¶</a></dt>
+<code class="descname">filter_cells</code><span class="sig-paren">(</span><em>cells</em>, <em>require_morphology</em>, <em>require_reconstruction</em>, <em>reporter_status</em>, <em>species</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/cell_types_api.html#CellTypesApi.filter_cells"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.cell_types_api.CellTypesApi.filter_cells" title="Permalink to this definition">¶</a></dt>
 <dd><p>Filter a list of cell specimens to those that optionally have morphologies
 or have morphological reconstructions.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -733,8 +743,13 @@ or have morphological reconstructions.</p>
 <div><p>Filter out cells that have no morphological reconstructions.</p>
 </div></blockquote>
 <p><strong>reporter_status: list</strong></p>
-<blockquote class="last">
+<blockquote>
 <div><p>Filter for cells that have a particular cell reporter status</p>
+</div></blockquote>
+<p><strong>species: list</strong></p>
+<blockquote class="last">
+<div><p>Filter for cells that belong to one or more species.  If None, return all.
+Must be one of [ CellTypesApi.MOUSE, CellTypesApi.HUMAN ].</p>
 </div></blockquote>
 </td>
 </tr>
@@ -797,7 +812,7 @@ or have morphological reconstructions.</p>
 
 <dl class="method">
 <dt id="allensdk.api.queries.cell_types_api.CellTypesApi.list_cells">
-<code class="descname">list_cells</code><span class="sig-paren">(</span><em>id=None</em>, <em>require_morphology=False</em>, <em>require_reconstruction=False</em>, <em>reporter_status=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/cell_types_api.html#CellTypesApi.list_cells"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.cell_types_api.CellTypesApi.list_cells" title="Permalink to this definition">¶</a></dt>
+<code class="descname">list_cells</code><span class="sig-paren">(</span><em>id=None</em>, <em>require_morphology=False</em>, <em>require_reconstruction=False</em>, <em>reporter_status=None</em>, <em>species=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/cell_types_api.html#CellTypesApi.list_cells"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.cell_types_api.CellTypesApi.list_cells" title="Permalink to this definition">¶</a></dt>
 <dd><p>Query the API for a list of all cells in the Cell Types Database.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -818,6 +833,11 @@ or have morphological reconstructions.</p>
 <p><strong>reporter_status: list</strong></p>
 <blockquote>
 <div><p>Return cells that have a particular cell reporter status.</p>
+</div></blockquote>
+<p><strong>species: list</strong></p>
+<blockquote>
+<div><p>Filter for cells that belong to one or more species.  If None, return all.
+Must be one of [ CellTypesApi.MOUSE, CellTypesApi.HUMAN ].</p>
 </div></blockquote>
 </td>
 </tr>
@@ -1406,67 +1426,12 @@ See: <a href="#id2"><span class="problematic" id="id3">`</span></a>Image Downloa
 <dl class="class">
 <dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi">
 <em class="property">class </em><code class="descclassname">allensdk.api.queries.mouse_connectivity_api.</code><code class="descname">MouseConnectivityApi</code><span class="sig-paren">(</span><em>base_uri=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/mouse_connectivity_api.html#MouseConnectivityApi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#allensdk.api.queries.rma_api.RmaApi" title="allensdk.api.queries.rma_api.RmaApi"><code class="xref py py-class docutils literal"><span class="pre">allensdk.api.queries.rma_api.RmaApi</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#allensdk.api.queries.reference_space_api.ReferenceSpaceApi" title="allensdk.api.queries.reference_space_api.ReferenceSpaceApi"><code class="xref py py-class docutils literal"><span class="pre">allensdk.api.queries.reference_space_api.ReferenceSpaceApi</span></code></a></p>
 <p>HTTP Client for the Allen Mouse Brain Connectivity Atlas.</p>
 <p>See: <a class="reference external" href="http://help.brain-map.org/display/mouseconnectivity/API">Mouse Connectivity API</a></p>
 <dl class="attribute">
-<dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.ARA_NISSL">
-<code class="descname">ARA_NISSL</code><em class="property"> = 'ara_nissl'</em><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.ARA_NISSL" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.AVERAGE_TEMPLATE">
-<code class="descname">AVERAGE_TEMPLATE</code><em class="property"> = 'average_template'</em><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.AVERAGE_TEMPLATE" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.CCF_2015">
-<code class="descname">CCF_2015</code><em class="property"> = 'annotation/ccf_2015'</em><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.CCF_2015" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.CCF_2016">
-<code class="descname">CCF_2016</code><em class="property"> = 'annotation/ccf_2016'</em><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.CCF_2016" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.CCF_VERSION_DEFAULT">
-<code class="descname">CCF_VERSION_DEFAULT</code><em class="property"> = 'annotation/ccf_2016'</em><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.CCF_VERSION_DEFAULT" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.DEVMOUSE_2012">
-<code class="descname">DEVMOUSE_2012</code><em class="property"> = 'annotation/devmouse_2012'</em><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.DEVMOUSE_2012" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.MOUSE_2011">
-<code class="descname">MOUSE_2011</code><em class="property"> = 'annotation/mouse_2011'</em><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.MOUSE_2011" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
 <dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.PRODUCT_IDS">
 <code class="descname">PRODUCT_IDS</code><em class="property"> = [5, 31]</em><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.PRODUCT_IDS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.VOXEL_RESOLUTION_100_MICRONS">
-<code class="descname">VOXEL_RESOLUTION_100_MICRONS</code><em class="property"> = 100</em><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.VOXEL_RESOLUTION_100_MICRONS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.VOXEL_RESOLUTION_10_MICRONS">
-<code class="descname">VOXEL_RESOLUTION_10_MICRONS</code><em class="property"> = 10</em><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.VOXEL_RESOLUTION_10_MICRONS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.VOXEL_RESOLUTION_25_MICRONS">
-<code class="descname">VOXEL_RESOLUTION_25_MICRONS</code><em class="property"> = 25</em><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.VOXEL_RESOLUTION_25_MICRONS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.VOXEL_RESOLUTION_50_MICRONS">
-<code class="descname">VOXEL_RESOLUTION_50_MICRONS</code><em class="property"> = 50</em><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.VOXEL_RESOLUTION_50_MICRONS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1492,35 +1457,6 @@ for additional documentation.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.build_volumetric_data_download_url">
-<code class="descname">build_volumetric_data_download_url</code><span class="sig-paren">(</span><em>data_path</em>, <em>file_name</em>, <em>voxel_resolution=None</em>, <em>release=None</em>, <em>coordinate_framework=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/mouse_connectivity_api.html#MouseConnectivityApi.build_volumetric_data_download_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.build_volumetric_data_download_url" title="Permalink to this definition">¶</a></dt>
-<dd><p>Construct url to download 3D reference model in NRRD format.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>data_path</strong> : string</p>
-<blockquote>
-<div><p>&#8216;average_template&#8217;, &#8216;ara_nissl&#8217;, &#8216;annotation/ccf_2015&#8217;, &#8216;annotation/mouse_2011&#8217;, or &#8216;annotation/devmouse_2012&#8217;</p>
-</div></blockquote>
-<p><strong>voxel_resolution</strong> : int</p>
-<blockquote>
-<div><p>10, 25, 50 or 100</p>
-</div></blockquote>
-<p><strong>coordinate_framework</strong> : string</p>
-<blockquote class="last">
-<div><p>&#8216;mouse_ccf&#8217; (default) or &#8216;mouse_annotation&#8217;</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Notes</p>
-<p>See: <a class="reference external" href="http://help.brain-map.org/display/mouseconnectivity/API#API-3DReferenceModels">3-D Reference Models</a>
-for additional documentation.</p>
-</dd></dl>
-
-<dl class="method">
 <dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.calculate_injection_centroid">
 <code class="descname">calculate_injection_centroid</code><span class="sig-paren">(</span><em>injection_density</em>, <em>injection_fraction</em>, <em>resolution=25</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/mouse_connectivity_api.html#MouseConnectivityApi.calculate_injection_centroid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.calculate_injection_centroid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute the centroid of an injection site.</p>
@@ -1536,34 +1472,6 @@ for additional documentation.</p>
 <blockquote class="last">
 <div><p>The injection fraction volume of an experiment</p>
 </div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_annotation_volume">
-<code class="descname">download_annotation_volume</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/mouse_connectivity_api.html#MouseConnectivityApi.download_annotation_volume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_annotation_volume" title="Permalink to this definition">¶</a></dt>
-<dd><p>Download the annotation volume at a particular resolution.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>ccf_version: string</strong></p>
-<blockquote>
-<div><p>MouseConnectivityApi.CCF_2016 (default) or MouseConnectivityApi.CCF_2015</p>
-</div></blockquote>
-<p><strong>resolution: int</strong></p>
-<blockquote>
-<div><p>Desired resolution to download in microns.
-Must be 10, 25, 50, or 100.</p>
-</div></blockquote>
-<p><strong>file_name: string</strong></p>
-<blockquote>
-<div><p>Where to save the annotation volume.</p>
-</div></blockquote>
-<p class="last"><strong>Note: the parameters must be used as positional parameters, not keywords</strong></p>
 </td>
 </tr>
 </tbody>
@@ -1601,61 +1509,6 @@ Must be 10, 25, 50, or 100.</p>
 </tr>
 </tbody>
 </table>
-</dd></dl>
-
-<dl class="method">
-<dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_template_volume">
-<code class="descname">download_template_volume</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/mouse_connectivity_api.html#MouseConnectivityApi.download_template_volume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_template_volume" title="Permalink to this definition">¶</a></dt>
-<dd><p>Download the registration template volume at a particular resolution.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>resolution: int</strong></p>
-<blockquote>
-<div><p>Desired resolution to download in microns.  Must be 10, 25, 50, or 100.</p>
-</div></blockquote>
-<p><strong>file_name: string</strong></p>
-<blockquote class="last">
-<div><p>Where to save the registration template volume.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_volumetric_data">
-<code class="descname">download_volumetric_data</code><span class="sig-paren">(</span><em>data_path</em>, <em>file_name</em>, <em>voxel_resolution=None</em>, <em>save_file_path=None</em>, <em>release=None</em>, <em>coordinate_framework=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/mouse_connectivity_api.html#MouseConnectivityApi.download_volumetric_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_volumetric_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Download 3D reference model in NRRD format.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>data_path</strong> : string</p>
-<blockquote>
-<div><p>&#8216;average_template&#8217;, &#8216;ara_nissl&#8217;, &#8216;annotation/ccf_2015&#8217;, &#8216;annotation/mouse_2011&#8217;, or &#8216;annotation/devmouse_2012&#8217;</p>
-</div></blockquote>
-<p><strong>file_name</strong> : string</p>
-<blockquote>
-<div><p>server-side file name. &#8216;annotation_10.nrrd&#8217; for example.</p>
-</div></blockquote>
-<p><strong>voxel_resolution</strong> : int</p>
-<blockquote>
-<div><p>10, 25, 50 or 100</p>
-</div></blockquote>
-<p><strong>coordinate_framework</strong> : string</p>
-<blockquote class="last">
-<div><p>&#8216;mouse_ccf&#8217; (default) or &#8216;mouse_annotation&#8217;</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Notes</p>
-<p>See: <a class="reference external" href="http://help.brain-map.org/display/mouseconnectivity/API#API-3DReferenceModels">3-D Reference Models</a>
-for additional documentation.</p>
 </dd></dl>
 
 <dl class="method">
@@ -2095,6 +1948,216 @@ See also: <a class="reference external" href="http://api.brain-map.org/doc/Atlas
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-allensdk.api.queries.reference_space_api">
+<span id="allensdk-api-queries-reference-space-api-module"></span><h2>allensdk.api.queries.reference_space_api module<a class="headerlink" href="#module-allensdk.api.queries.reference_space_api" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="allensdk.api.queries.reference_space_api.ReferenceSpaceApi">
+<em class="property">class </em><code class="descclassname">allensdk.api.queries.reference_space_api.</code><code class="descname">ReferenceSpaceApi</code><span class="sig-paren">(</span><em>base_uri=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/reference_space_api.html#ReferenceSpaceApi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.reference_space_api.ReferenceSpaceApi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#allensdk.api.queries.rma_api.RmaApi" title="allensdk.api.queries.rma_api.RmaApi"><code class="xref py py-class docutils literal"><span class="pre">allensdk.api.queries.rma_api.RmaApi</span></code></a></p>
+<dl class="attribute">
+<dt id="allensdk.api.queries.reference_space_api.ReferenceSpaceApi.ARA_NISSL">
+<code class="descname">ARA_NISSL</code><em class="property"> = 'ara_nissl'</em><a class="headerlink" href="#allensdk.api.queries.reference_space_api.ReferenceSpaceApi.ARA_NISSL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.reference_space_api.ReferenceSpaceApi.AVERAGE_TEMPLATE">
+<code class="descname">AVERAGE_TEMPLATE</code><em class="property"> = 'average_template'</em><a class="headerlink" href="#allensdk.api.queries.reference_space_api.ReferenceSpaceApi.AVERAGE_TEMPLATE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.reference_space_api.ReferenceSpaceApi.CCF_2015">
+<code class="descname">CCF_2015</code><em class="property"> = 'annotation/ccf_2015'</em><a class="headerlink" href="#allensdk.api.queries.reference_space_api.ReferenceSpaceApi.CCF_2015" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.reference_space_api.ReferenceSpaceApi.CCF_2016">
+<code class="descname">CCF_2016</code><em class="property"> = 'annotation/ccf_2016'</em><a class="headerlink" href="#allensdk.api.queries.reference_space_api.ReferenceSpaceApi.CCF_2016" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.reference_space_api.ReferenceSpaceApi.CCF_2017">
+<code class="descname">CCF_2017</code><em class="property"> = 'annotation/ccf_2017'</em><a class="headerlink" href="#allensdk.api.queries.reference_space_api.ReferenceSpaceApi.CCF_2017" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.reference_space_api.ReferenceSpaceApi.CCF_VERSION_DEFAULT">
+<code class="descname">CCF_VERSION_DEFAULT</code><em class="property"> = 'annotation/ccf_2017'</em><a class="headerlink" href="#allensdk.api.queries.reference_space_api.ReferenceSpaceApi.CCF_VERSION_DEFAULT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.reference_space_api.ReferenceSpaceApi.DEVMOUSE_2012">
+<code class="descname">DEVMOUSE_2012</code><em class="property"> = 'annotation/devmouse_2012'</em><a class="headerlink" href="#allensdk.api.queries.reference_space_api.ReferenceSpaceApi.DEVMOUSE_2012" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.reference_space_api.ReferenceSpaceApi.MOUSE_2011">
+<code class="descname">MOUSE_2011</code><em class="property"> = 'annotation/mouse_2011'</em><a class="headerlink" href="#allensdk.api.queries.reference_space_api.ReferenceSpaceApi.MOUSE_2011" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.reference_space_api.ReferenceSpaceApi.VOXEL_RESOLUTION_100_MICRONS">
+<code class="descname">VOXEL_RESOLUTION_100_MICRONS</code><em class="property"> = 100</em><a class="headerlink" href="#allensdk.api.queries.reference_space_api.ReferenceSpaceApi.VOXEL_RESOLUTION_100_MICRONS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.reference_space_api.ReferenceSpaceApi.VOXEL_RESOLUTION_10_MICRONS">
+<code class="descname">VOXEL_RESOLUTION_10_MICRONS</code><em class="property"> = 10</em><a class="headerlink" href="#allensdk.api.queries.reference_space_api.ReferenceSpaceApi.VOXEL_RESOLUTION_10_MICRONS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.reference_space_api.ReferenceSpaceApi.VOXEL_RESOLUTION_25_MICRONS">
+<code class="descname">VOXEL_RESOLUTION_25_MICRONS</code><em class="property"> = 25</em><a class="headerlink" href="#allensdk.api.queries.reference_space_api.ReferenceSpaceApi.VOXEL_RESOLUTION_25_MICRONS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.reference_space_api.ReferenceSpaceApi.VOXEL_RESOLUTION_50_MICRONS">
+<code class="descname">VOXEL_RESOLUTION_50_MICRONS</code><em class="property"> = 50</em><a class="headerlink" href="#allensdk.api.queries.reference_space_api.ReferenceSpaceApi.VOXEL_RESOLUTION_50_MICRONS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.reference_space_api.ReferenceSpaceApi.build_volumetric_data_download_url">
+<code class="descname">build_volumetric_data_download_url</code><span class="sig-paren">(</span><em>data_path</em>, <em>file_name</em>, <em>voxel_resolution=None</em>, <em>release=None</em>, <em>coordinate_framework=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/reference_space_api.html#ReferenceSpaceApi.build_volumetric_data_download_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.reference_space_api.ReferenceSpaceApi.build_volumetric_data_download_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct url to download 3D reference model in NRRD format.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>data_path</strong> : string</p>
+<blockquote>
+<div><p>&#8216;average_template&#8217;, &#8216;ara_nissl&#8217;, &#8216;annotation/ccf_{year}&#8217;, 
+&#8216;annotation/mouse_2011&#8217;, or &#8216;annotation/devmouse_2012&#8217;</p>
+</div></blockquote>
+<p><strong>voxel_resolution</strong> : int</p>
+<blockquote>
+<div><p>10, 25, 50 or 100</p>
+</div></blockquote>
+<p><strong>coordinate_framework</strong> : string</p>
+<blockquote class="last">
+<div><p>&#8216;mouse_ccf&#8217; (default) or &#8216;mouse_annotation&#8217;</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>See: <a class="reference external" href="http://help.brain-map.org/display/mouseconnectivity/API#API-3DReferenceModels">3-D Reference Models</a>
+for additional documentation.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.reference_space_api.ReferenceSpaceApi.download_annotation_volume">
+<code class="descname">download_annotation_volume</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/reference_space_api.html#ReferenceSpaceApi.download_annotation_volume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.reference_space_api.ReferenceSpaceApi.download_annotation_volume" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download the annotation volume at a particular resolution.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>ccf_version: string</strong></p>
+<blockquote>
+<div><p>Which reference space version to download. Defaults to &#8220;annotation/ccf_2017&#8221;</p>
+</div></blockquote>
+<p><strong>resolution: int</strong></p>
+<blockquote>
+<div><p>Desired resolution to download in microns.
+Must be 10, 25, 50, or 100.</p>
+</div></blockquote>
+<p><strong>file_name: string</strong></p>
+<blockquote>
+<div><p>Where to save the annotation volume.</p>
+</div></blockquote>
+<p class="last"><strong>Note: the parameters must be used as positional parameters, not keywords</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.reference_space_api.ReferenceSpaceApi.download_structure_mask">
+<code class="descname">download_structure_mask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/reference_space_api.html#ReferenceSpaceApi.download_structure_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.reference_space_api.ReferenceSpaceApi.download_structure_mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download an indicator mask for a specific structure.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>structure_id</strong> : int</p>
+<p><strong>ccf_version</strong> : string</p>
+<blockquote>
+<div><p>Which reference space version to download. Defaults to &#8220;annotation/ccf_2017&#8221;</p>
+</div></blockquote>
+<p><strong>resolution</strong> : int</p>
+<blockquote>
+<div><p>Desired resolution to download in microns.  Must be 10, 25, 50, or 100.</p>
+</div></blockquote>
+<p><strong>file_name</strong> : string</p>
+<blockquote class="last">
+<div><p>Where to save the downloaded mask.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.reference_space_api.ReferenceSpaceApi.download_template_volume">
+<code class="descname">download_template_volume</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/reference_space_api.html#ReferenceSpaceApi.download_template_volume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.reference_space_api.ReferenceSpaceApi.download_template_volume" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download the registration template volume at a particular resolution.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>resolution: int</strong></p>
+<blockquote>
+<div><p>Desired resolution to download in microns.  Must be 10, 25, 50, or 100.</p>
+</div></blockquote>
+<p><strong>file_name: string</strong></p>
+<blockquote class="last">
+<div><p>Where to save the registration template volume.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.reference_space_api.ReferenceSpaceApi.download_volumetric_data">
+<code class="descname">download_volumetric_data</code><span class="sig-paren">(</span><em>data_path</em>, <em>file_name</em>, <em>voxel_resolution=None</em>, <em>save_file_path=None</em>, <em>release=None</em>, <em>coordinate_framework=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/reference_space_api.html#ReferenceSpaceApi.download_volumetric_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.reference_space_api.ReferenceSpaceApi.download_volumetric_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download 3D reference model in NRRD format.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>data_path</strong> : string</p>
+<blockquote>
+<div><p>&#8216;average_template&#8217;, &#8216;ara_nissl&#8217;, &#8216;annotation/ccf_{year}&#8217;, 
+&#8216;annotation/mouse_2011&#8217;, or &#8216;annotation/devmouse_2012&#8217;</p>
+</div></blockquote>
+<p><strong>file_name</strong> : string</p>
+<blockquote>
+<div><p>server-side file name. &#8216;annotation_10.nrrd&#8217; for example.</p>
+</div></blockquote>
+<p><strong>voxel_resolution</strong> : int</p>
+<blockquote>
+<div><p>10, 25, 50 or 100</p>
+</div></blockquote>
+<p><strong>coordinate_framework</strong> : string</p>
+<blockquote class="last">
+<div><p>&#8216;mouse_ccf&#8217; (default) or &#8216;mouse_annotation&#8217;</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>See: <a class="reference external" href="http://help.brain-map.org/display/mouseconnectivity/API#API-3DReferenceModels">3-D Reference Models</a>
+for additional documentation.</p>
 </dd></dl>
 
 </dd></dl>

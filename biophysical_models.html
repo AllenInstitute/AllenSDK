@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Biophysical Models &mdash; Allen SDK 0.14.2 documentation</title>
+    <title>Biophysical Models &mdash; Allen SDK 0.14.3 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.14.2',
+        VERSION:     '0.14.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.14.2 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.14.3 documentation" href="index.html" />
     <link rel="up" title="Models" href="models.html" />
     <link rel="next" title="Examples" href="examples.html" />
     <link rel="prev" title="Generalized LIF Models" href="glif_models.html" /> 
@@ -133,7 +133,7 @@ the corresponding &#8216;Biophysical - perisomatic&#8217; or
 <span class="n">bp</span><span class="o">.</span><span class="n">cache_stimulus</span> <span class="o">=</span> <span class="kc">True</span> <span class="c1"># change to False to not download the large stimulus NWB file</span>
 <span class="n">neuronal_model_id</span> <span class="o">=</span> <span class="mi">472451419</span>    <span class="c1"># get this from the web site as above</span>
 <span class="n">bp</span><span class="o">.</span><span class="n">cache_data</span><span class="p">(</span><span class="n">neuronal_model_id</span><span class="p">,</span> <span class="n">working_directory</span><span class="o">=</span><span class="s1">&#39;neuronal_model&#39;</span><span class="p">)</span>
-<span class="k">pass</span>
+
 
 </pre></div>
 </div>
@@ -187,8 +187,8 @@ module.  The implementation of the method is discussed here step-by-step:</p>
 <p>First configure NEURON based on the configuration file, which was
 read in from the command line at the very bottom of the script.</p>
 <p><a class="reference internal" href="allensdk.model.biophysical.html#allensdk.model.biophysical.runner.run" title="allensdk.model.biophysical.runner.run"><code class="xref py py-meth docutils literal"><span class="pre">run()</span></code></a>:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># configure NEURON</span>
-<span class="n">utils</span> <span class="o">=</span> <span class="n">Utils</span><span class="p">(</span><span class="n">description</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># configure NEURON -- this will infer model type (perisomatic vs. all-active)</span>
+<span class="n">utils</span> <span class="o">=</span> <span class="n">Utils</span><span class="o">.</span><span class="n">create_utils</span><span class="p">(</span><span class="n">description</span><span class="p">)</span>
 <span class="n">h</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">h</span>
 </pre></div>
 </div>

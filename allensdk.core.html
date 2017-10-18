@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.core package &mdash; Allen SDK 0.14.2 documentation</title>
+    <title>allensdk.core package &mdash; Allen SDK 0.14.3 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.14.2',
+        VERSION:     '0.14.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.14.2 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.14.3 documentation" href="index.html" />
     <link rel="up" title="allensdk package" href="allensdk.html" />
     <link rel="next" title="allensdk.ephys package" href="allensdk.ephys.html" />
     <link rel="prev" title="allensdk.config.model.formats package" href="allensdk.config.model.formats.html" /> 
@@ -345,7 +345,7 @@ is disabled, no file will be saved. Default is None.</p>
 
 <dl class="method">
 <dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiments">
-<code class="descname">get_ophys_experiments</code><span class="sig-paren">(</span><em>file_name=None</em>, <em>ids=None</em>, <em>experiment_container_ids=None</em>, <em>targeted_structures=None</em>, <em>imaging_depths=None</em>, <em>cre_lines=None</em>, <em>transgenic_lines=None</em>, <em>stimuli=None</em>, <em>session_types=None</em>, <em>cell_specimen_ids=None</em>, <em>include_failed=False</em>, <em>simple=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.get_ophys_experiments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiments" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_ophys_experiments</code><span class="sig-paren">(</span><em>file_name=None</em>, <em>ids=None</em>, <em>experiment_container_ids=None</em>, <em>targeted_structures=None</em>, <em>imaging_depths=None</em>, <em>cre_lines=None</em>, <em>transgenic_lines=None</em>, <em>stimuli=None</em>, <em>session_types=None</em>, <em>cell_specimen_ids=None</em>, <em>include_failed=False</em>, <em>require_eye_tracking=False</em>, <em>simple=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.get_ophys_experiments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiments" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a list of ophys experiments matching certain criteria.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -408,6 +408,10 @@ BrainObservatoryCache.get_all_session_types().</p>
 <blockquote>
 <div><p>Whether or not to simplify the dictionary properties returned by this method
 to a more concise subset.</p>
+</div></blockquote>
+<p><strong>require_eye_tracking: boolean</strong></p>
+<blockquote>
+<div><p>If True, only return experiments that have eye tracking results. Default: False.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -1079,7 +1083,7 @@ in the function call (e.g. get_ephys_data(file_name=&#8217;file.nwb&#8217;)).</p
 
 <dl class="attribute">
 <dt id="allensdk.core.cell_types_cache.CellTypesCache.MANIFEST_VERSION">
-<code class="descname">MANIFEST_VERSION</code><em class="property"> = None</em><a class="headerlink" href="#allensdk.core.cell_types_cache.CellTypesCache.MANIFEST_VERSION" title="Permalink to this definition">¶</a></dt>
+<code class="descname">MANIFEST_VERSION</code><em class="property"> = '1.0'</em><a class="headerlink" href="#allensdk.core.cell_types_cache.CellTypesCache.MANIFEST_VERSION" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -1142,7 +1146,7 @@ reconstructions. Default True.</p>
 
 <dl class="method">
 <dt id="allensdk.core.cell_types_cache.CellTypesCache.get_cells">
-<code class="descname">get_cells</code><span class="sig-paren">(</span><em>file_name=None</em>, <em>require_morphology=False</em>, <em>require_reconstruction=False</em>, <em>reporter_status=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/cell_types_cache.html#CellTypesCache.get_cells"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.cell_types_cache.CellTypesCache.get_cells" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_cells</code><span class="sig-paren">(</span><em>file_name=None</em>, <em>require_morphology=False</em>, <em>require_reconstruction=False</em>, <em>reporter_status=None</em>, <em>species=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/cell_types_cache.html#CellTypesCache.get_cells"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.cell_types_cache.CellTypesCache.get_cells" title="Permalink to this definition">¶</a></dt>
 <dd><p>Download metadata for all cells in the database and optionally return a
 subset filtered by whether or not they have a morphology or reconstruction.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -1164,8 +1168,13 @@ is disabled, no file will be saved. Default is None.</p>
 <div><p>Filter out cells that have no morphological reconstructions.</p>
 </div></blockquote>
 <p><strong>reporter_status: list</strong></p>
-<blockquote class="last">
+<blockquote>
 <div><p>Filter for cells that have one or more cell reporter statuses.</p>
+</div></blockquote>
+<p><strong>species: list</strong></p>
+<blockquote class="last">
+<div><p>Filter for cells that belong to one or more species.  If None, return all.
+Must be one of [ CellTypesApi.MOUSE, CellTypesApi.HUMAN ].</p>
 </div></blockquote>
 </td>
 </tr>
@@ -1557,8 +1566,8 @@ nested python dict.</p>
 <span id="allensdk-core-mouse-connectivity-cache-module"></span><h2>allensdk.core.mouse_connectivity_cache module<a class="headerlink" href="#module-allensdk.core.mouse_connectivity_cache" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache">
-<em class="property">class </em><code class="descclassname">allensdk.core.mouse_connectivity_cache.</code><code class="descname">MouseConnectivityCache</code><span class="sig-paren">(</span><em>resolution=None</em>, <em>cache=True</em>, <em>manifest_file='mouse_connectivity_manifest.json'</em>, <em>ccf_version=None</em>, <em>base_uri=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="allensdk.api.html#allensdk.api.cache.Cache" title="allensdk.api.cache.Cache"><code class="xref py py-class docutils literal"><span class="pre">allensdk.api.cache.Cache</span></code></a></p>
+<em class="property">class </em><code class="descclassname">allensdk.core.mouse_connectivity_cache.</code><code class="descname">MouseConnectivityCache</code><span class="sig-paren">(</span><em>resolution=None</em>, <em>cache=True</em>, <em>manifest_file='mouse_connectivity_manifest.json'</em>, <em>ccf_version=None</em>, <em>base_uri=None</em>, <em>version=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#allensdk.core.reference_space_cache.ReferenceSpaceCache" title="allensdk.core.reference_space_cache.ReferenceSpaceCache"><code class="xref py py-class docutils literal"><span class="pre">allensdk.core.reference_space_cache.ReferenceSpaceCache</span></code></a></p>
 <p>Cache class for storing and accessing data related to the adult mouse
 Connectivity Atlas.  By default, this class will cache any downloaded
 metadata or files in well known locations defined in a manifest file.
@@ -1611,18 +1620,13 @@ in the function call (e.g. get_projection_density(file_name=&#8217;file.nrrd&#82
 </tbody>
 </table>
 <dl class="attribute">
-<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.ANNOTATION_KEY">
-<code class="descname">ANNOTATION_KEY</code><em class="property"> = 'ANNOTATION'</em><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.ANNOTATION_KEY" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.CCF_VERSION_KEY">
-<code class="descname">CCF_VERSION_KEY</code><em class="property"> = 'CCF_VERSION'</em><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.CCF_VERSION_KEY" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
 <dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.DATA_MASK_KEY">
 <code class="descname">DATA_MASK_KEY</code><em class="property"> = 'DATA_MASK'</em><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.DATA_MASK_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.DEFAULT_STRUCTURE_SET_IDS">
+<code class="descname">DEFAULT_STRUCTURE_SET_IDS</code><em class="property"> = (167587189,)</em><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.DEFAULT_STRUCTURE_SET_IDS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -1642,7 +1646,7 @@ in the function call (e.g. get_projection_density(file_name=&#8217;file.nrrd&#82
 
 <dl class="attribute">
 <dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.MANIFEST_VERSION">
-<code class="descname">MANIFEST_VERSION</code><em class="property"> = 1.0</em><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.MANIFEST_VERSION" title="Permalink to this definition">¶</a></dt>
+<code class="descname">MANIFEST_VERSION</code><em class="property"> = 1.1</em><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.MANIFEST_VERSION" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -1651,33 +1655,18 @@ in the function call (e.g. get_projection_density(file_name=&#8217;file.nrrd&#82
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.STRUCTURES_KEY">
-<code class="descname">STRUCTURES_KEY</code><em class="property"> = 'STRUCTURES'</em><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.STRUCTURES_KEY" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.STRUCTURE_MASK_KEY">
-<code class="descname">STRUCTURE_MASK_KEY</code><em class="property"> = 'STRUCTURE_MASK'</em><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.STRUCTURE_MASK_KEY" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.STRUCTURE_TREE_KEY">
-<code class="descname">STRUCTURE_TREE_KEY</code><em class="property"> = 'STRUCTURE_TREE'</em><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.STRUCTURE_TREE_KEY" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
 <dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.STRUCTURE_UNIONIZES_KEY">
 <code class="descname">STRUCTURE_UNIONIZES_KEY</code><em class="property"> = 'STRUCTURE_UNIONIZES'</em><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.STRUCTURE_UNIONIZES_KEY" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.TEMPLATE_KEY">
-<code class="descname">TEMPLATE_KEY</code><em class="property"> = 'TEMPLATE'</em><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.TEMPLATE_KEY" title="Permalink to this definition">¶</a></dt>
+<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.SUMMARY_STRUCTURE_SET_ID">
+<code class="descname">SUMMARY_STRUCTURE_SET_ID</code><em class="property"> = 167587189</em><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.SUMMARY_STRUCTURE_SET_ID" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.build_manifest">
-<code class="descname">build_manifest</code><span class="sig-paren">(</span><em>file_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.build_manifest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.build_manifest" title="Permalink to this definition">¶</a></dt>
+<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.add_manifest_paths">
+<code class="descname">add_manifest_paths</code><span class="sig-paren">(</span><em>manifest_builder</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.add_manifest_paths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.add_manifest_paths" title="Permalink to this definition">¶</a></dt>
 <dd><p>Construct a manifest for this Cache class and save it in a file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1692,6 +1681,11 @@ in the function call (e.g. get_projection_density(file_name=&#8217;file.nrrd&#82
 </tbody>
 </table>
 </dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.default_structure_ids">
+<code class="descname">default_structure_ids</code><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.default_structure_ids" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.filter_experiments">
@@ -1747,26 +1741,6 @@ If None, return all records. Default None.</p>
 <div><p>Only return unionize records that disregard pixels outside of a hemisphere.
 or set of hemispheres. Left = 1, Right = 2, Both = 3.  If None, include all
 records [1, 2, 3].  Default None.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_annotation_volume">
-<code class="descname">get_annotation_volume</code><span class="sig-paren">(</span><em>file_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.get_annotation_volume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_annotation_volume" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read the annotation volume.  Download it first if it doesn&#8217;t exist.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>file_name: string</strong></p>
-<blockquote class="last">
-<div><p>File name to store the annotation volume.  If it already exists,
-it will be read from this file.  If file_name is None, the
-file_name will be pulled out of the manifest.  Default is None.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -1940,26 +1914,6 @@ file_name will be pulled out of the manifest.  Default is None.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_ontology">
-<code class="descname">get_ontology</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.get_ontology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_ontology" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read the list of adult mouse structures and return an Ontology instance.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>file_name: string</strong></p>
-<blockquote class="last">
-<div><p>File name to save/read the structures table.  If file_name is None,
-the file_name will be pulled out of the manifest.  If caching
-is disabled, no file will be saved. Default is None.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
 <dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_projection_density">
 <code class="descname">get_projection_density</code><span class="sig-paren">(</span><em>experiment_id</em>, <em>file_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.get_projection_density"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_projection_density" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read a projection density volume for a single experiment.  Download it
@@ -1988,91 +1942,8 @@ file_name will be pulled out of the manifest.  Default is None.</p>
 
 <dl class="method">
 <dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_projection_matrix">
-<code class="descname">get_projection_matrix</code><span class="sig-paren">(</span><em>experiment_ids</em>, <em>projection_structure_ids</em>, <em>hemisphere_ids=None</em>, <em>parameter='projection_volume'</em>, <em>dataframe=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.get_projection_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_projection_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_projection_matrix</code><span class="sig-paren">(</span><em>experiment_ids</em>, <em>projection_structure_ids=None</em>, <em>hemisphere_ids=None</em>, <em>parameter='projection_volume'</em>, <em>dataframe=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.get_projection_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_projection_matrix" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
-<dl class="method">
-<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_reference_space">
-<code class="descname">get_reference_space</code><span class="sig-paren">(</span><em>structure_file_name=None</em>, <em>annotation_file_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.get_reference_space"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_reference_space" title="Permalink to this definition">¶</a></dt>
-<dd><p>Build a ReferenceSpace from this cache&#8217;s annotation volume and 
-structure tree. The ReferenceSpace does operations that relate brain 
-structures to spatial domains.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>structure_file_name: string</strong></p>
-<blockquote>
-<div><p>File name to save/read the structures table.  If file_name is None,
-the file_name will be pulled out of the manifest.  If caching
-is disabled, no file will be saved. Default is None.</p>
-</div></blockquote>
-<p><strong>annotation_file_name: string</strong></p>
-<blockquote class="last">
-<div><p>File name to store the annotation volume.  If it already exists,
-it will be read from this file.  If file_name is None, the
-file_name will be pulled out of the manifest.  Default is None.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_structure_mask">
-<code class="descname">get_structure_mask</code><span class="sig-paren">(</span><em>structure_id</em>, <em>file_name=None</em>, <em>annotation_file_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.get_structure_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_structure_mask" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read a 3D numpy array shaped like the annotation volume that has non-zero values where
-voxels belong to a particular structure.  This will take care of identifying substructures.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>structure_id: int</strong></p>
-<blockquote>
-<div><p>ID of a structure.</p>
-</div></blockquote>
-<p><strong>file_name: string</strong></p>
-<blockquote>
-<div><p>File name to store the structure mask.  If it already exists,
-it will be read from this file.  If file_name is None, the
-file_name will be pulled out of the manifest.  Default is None.</p>
-</div></blockquote>
-<p><strong>annotation_file_name: string</strong></p>
-<blockquote class="last">
-<div><p>File name to store the annotation volume.  If it already exists,
-it will be read from this file.  If file_name is None, the
-file_name will be pulled out of the manifest.  Default is None.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Notes</p>
-<p>If you are making large numbers of masks, there is a faster structure mask generator in 
-ReferenceSpace.many_structure_masks.  We will be migrating this function in a future release.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_structure_tree">
-<code class="descname">get_structure_tree</code><span class="sig-paren">(</span><em>file_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.get_structure_tree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_structure_tree" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read the list of adult mouse structures and return an StructureTree 
-instance.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>file_name: string</strong></p>
-<blockquote class="last">
-<div><p>File name to save/read the structures table.  If file_name is None,
-the file_name will be pulled out of the manifest.  If caching
-is disabled, no file will be saved. Default is None.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
 
 <dl class="method">
 <dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_structure_unionizes">
@@ -2115,77 +1986,57 @@ records [1, 2, 3].  Default None.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_structures">
-<code class="descname">get_structures</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.get_structures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_structures" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read the list of adult mouse structures and return a Pandas DataFrame.</p>
+<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.rank_structures">
+<code class="descname">rank_structures</code><span class="sig-paren">(</span><em>experiment_ids</em>, <em>is_injection</em>, <em>structure_ids=None</em>, <em>hemisphere_ids=None</em>, <em>rank_on='normalized_projection_volume'</em>, <em>n=5</em>, <em>threshold=0.01</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.rank_structures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.rank_structures" title="Permalink to this definition">¶</a></dt>
+<dd><p>Produces one or more (per experiment) ranked lists of brain structures, using a specified data field.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>file_name: string</strong></p>
-<blockquote class="last">
-<div><p>File name to save/read the structures table.  If file_name is None,
-the file_name will be pulled out of the manifest.  If caching
-is disabled, no file will be saved. Default is None.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_template_volume">
-<code class="descname">get_template_volume</code><span class="sig-paren">(</span><em>file_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.get_template_volume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_template_volume" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read the template volume.  Download it first if it doesn&#8217;t exist.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>file_name: string</strong></p>
-<blockquote class="last">
-<div><p>File name to store the template volume.  If it already exists,
-it will be read from this file.  If file_name is None, the
-file_name will be pulled out of the manifest.  Default is None.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.make_structure_mask">
-<code class="descname">make_structure_mask</code><span class="sig-paren">(</span><em>structure_ids</em>, <em>annotation</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.make_structure_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.make_structure_mask" title="Permalink to this definition">¶</a></dt>
-<dd><p>Look at an annotation volume and identify voxels that have values
-in a list of structure ids.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>structure_ids: list</strong></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>experiment_ids</strong> : list of int</p>
 <blockquote>
-<div><p>List of IDs to look for in the annotation volume</p>
+<div><p>Obtain injection_structures for these experiments.</p>
 </div></blockquote>
-<p><strong>annotation: np.ndarray</strong></p>
+<p><strong>is_injection</strong> : boolean</p>
+<blockquote>
+<div><p>Use data from only injection (or non-injection) unionizes.</p>
+</div></blockquote>
+<p><strong>structure_ids</strong> : list of int, optional</p>
+<blockquote>
+<div><p>Consider only these structures. It is a good idea to make sure that these structures are not spatially 
+overlapping; otherwise your results will contain redundant information. Defaults to the summary 
+structures - a brain-wide list of nonoverlapping mid-level structures.</p>
+</div></blockquote>
+<p><strong>hemisphere_ids</strong> : list of int, optional</p>
+<blockquote>
+<div><p>Consider only these hemispheres (1: left, 2: right, 3: both). Like with structures, 
+you might get redundant results if you select overlapping options. Defaults to [1, 2].</p>
+</div></blockquote>
+<p><strong>rank_on</strong> : str, optional</p>
+<blockquote>
+<div><p>Rank unionize data using this field (descending). Defaults to normalized_projection_volume.</p>
+</div></blockquote>
+<p><strong>n</strong> : int, optional</p>
+<blockquote>
+<div><p>Return only the top n structures.</p>
+</div></blockquote>
+<p><strong>threshold</strong> : float, optional</p>
+<blockquote>
+<div><p>Consider only records whose data value - specified by the rank_on parameter - exceeds this value.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list :</p>
 <blockquote class="last">
-<div><p>Numpy array filled with IDs.</p>
+<div><p>Each element (1 for each input experiment) is a list of dictionaries. The dictionaries describe the top
+injection structures in descending order. They are specified by their structure and hemisphere id fields and 
+additionally report the value specified by the rank_on parameter.</p>
 </div></blockquote>
 </td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
-
-<dl class="staticmethod">
-<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.validate_structure_id">
-<em class="property">static </em><code class="descname">validate_structure_id</code><span class="sig-paren">(</span><em>structure_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.validate_structure_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.validate_structure_id" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="staticmethod">
-<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.validate_structure_ids">
-<em class="property">static </em><code class="descname">validate_structure_ids</code><span class="sig-paren">(</span><em>structure_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.validate_structure_ids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.validate_structure_ids" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 </dd></dl>
 
@@ -2210,7 +2061,7 @@ from an NWB file.</p>
 
 <dl class="method">
 <dt id="allensdk.core.nwb_data_set.NwbDataSet.fill_sweep_responses">
-<code class="descname">fill_sweep_responses</code><span class="sig-paren">(</span><em>fill_value=0.0</em>, <em>sweep_numbers=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/nwb_data_set.html#NwbDataSet.fill_sweep_responses"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.nwb_data_set.NwbDataSet.fill_sweep_responses" title="Permalink to this definition">¶</a></dt>
+<code class="descname">fill_sweep_responses</code><span class="sig-paren">(</span><em>fill_value=0.0</em>, <em>sweep_numbers=None</em>, <em>extend_experiment=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/nwb_data_set.html#NwbDataSet.fill_sweep_responses"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.nwb_data_set.NwbDataSet.fill_sweep_responses" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fill sweep response arrays with a single value.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2221,8 +2072,12 @@ from an NWB file.</p>
 <div><p>Value used to fill sweep response array</p>
 </div></blockquote>
 <p><strong>sweep_numbers: list</strong></p>
-<blockquote class="last">
+<blockquote>
 <div><p>List of integer sweep numbers to be filled (default all sweeps)</p>
+</div></blockquote>
+<p><strong>extend_experiment: bool</strong></p>
+<blockquote class="last">
+<div><p>If True, extend experiment epoch length to the end of the sweep (undo any truncation)</p>
 </div></blockquote>
 </td>
 </tr>
@@ -2815,6 +2670,205 @@ the supplied set.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="module-allensdk.core.reference_space_cache">
+<span id="allensdk-core-reference-space-cache-module"></span><h2>allensdk.core.reference_space_cache module<a class="headerlink" href="#module-allensdk.core.reference_space_cache" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="allensdk.core.reference_space_cache.ReferenceSpaceCache">
+<em class="property">class </em><code class="descclassname">allensdk.core.reference_space_cache.</code><code class="descname">ReferenceSpaceCache</code><span class="sig-paren">(</span><em>resolution</em>, <em>reference_space_key</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/reference_space_cache.html#ReferenceSpaceCache"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.reference_space_cache.ReferenceSpaceCache" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="allensdk.api.html#allensdk.api.cache.Cache" title="allensdk.api.cache.Cache"><code class="xref py py-class docutils literal"><span class="pre">allensdk.api.cache.Cache</span></code></a></p>
+<dl class="attribute">
+<dt id="allensdk.core.reference_space_cache.ReferenceSpaceCache.ANNOTATION_KEY">
+<code class="descname">ANNOTATION_KEY</code><em class="property"> = 'ANNOTATION'</em><a class="headerlink" href="#allensdk.core.reference_space_cache.ReferenceSpaceCache.ANNOTATION_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.reference_space_cache.ReferenceSpaceCache.MANIFEST_VERSION">
+<code class="descname">MANIFEST_VERSION</code><em class="property"> = 1.1</em><a class="headerlink" href="#allensdk.core.reference_space_cache.ReferenceSpaceCache.MANIFEST_VERSION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.reference_space_cache.ReferenceSpaceCache.REFERENCE_SPACE_VERSION_KEY">
+<code class="descname">REFERENCE_SPACE_VERSION_KEY</code><em class="property"> = 'REFERENCE_SPACE_VERSION'</em><a class="headerlink" href="#allensdk.core.reference_space_cache.ReferenceSpaceCache.REFERENCE_SPACE_VERSION_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.reference_space_cache.ReferenceSpaceCache.STRUCTURES_KEY">
+<code class="descname">STRUCTURES_KEY</code><em class="property"> = 'STRUCTURES'</em><a class="headerlink" href="#allensdk.core.reference_space_cache.ReferenceSpaceCache.STRUCTURES_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.reference_space_cache.ReferenceSpaceCache.STRUCTURE_MASK_KEY">
+<code class="descname">STRUCTURE_MASK_KEY</code><em class="property"> = 'STRUCTURE_MASK'</em><a class="headerlink" href="#allensdk.core.reference_space_cache.ReferenceSpaceCache.STRUCTURE_MASK_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.reference_space_cache.ReferenceSpaceCache.STRUCTURE_TREE_KEY">
+<code class="descname">STRUCTURE_TREE_KEY</code><em class="property"> = 'STRUCTURE_TREE'</em><a class="headerlink" href="#allensdk.core.reference_space_cache.ReferenceSpaceCache.STRUCTURE_TREE_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.reference_space_cache.ReferenceSpaceCache.TEMPLATE_KEY">
+<code class="descname">TEMPLATE_KEY</code><em class="property"> = 'TEMPLATE'</em><a class="headerlink" href="#allensdk.core.reference_space_cache.ReferenceSpaceCache.TEMPLATE_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.reference_space_cache.ReferenceSpaceCache.add_manifest_paths">
+<code class="descname">add_manifest_paths</code><span class="sig-paren">(</span><em>manifest_builder</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/reference_space_cache.html#ReferenceSpaceCache.add_manifest_paths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.reference_space_cache.ReferenceSpaceCache.add_manifest_paths" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a manifest for this Cache class and save it in a file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>file_name: string</strong></p>
+<blockquote class="last">
+<div><p>File location to save the manifest.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.reference_space_cache.ReferenceSpaceCache.get_annotation_volume">
+<code class="descname">get_annotation_volume</code><span class="sig-paren">(</span><em>file_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/reference_space_cache.html#ReferenceSpaceCache.get_annotation_volume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.reference_space_cache.ReferenceSpaceCache.get_annotation_volume" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the annotation volume.  Download it first if it doesn&#8217;t exist.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>file_name: string</strong></p>
+<blockquote class="last">
+<div><p>File name to store the annotation volume.  If it already exists,
+it will be read from this file.  If file_name is None, the
+file_name will be pulled out of the manifest.  Default is None.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.reference_space_cache.ReferenceSpaceCache.get_reference_space">
+<code class="descname">get_reference_space</code><span class="sig-paren">(</span><em>structure_file_name=None</em>, <em>annotation_file_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/reference_space_cache.html#ReferenceSpaceCache.get_reference_space"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.reference_space_cache.ReferenceSpaceCache.get_reference_space" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a ReferenceSpace from this cache&#8217;s annotation volume and 
+structure tree. The ReferenceSpace does operations that relate brain 
+structures to spatial domains.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>structure_file_name: string</strong></p>
+<blockquote>
+<div><p>File name to save/read the structures table.  If file_name is None,
+the file_name will be pulled out of the manifest.  If caching
+is disabled, no file will be saved. Default is None.</p>
+</div></blockquote>
+<p><strong>annotation_file_name: string</strong></p>
+<blockquote class="last">
+<div><p>File name to store the annotation volume.  If it already exists,
+it will be read from this file.  If file_name is None, the
+file_name will be pulled out of the manifest.  Default is None.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.reference_space_cache.ReferenceSpaceCache.get_structure_mask">
+<code class="descname">get_structure_mask</code><span class="sig-paren">(</span><em>structure_id</em>, <em>file_name=None</em>, <em>annotation_file_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/reference_space_cache.html#ReferenceSpaceCache.get_structure_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.reference_space_cache.ReferenceSpaceCache.get_structure_mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a 3D numpy array shaped like the annotation volume that has non-zero values where
+voxels belong to a particular structure.  This will take care of identifying substructures.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>structure_id: int</strong></p>
+<blockquote>
+<div><p>ID of a structure.</p>
+</div></blockquote>
+<p><strong>file_name: string</strong></p>
+<blockquote>
+<div><p>File name to store the structure mask.  If it already exists,
+it will be read from this file.  If file_name is None, the
+file_name will be pulled out of the manifest.  Default is None.</p>
+</div></blockquote>
+<p><strong>annotation_file_name: string</strong></p>
+<blockquote class="last">
+<div><p>File name to store the annotation volume.  If it already exists,
+it will be read from this file.  If file_name is None, the
+file_name will be pulled out of the manifest.  Default is None.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This method downloads structure masks from the Allen Institute. To make your own locally, see 
+ReferenceSpace.many_structure_masks.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.reference_space_cache.ReferenceSpaceCache.get_structure_tree">
+<code class="descname">get_structure_tree</code><span class="sig-paren">(</span><em>file_name=None</em>, <em>structure_graph_id=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/reference_space_cache.html#ReferenceSpaceCache.get_structure_tree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.reference_space_cache.ReferenceSpaceCache.get_structure_tree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the list of adult mouse structures and return an StructureTree 
+instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>file_name: string</strong></p>
+<blockquote>
+<div><p>File name to save/read the structures table.  If file_name is None,
+the file_name will be pulled out of the manifest.  If caching
+is disabled, no file will be saved. Default is None.</p>
+</div></blockquote>
+<p><strong>structure_graph_id: int</strong></p>
+<blockquote class="last">
+<div><p>Build a tree using structure only from the identified structure graph.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.reference_space_cache.ReferenceSpaceCache.get_template_volume">
+<code class="descname">get_template_volume</code><span class="sig-paren">(</span><em>file_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/reference_space_cache.html#ReferenceSpaceCache.get_template_volume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.reference_space_cache.ReferenceSpaceCache.get_template_volume" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the template volume.  Download it first if it doesn&#8217;t exist.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>file_name: string</strong></p>
+<blockquote class="last">
+<div><p>File name to store the template volume.  If it already exists,
+it will be read from this file.  If file_name is None, the
+file_name will be pulled out of the manifest.  Default is None.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="allensdk.core.reference_space_cache.ReferenceSpaceCache.validate_structure_id">
+<em class="property">classmethod </em><code class="descname">validate_structure_id</code><span class="sig-paren">(</span><em>structure_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/reference_space_cache.html#ReferenceSpaceCache.validate_structure_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.reference_space_cache.ReferenceSpaceCache.validate_structure_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="allensdk.core.reference_space_cache.ReferenceSpaceCache.validate_structure_ids">
+<em class="property">classmethod </em><code class="descname">validate_structure_ids</code><span class="sig-paren">(</span><em>structure_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/reference_space_cache.html#ReferenceSpaceCache.validate_structure_ids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.reference_space_cache.ReferenceSpaceCache.validate_structure_ids" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="module-allensdk.core.simple_tree">
 <span id="allensdk-core-simple-tree-module"></span><h2>allensdk.core.simple_tree module<a class="headerlink" href="#module-allensdk.core.simple_tree" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -3004,7 +3058,30 @@ A -&gt; B -&gt; C</p>
 
 <dl class="method">
 <dt id="allensdk.core.simple_tree.SimpleTree.node">
-<code class="descname">node</code><span class="sig-paren">(</span><em>node_ids=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/simple_tree.html#SimpleTree.node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.simple_tree.SimpleTree.node" title="Permalink to this definition">¶</a></dt>
+<code class="descname">node</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/simple_tree.html#SimpleTree.node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.simple_tree.SimpleTree.node" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.simple_tree.SimpleTree.node_ids">
+<code class="descname">node_ids</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/simple_tree.html#SimpleTree.node_ids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.simple_tree.SimpleTree.node_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Obtain the node ids of each node in the tree</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list :</p>
+<blockquote class="last">
+<div><p>elements are node ids</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.simple_tree.SimpleTree.nodes">
+<code class="descname">nodes</code><span class="sig-paren">(</span><em>node_ids=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/simple_tree.html#SimpleTree.nodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.simple_tree.SimpleTree.nodes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get one or more nodes&#8217; full dictionaries from their ids.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -3027,50 +3104,18 @@ A -&gt; B -&gt; C</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="allensdk.core.simple_tree.SimpleTree.node_ids">
-<code class="descname">node_ids</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/simple_tree.html#SimpleTree.node_ids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.simple_tree.SimpleTree.node_ids" title="Permalink to this definition">¶</a></dt>
-<dd><p>Obtain the node ids of each node in the tree</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list :</p>
-<blockquote class="last">
-<div><p>elements are node ids</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
 <dt id="allensdk.core.simple_tree.SimpleTree.parent">
-<code class="descname">parent</code><span class="sig-paren">(</span><em>node_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/simple_tree.html#SimpleTree.parent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.simple_tree.SimpleTree.parent" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get one or mode nodes&#8217; parent nodes</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>node_ids</strong> : list of hashable</p>
-<blockquote>
-<div><p>Items are ids of nodes whose parents will be found.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list of dict :</p>
-<blockquote class="last">
-<div><p>Items are parents of nodes corresponding to argued ids.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
+<code class="descname">parent</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/simple_tree.html#SimpleTree.parent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.simple_tree.SimpleTree.parent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="allensdk.core.simple_tree.SimpleTree.parent_id">
-<code class="descname">parent_id</code><span class="sig-paren">(</span><em>node_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/simple_tree.html#SimpleTree.parent_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.simple_tree.SimpleTree.parent_id" title="Permalink to this definition">¶</a></dt>
+<code class="descname">parent_id</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/simple_tree.html#SimpleTree.parent_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.simple_tree.SimpleTree.parent_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.simple_tree.SimpleTree.parent_ids">
+<code class="descname">parent_ids</code><span class="sig-paren">(</span><em>node_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/simple_tree.html#SimpleTree.parent_ids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.simple_tree.SimpleTree.parent_ids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Obtain the ids of one or more nodes&#8217; parents</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -3085,6 +3130,30 @@ A -&gt; B -&gt; C</p>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list of hashable :</p>
 <blockquote class="last">
 <div><p>Items are ids of input nodes&#8217; parents in order.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.simple_tree.SimpleTree.parents">
+<code class="descname">parents</code><span class="sig-paren">(</span><em>node_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/simple_tree.html#SimpleTree.parents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.simple_tree.SimpleTree.parents" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get one or mode nodes&#8217; parent nodes</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>node_ids</strong> : list of hashable</p>
+<blockquote>
+<div><p>Items are ids of nodes whose parents will be found.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list of dict :</p>
+<blockquote class="last">
+<div><p>Items are parents of nodes corresponding to argued ids.</p>
 </div></blockquote>
 </td>
 </tr>
