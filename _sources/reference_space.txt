@@ -35,9 +35,9 @@ ReferenceSpace Class
 
 The :py:class:`allensdk.core.reference_space.ReferenceSpace` class contains methods for working with our reference spaces. Some use cases might include:
 
-    - `Building an indicator mask for one or more structures <_static/examples/nb/reference_space.html#making structure masks>`_ 
-    - `Viewing the annotation <_static/exampled/nb/reference_space.html#View a slice from the annotation>`_
-    - `Querying the structure graph <_static/exampled/nb/reference_space.html#Using a StructureTree>`_
+    - `Building an indicator mask for one or more structures <_static/examples/nb/reference_space.html#making-structure-masks>`_ 
+    - `Viewing the annotation <_static/examples/nb/reference_space.html#View-a-slice-from-the-annotation>`_
+    - `Querying the structure graph <_static/examples/nb/reference_space.html#Using-a-StructureTree>`_
     
 Please see the `example notebook <_static/examples/nb/reference_space.html>`_ for more code samples.
 
