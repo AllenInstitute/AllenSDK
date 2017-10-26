@@ -54,7 +54,7 @@ from allensdk.deprecated import deprecated
 from allensdk.brain_observatory.stimulus_info import warp_stimulus_coords as si_warp_stimulus_coords
 from allensdk.brain_observatory.stimulus_info import make_display_mask as si_make_display_mask
 from allensdk.brain_observatory.stimulus_info import mask_stimulus_template as si_mask_stimulus_template
-
+from allensdk.brain_observatory.brain_observatory_exceptions import EpochSeparationException
 
 def get_epoch_mask_list(st, threshold, max_cuts=2):
     '''Convenience function to cut a stim table into multiple epochs
@@ -74,7 +74,10 @@ def get_epoch_mask_list(st, threshold, max_cuts=2):
     epoch_mask_list = []
 
     if len(cut_inds) > max_cuts:
-        raise Exception('more than 2 epochs cut')
+
+        # See: https://gist.github.com/nicain/bce66cd073e422f07cf337b476c63be7
+        #      https://github.com/AllenInstitute/AllenSDK/issues/66
+        raise EpochSeparationException('more than 2 epochs cut', delta=delta)
 
     for ii in range(len(cut_inds)+1):
 
@@ -166,7 +169,7 @@ class BrainObservatoryNwbDataSet(object):
         #  count as different trials (rows in the stim table).  This helps account for dropped frames, so that they dont
         #  cause the cutting of an entire experiment into too many stimulus epochs.  If these thresholds are too low,
         #  the assert statment in get_epoch_mask_list will halt execution.  In that case, make a bug report!.
-        threshold_dict = {si.THREE_SESSION_A:31+7,
+        threshold_dict = {si.THREE_SESSION_A:32+7,
                           si.THREE_SESSION_B:15,
                           si.THREE_SESSION_C:7,
                           si.THREE_SESSION_C2:7}

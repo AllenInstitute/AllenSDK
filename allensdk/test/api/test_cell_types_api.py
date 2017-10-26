@@ -11,7 +11,8 @@ def mock_cells():
             'data_sets': [],
             'donor': {
                 'transgenic_lines': [],
-                'organism': { 'name': CellTypesApi.MOUSE }
+                'organism': { 'name': CellTypesApi.MOUSE },
+                'conditions': [ { 'name': 'disease categories - influenza' } ]
                 }
             },
         { 
@@ -30,7 +31,8 @@ def mock_cells():
             'cell_reporter': { 'name': 'bob' },
             'donor': {
                 'transgenic_lines': [],
-                'organism': { 'name': CellTypesApi.HUMAN }
+                'organism': { 'name': CellTypesApi.HUMAN },
+                'conditions': [ { 'name': 'disease categories - cheese' } ]
                 }
             },
         ]
@@ -61,6 +63,9 @@ def test_list_cells_mocked(mock_cells):
     cells = ctapi.list_cells()
     assert len(cells) == 3
 
+    flu_cells = [ cell for cell in cells if cell['disease_categories'] == [('influenza')] ]
+    assert len(flu_cells) == 1
+    
     cells = ctapi.list_cells(require_reconstruction=True)
     assert len(cells) == 1
     

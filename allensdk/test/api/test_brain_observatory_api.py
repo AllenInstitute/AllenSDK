@@ -109,7 +109,8 @@ def mock_ophys_experiments():
          'specimen': {'donor': {
              'transgenic_lines': [{'name': 'Don'}]}},
          'stimulus_name': 'three_session_C',
-         'experiment_container': { 'failed': False }
+         'experiment_container': { 'failed': False },
+         'fail_eye_tracking': False
          },
         {'experiment_container_id': 2,
          'targeted_structure': {'acronym': 'NBC'},
@@ -117,7 +118,8 @@ def mock_ophys_experiments():
          'specimen': {'donor': {
              'transgenic_lines': [{'name': 'Don'}]}},
          'stimulus_name': 'three_session_C',
-         'experiment_container': { 'failed': True }
+         'experiment_container': { 'failed': True },
+         'fail_eye_tracking': True
          }
     ]
 
@@ -308,7 +310,14 @@ def test_filter_experiment_containers_lines_all_filters(bo_api, mock_containers)
                                             imaging_depths=[200],
                                             targeted_structures=['NBC'],
                                             transgenic_lines=['Don'])
+
     assert len(containers) == 1
+
+def test_filter_experiment_containers_caseless(bo_api, mock_containers):
+    containers = \
+        bo_api.filter_experiment_containers(mock_containers, transgenic_lines=['DON'])
+    assert len(containers) == 1
+
 
 
 def test_filter_ophys_experiments_no_filters(bo_api, mock_ophys_experiments):
@@ -325,6 +334,11 @@ def test_filter_ophys_experiments_container_id(bo_api, mock_ophys_experiments):
 def test_filter_ophys_experiments_stimuli(bo_api, mock_ophys_experiments):
     experiments = bo_api.filter_ophys_experiments(mock_ophys_experiments,
                                                   stimuli=['static_gratings'])
+    assert len(experiments) == 1
+
+def test_filter_ophys_experiments_eye_tracking(bo_api, mock_ophys_experiments):
+    experiments = bo_api.filter_ophys_experiments(mock_ophys_experiments,
+                                                  require_eye_tracking=True)
     assert len(experiments) == 1
 
 
