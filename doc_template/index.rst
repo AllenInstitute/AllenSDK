@@ -100,7 +100,7 @@ Users of the :py:class:`~allensdk.core.cell_types_cache.CellTypesCache` can filt
 `Jupyter notebook <_static/examples/nb/cell_types.html>`_
 
 The Allen Mouse Brain Connectivity Atlas contains over 350 new data sets and structure unionize records have been completely reprocessed with updated 3D annotations of the Common Coordinate Framework.
-The structure ontology contains new structures, with annotations have changing the most.  The :py:class:`~allensdk.core.mouse_connectivity_cache.MouseConnectivityCache` :code:`get_annotation_volume` method will by default return a new volume by default.  You can choose which version of annotations you would like using the ``ccf_version`` :py:class:`~allensdk.core.mouse_connectivity_cache.MouseConnectivityCache` constructor.
+The structure ontology contains new structures, with subcortical annotations having changed the most.  The :py:class:`~allensdk.core.mouse_connectivity_cache.MouseConnectivityCache` :code:`get_annotation_volume` method will by default return a new volume by default.  You can choose which version of annotations you would like using the ``ccf_version`` :py:class:`~allensdk.core.mouse_connectivity_cache.MouseConnectivityCache` constructor.
 
 To access new experiments and unionize records, you will need to remove a number of files in your manifest directory so that 
 :py:class:`~allensdk.core.mouse_connectivity_cache.MouseConnectivityCache` will know to download the new copies:
