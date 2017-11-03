@@ -179,7 +179,7 @@ class LocallySparseNoise(StimulusAnalysis):
                 # watch out for NaNs and Nones
                 if isinstance(area_on, np.ndarray):
                     area_on[np.equal(area_on, None)] = np.nan
-                    if not np.all(np.isnan(area_on).astype(float)):
+                    if not np.all(np.isnan(area_on.astype(float))):
                         on_i = np.nanargmax(area_on)
             else:
                 on_i = None
@@ -201,7 +201,7 @@ class LocallySparseNoise(StimulusAnalysis):
                 # watch out for NaNs and Nones
                 if isinstance(area_off, np.ndarray):
                     area_off[np.equal(area_off, None)] = np.nan
-                    if not np.all(np.isnan(area_off).astype(float)):
+                    if not np.all(np.isnan(area_off.astype(float))):
                         off_i = np.nanargmax(area_off)
             else:
                 off_i = None
