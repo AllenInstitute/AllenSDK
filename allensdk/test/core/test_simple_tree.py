@@ -65,11 +65,11 @@ def test_filter_nodes(tree):
     assert( len(two_par) == 1 )
 
 
-def test_extract_nodes(tree):
+def test_nodes_by_property(tree):
   
     exp_ids = [2, 1, 3]
 
-    obt = tree.extract_nodes( lambda x: x['id'], exp_ids )
+    obt = tree.nodes_by_property( lambda x: x['id'], exp_ids )
     obt_ids = [ item['id'] for item in obt ]
     
     assert( allclose( obt_ids, exp_ids) )   

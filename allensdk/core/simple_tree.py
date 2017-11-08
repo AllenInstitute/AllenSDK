@@ -117,11 +117,7 @@ class SimpleTree( object ):
         dict :
             Maps the node property defined by from_fn to the node property 
             defined by to_fn across nodes.
-            
-        Notes
-        -----
-        The resulting map is not necessarily 1-to-1! 
-        
+
         '''
         
         vm = {}
@@ -137,7 +133,7 @@ class SimpleTree( object ):
         return vm
 
 
-    def extract_nodes(self, from_fn, values, to_fn=None):
+    def nodes_by_property(self, from_fn, values, to_fn=None):
         '''Get nodes by a specified property
 
         Parameters
@@ -149,6 +145,11 @@ class SimpleTree( object ):
         to_fn : function, optional
             Defines the outputs, on a per-node basis. Defaults to returning 
             the whole node.
+  
+        Returns
+        -------
+        list : 
+            outputs, 1 for each input value.
 
         '''
 
