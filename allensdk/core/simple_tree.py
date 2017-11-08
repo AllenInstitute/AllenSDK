@@ -133,13 +133,14 @@ class SimpleTree( object ):
         return vm
 
 
-    def nodes_by_property(self, from_fn, values, to_fn=None):
+    def nodes_by_property(self, key, values, to_fn=None):
         '''Get nodes by a specified property
 
         Parameters
         ----------
-        from_fn : function
-            The property used for lookup. Should be unique.
+        key : hashable or function
+            The property used for lookup. Should be unique. If a function, will 
+            be invoked on each node.
         values : list
             Select matching elements from the lookup.
         to_fn : function, optional
@@ -155,6 +156,11 @@ class SimpleTree( object ):
 
         if to_fn is None:
             to_fn = lambda x: x
+
+        if not callable( key ):
+            from_fn = lambda x: x[key]
+        else:
+            from_fn = key
 
         value_map = self.value_map( from_fn, to_fn )
         return [ value_map[vv] for vv in values ]
