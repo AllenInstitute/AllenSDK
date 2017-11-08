@@ -117,7 +117,7 @@ class StructureTree( SimpleTree ):
             
         '''
         
-        return self.filter_nodes(lambda x: x['name'] in names)
+        return self.extract_nodes(lambda x: x['name'], names)
         
         
     def get_structures_by_acronym(self, acronyms):
@@ -135,7 +135,7 @@ class StructureTree( SimpleTree ):
             
         '''
         
-        return self.filter_nodes(lambda x: x['acronym'] in acronyms)
+        return self.extract_nodes(lambda x: x['acronym'], acronyms)
         
         
     def get_structures_by_set_id(self, structure_set_ids):

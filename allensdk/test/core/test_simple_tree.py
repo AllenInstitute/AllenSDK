@@ -63,7 +63,17 @@ def test_filter_nodes(tree):
     two_par = tree.filter_nodes(lambda node: node['parent'] == 2)
     assert( two_par[0]['id'] == 5 )
     assert( len(two_par) == 1 )
+
+
+def test_extract_nodes(tree):
+  
+    exp_ids = [2, 1, 3]
+
+    obt = tree.extract_nodes( lambda x: x['id'], exp_ids )
+    obt_ids = [ item['id'] for item in obt ]
     
+    assert( allclose( obt_ids, exp_ids) )   
+
     
 def test_value_map(tree):
     
@@ -74,6 +84,13 @@ def test_value_map(tree):
     assert( parent_map[2] == 0 )
     assert( parent_map[3] == 1 ) 
     
+
+def test_value_map_nonunique(tree):
+    
+    with pytest.raises( RuntimeError ):
+        parent_map = tree.value_map(lambda node: node['parent'], 
+                                    lambda node: node['id'])
+
     
 def test_node_ids(tree):
 

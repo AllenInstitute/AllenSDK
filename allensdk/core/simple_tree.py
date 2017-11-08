@@ -97,7 +97,7 @@ class SimpleTree( object ):
         '''
     
         return list(filter(criterion, self._nodes.values()))
-        
+
         
     def value_map(self, from_fn, to_fn):
         '''Obtain a look-up table relating a pair of node properties across 
@@ -107,7 +107,7 @@ class SimpleTree( object ):
         ----------
         from_fn : function | node dict => hashable value
             The keys of the output dictionary will be obtained by calling 
-            from_fn on each node.
+            from_fn on each node. Should be unique.
         to_fn : function | node_dict => value
             The values of the output function will be obtained by calling 
             to_fn on each node.
@@ -123,8 +123,40 @@ class SimpleTree( object ):
         The resulting map is not necessarily 1-to-1! 
         
         '''
-    
-        return {from_fn(v): to_fn(v) for v in self._nodes.values()}
+        
+        vm = {}
+        for node in self._nodes.values():
+            key = from_fn(node)
+            value = to_fn(node)
+            
+            if key in vm:
+                raise RuntimeError('from_fn is not unique across nodes. '
+                                   'Collision between {0} and {1}.'.format(value, vm[key]))    
+            vm[key] = value
+  
+        return vm
+
+
+    def extract_nodes(self, from_fn, values, to_fn=None):
+        '''Get nodes by a specified property
+
+        Parameters
+        ----------
+        from_fn : function
+            The property used for lookup. Should be unique.
+        values : list
+            Select matching elements from the lookup.
+        to_fn : function, optional
+            Defines the outputs, on a per-node basis. Defaults to returning 
+            the whole node.
+
+        '''
+
+        if to_fn is None:
+            to_fn = lambda x: x
+
+        value_map = self.value_map( from_fn, to_fn )
+        return [ value_map[vv] for vv in values ]
 
 
     def node_ids(self):
