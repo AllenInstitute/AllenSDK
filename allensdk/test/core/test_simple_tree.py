@@ -39,12 +39,15 @@ from numpy import allclose
 
 from allensdk.core.simple_tree import SimpleTree
 
+
 @pytest.fixture
 def tree():
 
-    nodes = [{'id': 0, 'parent': None}, {'id': 1, 'parent': 0}, 
-             {'id': 2, 'parent': 0}, {'id': 3, 'parent': 1}, 
-             {'id': 4, 'parent': 1}, {'id': 5, 'parent': 2}]
+    s = frozenset([1, 2, 3])
+
+    nodes = [{'id': 0, 'parent': None, 1: 2, s: 'a'}, {'id': 1, 'parent': 0, 1: 7, s: 'd'}, 
+             {'id': 2, 'parent': 0, 1: 3, s: 'b'}, {'id': 3, 'parent': 1, 1: 6, s: 'e'}, 
+             {'id': 4, 'parent': 1, 1: 4, s: 'c'}, {'id': 5, 'parent': 2, 1: 5, s: 'f'}]
             
     parent_fn = lambda node: node['parent']
     id_fn = lambda node: node['id']
@@ -65,14 +68,14 @@ def test_filter_nodes(tree):
     assert( len(two_par) == 1 )
 
 
-def test_nodes_by_property(tree):
-  
-    exp_ids = [2, 1, 3]
+@pytest.mark.parametrize('key,val,to,exp', [ ['id', [2, 1, 3], lambda x: x['id'],[2, 1, 3]],
+                                             [lambda x: x['id'], [2, 1, 3], lambda x: x['id'],[2, 1, 3]],
+                                             [1, [3, 7, 6], lambda x: x['id'],[2, 1, 3]],
+                                             [frozenset([1, 2, 3]), ['b'], lambda x: x[1], [3]] ])
+def test_nodes_by_property(tree, key, val, to, exp):
 
-    obt = tree.nodes_by_property( lambda x: x['id'], exp_ids )
-    obt_ids = [ item['id'] for item in obt ]
-    
-    assert( allclose( obt_ids, exp_ids) )   
+    obt = tree.nodes_by_property( key, val, to_fn=to )
+    assert( allclose( obt, exp) )
 
     
 def test_value_map(tree):
