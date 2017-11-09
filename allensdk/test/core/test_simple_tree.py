@@ -39,12 +39,15 @@ from numpy import allclose
 
 from allensdk.core.simple_tree import SimpleTree
 
+
 @pytest.fixture
 def tree():
 
-    nodes = [{'id': 0, 'parent': None}, {'id': 1, 'parent': 0}, 
-             {'id': 2, 'parent': 0}, {'id': 3, 'parent': 1}, 
-             {'id': 4, 'parent': 1}, {'id': 5, 'parent': 2}]
+    s = frozenset([1, 2, 3])
+
+    nodes = [{'id': 0, 'parent': None, 1: 2, s: 'a'}, {'id': 1, 'parent': 0, 1: 7, s: 'd'}, 
+             {'id': 2, 'parent': 0, 1: 3, s: 'b'}, {'id': 3, 'parent': 1, 1: 6, s: 'e'}, 
+             {'id': 4, 'parent': 1, 1: 4, s: 'c'}, {'id': 5, 'parent': 2, 1: 5, s: 'f'}]
             
     parent_fn = lambda node: node['parent']
     id_fn = lambda node: node['id']
@@ -63,7 +66,17 @@ def test_filter_nodes(tree):
     two_par = tree.filter_nodes(lambda node: node['parent'] == 2)
     assert( two_par[0]['id'] == 5 )
     assert( len(two_par) == 1 )
-    
+
+
+@pytest.mark.parametrize('key,val,to,exp', [ ['id', [2, 1, 3], lambda x: x['id'],[2, 1, 3]],
+                                             [lambda x: x['id'], [2, 1, 3], lambda x: x['id'],[2, 1, 3]],
+                                             [1, [3, 7, 6], lambda x: x['id'],[2, 1, 3]],
+                                             [frozenset([1, 2, 3]), ['b'], lambda x: x[1], [3]] ])
+def test_nodes_by_property(tree, key, val, to, exp):
+
+    obt = tree.nodes_by_property( key, val, to_fn=to )
+    assert( allclose( obt, exp) )
+
     
 def test_value_map(tree):
     
@@ -74,6 +87,13 @@ def test_value_map(tree):
     assert( parent_map[2] == 0 )
     assert( parent_map[3] == 1 ) 
     
+
+def test_value_map_nonunique(tree):
+    
+    with pytest.raises( RuntimeError ):
+        parent_map = tree.value_map(lambda node: node['parent'], 
+                                    lambda node: node['id'])
+
     
 def test_node_ids(tree):
 
