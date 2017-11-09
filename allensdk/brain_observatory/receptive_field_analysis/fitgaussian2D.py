@@ -53,47 +53,23 @@ def gaussian2D(height, center_x, center_y, width_x, width_y, rotation):
         return g
     return rotgauss
             
-# def moments(data):
-#     #uses location of peak as seed for center
-#     # total = data.sum()
-#     # Y,X = np.indices(data.shape)
-#     x = (np.where(data==data.max())[1][0]).astype(np.float)        #(X*data).sum()/total # BUG HERE USES MAX, what happens if tie?
-#     y = (np.where(data==data.max())[0][0]).astype(np.float)        #(Y*data).sum()/total
-#
-#     print x, np.where(data==data.max())[1]
-#     print y, np.where(data==data.max())[0]
-#
-#
-#     col = data[:, int(x)]
-#     width_x = np.sqrt(abs((np.arange(col.size)-x)**2*col).sum()/col.sum())
-#
-#     print abs((np.arange(col.size)-x)**2*col).sum()/col.sum()
-#
-#     print 'moments', x, width_x, 0.0
-#     import sys
-#     sys.exit()
-#     return height, y, x, width_y, width_x, 0.0
-#
-#
-#     row = data[int(y), :]
-#     width_y = np.sqrt(abs((np.arange(row.size)-y)**2*row).sum()/row.sum())
-#     height = data.max()
-#     #
+
 def moments2(data):
     #uses original method from website for finding center
+
     total = data.sum()
+
     Y,X = np.indices(data.shape)
     x = (X*data).sum()/total
     y = (Y*data).sum()/total
+
     col = data[:, int(x)]
     width_x = np.sqrt(abs((np.arange(col.size)-x)**2*col).sum()/col.sum())
+
     row = data[int(y), :]
     width_y = np.sqrt(abs((np.arange(row.size)-y)**2*row).sum()/row.sum())
+
     height = data.max()
-    # print height, y, x, width_y, width_x, 0.0
-    #
-    # import sys
-    # sys.exit()
 
     return height, y, x, width_y, width_x, None
     
