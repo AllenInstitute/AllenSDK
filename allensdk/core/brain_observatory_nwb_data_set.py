@@ -37,6 +37,7 @@ import h5py
 import logging
 import pandas as pd
 import numpy as np
+import six
 import allensdk.brain_observatory.roi_masks as roi
 import itertools
 from allensdk.brain_observatory.locally_sparse_noise import LocallySparseNoise
@@ -764,7 +765,7 @@ class BrainObservatoryNwbDataSet(object):
 
         # convert start time to a date object
         session_start_time = meta.get('session_start_time')
-        if isinstance(session_start_time, str) or isinstance(session_start_time, unicode):
+        if isinstance( session_start_time, six.string_types ):
             meta['session_start_time'] = dateutil.parser.parse(session_start_time)
 
         age = meta.pop('age', None)
