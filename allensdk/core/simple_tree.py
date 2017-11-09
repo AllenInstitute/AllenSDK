@@ -40,6 +40,7 @@ from six import iteritems
 
 from allensdk.deprecated import deprecated
 
+
 class SimpleTree( object ):
     def __init__(self, nodes, 
                  node_id_cb, 
@@ -97,7 +98,7 @@ class SimpleTree( object ):
         '''
     
         return list(filter(criterion, self._nodes.values()))
-        
+
         
     def value_map(self, from_fn, to_fn):
         '''Obtain a look-up table relating a pair of node properties across 
@@ -107,7 +108,7 @@ class SimpleTree( object ):
         ----------
         from_fn : function | node dict => hashable value
             The keys of the output dictionary will be obtained by calling 
-            from_fn on each node.
+            from_fn on each node. Should be unique.
         to_fn : function | node_dict => value
             The values of the output function will be obtained by calling 
             to_fn on each node.
@@ -117,14 +118,53 @@ class SimpleTree( object ):
         dict :
             Maps the node property defined by from_fn to the node property 
             defined by to_fn across nodes.
-            
-        Notes
-        -----
-        The resulting map is not necessarily 1-to-1! 
-        
+
         '''
-    
-        return {from_fn(v): to_fn(v) for v in self._nodes.values()}
+        
+        vm = {}
+        for node in self._nodes.values():
+            key = from_fn(node)
+            value = to_fn(node)
+            
+            if key in vm:
+                raise RuntimeError('from_fn is not unique across nodes. '
+                                   'Collision between {0} and {1}.'.format(value, vm[key]))    
+            vm[key] = value
+  
+        return vm
+
+
+    def nodes_by_property(self, key, values, to_fn=None):
+        '''Get nodes by a specified property
+
+        Parameters
+        ----------
+        key : hashable or function
+            The property used for lookup. Should be unique. If a function, will 
+            be invoked on each node.
+        values : list
+            Select matching elements from the lookup.
+        to_fn : function, optional
+            Defines the outputs, on a per-node basis. Defaults to returning 
+            the whole node.
+  
+        Returns
+        -------
+        list : 
+            outputs, 1 for each input value.
+
+        '''
+
+        if to_fn is None:
+            to_fn = lambda x: x
+
+        if not callable( key ):
+            from_fn = lambda x: x[key]
+        else:
+            from_fn = key
+
+        value_map = self.value_map( from_fn, to_fn )
+        return [ value_map[vv] for vv in values ]
 
 
     def node_ids(self):
