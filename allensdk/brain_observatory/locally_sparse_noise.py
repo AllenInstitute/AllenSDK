@@ -438,6 +438,15 @@ class LocallySparseNoise(StimulusAnalysis):
                 raise Exception
 
         for x in attr_list:
+
+            # replace None => nan before writing
+            # set array type to float
+            for ii, item in enumerate(x):
+                if isinstance( item, np.ndarray ):
+                    if item.dtype == np.dtype('O'):
+                        item[ item == None ] = np.nan
+                        x[ii] = np.array(item, dtype=float)
+
             if len(x) > 3:
                 f['/'.join(x[:-3])].attrs[x[-2]] = x[-1]
             else:
