@@ -40,6 +40,7 @@ from six import iteritems
 
 from allensdk.deprecated import deprecated
 
+
 class SimpleTree( object ):
     def __init__(self, nodes, 
                  node_id_cb, 
