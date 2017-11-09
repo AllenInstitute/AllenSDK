@@ -60,14 +60,14 @@ def moments2(data):
     total = data.sum()
 
     Y,X = np.indices(data.shape)
-    x = (X*data).sum()/total
-    y = (Y*data).sum()/total
+    x = ( X * data ).sum() / total
+    y = ( Y * data ).sum() / total
 
     col = data[:, int(x)]
-    width_x = np.sqrt(abs((np.arange(col.size)-x)**2*col).sum()/col.sum())
+    width_x = np.sqrt( abs( ( np.arange(col.size) - x ) ** 2 * col ).sum() / col.sum() )
 
     row = data[int(y), :]
-    width_y = np.sqrt(abs((np.arange(row.size)-y)**2*row).sum()/row.sum())
+    width_y = np.sqrt( abs( ( np.arange(row.size) - y ) ** 2 * row  ).sum() / row.sum() )
 
     height = data.max()
 
