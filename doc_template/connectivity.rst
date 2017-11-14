@@ -48,7 +48,7 @@ The :py:class:`~allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi
 for downloading data in the Allen Mouse Brain Connectivity Atlas.  The following example demonstrates how to download 
 meta data for all wild-type injections and the projection signal density for one experiment:
 
-.. literalinclude:: _static/examples/connectivity_ex1.py
+.. literalinclude:: _static/examples_root/examples/connectivity_ex1.py
 
 
 Mouse Connectivity Cache
@@ -60,7 +60,7 @@ don't have to think about file names and directories.  It also takes care of kno
 and reads them from disk instead of downloading them again.  The following example demonstrates how to download meta data for
 all experiments with injections in the isocortex and download the projetion density volume for one of them:
 
-.. literalinclude:: _static/examples/connectivity_ex2.py
+.. literalinclude:: _static/examples_root/examples/connectivity_ex2.py
 
 
 File Formats
@@ -79,7 +79,7 @@ consists of a short ASCII header followed by a binary array of data values.
 To read these in Python, we recommend the `pynrrd package <https://github.com/mhe/pynrrd>`_. 
 Usage is straightforward:
 
-.. literalinclude:: _static/examples/connectivity_ex3.py
+.. literalinclude:: _static/examples_root/examples/connectivity_ex3.py
 
 
 
