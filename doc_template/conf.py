@@ -302,11 +302,23 @@ def skip_autodoc(app, what, name, obj, skip, options):
     
     return skip or skip_explicit
 
-def setup(app):
-    app.connect('autodoc-skip-member', skip_autodoc)
-
+def render_notebooks(_):
     nb_root = 'examples_root/examples/nb'
     for filename in os.listdir(nb_root):
         if filename.endswith('.ipynb'):
             os.system('jupyter-nbconvert --to html ' + os.path.join(nb_root, filename))
 
+def run_apidoc(_):
+	from sphinx.apidoc import main
+	import sys
+	sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+	cur_dir = os.path.abspath(os.path.dirname(__file__))
+	module = os.path.join(cur_dir,"..","allensdk")
+	main(['-e', '-o', cur_dir, module, '--force'])
+
+def setup(app):
+    app.connect('autodoc-skip-member', skip_autodoc)
+    app.connect('builder-inited', render_notebooks)
+    app.connect('builder-inited', run_apidoc)
+
+    
