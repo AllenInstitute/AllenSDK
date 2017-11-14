@@ -166,7 +166,7 @@ def test_pageable_json(rma):
     expected_calls = map(lambda c: call(base_query.format(c)),
                          [0, 1, 2, 3, 4])
                      
-    assert rma['ju_read_url_get'].call_args_list == expected_calls
+    assert rma['ju_read_url_get'].call_args_list == list(expected_calls)
 
 
 def test_all(rma5):
@@ -193,7 +193,7 @@ def test_all(rma5):
     expected_calls = map(lambda c: call(base_query.format(c)),
                          [0, 1, 2, 3, 4, 5])
                      
-    assert rma5['ju_read_url_get'].call_args_list == expected_calls
+    assert rma5['ju_read_url_get'].call_args_list == list(expected_calls)
 
 
 @pytest.mark.parametrize("cache_style",
@@ -235,16 +235,16 @@ def test_cacheable_pageable_csv(rma5,
 
     rma5['os_makedirs'].assert_called_once_with('/path/to')
 
-    base_query = \
-        ('http://api.brain-map.org/api/v2/data/query.json?'
-         'q=model::ApiCamCellMetric,'
-         'rma::options%5Bnum_rows$eq1%5D%5Bstart_row$eq{}%5D'
-         '%5Bcount$eqfalse%5D')
+    base_query = ('http://api.brain-map.org/api/v2/data/query.json?'
+                  'q=model::ApiCamCellMetric,'
+                  'rma::options%5Bnum_rows$eq1%5D%5Bstart_row$eq{}%5D'
+                  '%5Bcount$eqfalse%5D')
 
     expected_calls = map(lambda c: call(base_query.format(c)),
                          [0, 1, 2, 3, 4, 5])
 
-    assert rma5['ju_read_url_get'].call_args_list == expected_calls
+    assert rma5['ju_read_url_get'].call_args_list == list(expected_calls)
+
     assert csv_writerow.call_args_list == [call({'whatever': 'whatever'}),
                                            call({'whatever': True}),
                                            call({'whatever': True}),
@@ -307,5 +307,5 @@ def test_cacheable_pageable_json(rma5,
 
     open_mock.assert_called_once_with('/path/to/cam_cell_metrics.json', 'wb')
     open_mock.return_value.write.assert_called_once_with('[\n  {\n    "whatever": true\n  },\n  {\n    "whatever": true\n  },\n  {\n    "whatever": true\n  },\n  {\n    "whatever": true\n  },\n  {\n    "whatever": true\n  }\n]')
-    assert rma5['ju_read_url_get'].call_args_list == expected_calls
+    assert rma5['ju_read_url_get'].call_args_list == list(expected_calls)
     assert len(cam_cell_metrics) == 5

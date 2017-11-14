@@ -352,7 +352,7 @@ class Cache(object):
         with open(pth, 'w') as output:
             for row in gen:
                 if first_row:
-                    field_names = map(str, row.keys())
+                    field_names = [ str(k) for k in row.keys() ]
                     csv_writer = csv.DictWriter(output,
                                                 fieldnames=field_names,
                                                 delimiter=',',

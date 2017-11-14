@@ -316,7 +316,7 @@ class StimulusAnalysis(object):
         celltraces_vis = celltraces_vis[:, ~np.isnan(dx_vis)]
         dx_vis = dx_vis[~np.isnan(dx_vis)]
 
-        nbins = 1 + len(np.where(dx_sp >= 1)[0]) / binsize
+        nbins = 1 + len(np.where(dx_sp >= 1)[0]) // binsize
         dx_sorted = dx_sp[np.argsort(dx_sp)]
         celltraces_sorted_sp = celltraces_sp[:, np.argsort(dx_sp)]
         binned_cells_sp = np.zeros((self.numbercells, nbins, 2))
@@ -377,7 +377,7 @@ class StimulusAnalysis(object):
                     binned_cells_shuffled_sp[:, i, 1, shuf] = np.std(
                         celltraces_shuffled_sorted[:, start:start + binsize], axis=1)
 
-        nbins = 1 + len(np.where(dx_vis >= 1)[0]) / binsize
+        nbins = 1 + len(np.where(dx_vis >= 1)[0]) // binsize
         dx_sorted = dx_vis[np.argsort(dx_vis)]
         celltraces_sorted_vis = celltraces_vis[:, np.argsort(dx_vis)]
         binned_cells_vis = np.zeros((self.numbercells, nbins, 2))
