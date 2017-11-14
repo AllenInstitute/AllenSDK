@@ -87,16 +87,29 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
-What's New - Release 0.14.2 (August 17th, 2017)
+
+What's New - Release 0.14.3 (October 19th, 2017)
 -----------------------------------------------
 
-The 0.14.2  release is primarily a change in our open source license.
-We are now using a 2-clause BSD license with an additional clause
-related to commercial use.  If you have any questions, please contact us on our
-`Gitter channel <https://gitter.im/AllenInstitute/AllenSDK>`_
-or `send us a message <http://allins.convio.net/site/PageServer?pagename=send_us_a_message>`_.
+The 0.14.3 release coincides with the first release of human data and models in the Allen Cell Types Database and a complete requantification of structure unionize
+records in the Allen Mouse Brain Connectivity Atlas based on a new revision of the Common Coordinate Framework structure ontology and voxel annotations.  For details 
+on what types of data were added to the two atlases, take a look at the `data release notes <https://github.com/AllenInstitute/AllenSDK/wiki/Release-Notes-(0.14.3)>`_.
 
-This release also includes code in the BrainObservatory for mapping stimuli to screens.
-See `this Jupyter example notebook <http://alleninstitute.github.io/AllenSDK/_static/examples/nb/brain_observatory_monitor.html>`_ for details.
+Users of the :py:class:`~allensdk.core.cell_types_cache.CellTypesCache` can filter for cells based on the species of the cell's donor using the ``species`` argument of 
+:py:meth:`~allensdk.core.cell_types_cache.CellTypesCache.get_cells`.  Examples of this are shown in the metadata filtering section of the example 
+`Jupyter notebook <_static/examples/nb/cell_types.html>`_
+
+The Allen Mouse Brain Connectivity Atlas contains over 350 new data sets and structure unionize records have been completely reprocessed with updated 3D annotations of the Common Coordinate Framework.
+The structure ontology contains new structures, with annotations have changing the most.  The :py:class:`~allensdk.core.mouse_connectivity_cache.MouseConnectivityCache` :code:`get_annotation_volume` method will by default return a new volume by default.  You can choose which version of annotations you would like using the ``ccf_version`` :py:class:`~allensdk.core.mouse_connectivity_cache.MouseConnectivityCache` constructor.
+
+To access new experiments and unionize records, you will need to remove a number of files in your manifest directory so that 
+:py:class:`~allensdk.core.mouse_connectivity_cache.MouseConnectivityCache` will know to download the new copies:
+
+    * :py:class:`~allensdk.core.mouse_connectivity_cache.MouseConnectivityCache` manifest JSON
+    * ``experiments.json`` 
+    * ``structures.json`` 
+    * ``structure_unionizes.csv`` (one per experiment within experiment subdirectories)  
+
+You can then call the :py:class:`~allensdk.core.mouse_connectivity_cache.MouseConnectivityCache` :code:`get_experiments`, :code:`get_structure_tree`, and :code:`get_structure_unionizes` methods to download the files above.
 
 To find out more, take a look at our `CHANGELOG <http://github.com/AllenInstitute/AllenSDK/blob/master/CHANGELOG.md>`_. 

@@ -205,16 +205,18 @@ def test_sweep_data_exception(cache_fixture):
     assert 'has no ephys data' in str(exc.value)
 
 
-@pytest.mark.parametrize('path_exists,morph_flag,recon_flag,statuses',
+@pytest.mark.parametrize('path_exists,morph_flag,recon_flag,statuses,species',
                          it.product((False, True),
                                     (False, True),
                                     (False, True),
-                                    (RS.POSITIVE, ['list', 'of', 'statuses'])))
+                                    (RS.POSITIVE, ['list', 'of', 'statuses']),
+                                    (None, ['mouse'], ['human'])))
 def test_get_cells(cache_fixture,
                    path_exists,
                    morph_flag,
                    recon_flag,
-                   statuses):
+                   statuses,
+                   species):
     ctc = cache_fixture
     # this downloads metadata for all cells with morphology images
     with patch('allensdk.api.queries.cell_types_api.CellTypesApi.list_cells',
@@ -227,7 +229,8 @@ def test_get_cells(cache_fixture,
                     with patch('allensdk.core.json_utilities.write') as ju_write:
                         cells = ctc.get_cells(require_morphology=morph_flag,
                                               require_reconstruction=recon_flag,
-                                              reporter_status=statuses)
+                                              reporter_status=statuses,
+                                              species=species)
 
     assert len(cells) > 0
 
@@ -246,7 +249,8 @@ def test_get_cells(cache_fixture,
     filter_cells_mock.assert_called_once_with(expected_cells,
                                               morph_flag,
                                               recon_flag,
-                                              expected_status)
+                                              expected_status,
+                                              species)
 
 
 @pytest.mark.parametrize('path_exists,morph_flag,recon_flag,statuses',

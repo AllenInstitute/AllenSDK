@@ -889,12 +889,12 @@ class EphysCellFeatureExtractor:
         for s in self._features["long_squares"]["subthreshold_sweeps"]:
             s.set_stimulus_amplitude_calculator(_step_stim_amp)
 
-        print "subthresh_sweeps", len(subthresh_sweeps) # DEBUG
+        logging.debug("subthresh_sweeps: %d", len(subthresh_sweeps))
         calc_subthresh_sweeps = [sweep for sweep in subthresh_sweeps if
                                  sweep.sweep_feature("stim_amp") < self.SUBTHRESH_MAX_AMP and
                                  sweep.sweep_feature("stim_amp") > self._subthresh_min_amp]
 
-        print "calc_subthresh_sweeps", len(calc_subthresh_sweeps) # DEBUG
+        logging.debug("calc_subthresh_sweeps: %d", len(calc_subthresh_sweeps))
         calc_subthresh_ext = EphysSweepSetFeatureExtractor.from_sweeps(calc_subthresh_sweeps)
         self._subthreshold_membrane_property_ext = calc_subthresh_ext
         self._features["long_squares"]["subthreshold_membrane_property_sweeps"] = calc_subthresh_ext.sweeps()
@@ -1018,10 +1018,7 @@ def fit_fi_slope(ext):
 def reset_long_squares_start(when):
     global LONG_SQUARES_START, LONG_SQUARES_END
     delta = LONG_SQUARES_END - LONG_SQUARES_START
-    print delta
-    print when
     LONG_SQUARES_START = when
-    print LONG_SQUARES_START
     LONG_SQUARES_END = when + delta
 
 
