@@ -36,7 +36,9 @@
 import numpy as np
 from scipy import optimize
 
+
 class GaussianFitError(RuntimeError): pass
+
 
 def gaussian2D(height, center_x, center_y, width_x, width_y, rotation):
     width_x = float(width_x)
@@ -55,7 +57,33 @@ def gaussian2D(height, center_x, center_y, width_x, width_y, rotation):
             
 
 def moments2(data):
-    #uses original method from website for finding center
+    '''Compute mean and width of 
+
+    Parameters
+    ----------
+    data : np.ndarray
+        2d numpy array. Moments will be computed from 
+
+    Returns
+    -------
+    height : float
+        The maximum observed value in the data
+    y : float
+        Mean row index
+    x : float
+        Mean column index
+    width_y : float
+        The standard deviation along the mean row 
+    width_x : float
+        The standard deviation along the mean column
+    None : 
+        This function returns an instance of None.
+
+    Notes
+    -----
+    uses original method from website for finding center
+
+    '''
 
     total = data.sum()
 
@@ -64,15 +92,16 @@ def moments2(data):
     y = ( Y * data ).sum() / total
 
     col = data[:, int(x)]
-    width_x = np.sqrt( abs( ( np.arange(col.size) - x ) ** 2 * col ).sum() / col.sum() )
+    width_x = np.sqrt( abs( ( np.arange(col.size) - y ) ** 2 * col ).sum() / col.sum() )
 
     row = data[int(y), :]
-    width_y = np.sqrt( abs( ( np.arange(row.size) - y ) ** 2 * row  ).sum() / row.sum() )
+    width_y = np.sqrt( abs( ( np.arange(row.size) - x ) ** 2 * row  ).sum() / row.sum() )
 
     height = data.max()
 
     return height, y, x, width_y, width_x, None
     
+
 def fitgaussian2D(data):
     params = moments2(data)
     def errorfunction(p):
@@ -94,6 +123,7 @@ def fitgaussian2D(data):
         raise GaussianFitError('Gaussian optimization failed to converge:\n%s' % res.message)
 
     return p2
+
 
 def fitgaussian2D_fixedcenter(data):
     params = moments2(data)
