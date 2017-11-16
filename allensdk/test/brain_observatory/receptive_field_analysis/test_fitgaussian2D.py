@@ -87,7 +87,17 @@ def simple_fill():
     return do_fill
 
 
+@pytest.fixture()
+def rel_tol():
+    # some tests (like with rotated gaussians) depend on interpolation/optimization
+    # or other processes that are not expected to always product *exact* correspondance
+    return 10 ** -2
+
 # only providing independent cov - using rotation after the fact
+# TODO: I'm not sure how I like the non-right rotation tests. The covs are in a weird goldilocks zone 
+# between being so large that they go out of bounds and so small that discretization error is a big problem.
+# I think what this tells me is that I am not using the right ground truth, but I like this method 
+# as it provides a truly distinct comparison case 
 @pytest.mark.parametrize('mean,cov,scale,rot', [ [ [ 100, 100 ], [ 25, 25 ], 1, 0 ],
                                                  [ [ 100, 100 ], [ 10, 25 ], 1, 0 ],
                                                  [ [ 100, 110 ], [ 25, 25 ], 1, 0 ],
@@ -96,19 +106,24 @@ def simple_fill():
                                                  [ [ 100, 100 ], [ 25, 25 ], 1, 90 ],
                                                  [ [ 100, 100 ], [ 25, 20 ], 1, 180 ],
                                                  [ [ 100, 100 ], [ 30, 25 ], 1, -90 ],
-                                                 [ [ 100, 110 ], [ 30, 25 ], 1, -45 ] ])
-def test_gaussian2D(mean, cov, scale, rot, gaussian_pdf, domain_axes, simple_fill):
+                                                 [ [ 100, 110 ], [ 20, 15 ], 1, -45 ],
+                                                 [ [ 100, 110 ], [ 20, 15 ], 1, 30 ], 
+                                                 [ [ 100, 100 ], [ 15, 20 ], 1, 10 ] ])
+def test_gaussian2D(mean, cov, scale, rot, gaussian_pdf, domain_axes, simple_fill, rel_tol):
 
     full_cov = [ [ cov[0], 0 ], [ 0, cov[1] ] ]
     exp, mesh = gaussian_pdf( mean, full_cov, domain_axes, scale )
 
     if rot != 0:
-        exp = rotate( exp, rot, False, center=mean[::-1] )
+        exp = rotate( exp, -rot, False, center=mean[::-1] ) # note negative rotation
     
     obt_fn = gauss.gaussian2D( scale, mean[0], mean[1], np.sqrt(cov[0]), np.sqrt(cov[1]), rot )
     obt = simple_fill( domain_axes, obt_fn )
 
-    assert( np.allclose( exp, obt, rtol=10**-1 ) )
+    if rot == 0:
+        assert( np.allclose( obt, exp ) )
+    else:
+        assert( np.linalg.norm( obt - exp ) / np.linalg.norm(exp) < rel_tol )
 
 
 @pytest.mark.parametrize('mean,cov,scale', [ [ [ 100, 100 ], [ [1, 0 ], [0, 1] ], 1 ],
@@ -131,5 +146,5 @@ def test_moments2(mean, cov, scale, gaussian_pdf, domain_axes):
     print( mom_exp )  
 
     assert( np.allclose( mom_obt[:-1], mom_exp ) )
-    assert( mom_obt[-1] is None )
+    assert( mom_obt[-1] is None ) # TODO: why?
     
