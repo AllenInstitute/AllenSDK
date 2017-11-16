@@ -177,7 +177,7 @@ class SimpleTree( object ):
         
         '''
     
-        return self._nodes.keys()
+        return list(self._nodes)
 
     
     @deprecated("Use SimpleTree.parent_ids instead.")

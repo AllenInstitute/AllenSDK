@@ -36,10 +36,13 @@
 import pytest
 import mock
 from numpy import allclose
+import sys
 
 from allensdk.api.queries.ontologies_api import OntologiesApi
 from allensdk.core.structure_tree import StructureTree
 
+if sys.version_info > (3,):
+    long = int
 
 @pytest.fixture
 def nodes():

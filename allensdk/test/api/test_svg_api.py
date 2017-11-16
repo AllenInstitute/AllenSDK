@@ -38,7 +38,6 @@ from allensdk.api.queries.svg_api import SvgApi
 import pytest
 import json
 from mock import MagicMock
-import StringIO
 import os
 
 @pytest.fixture

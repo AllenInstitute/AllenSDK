@@ -132,7 +132,7 @@ def movingaverage(x, kernelsize, y):
         Output array to store the results
     """
 
-    halfsize = kernelsize / 2
+    halfsize = int( kernelsize / 2 )
     sumkernel = np.sum(x[0:halfsize])
     for m in range(0, halfsize):
         sumkernel = sumkernel + x[m + halfsize]

@@ -33,14 +33,18 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
+
+import logging
+
 import pandas as pd
 from six import string_types
+
+from allensdk.config.manifest import Manifest
+import allensdk.brain_observatory.stimulus_info as stimulus_info
+
 from .rma_template import RmaTemplate
 from ..cache import cacheable, Cache
 from .rma_pager import pageable
-from allensdk.config.manifest import Manifest
-import allensdk.brain_observatory.stimulus_info as stimulus_info
-import logging
 
 
 class BrainObservatoryApi(RmaTemplate):
@@ -510,6 +514,7 @@ class BrainObservatoryApi(RmaTemplate):
            { 'field': 'osi_dg', 'op': '>', 'value': 1.0 }.  See _QUERY_TEMPLATES for a full list
            of operators.
         """
+
         queries = self.dataframe_query_string(filters)
         result_dataframe = pd.DataFrame(data)
         result_dataframe = result_dataframe.query(queries)

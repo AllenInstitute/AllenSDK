@@ -595,10 +595,10 @@ def test_get_ephys_sweeps_with_api(cache_fixture,
                                     (False, True)))
 @patch('pandas.DataFrame.merge')
 def test_get_all_features(mock_merge,
-                           cache_fixture,
-                           mock_csv_stuff,
-                           path_exists,
-                           require_reconstruction):
+                          cache_fixture,
+                          mock_csv_stuff,
+                          path_exists,
+                          require_reconstruction):
     ctc = cache_fixture
 
     sweeps = [1, 2, 3]

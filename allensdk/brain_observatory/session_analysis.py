@@ -50,6 +50,8 @@ import argparse
 import logging
 import os
 
+from allensdk.deprecated import deprecated
+
 
 
 def multi_dataframe_merge(dfs):
@@ -578,6 +580,7 @@ def run_session_analysis(nwb_path, save_path, plot_flag=False, save_flag=True):
     return metrics
 
 
+@deprecated('use the standalone version in bin/brain_observatory')
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("input_nwb")

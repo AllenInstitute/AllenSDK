@@ -37,6 +37,7 @@ import h5py
 import logging
 import pandas as pd
 import numpy as np
+import six
 import allensdk.brain_observatory.roi_masks as roi
 import itertools
 from allensdk.brain_observatory.locally_sparse_noise import LocallySparseNoise
@@ -480,7 +481,7 @@ class BrainObservatoryNwbDataSet(object):
         '''
         with h5py.File(self.nwb_file, 'r') as f:
             session_type = f['general/session_type'].value
-        return session_type
+        return session_type.decode('utf-8')
 
     def get_max_projection(self):
         '''Returns the maximum projection image for the 2P movie.
@@ -504,8 +505,8 @@ class BrainObservatoryNwbDataSet(object):
         '''
 
         with h5py.File(self.nwb_file, 'r') as f:
-            keys = f["stimulus/presentation/"].keys()
-        return [k.replace('_stimulus', '') for k in keys]
+            keys = list(f["stimulus/presentation/"].keys())
+        return [ k.replace('_stimulus', '') for k in keys ]
 
     def get_stimulus_table(self, stimulus_name):
         ''' Return a stimulus table given a stimulus name '''
@@ -764,7 +765,7 @@ class BrainObservatoryNwbDataSet(object):
 
         # convert start time to a date object
         session_start_time = meta.get('session_start_time')
-        if isinstance(session_start_time, basestring):
+        if isinstance( session_start_time, six.string_types ):
             meta['session_start_time'] = dateutil.parser.parse(session_start_time)
 
         age = meta.pop('age', None)
@@ -1027,6 +1028,6 @@ def _get_repeated_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
     # If this ever occurs, the repeat counter cant be trusted!
     assert np.floor(len(stimulus_table))/len(a) == int(len(stimulus_table))/len(a)
 
-    stimulus_table['repeat'] = np.repeat(range(len(stimulus_table)/len(a)), len(a))
+    stimulus_table['repeat'] = np.repeat(range(len(stimulus_table)//len(a)), len(a))
 
     return stimulus_table

@@ -57,15 +57,16 @@ class Ontology(object):
         descendant_ids = defaultdict(set)
 
         for _, s in df.iterrows():
+            sid = s.name
             parent_id = s['parent_structure_id']
             if np.isfinite(parent_id):
                 parent_id = int(parent_id)
-                child_ids[parent_id].add(s['id'])
+                child_ids[parent_id].add(sid)
 
             parent_id_list = map(int, s['structure_id_path'].split('/')[1:-1])
 
             for parent_id in parent_id_list:
-                descendant_ids[parent_id].add(s['id'])
+                descendant_ids[parent_id].add(sid)
 
         self.child_ids = dict(child_ids)
         self.descendant_ids = dict(descendant_ids)

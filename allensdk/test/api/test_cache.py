@@ -142,7 +142,7 @@ def test_memoize():
 
         for ii in range(2):
             t0 = time.time()
-            print f(0), time.time() - t0
+            print(f(0), time.time() - t0)
 
         class FooBar(object):
 

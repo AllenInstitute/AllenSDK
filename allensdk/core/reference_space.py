@@ -180,7 +180,7 @@ class ReferenceSpace(object):
             
         else:
             structure_ids = self.structure_tree.descendant_ids(structure_ids)
-            structure_ids = set(reduce(op.add, structure_ids))
+            structure_ids = set(functools.reduce(op.add, structure_ids))
             return self.make_structure_mask(structure_ids, direct_only=True)
                         
     def many_structure_masks(self, structure_ids, output_cb=None, 

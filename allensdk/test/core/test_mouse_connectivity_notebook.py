@@ -64,7 +64,7 @@ def test_notebook(fn_temp_dir):
 
     # open up a list of all of the experiments
     all_experiments = mcc.get_experiments(dataframe=True)
-    print "%d total experiments" % len(all_experiments)
+    print("%d total experiments" % len(all_experiments))
 
     # take a look at what we know about an experiment with a primary motor injection
     all_experiments.loc[122642490]
@@ -124,14 +124,14 @@ def test_notebook(fn_temp_dir):
     cre_cortical_experiments = mcc.get_experiments(cre=True, 
                                                     injection_structure_ids=[isocortex['id']])
 
-    print "%d cre cortical experiments" % len(cre_cortical_experiments)
+    print("%d cre cortical experiments" % len(cre_cortical_experiments))
 
     # same as before, but restrict the cre line
     rbp4_cortical_experiments = mcc.get_experiments(cre=[ 'Rbp4-Cre_KL100' ], 
                                                     injection_structure_ids=[isocortex['id']])
 
 
-    print "%d Rbp4 cortical experiments" % len(rbp4_cortical_experiments)
+    print("%d Rbp4 cortical experiments" % len(rbp4_cortical_experiments))
 
 
     # ## Structure Signal Unionization
@@ -145,14 +145,14 @@ def test_notebook(fn_temp_dir):
     visp_experiments = mcc.get_experiments(cre=False, 
                                            injection_structure_ids=[visp['id']])
 
-    print "%d VISp experiments" % len(visp_experiments)
+    print("%d VISp experiments" % len(visp_experiments))
 
     structure_unionizes = mcc.get_structure_unionizes([ e['id'] for e in visp_experiments ], 
                                                       is_injection=False,
                                                       structure_ids=[isocortex['id']],
                                                       include_descendants=True)
 
-    print "%d VISp non-injection, cortical structure unionizes" % len(structure_unionizes)
+    print("%d VISp non-injection, cortical structure unionizes" % len(structure_unionizes))
 
 
     # In[7]:
@@ -168,9 +168,9 @@ def test_notebook(fn_temp_dir):
     large_unionizes = dense_unionizes[ dense_unionizes.volume > .5 ]
     large_structures = pd.DataFrame(structure_tree.nodes(large_unionizes.structure_id))
 
-    print "%d large, dense, cortical, non-injection unionizes, %d structures" % ( len(large_unionizes), len(large_structures) )
+    print("%d large, dense, cortical, non-injection unionizes, %d structures" % ( len(large_unionizes), len(large_structures) ))
 
-    print large_structures.name
+    print(large_structures.name)
 
     large_unionizes
 
