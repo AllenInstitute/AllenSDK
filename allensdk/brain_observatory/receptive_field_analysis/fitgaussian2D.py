@@ -130,6 +130,30 @@ def moments2(data):
     
 
 def fitgaussian2D(data):
+    '''Fit a 2D gaussian to an image
+
+    Parameters
+    ----------
+    data : np.ndarray
+        input image
+
+    Returns
+    -------
+    p2 : list
+        height
+        row mean
+        column mean
+        row standard deviation
+        column standard deviation
+        rotation
+    
+    Notes
+    -----
+    see gaussian2D for details about output values
+
+    '''
+
+
     params = moments2(data)
     def errorfunction(p):
         p2 = np.array([p[0], params[1], params[2], np.abs(p[1]), np.abs(p[2]), p[3]])
