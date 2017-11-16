@@ -84,7 +84,7 @@ def pvalue_to_NLL(p_values,
                   max_NLL=10.0):
     return np.where(p_values == 0.0, max_NLL, -np.log10(p_values))
 
-def plot_chi_square_summary(rf_data, ax=None, cax=None, cmap=DEFAULT_CMAP):
+def plot_chi_square_summary(rf_data, ax=None, cax=None, cmap=DEFAULT_CMAP, title=None):
     if ax is None:
         ax = plt.gca()
 
@@ -93,18 +93,26 @@ def plot_chi_square_summary(rf_data, ax=None, cax=None, cmap=DEFAULT_CMAP):
     clim = (0, max(2,chi_square_grid_NLL.max()))
     img = ax.imshow(chi_square_grid_NLL, interpolation='none', origin='lower', clim=clim, cmap=cmap)
 
-    if cax is None:
-        cb = ax.figure.colorbar(img, ax=ax, ticks=clim)
-    else:
-        cb = ax.figure.colorbar(img, cax=cax, ticks=clim)
+    if not cax is False:
 
-    tick_locator = ticker.MaxNLocator(nbins=5)
-    cb.locator = tick_locator
-    cb.update_ticks()
+        if cax is None:
+            cb = ax.figure.colorbar(img, ax=ax, ticks=clim)
+        else:
+            cb = ax.figure.colorbar(img, cax=cax, ticks=clim)
+
+        tick_locator = ticker.MaxNLocator(nbins=5)
+        cb.locator = tick_locator
+        cb.update_ticks()
+
     ax.axes.get_xaxis().set_visible(False)
     ax.axes.get_yaxis().set_visible(False)
-    ax.set_title('Significant: %s (min_p=%s)' % (rf_data['chi_squared_analysis']['attrs']['significant'], 
-                                                 rf_data['chi_squared_analysis']['attrs']['min_p']) )    
+
+    if not title is False:
+        if title is None:
+            title = 'Significant: %s (min_p=%s)' % (rf_data['chi_squared_analysis']['attrs']['significant'], 
+                                                    rf_data['chi_squared_analysis']['attrs']['min_p']) 
+
+        ax.set_title(title)    
 
 def plot_msr_summary(lsn, cell_index, ax_on, ax_off, ax_cbar=None, cmap=None):
     min_clim = lsn.mean_response[:, :, cell_index,:].min()
@@ -113,43 +121,54 @@ def plot_msr_summary(lsn, cell_index, ax_on, ax_off, ax_cbar=None, cmap=None):
                 lsn.mean_response[:, :, cell_index, 1], 
                 ax_on, ax_off, clim=(min_clim, max_clim), cmap=cmap, cbar_axes=ax_cbar)
 
-def plot_fields(on_data, off_data, on_axes, off_axes, cbar_axes=None, clim=None, cmap=DEFAULT_CMAP):
-    if cbar_axes is None:
-        on_axes.figure.subplots_adjust(right=0.9)
-        cbar_axes = on_axes.figure.add_axes([0.93, 0.37, 0.02, .28])
+def plot_fields(on_data, off_data, on_axes, off_axes, cbar_axes=None, clim=None, cmap=DEFAULT_CMAP, title=None):
     
     if clim is None:
         clim_max = max(np.nanmax(on_data), np.nanmax(off_data))
         clim = (0,clim_max)
     on_axes.imshow(on_data, clim=clim, cmap=cmap, interpolation='none', origin='lower')
-    on_axes.set_title("on")
     img = off_axes.imshow(off_data, clim=clim, cmap=cmap, interpolation='none', origin='lower')
-    off_axes.set_title("off")
-    cb = cbar_axes.figure.colorbar(img, cax=cbar_axes, ticks=clim)
-    tick_locator = ticker.MaxNLocator(nbins=5)
-    cb.locator = tick_locator
-    cb.update_ticks()
+    
+    if not cbar_axes == False:
+        if cbar_axes is None:
+            on_axes.figure.subplots_adjust(right=0.9)
+            cbar_axes = on_axes.figure.add_axes([0.93, 0.37, 0.02, .28])
+
+        cb = cbar_axes.figure.colorbar(img, cax=cbar_axes, ticks=clim)
+        tick_locator = ticker.MaxNLocator(nbins=5)
+        cb.locator = tick_locator
+        cb.update_ticks()
+
+    if title is None:
+        on_axes.set_title("on")
+        off_axes.set_title("off")
+    elif not title == False:
+        on_axes.set_title(title)
+        off_axes.set_title(title)
+    
+
+
     for frame in [on_axes, off_axes]:
         frame.axes.get_xaxis().set_visible(False)
         frame.axes.get_yaxis().set_visible(False)
 
-def plot_rts_summary(rf_data, ax_on, ax_off, ax_cbar=None, cmap=DEFAULT_CMAP):
+def plot_rts_summary(rf_data, ax_on, ax_off, ax_cbar=None, cmap=DEFAULT_CMAP, title=True):
     rts_on = rf_data['on']['rts']['data']
     rts_off = rf_data['off']['rts']['data']
-    plot_fields(rts_on, rts_off, ax_on, ax_off, cbar_axes=ax_cbar, cmap=cmap)
+    plot_fields(rts_on, rts_off, ax_on, ax_off, cbar_axes=ax_cbar, cmap=cmap, title=title)
 
 def plot_rts_blur_summary(rf_data, ax_on, ax_off, ax_cbar=None, cmap=DEFAULT_CMAP):
     rts_on_blur = rf_data['on']['rts_convolution']['data']
     rts_off_blur = rf_data['off']['rts_convolution']['data']
     plot_fields(rts_on_blur, rts_off_blur, ax_on, ax_off, cbar_axes=ax_cbar, cmap=cmap)
 
-def plot_p_values(rf_data, ax_on, ax_off, ax_cbar=None, cmap=DEFAULT_CMAP):
+def plot_p_values(rf_data, ax_on, ax_off, ax_cbar=None, cmap=DEFAULT_CMAP, title=None):
     pvalues_on = rf_data['on']['pvalues']['data']
     pvalues_off = rf_data['off']['pvalues']['data']
     clim_max = max(pvalues_on.max(), pvalues_off.max())
-    plot_fields(pvalues_on, pvalues_off, ax_on, ax_off, cbar_axes=ax_cbar, clim=(0, clim_max/2), cmap=cmap)
+    plot_fields(pvalues_on, pvalues_off, ax_on, ax_off, cbar_axes=ax_cbar, clim=(0, clim_max/2), cmap=cmap, title=title)
 
-def plot_mask(rf_data, ax_on, ax_off, ax_cbar=None, cmap=DEFAULT_CMAP):
+def plot_mask(rf_data, ax_on, ax_off, ax_cbar=None, cmap=DEFAULT_CMAP, title=None):
     pvalues_on = rf_data['on']['pvalues']['data']
     pvalues_off = rf_data['off']['pvalues']['data']
 
@@ -159,28 +178,32 @@ def plot_mask(rf_data, ax_on, ax_off, ax_cbar=None, cmap=DEFAULT_CMAP):
     rf_on[np.logical_not(rf_data['on']['fdr_mask']['data'].sum(axis=0))] = np.nan
     rf_off[np.logical_not(rf_data['off']['fdr_mask']['data'].sum(axis=0))] = np.nan
 
-    plot_fields(rf_on, rf_off, ax_on, ax_off, cbar_axes=ax_cbar, cmap=cmap)
+    plot_fields(rf_on, rf_off, ax_on, ax_off, cbar_axes=ax_cbar, cmap=cmap, title=title)
 
-def plot_gaussian_fit(rf_data, ax_on, ax_off, ax_cbar=None, cmap=DEFAULT_CMAP):
+def plot_gaussian_fit(rf_data, ax_on, ax_off, ax_cbar=None, cmap=DEFAULT_CMAP, title=True):
 
     gf_on_exists = 'gaussian_fit' in rf_data['on']
     gf_off_exists = 'gaussian_fit' in rf_data['off']
 
     if not gf_on_exists and not gf_off_exists:
+        img_data_off = np.zeros(rf_data['on']['rts']['data'].shape)
+        img_data_on = np.zeros(rf_data['on']['rts']['data'].shape)
+
+        plot_fields(img_data_on, img_data_off, ax_on, ax_off, cbar_axes=ax_cbar, cmap=cmap, title=title)
         return
 
     img_data_on = rf_data['on']['gaussian_fit']['data'].sum(axis=0) if gf_on_exists else None
     img_data_off = rf_data['off']['gaussian_fit']['data'].sum(axis=0) if gf_off_exists else None
 
     if gf_on_exists and gf_off_exists:
-        plot_fields(img_data_on, img_data_off, ax_on, ax_off, cbar_axes=ax_cbar, cmap=cmap)
+        plot_fields(img_data_on, img_data_off, ax_on, ax_off, cbar_axes=ax_cbar, cmap=cmap, title=title)
     else:
         if gf_on_exists:
             img_data_off = np.zeros(img_data_on.shape)
         else:
             img_data_on = np.zeros(img_data_off.shape)
 
-        plot_fields(img_data_on, img_data_off, ax_on, ax_off, cbar_axes=ax_cbar, cmap=cmap)
+        plot_fields(img_data_on, img_data_off, ax_on, ax_off, cbar_axes=ax_cbar, cmap=cmap, title=title)
 
 def plot_receptive_field_data(rf, lsn, show=True, save_file_name=None, close=True, cmap=DEFAULT_CMAP):
     cell_index = rf['attrs']['cell_index']
