@@ -88,7 +88,6 @@ def simple_fill():
     return do_fill
 
 
-@pytest.mark.skipif(skimage.__version__ < '0.11.1', reason='cannot rotate about non-center point before .11.1')
 @pytest.mark.parametrize('mean,cov,scale', [ [ [ 100, 100 ], [ 25, 25 ], 1 ],
                                                  [ [ 100, 100 ], [ 10, 25 ], 1 ],
                                                  [ [ 100, 110 ], [ 25, 25 ], 1 ],
@@ -106,6 +105,7 @@ def test_gaussian2D_norot(mean, cov, scale, gaussian_pdf, domain_axes, simple_fi
 
 
 # only providing independent cov - using rotation after the fact
+@pytest.mark.skipif(skimage.__version__ < '0.11.1', reason='cannot rotate about non-center point before .11.1')
 @pytest.mark.parametrize('mean,cov,scale,rot', [ [ [ 100, 100 ], [ 25, 25 ], 1, 0 ],
                                                  [ [ 100, 100 ], [ 10, 25 ], 1, 0 ],
                                                  [ [ 100, 110 ], [ 25, 25 ], 1, 0 ],
