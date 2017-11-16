@@ -165,9 +165,23 @@ def test_fitgaussian2D(mean, cov, scale, gaussian_pdf, domain_axes):
     assert( np.allclose( exp, obt, atol=10**-3 ) )
 
 
+@pytest.mark.parametrize('mean,cov,scale', [ [ [ 100, 100 ], [ 25, 25 ], 1 ],
+                                             [ [ 100, 100 ], [ 10, 25 ], 1 ],
+                                             [ [ 100, 110 ], [ 25, 25 ], 1 ],
+                                             [ [ 100, 110 ], [ 10, 25 ], 1 ],
+                                             [ [ 110, 100 ], [ 10, 25 ], 1 ] ])
+def test_fitgaussian2D_fixedcenter(mean, cov, scale, gaussian_pdf, domain_axes):
 
+    full_cov = [ [ cov[0], 0 ], [ 0, cov[1] ] ]
+    img, mesh = gaussian_pdf( mean, full_cov, domain_axes, scale )
 
+    obt = gauss.fitgaussian2D_fixedcenter( img )
+    exp = [ scale, mean[0], mean[1], np.sqrt(cov[0]), np.sqrt(cov[1]), 0 ]
 
+    print exp
+    print obt
+
+    assert( np.allclose( exp, obt, atol=10**-3 ) )
 
 
 
