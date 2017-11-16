@@ -39,6 +39,7 @@ import itertools as it
 import pytest
 from scipy.stats import multivariate_normal
 from skimage.transform import rotate
+import skimage
 import numpy as np
 
 import allensdk.brain_observatory.receptive_field_analysis.fitgaussian2D as gauss
@@ -87,11 +88,24 @@ def simple_fill():
     return do_fill
 
 
+@pytest.mark.skipif(skimage.__version__ < '0.11.1', reason='cannot rotate about non-center point before .11.1')
+@pytest.mark.parametrize('mean,cov,scale', [ [ [ 100, 100 ], [ 25, 25 ], 1 ],
+                                                 [ [ 100, 100 ], [ 10, 25 ], 1 ],
+                                                 [ [ 100, 110 ], [ 25, 25 ], 1 ],
+                                                 [ [ 100, 110 ], [ 10, 25 ], 1 ],
+                                                 [ [ 110, 100 ], [ 10, 25 ], 1 ] ])
+def test_gaussian2D_norot(mean, cov, scale, gaussian_pdf, domain_axes, simple_fill):
+
+    full_cov = [ [ cov[0], 0 ], [ 0, cov[1] ] ]
+    exp, mesh = gaussian_pdf( mean, full_cov, domain_axes, scale )
+    
+    obt_fn = gauss.gaussian2D( scale, mean[0], mean[1], np.sqrt(cov[0]), np.sqrt(cov[1]), 0 )
+    obt = simple_fill( domain_axes, obt_fn )
+
+    assert( np.allclose( obt, exp ) )
+
+
 # only providing independent cov - using rotation after the fact
-# TODO: I'm not sure how I like the non-right rotation tests. The covs are in a weird goldilocks zone 
-# between being so large that they go out of bounds and so small that discretization error is a big problem.
-# I think what this tells me is that I am not using the right ground truth, but I like this method 
-# as it provides a truly distinct comparison case 
 @pytest.mark.parametrize('mean,cov,scale,rot', [ [ [ 100, 100 ], [ 25, 25 ], 1, 0 ],
                                                  [ [ 100, 100 ], [ 10, 25 ], 1, 0 ],
                                                  [ [ 100, 110 ], [ 25, 25 ], 1, 0 ],
@@ -110,7 +124,7 @@ def test_gaussian2D(mean, cov, scale, rot, gaussian_pdf, domain_axes, simple_fil
     exp, mesh = gaussian_pdf( mean, full_cov, domain_axes, scale )
 
     if rot != 0:
-        exp = rotate( exp, -rot, False, center=mean[::-1] ) # note negative rotation
+        exp = rotate( exp, -rot, False, center=mean[::-1] ) # negative rotation
     
     obt_fn = gauss.gaussian2D( scale, mean[0], mean[1], np.sqrt(cov[0]), np.sqrt(cov[1]), rot )
     obt = simple_fill( domain_axes, obt_fn )
