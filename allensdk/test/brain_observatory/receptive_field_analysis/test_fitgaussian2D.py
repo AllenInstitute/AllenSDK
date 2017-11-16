@@ -87,12 +87,6 @@ def simple_fill():
     return do_fill
 
 
-@pytest.fixture()
-def rel_tol():
-    # some tests (like with rotated gaussians) depend on interpolation/optimization
-    # or other processes that are not expected to always product *exact* correspondance
-    return 10 ** -2
-
 # only providing independent cov - using rotation after the fact
 # TODO: I'm not sure how I like the non-right rotation tests. The covs are in a weird goldilocks zone 
 # between being so large that they go out of bounds and so small that discretization error is a big problem.
@@ -110,7 +104,7 @@ def rel_tol():
                                                  [ [ 100, 110 ], [ 20, 15 ], 1, 30 ], 
                                                  [ [ 100, 100 ], [ 15, 20 ], 1, 10 ],
                                                  [ [ 100, 100 ], [ 10, 25 ], 10, 0 ] ])
-def test_gaussian2D(mean, cov, scale, rot, gaussian_pdf, domain_axes, simple_fill, rel_tol):
+def test_gaussian2D(mean, cov, scale, rot, gaussian_pdf, domain_axes, simple_fill):
 
     full_cov = [ [ cov[0], 0 ], [ 0, cov[1] ] ]
     exp, mesh = gaussian_pdf( mean, full_cov, domain_axes, scale )
@@ -124,7 +118,7 @@ def test_gaussian2D(mean, cov, scale, rot, gaussian_pdf, domain_axes, simple_fil
     if rot == 0:
         assert( np.allclose( obt, exp ) )
     else:
-        assert( np.linalg.norm( obt - exp ) / np.linalg.norm(exp) < rel_tol )
+        assert( np.linalg.norm( obt - exp ) / np.linalg.norm(exp) < 10 ** -2 )
 
 
 @pytest.mark.parametrize('mean,cov,scale', [ [ [ 100, 100 ], [ [1, 0 ], [0, 1] ], 1 ],
@@ -149,3 +143,37 @@ def test_moments2(mean, cov, scale, gaussian_pdf, domain_axes):
     assert( np.allclose( mom_obt[:-1], mom_exp ) )
     assert( mom_obt[-1] is None ) # TODO: why?
     
+
+# we probably want to test rotation here at some point, but there is no way that it could work now, given
+# that moments2 assumes independence ...
+@pytest.mark.parametrize('mean,cov,scale', [ [ [ 100, 100 ], [ 25, 25 ], 1 ],
+                                             [ [ 100, 100 ], [ 10, 25 ], 1 ],
+                                             [ [ 100, 110 ], [ 25, 25 ], 1 ],
+                                             [ [ 100, 110 ], [ 10, 25 ], 1 ],
+                                             [ [ 110, 100 ], [ 10, 25 ], 1 ] ])
+def test_fitgaussian2D(mean, cov, scale, gaussian_pdf, domain_axes):
+
+    full_cov = [ [ cov[0], 0 ], [ 0, cov[1] ] ]
+    img, mesh = gaussian_pdf( mean, full_cov, domain_axes, scale )
+
+    obt = gauss.fitgaussian2D( img )
+    exp = [ scale, mean[0], mean[1], np.sqrt(cov[0]), np.sqrt(cov[1]), 0 ]
+
+    print exp
+    print obt
+
+    assert( np.allclose( exp, obt, atol=10**-3 ) )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
