@@ -91,10 +91,10 @@ def moments2(data):
     x = ( X * data ).sum() / total
     y = ( Y * data ).sum() / total
 
-    col = data[:, int(x)]
+    col = data[:, int(np.around(x))]
     width_x = np.sqrt( abs( ( np.arange(col.size) - y ) ** 2 * col ).sum() / col.sum() )
 
-    row = data[int(y), :]
+    row = data[int(np.around(y)), :]
     width_y = np.sqrt( abs( ( np.arange(row.size) - x ) ** 2 * row  ).sum() / row.sum() )
 
     height = data.max()
