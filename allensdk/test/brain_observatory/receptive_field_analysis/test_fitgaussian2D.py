@@ -137,9 +137,6 @@ def test_moments2(mean, cov, scale, gaussian_pdf, domain_axes):
 
     mom_obt = gauss.moments2( pdf )
 
-    print( mom_obt )
-    print( mom_exp )  
-
     assert( np.allclose( mom_obt[:-1], mom_exp ) )
     assert( mom_obt[-1] is None ) # TODO: why?
     
@@ -159,9 +156,6 @@ def test_fitgaussian2D(mean, cov, scale, gaussian_pdf, domain_axes):
     obt = gauss.fitgaussian2D( img )
     exp = [ scale, mean[0], mean[1], np.sqrt(cov[0]), np.sqrt(cov[1]), 0 ]
 
-    print exp
-    print obt
-
     assert( np.allclose( exp, obt, atol=10**-3 ) )
 
 
@@ -177,9 +171,6 @@ def test_fitgaussian2D_fixedcenter(mean, cov, scale, gaussian_pdf, domain_axes):
 
     obt = gauss.fitgaussian2D_fixedcenter( img )
     exp = [ scale, mean[0], mean[1], np.sqrt(cov[0]), np.sqrt(cov[1]), 0 ]
-
-    print exp
-    print obt
 
     assert( np.allclose( exp, obt, atol=10**-3 ) )
 
