@@ -174,32 +174,3 @@ def fitgaussian2D(data):
         raise GaussianFitError('Gaussian optimization failed to converge:\n%s' % res.message)
 
     return p2
-
-
-def fitgaussian2D_fixedcenter(data):
-    params = moments2(data)
-    if any(np.isnan(params)):
-        params = moments2(data)
-    fixedcenter_x = params[2]
-    fixedcenter_y = params[1]
-    new_params = tuple(params[a] for a in [0,3,4,5])
-
-    def gaussian2D_fixedcenter(height, width_x, width_y, rotation):
-        width_x = float(width_x)
-        width_y = float(width_y)
-        
-        rotation = np.deg2rad(rotation)
-        center_xp = fixedcenter_x*np.cos(rotation) - fixedcenter_y*np.sin(rotation)
-        center_yp = fixedcenter_x*np.sin(rotation) + fixedcenter_y*np.cos(rotation)
-        
-        def rotgauss(x,y):
-            xp = x*np.cos(rotation) - y*np.sin(rotation)
-            yp = x*np.sin(rotation) + y*np.cos(rotation)
-            g = height*np.exp(-((center_xp-xp)/width_x)**2/2.0 - ((center_yp-yp)/width_y)**2/2.)
-            return g
-        return rotgauss    
-    
-    errorfunction = lambda p: np.ravel(gaussian2D_fixedcenter(*p)(*np.indices(data.shape)) - data)
-    p, success = optimize.leastsq(errorfunction, new_params)
-    new_p = list((p[0], fixedcenter_y, fixedcenter_x, p[1],p[2],p[3]))
-    return params, new_p
