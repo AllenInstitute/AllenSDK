@@ -153,7 +153,6 @@ def fitgaussian2D(data):
 
     '''
 
-
     params = moments2(data)
     def errorfunction(p):
         p2 = np.array([p[0], params[1], params[2], np.abs(p[1]), np.abs(p[2]), p[3]])

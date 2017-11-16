@@ -37,6 +37,8 @@
 import itertools as it
 
 import pytest
+import mock
+
 from scipy.stats import multivariate_normal
 from skimage.transform import rotate
 import skimage
@@ -171,3 +173,17 @@ def test_fitgaussian2D(mean, cov, scale, gaussian_pdf, domain_axes):
     exp = [ scale, mean[0], mean[1], np.sqrt(cov[0]), np.sqrt(cov[1]), 0 ]
 
     assert( np.allclose( exp, obt, atol=10**-3 ) )
+
+
+def test_fitgaussian2D_failure():
+
+    data = np.eye(10)
+
+    res = mock.MagicMock()
+    res.success = False
+    res.status = 3
+    res.message = 'foo'
+
+    with mock.patch('scipy.optimize.minimize', return_value=res) as p:
+        with pytest.raises( gauss.GaussianFitError ):
+            gauss.fitgaussian2D(data)
