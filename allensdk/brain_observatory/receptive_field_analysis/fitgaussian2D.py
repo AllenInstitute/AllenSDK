@@ -41,6 +41,32 @@ class GaussianFitError(RuntimeError): pass
 
 
 def gaussian2D(height, center_x, center_y, width_x, width_y, rotation):
+    '''Build a function which evaluates a scaled 2d gaussian pdf
+
+    Parameters
+    ----------
+    height : float
+        scale factor
+    center_x : float
+        first coordinate of mean
+    center_y : float
+        second coordinate of mean
+    width_x : float
+        standard deviation along x axis
+    width_y : float
+        standard deviation along y axis
+    rotation : float
+        degrees clockwise by which to rotate the gaussian
+
+    Returns
+    -------
+    rotgauss: fn
+      parameters are x and y positions (row/column semantics are set by your 
+      inputs to this function). Return value is the scaled gaussian pdf 
+      evaluated at the argued point.
+
+    '''
+
     width_x = float(width_x)
     width_y = float(width_y)
     
@@ -57,12 +83,13 @@ def gaussian2D(height, center_x, center_y, width_x, width_y, rotation):
             
 
 def moments2(data):
-    '''Compute mean and width of 
+    '''Treating input image data as an independent multivariate gaussian, 
+    estimate mean and standard deviations
 
     Parameters
     ----------
     data : np.ndarray
-        2d numpy array. Moments will be computed from 
+        2d numpy array.
 
     Returns
     -------
