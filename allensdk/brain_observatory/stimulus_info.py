@@ -550,11 +550,11 @@ class Monitor(object):
         return float(number_of_pixels)/number_of_cycles
 
 
-    def grating_to_screen(self, phase, spatial_frequency, orientation, distance_from_monitor, p2p_amp=256, baseline=127):
+    def grating_to_screen(self, phase, spatial_frequency, orientation, distance_from_monitor, p2p_amp=256, baseline=127, translation=(0,0)):
 
         pix_per_cycle = self.spatial_frequency_to_pix_per_cycle(spatial_frequency, distance_from_monitor)
 
-        grating = get_spatial_grating(height=self.n_pixels_r,
+        full_image = get_spatial_grating(height=self.n_pixels_r,
                                       aspect_ratio=self.aspect_ratio,
                                       ori=orientation,
                                       pix_per_cycle=pix_per_cycle,
@@ -562,11 +562,11 @@ class Monitor(object):
                                       p2p_amp=p2p_amp,
                                       baseline=baseline)
 
-        return grating
+        full_image = translate_image_and_fill(full_image, translation=translation)
+
+        return full_image
 
     def get_mask(self):
-
-        from allensdk.core.brain_observatory_nwb_data_set import make_display_mask
 
         mask = make_display_mask(display_shape=(self.n_pixels_c, self.n_pixels_r)).T
         assert mask.shape[0] == self.n_pixels_r
@@ -687,11 +687,11 @@ class BrainObservatoryMonitor(Monitor):
 
         return spndi.map_coordinates(img, self.experiment_geometry.warp_coordinates.T).reshape((self.n_pixels_r, self.n_pixels_c))
 
-    def grating_to_screen(self, phase, spatial_frequency, orientation):
+    def grating_to_screen(self, phase, spatial_frequency, orientation, **kwargs):
 
         return super(BrainObservatoryMonitor, self).grating_to_screen(phase, spatial_frequency, orientation,
                                                                       self.experiment_geometry.distance,
-                                                                      p2p_amp = 256, baseline = 127)
+                                                                      p2p_amp = 256, baseline = 127, **kwargs)
 
     def pixels_to_visual_degrees(self, n, **kwargs):
 
