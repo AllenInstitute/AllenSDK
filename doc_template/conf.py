@@ -306,15 +306,17 @@ def render_notebooks(_):
     nb_root = 'examples_root/examples/nb'
     for filename in os.listdir(nb_root):
         if filename.endswith('.ipynb'):
-            os.system('jupyter-nbconvert --to html ' + os.path.join(nb_root, filename))
-
+            nb = os.path.join(nb_root, filename)
+            nb_html = nb.replace("ipynb","html")
+            os.system('jupyter-nbconvert --to html %s --output %s' % (nb, nb_html))
+            
 def run_apidoc(_):
-	from sphinx.apidoc import main
-	import sys
-	sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-	cur_dir = os.path.abspath(os.path.dirname(__file__))
-	module = os.path.join(cur_dir,"..","allensdk")
-	main(['-e', '-o', cur_dir, module, '--force'])
+    from sphinx.apidoc import main
+    import sys
+    sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+    cur_dir = os.path.abspath(os.path.dirname(__file__))
+    module = os.path.join(cur_dir,"..","allensdk")
+    main(['-e', '-o', cur_dir, module, '--force'])
 
 def setup(app):
     app.connect('autodoc-skip-member', skip_autodoc)
