@@ -303,7 +303,7 @@ def skip_autodoc(app, what, name, obj, skip, options):
     return skip or skip_explicit
 
 def render_notebooks(_):
-    nb_root = 'examples_root/examples/nb'
+    nb_root = os.path.abspath('examples_root/examples/nb')
     for filename in os.listdir(nb_root):
         if filename.endswith('.ipynb'):
             nb = os.path.join(nb_root, filename)
