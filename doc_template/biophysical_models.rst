@@ -61,7 +61,7 @@ The neuronal model id can be found to the left of
 the corresponding 'Biophysical - perisomatic' or
 'Biophysical - all active' "download model" link.
 
-.. literalinclude:: _static/examples/biophysical_ex1.py
+.. literalinclude:: examples_root/examples/biophysical_ex1.py
 
 More help can be found in the
 `online help <http://help.brain-map.org/display/celltypes/Allen+Cell+Types+Database>`_
