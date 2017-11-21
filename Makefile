@@ -57,7 +57,8 @@ flake8:
 EXAMPLES=doc/_static/examples
 
 doc: FORCE
-	cp -r doc_template $(DOCDIR)
+	mkdir -p $(DOCDIR)
+	cp -r doc_template/* $(DOCDIR)
 	cd $(DOCDIR); sphinx-build -b html . _build/html
 
 notebooks:
