@@ -244,6 +244,30 @@ def deinterpolate_RF(rf_map, x_pnts, y_pnts, deg_per_pnt):
 def chi_square_within_mask(exclusion_mask,
                            events_per_pixel,
                            trials_per_pixel):
+    '''
+  
+    Parameters
+    ----------
+    exclusion_mask : np.ndarray
+        Dimensions are (nYPixels, nXPixels, 1). Integer indicator for INCLUSION (!) 
+        of a pixel within the testing region.
+    events_per_pixel : np.ndarray
+        Dimensions are (nCells, nYPixels, nXPixels, {on, off}). Integer values 
+        are response counts by cell to on/off luminance at each pixel.
+    trials_per_pixel : np.ndarray
+        Dimensions are (nYPixels, nXPixels, {on, off}) 
+
+    Returns
+    -------
+    p_vals : np.ndarray 
+        One-dimensional, of length nCells. Float values are p-values 
+        for the hypothesis that a given cell has a receptive field within the 
+        exclusion mask.
+    chi : np.ndarray
+        Dimensions are (nCells, nYPixels, nXPixels, {on, off}). Values (float) 
+        are squared residual event counts divided by expected event counts.
+    '''
+
     num_y = np.shape(exclusion_mask)[0]
     num_x = np.shape(exclusion_mask)[1]
     num_cells = np.shape(events_per_pixel)[0]
