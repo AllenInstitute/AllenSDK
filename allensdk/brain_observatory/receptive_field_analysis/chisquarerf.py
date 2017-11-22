@@ -310,8 +310,7 @@ def get_expected_events_by_pixel(exclusion_mask, events_per_pixel, trials_per_pi
     -------
     expected_by_pixel : np.ndarray
         Dimensions (nCells, nYPixels, nXPixels, {on, off}). Float values are 
-        pixelwise counts of events expected if events are evenly distributed 
-        through the mask.
+        pixelwise counts of events expected if events are evenly distributed.
     '''
 
     num_y = np.shape(exclusion_mask)[0]

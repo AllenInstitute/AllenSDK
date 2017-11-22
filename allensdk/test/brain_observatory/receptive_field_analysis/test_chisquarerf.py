@@ -42,6 +42,35 @@ import numpy as np
 from allensdk.brain_observatory.receptive_field_analysis import chisquarerf as chi
 
 
+@pytest.fixture
+def exclusion_mask():
+    mask = np.zeros((4, 4, 2))
+    mask[:, :2, :] = 1
+    return mask
+
+
+@pytest.fixture
+def events_per_pixel():
+
+    epp = np.zeros((2, 4, 4, 2))
+    epp[0, 0, 0, 0] = 2
+    epp[0, 0, 0, 1] = 3
+    epp[1, 3, 3, 0] = 5
+    epp[1, 1, 0, 0] = 4
+  
+    return epp
+
+
+@pytest.fixture
+def trials_per_pixel():
+
+    tpp = np.zeros((4, 4, 2))
+    tpp[:, :, 0] = 2
+    tpp[:, :, 1] = 0
+
+    return tpp
+
+
 # not testing d < 1 here
 @pytest.mark.parametrize('r,c,d', [[2, 3, 4], [28, 16, 3], [28, 16, 2], [10, 20, 12]])
 def test_interpolate_rf(r, c, d):
@@ -102,26 +131,14 @@ def test_build_trial_matrix():
     assert(np.allclose( exp, obt ))
 
 
-def test_get_expected_events_by_pixel():
+def test_get_expected_events_by_pixel(exclusion_mask, events_per_pixel, trials_per_pixel):
 
-    ny = 4
-    nx = 4
-    ncells = 2
+    obt = chi.get_expected_events_by_pixel(exclusion_mask, events_per_pixel, trials_per_pixel)
 
-    mask = np.zeros((ny, nx, 2))
-    mask[:, :nx/2, :] = 1
+    assert( obt[0, 0, 0, 0] == 0.625 )
+    assert( obt[1, 1, 0, 0] == 0.5 )
+    assert( obt[0, 0, 0, 1] == 0.0 ) # no trials
+    assert( obt[1, 3, 3, 0] == 0.0 ) # out of mask
 
-    epp = np.zeros((ncells, ny, nx, 2))
-    tpp = np.zeros((ny, nx, 2))
 
-    tpp[:, :, 0] = 2
-    tpp[:, :, 1] = 0
-
-    epp[0, 0, 0, 0] = 1
-    epp[0, 0, 0, 1] = 3
-    epp[1, 3, 3, 0] = 5
-
-    obt = chi.get_expected_events_by_pixel(mask, epp, tpp)
-    assert( obt[0, 0, 0, 0] == 0.5 )
-    assert( obt[0, 0, 0, 1] == 0.0 )
-    assert( obt[1, 3, 3, 0] == 0.0 )
+#def test_chi_square_within_mask()
