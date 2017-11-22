@@ -308,7 +308,7 @@ def get_expected_events_by_pixel(exclusion_mask, events_per_pixel, trials_per_pi
 
     Returns
     -------
-    expected_by_pixel : np.ndarray
+    np.ndarray :
         Dimensions (nCells, nYPixels, nXPixels, {on, off}). Float values are 
         pixelwise counts of events expected if events are evenly distributed.
     '''
@@ -317,17 +317,14 @@ def get_expected_events_by_pixel(exclusion_mask, events_per_pixel, trials_per_pi
     num_x = np.shape(exclusion_mask)[1]
     num_cells = np.shape(events_per_pixel)[0]
 
-    num_trials_by_pixel = exclusion_mask * trials_per_pixel  # shape is (num_y,num_x,2)
+    trials_per_pixel = exclusion_mask * trials_per_pixel  # shape is (num_y,num_x,2)
+    events_per_pixel = exclusion_mask.reshape(1, num_y, num_x, 2) * events_per_pixel
 
-    events_by_pixel_in_mask = exclusion_mask.reshape(1, num_y, num_x, 2) * events_per_pixel
-    total_events_in_mask = np.sum(events_by_pixel_in_mask, axis=(1, 2, 3)).astype(float)
-
-    total_trials_in_mask = np.sum(num_trials_by_pixel).astype(float)
-    expected_per_trial = total_events_in_mask / total_trials_in_mask  # shape is (num_cells,)
-
-    expected_by_pixel = num_trials_by_pixel.reshape(1, num_y, num_x, 2) \
-        * expected_per_trial.reshape(num_cells, 1, 1, 1)
-    return expected_by_pixel
+    total_trials = np.sum(trials_per_pixel).astype(float)
+    total_events = np.sum(events_per_pixel, axis=(1, 2, 3)).astype(float)
+    
+    expected_per_trial = total_events / total_trials  # shape is (num_cells,)
+    return trials_per_pixel.reshape(1, num_y, num_x, 2) * expected_per_trial.reshape(num_cells, 1, 1, 1)
 
 
 def build_trial_matrix(LSN_template, num_trials, on_off_luminance=ON_OFF_LUMINANCE):

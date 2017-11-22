@@ -135,10 +135,10 @@ def test_get_expected_events_by_pixel(exclusion_mask, events_per_pixel, trials_p
 
     obt = chi.get_expected_events_by_pixel(exclusion_mask, events_per_pixel, trials_per_pixel)
 
-    assert( obt[0, 0, 0, 0] == 0.625 )
-    assert( obt[1, 1, 0, 0] == 0.5 )
+    assert( obt[0, 0, 0, 0] == 0.625 ) # 5 events, 8 trials (events counted even if 0 trials)
+    assert( obt[1, 1, 0, 0] == 0.5 ) # 4 events, 8 trials
     assert( obt[0, 0, 0, 1] == 0.0 ) # no trials
     assert( obt[1, 3, 3, 0] == 0.0 ) # out of mask
 
 
-#def test_chi_square_within_mask()
+
