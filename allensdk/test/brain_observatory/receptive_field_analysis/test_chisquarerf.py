@@ -33,3 +33,57 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
+
+import pytest
+
+from scipy.ndimage.interpolation import zoom
+import numpy as np
+
+from allensdk.brain_observatory.receptive_field_analysis import chisquarerf as chi
+
+
+# not testing d < 1 here
+@pytest.mark.parametrize('r,c,d', [[2, 3, 4], [28, 16, 3], [28, 16, 2], [10, 20, 12]])
+def test_interpolate_rf(r, c, d):
+
+    image = np.arange( r * c ).reshape([ r, c ])
+
+    delta_col = 1.0 / d
+    delta_row = c * delta_col
+
+    obtained = chi.interpolate_RF(image, d)
+    grad = np.gradient(obtained)
+
+    assert(np.allclose( grad[0], np.zeros_like(grad[0]) + delta_row ))
+    assert(np.allclose( grad[1], np.zeros_like(grad[1]) + delta_col ))
+
+
+# tests integration with interpolate
+# not testing case where r, c are small
+@pytest.mark.parametrize('r,c,d', [[28, 16, 3], [28, 16, 2], [10, 20, 12]])
+def test_deinterpolate_rf(r, c, d):
+
+    image = np.arange( r * c ).reshape([ r, c ])
+
+    interp = chi.interpolate_RF(image, d)
+    obt = chi.deinterpolate_RF(interp, c, r, d)
+
+    assert(np.allclose( image, obt ))
+
+
+def test_smooth_sta():
+
+    image = np.eye(10)
+
+    smoothed = chi.smooth_STA(image)
+    
+    thresholded = smoothed.copy()
+    thresholded[thresholded < 0.5] = 0
+    thresholded[thresholded > 0.5] = 1
+
+    assert(np.allclose( smoothed.T, smoothed ))
+    assert(np.allclose( image, thresholded ))
+    assert( np.count_nonzero(smoothed) > np.count_nonzero(image) )
+
+
+#def test_build_trial_matrix():
