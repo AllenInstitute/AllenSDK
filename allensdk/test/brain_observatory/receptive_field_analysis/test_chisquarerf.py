@@ -37,6 +37,7 @@
 import pytest
 
 from scipy.ndimage.interpolation import zoom
+import scipy.stats as stats
 import numpy as np
 
 from allensdk.brain_observatory.receptive_field_analysis import chisquarerf as chi
@@ -141,4 +142,16 @@ def test_get_expected_events_by_pixel(exclusion_mask, events_per_pixel, trials_p
     assert( obt[1, 3, 3, 0] == 0.0 ) # out of mask
 
 
+def test_chi_square_within_mask(exclusion_mask, events_per_pixel, trials_per_pixel):
 
+    obt_p, obt_ch = chi.chi_square_within_mask(exclusion_mask, events_per_pixel, trials_per_pixel)
+
+    resps = np.array([4, 0, 0, 0, 0, 0, 0, 0])
+    resids = resps - 0.5
+    chi_sum = (resids ** 2 / 0.5).sum()
+
+    exp_p = 1.0 - stats.chi2.cdf(chi_sum, 15)
+
+    # the zeroth test cell has a response without a trial.
+    # this is infinitely surprising, so the pval is 0
+    assert(np.allclose( obt_p, [0, exp_p] )) 

@@ -241,9 +241,7 @@ def deinterpolate_RF(rf_map, x_pnts, y_pnts, deg_per_pnt):
     return sampled_yx
 
 
-def chi_square_within_mask(exclusion_mask,
-                           events_per_pixel,
-                           trials_per_pixel):
+def chi_square_within_mask(exclusion_mask, events_per_pixel, trials_per_pixel):
     '''Determine if cells respond preferentially to on/off pixels in a mask using
     a chi2 test.
   
@@ -321,14 +319,14 @@ def get_expected_events_by_pixel(exclusion_mask, events_per_pixel, trials_per_pi
     exclusion_mask = exclusion_mask.reshape(1, num_y, num_x, 2)
     trials_per_pixel = trials_per_pixel.reshape(1, num_y, num_x, 2)
 
-    trials_per_pixel = exclusion_mask * trials_per_pixel
-    events_per_pixel = exclusion_mask * events_per_pixel
+    masked_trials = exclusion_mask * trials_per_pixel
+    masked_events = exclusion_mask * events_per_pixel
 
-    total_trials = np.sum(trials_per_pixel).astype(float)
-    total_events_by_cell = np.sum(events_per_pixel, axis=(1, 2, 3)).astype(float)
+    total_trials = np.sum(masked_trials).astype(float)
+    total_events_by_cell = np.sum(masked_events, axis=(1, 2, 3)).astype(float)
     
     expected_by_cell_per_trial = total_events_by_cell / total_trials
-    return trials_per_pixel * expected_by_cell_per_trial.reshape(num_cells, 1, 1, 1)
+    return masked_trials * expected_by_cell_per_trial.reshape(num_cells, 1, 1, 1)
 
 
 def build_trial_matrix(LSN_template, num_trials, on_off_luminance=ON_OFF_LUMINANCE):
