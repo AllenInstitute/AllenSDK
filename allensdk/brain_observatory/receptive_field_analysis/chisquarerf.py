@@ -276,8 +276,30 @@ def chi_square_within_mask(exclusion_mask,
 
 
 def build_trial_matrix(LSN_template, num_trials, on_off_luminance=ON_OFF_LUMINANCE):
+    '''Construct indicator arrays for on/off pixels across trials.
 
-    _, num_y, num_x = LSN_template.shape
+    Parameters
+    ----------
+    LSN_template : np.ndarray
+        Dimensions are (nTrials, nYPixels, nXPixels). The size of the first dimension 
+        may be larger than the num_trials argument (in which case only the first num_trials
+        slices will be used) but may not be smaller.
+    num_trials : int
+        The number of trials (left-justified) to build indicators for.
+    on_off_luminance : array-like, optional
+        The zeroth element is the luminance value of a pixel when on, the first when off.
+        Defaults are 255, 0.
+
+    Returns
+    -------
+    trial_mat : np.ndarray
+        Dimensions are (nYPixels, nXPixels, 2, nTrials). Axis 2 corresponds to 
+        on and off states (in that order). Boolean values indicate that a pixel 
+        was on/off on a particular trial.
+
+    '''
+
+    _, num_y, num_x = np.shape(LSN_template)
     trial_mat = np.zeros( (num_y, num_x, 2, num_trials), dtype=bool )
 
     for y in range(num_y):
