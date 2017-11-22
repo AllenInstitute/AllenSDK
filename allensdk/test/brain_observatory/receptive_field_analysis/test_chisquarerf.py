@@ -86,4 +86,17 @@ def test_smooth_sta():
     assert( np.count_nonzero(smoothed) > np.count_nonzero(image) )
 
 
-#def test_build_trial_matrix():
+def test_build_trial_matrix():
+
+    tr0 = np.eye(16) * 255
+    tr1 = np.arange(256).reshape((16, 16))
+    lsn_template = np.array([ tr0, tr1 ])
+
+    exp = np.zeros((16, 16, 2, 2))
+    exp[:, :, 0, 0] = np.eye(16)
+    exp[:, :, 1, 0] = 1 - np.eye(16)
+    exp[15, 15, 0, 1] = 1
+    exp[0, 0, 1, 1] = 1
+
+    obt = chi.build_trial_matrix( lsn_template, 2 )
+    assert(np.allclose( exp, obt ))

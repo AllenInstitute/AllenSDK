@@ -288,7 +288,7 @@ def build_trial_matrix(LSN_template, num_trials, on_off_luminance=ON_OFF_LUMINAN
         The number of trials (left-justified) to build indicators for.
     on_off_luminance : array-like, optional
         The zeroth element is the luminance value of a pixel when on, the first when off.
-        Defaults are 255, 0.
+        Defaults are [255, 0].
 
     Returns
     -------
