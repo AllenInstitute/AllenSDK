@@ -38,6 +38,10 @@ import scipy.interpolate as si
 import scipy.ndimage.filters as filt
 import scipy.stats as stats
 
+
+ON_OFF_LUMINANCE = (255, 0)
+
+
 def chi_square_binary(events, LSN_template):
     # note: can only be applied to binary events for trial responses
     #
@@ -271,18 +275,17 @@ def chi_square_within_mask(exclusion_mask,
     return p_vals, chi
 
 
-def build_trial_matrix(LSN_template,
-                       num_trials):
-    num_y = np.shape(LSN_template)[1]
-    num_x = np.shape(LSN_template)[2]
-    on_off_luminance = [255, 0]
+def build_trial_matrix(LSN_template, num_trials, on_off_luminance=ON_OFF_LUMINANCE):
 
-    trial_mat = np.zeros((num_y, num_x, 2, num_trials), dtype=bool)
+    _, num_y, num_x = LSN_template.shape
+    trial_mat = np.zeros( (num_y, num_x, 2, num_trials), dtype=bool )
+
     for y in range(num_y):
         for x in range(num_x):
-            for on_off in range(2):
-                frame = np.argwhere(LSN_template[:num_trials, y, x] == on_off_luminance[on_off])[:, 0]
-                trial_mat[y, x, on_off, frame] = True
+            for oo, on_off in enumerate(on_off_luminance):
+
+                frame = np.argwhere( LSN_template[:num_trials, y, x] == on_off )[:, 0]
+                trial_mat[y, x, oo, frame] = True
 
     return trial_mat
 
