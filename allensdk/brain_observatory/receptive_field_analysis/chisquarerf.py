@@ -250,7 +250,7 @@ def chi_square_within_mask(exclusion_mask,
     Parameters
     ----------
     exclusion_mask : np.ndarray
-        Dimensions are (nYPixels, nXPixels, 1). Integer indicator for INCLUSION (!) 
+        Dimensions are (nYPixels, nXPixels, {on, off}). Integer indicator for INCLUSION (!) 
         of a pixel within the testing region.
     events_per_pixel : np.ndarray
         Dimensions are (nCells, nYPixels, nXPixels, {on, off}). Integer values 
@@ -272,7 +272,6 @@ def chi_square_within_mask(exclusion_mask,
 
     num_y = np.shape(exclusion_mask)[0]
     num_x = np.shape(exclusion_mask)[1]
-    num_cells = np.shape(events_per_pixel)[0]
 
     # d.f. is number of pixels in mask minus one
     degrees_of_freedom = int(np.sum(exclusion_mask)) - 1
@@ -298,7 +297,7 @@ def get_expected_events_by_pixel(exclusion_mask, events_per_pixel, trials_per_pi
     Parameters
     ----------
     exclusion_mask : np.ndarray
-        Dimensions are (nYPixels, nXPixels, 1). Integer indicator for INCLUSION (!) 
+        Dimensions are (nYPixels, nXPixels, {on, off}). Integer indicator for INCLUSION (!) 
         of a pixel within the testing region.
     events_per_pixel : np.ndarray
         Dimensions are (nCells, nYPixels, nXPixels, {on, off}). Integer values 
@@ -310,12 +309,15 @@ def get_expected_events_by_pixel(exclusion_mask, events_per_pixel, trials_per_pi
     Returns
     -------
     expected_by_pixel : np.ndarray
-        Dimensions (nCells, nYPixels, nXPixels, {on, off}). Flaot values are 
+        Dimensions (nCells, nYPixels, nXPixels, {on, off}). Float values are 
         pixelwise counts of events expected if events are evenly distributed 
         through the mask.
     '''
 
-    num_y, num_x = np.shape(exclusion_mask)[:2]
+    num_y = np.shape(exclusion_mask)[0]
+    num_x = np.shape(exclusion_mask)[1]
+    num_cells = np.shape(events_per_pixel)[0]
+
     num_trials_by_pixel = exclusion_mask * trials_per_pixel  # shape is (num_y,num_x,2)
 
     events_by_pixel_in_mask = exclusion_mask.reshape(1, num_y, num_x, 2) * events_per_pixel

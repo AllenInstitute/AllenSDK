@@ -100,3 +100,28 @@ def test_build_trial_matrix():
 
     obt = chi.build_trial_matrix( lsn_template, 2 )
     assert(np.allclose( exp, obt ))
+
+
+def test_get_expected_events_by_pixel():
+
+    ny = 4
+    nx = 4
+    ncells = 2
+
+    mask = np.zeros((ny, nx, 2))
+    mask[:, :nx/2, :] = 1
+
+    epp = np.zeros((ncells, ny, nx, 2))
+    tpp = np.zeros((ny, nx, 2))
+
+    tpp[:, :, 0] = 2
+    tpp[:, :, 1] = 0
+
+    epp[0, 0, 0, 0] = 1
+    epp[0, 0, 0, 1] = 3
+    epp[1, 3, 3, 0] = 5
+
+    obt = chi.get_expected_events_by_pixel(mask, epp, tpp)
+    assert( obt[0, 0, 0, 0] == 0.5 )
+    assert( obt[0, 0, 0, 1] == 0.0 )
+    assert( obt[1, 3, 3, 0] == 0.0 )
