@@ -244,7 +244,8 @@ def deinterpolate_RF(rf_map, x_pnts, y_pnts, deg_per_pnt):
 def chi_square_within_mask(exclusion_mask,
                            events_per_pixel,
                            trials_per_pixel):
-    '''
+    '''Determine if cells respond preferentially to on/off pixels in a mask using
+    a chi2 test.
   
     Parameters
     ----------
@@ -255,7 +256,8 @@ def chi_square_within_mask(exclusion_mask,
         Dimensions are (nCells, nYPixels, nXPixels, {on, off}). Integer values 
         are response counts by cell to on/off luminance at each pixel.
     trials_per_pixel : np.ndarray
-        Dimensions are (nYPixels, nXPixels, {on, off}) 
+        Dimensions are (nYPixels, nXPixels, {on, off}). Integer values are 
+        counts of trials where a pixel is on/off.
 
     Returns
     -------
@@ -275,17 +277,8 @@ def chi_square_within_mask(exclusion_mask,
     # d.f. is number of pixels in mask minus one
     degrees_of_freedom = int(np.sum(exclusion_mask)) - 1
 
-    # calculate expected number of events per pixel
-    #   expected_by_pixel has shape (num_cells,num_y,num_x,2)
-    num_trials_by_pixel = exclusion_mask * trials_per_pixel  # shape is (num_y,num_x,2)
-    total_trials_in_mask = np.sum(num_trials_by_pixel).astype(float)
-    events_by_pixel_in_mask = exclusion_mask.reshape(1, num_y, num_x, 2) * events_per_pixel
-    total_events_in_mask = np.sum(events_by_pixel_in_mask, axis=(1, 2, 3)).astype(float)
-    expected_per_trial = total_events_in_mask / total_trials_in_mask  # shape is (num_cells,)
-    expected_by_pixel = num_trials_by_pixel.reshape(1, num_y, num_x, 2) * expected_per_trial.reshape(num_cells, 1, 1, 1)
-
-    # calculate observed number of events per pixel
     #   observed_by_pixel has shape (num_cells,num_y,num_x,2)
+    expected_by_pixel = get_expected_events_by_pixel(exclusion_mask, events_per_pixel, trials_per_pixel)
     observed_by_pixel = (events_per_pixel * exclusion_mask.reshape(1, num_y, num_x, 2)).astype(float)
 
     # calculate test statistic given observed and expected
@@ -297,6 +290,43 @@ def chi_square_within_mask(exclusion_mask,
     p_vals = 1.0 - stats.chi2.cdf(chi_sum, degrees_of_freedom)
 
     return p_vals, chi
+
+
+def get_expected_events_by_pixel(exclusion_mask, events_per_pixel, trials_per_pixel):
+    '''Calculate expected number of events per pixel
+
+    Parameters
+    ----------
+    exclusion_mask : np.ndarray
+        Dimensions are (nYPixels, nXPixels, 1). Integer indicator for INCLUSION (!) 
+        of a pixel within the testing region.
+    events_per_pixel : np.ndarray
+        Dimensions are (nCells, nYPixels, nXPixels, {on, off}). Integer values 
+        are response counts by cell to on/off luminance at each pixel.
+    trials_per_pixel : np.ndarray
+        Dimensions are (nYPixels, nXPixels, {on, off}). Integer values are 
+        counts of trials where a pixel is on/off.
+
+    Returns
+    -------
+    expected_by_pixel : np.ndarray
+        Dimensions (nCells, nYPixels, nXPixels, {on, off}). Flaot values are 
+        pixelwise counts of events expected if events are evenly distributed 
+        through the mask.
+    '''
+
+    num_y, num_x = np.shape(exclusion_mask)[:2]
+    num_trials_by_pixel = exclusion_mask * trials_per_pixel  # shape is (num_y,num_x,2)
+
+    events_by_pixel_in_mask = exclusion_mask.reshape(1, num_y, num_x, 2) * events_per_pixel
+    total_events_in_mask = np.sum(events_by_pixel_in_mask, axis=(1, 2, 3)).astype(float)
+
+    total_trials_in_mask = np.sum(num_trials_by_pixel).astype(float)
+    expected_per_trial = total_events_in_mask / total_trials_in_mask  # shape is (num_cells,)
+
+    expected_by_pixel = num_trials_by_pixel.reshape(1, num_y, num_x, 2) \
+        * expected_per_trial.reshape(num_cells, 1, 1, 1)
+    return expected_by_pixel
 
 
 def build_trial_matrix(LSN_template, num_trials, on_off_luminance=ON_OFF_LUMINANCE):
@@ -320,7 +350,6 @@ def build_trial_matrix(LSN_template, num_trials, on_off_luminance=ON_OFF_LUMINAN
         Dimensions are (nYPixels, nXPixels, 2, nTrials). Axis 2 corresponds to 
         on and off states (in that order). Boolean values indicate that a pixel 
         was on/off on a particular trial.
-
     '''
 
     _, num_y, num_x = np.shape(LSN_template)
