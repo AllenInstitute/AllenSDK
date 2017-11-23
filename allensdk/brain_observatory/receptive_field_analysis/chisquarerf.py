@@ -181,8 +181,27 @@ def NLL_to_pvalue(NLLs,
     return (log_base ** (-NLLs))
 
 
-def get_events_per_pixel(responses_np,
-                         trial_matrix):
+def get_events_per_pixel(responses_np, trial_matrix):
+    '''Obtain a matrix linking cellular responses to pixel activity.
+
+    Parameters
+    ----------
+    responses_np : np.ndarray
+        Dimensions are (nTrials, nCells). Boolean values indicate presence/absence
+        of a response on a given trial.
+    trial_matrix : np.ndarray
+        Dimensions are (nYPixels, nXPixels, {on, off}, nTrials). Boolean values 
+        indicate that a pixel was on/off on a particular trial.
+
+    Returns
+    -------
+    events_per_pixel : np.ndarray
+        Dimensions are (nCells, nYPixels, nXPixels, {on, off}). Values are 
+        the sum of the number of events for a each cell across all trials 
+        that each pixel is active.
+
+    '''
+
     num_cells = np.shape(responses_np)[1]
     num_y = np.shape(trial_matrix)[0]
     num_x = np.shape(trial_matrix)[1]
@@ -197,8 +216,7 @@ def get_events_per_pixel(responses_np,
     return events_per_pixel
 
 
-def smooth_STA(STA,
-               gauss_std=0.75):
+def smooth_STA(STA, gauss_std=0.75):
 
     deg_per_pnt = 64 // STA.shape[0]
     STA_interpolated = interpolate_RF(STA, deg_per_pnt)
@@ -208,8 +226,8 @@ def smooth_STA(STA,
     return STA_smoothed
 
 
-def interpolate_RF(rf_map,
-                   deg_per_pnt):
+def interpolate_RF(rf_map, deg_per_pnt):
+
     x_pnts = np.shape(rf_map)[1]
     y_pnts = np.shape(rf_map)[0]
 
@@ -351,9 +369,8 @@ def build_trial_matrix(LSN_template,
     Returns
     -------
     trial_mat : np.ndarray
-        Dimensions are (nYPixels, nXPixels, 2, nTrials). Axis 2 corresponds to 
-        on and off states (in that order). Boolean values indicate that a pixel 
-        was on/off on a particular trial.
+        Dimensions are (nYPixels, nXPixels, {on, off}, nTrials). Boolean values 
+        indicate that a pixel was on/off on a particular trial.
     '''
 
     _, num_y, num_x = np.shape(LSN_template)

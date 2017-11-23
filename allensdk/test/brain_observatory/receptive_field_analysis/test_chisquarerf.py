@@ -157,7 +157,6 @@ def test_chi_square_within_mask(exclusion_mask, events_per_pixel, trials_per_pix
     assert(np.allclose( obt_p, [0, exp_p] )) 
 
 
-# what if a pixel is never active?
 def test_get_disc_masks():
 
     lsn_template = np.zeros((9, 3, 3)) + 128
@@ -176,4 +175,9 @@ def test_get_disc_masks():
 
     assert(np.allclose( exp1, obt[1, 1, :, :] ))
     assert(np.allclose( exp0, obt[0, 0, :, :] ))
+
+
+def test_get_events_per_pixel():
     
+    events = np.zeros((3, 2))
+    trials = np.zeros((4, 4, 2, ))
