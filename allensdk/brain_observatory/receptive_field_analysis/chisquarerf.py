@@ -39,7 +39,8 @@ import scipy.ndimage.filters as filt
 import scipy.stats as stats
 
 
-ON_OFF_LUMINANCE = (255, 0)
+ON_LUMINANCE = 255
+OFF_LUMINANCE = 0
 
 
 def chi_square_binary(events, LSN_template):
@@ -329,15 +330,18 @@ def get_expected_events_by_pixel(exclusion_mask, events_per_pixel, trials_per_pi
     return masked_trials * expected_by_cell_per_trial.reshape(num_cells, 1, 1, 1)
 
 
-def build_trial_matrix(LSN_template, num_trials, on_off_luminance=ON_OFF_LUMINANCE):
+def build_trial_matrix(LSN_template, 
+                       num_trials, 
+                       on_off_luminance=(ON_LUMINANCE, OFF_LUMINANCE)):
     '''Construct indicator arrays for on/off pixels across trials.
 
     Parameters
     ----------
     LSN_template : np.ndarray
-        Dimensions are (nTrials, nYPixels, nXPixels). The size of the first dimension 
-        may be larger than the num_trials argument (in which case only the first num_trials
-        slices will be used) but may not be smaller.
+        Dimensions are (nTrials, nYPixels, nXPixels). Luminance values per pixel 
+        and trial. The size of the first dimension may be larger than the num_trials 
+        argument (in which case only the first num_trials slices will be used) 
+        but may not be smaller.
     num_trials : int
         The number of trials (left-justified) to build indicators for.
     on_off_luminance : array-like, optional
@@ -365,10 +369,33 @@ def build_trial_matrix(LSN_template, num_trials, on_off_luminance=ON_OFF_LUMINAN
     return trial_mat
 
 
-def get_disc_masks(LSN_template,
-                   radius=3):
-    on_luminance = 255
-    off_luminance = 0
+def get_disc_masks(LSN_template, radius=3, on_luminance=ON_LUMINANCE, off_luminance=OFF_LUMINANCE):
+    '''Obtain an indicator mask surrounding each pixel. The mask is a square, excluding pixels which 
+    are coactive on any trial with the main pixel.
+
+    Parameters
+    ----------
+    LSN_template : np.ndarray
+        Dimensions are (nTrials, nYPixels, nXPixels). Luminance values per pixel 
+        and trial.
+    radius : int
+        The base mask will be a box whose sides are 2 * radius + 1 in length.
+    on_luminance : int, optional
+        The value of the luminance for on trials. Default is 255
+    off_luminance : int, optional
+        The value of the luminance for off trials. Default is 0
+  
+
+    Returns
+    -------
+    masks : np.ndarray
+        Dimensions are (nYPixels, nXPixels, nYPixels, nXPixels). The first 2 
+        dimensions describe the pixel from which the mask was computed. The last 
+        2 serve as the dimensions of the mask images themselves. Masks are binary 
+        arrays of type float, with 1 indicating inside, 0 outside.
+
+    '''
+
     num_y = np.shape(LSN_template)[1]
     num_x = np.shape(LSN_template)[2]
 
@@ -378,15 +405,15 @@ def get_disc_masks(LSN_template,
     LSN_binary = np.where(LSN_binary == 1, 1.0, 0.0)
 
     # get number of trials each pixel is not gray
-    on_trials = np.sum(LSN_binary, axis=0).astype(float)  # shape is (num_y,num_x)
+    on_trials = LSN_binary.sum(axis=0).astype(float)  # shape is (num_y,num_x)
 
     masks = np.zeros((num_y, num_x, num_y, num_x))
     for y in range(num_y):
         for x in range(num_x):
-            trials_not_gray = np.argwhere(LSN_binary[:, y, x] > 0)[:, 0]
-            raw_mask = np.divide(np.sum(LSN_binary[trials_not_gray, :, :], axis=0), on_trials)
+            trials_not_gray = np.argwhere( LSN_binary[:, y, x] > 0 )[:, 0]
+            raw_mask = np.divide( LSN_binary[trials_not_gray, :, :].sum(axis=0), on_trials ) 
 
-            center_y, center_x = np.unravel_index(raw_mask.argmax(), (num_y, num_x))
+            center_y, center_x = np.unravel_index( raw_mask.argmax(), (num_y, num_x) )
 
             # include center pixel in mask
             raw_mask[center_y, center_x] = 0.0

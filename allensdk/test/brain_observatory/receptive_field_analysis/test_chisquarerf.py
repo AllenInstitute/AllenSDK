@@ -155,3 +155,25 @@ def test_chi_square_within_mask(exclusion_mask, events_per_pixel, trials_per_pix
     # the zeroth test cell has a response without a trial.
     # this is infinitely surprising, so the pval is 0
     assert(np.allclose( obt_p, [0, exp_p] )) 
+
+
+# what if a pixel is never active?
+def test_get_disc_masks():
+
+    lsn_template = np.zeros((9, 3, 3)) + 128
+    for ii in range(3):
+        for jj in range(3):
+            lsn_template[3*ii+jj, ii, jj] = 0
+    lsn_template[4, 2, 2] = 255
+
+    exp1 = np.ones((3, 3))
+    exp1[2, 2] = 0
+
+    exp0 = np.zeros((3, 3))
+    exp0[:2, :2] = 1
+
+    obt = chi.get_disc_masks(lsn_template, radius=1)
+
+    assert(np.allclose( exp1, obt[1, 1, :, :] ))
+    assert(np.allclose( exp0, obt[0, 0, :, :] ))
+    
