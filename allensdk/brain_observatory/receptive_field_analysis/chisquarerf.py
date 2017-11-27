@@ -171,13 +171,11 @@ def get_peak_significance(chi_square_grid_NLL,
     return significant_cells, best_p, corrected_p_value_array_list, best_exclusion_region_list
 
 
-def pvalue_to_NLL(p_values,
-                  max_NLL=10.0):
+def pvalue_to_NLL(p_values, max_NLL=10.0):
     return np.where(p_values == 0.0, max_NLL, -np.log10(p_values))
 
 
-def NLL_to_pvalue(NLLs,
-                  log_base=10.0):
+def NLL_to_pvalue(NLLs, log_base=10.0):
     return (log_base ** (-NLLs))
 
 

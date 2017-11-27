@@ -206,4 +206,23 @@ def test_get_events_per_pixel():
     obt = chi.get_events_per_pixel(events, trials)
     assert(np.allclose( obt, exp ))
 
-    
+
+@pytest.mark.parametrize('base,ex', [[5., 10], [0.1, 12], [np.arange(20), np.linspace(0, 1, 20)]])
+def test_nll_to_pvalue(base, ex):
+
+    obt = chi.NLL_to_pvalue(ex, base)
+    exp = np.power(base, -ex)
+
+    assert(np.allclose( exp, obt ))
+
+
+# test by reversing nll_to_pvalue
+@pytest.mark.parametrize('base,ex', [[10., 2], [10., 4], [np.array([10, 10, 10]), np.linspace(0, 1, 3)]])
+def test_pvalue_to_nll(base, ex):
+
+    pv = chi.NLL_to_pvalue(ex, base)
+    max_nll = np.amax(ex)
+
+    obt = chi.pvalue_to_NLL(pv, max_nll)
+
+    assert(np.allclose( ex, obt ))
