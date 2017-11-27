@@ -180,4 +180,30 @@ def test_get_disc_masks():
 def test_get_events_per_pixel():
     
     events = np.zeros((3, 2))
-    trials = np.zeros((4, 4, 2, ))
+    trials = np.zeros((4, 4, 2, 3))
+
+    # pixel 1,1 is off trial 1 and on trial 2 
+    trials[1, 1, 1, 1] = 1
+    trials[1, 1, 0, 2] = 1
+
+    # pixel 2,2 is on trial 2 and off trial 0
+    trials[2, 2, 0, 2] = 1
+    trials[2, 2, 1, 0] = 1
+
+    # cell 0 has 4 events on trial 2 and 1 on trial 0
+    events[2, 0] = 4
+    events[0, 0] = 1
+  
+    # cell 1 has 2 events on trial 1
+    events[1, 1] = 2
+
+    exp = np.zeros((2, 4, 4, 2))
+    exp[0, 2, 2, 0] = 4
+    exp[0, 1, 1, 0] = 4
+    exp[0, 2, 2, 1] = 1
+    exp[1, 1, 1, 1] = 2
+
+    obt = chi.get_events_per_pixel(events, trials)
+    assert(np.allclose( obt, exp ))
+
+    

@@ -196,9 +196,9 @@ def get_events_per_pixel(responses_np, trial_matrix):
     Returns
     -------
     events_per_pixel : np.ndarray
-        Dimensions are (nCells, nYPixels, nXPixels, {on, off}). Values are 
-        the sum of the number of events for a each cell across all trials 
-        that each pixel is active.
+        Dimensions are (nCells, nYPixels, nXPixels, {on, off}). Values for each 
+        cell, pixel, and on/off state are the sum of events for that cell across 
+        all trials where the pixel was in the on/off state.
 
     '''
 
