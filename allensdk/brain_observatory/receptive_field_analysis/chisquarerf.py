@@ -144,21 +144,7 @@ def get_peak_significance(chi_square_grid_NLL,
         if np.sum(p_value_corrected_per_pixel == 0.0) > 1:
 
             y, x = np.unravel_index(np.argwhere(p_value_corrected_per_pixel.flatten() == 0.0)[:, 0], (num_y, num_x))
-
-            med_x = np.median(x)
-            med_y = np.median(y)
-            center_x = x[0]
-            center_y = y[0]
-            for i in range(len(x)):
-                dx = x[i] - med_x
-                dy = y[i] - med_y
-                dc_x = center_x - med_x
-                dc_y = center_y - med_y
-                if np.sqrt(dx ** 2 + dy ** 2) < np.sqrt(dc_x ** 2 + dc_y ** 2):
-                    center_x = x[i]
-                    center_y = y[i]
-            x = center_x
-            y = center_y
+            center_y, center_x = locate_median(y, x)
 
         best_p[n] = p_value_corrected_per_pixel[y,x]
         if best_p[n] < alpha:
@@ -168,6 +154,26 @@ def get_peak_significance(chi_square_grid_NLL,
             best_exclusion_region_list.append(np.zeros((disc_masks.shape[0], disc_masks.shape[1]), dtype=np.bool))
 
     return significant_cells, best_p, corrected_p_value_array_list, best_exclusion_region_list
+
+
+def locate_median(y, x):
+
+    med_x = np.median(x)
+    med_y = np.median(y)
+    center_x = x[0]
+    center_y = y[0]
+
+    for i in range(len(x)):
+        dx = x[i] - med_x
+        dy = y[i] - med_y
+        dc_x = center_x - med_x
+        dc_y = center_y - med_y
+
+        if np.sqrt(dx ** 2 + dy ** 2) < np.sqrt(dc_x ** 2 + dc_y ** 2):
+            center_x = x[i]
+            center_y = y[i]
+
+    return center_y, center_x
 
 
 def pvalue_to_NLL(p_values, max_NLL=10.0):
