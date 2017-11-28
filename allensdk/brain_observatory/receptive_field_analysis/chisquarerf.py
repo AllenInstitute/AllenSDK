@@ -54,7 +54,7 @@ def chi_square_binary(events, LSN_template):
     #
     # *****OUTPUT*****
     # chi_square_grid_NLL: 3D numpy float with shape (num_cells,num_y_pixels,num_x_pixels)
-    #   that gives the negative log-likelihood that a receptive field is contained
+    #   that gives the p value for the hypothesis that a receptive field is contained
     #   within a 7x7 pixel mask centered on a given pixel location as measured
     #   by a chi-square test for the responses among the pixels (both on and off)
     #   that fall within the mask.
@@ -231,7 +231,6 @@ def smooth_STA(STA, gauss_std=0.75, total_degrees=64):
     -------
     STA_smoothed : np.ndarray
         Smoothed image
-
     '''
 
     deg_per_pnt = total_degrees // STA.shape[0]
@@ -256,7 +255,6 @@ def interpolate_RF(rf_map, deg_per_pnt):
     -------
     interpolated : np.ndarray
         Upsampled image
-
     '''
 
     x_pnts = np.shape(rf_map)[1]
@@ -292,7 +290,6 @@ def deinterpolate_RF(rf_map, x_pnts, y_pnts, deg_per_pnt):
     -------
     sampled_yx : np.ndarray
         Downsampled image
-
     '''
 
     # x_pnts = 28
@@ -460,7 +457,6 @@ def get_disc_masks(LSN_template, radius=3, on_luminance=ON_LUMINANCE, off_lumina
         dimensions describe the pixel from which the mask was computed. The last 
         2 serve as the dimensions of the mask images themselves. Masks are binary 
         arrays of type float, with 1 indicating inside, 0 outside.
-
     '''
 
     num_y = np.shape(LSN_template)[1]
