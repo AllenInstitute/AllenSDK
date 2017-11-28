@@ -34,6 +34,8 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 
+import os
+
 import pytest
 
 from scipy.ndimage.interpolation import zoom
@@ -260,8 +262,7 @@ def test_pvalue_to_nll(base, ex):
     assert(np.allclose( ex, obt ))
 
 
-# this test depends on a random seed - the actual effect can vary across machines
-# and software versions.
+@pytest.mark.skipif(os.getenv('NO_TEST_RANDOM') == 'true', reason="random seed may not produce the same results on all machines")
 def test_chi_square_binary(locally_sparse_noise, rf_events, rf_mask):
 
     ntr = 2000
@@ -297,3 +298,11 @@ def test_get_peak_significance(locally_sparse_noise, rf_events, rf_mask):
     assert(np.allclose( best_p, 0 ))
     assert(np.allclose( significant_cells, [True] ))
 
+
+def test_locate_median():
+
+    mask = np.eye(9)
+    where = np.where(mask)
+    
+    obt = chi.locate_median(*where)
+    assert(np.allclose( obt , [4, 4] ))
