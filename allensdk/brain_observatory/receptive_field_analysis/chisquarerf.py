@@ -100,7 +100,6 @@ def chi_square_binary(events, LSN_template):
     return chi_square_grid
 
 
-
 def get_peak_significance(chi_square_grid_NLL,
                           LSN_template,
                           alpha=0.05):

@@ -44,6 +44,38 @@ from allensdk.brain_observatory.receptive_field_analysis import chisquarerf as c
 
 
 @pytest.fixture
+def rf_events():
+    
+    np.random.seed(12)
+
+    def make(receptive_field_mask, lsn):
+        activity = np.logical_or(lsn == 255, lsn==0)
+        return np.logical_and(activity, receptive_field_mask).sum(axis=(1, 2))[:, None]
+
+    return make
+
+
+@pytest.fixture
+def locally_sparse_noise():
+
+    def make(ntr, nr, nc):
+        return np.around(np.random.rand(ntr, nr, nc)*255).astype(int)
+
+    return make
+
+
+@pytest.fixture
+def rf_mask():
+
+    def make(nr, nc, slices):
+        mask = np.zeros((nr, nc))
+        mask[slices] = 1
+        return mask
+  
+    return make
+
+
+@pytest.fixture
 def exclusion_mask():
     mask = np.zeros((4, 4, 2))
     mask[:, :2, :] = 1
@@ -226,3 +258,42 @@ def test_pvalue_to_nll(base, ex):
     obt = chi.pvalue_to_NLL(pv, max_nll)
 
     assert(np.allclose( ex, obt ))
+
+
+# this test depends on a random seed - the actual effect can vary across machines
+# and software versions.
+def test_chi_square_binary(locally_sparse_noise, rf_events, rf_mask):
+
+    ntr = 2000
+    nr = 20
+    nc = 20
+    slices = [slice(9, 11), slice(9, 11)]
+
+    mask = rf_mask(nr, nc, slices)
+    lsn = locally_sparse_noise(ntr, nr, nc)
+    events = rf_events(mask, lsn)
+
+    obt = chi.chi_square_binary(events, lsn)
+    assert( obt[0][slices].sum() == 0 )
+    assert( obt.sum() > 0 )
+
+
+def test_get_peak_significance(locally_sparse_noise, rf_events, rf_mask):
+
+    ntr = 2000
+    nr = 20
+    nc = 20
+    slices = [slice(9, 11), slice(9, 11)]
+
+    mask = rf_mask(nr, nc, slices)
+    lsn = locally_sparse_noise(ntr, nr, nc)
+    events = rf_events(mask, lsn)
+
+    chi_pv = chi.chi_square_binary(events, lsn)
+    chi_nll = chi.pvalue_to_NLL(chi_pv)
+
+    significant_cells, best_p, _, _ = chi.get_peak_significance(chi_nll, lsn)
+
+    assert(np.allclose( best_p, 0 ))
+    assert(np.allclose( significant_cells, [True] ))
+
