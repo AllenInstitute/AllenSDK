@@ -213,9 +213,28 @@ def get_events_per_pixel(responses_np, trial_matrix):
     return events_per_pixel
 
 
-def smooth_STA(STA, gauss_std=0.75):
+def smooth_STA(STA, gauss_std=0.75, total_degrees=64):
+    '''Smooth an image by convolution with a gaussian kernel
 
-    deg_per_pnt = 64 // STA.shape[0]
+    Parameters
+    ----------
+    STA : np.ndarray
+        Input image
+    gauss_std : numeric, optional
+        Standard deviation of the gaussian kernel. Will be applied to the 
+        upsampled image, so units are visual degrees. Default is 0.75
+    total_degrees : int, optional
+        Size in visual degrees of the input image along its zeroth (row) axis.
+        Used to set the scale factor for up/downsampling.
+
+    Returns
+    -------
+    STA_smoothed : np.ndarray
+        Smoothed image
+
+    '''
+
+    deg_per_pnt = total_degrees // STA.shape[0]
     STA_interpolated = interpolate_RF(STA, deg_per_pnt)
     STA_interpolated_smoothed = filt.gaussian_filter(STA_interpolated, gauss_std)
     STA_smoothed = deinterpolate_RF(STA_interpolated_smoothed, STA.shape[1], STA.shape[0], deg_per_pnt)
@@ -224,6 +243,21 @@ def smooth_STA(STA, gauss_std=0.75):
 
 
 def interpolate_RF(rf_map, deg_per_pnt):
+    '''Upsample an image
+      
+    Parameters
+    ----------
+    rf_map : np.ndarray
+        Input image
+    deg_per_pnt : numeric
+        scale factor
+
+    Returns
+    -------
+    interpolated : np.ndarray
+        Upsampled image
+
+    '''
 
     x_pnts = np.shape(rf_map)[1]
     y_pnts = np.shape(rf_map)[0]
@@ -241,6 +275,25 @@ def interpolate_RF(rf_map, deg_per_pnt):
 
 
 def deinterpolate_RF(rf_map, x_pnts, y_pnts, deg_per_pnt):
+    '''Downsample an image
+
+    Parameters
+    ----------
+    rf_map : np.ndarray
+        Input image
+    x_pnts : np.ndarray
+        Count of sample points along the first (column) axis
+    y_pnts : np.ndarray
+        Count of sample points along the zeroth (row) axis
+    deg_per_pnt : numeric
+        scale factor
+        
+    Returns
+    -------
+    sampled_yx : np.ndarray
+        Downsampled image
+
+    '''
 
     # x_pnts = 28
     # y_pnts = 16
