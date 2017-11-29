@@ -94,9 +94,6 @@ def chi_square_binary(events, LSN_template):
             p_vals, __ = chi_square_within_mask(exclusion_mask, events_per_pixel, trials_per_pixel)
             chi_square_grid[:, y, x] = p_vals
 
-    # convert p-values to negative log-likelihood
-    # chi_square_grid_NLL = pvalue_to_NLL(chi_square_grid)
-
     return chi_square_grid
 
 
