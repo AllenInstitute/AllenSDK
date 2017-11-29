@@ -52,8 +52,9 @@ class ReferenceSpaceCache(Cache):
     STRUCTURES_KEY = 'STRUCTURES'
     STRUCTURE_TREE_KEY = 'STRUCTURE_TREE'
     STRUCTURE_MASK_KEY = 'STRUCTURE_MASK'
+    STRUCTURE_MESH_KEY = 'STRUCTURE_MESH'
 
-    MANIFEST_VERSION = 1.1
+    MANIFEST_VERSION = 1.2
 
     def __init__(self, 
                  resolution, 
@@ -216,6 +217,50 @@ class ReferenceSpaceCache(Cache):
                                                 strategy='lazy')
 
 
+    def get_structure_mesh(self, structure_id, file_name=None):
+        """Obtain a 3D mesh specifying the surface of an annotated structure.
+    
+        Parameters
+        -----------
+        structure_id: int
+            ID of a structure.
+        file_name: string
+            File name to store the structure mesh.  If it already exists,
+            it will be read from this file.  If file_name is None, the
+            file_name will be pulled out of the manifest.  Default is None.
+
+        Returns
+        -------
+        vertices : np.ndarray
+            Dimensions are (nSamples, nCoordinates=3). Locations in the reference space
+            of vertices
+        vertex_normals : np.ndarray
+            Dimensions are (nSample, nElements=3). Vectors normal to vertices.
+        face_vertices : np.ndarray
+            Dimensions are (sample, nVertices=3). References are given in indices 
+            (0-indexed here, but 1-indexed in the file) of vertices that make up each face.
+        face_normals : np.ndarray
+            Dimensions are (sample, nNormals=3). References are given in indices 
+            (0-indexed here, but 1-indexed in the file) of vertex normals that make up each face.
+
+        Notes
+        -----
+        These meshes are meant for 3D visualization and as such have been smoothed. 
+        If you are interested in performing quantative analyses, we recommend that you 
+        use the structure masks instead.
+
+        """
+        structure_id = ReferenceSpaceCache.validate_structure_id(structure_id)
+
+        file_name = self.get_cache_path(
+            file_name, self.STRUCTURE_MESH_KEY, self.reference_space_key, structure_id)
+
+        return self.api.download_structure_mesh(structure_id, 
+                                                self.reference_space_key,
+                                                file_name, 
+                                                strategy='lazy')
+
+
     def add_manifest_paths(self, manifest_builder):
         """
         Construct a manifest for this Cache class and save it in a file.
@@ -252,6 +297,11 @@ class ReferenceSpaceCache(Cache):
 
         manifest_builder.add_path(self.STRUCTURE_MASK_KEY,
                                   'structure_masks/resolution_%d/structure_%d.nrrd',
+                                  parent_key=self.REFERENCE_SPACE_VERSION_KEY,
+                                  typename='file')
+
+        manifest_builder.add_path(self.STRUCTURE_MESH_KEY,
+                                  'structure_meshes/structure_%d.obj',
                                   parent_key=self.REFERENCE_SPACE_VERSION_KEY,
                                   typename='file')
 
