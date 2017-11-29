@@ -125,6 +125,7 @@ class ReferenceSpaceApi(RmaApi):
         Parameters
         ----------
         structure_id : int
+            Unique identifier for the annotated structure
         ccf_version : string
             Which reference space version to download. Defaults to "annotation/ccf_2017"
         resolution : int
@@ -155,7 +156,18 @@ class ReferenceSpaceApi(RmaApi):
                pathfinder=Cache.pathfinder(file_name_position=3, 
                                            path_keyword='file_name'))
     def download_structure_mesh(self, structure_id, ccf_version, file_name):
-        '''
+        '''Download a Wavefront obj file containing a triangulated 3d mesh built 
+        from an annotated structure.
+
+        Parameters
+        ----------
+        structure_id : int
+            Unique identifier for the annotated structure
+        ccf_version : string
+            Which reference space version to download. Defaults to "annotation/ccf_2017"
+        file_name : string
+             Where to save the downloaded mask.
+
         '''
 
         if ccf_version  is None:
