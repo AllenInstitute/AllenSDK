@@ -52,8 +52,9 @@ class ReferenceSpaceCache(Cache):
     STRUCTURES_KEY = 'STRUCTURES'
     STRUCTURE_TREE_KEY = 'STRUCTURE_TREE'
     STRUCTURE_MASK_KEY = 'STRUCTURE_MASK'
+    STRUCTURE_MESH_KEY = 'STRUCTURE_MESH'
 
-    MANIFEST_VERSION = 1.1
+    MANIFEST_VERSION = 1.2
 
     def __init__(self, 
                  resolution, 
@@ -252,6 +253,11 @@ class ReferenceSpaceCache(Cache):
 
         manifest_builder.add_path(self.STRUCTURE_MASK_KEY,
                                   'structure_masks/resolution_%d/structure_%d.nrrd',
+                                  parent_key=self.REFERENCE_SPACE_VERSION_KEY,
+                                  typename='file')
+
+        manifest_builder.add_path(self.STRUCTURE_MASK_KEY,
+                                  'structure_meshes/structure_%d.obj',
                                   parent_key=self.REFERENCE_SPACE_VERSION_KEY,
                                   typename='file')
 

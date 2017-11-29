@@ -40,7 +40,6 @@ import nrrd
 import six
 
 
-
 class ReferenceSpaceApi(RmaApi):
 
     AVERAGE_TEMPLATE = 'average_template'
