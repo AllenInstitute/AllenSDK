@@ -279,6 +279,7 @@ def test_chi_square_binary(locally_sparse_noise, rf_events, rf_mask):
     assert( obt.sum() > 0 )
 
 
+@pytest.mark.skipif(os.getenv('NO_TEST_RANDOM') == 'true', reason="random seed may not produce the same results on all machines")
 def test_get_peak_significance(locally_sparse_noise, rf_events, rf_mask):
 
     ntr = 2000
