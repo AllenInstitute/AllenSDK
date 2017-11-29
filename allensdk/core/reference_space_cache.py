@@ -300,7 +300,7 @@ class ReferenceSpaceCache(Cache):
                                   parent_key=self.REFERENCE_SPACE_VERSION_KEY,
                                   typename='file')
 
-        manifest_builder.add_path(self.STRUCTURE_MASK_KEY,
+        manifest_builder.add_path(self.STRUCTURE_MESH_KEY,
                                   'structure_meshes/structure_%d.obj',
                                   parent_key=self.REFERENCE_SPACE_VERSION_KEY,
                                   typename='file')

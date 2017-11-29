@@ -174,6 +174,29 @@ def test_get_structure_mask(rsp, fn_temp_dir, rsp_version):
     assert( os.path.exists(path) )
 
 
+def test_get_structure_mesh(rsp, fn_temp_dir, rsp_version):
+  
+    sid = 12
+
+    path = os.path.join(fn_temp_dir, rsp_version, 'structure_meshes','structure_{0}.obj'.format(sid))
+
+    def write_obj(path):
+        with open(path, 'w') as fil:
+          fil.write('vn 1 2 4')
+
+    expected = [1, 2, 4]
+
+    rsp.api.retrieve_file_over_http = lambda a, b: write_obj(b)
+    obtained = rsp.get_structure_mesh(sid)
+
+    rsp.api.retrieve_file_over_http = mock.MagicMock()
+    rsp.get_structure_mesh(sid)
+
+    rsp.api.retrieve_file_over_http.assert_not_called()
+    assert( np.allclose(obtained[1], expected) ) 
+    assert( os.path.exists(path) )
+
+
 @pytest.mark.parametrize('inp,fails', [(1, False), 
                                         (pd.Series([2]), False), 
                                         ('qwerty', True)])
