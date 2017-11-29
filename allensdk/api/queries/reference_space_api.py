@@ -34,7 +34,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 from .rma_api import RmaApi
-from ..cache import cacheable, Cache
+from ..cache import cacheable, Cache, read_obj
 import numpy as np
 import nrrd
 import six
@@ -150,6 +150,27 @@ class ReferenceSpaceApi(RmaApi):
             raise
 
 
+    @cacheable(strategy='create', 
+               reader=read_obj, 
+               pathfinder=Cache.pathfinder(file_name_position=3, 
+                                           path_keyword='file_name'))
+    def download_structure_mesh(self, structure_id, ccf_version, file_name):
+        '''
+        '''
+
+        if ccf_version  is None:
+            ccf_version = ReferenceSpaceApi.CCF_VERSION_DEFAULT
+
+        data_path = '{0}/{1}'.format(ccf_version, 'structure_meshes')        
+        remote_file_name = '{0}.obj'.format(structure_id)
+
+        try:
+            self.download_volumetric_data(data_path, remote_file_name, save_file_path=file_name)
+        except Exception as e:
+            self._file_download_log.error('unable to download a structure mesh for structure {0}.'.format(structure_id))
+            raise
+
+
     def build_volumetric_data_download_url(self,
                                            data_path,
                                            file_name,
@@ -231,3 +252,4 @@ class ReferenceSpaceApi(RmaApi):
             save_file_path = 'volumetric_data.nrrd'
 
         self.retrieve_file_over_http(url, save_file_path)
+
