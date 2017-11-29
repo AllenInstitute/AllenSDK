@@ -64,7 +64,7 @@ def nrrd_read():
 
 @pytest.fixture
 def read_obj():
-    with patch('allensdk.api.cache.read_obj', 
+    with patch('allensdk.core.obj_utilities.read_obj', 
                Mock(name='read_obj_file_mcm', return_value=('mock_obj'))) as read_obj:
         import allensdk.api.queries.reference_space_api as RSA
         reload(RSA)
