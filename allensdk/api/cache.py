@@ -36,15 +36,18 @@
 from allensdk.config.manifest import Manifest, ManifestVersionError
 from allensdk.config.manifest_builder import ManifestBuilder
 import allensdk.core.json_utilities as ju
+from allensdk.deprecated import deprecated
+
+import numpy as np
 import pandas as pd
 import pandas.io.json as pj
+
 import functools
+from functools import wraps
 import os
 import logging
-from allensdk.deprecated import deprecated
 import csv
 
-from functools import wraps
 
 def memoize(f):
    memodict = dict()
@@ -599,18 +602,19 @@ def cacheable(strategy=None,
 
 def read_obj(path):
     with open(path, 'r') as obj_file:
-        output = read_obj_file(obj_file)
+        lines = obj_file.read().split('\n')
+        output = parse_obj(lines)
     return output
 
 
-def read_obj_file(obj_file):
+def parse_obj(lines):
     '''Parse a wavefront obj file into a triplet of vertices, normals, and faces. 
     This parser is specific to obj files generated from our annotation volumes
 
     Parameters
     ----------
-    obj_file : File
-        file object containing obj-formatted data
+    lines : list of str
+        Lines of input obj file
 
     Returns
     -------
@@ -632,8 +636,6 @@ def read_obj_file(obj_file):
     generates from our own structure annotations.
     '''
 
-    lines = obj_file.read().split('\n')
-    
     vertices = []
     vertex_normals = []
     face_vertices = []
@@ -641,6 +643,8 @@ def read_obj_file(obj_file):
 
     for line in lines:
         
+        print line[:2] == 'f '
+
         if line[:2] == 'v ':
             vertices.append( line.split()[1:] )
 
@@ -649,6 +653,7 @@ def read_obj_file(obj_file):
 
         elif line[:2] == 'f ':
             line = line.replace('//', ' ').split()[1:]
+
             face_vertices.append( line[::2] )
             face_normals.append( line[1::2] )
             
