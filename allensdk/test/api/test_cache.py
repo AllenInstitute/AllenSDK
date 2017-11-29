@@ -42,7 +42,7 @@ import numpy as np
 import pytest
 from mock import MagicMock, mock_open, patch
 
-from allensdk.api.cache import Cache, memoize, read_obj, parse_obj
+from allensdk.api.cache import Cache, memoize
 from allensdk.api.queries.rma_api import RmaApi
 import allensdk.core.json_utilities as ju
 from allensdk.config.manifest import ManifestVersionError
@@ -189,25 +189,3 @@ def test_memoize():
         for ii in range(2):
             t0 = time.time()
             fb.f(0), time.time() - t0
-
-
-def test_read_obj(wavefront_obj):
-
-    path = 'path!'
-
-    # need to patch the version in allensdk.api.cache because of import x from y syntax above
-    with patch( 'allensdk.api.cache.open', mock_open(read_data=wavefront_obj) ) as p:
-        obt = read_obj(path)
-        p.assert_called_with(path, 'r')
-        assert( obt is not None )        
-
-
-def test_parse_obj(wavefront_obj):
-
-    lines = wavefront_obj.split('\n')
-    vertices, vertex_normals, face_vertices, face_normals = parse_obj(lines)
-    
-    assert(np.allclose( face_vertices, face_normals ))
-    assert(np.allclose( face_vertices[2, :], [2, 1, 4] ))
-    assert(np.allclose( vertices[1, :], [8509.2, 5487.54, 5237.07] ))
-    assert(np.allclose( vertex_normals[2, :], [-0.0880336, -0.0323767, -0.995591] ))
