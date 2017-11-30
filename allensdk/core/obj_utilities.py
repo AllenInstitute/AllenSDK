@@ -81,8 +81,6 @@ def parse_obj(lines):
 
     for line in lines:
         
-        print line[:2] == 'f '
-
         if line[:2] == 'v ':
             vertices.append( line.split()[1:] )
 
