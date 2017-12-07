@@ -60,6 +60,10 @@ doc: FORCE
 	cp -r doc_template $(DOCDIR)
 	cd $(DOCDIR); sphinx-build -b html . _build/html
 
+doc-noplot: FORCE
+	cp -r doc_template $(DOCDIR)
+	cd $(DOCDIR); sphinx-build -D plot_gallery=0 -b html . _build/html
+
 notebooks:
 	cd doc_template/examples/nb && find . -maxdepth 1 -name '*.ipynb' -exec jupyter-nbconvert --to notebook --execute --ExecutePreprocessor.timeout=1800 {} \;
 	cd doc_template/examples/nb/summer_workshop_2015 && find . -maxdepth 1 -name '*.ipynb' -exec jupyter-nbconvert --to notebook --execute --ExecutePreprocessor.timeout=1800 {} \;
