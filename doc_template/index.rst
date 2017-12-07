@@ -28,6 +28,10 @@ The Allen SDK focuses on the Allen Brain Observatory, Cell Types Database, and M
 .. image:: /_static/sdk_cam.png
    :align: right
 
+Gallery:
+==================
+
+:ref:`examples-index`
 
 Allen Brain Observatory
 -----------------------

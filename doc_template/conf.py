@@ -26,7 +26,19 @@ sys.path.insert(0, os.path.abspath('..'))
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode', 'sphinx.ext.autosummary', 'numpydoc']
+extensions = ['sphinx.ext.autodoc', 
+              'sphinx.ext.viewcode', 
+              'sphinx.ext.autosummary', 
+              'numpydoc',
+              'sphinx_gallery.gen_gallery']
+
+sphinx_gallery_conf = {
+    # path to your examples scripts
+    'examples_dirs' : './gallery',
+    # path where to save gallery generated examples
+    'gallery_dirs'  : 'auto_examples',
+    'filename_pattern': '/',
+    'backreferences_dir': False}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['aibs_sphinx/templates']
