@@ -2,10 +2,10 @@
 Traces with Stimulus Epochs
 =================================
 
-This is an example of how to show timeseries traces (dFF and running
+This is an example of how to show timeseries traces (fluorescence and running
 speed) with stimulus epochs overlaid.
 """
-# sphinx_gallery_thumbnail_number = 2
+# sphinx_gallery_thumbnail_number = 5
 from allensdk.core.brain_observatory_cache import BrainObservatoryCache
 from allensdk.brain_observatory.stimulus_info import (NATURAL_MOVIE_ONE_COLOR,
                                                       SPONTANEOUS_ACTIVITY_COLOR,
@@ -54,16 +54,46 @@ cell_id = data_set.get_cell_specimen_ids()[0]
 epoch_df = data_set.get_stimulus_epoch_table()
 
 #####################
-# Plot the dF over F for the experiment with an overlay indicating the stimulus
-# presented at the time. The get_dff_traces returns a (time, traces) tuple.
+# Plot traces for the experiment with an overlay indicating the stimulus
+# presented at the time. The methods here return a (time, traces) tuple.
 
-time, dff = data_set.get_dff_traces(cell_specimen_ids=[cell_id])
+time, raw_trace = data_set.get_fluorescence_traces(cell_specimen_ids=[cell_id])
+_, demixed_trace = data_set.get_demixed_traces(cell_specimen_ids=[cell_id])
+_, corrected_trace = data_set.get_corrected_fluorescence_traces(cell_specimen_ids=[cell_id])
+_, dff_trace = data_set.get_dff_traces(cell_specimen_ids=[cell_id])
 
-fig, ax = plt.subplots()
-ax.plot(time, dff.T)
+fig, ax = plt.subplots(figsize=(14,4.5))
+ax.plot(time, raw_trace.T)
 stimuli_shaded = {}
 color_axis_by_stimuli(ax, epoch_df)
-plt.title("dF/F")
+plt.title("Raw Fluorescence Trace")
+plt.xlabel("time (s)")
+plt.legend()
+plt.show()
+
+fig, ax = plt.subplots(figsize=(14,4.5))
+ax.plot(time, demixed_trace.T)
+stimuli_shaded = {}
+color_axis_by_stimuli(ax, epoch_df)
+plt.title("Demixed Fluorescence Trace")
+plt.xlabel("time (s)")
+plt.legend()
+plt.show()
+
+fig, ax = plt.subplots(figsize=(14,4.5))
+ax.plot(time, corrected_trace.T)
+stimuli_shaded = {}
+color_axis_by_stimuli(ax, epoch_df)
+plt.title("Neuropil-corrected Fluorescence Trace")
+plt.xlabel("time (s)")
+plt.legend()
+plt.show()
+
+fig, ax = plt.subplots(figsize=(14,4.5))
+ax.plot(time, dff_trace.T)
+stimuli_shaded = {}
+color_axis_by_stimuli(ax, epoch_df)
+plt.title("dF/F Trace")
 plt.xlabel("time (s)")
 plt.legend()
 plt.show()
@@ -73,7 +103,7 @@ plt.show()
 # The get_running_speed method returns a (speed, time) tuple.
 speed, time = data_set.get_running_speed()
 
-fig, ax = plt.subplots()
+fig, ax = plt.subplots(figsize=(14,4.5))
 ax.plot(time, speed)
 stimuli_shaded = {}
 color_axis_by_stimuli(ax, epoch_df)
