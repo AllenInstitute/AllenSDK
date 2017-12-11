@@ -1,0 +1,6 @@
+r'''
+
+Comparing Stimulus Blocks
+=========================
+
+'''
