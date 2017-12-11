@@ -35,9 +35,9 @@ extensions = ['sphinx.ext.autodoc',
 
 sphinx_gallery_conf = {
     # path to your examples scripts
-    'examples_dirs' : './gallery',
+    'examples_dirs' : ['./gallery', './brain_observatory_gallery'],
     # path where to save gallery generated examples
-    'gallery_dirs'  : 'auto_examples',
+    'gallery_dirs'  : ['auto_examples', 'brain_observatory_examples'],
     'filename_pattern': '/',
     'backreferences_dir': False}
 
