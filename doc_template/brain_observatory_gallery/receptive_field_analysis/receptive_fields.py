@@ -44,7 +44,7 @@ cell_index = data_set.get_cell_specimen_indices([ cell_specimen_id ])[0]
 
 
 ###############################################################################
-# With the data in memory, we can carry out the analyses.
+# With the data in memory, we can run the analyses.
 
 
 rf_data = rf.compute_receptive_field_with_postprocessing(data_set, 
@@ -62,6 +62,7 @@ rf_data = rf.compute_receptive_field_with_postprocessing(data_set,
 # pixel is more likely).
 
 
+plt.subplots(figsize=(8, 3))
 rfvis.plot_chi_square_summary(rf_data)
 
 
@@ -72,7 +73,7 @@ rfvis.plot_chi_square_summary(rf_data)
 # either the off or on luminance state).
 #
 
-fig, (ax1, ax2) = plt.subplots(1,2)
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 3))
 rfvis.plot_rts_summary(rf_data, ax1, ax2)
 
 
@@ -81,7 +82,7 @@ rfvis.plot_rts_summary(rf_data, ax1, ax2)
 # in order to incorporate contributions from nearby pixels.
 
 
-fig, (ax1, ax2) = plt.subplots(1,2)
+fig, (ax1, ax2) = plt.subplots(1,2, figsize=(14, 3))
 rfvis.plot_rts_blur_summary(rf_data, ax1, ax2)
 
 
@@ -91,24 +92,23 @@ rfvis.plot_rts_blur_summary(rf_data, ax1, ax2)
 # This results in a field of p-values.
 
 
-fig, (ax1, ax2) = plt.subplots(1,2)
+fig, (ax1, ax2) = plt.subplots(1,2, figsize=(14, 3))
 rfvis.plot_p_values(rf_data, ax1, ax2)
 
 
 ###############################################################################
-# The p-values are compared to a false-discovery-rate-corrected threshold. 
-# This results in a binary decision for each pixel - is it part of a receptive field or not?
-# These decisions are stored in the significance mask.
+# A false discovery rate-corrected threshold is used to make a binary decision for each pixel 
+# - is it part of a receptive field or not?
+# These decisions are stored in the significance mask. Here we'll apply this mask to the 
+# p-values and plot the result.
 
-
-fig, (ax1, ax2) = plt.subplots(1,2)
+fig, (ax1, ax2) = plt.subplots(1,2, figsize=(14, 3))
 rfvis.plot_mask(rf_data, ax1, ax2)
 
 
 ###############################################################################
-# A 2D gaussian is fit to each subunit identified in the significance mask.
+# Finally, a 2D gaussian is fit to each subunit identified in the significance mask.
 
 
-fig, (ax1, ax2) = plt.subplots(1,2)
+fig, (ax1, ax2) = plt.subplots(1,2, figsize=(14, 3))
 rfvis.plot_gaussian_fit(rf_data, ax1, ax2)
-
