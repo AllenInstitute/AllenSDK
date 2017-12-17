@@ -38,7 +38,7 @@ from pkg_resources import resource_filename  # @UnresolvedImport
 from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet, si
 import pytest
 import os
-
+from mock import patch, mock_open, MagicMock
 
 NWB_FLAVORS = []
 
@@ -94,6 +94,22 @@ def test_get_metadata(data_set):
         assert field not in md
     
 
+def test_get_metadata_mock():
+    with patch('os.path.exists') as m1:
+        m1.return_value = True        
+        with patch('h5py.File') as m2:
+            
+
+            metadata = { 'session_start_time': MagicMock(value=np.string_("2012-01-19 17:21:00 CST")),
+                         'general/subject/age': MagicMock(value=np.string_("27 days"))}
+            m2.return_value.__enter__.return_value = metadata
+
+            ds = BrainObservatoryNwbDataSet("some_file.nwb")
+            md = ds.get_metadata()
+
+            assert md['session_start_time'].date().year == 2012
+            assert md['age_days'] == 27
+        
 
 @pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
                     reason="test NWB file not available")

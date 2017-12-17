@@ -44,6 +44,7 @@ import allensdk.brain_observatory.stimulus_info as si
 import dateutil
 import re
 import os
+import six
 from pkg_resources import parse_version
 from allensdk.brain_observatory.brain_observatory_exceptions import (MissingStimulusException,
                                                                      NoEyeTrackingException)
@@ -762,11 +763,15 @@ class BrainObservatoryNwbDataSet(object):
         experiment_container_id = meta.get('experiment_container_id')
         meta['experiment_container_id'] = int(experiment_container_id) if experiment_container_id else None
 
-        # convert start time to a date object
+       # convert start time to a date object
         session_start_time = meta.get('session_start_time')
-        if isinstance(session_start_time, basestring):
-            meta['session_start_time'] = dateutil.parser.parse(session_start_time)
-
+        if isinstance(session_start_time, six.string_types):
+            try:
+                meta['session_start_time'] = dateutil.parser.parse(session_start_time)
+            except ValueError as e:
+                raise ValueError("Could not part session_start_time ('%s'): %s" % (session_start_time, str(e)))
+                
+        print("***", meta)
         age = meta.pop('age', None)
         if age:
             # parse the age in days
@@ -774,7 +779,7 @@ class BrainObservatoryNwbDataSet(object):
             if m:
                 meta['age_days'] = int(m.groups()[0])
             else:
-                raise IOError("Could not parse age.")
+                raise ValueError("Could not parse age ('%s')." % age)
 
 
         # parse the device string (ugly, sorry)
