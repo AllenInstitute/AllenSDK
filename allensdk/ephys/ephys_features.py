@@ -117,8 +117,10 @@ def find_peak_indexes(v, t, spike_indexes, end=None):
     return np.array(peak_indexes)
 
 
-def filter_putative_spikes(v, t, spike_indexes, peak_indexes, min_height=2., min_peak=-30.):
+def filter_putative_spikes(v, t, spike_indexes, peak_indexes, min_height=2.,
+                           min_peak=-30., filter=10., dvdt=None):
     """Filter out events that are unlikely to be spikes based on:
+        * Voltage failing to go down between peak and the next spike's threshold
         * Height (threshold to peak)
         * Absolute peak level
 
@@ -130,6 +132,8 @@ def filter_putative_spikes(v, t, spike_indexes, peak_indexes, min_height=2., min
     peak_indexes : numpy array of indexes of spike peaks
     min_height : minimum acceptable height from threshold to peak in mV (optional, default 2)
     min_peak : minimum acceptable absolute peak level in mV (optional, default -30)
+    filter : cutoff frequency for 4-pole low-pass Bessel filter in kHz (optional, default 10)
+    dvdt : pre-calculated time-derivative of voltage (optional)
 
     Returns
     -------
@@ -139,6 +143,15 @@ def filter_putative_spikes(v, t, spike_indexes, peak_indexes, min_height=2., min
 
     if not spike_indexes.size or not peak_indexes.size:
         return np.array([]), np.array([])
+
+    if dvdt is None:
+        dvdt = calculate_dvdt(v, t, filter)
+
+    diff_mask = [np.any(dvdt[peak_ind:spike_ind] < 0)
+                 for peak_ind, spike_ind
+                 in zip(peak_indexes[:-1], spike_indexes[1:])]
+    peak_indexes = peak_indexes[diff_mask + [True]]
+    spike_indexes = spike_indexes[[True] + diff_mask]
 
     peak_level_mask = v[peak_indexes] >= min_peak
     spike_indexes = spike_indexes[peak_level_mask]
