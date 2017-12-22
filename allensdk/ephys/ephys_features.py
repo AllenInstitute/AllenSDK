@@ -232,7 +232,8 @@ def refine_threshold_indexes(v, t, upstroke_indexes, thresh_frac=0.05, filter=10
 
 
 def check_thresholds_and_peaks(v, t, spike_indexes, peak_indexes, upstroke_indexes, end=None,
-                               max_interval=0.005, thresh_frac=0.05, filter=10., dvdt=None):
+                               max_interval=0.005, thresh_frac=0.05, filter=10., dvdt=None,
+                               tol=1.0):
     """Validate thresholds and peaks for set of spikes
 
     Check that peaks and thresholds for consecutive spikes do not overlap
@@ -251,13 +252,14 @@ def check_thresholds_and_peaks(v, t, spike_indexes, peak_indexes, upstroke_index
     thresh_frac : fraction of average upstroke for threshold calculation (optional, default 0.05)
     filter : cutoff frequency for 4-pole low-pass Bessel filter in kHz (optional, default 10)
     dvdt : pre-calculated time-derivative of voltage (optional)
+    tol : tolerance for returning to threshold in mV (optional, default 1)
 
     Returns
     -------
     spike_indexes : numpy array of modified spike indexes
     peak_indexes : numpy array of modified spike peak indexes
     upstroke_indexes : numpy array of modified spike upstroke indexes
-    clipped : numpy array of clippped status of spikes
+    clipped : numpy array of clipped status of spikes
     """
 
     if not end:
@@ -328,8 +330,8 @@ def check_thresholds_and_peaks(v, t, spike_indexes, peak_indexes, upstroke_index
     # voltage - otherwise, drop it
     clipped = np.zeros_like(spike_indexes, dtype=bool)
     end_index = find_time_index(t, end)
-    if len(spike_indexes) > 0 and not np.any(v[peak_indexes[-1]:end_index + 1] <= v[spike_indexes[-1]]):
-        logging.debug("Failed to return to threshold voltage (%f) after last spike (min %f) - marking last spike as clipped", v[spike_indexes[-1]], v[peak_indexes[-1]:end_index + 1].min())
+    if len(spike_indexes) > 0 and not np.any(v[peak_indexes[-1]:end_index + 1] <= v[spike_indexes[-1]] + tol):
+        logging.debug("Failed to return to threshold voltage + tolerance (%.2f) after last spike (min %.2f) - marking last spike as clipped", v[spike_indexes[-1]] + tol, v[peak_indexes[-1]:end_index + 1].min())
         clipped[-1] = True
 
     return spike_indexes, peak_indexes, upstroke_indexes, clipped
