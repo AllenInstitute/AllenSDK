@@ -5,7 +5,7 @@ mcc = MouseConnectivityCache(resolution=25)
 
 # use the structure tree class to get information about the isocortex structure
 structure_tree = mcc.get_structure_tree()
-isocortex_id = structure_tree.get_structures_by_name('Isocortex')[0]['id']
+isocortex_id = structure_tree.get_structures_by_name(['Isocortex'])[0]['id']
 
 # a list of dictionaries containing metadata for non-Cre experiments
 experiments = mcc.get_experiments(file_name='non_cre.json',
