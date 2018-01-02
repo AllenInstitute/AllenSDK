@@ -34,6 +34,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 from .rma_template import RmaTemplate
+from ..cache import cacheable
 from six import string_types
 
 
@@ -60,8 +61,43 @@ class ImageDownloadApi(RmaTemplate):
                   "projection": 11
     }
 
+
+    rma_templates = \
+        {"image_queries": [
+            {'name': 'section_image_ranges',
+             'description': 'see name',
+             'model': 'Equalization',
+             'num_rows': 'all',
+             'count': False,
+             'only': ['blue_lower', 'blue_upper', 'red_lower', 'red_upper', 'green_lower', 'green_upper'],
+             'criteria': 'section_data_set(section_images[id$in{{ section_image_ids }}])', 
+             'criteria_params': ['section_image_ids']
+             }]}
+
+
     def __init__(self, base_uri=None):
-        super(ImageDownloadApi, self).__init__(base_uri)
+        super(ImageDownloadApi, self).__init__(base_uri, query_manifest=ImageDownloadApi.rma_templates)
+
+
+    @cacheable()
+    def get_section_image_ranges(self, section_image_ids, num_rows='all', count=False, as_lists=True, **kwargs):
+        '''
+        '''
+
+        dict_ranges = self.template_query('image_queries', 'section_image_ranges', 
+                                          section_image_ids=section_image_ids, 
+                                          num_rows=num_rows, count=count)
+
+        if not as_lists:
+            return dict_ranges
+
+        list_ranges = []
+        for rng in dict_ranges:
+            list_ranges.append([ rng['red_lower'], rng['red_upper'], rng['green_lower'], rng['green_upper'], rng['blue_lower'], rng['blue_upper'] ])
+
+        return list_ranges
+            
+  
 
     def download_section_image(self,
                                section_image_id,

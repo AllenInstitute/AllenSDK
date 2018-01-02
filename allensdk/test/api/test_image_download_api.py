@@ -49,6 +49,18 @@ def image_api():
     return image_api
 
 
+def test_get_section_image_ranges(image_api):
+
+    section_image_ids = [126862575, 297225768]
+    image_api.get_section_image_ranges(section_image_ids)
+
+    image_api.json_msg_query.assert_called_once_with('http://api.brain-map.org/api/v2/data/query.json?q=model::Equalization,'
+                                                     'rma::criteria,section_data_set(section_images[id$in126862575,297225768]),'
+                                                     'rma::options[only$eq\'blue_lower,blue_upper,red_lower,red_upper,green_lower,green_upper\']'
+                                                     '[num_rows$eq\'all\'][count$eqfalse]')
+
+
+
 def test_api_doc_url_download_section_image_downsampled(image_api):
     '''
     Notes
