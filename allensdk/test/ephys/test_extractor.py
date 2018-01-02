@@ -101,7 +101,7 @@ def test_extractor_on_sample_data_with_i():
 
 
 def test_extractor_on_zero_voltage():
-    t = np.arange(0, 4000) * 5e-5
+    t = np.arange(0, 4000) * 5e-6
     v = np.zeros_like(t)
     i = np.zeros_like(t)
 
@@ -128,7 +128,7 @@ def test_extractor_with_high_init_dvdt():
 
     ext = EphysSweepSetFeatureExtractor([t], [v])
     ext.process_spikes()
-    expected_thresh_ind = np.array([11222, 16256, 24058])
+    expected_thresh_ind = np.array([11222, 16258, 24060])
     sweep = ext.sweeps()[0]
     assert np.allclose(sweep.spike_feature("threshold_index"), expected_thresh_ind)
 

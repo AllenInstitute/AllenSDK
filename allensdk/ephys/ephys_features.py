@@ -150,8 +150,8 @@ def filter_putative_spikes(v, t, spike_indexes, peak_indexes, min_height=2.,
     diff_mask = [np.any(dvdt[peak_ind:spike_ind] < 0)
                  for peak_ind, spike_ind
                  in zip(peak_indexes[:-1], spike_indexes[1:])]
-    peak_indexes = peak_indexes[diff_mask + [True]]
-    spike_indexes = spike_indexes[[True] + diff_mask]
+    peak_indexes = peak_indexes[np.array(diff_mask + [True])]
+    spike_indexes = spike_indexes[np.array([True] + diff_mask)]
 
     peak_level_mask = v[peak_indexes] >= min_peak
     spike_indexes = spike_indexes[peak_level_mask]
