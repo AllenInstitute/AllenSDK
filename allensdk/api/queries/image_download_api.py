@@ -33,11 +33,11 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-from .rma_api import RmaApi
+from .rma_template import RmaTemplate
 from six import string_types
 
 
-class ImageDownloadApi(RmaApi):
+class ImageDownloadApi(RmaTemplate):
     '''HTTP Client to download whole or partial two-dimensional images from the Allen Institute
     with the SectionImage, AtlasImage and ProjectionImage Download Services.
 
