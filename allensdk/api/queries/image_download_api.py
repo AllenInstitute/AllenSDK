@@ -72,7 +72,15 @@ class ImageDownloadApi(RmaTemplate):
              'only': ['blue_lower', 'blue_upper', 'red_lower', 'red_upper', 'green_lower', 'green_upper'],
              'criteria': 'section_data_set(section_images[id$in{{ section_image_ids }}])', 
              'criteria_params': ['section_image_ids']
-             }]}
+             },
+            {'name': 'section_images_by_data_set_id',
+             'description': 'see name',
+             'model': 'SectionImage', 
+             'num_rows': 'all',
+             'count': False,
+             'criteria': '[data_set_id$eq{{ data_set_id }}]',
+             'criteria_params': ['data_set_id']
+              }]}
 
 
     def __init__(self, base_uri=None):
@@ -95,6 +103,15 @@ class ImageDownloadApi(RmaTemplate):
             list_ranges.append([ rng['red_lower'], rng['red_upper'], rng['green_lower'], rng['green_upper'], rng['blue_lower'], rng['blue_upper'] ])
 
         return list_ranges
+
+    @cacheable()
+    def section_image_query(self, section_data_set_id, num_rows='all', count=False, **kwargs):
+        '''
+        '''
+
+        return self.template_query('image_queries', 'section_images_by_data_set_id', 
+                                   data_set_id=section_data_set_id, 
+                                   num_rows=num_rows, count=count)
 
     def download_section_image(self,
                                section_image_id,

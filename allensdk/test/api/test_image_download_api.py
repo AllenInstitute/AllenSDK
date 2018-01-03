@@ -578,3 +578,14 @@ def test_atlas_image_query_image_type_name(image_api):
                                 image_type_name=adult_mouse_image_type_name)
 
     image_api.json_msg_query.assert_called_once_with(expected)
+
+
+def test_section_image_query(image_api):
+
+    exp = 'http://api.brain-map.org/api/v2/data/query.json?'\
+          'q=model::SectionImage,'\
+          'rma::criteria,[data_set_id$eq70813257],'\
+          'rma::options[num_rows$eq\'all\'][count$eqfalse]'
+
+    image_api.section_image_query(70813257)
+    image_api.json_msg_query.assert_called_once_with(exp)
