@@ -78,7 +78,6 @@ class ImageDownloadApi(RmaTemplate):
     def __init__(self, base_uri=None):
         super(ImageDownloadApi, self).__init__(base_uri, query_manifest=ImageDownloadApi.rma_templates)
 
-
     @cacheable()
     def get_section_image_ranges(self, section_image_ids, num_rows='all', count=False, as_lists=True, **kwargs):
         '''
@@ -96,8 +95,6 @@ class ImageDownloadApi(RmaTemplate):
             list_ranges.append([ rng['red_lower'], rng['red_upper'], rng['green_lower'], rng['green_upper'], rng['blue_lower'], rng['blue_upper'] ])
 
         return list_ranges
-            
-  
 
     def download_section_image(self,
                                section_image_id,
