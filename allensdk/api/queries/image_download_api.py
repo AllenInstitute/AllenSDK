@@ -379,37 +379,36 @@ class ImageDownloadApi(RmaTemplate):
         for additional documentation.
         :py:meth:`allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases` can also be used to list atlases along with their ids.
         '''
-        rma = self
 
         stages = []
 
         if image_type_name is None:
-            atlas_stage = rma.model_stage('Atlas',
-                                          criteria='[id$eq%d]' % (atlas_id),
-                                          only=['image_type'])
+            atlas_stage = self.model_stage('Atlas',
+                                           criteria='[id$eq%d]' % (atlas_id),
+                                           only=['image_type'])
             stages.append(atlas_stage)
 
-            atlas_name_pipe_stage = rma.pipe_stage('list',
-                                                   parameters=[('type_name',
-                                                                rma.IS,
-                                                                rma.quote_string('image_type'))])
+            atlas_name_pipe_stage = self.pipe_stage('list',
+                                                    parameters=[('type_name',
+                                                                 self.IS,
+                                                                 self.quote_string('image_type'))])
             stages.append(atlas_name_pipe_stage)
 
             image_type_name = '$type_name'
         else:
-            image_type_name = rma.quote_string(image_type_name)
+            image_type_name = self.quote_string(image_type_name)
 
         criteria_list = ['[annotated$eqtrue],',
                          'atlas_data_set(atlases[id$eq%d]),' % (atlas_id),
                          "alternate_images[image_type$eq%s]" % (image_type_name)]
 
-        atlas_image_model_stage = rma.model_stage('AtlasImage',
-                                                  criteria=criteria_list,
-                                                  order=[
-                                                      'sub_images.section_number'],
-                                                  num_rows='all')
+        atlas_image_model_stage = self.model_stage('AtlasImage',
+                                                   criteria=criteria_list,
+                                                   order=[
+                                                       'sub_images.section_number'],
+                                                   num_rows='all')
 
         stages.append(atlas_image_model_stage)
 
         return self.json_msg_query(
-            rma.build_query_url(stages))
+            self.build_query_url(stages))
