@@ -358,25 +358,26 @@ class ImageDownloadApi(RmaTemplate):
 
 
     def atlas_image_query(self, atlas_id, image_type_name=None):
-        '''Build the URL.
+        '''List atlas images belonging to a specified atlas
 
         Parameters
         ----------
         atlas_id : integer, optional
-            request a certain record.
+            Find images from this atlas.
         image_type_name : string, optional
-            if not present, the query will get it from the atlas id.
+            Restrict response to images of this type. If not provided, 
+            the query will get it from the atlas id.
 
         Returns
         -------
-        url : string
-            The constructed URL
+        list of dict :
+            Each element is an AtlasImage record.
 
         Notes
         -----
         See `Downloading Atlas Images and Graphics <http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies#AtlasDrawingsandOntologies-DownloadingAtlasImagesAndGraphics>`_
         for additional documentation.
-        The atlas id can be found with :py:meth:`allensdk.api.queries.ontologies_api.OntologiesApi.build_atlases_query`
+        :py:meth:`allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases` can also be used to list atlases along with their ids.
         '''
         rma = self
 
