@@ -61,7 +61,6 @@ class ImageDownloadApi(RmaTemplate):
                   "projection": 11
     }
 
-
     rma_templates = \
         {"image_queries": [
             {'name': 'section_image_ranges',
@@ -82,13 +81,33 @@ class ImageDownloadApi(RmaTemplate):
              'criteria_params': ['data_set_id']
               }]}
 
-
     def __init__(self, base_uri=None):
         super(ImageDownloadApi, self).__init__(base_uri, query_manifest=ImageDownloadApi.rma_templates)
 
     @cacheable()
     def get_section_image_ranges(self, section_image_ids, num_rows='all', count=False, as_lists=True, **kwargs):
-        '''
+        '''Section images from the Mouse Connectivity Atlas are displayed on connectivity.brain-map.org after having been 
+        linearly windowed and leveled. This method obtains parameters defining channelwise upper and lower bounds of the windows used for 
+        one or more images.
+
+        Parameters
+        ----------
+        section_image_ids : list of int
+            Each element is a unique identifier for a section image.
+        num_rows : int, optional
+            how many records to retrieve. Default is 'all'.
+        count : bool, optional
+            If True, return a count of the lines found by the query. Default is False.
+        as_lists : bool, optional
+            If True, return the window parameters in a list, rather than a dict 
+            (this is the format of the range parameter on ImageDownloadApi.download_image). 
+            Default is False.
+
+        Returns
+        -------
+        list of dict or list of list : 
+            For each section image id provided, return the window bounds for each channel.
+
         '''
 
         dict_ranges = self.template_query('image_queries', 'section_image_ranges', 
@@ -112,6 +131,10 @@ class ImageDownloadApi(RmaTemplate):
         ----------
         atlas_id : integer, optional
             Find images from this section data set.
+        num_rows : int
+            how many records to retrieve. Default is 'all'
+        count : bool
+            If True, return a count of the lines found by the query.
 
         Returns
         -------
