@@ -106,7 +106,24 @@ class ImageDownloadApi(RmaTemplate):
 
     @cacheable()
     def section_image_query(self, section_data_set_id, num_rows='all', count=False, **kwargs):
-        '''
+        '''List section images belonging to a specified section data set
+
+        Parameters
+        ----------
+        atlas_id : integer, optional
+            Find images from this section data set.
+
+        Returns
+        -------
+        list of dict :
+            Each element is an SectionImage record.
+
+        Notes
+        -----
+        The SectionDataSet model is used to represent single experiments which produce an array of images. 
+        This includes Mouse Connectivity and Mouse Brain Atlas experiments, among other projects.
+        You may see references to the ids of experiments from those projects. 
+        These are the same as section data set ids.
         '''
 
         return self.template_query('image_queries', 'section_images_by_data_set_id', 
