@@ -35,6 +35,7 @@
 #
 import pytest
 from mock import MagicMock
+import numpy as np
 from allensdk.api.queries.image_download_api import ImageDownloadApi
 
 
@@ -48,6 +49,22 @@ def image_api():
 
     return image_api
 
+def test_get_section_image_ranges(image_api):
+
+    section_image_ids = [126862575, 297225768]
+    image_api.get_section_image_ranges(section_image_ids)
+
+    image_api.json_msg_query.assert_called_once_with('http://api.brain-map.org/api/v2/data/query.json?q=model::Equalization,'
+                                                     'rma::criteria,section_data_set(section_images[id$in126862575,297225768]),'
+                                                     'rma::options[only$eq\'blue_lower,blue_upper,red_lower,red_upper,green_lower,green_upper\']'
+                                                     '[num_rows$eq\'all\'][count$eqfalse]')
+
+def test_get_section_image_ranges_as_list(image_api):
+
+    image_api.template_query = MagicMock(return_value=[{'blue_lower': 0, 'blue_upper': 1, 'green_lower': 2, 'green_upper': 3, 'red_lower': 4, 'red_upper': 5}])
+    obt = image_api.get_section_image_ranges([1])
+
+    assert(np.allclose( [4, 5, 2, 3, 0, 1], obt[0] ))
 
 def test_api_doc_url_download_section_image_downsampled(image_api):
     '''
@@ -561,3 +578,14 @@ def test_atlas_image_query_image_type_name(image_api):
                                 image_type_name=adult_mouse_image_type_name)
 
     image_api.json_msg_query.assert_called_once_with(expected)
+
+
+def test_section_image_query(image_api):
+
+    exp = 'http://api.brain-map.org/api/v2/data/query.json?'\
+          'q=model::SectionImage,'\
+          'rma::criteria,[data_set_id$eq70813257],'\
+          'rma::options[num_rows$eq\'all\'][count$eqfalse]'
+
+    image_api.section_image_query(70813257)
+    image_api.json_msg_query.assert_called_once_with(exp)
