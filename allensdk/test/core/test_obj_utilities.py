@@ -77,7 +77,7 @@ def test_read_obj(wavefront_obj):
     path = 'path!'
 
     # need to patch the version in allensdk.api.cache because of import x from y syntax above
-    with patch( 'allensdk.core.obj_utilities.open', mock_open(read_data=wavefront_obj) ) as p:
+    with patch( 'allensdk.core.obj_utilities.open', mock_open(read_data=wavefront_obj), create=True ) as p:
         obt = read_obj(path)
         p.assert_called_with(path, 'r')
         assert( obt is not None )        
