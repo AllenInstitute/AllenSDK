@@ -75,7 +75,7 @@ def detect_events(data, cell_index, stimulus, debug_plots=False):
             debug_dict[fi + k_min+1+offset] = (ii, trace)
 
     xx_list, yy_list = [], []
-    for _, _, xx, yy in var_dict.itervalues():
+    for _, _, xx, yy in var_dict.values():
         xx_list.append(xx)
         yy_list.append(yy)
 
@@ -109,7 +109,7 @@ def detect_events(data, cell_index, stimulus, debug_plots=False):
     noise_threshold = max(allowed_sigma * std_x + mu_x, allowed_sigma * std_y + mu_y)
     mu_array = np.array([mu_x, mu_y])
     yes_set, no_set = set(), set()
-    for ii, (t0, tf, xx, yy) in var_dict.iteritems():
+    for ii, (t0, tf, xx, yy) in var_dict.items():
 
 
         xi_z, yi_z = Cov_Factor_Inv.dot((np.array([xx,yy]) - mu_array))
@@ -136,7 +136,7 @@ def detect_events(data, cell_index, stimulus, debug_plots=False):
         import matplotlib.pyplot as plt
         fig, ax = plt.subplots(1,2)
         # ax[0].plot(dff_trace)
-        for key, val in debug_dict.iteritems():
+        for key, val in debug_dict.items():
             ti, trace = val
             if ti in no_set:
                 ax[0].plot(np.arange(key, key+len(trace)), trace, 'b')
@@ -151,7 +151,7 @@ def detect_events(data, cell_index, stimulus, debug_plots=False):
         for ii in no_set:
             ax[1].plot([var_dict[ii][2]], [var_dict[ii][3]], 'b.')
 
-        print('number_of_events:', b.sum())
+        print('number_of_events: %d' % b.sum())
         plt.show()
 
     return b

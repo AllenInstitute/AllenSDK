@@ -56,10 +56,12 @@ class RmaPager(object):
             while result_count == num_rows:
                 kwargs['start_row'] = start_row
                 data = fn(*args, **kwargs)
+
                 start_row = start_row + num_rows
                 result_count = len(data)
                 for r in data:
                     yield r
+
         else:
             start_row = 0
             kwargs = kwargs
@@ -70,6 +72,7 @@ class RmaPager(object):
 
                 data = fn(*args, **kwargs)
                 result_count = len(data)
+
                 start_row = start_row + result_count
                 for r in data:
                     yield r

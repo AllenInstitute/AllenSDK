@@ -160,19 +160,10 @@ def json_handler(obj):
         return obj.to_dict()
     elif isinstance(obj, np.ndarray):
         return obj.tolist()
-    elif (isinstance(obj, np.float64) or
-          isinstance(obj, np.float32) or
-          isinstance(obj, np.float16)):
+    elif isinstance(obj, np.floating):
         return float(obj)
-    elif (isinstance(obj, np.int64) or
-          isinstance(obj, np.int32) or
-          isinstance(obj, np.int16) or
-          isinstance(obj, np.int8) or
-          isinstance(obj, np.uint64) or
-          isinstance(obj, np.uint32) or
-          isinstance(obj, np.uint16) or
-          isinstance(obj, np.uint8)):
-        return long(obj)
+    elif isinstance(obj, np.integer):
+        return int(obj)
     elif (isinstance(obj, np.bool) or
           isinstance(obj, np.bool_)):
         return bool(obj)

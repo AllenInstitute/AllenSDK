@@ -111,7 +111,7 @@ def get_A_blur(data, stimulus):
     A = get_A(data, stimulus).copy()
 
 
-    number_of_pixels = A.shape[0] / 2
+    number_of_pixels = A.shape[0] // 2
     for fi in range(A.shape[1]):
         A[:number_of_pixels,fi] = convolve(A[:number_of_pixels, fi].reshape(stimulus_template.shape[1], stimulus_template.shape[2])).flatten()
         A[number_of_pixels:,fi] = convolve(A[number_of_pixels:, fi].reshape(stimulus_template.shape[1], stimulus_template.shape[2])).flatten()
@@ -122,7 +122,7 @@ def get_A_blur(data, stimulus):
 def get_shuffle_matrix(data, event_vector, A, number_of_shuffles=5000, response_detection_error_std_dev=.1):
 
     number_of_events = event_vector.sum()
-    number_of_pixels = A.shape[0] / 2
+    number_of_pixels = A.shape[0] // 2
     shuffle_data = np.zeros((2*number_of_pixels, number_of_shuffles))
     evr = range(len(event_vector))
     for ii in range(number_of_shuffles):
@@ -145,7 +145,7 @@ def get_sparse_noise_epoch_mask_list(st, number_of_acquisition_frames, threshold
 
     if len(cut_inds) > 2:
         warnings.warn('more than 2 epochs cut')
-        print('    ', len(delta), cut_inds)
+        print('    %d %d' % (len(delta), cut_inds))
 
     for ii in range(len(cut_inds)+1):
 

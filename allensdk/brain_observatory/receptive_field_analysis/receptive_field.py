@@ -42,7 +42,7 @@ import h5py
 
 def events_to_pvalues_no_fdr_correction(data, event_vector, A, number_of_shuffles=5000, response_detection_error_std_dev=.1, seed=1):
 
-    number_of_pixels = A.shape[0] / 2
+    number_of_pixels = A.shape[0] // 2
 
     # Initializations:
     number_of_events = event_vector.sum()
@@ -66,7 +66,7 @@ def compute_receptive_field(data, cell_index, stimulus, **kwargs):
     event_vector = detect_events(data, cell_index, stimulus)
 
     A_blur = get_A_blur(data, stimulus)
-    number_of_pixels = A_blur.shape[0]/2
+    number_of_pixels = A_blur.shape[0] // 2
 
     pvalues = events_to_pvalues_no_fdr_correction(data, event_vector, A_blur, **kwargs)
 

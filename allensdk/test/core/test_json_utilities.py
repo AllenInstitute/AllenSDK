@@ -53,10 +53,72 @@ def dict_obj():
     return object
 
 
+def test_write_integer_array(dict_obj):
+    s_in = ju.write_string({ "int_array": dict_obj["int_array"] })
+    s_out = """{
+  "int_array": [
+    [
+      0,
+      1
+    ],
+    [
+      0,
+      1
+    ]
+  ]
+}"""
+
+    assert s_in == s_out
+
+def test_write_float_array(dict_obj):
+    s_in = ju.write_string({ "float_array": dict_obj["float_array"] })
+    s_out ="""{
+  "float_array": [
+    [
+      0.0,
+      0.0
+    ],
+    [
+      0.23809523809523808,
+      0.23809523809523808
+    ]
+  ]
+}"""
+
+    assert s_in == s_out
+
 def test_write_string(dict_obj):
-    ju.write_string(dict_obj)
-    with patch("allensdk.core.json_utilities.json_handler",
-               MagicMock()) as json_handler:
-        ju.write_string(dict_obj)
-        expected = [call(False), call(True), call(False), call(True)]
-        assert json_handler.call_args_list == expected
+    s_in = ju.write_string({ "string": dict_obj["string"] })
+    s_out = """{
+  "string": "test string"
+}"""
+
+    assert s_in == s_out
+
+def test_write_bool_array(dict_obj):
+    s_in = ju.write_string({ "bool_array": dict_obj["bool_array"] })
+    s_out = """{
+  "bool_array": [
+    [
+      false,
+      true
+    ],
+    [
+      false,
+      true
+    ]
+  ]
+}"""
+    assert s_in == s_out
+
+def test_write_list(dict_obj):
+    s_in = ju.write_string({ "list": dict_obj["list"] })
+    s_out = """{
+  "list": [
+    "this",
+    "is",
+    1,
+    "list"
+  ]
+}"""
+    assert s_in == s_out

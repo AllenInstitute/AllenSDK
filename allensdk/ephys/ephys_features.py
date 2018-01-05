@@ -117,8 +117,10 @@ def find_peak_indexes(v, t, spike_indexes, end=None):
     return np.array(peak_indexes)
 
 
-def filter_putative_spikes(v, t, spike_indexes, peak_indexes, min_height=2., min_peak=-30.):
+def filter_putative_spikes(v, t, spike_indexes, peak_indexes, min_height=2.,
+                           min_peak=-30., filter=10., dvdt=None):
     """Filter out events that are unlikely to be spikes based on:
+        * Voltage failing to go down between peak and the next spike's threshold
         * Height (threshold to peak)
         * Absolute peak level
 
@@ -130,6 +132,8 @@ def filter_putative_spikes(v, t, spike_indexes, peak_indexes, min_height=2., min
     peak_indexes : numpy array of indexes of spike peaks
     min_height : minimum acceptable height from threshold to peak in mV (optional, default 2)
     min_peak : minimum acceptable absolute peak level in mV (optional, default -30)
+    filter : cutoff frequency for 4-pole low-pass Bessel filter in kHz (optional, default 10)
+    dvdt : pre-calculated time-derivative of voltage (optional)
 
     Returns
     -------
@@ -139,6 +143,15 @@ def filter_putative_spikes(v, t, spike_indexes, peak_indexes, min_height=2., min
 
     if not spike_indexes.size or not peak_indexes.size:
         return np.array([]), np.array([])
+
+    if dvdt is None:
+        dvdt = calculate_dvdt(v, t, filter)
+
+    diff_mask = [np.any(dvdt[peak_ind:spike_ind] < 0)
+                 for peak_ind, spike_ind
+                 in zip(peak_indexes[:-1], spike_indexes[1:])]
+    peak_indexes = peak_indexes[np.array(diff_mask + [True])]
+    spike_indexes = spike_indexes[np.array([True] + diff_mask)]
 
     peak_level_mask = v[peak_indexes] >= min_peak
     spike_indexes = spike_indexes[peak_level_mask]
@@ -219,7 +232,8 @@ def refine_threshold_indexes(v, t, upstroke_indexes, thresh_frac=0.05, filter=10
 
 
 def check_thresholds_and_peaks(v, t, spike_indexes, peak_indexes, upstroke_indexes, end=None,
-                               max_interval=0.005, thresh_frac=0.05, filter=10., dvdt=None):
+                               max_interval=0.005, thresh_frac=0.05, filter=10., dvdt=None,
+                               tol=1.0):
     """Validate thresholds and peaks for set of spikes
 
     Check that peaks and thresholds for consecutive spikes do not overlap
@@ -238,13 +252,14 @@ def check_thresholds_and_peaks(v, t, spike_indexes, peak_indexes, upstroke_index
     thresh_frac : fraction of average upstroke for threshold calculation (optional, default 0.05)
     filter : cutoff frequency for 4-pole low-pass Bessel filter in kHz (optional, default 10)
     dvdt : pre-calculated time-derivative of voltage (optional)
+    tol : tolerance for returning to threshold in mV (optional, default 1)
 
     Returns
     -------
     spike_indexes : numpy array of modified spike indexes
     peak_indexes : numpy array of modified spike peak indexes
     upstroke_indexes : numpy array of modified spike upstroke indexes
-    clipped : numpy array of clippped status of spikes
+    clipped : numpy array of clipped status of spikes
     """
 
     if not end:
@@ -315,8 +330,8 @@ def check_thresholds_and_peaks(v, t, spike_indexes, peak_indexes, upstroke_index
     # voltage - otherwise, drop it
     clipped = np.zeros_like(spike_indexes, dtype=bool)
     end_index = find_time_index(t, end)
-    if len(spike_indexes) > 0 and not np.any(v[peak_indexes[-1]:end_index + 1] <= v[spike_indexes[-1]]):
-        logging.debug("Failed to return to threshold voltage (%f) after last spike (min %f) - marking last spike as clipped", v[spike_indexes[-1]], v[peak_indexes[-1]:end_index + 1].min())
+    if len(spike_indexes) > 0 and not np.any(v[peak_indexes[-1]:end_index + 1] <= v[spike_indexes[-1]] + tol):
+        logging.debug("Failed to return to threshold voltage + tolerance (%.2f) after last spike (min %.2f) - marking last spike as clipped", v[spike_indexes[-1]] + tol, v[peak_indexes[-1]:end_index + 1].min())
         clipped[-1] = True
 
     return spike_indexes, peak_indexes, upstroke_indexes, clipped
@@ -639,8 +654,8 @@ def calculate_dvdt(v, t, filter=None):
         delta_t = t[1] - t[0]
         sample_freq = 1. / delta_t
         filt_coeff = (filter * 1e3) / (sample_freq / 2.) # filter kHz -> Hz, then get fraction of Nyquist frequency
-        if filt_coeff < 0 or filt_coeff > 1:
-            raise FeatureError("bessel coeff (%f) is outside of valid range [0,1]. cannot compute features." % filt_coeff)
+        if filt_coeff < 0 or filt_coeff >= 1:
+            raise ValueError("bessel coeff ({:f}) is outside of valid range [0,1); cannot filter sampling frequency {:.1f} kHz with cutoff frequency {:.1f} kHz.".format(filt_coeff, sample_freq / 1e3, filter))
         b, a = signal.bessel(4, filt_coeff, "low")
         v_filt = signal.filtfilt(b, a, v, axis=0)
         dv = np.diff(v_filt)

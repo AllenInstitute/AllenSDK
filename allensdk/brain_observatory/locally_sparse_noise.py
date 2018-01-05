@@ -172,10 +172,15 @@ class LocallySparseNoise(StimulusAnalysis):
             peak['rf_chi2_lsn'].iloc[nc] = df['chi_squared_analysis/min_p'].iloc[nc]
 
             # find the index of the largest on subunit, if it exists
+            on_i = None
             if 'on/gaussian_fit/area' in df.columns:
                 area_on = df['on/gaussian_fit/area'].iloc[nc]
-                # watch out for NaNs
-                on_i = np.argmax(area_on) if isinstance(area_on, np.ndarray) else None
+
+                # watch out for NaNs and Nones
+                if isinstance(area_on, np.ndarray):
+                    area_on[np.equal(area_on, None)] = np.nan
+                    if not np.all(np.isnan(area_on.astype(float))):
+                        on_i = np.nanargmax(area_on)
             else:
                 on_i = None
 
@@ -189,10 +194,15 @@ class LocallySparseNoise(StimulusAnalysis):
                 peak['rf_center_on_y_lsn'].iloc[nc] = df['on/gaussian_fit/center_y'].iloc[nc][on_i]
 
             # find the index of the largest off subunit, if it exists
+            off_i = None
             if 'off/gaussian_fit/area' in df.columns:
                 area_off = df['off/gaussian_fit/area'].iloc[nc]
-                # watch out for NaNs
-                off_i = np.argmax(area_off) if isinstance(area_off, np.ndarray) else None
+
+                # watch out for NaNs and Nones
+                if isinstance(area_off, np.ndarray):
+                    area_off[np.equal(area_off, None)] = np.nan
+                    if not np.all(np.isnan(area_off.astype(float))):
+                        off_i = np.nanargmax(area_off)
             else:
                 off_i = None
 
@@ -428,6 +438,15 @@ class LocallySparseNoise(StimulusAnalysis):
                 raise Exception
 
         for x in attr_list:
+
+            # replace None => nan before writing
+            # set array type to float
+            for ii, item in enumerate(x):
+                if isinstance( item, np.ndarray ):
+                    if item.dtype == np.dtype('O'):
+                        item[ item == None ] = np.nan
+                        x[ii] = np.array(item, dtype=float)
+
             if len(x) > 3:
                 f['/'.join(x[:-3])].attrs[x[-2]] = x[-1]
             else:

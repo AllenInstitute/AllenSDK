@@ -220,4 +220,4 @@ def test_validate_structure_ids(inp, fails):
             ReferenceSpaceCache.validate_structure_ids(inp)
     else:
         out = ReferenceSpaceCache.validate_structure_ids(inp)
-        assert( out == map(int, inp) )
+        assert( out == list(map(int, inp)) )
