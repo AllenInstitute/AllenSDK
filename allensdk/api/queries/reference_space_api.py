@@ -34,11 +34,11 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 from .rma_api import RmaApi
-from ..cache import cacheable, Cache
+from allensdk.api.cache import cacheable, Cache
+from allensdk.core.obj_utilities import read_obj
 import numpy as np
 import nrrd
 import six
-
 
 
 class ReferenceSpaceApi(RmaApi):
@@ -125,6 +125,7 @@ class ReferenceSpaceApi(RmaApi):
         Parameters
         ----------
         structure_id : int
+            Unique identifier for the annotated structure
         ccf_version : string
             Which reference space version to download. Defaults to "annotation/ccf_2017"
         resolution : int
@@ -147,6 +148,38 @@ class ReferenceSpaceApi(RmaApi):
             self._file_download_log.error('''We weren't able to download a structure mask for structure {0}. 
                                              You can instead build the mask locally using 
                                              ReferenceSpace.many_structure_masks''')
+            raise
+
+
+    @cacheable(strategy='create', 
+               reader=read_obj, 
+               pathfinder=Cache.pathfinder(file_name_position=3, 
+                                           path_keyword='file_name'))
+    def download_structure_mesh(self, structure_id, ccf_version, file_name):
+        '''Download a Wavefront obj file containing a triangulated 3d mesh built 
+        from an annotated structure.
+
+        Parameters
+        ----------
+        structure_id : int
+            Unique identifier for the annotated structure
+        ccf_version : string
+            Which reference space version to download. Defaults to "annotation/ccf_2017"
+        file_name : string
+             Where to save the downloaded mask.
+
+        '''
+
+        if ccf_version  is None:
+            ccf_version = ReferenceSpaceApi.CCF_VERSION_DEFAULT
+
+        data_path = '{0}/{1}'.format(ccf_version, 'structure_meshes')        
+        remote_file_name = '{0}.obj'.format(structure_id)
+
+        try:
+            self.download_volumetric_data(data_path, remote_file_name, save_file_path=file_name)
+        except Exception as e:
+            self._file_download_log.error('unable to download a structure mesh for structure {0}.'.format(structure_id))
             raise
 
 
@@ -231,3 +264,4 @@ class ReferenceSpaceApi(RmaApi):
             save_file_path = 'volumetric_data.nrrd'
 
         self.retrieve_file_over_http(url, save_file_path)
+

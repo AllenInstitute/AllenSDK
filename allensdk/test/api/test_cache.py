@@ -37,9 +37,10 @@ import os
 
 import pandas as pd
 import pandas.io.json as pj
+import numpy as np
 
 import pytest
-from mock import MagicMock
+from mock import MagicMock, mock_open, patch
 
 from allensdk.api.cache import Cache, memoize
 from allensdk.api.queries.rma_api import RmaApi
@@ -58,6 +59,36 @@ def cache():
 @pytest.fixture
 def rma():
     return RmaApi()
+
+
+@pytest.fixture
+def wavefront_obj():
+    return '''
+
+v 8578 5484.96 5227.57
+v 8509.2 5487.54 5237.07
+v 8564.38 5522.13 5220.41
+v 8631.93 5497.82 5228.33
+v 8517.88 5542.95 5234.53
+v 8615.26 5563.22 5224.48
+
+# i'm a comment!
+
+vn -0.0247061 -0.352726 -0.935401
+vn -0.235489 -0.190095 -0.953105
+vn -0.0880336 -0.0323767 -0.995591
+vn 0.122706 -0.209891 -0.969994
+vn -0.343738 0.217978 -0.913416
+vn 0.0753706 0.16324 -0.983703
+
+I should be a comment, but am not
+
+f 1//1 2//2 3//3 
+f 4//4 1//1 3//3 
+f 3//3 2//2 5//5 
+f 6//6 3//3 5//5 
+
+    '''
 
 
 def test_version_update(fn_temp_dir):
