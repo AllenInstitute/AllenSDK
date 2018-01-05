@@ -130,6 +130,8 @@ LOCALLY_SPARSE_NOISE_PIXEL_SIZE = {
     LOCALLY_SPARSE_NOISE_8DEG: 9.3
 }
 
+RADIANS_TO_DEGREES = 57.2958
+
 def sessions_with_stimulus(stimulus):
     """ Return the names of the sessions that contain a given stimulus. """
 
@@ -298,6 +300,9 @@ def get_spatial_grating(height=None, aspect_ratio=None, ori=None, pix_per_cycle=
 
     return (p2p_amp/2.)*spndi.zoom(img, height/float(_height_prime)) + baseline
 
+
+# def grating_to_screen(self, phase, spatial_frequency, orientation, **kwargs):
+
 def get_spatio_temporal_grating(t, temporal_frequency=None, **kwargs):
 
     kwargs['phase'] = kwargs.pop('phase', 0) + (float(t)*temporal_frequency)%1
@@ -394,6 +399,25 @@ def map_stimulus(source_stimulus_coordinate, source_stimulus_type, target_stimul
     mc = map_stimulus_coordinate_to_monitor_coordinate(source_stimulus_coordinate, monitor_shape, source_stimulus_type)
     return map_monitor_coordinate_to_stimulus_coordinate(mc, monitor_shape, target_stimulus_type)
 
+def translate_image_and_fill(img, translation=(0,0)):
+    # first coordinate is horizontal, second is vertical
+
+    roll = (int(translation[0]), -int(translation[1]))
+
+    im2 = np.roll(img, roll, (1,0))
+
+    if roll[1] >= 0:
+        im2[:roll[1],:] = STIMULUS_GRAY
+    else:
+        im2[roll[1]:,:] = STIMULUS_GRAY
+
+    if roll[0] >= 0:
+        im2[:,:roll[0]] = STIMULUS_GRAY
+    else:
+        im2[:,roll[0]:] = STIMULUS_GRAY
+
+    return im2
+
 class Monitor(object):
 
     def __init__(self, n_pixels_r, n_pixels_c, panel_size, spatial_unit):
@@ -441,12 +465,21 @@ class Monitor(object):
 
     def pixels_to_visual_degrees(self, n, distance_from_monitor, small_angle_approximation=True):
 
-        if small_angle_approximation == True:
-            return n*self.pixel_size/distance_from_monitor*57.2958 # radians to degrees
-        else:
-            return 2*np.arctan(n*1./2*self.pixel_size / distance_from_monitor) * 57.2958  # radians to degrees
 
-    def lsn_image_to_screen(self, img, stimulus_type, origin='lower', background_color=STIMULUS_GRAY):
+        if small_angle_approximation == True:
+            return n*self.pixel_size/distance_from_monitor*RADIANS_TO_DEGREES # radians to degrees
+        else:
+            return 2*np.arctan(n*1./2*self.pixel_size / distance_from_monitor) * RADIANS_TO_DEGREES  # radians to degrees
+
+    def visual_degrees_to_pixels(self, vd, distance_from_monitor, small_angle_approximation=True):
+
+        if small_angle_approximation == True:
+            return vd*(distance_from_monitor/self.pixel_size/RADIANS_TO_DEGREES)
+        else:
+            raise NotImplementedError
+
+
+    def lsn_image_to_screen(self, img, stimulus_type, origin='lower', background_color=STIMULUS_GRAY, translation=(0,0)):
 
         # assert img.dtype == np.uint8
 
@@ -458,6 +491,8 @@ class Monitor(object):
         Mr, Mc = lsn_coordinate_to_monitor_coordinate(img.shape, (self.n_pixels_r, self.n_pixels_c), stimulus_type)
         full_image[int(mr):int(Mr), int(mc):int(Mc)] = img_full_res
 
+        full_image = translate_image_and_fill(full_image, translation=translation)
+
         if origin == 'lower':
             return full_image
         elif origin == 'upper':
@@ -467,7 +502,7 @@ class Monitor(object):
 
         return full_image
 
-    def natural_scene_image_to_screen(self, img, origin='lower'):
+    def natural_scene_image_to_screen(self, img, origin='lower', translation=(0,0)):
 
         # assert img.dtype == np.float32
         # img = img.astype(np.uint8)
@@ -476,6 +511,10 @@ class Monitor(object):
         mr, mc = natural_scene_coordinate_to_monitor_coordinate((0, 0), (self.n_pixels_r, self.n_pixels_c))
         Mr, Mc = natural_scene_coordinate_to_monitor_coordinate((img.shape[0], img.shape[1]), (self.n_pixels_r, self.n_pixels_c))
         full_image[int(mr):int(Mr), int(mc):int(Mc)] = img
+
+        full_image = translate_image_and_fill(full_image, translation=translation)
+
+
         if origin == 'lower':
             return np.flipud(full_image)
         elif origin == 'upper':
@@ -483,7 +522,7 @@ class Monitor(object):
         else:
             raise Exception
 
-    def natural_movie_image_to_screen(self, img, origin='lower'):
+    def natural_movie_image_to_screen(self, img, origin='lower', translation=(0,0)):
 
         img = imresize(img, NATURAL_MOVIE_PIXELS)
 
@@ -494,6 +533,8 @@ class Monitor(object):
         Mr, Mc = map_template_coordinate_to_monitor_coordinate((img.shape[0], img.shape[1]), (self.n_pixels_r, self.n_pixels_c), NATURAL_MOVIE_PIXELS)
 
         full_image[int(mr):int(Mr), int(mc):int(Mc)] = img
+
+        full_image = translate_image_and_fill(full_image, translation=translation)
 
         if origin == 'lower':
             return np.flipud(full_image)
@@ -515,11 +556,11 @@ class Monitor(object):
         return float(number_of_pixels)/number_of_cycles
 
 
-    def grating_to_screen(self, phase, spatial_frequency, orientation, distance_from_monitor, p2p_amp=256, baseline=127):
+    def grating_to_screen(self, phase, spatial_frequency, orientation, distance_from_monitor, p2p_amp=256, baseline=127, translation=(0,0)):
 
         pix_per_cycle = self.spatial_frequency_to_pix_per_cycle(spatial_frequency, distance_from_monitor)
 
-        grating = get_spatial_grating(height=self.n_pixels_r,
+        full_image = get_spatial_grating(height=self.n_pixels_r,
                                       aspect_ratio=self.aspect_ratio,
                                       ori=orientation,
                                       pix_per_cycle=pix_per_cycle,
@@ -527,11 +568,11 @@ class Monitor(object):
                                       p2p_amp=p2p_amp,
                                       baseline=baseline)
 
-        return grating
+        full_image = translate_image_and_fill(full_image, translation=translation)
+
+        return full_image
 
     def get_mask(self):
-
-        from allensdk.core.brain_observatory_nwb_data_set import make_display_mask
 
         mask = make_display_mask(display_shape=(self.n_pixels_c, self.n_pixels_r)).T
         assert mask.shape[0] == self.n_pixels_r
@@ -540,8 +581,6 @@ class Monitor(object):
         return mask
 
     def show_image(self, img, ax=None, show=True, mask=False, warp=False, origin='lower'):
-
-        from allensdk.core.brain_observatory_nwb_data_set import make_display_mask
 
         assert img.shape == (self.n_pixels_r, self.n_pixels_c) or img.shape == (self.n_pixels_r, self.n_pixels_c, 4)
 
@@ -654,15 +693,19 @@ class BrainObservatoryMonitor(Monitor):
 
         return spndi.map_coordinates(img, self.experiment_geometry.warp_coordinates.T).reshape((self.n_pixels_r, self.n_pixels_c))
 
-    def grating_to_screen(self, phase, spatial_frequency, orientation):
+    def grating_to_screen(self, phase, spatial_frequency, orientation, **kwargs):
 
         return super(BrainObservatoryMonitor, self).grating_to_screen(phase, spatial_frequency, orientation,
                                                                       self.experiment_geometry.distance,
-                                                                      p2p_amp = 256, baseline = 127)
+                                                                      p2p_amp = 256, baseline = 127, **kwargs)
 
     def pixels_to_visual_degrees(self, n, **kwargs):
 
         return super(BrainObservatoryMonitor, self).pixels_to_visual_degrees(n, self.experiment_geometry.distance, **kwargs)
+
+    def visual_degrees_to_pixels(self, vd, **kwargs):
+    
+        return super(BrainObservatoryMonitor, self).visual_degrees_to_pixels(vd, self.experiment_geometry.distance, **kwargs)
 
 def warp_stimulus_coords(vertices,
                          distance=15.0,
