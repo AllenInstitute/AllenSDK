@@ -130,6 +130,8 @@ LOCALLY_SPARSE_NOISE_PIXEL_SIZE = {
     LOCALLY_SPARSE_NOISE_8DEG: 9.3
 }
 
+RADIANS_TO_DEGREES = 57.2958
+
 def sessions_with_stimulus(stimulus):
     """ Return the names of the sessions that contain a given stimulus. """
 
@@ -298,6 +300,9 @@ def get_spatial_grating(height=None, aspect_ratio=None, ori=None, pix_per_cycle=
 
     return (p2p_amp/2.)*spndi.zoom(img, height/float(_height_prime)) + baseline
 
+
+# def grating_to_screen(self, phase, spatial_frequency, orientation, **kwargs):
+
 def get_spatio_temporal_grating(t, temporal_frequency=None, **kwargs):
 
     kwargs['phase'] = kwargs.pop('phase', 0) + (float(t)*temporal_frequency)%1
@@ -460,15 +465,16 @@ class Monitor(object):
 
     def pixels_to_visual_degrees(self, n, distance_from_monitor, small_angle_approximation=True):
 
+
         if small_angle_approximation == True:
-            return n*self.pixel_size/distance_from_monitor*57.2958 # radians to degrees
+            return n*self.pixel_size/distance_from_monitor*RADIANS_TO_DEGREES # radians to degrees
         else:
-            return 2*np.arctan(n*1./2*self.pixel_size / distance_from_monitor) * 57.2958  # radians to degrees
+            return 2*np.arctan(n*1./2*self.pixel_size / distance_from_monitor) * RADIANS_TO_DEGREES  # radians to degrees
 
     def visual_degrees_to_pixels(self, vd, distance_from_monitor, small_angle_approximation=True):
 
         if small_angle_approximation == True:
-            return vd*(distance_from_monitor/self.pixel_size/57.2958)
+            return vd*(distance_from_monitor/self.pixel_size/RADIANS_TO_DEGREES)
         else:
             raise NotImplementedError
 

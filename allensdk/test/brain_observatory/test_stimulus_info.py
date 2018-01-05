@@ -298,6 +298,29 @@ def test_get_mask():
     assert mask.sum() == 931286
     assert mask.shape == si.MONITOR_DIMENSIONS
 
+def test_translate_image_and_fill():
+    '''
+    [[1 2 3]
+    [4 5 6]
+    [7 8 9]]
+
+    [[127   4   5]
+    [127   7   8]
+    [127 127 127]]
+    '''
+
+
+    X = np.array([[1,2,3],[4,5,6],[7,8,9]])
+    X_test = np.array([[127, 4, 5], [127, 7, 8], [127, 127, 127]])
+    X_result = si.translate_image_and_fill(X, translation=(1,1))
+
+    np.testing.assert_array_almost_equal(X_result, X_test)
+
+def test_visual_degrees_to_pixels():
+    
+    m = si.BrainObservatoryMonitor()
+    np.testing.assert_approx_equal(m.visual_degrees_to_pixels(4.5), 43.5749072092)
+
 def test_spatial_frequency_to_pix_per_cycle():
 
     m = si.BrainObservatoryMonitor()
