@@ -36,15 +36,17 @@
 from allensdk.config.manifest import Manifest, ManifestVersionError
 from allensdk.config.manifest_builder import ManifestBuilder
 import allensdk.core.json_utilities as ju
+from allensdk.deprecated import deprecated
+
 import pandas as pd
 import pandas.io.json as pj
+
 import functools
+from functools import wraps
 import os
 import logging
-from allensdk.deprecated import deprecated
 import csv
 
-from functools import wraps
 
 def memoize(f):
    memodict = dict()

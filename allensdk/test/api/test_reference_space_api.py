@@ -61,6 +61,17 @@ def nrrd_read():
 
     return nrrd_read
 
+
+@pytest.fixture
+def read_obj():
+    with patch('allensdk.core.obj_utilities.read_obj', 
+               Mock(name='read_obj_file_mcm', return_value=('mock_obj'))) as read_obj:
+        import allensdk.api.queries.reference_space_api as RSA
+        reload(RSA)
+
+    return read_obj
+
+
 @pytest.fixture
 def RSA(nrrd_read):
     import allensdk.api.queries.reference_space_api as RSA
@@ -84,7 +95,8 @@ def CCF_VERSIONS():
     from allensdk.api.queries.reference_space_api import ReferenceSpaceApi
      
     return [ReferenceSpaceApi.CCF_2015,
-            ReferenceSpaceApi.CCF_2016]
+            ReferenceSpaceApi.CCF_2016,
+            ReferenceSpaceApi.CCF_2017]
 
 
 def DATA_PATHS(): 
@@ -159,6 +171,25 @@ def test_download_structure_mask(os_makedirs,
                                                                resolution, 
                                                                structure_id)
     ref_space.retrieve_file_over_http.assert_called_once_with(expected, '/path/to/foo.nrrd')
+    os.makedirs.assert_any_call('/path/to')
+
+
+@patch('os.makedirs')
+def test_download_structure_mesh(os_makedirs, read_obj, RSA, ref_space):
+
+    structure_id = 12
+
+    ref_space.retrieve_file_over_http.reset_mock()
+
+    a = ref_space.download_structure_mesh(structure_id, None, '/path/to/foo.obj', reader=read_obj)
+    
+    assert a == 'mock_obj'
+    
+    expected = 'http://download.alleninstitute.org/informatics-archive/'\
+               'current-release/mouse_ccf/{0}/structure_meshes/'\
+               '{1}.obj'.format(RSA.ReferenceSpaceApi.CCF_VERSION_DEFAULT, structure_id)
+
+    ref_space.retrieve_file_over_http.assert_called_once_with(expected, '/path/to/foo.obj')
     os.makedirs.assert_any_call('/path/to')
 
 

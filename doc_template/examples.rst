@@ -17,4 +17,5 @@ Brain Observatory Monitor                             `Jupyter notebook <_static
 Dynamic Brain Workshop 2015 experiment detail         `Jupyter notebook <_static/examples/nb/summer_workshop_2015/experiment_detail_example.html>`_ `(download .ipynb) <_static/examples/nb/summer_workshop_2015/experiment_detail_example.ipynb>`_
 Stimulating a biophysical model with a square pulse   `Jupyter notebook <_static/examples/nb/pulse_stimulus.html>`_ `(download .ipynb) <_static/examples/nb/pulse_stimulus.ipynb>`_
 Using a Reference Space                               `Jupyter notebook <_static/examples/nb/reference_space.html>`_ `(download .ipynb) <_static/examples/nb/reference_space.ipynb>`_  
+Downloading Images                                    `Jupyter notebook <_static/examples/nb/image_download.html>`_ `(download .ipynb) <_static/examples/nb/image_download.ipynb>`_
 ===================================================== ====
