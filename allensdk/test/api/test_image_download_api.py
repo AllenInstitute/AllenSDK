@@ -59,6 +59,16 @@ def test_get_section_image_ranges(image_api):
                                                      'rma::options[only$eq\'blue_lower,blue_upper,red_lower,red_upper,green_lower,green_upper\']'
                                                      '[num_rows$eq\'all\'][count$eqfalse]')
 
+def test_get_section_data_sets_by_product(image_api):
+
+    product_ids = [10, 22]
+    image_api.get_section_data_sets_by_product(product_ids)
+
+    image_api.json_msg_query.assert_called_once_with('http://api.brain-map.org/api/v2/data/query.json?'\
+                                                     'q=model::SectionDataSet,'\
+                                                     'rma::criteria,products[id$in10,22],'\
+                                                     'rma::options[num_rows$eq\'all\'][count$eqfalse]')
+
 def test_get_section_image_ranges_as_list(image_api):
 
     image_api.template_query = MagicMock(return_value=[{'blue_lower': 0, 'blue_upper': 1, 'green_lower': 2, 'green_upper': 3, 'red_lower': 4, 'red_upper': 5}])

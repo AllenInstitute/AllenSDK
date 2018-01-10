@@ -79,6 +79,14 @@ class ImageDownloadApi(RmaTemplate):
              'count': False,
              'criteria': '[data_set_id$eq{{ data_set_id }}]',
              'criteria_params': ['data_set_id']
+              },
+            {'name': 'section_data_sets_by_product_id',
+             'description': 'see name',
+             'model': 'SectionDataSet',
+             'num_rows': 'all',
+             'count': False,
+             'criteria': 'products[id$in{{ product_ids }}]',
+             'criteria_params': ['product_ids']
               }]}
 
     def __init__(self, base_uri=None):
@@ -122,6 +130,36 @@ class ImageDownloadApi(RmaTemplate):
             list_ranges.append([ rng['red_lower'], rng['red_upper'], rng['green_lower'], rng['green_upper'], rng['blue_lower'], rng['blue_upper'] ])
 
         return list_ranges
+
+
+    @cacheable()
+    def get_section_data_sets_by_product(self, product_ids, num_rows='all', count=False, **kwargs):
+        '''List all of the section data sets produced as part of one or more products
+
+        Parameters
+        ----------
+        product_ids : list of int
+            Integer specifiers for Allen Institute products. A product is a set of related data.
+        num_rows : int, optional
+            how many records to retrieve. Default is 'all'.
+        count : bool, optional
+            If True, return a count of the lines found by the query. Default is False.
+
+        Returns
+        -------
+        list of dict : 
+            Each returned element is a section data set record.
+
+        Notes
+        -----
+        See :py:meth:`allensdk.api.queries.image_download_api.ImageDownloadApi.get_products` for a list of products.
+
+        '''
+
+        return self.template_query('image_queries', 'section_data_sets_by_product_id', 
+                                   product_ids=product_ids, 
+                                   num_rows=num_rows, count=count)
+
 
     @cacheable()
     def section_image_query(self, section_data_set_id, num_rows='all', count=False, **kwargs):
