@@ -5,17 +5,19 @@
 
 * Before reporting a bug or requesting a feature, use Github's issue search to see if anyone else has already done so.
 * If there is no existing issue, create a new one. You should include:
-        * A brief, descriptive title
-        * A clear description of the problem or request. 
+    * A brief, descriptive title
+    * A clear description of the problem or request.
+    * If you are reporting a bug, your description should contain the following information:
+        * What you did (preferably the actual code or commands that you ran)
+        * What happened
+        * What you were expecting to happen
+        * How your system is configured (operating system, Python version)
+
 
 ###### Writing bug reports
 
 Please include the following information when reporting a bug:
 
-* What you did (preferably the actual code or commands that you ran)
-* What happened
-* What you were expecting to happen
-* How your system is configured (operating system, Python version)
 
 ### Questions 
 
