@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Mouse Connectivity &mdash; Allen SDK 0.14.3 documentation</title>
+    <title>Mouse Connectivity &mdash; Allen SDK dev documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.14.3',
+        VERSION:     'dev',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.14.3 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK dev documentation" href="index.html" />
     <link rel="up" title="Data Resources" href="data_resources.html" />
     <link rel="next" title="Reference Space" href="reference_space.html" />
     <link rel="prev" title="Cell Types" href="cell_types.html" /> 
@@ -52,7 +52,7 @@
   display: inline-block;
   width: 250px;
   height: 75px;
-  background-image:url("/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-image:url("_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
   background-size: 235px 37px;
   background-position: 0px 20px;
   background-repeat: no-repeat;
@@ -60,7 +60,7 @@
 </style>
 
 <script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
-<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -143,9 +143,9 @@ all experiments with injections in the isocortex and download the projetion dens
 <span class="c1"># tell the cache class what resolution (in microns) of data you want to download</span>
 <span class="n">mcc</span> <span class="o">=</span> <span class="n">MouseConnectivityCache</span><span class="p">(</span><span class="n">resolution</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
 
-<span class="c1"># use the ontology class to get the id of the isocortex structure</span>
-<span class="n">ontology</span> <span class="o">=</span> <span class="n">mcc</span><span class="o">.</span><span class="n">get_ontology</span><span class="p">(</span><span class="s1">&#39;ontology.csv&#39;</span><span class="p">)</span>
-<span class="n">isocortex</span> <span class="o">=</span> <span class="n">ontology</span><span class="p">[</span><span class="s1">&#39;Isocortex&#39;</span><span class="p">]</span>
+<span class="c1"># use the structure tree class to get information about the isocortex structure</span>
+<span class="n">structure_tree</span> <span class="o">=</span> <span class="n">mcc</span><span class="o">.</span><span class="n">get_structure_tree</span><span class="p">()</span>
+<span class="n">isocortex_id</span> <span class="o">=</span> <span class="n">structure_tree</span><span class="o">.</span><span class="n">get_structures_by_name</span><span class="p">([</span><span class="s1">&#39;Isocortex&#39;</span><span class="p">])[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
 
 <span class="c1"># a list of dictionaries containing metadata for non-Cre experiments</span>
 <span class="n">experiments</span> <span class="o">=</span> <span class="n">mcc</span><span class="o">.</span><span class="n">get_experiments</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="s1">&#39;non_cre.json&#39;</span><span class="p">,</span>

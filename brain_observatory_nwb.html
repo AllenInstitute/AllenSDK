@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Organization of a Brain Observatory NWB file &mdash; Allen SDK 0.14.3 documentation</title>
+    <title>Organization of a Brain Observatory NWB file &mdash; Allen SDK dev documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.14.3',
+        VERSION:     'dev',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.14.3 documentation" href="index.html" /> 
+    <link rel="top" title="Allen SDK dev documentation" href="index.html" /> 
   </head>
   <body role="document">
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
@@ -49,7 +49,7 @@
   display: inline-block;
   width: 250px;
   height: 75px;
-  background-image:url("/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-image:url("_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
   background-size: 235px 37px;
   background-position: 0px 20px;
   background-repeat: no-repeat;
@@ -57,7 +57,7 @@
 </style>
 
 <script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
-<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -89,7 +89,7 @@ It is <em>highly</em> recommended that anyone using an NWB file download and ins
 <h2>NWB file organization<a class="headerlink" href="#nwb-file-organization" title="Permalink to this headline">¶</a></h2>
 <p>Each NWB file is organized into six sections. These sections store acquired data (&#8216;acquisition&#8217;), stimulus data (&#8216;stimulus&#8217;), general metadata about the experiment (&#8216;general&#8217;), experiment organization (&#8216;epochs&#8217;), processed data (&#8216;processing&#8217;) and a free-form area for storing analysis data (&#8216;analysis&#8217;).</p>
 <div class="figure" id="id1">
-<img alt="_images/fig-1.png" src="_images/fig-1.png" />
+<img alt="_static/fig-1.png" src="_static/fig-1.png" />
 <p class="caption"><span class="caption-text"><strong>Figure 1. An NWB file, viewed in HDFView</strong></span></p>
 </div>
 <p>At the left of HDFView shows the organization of data in an NWB file.
@@ -107,7 +107,7 @@ The NWB specification, describing the format and how data is stored, can be down
 <h2>Stimulus data<a class="headerlink" href="#stimulus-data" title="Permalink to this headline">¶</a></h2>
 <p>Within an NWB file, stimulus data is organized into &#8216;templates&#8217;, which are stimulus descriptions that can be used one or more times, and &#8216;presentation&#8217;, which stores the time-series data about what was presented and when.</p>
 <div class="figure" id="id2">
-<img alt="_images/fig-2.png" src="_images/fig-2.png" />
+<img alt="_static/fig-2.png" src="_static/fig-2.png" />
 <p class="caption"><span class="caption-text"><strong>Figure 2. Stimuli presented during the experiment</strong></span></p>
 </div>
 <p>In this experiment shown in Figure 2, there were four stimuli – one locally sparse noise, two movies and one neutral stimulus for observing spontaneous activity.
@@ -120,7 +120,7 @@ This information can include the type of data stored, the unit that stored in, a
 <p>In the NWB file, the processing folder is designed to store the contents the different levels of intermediate processing of data that are necessary to convert raw data into something that can be used for scientific analysis.
 In the Allen Institute&#8217;s NWB file, these levels of processing include motion correction of the acquired 2-photon move frames, image segmentation into regions of interest, the fluorescence signal for each of these regions, and the dF/F signal that is useful for correlating cell activity with presented stimuli.</p>
 <div class="figure" id="id3">
-<img alt="_images/fig-3.png" src="_images/fig-3.png" />
+<img alt="_static/fig-3.png" src="_static/fig-3.png" />
 <p class="caption"><span class="caption-text"><strong>Figure 3. Location of dF/F data</strong></span></p>
 </div>
 <p>HDFView provides a very efficient way to browse the contents of an NWB file.</p>

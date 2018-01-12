@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Welcome to the Allen SDK &mdash; Allen SDK 0.14.3 documentation</title>
+    <title>Welcome to the Allen SDK &mdash; Allen SDK dev documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.14.3',
+        VERSION:     'dev',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.14.3 documentation" href="#" />
+    <link rel="top" title="Allen SDK dev documentation" href="#" />
     <link rel="next" title="Install Guide" href="install.html" /> 
   </head>
   <body role="document">
@@ -50,7 +50,7 @@
   display: inline-block;
   width: 250px;
   height: 75px;
-  background-image:url("/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-image:url("_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
   background-size: 235px 37px;
   background-position: 0px 20px;
   background-repeat: no-repeat;
@@ -58,7 +58,7 @@
 </style>
 
 <script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
-<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -74,7 +74,7 @@
 </div>
 <p>The Allen Software Development Kit houses source code for reading and processing Allen Brain Atlas data.
 The Allen SDK focuses on the Allen Brain Observatory, Cell Types Database, and Mouse Brain Connectivity Atlas.</p>
-<img alt="_images/sdk_cam.png" class="align-right" src="_images/sdk_cam.png" />
+<img alt="_static/sdk_cam.png" class="align-right" src="_static/sdk_cam.png" />
 <div class="section" id="allen-brain-observatory">
 <h2>Allen Brain Observatory<a class="headerlink" href="#allen-brain-observatory" title="Permalink to this headline">¶</a></h2>
 <p>The <a class="reference external" href="http://observatory.brain-map.org/visualcoding">Allen Brain Observatory</a> is a data resource for
@@ -93,7 +93,7 @@ frequency tuning, temporal dynamics, and spatial receptive field structure.</p>
 </ul>
 </div></blockquote>
 <hr class="docutils" />
-<img alt="_images/ccf_v3_sdk.png" class="align-right" src="_images/ccf_v3_sdk.png" />
+<img alt="_static/ccf_v3_sdk.png" class="align-right" src="_static/ccf_v3_sdk.png" />
 </div>
 <div class="section" id="allen-cell-types-database">
 <h2>Allen Cell Types Database<a class="headerlink" href="#allen-cell-types-database" title="Permalink to this headline">¶</a></h2>
@@ -114,7 +114,7 @@ your own simulations using stimuli from the Allen Cell Types Database or custom 
 </ul>
 </div></blockquote>
 <hr class="docutils" />
-<img alt="_images/connectivity.png" class="align-right" src="_images/connectivity.png" />
+<img alt="_static/connectivity.png" class="align-right" src="_static/connectivity.png" />
 </div>
 <div class="section" id="allen-mouse-brain-connectivity-atlas">
 <h2>Allen Mouse Brain Connectivity Atlas<a class="headerlink" href="#allen-mouse-brain-connectivity-atlas" title="Permalink to this headline">¶</a></h2>
@@ -131,7 +131,7 @@ on what types of data were added to the two atlases, take a look at the <a class
 <a class="reference internal" href="allensdk.core.html#allensdk.core.cell_types_cache.CellTypesCache.get_cells" title="allensdk.core.cell_types_cache.CellTypesCache.get_cells"><code class="xref py py-meth docutils literal"><span class="pre">get_cells()</span></code></a>.  Examples of this are shown in the metadata filtering section of the example
 <a class="reference external" href="_static/examples/nb/cell_types.html">Jupyter notebook</a></p>
 <p>The Allen Mouse Brain Connectivity Atlas contains over 350 new data sets and structure unionize records have been completely reprocessed with updated 3D annotations of the Common Coordinate Framework.
-The structure ontology contains new structures, with subcortical annotations having changed the most.  The <a class="reference internal" href="allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache" title="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache"><code class="xref py py-class docutils literal"><span class="pre">MouseConnectivityCache</span></code></a> <code class="code docutils literal"><span class="pre">get_annotation_volume</span></code> method will by default return a new volume by default.  You can choose which version of annotations you would like using the <code class="docutils literal"><span class="pre">ccf_version</span></code> <a class="reference internal" href="allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache" title="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache"><code class="xref py py-class docutils literal"><span class="pre">MouseConnectivityCache</span></code></a> constructor.</p>
+The structure ontology contains new structures, with annotations have changing the most.  The <a class="reference internal" href="allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache" title="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache"><code class="xref py py-class docutils literal"><span class="pre">MouseConnectivityCache</span></code></a> <code class="code docutils literal"><span class="pre">get_annotation_volume</span></code> method will by default return a new volume by default.  You can choose which version of annotations you would like using the <code class="docutils literal"><span class="pre">ccf_version</span></code> <a class="reference internal" href="allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache" title="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache"><code class="xref py py-class docutils literal"><span class="pre">MouseConnectivityCache</span></code></a> constructor.</p>
 <p>To access new experiments and unionize records, you will need to remove a number of files in your manifest directory so that
 <a class="reference internal" href="allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache" title="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache"><code class="xref py py-class docutils literal"><span class="pre">MouseConnectivityCache</span></code></a> will know to download the new copies:</p>
 <blockquote>

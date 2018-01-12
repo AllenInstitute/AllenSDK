@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.brain_observatory.stimulus_info &mdash; Allen SDK 0.14.3 documentation</title>
+    <title>allensdk.brain_observatory.stimulus_info &mdash; Allen SDK dev documentation</title>
     
     <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.14.3',
+        VERSION:     'dev',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.14.3 documentation" href="../../../index.html" />
+    <link rel="top" title="Allen SDK dev documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body role="document">
@@ -50,7 +50,7 @@
   display: inline-block;
   width: 250px;
   height: 75px;
-  background-image:url("/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-image:url("_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
   background-size: 235px 37px;
   background-position: 0px 20px;
   background-repeat: no-repeat;
@@ -58,7 +58,7 @@
 </style>
 
 <script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
-<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -200,6 +200,8 @@
     <span class="n">LOCALLY_SPARSE_NOISE_4DEG</span><span class="p">:</span> <span class="mf">4.65</span><span class="p">,</span>
     <span class="n">LOCALLY_SPARSE_NOISE_8DEG</span><span class="p">:</span> <span class="mf">9.3</span>
 <span class="p">}</span>
+
+<span class="n">RADIANS_TO_DEGREES</span> <span class="o">=</span> <span class="mf">57.2958</span>
 
 <div class="viewcode-block" id="sessions_with_stimulus"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.sessions_with_stimulus">[docs]</a><span class="k">def</span> <span class="nf">sessions_with_stimulus</span><span class="p">(</span><span class="n">stimulus</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Return the names of the sessions that contain a given stimulus. &quot;&quot;&quot;</span>
@@ -369,6 +371,9 @@
 
     <span class="k">return</span> <span class="p">(</span><span class="n">p2p_amp</span><span class="o">/</span><span class="mf">2.</span><span class="p">)</span><span class="o">*</span><span class="n">spndi</span><span class="o">.</span><span class="n">zoom</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">height</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">_height_prime</span><span class="p">))</span> <span class="o">+</span> <span class="n">baseline</span></div>
 
+
+<span class="c1"># def grating_to_screen(self, phase, spatial_frequency, orientation, **kwargs):</span>
+
 <div class="viewcode-block" id="get_spatio_temporal_grating"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.get_spatio_temporal_grating">[docs]</a><span class="k">def</span> <span class="nf">get_spatio_temporal_grating</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">temporal_frequency</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
     <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;phase&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;phase&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">*</span><span class="n">temporal_frequency</span><span class="p">)</span><span class="o">%</span><span class="mi">1</span>
@@ -465,6 +470,25 @@
     <span class="n">mc</span> <span class="o">=</span> <span class="n">map_stimulus_coordinate_to_monitor_coordinate</span><span class="p">(</span><span class="n">source_stimulus_coordinate</span><span class="p">,</span> <span class="n">monitor_shape</span><span class="p">,</span> <span class="n">source_stimulus_type</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">map_monitor_coordinate_to_stimulus_coordinate</span><span class="p">(</span><span class="n">mc</span><span class="p">,</span> <span class="n">monitor_shape</span><span class="p">,</span> <span class="n">target_stimulus_type</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="translate_image_and_fill"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.translate_image_and_fill">[docs]</a><span class="k">def</span> <span class="nf">translate_image_and_fill</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">translation</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)):</span>
+    <span class="c1"># first coordinate is horizontal, second is vertical</span>
+
+    <span class="n">roll</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">translation</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="o">-</span><span class="nb">int</span><span class="p">(</span><span class="n">translation</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+    <span class="n">im2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">roll</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">roll</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">im2</span><span class="p">[:</span><span class="n">roll</span><span class="p">[</span><span class="mi">1</span><span class="p">],:]</span> <span class="o">=</span> <span class="n">STIMULUS_GRAY</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">im2</span><span class="p">[</span><span class="n">roll</span><span class="p">[</span><span class="mi">1</span><span class="p">]:,:]</span> <span class="o">=</span> <span class="n">STIMULUS_GRAY</span>
+
+    <span class="k">if</span> <span class="n">roll</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">im2</span><span class="p">[:,:</span><span class="n">roll</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">STIMULUS_GRAY</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">im2</span><span class="p">[:,</span><span class="n">roll</span><span class="p">[</span><span class="mi">0</span><span class="p">]:]</span> <span class="o">=</span> <span class="n">STIMULUS_GRAY</span>
+
+    <span class="k">return</span> <span class="n">im2</span></div>
+
 <div class="viewcode-block" id="Monitor"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.Monitor">[docs]</a><span class="k">class</span> <span class="nc">Monitor</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_pixels_r</span><span class="p">,</span> <span class="n">n_pixels_c</span><span class="p">,</span> <span class="n">panel_size</span><span class="p">,</span> <span class="n">spatial_unit</span><span class="p">):</span>
@@ -512,12 +536,21 @@
 
 <div class="viewcode-block" id="Monitor.pixels_to_visual_degrees"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.Monitor.pixels_to_visual_degrees">[docs]</a>    <span class="k">def</span> <span class="nf">pixels_to_visual_degrees</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">distance_from_monitor</span><span class="p">,</span> <span class="n">small_angle_approximation</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
 
-        <span class="k">if</span> <span class="n">small_angle_approximation</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">n</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">pixel_size</span><span class="o">/</span><span class="n">distance_from_monitor</span><span class="o">*</span><span class="mf">57.2958</span> <span class="c1"># radians to degrees</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">(</span><span class="n">n</span><span class="o">*</span><span class="mf">1.</span><span class="o">/</span><span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">pixel_size</span> <span class="o">/</span> <span class="n">distance_from_monitor</span><span class="p">)</span> <span class="o">*</span> <span class="mf">57.2958</span>  <span class="c1"># radians to degrees</span></div>
 
-<div class="viewcode-block" id="Monitor.lsn_image_to_screen"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.Monitor.lsn_image_to_screen">[docs]</a>    <span class="k">def</span> <span class="nf">lsn_image_to_screen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">stimulus_type</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">,</span> <span class="n">background_color</span><span class="o">=</span><span class="n">STIMULUS_GRAY</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">small_angle_approximation</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">n</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">pixel_size</span><span class="o">/</span><span class="n">distance_from_monitor</span><span class="o">*</span><span class="n">RADIANS_TO_DEGREES</span> <span class="c1"># radians to degrees</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">(</span><span class="n">n</span><span class="o">*</span><span class="mf">1.</span><span class="o">/</span><span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">pixel_size</span> <span class="o">/</span> <span class="n">distance_from_monitor</span><span class="p">)</span> <span class="o">*</span> <span class="n">RADIANS_TO_DEGREES</span>  <span class="c1"># radians to degrees</span></div>
+
+<div class="viewcode-block" id="Monitor.visual_degrees_to_pixels"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.Monitor.visual_degrees_to_pixels">[docs]</a>    <span class="k">def</span> <span class="nf">visual_degrees_to_pixels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vd</span><span class="p">,</span> <span class="n">distance_from_monitor</span><span class="p">,</span> <span class="n">small_angle_approximation</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">small_angle_approximation</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">vd</span><span class="o">*</span><span class="p">(</span><span class="n">distance_from_monitor</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">pixel_size</span><span class="o">/</span><span class="n">RADIANS_TO_DEGREES</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+
+<div class="viewcode-block" id="Monitor.lsn_image_to_screen"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.Monitor.lsn_image_to_screen">[docs]</a>    <span class="k">def</span> <span class="nf">lsn_image_to_screen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">stimulus_type</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">,</span> <span class="n">background_color</span><span class="o">=</span><span class="n">STIMULUS_GRAY</span><span class="p">,</span> <span class="n">translation</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)):</span>
 
         <span class="c1"># assert img.dtype == np.uint8</span>
 
@@ -529,6 +562,8 @@
         <span class="n">Mr</span><span class="p">,</span> <span class="n">Mc</span> <span class="o">=</span> <span class="n">lsn_coordinate_to_monitor_coordinate</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_r</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_c</span><span class="p">),</span> <span class="n">stimulus_type</span><span class="p">)</span>
         <span class="n">full_image</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">mr</span><span class="p">):</span><span class="nb">int</span><span class="p">(</span><span class="n">Mr</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">mc</span><span class="p">):</span><span class="nb">int</span><span class="p">(</span><span class="n">Mc</span><span class="p">)]</span> <span class="o">=</span> <span class="n">img_full_res</span>
 
+        <span class="n">full_image</span> <span class="o">=</span> <span class="n">translate_image_and_fill</span><span class="p">(</span><span class="n">full_image</span><span class="p">,</span> <span class="n">translation</span><span class="o">=</span><span class="n">translation</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">origin</span> <span class="o">==</span> <span class="s1">&#39;lower&#39;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">full_image</span>
         <span class="k">elif</span> <span class="n">origin</span> <span class="o">==</span> <span class="s1">&#39;upper&#39;</span><span class="p">:</span>
@@ -538,7 +573,7 @@
 
         <span class="k">return</span> <span class="n">full_image</span></div>
 
-<div class="viewcode-block" id="Monitor.natural_scene_image_to_screen"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.Monitor.natural_scene_image_to_screen">[docs]</a>    <span class="k">def</span> <span class="nf">natural_scene_image_to_screen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="Monitor.natural_scene_image_to_screen"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.Monitor.natural_scene_image_to_screen">[docs]</a>    <span class="k">def</span> <span class="nf">natural_scene_image_to_screen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">,</span> <span class="n">translation</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)):</span>
 
         <span class="c1"># assert img.dtype == np.float32</span>
         <span class="c1"># img = img.astype(np.uint8)</span>
@@ -547,6 +582,10 @@
         <span class="n">mr</span><span class="p">,</span> <span class="n">mc</span> <span class="o">=</span> <span class="n">natural_scene_coordinate_to_monitor_coordinate</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_r</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_c</span><span class="p">))</span>
         <span class="n">Mr</span><span class="p">,</span> <span class="n">Mc</span> <span class="o">=</span> <span class="n">natural_scene_coordinate_to_monitor_coordinate</span><span class="p">((</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_r</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_c</span><span class="p">))</span>
         <span class="n">full_image</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">mr</span><span class="p">):</span><span class="nb">int</span><span class="p">(</span><span class="n">Mr</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">mc</span><span class="p">):</span><span class="nb">int</span><span class="p">(</span><span class="n">Mc</span><span class="p">)]</span> <span class="o">=</span> <span class="n">img</span>
+
+        <span class="n">full_image</span> <span class="o">=</span> <span class="n">translate_image_and_fill</span><span class="p">(</span><span class="n">full_image</span><span class="p">,</span> <span class="n">translation</span><span class="o">=</span><span class="n">translation</span><span class="p">)</span>
+
+
         <span class="k">if</span> <span class="n">origin</span> <span class="o">==</span> <span class="s1">&#39;lower&#39;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">full_image</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">origin</span> <span class="o">==</span> <span class="s1">&#39;upper&#39;</span><span class="p">:</span>
@@ -554,7 +593,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span></div>
 
-<div class="viewcode-block" id="Monitor.natural_movie_image_to_screen"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.Monitor.natural_movie_image_to_screen">[docs]</a>    <span class="k">def</span> <span class="nf">natural_movie_image_to_screen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="Monitor.natural_movie_image_to_screen"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.Monitor.natural_movie_image_to_screen">[docs]</a>    <span class="k">def</span> <span class="nf">natural_movie_image_to_screen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">,</span> <span class="n">translation</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)):</span>
 
         <span class="n">img</span> <span class="o">=</span> <span class="n">imresize</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">NATURAL_MOVIE_PIXELS</span><span class="p">)</span>
 
@@ -565,6 +604,8 @@
         <span class="n">Mr</span><span class="p">,</span> <span class="n">Mc</span> <span class="o">=</span> <span class="n">map_template_coordinate_to_monitor_coordinate</span><span class="p">((</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_r</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_c</span><span class="p">),</span> <span class="n">NATURAL_MOVIE_PIXELS</span><span class="p">)</span>
 
         <span class="n">full_image</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">mr</span><span class="p">):</span><span class="nb">int</span><span class="p">(</span><span class="n">Mr</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">mc</span><span class="p">):</span><span class="nb">int</span><span class="p">(</span><span class="n">Mc</span><span class="p">)]</span> <span class="o">=</span> <span class="n">img</span>
+
+        <span class="n">full_image</span> <span class="o">=</span> <span class="n">translate_image_and_fill</span><span class="p">(</span><span class="n">full_image</span><span class="p">,</span> <span class="n">translation</span><span class="o">=</span><span class="n">translation</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">origin</span> <span class="o">==</span> <span class="s1">&#39;lower&#39;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">full_image</span><span class="p">)</span>
@@ -586,11 +627,11 @@
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">number_of_pixels</span><span class="p">)</span><span class="o">/</span><span class="n">number_of_cycles</span></div>
 
 
-<div class="viewcode-block" id="Monitor.grating_to_screen"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.Monitor.grating_to_screen">[docs]</a>    <span class="k">def</span> <span class="nf">grating_to_screen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">spatial_frequency</span><span class="p">,</span> <span class="n">orientation</span><span class="p">,</span> <span class="n">distance_from_monitor</span><span class="p">,</span> <span class="n">p2p_amp</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">baseline</span><span class="o">=</span><span class="mi">127</span><span class="p">):</span>
+<div class="viewcode-block" id="Monitor.grating_to_screen"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.Monitor.grating_to_screen">[docs]</a>    <span class="k">def</span> <span class="nf">grating_to_screen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">spatial_frequency</span><span class="p">,</span> <span class="n">orientation</span><span class="p">,</span> <span class="n">distance_from_monitor</span><span class="p">,</span> <span class="n">p2p_amp</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">baseline</span><span class="o">=</span><span class="mi">127</span><span class="p">,</span> <span class="n">translation</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)):</span>
 
         <span class="n">pix_per_cycle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spatial_frequency_to_pix_per_cycle</span><span class="p">(</span><span class="n">spatial_frequency</span><span class="p">,</span> <span class="n">distance_from_monitor</span><span class="p">)</span>
 
-        <span class="n">grating</span> <span class="o">=</span> <span class="n">get_spatial_grating</span><span class="p">(</span><span class="n">height</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_r</span><span class="p">,</span>
+        <span class="n">full_image</span> <span class="o">=</span> <span class="n">get_spatial_grating</span><span class="p">(</span><span class="n">height</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_r</span><span class="p">,</span>
                                       <span class="n">aspect_ratio</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">aspect_ratio</span><span class="p">,</span>
                                       <span class="n">ori</span><span class="o">=</span><span class="n">orientation</span><span class="p">,</span>
                                       <span class="n">pix_per_cycle</span><span class="o">=</span><span class="n">pix_per_cycle</span><span class="p">,</span>
@@ -598,11 +639,11 @@
                                       <span class="n">p2p_amp</span><span class="o">=</span><span class="n">p2p_amp</span><span class="p">,</span>
                                       <span class="n">baseline</span><span class="o">=</span><span class="n">baseline</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">grating</span></div>
+        <span class="n">full_image</span> <span class="o">=</span> <span class="n">translate_image_and_fill</span><span class="p">(</span><span class="n">full_image</span><span class="p">,</span> <span class="n">translation</span><span class="o">=</span><span class="n">translation</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">full_image</span></div>
 
 <div class="viewcode-block" id="Monitor.get_mask"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.Monitor.get_mask">[docs]</a>    <span class="k">def</span> <span class="nf">get_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
-        <span class="kn">from</span> <span class="nn">allensdk.core.brain_observatory_nwb_data_set</span> <span class="kn">import</span> <span class="n">make_display_mask</span>
 
         <span class="n">mask</span> <span class="o">=</span> <span class="n">make_display_mask</span><span class="p">(</span><span class="n">display_shape</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_c</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_r</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
         <span class="k">assert</span> <span class="n">mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_r</span>
@@ -611,8 +652,6 @@
         <span class="k">return</span> <span class="n">mask</span></div>
 
 <div class="viewcode-block" id="Monitor.show_image"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.Monitor.show_image">[docs]</a>    <span class="k">def</span> <span class="nf">show_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">warp</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">):</span>
-
-        <span class="kn">from</span> <span class="nn">allensdk.core.brain_observatory_nwb_data_set</span> <span class="kn">import</span> <span class="n">make_display_mask</span>
 
         <span class="k">assert</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_r</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_c</span><span class="p">)</span> <span class="ow">or</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_r</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_c</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
 
@@ -725,15 +764,19 @@
 
         <span class="k">return</span> <span class="n">spndi</span><span class="o">.</span><span class="n">map_coordinates</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiment_geometry</span><span class="o">.</span><span class="n">warp_coordinates</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_r</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_pixels_c</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="BrainObservatoryMonitor.grating_to_screen"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.BrainObservatoryMonitor.grating_to_screen">[docs]</a>    <span class="k">def</span> <span class="nf">grating_to_screen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">spatial_frequency</span><span class="p">,</span> <span class="n">orientation</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryMonitor.grating_to_screen"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.BrainObservatoryMonitor.grating_to_screen">[docs]</a>    <span class="k">def</span> <span class="nf">grating_to_screen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">spatial_frequency</span><span class="p">,</span> <span class="n">orientation</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">BrainObservatoryMonitor</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">grating_to_screen</span><span class="p">(</span><span class="n">phase</span><span class="p">,</span> <span class="n">spatial_frequency</span><span class="p">,</span> <span class="n">orientation</span><span class="p">,</span>
                                                                       <span class="bp">self</span><span class="o">.</span><span class="n">experiment_geometry</span><span class="o">.</span><span class="n">distance</span><span class="p">,</span>
-                                                                      <span class="n">p2p_amp</span> <span class="o">=</span> <span class="mi">256</span><span class="p">,</span> <span class="n">baseline</span> <span class="o">=</span> <span class="mi">127</span><span class="p">)</span></div>
+                                                                      <span class="n">p2p_amp</span> <span class="o">=</span> <span class="mi">256</span><span class="p">,</span> <span class="n">baseline</span> <span class="o">=</span> <span class="mi">127</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BrainObservatoryMonitor.pixels_to_visual_degrees"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.BrainObservatoryMonitor.pixels_to_visual_degrees">[docs]</a>    <span class="k">def</span> <span class="nf">pixels_to_visual_degrees</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
-        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">BrainObservatoryMonitor</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">pixels_to_visual_degrees</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiment_geometry</span><span class="o">.</span><span class="n">distance</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">BrainObservatoryMonitor</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">pixels_to_visual_degrees</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiment_geometry</span><span class="o">.</span><span class="n">distance</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BrainObservatoryMonitor.visual_degrees_to_pixels"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.BrainObservatoryMonitor.visual_degrees_to_pixels">[docs]</a>    <span class="k">def</span> <span class="nf">visual_degrees_to_pixels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vd</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">BrainObservatoryMonitor</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">visual_degrees_to_pixels</span><span class="p">(</span><span class="n">vd</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiment_geometry</span><span class="o">.</span><span class="n">distance</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="warp_stimulus_coords"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.warp_stimulus_coords">[docs]</a><span class="k">def</span> <span class="nf">warp_stimulus_coords</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span>
                          <span class="n">distance</span><span class="o">=</span><span class="mf">15.0</span><span class="p">,</span>

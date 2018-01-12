@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.api.queries.image_download_api &mdash; Allen SDK 0.14.3 documentation</title>
+    <title>allensdk.api.queries.image_download_api &mdash; Allen SDK dev documentation</title>
     
     <link rel="stylesheet" href="../../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '0.14.3',
+        VERSION:     'dev',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.14.3 documentation" href="../../../../index.html" />
+    <link rel="top" title="Allen SDK dev documentation" href="../../../../index.html" />
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
   <body role="document">
@@ -50,7 +50,7 @@
   display: inline-block;
   width: 250px;
   height: 75px;
-  background-image:url("/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-image:url("_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
   background-size: 235px 37px;
   background-position: 0px 20px;
   background-repeat: no-repeat;
@@ -58,7 +58,7 @@
 </style>
 
 <script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
-<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -104,11 +104,12 @@
 <span class="c1"># ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="c1">#</span>
-<span class="kn">from</span> <span class="nn">.rma_api</span> <span class="kn">import</span> <span class="n">RmaApi</span>
+<span class="kn">from</span> <span class="nn">.rma_template</span> <span class="kn">import</span> <span class="n">RmaTemplate</span>
+<span class="kn">from</span> <span class="nn">..cache</span> <span class="kn">import</span> <span class="n">cacheable</span>
 <span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">string_types</span>
 
 
-<div class="viewcode-block" id="ImageDownloadApi"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.image_download_api.ImageDownloadApi">[docs]</a><span class="k">class</span> <span class="nc">ImageDownloadApi</span><span class="p">(</span><span class="n">RmaApi</span><span class="p">):</span>
+<div class="viewcode-block" id="ImageDownloadApi"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.image_download_api.ImageDownloadApi">[docs]</a><span class="k">class</span> <span class="nc">ImageDownloadApi</span><span class="p">(</span><span class="n">RmaTemplate</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;HTTP Client to download whole or partial two-dimensional images from the Allen Institute</span>
 <span class="sd">    with the SectionImage, AtlasImage and ProjectionImage Download Services.</span>
 
@@ -131,8 +132,97 @@
                   <span class="s2">&quot;projection&quot;</span><span class="p">:</span> <span class="mi">11</span>
     <span class="p">}</span>
 
+    <span class="n">rma_templates</span> <span class="o">=</span> \
+        <span class="p">{</span><span class="s2">&quot;image_queries&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;section_image_ranges&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;see name&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="s1">&#39;Equalization&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;num_rows&#39;</span><span class="p">:</span> <span class="s1">&#39;all&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+             <span class="s1">&#39;only&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;blue_lower&#39;</span><span class="p">,</span> <span class="s1">&#39;blue_upper&#39;</span><span class="p">,</span> <span class="s1">&#39;red_lower&#39;</span><span class="p">,</span> <span class="s1">&#39;red_upper&#39;</span><span class="p">,</span> <span class="s1">&#39;green_lower&#39;</span><span class="p">,</span> <span class="s1">&#39;green_upper&#39;</span><span class="p">],</span>
+             <span class="s1">&#39;criteria&#39;</span><span class="p">:</span> <span class="s1">&#39;section_data_set(section_images[id$in{{ section_image_ids }}])&#39;</span><span class="p">,</span> 
+             <span class="s1">&#39;criteria_params&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;section_image_ids&#39;</span><span class="p">]</span>
+             <span class="p">},</span>
+            <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;section_images_by_data_set_id&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;see name&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="s1">&#39;SectionImage&#39;</span><span class="p">,</span> 
+             <span class="s1">&#39;num_rows&#39;</span><span class="p">:</span> <span class="s1">&#39;all&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+             <span class="s1">&#39;criteria&#39;</span><span class="p">:</span> <span class="s1">&#39;[data_set_id$eq{{ data_set_id }}]&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;criteria_params&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;data_set_id&#39;</span><span class="p">]</span>
+              <span class="p">}]}</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">ImageDownloadApi</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">base_uri</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ImageDownloadApi</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">base_uri</span><span class="p">,</span> <span class="n">query_manifest</span><span class="o">=</span><span class="n">ImageDownloadApi</span><span class="o">.</span><span class="n">rma_templates</span><span class="p">)</span>
+
+    <span class="nd">@cacheable</span><span class="p">()</span>
+<div class="viewcode-block" id="ImageDownloadApi.get_section_image_ranges"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.image_download_api.ImageDownloadApi.get_section_image_ranges">[docs]</a>    <span class="k">def</span> <span class="nf">get_section_image_ranges</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section_image_ids</span><span class="p">,</span> <span class="n">num_rows</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">as_lists</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Section images from the Mouse Connectivity Atlas are displayed on connectivity.brain-map.org after having been </span>
+<span class="sd">        linearly windowed and leveled. This method obtains parameters defining channelwise upper and lower bounds of the windows used for </span>
+<span class="sd">        one or more images.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        section_image_ids : list of int</span>
+<span class="sd">            Each element is a unique identifier for a section image.</span>
+<span class="sd">        num_rows : int, optional</span>
+<span class="sd">            how many records to retrieve. Default is &#39;all&#39;.</span>
+<span class="sd">        count : bool, optional</span>
+<span class="sd">            If True, return a count of the lines found by the query. Default is False.</span>
+<span class="sd">        as_lists : bool, optional</span>
+<span class="sd">            If True, return the window parameters in a list, rather than a dict </span>
+<span class="sd">            (this is the format of the range parameter on ImageDownloadApi.download_image). </span>
+<span class="sd">            Default is False.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of dict or list of list : </span>
+<span class="sd">            For each section image id provided, return the window bounds for each channel.</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">dict_ranges</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_query</span><span class="p">(</span><span class="s1">&#39;image_queries&#39;</span><span class="p">,</span> <span class="s1">&#39;section_image_ranges&#39;</span><span class="p">,</span> 
+                                          <span class="n">section_image_ids</span><span class="o">=</span><span class="n">section_image_ids</span><span class="p">,</span> 
+                                          <span class="n">num_rows</span><span class="o">=</span><span class="n">num_rows</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="n">count</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">as_lists</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">dict_ranges</span>
+
+        <span class="n">list_ranges</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">rng</span> <span class="ow">in</span> <span class="n">dict_ranges</span><span class="p">:</span>
+            <span class="n">list_ranges</span><span class="o">.</span><span class="n">append</span><span class="p">([</span> <span class="n">rng</span><span class="p">[</span><span class="s1">&#39;red_lower&#39;</span><span class="p">],</span> <span class="n">rng</span><span class="p">[</span><span class="s1">&#39;red_upper&#39;</span><span class="p">],</span> <span class="n">rng</span><span class="p">[</span><span class="s1">&#39;green_lower&#39;</span><span class="p">],</span> <span class="n">rng</span><span class="p">[</span><span class="s1">&#39;green_upper&#39;</span><span class="p">],</span> <span class="n">rng</span><span class="p">[</span><span class="s1">&#39;blue_lower&#39;</span><span class="p">],</span> <span class="n">rng</span><span class="p">[</span><span class="s1">&#39;blue_upper&#39;</span><span class="p">]</span> <span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">list_ranges</span></div>
+
+    <span class="nd">@cacheable</span><span class="p">()</span>
+<div class="viewcode-block" id="ImageDownloadApi.section_image_query"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.image_download_api.ImageDownloadApi.section_image_query">[docs]</a>    <span class="k">def</span> <span class="nf">section_image_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section_data_set_id</span><span class="p">,</span> <span class="n">num_rows</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;List section images belonging to a specified section data set</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        atlas_id : integer, optional</span>
+<span class="sd">            Find images from this section data set.</span>
+<span class="sd">        num_rows : int</span>
+<span class="sd">            how many records to retrieve. Default is &#39;all&#39;</span>
+<span class="sd">        count : bool</span>
+<span class="sd">            If True, return a count of the lines found by the query.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of dict :</span>
+<span class="sd">            Each element is an SectionImage record.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The SectionDataSet model is used to represent single experiments which produce an array of images. </span>
+<span class="sd">        This includes Mouse Connectivity and Mouse Brain Atlas experiments, among other projects.</span>
+<span class="sd">        You may see references to the ids of experiments from those projects. </span>
+<span class="sd">        These are the same as section data set ids.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_query</span><span class="p">(</span><span class="s1">&#39;image_queries&#39;</span><span class="p">,</span> <span class="s1">&#39;section_images_by_data_set_id&#39;</span><span class="p">,</span> 
+                                   <span class="n">data_set_id</span><span class="o">=</span><span class="n">section_data_set_id</span><span class="p">,</span> 
+                                   <span class="n">num_rows</span><span class="o">=</span><span class="n">num_rows</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="n">count</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ImageDownloadApi.download_section_image"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.image_download_api.ImageDownloadApi.download_section_image">[docs]</a>    <span class="k">def</span> <span class="nf">download_section_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                <span class="n">section_image_id</span><span class="p">,</span>
@@ -379,60 +469,60 @@
 
 
 <div class="viewcode-block" id="ImageDownloadApi.atlas_image_query"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.image_download_api.ImageDownloadApi.atlas_image_query">[docs]</a>    <span class="k">def</span> <span class="nf">atlas_image_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atlas_id</span><span class="p">,</span> <span class="n">image_type_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Build the URL.</span>
+        <span class="sd">&#39;&#39;&#39;List atlas images belonging to a specified atlas</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        atlas_id : integer, optional</span>
-<span class="sd">            request a certain record.</span>
+<span class="sd">            Find images from this atlas.</span>
 <span class="sd">        image_type_name : string, optional</span>
-<span class="sd">            if not present, the query will get it from the atlas id.</span>
+<span class="sd">            Restrict response to images of this type. If not provided, </span>
+<span class="sd">            the query will get it from the atlas id.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        url : string</span>
-<span class="sd">            The constructed URL</span>
+<span class="sd">        list of dict :</span>
+<span class="sd">            Each element is an AtlasImage record.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        See `Downloading Atlas Images and Graphics &lt;http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies#AtlasDrawingsandOntologies-DownloadingAtlasImagesAndGraphics&gt;`_</span>
 <span class="sd">        for additional documentation.</span>
-<span class="sd">        The atlas id can be found with :py:meth:`allensdk.api.queries.ontologies_api.OntologiesApi.build_atlases_query`</span>
+<span class="sd">        :py:meth:`allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases` can also be used to list atlases along with their ids.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">rma</span> <span class="o">=</span> <span class="bp">self</span>
 
         <span class="n">stages</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">if</span> <span class="n">image_type_name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">atlas_stage</span> <span class="o">=</span> <span class="n">rma</span><span class="o">.</span><span class="n">model_stage</span><span class="p">(</span><span class="s1">&#39;Atlas&#39;</span><span class="p">,</span>
-                                          <span class="n">criteria</span><span class="o">=</span><span class="s1">&#39;[id$eq</span><span class="si">%d</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">atlas_id</span><span class="p">),</span>
-                                          <span class="n">only</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;image_type&#39;</span><span class="p">])</span>
+            <span class="n">atlas_stage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_stage</span><span class="p">(</span><span class="s1">&#39;Atlas&#39;</span><span class="p">,</span>
+                                           <span class="n">criteria</span><span class="o">=</span><span class="s1">&#39;[id$eq</span><span class="si">%d</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">atlas_id</span><span class="p">),</span>
+                                           <span class="n">only</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;image_type&#39;</span><span class="p">])</span>
             <span class="n">stages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atlas_stage</span><span class="p">)</span>
 
-            <span class="n">atlas_name_pipe_stage</span> <span class="o">=</span> <span class="n">rma</span><span class="o">.</span><span class="n">pipe_stage</span><span class="p">(</span><span class="s1">&#39;list&#39;</span><span class="p">,</span>
-                                                   <span class="n">parameters</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;type_name&#39;</span><span class="p">,</span>
-                                                                <span class="n">rma</span><span class="o">.</span><span class="n">IS</span><span class="p">,</span>
-                                                                <span class="n">rma</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span><span class="s1">&#39;image_type&#39;</span><span class="p">))])</span>
+            <span class="n">atlas_name_pipe_stage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipe_stage</span><span class="p">(</span><span class="s1">&#39;list&#39;</span><span class="p">,</span>
+                                                    <span class="n">parameters</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;type_name&#39;</span><span class="p">,</span>
+                                                                 <span class="bp">self</span><span class="o">.</span><span class="n">IS</span><span class="p">,</span>
+                                                                 <span class="bp">self</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span><span class="s1">&#39;image_type&#39;</span><span class="p">))])</span>
             <span class="n">stages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atlas_name_pipe_stage</span><span class="p">)</span>
 
             <span class="n">image_type_name</span> <span class="o">=</span> <span class="s1">&#39;$type_name&#39;</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">image_type_name</span> <span class="o">=</span> <span class="n">rma</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span><span class="n">image_type_name</span><span class="p">)</span>
+            <span class="n">image_type_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span><span class="n">image_type_name</span><span class="p">)</span>
 
         <span class="n">criteria_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;[annotated$eqtrue],&#39;</span><span class="p">,</span>
                          <span class="s1">&#39;atlas_data_set(atlases[id$eq</span><span class="si">%d</span><span class="s1">]),&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">atlas_id</span><span class="p">),</span>
                          <span class="s2">&quot;alternate_images[image_type$eq</span><span class="si">%s</span><span class="s2">]&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">image_type_name</span><span class="p">)]</span>
 
-        <span class="n">atlas_image_model_stage</span> <span class="o">=</span> <span class="n">rma</span><span class="o">.</span><span class="n">model_stage</span><span class="p">(</span><span class="s1">&#39;AtlasImage&#39;</span><span class="p">,</span>
-                                                  <span class="n">criteria</span><span class="o">=</span><span class="n">criteria_list</span><span class="p">,</span>
-                                                  <span class="n">order</span><span class="o">=</span><span class="p">[</span>
-                                                      <span class="s1">&#39;sub_images.section_number&#39;</span><span class="p">],</span>
-                                                  <span class="n">num_rows</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
+        <span class="n">atlas_image_model_stage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_stage</span><span class="p">(</span><span class="s1">&#39;AtlasImage&#39;</span><span class="p">,</span>
+                                                   <span class="n">criteria</span><span class="o">=</span><span class="n">criteria_list</span><span class="p">,</span>
+                                                   <span class="n">order</span><span class="o">=</span><span class="p">[</span>
+                                                       <span class="s1">&#39;sub_images.section_number&#39;</span><span class="p">],</span>
+                                                   <span class="n">num_rows</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
 
         <span class="n">stages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atlas_image_model_stage</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">json_msg_query</span><span class="p">(</span>
-            <span class="n">rma</span><span class="o">.</span><span class="n">build_query_url</span><span class="p">(</span><span class="n">stages</span><span class="p">))</span></div></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">build_query_url</span><span class="p">(</span><span class="n">stages</span><span class="p">))</span></div></div>
 </pre></div>
 
           </div>

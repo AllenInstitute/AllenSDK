@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.api.queries.reference_space_api &mdash; Allen SDK 0.14.3 documentation</title>
+    <title>allensdk.api.queries.reference_space_api &mdash; Allen SDK dev documentation</title>
     
     <link rel="stylesheet" href="../../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '0.14.3',
+        VERSION:     'dev',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.14.3 documentation" href="../../../../index.html" />
+    <link rel="top" title="Allen SDK dev documentation" href="../../../../index.html" />
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
   <body role="document">
@@ -50,7 +50,7 @@
   display: inline-block;
   width: 250px;
   height: 75px;
-  background-image:url("/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-image:url("_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
   background-size: 235px 37px;
   background-position: 0px 20px;
   background-repeat: no-repeat;
@@ -58,7 +58,7 @@
 </style>
 
 <script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
-<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -105,11 +105,11 @@
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="c1">#</span>
 <span class="kn">from</span> <span class="nn">.rma_api</span> <span class="kn">import</span> <span class="n">RmaApi</span>
-<span class="kn">from</span> <span class="nn">..cache</span> <span class="kn">import</span> <span class="n">cacheable</span><span class="p">,</span> <span class="n">Cache</span>
+<span class="kn">from</span> <span class="nn">allensdk.api.cache</span> <span class="kn">import</span> <span class="n">cacheable</span><span class="p">,</span> <span class="n">Cache</span>
+<span class="kn">from</span> <span class="nn">allensdk.core.obj_utilities</span> <span class="kn">import</span> <span class="n">read_obj</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">nrrd</span>
 <span class="kn">import</span> <span class="nn">six</span>
-
 
 
 <div class="viewcode-block" id="ReferenceSpaceApi"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.reference_space_api.ReferenceSpaceApi">[docs]</a><span class="k">class</span> <span class="nc">ReferenceSpaceApi</span><span class="p">(</span><span class="n">RmaApi</span><span class="p">):</span>
@@ -196,6 +196,7 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        structure_id : int</span>
+<span class="sd">            Unique identifier for the annotated structure</span>
 <span class="sd">        ccf_version : string</span>
 <span class="sd">            Which reference space version to download. Defaults to &quot;annotation/ccf_2017&quot;</span>
 <span class="sd">        resolution : int</span>
@@ -218,6 +219,38 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_file_download_log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;We weren&#39;t able to download a structure mask for structure {0}. </span>
 <span class="s1">                                             You can instead build the mask locally using </span>
 <span class="s1">                                             ReferenceSpace.many_structure_masks&#39;&#39;&#39;</span><span class="p">)</span>
+            <span class="k">raise</span></div>
+
+
+    <span class="nd">@cacheable</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;create&#39;</span><span class="p">,</span> 
+               <span class="n">reader</span><span class="o">=</span><span class="n">read_obj</span><span class="p">,</span> 
+               <span class="n">pathfinder</span><span class="o">=</span><span class="n">Cache</span><span class="o">.</span><span class="n">pathfinder</span><span class="p">(</span><span class="n">file_name_position</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> 
+                                           <span class="n">path_keyword</span><span class="o">=</span><span class="s1">&#39;file_name&#39;</span><span class="p">))</span>
+<div class="viewcode-block" id="ReferenceSpaceApi.download_structure_mesh"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.reference_space_api.ReferenceSpaceApi.download_structure_mesh">[docs]</a>    <span class="k">def</span> <span class="nf">download_structure_mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_id</span><span class="p">,</span> <span class="n">ccf_version</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Download a Wavefront obj file containing a triangulated 3d mesh built </span>
+<span class="sd">        from an annotated structure.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        structure_id : int</span>
+<span class="sd">            Unique identifier for the annotated structure</span>
+<span class="sd">        ccf_version : string</span>
+<span class="sd">            Which reference space version to download. Defaults to &quot;annotation/ccf_2017&quot;</span>
+<span class="sd">        file_name : string</span>
+<span class="sd">             Where to save the downloaded mask.</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="n">ccf_version</span>  <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">ccf_version</span> <span class="o">=</span> <span class="n">ReferenceSpaceApi</span><span class="o">.</span><span class="n">CCF_VERSION_DEFAULT</span>
+
+        <span class="n">data_path</span> <span class="o">=</span> <span class="s1">&#39;{0}/{1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ccf_version</span><span class="p">,</span> <span class="s1">&#39;structure_meshes&#39;</span><span class="p">)</span>        
+        <span class="n">remote_file_name</span> <span class="o">=</span> <span class="s1">&#39;{0}.obj&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">structure_id</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">download_volumetric_data</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="n">remote_file_name</span><span class="p">,</span> <span class="n">save_file_path</span><span class="o">=</span><span class="n">file_name</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_file_download_log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;unable to download a structure mesh for structure {0}.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">structure_id</span><span class="p">))</span>
             <span class="k">raise</span></div>
 
 
@@ -302,6 +335,7 @@
             <span class="n">save_file_path</span> <span class="o">=</span> <span class="s1">&#39;volumetric_data.nrrd&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_file_over_http</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">save_file_path</span><span class="p">)</span></div></div>
+
 </pre></div>
 
           </div>

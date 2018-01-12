@@ -60,6 +60,14 @@ allensdk.core.nwb_data_set module
     :undoc-members:
     :show-inheritance:
 
+allensdk.core.obj_utilities module
+----------------------------------
+
+.. automodule:: allensdk.core.obj_utilities
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 allensdk.core.ontology module
 -----------------------------
 

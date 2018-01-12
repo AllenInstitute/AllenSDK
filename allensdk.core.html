@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.core package &mdash; Allen SDK 0.14.3 documentation</title>
+    <title>allensdk.core package &mdash; Allen SDK dev documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.14.3',
+        VERSION:     'dev',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.14.3 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK dev documentation" href="index.html" />
     <link rel="up" title="allensdk package" href="allensdk.html" />
     <link rel="next" title="allensdk.ephys package" href="allensdk.ephys.html" />
     <link rel="prev" title="allensdk.config.model.formats package" href="allensdk.config.model.formats.html" /> 
@@ -52,7 +52,7 @@
   display: inline-block;
   width: 250px;
   height: 75px;
-  background-image:url("/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-image:url("_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
   background-size: 235px 37px;
   background-position: 0px 20px;
   background-repeat: no-repeat;
@@ -60,7 +60,7 @@
 </style>
 
 <script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
-<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -107,11 +107,11 @@ in the function call (e.g. get_ophys_experiment_data(file_name=&#8217;file.nwb&#
 <p class="rubric">Attributes</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="31%" />
-<col width="69%" />
+<col width="34%" />
+<col width="66%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td>api: BrainObservatoryApi instance</td>
+<tr class="row-odd"><td><strong>api: BrainObservatoryApi instance</strong></td>
 <td>The object used for making API queries related to the Brain Observatory.</td>
 </tr>
 </tbody>
@@ -1052,11 +1052,11 @@ in the function call (e.g. get_ephys_data(file_name=&#8217;file.nwb&#8217;)).</p
 <p class="rubric">Attributes</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="26%" />
-<col width="74%" />
+<col width="29%" />
+<col width="71%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td>api: CellTypesApi instance</td>
+<tr class="row-odd"><td><strong>api: CellTypesApi instance</strong></td>
 <td>The object used for making API queries related to the Cell Types Database</td>
 </tr>
 </tbody>
@@ -1607,14 +1607,14 @@ in the function call (e.g. get_projection_density(file_name=&#8217;file.nrrd&#82
 <p class="rubric">Attributes</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="16%" />
-<col width="84%" />
+<col width="18%" />
+<col width="82%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td>resolution: int</td>
+<tr class="row-odd"><td><strong>resolution: int</strong></td>
 <td>Resolution of grid data to be downloaded when accessing projection volume, the annotation volume, and the annotation volume.  Must be one of (10, 25, 50, 100).  Default is 25.</td>
 </tr>
-<tr class="row-even"><td>api: MouseConnectivityApi instance</td>
+<tr class="row-even"><td><strong>api: MouseConnectivityApi instance</strong></td>
 <td>Used internally to make API queries.</td>
 </tr>
 </tbody>
@@ -1646,7 +1646,7 @@ in the function call (e.g. get_projection_density(file_name=&#8217;file.nrrd&#82
 
 <dl class="attribute">
 <dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.MANIFEST_VERSION">
-<code class="descname">MANIFEST_VERSION</code><em class="property"> = 1.1</em><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.MANIFEST_VERSION" title="Permalink to this definition">¶</a></dt>
+<code class="descname">MANIFEST_VERSION</code><em class="property"> = 1.2</em><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.MANIFEST_VERSION" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -2255,6 +2255,57 @@ size.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="module-allensdk.core.obj_utilities">
+<span id="allensdk-core-obj-utilities-module"></span><h2>allensdk.core.obj_utilities module<a class="headerlink" href="#module-allensdk.core.obj_utilities" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="allensdk.core.obj_utilities.parse_obj">
+<code class="descclassname">allensdk.core.obj_utilities.</code><code class="descname">parse_obj</code><span class="sig-paren">(</span><em>lines</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/obj_utilities.html#parse_obj"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.obj_utilities.parse_obj" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse a wavefront obj file into a triplet of vertices, normals, and faces. 
+This parser is specific to obj files generated from our annotation volumes</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>lines</strong> : list of str</p>
+<blockquote>
+<div><p>Lines of input obj file</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>vertices</strong> : np.ndarray</p>
+<blockquote>
+<div><p>Dimensions are (nSamples, nCoordinates=3). Locations in the reference space
+of vertices</p>
+</div></blockquote>
+<p><strong>vertex_normals</strong> : np.ndarray</p>
+<blockquote>
+<div><p>Dimensions are (nSample, nElements=3). Vectors normal to vertices.</p>
+</div></blockquote>
+<p><strong>face_vertices</strong> : np.ndarray</p>
+<blockquote>
+<div><p>Dimensions are (sample, nVertices=3). References are given in indices 
+(0-indexed here, but 1-indexed in the file) of vertices that make up each face.</p>
+</div></blockquote>
+<p><strong>face_normals</strong> : np.ndarray</p>
+<blockquote class="last">
+<div><p>Dimensions are (sample, nNormals=3). References are given in indices 
+(0-indexed here, but 1-indexed in the file) of vertex normals that make up each face.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This parser is specialized to the obj files that the Allen Institute for Brain Science 
+generates from our own structure annotations.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.core.obj_utilities.read_obj">
+<code class="descclassname">allensdk.core.obj_utilities.</code><code class="descname">read_obj</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/obj_utilities.html#read_obj"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.obj_utilities.read_obj" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
 <div class="section" id="module-allensdk.core.ontology">
 <span id="allensdk-core-ontology-module"></span><h2>allensdk.core.ontology module<a class="headerlink" href="#module-allensdk.core.ontology" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -2683,7 +2734,7 @@ the supplied set.</p>
 
 <dl class="attribute">
 <dt id="allensdk.core.reference_space_cache.ReferenceSpaceCache.MANIFEST_VERSION">
-<code class="descname">MANIFEST_VERSION</code><em class="property"> = 1.1</em><a class="headerlink" href="#allensdk.core.reference_space_cache.ReferenceSpaceCache.MANIFEST_VERSION" title="Permalink to this definition">¶</a></dt>
+<code class="descname">MANIFEST_VERSION</code><em class="property"> = 1.2</em><a class="headerlink" href="#allensdk.core.reference_space_cache.ReferenceSpaceCache.MANIFEST_VERSION" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -2699,6 +2750,11 @@ the supplied set.</p>
 <dl class="attribute">
 <dt id="allensdk.core.reference_space_cache.ReferenceSpaceCache.STRUCTURE_MASK_KEY">
 <code class="descname">STRUCTURE_MASK_KEY</code><em class="property"> = 'STRUCTURE_MASK'</em><a class="headerlink" href="#allensdk.core.reference_space_cache.ReferenceSpaceCache.STRUCTURE_MASK_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.reference_space_cache.ReferenceSpaceCache.STRUCTURE_MESH_KEY">
+<code class="descname">STRUCTURE_MESH_KEY</code><em class="property"> = 'STRUCTURE_MESH'</em><a class="headerlink" href="#allensdk.core.reference_space_cache.ReferenceSpaceCache.STRUCTURE_MESH_KEY" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -2809,6 +2865,55 @@ file_name will be pulled out of the manifest.  Default is None.</p>
 <p class="rubric">Notes</p>
 <p>This method downloads structure masks from the Allen Institute. To make your own locally, see 
 ReferenceSpace.many_structure_masks.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.reference_space_cache.ReferenceSpaceCache.get_structure_mesh">
+<code class="descname">get_structure_mesh</code><span class="sig-paren">(</span><em>structure_id</em>, <em>file_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/reference_space_cache.html#ReferenceSpaceCache.get_structure_mesh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.reference_space_cache.ReferenceSpaceCache.get_structure_mesh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Obtain a 3D mesh specifying the surface of an annotated structure.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>structure_id: int</strong></p>
+<blockquote>
+<div><p>ID of a structure.</p>
+</div></blockquote>
+<p><strong>file_name: string</strong></p>
+<blockquote>
+<div><p>File name to store the structure mesh.  If it already exists,
+it will be read from this file.  If file_name is None, the
+file_name will be pulled out of the manifest.  Default is None.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>vertices</strong> : np.ndarray</p>
+<blockquote>
+<div><p>Dimensions are (nSamples, nCoordinates=3). Locations in the reference space
+of vertices</p>
+</div></blockquote>
+<p><strong>vertex_normals</strong> : np.ndarray</p>
+<blockquote>
+<div><p>Dimensions are (nSample, nElements=3). Vectors normal to vertices.</p>
+</div></blockquote>
+<p><strong>face_vertices</strong> : np.ndarray</p>
+<blockquote>
+<div><p>Dimensions are (sample, nVertices=3). References are given in indices 
+(0-indexed here, but 1-indexed in the file) of vertices that make up each face.</p>
+</div></blockquote>
+<p><strong>face_normals</strong> : np.ndarray</p>
+<blockquote class="last">
+<div><p>Dimensions are (sample, nNormals=3). References are given in indices 
+(0-indexed here, but 1-indexed in the file) of vertex normals that make up each face.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>These meshes are meant for 3D visualization and as such have been smoothed. 
+If you are interested in performing quantative analyses, we recommend that you 
+use the structure masks instead.</p>
 </dd></dl>
 
 <dl class="method">

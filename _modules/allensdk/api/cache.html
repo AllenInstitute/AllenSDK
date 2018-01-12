@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.api.cache &mdash; Allen SDK 0.14.3 documentation</title>
+    <title>allensdk.api.cache &mdash; Allen SDK dev documentation</title>
     
     <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.14.3',
+        VERSION:     'dev',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.14.3 documentation" href="../../../index.html" />
+    <link rel="top" title="Allen SDK dev documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body role="document">
@@ -50,7 +50,7 @@
   display: inline-block;
   width: 250px;
   height: 75px;
-  background-image:url("/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-image:url("_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
   background-size: 235px 37px;
   background-position: 0px 20px;
   background-repeat: no-repeat;
@@ -58,7 +58,7 @@
 </style>
 
 <script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
-<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -107,15 +107,17 @@
 <span class="kn">from</span> <span class="nn">allensdk.config.manifest</span> <span class="kn">import</span> <span class="n">Manifest</span><span class="p">,</span> <span class="n">ManifestVersionError</span>
 <span class="kn">from</span> <span class="nn">allensdk.config.manifest_builder</span> <span class="kn">import</span> <span class="n">ManifestBuilder</span>
 <span class="kn">import</span> <span class="nn">allensdk.core.json_utilities</span> <span class="kn">as</span> <span class="nn">ju</span>
+<span class="kn">from</span> <span class="nn">allensdk.deprecated</span> <span class="kn">import</span> <span class="n">deprecated</span>
+
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">pandas.io.json</span> <span class="kn">as</span> <span class="nn">pj</span>
+
 <span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">allensdk.deprecated</span> <span class="kn">import</span> <span class="n">deprecated</span>
 <span class="kn">import</span> <span class="nn">csv</span>
 
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
 
 <div class="viewcode-block" id="memoize"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.memoize">[docs]</a><span class="k">def</span> <span class="nf">memoize</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
    <span class="n">memodict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>

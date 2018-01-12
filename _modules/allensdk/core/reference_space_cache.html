@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.core.reference_space_cache &mdash; Allen SDK 0.14.3 documentation</title>
+    <title>allensdk.core.reference_space_cache &mdash; Allen SDK dev documentation</title>
     
     <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.14.3',
+        VERSION:     'dev',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.14.3 documentation" href="../../../index.html" />
+    <link rel="top" title="Allen SDK dev documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body role="document">
@@ -50,7 +50,7 @@
   display: inline-block;
   width: 250px;
   height: 75px;
-  background-image:url("/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-image:url("_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
   background-size: 235px 37px;
   background-position: 0px 20px;
   background-repeat: no-repeat;
@@ -58,7 +58,7 @@
 </style>
 
 <script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
-<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -123,8 +123,9 @@
     <span class="n">STRUCTURES_KEY</span> <span class="o">=</span> <span class="s1">&#39;STRUCTURES&#39;</span>
     <span class="n">STRUCTURE_TREE_KEY</span> <span class="o">=</span> <span class="s1">&#39;STRUCTURE_TREE&#39;</span>
     <span class="n">STRUCTURE_MASK_KEY</span> <span class="o">=</span> <span class="s1">&#39;STRUCTURE_MASK&#39;</span>
+    <span class="n">STRUCTURE_MESH_KEY</span> <span class="o">=</span> <span class="s1">&#39;STRUCTURE_MESH&#39;</span>
 
-    <span class="n">MANIFEST_VERSION</span> <span class="o">=</span> <span class="mf">1.1</span>
+    <span class="n">MANIFEST_VERSION</span> <span class="o">=</span> <span class="mf">1.2</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
                  <span class="n">resolution</span><span class="p">,</span> 
@@ -287,6 +288,50 @@
                                                 <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;lazy&#39;</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="ReferenceSpaceCache.get_structure_mesh"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.reference_space_cache.ReferenceSpaceCache.get_structure_mesh">[docs]</a>    <span class="k">def</span> <span class="nf">get_structure_mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_id</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Obtain a 3D mesh specifying the surface of an annotated structure.</span>
+<span class="sd">    </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        structure_id: int</span>
+<span class="sd">            ID of a structure.</span>
+<span class="sd">        file_name: string</span>
+<span class="sd">            File name to store the structure mesh.  If it already exists,</span>
+<span class="sd">            it will be read from this file.  If file_name is None, the</span>
+<span class="sd">            file_name will be pulled out of the manifest.  Default is None.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        vertices : np.ndarray</span>
+<span class="sd">            Dimensions are (nSamples, nCoordinates=3). Locations in the reference space</span>
+<span class="sd">            of vertices</span>
+<span class="sd">        vertex_normals : np.ndarray</span>
+<span class="sd">            Dimensions are (nSample, nElements=3). Vectors normal to vertices.</span>
+<span class="sd">        face_vertices : np.ndarray</span>
+<span class="sd">            Dimensions are (sample, nVertices=3). References are given in indices </span>
+<span class="sd">            (0-indexed here, but 1-indexed in the file) of vertices that make up each face.</span>
+<span class="sd">        face_normals : np.ndarray</span>
+<span class="sd">            Dimensions are (sample, nNormals=3). References are given in indices </span>
+<span class="sd">            (0-indexed here, but 1-indexed in the file) of vertex normals that make up each face.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        These meshes are meant for 3D visualization and as such have been smoothed. </span>
+<span class="sd">        If you are interested in performing quantative analyses, we recommend that you </span>
+<span class="sd">        use the structure masks instead.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">structure_id</span> <span class="o">=</span> <span class="n">ReferenceSpaceCache</span><span class="o">.</span><span class="n">validate_structure_id</span><span class="p">(</span><span class="n">structure_id</span><span class="p">)</span>
+
+        <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cache_path</span><span class="p">(</span>
+            <span class="n">file_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">STRUCTURE_MESH_KEY</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_space_key</span><span class="p">,</span> <span class="n">structure_id</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">download_structure_mesh</span><span class="p">(</span><span class="n">structure_id</span><span class="p">,</span> 
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">reference_space_key</span><span class="p">,</span>
+                                                <span class="n">file_name</span><span class="p">,</span> 
+                                                <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;lazy&#39;</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="ReferenceSpaceCache.add_manifest_paths"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.reference_space_cache.ReferenceSpaceCache.add_manifest_paths">[docs]</a>    <span class="k">def</span> <span class="nf">add_manifest_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">manifest_builder</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Construct a manifest for this Cache class and save it in a file.</span>
@@ -323,6 +368,11 @@
 
         <span class="n">manifest_builder</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">STRUCTURE_MASK_KEY</span><span class="p">,</span>
                                   <span class="s1">&#39;structure_masks/resolution_</span><span class="si">%d</span><span class="s1">/structure_</span><span class="si">%d</span><span class="s1">.nrrd&#39;</span><span class="p">,</span>
+                                  <span class="n">parent_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">REFERENCE_SPACE_VERSION_KEY</span><span class="p">,</span>
+                                  <span class="n">typename</span><span class="o">=</span><span class="s1">&#39;file&#39;</span><span class="p">)</span>
+
+        <span class="n">manifest_builder</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">STRUCTURE_MESH_KEY</span><span class="p">,</span>
+                                  <span class="s1">&#39;structure_meshes/structure_</span><span class="si">%d</span><span class="s1">.obj&#39;</span><span class="p">,</span>
                                   <span class="n">parent_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">REFERENCE_SPACE_VERSION_KEY</span><span class="p">,</span>
                                   <span class="n">typename</span><span class="o">=</span><span class="s1">&#39;file&#39;</span><span class="p">)</span>
 

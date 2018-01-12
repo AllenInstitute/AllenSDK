@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.brain_observatory package &mdash; Allen SDK 0.14.3 documentation</title>
+    <title>allensdk.brain_observatory package &mdash; Allen SDK dev documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.14.3',
+        VERSION:     'dev',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.14.3 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK dev documentation" href="index.html" />
     <link rel="up" title="allensdk package" href="allensdk.html" />
     <link rel="next" title="allensdk.brain_observatory.receptive_field_analysis package" href="allensdk.brain_observatory.receptive_field_analysis.html" />
     <link rel="prev" title="allensdk.api.queries package" href="allensdk.api.queries.html" /> 
@@ -52,7 +52,7 @@
   display: inline-block;
   width: 250px;
   height: 75px;
-  background-image:url("/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-image:url("_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
   background-size: 235px 37px;
   background-position: 0px 20px;
   background-repeat: no-repeat;
@@ -60,7 +60,7 @@
 </style>
 
 <script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
-<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -2373,7 +2373,7 @@ The return is a 3-tuple of:</p>
 <a class="reference external" href="https://www.cnet.com/products/asus-pa248q/specs/">https://www.cnet.com/products/asus-pa248q/specs/</a></p>
 <dl class="method">
 <dt id="allensdk.brain_observatory.stimulus_info.BrainObservatoryMonitor.grating_to_screen">
-<code class="descname">grating_to_screen</code><span class="sig-paren">(</span><em>phase</em>, <em>spatial_frequency</em>, <em>orientation</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#BrainObservatoryMonitor.grating_to_screen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.BrainObservatoryMonitor.grating_to_screen" title="Permalink to this definition">¶</a></dt>
+<code class="descname">grating_to_screen</code><span class="sig-paren">(</span><em>phase</em>, <em>spatial_frequency</em>, <em>orientation</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#BrainObservatoryMonitor.grating_to_screen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.BrainObservatoryMonitor.grating_to_screen" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -2384,6 +2384,11 @@ The return is a 3-tuple of:</p>
 <dl class="method">
 <dt id="allensdk.brain_observatory.stimulus_info.BrainObservatoryMonitor.pixels_to_visual_degrees">
 <code class="descname">pixels_to_visual_degrees</code><span class="sig-paren">(</span><em>n</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#BrainObservatoryMonitor.pixels_to_visual_degrees"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.BrainObservatoryMonitor.pixels_to_visual_degrees" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.stimulus_info.BrainObservatoryMonitor.visual_degrees_to_pixels">
+<code class="descname">visual_degrees_to_pixels</code><span class="sig-paren">(</span><em>vd</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#BrainObservatoryMonitor.visual_degrees_to_pixels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.BrainObservatoryMonitor.visual_degrees_to_pixels" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -2425,7 +2430,7 @@ The return is a 3-tuple of:</p>
 
 <dl class="method">
 <dt id="allensdk.brain_observatory.stimulus_info.Monitor.grating_to_screen">
-<code class="descname">grating_to_screen</code><span class="sig-paren">(</span><em>phase</em>, <em>spatial_frequency</em>, <em>orientation</em>, <em>distance_from_monitor</em>, <em>p2p_amp=256</em>, <em>baseline=127</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#Monitor.grating_to_screen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.Monitor.grating_to_screen" title="Permalink to this definition">¶</a></dt>
+<code class="descname">grating_to_screen</code><span class="sig-paren">(</span><em>phase</em>, <em>spatial_frequency</em>, <em>orientation</em>, <em>distance_from_monitor</em>, <em>p2p_amp=256</em>, <em>baseline=127</em>, <em>translation=(0</em>, <em>0)</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#Monitor.grating_to_screen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.Monitor.grating_to_screen" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -2435,7 +2440,7 @@ The return is a 3-tuple of:</p>
 
 <dl class="method">
 <dt id="allensdk.brain_observatory.stimulus_info.Monitor.lsn_image_to_screen">
-<code class="descname">lsn_image_to_screen</code><span class="sig-paren">(</span><em>img</em>, <em>stimulus_type</em>, <em>origin='lower'</em>, <em>background_color=127</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#Monitor.lsn_image_to_screen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.Monitor.lsn_image_to_screen" title="Permalink to this definition">¶</a></dt>
+<code class="descname">lsn_image_to_screen</code><span class="sig-paren">(</span><em>img</em>, <em>stimulus_type</em>, <em>origin='lower'</em>, <em>background_color=127</em>, <em>translation=(0</em>, <em>0)</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#Monitor.lsn_image_to_screen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.Monitor.lsn_image_to_screen" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -2445,12 +2450,12 @@ The return is a 3-tuple of:</p>
 
 <dl class="method">
 <dt id="allensdk.brain_observatory.stimulus_info.Monitor.natural_movie_image_to_screen">
-<code class="descname">natural_movie_image_to_screen</code><span class="sig-paren">(</span><em>img</em>, <em>origin='lower'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#Monitor.natural_movie_image_to_screen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.Monitor.natural_movie_image_to_screen" title="Permalink to this definition">¶</a></dt>
+<code class="descname">natural_movie_image_to_screen</code><span class="sig-paren">(</span><em>img</em>, <em>origin='lower'</em>, <em>translation=(0</em>, <em>0)</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#Monitor.natural_movie_image_to_screen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.Monitor.natural_movie_image_to_screen" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="allensdk.brain_observatory.stimulus_info.Monitor.natural_scene_image_to_screen">
-<code class="descname">natural_scene_image_to_screen</code><span class="sig-paren">(</span><em>img</em>, <em>origin='lower'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#Monitor.natural_scene_image_to_screen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.Monitor.natural_scene_image_to_screen" title="Permalink to this definition">¶</a></dt>
+<code class="descname">natural_scene_image_to_screen</code><span class="sig-paren">(</span><em>img</em>, <em>origin='lower'</em>, <em>translation=(0</em>, <em>0)</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#Monitor.natural_scene_image_to_screen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.Monitor.natural_scene_image_to_screen" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -2481,6 +2486,11 @@ The return is a 3-tuple of:</p>
 <dl class="method">
 <dt id="allensdk.brain_observatory.stimulus_info.Monitor.spatial_frequency_to_pix_per_cycle">
 <code class="descname">spatial_frequency_to_pix_per_cycle</code><span class="sig-paren">(</span><em>spatial_frequency</em>, <em>distance_from_monitor</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#Monitor.spatial_frequency_to_pix_per_cycle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.Monitor.spatial_frequency_to_pix_per_cycle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.stimulus_info.Monitor.visual_degrees_to_pixels">
+<code class="descname">visual_degrees_to_pixels</code><span class="sig-paren">(</span><em>vd</em>, <em>distance_from_monitor</em>, <em>small_angle_approximation=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#Monitor.visual_degrees_to_pixels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.Monitor.visual_degrees_to_pixels" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -2636,6 +2646,11 @@ on screen to count as belonging to the mask.</p>
 </tbody>
 </table>
 </dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.stimulus_info.translate_image_and_fill">
+<code class="descclassname">allensdk.brain_observatory.stimulus_info.</code><code class="descname">translate_image_and_fill</code><span class="sig-paren">(</span><em>img</em>, <em>translation=(0</em>, <em>0)</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_info.html#translate_image_and_fill"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_info.translate_image_and_fill" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="function">
 <dt id="allensdk.brain_observatory.stimulus_info.warp_stimulus_coords">

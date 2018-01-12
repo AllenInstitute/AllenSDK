@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Brain Observatory &mdash; Allen SDK 0.14.3 documentation</title>
+    <title>Brain Observatory &mdash; Allen SDK dev documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.14.3',
+        VERSION:     'dev',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.14.3 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK dev documentation" href="index.html" />
     <link rel="up" title="Data Resources" href="data_resources.html" />
     <link rel="next" title="Cell Types" href="cell_types.html" />
     <link rel="prev" title="Data Resources" href="data_resources.html" /> 
@@ -52,7 +52,7 @@
   display: inline-block;
   width: 250px;
   height: 75px;
-  background-image:url("/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-image:url("_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
   background-size: 235px 37px;
   background-position: 0px 20px;
   background-repeat: no-repeat;
@@ -60,7 +60,7 @@
 </style>
 
 <script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
-<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -78,7 +78,7 @@ tuning, spatial and temporal frequency tuning, temporal dynamics, and spatial re
 <p>The data is organized into experiments and experiment containers.  An experiment container represents a group of
 experiments with the same targeted imaging area, imaging depth, and Cre line.  The individual experiments within
 an experiment container have different stimulus protocols, but cover the same imaging field of view.</p>
-<img alt="_images/container_session_layout.png" class="align-center" src="_images/container_session_layout.png" />
+<img alt="_static/container_session_layout.png" class="align-center" src="_static/container_session_layout.png" />
 <p><strong>Note:</strong> Data collected after September 2016 uses a new session C stimulus designed to better-characterize spatial receptive fields in
 higher visual areas.  The original locally sparse noise stimulus used 4.65 visual degree pixels.  Session C2 broke that stimulus
 into two separate stimulus blocks: one with 4.65 degree pixels and one with 9.3 degree pixels.  Note that the <a class="reference internal" href="allensdk.brain_observatory.html#module-allensdk.brain_observatory.stimulus_info" title="allensdk.brain_observatory.stimulus_info"><code class="xref py py-mod docutils literal"><span class="pre">stimulus_info</span></code></a>
