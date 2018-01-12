@@ -1,5 +1,7 @@
 # Contributing to the AllenSDK
 
+Thank you for your interest in contributing!
+
 ### Bug reports and feature requests
 
 * Before reporting a bug or requesting a feature, use Github's issue search to see if anyone else has already done so.
@@ -36,7 +38,7 @@ Also, every time you push to your fork, the issue page will be updated with a li
 **If you are adding functionality, you must also add tests.**
 * When you are ready, create a pull request from your fork to the main repository. The title should be brief and descriptive, 
 and the body of the pull request should include the phrase `Resolves #issue_number`, as well as a short description of the changes that you have implemented.
-    * Before creating a pull request, make sure that your changes do not conflict with work in the main repository by rebasing or merging from the main repository into your fork.
+    * Before creating a pull request, make sure that your changes do not conflict with work in the main repository by [rebasing or merging](https://www.atlassian.com/git/tutorials/merging-vs-rebasing) from the main repository into your fork.
 
 ###### Branches
 
@@ -44,5 +46,5 @@ There are two branches that you might want to base your work on:`master` and `in
 The distinction comes down to whether your changes depend on API features or data that have not yet been publically released by the Allen Institute for Brain Science.
 If the answer to this question is "yes," you should branch from `internal`. Otherwise, branch from `master`.
 
-Whenever a feature branch is merged into `master`, `master` should be merged into `internal`. 
-Merges in the other direction, from `internal` to `master`, will be performed during Allen Institute data releases.
+Whenever a feature branch is merged into `master`, `master` should be merged into `internal` to ensure that the branches do not diverge. 
+Merges in the other direction, from `internal` to `master`, will be performed during Allen Institute data releases, when the new API features and data become publically available.
