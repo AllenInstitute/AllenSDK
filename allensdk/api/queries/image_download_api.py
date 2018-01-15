@@ -152,7 +152,7 @@ class ImageDownloadApi(RmaTemplate):
 
         Notes
         -----
-        See :py:meth:`allensdk.api.queries.image_download_api.ImageDownloadApi.get_products` for a list of products.
+        See http://api.brain-map.org/api/v2/data/query.json?criteria=model::Product for a list of products.
 
         '''
 
