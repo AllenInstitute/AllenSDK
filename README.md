@@ -7,6 +7,9 @@ in the [Allen Brain Atlas](http://brain-map.org/).
 
 Please visit http://alleninstitute.github.io/AllenSDK for more information.
 
+We welcome contributions! See the [contribution guide](CONTRIBUTING.md) here.
+
+
 # Authors
 
 Tim Fliss @tfliss
@@ -40,3 +43,5 @@ Saskia de Vries @saskiad
 Derric Williams @derricw
 
 Jed Perkins @jfperkins
+
+Joe Knox @jknox13

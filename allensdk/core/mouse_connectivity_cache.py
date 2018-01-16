@@ -49,6 +49,7 @@ from allensdk.config.manifest import Manifest
 import warnings
 import operator as op
 import functools
+from six.moves import reduce
 
 
 class MouseConnectivityCache(ReferenceSpaceCache):
