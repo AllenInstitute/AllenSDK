@@ -37,6 +37,7 @@ from __future__ import division, print_function, absolute_import
 import re
 import operator as op
 from six import iteritems, string_types
+from six.moves import xrange
 
 import numpy as np
 
