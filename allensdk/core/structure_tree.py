@@ -37,7 +37,6 @@ from __future__ import division, print_function, absolute_import
 import re
 import operator as op
 from six import iteritems, string_types
-from six.moves import xrange
 
 import numpy as np
 
@@ -377,7 +376,7 @@ class StructureTree( SimpleTree ):
         if hex_color[0] == '#':
             hex_color = hex_color[1:]
         
-        return [int(hex_color[a * 2: a*2 + 2], 16) for a in xrange(3)] 
+        return [int(hex_color[a * 2: a*2 + 2], 16) for a in range(3)] 
     
 
     @staticmethod
