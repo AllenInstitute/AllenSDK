@@ -265,7 +265,7 @@ def check_thresholds_and_peaks(v, t, spike_indexes, peak_indexes, upstroke_index
     if not end:
         end = t[-1]
 
-    overlaps = np.flatnonzero(spike_indexes[1:] <= peak_indexes[:-1])
+    overlaps = np.flatnonzero(spike_indexes[1:] <= peak_indexes[:-1] + 1)
     if overlaps.size:
         spike_mask = np.ones_like(spike_indexes, dtype=bool)
         spike_mask[overlaps + 1] = False
