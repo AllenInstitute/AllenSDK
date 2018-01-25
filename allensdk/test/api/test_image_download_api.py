@@ -66,7 +66,17 @@ def test_get_section_data_sets_by_product(image_api):
 
     image_api.json_msg_query.assert_called_once_with('http://api.brain-map.org/api/v2/data/query.json?'\
                                                      'q=model::SectionDataSet,'\
-                                                     'rma::criteria,products[id$in10,22],'\
+                                                     'rma::criteria,[failed$in\'false\'],products[id$in10,22],'\
+                                                     'rma::options[num_rows$eq\'all\'][count$eqfalse]')
+
+def test_get_section_data_sets_by_product_failedok(image_api):
+
+    product_ids = [10, 22]
+    image_api.get_section_data_sets_by_product(product_ids, include_failed=True)
+
+    image_api.json_msg_query.assert_called_once_with('http://api.brain-map.org/api/v2/data/query.json?'\
+                                                     'q=model::SectionDataSet,'\
+                                                     'rma::criteria,[failed$in\'false\',\'true\'],products[id$in10,22],'\
                                                      'rma::options[num_rows$eq\'all\'][count$eqfalse]')
 
 def test_get_section_image_ranges_as_list(image_api):

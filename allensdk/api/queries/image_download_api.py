@@ -85,8 +85,8 @@ class ImageDownloadApi(RmaTemplate):
              'model': 'SectionDataSet',
              'num_rows': 'all',
              'count': False,
-             'criteria': 'products[id$in{{ product_ids }}]',
-             'criteria_params': ['product_ids']
+             'criteria': '[failed$in{{failed}}],products[id$in{{ product_ids }}]',
+             'criteria_params': ['product_ids', 'failed']
               }]}
 
     def __init__(self, base_uri=None):
@@ -133,13 +133,15 @@ class ImageDownloadApi(RmaTemplate):
 
 
     @cacheable()
-    def get_section_data_sets_by_product(self, product_ids, num_rows='all', count=False, **kwargs):
+    def get_section_data_sets_by_product(self, product_ids, include_failed=False, num_rows='all', count=False, **kwargs):
         '''List all of the section data sets produced as part of one or more products
 
         Parameters
         ----------
         product_ids : list of int
             Integer specifiers for Allen Institute products. A product is a set of related data.
+        include_failed : bool, optional
+            If True, find both failed and passed datasets. Default is False
         num_rows : int, optional
             how many records to retrieve. Default is 'all'.
         count : bool, optional
@@ -156,8 +158,14 @@ class ImageDownloadApi(RmaTemplate):
 
         '''
 
+        if include_failed:
+            failed_crit = "\'false\',\'true\'"
+        else:
+            failed_crit = "\'false\'"
+
         return self.template_query('image_queries', 'section_data_sets_by_product_id', 
                                    product_ids=product_ids, 
+                                   failed=failed_crit,
                                    num_rows=num_rows, count=count)
 
 
