@@ -43,7 +43,7 @@ and the body of the pull request should include the phrase `Resolves #issue_numb
 ###### Branches
 
 There are two branches that you might want to base your work on:`master` and `internal`. 
-The distinction comes down to whether your changes depend on API features or data that have not yet been publically released by the Allen Institute for Brain Science.
+The distinction comes down to whether your changes depend on API features or data that have not yet been publicly released by the Allen Institute for Brain Science.
 If the answer to this question is "yes," you should branch from `internal`. Otherwise, branch from `master`.
 
 Whenever a feature branch is merged into `master`, `master` should be merged into `internal` to ensure that the branches do not diverge. 

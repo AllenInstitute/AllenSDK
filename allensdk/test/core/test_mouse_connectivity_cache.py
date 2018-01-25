@@ -69,13 +69,12 @@ def old_nodes():
              'color_hex_triplet': '000000', 'acronym': 'rt', 
              'name': 'root', 'parent_structure_id': 12}]
 
-
 @pytest.fixture(scope='function')
 def experiments():
 
     return [{'num-voxels': 100, 'injection-volume': 99, 'sum': 98, 
              'name': 'foo', 'transgenic-line': 'most_creish', 
-             'structure-id': 97,}]
+             'structure-id': 97}]
 
 
 @pytest.fixture(scope='function')
@@ -281,6 +280,10 @@ def test_filter_experiments(mcc, fn_temp_dir, experiments):
     assert len(pass_line) == 1
     assert len(fail_line) == 0
 
+    sid_line = mcc.filter_experiments(experiments, cre=True,
+                                      injection_structure_ids=[97,98])
+
+    assert len(sid_line) == 1
 
 def test_rank_structures(mcc, top_injection_unionizes, fn_temp_dir):
 
@@ -336,6 +339,11 @@ def test_filter_structure_unionizes(mcc, unionizes):
 
     assert obtained.loc[0, 'volume'] == 0.016032
 
+    obt_sid = mcc.filter_structure_unionizes(pd.DataFrame(unionizes),
+                                              hemisphere_ids=[1],
+                                              structure_ids=[1,60,90])
+
+    assert obtained.loc[0, 'volume'] == 0.016032
 
 def test_get_structure_unionizes(mcc, unionizes):
 
