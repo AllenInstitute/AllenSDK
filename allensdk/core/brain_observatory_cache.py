@@ -79,10 +79,14 @@ class BrainObservatoryCache(Cache):
     STIMULUS_MAPPINGS_KEY = 'STIMULUS_MAPPINGS'
     MANIFEST_VERSION=None
 
-    def __init__(self, cache=True, manifest_file='brain_observatory_manifest.json', base_uri=None):
+    def __init__(self, cache=True, manifest_file='brain_observatory_manifest.json', base_uri=None, api=None):
         super(BrainObservatoryCache, self).__init__(
             manifest=manifest_file, cache=cache, version=self.MANIFEST_VERSION)
-        self.api = BrainObservatoryApi(base_uri=base_uri)
+        
+        if api is None:
+            self.api = BrainObservatoryApi(base_uri=base_uri)
+        else:
+            self.api = api
 
     def get_all_targeted_structures(self):
         """ Return a list of all targeted structures in the data set. """
