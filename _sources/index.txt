@@ -94,7 +94,7 @@ What's New - Release 0.14.4 (January 30th, 2018)
 The 0.14.4 release brings support for Python 3.6 along with Python 2.7. These changes maintain compatibility with Python 2.7, so users who continue 
 to work in Python 2.7 will not experience any disruptions.
 
-The :py:class`~allensdk.ephys.ephys_features.filter_putative_spikes` function now excludes candidate spikes when the voltage trace does not show a 
+The :py:func:`~allensdk.ephys.ephys_features.filter_putative_spikes` function now excludes candidate spikes when the voltage trace does not show a 
 decrease between the candidate's peak and the next candidate's threshold-crossing.
 
 
