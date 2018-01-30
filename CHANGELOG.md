@@ -1,6 +1,13 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [0.14.4] - 2018-01-30
+
+### Changed
+
+- Numerous Python 2/3 compatibility fixes
+- Improved spike filtering in ephys.ephys_features
+
 ## [0.14.3] - 2017-10-19
 
 ### Added
