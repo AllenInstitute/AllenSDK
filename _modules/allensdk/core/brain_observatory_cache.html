@@ -150,10 +150,14 @@
     <span class="n">STIMULUS_MAPPINGS_KEY</span> <span class="o">=</span> <span class="s1">&#39;STIMULUS_MAPPINGS&#39;</span>
     <span class="n">MANIFEST_VERSION</span><span class="o">=</span><span class="bp">None</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">manifest_file</span><span class="o">=</span><span class="s1">&#39;brain_observatory_manifest.json&#39;</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">manifest_file</span><span class="o">=</span><span class="s1">&#39;brain_observatory_manifest.json&#39;</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">api</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">BrainObservatoryCache</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span>
             <span class="n">manifest</span><span class="o">=</span><span class="n">manifest_file</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="n">cache</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">MANIFEST_VERSION</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">api</span> <span class="o">=</span> <span class="n">BrainObservatoryApi</span><span class="p">(</span><span class="n">base_uri</span><span class="o">=</span><span class="n">base_uri</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">api</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">api</span> <span class="o">=</span> <span class="n">BrainObservatoryApi</span><span class="p">(</span><span class="n">base_uri</span><span class="o">=</span><span class="n">base_uri</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">api</span> <span class="o">=</span> <span class="n">api</span>
 
 <div class="viewcode-block" id="BrainObservatoryCache.get_all_targeted_structures"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_all_targeted_structures">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_targeted_structures</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Return a list of all targeted structures in the data set. &quot;&quot;&quot;</span>
@@ -466,6 +470,7 @@
 
         <span class="n">cell_specimens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">get_cell_metrics</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">file_name</span><span class="p">,</span>
                                                    <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;lazy&#39;</span><span class="p">,</span>
+                                                   <span class="n">pre</span><span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">[</span><span class="n">y</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span><span class="p">],</span> 
                                                    <span class="o">**</span><span class="n">Cache</span><span class="o">.</span><span class="n">cache_json</span><span class="p">())</span>
 
         <span class="n">cell_specimens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">filter_cell_specimens</span><span class="p">(</span><span class="n">cell_specimens</span><span class="p">,</span>

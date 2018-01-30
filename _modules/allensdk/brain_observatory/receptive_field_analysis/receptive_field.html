@@ -113,7 +113,7 @@
 
 <div class="viewcode-block" id="events_to_pvalues_no_fdr_correction"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.receptive_field.events_to_pvalues_no_fdr_correction">[docs]</a><span class="k">def</span> <span class="nf">events_to_pvalues_no_fdr_correction</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">event_vector</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">number_of_shuffles</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">response_detection_error_std_dev</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
 
-    <span class="n">number_of_pixels</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">number_of_pixels</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span>
 
     <span class="c1"># Initializations:</span>
     <span class="n">number_of_events</span> <span class="o">=</span> <span class="n">event_vector</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
@@ -137,7 +137,7 @@
     <span class="n">event_vector</span> <span class="o">=</span> <span class="n">detect_events</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">cell_index</span><span class="p">,</span> <span class="n">stimulus</span><span class="p">)</span>
 
     <span class="n">A_blur</span> <span class="o">=</span> <span class="n">get_A_blur</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">stimulus</span><span class="p">)</span>
-    <span class="n">number_of_pixels</span> <span class="o">=</span> <span class="n">A_blur</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span>
+    <span class="n">number_of_pixels</span> <span class="o">=</span> <span class="n">A_blur</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span>
 
     <span class="n">pvalues</span> <span class="o">=</span> <span class="n">events_to_pvalues_no_fdr_correction</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">event_vector</span><span class="p">,</span> <span class="n">A_blur</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 

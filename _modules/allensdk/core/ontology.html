@@ -128,15 +128,16 @@
         <span class="n">descendant_ids</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="n">sid</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">name</span>
             <span class="n">parent_id</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;parent_structure_id&#39;</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">parent_id</span><span class="p">):</span>
                 <span class="n">parent_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">parent_id</span><span class="p">)</span>
-                <span class="n">child_ids</span><span class="p">[</span><span class="n">parent_id</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
+                <span class="n">child_ids</span><span class="p">[</span><span class="n">parent_id</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sid</span><span class="p">)</span>
 
             <span class="n">parent_id_list</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;structure_id_path&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 
             <span class="k">for</span> <span class="n">parent_id</span> <span class="ow">in</span> <span class="n">parent_id_list</span><span class="p">:</span>
-                <span class="n">descendant_ids</span><span class="p">[</span><span class="n">parent_id</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
+                <span class="n">descendant_ids</span><span class="p">[</span><span class="n">parent_id</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sid</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">child_ids</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">child_ids</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">descendant_ids</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">descendant_ids</span><span class="p">)</span>

@@ -108,6 +108,7 @@
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">operator</span> <span class="kn">as</span> <span class="nn">op</span>
 <span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">iteritems</span><span class="p">,</span> <span class="n">string_types</span>
+<span class="kn">import</span> <span class="nn">functools</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 
@@ -188,7 +189,7 @@
 <span class="sd">            </span>
 <span class="sd">        &#39;&#39;&#39;</span>
         
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_nodes</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">names</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes_by_property</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="n">names</span><span class="p">)</span></div>
         
         
 <div class="viewcode-block" id="StructureTree.get_structures_by_acronym"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.structure_tree.StructureTree.get_structures_by_acronym">[docs]</a>    <span class="k">def</span> <span class="nf">get_structures_by_acronym</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acronyms</span><span class="p">):</span>
@@ -206,7 +207,7 @@
 <span class="sd">            </span>
 <span class="sd">        &#39;&#39;&#39;</span>
         
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_nodes</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;acronym&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">acronyms</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes_by_property</span><span class="p">(</span><span class="s1">&#39;acronym&#39;</span><span class="p">,</span> <span class="n">acronyms</span><span class="p">)</span></div>
         
         
 <div class="viewcode-block" id="StructureTree.get_structures_by_set_id"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.structure_tree.StructureTree.get_structures_by_set_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_structures_by_set_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_set_ids</span><span class="p">):</span>
@@ -319,8 +320,8 @@
 <span class="sd">        </span>
 <span class="sd">        &#39;&#39;&#39;</span>
         
-        <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="nb">reduce</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">add</span><span class="p">,</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;structure_set_ids&#39;</span><span class="p">],</span> 
-                                      <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">())))</span></div>
+        <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">add</span><span class="p">,</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;structure_set_ids&#39;</span><span class="p">],</span> 
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="p">())))</span></div>
         
         
 <div class="viewcode-block" id="StructureTree.has_overlaps"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.structure_tree.StructureTree.has_overlaps">[docs]</a>    <span class="k">def</span> <span class="nf">has_overlaps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_ids</span><span class="p">):</span>
@@ -340,7 +341,7 @@
 <span class="sd">        </span>
 <span class="sd">        &#39;&#39;&#39;</span>
     
-        <span class="n">ancestor_ids</span> <span class="o">=</span> <span class="nb">reduce</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">add</span><span class="p">,</span> 
+        <span class="n">ancestor_ids</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">add</span><span class="p">,</span> 
                               <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> 
                                   <span class="bp">self</span><span class="o">.</span><span class="n">ancestor_ids</span><span class="p">(</span><span class="n">structure_ids</span><span class="p">)))</span>
         <span class="k">return</span> <span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">ancestor_ids</span><span class="p">)</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">structure_ids</span><span class="p">))</span></div>
@@ -447,7 +448,7 @@
         <span class="k">if</span> <span class="n">hex_color</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;#&#39;</span><span class="p">:</span>
             <span class="n">hex_color</span> <span class="o">=</span> <span class="n">hex_color</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
         
-        <span class="k">return</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">hex_color</span><span class="p">[</span><span class="n">a</span> <span class="o">*</span> <span class="mi">2</span><span class="p">:</span> <span class="n">a</span><span class="o">*</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">2</span><span class="p">],</span> <span class="mi">16</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span> </div>
+        <span class="k">return</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">hex_color</span><span class="p">[</span><span class="n">a</span> <span class="o">*</span> <span class="mi">2</span><span class="p">:</span> <span class="n">a</span><span class="o">*</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">2</span><span class="p">],</span> <span class="mi">16</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span> </div>
     
 
     <span class="nd">@staticmethod</span>

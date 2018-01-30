@@ -554,7 +554,7 @@ are hyperpolarizing responses.</p>
 
 <dl class="function">
 <dt id="allensdk.ephys.ephys_features.check_thresholds_and_peaks">
-<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">check_thresholds_and_peaks</code><span class="sig-paren">(</span><em>v</em>, <em>t</em>, <em>spike_indexes</em>, <em>peak_indexes</em>, <em>upstroke_indexes</em>, <em>end=None</em>, <em>max_interval=0.005</em>, <em>thresh_frac=0.05</em>, <em>filter=10.0</em>, <em>dvdt=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#check_thresholds_and_peaks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.check_thresholds_and_peaks" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">check_thresholds_and_peaks</code><span class="sig-paren">(</span><em>v</em>, <em>t</em>, <em>spike_indexes</em>, <em>peak_indexes</em>, <em>upstroke_indexes</em>, <em>end=None</em>, <em>max_interval=0.005</em>, <em>thresh_frac=0.05</em>, <em>filter=10.0</em>, <em>dvdt=None</em>, <em>tol=1.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#check_thresholds_and_peaks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.check_thresholds_and_peaks" title="Permalink to this definition">¶</a></dt>
 <dd><p>Validate thresholds and peaks for set of spikes</p>
 <p>Check that peaks and thresholds for consecutive spikes do not overlap
 Spikes with overlapping thresholds and peaks will be merged.</p>
@@ -572,12 +572,13 @@ Spikes with overlapping thresholds and peaks will be merged.</p>
 <p><strong>thresh_frac</strong> : fraction of average upstroke for threshold calculation (optional, default 0.05)</p>
 <p><strong>filter</strong> : cutoff frequency for 4-pole low-pass Bessel filter in kHz (optional, default 10)</p>
 <p><strong>dvdt</strong> : pre-calculated time-derivative of voltage (optional)</p>
+<p><strong>tol</strong> : tolerance for returning to threshold in mV (optional, default 1)</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>spike_indexes</strong> : numpy array of modified spike indexes</p>
 <p><strong>peak_indexes</strong> : numpy array of modified spike peak indexes</p>
 <p><strong>upstroke_indexes</strong> : numpy array of modified spike upstroke indexes</p>
-<p class="last"><strong>clipped</strong> : numpy array of clippped status of spikes</p>
+<p class="last"><strong>clipped</strong> : numpy array of clipped status of spikes</p>
 </td>
 </tr>
 </tbody>
@@ -694,10 +695,11 @@ in spurious spike detection results.</p>
 
 <dl class="function">
 <dt id="allensdk.ephys.ephys_features.filter_putative_spikes">
-<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">filter_putative_spikes</code><span class="sig-paren">(</span><em>v</em>, <em>t</em>, <em>spike_indexes</em>, <em>peak_indexes</em>, <em>min_height=2.0</em>, <em>min_peak=-30.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#filter_putative_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.filter_putative_spikes" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">filter_putative_spikes</code><span class="sig-paren">(</span><em>v</em>, <em>t</em>, <em>spike_indexes</em>, <em>peak_indexes</em>, <em>min_height=2.0</em>, <em>min_peak=-30.0</em>, <em>filter=10.0</em>, <em>dvdt=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#filter_putative_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.filter_putative_spikes" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>Filter out events that are unlikely to be spikes based on:</dt>
 <dd><ul class="first last simple">
+<li>Voltage failing to go down between peak and the next spike&#8217;s threshold</li>
 <li>Height (threshold to peak)</li>
 <li>Absolute peak level</li>
 </ul>
@@ -713,6 +715,8 @@ in spurious spike detection results.</p>
 <p><strong>peak_indexes</strong> : numpy array of indexes of spike peaks</p>
 <p><strong>min_height</strong> : minimum acceptable height from threshold to peak in mV (optional, default 2)</p>
 <p><strong>min_peak</strong> : minimum acceptable absolute peak level in mV (optional, default -30)</p>
+<p><strong>filter</strong> : cutoff frequency for 4-pole low-pass Bessel filter in kHz (optional, default 10)</p>
+<p><strong>dvdt</strong> : pre-calculated time-derivative of voltage (optional)</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>spike_indexes</strong> : numpy array of threshold indexes</p>

@@ -79,7 +79,7 @@
 <span id="allensdk-core-brain-observatory-cache-module"></span><h2>allensdk.core.brain_observatory_cache module<a class="headerlink" href="#module-allensdk.core.brain_observatory_cache" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache">
-<em class="property">class </em><code class="descclassname">allensdk.core.brain_observatory_cache.</code><code class="descname">BrainObservatoryCache</code><span class="sig-paren">(</span><em>cache=True</em>, <em>manifest_file='brain_observatory_manifest.json'</em>, <em>base_uri=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">allensdk.core.brain_observatory_cache.</code><code class="descname">BrainObservatoryCache</code><span class="sig-paren">(</span><em>cache=True</em>, <em>manifest_file='brain_observatory_manifest.json'</em>, <em>base_uri=None</em>, <em>api=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="allensdk.api.html#allensdk.api.cache.Cache" title="allensdk.api.cache.Cache"><code class="xref py py-class docutils literal"><span class="pre">allensdk.api.cache.Cache</span></code></a></p>
 <p>Cache class for storing and accessing data from the Brain Observatory.
 By default, this class will cache any downloaded metadata or files in
@@ -3209,6 +3209,40 @@ A -&gt; B -&gt; C</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="allensdk.core.simple_tree.SimpleTree.nodes_by_property">
+<code class="descname">nodes_by_property</code><span class="sig-paren">(</span><em>key</em>, <em>values</em>, <em>to_fn=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/simple_tree.html#SimpleTree.nodes_by_property"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.simple_tree.SimpleTree.nodes_by_property" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get nodes by a specified property</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>key</strong> : hashable or function</p>
+<blockquote>
+<div><p>The property used for lookup. Should be unique. If a function, will 
+be invoked on each node.</p>
+</div></blockquote>
+<p><strong>values</strong> : list</p>
+<blockquote>
+<div><p>Select matching elements from the lookup.</p>
+</div></blockquote>
+<p><strong>to_fn</strong> : function, optional</p>
+<blockquote>
+<div><p>Defines the outputs, on a per-node basis. Defaults to returning 
+the whole node.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list :</p>
+<blockquote class="last">
+<div><p>outputs, 1 for each input value.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="allensdk.core.simple_tree.SimpleTree.parent">
 <code class="descname">parent</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/simple_tree.html#SimpleTree.parent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.simple_tree.SimpleTree.parent" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -3278,7 +3312,7 @@ nodes</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>from_fn</strong> : function | node dict =&gt; hashable value</p>
 <blockquote>
 <div><p>The keys of the output dictionary will be obtained by calling 
-from_fn on each node.</p>
+from_fn on each node. Should be unique.</p>
 </div></blockquote>
 <p><strong>to_fn</strong> : function | node_dict =&gt; value</p>
 <blockquote>
@@ -3296,8 +3330,6 @@ defined by to_fn across nodes.</p>
 </tr>
 </tbody>
 </table>
-<p class="rubric">Notes</p>
-<p>The resulting map is not necessarily 1-to-1!</p>
 </dd></dl>
 
 </dd></dl>

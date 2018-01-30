@@ -84,8 +84,40 @@
 
 <dl class="function">
 <dt id="allensdk.brain_observatory.receptive_field_analysis.chisquarerf.build_trial_matrix">
-<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.chisquarerf.</code><code class="descname">build_trial_matrix</code><span class="sig-paren">(</span><em>LSN_template</em>, <em>num_trials</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/chisquarerf.html#build_trial_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.build_trial_matrix" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.chisquarerf.</code><code class="descname">build_trial_matrix</code><span class="sig-paren">(</span><em>LSN_template</em>, <em>num_trials</em>, <em>on_off_luminance=(255</em>, <em>0)</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/chisquarerf.html#build_trial_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.build_trial_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct indicator arrays for on/off pixels across trials.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>LSN_template</strong> : np.ndarray</p>
+<blockquote>
+<div><p>Dimensions are (nTrials, nYPixels, nXPixels). Luminance values per pixel 
+and trial. The size of the first dimension may be larger than the num_trials 
+argument (in which case only the first num_trials slices will be used) 
+but may not be smaller.</p>
+</div></blockquote>
+<p><strong>num_trials</strong> : int</p>
+<blockquote>
+<div><p>The number of trials (left-justified) to build indicators for.</p>
+</div></blockquote>
+<p><strong>on_off_luminance</strong> : array-like, optional</p>
+<blockquote>
+<div><p>The zeroth element is the luminance value of a pixel when on, the first when off.
+Defaults are [255, 0].</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>trial_mat</strong> : np.ndarray</p>
+<blockquote class="last">
+<div><p>Dimensions are (nYPixels, nXPixels, {on, off}, nTrials). Boolean values 
+indicate that a pixel was on/off on a particular trial.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="allensdk.brain_observatory.receptive_field_analysis.chisquarerf.chi_square_binary">
@@ -95,22 +127,191 @@
 <dl class="function">
 <dt id="allensdk.brain_observatory.receptive_field_analysis.chisquarerf.chi_square_within_mask">
 <code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.chisquarerf.</code><code class="descname">chi_square_within_mask</code><span class="sig-paren">(</span><em>exclusion_mask</em>, <em>events_per_pixel</em>, <em>trials_per_pixel</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/chisquarerf.html#chi_square_within_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.chi_square_within_mask" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Determine if cells respond preferentially to on/off pixels in a mask using
+a chi2 test.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>exclusion_mask</strong> : np.ndarray</p>
+<blockquote>
+<div><p>Dimensions are (nYPixels, nXPixels, {on, off}). Integer indicator for INCLUSION (!) 
+of a pixel within the testing region.</p>
+</div></blockquote>
+<p><strong>events_per_pixel</strong> : np.ndarray</p>
+<blockquote>
+<div><p>Dimensions are (nCells, nYPixels, nXPixels, {on, off}). Integer values 
+are response counts by cell to on/off luminance at each pixel.</p>
+</div></blockquote>
+<p><strong>trials_per_pixel</strong> : np.ndarray</p>
+<blockquote>
+<div><p>Dimensions are (nYPixels, nXPixels, {on, off}). Integer values are 
+counts of trials where a pixel is on/off.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>p_vals</strong> : np.ndarray</p>
+<blockquote>
+<div><p>One-dimensional, of length nCells. Float values are p-values 
+for the hypothesis that a given cell has a receptive field within the 
+exclusion mask.</p>
+</div></blockquote>
+<p><strong>chi</strong> : np.ndarray</p>
+<blockquote class="last">
+<div><p>Dimensions are (nCells, nYPixels, nXPixels, {on, off}). Values (float) 
+are squared residual event counts divided by expected event counts.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="allensdk.brain_observatory.receptive_field_analysis.chisquarerf.deinterpolate_RF">
 <code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.chisquarerf.</code><code class="descname">deinterpolate_RF</code><span class="sig-paren">(</span><em>rf_map</em>, <em>x_pnts</em>, <em>y_pnts</em>, <em>deg_per_pnt</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/chisquarerf.html#deinterpolate_RF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.deinterpolate_RF" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Downsample an image</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>rf_map</strong> : np.ndarray</p>
+<blockquote>
+<div><p>Input image</p>
+</div></blockquote>
+<p><strong>x_pnts</strong> : np.ndarray</p>
+<blockquote>
+<div><p>Count of sample points along the first (column) axis</p>
+</div></blockquote>
+<p><strong>y_pnts</strong> : np.ndarray</p>
+<blockquote>
+<div><p>Count of sample points along the zeroth (row) axis</p>
+</div></blockquote>
+<p><strong>deg_per_pnt</strong> : numeric</p>
+<blockquote>
+<div><p>scale factor</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>sampled_yx</strong> : np.ndarray</p>
+<blockquote class="last">
+<div><p>Downsampled image</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="allensdk.brain_observatory.receptive_field_analysis.chisquarerf.get_disc_masks">
-<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.chisquarerf.</code><code class="descname">get_disc_masks</code><span class="sig-paren">(</span><em>LSN_template</em>, <em>radius=3</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/chisquarerf.html#get_disc_masks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.get_disc_masks" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.chisquarerf.</code><code class="descname">get_disc_masks</code><span class="sig-paren">(</span><em>LSN_template</em>, <em>radius=3</em>, <em>on_luminance=255</em>, <em>off_luminance=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/chisquarerf.html#get_disc_masks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.get_disc_masks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Obtain an indicator mask surrounding each pixel. The mask is a square, excluding pixels which 
+are coactive on any trial with the main pixel.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>LSN_template</strong> : np.ndarray</p>
+<blockquote>
+<div><p>Dimensions are (nTrials, nYPixels, nXPixels). Luminance values per pixel 
+and trial.</p>
+</div></blockquote>
+<p><strong>radius</strong> : int</p>
+<blockquote>
+<div><p>The base mask will be a box whose sides are 2 * radius + 1 in length.</p>
+</div></blockquote>
+<p><strong>on_luminance</strong> : int, optional</p>
+<blockquote>
+<div><p>The value of the luminance for on trials. Default is 255</p>
+</div></blockquote>
+<p><strong>off_luminance</strong> : int, optional</p>
+<blockquote>
+<div><p>The value of the luminance for off trials. Default is 0</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>masks</strong> : np.ndarray</p>
+<blockquote class="last">
+<div><p>Dimensions are (nYPixels, nXPixels, nYPixels, nXPixels). The first 2 
+dimensions describe the pixel from which the mask was computed. The last 
+2 serve as the dimensions of the mask images themselves. Masks are binary 
+arrays of type float, with 1 indicating inside, 0 outside.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="allensdk.brain_observatory.receptive_field_analysis.chisquarerf.get_events_per_pixel">
 <code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.chisquarerf.</code><code class="descname">get_events_per_pixel</code><span class="sig-paren">(</span><em>responses_np</em>, <em>trial_matrix</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/chisquarerf.html#get_events_per_pixel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.get_events_per_pixel" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Obtain a matrix linking cellular responses to pixel activity.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>responses_np</strong> : np.ndarray</p>
+<blockquote>
+<div><p>Dimensions are (nTrials, nCells). Boolean values indicate presence/absence
+of a response on a given trial.</p>
+</div></blockquote>
+<p><strong>trial_matrix</strong> : np.ndarray</p>
+<blockquote>
+<div><p>Dimensions are (nYPixels, nXPixels, {on, off}, nTrials). Boolean values 
+indicate that a pixel was on/off on a particular trial.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>events_per_pixel</strong> : np.ndarray</p>
+<blockquote class="last">
+<div><p>Dimensions are (nCells, nYPixels, nXPixels, {on, off}). Values for each 
+cell, pixel, and on/off state are the sum of events for that cell across 
+all trials where the pixel was in the on/off state.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.chisquarerf.get_expected_events_by_pixel">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.chisquarerf.</code><code class="descname">get_expected_events_by_pixel</code><span class="sig-paren">(</span><em>exclusion_mask</em>, <em>events_per_pixel</em>, <em>trials_per_pixel</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/chisquarerf.html#get_expected_events_by_pixel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.get_expected_events_by_pixel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate expected number of events per pixel</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>exclusion_mask</strong> : np.ndarray</p>
+<blockquote>
+<div><p>Dimensions are (nYPixels, nXPixels, {on, off}). Integer indicator for INCLUSION (!) 
+of a pixel within the testing region.</p>
+</div></blockquote>
+<p><strong>events_per_pixel</strong> : np.ndarray</p>
+<blockquote>
+<div><p>Dimensions are (nCells, nYPixels, nXPixels, {on, off}). Integer values 
+are response counts by cell to on/off luminance at each pixel.</p>
+</div></blockquote>
+<p><strong>trials_per_pixel</strong> : np.ndarray</p>
+<blockquote>
+<div><p>Dimensions are (nYPixels, nXPixels, {on, off}). Integer values are 
+counts of trials where a pixel is on/off.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">np.ndarray :</p>
+<blockquote class="last">
+<div><p>Dimensions (nCells, nYPixels, nXPixels, {on, off}). Float values are 
+pixelwise counts of events expected if events are evenly distributed
+in mask across trials.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="allensdk.brain_observatory.receptive_field_analysis.chisquarerf.get_peak_significance">
@@ -120,6 +321,34 @@
 <dl class="function">
 <dt id="allensdk.brain_observatory.receptive_field_analysis.chisquarerf.interpolate_RF">
 <code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.chisquarerf.</code><code class="descname">interpolate_RF</code><span class="sig-paren">(</span><em>rf_map</em>, <em>deg_per_pnt</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/chisquarerf.html#interpolate_RF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.interpolate_RF" title="Permalink to this definition">¶</a></dt>
+<dd><p>Upsample an image</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>rf_map</strong> : np.ndarray</p>
+<blockquote>
+<div><p>Input image</p>
+</div></blockquote>
+<p><strong>deg_per_pnt</strong> : numeric</p>
+<blockquote>
+<div><p>scale factor</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>interpolated</strong> : np.ndarray</p>
+<blockquote class="last">
+<div><p>Upsampled image</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.receptive_field_analysis.chisquarerf.locate_median">
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.chisquarerf.</code><code class="descname">locate_median</code><span class="sig-paren">(</span><em>y</em>, <em>x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/chisquarerf.html#locate_median"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.locate_median" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
@@ -129,8 +358,37 @@
 
 <dl class="function">
 <dt id="allensdk.brain_observatory.receptive_field_analysis.chisquarerf.smooth_STA">
-<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.chisquarerf.</code><code class="descname">smooth_STA</code><span class="sig-paren">(</span><em>STA</em>, <em>gauss_std=0.75</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/chisquarerf.html#smooth_STA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.smooth_STA" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.chisquarerf.</code><code class="descname">smooth_STA</code><span class="sig-paren">(</span><em>STA</em>, <em>gauss_std=0.75</em>, <em>total_degrees=64</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/chisquarerf.html#smooth_STA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.smooth_STA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Smooth an image by convolution with a gaussian kernel</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>STA</strong> : np.ndarray</p>
+<blockquote>
+<div><p>Input image</p>
+</div></blockquote>
+<p><strong>gauss_std</strong> : numeric, optional</p>
+<blockquote>
+<div><p>Standard deviation of the gaussian kernel. Will be applied to the 
+upsampled image, so units are visual degrees. Default is 0.75</p>
+</div></blockquote>
+<p><strong>total_degrees</strong> : int, optional</p>
+<blockquote>
+<div><p>Size in visual degrees of the input image along its zeroth (row) axis.
+Used to set the scale factor for up/downsampling.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>STA_smoothed</strong> : np.ndarray</p>
+<blockquote class="last">
+<div><p>Smoothed image</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </div>
 <div class="section" id="module-allensdk.brain_observatory.receptive_field_analysis.eventdetection">
@@ -175,22 +433,126 @@
 <dl class="function">
 <dt id="allensdk.brain_observatory.receptive_field_analysis.fitgaussian2D.fitgaussian2D">
 <code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.fitgaussian2D.</code><code class="descname">fitgaussian2D</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/fitgaussian2D.html#fitgaussian2D"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.fitgaussian2D.fitgaussian2D" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="allensdk.brain_observatory.receptive_field_analysis.fitgaussian2D.fitgaussian2D_fixedcenter">
-<code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.fitgaussian2D.</code><code class="descname">fitgaussian2D_fixedcenter</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/fitgaussian2D.html#fitgaussian2D_fixedcenter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.fitgaussian2D.fitgaussian2D_fixedcenter" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Fit a 2D gaussian to an image</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>data</strong> : np.ndarray</p>
+<blockquote>
+<div><p>input image</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>p2</strong> : list</p>
+<blockquote class="last">
+<div><p>height
+row mean
+column mean
+row standard deviation
+column standard deviation
+rotation</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>see gaussian2D for details about output values</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="allensdk.brain_observatory.receptive_field_analysis.fitgaussian2D.gaussian2D">
 <code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.fitgaussian2D.</code><code class="descname">gaussian2D</code><span class="sig-paren">(</span><em>height</em>, <em>center_x</em>, <em>center_y</em>, <em>width_x</em>, <em>width_y</em>, <em>rotation</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/fitgaussian2D.html#gaussian2D"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.fitgaussian2D.gaussian2D" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Build a function which evaluates a scaled 2d gaussian pdf</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>height</strong> : float</p>
+<blockquote>
+<div><p>scale factor</p>
+</div></blockquote>
+<p><strong>center_x</strong> : float</p>
+<blockquote>
+<div><p>first coordinate of mean</p>
+</div></blockquote>
+<p><strong>center_y</strong> : float</p>
+<blockquote>
+<div><p>second coordinate of mean</p>
+</div></blockquote>
+<p><strong>width_x</strong> : float</p>
+<blockquote>
+<div><p>standard deviation along x axis</p>
+</div></blockquote>
+<p><strong>width_y</strong> : float</p>
+<blockquote>
+<div><p>standard deviation along y axis</p>
+</div></blockquote>
+<p><strong>rotation</strong> : float</p>
+<blockquote>
+<div><p>degrees clockwise by which to rotate the gaussian</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">rotgauss: fn</p>
+<blockquote class="last">
+<div><p>parameters are x and y positions (row/column semantics are set by your 
+inputs to this function). Return value is the scaled gaussian pdf 
+evaluated at the argued point.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="allensdk.brain_observatory.receptive_field_analysis.fitgaussian2D.moments2">
 <code class="descclassname">allensdk.brain_observatory.receptive_field_analysis.fitgaussian2D.</code><code class="descname">moments2</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/receptive_field_analysis/fitgaussian2D.html#moments2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.receptive_field_analysis.fitgaussian2D.moments2" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Treating input image data as an independent multivariate gaussian, 
+estimate mean and standard deviations</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>data</strong> : np.ndarray</p>
+<blockquote>
+<div><p>2d numpy array.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>height</strong> : float</p>
+<blockquote>
+<div><p>The maximum observed value in the data</p>
+</div></blockquote>
+<p><strong>y</strong> : float</p>
+<blockquote>
+<div><p>Mean row index</p>
+</div></blockquote>
+<p><strong>x</strong> : float</p>
+<blockquote>
+<div><p>Mean column index</p>
+</div></blockquote>
+<p><strong>width_y</strong> : float</p>
+<blockquote>
+<div><p>The standard deviation along the mean row</p>
+</div></blockquote>
+<p><strong>width_x</strong> : float</p>
+<blockquote>
+<div><p>The standard deviation along the mean column</p>
+</div></blockquote>
+<p>None :</p>
+<blockquote class="last">
+<div><p>This function returns an instance of None.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>uses original method from website for finding center</p>
+</dd></dl>
 
 </div>
 <div class="section" id="module-allensdk.brain_observatory.receptive_field_analysis.postprocessing">

@@ -104,14 +104,18 @@
 <span class="c1"># ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="c1">#</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">string_types</span>
+
+<span class="kn">from</span> <span class="nn">allensdk.config.manifest</span> <span class="kn">import</span> <span class="n">Manifest</span>
+<span class="kn">import</span> <span class="nn">allensdk.brain_observatory.stimulus_info</span> <span class="kn">as</span> <span class="nn">stimulus_info</span>
+
 <span class="kn">from</span> <span class="nn">.rma_template</span> <span class="kn">import</span> <span class="n">RmaTemplate</span>
 <span class="kn">from</span> <span class="nn">..cache</span> <span class="kn">import</span> <span class="n">cacheable</span><span class="p">,</span> <span class="n">Cache</span>
 <span class="kn">from</span> <span class="nn">.rma_pager</span> <span class="kn">import</span> <span class="n">pageable</span>
-<span class="kn">from</span> <span class="nn">allensdk.config.manifest</span> <span class="kn">import</span> <span class="n">Manifest</span>
-<span class="kn">import</span> <span class="nn">allensdk.brain_observatory.stimulus_info</span> <span class="kn">as</span> <span class="nn">stimulus_info</span>
-<span class="kn">import</span> <span class="nn">logging</span>
 
 
 <div class="viewcode-block" id="BrainObservatoryApi"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi">[docs]</a><span class="k">class</span> <span class="nc">BrainObservatoryApi</span><span class="p">(</span><span class="n">RmaTemplate</span><span class="p">):</span>
@@ -581,6 +585,7 @@
 <span class="sd">           { &#39;field&#39;: &#39;osi_dg&#39;, &#39;op&#39;: &#39;&gt;&#39;, &#39;value&#39;: 1.0 }.  See _QUERY_TEMPLATES for a full list</span>
 <span class="sd">           of operators.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">queries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataframe_query_string</span><span class="p">(</span><span class="n">filters</span><span class="p">)</span>
         <span class="n">result_dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="n">result_dataframe</span> <span class="o">=</span> <span class="n">result_dataframe</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">queries</span><span class="p">)</span>

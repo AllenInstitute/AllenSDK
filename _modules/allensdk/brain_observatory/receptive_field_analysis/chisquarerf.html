@@ -109,6 +109,11 @@
 <span class="kn">import</span> <span class="nn">scipy.ndimage.filters</span> <span class="kn">as</span> <span class="nn">filt</span>
 <span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="kn">as</span> <span class="nn">stats</span>
 
+
+<span class="n">ON_LUMINANCE</span> <span class="o">=</span> <span class="mi">255</span>
+<span class="n">OFF_LUMINANCE</span> <span class="o">=</span> <span class="mi">0</span>
+
+
 <div class="viewcode-block" id="chi_square_binary"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.chi_square_binary">[docs]</a><span class="k">def</span> <span class="nf">chi_square_binary</span><span class="p">(</span><span class="n">events</span><span class="p">,</span> <span class="n">LSN_template</span><span class="p">):</span>
     <span class="c1"># note: can only be applied to binary events for trial responses</span>
     <span class="c1">#</span>
@@ -120,7 +125,7 @@
     <span class="c1">#</span>
     <span class="c1"># *****OUTPUT*****</span>
     <span class="c1"># chi_square_grid_NLL: 3D numpy float with shape (num_cells,num_y_pixels,num_x_pixels)</span>
-    <span class="c1">#   that gives the negative log-likelihood that a receptive field is contained</span>
+    <span class="c1">#   that gives the p value for the hypothesis that a receptive field is contained</span>
     <span class="c1">#   within a 7x7 pixel mask centered on a given pixel location as measured</span>
     <span class="c1">#   by a chi-square test for the responses among the pixels (both on and off)</span>
     <span class="c1">#   that fall within the mask.</span>
@@ -160,11 +165,7 @@
             <span class="n">p_vals</span><span class="p">,</span> <span class="n">__</span> <span class="o">=</span> <span class="n">chi_square_within_mask</span><span class="p">(</span><span class="n">exclusion_mask</span><span class="p">,</span> <span class="n">events_per_pixel</span><span class="p">,</span> <span class="n">trials_per_pixel</span><span class="p">)</span>
             <span class="n">chi_square_grid</span><span class="p">[:,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">p_vals</span>
 
-    <span class="c1"># convert p-values to negative log-likelihood</span>
-    <span class="c1"># chi_square_grid_NLL = pvalue_to_NLL(chi_square_grid)</span>
-
     <span class="k">return</span> <span class="n">chi_square_grid</span></div>
-
 
 
 <div class="viewcode-block" id="get_peak_significance"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.get_peak_significance">[docs]</a><span class="k">def</span> <span class="nf">get_peak_significance</span><span class="p">(</span><span class="n">chi_square_grid_NLL</span><span class="p">,</span>
@@ -211,21 +212,7 @@
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">p_value_corrected_per_pixel</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
 
             <span class="n">y</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">p_value_corrected_per_pixel</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">)[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="n">num_y</span><span class="p">,</span> <span class="n">num_x</span><span class="p">))</span>
-
-            <span class="n">med_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-            <span class="n">med_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-            <span class="n">center_x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">center_y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)):</span>
-                <span class="n">dx</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">med_x</span>
-                <span class="n">dy</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">med_y</span>
-                <span class="n">dc_x</span> <span class="o">=</span> <span class="n">center_x</span> <span class="o">-</span> <span class="n">med_x</span>
-                <span class="n">dc_y</span> <span class="o">=</span> <span class="n">center_y</span> <span class="o">-</span> <span class="n">med_y</span>
-                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dx</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">dy</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dc_x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">dc_y</span> <span class="o">**</span> <span class="mi">2</span><span class="p">):</span>
-                    <span class="n">center_x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-                    <span class="n">center_y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="n">center_x</span>
-            <span class="n">y</span> <span class="o">=</span> <span class="n">center_y</span>
+            <span class="n">center_y</span><span class="p">,</span> <span class="n">center_x</span> <span class="o">=</span> <span class="n">locate_median</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
 
         <span class="n">best_p</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">p_value_corrected_per_pixel</span><span class="p">[</span><span class="n">y</span><span class="p">,</span><span class="n">x</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">best_p</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">alpha</span><span class="p">:</span>
@@ -237,18 +224,55 @@
     <span class="k">return</span> <span class="n">significant_cells</span><span class="p">,</span> <span class="n">best_p</span><span class="p">,</span> <span class="n">corrected_p_value_array_list</span><span class="p">,</span> <span class="n">best_exclusion_region_list</span></div>
 
 
-<div class="viewcode-block" id="pvalue_to_NLL"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.pvalue_to_NLL">[docs]</a><span class="k">def</span> <span class="nf">pvalue_to_NLL</span><span class="p">(</span><span class="n">p_values</span><span class="p">,</span>
-                  <span class="n">max_NLL</span><span class="o">=</span><span class="mf">10.0</span><span class="p">):</span>
+<div class="viewcode-block" id="locate_median"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.locate_median">[docs]</a><span class="k">def</span> <span class="nf">locate_median</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+
+    <span class="n">med_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">med_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">center_x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">center_y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)):</span>
+        <span class="n">dx</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">med_x</span>
+        <span class="n">dy</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">med_y</span>
+        <span class="n">dc_x</span> <span class="o">=</span> <span class="n">center_x</span> <span class="o">-</span> <span class="n">med_x</span>
+        <span class="n">dc_y</span> <span class="o">=</span> <span class="n">center_y</span> <span class="o">-</span> <span class="n">med_y</span>
+
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dx</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">dy</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dc_x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">dc_y</span> <span class="o">**</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="n">center_x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">center_y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">center_y</span><span class="p">,</span> <span class="n">center_x</span></div>
+
+
+<div class="viewcode-block" id="pvalue_to_NLL"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.pvalue_to_NLL">[docs]</a><span class="k">def</span> <span class="nf">pvalue_to_NLL</span><span class="p">(</span><span class="n">p_values</span><span class="p">,</span> <span class="n">max_NLL</span><span class="o">=</span><span class="mf">10.0</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">p_values</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">max_NLL</span><span class="p">,</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">p_values</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="NLL_to_pvalue"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.NLL_to_pvalue">[docs]</a><span class="k">def</span> <span class="nf">NLL_to_pvalue</span><span class="p">(</span><span class="n">NLLs</span><span class="p">,</span>
-                  <span class="n">log_base</span><span class="o">=</span><span class="mf">10.0</span><span class="p">):</span>
+<div class="viewcode-block" id="NLL_to_pvalue"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.NLL_to_pvalue">[docs]</a><span class="k">def</span> <span class="nf">NLL_to_pvalue</span><span class="p">(</span><span class="n">NLLs</span><span class="p">,</span> <span class="n">log_base</span><span class="o">=</span><span class="mf">10.0</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">log_base</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="n">NLLs</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="get_events_per_pixel"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.get_events_per_pixel">[docs]</a><span class="k">def</span> <span class="nf">get_events_per_pixel</span><span class="p">(</span><span class="n">responses_np</span><span class="p">,</span>
-                         <span class="n">trial_matrix</span><span class="p">):</span>
+<div class="viewcode-block" id="get_events_per_pixel"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.get_events_per_pixel">[docs]</a><span class="k">def</span> <span class="nf">get_events_per_pixel</span><span class="p">(</span><span class="n">responses_np</span><span class="p">,</span> <span class="n">trial_matrix</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Obtain a matrix linking cellular responses to pixel activity.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    responses_np : np.ndarray</span>
+<span class="sd">        Dimensions are (nTrials, nCells). Boolean values indicate presence/absence</span>
+<span class="sd">        of a response on a given trial.</span>
+<span class="sd">    trial_matrix : np.ndarray</span>
+<span class="sd">        Dimensions are (nYPixels, nXPixels, {on, off}, nTrials). Boolean values </span>
+<span class="sd">        indicate that a pixel was on/off on a particular trial.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    events_per_pixel : np.ndarray</span>
+<span class="sd">        Dimensions are (nCells, nYPixels, nXPixels, {on, off}). Values for each </span>
+<span class="sd">        cell, pixel, and on/off state are the sum of events for that cell across </span>
+<span class="sd">        all trials where the pixel was in the on/off state.</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+
     <span class="n">num_cells</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">responses_np</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">num_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">trial_matrix</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">num_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">trial_matrix</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
@@ -263,10 +287,27 @@
     <span class="k">return</span> <span class="n">events_per_pixel</span></div>
 
 
-<div class="viewcode-block" id="smooth_STA"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.smooth_STA">[docs]</a><span class="k">def</span> <span class="nf">smooth_STA</span><span class="p">(</span><span class="n">STA</span><span class="p">,</span>
-               <span class="n">gauss_std</span><span class="o">=</span><span class="mf">0.75</span><span class="p">):</span>
+<div class="viewcode-block" id="smooth_STA"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.smooth_STA">[docs]</a><span class="k">def</span> <span class="nf">smooth_STA</span><span class="p">(</span><span class="n">STA</span><span class="p">,</span> <span class="n">gauss_std</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span> <span class="n">total_degrees</span><span class="o">=</span><span class="mi">64</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Smooth an image by convolution with a gaussian kernel</span>
 
-    <span class="n">deg_per_pnt</span> <span class="o">=</span> <span class="mi">64</span><span class="o">/</span><span class="n">STA</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    STA : np.ndarray</span>
+<span class="sd">        Input image</span>
+<span class="sd">    gauss_std : numeric, optional</span>
+<span class="sd">        Standard deviation of the gaussian kernel. Will be applied to the </span>
+<span class="sd">        upsampled image, so units are visual degrees. Default is 0.75</span>
+<span class="sd">    total_degrees : int, optional</span>
+<span class="sd">        Size in visual degrees of the input image along its zeroth (row) axis.</span>
+<span class="sd">        Used to set the scale factor for up/downsampling.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    STA_smoothed : np.ndarray</span>
+<span class="sd">        Smoothed image</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">deg_per_pnt</span> <span class="o">=</span> <span class="n">total_degrees</span> <span class="o">//</span> <span class="n">STA</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">STA_interpolated</span> <span class="o">=</span> <span class="n">interpolate_RF</span><span class="p">(</span><span class="n">STA</span><span class="p">,</span> <span class="n">deg_per_pnt</span><span class="p">)</span>
     <span class="n">STA_interpolated_smoothed</span> <span class="o">=</span> <span class="n">filt</span><span class="o">.</span><span class="n">gaussian_filter</span><span class="p">(</span><span class="n">STA_interpolated</span><span class="p">,</span> <span class="n">gauss_std</span><span class="p">)</span>
     <span class="n">STA_smoothed</span> <span class="o">=</span> <span class="n">deinterpolate_RF</span><span class="p">(</span><span class="n">STA_interpolated_smoothed</span><span class="p">,</span> <span class="n">STA</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">STA</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">deg_per_pnt</span><span class="p">)</span>
@@ -274,8 +315,22 @@
     <span class="k">return</span> <span class="n">STA_smoothed</span></div>
 
 
-<div class="viewcode-block" id="interpolate_RF"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.interpolate_RF">[docs]</a><span class="k">def</span> <span class="nf">interpolate_RF</span><span class="p">(</span><span class="n">rf_map</span><span class="p">,</span>
-                   <span class="n">deg_per_pnt</span><span class="p">):</span>
+<div class="viewcode-block" id="interpolate_RF"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.interpolate_RF">[docs]</a><span class="k">def</span> <span class="nf">interpolate_RF</span><span class="p">(</span><span class="n">rf_map</span><span class="p">,</span> <span class="n">deg_per_pnt</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Upsample an image</span>
+<span class="sd">      </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    rf_map : np.ndarray</span>
+<span class="sd">        Input image</span>
+<span class="sd">    deg_per_pnt : numeric</span>
+<span class="sd">        scale factor</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    interpolated : np.ndarray</span>
+<span class="sd">        Upsampled image</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
     <span class="n">x_pnts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">rf_map</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">y_pnts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">rf_map</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
@@ -292,6 +347,24 @@
 
 
 <div class="viewcode-block" id="deinterpolate_RF"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.deinterpolate_RF">[docs]</a><span class="k">def</span> <span class="nf">deinterpolate_RF</span><span class="p">(</span><span class="n">rf_map</span><span class="p">,</span> <span class="n">x_pnts</span><span class="p">,</span> <span class="n">y_pnts</span><span class="p">,</span> <span class="n">deg_per_pnt</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Downsample an image</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    rf_map : np.ndarray</span>
+<span class="sd">        Input image</span>
+<span class="sd">    x_pnts : np.ndarray</span>
+<span class="sd">        Count of sample points along the first (column) axis</span>
+<span class="sd">    y_pnts : np.ndarray</span>
+<span class="sd">        Count of sample points along the zeroth (row) axis</span>
+<span class="sd">    deg_per_pnt : numeric</span>
+<span class="sd">        scale factor</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    sampled_yx : np.ndarray</span>
+<span class="sd">        Downsampled image</span>
+<span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="c1"># x_pnts = 28</span>
     <span class="c1"># y_pnts = 16</span>
@@ -308,27 +381,41 @@
     <span class="k">return</span> <span class="n">sampled_yx</span></div>
 
 
-<div class="viewcode-block" id="chi_square_within_mask"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.chi_square_within_mask">[docs]</a><span class="k">def</span> <span class="nf">chi_square_within_mask</span><span class="p">(</span><span class="n">exclusion_mask</span><span class="p">,</span>
-                           <span class="n">events_per_pixel</span><span class="p">,</span>
-                           <span class="n">trials_per_pixel</span><span class="p">):</span>
+<div class="viewcode-block" id="chi_square_within_mask"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.chi_square_within_mask">[docs]</a><span class="k">def</span> <span class="nf">chi_square_within_mask</span><span class="p">(</span><span class="n">exclusion_mask</span><span class="p">,</span> <span class="n">events_per_pixel</span><span class="p">,</span> <span class="n">trials_per_pixel</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Determine if cells respond preferentially to on/off pixels in a mask using</span>
+<span class="sd">    a chi2 test.</span>
+<span class="sd">  </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    exclusion_mask : np.ndarray</span>
+<span class="sd">        Dimensions are (nYPixels, nXPixels, {on, off}). Integer indicator for INCLUSION (!) </span>
+<span class="sd">        of a pixel within the testing region.</span>
+<span class="sd">    events_per_pixel : np.ndarray</span>
+<span class="sd">        Dimensions are (nCells, nYPixels, nXPixels, {on, off}). Integer values </span>
+<span class="sd">        are response counts by cell to on/off luminance at each pixel.</span>
+<span class="sd">    trials_per_pixel : np.ndarray</span>
+<span class="sd">        Dimensions are (nYPixels, nXPixels, {on, off}). Integer values are </span>
+<span class="sd">        counts of trials where a pixel is on/off.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    p_vals : np.ndarray </span>
+<span class="sd">        One-dimensional, of length nCells. Float values are p-values </span>
+<span class="sd">        for the hypothesis that a given cell has a receptive field within the </span>
+<span class="sd">        exclusion mask.</span>
+<span class="sd">    chi : np.ndarray</span>
+<span class="sd">        Dimensions are (nCells, nYPixels, nXPixels, {on, off}). Values (float) </span>
+<span class="sd">        are squared residual event counts divided by expected event counts.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
     <span class="n">num_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">exclusion_mask</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">num_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">exclusion_mask</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">num_cells</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">events_per_pixel</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="c1"># d.f. is number of pixels in mask minus one</span>
     <span class="n">degrees_of_freedom</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">exclusion_mask</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span>
 
-    <span class="c1"># calculate expected number of events per pixel</span>
-    <span class="c1">#   expected_by_pixel has shape (num_cells,num_y,num_x,2)</span>
-    <span class="n">num_trials_by_pixel</span> <span class="o">=</span> <span class="n">exclusion_mask</span> <span class="o">*</span> <span class="n">trials_per_pixel</span>  <span class="c1"># shape is (num_y,num_x,2)</span>
-    <span class="n">total_trials_in_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">num_trials_by_pixel</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
-    <span class="n">events_by_pixel_in_mask</span> <span class="o">=</span> <span class="n">exclusion_mask</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_y</span><span class="p">,</span> <span class="n">num_x</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">events_per_pixel</span>
-    <span class="n">total_events_in_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">events_by_pixel_in_mask</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
-    <span class="n">expected_per_trial</span> <span class="o">=</span> <span class="n">total_events_in_mask</span> <span class="o">/</span> <span class="n">total_trials_in_mask</span>  <span class="c1"># shape is (num_cells,)</span>
-    <span class="n">expected_by_pixel</span> <span class="o">=</span> <span class="n">num_trials_by_pixel</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_y</span><span class="p">,</span> <span class="n">num_x</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">expected_per_trial</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_cells</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-
-    <span class="c1"># calculate observed number of events per pixel</span>
     <span class="c1">#   observed_by_pixel has shape (num_cells,num_y,num_x,2)</span>
+    <span class="n">expected_by_pixel</span> <span class="o">=</span> <span class="n">get_expected_events_by_pixel</span><span class="p">(</span><span class="n">exclusion_mask</span><span class="p">,</span> <span class="n">events_per_pixel</span><span class="p">,</span> <span class="n">trials_per_pixel</span><span class="p">)</span>
     <span class="n">observed_by_pixel</span> <span class="o">=</span> <span class="p">(</span><span class="n">events_per_pixel</span> <span class="o">*</span> <span class="n">exclusion_mask</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_y</span><span class="p">,</span> <span class="n">num_x</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
 
     <span class="c1"># calculate test statistic given observed and expected</span>
@@ -342,26 +429,110 @@
     <span class="k">return</span> <span class="n">p_vals</span><span class="p">,</span> <span class="n">chi</span></div>
 
 
-<div class="viewcode-block" id="build_trial_matrix"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.build_trial_matrix">[docs]</a><span class="k">def</span> <span class="nf">build_trial_matrix</span><span class="p">(</span><span class="n">LSN_template</span><span class="p">,</span>
-                       <span class="n">num_trials</span><span class="p">):</span>
-    <span class="n">num_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">LSN_template</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">num_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">LSN_template</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span>
-    <span class="n">on_off_luminance</span> <span class="o">=</span> <span class="p">[</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+<div class="viewcode-block" id="get_expected_events_by_pixel"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.get_expected_events_by_pixel">[docs]</a><span class="k">def</span> <span class="nf">get_expected_events_by_pixel</span><span class="p">(</span><span class="n">exclusion_mask</span><span class="p">,</span> <span class="n">events_per_pixel</span><span class="p">,</span> <span class="n">trials_per_pixel</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Calculate expected number of events per pixel</span>
 
-    <span class="n">trial_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_y</span><span class="p">,</span> <span class="n">num_x</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">num_trials</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    exclusion_mask : np.ndarray</span>
+<span class="sd">        Dimensions are (nYPixels, nXPixels, {on, off}). Integer indicator for INCLUSION (!) </span>
+<span class="sd">        of a pixel within the testing region.</span>
+<span class="sd">    events_per_pixel : np.ndarray</span>
+<span class="sd">        Dimensions are (nCells, nYPixels, nXPixels, {on, off}). Integer values </span>
+<span class="sd">        are response counts by cell to on/off luminance at each pixel.</span>
+<span class="sd">    trials_per_pixel : np.ndarray</span>
+<span class="sd">        Dimensions are (nYPixels, nXPixels, {on, off}). Integer values are </span>
+<span class="sd">        counts of trials where a pixel is on/off.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray :</span>
+<span class="sd">        Dimensions (nCells, nYPixels, nXPixels, {on, off}). Float values are </span>
+<span class="sd">        pixelwise counts of events expected if events are evenly distributed</span>
+<span class="sd">        in mask across trials.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">num_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">exclusion_mask</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">num_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">exclusion_mask</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">num_cells</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">events_per_pixel</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">exclusion_mask</span> <span class="o">=</span> <span class="n">exclusion_mask</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_y</span><span class="p">,</span> <span class="n">num_x</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">trials_per_pixel</span> <span class="o">=</span> <span class="n">trials_per_pixel</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_y</span><span class="p">,</span> <span class="n">num_x</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">masked_trials</span> <span class="o">=</span> <span class="n">exclusion_mask</span> <span class="o">*</span> <span class="n">trials_per_pixel</span>
+    <span class="n">masked_events</span> <span class="o">=</span> <span class="n">exclusion_mask</span> <span class="o">*</span> <span class="n">events_per_pixel</span>
+
+    <span class="n">total_trials</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">masked_trials</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">total_events_by_cell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">masked_events</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+    
+    <span class="n">expected_by_cell_per_trial</span> <span class="o">=</span> <span class="n">total_events_by_cell</span> <span class="o">/</span> <span class="n">total_trials</span>
+    <span class="k">return</span> <span class="n">masked_trials</span> <span class="o">*</span> <span class="n">expected_by_cell_per_trial</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_cells</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="build_trial_matrix"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.build_trial_matrix">[docs]</a><span class="k">def</span> <span class="nf">build_trial_matrix</span><span class="p">(</span><span class="n">LSN_template</span><span class="p">,</span> 
+                       <span class="n">num_trials</span><span class="p">,</span> 
+                       <span class="n">on_off_luminance</span><span class="o">=</span><span class="p">(</span><span class="n">ON_LUMINANCE</span><span class="p">,</span> <span class="n">OFF_LUMINANCE</span><span class="p">)):</span>
+    <span class="sd">&#39;&#39;&#39;Construct indicator arrays for on/off pixels across trials.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    LSN_template : np.ndarray</span>
+<span class="sd">        Dimensions are (nTrials, nYPixels, nXPixels). Luminance values per pixel </span>
+<span class="sd">        and trial. The size of the first dimension may be larger than the num_trials </span>
+<span class="sd">        argument (in which case only the first num_trials slices will be used) </span>
+<span class="sd">        but may not be smaller.</span>
+<span class="sd">    num_trials : int</span>
+<span class="sd">        The number of trials (left-justified) to build indicators for.</span>
+<span class="sd">    on_off_luminance : array-like, optional</span>
+<span class="sd">        The zeroth element is the luminance value of a pixel when on, the first when off.</span>
+<span class="sd">        Defaults are [255, 0].</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    trial_mat : np.ndarray</span>
+<span class="sd">        Dimensions are (nYPixels, nXPixels, {on, off}, nTrials). Boolean values </span>
+<span class="sd">        indicate that a pixel was on/off on a particular trial.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">_</span><span class="p">,</span> <span class="n">num_y</span><span class="p">,</span> <span class="n">num_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">LSN_template</span><span class="p">)</span>
+    <span class="n">trial_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span> <span class="p">(</span><span class="n">num_y</span><span class="p">,</span> <span class="n">num_x</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">num_trials</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span> <span class="p">)</span>
+
     <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_y</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_x</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">on_off</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
-                <span class="n">frame</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">LSN_template</span><span class="p">[:</span><span class="n">num_trials</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">]</span> <span class="o">==</span> <span class="n">on_off_luminance</span><span class="p">[</span><span class="n">on_off</span><span class="p">])[:,</span> <span class="mi">0</span><span class="p">]</span>
-                <span class="n">trial_mat</span><span class="p">[</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">on_off</span><span class="p">,</span> <span class="n">frame</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">for</span> <span class="n">oo</span><span class="p">,</span> <span class="n">on_off</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">on_off_luminance</span><span class="p">):</span>
+
+                <span class="n">frame</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span> <span class="n">LSN_template</span><span class="p">[:</span><span class="n">num_trials</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">]</span> <span class="o">==</span> <span class="n">on_off</span> <span class="p">)[:,</span> <span class="mi">0</span><span class="p">]</span>
+                <span class="n">trial_mat</span><span class="p">[</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">oo</span><span class="p">,</span> <span class="n">frame</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
 
     <span class="k">return</span> <span class="n">trial_mat</span></div>
 
 
-<div class="viewcode-block" id="get_disc_masks"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.get_disc_masks">[docs]</a><span class="k">def</span> <span class="nf">get_disc_masks</span><span class="p">(</span><span class="n">LSN_template</span><span class="p">,</span>
-                   <span class="n">radius</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
-    <span class="n">on_luminance</span> <span class="o">=</span> <span class="mi">255</span>
-    <span class="n">off_luminance</span> <span class="o">=</span> <span class="mi">0</span>
+<div class="viewcode-block" id="get_disc_masks"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.chisquarerf.get_disc_masks">[docs]</a><span class="k">def</span> <span class="nf">get_disc_masks</span><span class="p">(</span><span class="n">LSN_template</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">on_luminance</span><span class="o">=</span><span class="n">ON_LUMINANCE</span><span class="p">,</span> <span class="n">off_luminance</span><span class="o">=</span><span class="n">OFF_LUMINANCE</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Obtain an indicator mask surrounding each pixel. The mask is a square, excluding pixels which </span>
+<span class="sd">    are coactive on any trial with the main pixel.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    LSN_template : np.ndarray</span>
+<span class="sd">        Dimensions are (nTrials, nYPixels, nXPixels). Luminance values per pixel </span>
+<span class="sd">        and trial.</span>
+<span class="sd">    radius : int</span>
+<span class="sd">        The base mask will be a box whose sides are 2 * radius + 1 in length.</span>
+<span class="sd">    on_luminance : int, optional</span>
+<span class="sd">        The value of the luminance for on trials. Default is 255</span>
+<span class="sd">    off_luminance : int, optional</span>
+<span class="sd">        The value of the luminance for off trials. Default is 0</span>
+<span class="sd">  </span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    masks : np.ndarray</span>
+<span class="sd">        Dimensions are (nYPixels, nXPixels, nYPixels, nXPixels). The first 2 </span>
+<span class="sd">        dimensions describe the pixel from which the mask was computed. The last </span>
+<span class="sd">        2 serve as the dimensions of the mask images themselves. Masks are binary </span>
+<span class="sd">        arrays of type float, with 1 indicating inside, 0 outside.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
     <span class="n">num_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">LSN_template</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">num_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">LSN_template</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span>
 
@@ -371,15 +542,15 @@
     <span class="n">LSN_binary</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">LSN_binary</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
 
     <span class="c1"># get number of trials each pixel is not gray</span>
-    <span class="n">on_trials</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">LSN_binary</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>  <span class="c1"># shape is (num_y,num_x)</span>
+    <span class="n">on_trials</span> <span class="o">=</span> <span class="n">LSN_binary</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>  <span class="c1"># shape is (num_y,num_x)</span>
 
     <span class="n">masks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_y</span><span class="p">,</span> <span class="n">num_x</span><span class="p">,</span> <span class="n">num_y</span><span class="p">,</span> <span class="n">num_x</span><span class="p">))</span>
     <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_y</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_x</span><span class="p">):</span>
-            <span class="n">trials_not_gray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">LSN_binary</span><span class="p">[:,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)[:,</span> <span class="mi">0</span><span class="p">]</span>
-            <span class="n">raw_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">LSN_binary</span><span class="p">[</span><span class="n">trials_not_gray</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">on_trials</span><span class="p">)</span>
+            <span class="n">trials_not_gray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span> <span class="n">LSN_binary</span><span class="p">[:,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)[:,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="n">raw_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span> <span class="n">LSN_binary</span><span class="p">[</span><span class="n">trials_not_gray</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">on_trials</span> <span class="p">)</span> 
 
-            <span class="n">center_y</span><span class="p">,</span> <span class="n">center_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">raw_mask</span><span class="o">.</span><span class="n">argmax</span><span class="p">(),</span> <span class="p">(</span><span class="n">num_y</span><span class="p">,</span> <span class="n">num_x</span><span class="p">))</span>
+            <span class="n">center_y</span><span class="p">,</span> <span class="n">center_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span> <span class="n">raw_mask</span><span class="o">.</span><span class="n">argmax</span><span class="p">(),</span> <span class="p">(</span><span class="n">num_y</span><span class="p">,</span> <span class="n">num_x</span><span class="p">)</span> <span class="p">)</span>
 
             <span class="c1"># include center pixel in mask</span>
             <span class="n">raw_mask</span><span class="p">[</span><span class="n">center_y</span><span class="p">,</span> <span class="n">center_x</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>

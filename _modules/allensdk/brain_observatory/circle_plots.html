@@ -104,14 +104,16 @@
 <span class="c1"># ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="c1">#</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">math</span>
+
 <span class="k">try</span><span class="p">:</span>
     <span class="nb">xrange</span>
 <span class="k">except</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">past.builtins</span> <span class="kn">import</span> <span class="nb">xrange</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">matplotlib.colors</span> <span class="kn">import</span> <span class="n">LinearSegmentedColormap</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">matplotlib.patches</span> <span class="kn">as</span> <span class="nn">mpatches</span>
@@ -119,6 +121,8 @@
 <span class="kn">import</span> <span class="nn">matplotlib.transforms</span> <span class="kn">as</span> <span class="nn">mxfms</span>
 <span class="kn">import</span> <span class="nn">matplotlib.colors</span> <span class="kn">as</span> <span class="nn">mcolors</span>
 <span class="kn">import</span> <span class="nn">skimage.transform</span>
+<span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">iteritems</span>
+
 
 <span class="n">DEFAULT_COLOR_MAP</span> <span class="o">=</span> <span class="n">LinearSegmentedColormap</span><span class="o">.</span><span class="n">from_list</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="p">[[</span><span class="o">.</span><span class="mi">7</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">.</span><span class="mi">7</span><span class="p">,</span><span class="mf">0.0</span><span class="p">],[</span><span class="o">.</span><span class="mi">7</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]])</span>
 <span class="n">DEFAULT_MEAN_RESP_COLOR_MAP</span> <span class="o">=</span> <span class="n">LinearSegmentedColormap</span><span class="o">.</span><span class="n">from_list</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="p">[[</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">0.0</span><span class="p">],[</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">0.5</span><span class="p">,</span><span class="mi">1</span><span class="p">]])</span>
@@ -344,7 +348,7 @@
         <span class="n">color_map</span> <span class="o">=</span> <span class="n">LSN_ON_COLOR_MAP</span> <span class="k">if</span> <span class="n">on</span> <span class="k">else</span> <span class="n">LSN_OFF_COLOR_MAP</span>
 
     <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
-    <span class="k">for</span> <span class="p">(</span><span class="n">col</span><span class="p">,</span><span class="n">row</span><span class="p">,</span><span class="n">on_state</span><span class="p">),</span> <span class="n">sweeps</span> <span class="ow">in</span> <span class="n">trials</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">col</span><span class="p">,</span><span class="n">row</span><span class="p">,</span><span class="n">on_state</span><span class="p">),</span> <span class="n">sweeps</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">trials</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">on_state</span> <span class="o">!=</span> <span class="n">on</span><span class="p">:</span>
             <span class="k">continue</span>
 
@@ -531,7 +535,7 @@
         <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span> <span class="s1">&#39;category&#39;</span><span class="p">:</span> <span class="n">category_data</span> <span class="p">})</span>
         <span class="n">gb</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;category&#39;</span><span class="p">])</span>
 
-        <span class="k">for</span> <span class="n">category</span><span class="p">,</span> <span class="n">trials</span> <span class="ow">in</span> <span class="n">gb</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">category</span><span class="p">,</span> <span class="n">trials</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">gb</span><span class="o">.</span><span class="n">groups</span><span class="p">):</span>
             <span class="n">idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cat_idx_map</span><span class="p">[</span><span class="n">category</span><span class="p">]</span>
             <span class="n">order</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">trials</span><span class="p">])[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">trial_order</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">trials</span><span class="p">)[</span><span class="n">order</span><span class="p">]</span>
@@ -767,7 +771,7 @@
 
         <span class="n">gb</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;group&#39;</span><span class="p">,</span> <span class="s1">&#39;angle&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">])</span>
 
-        <span class="k">for</span> <span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">r</span><span class="p">),</span> <span class="n">trials</span> <span class="ow">in</span> <span class="n">gb</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">r</span><span class="p">),</span> <span class="n">trials</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">gb</span><span class="o">.</span><span class="n">groups</span><span class="p">):</span>
             <span class="n">responses</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">trials</span><span class="p">])[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
             <span class="n">circles</span> <span class="o">=</span> <span class="n">spiral_trials_polar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">r_radius_map</span><span class="p">[</span><span class="n">r</span><span class="p">],</span>

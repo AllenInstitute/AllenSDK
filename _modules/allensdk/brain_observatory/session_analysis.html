@@ -121,6 +121,8 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
+<span class="kn">from</span> <span class="nn">allensdk.deprecated</span> <span class="kn">import</span> <span class="n">deprecated</span>
+
 
 
 <div class="viewcode-block" id="multi_dataframe_merge"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.multi_dataframe_merge">[docs]</a><span class="k">def</span> <span class="nf">multi_dataframe_merge</span><span class="p">(</span><span class="n">dfs</span><span class="p">):</span>
@@ -649,6 +651,7 @@
     <span class="k">return</span> <span class="n">metrics</span></div>
 
 
+<span class="nd">@deprecated</span><span class="p">(</span><span class="s1">&#39;use the standalone version in bin/brain_observatory&#39;</span><span class="p">)</span>
 <div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;input_nwb&quot;</span><span class="p">)</span>

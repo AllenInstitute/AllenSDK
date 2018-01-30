@@ -111,6 +111,7 @@
 
 <span class="kn">from</span> <span class="nn">allensdk.deprecated</span> <span class="kn">import</span> <span class="n">deprecated</span>
 
+
 <div class="viewcode-block" id="SimpleTree"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.simple_tree.SimpleTree">[docs]</a><span class="k">class</span> <span class="nc">SimpleTree</span><span class="p">(</span> <span class="nb">object</span> <span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> 
                  <span class="n">node_id_cb</span><span class="p">,</span> 
@@ -168,7 +169,7 @@
 <span class="sd">        &#39;&#39;&#39;</span>
     
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="n">criterion</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nodes</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span></div>
-        
+
         
 <div class="viewcode-block" id="SimpleTree.value_map"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.simple_tree.SimpleTree.value_map">[docs]</a>    <span class="k">def</span> <span class="nf">value_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">from_fn</span><span class="p">,</span> <span class="n">to_fn</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Obtain a look-up table relating a pair of node properties across </span>
@@ -178,7 +179,7 @@
 <span class="sd">        ----------</span>
 <span class="sd">        from_fn : function | node dict =&gt; hashable value</span>
 <span class="sd">            The keys of the output dictionary will be obtained by calling </span>
-<span class="sd">            from_fn on each node.</span>
+<span class="sd">            from_fn on each node. Should be unique.</span>
 <span class="sd">        to_fn : function | node_dict =&gt; value</span>
 <span class="sd">            The values of the output function will be obtained by calling </span>
 <span class="sd">            to_fn on each node.</span>
@@ -188,14 +189,53 @@
 <span class="sd">        dict :</span>
 <span class="sd">            Maps the node property defined by from_fn to the node property </span>
 <span class="sd">            defined by to_fn across nodes.</span>
-<span class="sd">            </span>
-<span class="sd">        Notes</span>
-<span class="sd">        -----</span>
-<span class="sd">        The resulting map is not necessarily 1-to-1! </span>
-<span class="sd">        </span>
+
 <span class="sd">        &#39;&#39;&#39;</span>
-    
-        <span class="k">return</span> <span class="p">{</span><span class="n">from_fn</span><span class="p">(</span><span class="n">v</span><span class="p">):</span> <span class="n">to_fn</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nodes</span><span class="o">.</span><span class="n">values</span><span class="p">()}</span></div>
+        
+        <span class="n">vm</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nodes</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">from_fn</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">to_fn</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">vm</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;from_fn is not unique across nodes. &#39;</span>
+                                   <span class="s1">&#39;Collision between {0} and {1}.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">vm</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span>    
+            <span class="n">vm</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+  
+        <span class="k">return</span> <span class="n">vm</span></div>
+
+
+<div class="viewcode-block" id="SimpleTree.nodes_by_property"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.simple_tree.SimpleTree.nodes_by_property">[docs]</a>    <span class="k">def</span> <span class="nf">nodes_by_property</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">to_fn</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Get nodes by a specified property</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : hashable or function</span>
+<span class="sd">            The property used for lookup. Should be unique. If a function, will </span>
+<span class="sd">            be invoked on each node.</span>
+<span class="sd">        values : list</span>
+<span class="sd">            Select matching elements from the lookup.</span>
+<span class="sd">        to_fn : function, optional</span>
+<span class="sd">            Defines the outputs, on a per-node basis. Defaults to returning </span>
+<span class="sd">            the whole node.</span>
+<span class="sd">  </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list : </span>
+<span class="sd">            outputs, 1 for each input value.</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="n">to_fn</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">to_fn</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">callable</span><span class="p">(</span> <span class="n">key</span> <span class="p">):</span>
+            <span class="n">from_fn</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">from_fn</span> <span class="o">=</span> <span class="n">key</span>
+
+        <span class="n">value_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_map</span><span class="p">(</span> <span class="n">from_fn</span><span class="p">,</span> <span class="n">to_fn</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span> <span class="n">value_map</span><span class="p">[</span><span class="n">vv</span><span class="p">]</span> <span class="k">for</span> <span class="n">vv</span> <span class="ow">in</span> <span class="n">values</span> <span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="SimpleTree.node_ids"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.simple_tree.SimpleTree.node_ids">[docs]</a>    <span class="k">def</span> <span class="nf">node_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -208,7 +248,7 @@
 <span class="sd">        </span>
 <span class="sd">        &#39;&#39;&#39;</span>
     
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nodes</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span></div>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nodes</span><span class="p">)</span></div>
 
     
     <span class="nd">@deprecated</span><span class="p">(</span><span class="s2">&quot;Use SimpleTree.parent_ids instead.&quot;</span><span class="p">)</span>
