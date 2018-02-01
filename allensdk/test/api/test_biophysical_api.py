@@ -1,8 +1,20 @@
 import os
+import json
 
+import numpy as np
 import pytest
 from mock import MagicMock
 
+
+@pytest.fixture
+def neuronal_model_response():
+    dirname = os.path.dirname(__file__)
+    path = os.path.join(dirname, 'response_test_data', '472451419_response.json')
+
+    with open(path, 'r') as jf:
+        data = json.load(jf)
+
+    return data
 
 
 def make_biophys_api():
@@ -63,3 +75,14 @@ def test_get_neuronal_models(biophys_api):
         "q=model::NeuronalModel,rma::criteria,[neuronal_model_template_id$in491455321,32923071],"
         "[specimen_id$in386049446,469753383],rma::options[num_rows$eq'all'][count$eqfalse]")
 
+
+def test_read_json(biophys_api, neuronal_model_response):
+    
+    obt = biophys_api.read_json(neuronal_model_response)
+
+    assert(obt['stimulus']['491198851'] == "386049444.nwb")
+    assert(obt['morphology']['491459173'] == "Nr5a1-Cre_Ai14-177334.05.01.01_491459171_m.swc")
+    assert(obt['fit']['497235805'] == '386049446_fit.json')
+    assert(obt['marker']['496607103'] == 'Nr5a1-Cre_Ai14-177334.05.01.01_491459171_marker_m.swc')
+    assert(obt['modfiles']['395337293'] == 'modfiles/SK.mod')
+    assert(np.allclose(biophys_api.sweeps, [42]))
