@@ -33,27 +33,56 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-from ..api import Api
+from allensdk.api.queries.rma_template import RmaTemplate
+from allensdk.api.cache import cacheable
 import os
 import simplejson as json
 from collections import OrderedDict
 from allensdk.config.manifest import Manifest
 
 
-class BiophysicalApi(Api):
+class BiophysicalApi(RmaTemplate):
     _NWB_file_type = 'NWBDownload'
     _SWC_file_type = '3DNeuronReconstruction'
     _MOD_file_type = 'BiophysicalModelDescription'
     _FIT_file_type = 'NeuronalModelParameters'
     _MARKER_file_type = '3DNeuronMarker'
+    BIOPHYSICAL_MODEL_TYPE_IDS = (491455321, 32923071,)
+
+    rma_templates = \
+        {"model_queries": [
+            {'name': 'models_by_specimen',
+             'description': 'see name',
+             'model': 'NeuronalModel',
+             'num_rows': 'all',
+             'count': False,
+             'criteria': '[neuronal_model_template_id$in{{biophysical_model_types}}],[specimen_id$in{{specimen_ids}}]', 
+             'criteria_params': ['specimen_ids', 'biophysical_model_types']
+             }]}
+
 
     def __init__(self, base_uri=None):
-        super(BiophysicalApi, self).__init__(base_uri)
+        super(BiophysicalApi, self).__init__(base_uri, query_manifest=BiophysicalApi.rma_templates)
         self.cache_stimulus = True
         self.ids = {}
         self.sweeps = []
         self.manifest = {}
         self.model_type = None
+
+
+    @cacheable()
+    def get_neuronal_models(self, specimen_ids, num_rows='all', count=False, model_type_ids=None, **kwargs):
+        '''
+        '''
+
+        if model_type_ids is None:
+            model_type_ids = self.BIOPHYSICAL_MODEL_TYPE_IDS
+
+        return self.template_query('model_queries', 'models_by_specimen', 
+                                   specimen_ids=specimen_ids, 
+                                   biophysical_model_types=list(model_type_ids), 
+                                   num_rows=num_rows, count=count)
+
 
     def build_rma(self, neuronal_model_id, fmt='json'):
         '''Construct a query to find all files related to a neuronal model.

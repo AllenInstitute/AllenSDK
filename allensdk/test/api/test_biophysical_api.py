@@ -15,6 +15,7 @@ def make_biophys_api():
 @pytest.fixture
 def biophys_api():
     bio = make_biophys_api()
+    bio.retrieve_file_over_http = MagicMock(name='retrieve_file_over_http')
     bio.json_msg_query = MagicMock(name='json_msg_query')
 
     return bio
@@ -44,8 +45,21 @@ def test_build_rma(model_id, fmt, biophys_api):
           'well_known_files(well_known_file_type)'
     exp = exp.format(fmt_exp, model_id)
 
-    print(exp)
-    print(obt)
-
-
     assert obt == exp
+
+
+def test_is_well_known_file_type(biophys_api):
+    wkf = {'well_known_file_type': {'name': 'fish'}}
+
+    assert(biophys_api.is_well_known_file_type(wkf, 'fish'))
+    assert(not biophys_api.is_well_known_file_type(wkf, 'fowl'))
+
+
+def test_get_neuronal_models(biophys_api):
+    mck = biophys_api.get_neuronal_models([386049446,469753383])
+
+    biophys_api.json_msg_query.assert_called_once_with(
+        "http://twarehouse-backup/api/v2/data/query.json?"
+        "q=model::NeuronalModel,rma::criteria,[neuronal_model_template_id$in491455321,32923071],"
+        "[specimen_id$in386049446,469753383],rma::options[num_rows$eq'all'][count$eqfalse]")
+
