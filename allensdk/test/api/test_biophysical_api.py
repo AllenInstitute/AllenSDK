@@ -20,7 +20,7 @@ def neuronal_model_response():
 def make_biophys_api():
     from allensdk.api.queries.biophysical_api import BiophysicalApi
 
-    endpoint = os.environ['TEST_API_ENDPOINT'] if 'TEST_API_ENDPOINT' in os.environ else 'http://twarehouse-backup'
+    endpoint = 'http://twarehouse-backup'
     return BiophysicalApi(endpoint)
 
 
