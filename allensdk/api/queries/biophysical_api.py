@@ -72,7 +72,28 @@ class BiophysicalApi(RmaTemplate):
 
     @cacheable()
     def get_neuronal_models(self, specimen_ids, num_rows='all', count=False, model_type_ids=None, **kwargs):
-        '''
+        '''Fetch all of the biophysically detailed model records associated with 
+        a particular specimen_id
+
+        Parameters
+        ----------
+        specimen_ids : list
+            One or more integer ids identifying specimen records.
+        num_rows : int, optional
+            how many records to retrieve. Default is 'all'.
+        count : bool, optional
+            If True, return a count of the lines found by the query. Default is False.
+        model_type_ids : list, optional
+            One or more integer ids identifying categories of neuronal model. Defaults 
+            to all-active and perisomatic biophysical_models.
+
+        Returns
+        -------
+        List of dict
+            Each element is a biophysical model record, containing a unique integer 
+            id, the id of the associated specimen, and the id of the model type to 
+            which this model belongs.
+  
         '''
 
         if model_type_ids is None:
