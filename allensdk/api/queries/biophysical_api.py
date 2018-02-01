@@ -360,11 +360,11 @@ class BiophysicalApi(RmaTemplate):
         modfile_dir = os.path.join(working_directory, 'modfiles')
         Manifest.safe_mkdir(modfile_dir)
 
-        for key, id_dict in list(well_known_file_id_dict.items()):
+        for key, id_dict in well_known_file_id_dict.items():
             if (not self.cache_stimulus) and (key == 'stimulus'):
                 continue
 
-            for well_known_id, filename in list(id_dict.items()):
+            for well_known_id, filename in id_dict.items():
                 well_known_file_url = self.construct_well_known_file_download_url(
                     well_known_id)
                 cached_file_path = os.path.join(working_directory, filename)
