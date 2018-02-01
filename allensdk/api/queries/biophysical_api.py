@@ -33,27 +33,77 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-from ..api import Api
+from allensdk.api.queries.rma_template import RmaTemplate
+from allensdk.api.cache import cacheable
 import os
 import simplejson as json
 from collections import OrderedDict
 from allensdk.config.manifest import Manifest
 
 
-class BiophysicalApi(Api):
+class BiophysicalApi(RmaTemplate):
     _NWB_file_type = 'NWBDownload'
     _SWC_file_type = '3DNeuronReconstruction'
     _MOD_file_type = 'BiophysicalModelDescription'
     _FIT_file_type = 'NeuronalModelParameters'
     _MARKER_file_type = '3DNeuronMarker'
+    BIOPHYSICAL_MODEL_TYPE_IDS = (491455321, 32923071,)
+
+    rma_templates = \
+        {"model_queries": [
+            {'name': 'models_by_specimen',
+             'description': 'see name',
+             'model': 'NeuronalModel',
+             'num_rows': 'all',
+             'count': False,
+             'criteria': '[neuronal_model_template_id$in{{biophysical_model_types}}],[specimen_id$in{{specimen_ids}}]', 
+             'criteria_params': ['specimen_ids', 'biophysical_model_types']
+             }]}
+
 
     def __init__(self, base_uri=None):
-        super(BiophysicalApi, self).__init__(base_uri)
+        super(BiophysicalApi, self).__init__(base_uri, query_manifest=BiophysicalApi.rma_templates)
         self.cache_stimulus = True
         self.ids = {}
         self.sweeps = []
         self.manifest = {}
         self.model_type = None
+
+
+    @cacheable()
+    def get_neuronal_models(self, specimen_ids, num_rows='all', count=False, model_type_ids=None, **kwargs):
+        '''Fetch all of the biophysically detailed model records associated with 
+        a particular specimen_id
+
+        Parameters
+        ----------
+        specimen_ids : list
+            One or more integer ids identifying specimen records.
+        num_rows : int, optional
+            how many records to retrieve. Default is 'all'.
+        count : bool, optional
+            If True, return a count of the lines found by the query. Default is False.
+        model_type_ids : list, optional
+            One or more integer ids identifying categories of neuronal model. Defaults 
+            to all-active and perisomatic biophysical_models.
+
+        Returns
+        -------
+        List of dict
+            Each element is a biophysical model record, containing a unique integer 
+            id, the id of the associated specimen, and the id of the model type to 
+            which this model belongs.
+  
+        '''
+
+        if model_type_ids is None:
+            model_type_ids = self.BIOPHYSICAL_MODEL_TYPE_IDS
+
+        return self.template_query('model_queries', 'models_by_specimen', 
+                                   specimen_ids=specimen_ids, 
+                                   biophysical_model_types=list(model_type_ids), 
+                                   num_rows=num_rows, count=count)
+
 
     def build_rma(self, neuronal_model_id, fmt='json'):
         '''Construct a query to find all files related to a neuronal model.
@@ -298,7 +348,7 @@ class BiophysicalApi(Api):
             neuronal_model_id)
 
         if not well_known_file_id_dict or \
-           (not any(well_known_file_id_dict.values())):
+           (not any(list(well_known_file_id_dict.values()))):
             raise(Exception("No data found for neuronal model id %d" %
                             (neuronal_model_id)))
 
@@ -321,11 +371,11 @@ class BiophysicalApi(Api):
                 self.retrieve_file_over_http(
                     well_known_file_url, cached_file_path)
 
-        fit_path = self.ids['fit'].values()[0]
-        stimulus_filename = self.ids['stimulus'].values()[0]
-        swc_morphology_path = self.ids['morphology'].values()[0]
+        fit_path = list(self.ids['fit'].values())[0]
+        stimulus_filename = list(self.ids['stimulus'].values())[0]
+        swc_morphology_path = list(self.ids['morphology'].values())[0]
         marker_path = \
-            self.ids['marker'].values()[0] if 'marker' in self.ids else ''
+            list(self.ids['marker'].values())[0] if 'marker' in self.ids else ''
         sweeps = sorted(self.sweeps)
 
         self.create_manifest(fit_path,
@@ -336,5 +386,5 @@ class BiophysicalApi(Api):
                              sweeps)
 
         manifest_path = os.path.join(working_directory, 'manifest.json')
-        with open(manifest_path, 'wb') as f:
-            f.write(json.dumps(self.manifest, indent=2))
+        with open(manifest_path, 'w') as f:
+            json.dump(self.manifest, f, indent=2)
