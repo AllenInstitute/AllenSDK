@@ -1,10 +1,12 @@
 allensdk/internal
 .cache
 .idea
+.coverage
 htmlcov
 .settings
 cell_types
 dist
+test-reports/*
 doc_template/examples/nb/connectivity/experiment_*
 doc_template/examples/nb/Website_Inquiry_RT_45792 /experiment_*
 *pyc
