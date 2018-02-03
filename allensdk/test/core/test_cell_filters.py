@@ -34,6 +34,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import pytest
+import os
 from mock import patch, mock_open, MagicMock
 from test_brain_observatory_cache import CACHE_MANIFEST
 from allensdk.core.brain_observatory_cache \
@@ -226,6 +227,8 @@ def test_dataframe_query(brain_observatory_cache,
             assert len(cells) > 0
 
 
+@pytest.mark.skipif(os.getenv("SKIP_LONG_RUNNING_TESTS") == "true",
+                              reason="query can exceed 10 minutes")
 def test_dataframe_query_unmocked(unmocked_boc,
                                   example_filters,
                                   cells):
@@ -239,6 +242,8 @@ def test_dataframe_query_unmocked(unmocked_boc,
     assert len(cells) > 0 and len(cells) < 1000
 
 
+@pytest.mark.skipif(os.getenv("SKIP_LONG_RUNNING_TESTS") == "true",
+                              reason="query can exceed 10 minutes")
 def test_dataframe_query_between_unmocked(unmocked_boc,
                                           between_filter,
                                           cells):
@@ -252,6 +257,8 @@ def test_dataframe_query_between_unmocked(unmocked_boc,
     assert len(cells) > 0 and len (cells) < 1000
 
 
+@pytest.mark.skipif(os.getenv("SKIP_LONG_RUNNING_TESTS") == "true",
+                              reason="query can exceed 10 minutes")
 def test_dataframe_query_is_unmocked(unmocked_boc,
                                      cells):
     brain_observatory_cache = unmocked_boc
