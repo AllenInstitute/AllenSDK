@@ -34,7 +34,9 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import pytest
+import os
 from allensdk.config.manifest_builder import ManifestBuilder
+from allensdk.config.manifest import Manifest
 
 
 @pytest.fixture
@@ -87,3 +89,8 @@ def testManifestDataFrame(builder):
     assert('type' in df.keys())
     assert('spec' in df.keys())
     assert(2 == len(df.keys()))
+
+
+def safe_mkdir_root_dir():
+    directory = os.path.abspath(os.sep)
+    Manifest.safe_mkdir(directory) # should not error

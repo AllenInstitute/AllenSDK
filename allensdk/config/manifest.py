@@ -34,6 +34,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import os
+import sys
 import re
 import logging
 import errno
@@ -307,7 +308,13 @@ class Manifest(object):
         try:
             os.makedirs(directory)
         except OSError as e:
-            if e.errno == errno.EEXIST:
+            if ((sys.platform == "darwin") and (e.errno == errno.EISDIR) and \
+                (e.filename == "/")):
+                # undocumented behavior of mkdir on OSX where for / it raises
+                # EISDIR and not EEXIST
+                # https://bugs.python.org/issue24231 (old but still holds true)
+                pass
+            elif e.errno == errno.EEXIST:
                 pass
             else:
                 raise
