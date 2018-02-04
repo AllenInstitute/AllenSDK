@@ -18,6 +18,8 @@ install:
   - conda update -q conda
   - conda create -q -n test-environment python=%PYTHON% pip
   - activate test-environment
+  - conda install statsmodels
+  - if %PYTHON% == 2.7 conda install scikit-image
   - pip install -r test_requirements.txt
   - pip install .
 
