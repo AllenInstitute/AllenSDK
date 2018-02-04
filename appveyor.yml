@@ -24,4 +24,4 @@ install:
   - pip install .
 
 test_script:
-  - py.test -s --boxed
+  - pytest -s
