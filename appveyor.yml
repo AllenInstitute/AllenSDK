@@ -24,4 +24,4 @@ install:
   - pip install .
 
 test_script:
-  - make test
+  - py.test -s --boxed
