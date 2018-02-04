@@ -51,6 +51,9 @@ from allensdk.config.manifest_builder import ManifestBuilder
 from allensdk.test_utilities.temp_dir import fn_temp_dir
 
 
+_msg = [{'whatever': True}]
+_pd_msg = pd.DataFrame(_msg)
+
 @pytest.fixture
 def cache():
     return Cache()
@@ -111,19 +114,10 @@ def test_version_update(fn_temp_dir):
         new_dc = DummyCache(manifest=mpath, version=1.0)
 
 
-def test_wrap_json(rma, cache):
-    msg = [{'whatever': True}]
-
-    ju.read_url_get = \
-        MagicMock(name='read_url_get',
-                  return_value={'msg': msg})
-    ju.write = \
-        MagicMock(name='write')
-
-    ju.read = \
-        MagicMock(name='read',
-                  return_value=pd.DataFrame(msg))
-
+@patch("allensdk.core.json_utilities.write")
+@patch("allensdk.core.json_utilities.read", return_value=pd.DataFrame(_msg))
+@patch("allensdk.core.json_utilities.read_url_get", return_value={'msg': _msg})
+def test_wrap_json(ju_read_url_get, ju_read, ju_write, rma, cache):
     df = cache.wrap(rma.model_query,
                     'example.txt',
                     cache=True,
@@ -131,24 +125,16 @@ def test_wrap_json(rma, cache):
 
     assert df.loc[:, 'whatever'][0]
 
-    ju.read_url_get.assert_called_once_with(
+    ju_read_url_get.assert_called_once_with(
         'http://api.brain-map.org/api/v2/data/query.json?q=model::Hemisphere')
-    ju.write.assert_called_once_with('example.txt', msg)
-    ju.read.assert_called_once_with('example.txt')
+    ju_write.assert_called_once_with('example.txt', _msg)
+    ju_read.assert_called_once_with('example.txt')
 
 
-def test_wrap_dataframe(rma, cache):
-    msg = [{'whatever': True}]
-
-    ju.read_url_get = \
-        MagicMock(name='read_url_get',
-                  return_value={'msg': msg})
-    ju.write = \
-        MagicMock(name='write')
-    pj.read_json = \
-        MagicMock(name='read_json',
-                  return_value=msg)
-
+@patch("pandas.io.json.read_json", return_value=_msg)
+@patch("allensdk.core.json_utilities.write")
+@patch("allensdk.core.json_utilities.read_url_get", return_value={'msg': _msg})
+def test_wrap_dataframe(ju_read_url_get, ju_write, mock_read_json, rma, cache):
     json_data = cache.wrap(rma.model_query,
                            'example.txt',
                            cache=True,
@@ -157,10 +143,10 @@ def test_wrap_dataframe(rma, cache):
 
     assert json_data[0]['whatever']
 
-    ju.read_url_get.assert_called_once_with(
+    ju_read_url_get.assert_called_once_with(
         'http://api.brain-map.org/api/v2/data/query.json?q=model::Hemisphere')
-    ju.write.assert_called_once_with('example.txt', msg)
-    pj.read_json.assert_called_once_with('example.txt', orient='records')
+    ju_write.assert_called_once_with('example.txt', _msg)
+    mock_read_json.assert_called_once_with('example.txt', orient='records')
 
 def test_memoize():
 
