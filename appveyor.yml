@@ -24,4 +24,4 @@ install:
   - pip install .
 
 test_script:
-  - pytest -s
+  - py.test -s
