@@ -3,7 +3,8 @@ import json
 
 import numpy as np
 import pytest
-from mock import MagicMock
+from mock import patch
+from allensdk.api.queries.biophysical_api import BiophysicalApi
 
 
 @pytest.fixture
@@ -17,26 +18,15 @@ def neuronal_model_response():
     return data
 
 
-def make_biophys_api():
-    from allensdk.api.queries.biophysical_api import BiophysicalApi
-
-    endpoint = 'http://twarehouse-backup'
-    return BiophysicalApi(endpoint)
-
-
 @pytest.fixture
 def biophys_api():
-    bio = make_biophys_api()
-    bio.retrieve_file_over_http = MagicMock(name='retrieve_file_over_http')
-    bio.json_msg_query = MagicMock(name='json_msg_query')
-
-    return bio
+    endpoint = 'http://twarehouse-backup'
+    return BiophysicalApi(endpoint)
 
 
 @pytest.mark.parametrize('model_id', [3])
 @pytest.mark.parametrize('fmt', [None, 'json', 'xml'])
 def test_build_rma(model_id, fmt, biophys_api):
-    
     if fmt is None:
         fmt_exp = 'json'
         obt = biophys_api.build_rma(model_id)
@@ -67,10 +57,11 @@ def test_is_well_known_file_type(biophys_api):
     assert(not biophys_api.is_well_known_file_type(wkf, 'fowl'))
 
 
-def test_get_neuronal_models(biophys_api):
+@patch.object(BiophysicalApi, "json_msg_query")
+def test_get_neuronal_models(mock_json_msg_query, biophys_api):
     mck = biophys_api.get_neuronal_models([386049446,469753383])
 
-    biophys_api.json_msg_query.assert_called_once_with(
+    mock_json_msg_query.assert_called_once_with(
         "http://twarehouse-backup/api/v2/data/query.json?"
         "q=model::NeuronalModel,rma::criteria,[neuronal_model_template_id$in491455321,32923071],"
         "[specimen_id$in386049446,469753383],rma::options[num_rows$eq'all'][count$eqfalse]")
@@ -84,5 +75,5 @@ def test_read_json(biophys_api, neuronal_model_response):
     assert(obt['morphology']['491459173'] == "Nr5a1-Cre_Ai14-177334.05.01.01_491459171_m.swc")
     assert(obt['fit']['497235805'] == '386049446_fit.json')
     assert(obt['marker']['496607103'] == 'Nr5a1-Cre_Ai14-177334.05.01.01_491459171_marker_m.swc')
-    assert(obt['modfiles']['395337293'] == 'modfiles/SK.mod')
+    assert(obt['modfiles']['395337293'] == os.path.join('modfiles', 'SK.mod'))
     assert(np.allclose(biophys_api.sweeps, [42]))
