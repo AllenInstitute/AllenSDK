@@ -44,7 +44,6 @@ import pandas as pd
 
 from allensdk.core.mouse_connectivity_cache import MouseConnectivityCache
 from allensdk.core.structure_tree import StructureTree
-from allensdk.test_utilities.temp_dir import fn_temp_dir
 
 
 @pytest.fixture(scope='function')
