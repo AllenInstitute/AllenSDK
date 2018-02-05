@@ -72,6 +72,4 @@ def temp_dir(request):
     request.addfinalizer(fin)
     
     return specific_path
-    
-fn_temp_dir = pytest.fixture(scope='function')(temp_dir)
-md_temp_dir = pytest.fixture(scope='module')(temp_dir)
+

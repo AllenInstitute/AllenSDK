@@ -48,8 +48,6 @@ import allensdk.core.json_utilities as ju
 from allensdk.config.manifest import ManifestVersionError
 from allensdk.config.manifest_builder import ManifestBuilder
 
-from allensdk.test_utilities.temp_dir import fn_temp_dir
-
 
 _msg = [{'whatever': True}]
 _pd_msg = pd.DataFrame(_msg)
