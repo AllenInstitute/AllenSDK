@@ -1,7 +1,7 @@
 import matplotlib
 matplotlib.use('agg')
-import pytest
-from allensdk.test_utilities.temp_dir import temp_dir
+import pytest  # noqa: E402
+from allensdk.test_utilities.temp_dir import temp_dir  # noqa: 402
 
 
 @pytest.fixture(scope="function")
