@@ -49,7 +49,6 @@ from allensdk.test_utilities.temp_dir import fn_temp_dir
 
 @pytest.fixture(scope='function')
 def mcc(fn_temp_dir):
-
     manifest_path = os.path.join(fn_temp_dir, 'manifest.json')
     return MouseConnectivityCache(manifest_file=manifest_path)
 
@@ -128,10 +127,10 @@ def test_get_annotation_volume(mcc, fn_temp_dir):
     mcc.api.retrieve_file_over_http = lambda a, b: nrrd.write(b, eye)
     obtained, _ = mcc.get_annotation_volume()
 
-    mcc.api.retrieve_file_over_http = mock.MagicMock()
-    mcc.get_annotation_volume()
+    with mock.patch.object(mcc.api, "retrieve_file_over_http") as mock_rtrv:
+        mcc.get_annotation_volume()
 
-    mcc.api.retrieve_file_over_http.assert_not_called()
+    mock_rtrv.assert_not_called()
     assert( np.allclose(obtained, eye) ) 
     assert( os.path.exists(path) )
 
@@ -141,14 +140,15 @@ def test_get_template_volume(mcc, fn_temp_dir):
     eye = np.eye(100)
     path = os.path.join(fn_temp_dir, 'average_template_25.nrrd')
 
-    mcc.api.retrieve_file_over_http = lambda a, b: nrrd.write(b, eye)
-    obtained, _ = mcc.get_template_volume()
+    with mock.patch.object(mcc.api, "retrieve_file_over_http",
+                           new=lambda a, b: nrrd.write(b, eye)):
+        obtained, _ = mcc.get_template_volume()
 
-    mcc.api.retrieve_file_over_http = mock.MagicMock()
-    mcc.get_template_volume()
+    with mock.patch.object(mcc.api, "retrieve_file_over_http") as mock_rtrv:
+        mcc.get_template_volume()
 
-    mcc.api.retrieve_file_over_http.assert_not_called()
-    assert( np.allclose(obtained, eye) )            
+    mock_rtrv.assert_not_called()
+    assert( np.allclose(obtained, eye) )
     assert( os.path.exists(path) )
 
 
@@ -164,11 +164,11 @@ def test_get_projection_density(mcc, fn_temp_dir):
                     new=lambda a, b, c: nrrd.write(c, eye)):
         obtained, _ = mcc.get_projection_density(eid)
 
-    mcc.api.retrieve_file_over_http = mock.MagicMock()
-    mcc.get_projection_density(eid)
+    with mock.patch.object(mcc.api, "retrieve_file_over_http") as mock_rtrv:
+        mcc.get_projection_density(eid)
 
-    mcc.api.retrieve_file_over_http.assert_not_called()
-    assert( np.allclose(obtained, eye) )            
+    mock_rtrv.assert_not_called()
+    assert( np.allclose(obtained, eye) )
     assert( os.path.exists(path) )
 
 
@@ -184,11 +184,11 @@ def test_get_injection_density(mcc, fn_temp_dir):
                     new=lambda a, b, c: nrrd.write(c, eye)):
         obtained, _ = mcc.get_injection_density(eid)
 
-    mcc.api.retrieve_file_over_http = mock.MagicMock()
-    mcc.get_injection_density(eid)
+    with mock.patch.object(mcc.api, "retrieve_file_over_http") as mock_rtrv:
+        mcc.get_injection_density(eid)
 
-    mcc.api.retrieve_file_over_http.assert_not_called()
-    assert( np.allclose(obtained, eye) )            
+    mock_rtrv.assert_not_called()
+    assert( np.allclose(obtained, eye) )
     assert( os.path.exists(path) )
 
 
@@ -204,11 +204,11 @@ def test_get_injection_fraction(mcc, fn_temp_dir):
                     new=lambda a, b, c: nrrd.write(c, eye)):
         obtained, _ = mcc.get_injection_fraction(eid)
 
-    mcc.api.retrieve_file_over_http = mock.MagicMock()
-    mcc.get_injection_fraction(eid)
+    with mock.patch.object(mcc.api, "retrieve_file_over_http") as mock_rtrv:
+        mcc.get_injection_fraction(eid)
 
-    mcc.api.retrieve_file_over_http.assert_not_called()
-    assert( np.allclose(obtained, eye) )            
+    mock_rtrv.assert_not_called()
+    assert( np.allclose(obtained, eye) )
     assert( os.path.exists(path) )
 
 
@@ -224,11 +224,11 @@ def test_get_data_mask(mcc, fn_temp_dir):
                     new=lambda a, b, c: nrrd.write(c, eye)):
         obtained, _ = mcc.get_data_mask(eid)
 
-    mcc.api.retrieve_file_over_http = mock.MagicMock()
-    mcc.get_data_mask(eid)
+    with mock.patch.object(mcc.api, "retrieve_file_over_http") as mock_rtrv:
+        mcc.get_data_mask(eid)
 
-    mcc.api.retrieve_file_over_http.assert_not_called()
-    assert( np.allclose(obtained, eye) )            
+    mock_rtrv.assert_not_called()
+    assert( np.allclose(obtained, eye) )
     assert( os.path.exists(path) )
 
 
@@ -257,13 +257,14 @@ def test_get_experiments(mcc, fn_temp_dir, experiments):
 
     file_path = os.path.join(fn_temp_dir, 'experiments.json')
 
-    mcc.api.service_query = lambda a, parameters: experiments    
-    obtained = mcc.get_experiments()
+    with mock.patch.object(mcc.api, "service_query",
+                           new=lambda a, parameters: experiments):
+        obtained = mcc.get_experiments()
 
-    mcc.api.service_query = mock.MagicMock()
-    mcc.get_experiments()
+    with mock.patch.object(mcc.api, "service_query") as mock_squery:
+        mcc.get_experiments()
 
-    mcc.api.service_query.assert_not_called()
+    mock_squery.assert_not_called()
     assert os.path.exists(file_path)
     assert 'num_voxels' not in obtained[0]
     assert obtained[0]['transgenic-line'] == 'most_creish' 
@@ -273,6 +274,8 @@ def test_get_experiments(mcc, fn_temp_dir, experiments):
 
 
 def test_filter_experiments(mcc, fn_temp_dir, experiments):
+
+    print(os.path.exists(os.path.join(fn_temp_dir, "experiments.json")))
 
     pass_line = mcc.filter_experiments(experiments, cre=True)
     fail_line = mcc.filter_experiments(experiments, cre=False)
@@ -290,9 +293,9 @@ def test_rank_structures(mcc, top_injection_unionizes, fn_temp_dir):
     path = os.path.join(fn_temp_dir, 'experiment_{0}'.format(1), 
                         'structure_unionizes.csv')
 
-    mcc.api.model_query = lambda *args, **kwargs: top_injection_unionizes
-
-    obt = mcc.rank_structures([1], True, [15], [1, 2])
+    with mock.patch.object(mcc.api, "model_query",
+                           lambda *args, **kwargs: top_injection_unionizes):
+        obt = mcc.rank_structures([1], True, [15], [1, 2])
 
     assert(len(obt) == 1)
     exp = obt[0]
@@ -391,7 +394,7 @@ def test_get_reference_space(mcc, new_nodes):
     rsp_obt = mcc.get_reference_space()
 
     assert( np.allclose(rsp_obt.resolution, [25, 25, 25]) )
-    assert( np.allclose( rsp_obt.annotation, annot ) ) 
+    assert( np.allclose( rsp_obt.annotation, annot ) )
 
 
 def test_get_structure_mask(mcc, fn_temp_dir):
@@ -405,11 +408,11 @@ def test_get_structure_mask(mcc, fn_temp_dir):
     mcc.api.retrieve_file_over_http = lambda a, b: nrrd.write(b, eye)
     obtained, _ = mcc.get_structure_mask(sid)
 
-    mcc.api.retrieve_file_over_http = mock.MagicMock()
-    mcc.get_structure_mask(sid)
+    with mock.patch.object(mcc.api, "retrieve_file_over_http") as mock_rtrv:
+        mcc.get_structure_mask(sid)
 
-    mcc.api.retrieve_file_over_http.assert_not_called()
-    assert( np.allclose(obtained, eye) ) 
+    mock_rtrv.assert_not_called()
+    assert( np.allclose(obtained, eye) )
     assert( os.path.exists(path) )
 
 
