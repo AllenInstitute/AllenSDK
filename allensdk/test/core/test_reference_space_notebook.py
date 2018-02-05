@@ -36,7 +36,7 @@
 import pytest
 
 import os
-from allensdk.test_utilities.temp_dir import fn_temp_dir
+
 
 @pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
                     reason="partial testing")
