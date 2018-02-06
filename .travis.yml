@@ -4,7 +4,6 @@ env:
     - TEST_OBSERVATORY_EXPERIMENT_PLOTS_DATA=skip
     - TEST_API_ENDPOINT=http://api.brain-map.org 
     - TEST_COMPLETE=false
-    - SKIP_LONG_RUNNING_TESTS=true
 
 matrix:
   include:
