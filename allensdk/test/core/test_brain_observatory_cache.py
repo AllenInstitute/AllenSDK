@@ -34,6 +34,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import pytest
+import os
 from mock import patch, mock_open, MagicMock
 from allensdk.core.brain_observatory_cache import (BrainObservatoryCache, 
                                                    _find_container_tags,
@@ -92,7 +93,7 @@ CACHE_MANIFEST = """
 
 
 @pytest.fixture
-def brain_observatory_cache():
+def brain_observatory_cache(md_temp_dir):
     boc = None
 
     try:
@@ -105,7 +106,8 @@ def brain_observatory_cache():
         with patch(builtins.__name__ + ".open",
                    mock_open(read_data=manifest_data)):
             # Download a list of all targeted areas
-            boc = BrainObservatoryCache(manifest_file='boc/manifest.json',
+            manifest_file = os.path.join(md_temp_dir, "boc", "manifest.json")
+            boc = BrainObservatoryCache(manifest_file=manifest_file,
                                         base_uri='http://api.brain-map.org')
 
     return boc

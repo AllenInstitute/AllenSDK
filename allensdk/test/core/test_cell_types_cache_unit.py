@@ -45,7 +45,6 @@ import allensdk.core.json_utilities as ju
 import pandas.io.json as pj
 import os
 
-_TEMPDIR = 'cell_types'
 _MOCK_PATH = '/path/to/xyz.txt'
 
 
@@ -62,13 +61,13 @@ def cell_id():
 
 
 @pytest.fixture
-def cache_fixture():
+def cache_fixture(md_temp_dir):
     # Instantiate the CellTypesCache instance.  The manifest_file argument
     # tells it where to store the manifest, which is a JSON file that tracks
     # file paths.  If you supply a relative path (like this), it will go
     # into your current working directory
     ctc = CTC.CellTypesCache(
-        manifest_file=os.path.join(_TEMPDIR,
+        manifest_file=os.path.join(md_temp_dir,
         'cell_types_manifest.json'))
 
     return ctc

@@ -144,14 +144,15 @@ def api():
 
 
 @pytest.fixture
-def unmocked_boc():
-    boc = BrainObservatoryCache()
+def unmocked_boc(md_temp_dir):
+    manifest_file = os.path.join(md_temp_dir, "unmocked_boc", "manifest.json")
+    boc = BrainObservatoryCache(manifest_file=manifest_file)
 
     return boc
 
 
 @pytest.fixture
-def brain_observatory_cache():
+def brain_observatory_cache(md_temp_dir):
     boc = None
 
     try:
@@ -164,8 +165,8 @@ def brain_observatory_cache():
                return_value=True):
         with patch(builtins.__name__ + ".open",
                    mock_open(read_data=manifest_data)):
-            # Download a list of all targeted areas
-            boc = BrainObservatoryCache(manifest_file='boc/manifest.json',
+            manifest_file = os.path.join(md_temp_dir, "boc", "manifest.json")
+            boc = BrainObservatoryCache(manifest_file=manifest_file,
                                         base_uri='http://api.brain-map.org')
 
     return boc

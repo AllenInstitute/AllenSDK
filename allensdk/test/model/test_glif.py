@@ -42,6 +42,17 @@ from allensdk.core.nwb_data_set import NwbDataSet
 import os
 # import matplotlib.pyplot as plt
 
+
+@pytest.fixture
+def neuron_config_file(md_temp_dir):
+    return os.path.join(md_temp_dir, "neuron_config.json")
+
+
+@pytest.fixture
+def ephys_sweeps_file(md_temp_dir):
+    return os.path.join(md_temp_dir, "ephys_sweeps.json")
+
+
 @pytest.fixture
 def glif_api():
     endpoint = None
@@ -60,9 +71,9 @@ def neuronal_model_id():
 
 
 @pytest.fixture
-def output():
-    neuron_config = json_utilities.read('neuron_config.json')
-    ephys_sweeps = json_utilities.read('ephys_sweeps.json')
+def output(neuron_config_file, ephys_sweeps_file):
+    neuron_config = json_utilities.read(neuron_config_file)
+    ephys_sweeps = json_utilities.read(ephys_sweeps_file)
     ephys_file_name = 'stimulus.nwb'
 
     # pull out the stimulus for the first sweep
@@ -83,21 +94,22 @@ def output():
     return output
 
 
-def test_1(fn_temp_dir, glif_api, neuronal_model_id):
+def test_1(neuron_config_file, ephys_sweeps_file, fn_temp_dir, glif_api,
+           neuronal_model_id):
     nwb_path = os.path.join(fn_temp_dir, 'stimulus.nwb')
     glif_api.get_neuronal_model(neuronal_model_id)
     glif_api.cache_stimulus_file(nwb_path)
 
     neuron_config = glif_api.get_neuron_config()
-    json_utilities.write('neuron_config.json', neuron_config)
+    json_utilities.write(neuron_config_file, neuron_config)
 
     ephys_sweeps = glif_api.get_ephys_sweeps()
-    json_utilities.write('ephys_sweeps.json', ephys_sweeps)
+    json_utilities.write(ephys_sweeps_file, ephys_sweeps)
 
 
-def test_2():
+def test_2(neuron_config_file):
     # initialize the neuron
-    neuron_config = json_utilities.read('neuron_config.json')
+    neuron_config = json_utilities.read(neuron_config_file)
     neuron = GlifNeuron.from_dict(neuron_config)
 
     # make a short square pulse. stimulus units should be in Amps.
@@ -115,9 +127,9 @@ def test_2():
 
 
 @pytest.mark.skipif(True, reason="needs nwb file")
-def test_3():
-    neuron_config = json_utilities.read('neuron_config.json')
-    ephys_sweeps = json_utilities.read('ephys_sweeps.json')
+def test_3(neuron_config_file, ephys_sweeps_file):
+    neuron_config = json_utilities.read(neuron_config_file)
+    ephys_sweeps = json_utilities.read(ephys_sweeps_file)
     ephys_file_name = 'stimulus.nwb'
 
     neuron = GlifNeuron.from_dict(neuron_config)
@@ -130,9 +142,9 @@ def test_3():
 
 
 @pytest.fixture
-def stimulus():
-    neuron_config = json_utilities.read('neuron_config.json')
-    ephys_sweeps = json_utilities.read('ephys_sweeps.json')
+def stimulus(neuron_config_file, ephys_sweeps_file):
+    neuron_config = json_utilities.read(neuron_config_file)
+    ephys_sweeps = json_utilities.read(ephys_sweeps_file)
     ephys_file_name = 'stimulus.nwb'
 
     # pull out the stimulus for the first sweep
@@ -205,14 +217,14 @@ def test_5(output):
 
 
 @pytest.mark.skipif(True, reason="needs nwb file")
-def test_6(stimulus):
+def test_6(neuron_config_file, stimulus):
     # define your own custom voltage reset rule
     # this one linearly scales the input voltage
     def custom_voltage_reset_rule(neuron, voltage_t0, custom_param_a, custom_param_b):
         return custom_param_a * voltage_t0 + custom_param_b
 
     # initialize a neuron from a neuron config file
-    neuron_config = json_utilities.read('neuron_config.json')
+    neuron_config = json_utilities.read(neuron_config_file)
     neuron = GlifNeuron.from_dict(neuron_config)
 
     # configure a new method and overwrite the neuron's old method
