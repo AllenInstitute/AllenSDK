@@ -303,8 +303,6 @@ class Manifest(object):
         directory : string
             create it if it doesn't exist
         '''
-        
-
         try:
             os.makedirs(directory)
         except OSError as e:
@@ -314,6 +312,15 @@ class Manifest(object):
                 # EISDIR and not EEXIST
                 # https://bugs.python.org/issue24231 (old but still holds true)
                 pass
+            elif sys.platform == "win32" and e.errno == errno.EACCES:
+                root_path = os.path.abspath(os.sep)
+                if e.filename == root_path or \
+                   e.filename == root_path.replace("\\", "/"):
+                    # When attempting to os.makedirs the root drive letter on
+                    # Windows, EACCES is raised, not EEXIST
+                    pass
+                else:
+                    raise
             elif e.errno == errno.EEXIST:
                 pass
             else:

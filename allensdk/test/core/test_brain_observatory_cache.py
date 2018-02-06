@@ -40,6 +40,7 @@ from allensdk.core.brain_observatory_cache import (BrainObservatoryCache,
                                                    _merge_transgenic_lines,
                                                    _find_specimen_cre_line,
                                                    _find_specimen_reporter_line)
+from allensdk.api.queries.brain_observatory_api import BrainObservatoryApi
 
 try:
     import __builtin__ as builtins  # @UnresolvedImport
@@ -107,11 +108,12 @@ def brain_observatory_cache():
             boc = BrainObservatoryCache(manifest_file='boc/manifest.json',
                                         base_uri='http://api.brain-map.org')
 
-    boc.api.json_msg_query = MagicMock(name='json_msg_query')
-
     return boc
 
-def test_get_all_targeted_structures(brain_observatory_cache):
+
+@patch.object(BrainObservatoryApi, "json_msg_query")
+def test_get_all_targeted_structures(mock_json_msg_query,
+                                     brain_observatory_cache):
     with patch('os.path.exists') as m:
         m.return_value = False
 
@@ -121,7 +123,7 @@ def test_get_all_targeted_structures(brain_observatory_cache):
                        MagicMock(name='read_json')):
                 brain_observatory_cache.get_all_targeted_structures()
 
-        brain_observatory_cache.api.json_msg_query.assert_called_once_with(
+        mock_json_msg_query.assert_called_once_with(
             "http://api.brain-map.org/api/v2/data/query.json?q="
             "model::ExperimentContainer,rma::include,"
             "ophys_experiments,isi_experiment,"
@@ -130,7 +132,9 @@ def test_get_all_targeted_structures(brain_observatory_cache):
             "rma::options[num_rows$eq'all'][count$eqfalse]")
 
 
-def test_get_experiment_containers(brain_observatory_cache):
+@patch.object(BrainObservatoryApi, "json_msg_query")
+def test_get_experiment_containers(mock_json_msg_query,
+                                   brain_observatory_cache):
     with patch('os.path.exists') as m:
         m.return_value = False
 
@@ -142,7 +146,7 @@ def test_get_experiment_containers(brain_observatory_cache):
                 visp_ecs = brain_observatory_cache.get_experiment_containers(
                     targeted_structures=['VISp'])
 
-    brain_observatory_cache.api.json_msg_query.assert_called_once_with(
+    mock_json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::ExperimentContainer,rma::include,"
         "ophys_experiments,isi_experiment,"
@@ -150,7 +154,9 @@ def test_get_experiment_containers(brain_observatory_cache):
         "rma::options[num_rows$eq'all'][count$eqfalse]")
 
 
-def test_get_all_cre_lines(brain_observatory_cache):
+@patch.object(BrainObservatoryApi, "json_msg_query")
+def test_get_all_cre_lines(mock_json_msg_query,
+                           brain_observatory_cache):
     with patch('os.path.exists') as m:
         m.return_value = False
 
@@ -161,7 +167,7 @@ def test_get_all_cre_lines(brain_observatory_cache):
                 # Download a list of all cre lines
                 tls = brain_observatory_cache.get_all_cre_lines()
 
-    brain_observatory_cache.api.json_msg_query.assert_called_once_with(
+    mock_json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::ExperimentContainer,rma::include,"
         "ophys_experiments,isi_experiment,"
@@ -169,7 +175,9 @@ def test_get_all_cre_lines(brain_observatory_cache):
         "rma::options[num_rows$eq'all'][count$eqfalse]")
 
 
-def test_get_ophys_experiments(brain_observatory_cache):
+@patch.object(BrainObservatoryApi, "json_msg_query")
+def test_get_ophys_experiments(mock_json_msg_query,
+                               brain_observatory_cache):
     with patch('os.path.exists') as m:
         m.return_value = False
 
@@ -180,14 +188,17 @@ def test_get_ophys_experiments(brain_observatory_cache):
                 # Download a list of all transgenic driver lines
                 tls = brain_observatory_cache.get_ophys_experiments()
 
-    brain_observatory_cache.api.json_msg_query.assert_called_once_with(
+    mock_json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::OphysExperiment,rma::include,experiment_container,"
         "well_known_files(well_known_file_type),targeted_structure,"
         "specimen(donor(age,transgenic_lines)),"
         "rma::options[num_rows$eq'all'][count$eqfalse]")
 
-def test_get_all_session_types(brain_observatory_cache):
+
+@patch.object(BrainObservatoryApi, "json_msg_query")
+def test_get_all_session_types(mock_json_msg_query,
+                               brain_observatory_cache):
     with patch('os.path.exists') as m:
         m.return_value = False
 
@@ -198,7 +209,7 @@ def test_get_all_session_types(brain_observatory_cache):
                 # Download a list of all transgenic driver lines
                 tls = brain_observatory_cache.get_all_session_types()
 
-    brain_observatory_cache.api.json_msg_query.assert_called_once_with(
+    mock_json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::OphysExperiment,rma::include,experiment_container,"
         "well_known_files(well_known_file_type),targeted_structure,"
@@ -206,7 +217,9 @@ def test_get_all_session_types(brain_observatory_cache):
         "rma::options[num_rows$eq'all'][count$eqfalse]")
 
 
-def test_get_stimulus_mappings(brain_observatory_cache):
+@patch.object(BrainObservatoryApi, "json_msg_query")
+def test_get_stimulus_mappings(mock_json_msg_query,
+                               brain_observatory_cache):
     with patch('os.path.exists') as m:
         m.return_value = False
 
@@ -217,14 +230,16 @@ def test_get_stimulus_mappings(brain_observatory_cache):
                 # Download a list of all transgenic driver lines
                 tls = brain_observatory_cache._get_stimulus_mappings()
 
-    brain_observatory_cache.api.json_msg_query.assert_called_once_with(
+    mock_json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::ApiCamStimulusMapping,"
         "rma::options[num_rows$eq'all'][count$eqfalse]")
 
 
 @pytest.mark.skipif(True, reason="need to develop mocks")
-def test_get_cell_specimens(brain_observatory_cache):
+@patch.object(BrainObservatoryApi, "json_msg_query")
+def test_get_cell_specimens(mock_json_msg_query,
+                            brain_observatory_cache):
     with patch('os.path.exists') as m:
         m.return_value = False
 
@@ -233,7 +248,7 @@ def test_get_cell_specimens(brain_observatory_cache):
             # Download a list of all transgenic driver lines
             tls = brain_observatory_cache.get_cell_specimens()
 
-    brain_observatory_cache.api.json_msg_query.assert_called_once_with(
+    mock_json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q=")
 
 
