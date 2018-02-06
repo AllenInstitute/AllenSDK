@@ -20,8 +20,10 @@ install:
   - activate test-environment
   - conda install statsmodels
   - if %PYTHON% == 2.7 conda install scikit-image
+  - pip install codecov
   - pip install -r test_requirements.txt
   - pip install .
 
 test_script:
-  - py.test
+  - py.test --cov=allensdk
+  - codecov
