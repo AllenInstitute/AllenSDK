@@ -44,13 +44,13 @@ import os
 
 
 @pytest.fixture
-def neuron_config_file(md_temp_dir):
-    return os.path.join(md_temp_dir, "neuron_config.json")
+def neuron_config_file(fn_temp_dir):
+    return os.path.join(fn_temp_dir, "neuron_config.json")
 
 
 @pytest.fixture
-def ephys_sweeps_file(md_temp_dir):
-    return os.path.join(md_temp_dir, "ephys_sweeps.json")
+def ephys_sweeps_file(fn_temp_dir):
+    return os.path.join(fn_temp_dir, "ephys_sweeps.json")
 
 
 @pytest.fixture
@@ -63,11 +63,27 @@ def glif_api():
     else:
         return GlifApi()
 
+
 @pytest.fixture
 def neuronal_model_id():
     neuronal_model_id = 566302806
 
     return neuronal_model_id
+
+
+@pytest.fixture
+def configured_glif_api(glif_api, neuronal_model_id, neuron_config_file,
+                        ephys_sweeps_file):
+    glif_api.get_neuronal_model(neuronal_model_id)
+
+    neuron_config = glif_api.get_neuron_config()
+    json_utilities.write(neuron_config_file, neuron_config)
+
+    ephys_sweeps = glif_api.get_ephys_sweeps()
+    json_utilities.write(ephys_sweeps_file, ephys_sweeps)
+
+    return glif_api
+
 
 
 @pytest.fixture
@@ -94,20 +110,28 @@ def output(neuron_config_file, ephys_sweeps_file):
     return output
 
 
-def test_1(neuron_config_file, ephys_sweeps_file, fn_temp_dir, glif_api,
-           neuronal_model_id):
+@pytest.fixture
+def stimulus(neuron_config_file, ephys_sweeps_file):
+    neuron_config = json_utilities.read(neuron_config_file)
+    ephys_sweeps = json_utilities.read(ephys_sweeps_file)
+    ephys_file_name = 'stimulus.nwb'
+
+    # pull out the stimulus for the first sweep
+    ephys_sweep = ephys_sweeps[0]
+    ds = NwbDataSet(ephys_file_name)
+    data = ds.get_sweep(ephys_sweep['sweep_number'])
+    stimulus = data['stimulus']
+
+    return stimulus
+
+
+def test_cache_stimulus(neuron_config_file, ephys_sweeps_file, fn_temp_dir,
+                        configured_glif_api):
     nwb_path = os.path.join(fn_temp_dir, 'stimulus.nwb')
-    glif_api.get_neuronal_model(neuronal_model_id)
-    glif_api.cache_stimulus_file(nwb_path)
-
-    neuron_config = glif_api.get_neuron_config()
-    json_utilities.write(neuron_config_file, neuron_config)
-
-    ephys_sweeps = glif_api.get_ephys_sweeps()
-    json_utilities.write(ephys_sweeps_file, ephys_sweeps)
+    configured_glif_api.cache_stimulus_file(nwb_path)
 
 
-def test_2(neuron_config_file):
+def test_run_glifneuron(configured_glif_api, neuron_config_file):
     # initialize the neuron
     neuron_config = json_utilities.read(neuron_config_file)
     neuron = GlifNeuron.from_dict(neuron_config)
@@ -127,7 +151,7 @@ def test_2(neuron_config_file):
 
 
 @pytest.mark.skipif(True, reason="needs nwb file")
-def test_3(neuron_config_file, ephys_sweeps_file):
+def test_3(configured_glif_api, neuron_config_file, ephys_sweeps_file):
     neuron_config = json_utilities.read(neuron_config_file)
     ephys_sweeps = json_utilities.read(ephys_sweeps_file)
     ephys_file_name = 'stimulus.nwb'
@@ -139,21 +163,6 @@ def test_3(neuron_config_file, ephys_sweeps_file):
     sweep_numbers = [7]
     simulate_neuron(neuron, sweep_numbers,
                     ephys_file_name, ephys_file_name, 0.05)
-
-
-@pytest.fixture
-def stimulus(neuron_config_file, ephys_sweeps_file):
-    neuron_config = json_utilities.read(neuron_config_file)
-    ephys_sweeps = json_utilities.read(ephys_sweeps_file)
-    ephys_file_name = 'stimulus.nwb'
-
-    # pull out the stimulus for the first sweep
-    ephys_sweep = ephys_sweeps[0]
-    ds = NwbDataSet(ephys_file_name)
-    data = ds.get_sweep(ephys_sweep['sweep_number'])
-    stimulus = data['stimulus']
-
-    return stimulus
 
 
 @pytest.mark.skipif(True, reason="needs nwb file")
@@ -217,7 +226,7 @@ def test_5(output):
 
 
 @pytest.mark.skipif(True, reason="needs nwb file")
-def test_6(neuron_config_file, stimulus):
+def test_6(configured_glif_api, neuron_config_file, stimulus):
     # define your own custom voltage reset rule
     # this one linearly scales the input voltage
     def custom_voltage_reset_rule(neuron, voltage_t0, custom_param_a, custom_param_b):
