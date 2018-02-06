@@ -122,9 +122,10 @@ def test_get_annotation_volume(mcc, fn_temp_dir):
     eye = np.eye(100)
     path = os.path.join(fn_temp_dir, 'annotation', 'ccf_2017', 
                         'annotation_25.nrrd')
-
-    mcc.api.retrieve_file_over_http = lambda a, b: nrrd.write(b, eye)
-    obtained, _ = mcc.get_annotation_volume()
+ 
+    with mock.patch.object(mcc.api, "retrieve_file_over_http",
+                           new=lambda a, b: nrrd.write(b, eye)):
+        obtained, _ = mcc.get_annotation_volume()
 
     with mock.patch.object(mcc.api, "retrieve_file_over_http") as mock_rtrv:
         mcc.get_annotation_volume()
@@ -135,7 +136,6 @@ def test_get_annotation_volume(mcc, fn_temp_dir):
 
 
 def test_get_template_volume(mcc, fn_temp_dir):
-
     eye = np.eye(100)
     path = os.path.join(fn_temp_dir, 'average_template_25.nrrd')
 
@@ -274,8 +274,6 @@ def test_get_experiments(mcc, fn_temp_dir, experiments):
 
 def test_filter_experiments(mcc, fn_temp_dir, experiments):
 
-    print(os.path.exists(os.path.join(fn_temp_dir, "experiments.json")))
-
     pass_line = mcc.filter_experiments(experiments, cre=True)
     fail_line = mcc.filter_experiments(experiments, cre=False)
 
@@ -323,13 +321,14 @@ def test_get_experiment_structure_unionizes(mcc, fn_temp_dir, unionizes):
     path = os.path.join(fn_temp_dir, 'experiment_{0}'.format(eid), 
                         'structure_unionizes.csv')
 
-    mcc.api.model_query = lambda *args, **kwargs: unionizes
-    obtained = mcc.get_experiment_structure_unionizes(eid)
+    with mock.patch.object(mcc.api, "model_query",
+                           new=lambda *args, **kwargs: unionizes):
+        obtained = mcc.get_experiment_structure_unionizes(eid)
 
-    mcc.api.model_query = mock.MagicMock()
-    mcc.get_experiment_structure_unionizes(eid)
+    with mock.patch.object(mcc.api, "model_query") as mock_query:
+        mcc.get_experiment_structure_unionizes(eid)
 
-    mcc.api.model_query.assert_not_called()
+    mock_query.assert_not_called()
     assert obtained.loc[0, 'projection_intensity'] == 263.231
     assert os.path.exists(path)
 
@@ -349,9 +348,9 @@ def test_filter_structure_unionizes(mcc, unionizes):
 
 def test_get_structure_unionizes(mcc, unionizes):
 
-    mcc.get_experiment_structure_unionizes = \
-        lambda *a, **k: pd.DataFrame(unionizes)
-    obtained = mcc.get_structure_unionizes([1, 2, 3])
+    with mock.patch.object(mcc, "get_experiment_structure_unionizes",
+                           new=lambda *a, **k: pd.DataFrame(unionizes)):
+        obtained = mcc.get_structure_unionizes([1, 2, 3])
 
     assert obtained.shape[0] == 6
 
@@ -368,14 +367,14 @@ def test_get_projection_matrix(mcc):
                   'hemisphere_id': 2, 
                   'value': 40},]
 
-    mcc.get_structure_unionizes = lambda *a, **k: pd.DataFrame(unionizes)
-
-    class FakeTree(object):
-        def value_map(*a, **k):
-            return {1: 'one', 2: 'two'}
-    mcc.get_structure_tree = lambda *a, **k: FakeTree()
-
-    obtained = mcc.get_projection_matrix([1], [2], [1, 2], ['value'])
+    with mock.patch.object(mcc, "get_structure_unionizes",
+                           new=lambda *a, **k: pd.DataFrame(unionizes)):
+        class FakeTree(object):
+            def value_map(*a, **k):
+                return {1: 'one', 2: 'two'}
+        with mock.patch.object(mcc, "get_structure_tree",
+                               new=lambda *a, **k: FakeTree()):
+            obtained = mcc.get_projection_matrix([1], [2], [1, 2], ['value'])
 
     assert np.allclose(obtained['matrix'], np.array([[30, 40]]))
     assert np.array_equal([ii['label'] for ii in obtained['columns']], 
@@ -385,12 +384,12 @@ def test_get_projection_matrix(mcc):
 def test_get_reference_space(mcc, new_nodes):
 
     tree = StructureTree(StructureTree.clean_structures(new_nodes))
-    mcc.get_structure_tree = lambda *a, **k: tree
-
-    annot = np.arange(125).reshape((5, 5, 5))
-    mcc.get_annotation_volume = lambda *a, **k: (annot, 'foo')
-
-    rsp_obt = mcc.get_reference_space()
+    with mock.patch.object(mcc, "get_structure_tree",
+                           new=lambda *a, **k: tree):
+        annot = np.arange(125).reshape((5, 5, 5))
+        with mock.patch.object(mcc, "get_annotation_volume",
+                               new=lambda *a, **k: (annot, 'foo')):
+            rsp_obt = mcc.get_reference_space()
 
     assert( np.allclose(rsp_obt.resolution, [25, 25, 25]) )
     assert( np.allclose( rsp_obt.annotation, annot ) )
@@ -404,8 +403,9 @@ def test_get_structure_mask(mcc, fn_temp_dir):
     path = os.path.join(fn_temp_dir, 'annotation', 'ccf_2017', 'structure_masks', 
                         'resolution_25', 'structure_{0}.nrrd'.format(sid))
 
-    mcc.api.retrieve_file_over_http = lambda a, b: nrrd.write(b, eye)
-    obtained, _ = mcc.get_structure_mask(sid)
+    with mock.patch.object(mcc.api, "retrieve_file_over_http",
+                           new=lambda a, b: nrrd.write(b, eye)):
+        obtained, _ = mcc.get_structure_mask(sid)
 
     with mock.patch.object(mcc.api, "retrieve_file_over_http") as mock_rtrv:
         mcc.get_structure_mask(sid)
