@@ -11,7 +11,7 @@ def mock_request():
 
 
 @pytest.mark.parametrize("ismount,base_path",[
-    (True, "/dev/shm"),
+    (True, os.path.normpath(os.path.join('/', 'dev', 'shm'))),
     (False, os.path.dirname(temp_dir.__file__))
 ])
 @patch("numpy.random.randint", side_effect=([1, 2, 3, 4, 5, 6],
