@@ -41,16 +41,11 @@ from requests.exceptions import HTTPError
 from six.moves import builtins
 import requests
 
+_msg = {'whatever': True}
 
 @pytest.fixture
 def api():
-    ju.read_url_post = \
-        MagicMock(name='read_url_post',
-                  return_value={'whatever': True})
-
-    api = Api()
-
-    return api
+    return Api()
 
 
 @pytest.mark.xfail
@@ -91,34 +86,29 @@ def test_request_timeout(api):
     os_remove.assert_called_once_with('/tmp/testfile')
 
 
-def test_do_query_post(api):
+@patch("allensdk.core.json_utilities.read_url_post", return_value=_msg)
+def test_do_query_post(ju_read_url_post, api):
     api.do_query(lambda *a, **k: 'http://localhost/%s' % (a[0]),
                  lambda d: d,
                  "wow",
                  post=True)
 
-    ju.read_url_post.assert_called_once_with('http://localhost/wow')
+    ju_read_url_post.assert_called_once_with('http://localhost/wow')
 
 
-def test_do_query_get(api):
-    ju.read_url_get = \
-        MagicMock(name='read_url_get',
-                  return_value={'whatever': True})
-
+@patch("allensdk.core.json_utilities.read_url_get", return_value=_msg)
+def test_do_query_get(ju_read_url_get, api):
     api.do_query(lambda *a, **k: 'http://localhost/%s' % (a[0]),
                  lambda d: d,
                  "wow",
                  post=False)
 
-    ju.read_url_get.assert_called_once_with('http://localhost/wow')
+    ju_read_url_get.assert_called_once_with('http://localhost/wow')
 
 
-def test_load_api_schema(api):
-    ju.read_url_get = \
-        MagicMock(name='read_url_get',
-                  return_value={'whatever': True})
-
+@patch("allensdk.core.json_utilities.read_url_get", return_value=_msg)
+def test_load_api_schema(ju_read_url_get, api):
     api.load_api_schema()
 
-    ju.read_url_get.assert_called_once_with(
+    ju_read_url_get.assert_called_once_with(
         'http://api.brain-map.org/api/v2/data/enumerate.json')

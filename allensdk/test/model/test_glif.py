@@ -83,9 +83,10 @@ def output():
     return output
 
 
-def test_1(glif_api, neuronal_model_id):
+def test_1(fn_temp_dir, glif_api, neuronal_model_id):
+    nwb_path = os.path.join(fn_temp_dir, 'stimulus.nwb')
     glif_api.get_neuronal_model(neuronal_model_id)
-    glif_api.cache_stimulus_file('stimulus.nwb')
+    glif_api.cache_stimulus_file(nwb_path)
 
     neuron_config = glif_api.get_neuron_config()
     json_utilities.write('neuron_config.json', neuron_config)

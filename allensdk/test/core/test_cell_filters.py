@@ -138,14 +138,14 @@ def cells():
 @pytest.fixture
 def api():
     boi = BrainObservatoryApi()
-    
+
     return boi
 
 
 @pytest.fixture
 def unmocked_boc():
     boc = BrainObservatoryCache()
-    
+
     return boc
 
 
@@ -166,8 +166,6 @@ def brain_observatory_cache():
             # Download a list of all targeted areas
             boc = BrainObservatoryCache(manifest_file='boc/manifest.json',
                                         base_uri='http://api.brain-map.org')
-
-    boc.api.json_msg_query = MagicMock(name='json_msg_query')
 
     return boc
 
@@ -212,7 +210,9 @@ QUERY_TEMPLATES = {
 
 
 @pytest.mark.skipif(True, reason="not done")
-def test_dataframe_query(brain_observatory_cache,
+@patch.object(BrainObservatoryApi, "json_msg_query")
+def test_dataframe_query(mock_json_msg_query,
+                         brain_observatory_cache,
                          between_filter,
                          cells):
     brain_observatory_cache = unmocked_boc
