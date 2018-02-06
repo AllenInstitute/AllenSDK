@@ -38,13 +38,16 @@ import numpy as np
 import pytest
 import os
 
+
 @pytest.fixture
 def neuronal_model_id():
     return 566283950
 
+
 @pytest.fixture
 def specimen_id():
     return 325464516
+
 
 @pytest.fixture
 def glif_api():
@@ -101,7 +104,7 @@ def test_get_neuron_configs(glif_api, specimen_id):
     np.testing.assert_almost_equal(glif_api.get_neuron_configs([neuronal_model_id])[neuronal_model_id]['th_inf'], 0.024561992461740227)
 
 @pytest.mark.skipif(glif_api() is None, reason='No TEST_API_ENDPOINT set.')
-def test_deprecated(glif_api, neuronal_model_id):
+def test_deprecated(fn_temp_dir, glif_api, neuronal_model_id):
 
     # Exercising deprecated functionality
     len(glif_api.list_neuronal_models())
@@ -114,5 +117,6 @@ def test_deprecated(glif_api, neuronal_model_id):
     glif_api.get_neuronal_model(neuronal_model_id)
     x = glif_api.get_neuron_config()
 
+    nwb_path = os.path.join(fn_temp_dir, 'tmp.nwb')
     glif_api.get_neuronal_model(neuronal_model_id)
-    glif_api.cache_stimulus_file('tmp.nwb')
+    glif_api.cache_stimulus_file(nwb_path)
