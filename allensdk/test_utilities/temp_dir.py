@@ -56,7 +56,7 @@ def temp_dir(request):
     fls = os.listdir(base_path)
     while True:
         dname = ''.join(map(str, np.random.randint(0, 10, 6)))
-        if dname not in fls:
+        if "allensdk_test_{}".format(dname) not in fls:
             break
 
     specific_path = os.path.join(base_path, 'allensdk_test_' + dname)
