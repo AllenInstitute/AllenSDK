@@ -34,6 +34,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import pytest
+import os
 from allensdk.config.manifest_builder import ManifestBuilder
 
 
@@ -47,7 +48,7 @@ def builder():
 
 def testManifestConstructor(builder):
     manifest = builder.get_manifest()
-    expected = '/home/username/example'
+    expected = os.path.abspath('/home/username/example')
     actual = manifest.get_path('BASEDIR')
     assert(expected == actual)
 
@@ -57,7 +58,7 @@ def testManifestParent(builder):
                      'work',
                      parent_key='BASEDIR')
     manifest = builder.get_manifest()
-    expected = '/home/username/example/work'
+    expected = os.path.abspath('/home/username/example/work')
     actual = manifest.get_path('WORKDIR')
     assert(expected == actual)
 
