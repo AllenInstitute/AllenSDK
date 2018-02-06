@@ -40,32 +40,18 @@ from allensdk.config.manifest import Manifest
 import allensdk.core.json_utilities as ju
 import pandas.io.json as pj
 import pandas as pd
+from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi as MCA
+
 
 try:
     import StringIO
 except:
     import io as StringIO
 
-try:
-    reload
-except NameError:
-    try:
-        from importlib import reload
-    except ImportError:
-        from imp import reload
 
-
-@pytest.fixture(scope='module', autouse=True)
-def mock_imports():
-    with patch('nrrd.read',
-               Mock(name='nrrd_read_file_mcm',
-                    return_value=('mock_annotation_data',
-                                  'mock_annotation_image'))) as nrrd_read:
-        import allensdk.api.queries.mouse_connectivity_api
-        reload(allensdk.api.queries.mouse_connectivity_api)
-        from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi as MCA
-
-    return nrrd_read, MCA
+@pytest.fixture
+def mca():
+    return MCA()
 
 
 @pytest.fixture
@@ -74,13 +60,11 @@ def cache():
 
 
 @pytest.mark.parametrize("file_exists", (True, False))
+@patch("nrrd.read", return_value=('mock_annotation_data',
+                                  'mock_annotation_image'))
 @patch.object(Manifest, 'safe_mkdir')
-def test_file_download_lazy(safe_mkdir, mock_imports, cache, file_exists):
-    nrrd_read, MCA = mock_imports
-
-    with patch.object(MCA, "retrieve_file_over_http") as mock_retrieve:
-        mca = MCA()
-
+def test_file_download_lazy(nrrd_read, safe_mkdir, mca, cache, file_exists):
+    with patch.object(mca, "retrieve_file_over_http") as mock_retrieve:
         @cacheable(strategy='lazy',
                 reader=nrrd_read,
                 pathfinder=Cache.pathfinder(file_name_position=3,
@@ -121,13 +105,11 @@ def test_file_download_lazy(safe_mkdir, mock_imports, cache, file_exists):
 
 
 @pytest.mark.parametrize("file_exists", (True, False))
+@patch("nrrd.read", return_value=('mock_annotation_data',
+                                  'mock_annotation_image'))
 @patch.object(Manifest, 'safe_mkdir')
-def test_file_download_server(safe_mkdir, mock_imports, cache, file_exists):
-    nrrd_read, MCA = mock_imports
-
-    with patch.object(MCA, "retrieve_file_over_http") as mock_retrieve:
-        mca = MCA()
-
+def test_file_download_server(nrrd_read, safe_mkdir, mca, cache, file_exists):
+    with patch.object(mca, "retrieve_file_over_http") as mock_retrieve:
         @cacheable(reader=nrrd_read,
                 pathfinder=Cache.pathfinder(file_name_position=3,
                                             secondary_file_name_position=1))
@@ -165,13 +147,11 @@ def test_file_download_server(safe_mkdir, mock_imports, cache, file_exists):
 
 
 @pytest.mark.parametrize("file_exists", (True, False))
+@patch("nrrd.read", return_value=('mock_annotation_data',
+                                  'mock_annotation_image'))
 @patch.object(Manifest, 'safe_mkdir')
-def test_file_download_cached_file(safe_mkdir, mock_imports, cache, file_exists):
-    nrrd_read, MCA = mock_imports
-
-    with patch.object(MCA, "retrieve_file_over_http") as mock_retrieve:
-        mca = MCA()
-
+def test_file_download_cached_file(nrrd_read, safe_mkdir, mca, cache, file_exists):
+    with patch.object(mca, "retrieve_file_over_http") as mock_retrieve:
         @cacheable(reader=nrrd_read,
                 pathfinder=Cache.pathfinder(file_name_position=3,
                                             secondary_file_name_position=1))
@@ -207,13 +187,11 @@ def test_file_download_cached_file(safe_mkdir, mock_imports, cache, file_exists)
 
 
 @pytest.mark.parametrize("file_exists", (True, False))
+@patch("nrrd.read", return_value=('mock_annotation_data',
+                                  'mock_annotation_image'))
 @patch.object(Manifest, 'safe_mkdir')
-def test_file_kwarg(safe_mkdir, mock_imports, cache, file_exists):
-    nrrd_read, MCA = mock_imports
-
-    with patch.object(MCA, "retrieve_file_over_http") as mock_retrieve:
-        mca = MCA()
-
+def test_file_kwarg(nrrd_read, safe_mkdir, mca, cache, file_exists):
+    with patch.object(mca, "retrieve_file_over_http") as mock_retrieve:
         @cacheable(reader=nrrd_read,
                 pathfinder=Cache.pathfinder(file_name_position=3,
                                             secondary_file_name_position=1,
@@ -248,11 +226,3 @@ def test_file_kwarg(safe_mkdir, mock_imports, cache, file_exists):
         assert not mock_retrieve.called, 'server should not have been called'
         assert not safe_mkdir.called, 'safe_mkdir should not have been called.'
         nrrd_read.assert_called_once_with('file.nrrd')
-
-
-@pytest.mark.run('last')
-def test_cleanup():
-    import allensdk.api.queries.mouse_connectivity_api
-    reload(allensdk.api.queries.mouse_connectivity_api)
-    import allensdk.core.mouse_connectivity_cache
-    reload(allensdk.core.mouse_connectivity_cache)
