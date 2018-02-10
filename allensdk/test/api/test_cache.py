@@ -48,9 +48,9 @@ import allensdk.core.json_utilities as ju
 from allensdk.config.manifest import ManifestVersionError
 from allensdk.config.manifest_builder import ManifestBuilder
 
-
 _msg = [{'whatever': True}]
 _pd_msg = pd.DataFrame(_msg)
+
 
 @pytest.fixture
 def cache():
