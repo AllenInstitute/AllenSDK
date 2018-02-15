@@ -62,89 +62,32 @@ _csv_msg = pd.DataFrame.from_csv(StringIO.StringIO(""",whatever
 0,True
 """))
 
+_read_url_get_msg5 = [{'msg': _msg},
+                      {'msg': _msg},
+                      {'msg': _msg},
+                      {'msg': _msg},
+                      {'msg': _msg}]
+_pj_msg5 = pd.DataFrame([{'whatever': True},
+                         {'whatever': True},
+                         {'whatever': True},
+                         {'whatever': True},
+                         {'whatever': True}])
+_read_msg5 = [{'whatever': True},
+              {'whatever': True},
+              {'whatever': True},
+              {'whatever': True},
+              {'whatever': True}]
+
 @pytest.fixture
 def rma():
-    ju.read_url_get = \
-        MagicMock(name='read_url_get',
-                  return_value={'msg': _msg})
-    json.dumps = \
-        MagicMock(name='dumps')
+    return RmaApi()
 
-    ju.read = \
-        MagicMock(name='read',
-                  return_value=_msg)
-
-    pj.read_json = \
-        MagicMock(name='read_json',
-                  return_value=_pd_msg)
-
-    pd.DataFrame.to_csv = \
-        MagicMock(name='to_csv')
-
-    pd.DataFrame.from_csv = \
-        MagicMock(name='from_csv',
-                  return_value=_csv_msg)
-    
-    os.makedirs = MagicMock(name='makedirs')
-
-    return { 'ju_read_url_get': ju.read_url_get,
-             'ju_write': ju.write,
-             'ju_read': ju.read,
-             'pj_read_json': pj.read_json,
-             'to_csv': pd.DataFrame.to_csv,
-             'from_csv': pd.DataFrame.from_csv,
-             'os_makedirs': os.makedirs,
-             'rma_api': RmaApi() }
-
-@pytest.fixture
-def rma5():
-    ju.read_url_get = \
-        MagicMock(name='read_url_get',
-                  side_effect = [{'msg': _msg},
-                                 {'msg': _msg},
-                                 {'msg': _msg},
-                                 {'msg': _msg},
-                                 {'msg': _msg}])
-
-    ju.read = \
-        MagicMock(name='read',
-                  return_value=[{'whatever': True},
-                                {'whatever': True},
-                                {'whatever': True},
-                                {'whatever': True},
-                                {'whatever': True}])
-
-    pj.read_json = \
-        MagicMock(name='read_json',
-                  return_value=pd.DataFrame([{'whatever': True},
-                                             {'whatever': True},
-                                             {'whatever': True},
-                                             {'whatever': True},
-                                             {'whatever': True}]))
-
-    pd.DataFrame.to_csv = \
-        MagicMock(name='to_csv')
-
-    pd.DataFrame.from_csv = \
-        MagicMock(name='from_csv',
-                  return_value=_csv_msg)
-    
-    os.makedirs = MagicMock(name='makedirs')
-
-    return { 'ju_read_url_get': ju.read_url_get,
-             #'ju_write': json.dumps,
-             'ju_read': ju.read,
-             'pj_read_json': pj.read_json,
-             'to_csv': pd.DataFrame.to_csv,
-             'from_csv': pd.DataFrame.from_csv,
-             'os_makedirs': os.makedirs,
-             'rma_api': RmaApi() }
-
-def test_pageable_json(rma):
+@patch("allensdk.core.json_utilities.read_url_get",
+       return_value={'msg': _msg})
+def test_pageable_json(ju_read_url_get, rma):
     @pageable()
     def get_genes(**kwargs):
-        return rma['rma_api'].model_query(model='Gene',
-                                          **kwargs)
+        return rma.model_query(model='Gene', **kwargs)
 
     nr = 5
     pp = 1
@@ -166,13 +109,15 @@ def test_pageable_json(rma):
     expected_calls = map(lambda c: call(base_query.format(c)),
                          [0, 1, 2, 3, 4])
                      
-    assert rma['ju_read_url_get'].call_args_list == list(expected_calls)
+    assert ju_read_url_get.call_args_list == list(expected_calls)
 
 
-def test_all(rma5):
+@patch("allensdk.core.json_utilities.read_url_get",
+       side_effect=_read_url_get_msg5)
+def test_all(ju_read_url_get, rma):
     @pageable()
     def get_genes(**kwargs):
-        return rma5['rma_api'].model_query(model='Gene', **kwargs)
+        return rma.model_query(model='Gene', **kwargs)
 
     nr = 1
 
@@ -193,14 +138,18 @@ def test_all(rma5):
     expected_calls = map(lambda c: call(base_query.format(c)),
                          [0, 1, 2, 3, 4, 5])
                      
-    assert rma5['ju_read_url_get'].call_args_list == list(expected_calls)
+    assert ju_read_url_get.call_args_list == list(expected_calls)
 
 
 @pytest.mark.parametrize("cache_style",
                          (Cache.cache_csv,
                           Cache.cache_csv_json,
                           Cache.cache_csv_dataframe))
-def test_cacheable_pageable_csv(rma5,
+@patch.object(pd.DataFrame, "from_csv", return_value=_csv_msg)
+@patch("allensdk.core.json_utilities.read_url_get",
+       side_effect=_read_url_get_msg5)
+@patch("os.makedirs")
+def test_cacheable_pageable_csv(os_makedirs, ju_read_url_get, from_csv,
                                 cache_style):
     archive_templates = \
         {"cam_cell_queries": [
@@ -233,7 +182,7 @@ def test_cacheable_pageable_csv(rma5,
                                      total_rows='all',
                                      **cache_style())
 
-    rma5['os_makedirs'].assert_called_once_with('/path/to')
+    os_makedirs.assert_called_once_with('/path/to')
 
     base_query = ('http://api.brain-map.org/api/v2/data/query.json?'
                   'q=model::ApiCamCellMetric,'
@@ -243,7 +192,8 @@ def test_cacheable_pageable_csv(rma5,
     expected_calls = map(lambda c: call(base_query.format(c)),
                          [0, 1, 2, 3, 4, 5])
 
-    assert rma5['ju_read_url_get'].call_args_list == list(expected_calls)
+    assert ju_read_url_get.call_args_list == list(expected_calls)
+    from_csv.assert_called_once_with('/path/to/cam_cell_metrics.csv')
 
     assert csv_writerow.call_args_list == [call({'whatever': 'whatever'}),
                                            call({'whatever': True}),
@@ -255,8 +205,13 @@ def test_cacheable_pageable_csv(rma5,
 @pytest.mark.parametrize("cache_style",
                          (Cache.cache_json,
                           Cache.cache_json_dataframe))
-def test_cacheable_pageable_json(rma5,
-                                 cache_style):
+@patch("allensdk.core.json_utilities.read", return_value=_read_msg5)
+@patch("pandas.io.json.read_json", return_value=_pj_msg5)
+@patch("allensdk.core.json_utilities.read_url_get",
+       side_effect=_read_url_get_msg5)
+@patch("os.makedirs")
+def test_cacheable_pageable_json(os_makedirs, ju_read_url_get, pj_read_json,
+                                 ju_read, cache_style):
     archive_templates = \
         {"cam_cell_queries": [
             {'name': 'cam_cell_metric',
@@ -294,7 +249,7 @@ def test_cacheable_pageable_json(rma5,
                                  total_rows='all',
                                  **cache_style())
 
-    rma5['os_makedirs'].assert_called_once_with('/path/to')
+    os_makedirs.assert_called_once_with('/path/to')
 
     base_query = \
         ('http://api.brain-map.org/api/v2/data/query.json?'
@@ -307,5 +262,5 @@ def test_cacheable_pageable_json(rma5,
 
     open_mock.assert_called_once_with('/path/to/cam_cell_metrics.json', 'wb')
     open_mock.return_value.write.assert_called_once_with('[\n  {\n    "whatever": true\n  },\n  {\n    "whatever": true\n  },\n  {\n    "whatever": true\n  },\n  {\n    "whatever": true\n  },\n  {\n    "whatever": true\n  }\n]')
-    assert rma5['ju_read_url_get'].call_args_list == list(expected_calls)
+    assert ju_read_url_get.call_args_list == list(expected_calls)
     assert len(cam_cell_metrics) == 5

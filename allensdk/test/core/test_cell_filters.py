@@ -34,6 +34,10 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import pytest
+import os
+import json
+import pandas as pd
+from zipfile import ZipFile
 from mock import patch, mock_open, MagicMock
 from test_brain_observatory_cache import CACHE_MANIFEST
 from allensdk.core.brain_observatory_cache \
@@ -46,6 +50,9 @@ try:
     import __builtin__ as builtins  # @UnresolvedImport
 except:
     import builtins  # @UnresolvedImport
+
+CELL_SPECIMEN_ZIP_URL = ("http://observatory.brain-map.org/visualcoding/"
+                         "data/cell_metrics.csv.zip")
 
 
 @pytest.fixture
@@ -138,19 +145,20 @@ def cells():
 @pytest.fixture
 def api():
     boi = BrainObservatoryApi()
-    
+
     return boi
 
 
 @pytest.fixture
-def unmocked_boc():
-    boc = BrainObservatoryCache()
-    
+def unmocked_boc(fn_temp_dir):
+    manifest_file = os.path.join(fn_temp_dir, "unmocked_boc", "manifest.json")
+    boc = BrainObservatoryCache(manifest_file=manifest_file)
+
     return boc
 
 
 @pytest.fixture
-def brain_observatory_cache():
+def brain_observatory_cache(fn_temp_dir):
     boc = None
 
     try:
@@ -163,13 +171,27 @@ def brain_observatory_cache():
                return_value=True):
         with patch(builtins.__name__ + ".open",
                    mock_open(read_data=manifest_data)):
-            # Download a list of all targeted areas
-            boc = BrainObservatoryCache(manifest_file='boc/manifest.json',
+            manifest_file = os.path.join(fn_temp_dir, "boc", "manifest.json")
+            boc = BrainObservatoryCache(manifest_file=manifest_file,
                                         base_uri='http://api.brain-map.org')
 
-    boc.api.json_msg_query = MagicMock(name='json_msg_query')
-
     return boc
+
+
+@pytest.fixture(scope="module")
+def cell_specimen_table(md_temp_dir):
+    # download a zipped version of the cell specimen table for filter tests
+    # as it is orders of magnitude faster
+    api = BrainObservatoryApi()
+    zipped = os.path.join(md_temp_dir, "cell_specimens.zip")
+    api.retrieve_file_over_http(CELL_SPECIMEN_ZIP_URL, zipped)
+    df = pd.read_csv(ZipFile(zipped).open("cell_metrics.csv"),
+                     true_values="t", false_values="f")
+    js = json.loads(df.to_json(orient="records"))
+    table_file = os.path.join(md_temp_dir, "cell_specimens.json")
+    with open(table_file, "w") as f:
+        json.dump(js, f, indent=1)
+    return table_file
 
 
 @pytest.fixture
@@ -212,7 +234,9 @@ QUERY_TEMPLATES = {
 
 
 @pytest.mark.skipif(True, reason="not done")
-def test_dataframe_query(brain_observatory_cache,
+@patch.object(BrainObservatoryApi, "json_msg_query")
+def test_dataframe_query(mock_json_msg_query,
+                         brain_observatory_cache,
                          between_filter,
                          cells):
     brain_observatory_cache = unmocked_boc
@@ -228,11 +252,13 @@ def test_dataframe_query(brain_observatory_cache,
 
 def test_dataframe_query_unmocked(unmocked_boc,
                                   example_filters,
-                                  cells):
+                                  cells,
+                                  cell_specimen_table):
     brain_observatory_cache = unmocked_boc
 
     cells = brain_observatory_cache.get_cell_specimens(
-        filters=example_filters)
+        filters=example_filters,
+        file_name=cell_specimen_table)
 
     # total lines = 18260, can make fail by passing no filters
     #expected = 105
@@ -241,11 +267,13 @@ def test_dataframe_query_unmocked(unmocked_boc,
 
 def test_dataframe_query_between_unmocked(unmocked_boc,
                                           between_filter,
-                                          cells):
+                                          cells,
+                                          cell_specimen_table):
     brain_observatory_cache = unmocked_boc
 
     cells = brain_observatory_cache.get_cell_specimens(
-        filters=between_filter)
+        filters=between_filter,
+        file_name=cell_specimen_table)
 
     # total lines = 18260, can make fail by passing no filters
     #expected = 15
@@ -253,7 +281,8 @@ def test_dataframe_query_between_unmocked(unmocked_boc,
 
 
 def test_dataframe_query_is_unmocked(unmocked_boc,
-                                     cells):
+                                     cells,
+                                     cell_specimen_table):
     brain_observatory_cache = unmocked_boc
 
     is_filter = [
@@ -263,7 +292,8 @@ def test_dataframe_query_is_unmocked(unmocked_boc,
     ]
 
     cells = brain_observatory_cache.get_cell_specimens(
-        filters=is_filter)
+        filters=is_filter,
+        file_name=cell_specimen_table)
 
     assert len(cells) > 0
 

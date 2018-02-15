@@ -1,0 +1,54 @@
+env:
+  global:
+    - TEST_NWB_FILES=skip
+    - TEST_OBSERVATORY_EXPERIMENT_PLOTS_DATA=skip
+    - TEST_API_ENDPOINT=http://api.brain-map.org 
+    - TEST_COMPLETE=false
+
+matrix:
+  include:
+    - os: linux
+      sudo: required
+      python: 2.7
+      env: TEST_PYTHON_VERSION=2.7
+    - os: linux
+      sudo: required
+      python: 3.6
+      env: TEST_PYTHON_VERSION=3.6
+    - os: osx
+      language: generic
+      env: TEST_PYTHON_VERSION=2.7
+    - os: osx
+      language: generic
+      env: TEST_PYTHON_VERSION=3.6
+
+install:
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+      sudo apt-get update;
+      if [[ "$TEST_PYTHON_VERSION" == "2.7" ]]; then
+        wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh;
+      else
+        wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+      fi
+    else
+      brew update;
+      if [[ "$TEST_PYTHON_VERSION" == "2.7" ]]; then
+        wget https://repo.continuum.io/miniconda/Miniconda2-latest-MacOSX-x86_64.sh -O miniconda.sh;
+      else
+        wget https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh;
+      fi
+    fi
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - export PATH="$HOME/miniconda/bin:$PATH"
+  - hash -r
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update -q conda
+  - conda create -q -n test-environment python=$TEST_PYTHON_VERSION pip
+  - source activate test-environment
+  - pip install codecov
+  - pip install -r test_requirements.txt
+  - pip install .
+
+script:
+  - make test
+  - codecov
