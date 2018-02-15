@@ -128,6 +128,9 @@ class Cache(object):
                                             " and it will be regenerated for you the next"
                                             " time you instantiate this class.") % (file_name, e.found_version, e.version),
                                            e.version, e.found_version)
+
+            self.manifest_path = file_name
+
         else:
             self.manifest = None
 
