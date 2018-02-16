@@ -88,20 +88,27 @@ def test_get_neuronal_model_templates(glif_api):
 @pytest.mark.skipif(glif_api() is None, reason='No TEST_API_ENDPOINT set.')
 def test_get_neuronal_models(glif_api, specimen_id):
 
-    model = glif_api.get_neuronal_models([specimen_id])
+    cells = glif_api.get_neuronal_models([specimen_id])
 
-    assert len(model) == 1
-    assert len(model[0]['neuronal_models']) == 2
+    assert len(cells) == 1
+    assert len(cells[0]['neuronal_models']) == 2
+
+@pytest.mark.skipif(glif_api() is None, reason='No TEST_API_ENDPOINT set.')
+def test_get_neuronal_models_no_ids(glif_api):
+    cells = glif_api.get_neuronal_models()
+    assert len(cells) > 0
 
 
 @pytest.mark.skipif(glif_api() is None, reason='No TEST_API_ENDPOINT set.')
 def test_get_neuron_configs(glif_api, specimen_id):
     model = glif_api.get_neuronal_models([specimen_id])
 
-    neuronal_model_id = model[0]['neuronal_models'][0]['id']
-    assert neuronal_model_id == 566283950
+    neuronal_model_ids = [nm['id'] for nm in model[0]['neuronal_models']]
+    assert set(neuronal_model_ids) == set((566283950, 566283946))
 
-    np.testing.assert_almost_equal(glif_api.get_neuron_configs([neuronal_model_id])[neuronal_model_id]['th_inf'], 0.024561992461740227)
+    test_id = 566283950 
+
+    np.testing.assert_almost_equal(glif_api.get_neuron_configs([test_id])[test_id]['th_inf'], 0.024561992461740227)
 
 @pytest.mark.skipif(glif_api() is None, reason='No TEST_API_ENDPOINT set.')
 def test_deprecated(fn_temp_dir, glif_api, neuronal_model_id):
