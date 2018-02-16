@@ -92,8 +92,8 @@ f 6//6 3//3 5//5
     '''
 
 
-def test_version_update(fn_temp_dir):
-
+@pytest.fixture
+def dummy_cache():
     class DummyCache(Cache):
         
         VERSION = None
@@ -103,13 +103,27 @@ def test_version_update(fn_temp_dir):
             manifest_builder.set_version(DummyCache.VERSION)
             manifest_builder.write_json_file(file_name)
 
+    return DummyCache
+
+
+def test_version_update(fn_temp_dir, dummy_cache):
+
     mpath = os.path.join(fn_temp_dir, 'manifest.json')
-    dc = DummyCache(manifest=mpath)
+    dc = dummy_cache(manifest=mpath)
     
-    same_dc = DummyCache(manifest=mpath)
+    same_dc = dummy_cache(manifest=mpath)
     
     with pytest.raises(ManifestVersionError):
-        new_dc = DummyCache(manifest=mpath, version=1.0)
+        new_dc = dummy_cache(manifest=mpath, version=1.0)
+
+
+def test_load_manifest(tmpdir_factory, dummy_cache):
+
+    manifest = tmpdir_factory.mktemp('data').join('test_manifest.json')
+    cache = dummy_cache(manifest=str(manifest))
+
+    assert(cache.manifest_path == str(manifest))
+    assert(os.path.exists(cache.manifest_path))
 
 
 @patch("allensdk.core.json_utilities.write")
