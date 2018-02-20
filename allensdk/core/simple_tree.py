@@ -356,7 +356,7 @@ class SimpleTree( object ):
         
         '''
     
-        return list(map(self.node, self.child_ids(node_ids)))
+        return list(map(self.nodes, self.child_ids(node_ids)))
 
 
     def descendants(self, node_ids):
@@ -374,7 +374,7 @@ class SimpleTree( object ):
         
         '''
         
-        return list(map(self.node, self.descendant_ids(node_ids)))
+        return list(map(self.nodes, self.descendant_ids(node_ids)))
 
     
     def ancestors(self, node_ids):
@@ -392,5 +392,5 @@ class SimpleTree( object ):
         
         '''
     
-        return list(map(self.node, self.ancestor_ids(node_ids)))
+        return list(map(self.nodes, self.ancestor_ids(node_ids)))
     
