@@ -302,7 +302,9 @@ def get_spatio_temporal_grating(t, temporal_frequency=None, **kwargs):
 
     kwargs['phase'] = kwargs.pop('phase', 0) + (float(t)*temporal_frequency)%1
 
-    return get_spatial_grating(**kwargs)
+    ori = kwargs.pop('orientation')
+
+    return get_spatial_grating(ori=ori, **kwargs)
 
 def map_template_coordinate_to_monitor_coordinate(template_coord, monitor_shape, template_shape):
 
@@ -515,7 +517,17 @@ class Monitor(object):
         return float(number_of_pixels)/number_of_cycles
 
 
-    def grating_to_screen(self, phase, spatial_frequency, orientation, distance_from_monitor, p2p_amp=256, baseline=127):
+
+    def static_grating_to_screen(self, *args, **kwargs):
+        
+        return self.grating_to_screen(*args, direct=False, **kwargs)
+
+    def grating_to_screen(self, phase, spatial_frequency, orientation, distance_from_monitor, p2p_amp=256, baseline=127, direct=True):
+        
+        if direct == True:
+            warnings.warn('Depricated, use static_grating_to_screen instead')
+
+
 
         pix_per_cycle = self.spatial_frequency_to_pix_per_cycle(spatial_frequency, distance_from_monitor)
 
@@ -526,6 +538,18 @@ class Monitor(object):
                                       phase=phase,
                                       p2p_amp=p2p_amp,
                                       baseline=baseline)
+
+        return grating
+
+    def drifting_grating_to_screen(self, t, temporal_frequency, spatial_frequency, distance_from_monitor, **kwargs):
+    
+        pix_per_cycle = self.spatial_frequency_to_pix_per_cycle(spatial_frequency, distance_from_monitor)
+
+        grating = get_spatio_temporal_grating(t, 
+                                              height=self.n_pixels_r,
+                                              aspect_ratio=self.aspect_ratio,
+                                              temporal_frequency=temporal_frequency, 
+                                              pix_per_cycle=pix_per_cycle, **kwargs)
 
         return grating
 
@@ -658,6 +682,14 @@ class BrainObservatoryMonitor(Monitor):
 
         return super(BrainObservatoryMonitor, self).grating_to_screen(phase, spatial_frequency, orientation,
                                                                       self.experiment_geometry.distance,
+                                                                      p2p_amp = 256, baseline = 127)
+
+    def drifting_grating_to_screen(self, t, temporal_frequency, spatial_frequency, orientation):
+    
+
+        return super(BrainObservatoryMonitor, self).drifting_grating_to_screen(t, temporal_frequency, spatial_frequency,
+                                                                      self.experiment_geometry.distance,
+                                                                      orientation=orientation,
                                                                       p2p_amp = 256, baseline = 127)
 
     def pixels_to_visual_degrees(self, n, **kwargs):

@@ -288,8 +288,35 @@ def test_grating_to_screen(data_set):
             phase = 0
             spatial_frequency = .04
             orientation = curr_row.orientation
-            template =  m.grating_to_screen(phase, spatial_frequency, orientation)
+            template =  m.grating_to_screen(phase, spatial_frequency, orientation) # TODO change to static_grating...
             assert m.natural_movie_image_to_screen(template).shape == si.MONITOR_DIMENSIONS
+
+@pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
+                    reason="test NWB file not available")
+def test_drifting_grating_to_screen(data_set):
+
+    compare_set = set(data_set.list_stimuli()).intersection([si.STATIC_GRATINGS, si.DRIFTING_GRATINGS])
+    if len(compare_set) > 0:
+
+        for stimulus_type in compare_set:
+            m = si.BrainObservatoryMonitor()
+            curr_row = data_set.get_stimulus_table(stimulus_type).iloc[10]
+            t=0
+            temporal_frequency=2
+            spatial_frequency = .04
+            orientation = curr_row.orientation
+            print orientation
+            template =  m.drifting_grating_to_screen(t, temporal_frequency, spatial_frequency, orientation)
+
+            import matplotlib.pyplot as plt
+
+            plt.imshow(template)
+            plt.show()
+
+            # NOT TESTED YET
+            raise 
+            # print template.shape
+            # raise
 
 def test_get_mask():
     m = si.BrainObservatoryMonitor()

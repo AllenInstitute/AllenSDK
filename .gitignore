@@ -1,4 +1,5 @@
 allensdk/internal
+.pytest_cache/
 .cache
 .idea
 htmlcov
