@@ -191,7 +191,7 @@ class BinaryIntervalSearchTree(object):
 
         # Check that the intervals are non-overlapping (except potentially at the end point)
         for x, y in zip(search_list[:-1], search_list[1:]):
-            assert x[1] < y[0]
+            assert x[1] <= y[0]
 
 
         self.data = {}

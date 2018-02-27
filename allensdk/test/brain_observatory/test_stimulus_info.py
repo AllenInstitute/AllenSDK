@@ -31,6 +31,13 @@ def test_BinaryIntervalSearchTree():
     assert bist.search(2.5)[2] == 'C'
     assert bist.search(3.5)[2] == 'D'
 
+def test_BinaryIntervalSearchTree_shared_endpoint():
+    
+    bist = si.BinaryIntervalSearchTree([(0, 1, 'A'), (1, 2, 'B')])
+    assert bist.search(0)[2] == 'A'
+    assert bist.search(1)[2] == 'A'
+    assert bist.search(1.5)[2] == 'B'
+
 def test_pixels_to_visual_degrees():
     m = si.BrainObservatoryMonitor()
     np.testing.assert_almost_equal(m.pixels_to_visual_degrees(1), 0.103270443661,10)
