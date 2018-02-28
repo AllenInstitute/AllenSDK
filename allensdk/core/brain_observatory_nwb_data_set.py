@@ -538,7 +538,7 @@ class BrainObservatoryNwbDataSet(object):
                     curr_subtable['stimulus'] = stimulus
                     table_list.append(curr_subtable)
 
-            table_list = sorted(table_list, key=lambda t: t.iloc[0]['start'])
+            table_list = [t.sort_values(['start', 'end']) for t in table_list]
 
             new_table = pd.concat(table_list)
             new_table.reset_index(drop=True, inplace=True)
@@ -574,6 +574,7 @@ class BrainObservatoryNwbDataSet(object):
             [frame_dur[start_inds, 0].T, frame_dur[stop_inds, 0].T]).astype(int)
 
         stimulus_table = pd.DataFrame(stim_data, columns=['start', 'end'])
+        stimulus_table = stimulus_table.sort_values(['start', 'end'])
 
         return stimulus_table
 
@@ -992,6 +993,7 @@ def _get_abstract_feature_series_stimulus_table(nwb_file, stimulus_name):
     stimulus_table = pd.DataFrame(stim_data, columns=features)
     stimulus_table.loc[:, 'start'] = frame_dur[:, 0].astype(int)
     stimulus_table.loc[:, 'end'] = frame_dur[:, 1].astype(int)
+    stimulus_table = stimulus_table.sort_values(['start', 'end'])
 
     return stimulus_table
 
@@ -1017,6 +1019,7 @@ def _get_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
     stimulus_table = pd.DataFrame(inds, columns=['frame'])
     stimulus_table.loc[:, 'start'] = frame_dur[:, 0].astype(int)
     stimulus_table.loc[:, 'end'] = frame_dur[:, 1].astype(int)
+    stimulus_table = stimulus_table.sort_values(['start', 'end'])
 
     return stimulus_table
 
