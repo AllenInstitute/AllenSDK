@@ -61,7 +61,7 @@ def set_sitk_image_information(image, information):
         image.SetDirection(information['direction'])
 
 
-def fix_array_dimensions(array, decl_size, ncomponents):
+def fix_array_dimensions(array, decl_size, ncomponents=1):
     '''
     '''
 
@@ -101,6 +101,11 @@ def write_ndarray_with_sitk(array, path, **information):
     if not 'ncomponents' in information:
         information['ncomponents'] = 1
 
+    if information['ncomponents'] > 1:
+        array = fix_array_dimensions(array, array.shape[:-1][::-1], information['ncomponents'])
+    else:
+        array = fix_array_dimensions(array, array.shape[::-1])
+    
     array = sitk.GetImageFromArray(array, information['ncomponents'] > 1)
     set_sitk_image_information(array, information)
 

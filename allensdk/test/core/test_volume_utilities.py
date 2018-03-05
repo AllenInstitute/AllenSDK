@@ -127,17 +127,15 @@ def test_fix_array_dimensions(act, dec, nc):
         assert(np.array_equal( obt.shape[:-1], dec ))
 
 
-
-def test_sitk_metaimage_roundtrip(tmpdir_factory):
+@pytest.mark.parametrize('size', [[10, 20], [10, 20, 30], [10, 20, 30]])
+def test_sitk_metaimage_roundtrip(tmpdir_factory, size):
 
     path = tmpdir_factory.mktemp('metaimage_io_test').join('dummy.mhd')
     
-    array = np.random.rand(10, 20, 30)
-    info = {'spacing': [5, 5, 5]}
+    array = np.random.rand(*size)
+    info = {}
 
     vu.write_ndarray_with_sitk(array, path, **info)
     obt_image, obt_info = vu.read_ndarray_with_sitk(path)
-
-    print(sitk.GetImageFromArray(array).GetSize())
 
     assert(np.allclose( obt_image, array ))
