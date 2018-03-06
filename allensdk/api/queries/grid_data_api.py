@@ -33,6 +33,8 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
+
+from allensdk.deprecated import deprecated
 from .rma_api import RmaApi
 
 
@@ -62,6 +64,21 @@ class GridDataApi(RmaApi):
             resolution = 25
         self.resolution = resolution
 
+
+    def download_gene_expression_grid_data(self, 
+                                           section_data_set_id, 
+                                           volume_type, 
+                                           path):
+        '''
+        '''
+
+        include = '?include={}'.format(volume_type)
+        url = ''.join([self.grid_data_endpoint, '/download/', str(section_data_set_id), include])
+
+        self.retrieve_file_over_http(url, path, zipped=True)
+
+
+    @deprecated(message='Use download_gene_expression_grid_data instead')
     def download_expression_grid_data(self,
                                       section_data_set_id,
                                       include=None,
@@ -76,7 +93,7 @@ class GridDataApi(RmaApi):
             Image volumes. 'energy' (default), 'density', 'intensity'.
         path : string, optional
             File name to save as.
-        i
+        
         Returns
         -------
             file : 3-D expression grid data packaged into a compressed archive file (.zip).

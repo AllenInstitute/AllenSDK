@@ -62,7 +62,7 @@ def set_sitk_image_information(image, information):
 
 
 def fix_array_dimensions(array, ncomponents=1):
-    ''' Convenience function for reordering array dimensions for io with SimpleITK
+    ''' Convenience function that reorders ndarray dimensions for io with SimpleITK
 
     Parameters
     ----------
