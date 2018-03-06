@@ -41,7 +41,7 @@ import nrrd
 import six
 
 
-class MouseConnectivityApi(ReferenceSpaceApi):
+class MouseConnectivityApi(ReferenceSpaceApi, GridDataApi):
     '''
     HTTP Client for the Allen Mouse Brain Connectivity Atlas.
 
@@ -435,28 +435,28 @@ class MouseConnectivityApi(ReferenceSpaceApi):
                pathfinder=Cache.pathfinder(file_name_position=1,
                                            path_keyword='path'))
     def download_injection_density(self, path, experiment_id, resolution):
-        GridDataApi(base_uri=self.api_url).download_projection_grid_data(
+        self.download_projection_grid_data(
             experiment_id, [GridDataApi.INJECTION_DENSITY], resolution, path)
 
     @cacheable(strategy='create', 
                pathfinder=Cache.pathfinder(file_name_position=1,
                                            path_keyword='path'))
     def download_projection_density(self, path, experiment_id, resolution):
-        GridDataApi(base_uri=self.api_url).download_projection_grid_data(
+        self.download_projection_grid_data(
             experiment_id, [GridDataApi.PROJECTION_DENSITY], resolution, path)
 
     @cacheable(strategy='create', 
                pathfinder=Cache.pathfinder(file_name_position=1,
                                            path_keyword='path'))
     def download_injection_fraction(self, path, experiment_id, resolution):
-        GridDataApi(base_uri=self.api_url).download_projection_grid_data(
+        self.download_projection_grid_data(
             experiment_id, [GridDataApi.INJECTION_FRACTION], resolution, path)
 
     @cacheable(strategy='create', 
                pathfinder=Cache.pathfinder(file_name_position=1,
                                            path_keyword='path'))
     def download_data_mask(self, path, experiment_id, resolution):
-        GridDataApi(base_uri=self.api_url).download_projection_grid_data(
+        self.download_projection_grid_data(
             experiment_id, [GridDataApi.DATA_MASK], resolution, path)
 
     def calculate_injection_centroid(self,

@@ -74,7 +74,6 @@ class GridDataApi(RmaApi):
 
         include = '?include={}'.format(volume_type)
         url = ''.join([self.grid_data_endpoint, '/download/', str(section_data_set_id), include])
-
         self.retrieve_file_over_http(url, path, zipped=True)
 
 
