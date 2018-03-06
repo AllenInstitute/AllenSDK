@@ -36,6 +36,7 @@
 from .rma_api import RmaApi
 from allensdk.api.cache import cacheable, Cache
 from allensdk.core.obj_utilities import read_obj
+from allensdk.core.volume_utilities import read_metaimage
 import numpy as np
 import nrrd
 import six
@@ -92,6 +93,24 @@ class ReferenceSpaceApi(RmaApi):
         self.download_volumetric_data(ccf_version,
                                       'annotation_%d.nrrd' % resolution, 
                                       save_file_path=file_name)
+
+
+    @cacheable(strategy='create', reader=read_metaimage, 
+               pathfinder=Cache.pathfinder(file_name_position=3,
+                                           path_keyword='file_name'))
+    def download_devmouse_volume(self, age, volume_type, file_name):
+        '''Download a reference volume (annotation, grid annotation, atlas volume) 
+        from the devmouse project
+
+        Parameters
+        ----------
+        age : str
+        volume_type : str
+        file_name : str
+
+        '''
+
+
 
 
     @cacheable(strategy='create',
