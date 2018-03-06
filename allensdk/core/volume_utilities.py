@@ -100,13 +100,14 @@ def write_ndarray_with_sitk(array, path, **information):
 
     if not 'ncomponents' in information:
         information['ncomponents'] = 1
+    ncomponents = information.pop('ncomponents')
 
-    if information['ncomponents'] > 1:
-        array = fix_array_dimensions(array, array.shape[:-1][::-1], information['ncomponents'])
+    if ncomponents > 1:
+        array = fix_array_dimensions(array, array.shape[:-1][::-1], ncomponents)
     else:
         array = fix_array_dimensions(array, array.shape[::-1])
     
-    array = sitk.GetImageFromArray(array, information['ncomponents'] > 1)
+    array = sitk.GetImageFromArray(array, ncomponents > 1)
     set_sitk_image_information(array, information)
 
     sitk.WriteImage(array, str(path))
