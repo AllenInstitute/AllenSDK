@@ -61,25 +61,35 @@ def set_sitk_image_information(image, information):
         image.SetDirection(information['direction'])
 
 
-def fix_array_dimensions(array, decl_size, ncomponents=1):
-    '''
+def fix_array_dimensions(array, ncomponents=1):
+    ''' Convenience function for reordering array dimensions for io with SimpleITK
+
+    Parameters
+    ----------
+    array : np.ndarray
+        The array to be reordered
+    ncomponents : int, optional
+        Number of components per pixel, default 1. 
+
+    Returns
+    -------
+    np.ndarray : 
+        Reordered array
+
     '''
 
     act_size = list(array.shape)
     ndims = len(act_size)
     multicomponent = ncomponents > 1
 
+    from_order = list(range( ndims - multicomponent ))
+    to_order = list(range( ndims - multicomponent ))[::-1]
+
     if multicomponent:
-        act_size = act_size[:-1]
+        from_order += [-1]
+        to_order += [-1]
 
-    if np.array_equal(act_size, decl_size):
-        return array
-
-    reordering = [ decl_size.index(vv) for vv in act_size ] 
-    if multicomponent: 
-        reordering += [-1]
-
-    return np.moveaxis(array, list(range(ndims)), reordering)
+    return np.ascontiguousarray(np.moveaxis(array, from_order, to_order))
 
 
 def read_ndarray_with_sitk(path):
@@ -90,7 +100,7 @@ def read_ndarray_with_sitk(path):
     information = get_sitk_image_information(image)
     image = sitk.GetArrayFromImage(image)
 
-    image = fix_array_dimensions(image, information['size'], information['ncomponents'])
+    image = fix_array_dimensions(image, information['ncomponents'])
     return image, information
 
 
@@ -102,10 +112,7 @@ def write_ndarray_with_sitk(array, path, **information):
         information['ncomponents'] = 1
     ncomponents = information.pop('ncomponents')
 
-    if ncomponents > 1:
-        array = fix_array_dimensions(array, array.shape[:-1][::-1], ncomponents)
-    else:
-        array = fix_array_dimensions(array, array.shape[::-1])
+    array = fix_array_dimensions(array, ncomponents)
     
     array = sitk.GetImageFromArray(array, ncomponents > 1)
     set_sitk_image_information(array, information)

@@ -37,6 +37,7 @@
 import pytest
 import numpy as np
 import SimpleITK as sitk
+import nrrd
 
 from allensdk.core import volume_utilities as vu
 
@@ -47,7 +48,7 @@ def ncomponents(request):
     return request.param
 
 
-@pytest.fixture(params=[ [10, 20], [10, 20, 30], [10, 20, 30] ])
+@pytest.fixture(params=[ [10, 20], [10, 20, 30], [10, 20, 30], [10, 10, 10], [20, 20] ])
 def size(request):
     return request.param
 
@@ -115,27 +116,67 @@ def test_set_sitk_image_information_roundtrip(image):
 
 @pytest.mark.parametrize('act,dec,nc', [ ([10, 20], [20, 10], 1), 
                                          ([10, 20, 30], [30, 20, 10], 1),
-                                         ([10, 20, 30, 3], [30, 20, 10], 3) ])
+                                         ([10, 20, 30, 3], [30, 20, 10], 3),
+                                         ([10, 10, 10, 3], [10, 10, 10], 3 ) ])
 def test_fix_array_dimensions(act, dec, nc):
 
     arr = np.zeros(act)
-    obt = vu.fix_array_dimensions(arr, dec, nc)
+    obt = vu.fix_array_dimensions(arr, nc)
 
     if nc == 1:
         assert(np.array_equal( obt.shape, dec ))
     else:
         assert(np.array_equal( obt.shape[:-1], dec ))
 
+    assert( not np.isfortran(obt) )
 
-@pytest.mark.parametrize('size', [[10, 20], [10, 20, 30], [10, 20, 30]])
+
 def test_sitk_metaimage_roundtrip(tmpdir_factory, size):
 
     path = tmpdir_factory.mktemp('metaimage_io_test').join('dummy.mhd')
     
     array = np.random.rand(*size)
-    info = {}
 
-    vu.write_ndarray_with_sitk(array, path, **info)
+    vu.write_ndarray_with_sitk(array, path)
     obt_image, obt_info = vu.read_ndarray_with_sitk(path)
+
+    assert(np.allclose( obt_image, array ))
+
+
+def test_sitk_metaimage_vector_roundtrip(tmpdir_factory, size):
+
+    path = tmpdir_factory.mktemp('metaimage_io_test').join('dummy.mhd')
+    
+    size = list(size) + [3]
+    array = np.random.rand(*size)
+
+    vu.write_ndarray_with_sitk(array, path, ncomponents=3)
+    obt_image, obt_info = vu.read_ndarray_with_sitk(path)
+
+    assert(np.allclose( obt_image, array ))
+    assert( obt_info['ncomponents'] == 3 )
+
+
+def test_sitk_nrrd_read(tmpdir_factory, size):
+    
+    path = tmpdir_factory.mktemp('nrrd_io_test').join('dummy.nrrd')
+    array = np.random.rand(*size)
+    
+    nrrd.write(str(path), array)
+
+    obt_image, obt_info = vu.read_ndarray_with_sitk(path)
+
+    assert(np.allclose( obt_image, array ))
+
+
+
+def test_sitk_nrrd_write(tmpdir_factory, size):
+
+    path = tmpdir_factory.mktemp('nrrd_io_test').join('dummy_again.nrrd')
+    
+    array = np.random.rand(*size)
+
+    vu.write_ndarray_with_sitk(array, path)
+    obt_image, obt_info = nrrd.read(path)
 
     assert(np.allclose( obt_image, array ))
