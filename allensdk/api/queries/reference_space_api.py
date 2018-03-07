@@ -105,9 +105,11 @@ class ReferenceSpaceApi(RmaApi):
         Parameters
         ----------
         age : str
+            Specify a mouse age for which to download the reference volume
         volume_type : str
+            Specify the type of volume to download
         file_name : str
-
+            Specify the path to the downloaded volume
         '''
 
         remote_file_name = '{}_{}.zip'.format(age, volume_type)

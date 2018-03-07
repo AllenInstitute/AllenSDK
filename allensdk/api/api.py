@@ -414,7 +414,7 @@ def stream_zip_directory_over_http(url, directory, members=None, timeout=(9.05, 
     buf = io.BytesIO()
 
     with closing( requests.get(url, stream=True, timeout=timeout) ) as request:
-      stream.stream_response_to_file( request, buf )
+        stream.stream_response_to_file( request, buf )
 
     zipper = zipfile.ZipFile(buf)
     zipper.extractall(path=directory, members=members)
