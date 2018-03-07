@@ -51,22 +51,17 @@ class MouseAtlasApi(ReferenceSpaceApi, GridDataApi):
 
     @cacheable()
     @pageable(num_rows=2000, total_rows='all')
-    def get_section_data_sets(self, gene_ids=None, include_devmouse=False, **kwargs):
+    def get_section_data_sets(self, gene_ids=None, product_ids=None, **kwargs):
         '''
         '''
         
-        cs_string = lambda ls: ','.join(map(str, ls))
-
-        product_ids = list(self.MOUSE_ATLAS_PRODUCTS)
-        if include_devmouse:
-            product_ids.extend(list(self.DEVMOUSE_ATLAS_PRODUCTS))
-            
-        product_ids = cs_string(product_ids)
-        criteria = 'products[id$in{}]'.format(product_ids)
+        if product_ids is None:
+            list(self.MOUSE_ATLAS_PRODUCTS)
+        criteria = 'products[id$in{}]'.format(','.join(map(str, product_ids)))
 
         if gene_ids is not None:
             gene_ids = cs_string(gene_ids)
-            criteria += ',genes[id$in{}]'.format(gene_ids)
+            criteria += ',genes[id$in{}]'.format(','.join(map(str, gene_ids)))
 
         return self.model_query(model='SectionDataSet', 
                                 criteria=criteria,
