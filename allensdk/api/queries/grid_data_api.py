@@ -69,7 +69,18 @@ class GridDataApi(RmaApi):
                                            section_data_set_id, 
                                            volume_type, 
                                            path):
-        '''
+        ''' Download a metaimage file containing registered gene expression grid data
+
+        Parameters
+        ----------
+        section_data_set_id : int
+            Download data from this experiment
+        volume_type : str
+            Download this type of data (options are GridDataApi.ENERGY, 
+            GridDataApi.DENSITY, GridDataApi.INTENSITY)
+        path : str
+            Download to this path
+
         '''
 
         include = '?include={}'.format(volume_type)
@@ -82,7 +93,7 @@ class GridDataApi(RmaApi):
                                       section_data_set_id,
                                       include=None,
                                       path=None):
-        '''Download in NRRD format.
+        '''Download in zipped metaimage format.
 
         Parameters
         ----------

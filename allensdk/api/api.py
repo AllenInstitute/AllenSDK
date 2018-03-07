@@ -300,6 +300,10 @@ class Api(object):
             Url[1]_ from which to get the file.
         file_path : string
             Absolute path including the file name to save.
+        zipped : bool, optional
+            If true, assume that the response is a zipped directory and attempt 
+            to extract contained files into the directory containing file_path. 
+            Default is False.
 
         See Also
         --------
@@ -390,8 +394,21 @@ class Api(object):
         return response.content
 
 
-def stream_zip_directory_over_http(url, directory=None, members=None, timeout=(9.05, 31.1)):
-    '''
+def stream_zip_directory_over_http(url, directory, members=None, timeout=(9.05, 31.1)):
+    ''' Supply an http get request and stream the response to a file.
+
+    Parameters
+    ----------
+    url : str
+        Send the request to this url
+    directory : str
+        Extract the response to this directory
+    members : list of str, optional
+        Extract only these files
+    timeout : float or tuple of float, optional
+        Specify a timeout for the request. If a tuple, specify seperate connect 
+        and read timeouts.
+
     '''
 
     buf = io.BytesIO()
@@ -405,9 +422,19 @@ def stream_zip_directory_over_http(url, directory=None, members=None, timeout=(9
 
 
 def stream_file_over_http(url, file_path, timeout=(9.05, 31.1)):
-    '''
-    '''
+    ''' Supply an http get request and stream the response to a file.
 
+    Parameters
+    ----------
+    url : str
+        Send the request to this url
+    file_path : str
+        Stream the response to this path
+    timeout : float or tuple of float, optional
+        Specify a timeout for the request. If a tuple, specify seperate connect 
+        and read timeouts.
+
+    '''
 
     with closing(requests.get(url, stream=True, timeout=timeout)) as response:
 
