@@ -36,7 +36,7 @@
 from .rma_api import RmaApi
 from allensdk.api.cache import cacheable, Cache
 from allensdk.core.obj_utilities import read_obj
-import allensdk.core.volume_utilities as vu
+import allensdk.core.sitk_utilities as sitk_utilities
 import numpy as np
 import nrrd
 import six
@@ -95,7 +95,7 @@ class ReferenceSpaceApi(RmaApi):
                                       save_file_path=file_name)
 
 
-    @cacheable(strategy='create', reader=vu.read_ndarray_with_sitk, 
+    @cacheable(strategy='create', reader=sitk_utilities.read_ndarray_with_sitk, 
                pathfinder=Cache.pathfinder(file_name_position=3,
                                            path_keyword='file_name'))
     def download_mouse_atlas_volume(self, age, volume_type, file_name):

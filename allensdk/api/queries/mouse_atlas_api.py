@@ -34,7 +34,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 
-from allensdk.core import volume_utilities as vu
+from allensdk.core import sitk_utilities
 from allensdk.api.cache import Cache, cacheable
 
 from .reference_space_api import ReferenceSpaceApi
@@ -94,7 +94,7 @@ class MouseAtlasApi(ReferenceSpaceApi, GridDataApi):
                                 **kwargs)
 
     @cacheable(strategy='create', 
-               reader = vu.read_ndarray_with_sitk, 
+               reader = sitk_utilities.read_ndarray_with_sitk, 
                pathfinder=Cache.pathfinder(file_name_position=1,
                                            path_keyword='path'))
     def download_expression_density(self, path, experiment_id):
@@ -103,7 +103,7 @@ class MouseAtlasApi(ReferenceSpaceApi, GridDataApi):
 
 
     @cacheable(strategy='create', 
-               reader = vu.read_ndarray_with_sitk, 
+               reader = sitk_utilities.read_ndarray_with_sitk, 
                pathfinder=Cache.pathfinder(file_name_position=1,
                                            path_keyword='path'))
     def download_expression_energy(self, path, experiment_id):
@@ -112,7 +112,7 @@ class MouseAtlasApi(ReferenceSpaceApi, GridDataApi):
 
 
     @cacheable(strategy='create', 
-               reader = vu.read_ndarray_with_sitk, 
+               reader = sitk_utilities.read_ndarray_with_sitk, 
                pathfinder=Cache.pathfinder(file_name_position=1,
                                            path_keyword='path'))
     def download_expression_intensity(self, path, experiment_id):
