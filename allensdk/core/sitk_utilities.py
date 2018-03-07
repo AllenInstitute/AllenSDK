@@ -34,6 +34,8 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 
+import warnings
+
 import SimpleITK as sitk
 import numpy as np
 
@@ -79,8 +81,13 @@ def set_sitk_image_information(image, information):
     if 'direction' in information:
         image.SetDirection(information.pop('direction'))
 
+    if 'size' in information:
+        assert(np.array_equal( information.pop('size'), image.GetSize() ))
+    if 'ncomponents' in information:
+        assert( information.pop('ncomponents') == image.GetNumberOfComponentsPerPixel() )
+    
     if not len(information) == 0:
-        raise ValueError('unwritten keys: {}'.format(','.join(information.keys())))
+        warnings.warn('unwritten keys: {}'.format(','.join(information.keys())))
 
 
 def fix_array_dimensions(array, ncomponents=1):
