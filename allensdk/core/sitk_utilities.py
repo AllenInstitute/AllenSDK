@@ -39,7 +39,18 @@ import numpy as np
 
 
 def get_sitk_image_information(image):
-    '''
+    ''' Extract information about a SimpleITK image
+
+    Parameters
+    ----------
+    image : sitk.Image
+        Extract information about this image.
+
+    Returns
+    -------
+    dict : 
+        Extracted information.
+
     '''
 
     return {'spacing': image.GetSpacing(),
@@ -50,15 +61,26 @@ def get_sitk_image_information(image):
 
 
 def set_sitk_image_information(image, information):
-    '''
+    ''' Set information on a SimpleITK image
+
+    Parameters
+    ----------
+    image : sitk.Image
+        Set information on this image.
+    information : dict
+        Stores information to be set
+
     '''
 
     if 'spacing' in information:
-        image.SetSpacing(information['spacing'])
+        image.SetSpacing(information.pop('spacing'))
     if 'origin' in information:
-        image.SetOrigin(information['origin'])
+        image.SetOrigin(information.pop('origin'))
     if 'direction' in information:
-        image.SetDirection(information['direction'])
+        image.SetDirection(information.pop('direction'))
+
+    if not len(information) == 0:
+        raise ValueError('unwritten keys: {}'.format(','.join(information.keys())))
 
 
 def fix_array_dimensions(array, ncomponents=1):
@@ -93,7 +115,20 @@ def fix_array_dimensions(array, ncomponents=1):
 
 
 def read_ndarray_with_sitk(path):
-    '''
+    ''' Read a numpy array from a file using SimpleITK
+
+    Parameters
+    ----------
+    path : str
+        Read from this path
+    
+    Returns
+    -------
+    image : np.ndarray
+        Obtained array
+    information : dict
+        Additional information about the array
+
     '''
 
     image = sitk.ReadImage(str(path))
@@ -105,7 +140,17 @@ def read_ndarray_with_sitk(path):
 
 
 def write_ndarray_with_sitk(array, path, **information):
-    '''
+    ''' Write a numpy array to a file using SimpleITK
+
+    Parameters
+    ----------
+    array : np.ndarray
+        Array to be written.
+    path : str
+        Write to here
+    **information : dict
+        Containes additional information to be stored in the image file. 
+
     '''
 
     if not 'ncomponents' in information:
