@@ -93,6 +93,7 @@ class RmaApi(Api):
             '?q=',
             ','.join(stage_clauses)])
 
+        print(url)
         return url
 
     def model_stage(self,

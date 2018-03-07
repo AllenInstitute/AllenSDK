@@ -98,9 +98,9 @@ class ReferenceSpaceApi(RmaApi):
     @cacheable(strategy='create', reader=vu.read_ndarray_with_sitk, 
                pathfinder=Cache.pathfinder(file_name_position=3,
                                            path_keyword='file_name'))
-    def download_devmouse_volume(self, age, volume_type, file_name):
+    def download_mouse_atlas_volume(self, age, volume_type, file_name):
         '''Download a reference volume (annotation, grid annotation, atlas volume) 
-        from the devmouse project
+        from the mouse brain atlas project
 
         Parameters
         ----------
