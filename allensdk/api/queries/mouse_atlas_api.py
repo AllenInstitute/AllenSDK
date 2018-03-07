@@ -47,12 +47,29 @@ class MouseAtlasApi(ReferenceSpaceApi, GridDataApi):
 
     MOUSE_ATLAS_PRODUCTS = (1,)
     DEVMOUSE_ATLAS_PRODUCTS = (3,)
-    MOUSE_ORGANISM = (1,)
+    MOUSE_ORGANISM = (2,)
+    HUMAN_ORGANISM = (1,)
 
     @cacheable()
     @pageable(num_rows=2000, total_rows='all')
     def get_section_data_sets(self, gene_ids=None, product_ids=None, **kwargs):
-        '''
+        ''' Download a list of section data sets (experiments) from the Mouse Brain
+        Atlas project.
+
+        Parameters
+        ----------
+        gene_ids : list of int, optional
+            Filter results based on the genes whose expression was characterized 
+            in each experiment. Default is all.
+        product_ids : list of int, optional
+            Filter results to a subset of products. Default is the Mouse Brain Atlas.
+
+        Returns
+        -------
+        list of dict : 
+            Each element is a section data set record, with one or more gene 
+            records nested in a list. 
+
         '''
         
         if product_ids is None:
@@ -60,19 +77,30 @@ class MouseAtlasApi(ReferenceSpaceApi, GridDataApi):
         criteria = 'products[id$in{}]'.format(','.join(map(str, product_ids)))
 
         if gene_ids is not None:
-            gene_ids = cs_string(gene_ids)
             criteria += ',genes[id$in{}]'.format(','.join(map(str, gene_ids)))
 
         return self.model_query(model='SectionDataSet', 
                                 criteria=criteria,
                                 include='genes',
-                                only=['id', 'genes.id', 'genes.name', 'reference_space_id'],
                                 **kwargs)
 
     @cacheable()
     @pageable(num_rows=2000, total_rows='all')
     def get_genes(self, organism_ids=None, chromosome_ids=None, **kwargs):
-        '''
+        ''' Download a list of genes
+
+        Parameters
+        ----------
+        organism_ids : list of int, optional
+            Filter genes to those appearing in these organisms. Defaults to mouse (2).
+        chromosome_ids : list of int, optional
+            Filter genes to those appearing on these chromosomes. Defaults to all.
+
+        Returns
+        -------
+        list of dict:
+            Each element is a gene record, with a nested chromosome record (also a dict).
+
         '''
 
         if organism_ids is None:
@@ -85,7 +113,6 @@ class MouseAtlasApi(ReferenceSpaceApi, GridDataApi):
         return self.model_query(model='Gene', 
                                 criteria=criteria,
                                 include='chromosome',
-                                only=['id', 'name', 'organism_id', 'acronym','chromosome.id', 'chromosome.name'],
                                 **kwargs)
 
     @cacheable(strategy='create', 
