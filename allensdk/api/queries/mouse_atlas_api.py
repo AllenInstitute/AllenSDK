@@ -2,7 +2,7 @@
 # license plus a third clause that prohibits redistribution for commercial
 # purposes without further permission.
 #
-# Copyright 2015-2017. Allen Institute. All rights reserved.
+# Copyright 2015-2018. Allen Institute. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -73,7 +73,7 @@ class MouseAtlasApi(ReferenceSpaceApi, GridDataApi):
         '''
         
         if product_ids is None:
-            list(self.MOUSE_ATLAS_PRODUCTS)
+            product_ids = list(self.MOUSE_ATLAS_PRODUCTS)
         criteria = 'products[id$in{}]'.format(','.join(map(str, product_ids)))
 
         if gene_ids is not None:
