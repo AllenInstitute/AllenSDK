@@ -151,9 +151,9 @@ def test_stream_file_over_http(response, tmpdir_factory):
     path = tmpdir_factory.mktemp('file_stream_test').join('test.txt')
 
     with patch('requests.get', return_value=response) as get_mock:
-        stream_file_over_http('https://fish.gov', path)
+        stream_file_over_http('https://fish.gov', str(path))
 
-    with open(path, 'r') as fil:
+    with open(str(path), 'r') as fil:
         data = fil.read()
 
     assert( data == '123' )
@@ -167,9 +167,9 @@ def test_stream_zip_directory_over_http(zip_response, tmpdir_factory):
         with patch('requests_toolbelt.downloadutils.stream.stream_response_to_file', 
                    side_effect=lambda r, b: b.write(zip_response)):
 
-            stream_zip_directory_over_http('https://fish.gov', os.path.dirname(path))
+            stream_zip_directory_over_http('https://fish.gov', os.path.dirname(str(path)))
 
-    with open(path, 'r') as fil:
+    with open(str(path), 'r') as fil:
         data = fil.read()
 
     assert( data == '122333444455555' )

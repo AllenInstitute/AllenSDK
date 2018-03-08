@@ -177,6 +177,6 @@ def test_sitk_nrrd_write(tmpdir_factory, size):
     array = np.random.rand(*size)
 
     su.write_ndarray_with_sitk(array, path)
-    obt_image, obt_info = nrrd.read(path)
+    obt_image, obt_info = nrrd.read(str(path))
 
     assert(np.allclose( obt_image, array ))
