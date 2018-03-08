@@ -71,3 +71,33 @@ def test_get_section_data_sets(mock_query, atlas):
         pass
     
     mock_query.assert_called_once_with(expected)
+
+
+def test_download_expression_density(atlas):
+    with patch('allensdk.api.api.Api.retrieve_file_over_http') as gda:
+        with pytest.raises(RuntimeError):
+            atlas.download_expression_density('file.name', 12345)
+
+            gda.assert_called_once_with(
+                'http://api.brain-map.org/grid_data/download/'\
+                '12345?include=density')
+                
+
+def test_download_expression_intensity(atlas):
+    with patch('allensdk.api.api.Api.retrieve_file_over_http') as gda:
+        with pytest.raises(RuntimeError):
+            atlas.download_expression_intensity('file.name', 12345)
+
+            gda.assert_called_once_with(
+                'http://api.brain-map.org/grid_data/download/'\
+                '12345?include=intensity')
+
+
+def test_download_expression_energy(atlas):
+    with patch('allensdk.api.api.Api.retrieve_file_over_http') as gda:
+        with pytest.raises(RuntimeError):
+            atlas.download_expression_energy('file.name', 12345)
+
+            gda.assert_called_once_with(
+                'http://api.brain-map.org/grid_data/download/'\
+                '12345?include=energy')
