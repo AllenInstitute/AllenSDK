@@ -44,6 +44,8 @@ from .rma_pager import pageable
 
 
 class MouseAtlasApi(ReferenceSpaceApi, GridDataApi):
+    ''' Downloads Mouse Brain Atlas grid data, reference volumes, and metadata.
+    '''
 
     MOUSE_ATLAS_PRODUCTS = (1,)
     DEVMOUSE_ATLAS_PRODUCTS = (3,)

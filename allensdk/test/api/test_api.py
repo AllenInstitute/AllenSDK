@@ -171,4 +171,5 @@ def test_stream_zip_directory_over_http(zip_response, tmpdir_factory):
     with open(str(path), 'r') as fil:
         data = fil.read()
 
-    assert( data == '122333444455555' )
+    assert(data == '122333444455555')
+    

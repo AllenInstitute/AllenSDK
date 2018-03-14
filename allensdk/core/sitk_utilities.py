@@ -51,7 +51,8 @@ def get_sitk_image_information(image):
     Returns
     -------
     dict : 
-        Extracted information.
+        Extracted information. Includes spacing, origin, size, direction, and 
+        number of components per pixel
 
     '''
 
@@ -70,7 +71,8 @@ def set_sitk_image_information(image, information):
     image : sitk.Image
         Set information on this image.
     information : dict
-        Stores information to be set
+        Stores information to be set. Supports spacing, origin, direction. Also 
+        checks (but cannot set) size and number of components per pixel
 
     '''
 
@@ -156,7 +158,8 @@ def write_ndarray_with_sitk(array, path, **information):
     path : str
         Write to here
     **information : dict
-        Containes additional information to be stored in the image file. 
+        Contains additional information to be stored in the image file. 
+        See set_sitk_image_information for more information.
 
     '''
 
