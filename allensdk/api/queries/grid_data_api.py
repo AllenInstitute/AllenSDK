@@ -33,6 +33,8 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
+
+from allensdk.deprecated import deprecated
 from .rma_api import RmaApi
 
 
@@ -62,11 +64,36 @@ class GridDataApi(RmaApi):
             resolution = 25
         self.resolution = resolution
 
+
+    def download_gene_expression_grid_data(self, 
+                                           section_data_set_id, 
+                                           volume_type, 
+                                           path):
+        ''' Download a metaimage file containing registered gene expression grid data
+
+        Parameters
+        ----------
+        section_data_set_id : int
+            Download data from this experiment
+        volume_type : str
+            Download this type of data (options are GridDataApi.ENERGY, 
+            GridDataApi.DENSITY, GridDataApi.INTENSITY)
+        path : str
+            Download to this path
+
+        '''
+
+        include = '?include={}'.format(volume_type)
+        url = ''.join([self.grid_data_endpoint, '/download/', str(section_data_set_id), include])
+        self.retrieve_file_over_http(url, path, zipped=True)
+
+
+    @deprecated(message='Use download_gene_expression_grid_data instead')
     def download_expression_grid_data(self,
                                       section_data_set_id,
                                       include=None,
                                       path=None):
-        '''Download in NRRD format.
+        '''Download in zipped metaimage format.
 
         Parameters
         ----------
@@ -76,7 +103,7 @@ class GridDataApi(RmaApi):
             Image volumes. 'energy' (default), 'density', 'intensity'.
         path : string, optional
             File name to save as.
-        i
+        
         Returns
         -------
             file : 3-D expression grid data packaged into a compressed archive file (.zip).

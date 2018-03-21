@@ -34,7 +34,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import pytest
-from mock import MagicMock
+from mock import MagicMock, patch
 from allensdk.api.queries.grid_data_api import GridDataApi
 
 
@@ -45,6 +45,17 @@ def grid_data():
         MagicMock(name='retrieve_file_over_http')
 
     return gda
+
+
+def test_download_gene_expression_grid_data(grid_data):
+
+    path = '69816930/density.mhd'
+    section_data_set_id = 69816930
+    volume_type = 'density'
+
+    grid_data.download_gene_expression_grid_data(section_data_set_id, volume_type, path)
+    expected = 'http://api.brain-map.org/grid_data/download/69816930?include=density'
+    grid_data.retrieve_file_over_http.assert_called_once_with(expected, path, zipped=True)
 
 
 def test_api_doc_url_download_expression_grid(grid_data):

@@ -33,14 +33,21 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import requests
+
 from contextlib import closing
-import allensdk.core.json_utilities as json_utilities
-import pandas as pd
 import logging
 import os
 import errno
 import warnings
+import io
+import zipfile
+
+import requests
+import pandas as pd
+from requests_toolbelt import exceptions
+from requests_toolbelt.downloadutils import stream
+
+import allensdk.core.json_utilities as json_utilities
 
 
 class Api(object):
@@ -284,7 +291,7 @@ class Api(object):
             if e.errno != errno.ENOENT:
                 raise
 
-    def retrieve_file_over_http(self, url, file_path):
+    def retrieve_file_over_http(self, url, file_path, zipped=False):
         '''Get a file from the data api and save it.
 
         Parameters
@@ -293,6 +300,10 @@ class Api(object):
             Url[1]_ from which to get the file.
         file_path : string
             Absolute path including the file name to save.
+        zipped : bool, optional
+            If true, assume that the response is a zipped directory and attempt 
+            to extract contained files into the directory containing file_path. 
+            Default is False.
 
         See Also
         --------
@@ -304,33 +315,33 @@ class Api(object):
         '''
 
         self._file_download_log.info("Downloading URL: %s", url)
-        
-        from requests_toolbelt import exceptions
-        from requests_toolbelt.downloadutils import stream
 
         try:
-            with closing(requests.get(url,
-                                      stream=True,
-                                      timeout=(9.05,31.1))) as response:
-                response.raise_for_status()
-                with open(file_path, 'wb') as f:
-                    stream.stream_response_to_file(response, path=f)
+            if zipped:
+                stream_zip_directory_over_http(url, os.path.dirname(file_path))
+            else:
+                stream_file_over_http(url, file_path)
+
         except exceptions.StreamingError as e:
             self._file_download_log.error("Couldn't retrieve file %s from %s (streaming)." % (file_path,url))
             self.cleanup_truncated_file(file_path)
             raise
+
         except requests.exceptions.ConnectionError as e:
             self._file_download_log.error("Couldn't retrieve file %s from %s (connection)." % (file_path,url))
             self.cleanup_truncated_file(file_path)
             raise
+
         except requests.exceptions.ReadTimeout as e:
             self._file_download_log.error("Couldn't retrieve file %s from %s (timeout)." % (file_path,url))
             self.cleanup_truncated_file(file_path)
             raise
+
         except requests.exceptions.RequestException as e:
             self._file_download_log.error("Couldn't retrieve file %s from %s (request)." % (file_path,url))
             self.cleanup_truncated_file(file_path)
             raise
+
         except Exception as e:
             self._file_download_log.error("Couldn't retrieve file %s from %s" % (file_path, url))
             self.cleanup_truncated_file(file_path)
@@ -381,3 +392,52 @@ class Api(object):
         response = requests.get(url)
 
         return response.content
+
+
+def stream_zip_directory_over_http(url, directory, members=None, timeout=(9.05, 31.1)):
+    ''' Supply an http get request and stream the response to a file.
+
+    Parameters
+    ----------
+    url : str
+        Send the request to this url
+    directory : str
+        Extract the response to this directory
+    members : list of str, optional
+        Extract only these files
+    timeout : float or tuple of float, optional
+        Specify a timeout for the request. If a tuple, specify seperate connect 
+        and read timeouts.
+
+    '''
+
+    buf = io.BytesIO()
+
+    with closing( requests.get(url, stream=True, timeout=timeout) ) as request:
+        stream.stream_response_to_file( request, buf )
+
+    zipper = zipfile.ZipFile(buf)
+    zipper.extractall(path=directory, members=members)
+    zipper.close()
+
+
+def stream_file_over_http(url, file_path, timeout=(9.05, 31.1)):
+    ''' Supply an http get request and stream the response to a file.
+
+    Parameters
+    ----------
+    url : str
+        Send the request to this url
+    file_path : str
+        Stream the response to this path
+    timeout : float or tuple of float, optional
+        Specify a timeout for the request. If a tuple, specify seperate connect 
+        and read timeouts.
+
+    '''
+
+    with closing(requests.get(url, stream=True, timeout=timeout)) as response:
+
+        response.raise_for_status()
+        with open(file_path, 'wb') as fil:
+            stream.stream_response_to_file(response, path=fil)

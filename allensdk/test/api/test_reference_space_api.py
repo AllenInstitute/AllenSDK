@@ -82,6 +82,21 @@ MOCK_ANNOTATION_DATA = 'mock_annotation_data'
 MOCK_ANNOTATION_IMAGE = 'mock_annotation_image'
 
 
+
+def test_download_mouse_atlas_volume(ref_space):
+
+    with patch.object(ref_space, 'retrieve_file_over_http') as mock_retrieve:
+        with pytest.raises(RuntimeError):
+            ref_space.download_mouse_atlas_volume('P56', 'Mouse_gridAnnotation', 'P56/gridAnnotation.mhd')    
+
+    mock_retrieve.assert_called_once_with(
+        'http://download.alleninstitute.org/informatics-archive/'\
+        'current-release/mouse_annotation/'\
+        'P56_Mouse_gridAnnotation.zip',
+        'P56/gridAnnotation.mhd',
+        zipped=True)
+
+
 @pytest.mark.parametrize("data_path,resolution",
                          it.product(DATA_PATHS(),
                                     RESOLUTIONS()))

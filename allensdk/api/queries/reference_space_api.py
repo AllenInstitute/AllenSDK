@@ -36,6 +36,7 @@
 from .rma_api import RmaApi
 from allensdk.api.cache import cacheable, Cache
 from allensdk.core.obj_utilities import read_obj
+import allensdk.core.sitk_utilities as sitk_utilities
 import numpy as np
 import nrrd
 import six
@@ -92,6 +93,31 @@ class ReferenceSpaceApi(RmaApi):
         self.download_volumetric_data(ccf_version,
                                       'annotation_%d.nrrd' % resolution, 
                                       save_file_path=file_name)
+
+
+    @cacheable(strategy='create', reader=sitk_utilities.read_ndarray_with_sitk, 
+               pathfinder=Cache.pathfinder(file_name_position=3,
+                                           path_keyword='file_name'))
+    def download_mouse_atlas_volume(self, age, volume_type, file_name):
+        '''Download a reference volume (annotation, grid annotation, atlas volume) 
+        from the mouse brain atlas project
+
+        Parameters
+        ----------
+        age : str
+            Specify a mouse age for which to download the reference volume
+        volume_type : str
+            Specify the type of volume to download
+        file_name : str
+            Specify the path to the downloaded volume
+        '''
+
+        remote_file_name = '{}_{}.zip'.format(age, volume_type)
+        url = '/'.join([ self.informatics_archive_endpoint, 
+                         'current-release', 'mouse_annotation', 
+                         remote_file_name ])
+
+        self.retrieve_file_over_http(url, file_name, zipped=True)
 
 
     @cacheable(strategy='create',
