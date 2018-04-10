@@ -305,6 +305,17 @@ def test_get_mask():
     assert mask.sum() == 931286
     assert mask.shape == si.MONITOR_DIMENSIONS
 
+
+def test_mask():
+    m = si.BrainObservatoryMonitor()
+
+    assert(m._mask is None)
+
+    assert(m.mask.sum() == 931286)
+    assert(m.mask.shape == si.MONITOR_DIMENSIONS)
+    assert(m._mask is not None)
+
+
 def test_translate_image_and_fill():
     '''
     [[1 2 3]
