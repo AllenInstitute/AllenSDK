@@ -1,3 +1,8 @@
+branches:
+  only:
+    - master
+    - internal
+
 env:
   global:
     - TEST_NWB_FILES=skip
