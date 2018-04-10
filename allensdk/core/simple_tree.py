@@ -81,6 +81,9 @@ class SimpleTree( object ):
             if pid is not None:
                 self._child_ids[pid].append(nid)
 
+        self.node_id_cb = node_id_cb
+        self.parent_id_cb = parent_id_cb
+
 
     def filter_nodes(self, criterion):
         '''Obtain a list of nodes filtered by some criterion
@@ -393,4 +396,3 @@ class SimpleTree( object ):
         '''
     
         return list(map(self.nodes, self.ancestor_ids(node_ids)))
-    
