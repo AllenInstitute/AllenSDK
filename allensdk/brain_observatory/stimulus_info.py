@@ -431,6 +431,13 @@ class Monitor(object):
         self._panel_size = panel_size
         self.n_pixels_r = n_pixels_r
         self.n_pixels_c = n_pixels_c
+        self._mask = None
+
+    @property
+    def mask(self):
+        if self._mask is None:
+            self._mask = self.get_mask()
+        return self._mask
 
     @property
     def panel_size(self):
@@ -549,8 +556,7 @@ class Monitor(object):
         number_of_cycles = spatial_frequency*2*np.degrees(np.arctan(self.width/2./distance_from_monitor))
 
         # How many pixels to I have pre-warp to place my cycles on:
-        mask = self.get_mask()
-        _, m_col = np.where(mask != 0)
+        _, m_col = np.where(self.mask != 0)
         number_of_pixels = (m_col.max() - m_col.min())
 
         return float(number_of_pixels)/number_of_cycles
@@ -704,7 +710,7 @@ class BrainObservatoryMonitor(Monitor):
         return super(BrainObservatoryMonitor, self).pixels_to_visual_degrees(n, self.experiment_geometry.distance, **kwargs)
 
     def visual_degrees_to_pixels(self, vd, **kwargs):
-    
+
         return super(BrainObservatoryMonitor, self).visual_degrees_to_pixels(vd, self.experiment_geometry.distance, **kwargs)
 
 def warp_stimulus_coords(vertices,
