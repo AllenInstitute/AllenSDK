@@ -42,7 +42,6 @@ import nrrd
 import pandas as pd
 
 from allensdk.core.reference_space_cache import ReferenceSpaceCache
-from allensdk.test_utilities.temp_dir import fn_temp_dir
 from allensdk.core.structure_tree import StructureTree
 
 

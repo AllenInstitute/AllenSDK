@@ -55,32 +55,28 @@ def test_list_cells_unmocked(cell_types_api):
     # this test will always require the latest warehouse
     cells = cell_types_api.list_cells()
 
+
 def test_list_cells_mocked(mock_cells):
-    ctapi = CellTypesApi()
+    with patch.object(CellTypesApi, "model_query", return_value=mock_cells):
+        ctapi = CellTypesApi()
 
-    ctapi.model_query = MagicMock(return_value=mock_cells)
+        cells = ctapi.list_cells()
+        assert len(cells) == 3
 
-    cells = ctapi.list_cells()
-    assert len(cells) == 3
-
-    flu_cells = [ cell for cell in cells if cell['disease_categories'] == [('influenza')] ]
-    assert len(flu_cells) == 1
+        flu_cells = [ cell for cell in cells if cell['disease_categories'] == [('influenza')] ]
+        assert len(flu_cells) == 1
     
-    cells = ctapi.list_cells(require_reconstruction=True)
-    assert len(cells) == 1
+        cells = ctapi.list_cells(require_reconstruction=True)
+        assert len(cells) == 1
     
-    cells = ctapi.list_cells(require_morphology=True)
-    assert len(cells) == 1
+        cells = ctapi.list_cells(require_morphology=True)
+        assert len(cells) == 1
 
-    cells = ctapi.list_cells(reporter_status=['bob'])
-    assert len(cells) == 1
+        cells = ctapi.list_cells(reporter_status=['bob'])
+        assert len(cells) == 1
 
-    cells = ctapi.list_cells(species=['HOMO SAPIENS'])
-    assert len(cells) == 1
+        cells = ctapi.list_cells(species=['HOMO SAPIENS'])
+        assert len(cells) == 1
 
-    cells = ctapi.list_cells(species=['mus musculus'])
-    assert len(cells) == 1
-
-
-    
-
+        cells = ctapi.list_cells(species=['mus musculus'])
+        assert len(cells) == 1

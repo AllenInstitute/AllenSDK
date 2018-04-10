@@ -1136,7 +1136,7 @@ def estimate_adjusted_detection_parameters(v_set, t_set, interval_start, interva
     for v, t, dv in zip(v_set, t_set, dv_set):
         putative_spikes = detect_putative_spikes(v, t, dv_cutoff=new_dv_cutoff, filter=filter)
         peaks = find_peak_indexes(v, t, putative_spikes)
-        putative_spikes, peaks = filter_putative_spikes(v, t, putative_spikes, peaks)
+        putative_spikes, peaks = filter_putative_spikes(v, t, putative_spikes, peaks, dvdt=dv, filter=filter)
         upstrokes = find_upstroke_indexes(v, t, putative_spikes, peaks, dvdt=dv)
         if upstrokes.size:
             all_upstrokes = np.append(all_upstrokes, dv[upstrokes])

@@ -44,6 +44,7 @@ class GlifApi(RmaTemplate):
     _log = logging.getLogger('allensdk.api.queries.glif_api')
 
     NWB_FILE_TYPE = None
+    GLIF_TYPES = [ 395310498, 395310469, 395310475, 395310479, 471355161 ]
 
     rma_templates = \
         {"glif_queries": [
@@ -56,8 +57,8 @@ class GlifApi(RmaTemplate):
             {'name': 'neuronal_models',
              'description': 'see name',
              'model': 'Specimen',
-             'include': 'neuronal_models(well_known_files,neuronal_model_template,neuronal_model_runs(well_known_files))',
-             'criteria':'[id$in{{ ephys_experiment_ids }}]',
+             'include': 'neuronal_models(well_known_files,neuronal_model_template[id$in' + ','.join(map(str,GLIF_TYPES)) + '],neuronal_model_runs(well_known_files))',             
+             'criteria':'{% if ephys_experiment_ids is defined %}[id$in{{ ephys_experiment_ids }}]{%endif%}',
              'num_rows': 'all',
              'criteria_params':['ephys_experiment_ids'],
              'count': False,
@@ -70,8 +71,8 @@ class GlifApi(RmaTemplate):
              'num_rows': 'all',
              'criteria_params':['neuronal_model_ids'],
              'count': False,
-            }
-        ]
+             }
+            ]
         }
 
     def __init__(self, base_uri=None):
@@ -103,6 +104,7 @@ class GlifApi(RmaTemplate):
                                                                                  neuron_config_url)
 
         return return_dict
+
 
     @deprecated()
     def list_neuronal_models(self):

@@ -110,7 +110,8 @@ class EphysSweepFeatureExtractor:
                                                     self.filter, self.dv_cutoff)
         peaks = ft.find_peak_indexes(v, t, putative_spikes, self.end)
         putative_spikes, peaks = ft.filter_putative_spikes(v, t, putative_spikes, peaks,
-                                                           self.min_height, self.min_peak)
+                                                           self.min_height, self.min_peak, 
+                                                           dvdt=dvdt, filter=self.filter)
 
         if not putative_spikes.size:
             # Save time if no spikes detected

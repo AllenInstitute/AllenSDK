@@ -48,7 +48,8 @@ import allensdk.core.json_utilities as ju
 from allensdk.config.manifest import ManifestVersionError
 from allensdk.config.manifest_builder import ManifestBuilder
 
-from allensdk.test_utilities.temp_dir import fn_temp_dir
+_msg = [{'whatever': True}]
+_pd_msg = pd.DataFrame(_msg)
 
 
 @pytest.fixture
@@ -91,8 +92,8 @@ f 6//6 3//3 5//5
     '''
 
 
-def test_version_update(fn_temp_dir):
-
+@pytest.fixture
+def dummy_cache():
     class DummyCache(Cache):
         
         VERSION = None
@@ -102,28 +103,33 @@ def test_version_update(fn_temp_dir):
             manifest_builder.set_version(DummyCache.VERSION)
             manifest_builder.write_json_file(file_name)
 
+    return DummyCache
+
+
+def test_version_update(fn_temp_dir, dummy_cache):
+
     mpath = os.path.join(fn_temp_dir, 'manifest.json')
-    dc = DummyCache(manifest=mpath)
+    dc = dummy_cache(manifest=mpath)
     
-    same_dc = DummyCache(manifest=mpath)
+    same_dc = dummy_cache(manifest=mpath)
     
     with pytest.raises(ManifestVersionError):
-        new_dc = DummyCache(manifest=mpath, version=1.0)
+        new_dc = dummy_cache(manifest=mpath, version=1.0)
 
 
-def test_wrap_json(rma, cache):
-    msg = [{'whatever': True}]
+def test_load_manifest(tmpdir_factory, dummy_cache):
 
-    ju.read_url_get = \
-        MagicMock(name='read_url_get',
-                  return_value={'msg': msg})
-    ju.write = \
-        MagicMock(name='write')
+    manifest = tmpdir_factory.mktemp('data').join('test_manifest.json')
+    cache = dummy_cache(manifest=str(manifest))
 
-    ju.read = \
-        MagicMock(name='read',
-                  return_value=pd.DataFrame(msg))
+    assert(cache.manifest_path == str(manifest))
+    assert(os.path.exists(cache.manifest_path))
 
+
+@patch("allensdk.core.json_utilities.write")
+@patch("allensdk.core.json_utilities.read", return_value=pd.DataFrame(_msg))
+@patch("allensdk.core.json_utilities.read_url_get", return_value={'msg': _msg})
+def test_wrap_json(ju_read_url_get, ju_read, ju_write, rma, cache):
     df = cache.wrap(rma.model_query,
                     'example.txt',
                     cache=True,
@@ -131,24 +137,16 @@ def test_wrap_json(rma, cache):
 
     assert df.loc[:, 'whatever'][0]
 
-    ju.read_url_get.assert_called_once_with(
+    ju_read_url_get.assert_called_once_with(
         'http://api.brain-map.org/api/v2/data/query.json?q=model::Hemisphere')
-    ju.write.assert_called_once_with('example.txt', msg)
-    ju.read.assert_called_once_with('example.txt')
+    ju_write.assert_called_once_with('example.txt', _msg)
+    ju_read.assert_called_once_with('example.txt')
 
 
-def test_wrap_dataframe(rma, cache):
-    msg = [{'whatever': True}]
-
-    ju.read_url_get = \
-        MagicMock(name='read_url_get',
-                  return_value={'msg': msg})
-    ju.write = \
-        MagicMock(name='write')
-    pj.read_json = \
-        MagicMock(name='read_json',
-                  return_value=msg)
-
+@patch("pandas.io.json.read_json", return_value=_msg)
+@patch("allensdk.core.json_utilities.write")
+@patch("allensdk.core.json_utilities.read_url_get", return_value={'msg': _msg})
+def test_wrap_dataframe(ju_read_url_get, ju_write, mock_read_json, rma, cache):
     json_data = cache.wrap(rma.model_query,
                            'example.txt',
                            cache=True,
@@ -157,10 +155,10 @@ def test_wrap_dataframe(rma, cache):
 
     assert json_data[0]['whatever']
 
-    ju.read_url_get.assert_called_once_with(
+    ju_read_url_get.assert_called_once_with(
         'http://api.brain-map.org/api/v2/data/query.json?q=model::Hemisphere')
-    ju.write.assert_called_once_with('example.txt', msg)
-    pj.read_json.assert_called_once_with('example.txt', orient='records')
+    ju_write.assert_called_once_with('example.txt', _msg)
+    mock_read_json.assert_called_once_with('example.txt', orient='records')
 
 def test_memoize():
 
