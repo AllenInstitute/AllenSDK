@@ -184,3 +184,11 @@ def test_ancestors(tree):
     assert( len(obtained[0]) == 3 )
     assert( isinstance(obtained[0][0], dict) )
     assert( len(obtained[1]) == 2 )
+
+
+def test_cbs(tree):
+
+    nodes = tree.nodes()
+    for node in nodes:
+        assert( node['id'] == tree.node_id_cb(node) )
+        assert( node['parent'] == tree.parent_id_cb(node) )
