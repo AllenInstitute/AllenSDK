@@ -396,4 +396,3 @@ class SimpleTree( object ):
         '''
     
         return list(map(self.nodes, self.ancestor_ids(node_ids)))
-    
