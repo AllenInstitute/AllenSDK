@@ -85,9 +85,27 @@ def indexed_timeseries_hfive(mem_hfive):
 
         mem_hfive[frame_dur_path] = frame_dur_data
         mem_hfive[inds_path] = inds_data
-        return mem_hfive
 
+        return mem_hfive
     return make_indexed_timeseries_hfive
+
+
+@pytest.fixture
+def abstract_feature_series_hfive(mem_hfive):
+    def make_abstract_feature_series_hfive(stimulus_name, stim_data, features, frame_dur):
+        
+        stimulus_path = 'stimulus/presentation/{}'.format(stimulus_name)
+        frame_dur_path = '{}/frame_duration'.format(stimulus_path)
+        features_path = '{}/features'.format(stimulus_path)
+        stim_data_path = '{}/data'.format(stimulus_path)
+
+        mem_hfive[frame_dur_path] = frame_dur
+        mem_hfive[stim_data_path] = stim_data
+        mem_hfive[features_path] = features
+
+        return mem_hfive
+    return make_abstract_feature_series_hfive
+
 
 def test_acceptance(data_set):
     data_set.get_cell_specimen_ids()
@@ -290,8 +308,10 @@ def test_get_indexed_time_series_stimulus_table(indexed_timeseries_hfive):
     inds_exp = np.arange(10)
 
     hfive = indexed_timeseries_hfive(stimulus_name, inds_exp, frame_dur_exp)
-    obtained = bonds._get_indexed_time_series_stimulus_table(hfive, stimulus_name)
-    assert(np.allclose( obtained['start'].values , frame_dur_exp[:, 0] ))
+    obt = bonds._get_indexed_time_series_stimulus_table(hfive, stimulus_name)
+
+    frame_dur_obt = np.array([ obt['start'].values, obt['end'].values ]).T
+    assert(np.allclose( frame_dur_obt, frame_dur_exp ))
 
 
 def test_get_indexed_time_series_stimulus_table_out_of_order(indexed_timeseries_hfive):
@@ -302,5 +322,26 @@ def test_get_indexed_time_series_stimulus_table_out_of_order(indexed_timeseries_
     inds_exp = np.arange(10)
 
     hfive = indexed_timeseries_hfive(stimulus_name, inds_exp, frame_dur_file)
-    obtained = bonds._get_indexed_time_series_stimulus_table(hfive, stimulus_name)
-    assert(np.allclose( obtained['start'].values , frame_dur_exp[:, 0] ))
+    obt = bonds._get_indexed_time_series_stimulus_table(hfive, stimulus_name)
+
+    frame_dur_obt = np.array([ obt['start'].values, obt['end'].values ]).T
+    assert(np.allclose( frame_dur_obt, frame_dur_exp ))
+
+
+def test_get_abstract_feature_series_stimulus_table_out_of_order(abstract_feature_series_hfive):
+
+    stimulus_name = 'fish'
+    frame_dur_exp = np.arange(20).reshape((10, 2))
+    frame_dur_file = frame_dur_exp.copy()[::-1, :]
+    features_exp = [b'orientation', b'spatial_frequency', b'phase']
+    data_exp = np.arange(30).reshape((10, 3))
+    data_file = data_exp.copy()[::-1, :]
+
+    hfive = abstract_feature_series_hfive(stimulus_name, data_file, features_exp, frame_dur_file)
+    obt = bonds._get_abstract_feature_series_stimulus_table(hfive, stimulus_name)
+
+    frame_dur_obt = np.array([ obt['start'].values, obt['end'].values ]).T
+    assert(np.allclose( frame_dur_obt, frame_dur_exp ))
+
+    data_obt = np.array([ obt['orientation'].values, obt['spatial_frequency'].values, obt['phase'].values ]).T
+    assert(np.allclose( data_obt, data_exp ))
