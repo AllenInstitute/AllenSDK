@@ -540,19 +540,25 @@ class BrainObservatoryNwbDataSet(object):
 
     def get_stimulus_table(self, stimulus_name):
         ''' Return a stimulus table given a stimulus name '''
-        if stimulus_name in self.STIMULUS_TABLE_TYPES['abstract_feature_series']:
-            return _get_abstract_feature_series_stimulus_table(self.nwb_file, stimulus_name + "_stimulus")
-        elif stimulus_name in self.STIMULUS_TABLE_TYPES['indexed_time_series']:
-            return _get_indexed_time_series_stimulus_table(self.nwb_file, stimulus_name)
-        elif stimulus_name in self.STIMULUS_TABLE_TYPES['repeated_indexed_time_series']:
-            return _get_repeated_indexed_time_series_stimulus_table(self.nwb_file, stimulus_name)
-        elif stimulus_name == 'spontaneous':
-            return self.get_spontaneous_activity_stimulus_table()
-        elif stimulus_name == 'master':
+
+        if stimulus_name == 'master':
             return self._get_master_stimulus_table()
-        else:
-            raise IOError(
-                "Could not find a stimulus table named '%s'" % stimulus_name)
+
+        with h5py.File(self.nwb_file, 'r') as nwb_file:
+
+            if stimulus_name in self.STIMULUS_TABLE_TYPES['abstract_feature_series']:
+                return _get_abstract_feature_series_stimulus_table(nwb_file, stimulus_name + "_stimulus")
+
+            if stimulus_name in self.STIMULUS_TABLE_TYPES['indexed_time_series']:
+                return _get_indexed_time_series_stimulus_table(nwb_file, stimulus_name)
+
+            if stimulus_name in self.STIMULUS_TABLE_TYPES['repeated_indexed_time_series']:
+                return _get_repeated_indexed_time_series_stimulus_table(nwb_file, stimulus_name)
+
+            if stimulus_name == 'spontaneous':
+                return self.get_spontaneous_activity_stimulus_table()
+
+        raise IOError("Could not find a stimulus table named '%s'" % stimulus_name)
                 
 
     def get_spontaneous_activity_stimulus_table(self):
@@ -987,19 +993,18 @@ def _get_abstract_feature_series_stimulus_table(nwb_file, stimulus_name):
 
     k = "stimulus/presentation/%s" % stimulus_name
 
-    with h5py.File(nwb_file, 'r') as f:
-        if k not in f:
-            raise MissingStimulusException("Stimulus not found: %s" % stimulus_name)
+    if k not in nwb_file:
+        raise MissingStimulusException("Stimulus not found: %s" % stimulus_name)
 
-        stim_data = f[k + '/data'].value
-        features = [ v.decode('UTF-8') for v in f[k + '/features'].value ]
-        frame_dur = f[k + '/frame_duration'].value
+    stim_data = nwb_file[k + '/data'].value
+    features = [ v.decode('UTF-8') for v in nwb_file[k + '/features'].value ]
+    frame_dur = nwb_file[k + '/frame_duration'].value
 
     stimulus_table = pd.DataFrame(stim_data, columns=features)
     stimulus_table.loc[:, 'start'] = frame_dur[:, 0].astype(int)
     stimulus_table.loc[:, 'end'] = frame_dur[:, 1].astype(int)
-    stimulus_table = stimulus_table.sort_values(['start', 'end'])
 
+    stimulus_table = stimulus_table.sort_values(['start', 'end'])
     return stimulus_table
 
 
@@ -1013,19 +1018,18 @@ def _get_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
 
     k = "stimulus/presentation/%s" % stimulus_name
 
-    with h5py.File(nwb_file, 'r') as f:
-        if k not in f:
-            k = "stimulus/presentation/%s" % (stimulus_name + "_stimulus")
-            if k not in f:
-                raise MissingStimulusException("Stimulus not found: %s" % stimulus_name)
-        inds = f[k + '/data'].value
-        frame_dur = f[k + '/frame_duration'].value
+    if k not in nwb_file:
+        k = "stimulus/presentation/%s" % (stimulus_name + "_stimulus")
+        if k not in nwb_file:
+            raise MissingStimulusException("Stimulus not found: %s" % stimulus_name)
+    inds = nwb_file[k + '/data'].value
+    frame_dur = nwb_file[k + '/frame_duration'].value
 
     stimulus_table = pd.DataFrame(inds, columns=['frame'])
     stimulus_table.loc[:, 'start'] = frame_dur[:, 0].astype(int)
     stimulus_table.loc[:, 'end'] = frame_dur[:, 1].astype(int)
+    
     stimulus_table = stimulus_table.sort_values(['start', 'end'])
-
     return stimulus_table
 
 def _get_repeated_indexed_time_series_stimulus_table(nwb_file, stimulus_name):

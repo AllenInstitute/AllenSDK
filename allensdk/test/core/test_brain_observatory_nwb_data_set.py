@@ -36,8 +36,10 @@
 import numpy as np
 from pkg_resources import resource_filename  # @UnresolvedImport
 from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet, si
+import allensdk.core.brain_observatory_nwb_data_set as bonds
 import pytest
 import os
+import h5py
 
 
 NWB_FLAVORS = []
@@ -61,6 +63,31 @@ def data_set(request):
 
     return data_set
 
+
+@pytest.fixture
+def mem_hfive(request):
+    my_file = h5py.File('my_file.h5', driver='core', backing_store=False)
+
+    def fin():
+        my_file.close()
+    request.addfinalizer(fin)
+
+    return my_file
+
+
+@pytest.fixture
+def indexed_timeseries_hfive(mem_hfive):
+    def make_indexed_timeseries_hfive(stimulus_name, inds_data, frame_dur_data):
+
+        stimulus_path = 'stimulus/presentation/{}'.format(stimulus_name)
+        inds_path = '{}/data'.format(stimulus_path)
+        frame_dur_path = '{}/frame_duration'.format(stimulus_path)
+
+        mem_hfive[frame_dur_path] = frame_dur_data
+        mem_hfive[inds_path] = inds_data
+        return mem_hfive
+
+    return make_indexed_timeseries_hfive
 
 def test_acceptance(data_set):
     data_set.get_cell_specimen_ids()
@@ -254,3 +281,26 @@ def test_get_stimulus_table_master(data_set):
         assert len(master_df) == 29398
     else:
         raise NotImplementedError('Code not tested for session of type: %s' % session_type)
+
+
+def test_get_indexed_time_series_stimulus_table(indexed_timeseries_hfive):
+
+    stimulus_name = 'fish'
+    frame_dur_exp = np.arange(20).reshape((10, 2))
+    inds_exp = np.arange(10)
+
+    hfive = indexed_timeseries_hfive(stimulus_name, inds_exp, frame_dur_exp)
+    obtained = bonds._get_indexed_time_series_stimulus_table(hfive, stimulus_name)
+    assert(np.allclose( obtained['start'].values , frame_dur_exp[:, 0] ))
+
+
+def test_get_indexed_time_series_stimulus_table_out_of_order(indexed_timeseries_hfive):
+
+    stimulus_name = 'fish'
+    frame_dur_exp = np.arange(20).reshape((10, 2))
+    frame_dur_file = frame_dur_exp.copy()[::-1, :]
+    inds_exp = np.arange(10)
+
+    hfive = indexed_timeseries_hfive(stimulus_name, inds_exp, frame_dur_file)
+    obtained = bonds._get_indexed_time_series_stimulus_table(hfive, stimulus_name)
+    assert(np.allclose( obtained['start'].values , frame_dur_exp[:, 0] ))
