@@ -508,6 +508,36 @@ class BrainObservatoryNwbDataSet(object):
             keys = list(f["stimulus/presentation/"].keys())
         return [ k.replace('_stimulus', '') for k in keys ]
 
+
+    def _get_master_stimulus_table(self):
+        ''' Builds a table for all stimuli by concatenating (vertically) the 
+        sub-tables describing presentation of each stimulus
+        '''
+
+        epoch_table = self.get_stimulus_epoch_table()
+
+        stimulus_table_dict = {}
+        for stimulus in self.list_stimuli():
+            stimulus_table_dict[stimulus] = self.get_stimulus_table(stimulus)
+
+        table_list = []
+        for stimulus in self.list_stimuli():
+            curr_stimtable = stimulus_table_dict[stimulus]
+
+            for _, row in epoch_table[epoch_table['stimulus'] == stimulus].iterrows():
+
+                epoch_start_ind, epoch_end_ind = row['start'], row['end']
+                curr_subtable = curr_stimtable[(epoch_start_ind <= curr_stimtable['start']) &
+                                                (curr_stimtable['end'] <= epoch_end_ind)].copy()
+                curr_subtable['stimulus'] = stimulus
+                table_list.append(curr_subtable)
+
+        new_table = pd.concat(table_list)
+        new_table.reset_index(drop=True, inplace=True)
+
+        return new_table
+
+
     def get_stimulus_table(self, stimulus_name):
         ''' Return a stimulus table given a stimulus name '''
         if stimulus_name in self.STIMULUS_TABLE_TYPES['abstract_feature_series']:
@@ -519,37 +549,11 @@ class BrainObservatoryNwbDataSet(object):
         elif stimulus_name == 'spontaneous':
             return self.get_spontaneous_activity_stimulus_table()
         elif stimulus_name == 'master':
-
-            epoch_table = self.get_stimulus_epoch_table()
-
-            stimulus_table_dict = {}
-            for stimulus in self.list_stimuli():
-                stimulus_table_dict[stimulus] = self.get_stimulus_table(stimulus)
-
-            table_list = []
-            for stimulus in self.list_stimuli():
-                curr_stimtable = stimulus_table_dict[stimulus]
-
-                for _, row in epoch_table[epoch_table['stimulus'] == stimulus].iterrows():
-
-                    epoch_start_ind, epoch_end_ind = row['start'], row['end']
-                    curr_subtable = curr_stimtable[(epoch_start_ind <= curr_stimtable['start']) &
-                                                   (curr_stimtable['end'] <= epoch_end_ind)].copy()
-                    curr_subtable['stimulus'] = stimulus
-                    table_list.append(curr_subtable)
-
-            table_list = [t.sort_values(['start', 'end']) for t in table_list]
-
-            new_table = pd.concat(table_list)
-            new_table.reset_index(drop=True, inplace=True)
-
-            return new_table
-
-
-
+            return self._get_master_stimulus_table()
         else:
             raise IOError(
                 "Could not find a stimulus table named '%s'" % stimulus_name)
+                
 
     def get_spontaneous_activity_stimulus_table(self):
         ''' Return the spontaneous activity stimulus table, if it exists.
@@ -971,6 +975,7 @@ def mask_stimulus_template(*args, **kwargs):
     return si_mask_stimulus_template(*args, **kwargs)
 
 
+
 def _get_abstract_feature_series_stimulus_table(nwb_file, stimulus_name):
     ''' Return the a stimulus table for an abstract feature series.
 
@@ -984,8 +989,8 @@ def _get_abstract_feature_series_stimulus_table(nwb_file, stimulus_name):
 
     with h5py.File(nwb_file, 'r') as f:
         if k not in f:
-            raise MissingStimulusException(
-                "Stimulus not found: %s" % stimulus_name)
+            raise MissingStimulusException("Stimulus not found: %s" % stimulus_name)
+
         stim_data = f[k + '/data'].value
         features = [ v.decode('UTF-8') for v in f[k + '/features'].value ]
         frame_dur = f[k + '/frame_duration'].value
