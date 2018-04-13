@@ -547,20 +547,21 @@ class BrainObservatoryNwbDataSet(object):
         with h5py.File(self.nwb_file, 'r') as nwb_file:
 
             if stimulus_name in self.STIMULUS_TABLE_TYPES['abstract_feature_series']:
-                return _get_abstract_feature_series_stimulus_table(nwb_file, stimulus_name + "_stimulus")
+                return make_abstract_feature_series_stimulus_table(nwb_file, stimulus_name + "_stimulus")
 
             if stimulus_name in self.STIMULUS_TABLE_TYPES['indexed_time_series']:
-                return _get_indexed_time_series_stimulus_table(nwb_file, stimulus_name)
+                return make_indexed_time_series_stimulus_table(nwb_file, stimulus_name)
 
             if stimulus_name in self.STIMULUS_TABLE_TYPES['repeated_indexed_time_series']:
-                return _get_repeated_indexed_time_series_stimulus_table(nwb_file, stimulus_name)
+                return make_repeated_indexed_time_series_stimulus_table(nwb_file, stimulus_name)
 
             if stimulus_name == 'spontaneous':
-                return self.get_spontaneous_activity_stimulus_table()
+                return make_spontaneous_activity_stimulus_table(nwb_file)
 
         raise IOError("Could not find a stimulus table named '%s'" % stimulus_name)
                 
 
+    @deprecated('Use allensdk.core.brain_observatory_nwb_data_set.make_spontaneous_activity_stimulus_table')
     def get_spontaneous_activity_stimulus_table(self):
         ''' Return the spontaneous activity stimulus table, if it exists.
 
@@ -568,25 +569,10 @@ class BrainObservatoryNwbDataSet(object):
         -------
         stimulus table: pd.DataFrame
         '''
-        k = "stimulus/presentation/spontaneous_stimulus"
-        with h5py.File(self.nwb_file, 'r') as f:
-            events = f[k + '/data'].value
-            frame_dur = f[k + '/frame_duration'].value
 
-        start_inds = np.where(events == 1)
-        stop_inds = np.where(events == -1)
+        with h5py.File(self.nwb_file, 'r') as nwb_file:
+            return make_spontaneous_activity_stimulus_table(nwb_file)
 
-        if len(start_inds) != len(stop_inds):
-            raise Exception(
-                "inconsistent start and time times in spontaneous activity stimulus table")
-
-        stim_data = np.column_stack(
-            [frame_dur[start_inds, 0].T, frame_dur[stop_inds, 0].T]).astype(int)
-
-        stimulus_table = pd.DataFrame(stim_data, columns=['start', 'end'])
-        stimulus_table = stimulus_table.sort_values(['start', 'end'])
-
-        return stimulus_table
 
     @memoize
     def get_stimulus_template(self, stimulus_name):
@@ -981,8 +967,24 @@ def mask_stimulus_template(*args, **kwargs):
     return si_mask_stimulus_template(*args, **kwargs)
 
 
-
+@deprecated('Use allensdk.core.brain_observatory_nwb_data_set.make_abstract_feature_series_stimulus_table')
 def _get_abstract_feature_series_stimulus_table(nwb_file, stimulus_name):
+    with open(nwb_file, 'r') as nwb_file:
+        return make_abstract_feature_series_stimulus_table(nwb_file, stimulus_name)
+
+
+@deprecated('Use allensdk.core.brain_observatory_nwb_data_set.make_indexed_time_series_stimulus_table')
+def _get_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
+    with open(nwb_file, 'r') as nwb_file:
+        return make_indexed_time_series_stimulus_table(nwb_file, stimulus_name)
+
+@deprecated('Use allensdk.core.brain_observatory_nwb_data_set.make_repeated_indexed_time_series_stimulus_table')
+def _get_repeated_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
+    with open(nwb_file, 'r') as nwb_file:
+        return make_repeated_indexed_time_series_stimulus_table(nwb_file, stimulus_name)
+
+
+def make_abstract_feature_series_stimulus_table(nwb_file, stimulus_name):
     ''' Return the a stimulus table for an abstract feature series.
 
     Returns
@@ -1008,7 +1010,7 @@ def _get_abstract_feature_series_stimulus_table(nwb_file, stimulus_name):
     return stimulus_table
 
 
-def _get_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
+def make_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
     ''' Return the a stimulus table for an indexed time series.
 
     Returns
@@ -1032,14 +1034,38 @@ def _get_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
     stimulus_table = stimulus_table.sort_values(['start', 'end'])
     return stimulus_table
 
-def _get_repeated_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
 
-    stimulus_table = _get_indexed_time_series_stimulus_table(nwb_file, stimulus_name)
+def make_repeated_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
+
+    stimulus_table = make_indexed_time_series_stimulus_table(nwb_file, stimulus_name)
     a = stimulus_table.groupby(by='frame')
 
     # If this ever occurs, the repeat counter cant be trusted!
     assert np.floor(len(stimulus_table))/len(a) == int(len(stimulus_table))/len(a)
 
     stimulus_table['repeat'] = np.repeat(range(len(stimulus_table)//len(a)), len(a))
+
+    return stimulus_table
+
+
+def make_spontaneous_activity_stimulus_table(nwb_file):
+
+    k = "stimulus/presentation/spontaneous_stimulus"
+    
+    events = nwb_file[k + '/data'].value
+    frame_dur = nwb_file[k + '/frame_duration'].value
+
+    start_inds = np.where(events == 1)
+    stop_inds = np.where(events == -1)
+
+    if len(start_inds) != len(stop_inds):
+        raise Exception(
+            "inconsistent start and time times in spontaneous activity stimulus table")
+
+    stim_data = np.column_stack(
+        [frame_dur[start_inds, 0].T, frame_dur[stop_inds, 0].T]).astype(int)
+
+    stimulus_table = pd.DataFrame(stim_data, columns=['start', 'end'])
+    stimulus_table = stimulus_table.sort_values(['start', 'end'])
 
     return stimulus_table

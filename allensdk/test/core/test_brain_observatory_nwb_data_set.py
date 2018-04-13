@@ -301,20 +301,20 @@ def test_get_stimulus_table_master(data_set):
         raise NotImplementedError('Code not tested for session of type: %s' % session_type)
 
 
-def test_get_indexed_time_series_stimulus_table(indexed_timeseries_hfive):
+def test_make_indexed_time_series_stimulus_table(indexed_timeseries_hfive):
 
     stimulus_name = 'fish'
     frame_dur_exp = np.arange(20).reshape((10, 2))
     inds_exp = np.arange(10)
 
     hfive = indexed_timeseries_hfive(stimulus_name, inds_exp, frame_dur_exp)
-    obt = bonds._get_indexed_time_series_stimulus_table(hfive, stimulus_name)
+    obt = bonds.make_indexed_time_series_stimulus_table(hfive, stimulus_name)
 
     frame_dur_obt = np.array([ obt['start'].values, obt['end'].values ]).T
     assert(np.allclose( frame_dur_obt, frame_dur_exp ))
 
 
-def test_get_indexed_time_series_stimulus_table_out_of_order(indexed_timeseries_hfive):
+def test_make_indexed_time_series_stimulus_table_out_of_order(indexed_timeseries_hfive):
 
     stimulus_name = 'fish'
     frame_dur_exp = np.arange(20).reshape((10, 2))
@@ -322,13 +322,13 @@ def test_get_indexed_time_series_stimulus_table_out_of_order(indexed_timeseries_
     inds_exp = np.arange(10)
 
     hfive = indexed_timeseries_hfive(stimulus_name, inds_exp, frame_dur_file)
-    obt = bonds._get_indexed_time_series_stimulus_table(hfive, stimulus_name)
+    obt = bonds.make_indexed_time_series_stimulus_table(hfive, stimulus_name)
 
     frame_dur_obt = np.array([ obt['start'].values, obt['end'].values ]).T
     assert(np.allclose( frame_dur_obt, frame_dur_exp ))
 
 
-def test_get_abstract_feature_series_stimulus_table_out_of_order(abstract_feature_series_hfive):
+def test_make_abstract_feature_series_stimulus_table_out_of_order(abstract_feature_series_hfive):
 
     stimulus_name = 'fish'
     frame_dur_exp = np.arange(20).reshape((10, 2))
@@ -338,7 +338,7 @@ def test_get_abstract_feature_series_stimulus_table_out_of_order(abstract_featur
     data_file = data_exp.copy()[::-1, :]
 
     hfive = abstract_feature_series_hfive(stimulus_name, data_file, features_exp, frame_dur_file)
-    obt = bonds._get_abstract_feature_series_stimulus_table(hfive, stimulus_name)
+    obt = bonds.make_abstract_feature_series_stimulus_table(hfive, stimulus_name)
 
     frame_dur_obt = np.array([ obt['start'].values, obt['end'].values ]).T
     assert(np.allclose( frame_dur_obt, frame_dur_exp ))
