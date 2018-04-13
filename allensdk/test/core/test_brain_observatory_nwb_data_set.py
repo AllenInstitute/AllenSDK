@@ -308,7 +308,7 @@ def test_make_indexed_time_series_stimulus_table(indexed_timeseries_hfive):
     inds_exp = np.arange(10)
 
     hfive = indexed_timeseries_hfive(stimulus_name, inds_exp, frame_dur_exp)
-    obt = bonds.make_indexed_time_series_stimulus_table(hfive, stimulus_name)
+    obt = bonds._make_indexed_time_series_stimulus_table(hfive, stimulus_name)
 
     frame_dur_obt = np.array([ obt['start'].values, obt['end'].values ]).T
     assert(np.allclose( frame_dur_obt, frame_dur_exp ))
@@ -322,7 +322,7 @@ def test_make_indexed_time_series_stimulus_table_out_of_order(indexed_timeseries
     inds_exp = np.arange(10)
 
     hfive = indexed_timeseries_hfive(stimulus_name, inds_exp, frame_dur_file)
-    obt = bonds.make_indexed_time_series_stimulus_table(hfive, stimulus_name)
+    obt = bonds._make_indexed_time_series_stimulus_table(hfive, stimulus_name)
 
     frame_dur_obt = np.array([ obt['start'].values, obt['end'].values ]).T
     assert(np.allclose( frame_dur_obt, frame_dur_exp ))
@@ -338,7 +338,7 @@ def test_make_abstract_feature_series_stimulus_table_out_of_order(abstract_featu
     data_file = data_exp.copy()[::-1, :]
 
     hfive = abstract_feature_series_hfive(stimulus_name, data_file, features_exp, frame_dur_file)
-    obt = bonds.make_abstract_feature_series_stimulus_table(hfive, stimulus_name)
+    obt = bonds._make_abstract_feature_series_stimulus_table(hfive, stimulus_name)
 
     frame_dur_obt = np.array([ obt['start'].values, obt['end'].values ]).T
     assert(np.allclose( frame_dur_obt, frame_dur_exp ))

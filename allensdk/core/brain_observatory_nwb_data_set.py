@@ -547,21 +547,21 @@ class BrainObservatoryNwbDataSet(object):
         with h5py.File(self.nwb_file, 'r') as nwb_file:
 
             if stimulus_name in self.STIMULUS_TABLE_TYPES['abstract_feature_series']:
-                return make_abstract_feature_series_stimulus_table(nwb_file, stimulus_name + "_stimulus")
+                return _make_abstract_feature_series_stimulus_table(nwb_file, stimulus_name + "_stimulus")
 
             if stimulus_name in self.STIMULUS_TABLE_TYPES['indexed_time_series']:
-                return make_indexed_time_series_stimulus_table(nwb_file, stimulus_name)
+                return _make_indexed_time_series_stimulus_table(nwb_file, stimulus_name)
 
             if stimulus_name in self.STIMULUS_TABLE_TYPES['repeated_indexed_time_series']:
-                return make_repeated_indexed_time_series_stimulus_table(nwb_file, stimulus_name)
+                return _make_repeated_indexed_time_series_stimulus_table(nwb_file, stimulus_name)
 
             if stimulus_name == 'spontaneous':
-                return make_spontaneous_activity_stimulus_table(nwb_file)
+                return _make_spontaneous_activity_stimulus_table(nwb_file)
 
         raise IOError("Could not find a stimulus table named '%s'" % stimulus_name)
                 
 
-    @deprecated('Use allensdk.core.brain_observatory_nwb_data_set.make_spontaneous_activity_stimulus_table')
+    @deprecated('Use BrainObservatoryNWBDataset.get_stimulus_table instead')
     def get_spontaneous_activity_stimulus_table(self):
         ''' Return the spontaneous activity stimulus table, if it exists.
 
@@ -966,24 +966,24 @@ def mask_stimulus_template(*args, **kwargs):
     return si_mask_stimulus_template(*args, **kwargs)
 
 
-@deprecated('Use allensdk.core.brain_observatory_nwb_data_set.make_abstract_feature_series_stimulus_table')
+@deprecated('Use BrainObservatoryNWBDataset.get_stimulus_table instead')
 def _get_abstract_feature_series_stimulus_table(nwb_file, stimulus_name):
     with open(nwb_file, 'r') as nwb_file:
         return make_abstract_feature_series_stimulus_table(nwb_file, stimulus_name)
 
 
-@deprecated('Use allensdk.core.brain_observatory_nwb_data_set.make_indexed_time_series_stimulus_table')
+@deprecated('Use BrainObservatoryNWBDataset.get_stimulus_table instead')
 def _get_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
     with open(nwb_file, 'r') as nwb_file:
         return make_indexed_time_series_stimulus_table(nwb_file, stimulus_name)
 
-@deprecated('Use allensdk.core.brain_observatory_nwb_data_set.make_repeated_indexed_time_series_stimulus_table')
+@deprecated('Use BrainObservatoryNWBDataset.get_stimulus_table instead')
 def _get_repeated_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
     with open(nwb_file, 'r') as nwb_file:
         return make_repeated_indexed_time_series_stimulus_table(nwb_file, stimulus_name)
 
 
-def make_abstract_feature_series_stimulus_table(nwb_file, stimulus_name):
+def _make_abstract_feature_series_stimulus_table(nwb_file, stimulus_name):
     ''' Return the a stimulus table for an abstract feature series.
 
     Parameters
@@ -1018,7 +1018,7 @@ def make_abstract_feature_series_stimulus_table(nwb_file, stimulus_name):
     return stimulus_table
 
 
-def make_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
+def _make_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
     ''' Return the a stimulus table for an indexed time series.
 
     Parameters
@@ -1052,9 +1052,9 @@ def make_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
     return stimulus_table
 
 
-def make_repeated_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
+def _make_repeated_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
 
-    stimulus_table = make_indexed_time_series_stimulus_table(nwb_file, stimulus_name)
+    stimulus_table = _make_indexed_time_series_stimulus_table(nwb_file, stimulus_name)
     a = stimulus_table.groupby(by='frame')
 
     # If this ever occurs, the repeat counter cant be trusted!
@@ -1065,7 +1065,7 @@ def make_repeated_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
     return stimulus_table
 
 
-def make_spontaneous_activity_stimulus_table(nwb_file):
+def _make_spontaneous_activity_stimulus_table(nwb_file):
     ''' Builds a table describing the start and end times of the spontaneous viewing
     intervals. 
 
