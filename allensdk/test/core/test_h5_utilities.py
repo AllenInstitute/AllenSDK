@@ -38,10 +38,10 @@ def simple_h5_with_datsets(simple_h5):
     return simple_h5
 
 
-def test_decode_bytes_dataset():
+def test_decode_bytes():
 
     inp = np.array([b'a', b'b', b'c'])
-    obt = h5_utilities.decode_bytes_dataset(inp)
+    obt = h5_utilities.decode_bytes(inp)
 
     assert(np.array_equal( obt, ['a', 'b', 'c'] ))
 

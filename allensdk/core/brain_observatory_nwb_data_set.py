@@ -566,7 +566,10 @@ class BrainObservatoryNwbDataSet(object):
             stimulus_group = _find_stimulus_presentation_group(nwb_file, stimulus_name)
 
             if stimulus_name in self.STIMULUS_TABLE_TYPES['abstract_feature_series']:
-                return _make_abstract_feature_series_stimulus_table(nwb_file, stimulus_name + "_stimulus")
+                datasets = h5_utilities.load_datasets_by_relnames(
+                    ['data', 'features', 'frame_duration'], nwb_file, stimulus_group)
+                return _make_abstract_feature_series_stimulus_table(
+                    datasets['data'], h5_utilities.decode_bytes(datasets['features']), datasets['frame_duration'])
 
             if stimulus_name in self.STIMULUS_TABLE_TYPES['indexed_time_series']:
                 datasets = h5_utilities.load_datasets_by_relnames(['data', 'frame_duration'], nwb_file, stimulus_group)
@@ -1019,7 +1022,7 @@ def align_running_speed(dxcm, dxtime, timestamps):
     return dxcm, dxtime
 
 
-def _make_abstract_feature_series_stimulus_table(nwb_file, stimulus_name):
+def _make_abstract_feature_series_stimulus_table(stim_data, features, frame_dur):
     ''' Return the a stimulus table for an abstract feature series.
 
     Parameters
@@ -1040,16 +1043,6 @@ def _make_abstract_feature_series_stimulus_table(nwb_file, stimulus_name):
     http://help.brain-map.org/display/observatory/Documentation?preview=/10616846/10813485/VisualCoding_VisualStimuli.pdf 
 
     '''
-
-
-    k = "stimulus/presentation/%s" % stimulus_name
-
-    if k not in nwb_file:
-        raise MissingStimulusException("Stimulus not found: %s" % stimulus_name)
-
-    stim_data = nwb_file[k + '/data'].value
-    features = h5_utilities.decode_bytes_dataset(nwb_file[k + '/features'])
-    frame_dur = nwb_file[k + '/frame_duration'].value
 
     stimulus_table = pd.DataFrame(stim_data, columns=features)
     stimulus_table.loc[:, 'start'] = frame_dur[:, 0].astype(int)

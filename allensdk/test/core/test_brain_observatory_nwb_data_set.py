@@ -312,17 +312,16 @@ def test_make_indexed_time_series_stimulus_table_out_of_order():
     assert(np.allclose( frame_dur_obt, frame_dur_exp ))
 
 
-def test_make_abstract_feature_series_stimulus_table_out_of_order(abstract_feature_series_h5):
+def test_make_abstract_feature_series_stimulus_table_out_of_order():
 
     stimulus_name = 'fish'
     frame_dur_exp = np.arange(20).reshape((10, 2))
     frame_dur_file = frame_dur_exp.copy()[::-1, :]
-    features_exp = [b'orientation', b'spatial_frequency', b'phase']
+    features_exp = ['orientation', 'spatial_frequency', 'phase']
     data_exp = np.arange(30).reshape((10, 3))
     data_file = data_exp.copy()[::-1, :]
 
-    h5 = abstract_feature_series_h5(stimulus_name, data_file, features_exp, frame_dur_file)
-    obt = bonds._make_abstract_feature_series_stimulus_table(h5, stimulus_name)
+    obt = bonds._make_abstract_feature_series_stimulus_table(data_file, features_exp, frame_dur_file)
 
     frame_dur_obt = np.array([ obt['start'].values, obt['end'].values ]).T
     assert(np.allclose( frame_dur_obt, frame_dur_exp ))

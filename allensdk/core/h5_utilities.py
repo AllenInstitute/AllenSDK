@@ -40,7 +40,7 @@ import six
 import h5py
 
 
-def decode_bytes_dataset(bytes_dataset, encoding='UTF-8'):
+def decode_bytes(bytes_dataset, encoding='UTF-8'):
     ''' Convert the elements of a dataset of bytes to str
     '''
 
