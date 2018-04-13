@@ -539,7 +539,14 @@ class BrainObservatoryNwbDataSet(object):
 
 
     def get_stimulus_table(self, stimulus_name):
-        ''' Return a stimulus table given a stimulus name '''
+        ''' Return a stimulus table given a stimulus name 
+        
+        Notes
+        -----
+        For more information, see:
+        http://help.brain-map.org/display/observatory/Documentation?preview=/10616846/10813485/VisualCoding_VisualStimuli.pdf 
+
+        '''
 
         if stimulus_name == 'master':
             return self._get_master_stimulus_table()
@@ -998,6 +1005,11 @@ def _make_abstract_feature_series_stimulus_table(nwb_file, stimulus_name):
     stimulus table : pd.DataFrame
         Describes the intervals of presentation of the stimulus
 
+    Notes
+    -----
+    For more information, see:
+    http://help.brain-map.org/display/observatory/Documentation?preview=/10616846/10813485/VisualCoding_VisualStimuli.pdf 
+
     '''
 
 
@@ -1032,6 +1044,11 @@ def _make_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
     -------
     stimulus table : pd.DataFrame
         Describes the intervals of presentation of the stimulus
+
+    Notes
+    -----
+    For more information, see:
+    http://help.brain-map.org/display/observatory/Documentation?preview=/10616846/10813485/VisualCoding_VisualStimuli.pdf 
 
     '''
 

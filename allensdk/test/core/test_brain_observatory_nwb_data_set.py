@@ -107,6 +107,21 @@ def abstract_feature_series_hfive(mem_hfive):
     return make_abstract_feature_series_hfive
 
 
+@pytest.fixture
+def spontaneous_activity_hfive(mem_hfive):
+    def make_spontaneous_activity_hfive(frame_dur, data):
+
+        stimulus_path = 'stimulus/presentation/spontaneous_stimulus'
+        frame_dur_path = '{}/frame_duration'.format(stimulus_path)
+        data_path = '{}/data'.format(stimulus_path)
+
+        mem_hfive[frame_dur_path] = frame_dur
+        mem_hfive[data_path] = data
+
+        return mem_hfive
+    return make_spontaneous_activity_hfive
+
+
 def test_acceptance(data_set):
     data_set.get_cell_specimen_ids()
     data_set.get_session_type()
@@ -345,3 +360,31 @@ def test_make_abstract_feature_series_stimulus_table_out_of_order(abstract_featu
 
     data_obt = np.array([ obt['orientation'].values, obt['spatial_frequency'].values, obt['phase'].values ]).T
     assert(np.allclose( data_obt, data_exp ))
+
+
+def test_make_spontanous_activity_stimulus_table(spontaneous_activity_hfive):
+
+    table_values_exp = [[0, 2], [4, 6]]
+
+    frame_dur_file = np.arange(8).reshape((4, 2))
+    data_file = np.array([ 1, -1, 1, -1 ])
+
+    hfive = spontaneous_activity_hfive(frame_dur_file, data_file)
+    obt = bonds._make_spontaneous_activity_stimulus_table(hfive)
+
+    assert(np.allclose( obt.values, table_values_exp ))
+
+
+def test_make_repeated_indexed_time_series_stimulus_table(indexed_timeseries_hfive):
+
+    stimulus_name = 'fish'
+    frame_dur_exp = np.arange(20).reshape((10, 2))
+    inds_exp = np.array([0, 1, 2, 3, 4, 0, 1, 2, 3, 4])
+    repeats_exp = np.array([0] * 5 + [1] * 5)
+    
+    hfive = indexed_timeseries_hfive(stimulus_name, inds_exp, frame_dur_exp)
+    obt = bonds._make_repeated_indexed_time_series_stimulus_table(hfive, stimulus_name)
+
+    frame_dur_obt = np.array([ obt['start'].values, obt['end'].values ]).T
+    assert(np.allclose( frame_dur_obt, frame_dur_exp ))
+    assert(np.allclose( repeats_exp, obt['repeat'] ))
