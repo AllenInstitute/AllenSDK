@@ -994,6 +994,19 @@ def _find_stimulus_presentation_group(nwb_file,
     return matches[0]
 
 
+def _load_datasets_by_relnames(relnames, h5_file, base_path):
+    ''' A convenience function for finding and loading into memory one or more
+    datasets from an h5 file
+    '''
+
+    matcher_cbs = {
+        relname: functools.partial(_h5_object_matcher_relname_in, [relname]) 
+        for relname in relnames
+    }
+
+    matches = _keyed_locate_h5_objects(matcher_cbs, h5_file, start_node=base_path)
+    return { key: value[:] for key, value in six.iteritems(matches) }
+
 
 def _h5_object_matcher_relname_in(relnames, h5_object_name, h5_object):
     ''' Asks if an h5 object's relative name (the final section of its absolute name)

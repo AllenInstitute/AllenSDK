@@ -403,6 +403,15 @@ def simple_h5(mem_h5):
 
 
 @pytest.fixture
+def simple_h5_with_datsets(simple_h5):
+    simple_h5.create_dataset(name='/a/b/c/fish', data=np.eye(10))
+    simple_h5.create_dataset(name='a/fowl', data=np.eye(15))
+    simple_h5.create_dataset(name='a/b/mammal', data=np.eye(20))
+
+    return simple_h5
+
+
+@pytest.fixture
 def stim_pres_h5(mem_h5):
     def make_stim_pres_h5(stimulus_name):
         mem_h5.create_group('stimulus/presentation/{}'.format(stimulus_name))
@@ -440,6 +449,16 @@ def test_keyed_locate_h5_objects(simple_h5):
     matches = bonds._keyed_locate_h5_objects(matcher_cbs, simple_h5)
     assert( matches['e'].name == '/a/e' )
     assert( matches['c'].name == '/a/b/c' )
+
+
+def test_load_datasets_by_relnames(simple_h5_with_datsets):
+
+    relnames = ['fish', 'fowl', 'mammal']
+    obt = bonds._load_datasets_by_relnames(relnames, simple_h5_with_datsets, simple_h5_with_datsets['a/b'])
+
+    assert( len(obt) == 2 )
+    assert(np.allclose( obt['fish'], np.eye(10) ))
+    assert(np.allclose( obt['mammal'], np.eye(20) ))
 
 
 def test_find_stimulus_presentation_group(stim_pres_h5):
