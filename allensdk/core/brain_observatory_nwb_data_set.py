@@ -569,10 +569,12 @@ class BrainObservatoryNwbDataSet(object):
                 return _make_abstract_feature_series_stimulus_table(nwb_file, stimulus_name + "_stimulus")
 
             if stimulus_name in self.STIMULUS_TABLE_TYPES['indexed_time_series']:
-                return _make_indexed_time_series_stimulus_table(nwb_file, stimulus_name)
+                datasets = h5_utilities.load_datasets_by_relnames(['data', 'frame_duration'], nwb_file, stimulus_group)
+                return _make_indexed_time_series_stimulus_table(datasets['data'], datasets['frame_duration'])
 
             if stimulus_name in self.STIMULUS_TABLE_TYPES['repeated_indexed_time_series']:
-                return _make_repeated_indexed_time_series_stimulus_table(nwb_file, stimulus_name)
+                datasets = h5_utilities.load_datasets_by_relnames(['data', 'frame_duration'], nwb_file, stimulus_group)
+                return _make_repeated_indexed_time_series_stimulus_table(datasets['data'], datasets['frame_duration'])
 
             if stimulus_name == 'spontaneous':
                 datasets = h5_utilities.load_datasets_by_relnames(['data', 'frame_duration'], nwb_file, stimulus_group)
@@ -1057,15 +1059,14 @@ def _make_abstract_feature_series_stimulus_table(nwb_file, stimulus_name):
     return stimulus_table
 
 
-def _make_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
+def _make_indexed_time_series_stimulus_table(inds, frame_dur):
     ''' Return the a stimulus table for an indexed time series.
 
     Parameters
     ----------
-    nwb_file : h5py.File
-        Build the table from data in this file
-    stimulus_name : str
-        Build the table for this stimulus        
+    inds : 
+    frame_durations : np.ndarray
+        start and stop times (s) of frames
 
     Returns
     -------
@@ -1079,15 +1080,6 @@ def _make_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
 
     '''
 
-    k = "stimulus/presentation/%s" % stimulus_name
-
-    if k not in nwb_file:
-        k = "stimulus/presentation/%s" % (stimulus_name + "_stimulus")
-        if k not in nwb_file:
-            raise MissingStimulusException("Stimulus not found: %s" % stimulus_name)
-    inds = nwb_file[k + '/data'].value
-    frame_dur = nwb_file[k + '/frame_duration'].value
-
     stimulus_table = pd.DataFrame(inds, columns=['frame'])
     stimulus_table.loc[:, 'start'] = frame_dur[:, 0].astype(int)
     stimulus_table.loc[:, 'end'] = frame_dur[:, 1].astype(int)
@@ -1096,9 +1088,9 @@ def _make_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
     return stimulus_table
 
 
-def _make_repeated_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
+def _make_repeated_indexed_time_series_stimulus_table(inds, frame_dur):
 
-    stimulus_table = _make_indexed_time_series_stimulus_table(nwb_file, stimulus_name)
+    stimulus_table = _make_indexed_time_series_stimulus_table(inds, frame_dur)
     a = stimulus_table.groupby(by='frame')
 
     # If this ever occurs, the repeat counter cant be trusted!

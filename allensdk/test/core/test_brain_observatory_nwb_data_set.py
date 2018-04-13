@@ -77,21 +77,6 @@ def stim_pres_h5(mem_h5):
 
 
 @pytest.fixture
-def indexed_timeseries_h5(mem_h5):
-    def make_indexed_timeseries_h5(stimulus_name, inds_data, frame_dur_data):
-
-        stimulus_path = 'stimulus/presentation/{}'.format(stimulus_name)
-        inds_path = '{}/data'.format(stimulus_path)
-        frame_dur_path = '{}/frame_duration'.format(stimulus_path)
-
-        mem_h5[frame_dur_path] = frame_dur_data
-        mem_h5[inds_path] = inds_data
-
-        return mem_h5
-    return make_indexed_timeseries_h5
-
-
-@pytest.fixture
 def abstract_feature_series_h5(mem_h5):
     def make_abstract_feature_series_h5(stimulus_name, stim_data, features, frame_dur):
         
@@ -106,21 +91,6 @@ def abstract_feature_series_h5(mem_h5):
 
         return mem_h5
     return make_abstract_feature_series_h5
-
-
-@pytest.fixture
-def spontaneous_activity_h5(mem_h5):
-    def make_spontaneous_activity_h5(frame_dur, data):
-
-        stimulus_path = 'stimulus/presentation/spontaneous_stimulus'
-        frame_dur_path = '{}/frame_duration'.format(stimulus_path)
-        data_path = '{}/data'.format(stimulus_path)
-
-        mem_h5[frame_dur_path] = frame_dur
-        mem_h5[data_path] = data
-
-        return mem_h5
-    return make_spontaneous_activity_h5
 
 
 def test_acceptance(data_set):
@@ -317,28 +287,26 @@ def test_get_stimulus_table_master(data_set):
         raise NotImplementedError('Code not tested for session of type: %s' % session_type)
 
 
-def test_make_indexed_time_series_stimulus_table(indexed_timeseries_h5):
+def test_make_indexed_time_series_stimulus_table():
 
     stimulus_name = 'fish'
     frame_dur_exp = np.arange(20).reshape((10, 2))
     inds_exp = np.arange(10)
 
-    h5 = indexed_timeseries_h5(stimulus_name, inds_exp, frame_dur_exp)
-    obt = bonds._make_indexed_time_series_stimulus_table(h5, stimulus_name)
+    obt = bonds._make_indexed_time_series_stimulus_table(inds_exp, frame_dur_exp)
 
     frame_dur_obt = np.array([ obt['start'].values, obt['end'].values ]).T
     assert(np.allclose( frame_dur_obt, frame_dur_exp ))
 
 
-def test_make_indexed_time_series_stimulus_table_out_of_order(indexed_timeseries_h5):
+def test_make_indexed_time_series_stimulus_table_out_of_order():
 
     stimulus_name = 'fish'
     frame_dur_exp = np.arange(20).reshape((10, 2))
     frame_dur_file = frame_dur_exp.copy()[::-1, :]
     inds_exp = np.arange(10)
 
-    h5 = indexed_timeseries_h5(stimulus_name, inds_exp, frame_dur_file)
-    obt = bonds._make_indexed_time_series_stimulus_table(h5, stimulus_name)
+    obt = bonds._make_indexed_time_series_stimulus_table(inds_exp, frame_dur_file)
 
     frame_dur_obt = np.array([ obt['start'].values, obt['end'].values ]).T
     assert(np.allclose( frame_dur_obt, frame_dur_exp ))
@@ -363,7 +331,7 @@ def test_make_abstract_feature_series_stimulus_table_out_of_order(abstract_featu
     assert(np.allclose( data_obt, data_exp ))
 
 
-def test_make_spontanous_activity_stimulus_table(spontaneous_activity_h5):
+def test_make_spontanous_activity_stimulus_table():
 
     table_values_exp = [[0, 2], [4, 6]]
 
@@ -374,15 +342,14 @@ def test_make_spontanous_activity_stimulus_table(spontaneous_activity_h5):
     assert(np.allclose( obt.values, table_values_exp ))
 
 
-def test_make_repeated_indexed_time_series_stimulus_table(indexed_timeseries_h5):
+def test_make_repeated_indexed_time_series_stimulus_table():
 
     stimulus_name = 'fish'
     frame_dur_exp = np.arange(20).reshape((10, 2))
     inds_exp = np.array([0, 1, 2, 3, 4, 0, 1, 2, 3, 4])
     repeats_exp = np.array([0] * 5 + [1] * 5)
     
-    h5 = indexed_timeseries_h5(stimulus_name, inds_exp, frame_dur_exp)
-    obt = bonds._make_repeated_indexed_time_series_stimulus_table(h5, stimulus_name)
+    obt = bonds._make_repeated_indexed_time_series_stimulus_table(inds_exp, frame_dur_exp)
 
     frame_dur_obt = np.array([ obt['start'].values, obt['end'].values ]).T
     assert(np.allclose( frame_dur_obt, frame_dur_exp ))
