@@ -986,9 +986,18 @@ def _get_repeated_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
 def make_abstract_feature_series_stimulus_table(nwb_file, stimulus_name):
     ''' Return the a stimulus table for an abstract feature series.
 
+    Parameters
+    ----------
+    nwb_file : h5py.File
+        Build the table from data in this file
+    stimulus_name : str
+        Build the table for this stimulus  
+
     Returns
     -------
-    stimulus table: pd.DataFrame
+    stimulus table : pd.DataFrame
+        Describes the intervals of presentation of the stimulus
+
     '''
 
 
@@ -1012,9 +1021,18 @@ def make_abstract_feature_series_stimulus_table(nwb_file, stimulus_name):
 def make_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
     ''' Return the a stimulus table for an indexed time series.
 
+    Parameters
+    ----------
+    nwb_file : h5py.File
+        Build the table from data in this file
+    stimulus_name : str
+        Build the table for this stimulus        
+
     Returns
     -------
-    stimulus table: pd.DataFrame
+    stimulus table : pd.DataFrame
+        Describes the intervals of presentation of the stimulus
+
     '''
 
     k = "stimulus/presentation/%s" % stimulus_name
@@ -1053,12 +1071,12 @@ def make_spontaneous_activity_stimulus_table(nwb_file):
 
     Parameters
     ----------
-    nwb_file: h5py.File
+    nwb_file : h5py.File
         Build the table from data in this file
 
     Returns
     -------
-    pd.DataFrame: 
+    pd.DataFrame : 
         Each row describes an interval of spontaneous viewing. Columns are start and end times.
 
     Notes
