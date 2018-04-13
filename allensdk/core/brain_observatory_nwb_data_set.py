@@ -957,38 +957,6 @@ def align_running_speed(dxcm, dxtime, timestamps):
 
     return dxcm, dxtime
 
-#
-@deprecated('Use allensdk.brain_observatory.stimulus_info.warp_stimulus_coords instead')
-def warp_stimulus_coords(*args, **kwargs):
-    return si_warp_stimulus_coords(*args, **kwargs)
-
-
-@deprecated('Use allensdk.brain_observatory.stimulus_info.make_display_mask instead')
-def make_display_mask(*args, **kwargs):
-    return si_make_display_mask(*args, **kwargs)
-
-
-@deprecated('Use allensdk.brain_observatory.stimulus_info.mask_stimulus_template instead')
-def mask_stimulus_template(*args, **kwargs):
-    return si_mask_stimulus_template(*args, **kwargs)
-
-
-@deprecated('Use BrainObservatoryNWBDataset.get_stimulus_table instead')
-def _get_abstract_feature_series_stimulus_table(nwb_file, stimulus_name):
-    with open(nwb_file, 'r') as nwb_file:
-        return make_abstract_feature_series_stimulus_table(nwb_file, stimulus_name)
-
-
-@deprecated('Use BrainObservatoryNWBDataset.get_stimulus_table instead')
-def _get_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
-    with open(nwb_file, 'r') as nwb_file:
-        return make_indexed_time_series_stimulus_table(nwb_file, stimulus_name)
-
-@deprecated('Use BrainObservatoryNWBDataset.get_stimulus_table instead')
-def _get_repeated_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
-    with open(nwb_file, 'r') as nwb_file:
-        return make_repeated_indexed_time_series_stimulus_table(nwb_file, stimulus_name)
-
 
 def _make_abstract_feature_series_stimulus_table(nwb_file, stimulus_name):
     ''' Return the a stimulus table for an abstract feature series.
@@ -1122,3 +1090,35 @@ def _make_spontaneous_activity_stimulus_table(nwb_file):
     stimulus_table = stimulus_table.sort_values(['start', 'end'])
 
     return stimulus_table
+
+
+@deprecated('Use allensdk.brain_observatory.stimulus_info.warp_stimulus_coords instead')
+def warp_stimulus_coords(*args, **kwargs):
+    return si_warp_stimulus_coords(*args, **kwargs)
+
+
+@deprecated('Use allensdk.brain_observatory.stimulus_info.make_display_mask instead')
+def make_display_mask(*args, **kwargs):
+    return si_make_display_mask(*args, **kwargs)
+
+
+@deprecated('Use allensdk.brain_observatory.stimulus_info.mask_stimulus_template instead')
+def mask_stimulus_template(*args, **kwargs):
+    return si_mask_stimulus_template(*args, **kwargs)
+
+
+@deprecated('Use BrainObservatoryNWBDataset.get_stimulus_table instead')
+def _get_abstract_feature_series_stimulus_table(nwb_file, stimulus_name):
+    with open(nwb_file, 'r') as nwb_file:
+        return make_abstract_feature_series_stimulus_table(nwb_file, stimulus_name)
+
+
+@deprecated('Use BrainObservatoryNWBDataset.get_stimulus_table instead')
+def _get_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
+    with open(nwb_file, 'r') as nwb_file:
+        return make_indexed_time_series_stimulus_table(nwb_file, stimulus_name)
+
+@deprecated('Use BrainObservatoryNWBDataset.get_stimulus_table instead')
+def _get_repeated_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
+    with open(nwb_file, 'r') as nwb_file:
+        return make_repeated_indexed_time_series_stimulus_table(nwb_file, stimulus_name)
