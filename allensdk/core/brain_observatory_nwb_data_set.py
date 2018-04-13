@@ -961,7 +961,6 @@ def make_display_mask(*args, **kwargs):
     return si_make_display_mask(*args, **kwargs)
 
 
-
 @deprecated('Use allensdk.brain_observatory.stimulus_info.mask_stimulus_template instead')
 def mask_stimulus_template(*args, **kwargs):
     return si_mask_stimulus_template(*args, **kwargs)
@@ -1049,6 +1048,25 @@ def make_repeated_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
 
 
 def make_spontaneous_activity_stimulus_table(nwb_file):
+    ''' Builds a table describing the start and end times of the spontaneous viewing
+    intervals. 
+
+    Parameters
+    ----------
+    nwb_file: h5py.File
+        Build the table from data in this file
+
+    Returns
+    -------
+    pd.DataFrame: 
+        Each row describes an interval of spontaneous viewing. Columns are start and end times.
+
+    Notes
+    -----
+    For more information, see:
+    http://help.brain-map.org/display/observatory/Documentation?preview=/10616846/10813485/VisualCoding_VisualStimuli.pdf 
+
+    '''
 
     k = "stimulus/presentation/spontaneous_stimulus"
     
