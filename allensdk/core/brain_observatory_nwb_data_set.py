@@ -53,6 +53,7 @@ import allensdk.brain_observatory.stimulus_info as si
 from allensdk.brain_observatory.brain_observatory_exceptions import (MissingStimulusException,
                                                                      NoEyeTrackingException)
 from allensdk.api.cache import memoize
+from allensdk.core import h5_utilities 
 
 # Deprecation rerouting:
 from allensdk.deprecated import deprecated
@@ -574,7 +575,7 @@ class BrainObservatoryNwbDataSet(object):
                 return _make_repeated_indexed_time_series_stimulus_table(nwb_file, stimulus_name)
 
             if stimulus_name == 'spontaneous':
-                datasets = _load_datasets_by_relnames(['data', 'frame_duration'], nwb_file, stimulus_group)
+                datasets = h5_utilities.load_datasets_by_relnames(['data', 'frame_duration'], nwb_file, stimulus_group)
                 return _make_spontaneous_activity_stimulus_table(datasets['data'], datasets['frame_duration'])
 
         raise IOError("Could not find a stimulus table named '%s'" % stimulus_name)
@@ -977,12 +978,9 @@ def _find_stimulus_presentation_group(nwb_file,
 
     '''
 
-    group_candidates = [pattern.format(stimulus_name) for pattern in group_patterns]
-    matcher = functools.partial(_h5_object_matcher_relname_in, group_candidates)
-
-    print(nwb_file, base_path)
-
-    matches = _locate_h5_objects(matcher, nwb_file, base_path)
+    group_candidates = [ pattern.format(stimulus_name) for pattern in group_patterns ]
+    matcher = functools.partial(h5_utilities.h5_object_matcher_relname_in, group_candidates)
+    matches = h5_utilities.locate_h5_objects(matcher, nwb_file, base_path)
 
     if matches is None:
         raise MissingStimulusException(
@@ -997,92 +995,6 @@ def _find_stimulus_presentation_group(nwb_file,
         )
 
     return matches[0]
-
-
-def _load_datasets_by_relnames(relnames, h5_file, start_node):
-    ''' A convenience function for finding and loading into memory one or more
-    datasets from an h5 file
-    '''
-
-    matcher_cbs = {
-        relname: functools.partial(_h5_object_matcher_relname_in, [relname]) 
-        for relname in relnames
-    }
-
-    matches = _keyed_locate_h5_objects(matcher_cbs, h5_file, start_node=start_node)
-    return { key: value[:] for key, value in six.iteritems(matches) }
-
-
-def _h5_object_matcher_relname_in(relnames, h5_object_name, h5_object):
-    ''' Asks if an h5 object's relative name (the final section of its absolute name)
-    is contained within a provided array
-
-    Parameters
-    ----------
-    relnames : array-like
-        Relative names against which to match
-    h5_object_name : str
-        Full name (path from origin) of h5 object
-    h5_object : h5py.Group, h5py.Dataset
-        Check this object's relative name
-
-    Returns
-    -------
-    bool : 
-        whether the match succeeded
-    h5_object : h5py.group, h5py.Dataset
-        the argued object
-
-    '''
-
-    return h5_object_name.split('/')[-1] in relnames, h5_object
-
-
-def _keyed_locate_h5_objects(matcher_cbs, h5_file, start_node=None):
-    ''' Traverse an h5 file and build up a dictionary mapping supplied keys to 
-    supplied 
-    '''
-
-    matches = {}
-    def matcher(obj_name, obj):
-        for key, matcher_cb in six.iteritems(matcher_cbs):
-            match, _ = matcher_cb(obj_name, obj)
-
-            if match:
-                if key in matches:
-                    raise ValueError(
-                        'Duplicate objects found for key: {} '
-                        'at {}'.format(key, [matches[key].name, obj.name]))
-                matches[key] = obj
-
-    _traverse_h5_file(matcher, h5_file, start_node)
-    return matches
-
-
-def _locate_h5_objects(matcher_cb, h5_file, start_node=None):
-    ''' Traverse an h5 file and return objects matching supplied criteria
-    '''
-
-    matches = []
-    def matcher(h5_object_name, h5_object):
-        match, _ = matcher_cb(h5_object_name, h5_object)
-        if match:
-            matches.append(h5_object)
-
-    _traverse_h5_file(matcher, h5_file, start_node)
-    return matches
-
-
-def _traverse_h5_file(callback, h5_file, start_node=None):
-    ''' Traverse an h5 file and apply a callback to each node
-    '''
-
-    if start_node is None:
-        start_node = h5_file['/']
-    elif isinstance(start_node, str):
-        start_node = h5_file[start_node]
-
-    start_node.visititems(callback)
 
 
 def align_running_speed(dxcm, dxtime, timestamps):
