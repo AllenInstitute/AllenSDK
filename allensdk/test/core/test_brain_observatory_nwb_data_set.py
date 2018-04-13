@@ -367,12 +367,10 @@ def test_make_spontanous_activity_stimulus_table(spontaneous_activity_h5):
 
     table_values_exp = [[0, 2], [4, 6]]
 
-    frame_dur_file = np.arange(8).reshape((4, 2))
-    data_file = np.array([ 1, -1, 1, -1 ])
+    frame_dur = np.arange(8).reshape((4, 2))
+    events = np.array([ 1, -1, 1, -1 ])
 
-    h5 = spontaneous_activity_h5(frame_dur_file, data_file)
-    obt = bonds._make_spontaneous_activity_stimulus_table(h5)
-
+    obt = bonds._make_spontaneous_activity_stimulus_table(events, frame_dur)
     assert(np.allclose( obt.values, table_values_exp ))
 
 

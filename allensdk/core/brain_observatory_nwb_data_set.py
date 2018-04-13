@@ -562,6 +562,8 @@ class BrainObservatoryNwbDataSet(object):
 
         with h5py.File(self.nwb_file, 'r') as nwb_file:
 
+            stimulus_group = _find_stimulus_presentation_group(nwb_file, stimulus_name)
+
             if stimulus_name in self.STIMULUS_TABLE_TYPES['abstract_feature_series']:
                 return _make_abstract_feature_series_stimulus_table(nwb_file, stimulus_name + "_stimulus")
 
@@ -572,7 +574,8 @@ class BrainObservatoryNwbDataSet(object):
                 return _make_repeated_indexed_time_series_stimulus_table(nwb_file, stimulus_name)
 
             if stimulus_name == 'spontaneous':
-                return _make_spontaneous_activity_stimulus_table(nwb_file)
+                datasets = _load_datasets_by_relnames(['data', 'frame_duration'], nwb_file, stimulus_group)
+                return _make_spontaneous_activity_stimulus_table(datasets['data'], datasets['frame_duration'])
 
         raise IOError("Could not find a stimulus table named '%s'" % stimulus_name)
                 
@@ -977,6 +980,8 @@ def _find_stimulus_presentation_group(nwb_file,
     group_candidates = [pattern.format(stimulus_name) for pattern in group_patterns]
     matcher = functools.partial(_h5_object_matcher_relname_in, group_candidates)
 
+    print(nwb_file, base_path)
+
     matches = _locate_h5_objects(matcher, nwb_file, base_path)
 
     if matches is None:
@@ -994,7 +999,7 @@ def _find_stimulus_presentation_group(nwb_file,
     return matches[0]
 
 
-def _load_datasets_by_relnames(relnames, h5_file, base_path):
+def _load_datasets_by_relnames(relnames, h5_file, start_node):
     ''' A convenience function for finding and loading into memory one or more
     datasets from an h5 file
     '''
@@ -1004,7 +1009,7 @@ def _load_datasets_by_relnames(relnames, h5_file, base_path):
         for relname in relnames
     }
 
-    matches = _keyed_locate_h5_objects(matcher_cbs, h5_file, start_node=base_path)
+    matches = _keyed_locate_h5_objects(matcher_cbs, h5_file, start_node=start_node)
     return { key: value[:] for key, value in six.iteritems(matches) }
 
 
@@ -1192,14 +1197,16 @@ def _make_repeated_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
     return stimulus_table
 
 
-def _make_spontaneous_activity_stimulus_table(nwb_file):
+def _make_spontaneous_activity_stimulus_table(events, frame_durations):
     ''' Builds a table describing the start and end times of the spontaneous viewing
     intervals. 
 
     Parameters
     ----------
-    nwb_file : h5py.File
-        Build the table from data in this file
+    events : np.ndarray
+        events data
+    frame_durations : np.ndarray
+        start and stop times (s) of frames
 
     Returns
     -------
@@ -1213,11 +1220,6 @@ def _make_spontaneous_activity_stimulus_table(nwb_file):
 
     '''
 
-    k = "stimulus/presentation/spontaneous_stimulus"
-    
-    events = nwb_file[k + '/data'].value
-    frame_dur = nwb_file[k + '/frame_duration'].value
-
     start_inds = np.where(events == 1)
     stop_inds = np.where(events == -1)
 
@@ -1225,8 +1227,10 @@ def _make_spontaneous_activity_stimulus_table(nwb_file):
         raise Exception(
             "inconsistent start and time times in spontaneous activity stimulus table")
 
-    stim_data = np.column_stack(
-        [frame_dur[start_inds, 0].T, frame_dur[stop_inds, 0].T]).astype(int)
+    stim_data = np.column_stack([
+        frame_durations[start_inds, 0].T, 
+        frame_durations[stop_inds, 0].T]
+    ).astype(int)
 
     stimulus_table = pd.DataFrame(stim_data, columns=['start', 'end'])
     stimulus_table = stimulus_table.sort_values(['start', 'end'])
