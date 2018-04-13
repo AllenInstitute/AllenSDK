@@ -42,6 +42,8 @@ import pytest
 import os
 import h5py
 
+from allensdk.brain_observatory.brain_observatory_exceptions import MissingStimulusException
+
 from test_h5_utilities import mem_h5
 
 
@@ -363,3 +365,22 @@ def test_find_stimulus_presentation_group(stim_pres_h5):
     obt = bonds._find_stimulus_presentation_group(stim_pres_h5, stimulus_name)
 
     assert( obt.name == '/stimulus/presentation/fish' )
+
+
+def test_find_stimulus_presentation_group_missing(stim_pres_h5):
+
+    stimulus_name = 'fish'
+    stim_pres_h5 = stim_pres_h5('fowl')
+
+    with pytest.raises(MissingStimulusException):
+        obt = bonds._find_stimulus_presentation_group(stim_pres_h5, stimulus_name)
+
+
+def test_find_stimulus_presentation_group_duplicate(stim_pres_h5):
+
+    stimulus_name = 'fish'
+    stim_pres_h5 = stim_pres_h5('fish')
+    stim_pres_h5.create_group('/stimulus/presentation/fish_stimulus')
+
+    with pytest.raises(MissingStimulusException):
+        obt = bonds._find_stimulus_presentation_group(stim_pres_h5, stimulus_name)

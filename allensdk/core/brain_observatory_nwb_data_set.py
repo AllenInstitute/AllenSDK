@@ -987,7 +987,7 @@ def _find_stimulus_presentation_group(nwb_file,
     matcher = functools.partial(h5_utilities.h5_object_matcher_relname_in, group_candidates)
     matches = h5_utilities.locate_h5_objects(matcher, nwb_file, base_path)
 
-    if matches is None:
+    if len(matches) == 0:
         raise MissingStimulusException(
             'Unable to locate stimulus: {}. '
             'Looked for this stimulus under the names: {} '.format(stimulus_name, group_candidates)
@@ -996,7 +996,7 @@ def _find_stimulus_presentation_group(nwb_file,
     if len(matches) > 1:
         raise MissingStimulusException(
             'Unable to locate stimulus: {}. '
-            'Found multiple matching stimuli: {}'.format(stimuls_name, [match.name for match in matches])
+            'Found multiple matching stimuli: {}'.format(stimulus_name, [match.name for match in matches])
         )
 
     return matches[0]
