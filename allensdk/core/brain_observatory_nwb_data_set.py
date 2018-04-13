@@ -1027,10 +1027,12 @@ def _make_abstract_feature_series_stimulus_table(stim_data, features, frame_dur)
 
     Parameters
     ----------
-    nwb_file : h5py.File
-        Build the table from data in this file
-    stimulus_name : str
-        Build the table for this stimulus  
+    stim_data : array-like
+        Stimulus feature values at each interval
+    features : array-like of str
+        Stimulus feature labels
+    frame_dur : array-like
+        Start and end times of presentation intervals
 
     Returns
     -------

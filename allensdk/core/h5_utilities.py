@@ -95,7 +95,6 @@ def keyed_locate_h5_objects(matcher_cbs, h5_file, start_node=None):
     def matcher(obj_name, obj):
         for key, matcher_cb in six.iteritems(matcher_cbs):
             match, _ = matcher_cb(obj_name, obj)
-
             if match:
                 matches[key] = obj
 
