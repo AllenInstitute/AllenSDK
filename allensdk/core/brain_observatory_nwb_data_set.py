@@ -33,19 +33,23 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-import h5py
-import logging
-import pandas as pd
-import numpy as np
-import six
-import allensdk.brain_observatory.roi_masks as roi
-import itertools
-from allensdk.brain_observatory.locally_sparse_noise import LocallySparseNoise
-import allensdk.brain_observatory.stimulus_info as si
+import functools
 import dateutil
 import re
 import os
+import six
+import itertools
+import logging
 from pkg_resources import parse_version
+
+import h5py
+import pandas as pd
+import numpy as np
+
+import allensdk.brain_observatory.roi_masks as roi
+from allensdk.brain_observatory.locally_sparse_noise import LocallySparseNoise
+import allensdk.brain_observatory.stimulus_info as si
+
 from allensdk.brain_observatory.brain_observatory_exceptions import (MissingStimulusException,
                                                                      NoEyeTrackingException)
 from allensdk.api.cache import memoize
@@ -56,6 +60,11 @@ from allensdk.brain_observatory.stimulus_info import warp_stimulus_coords as si_
 from allensdk.brain_observatory.stimulus_info import make_display_mask as si_make_display_mask
 from allensdk.brain_observatory.stimulus_info import mask_stimulus_template as si_mask_stimulus_template
 from allensdk.brain_observatory.brain_observatory_exceptions import EpochSeparationException
+
+
+_STIMULUS_PRESENTATION_PATH = 'stimulus/presentation'
+_STIMULUS_PRESENTATION_PATTERNS = ('{}', '{}_stimulus',)
+
 
 def get_epoch_mask_list(st, threshold, max_cuts=2):
     '''Convenience function to cut a stim table into multiple epochs
@@ -937,6 +946,126 @@ class BrainObservatoryNwbDataSet(object):
                 return search_result, self.get_stimulus_template(curr_stimulus)[int(curr_frame), :, :]
             elif curr_stimulus == si.STATIC_GRATINGS or curr_stimulus == si.DRIFTING_GRATINGS:
                 return search_result, None
+
+
+def _find_stimulus_presentation_group(nwb_file,
+                                      stimulus_name, 
+                                      base_path=_STIMULUS_PRESENTATION_PATH, 
+                                      group_patterns=_STIMULUS_PRESENTATION_PATTERNS):
+    ''' Searches an NWB file for a stimulus presentation group.
+
+    Parameters
+    ----------
+    nwb_file : h5py.File
+        File to search
+    stimulus_name : str
+        Identifier for this stimulus. Corresponds to the relative name of its h5 
+        group.
+    base_path : str, optional
+        Begin the search from here. Defaults to 'stimulus/presentation'
+    group_patterns : array-like of str, optional
+        Patterns for the relative name of the stimulus' h5 group. Defaults to 
+        the name, and the name suffixed by '_stimulus'
+
+    Returns
+    -------
+    h5py.Group, h5py.Dataset : 
+        h5 object found
+
+    '''
+
+    group_candidates = [pattern.format(stimulus_name) for pattern in group_patterns]
+    matcher = functools.partial(_h5_object_matcher_relname_in, group_candidates)
+
+    matches = _locate_h5_objects(matcher, nwb_file, base_path)
+
+    if matches is None:
+        raise MissingStimulusException(
+            'Unable to locate stimulus: {}. '
+            'Looked for this stimulus under the names: {} '.format(stimulus_name, group_candidates)
+            )
+
+    if len(matches) > 1:
+        raise MissingStimulusException(
+            'Unable to locate stimulus: {}. '
+            'Found multiple matching stimuli: {}'.format(stimuls_name, [match.name for match in matches])
+        )
+
+    return matches[0]
+
+
+
+def _h5_object_matcher_relname_in(relnames, h5_object_name, h5_object):
+    ''' Asks if an h5 object's relative name (the final section of its absolute name)
+    is contained within a provided array
+
+    Parameters
+    ----------
+    relnames : array-like
+        Relative names against which to match
+    h5_object_name : str
+        Full name (path from origin) of h5 object
+    h5_object : h5py.Group, h5py.Dataset
+        Check this object's relative name
+
+    Returns
+    -------
+    bool : 
+        whether the match succeeded
+    h5_object : h5py.group, h5py.Dataset
+        the argued object
+
+    '''
+
+    return h5_object_name.split('/')[-1] in relnames, h5_object
+
+
+def _keyed_locate_h5_objects(matcher_cbs, h5_file, start_node=None):
+    ''' Traverse an h5 file and build up a dictionary mapping supplied keys to 
+    supplied 
+    '''
+
+    matches = {}
+    def matcher(obj_name, obj):
+        for key, matcher_cb in six.iteritems(matcher_cbs):
+            match, _ = matcher_cb(obj_name, obj)
+
+            if match:
+                if key in matches:
+                    raise ValueError(
+                        'Duplicate objects found for key: {} '
+                        'at {}'.format(key, [matches[key].name, obj.name]))
+                matches[key] = obj
+
+    _traverse_h5_file(matcher, h5_file, start_node)
+    return matches
+
+
+def _locate_h5_objects(matcher_cb, h5_file, start_node=None):
+    ''' Traverse an h5 file and return objects matching supplied criteria
+    '''
+
+    matches = []
+    def matcher(h5_object_name, h5_object):
+        match, _ = matcher_cb(h5_object_name, h5_object)
+        if match:
+            matches.append(h5_object)
+
+    _traverse_h5_file(matcher, h5_file, start_node)
+    return matches
+
+
+def _traverse_h5_file(callback, h5_file, start_node=None):
+    ''' Traverse an h5 file and apply a callback to each node
+    '''
+
+    if start_node is None:
+        start_node = h5_file['/']
+    elif isinstance(start_node, str):
+        start_node = h5_file[start_node]
+
+    start_node.visititems(callback)
+
 
 def align_running_speed(dxcm, dxtime, timestamps):
     ''' If running speed timestamps differ from fluorescence

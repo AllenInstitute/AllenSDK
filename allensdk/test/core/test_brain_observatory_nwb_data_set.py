@@ -33,6 +33,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
+import functools
 import numpy as np
 from pkg_resources import resource_filename  # @UnresolvedImport
 from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet, si
@@ -65,7 +66,7 @@ def data_set(request):
 
 
 @pytest.fixture
-def mem_hfive(request):
+def mem_h5(request):
     my_file = h5py.File('my_file.h5', driver='core', backing_store=False)
 
     def fin():
@@ -76,50 +77,50 @@ def mem_hfive(request):
 
 
 @pytest.fixture
-def indexed_timeseries_hfive(mem_hfive):
-    def make_indexed_timeseries_hfive(stimulus_name, inds_data, frame_dur_data):
+def indexed_timeseries_h5(mem_h5):
+    def make_indexed_timeseries_h5(stimulus_name, inds_data, frame_dur_data):
 
         stimulus_path = 'stimulus/presentation/{}'.format(stimulus_name)
         inds_path = '{}/data'.format(stimulus_path)
         frame_dur_path = '{}/frame_duration'.format(stimulus_path)
 
-        mem_hfive[frame_dur_path] = frame_dur_data
-        mem_hfive[inds_path] = inds_data
+        mem_h5[frame_dur_path] = frame_dur_data
+        mem_h5[inds_path] = inds_data
 
-        return mem_hfive
-    return make_indexed_timeseries_hfive
+        return mem_h5
+    return make_indexed_timeseries_h5
 
 
 @pytest.fixture
-def abstract_feature_series_hfive(mem_hfive):
-    def make_abstract_feature_series_hfive(stimulus_name, stim_data, features, frame_dur):
+def abstract_feature_series_h5(mem_h5):
+    def make_abstract_feature_series_h5(stimulus_name, stim_data, features, frame_dur):
         
         stimulus_path = 'stimulus/presentation/{}'.format(stimulus_name)
         frame_dur_path = '{}/frame_duration'.format(stimulus_path)
         features_path = '{}/features'.format(stimulus_path)
         stim_data_path = '{}/data'.format(stimulus_path)
 
-        mem_hfive[frame_dur_path] = frame_dur
-        mem_hfive[stim_data_path] = stim_data
-        mem_hfive[features_path] = features
+        mem_h5[frame_dur_path] = frame_dur
+        mem_h5[stim_data_path] = stim_data
+        mem_h5[features_path] = features
 
-        return mem_hfive
-    return make_abstract_feature_series_hfive
+        return mem_h5
+    return make_abstract_feature_series_h5
 
 
 @pytest.fixture
-def spontaneous_activity_hfive(mem_hfive):
-    def make_spontaneous_activity_hfive(frame_dur, data):
+def spontaneous_activity_h5(mem_h5):
+    def make_spontaneous_activity_h5(frame_dur, data):
 
         stimulus_path = 'stimulus/presentation/spontaneous_stimulus'
         frame_dur_path = '{}/frame_duration'.format(stimulus_path)
         data_path = '{}/data'.format(stimulus_path)
 
-        mem_hfive[frame_dur_path] = frame_dur
-        mem_hfive[data_path] = data
+        mem_h5[frame_dur_path] = frame_dur
+        mem_h5[data_path] = data
 
-        return mem_hfive
-    return make_spontaneous_activity_hfive
+        return mem_h5
+    return make_spontaneous_activity_h5
 
 
 def test_acceptance(data_set):
@@ -316,34 +317,34 @@ def test_get_stimulus_table_master(data_set):
         raise NotImplementedError('Code not tested for session of type: %s' % session_type)
 
 
-def test_make_indexed_time_series_stimulus_table(indexed_timeseries_hfive):
+def test_make_indexed_time_series_stimulus_table(indexed_timeseries_h5):
 
     stimulus_name = 'fish'
     frame_dur_exp = np.arange(20).reshape((10, 2))
     inds_exp = np.arange(10)
 
-    hfive = indexed_timeseries_hfive(stimulus_name, inds_exp, frame_dur_exp)
-    obt = bonds._make_indexed_time_series_stimulus_table(hfive, stimulus_name)
+    h5 = indexed_timeseries_h5(stimulus_name, inds_exp, frame_dur_exp)
+    obt = bonds._make_indexed_time_series_stimulus_table(h5, stimulus_name)
 
     frame_dur_obt = np.array([ obt['start'].values, obt['end'].values ]).T
     assert(np.allclose( frame_dur_obt, frame_dur_exp ))
 
 
-def test_make_indexed_time_series_stimulus_table_out_of_order(indexed_timeseries_hfive):
+def test_make_indexed_time_series_stimulus_table_out_of_order(indexed_timeseries_h5):
 
     stimulus_name = 'fish'
     frame_dur_exp = np.arange(20).reshape((10, 2))
     frame_dur_file = frame_dur_exp.copy()[::-1, :]
     inds_exp = np.arange(10)
 
-    hfive = indexed_timeseries_hfive(stimulus_name, inds_exp, frame_dur_file)
-    obt = bonds._make_indexed_time_series_stimulus_table(hfive, stimulus_name)
+    h5 = indexed_timeseries_h5(stimulus_name, inds_exp, frame_dur_file)
+    obt = bonds._make_indexed_time_series_stimulus_table(h5, stimulus_name)
 
     frame_dur_obt = np.array([ obt['start'].values, obt['end'].values ]).T
     assert(np.allclose( frame_dur_obt, frame_dur_exp ))
 
 
-def test_make_abstract_feature_series_stimulus_table_out_of_order(abstract_feature_series_hfive):
+def test_make_abstract_feature_series_stimulus_table_out_of_order(abstract_feature_series_h5):
 
     stimulus_name = 'fish'
     frame_dur_exp = np.arange(20).reshape((10, 2))
@@ -352,8 +353,8 @@ def test_make_abstract_feature_series_stimulus_table_out_of_order(abstract_featu
     data_exp = np.arange(30).reshape((10, 3))
     data_file = data_exp.copy()[::-1, :]
 
-    hfive = abstract_feature_series_hfive(stimulus_name, data_file, features_exp, frame_dur_file)
-    obt = bonds._make_abstract_feature_series_stimulus_table(hfive, stimulus_name)
+    h5 = abstract_feature_series_h5(stimulus_name, data_file, features_exp, frame_dur_file)
+    obt = bonds._make_abstract_feature_series_stimulus_table(h5, stimulus_name)
 
     frame_dur_obt = np.array([ obt['start'].values, obt['end'].values ]).T
     assert(np.allclose( frame_dur_obt, frame_dur_exp ))
@@ -362,29 +363,90 @@ def test_make_abstract_feature_series_stimulus_table_out_of_order(abstract_featu
     assert(np.allclose( data_obt, data_exp ))
 
 
-def test_make_spontanous_activity_stimulus_table(spontaneous_activity_hfive):
+def test_make_spontanous_activity_stimulus_table(spontaneous_activity_h5):
 
     table_values_exp = [[0, 2], [4, 6]]
 
     frame_dur_file = np.arange(8).reshape((4, 2))
     data_file = np.array([ 1, -1, 1, -1 ])
 
-    hfive = spontaneous_activity_hfive(frame_dur_file, data_file)
-    obt = bonds._make_spontaneous_activity_stimulus_table(hfive)
+    h5 = spontaneous_activity_h5(frame_dur_file, data_file)
+    obt = bonds._make_spontaneous_activity_stimulus_table(h5)
 
     assert(np.allclose( obt.values, table_values_exp ))
 
 
-def test_make_repeated_indexed_time_series_stimulus_table(indexed_timeseries_hfive):
+def test_make_repeated_indexed_time_series_stimulus_table(indexed_timeseries_h5):
 
     stimulus_name = 'fish'
     frame_dur_exp = np.arange(20).reshape((10, 2))
     inds_exp = np.array([0, 1, 2, 3, 4, 0, 1, 2, 3, 4])
     repeats_exp = np.array([0] * 5 + [1] * 5)
     
-    hfive = indexed_timeseries_hfive(stimulus_name, inds_exp, frame_dur_exp)
-    obt = bonds._make_repeated_indexed_time_series_stimulus_table(hfive, stimulus_name)
+    h5 = indexed_timeseries_h5(stimulus_name, inds_exp, frame_dur_exp)
+    obt = bonds._make_repeated_indexed_time_series_stimulus_table(h5, stimulus_name)
 
     frame_dur_obt = np.array([ obt['start'].values, obt['end'].values ]).T
     assert(np.allclose( frame_dur_obt, frame_dur_exp ))
     assert(np.allclose( repeats_exp, obt['repeat'] ))
+
+
+@pytest.fixture
+def simple_h5(mem_h5):
+    mem_h5.create_group('a')
+    mem_h5.create_group('a/b')
+    mem_h5.create_group('a/b/c')
+    mem_h5.create_group('d')
+    mem_h5.create_group('a/e')
+
+    return mem_h5
+
+
+@pytest.fixture
+def stim_pres_h5(mem_h5):
+    def make_stim_pres_h5(stimulus_name):
+        mem_h5.create_group('stimulus/presentation/{}'.format(stimulus_name))
+        mem_h5.create_group('stimulus/not_presentation/{}'.format(stimulus_name))
+        return mem_h5
+    return make_stim_pres_h5
+
+
+def test_traverse_h5_file(simple_h5):
+
+    names = []
+    def cb(name, node):
+        names.append(name)
+    bonds._traverse_h5_file(cb, simple_h5)
+
+    assert( set(names) == set(['a', 'a/b', 'a/b/c', 'd', 'a/e']) )
+
+
+def test_locate_h5_objects(simple_h5):
+
+    matcher_cb = functools.partial(bonds._h5_object_matcher_relname_in, ['c', 'e'])
+    matches = bonds._locate_h5_objects(matcher_cb, simple_h5)
+
+    match_names = [ match.name for match in matches ]
+    assert( set(match_names) == set(['/a/e', '/a/b/c']) )
+
+
+def test_keyed_locate_h5_objects(simple_h5):
+
+    matcher_cbs = {
+        'e': functools.partial(bonds._h5_object_matcher_relname_in, ['e']),
+        'c': functools.partial(bonds._h5_object_matcher_relname_in, ['c']),
+    }
+
+    matches = bonds._keyed_locate_h5_objects(matcher_cbs, simple_h5)
+    assert( matches['e'].name == '/a/e' )
+    assert( matches['c'].name == '/a/b/c' )
+
+
+def test_find_stimulus_presentation_group(stim_pres_h5):
+
+    stimulus_name = 'fish'
+    stim_pres_h5 = stim_pres_h5(stimulus_name)
+
+    obt = bonds._find_stimulus_presentation_group(stim_pres_h5, stimulus_name)
+
+    assert( obt.name == '/stimulus/presentation/fish' )
