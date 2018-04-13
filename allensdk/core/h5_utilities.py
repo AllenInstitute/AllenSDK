@@ -97,10 +97,6 @@ def keyed_locate_h5_objects(matcher_cbs, h5_file, start_node=None):
             match, _ = matcher_cb(obj_name, obj)
 
             if match:
-                if key in matches:
-                    raise ValueError(
-                        'Duplicate objects found for key: {} '
-                        'at {}'.format(key, [matches[key].name, obj.name]))
                 matches[key] = obj
 
     traverse_h5_file(matcher, h5_file, start_node)
