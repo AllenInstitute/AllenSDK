@@ -40,6 +40,13 @@ import six
 import h5py
 
 
+def decode_bytes_dataset(bytes_dataset, encoding='UTF-8'):
+    ''' Convert the elements of a dataset of bytes to str
+    '''
+
+    return [ item.decode(encoding) for item in bytes_dataset[:].flat ]
+
+
 def load_datasets_by_relnames(relnames, h5_file, start_node):
     ''' A convenience function for finding and loading into memory one or more
     datasets from an h5 file

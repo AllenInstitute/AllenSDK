@@ -1048,7 +1048,7 @@ def _make_abstract_feature_series_stimulus_table(nwb_file, stimulus_name):
         raise MissingStimulusException("Stimulus not found: %s" % stimulus_name)
 
     stim_data = nwb_file[k + '/data'].value
-    features = [ v.decode('UTF-8') for v in nwb_file[k + '/features'].value ]
+    features = h5_utilities.decode_bytes_dataset(nwb_file[k + '/features'])
     frame_dur = nwb_file[k + '/frame_duration'].value
 
     stimulus_table = pd.DataFrame(stim_data, columns=features)

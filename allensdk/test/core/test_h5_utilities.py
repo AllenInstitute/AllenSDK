@@ -38,6 +38,14 @@ def simple_h5_with_datsets(simple_h5):
     return simple_h5
 
 
+def test_decode_bytes_dataset():
+
+    inp = np.array([b'a', b'b', b'c'])
+    obt = h5_utilities.decode_bytes_dataset(inp)
+
+    assert(np.array_equal( obt, ['a', 'b', 'c'] ))
+
+
 def test_traverse_h5_file(simple_h5):
 
     names = []
