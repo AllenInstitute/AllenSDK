@@ -252,6 +252,8 @@ def plot_representational_similarity(rs, dims=None, dim_labels=None, colors=None
 
 def plot_condition_histogram(vals, bins, color=STIM_COLOR):
     plt.grid()
+    if len(vals) > 1:
+        vals = [np.array(vals).flatten()]  # matplotlib >= 2.1 needs this
     if len(vals) > 0:
         n, hbins, patches = plt.hist(vals,
                                      bins=np.arange(len(bins)+1)+1,
@@ -270,6 +272,9 @@ def plot_selectivity_cumulative_histogram(sis,
                                           si_range=SI_RANGE, 
                                           n_hist_bins=N_HIST_BINS, 
                                           color=STIM_COLOR):
+    if len(sis) > 1:
+        sis = [np.array(sis).flatten()]  # matplotlib >= 2.1 needs this
+
     bins = np.linspace(si_range[0], si_range[1], n_hist_bins)
     yticks = np.linspace(0,1,5)
     xticks = np.linspace(si_range[0], si_range[1], 4)
