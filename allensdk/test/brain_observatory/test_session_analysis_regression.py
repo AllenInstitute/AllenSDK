@@ -16,7 +16,7 @@ from allensdk.brain_observatory.session_analysis import SessionAnalysis
 from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet as BODS
 import allensdk.brain_observatory.stimulus_info as si
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def paths():
     return {
         'analysis_a': '/allen/aibs/informatics/module_test_data/observatory/plots/510859641_three_session_A_analysis.h5',
@@ -27,72 +27,72 @@ def paths():
         'nwb_c': '/allen/aibs/informatics/module_test_data/observatory/plots/510532780.nwb'
     }
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def nwb_a(paths):
     return paths['nwb_a']
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def nwb_b(paths):
     return paths['nwb_b']
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def nwb_c(paths):
     return paths['nwb_c']
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def analysis_a(paths):
     return paths['analysis_a']
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def analysis_b(paths):
     return paths['analysis_b']
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def analysis_c(paths):
     return paths['analysis_c']
 
 # session a
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def dg(nwb_a, analysis_a):
     return DriftingGratings.from_analysis_file(BODS(nwb_a), analysis_a)
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def nm1a(nwb_a, analysis_a):
     return NaturalMovie.from_analysis_file(BODS(nwb_a), analysis_a, si.NATURAL_MOVIE_ONE)
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def nm3(nwb_a, analysis_a):
     return NaturalMovie.from_analysis_file(BODS(nwb_a), analysis_a, si.NATURAL_MOVIE_THREE)
 
 # session b
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def sg(nwb_b, analysis_b):
     return StaticGratings.from_analysis_file(BODS(nwb_b), analysis_b)
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def nm1b(nwb_b, analysis_b):
     return NaturalMovie.from_analysis_file(BODS(nwb_b), analysis_b, si.NATURAL_MOVIE_ONE)
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def ns(nwb_b, analysis_b):
     return NaturalScenes.from_analysis_file(BODS(nwb_b), analysis_b)
 
 # session c
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def lsn(nwb_c, analysis_c):
     return LocallySparseNoise.from_analysis_file(BODS(nwb_c), analysis_c, si.LOCALLY_SPARSE_NOISE)
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def nm1c(nwb_c, analysis_c):
     return NaturalMovie.from_analysis_file(BODS(nwb_c), analysis_c, si.NATURAL_MOVIE_ONE)
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def nm2(nwb_c, analysis_c):
     return NaturalMovie.from_analysis_file(BODS(nwb_c), analysis_c, si.NATURAL_MOVIE_TWO)
 
-@pytest.fixture(scope="module"):
+@pytest.fixture(scope="module")
 def analysis_a_new(nwb_a):
     with tempfile.NamedTemporaryFile(delete=True) as tf:
         save_path = tf.name
@@ -108,7 +108,7 @@ def analysis_a_new(nwb_a):
     if os.path.exists(save_path):
         os.remove(save_path)
 
-@pytest.fixture(scope="module"):
+@pytest.fixture(scope="module")
 def analysis_b_new(nwb_b):
     with tempfile.NamedTemporaryFile(delete=True) as tf:
         save_path = tf.name
@@ -124,7 +124,7 @@ def analysis_b_new(nwb_b):
     if os.path.exists(save_path):
         os.remove(save_path)
 
-@pytest.fixture(scope="module"):
+@pytest.fixture(scope="module")
 def analysis_c_new(nwb_c):
     with tempfile.NamedTemporaryFile(delete=True) as tf:
         save_path = tf.name
