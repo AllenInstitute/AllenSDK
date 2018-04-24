@@ -146,18 +146,16 @@ def analysis_c_new(nwb_c):
 def compare_peak(p1, p2):
     assert len(set(p1.columns) ^ set(p2.columns)) == 0
     
-    for col in p1.columns:
-        d1 = p1[col]
-        if d1.dtype == 'O':
-            d2 = p2[col]
+    p1 = p1.infer_objects()
+    p2 = p2.infer_objects()
 
-            d1 = d1.values.astype('float')
-            d2 = d2.values.astype('float')
+    for col in p1.select_dtypes(include=[np.number]):
+        print("checking " + col)
+        assert np.allclose(p1[col], p2[col], equal_nan=True)
 
-            print("checking " + col)
-            assert np.allclose(d1, d2, equal_nan=True)
-        else:
-            print("not checking " + col)
+    for col in p1.select_dtypes(include=['O']):
+        print("checking " + col)
+        assert all(p1[col] == p2[col])
 
 @pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
                     reason="partial testing")
@@ -173,22 +171,22 @@ def test_drifting_gratings(dg, nwb_a, analysis_a_new):
     print("reading outputs")
     dg_new = DriftingGratings.from_analysis_file(BODS(nwb_a), analysis_a_new)
     #assert np.allclose(dg.sweep_response, dg_new.sweep_response)
-    assert np.allclose(dg.mean_sweep_response, dg_new.mean_sweep_response)
+    assert np.allclose(dg.mean_sweep_response, dg_new.mean_sweep_response, equal_nan=True)
         
-    assert np.allclose(dg.response, dg_new.response)
-    assert np.allclose(dg.noise_correlation, dg_new.noise_correlation)
-    assert np.allclose(dg.signal_correlation, dg_new.signal_correlation)
-    assert np.allclose(dg.representational_similarity, dg_new.representational_similarity)
+    assert np.allclose(dg.response, dg_new.response, equal_nan=True)
+    assert np.allclose(dg.noise_correlation, dg_new.noise_correlation, equal_nan=True)
+    assert np.allclose(dg.signal_correlation, dg_new.signal_correlation, equal_nan=True)
+    assert np.allclose(dg.representational_similarity, dg_new.representational_similarity, equal_nan=True)
 
 @pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
                     reason="partial testing")
 def test_natural_movie_one_a(nm1a, nwb_a, analysis_a_new):
     nm1a_new = NaturalMovie.from_analysis_file(BODS(nwb_a), analysis_a_new, si.NATURAL_MOVIE_ONE)
     #assert np.allclose(nm1a.sweep_response, nm1a_new.sweep_response)
-    assert np.allclose(nm1a.binned_cells_sp, nm1a_new.binned_cells_sp)
-    assert np.allclose(nm1a.binned_cells_vis, nm1a_new.binned_cells_vis)
-    assert np.allclose(nm1a.binned_dx_sp, nm1a_new.binned_dx_sp)
-    assert np.allclose(nm1a.binned_dx_vis, nm1a_new.binned_dx_vis)
+    assert np.allclose(nm1a.binned_cells_sp, nm1a_new.binned_cells_sp, equal_nan=True)
+    assert np.allclose(nm1a.binned_cells_vis, nm1a_new.binned_cells_vis, equal_nan=True)
+    assert np.allclose(nm1a.binned_dx_sp, nm1a_new.binned_dx_sp, equal_nan=True)
+    assert np.allclose(nm1a.binned_dx_vis, nm1a_new.binned_dx_vis, equal_nan=True)
 
 @pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
                     reason="partial testing")    
@@ -210,12 +208,12 @@ def test_session_b(analysis_b, analysis_b_new):
 def test_static_gratings(sg, nwb_b, analysis_b_new):
     sg_new = StaticGratings.from_analysis_file(BODS(nwb_b), analysis_b_new)
     #assert np.allclose(sg.sweep_response, sg_new.sweep_response)
-    assert np.allclose(sg.mean_sweep_response, sg_new.mean_sweep_response)
+    assert np.allclose(sg.mean_sweep_response, sg_new.mean_sweep_response, equal_nan=True)
 
-    assert np.allclose(sg.response, sg_new.response)
-    assert np.allclose(sg.noise_correlation, sg_new.noise_correlation)
-    assert np.allclose(sg.signal_correlation, sg_new.signal_correlation)
-    assert np.allclose(sg.representational_similarity, sg_new.representational_similarity)
+    assert np.allclose(sg.response, sg_new.response, equal_nan=True)
+    assert np.allclose(sg.noise_correlation, sg_new.noise_correlation, equal_nan=True)
+    assert np.allclose(sg.signal_correlation, sg_new.signal_correlation, equal_nan=True)
+    assert np.allclose(sg.representational_similarity, sg_new.representational_similarity, equal_nan=True)
 
 @pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
                     reason="partial testing")
@@ -223,21 +221,21 @@ def test_natural_movie_one_b(nm1b, nwb_b, analysis_b_new):
     nm1b_new = NaturalMovie.from_analysis_file(BODS(nwb_b), analysis_b_new, si.NATURAL_MOVIE_ONE)
     #assert np.allclose(nm1b.sweep_response, nm1b_new.sweep_response)
 
-    assert np.allclose(nm1b.binned_cells_sp, nm1b_new.binned_cells_sp)
-    assert np.allclose(nm1b.binned_cells_vis, nm1b_new.binned_cells_vis)
-    assert np.allclose(nm1b.binned_dx_sp, nm1b_new.binned_dx_sp)
-    assert np.allclose(nm1b.binned_dx_vis, nm1b_new.binned_dx_vis)
+    assert np.allclose(nm1b.binned_cells_sp, nm1b_new.binned_cells_sp, equal_nan=True)
+    assert np.allclose(nm1b.binned_cells_vis, nm1b_new.binned_cells_vis, equal_nan=True)
+    assert np.allclose(nm1b.binned_dx_sp, nm1b_new.binned_dx_sp, equal_nan=True)
+    assert np.allclose(nm1b.binned_dx_vis, nm1b_new.binned_dx_vis, equal_nan=True)
 
 @pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
                     reason="partial testing")
 def test_natural_scenes(ns, nwb_b, analysis_b_new):    
     ns_new = NaturalScenes.from_analysis_file(BODS(nwb_b), analysis_b_new)
     #assert np.allclose(ns.sweep_response, ns_new.sweep_response)
-    assert np.allclose(ns.mean_sweep_response, ns_new.mean_sweep_response)
+    assert np.allclose(ns.mean_sweep_response, ns_new.mean_sweep_response, equal_nan=True)
 
-    assert np.allclose(ns.noise_correlation, ns_new.noise_correlation)
-    assert np.allclose(ns.signal_correlation, ns_new.signal_correlation)
-    assert np.allclose(ns.representational_similarity, ns_new.representational_similarity)
+    assert np.allclose(ns.noise_correlation, ns_new.noise_correlation, equal_nan=True)
+    assert np.allclose(ns.signal_correlation, ns_new.signal_correlation, equal_nan=True)
+    assert np.allclose(ns.representational_similarity, ns_new.representational_similarity, equal_nan=True)
 
 @pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
                     reason="partial testing")
@@ -251,7 +249,7 @@ def test_session_c2(analysis_c, analysis_c_new):
 def test_locally_sparse_noise(lsn, nwb_c, analysis_c_new):
     lsn_new = LocallySparseNoise.from_analysis_file(BODS(nwb_c), analysis_c_new, si.LOCALLY_SPARSE_NOISE)
     #assert np.allclose(lsn.sweep_response, lsn_new.sweep_response)
-    assert np.allclose(lsn.mean_sweep_response, lsn_new.mean_sweep_response)
+    assert np.allclose(lsn.mean_sweep_response, lsn_new.mean_sweep_response, equal_nan=True)
 
 @pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
                     reason="partial testing")
@@ -259,10 +257,10 @@ def test_natural_movie_one_c(nm1c, nwb_c, analysis_c_new):
     nm1c_new = NaturalMovie.from_analysis_file(BODS(nwb_c), analysis_c_new, si.NATURAL_MOVIE_ONE)
     #assert np.allclose(nm1c.sweep_response, nm1c_new.sweep_response)
 
-    assert np.allclose(nm1c.binned_dx_sp, nm1c_new.binned_dx_sp) 
-    assert np.allclose(nm1c.binned_dx_vis, nm1c_new.binned_dx_vis) 
-    assert np.allclose(nm1c.binned_cells_sp, nm1c_new.binned_cells_sp) 
-    assert np.allclose(nm1c.binned_cells_vis, nm1c_new.binned_cells_vis) 
+    assert np.allclose(nm1c.binned_dx_sp, nm1c_new.binned_dx_sp, equal_nan=True) 
+    assert np.allclose(nm1c.binned_dx_vis, nm1c_new.binned_dx_vis, equal_nan=True) 
+    assert np.allclose(nm1c.binned_cells_sp, nm1c_new.binned_cells_sp, equal_nan=True) 
+    assert np.allclose(nm1c.binned_cells_vis, nm1c_new.binned_cells_vis, equal_nan=True) 
     
     
 
