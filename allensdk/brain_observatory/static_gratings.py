@@ -320,7 +320,7 @@ class StaticGratings(StimulusAnalysis):
 
         mean_responses = np.array(resps)
 
-        sorted_table = self.peak[self.peak.ptest_sg < p_value_max].sort(columns='time_to_peak_sg')
+        sorted_table = self.peak[self.peak.ptest_sg < p_value_max].sort_values('time_to_peak_sg')
         cell_order = sorted_table.index
 
         # time to peak is relative to stimulus start in seconds
