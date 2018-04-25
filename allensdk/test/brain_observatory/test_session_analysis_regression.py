@@ -1,9 +1,11 @@
-import pytest
-import os
-import tempfile
 import logging
 logging.basicConfig(level=logging.DEBUG)
 
+import pytest
+import os
+import tempfile
+import json
+from pkg_resources import resource_filename  # @UnresolvedImport
 import numpy as np
 import pandas as pd
 
@@ -16,16 +18,17 @@ from allensdk.brain_observatory.session_analysis import SessionAnalysis
 from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet as BODS
 import allensdk.brain_observatory.stimulus_info as si
 
+if 'TEST_SESSION_ANALYSIS_REGRESSION_DATA' in os.environ:
+    data_file = os.environ['TEST_SESSION_ANALYSIS_REGRESSION_DATA']
+else:
+    data_file = resource_filename(__name__, 'test_session_analysis_regression_data.json')
+
 @pytest.fixture(scope="module")
 def paths():
-    return {
-        'analysis_a': '/allen/aibs/informatics/module_test_data/observatory/py2_analysis/570305847_three_session_A_analysis.h5',
-        'analysis_b': '/allen/aibs/informatics/module_test_data/observatory/py2_analysis/569407590_three_session_B_analysis.h5',
-        'analysis_c': '/allen/aibs/informatics/module_test_data/observatory/py2_analysis/569494121_three_session_C2_analysis.h5',
-        'nwb_a': '/allen/aibs/informatics/module_test_data/observatory/py2_analysis/570305847.nwb',        
-        'nwb_b': '/allen/aibs/informatics/module_test_data/observatory/py2_analysis/569407590.nwb',
-        'nwb_c': '/allen/aibs/informatics/module_test_data/observatory/py2_analysis/569494121.nwb'
-    }
+    print("*******************")
+    print(data_file)
+    with open(data_file,'r') as f:
+        return json.load(f)
 
 @pytest.fixture(scope="module")
 def nwb_a(paths):
