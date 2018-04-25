@@ -106,9 +106,7 @@ def analysis_a_new(nwb_a):
     yield save_path
 
     if os.path.exists(save_path):
-        #os.remove(save_path)
-        pass
-
+        os.remove(save_path)
 
 @pytest.fixture(scope="module")
 def analysis_b_new(nwb_b):
@@ -149,7 +147,21 @@ def compare_peak(p1, p2):
     p1 = p1.infer_objects()
     p2 = p2.infer_objects()
 
+    peak_blacklist = [ "rf_center_on_x_lsn",
+                       "rf_center_on_y_lsn",
+                       "rf_center_off_x_lsn",
+                       "rf_center_off_y_lsn",
+                       "rf_area_on_lsn",
+                       "rf_area_off_lsn",
+                       "rf_distance_lsn",
+                       "rf_overlap_index_lsn",
+                       "rf_chi2_lsn" ]
+
     for col in p1.select_dtypes(include=[np.number]):
+        if col in peak_blacklist:
+            print("skipping " + col)
+            continue
+
         print("checking " + col)
         assert np.allclose(p1[col], p2[col], equal_nan=True)
 
