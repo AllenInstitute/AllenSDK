@@ -25,8 +25,7 @@ else:
 
 @pytest.fixture(scope="module")
 def paths():
-    print("*******************")
-    print(data_file)
+    logging.debug("loading ", data_file)
     with open(data_file,'r') as f:
         return json.load(f)
 
@@ -162,14 +161,14 @@ def compare_peak(p1, p2):
 
     for col in p1.select_dtypes(include=[np.number]):
         if col in peak_blacklist:
-            print("skipping " + col)
+            logging.debug("skipping " + col)
             continue
 
-        print("checking " + col)
+        logging.debug("checking " + col)
         assert np.allclose(p1[col], p2[col], equal_nan=True)
 
     for col in p1.select_dtypes(include=['O']):
-        print("checking " + col)
+        logging.debug("checking " + col)
         assert all(p1[col] == p2[col])
 
 @pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
@@ -183,7 +182,7 @@ def test_session_a(analysis_a, analysis_a_new):
 @pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
                     reason="partial testing")
 def test_drifting_gratings(dg, nwb_a, analysis_a_new):
-    print("reading outputs")
+    logging.debug("reading outputs")
     dg_new = DriftingGratings.from_analysis_file(BODS(nwb_a), analysis_a_new)
     #assert np.allclose(dg.sweep_response, dg_new.sweep_response)
     assert np.allclose(dg.mean_sweep_response, dg_new.mean_sweep_response, equal_nan=True)
