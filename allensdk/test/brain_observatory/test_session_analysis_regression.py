@@ -25,7 +25,7 @@ else:
 
 @pytest.fixture(scope="module")
 def paths():
-    logging.debug("loading ", data_file)
+    logging.debug("loading " + data_file)
     with open(data_file,'r') as f:
         return json.load(f)
 
