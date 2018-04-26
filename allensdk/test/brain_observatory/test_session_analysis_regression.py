@@ -1,4 +1,5 @@
 import logging
+import sys
 logging.basicConfig(level=logging.DEBUG)
 
 import pytest
@@ -25,9 +26,11 @@ else:
 
 @pytest.fixture(scope="module")
 def paths():
+    pyversion = sys.version_info[0]
     logging.debug("loading " + data_file)
     with open(data_file,'r') as f:
-        return json.load(f)
+        data = json.load(f)
+        return data[str(pyversion)]
 
 @pytest.fixture(scope="module")
 def nwb_a(paths):
