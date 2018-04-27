@@ -136,8 +136,14 @@ def analysis_c_new(nwb_c):
 
     logging.debug("running analysis c")
     session_analysis = SessionAnalysis(nwb_c, save_path)
-    session_analysis.session_c2(plot_flag=False, save_flag=True)    
+
+    session_type = BODS(nwb_c).get_metadata()['session_type']
+    if session_type == si.THREE_SESSION_C2:
+        session_analysis.session_c2(plot_flag=False, save_flag=True)    
+    elif session_type == si.THREE_SESSION_C:
+        session_analysis.session_c(plot_flag=False, save_flag=True)    
     logging.debug("done running analysis c")
+    
     logging.debug(save_path)
 
     yield save_path
@@ -256,7 +262,7 @@ def test_natural_scenes(ns, nwb_b, analysis_b_new):
 
 @pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
                     reason="partial testing")
-def test_session_c2(analysis_c, analysis_c_new):
+def test_session_c(analysis_c, analysis_c_new):
     peak = pd.read_hdf(analysis_c, "analysis/peak")
     new_peak = pd.read_hdf(analysis_c_new, "analysis/peak")
     compare_peak(peak, new_peak)
@@ -264,7 +270,15 @@ def test_session_c2(analysis_c, analysis_c_new):
 @pytest.mark.skipif(os.getenv('TEST_COMPETE') != 'true',
                     reason="partial testing")
 def test_locally_sparse_noise(lsn, nwb_c, analysis_c_new):
-    lsn_new = LocallySparseNoise.from_analysis_file(BODS(nwb_c), analysis_c_new, si.LOCALLY_SPARSE_NOISE)
+    ds = BODS(nwb_c)
+    session_type = ds.get_metadata()['session_type']
+    logging.debug(session_type)
+
+    if session_type == si.THREE_SESSION_C:
+        lsn_new = LocallySparseNoise.from_analysis_file(ds, analysis_c_new, si.LOCALLY_SPARSE_NOISE)
+    elif session_type == si.THREE_SESSION_C2:
+        lsn_new = LocallySparseNoise.from_analysis_file(ds, analysis_c_new, si.LOCALLY_SPARSE_NOISE_4DEG)
+        
     #assert np.allclose(lsn.sweep_response, lsn_new.sweep_response)
     assert np.allclose(lsn.mean_sweep_response, lsn_new.mean_sweep_response, equal_nan=True)
 
