@@ -242,7 +242,6 @@ class LocallySparseNoise(StimulusAnalysis):
 
         for xp in range(self.nrows):
             for yp in range(self.ncols):
-                logging.debug("  for pixel (%d,%d)" % (xp, yp))
                 on_frame = np.where(self.LSN[:, xp, yp] == self.LSN_ON)[0]
                 off_frame = np.where(self.LSN[:, xp, yp] == self.LSN_OFF)[0]
                 subset_on = self.mean_sweep_response[
@@ -313,7 +312,7 @@ class LocallySparseNoise(StimulusAnalysis):
             attribute_df = pd.concat(df_list)
 
 
-        return attribute_df.sort(columns=['cell_index'])
+        return attribute_df.sort_values('cell_index')
 
     @staticmethod
     def merge_mean_response(rc1, rc2):
