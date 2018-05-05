@@ -234,29 +234,12 @@ class CellTypesApi(RmaApi):
 
         return cells
 
-    def filter_cells_api(self, cells, require_morphology, require_reconstruction, reporter_status, species):
+    def filter_cells_api(self, cells,
+                         require_morphology=False,
+                         require_reconstruction=False,
+                         reporter_status=None,
+                         species=None):
         """
-        Filter a list of cell specimens to those that optionally have morphologies
-        or have morphological reconstructions.
-
-        Parameters
-        ----------
-
-        cells: list
-            List of cell metadata dictionaries to be filtered
-
-        require_morphology: boolean
-            Filter out cells that have no morphological images.
-
-        require_reconstruction: boolean
-            Filter out cells that have no morphological reconstructions.
-
-        reporter_status: list
-            Filter for cells that have a particular cell reporter status
-
-        species: list
-            Filter for cells that belong to one or more species.  If None, return all.
-            Must be one of [ CellTypesApi.MOUSE, CellTypesApi.HUMAN ].
         """
 
         if require_morphology or require_reconstruction:
@@ -268,7 +251,7 @@ class CellTypesApi(RmaApi):
 
         if species:
             species_lower = [ s.lower() for s in species ]
-            cells = [c for c in cells if c['species'].lower() in species_lower]
+            cells = [c for c in cells if c['donor__species'].lower() in species_lower]
 
         return cells
 

@@ -151,7 +151,8 @@ class CellTypesCache(Cache):
                 'transgenic_line': cell['line_name'],
                 'dendrite_type': cell['tag__dendrite_type'],
                 'apical': cell['tag__apical'],
-                'reconstruction_type': cell['nr__reconstruction_type']
+                'reconstruction_type': cell['nr__reconstruction_type'],
+                'disease_state': cell['donor__disease_state']
             } for cell in cells ]
                 
         return cells
