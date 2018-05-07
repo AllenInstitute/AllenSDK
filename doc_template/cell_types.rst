@@ -26,27 +26,19 @@ started with analysis:
     - `Compute electrophysiology features for a single sweep <_static/examples/nb/cell_types.html#Computing-Electrophysiology-Features>`_
       
 
-Cell Types API
---------------
-
-The :py:class:`~allensdk.api.queries.cell_types_api.CellTypesApi` class provides a Python interface for downloading data
-in the Allen Cell Types Database.  The following example demonstrates how to download meta data for
-all cells with 3D reconstructions, then download the reconstruction and electrophysiology recordings
-for one of those cells:
-
-.. literalinclude:: examples_root/examples/cell_types_ex1.py
-    
-
 Cell Types Cache
 ----------------
 
-The :py:class:`~allensdk.core.cell_types_cache.CellTypesCache` class saves all of the data you can download via the
-:py:class:`~allensdk.api.queries.cell_types_api.CellTypesApi` in well known locations so that you don't have to think
-about file names and directories.  It also takes care of knowing if you've already downloaded some files and reads
-them from disk instead of downloading them again.  The following example demonstrates how to download meta data for
-all cells with 3D reconstructions:
+The :py:class:`~allensdk.api.queries.cell_types_api.CellTypesCache` class provides a Python interface for downloading data
+in the Allen Cell Types Database into well known locations so that you don't have to think
+about file names and directories.  The following example demonstrates how to download meta data for
+all cells with 3D reconstructions, then download the reconstruction and electrophysiology recordings
+for one of those cells:
 
 .. literalinclude:: examples_root/examples/cell_types_ex2.py    
+    
+:py:class:`~allensdk.api.queries.cell_types_api.CellTypesCache` takes takes care of knowing if you've already downloaded some files and reads
+them from disk instead of downloading them again.  All data is stored in the same directory as the `manifest_file` argument to the constructor.
 
 
 Feature Extraction

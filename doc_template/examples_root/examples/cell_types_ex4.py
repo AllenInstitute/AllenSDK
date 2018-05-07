@@ -1,6 +1,7 @@
 import allensdk.core.swc as swc
 
-file_name = 'example.swc'
+# if you ran the examples above, you will have a reconstruction here
+file_name = 'cell_types/specimen_478499902/reconstruction.swc'
 morphology = swc.read_swc(file_name)
 
 # subsample the morphology 3x. root, soma, junctions, and the first child of the root are preserved.

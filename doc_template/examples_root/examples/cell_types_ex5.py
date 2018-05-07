@@ -1,6 +1,7 @@
 from allensdk.core.nwb_data_set import NwbDataSet
 
-file_name = 'example.nwb'
+# if you ran the examples above, you will have a NWB file here
+file_name = 'cell_types/specimen_478499902/ephys.nwb'
 data_set = NwbDataSet(file_name)
 
 sweep_numbers = data_set.get_sweep_numbers()
