@@ -54,7 +54,7 @@ class CellTypesApi(RmaApi):
                    id=None, 
                    require_morphology=False, 
                    require_reconstruction=False, 
-                   reporter_status=None, 
+                   reporter_status=None,
                    species=None):
         """
         Query the API for a list of all cells in the Cell Types Database.

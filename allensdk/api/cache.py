@@ -130,7 +130,6 @@ class Cache(object):
                                            e.version, e.found_version)
 
             self.manifest_path = file_name
-
         else:
             self.manifest = None
 
