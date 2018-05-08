@@ -95,7 +95,7 @@ The 0.14.5 release coincides with the release of additional mouse electrophysiol
 We have simplified the data structure returned by :py:meth:`~allensdk.core.cell_types_cache.CellTypesCache.get_cells` to be simpler and more
 flat, so you will be prompted to update your manifest version.  To use the simpler format and access the new data, remove the following files:
 
-    * :py:meth:`~allensdk.core.cell_types_cache.CellTypesCache` `manifest.json`
+    * :py:meth:`~allensdk.core.cell_types_cache.CellTypesCache` manifest.json
     * ``cells.json`` 
     * ``ephys_features.csv`` 
     * ``morphology_features.csv`` 
@@ -103,7 +103,7 @@ flat, so you will be prompted to update your manifest version.  To use the simpl
 
 Additional changes:
 
-    * incrased `pandas` minimum version to 0.17, removed the upper limit 
+    * increased ``pandas`` minimum version to 0.17, removed the upper limit 
     * added regression tests to the Brain Observatory analysis modules to ensure py3/py2 numerical compatibility.
 
 What's New - Release 0.14.4 (January 30th, 2018)
