@@ -1,32 +1,111 @@
-# Copyright 2016 Allen Institute for Brain Science
-# This file is part of Allen SDK.
+# Allen Institute Software License - This software license is the 2-clause BSD
+# license plus a third clause that prohibits redistribution for commercial
+# purposes without further permission.
 #
-# Allen SDK is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, version 3 of the License.
+# Copyright 2017. Allen Institute. All rights reserved.
 #
-# Allen SDK is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
 #
-# You should have received a copy of the GNU General Public License
-# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
-
-import h5py
-import logging
-import pandas as pd
-import numpy as np
-import allensdk.brain_observatory.roi_masks as roi
-import itertools
-from allensdk.brain_observatory.locally_sparse_noise import LocallySparseNoise
-import allensdk.brain_observatory.stimulus_info as si
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+#
+# 3. Redistributions for commercial purposes are not permitted without the
+# Allen Institute's written permission.
+# For purposes of this license, commercial purposes is the incorporation of the
+# Allen Institute's software into anything for which you will charge fees or
+# other compensation. Contact terms@alleninstitute.org for commercial licensing
+# opportunities.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
+import functools
 import dateutil
 import re
 import os
+import six
+import itertools
+import logging
 from pkg_resources import parse_version
+
+import h5py
+import pandas as pd
+import numpy as np
+
+import allensdk.brain_observatory.roi_masks as roi
+from allensdk.brain_observatory.locally_sparse_noise import LocallySparseNoise
+import allensdk.brain_observatory.stimulus_info as si
+
 from allensdk.brain_observatory.brain_observatory_exceptions import (MissingStimulusException,
                                                                      NoEyeTrackingException)
+from allensdk.api.cache import memoize
+from allensdk.core import h5_utilities 
+
+# Deprecation rerouting:
+from allensdk.deprecated import deprecated
+from allensdk.brain_observatory.stimulus_info import warp_stimulus_coords as si_warp_stimulus_coords
+from allensdk.brain_observatory.stimulus_info import make_display_mask as si_make_display_mask
+from allensdk.brain_observatory.stimulus_info import mask_stimulus_template as si_mask_stimulus_template
+from allensdk.brain_observatory.brain_observatory_exceptions import EpochSeparationException
+
+
+_STIMULUS_PRESENTATION_PATH = 'stimulus/presentation'
+_STIMULUS_PRESENTATION_PATTERNS = ('{}', '{}_stimulus',)
+
+
+def get_epoch_mask_list(st, threshold, max_cuts=2):
+    '''Convenience function to cut a stim table into multiple epochs
+
+    :param st: input stimtable
+    :param threshold: threshold on the max duration of a subepoch
+    :param max_cuts: maximum number of allowed epochs to cut into
+    :return: epoch_mask_list, a list of indices that define the start and end of sub-epochs
+    '''
+
+    if threshold is None:
+        raise NotImplementedError('threshold not set for this type of session')
+
+    delta = (st.start.values[1:] - st.end.values[:-1])
+    cut_inds = np.where(delta > threshold)[0] + 1
+
+    epoch_mask_list = []
+
+    if len(cut_inds) > max_cuts:
+
+        # See: https://gist.github.com/nicain/bce66cd073e422f07cf337b476c63be7
+        #      https://github.com/AllenInstitute/AllenSDK/issues/66
+        raise EpochSeparationException('more than 2 epochs cut', delta=delta)
+
+    for ii in range(len(cut_inds)+1):
+
+        if ii == 0:
+            first_ind = st.iloc[0].start
+        else:
+            first_ind = st.iloc[cut_inds[ii-1]].start
+
+        if ii == len(cut_inds):
+            last_ind_inclusive = st.iloc[-1].end
+        else:
+            last_ind_inclusive = st.iloc[cut_inds[ii]-1].end
+
+        epoch_mask_list.append((first_ind,last_ind_inclusive))
+
+    return epoch_mask_list
+
 
 class BrainObservatoryNwbDataSet(object):
     PIPELINE_DATASET = 'brain_observatory_pipeline'
@@ -52,21 +131,21 @@ class BrainObservatoryNwbDataSet(object):
 
     STIMULUS_TABLE_TYPES = {
         'abstract_feature_series': [si.DRIFTING_GRATINGS, si.STATIC_GRATINGS],
-        'indexed_time_series': [si.NATURAL_MOVIE_ONE, si.NATURAL_MOVIE_TWO, si.NATURAL_MOVIE_THREE,
-                                si.NATURAL_SCENES, si.LOCALLY_SPARSE_NOISE, 
-                                si.LOCALLY_SPARSE_NOISE_4DEG, si.LOCALLY_SPARSE_NOISE_8DEG]
+        'indexed_time_series': [si.NATURAL_SCENES, si.LOCALLY_SPARSE_NOISE,
+                                si.LOCALLY_SPARSE_NOISE_4DEG, si.LOCALLY_SPARSE_NOISE_8DEG],
+        'repeated_indexed_time_series':[si.NATURAL_MOVIE_ONE, si.NATURAL_MOVIE_TWO, si.NATURAL_MOVIE_THREE]
 
     }
 
     # this array was moved before file versioning was in place
-    MOTION_CORRECTION_DATASETS = [ "MotionCorrection/2p_image_series/xy_translations", 
+    MOTION_CORRECTION_DATASETS = [ "MotionCorrection/2p_image_series/xy_translations",
                                    "MotionCorrection/2p_image_series/xy_translation" ]
 
     def __init__(self, nwb_file):
 
         self.nwb_file = nwb_file
         self.pipeline_version = None
-        
+
         if os.path.exists(self.nwb_file):
             meta = self.get_metadata()
             if meta and 'pipeline_version' in meta:
@@ -77,6 +156,81 @@ class BrainObservatoryNwbDataSet(object):
                     logging.warning("File %s has a pipeline version newer than the version supported by this class (%s vs %s)."
                                     " Please update your AllenSDK." % (nwb_file, pipeline_version_str, self.SUPPORTED_PIPELINE_VERSION))
 
+        self._stimulus_search = None
+
+    def get_stimulus_epoch_table(self):
+        '''Returns a pandas dataframe that summarizes the stimulus epoch duration for each acquisition time index in
+        the experiment
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        timestamps: 2D numpy array
+            Timestamp for each fluorescence sample
+
+        traces: 2D numpy array
+            Fluorescence traces for each cell
+        '''
+
+
+        # These are thresholds used by get_epoch_mask_list to set a maximum limit on the delta aqusistion frames to
+        #  count as different trials (rows in the stim table).  This helps account for dropped frames, so that they dont
+        #  cause the cutting of an entire experiment into too many stimulus epochs.  If these thresholds are too low,
+        #  the assert statment in get_epoch_mask_list will halt execution.  In that case, make a bug report!.
+        threshold_dict = {si.THREE_SESSION_A:32+7,
+                          si.THREE_SESSION_B:15,
+                          si.THREE_SESSION_C:7,
+                          si.THREE_SESSION_C2:7}
+
+        stimulus_table_dict = {}
+        for stimulus in self.list_stimuli():
+
+            stimulus_table_dict[stimulus] = self.get_stimulus_table(stimulus)
+
+            if stimulus == si.SPONTANEOUS_ACTIVITY:
+                stimulus_table_dict[stimulus]['frame'] = 0
+
+        interval_list = []
+        interval_stimulus_dict = {}
+        for stimulus in self.list_stimuli():
+            stimulus_interval_list = get_epoch_mask_list(stimulus_table_dict[stimulus], threshold=threshold_dict.get(self.get_session_type(), None))
+            for stimulus_interval in stimulus_interval_list:
+                interval_stimulus_dict[stimulus_interval] = stimulus
+            interval_list += stimulus_interval_list
+        interval_list.sort(key=lambda x: x[0])
+
+        stimulus_signature_list = ['gap']
+        duration_signature_list = [int(interval_list[0][0])]
+        interval_signature_list = [(0,int(interval_list[0][0]))]
+        for ii, interval in enumerate(interval_list):
+            stimulus_signature_list.append(interval_stimulus_dict[interval])
+            duration_signature_list.append(int(interval[1] - interval[0]))
+            interval_signature_list.append((int(interval[0]), int(interval[1])))
+
+            if ii != len(interval_list)-1:
+                stimulus_signature_list.append('gap')
+                duration_signature_list.append((int(interval_list[ii+1][0] - interval_list[ii][1])))
+                interval_signature_list.append((int(interval_list[ii][1]), int(interval_list[ii+1][0])))
+
+        stimulus_signature_list.append('gap')
+        interval_signature_list.append((int(interval_list[-1][1]), len(self.get_fluorescence_timestamps())))
+        duration_signature_list.append(interval_signature_list[-1][1]-interval_signature_list[-1][0])
+
+        interval_df = pd.DataFrame({'stimulus':stimulus_signature_list,
+                                    'duration':duration_signature_list,
+                                    'interval':interval_signature_list})
+
+        # Gaps are ininformative; remove them:
+        interval_df = interval_df[interval_df.stimulus != 'gap']
+        interval_df['start'] = [x[0] for x in interval_df['interval'].values]
+        interval_df['end'] = [x[1] for x in interval_df['interval'].values]
+
+        interval_df.reset_index(inplace=True, drop=True)
+        interval_df.drop(['interval', 'duration'], axis=1, inplace=True)
+        return interval_df
 
 
     def get_fluorescence_traces(self, cell_specimen_ids=None):
@@ -337,7 +491,7 @@ class BrainObservatoryNwbDataSet(object):
         '''
         with h5py.File(self.nwb_file, 'r') as f:
             session_type = f['general/session_type'].value
-        return session_type
+        return session_type.decode('utf-8')
 
     def get_max_projection(self):
         '''Returns the maximum projection image for the 2P movie.
@@ -361,24 +515,78 @@ class BrainObservatoryNwbDataSet(object):
         '''
 
         with h5py.File(self.nwb_file, 'r') as f:
-            keys = f["stimulus/presentation/"].keys()
-        return [k.replace('_stimulus', '') for k in keys]
+            keys = list(f["stimulus/presentation/"].keys())
+        return [ k.replace('_stimulus', '') for k in keys ]
+
+
+    def _get_master_stimulus_table(self):
+        ''' Builds a table for all stimuli by concatenating (vertically) the 
+        sub-tables describing presentation of each stimulus
+        '''
+
+        epoch_table = self.get_stimulus_epoch_table()
+
+        stimulus_table_dict = {}
+        for stimulus in self.list_stimuli():
+            stimulus_table_dict[stimulus] = self.get_stimulus_table(stimulus)
+
+        table_list = []
+        for stimulus in self.list_stimuli():
+            curr_stimtable = stimulus_table_dict[stimulus]
+
+            for _, row in epoch_table[epoch_table['stimulus'] == stimulus].iterrows():
+
+                epoch_start_ind, epoch_end_ind = row['start'], row['end']
+                curr_subtable = curr_stimtable[(epoch_start_ind <= curr_stimtable['start']) &
+                                                (curr_stimtable['end'] <= epoch_end_ind)].copy()
+                curr_subtable['stimulus'] = stimulus
+                table_list.append(curr_subtable)
+
+        new_table = pd.concat(table_list)
+        new_table.reset_index(drop=True, inplace=True)
+
+        return new_table
+
 
     def get_stimulus_table(self, stimulus_name):
-        ''' Return a stimulus table given a stimulus name '''
-        if stimulus_name in self.STIMULUS_TABLE_TYPES['abstract_feature_series']:
-            return _get_abstract_feature_series_stimulus_table(self.nwb_file, stimulus_name + "_stimulus")
-        elif stimulus_name in self.STIMULUS_TABLE_TYPES['indexed_time_series']:
-            try:
-                return _get_indexed_time_series_stimulus_table(self.nwb_file, stimulus_name + "_stimulus")
-            except:
-                return _get_indexed_time_series_stimulus_table(self.nwb_file, stimulus_name)
-        elif stimulus_name == 'spontaneous':
-            return self.get_spontaneous_activity_stimulus_table()
-        else:
-            raise IOError(
-                "Could not find a stimulus table named '%s'" % stimulus_name)
+        ''' Return a stimulus table given a stimulus name 
+        
+        Notes
+        -----
+        For more information, see:
+        http://help.brain-map.org/display/observatory/Documentation?preview=/10616846/10813485/VisualCoding_VisualStimuli.pdf 
 
+        '''
+
+        if stimulus_name == 'master':
+            return self._get_master_stimulus_table()
+
+        with h5py.File(self.nwb_file, 'r') as nwb_file:
+
+            stimulus_group = _find_stimulus_presentation_group(nwb_file, stimulus_name)
+
+            if stimulus_name in self.STIMULUS_TABLE_TYPES['abstract_feature_series']:
+                datasets = h5_utilities.load_datasets_by_relnames(
+                    ['data', 'features', 'frame_duration'], nwb_file, stimulus_group)
+                return _make_abstract_feature_series_stimulus_table(
+                    datasets['data'], h5_utilities.decode_bytes(datasets['features']), datasets['frame_duration'])
+
+            if stimulus_name in self.STIMULUS_TABLE_TYPES['indexed_time_series']:
+                datasets = h5_utilities.load_datasets_by_relnames(['data', 'frame_duration'], nwb_file, stimulus_group)
+                return _make_indexed_time_series_stimulus_table(datasets['data'], datasets['frame_duration'])
+
+            if stimulus_name in self.STIMULUS_TABLE_TYPES['repeated_indexed_time_series']:
+                datasets = h5_utilities.load_datasets_by_relnames(['data', 'frame_duration'], nwb_file, stimulus_group)
+                return _make_repeated_indexed_time_series_stimulus_table(datasets['data'], datasets['frame_duration'])
+
+            if stimulus_name == 'spontaneous':
+                datasets = h5_utilities.load_datasets_by_relnames(['data', 'frame_duration'], nwb_file, stimulus_group)
+                return _make_spontaneous_activity_stimulus_table(datasets['data'], datasets['frame_duration'])
+
+        raise IOError("Could not find a stimulus table named '%s'" % stimulus_name)
+                
+
+    @deprecated('Use BrainObservatoryNWBDataset.get_stimulus_table instead')
     def get_spontaneous_activity_stimulus_table(self):
         ''' Return the spontaneous activity stimulus table, if it exists.
 
@@ -386,25 +594,12 @@ class BrainObservatoryNwbDataSet(object):
         -------
         stimulus table: pd.DataFrame
         '''
-        k = "stimulus/presentation/spontaneous_stimulus"
-        with h5py.File(self.nwb_file, 'r') as f:
-            events = f[k + '/data'].value
-            frame_dur = f[k + '/frame_duration'].value
 
-        start_inds = np.where(events == 1)
-        stop_inds = np.where(events == -1)
+        with h5py.File(self.nwb_file, 'r') as nwb_file:
+            return make_spontaneous_activity_stimulus_table(nwb_file)
 
-        if len(start_inds) != len(stop_inds):
-            raise Exception(
-                "inconsistent start and time times in spontaneous activity stimulus table")
 
-        stim_data = np.column_stack(
-            [frame_dur[start_inds, 0].T, frame_dur[stop_inds, 0].T]).astype(int)
-
-        stimulus_table = pd.DataFrame(stim_data, columns=['start', 'end'])
-
-        return stimulus_table
-
+    @memoize
     def get_stimulus_template(self, stimulus_name):
         ''' Return an array of the stimulus template for the specified stimulus.
 
@@ -422,15 +617,15 @@ class BrainObservatoryNwbDataSet(object):
             image_stack = f['stimulus']['templates'][stim_name]['data'].value
         return image_stack
 
-    def get_locally_sparse_noise_stimulus_template(self, 
-                                                   stimulus, 
+    def get_locally_sparse_noise_stimulus_template(self,
+                                                   stimulus,
                                                    mask_off_screen=True):
         ''' Return an array of the stimulus template for the specified stimulus.
 
         Parameters
         ----------
         stimulus: string
-           Which locally sparse noise stimulus to retrieve.  Must be one of: 
+           Which locally sparse noise stimulus to retrieve.  Must be one of:
                stimulus_info.LOCALLY_SPARSE_NOISE
                stimulus_info.LOCALLY_SPARSE_NOISE_4DEG
                stimulus_info.LOCALLY_SPARSE_NOISE_8DEG
@@ -583,7 +778,7 @@ class BrainObservatoryNwbDataSet(object):
 
         imaging_depth = meta.pop('imaging_depth', None)
         meta['imaging_depth_um'] = int(imaging_depth.split()[0]) if imaging_depth else None
-        
+
         ophys_experiment_id = meta.get('ophys_experiment_id')
         meta['ophys_experiment_id'] = int(ophys_experiment_id) if ophys_experiment_id else None
 
@@ -592,7 +787,7 @@ class BrainObservatoryNwbDataSet(object):
 
         # convert start time to a date object
         session_start_time = meta.get('session_start_time')
-        if isinstance(session_start_time, basestring):
+        if isinstance( session_start_time, six.string_types ):
             meta['session_start_time'] = dateutil.parser.parse(session_start_time)
 
         age = meta.pop('age', None)
@@ -603,7 +798,7 @@ class BrainObservatoryNwbDataSet(object):
                 meta['age_days'] = int(m.groups()[0])
             else:
                 raise IOError("Could not parse age.")
-            
+
 
         # parse the device string (ugly, sorry)
         device_string = meta.pop('device_string', None)
@@ -697,7 +892,7 @@ class BrainObservatoryNwbDataSet(object):
     def get_motion_correction(self):
         ''' Returns a Panda DataFrame containing the x- and y- translation of each image used for image alignment
         '''
-        
+
         motion_correction = None
         with h5py.File(self.nwb_file, 'r') as f:
             pipeline_ds = f['processing'][self.PIPELINE_DATASET]
@@ -719,7 +914,7 @@ class BrainObservatoryNwbDataSet(object):
                     break
                 except KeyError as e:
                     pass
-        
+
         if motion_correction is None:
             raise KeyError("Could not find motion correction data.")
 
@@ -738,6 +933,75 @@ class BrainObservatoryNwbDataSet(object):
                     del f['analysis'][k]
                 f.create_dataset('analysis/%s' % k, data=v)
 
+    @property
+    def stimulus_search(self):
+
+        if self._stimulus_search is None:
+            self._stimulus_search = si.StimulusSearch(self)
+        return self._stimulus_search
+
+    def get_stimulus(self, frame_ind):
+
+        search_result = self.stimulus_search.search(frame_ind)
+
+        if search_result is None or search_result[2]['stimulus'] == si.SPONTANEOUS_ACTIVITY:
+            return None, None
+
+        else:
+
+            curr_stimulus = search_result[2]['stimulus']
+            if curr_stimulus in si.LOCALLY_SPARSE_NOISE_STIMULUS_TYPES + si.NATURAL_MOVIE_STIMULUS_TYPES + [si.NATURAL_SCENES]:
+                curr_frame = search_result[2]['frame']
+                return search_result, self.get_stimulus_template(curr_stimulus)[int(curr_frame), :, :]
+            elif curr_stimulus == si.STATIC_GRATINGS or curr_stimulus == si.DRIFTING_GRATINGS:
+                return search_result, None
+
+
+def _find_stimulus_presentation_group(nwb_file,
+                                      stimulus_name, 
+                                      base_path=_STIMULUS_PRESENTATION_PATH, 
+                                      group_patterns=_STIMULUS_PRESENTATION_PATTERNS):
+    ''' Searches an NWB file for a stimulus presentation group.
+
+    Parameters
+    ----------
+    nwb_file : h5py.File
+        File to search
+    stimulus_name : str
+        Identifier for this stimulus. Corresponds to the relative name of its h5 
+        group.
+    base_path : str, optional
+        Begin the search from here. Defaults to 'stimulus/presentation'
+    group_patterns : array-like of str, optional
+        Patterns for the relative name of the stimulus' h5 group. Defaults to 
+        the name, and the name suffixed by '_stimulus'
+
+    Returns
+    -------
+    h5py.Group, h5py.Dataset : 
+        h5 object found
+
+    '''
+
+    group_candidates = [ pattern.format(stimulus_name) for pattern in group_patterns ]
+    matcher = functools.partial(h5_utilities.h5_object_matcher_relname_in, group_candidates)
+    matches = h5_utilities.locate_h5_objects(matcher, nwb_file, base_path)
+
+    if len(matches) == 0:
+        raise MissingStimulusException(
+            'Unable to locate stimulus: {}. '
+            'Looked for this stimulus under the names: {} '.format(stimulus_name, group_candidates)
+            )
+
+    if len(matches) > 1:
+        raise MissingStimulusException(
+            'Unable to locate stimulus: {}. '
+            'Found multiple matching stimuli: {}'.format(stimulus_name, [match.name for match in matches])
+        )
+
+    return matches[0]
+
+
 def align_running_speed(dxcm, dxtime, timestamps):
     ''' If running speed timestamps differ from fluorescence
     timestamps, adjust by inserting NaNs to running speed.
@@ -754,208 +1018,152 @@ def align_running_speed(dxcm, dxtime, timestamps):
     if adjust > 0:
         dxtime = np.append(dxtime, timestamps[(-1 * adjust):])
         dxcm = np.append(dxcm, np.repeat(np.NaN, adjust))
-        
+
     return dxcm, dxtime
 
-def warp_stimulus_coords(vertices,
-                         distance=15.0,
-                         mon_height_cm=32.5,
-                         mon_width_cm=51.0,
-                         mon_res=(1920, 1200),
-                         eyepoint=(0.5, 0.5)):
-    '''
-    For a list of screen vertices, provides a corresponding list of texture coordinates.
 
-    Parameters
-    ----------
-    vertices: numpy.ndarray
-        [[x0,y0], [x1,y1], ...] A set of vertices to  convert to texture positions.
-    distance: float
-        distance from the monitor in cm.
-    mon_height_cm: float
-        monitor height in cm
-    mon_width_cm: float
-        monitor width in cm
-    mon_res: tuple
-        monitor resolution (x,y)
-    eyepoint: tuple
-
-    Returns
-    -------
-    np.ndarray
-        x,y coordinates shaped like the input that describe what pixel coordinates
-        are displayed an the input coordinates after warping the stimulus.
-
-    '''
-
-    mon_width_cm = float(mon_width_cm)
-    mon_height_cm = float(mon_height_cm)
-    distance = float(distance)
-    mon_res_x, mon_res_y = float(mon_res[0]), float(mon_res[1])
-
-    vertices = vertices.astype(np.float)
-
-    # from pixels (-1920/2 -> 1920/2) to stimulus space (-0.5->0.5)
-    vertices[:, 0] = vertices[:, 0] / mon_res_x
-    vertices[:, 1] = vertices[:, 1] / mon_res_y
-
-    x = (vertices[:, 0] + 0.5) * mon_width_cm
-    y = (vertices[:, 1] + 0.5) * mon_height_cm
-
-    xEye = eyepoint[0] * mon_width_cm
-    yEye = eyepoint[1] * mon_height_cm
-
-    x = x - xEye
-    y = y - yEye
-
-    r = np.sqrt(np.square(x) + np.square(y) + np.square(distance))
-
-    azimuth = np.arctan(x / distance)
-    altitude = np.arcsin(y / r)
-
-    # calculate the texture coordinates
-    tx = distance * (1 + x / r) - distance
-    ty = distance * (1 + y / r) - distance
-
-    # prevent div0
-    azimuth[azimuth == 0] = np.finfo(np.float32).eps
-    altitude[altitude == 0] = np.finfo(np.float32).eps
-
-    # the texture coordinates (which are now lying on the sphere)
-    # need to be remapped back onto the plane of the display.
-    # This effectively stretches the coordinates away from the eyepoint.
-
-    centralAngle = np.arccos(np.cos(altitude) * np.cos(np.abs(azimuth)))
-    # distance from eyepoint to texture vertex
-    arcLength = centralAngle * distance
-    # remap the texture coordinate
-    theta = np.arctan2(ty, tx)
-    tx = arcLength * np.cos(theta)
-    ty = arcLength * np.sin(theta)
-
-    u_coords = tx / mon_width_cm
-    v_coords = ty / mon_height_cm
-
-    retCoords = np.column_stack((u_coords, v_coords))
-
-    # back to pixels
-    retCoords[:, 0] = retCoords[:, 0] * mon_res_x
-    retCoords[:, 1] = retCoords[:, 1] * mon_res_y
-
-    return retCoords
-
-
-def make_display_mask(display_shape=(1920, 1200)):
-    ''' Build a display-shaped mask that indicates which pixels are on screen after warping the stimulus. '''
-    x = np.array(range(display_shape[0])) - display_shape[0] / 2
-    y = np.array(range(display_shape[1])) - display_shape[1] / 2
-    display_coords = np.array(list(itertools.product(x, y)))
-
-    warped_coords = warp_stimulus_coords(display_coords).astype(int)
-
-    off_warped_coords = np.array([warped_coords[:, 0] + display_shape[0] / 2,
-                                  warped_coords[:, 1] + display_shape[1] / 2])
-
-    used_coords = set()
-    for i in range(off_warped_coords.shape[1]):
-        used_coords.add((off_warped_coords[0, i], off_warped_coords[1, i]))
-
-    used_coords = (np.array([x for (x, y) in used_coords]).astype(int),
-                   np.array([y for (x, y) in used_coords]).astype(int))
-
-    mask = np.zeros(display_shape)
-
-    mask[used_coords] = 1
-
-    return mask
-
-
-def mask_stimulus_template(template_display_coords, template_shape, display_mask=None, threshold=1.0):
-    ''' Build a mask for a stimulus template of a given shape and display coordinates that indicates
-    which part of the template is on screen after warping.
-
-    Parameters
-    ----------
-    template_display_coords: list
-        list of (x,y) display coordinates
-
-    template_shape: tuple
-        (width,height) of the display template
-
-    display_mask: np.ndarray
-        boolean 2D mask indicating which display coordinates are on screen after warping.
-
-    threshold: float
-        Fraction of pixels associated with a template display coordinate that should remain
-        on screen to count as belonging to the mask.
-
-    Returns
-    -------
-    tuple: (template mask, pixel fraction)
-    '''
-    if display_mask is None:
-        display_mask = make_display_mask()
-
-    frac = np.zeros(template_shape)
-    mask = np.zeros(template_shape, dtype=bool)
-    for y in range(template_shape[1]):
-        for x in range(template_shape[0]):
-            tdcm = np.where((template_display_coords[0, :, :] == x) & (
-                template_display_coords[1, :, :] == y))
-            v = display_mask[tdcm]
-            f = np.sum(v) / len(v)
-            frac[x, y] = f
-            mask[x, y] = f >= threshold
-
-    return mask, frac
-
-
-def _get_abstract_feature_series_stimulus_table(nwb_file, stimulus_name):
+def _make_abstract_feature_series_stimulus_table(stim_data, features, frame_dur):
     ''' Return the a stimulus table for an abstract feature series.
 
+    Parameters
+    ----------
+    stim_data : array-like
+        Stimulus feature values at each interval
+    features : array-like of str
+        Stimulus feature labels
+    frame_dur : array-like
+        Start and end times of presentation intervals
+
     Returns
     -------
-    stimulus table: pd.DataFrame
+    stimulus table : pd.DataFrame
+        Describes the intervals of presentation of the stimulus
+
+    Notes
+    -----
+    For more information, see:
+    http://help.brain-map.org/display/observatory/Documentation?preview=/10616846/10813485/VisualCoding_VisualStimuli.pdf 
+
     '''
-
-
-    k = "stimulus/presentation/%s" % stimulus_name
-
-    with h5py.File(nwb_file, 'r') as f:
-        if k not in f:
-            raise MissingStimulusException(
-                "Stimulus not found: %s" % stimulus_name)
-        stim_data = f[k + '/data'].value
-        features = [ v.decode('UTF-8') for v in f[k + '/features'].value ]
-        frame_dur = f[k + '/frame_duration'].value
 
     stimulus_table = pd.DataFrame(stim_data, columns=features)
     stimulus_table.loc[:, 'start'] = frame_dur[:, 0].astype(int)
     stimulus_table.loc[:, 'end'] = frame_dur[:, 1].astype(int)
 
+    stimulus_table = stimulus_table.sort_values(['start', 'end'])
     return stimulus_table
 
 
-def _get_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
+def _make_indexed_time_series_stimulus_table(inds, frame_dur):
     ''' Return the a stimulus table for an indexed time series.
+
+    Parameters
+    ----------
+    inds : 
+    frame_durations : np.ndarray
+        start and stop times (s) of frames
 
     Returns
     -------
-    stimulus table: pd.DataFrame
+    stimulus table : pd.DataFrame
+        Describes the intervals of presentation of the stimulus
+
+    Notes
+    -----
+    For more information, see:
+    http://help.brain-map.org/display/observatory/Documentation?preview=/10616846/10813485/VisualCoding_VisualStimuli.pdf 
+
     '''
-
-    k = "stimulus/presentation/%s" % stimulus_name
-
-    with h5py.File(nwb_file, 'r') as f:
-        if k not in f:
-            raise MissingStimulusException(
-                "Stimulus not found: %s" % stimulus_name)
-        inds = f[k + '/data'].value
-        frame_dur = f[k + '/frame_duration'].value
 
     stimulus_table = pd.DataFrame(inds, columns=['frame'])
     stimulus_table.loc[:, 'start'] = frame_dur[:, 0].astype(int)
     stimulus_table.loc[:, 'end'] = frame_dur[:, 1].astype(int)
+    
+    stimulus_table = stimulus_table.sort_values(['start', 'end'])
+    return stimulus_table
+
+
+def _make_repeated_indexed_time_series_stimulus_table(inds, frame_dur):
+
+    stimulus_table = _make_indexed_time_series_stimulus_table(inds, frame_dur)
+    a = stimulus_table.groupby(by='frame')
+
+    # If this ever occurs, the repeat counter cant be trusted!
+    assert np.floor(len(stimulus_table))/len(a) == int(len(stimulus_table))/len(a)
+
+    stimulus_table['repeat'] = np.repeat(range(len(stimulus_table)//len(a)), len(a))
 
     return stimulus_table
 
+
+def _make_spontaneous_activity_stimulus_table(events, frame_durations):
+    ''' Builds a table describing the start and end times of the spontaneous viewing
+    intervals. 
+
+    Parameters
+    ----------
+    events : np.ndarray
+        events data
+    frame_durations : np.ndarray
+        start and stop times (s) of frames
+
+    Returns
+    -------
+    pd.DataFrame : 
+        Each row describes an interval of spontaneous viewing. Columns are start and end times.
+
+    Notes
+    -----
+    For more information, see:
+    http://help.brain-map.org/display/observatory/Documentation?preview=/10616846/10813485/VisualCoding_VisualStimuli.pdf 
+
+    '''
+
+    start_inds = np.where(events == 1)
+    stop_inds = np.where(events == -1)
+
+    if len(start_inds) != len(stop_inds):
+        raise Exception(
+            "inconsistent start and time times in spontaneous activity stimulus table")
+
+    stim_data = np.column_stack([
+        frame_durations[start_inds, 0].T, 
+        frame_durations[stop_inds, 0].T]
+    ).astype(int)
+
+    stimulus_table = pd.DataFrame(stim_data, columns=['start', 'end'])
+    stimulus_table = stimulus_table.sort_values(['start', 'end'])
+
+    return stimulus_table
+
+
+@deprecated('Use allensdk.brain_observatory.stimulus_info.warp_stimulus_coords instead')
+def warp_stimulus_coords(*args, **kwargs):
+    return si_warp_stimulus_coords(*args, **kwargs)
+
+
+@deprecated('Use allensdk.brain_observatory.stimulus_info.make_display_mask instead')
+def make_display_mask(*args, **kwargs):
+    return si_make_display_mask(*args, **kwargs)
+
+
+@deprecated('Use allensdk.brain_observatory.stimulus_info.mask_stimulus_template instead')
+def mask_stimulus_template(*args, **kwargs):
+    return si_mask_stimulus_template(*args, **kwargs)
+
+
+@deprecated('Use BrainObservatoryNWBDataset.get_stimulus_table instead')
+def _get_abstract_feature_series_stimulus_table(nwb_file, stimulus_name):
+    with open(nwb_file, 'r') as nwb_file:
+        return make_abstract_feature_series_stimulus_table(nwb_file, stimulus_name)
+
+
+@deprecated('Use BrainObservatoryNWBDataset.get_stimulus_table instead')
+def _get_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
+    with open(nwb_file, 'r') as nwb_file:
+        return make_indexed_time_series_stimulus_table(nwb_file, stimulus_name)
+
+@deprecated('Use BrainObservatoryNWBDataset.get_stimulus_table instead')
+def _get_repeated_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
+    with open(nwb_file, 'r') as nwb_file:
+        return make_repeated_indexed_time_series_stimulus_table(nwb_file, stimulus_name)

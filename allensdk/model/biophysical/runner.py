@@ -1,18 +1,38 @@
-# Copyright 2015 Allen Institute for Brain Science
-# This file is part of Allen SDK.
+# Allen Institute Software License - This software license is the 2-clause BSD
+# license plus a third clause that prohibits redistribution for commercial
+# purposes without further permission.
 #
-# Allen SDK is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, version 3 of the License.
+# Copyright 2017. Allen Institute. All rights reserved.
 #
-# Allen SDK is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
 #
-# You should have received a copy of the GNU General Public License
-# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
-
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+#
+# 3. Redistributions for commercial purposes are not permitted without the
+# Allen Institute's written permission.
+# For purposes of this license, commercial purposes is the incorporation of the
+# Allen Institute's software into anything for which you will charge fees or
+# other compensation. Contact terms@alleninstitute.org for commercial licensing
+# opportunities.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
 from ..biophys_sim.config import Config
 from .utils import create_utils
 from allensdk.core.nwb_data_set import NwbDataSet
@@ -22,22 +42,62 @@ import numpy
 import logging
 import time
 import os
+import multiprocessing as mp
+from functools import partial
 
 _runner_log = logging.getLogger('allensdk.model.biophysical.runner')
 
+_lock = None
 
-def run(description, sweeps=None):
-    '''Main function for running a biophysical experiment.
+def _init_lock(lock):
+    global _lock
+    _lock = lock
+
+def run(description, sweeps=None, procs=6):
+    '''Main function for simulating sweeps in a biophysical experiment.
 
     Parameters
     ----------
     description : Config
         All information needed to run the experiment.
+    procs : int
+        number of sweeps to simulate simultaneously.
+    sweeps : list
+        list of experiment sweep numbers to simulate.  If None, simulate all sweeps.
     '''
-    model_type = description.data['biophys'][0]['model_type']
+
+    prepare_nwb_output(description.manifest.get_path('stimulus_path'),
+                       description.manifest.get_path('output_path'))
+
+    if procs == 1:
+        run_sync(description, sweeps)
+        return
+
+    if sweeps is None:
+        stimulus_path = description.manifest.get_path('stimulus_path')
+        run_params = description.data['runs'][0]
+        sweeps = run_params['sweeps']
+
+    lock = mp.Lock()
+    pool = mp.Pool(procs, initializer=_init_lock, initargs=(lock,))
+    pool.map(partial(run_sync, description), [[sweep] for sweep in sweeps])
+    pool.close()
+    pool.join()
+
+
+def run_sync(description, sweeps=None):
+    '''Single-process main function for simulating sweeps in a biophysical experiment.
+
+    Parameters
+    ----------
+    description : Config
+        All information needed to run the experiment.
+    sweeps : list
+        list of experiment sweep numbers to simulate.  If None, simulate all sweeps.
+    '''
 
     # configure NEURON
-    utils = create_utils(description, model_type)
+    utils = create_utils(description)
     h = utils.h
 
     # configure model
@@ -52,17 +112,15 @@ def run(description, sweeps=None):
     if sweeps is None:
         sweeps = run_params['sweeps']
     sweeps_by_type = run_params['sweeps_by_type']
-    junction_potential = description.data['fitting'][0]['junction_potential']
-    mV = 1.0e-3
 
-    prepare_nwb_output(manifest.get_path('stimulus_path'),
-                       manifest.get_path('output_path'))
+    output_path = manifest.get_path("output_path")
 
     # run sweeps
     for sweep in sweeps:
-        _runner_log.info("Running sweep: %d" % (sweep))
+        _runner_log.info("Loading sweep: %d" % (sweep))
         utils.setup_iclamp(stimulus_path, sweep=sweep)
-        _runner_log.info("Done loading sweep: %d" % (sweep))
+
+        _runner_log.info("Simulating sweep: %d" % (sweep))
         vec = utils.record_values()
         tstart = time.time()
         h.finitialize()
@@ -71,11 +129,14 @@ def run(description, sweeps=None):
         _runner_log.info("Time: %f" % (tstop - tstart))
 
         # write to an NWB File
-        output_data = (numpy.array(vec['v']) - junction_potential) * mV
+        _runner_log.info("Writing sweep: %d" % (sweep))
+        recorded_data = utils.get_recorded_data(vec)
 
-        output_path = manifest.get_path("output_path")
-
-        save_nwb(output_path, output_data, sweep, sweeps_by_type)
+        if _lock is not None:
+            _lock.acquire()
+        save_nwb(output_path, recorded_data["v"], sweep, sweeps_by_type)
+        if _lock is not None:
+            _lock.release()
 
 
 def prepare_nwb_output(nwb_stimulus_path,
@@ -96,7 +157,7 @@ def prepare_nwb_output(nwb_stimulus_path,
 
     copy(nwb_stimulus_path, nwb_result_path)
     data_set = NwbDataSet(nwb_result_path)
-    data_set.fill_sweep_responses(0.0)
+    data_set.fill_sweep_responses(0.0, extend_experiment=True)
     for sweep in data_set.get_sweep_numbers():
         data_set.set_spike_times(sweep, [])
 

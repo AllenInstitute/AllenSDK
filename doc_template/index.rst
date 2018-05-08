@@ -87,25 +87,39 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
-What's New - Release 0.13.2 (June 15th, 2017)
-----------------------------------------------
 
-The 0.13.2 release is a major update for the Brain Observatory modules and data.  All Brain Observatory NWB files have been regenerated, and a large number of new experiments have been released.  All NWB files now contain demixed traces.  These traces are used for neuropil subtraction and dF/F computation, so those traces are affected as well.  
+What's New - Release 0.14.4 (January 30th, 2018)
+------------------------------------------------
 
-To get new lists of experiments and metadata, please delete/rename the directory container the Brain Observatory manifest.  The new files are a bit larger because of the new traces.
+The 0.14.4 release brings support for Python 3.6 along with Python 2.7. These changes maintain compatibility with Python 2.7, so users who continue 
+to work in Python 2.7 will not experience any disruptions.
 
-The cross-session alignment algorithm has been updated and re-run, so **all cell specimen IDs have changed**.  We have built a mapping table to help map from previous cell IDs to new cell IDs available here: `cell_specimen_mapping.csv <http://api.brain-map.org/api/v2/well_known_file_download/590985414>`_. For examples of how to download the file with the SDK and use it to map between IDs, see this `notebook <_static/examples/nb/cell_specimen_mapping.html>`_.
+The :py:func:`~allensdk.ephys.ephys_features.filter_putative_spikes` function now excludes candidate spikes when the voltage trace does not show a 
+decrease between the candidate's peak and the next candidate's threshold-crossing.
 
-The cell specimens table now has a large number of new features.  Read the `technical whitepapers <http://help.brain-map.org/display/observatory/Documentation>`_ on stimulus analysis to learn more.
 
-Code changes include:
-    * a new receptive field analysis module (:py:mod:`~allensdk.brain_observatory.receptive_field_analysis`)
-    * a trace demixing algorithm (:py:mod:`~allensdk.brain_observatory.demixer`)
-    * a new convenience method: :py:meth:`~allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiment_stimuli`
-    * a new method to get the cell specimen mapping table: :py:meth:`~allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.get_cell_specimen_id_mapping`
-    * new methods :py:meth:`~allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_pupil_location` and :py:meth:`~allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_pupil_size` to get pupil position and size for experiments with eye tracking data.
-    * :py:meth:`~allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiments` accepts a list of ``cell_specimen_ids`` as an additional filter
-    * :py:meth:`~allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiments` returns "acquisition_age_days" instead of "age_days".  The new field describes the age of the animal on the day of experiment acquisition.
-    * :py:meth:`~allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_experiment_containers` no longer returns "age_days".
-        
+What's New - Release 0.14.3 (October 19th, 2017)
+-----------------------------------------------
+
+The 0.14.3 release coincides with the first release of human data and models in the Allen Cell Types Database and a complete requantification of structure unionize
+records in the Allen Mouse Brain Connectivity Atlas based on a new revision of the Common Coordinate Framework structure ontology and voxel annotations.  For details 
+on what types of data were added to the two atlases, take a look at the `data release notes <https://github.com/AllenInstitute/AllenSDK/wiki/Release-Notes-(0.14.3)>`_.
+
+Users of the :py:class:`~allensdk.core.cell_types_cache.CellTypesCache` can filter for cells based on the species of the cell's donor using the ``species`` argument of 
+:py:meth:`~allensdk.core.cell_types_cache.CellTypesCache.get_cells`.  Examples of this are shown in the metadata filtering section of the example 
+`Jupyter notebook <_static/examples/nb/cell_types.html>`_
+
+The Allen Mouse Brain Connectivity Atlas contains over 350 new data sets and structure unionize records have been completely reprocessed with updated 3D annotations of the Common Coordinate Framework.
+The structure ontology contains new structures, with subcortical annotations having changed the most.  The :py:class:`~allensdk.core.mouse_connectivity_cache.MouseConnectivityCache` :code:`get_annotation_volume` method will by default return a new volume by default.  You can choose which version of annotations you would like using the ``ccf_version`` :py:class:`~allensdk.core.mouse_connectivity_cache.MouseConnectivityCache` constructor.
+
+To access new experiments and unionize records, you will need to remove a number of files in your manifest directory so that 
+:py:class:`~allensdk.core.mouse_connectivity_cache.MouseConnectivityCache` will know to download the new copies:
+
+    * :py:class:`~allensdk.core.mouse_connectivity_cache.MouseConnectivityCache` manifest JSON
+    * ``experiments.json`` 
+    * ``structures.json`` 
+    * ``structure_unionizes.csv`` (one per experiment within experiment subdirectories)  
+
+You can then call the :py:class:`~allensdk.core.mouse_connectivity_cache.MouseConnectivityCache` :code:`get_experiments`, :code:`get_structure_tree`, and :code:`get_structure_unionizes` methods to download the files above.
+
 To find out more, take a look at our `CHANGELOG <http://github.com/AllenInstitute/AllenSDK/blob/master/CHANGELOG.md>`_. 

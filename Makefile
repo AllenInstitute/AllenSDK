@@ -17,11 +17,10 @@ build:
 	mkdir -p $(DISTDIR)/$(PROJECTNAME) 
 	cp -r allensdk setup.py README.md $(DISTDIR)/$(PROJECTNAME)/
 	cd $(DISTDIR); tar czvf $(PROJECTNAME).tgz --exclude .git $(PROJECTNAME)
-	
 
 distutils_build: clean
 	python setup.py build
-	
+
 setversion:
 	sed -i --expression 's/'\''[0-9]\+.[0-9]\+.[0-9]\+'\''/'\''${VERSION}.${RELEASE}'\''/g' allensdk/__init__.py
 
@@ -35,7 +34,7 @@ pypi_deploy:
 	python setup.py sdist upload --repository https://testpypi.python.org/pypi
 
 pytest_lax:
-	py.test -s --boxed --cov=allensdk --cov-report html --junitxml=test-reports/test.xml
+	py.test -s --boxed --cov=allensdk --cov-config coveragerc --cov-report html --junitxml=test-reports/test.xml
 
 pytest: pytest_lax
 
@@ -58,20 +57,9 @@ flake8:
 EXAMPLES=doc/_static/examples
 
 doc: FORCE
-	sphinx-apidoc -d 4 -H "Allen SDK" -A "Allen Institute for Brain Science" -V $(VERSION) -R $(VERSION).$(RELEASE) --full -o doc $(PROJECTNAME)
-	cp doc_template/*.rst doc_template/conf.py doc
-	cp -R doc_template/examples $(EXAMPLES)
-	sed -i --expression "s/|version|/${VERSION}/g" doc/conf.py
-	cp -R doc_template/aibs_sphinx/static/* doc/_static
-	cp -R doc_template/aibs_sphinx/templates/* doc/_templates
-ifdef STATIC
-	sed -i --expression "s/\/_static\/external_assets/${STATIC}\/external_assets/g" doc/_templates/layout.html
-	sed -i --expression "s/\/_static\/external_assets/${STATIC}\/external_assets/g" doc/_templates/portalHeader.html
-	sed -i --expression "s/\/_static\/external_assets/${STATIC}\/external_assets/g" doc/_templates/portalFooter.html
-endif
-	cd $(EXAMPLES)/nb && find . -maxdepth 1 -name '*.ipynb' -exec jupyter-nbconvert --to html {} \;
-	cd $(EXAMPLES)/nb/summer_workshop_2015 && find . -maxdepth 1 -name '*.ipynb' -exec jupyter-nbconvert --to html {} \;
-	cd doc && make html || true
+	mkdir -p $(DOCDIR)
+	cp -r doc_template/* $(DOCDIR)
+	cd $(DOCDIR); sphinx-build -b html . _build/html
 
 notebooks:
 	cd doc_template/examples/nb && find . -maxdepth 1 -name '*.ipynb' -exec jupyter-nbconvert --to notebook --execute --ExecutePreprocessor.timeout=1800 {} \;

@@ -1,30 +1,75 @@
-# Copyright 2015-2016 Allen Institute for Brain Science
-# This file is part of Allen SDK.
+# Allen Institute Software License - This software license is the 2-clause BSD
+# license plus a third clause that prohibits redistribution for commercial
+# purposes without further permission.
 #
-# Allen SDK is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, version 3 of the License.
+# Copyright 2015-2017. Allen Institute. All rights reserved.
 #
-# Allen SDK is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
 #
-# You should have received a copy of the GNU General Public License
-# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
-
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+#
+# 3. Redistributions for commercial purposes are not permitted without the
+# Allen Institute's written permission.
+# For purposes of this license, commercial purposes is the incorporation of the
+# Allen Institute's software into anything for which you will charge fees or
+# other compensation. Contact terms@alleninstitute.org for commercial licensing
+# opportunities.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
 import logging
 import os
 from ..biophys_sim.neuron.hoc_utils import HocUtils
 from allensdk.core.nwb_data_set import NwbDataSet
+from fractions import gcd
+from skimage.measure import block_reduce
+import scipy.interpolate
+import numpy as np
+from pkg_resources import resource_filename #@UnresolvedImport
 
 PERISOMATIC_TYPE = "Biophysical - perisomatic"
 ALL_ACTIVE_TYPE = "Biophysical - all active"
 
 
 def create_utils(description, model_type=None):
+    ''' Factory method to create a Utils subclass.
+
+    Parameters
+    ----------
+    description : Config instance
+        used to initialize Utils subclass
+
+    model_type : string
+        Must be one of [PERISOMATIC_TYPE, ALL_ACTIVE_TYPE].  If none, defaults to PERISOMATIC_TYPE
+
+    Returns
+    -------
+    Utils instance    
+    '''
+
+    
+
     if model_type is None:
-        model_type = PERISOMATIC_TYPE
+        try:
+            model_type = description.data['biophys'][0]['model_type']
+        except KeyError as e:
+            logging.error("Could not infer model type from description")
 
     if model_type == PERISOMATIC_TYPE:
         return Utils(description)
@@ -48,13 +93,38 @@ class Utils(HocUtils):
 
     _log = logging.getLogger(__name__)
 
-    def __init__(self, description):
+    def __init__(self, description):                    
+        self.update_default_cell_hoc(description)
+
         super(Utils, self).__init__(description)
         self.stim = None
         self.stim_curr = None
-        self.sampling_rate = None
+        self.simulation_sampling_rate = None
+        self.stimulus_sampling_rate = None
 
         self.stim_vec_list = []
+        
+
+    def update_default_cell_hoc(self, description, default_cell_hoc='cell.hoc'):
+        ''' replace the default 'cell.hoc' path in the manifest with 'cell.hoc' packaged
+        within AllenSDK if it does not exist '''
+
+        hoc_files = description.data['neuron'][0]['hoc']
+        try:
+            hfi = hoc_files.index(default_cell_hoc)
+
+            if not os.path.exists(default_cell_hoc):
+                abspath_ch = resource_filename(__name__, 
+                                               default_cell_hoc)
+                hoc_files[hfi] = abspath_ch
+
+                if not os.path.exists(abspath_ch):
+                    raise IOError("cell.hoc does not exist!")
+
+                self._log.warning("Using cell.hoc from the following location: %s", abspath_ch)
+        except ValueError as e:
+            pass
+
 
     def generate_morphology(self, morph_filename):
         '''Load a swc-format cell morphology file.
@@ -126,7 +196,7 @@ class Utils(HocUtils):
     def setup_iclamp(self,
                      stimulus_path,
                      sweep=0):
-        '''Assign a current waveform as input stimulus.
+        '''Assign a current waveform as input stimulus. 
 
         Parameters
         ----------
@@ -140,16 +210,27 @@ class Utils(HocUtils):
         self.stim.dur = 1e12
 
         self.read_stimulus(stimulus_path, sweep=sweep)
-        self.h.dt = self.sampling_rate
+
+        # NEURON's dt is in milliseconds
+        simulation_dt = 1.0e3 / self.simulation_sampling_rate
+        stimulus_dt = 1.0e3 / self.stimulus_sampling_rate
+        self._log.debug("Using simulation dt %f, stimulus dt %f", simulation_dt, stimulus_dt)
+
+        self.h.dt = simulation_dt
         stim_vec = self.h.Vector(self.stim_curr)
-        stim_vec.play(self.stim._ref_amp, self.sampling_rate)
+        stim_vec.play(self.stim._ref_amp, stimulus_dt)
 
         stimulus_stop_index = len(self.stim_curr) - 1
-        self.h.tstop = stimulus_stop_index * self.sampling_rate
+        self.h.tstop = stimulus_stop_index * stimulus_dt
         self.stim_vec_list.append(stim_vec)
 
     def read_stimulus(self, stimulus_path, sweep=0):
-        '''load current values for a specific experiment sweep.
+        '''Load current values for a specific experiment sweep and setup simulation
+        and stimulus sampling rates.
+
+        NOTE: NEURON only allows simulation timestamps of multiples of 40KHz.  To 
+        avoid aliasing, we set the simulation sampling rate to the least common
+        multiple of the stimulus sampling rate and 40KHz.
 
         Parameters
         ----------
@@ -170,7 +251,14 @@ class Utils(HocUtils):
         self.stim_curr = sweep_data['stimulus'] * 1.0e9
 
         # convert from Hz
-        self.sampling_rate = 1.0e3 / sweep_data['sampling_rate']
+        hz = int(sweep_data['sampling_rate'])
+        neuron_hz = Utils.nearest_neuron_sampling_rate(hz)
+
+        self.simulation_sampling_rate = neuron_hz
+        self.stimulus_sampling_rate = hz
+
+        if hz != neuron_hz:
+            Utils._log.debug("changing sampling rate from %d to %d to avoid NEURON aliasing", hz, neuron_hz)
 
     def record_values(self):
         '''Set up output voltage recording.'''
@@ -181,6 +269,44 @@ class Utils(HocUtils):
         vec["t"].record(self.h._ref_t)
 
         return vec
+
+    def get_recorded_data(self, vec):
+        '''Extract recorded voltages and timestamps given the recorded Vector instance.  
+        If self.stimulus_sampling_rate is smaller than self.simulation_sampling_rate, 
+        resample to self.stimulus_sampling_rate.
+
+        Parameters
+        ----------
+        vec : neuron.Vector 
+           constructed by self.record_values
+
+        Returns
+        -------
+        dict with two keys: 'v' = numpy.ndarray with voltages, 't' = numpy.ndarray with timestamps
+
+        '''
+        junction_potential = self.description.data['fitting'][0]['junction_potential']
+        
+        v = np.array(vec["v"])
+        t = np.array(vec["t"])
+
+        if self.stimulus_sampling_rate < self.simulation_sampling_rate:
+            factor = self.simulation_sampling_rate / self.stimulus_sampling_rate
+                
+            Utils._log.debug("subsampling recorded traces by %dX", factor)
+            v = block_reduce(v, (factor,), np.mean)[:len(self.stim_curr)]
+            t = block_reduce(t, (factor,), np.min)[:len(self.stim_curr)]
+
+        mV = 1.0e-3
+        v = (v - junction_potential) * mV
+        
+        return { "v": v, "t": t }
+
+    @staticmethod
+    def nearest_neuron_sampling_rate(hz, target_hz=40000):
+        div = gcd(hz, target_hz)
+        new_hz = hz * target_hz / div
+        return new_hz
 
 
 class AllActiveUtils(Utils):

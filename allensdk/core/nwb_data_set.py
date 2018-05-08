@@ -1,18 +1,38 @@
-# Copyright 2015-2016 Allen Institute for Brain Science
-# This file is part of Allen SDK.
+# Allen Institute Software License - This software license is the 2-clause BSD
+# license plus a third clause that prohibits redistribution for commercial
+# purposes without further permission.
 #
-# Allen SDK is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, version 3 of the License.
+# Copyright 2015-2016. Allen Institute. All rights reserved.
 #
-# Allen SDK is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# Merchantability Or Fitness FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
 #
-# You should have received a copy of the GNU General Public License
-# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
-
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+#
+# 3. Redistributions for commercial purposes are not permitted without the
+# Allen Institute's written permission.
+# For purposes of this license, commercial purposes is the incorporation of the
+# Allen Institute's software into anything for which you will charge fees or
+# other compensation. Contact terms@alleninstitute.org for commercial licensing
+# opportunities.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
 import h5py
 import numpy as np
 
@@ -89,7 +109,8 @@ class NwbDataSet(object):
                 response = swp['response']['timeseries']['data'].value
 
             if 'unit' in stimulus_dataset.attrs:
-                unit = stimulus_dataset.attrs["unit"]
+                unit = stimulus_dataset.attrs["unit"].decode('UTF-8')
+
                 unit_str = None
                 if unit.startswith('A'):
                     unit_str = "Amps"
@@ -293,7 +314,7 @@ class NwbDataSet(object):
                       for e in f['epochs'].keys() if e.startswith('Experiment_')]
             return sweeps
 
-    def fill_sweep_responses(self, fill_value=0.0, sweep_numbers=None):
+    def fill_sweep_responses(self, fill_value=0.0, sweep_numbers=None, extend_experiment=False):
         """ Fill sweep response arrays with a single value.
 
         Parameters
@@ -304,21 +325,30 @@ class NwbDataSet(object):
         sweep_numbers: list
             List of integer sweep numbers to be filled (default all sweeps)
 
+        extend_experiment: bool
+            If True, extend experiment epoch length to the end of the sweep (undo any truncation)
+
         """
 
         with h5py.File(self.file_name, 'a') as f:
             if sweep_numbers is None:
-                # no sweep numbers given, grab all of them
-                epochs = [k for k in f[
-                    'epochs'].keys() if k.startswith('Sweep_')]
-            else:
-                epochs = ['Sweep_%d' %
-                          sweep_number for sweep_number in sweep_numbers]
+                sweep_numbers = self.get_sweep_numbers()
 
-            for epoch in epochs:
+            for sweep_number in sweep_numbers:
+                epoch = "Sweep_%d" % sweep_number
                 if epoch in f['epochs']:
                     f['epochs'][epoch]['response'][
                         'timeseries']['data'][...] = fill_value
+
+                if extend_experiment:
+                    epoch = "Experiment_%d" % sweep_number
+                    if epoch in f['epochs']:
+                        idx_start = f['epochs'][epoch]['stimulus']['idx_start'].value
+                        count = f['epochs'][epoch]['stimulus']['timeseries']['data'].shape[0]
+
+                        del f['epochs'][epoch]['stimulus']['count']
+                        f['epochs'][epoch]['stimulus']['count'] = count - idx_start
+
 
     def get_sweep_metadata(self, sweep_number):
         """ Retrieve the sweep level metadata associated with each sweep.

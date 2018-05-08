@@ -1,27 +1,61 @@
+# Allen Institute Software License - This software license is the 2-clause BSD
+# license plus a third clause that prohibits redistribution for commercial
+# purposes without further permission.
+#
+# Copyright 2017. Allen Institute. All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+#
+# 3. Redistributions for commercial purposes are not permitted without the
+# Allen Institute's written permission.
+# For purposes of this license, commercial purposes is the incorporation of the
+# Allen Institute's software into anything for which you will charge fees or
+# other compensation. Contact terms@alleninstitute.org for commercial licensing
+# opportunities.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
 import pytest
 
 import os
-from allensdk.test_utilities.temp_dir import fn_temp_dir
 
-@pytest.mark.skipif(True,
+
+@pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
                     reason="partial testing")
 def test_notebook(fn_temp_dir):
-
 
     # coding: utf-8
 
     # # Reference Space
-    # 
+    #
     # This notebook contains example code demonstrating the use of the StructureTree and ReferenceSpace classes. These classes provide methods for interacting with the 3d spaces to which Allen Institute data and atlases are registered.
-    # 
+    #
     # Unlike the AllenSDK cache classes, StructureTree and ReferenceSpace operate entirely in memory. We recommend using json files to store text and nrrd files to store volumetric images.
-    # 
+    #
     # The MouseConnectivityCache class has methods for downloading, storing, and constructing StructureTrees and ReferenceSpaces. Please see [here](https://alleninstitute.github.io/AllenSDK/_static/examples/nb/mouse_connectivity.html) for examples.
 
     # ## Constructing a StructureTree
-    # 
+    #
     # A StructureTree object is a wrapper around a structure graph - a list of dictionaries documenting brain structures and their containment relationships. To build a structure tree, you will first need to obtain a structure graph.
-    # 
+    #
     # For a list of atlases and corresponding structure graph ids, see [here](http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies).
 
     # In[1]:
@@ -46,7 +80,7 @@ def test_notebook(fn_temp_dir):
 
     # The fields are:
     #     * acronym: a shortened name for the structure
-    #     * color_hex_triplet: each structure is assigned a consistent color for visualizations
+    #     * rgb_triplet: each structure is assigned a consistent color for visualizations
     #     * graph_id: the structure graph to which this structure belongs
     #     * graph_order: each structure is assigned a consistent position in the flattened graph
     #     * id: a unique integer identifier
@@ -93,11 +127,12 @@ def test_notebook(fn_temp_dir):
 
 
     # ## Downloading an annotation volume
-    # 
+    #
     # This code snippet will download and store a nrrd file containing the Allen Common Coordinate Framework annotation. We have requested an annotation with 25-micron isometric spacing. The orientation of this space is:
     #     * Anterior -> Posterior
     #     * Superior -> Inferior
     #     * Left -> Right
+    # This is the no-frills way to download an annotation volume. See the <a href='_static/examples/nb/mouse_connectivity.html#Manipulating-Grid-Data'>mouse connectivity</a> examples if you want to properly cache the downloaded data.
 
     # In[7]:
 
@@ -110,13 +145,10 @@ def test_notebook(fn_temp_dir):
     annotation_dir = 'annotation'
     Manifest.safe_mkdir(annotation_dir)
 
-    annotation_path = os.path.join(fn_temp_dir, annotation_dir, 'annotation.nrrd')
+    annotation_path = os.path.join(annotation_dir, 'annotation.nrrd')
 
     mcapi = MouseConnectivityApi()
-    mcapi.download_annotation_volume(ccf_version='annotation/ccf_2016', 
-                                     resolution=25, 
-                                     file_name=annotation_path, 
-                                     reader=None)
+    mcapi.download_annotation_volume('annotation/ccf_2016', 25, annotation_path)
 
     annotation, meta = nrrd.read(annotation_path)
 
@@ -135,17 +167,15 @@ def test_notebook(fn_temp_dir):
     # ## Using a ReferenceSpace
 
     # #### making structure masks
-    # 
+    #
     # The simplest use of a Reference space is to build binary indicator masks for structures or groups of structures.
 
     # In[9]:
 
-
-
     # A complete mask for one structure
     whole_cortex_mask = rsp.make_structure_mask([315])
 
-
+    # view in coronal section
 
 
     # What if you want a mask for a whole collection of ontologically disparate structures? Just pass more structure ids to make_structure_masks:
@@ -158,8 +188,7 @@ def test_notebook(fn_temp_dir):
 
     brain_observatory_mask = rsp.make_structure_mask(brain_observatory_ids)
 
-
-
+    # view in horizontal section
 
     # You can also make and store a number of structure_masks at once:
 
@@ -185,7 +214,7 @@ def test_notebook(fn_temp_dir):
     # #### Removing unassigned structures
 
     # A structure graph may contain structures that are not used in a particular reference space. Having these around can complicate use of the reference space, so we generally want to remove them.
-    # 
+    #
     # We'll try this using "Somatosensory areas, layer 6a" as a test case. In the 2016 ccf space, this structure is unused in favor of finer distinctions (e.g. "Primary somatosensory area, barrel field, layer 6a").
 
     # In[12]:
@@ -208,17 +237,24 @@ def test_notebook(fn_temp_dir):
     import numpy as np
 
 
-
-
     # #### Downsample the space
-    # 
-    # If you want an annotation at a resolution we don't provide, you can make one with the downsample method:
+    #
+    # If you want an annotation at a resolution we don't provide, you can make one with the downsample method.
 
     # In[14]:
 
+    import warnings
+
     target_resolution = [75, 75, 75]
 
+    # in some versions of scipy, scipy.ndimage.zoom raises a helpful but distracting 
+    # warning about the method used to truncate integers. 
+    warnings.simplefilter('ignore')
+
     sf_rsp = rsp.downsample(target_resolution)
+
+    # re-enable warnings
+    warnings.simplefilter('default')
 
     print( rsp.annotation.shape )
     print( sf_rsp.annotation.shape )
@@ -227,5 +263,4 @@ def test_notebook(fn_temp_dir):
     # Now view the downsampled space:
 
     # In[15]:
-
 

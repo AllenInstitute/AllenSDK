@@ -1,25 +1,47 @@
-# Copyright 2016 Allen Institute for Brain Science
-# This file is part of Allen SDK.
+# Allen Institute Software License - This software license is the 2-clause BSD
+# license plus a third clause that prohibits redistribution for commercial
+# purposes without further permission.
 #
-# Allen SDK is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, version 3 of the License.
+# Copyright 2017. Allen Institute. All rights reserved.
 #
-# Allen SDK is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
 #
-# You should have received a copy of the GNU General Public License
-# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
-
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+#
+# 3. Redistributions for commercial purposes are not permitted without the
+# Allen Institute's written permission.
+# For purposes of this license, commercial purposes is the incorporation of the
+# Allen Institute's software into anything for which you will charge fees or
+# other compensation. Contact terms@alleninstitute.org for commercial licensing
+# opportunities.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
 import pytest
+import os
 from mock import patch, mock_open, MagicMock
 from allensdk.core.brain_observatory_cache import (BrainObservatoryCache, 
                                                    _find_container_tags,
                                                    _merge_transgenic_lines,
                                                    _find_specimen_cre_line,
                                                    _find_specimen_reporter_line)
+from allensdk.api.queries.brain_observatory_api import BrainObservatoryApi
 
 try:
     import __builtin__ as builtins  # @UnresolvedImport
@@ -71,7 +93,7 @@ CACHE_MANIFEST = """
 
 
 @pytest.fixture
-def brain_observatory_cache():
+def brain_observatory_cache(md_temp_dir):
     boc = None
 
     try:
@@ -84,14 +106,16 @@ def brain_observatory_cache():
         with patch(builtins.__name__ + ".open",
                    mock_open(read_data=manifest_data)):
             # Download a list of all targeted areas
-            boc = BrainObservatoryCache(manifest_file='boc/manifest.json',
+            manifest_file = os.path.join(md_temp_dir, "boc", "manifest.json")
+            boc = BrainObservatoryCache(manifest_file=manifest_file,
                                         base_uri='http://api.brain-map.org')
-
-    boc.api.json_msg_query = MagicMock(name='json_msg_query')
 
     return boc
 
-def test_get_all_targeted_structures(brain_observatory_cache):
+
+@patch.object(BrainObservatoryApi, "json_msg_query")
+def test_get_all_targeted_structures(mock_json_msg_query,
+                                     brain_observatory_cache):
     with patch('os.path.exists') as m:
         m.return_value = False
 
@@ -101,7 +125,7 @@ def test_get_all_targeted_structures(brain_observatory_cache):
                        MagicMock(name='read_json')):
                 brain_observatory_cache.get_all_targeted_structures()
 
-        brain_observatory_cache.api.json_msg_query.assert_called_once_with(
+        mock_json_msg_query.assert_called_once_with(
             "http://api.brain-map.org/api/v2/data/query.json?q="
             "model::ExperimentContainer,rma::include,"
             "ophys_experiments,isi_experiment,"
@@ -110,7 +134,9 @@ def test_get_all_targeted_structures(brain_observatory_cache):
             "rma::options[num_rows$eq'all'][count$eqfalse]")
 
 
-def test_get_experiment_containers(brain_observatory_cache):
+@patch.object(BrainObservatoryApi, "json_msg_query")
+def test_get_experiment_containers(mock_json_msg_query,
+                                   brain_observatory_cache):
     with patch('os.path.exists') as m:
         m.return_value = False
 
@@ -122,7 +148,7 @@ def test_get_experiment_containers(brain_observatory_cache):
                 visp_ecs = brain_observatory_cache.get_experiment_containers(
                     targeted_structures=['VISp'])
 
-    brain_observatory_cache.api.json_msg_query.assert_called_once_with(
+    mock_json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::ExperimentContainer,rma::include,"
         "ophys_experiments,isi_experiment,"
@@ -130,7 +156,9 @@ def test_get_experiment_containers(brain_observatory_cache):
         "rma::options[num_rows$eq'all'][count$eqfalse]")
 
 
-def test_get_all_cre_lines(brain_observatory_cache):
+@patch.object(BrainObservatoryApi, "json_msg_query")
+def test_get_all_cre_lines(mock_json_msg_query,
+                           brain_observatory_cache):
     with patch('os.path.exists') as m:
         m.return_value = False
 
@@ -141,7 +169,7 @@ def test_get_all_cre_lines(brain_observatory_cache):
                 # Download a list of all cre lines
                 tls = brain_observatory_cache.get_all_cre_lines()
 
-    brain_observatory_cache.api.json_msg_query.assert_called_once_with(
+    mock_json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::ExperimentContainer,rma::include,"
         "ophys_experiments,isi_experiment,"
@@ -149,7 +177,9 @@ def test_get_all_cre_lines(brain_observatory_cache):
         "rma::options[num_rows$eq'all'][count$eqfalse]")
 
 
-def test_get_ophys_experiments(brain_observatory_cache):
+@patch.object(BrainObservatoryApi, "json_msg_query")
+def test_get_ophys_experiments(mock_json_msg_query,
+                               brain_observatory_cache):
     with patch('os.path.exists') as m:
         m.return_value = False
 
@@ -160,7 +190,7 @@ def test_get_ophys_experiments(brain_observatory_cache):
                 # Download a list of all transgenic driver lines
                 tls = brain_observatory_cache.get_ophys_experiments()
 
-    brain_observatory_cache.api.json_msg_query.assert_called_once_with(
+    mock_json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::OphysExperiment,rma::include,experiment_container,"
         "well_known_files(well_known_file_type),targeted_structure,"
@@ -168,7 +198,9 @@ def test_get_ophys_experiments(brain_observatory_cache):
         "rma::options[num_rows$eq'all'][count$eqfalse]")
 
 
-def test_get_all_session_types(brain_observatory_cache):
+@patch.object(BrainObservatoryApi, "json_msg_query")
+def test_get_all_session_types(mock_json_msg_query,
+                               brain_observatory_cache):
     with patch('os.path.exists') as m:
         m.return_value = False
 
@@ -179,7 +211,7 @@ def test_get_all_session_types(brain_observatory_cache):
                 # Download a list of all transgenic driver lines
                 tls = brain_observatory_cache.get_all_session_types()
 
-    brain_observatory_cache.api.json_msg_query.assert_called_once_with(
+    mock_json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::OphysExperiment,rma::include,experiment_container,"
         "well_known_files(well_known_file_type),targeted_structure,"
@@ -187,7 +219,9 @@ def test_get_all_session_types(brain_observatory_cache):
         "rma::options[num_rows$eq'all'][count$eqfalse]")
 
 
-def test_get_stimulus_mappings(brain_observatory_cache):
+@patch.object(BrainObservatoryApi, "json_msg_query")
+def test_get_stimulus_mappings(mock_json_msg_query,
+                               brain_observatory_cache):
     with patch('os.path.exists') as m:
         m.return_value = False
 
@@ -198,14 +232,16 @@ def test_get_stimulus_mappings(brain_observatory_cache):
                 # Download a list of all transgenic driver lines
                 tls = brain_observatory_cache._get_stimulus_mappings()
 
-    brain_observatory_cache.api.json_msg_query.assert_called_once_with(
+    mock_json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::ApiCamStimulusMapping,"
         "rma::options[num_rows$eq'all'][count$eqfalse]")
 
 
 @pytest.mark.skipif(True, reason="need to develop mocks")
-def test_get_cell_specimens(brain_observatory_cache):
+@patch.object(BrainObservatoryApi, "json_msg_query")
+def test_get_cell_specimens(mock_json_msg_query,
+                            brain_observatory_cache):
     with patch('os.path.exists') as m:
         m.return_value = False
 
@@ -214,7 +250,7 @@ def test_get_cell_specimens(brain_observatory_cache):
             # Download a list of all transgenic driver lines
             tls = brain_observatory_cache.get_cell_specimens()
 
-    brain_observatory_cache.api.json_msg_query.assert_called_once_with(
+    mock_json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q=")
 
 

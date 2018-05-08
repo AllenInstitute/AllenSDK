@@ -1,18 +1,38 @@
-# Copyright 2017 Allen Institute for Brain Science
-# This file is part of Allen SDK.
+# Allen Institute Software License - This software license is the 2-clause BSD
+# license plus a third clause that prohibits redistribution for commercial
+# purposes without further permission.
 #
-# Allen SDK is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, version 3 of the License.
+# Copyright 2017. Allen Institute. All rights reserved.
 #
-# Allen SDK is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# Merchantability Or Fitness FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
 #
-# You should have received a copy of the GNU General Public License
-# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
-
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+#
+# 3. Redistributions for commercial purposes are not permitted without the
+# Allen Institute's written permission.
+# For purposes of this license, commercial purposes is the incorporation of the
+# Allen Institute's software into anything for which you will charge fees or
+# other compensation. Contact terms@alleninstitute.org for commercial licensing
+# opportunities.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
 from allensdk.core.brain_observatory_cache import BrainObservatoryCache
 from allensdk.brain_observatory.drifting_gratings import DriftingGratings
 from allensdk.brain_observatory.static_gratings import StaticGratings
@@ -42,7 +62,7 @@ def test_brain_observatory_trace_analysis_notebook(boc):
     
     cell_loc = np.argwhere(specimen_ids==specimen_id)[0][0]
 
-    assert cell_loc == 97
+    assert cell_loc == 97 
     
     # temporal frequency plot
     response = dg.response[:,1:,cell_loc,0]
@@ -55,17 +75,17 @@ def test_brain_observatory_trace_analysis_notebook(boc):
     # trials for cell's preferred condition
     pref_ori = dg.orivals[dg.peak.ori_dg[cell_loc]]
     pref_tf = dg.tfvals[dg.peak.tf_dg[cell_loc]]
-    assert pref_ori == 180
+    assert pref_ori == 180 
     assert pref_tf == 2
 
     pref_trials = dg.stim_table[(dg.stim_table.orientation==pref_ori)&(dg.stim_table.temporal_frequency==pref_tf)]
-    assert pref_trials.loc[1,'start'] == 836
-    assert pref_trials.loc[1,'end'] == 896
+    assert pref_trials['start'][1] == 836 
+    assert pref_trials['end'][1] == 896 
 
     # mean sweep response
     subset = dg.sweep_response[(dg.stim_table.orientation==pref_ori)&(dg.stim_table.temporal_frequency==pref_tf)]
     subset_mean = dg.mean_sweep_response[(dg.stim_table.orientation==pref_ori)&(dg.stim_table.temporal_frequency==pref_tf)]
-    assert np.isclose(subset_mean.loc[1,'dx'], 0.920868)
+    assert np.isclose(subset_mean['dx'][1], 0.920868)
 
     # response to each trial
     trial_timestamps = np.arange(-1*dg.interlength, dg.interlength+dg.sweeplength, 1.)/dg.acquisition_rate
@@ -78,8 +98,8 @@ def test_brain_observatory_static_gratings_notebook(boc):
     sg = StaticGratings(data_set)
 
     peak_head = sg.peak.head()
-    assert peak_head.loc[0,'cell_specimen_id'] == 517399188
-    assert np.isclose(peak_head.loc[0,'reliability_sg'], 0.0113189)
+    assert peak_head['cell_specimen_id'][0] == 517399188
+    assert np.isclose(peak_head['reliability_sg'][0], 0.011318858489782238)
 
 
 @pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
@@ -89,8 +109,8 @@ def test_brain_observatory_natural_scenes_notebook(boc):
     ns = NaturalScenes(data_set)
     ns_head = ns.peak.head()
     
-    assert np.isclose(ns_head.loc[0,'peak_dff_ns'], 4.91692)
-    assert ns_head.loc[0,'cell_specimen_id'] == 517399188
+    assert np.isclose(ns_head['peak_dff_ns'][0], 4.9169226656)
+    assert ns_head['cell_specimen_id'][0] == 517399188
 
 @pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
                     reason="partial testing")
@@ -126,7 +146,7 @@ def test_brain_observatory_experiment_containers_notebook(boc):
                                     stimuli=[stim_info.STATIC_GRATINGS])[0]
     exp = boc.get_ophys_experiment_data(exp['id'])
 
-    assert set(depths) == set([175, 265, 275, 300, 320, 325, 335, 350, 365, 375, 435])
+    assert set(depths) == set([175, 265, 275, 300, 320, 325, 335, 350, 365, 375])
     expected_stimuli = ['drifting_gratings',
                         'locally_sparse_noise',
                         'locally_sparse_noise_4deg',

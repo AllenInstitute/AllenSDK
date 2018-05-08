@@ -1,18 +1,38 @@
-# Copyright 2015-2016 Allen Institute for Brain Science
-# This file is part of Allen SDK.
+# Allen Institute Software License - This software license is the 2-clause BSD
+# license plus a third clause that prohibits redistribution for commercial
+# purposes without further permission.
 #
-# Allen SDK is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, version 3 of the License.
+# Copyright 2015-2016. Allen Institute. All rights reserved.
 #
-# Allen SDK is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
 #
-# You should have received a copy of the GNU General Public License
-# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
-
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+#
+# 3. Redistributions for commercial purposes are not permitted without the
+# Allen Institute's written permission.
+# For purposes of this license, commercial purposes is the incorporation of the
+# Allen Institute's software into anything for which you will charge fees or
+# other compensation. Contact terms@alleninstitute.org for commercial licensing
+# opportunities.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
 import simplejson as json
 import logging
 from ...deprecated import deprecated
@@ -24,6 +44,7 @@ class GlifApi(RmaTemplate):
     _log = logging.getLogger('allensdk.api.queries.glif_api')
 
     NWB_FILE_TYPE = None
+    GLIF_TYPES = [ 395310498, 395310469, 395310475, 395310479, 471355161 ]
 
     rma_templates = \
         {"glif_queries": [
@@ -36,8 +57,8 @@ class GlifApi(RmaTemplate):
             {'name': 'neuronal_models',
              'description': 'see name',
              'model': 'Specimen',
-             'include': 'neuronal_models(well_known_files,neuronal_model_template,neuronal_model_runs(well_known_files))',
-             'criteria':'[id$in{{ ephys_experiment_ids }}]',
+             'include': 'neuronal_models(well_known_files,neuronal_model_template[id$in' + ','.join(map(str,GLIF_TYPES)) + '],neuronal_model_runs(well_known_files))',             
+             'criteria':'{% if ephys_experiment_ids is defined %}[id$in{{ ephys_experiment_ids }}]{%endif%}',
              'num_rows': 'all',
              'criteria_params':['ephys_experiment_ids'],
              'count': False,
@@ -50,8 +71,8 @@ class GlifApi(RmaTemplate):
              'num_rows': 'all',
              'criteria_params':['neuronal_model_ids'],
              'count': False,
-            }
-        ]
+             }
+            ]
         }
 
     def __init__(self, base_uri=None):
@@ -83,6 +104,7 @@ class GlifApi(RmaTemplate):
                                                                                  neuron_config_url)
 
         return return_dict
+
 
     @deprecated()
     def list_neuronal_models(self):

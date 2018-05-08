@@ -1,22 +1,45 @@
-# Copyright 2016 Allen Institute for Brain Science
-# This file is part of Allen SDK.
+# Allen Institute Software License - This software license is the 2-clause BSD
+# license plus a third clause that prohibits redistribution for commercial
+# purposes without further permission.
 #
-# Allen SDK is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, version 3 of the License.
+# Copyright 2017. Allen Institute. All rights reserved.
 #
-# Allen SDK is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# Merchantability Or Fitness FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
 #
-# You should have received a copy of the GNU General Public License
-# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
-
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+#
+# 3. Redistributions for commercial purposes are not permitted without the
+# Allen Institute's written permission.
+# For purposes of this license, commercial purposes is the incorporation of the
+# Allen Institute's software into anything for which you will charge fees or
+# other compensation. Contact terms@alleninstitute.org for commercial licensing
+# opportunities.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
 import pytest
-from mock import MagicMock
+from mock import MagicMock, patch
 import allensdk.core.json_utilities as ju
 from allensdk.api.queries.rma_template import RmaTemplate
+
+
+_msg = {'msg': [{'whatever': True}]}
 
 
 @pytest.fixture
@@ -109,58 +132,46 @@ def rma():
     return rma
 
 
-def test_atlases_list(rma):
-    ju.read_url_get = \
-        MagicMock(name='read_url_get',
-                  return_value={'msg': [{'whatever': True}]})
-
+@patch("allensdk.core.json_utilities.read_url_get", return_value=_msg)
+def test_atlases_list(ju_read_url_get, rma):
     rma.template_query('ontology_queries',
                        'atlases_list')
 
-    ju.read_url_get.assert_called_once_with(
+    ju_read_url_get.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::Atlas,rma::options"
         "%5Bnum_rows$eq%27all%27%5D%5Bcount$eqfalse%5D")
 
 
-def test_structure_graphs_list(rma):
-    ju.read_url_get = \
-        MagicMock(name='read_url_get',
-                  return_value={'msg': [{'whatever': True}]})
-
+@patch("allensdk.core.json_utilities.read_url_get", return_value=_msg)
+def test_structure_graphs_list(ju_read_url_get, rma):
     rma.template_query('ontology_queries',
                        'structure_graphs_list')
 
-    ju.read_url_get.assert_called_once_with(
+    ju_read_url_get.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::StructureGraph,rma::options"
         "%5Bnum_rows$eq%27all%27%5D%5Bcount$eqfalse%5D")
 
 
-def test_structure_sets_list(rma):
-    ju.read_url_get = \
-        MagicMock(name='read_url_get',
-                  return_value={'msg': [{'whatever': True}]})
-
+@patch("allensdk.core.json_utilities.read_url_get", return_value=_msg)
+def test_structure_sets_list(ju_read_url_get, rma):
     rma.template_query('ontology_queries',
                        'structure_sets_list')
 
-    ju.read_url_get.assert_called_once_with(
+    ju_read_url_get.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::StructureSet,rma::options"
         "%5Bnum_rows$eq%27all%27%5D%5Bcount$eqfalse%5D")
 
 
-def test_structures_by_graph_ids(rma):
-    ju.read_url_get = \
-        MagicMock(name='read_url_get',
-                  return_value={'msg': [{'whatever': True}]})
-
+@patch("allensdk.core.json_utilities.read_url_get", return_value=_msg)
+def test_structures_by_graph_ids(ju_read_url_get, rma):
     rma.template_query('ontology_queries',
                        'structures_by_graph_ids',
                        graph_ids='1')
 
-    ju.read_url_get.assert_called_once_with(
+    ju_read_url_get.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::Structure,rma::criteria,"
         "%5Bgraph_id$in1%5D,rma::options"
@@ -168,16 +179,13 @@ def test_structures_by_graph_ids(rma):
         "%5Bcount$eqfalse%5D")
 
 
-def test_structures_by_two_graph_ids(rma):
-    ju.read_url_get = \
-        MagicMock(name='read_url_get',
-                  return_value={'msg': [{'whatever': True}]})
-
+@patch("allensdk.core.json_utilities.read_url_get", return_value=_msg)
+def test_structures_by_two_graph_ids(ju_read_url_get, rma):
     rma.template_query('ontology_queries',
                        'structures_by_graph_ids',
                        graph_ids=[1, 2])
 
-    ju.read_url_get.assert_called_once_with(
+    ju_read_url_get.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::Structure,rma::criteria,"
         "%5Bgraph_id$in1,2%5D,"
@@ -186,16 +194,13 @@ def test_structures_by_two_graph_ids(rma):
         "%5Border$eqstructures.graph_order%5D%5Bcount$eqfalse%5D")
 
 
-def test_structures_by_graph_names(rma):
-    ju.read_url_get = \
-        MagicMock(name='read_url_get',
-                  return_value={'msg': [{'whatever': True}]})
-
+@patch("allensdk.core.json_utilities.read_url_get", return_value=_msg)
+def test_structures_by_graph_names(ju_read_url_get, rma):
     rma.template_query('ontology_queries',
                        'structures_by_graph_names',
                        graph_names=rma.quote_string('Human+Brain+Atlas'))
 
-    ju.read_url_get.assert_called_once_with(
+    ju_read_url_get.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::Structure,rma::criteria,"
         "graph%5Bstructure_graphs.name$in%27Human+Brain+Atlas%27%5D,"
@@ -204,31 +209,25 @@ def test_structures_by_graph_names(rma):
         "%5Border$eqstructures.graph_order%5D%5Bcount$eqfalse%5D")
 
 
-def test_structures_by_set_ids(rma):
-    ju.read_url_get = \
-        MagicMock(name='read_url_get',
-                  return_value={'msg': [{'whatever': True}]})
-
+@patch("allensdk.core.json_utilities.read_url_get", return_value=_msg)
+def test_structures_by_set_ids(ju_read_url_get, rma):
     rma.template_query('ontology_queries',
                        'structures_by_graph_ids',
                        graph_ids='1')
 
-    ju.read_url_get.assert_called_once_with(
+    ju_read_url_get.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::Structure,rma::criteria,"
         "%5Bgraph_id$in1%5D,rma::options%5Bnum_rows$eq%27all%27%5D"
         "%5Border$eqstructures.graph_order%5D%5Bcount$eqfalse%5D")
 
 
-def test_atlases_table(rma):
-    ju.read_url_get = \
-        MagicMock(name='read_url_get',
-                  return_value={'msg': [{'whatever': True}]})
-
+@patch("allensdk.core.json_utilities.read_url_get", return_value=_msg)
+def test_atlases_table(ju_read_url_get, rma):
     rma.template_query('ontology_queries',
                        'atlases_table')
 
-    ju.read_url_get.assert_called_once_with(
+    ju_read_url_get.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::Atlas,rma::criteria,"
         "structure_graph%28ontology%29,graphic_group_labels,"
@@ -236,16 +235,13 @@ def test_atlases_table(rma):
         "rma::options%5Bnum_rows$eq%27all%27%5D%5Bcount$eqfalse%5D")
 
 
-def test_atlases_table_one_graph(rma):
-    ju.read_url_get = \
-        MagicMock(name='read_url_get',
-                  return_value={'msg': [{'whatever': True}]})
-
+@patch("allensdk.core.json_utilities.read_url_get", return_value=_msg)
+def test_atlases_table_one_graph(ju_read_url_get, rma):
     rma.template_query('ontology_queries',
                        'atlases_table',
                        graph_ids=1)
 
-    ju.read_url_get.assert_called_once_with(
+    ju_read_url_get.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::Atlas,rma::criteria,"
         "%5Bgraph_id$in1%5D,structure_graph%28ontology%29,graphic_group_labels,"
@@ -253,15 +249,12 @@ def test_atlases_table_one_graph(rma):
         "rma::options%5Bnum_rows$eq%27all%27%5D%5Bcount$eqfalse%5D")
 
 
-def test_atlases_table_brief(rma):
-    ju.read_url_get = \
-        MagicMock(name='read_url_get',
-                  return_value={'msg': [{'whatever': True}]})
-
+@patch("allensdk.core.json_utilities.read_url_get", return_value=_msg)
+def test_atlases_table_brief(ju_read_url_get, rma):
     rma.template_query('ontology_queries',
                        'atlases_table_brief')
 
-    ju.read_url_get.assert_called_once_with(
+    ju_read_url_get.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::Atlas,"
         "rma::criteria,structure_graph%28ontology%29,graphic_group_labels,"

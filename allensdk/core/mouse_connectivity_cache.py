@@ -1,28 +1,45 @@
-# Copyright 2015-2016 Allen Institute for Brain Science
-# This file is part of Allen SDK.
+# Allen Institute Software License - This software license is the 2-clause BSD
+# license plus a third clause that prohibits redistribution for commercial
+# purposes without further permission.
 #
-# Allen SDK is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, version 3 of the License.
+# Copyright 2015-2017. Allen Institute. All rights reserved.
 #
-# Allen SDK is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
 #
-# You should have received a copy of the GNU General Public License
-# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
-
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+#
+# 3. Redistributions for commercial purposes are not permitted without the
+# Allen Institute's written permission.
+# For purposes of this license, commercial purposes is the incorporation of the
+# Allen Institute's software into anything for which you will charge fees or
+# other compensation. Contact terms@alleninstitute.org for commercial licensing
+# opportunities.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
 from allensdk.config.manifest_builder import ManifestBuilder
 from allensdk.api.cache import Cache
 from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
-from allensdk.api.queries.ontologies_api import OntologiesApi
 from allensdk.deprecated import deprecated
 
 from . import json_utilities
-from .ontology import Ontology
-from .structure_tree import StructureTree
-from .reference_space import ReferenceSpace
+from .reference_space_cache import ReferenceSpaceCache
 
 import nrrd
 import os
@@ -32,9 +49,10 @@ from allensdk.config.manifest import Manifest
 import warnings
 import operator as op
 import functools
+from six.moves import reduce
 
 
-class MouseConnectivityCache(Cache):
+class MouseConnectivityCache(ReferenceSpaceCache):
     """
     Cache class for storing and accessing data related to the adult mouse
     Connectivity Atlas.  By default, this class will cache any downloaded
@@ -77,86 +95,51 @@ class MouseConnectivityCache(Cache):
 
     """
 
-    CCF_VERSION_KEY = 'CCF_VERSION'
-    ANNOTATION_KEY = 'ANNOTATION'
-    TEMPLATE_KEY = 'TEMPLATE'
     PROJECTION_DENSITY_KEY = 'PROJECTION_DENSITY'
     INJECTION_DENSITY_KEY = 'INJECTION_DENSITY'
     INJECTION_FRACTION_KEY = 'INJECTION_FRACTION'
     DATA_MASK_KEY = 'DATA_MASK'
     STRUCTURE_UNIONIZES_KEY = 'STRUCTURE_UNIONIZES'
     EXPERIMENTS_KEY = 'EXPERIMENTS'
-    STRUCTURES_KEY = 'STRUCTURES'
-    STRUCTURE_TREE_KEY = 'STRUCTURE_TREE'
-    STRUCTURE_MASK_KEY = 'STRUCTURE_MASK'
-    MANIFEST_VERSION = 1.0
+
+    MANIFEST_VERSION = 1.2
+
+    SUMMARY_STRUCTURE_SET_ID = 167587189
+    DEFAULT_STRUCTURE_SET_IDS = tuple([SUMMARY_STRUCTURE_SET_ID])
+
+    @property
+    def default_structure_ids(self):
+
+        if not hasattr(self, '_default_structure_ids'):
+            tree = self.get_structure_tree()
+            default_structures = tree.get_structures_by_set_id(MouseConnectivityCache.DEFAULT_STRUCTURE_SET_IDS)
+            self._default_structure_ids = [st['id'] for st in default_structures]
+
+        return self._default_structure_ids
 
     def __init__(self,
                  resolution=None,
                  cache=True,
                  manifest_file='mouse_connectivity_manifest.json',
                  ccf_version=None,
-                 base_uri=None):
-        super(MouseConnectivityCache, self).__init__(
-            manifest=manifest_file, cache=cache, version=self.MANIFEST_VERSION)
+                 base_uri=None, 
+                 version=None):
+
+        if version is None:
+            version = self.MANIFEST_VERSION
 
         if resolution is None:
-            self.resolution = MouseConnectivityApi.VOXEL_RESOLUTION_25_MICRONS
-        else:
-            self.resolution = resolution
-        self.api = MouseConnectivityApi(base_uri=base_uri)
+            resolution = MouseConnectivityApi.VOXEL_RESOLUTION_25_MICRONS
 
         if ccf_version is None:
             ccf_version = MouseConnectivityApi.CCF_VERSION_DEFAULT
-        self.ccf_version = ccf_version
         
-    def get_annotation_volume(self, file_name=None):
-        """
-        Read the annotation volume.  Download it first if it doesn't exist.
+        super(MouseConnectivityCache, self).__init__(
+            resolution, reference_space_key=ccf_version, cache=cache, 
+            manifest=manifest_file, version=version)
 
-        Parameters
-        ----------
+        self.api = MouseConnectivityApi(base_uri=base_uri)
 
-        file_name: string
-            File name to store the annotation volume.  If it already exists,
-            it will be read from this file.  If file_name is None, the
-            file_name will be pulled out of the manifest.  Default is None.
-
-        """
-
-        file_name = self.get_cache_path(
-            file_name, self.ANNOTATION_KEY, self.ccf_version, self.resolution)
-
-        annotation, info = self.api.download_annotation_volume(
-            self.ccf_version,
-            self.resolution,
-            file_name, 
-            strategy='lazy')
-
-        return annotation, info
-
-    def get_template_volume(self, file_name=None):
-        """
-        Read the template volume.  Download it first if it doesn't exist.
-
-        Parameters
-        ----------
-
-        file_name: string
-            File name to store the template volume.  If it already exists,
-            it will be read from this file.  If file_name is None, the
-            file_name will be pulled out of the manifest.  Default is None.
-
-        """
-
-        file_name = self.get_cache_path(
-            file_name, self.TEMPLATE_KEY, self.resolution)
-
-        template, info = self.api.download_template_volume(self.resolution, 
-                                                           file_name, 
-                                                           strategy='lazy')
-
-        return template, info
 
     def get_projection_density(self, experiment_id, file_name=None):
         """
@@ -276,67 +259,6 @@ class MouseConnectivityCache(Cache):
 
         return nrrd.read(file_name)
 
-    def get_structure_tree(self, file_name=None):
-        """
-        Read the list of adult mouse structures and return an StructureTree 
-        instance.
-
-        Parameters
-        ----------
-
-        file_name: string
-            File name to save/read the structures table.  If file_name is None,
-            the file_name will be pulled out of the manifest.  If caching
-            is disabled, no file will be saved. Default is None.
-        """
-        
-        file_name = self.get_cache_path(file_name, self.STRUCTURE_TREE_KEY)
-
-        return OntologiesApi(self.api.api_url).get_structures_with_sets(
-            strategy='lazy',
-            path=file_name,
-            pre=StructureTree.clean_structures, 
-            post=StructureTree, 
-            structure_graph_ids=1,
-            **Cache.cache_json())
-
-    @deprecated('Use get_structure_tree instead.')
-    def get_ontology(self, file_name=None):
-        """
-        Read the list of adult mouse structures and return an Ontology instance.
-
-        Parameters
-        ----------
-
-        file_name: string
-            File name to save/read the structures table.  If file_name is None,
-            the file_name will be pulled out of the manifest.  If caching
-            is disabled, no file will be saved. Default is None.
-        """
-
-        return Ontology(self.get_structures(file_name))
-
-    @deprecated('Use get_structure_tree instead.')
-    def get_structures(self, file_name=None):
-        """
-        Read the list of adult mouse structures and return a Pandas DataFrame.
-
-        Parameters
-        ----------
-
-        file_name: string
-            File name to save/read the structures table.  If file_name is None,
-            the file_name will be pulled out of the manifest.  If caching
-            is disabled, no file will be saved. Default is None.
-        """
-        file_name = self.get_cache_path(file_name, self.STRUCTURES_KEY)
-
-        return OntologiesApi(base_uri=self.api.api_url).get_structures(
-            1,
-            strategy='lazy',
-            path=file_name,
-            **Cache.cache_csv_dataframe())
-
 
     def get_experiments(self, dataframe=False, file_name=None, cre=None, injection_structure_ids=None):
         """
@@ -419,8 +341,8 @@ class MouseConnectivityCache(Cache):
         elif cre is False:
             experiments = [e for e in experiments if not e['transgenic-line']]
         elif cre is not None:
-            experiments = [e for e in experiments if e[
-                'transgenic-line'] in cre]
+            cre = [ c.lower() for c in cre ]
+            experiments = [e for e in experiments if e['transgenic-line'].lower() in cre]
 
         if injection_structure_ids is not None:
             structure_ids = MouseConnectivityCache.validate_structure_ids(injection_structure_ids)
@@ -492,6 +414,68 @@ class MouseConnectivityCache(Cache):
                                                 post=filter_fn,
                                                 writer=lambda p, x : pd.DataFrame(x).to_csv(p),
                                                 reader=pd.DataFrame.from_csv)
+
+    def rank_structures(self, experiment_ids, is_injection, structure_ids=None, hemisphere_ids=None, 
+                        rank_on='normalized_projection_volume', n=5, threshold=10**-2):
+        '''Produces one or more (per experiment) ranked lists of brain structures, using a specified data field.
+
+        Parameters
+        ----------
+        experiment_ids : list of int
+            Obtain injection_structures for these experiments.
+        is_injection : boolean
+            Use data from only injection (or non-injection) unionizes.
+        structure_ids : list of int, optional
+            Consider only these structures. It is a good idea to make sure that these structures are not spatially 
+            overlapping; otherwise your results will contain redundant information. Defaults to the summary 
+            structures - a brain-wide list of nonoverlapping mid-level structures.
+        hemisphere_ids : list of int, optional
+            Consider only these hemispheres (1: left, 2: right, 3: both). Like with structures, 
+            you might get redundant results if you select overlapping options. Defaults to [1, 2].
+        rank_on : str, optional
+            Rank unionize data using this field (descending). Defaults to normalized_projection_volume.
+        n : int, optional
+            Return only the top n structures.
+        threshold : float, optional
+            Consider only records whose data value - specified by the rank_on parameter - exceeds this value.
+
+        Returns
+        -------
+        list : 
+            Each element (1 for each input experiment) is a list of dictionaries. The dictionaries describe the top
+            injection structures in descending order. They are specified by their structure and hemisphere id fields and 
+            additionally report the value specified by the rank_on parameter.
+
+        '''
+
+        output_keys = ['experiment_id', rank_on, 'hemisphere_id', 'structure_id']
+        filter_fields = lambda fieldname: fieldname in output_keys
+
+        if hemisphere_ids is None:
+            hemisphere_ids = [1, 2]
+        if structure_ids is None:
+            structure_ids = self.default_structure_ids
+
+        unionizes = self.get_structure_unionizes(experiment_ids, 
+                                                 is_injection=is_injection, 
+                                                 structure_ids=structure_ids, 
+                                                 hemisphere_ids=hemisphere_ids, 
+                                                 include_descendants=False)
+        unionizes = unionizes[unionizes[rank_on] > threshold] 
+
+        results = []
+        for eid in experiment_ids:
+
+            this_experiment_unionizes = unionizes[unionizes['experiment_id'] == eid]
+            this_experiment_unionizes = this_experiment_unionizes.sort_values(by=rank_on, ascending=False)
+            this_experiment_unionizes = this_experiment_unionizes.select(filter_fields, axis=1)
+            
+            records = this_experiment_unionizes.to_dict('record')
+            if len(records) > n:
+                records = records[:n]
+            results.append(records)
+
+        return results
 
     def filter_structure_unionizes(self, unionizes, 
                                    is_injection=None, 
@@ -584,10 +568,13 @@ class MouseConnectivityCache(Cache):
         return pd.concat(unionizes, ignore_index=True)
 
     def get_projection_matrix(self, experiment_ids, 
-                              projection_structure_ids,
+                              projection_structure_ids=None,
                               hemisphere_ids=None, 
                               parameter='projection_volume', 
                               dataframe=False):
+
+        if projection_structure_ids is None:
+            projection_structure_ids = self.default_structure_ids
 
         unionizes = self.get_structure_unionizes(experiment_ids,
                                                  is_injection=False,
@@ -641,103 +628,9 @@ class MouseConnectivityCache(Cache):
             return {'matrix': matrix, 'rows': rows_df, 'columns': cols_df}
         else:
             return {'matrix': matrix, 'rows': experiment_ids, 'columns': columns}
+    
 
-    def get_reference_space(self, structure_file_name=None, 
-                            annotation_file_name=None):
-        """
-        Build a ReferenceSpace from this cache's annotation volume and 
-        structure tree. The ReferenceSpace does operations that relate brain 
-        structures to spatial domains.
-        
-        Parameters
-        ----------
-        
-        structure_file_name: string
-            File name to save/read the structures table.  If file_name is None,
-            the file_name will be pulled out of the manifest.  If caching
-            is disabled, no file will be saved. Default is None.
-            
-        annotation_file_name: string
-            File name to store the annotation volume.  If it already exists,
-            it will be read from this file.  If file_name is None, the
-            file_name will be pulled out of the manifest.  Default is None.
-        
-        """
-        
-        return ReferenceSpace(self.get_structure_tree(structure_file_name), 
-                              self.get_annotation_volume(annotation_file_name)[0], 
-                              [self.resolution] * 3)
-
-    def get_structure_mask(self, structure_id, file_name=None, annotation_file_name=None):
-        """
-        Read a 3D numpy array shaped like the annotation volume that has non-zero values where
-        voxels belong to a particular structure.  This will take care of identifying substructures.
-
-        Notes
-        -----
-        If you are making large numbers of masks, there is a faster structure mask generator in 
-        ReferenceSpace.many_structure_masks.  We will be migrating this function in a future release.
-        
-        Parameters
-        ----------
-
-        structure_id: int
-            ID of a structure.
-
-        file_name: string
-            File name to store the structure mask.  If it already exists,
-            it will be read from this file.  If file_name is None, the
-            file_name will be pulled out of the manifest.  Default is None.
-
-        annotation_file_name: string
-            File name to store the annotation volume.  If it already exists,
-            it will be read from this file.  If file_name is None, the
-            file_name will be pulled out of the manifest.  Default is None.
-        """
-        structure_id = MouseConnectivityCache.validate_structure_id(structure_id)
-
-        file_name = self.get_cache_path(
-            file_name, self.STRUCTURE_MASK_KEY, self.ccf_version, 
-            self.resolution, structure_id)
-
-        if os.path.exists(file_name):
-            return nrrd.read(file_name)
-        else:
-            st = self.get_structure_tree()
-            structure_ids = st.descendant_ids([structure_id])[0]
-            annotation, _ = self.get_annotation_volume(annotation_file_name)
-            mask = self.make_structure_mask(structure_ids, annotation)
-
-            if self.cache:
-                Manifest.safe_make_parent_dirs(file_name)
-                nrrd.write(file_name, mask)
-
-            return mask, None
-
-    def make_structure_mask(self, structure_ids, annotation):
-        """
-        Look at an annotation volume and identify voxels that have values
-        in a list of structure ids.
-
-        Parameters
-        ----------
-
-        structure_ids: list
-            List of IDs to look for in the annotation volume
-
-        annotation: np.ndarray
-            Numpy array filled with IDs.
-
-        """
-
-        m = np.zeros(annotation.shape, dtype=np.uint8)
-
-        for _, sid in enumerate(structure_ids):
-            m[annotation == sid] = 1
-
-        return m
-
-    def build_manifest(self, file_name):
+    def add_manifest_paths(self, manifest_builder):
         """
         Construct a manifest for this Cache class and save it in a file.
 
@@ -749,42 +642,15 @@ class MouseConnectivityCache(Cache):
 
         """
 
-        manifest_builder = ManifestBuilder()
-        manifest_builder.set_version(self.MANIFEST_VERSION)
-        manifest_builder.add_path('BASEDIR', '.')
+        manifest_builder = super(MouseConnectivityCache, self).add_manifest_paths(manifest_builder)
 
         manifest_builder.add_path(self.EXPERIMENTS_KEY,
                                   'experiments.json',
                                   parent_key='BASEDIR',
                                   typename='file')
 
-        manifest_builder.add_path(self.STRUCTURES_KEY,
-                                  'structures.csv',
-                                  parent_key='BASEDIR',
-                                  typename='file')
-                                  
-        manifest_builder.add_path(self.STRUCTURE_TREE_KEY,
-                                  'structures.json',
-                                  parent_key='BASEDIR',
-                                  typename='file')
-
         manifest_builder.add_path(self.STRUCTURE_UNIONIZES_KEY,
                                   'experiment_%d/structure_unionizes.csv',
-                                  parent_key='BASEDIR',
-                                  typename='file')
-
-        manifest_builder.add_path(self.CCF_VERSION_KEY,
-                                  '%s',
-                                  parent_key='BASEDIR',
-                                  typename='dir')
-
-        manifest_builder.add_path(self.ANNOTATION_KEY,
-                                  'annotation_%d.nrrd',
-                                  parent_key=self.CCF_VERSION_KEY,
-                                  typename='file')
-
-        manifest_builder.add_path(self.TEMPLATE_KEY,
-                                  'average_template_%d.nrrd',
                                   parent_key='BASEDIR',
                                   typename='file')
 
@@ -808,29 +674,4 @@ class MouseConnectivityCache(Cache):
                                   parent_key='BASEDIR',
                                   typename='file')
 
-        manifest_builder.add_path(self.STRUCTURE_MASK_KEY,
-                                  'structure_masks/resolution_%d/structure_%d.nrrd',
-                                  parent_key=self.CCF_VERSION_KEY,
-                                  typename='file')
-
-        manifest_builder.write_json_file(file_name)
-       
- 
-    @staticmethod
-    def validate_structure_id(structure_id):
-
-        try:
-            structure_id = int(structure_id)
-        except ValueError as e:
-            raise ValueError("Invalid structure_id (%s): could not convert to integer." % str(structure_id))
-
-        return structure_id
-
-
-    @staticmethod
-    def validate_structure_ids(structure_ids):
-
-        for ii, sid in enumerate(structure_ids):
-            structure_ids[ii] = MouseConnectivityCache.validate_structure_id(sid)
-
-        return structure_ids
+        return manifest_builder

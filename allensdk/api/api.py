@@ -1,31 +1,58 @@
-# Copyright 2015 Allen Institute for Brain Science
-# This file is part of Allen SDK.
+# Allen Institute Software License - This software license is the 2-clause BSD
+# license plus a third clause that prohibits redistribution for commercial
+# purposes without further permission.
 #
-# Allen SDK is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, version 3 of the License.
+# Copyright 2017. Allen Institute. All rights reserved.
 #
-# Allen SDK is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
 #
-# You should have received a copy of the GNU General Public License
-# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+#
+# 3. Redistributions for commercial purposes are not permitted without the
+# Allen Institute's written permission.
+# For purposes of this license, commercial purposes is the incorporation of the
+# Allen Institute's software into anything for which you will charge fees or
+# other compensation. Contact terms@alleninstitute.org for commercial licensing
+# opportunities.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
 
-
-import requests
 from contextlib import closing
-import allensdk.core.json_utilities as json_utilities
-import pandas as pd
 import logging
 import os
 import errno
 import warnings
+import io
+import zipfile
+
+import requests
+import pandas as pd
+from requests_toolbelt import exceptions
+from requests_toolbelt.downloadutils import stream
+
+import allensdk.core.json_utilities as json_utilities
 
 
 class Api(object):
-    _log = logging.getLogger(__name__)
+    _log = logging.getLogger('allensdk.api.api')
+    _file_download_log = logging.getLogger('allensdk.api.api.retrieve_file_over_http')
     default_api_url = 'http://api.brain-map.org'
     download_url = 'http://download.alleninstitute.org'
 
@@ -264,7 +291,7 @@ class Api(object):
             if e.errno != errno.ENOENT:
                 raise
 
-    def retrieve_file_over_http(self, url, file_path):
+    def retrieve_file_over_http(self, url, file_path, zipped=False):
         '''Get a file from the data api and save it.
 
         Parameters
@@ -273,6 +300,10 @@ class Api(object):
             Url[1]_ from which to get the file.
         file_path : string
             Absolute path including the file name to save.
+        zipped : bool, optional
+            If true, assume that the response is a zipped directory and attempt 
+            to extract contained files into the directory containing file_path. 
+            Default is False.
 
         See Also
         --------
@@ -283,36 +314,36 @@ class Api(object):
         .. [1] Allen Brain Atlas Data Portal: `Downloading a WellKnownFile <http://help.brain-map.org/display/api/Downloading+a+WellKnownFile>`_.
         '''
 
-        self._log.info("Downloading URL: %s", url)
-        
-        from requests_toolbelt import exceptions
-        from requests_toolbelt.downloadutils import stream
+        self._file_download_log.info("Downloading URL: %s", url)
 
         try:
-            with closing(requests.get(url,
-                                      stream=True,
-                                      timeout=(9.05,31.1))) as response:
-                response.raise_for_status()
-                with open(file_path, 'wb') as f:
-                    stream.stream_response_to_file(response, path=f)
+            if zipped:
+                stream_zip_directory_over_http(url, os.path.dirname(file_path))
+            else:
+                stream_file_over_http(url, file_path)
+
         except exceptions.StreamingError as e:
-            self._log.error("Couldn't retrieve file %s from %s (streaming)." % (file_path,url))
+            self._file_download_log.error("Couldn't retrieve file %s from %s (streaming)." % (file_path,url))
             self.cleanup_truncated_file(file_path)
             raise
+
         except requests.exceptions.ConnectionError as e:
-            self._log.error("Couldn't retrieve file %s from %s (connection)." % (file_path,url))
+            self._file_download_log.error("Couldn't retrieve file %s from %s (connection)." % (file_path,url))
             self.cleanup_truncated_file(file_path)
             raise
+
         except requests.exceptions.ReadTimeout as e:
-            self._log.error("Couldn't retrieve file %s from %s (timeout)." % (file_path,url))
+            self._file_download_log.error("Couldn't retrieve file %s from %s (timeout)." % (file_path,url))
             self.cleanup_truncated_file(file_path)
             raise
+
         except requests.exceptions.RequestException as e:
-            self._log.error("Couldn't retrieve file %s from %s (request)." % (file_path,url))
+            self._file_download_log.error("Couldn't retrieve file %s from %s (request)." % (file_path,url))
             self.cleanup_truncated_file(file_path)
             raise
+
         except Exception as e:
-            self._log.error("Couldn't retrieve file %s from %s" % (file_path, url))
+            self._file_download_log.error("Couldn't retrieve file %s from %s" % (file_path, url))
             self.cleanup_truncated_file(file_path)
             raise
 
@@ -361,3 +392,52 @@ class Api(object):
         response = requests.get(url)
 
         return response.content
+
+
+def stream_zip_directory_over_http(url, directory, members=None, timeout=(9.05, 31.1)):
+    ''' Supply an http get request and stream the response to a file.
+
+    Parameters
+    ----------
+    url : str
+        Send the request to this url
+    directory : str
+        Extract the response to this directory
+    members : list of str, optional
+        Extract only these files
+    timeout : float or tuple of float, optional
+        Specify a timeout for the request. If a tuple, specify seperate connect 
+        and read timeouts.
+
+    '''
+
+    buf = io.BytesIO()
+
+    with closing( requests.get(url, stream=True, timeout=timeout) ) as request:
+        stream.stream_response_to_file( request, buf )
+
+    zipper = zipfile.ZipFile(buf)
+    zipper.extractall(path=directory, members=members)
+    zipper.close()
+
+
+def stream_file_over_http(url, file_path, timeout=(9.05, 31.1)):
+    ''' Supply an http get request and stream the response to a file.
+
+    Parameters
+    ----------
+    url : str
+        Send the request to this url
+    file_path : str
+        Stream the response to this path
+    timeout : float or tuple of float, optional
+        Specify a timeout for the request. If a tuple, specify seperate connect 
+        and read timeouts.
+
+    '''
+
+    with closing(requests.get(url, stream=True, timeout=timeout)) as response:
+
+        response.raise_for_status()
+        with open(file_path, 'wb') as fil:
+            stream.stream_response_to_file(response, path=fil)

@@ -1,29 +1,53 @@
-# Copyright 2016-2017 Allen Institute for Brain Science
-# This file is part of Allen SDK.
+# Allen Institute Software License - This software license is the 2-clause BSD
+# license plus a third clause that prohibits redistribution for commercial
+# purposes without further permission.
 #
-# Allen SDK is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, version 3 of the License.
+# Copyright 2016-2017. Allen Institute. All rights reserved.
 #
-# Allen SDK is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# Merchantability Or Fitness FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
 #
-# You should have received a copy of the GNU General Public License
-
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+#
+# 3. Redistributions for commercial purposes are not permitted without the
+# Allen Institute's written permission.
+# For purposes of this license, commercial purposes is the incorporation of the
+# Allen Institute's software into anything for which you will charge fees or
+# other compensation. Contact terms@alleninstitute.org for commercial licensing
+# opportunities.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
 from allensdk.api.queries.glif_api import GlifApi
 import numpy as np
 import pytest
 import os
 
+
 @pytest.fixture
 def neuronal_model_id():
     return 566283950
 
+
 @pytest.fixture
 def specimen_id():
     return 325464516
+
 
 @pytest.fixture
 def glif_api():
@@ -64,23 +88,30 @@ def test_get_neuronal_model_templates(glif_api):
 @pytest.mark.skipif(glif_api() is None, reason='No TEST_API_ENDPOINT set.')
 def test_get_neuronal_models(glif_api, specimen_id):
 
-    model = glif_api.get_neuronal_models([specimen_id])
+    cells = glif_api.get_neuronal_models([specimen_id])
 
-    assert len(model) == 1
-    assert len(model[0]['neuronal_models']) == 2
+    assert len(cells) == 1
+    assert len(cells[0]['neuronal_models']) == 2
+
+@pytest.mark.skipif(glif_api() is None, reason='No TEST_API_ENDPOINT set.')
+def test_get_neuronal_models_no_ids(glif_api):
+    cells = glif_api.get_neuronal_models()
+    assert len(cells) > 0
 
 
 @pytest.mark.skipif(glif_api() is None, reason='No TEST_API_ENDPOINT set.')
 def test_get_neuron_configs(glif_api, specimen_id):
     model = glif_api.get_neuronal_models([specimen_id])
 
-    neuronal_model_id = model[0]['neuronal_models'][0]['id']
-    assert neuronal_model_id == 566283950
+    neuronal_model_ids = [nm['id'] for nm in model[0]['neuronal_models']]
+    assert set(neuronal_model_ids) == set((566283950, 566283946))
 
-    np.testing.assert_almost_equal(glif_api.get_neuron_configs([neuronal_model_id])[neuronal_model_id]['th_inf'], 0.024561992461740227)
+    test_id = 566283950 
+
+    np.testing.assert_almost_equal(glif_api.get_neuron_configs([test_id])[test_id]['th_inf'], 0.024561992461740227)
 
 @pytest.mark.skipif(glif_api() is None, reason='No TEST_API_ENDPOINT set.')
-def test_deprecated(glif_api, neuronal_model_id):
+def test_deprecated(fn_temp_dir, glif_api, neuronal_model_id):
 
     # Exercising deprecated functionality
     len(glif_api.list_neuronal_models())
@@ -93,5 +124,6 @@ def test_deprecated(glif_api, neuronal_model_id):
     glif_api.get_neuronal_model(neuronal_model_id)
     x = glif_api.get_neuron_config()
 
+    nwb_path = os.path.join(fn_temp_dir, 'tmp.nwb')
     glif_api.get_neuronal_model(neuronal_model_id)
-    glif_api.cache_stimulus_file('tmp.nwb')
+    glif_api.cache_stimulus_file(nwb_path)

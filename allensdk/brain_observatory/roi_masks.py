@@ -1,21 +1,43 @@
-# Copyright 2016 Allen Institute for Brain Science
-# This file is part of Allen SDK.
+# Allen Institute Software License - This software license is the 2-clause BSD
+# license plus a third clause that prohibits redistribution for commercial
+# purposes without further permission.
 #
-# Allen SDK is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, version 3 of the License.
+# Copyright 2017. Allen Institute. All rights reserved.
 #
-# Allen SDK is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
 #
-# You should have received a copy of the GNU General Public License
-# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+#
+# 3. Redistributions for commercial purposes are not permitted without the
+# Allen Institute's written permission.
+# For purposes of this license, commercial purposes is the incorporation of the
+# Allen Institute's software into anything for which you will charge fees or
+# other compensation. Contact terms@alleninstitute.org for commercial licensing
+# opportunities.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
 import numpy as np
 import math
 import scipy.ndimage.morphology as morphology
 import logging
+import h5py
 
 # constants used for accessing border array
 RIGHT_SHIFT = 0
@@ -65,7 +87,7 @@ class Mask(object):
         self.y = 0
         self.height = 0
         self.mask = None
-        self.valid = True
+        self.overlaps_motion_border = False
         # label is for distinguishing neuropil from ROI, in case
         #   these masks are mixed together
         self.label = label
@@ -89,7 +111,7 @@ class Mask(object):
             List of pixel coordinates (x,y) that define the mask
         '''
         assert pix_list.shape[1] == 2, "Pixel list not properly formed"
-        array = np.zeros((self.img_rows, self.img_cols))
+        array = np.zeros((self.img_rows, self.img_cols), dtype=bool)
 
         # pix_list stores array of [x,y] coordinates
         array[pix_list[:, 1], pix_list[:, 0]] = 1
@@ -215,9 +237,9 @@ class RoiMask(Mask):
 
         # if ROI crosses border, it's considered invalid
         if left < l_inset or right > r_inset:
-            self.valid = False
+            self.overlaps_motion_border = True
         if top < t_inset or bottom > b_inset:
-            self.valid = False
+            self.overlaps_motion_border = True
         #
         self.x = left
         self.width = right - left + 1
@@ -342,7 +364,7 @@ class NeuropilMask(Mask):
         self.mask = array[top:bottom + 1, left:right + 1]
 
 
-def calculate_traces(stack, mask_list):
+def calculate_traces(stack, mask_list, block_size=100):
     '''
     Calculates the average response of the specified masks in the
     image stack
@@ -360,35 +382,86 @@ def calculate_traces(stack, mask_list):
     float[number masks][number frames]
         This is the average response for each Mask in each image frame
     '''
-    traces = np.zeros((len(mask_list), stack.shape[0]))
+    traces = np.zeros((len(mask_list), stack.shape[0]), dtype=float)
     num_frames = stack.shape[0]
+
     # make sure masks are numpy objects
-    for mask in mask_list:
+    mask_areas = np.zeros(len(mask_list), dtype=float)
+    valid_masks = np.ones(len(mask_list), dtype=bool)
+
+    for i,mask in enumerate(mask_list):
         if not isinstance(mask.mask, np.ndarray):
             mask.mask = np.array(mask.mask)
+
+        # compute mask areas
+        mask_areas[i] = mask.mask.sum()
+
+        # if the mask is empty, the trace is nan
+        if mask_areas[i] == 0:
+            logging.warning("mask '%d/%s' is empty", i, mask.label)
+            traces[i,:] = np.nan
+            valid_masks[i] = False
+
+        # if the mask overlaps the motion border, the trace is nan
+        if mask.overlaps_motion_border:
+            logging.warning("mask '%d/%s' overlaps with motion border", i, mask.label)
+            traces[i,:] = np.nan
+            valid_masks[i] = False
+
     # calculate traces
-    for frame_num in range(num_frames):
+    for frame_num in range(0, num_frames, block_size):
         if frame_num % 1000 == 0:
             logging.debug("frame " + str(frame_num) + " of " + str(num_frames))
-        frame = stack[frame_num]
-        mask = None
-        try:
-            for i in range(len(mask_list)):
-                mask = mask_list[i]
-                subframe = frame[mask.y:mask.y +
-                                 mask.height, mask.x:mask.x + mask.width]
-                total = (subframe * mask.mask).sum(axis=-1).sum(axis=-1)
-                area = (mask.mask).sum(axis=-1).sum(axis=-1)
-                tvals = total / area
-                traces[i][frame_num] = tvals
-        except:
-            logging.error("Error encountered processing mask during frame %d" % frame_num)
-            if mask is not None:
-                logging.error(subframe.shape)
-                logging.error(mask.mask.shape)
-                logging.error(mask)
-            raise
+        frames = stack[frame_num:frame_num+block_size]
+
+        for i in range(len(mask_list)):
+            if valid_masks[i] is False:
+                continue
+
+            mask = mask_list[i]
+            subframe = frames[:,mask.y:mask.y + mask.height, 
+                                mask.x:mask.x + mask.width]
+
+            total = subframe[:, mask.mask].sum(axis=1)
+            traces[i, frame_num:frame_num+block_size] = total / mask_areas[i]
     return traces
+
+def calculate_roi_and_neuropil_traces(movie_h5, roi_mask_list, motion_border):
+    """ get roi and neuropil masks """
+
+    # a combined binary mask for all ROIs (this is used to 
+    #   subtracted ROIs from annuli
+    mask_array = create_roi_mask_array(roi_mask_list)
+    combined_mask = mask_array.max(axis=0)
+
+    logging.info("%d total ROIs" % len(roi_mask_list))
+
+    # create neuropil masks for the central ROIs
+    neuropil_masks = []
+    for m in roi_mask_list:
+        nmask = create_neuropil_mask(m, motion_border, combined_mask, "neuropil for " + m.label)
+        neuropil_masks.append(nmask)
+
+    # calculate fluorescence traces for valid ROI and neuropil masks
+    # create a combined list and calculate these together (this lets us
+    #   read the large image stack only once)
+    combined_list = []
+    for m in roi_mask_list:
+        combined_list.append(m)
+    for n in neuropil_masks:
+        combined_list.append(n)
+
+    with h5py.File(movie_h5, "r") as movie_f:
+        stack_frames = movie_f["data"]
+
+        logging.info("Calculating %d traces (neuropil + ROI) over %d frames" % (len(combined_list), len(stack_frames)))
+        traces = calculate_traces(stack_frames, combined_list)
+
+        roi_traces = traces[:len(roi_mask_list)]
+        neuropil_traces = traces[len(roi_mask_list):]
+
+    return roi_traces, neuropil_traces
+
 
 
 def create_roi_mask_array(rois):
@@ -413,3 +486,4 @@ def create_roi_mask_array(rois):
     else:
         masks = None
     return masks
+

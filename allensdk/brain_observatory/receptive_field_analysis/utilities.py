@@ -1,18 +1,38 @@
-# Copyright 2017 Allen Institute for Brain Science
-# This file is part of Allen SDK.
+# Allen Institute Software License - This software license is the 2-clause BSD
+# license plus a third clause that prohibits redistribution for commercial
+# purposes without further permission.
 #
-# Allen SDK is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, version 3 of the License.
+# Copyright 2017. Allen Institute. All rights reserved.
 #
-# Allen SDK is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
 #
-# You should have received a copy of the GNU General Public License
-# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
-
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+#
+# 3. Redistributions for commercial purposes are not permitted without the
+# Allen Institute's written permission.
+# For purposes of this license, commercial purposes is the incorporation of the
+# Allen Institute's software into anything for which you will charge fees or
+# other compensation. Contact terms@alleninstitute.org for commercial licensing
+# opportunities.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
 from scipy.ndimage.filters import gaussian_filter
 import numpy as np
 import scipy.interpolate as spinterp
@@ -91,7 +111,7 @@ def get_A_blur(data, stimulus):
     A = get_A(data, stimulus).copy()
 
 
-    number_of_pixels = A.shape[0] / 2
+    number_of_pixels = A.shape[0] // 2
     for fi in range(A.shape[1]):
         A[:number_of_pixels,fi] = convolve(A[:number_of_pixels, fi].reshape(stimulus_template.shape[1], stimulus_template.shape[2])).flatten()
         A[number_of_pixels:,fi] = convolve(A[number_of_pixels:, fi].reshape(stimulus_template.shape[1], stimulus_template.shape[2])).flatten()
@@ -102,15 +122,17 @@ def get_A_blur(data, stimulus):
 def get_shuffle_matrix(data, event_vector, A, number_of_shuffles=5000, response_detection_error_std_dev=.1):
 
     number_of_events = event_vector.sum()
-    number_of_pixels = A.shape[0] / 2
+    number_of_pixels = A.shape[0] // 2
     shuffle_data = np.zeros((2*number_of_pixels, number_of_shuffles))
+    evr = range(len(event_vector))
     for ii in range(number_of_shuffles):
 
         size = number_of_events + int(np.round(response_detection_error_std_dev*number_of_events*np.random.randn()))
-        shuffled_event_inds = np.random.choice(range(len(event_vector)), size=size, replace=False)
-        b_tmp = np.zeros(len(event_vector))
-        b_tmp[shuffled_event_inds] = 1
-        shuffle_data[:, ii] = A.dot(b_tmp)/float(size)
+        shuffled_event_inds = np.random.choice(evr, size=size, replace=False)
+
+        b_tmp = np.zeros(len(event_vector), dtype=np.bool)
+        b_tmp[shuffled_event_inds] = True
+        shuffle_data[:, ii] = A[:,b_tmp].sum(axis=1)/float(size)
 
     return shuffle_data
 
@@ -123,7 +145,7 @@ def get_sparse_noise_epoch_mask_list(st, number_of_acquisition_frames, threshold
 
     if len(cut_inds) > 2:
         warnings.warn('more than 2 epochs cut')
-        print('    ', len(delta), cut_inds)
+        print('    %d %d' % (len(delta), cut_inds))
 
     for ii in range(len(cut_inds)+1):
 
@@ -174,10 +196,10 @@ def smooth(x,window_len=11,window='hanning', mode='valid'):
     """
 
     if x.ndim != 1:
-        raise ValueError, "smooth only accepts 1 dimension arrays."
+        raise ValueError("smooth only accepts 1 dimension arrays.")
 
     if x.size < window_len:
-        raise ValueError, "Input vector needs to be bigger than window size."
+        raise ValueError("Input vector needs to be bigger than window size.")
 
 
     if window_len<3:
@@ -185,7 +207,7 @@ def smooth(x,window_len=11,window='hanning', mode='valid'):
 
 
     if not window in ['flat', 'hanning', 'hamming', 'bartlett', 'blackman']:
-        raise ValueError, "Window is on of 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'"
+        raise ValueError("Window is on of 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'")
 
 
     s=np.r_[x[window_len-1:0:-1],x,x[-1:-window_len:-1]]

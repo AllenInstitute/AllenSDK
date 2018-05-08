@@ -1,24 +1,50 @@
-# Copyright 2016 Allen Institute for Brain Science
-# This file is part of Allen SDK.
+# Allen Institute Software License - This software license is the 2-clause BSD
+# license plus a third clause that prohibits redistribution for commercial
+# purposes without further permission.
 #
-# Allen SDK is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, version 3 of the License.
+# Copyright 2017. Allen Institute. All rights reserved.
 #
-# Allen SDK is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# Merchantability Or Fitness FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
 #
-# You should have received a copy of the GNU General Public License
-# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
-
-
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+#
+# 3. Redistributions for commercial purposes are not permitted without the
+# Allen Institute's written permission.
+# For purposes of this license, commercial purposes is the incorporation of the
+# Allen Institute's software into anything for which you will charge fees or
+# other compensation. Contact terms@alleninstitute.org for commercial licensing
+# opportunities.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
+import functools
 import numpy as np
 from pkg_resources import resource_filename  # @UnresolvedImport
-from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
+from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet, si
+import allensdk.core.brain_observatory_nwb_data_set as bonds
 import pytest
 import os
+import h5py
+
+from allensdk.brain_observatory.brain_observatory_exceptions import MissingStimulusException
+
+from test_h5_utilities import mem_h5
 
 
 NWB_FLAVORS = []
@@ -41,6 +67,32 @@ def data_set(request):
     data_set = BrainObservatoryNwbDataSet(request.param)
 
     return data_set
+
+
+@pytest.fixture
+def stim_pres_h5(mem_h5):
+    def make_stim_pres_h5(stimulus_name):
+        mem_h5.create_group('stimulus/presentation/{}'.format(stimulus_name))
+        mem_h5.create_group('stimulus/not_presentation/{}'.format(stimulus_name))
+        return mem_h5
+    return make_stim_pres_h5
+
+
+@pytest.fixture
+def abstract_feature_series_h5(mem_h5):
+    def make_abstract_feature_series_h5(stimulus_name, stim_data, features, frame_dur):
+        
+        stimulus_path = 'stimulus/presentation/{}'.format(stimulus_name)
+        frame_dur_path = '{}/frame_duration'.format(stimulus_path)
+        features_path = '{}/features'.format(stimulus_path)
+        stim_data_path = '{}/data'.format(stimulus_path)
+
+        mem_h5[frame_dur_path] = frame_dur
+        mem_h5[stim_data_path] = stim_data
+        mem_h5[features_path] = features
+
+        return mem_h5
+    return make_abstract_feature_series_h5
 
 
 def test_acceptance(data_set):
@@ -200,3 +252,135 @@ def test_get_roi_mask_array(data_set):
         arr = data_set.get_roi_mask_array([0])
     except ValueError as e:
         assert str(e).startswith("Cell specimen not found")
+
+
+@pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
+                    reason="test NWB file not available")
+def test_get_stimulus_epoch_table(data_set):
+
+    summary_df = data_set.get_stimulus_epoch_table()
+
+    session_type = data_set.get_session_type()
+    if session_type == si.THREE_SESSION_A or si.THREE_SESSION_C:
+        assert len(summary_df) == 7
+    elif session_type == si.THREE_SESSION_B:
+        assert len(summary_df) == 8
+    elif session_type == si.THREE_SESSION_C2:
+        assert len(summary_df) == 10
+    else:
+        raise NotImplementedError('Code not tested for session of type: %s' % session_type)
+
+@pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
+                    reason="test NWB file not available")
+def test_get_stimulus_table_master(data_set):
+
+    master_df = data_set.get_stimulus_table('master')
+
+    session_type = data_set.get_session_type()
+    if session_type == si.THREE_SESSION_A:
+        assert len(master_df) == 45629
+    elif session_type == si.THREE_SESSION_B:
+        assert len(master_df) == 20951
+    elif session_type == si.THREE_SESSION_C:
+        assert len(master_df) == 26882
+    elif session_type == si.THREE_SESSION_C2:
+        assert len(master_df) == 29398
+    else:
+        raise NotImplementedError('Code not tested for session of type: %s' % session_type)
+
+
+def test_make_indexed_time_series_stimulus_table():
+
+    stimulus_name = 'fish'
+    frame_dur_exp = np.arange(20).reshape((10, 2))
+    inds_exp = np.arange(10)
+
+    obt = bonds._make_indexed_time_series_stimulus_table(inds_exp, frame_dur_exp)
+
+    frame_dur_obt = np.array([ obt['start'].values, obt['end'].values ]).T
+    assert(np.allclose( frame_dur_obt, frame_dur_exp ))
+
+
+def test_make_indexed_time_series_stimulus_table_out_of_order():
+
+    stimulus_name = 'fish'
+    frame_dur_exp = np.arange(20).reshape((10, 2))
+    frame_dur_file = frame_dur_exp.copy()[::-1, :]
+    inds_exp = np.arange(10)
+
+    obt = bonds._make_indexed_time_series_stimulus_table(inds_exp, frame_dur_file)
+
+    frame_dur_obt = np.array([ obt['start'].values, obt['end'].values ]).T
+    assert(np.allclose( frame_dur_obt, frame_dur_exp ))
+
+
+def test_make_abstract_feature_series_stimulus_table_out_of_order():
+
+    stimulus_name = 'fish'
+    frame_dur_exp = np.arange(20).reshape((10, 2))
+    frame_dur_file = frame_dur_exp.copy()[::-1, :]
+    features_exp = ['orientation', 'spatial_frequency', 'phase']
+    data_exp = np.arange(30).reshape((10, 3))
+    data_file = data_exp.copy()[::-1, :]
+
+    obt = bonds._make_abstract_feature_series_stimulus_table(data_file, features_exp, frame_dur_file)
+
+    frame_dur_obt = np.array([ obt['start'].values, obt['end'].values ]).T
+    assert(np.allclose( frame_dur_obt, frame_dur_exp ))
+
+    data_obt = np.array([ obt['orientation'].values, obt['spatial_frequency'].values, obt['phase'].values ]).T
+    assert(np.allclose( data_obt, data_exp ))
+
+
+def test_make_spontanous_activity_stimulus_table():
+
+    table_values_exp = [[0, 2], [4, 6]]
+
+    frame_dur = np.arange(8).reshape((4, 2))
+    events = np.array([ 1, -1, 1, -1 ])
+
+    obt = bonds._make_spontaneous_activity_stimulus_table(events, frame_dur)
+    assert(np.allclose( obt.values, table_values_exp ))
+
+
+def test_make_repeated_indexed_time_series_stimulus_table():
+
+    stimulus_name = 'fish'
+    frame_dur_exp = np.arange(20).reshape((10, 2))
+    inds_exp = np.array([0, 1, 2, 3, 4, 0, 1, 2, 3, 4])
+    repeats_exp = np.array([0] * 5 + [1] * 5)
+    
+    obt = bonds._make_repeated_indexed_time_series_stimulus_table(inds_exp, frame_dur_exp)
+
+    frame_dur_obt = np.array([ obt['start'].values, obt['end'].values ]).T
+    assert(np.allclose( frame_dur_obt, frame_dur_exp ))
+    assert(np.allclose( repeats_exp, obt['repeat'] ))
+
+
+def test_find_stimulus_presentation_group(stim_pres_h5):
+
+    stimulus_name = 'fish'
+    stim_pres_h5 = stim_pres_h5(stimulus_name)
+
+    obt = bonds._find_stimulus_presentation_group(stim_pres_h5, stimulus_name)
+
+    assert( obt.name == '/stimulus/presentation/fish' )
+
+
+def test_find_stimulus_presentation_group_missing(stim_pres_h5):
+
+    stimulus_name = 'fish'
+    stim_pres_h5 = stim_pres_h5('fowl')
+
+    with pytest.raises(MissingStimulusException):
+        obt = bonds._find_stimulus_presentation_group(stim_pres_h5, stimulus_name)
+
+
+def test_find_stimulus_presentation_group_duplicate(stim_pres_h5):
+
+    stimulus_name = 'fish'
+    stim_pres_h5 = stim_pres_h5('fish')
+    stim_pres_h5.create_group('/stimulus/presentation/fish_stimulus')
+
+    with pytest.raises(MissingStimulusException):
+        obt = bonds._find_stimulus_presentation_group(stim_pres_h5, stimulus_name)

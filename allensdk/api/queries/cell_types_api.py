@@ -1,18 +1,38 @@
-# Copyright 2015-2016 Allen Institute for Brain Science
-# This file is part of Allen SDK.
+# Allen Institute Software License - This software license is the 2-clause BSD
+# license plus a third clause that prohibits redistribution for commercial
+# purposes without further permission.
 #
-# Allen SDK is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, version 3 of the License.
+# Copyright 2015-2016. Allen Institute. All rights reserved.
 #
-# Allen SDK is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
 #
-# You should have received a copy of the GNU General Public License
-# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
-
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+#
+# 3. Redistributions for commercial purposes are not permitted without the
+# Allen Institute's written permission.
+# For purposes of this license, commercial purposes is the incorporation of the
+# Allen Institute's software into anything for which you will charge fees or
+# other compensation. Contact terms@alleninstitute.org for commercial licensing
+# opportunities.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
 from .rma_api import RmaApi
 from ..cache import cacheable
 from allensdk.config.manifest import Manifest
@@ -24,6 +44,9 @@ class CellTypesApi(RmaApi):
     SWC_FILE_TYPE = '3DNeuronReconstruction'
     MARKER_FILE_TYPE = '3DNeuronMarker'
 
+    MOUSE = 'Mus musculus'
+    HUMAN = 'Homo Sapiens'
+
     def __init__(self, base_uri=None):
         super(CellTypesApi, self).__init__(base_uri)
 
@@ -31,7 +54,8 @@ class CellTypesApi(RmaApi):
                    id=None, 
                    require_morphology=False, 
                    require_reconstruction=False, 
-                   reporter_status=None):
+                   reporter_status=None,
+                   species=None):
         """
         Query the API for a list of all cells in the Cell Types Database.
 
@@ -49,6 +73,10 @@ class CellTypesApi(RmaApi):
         reporter_status: list
             Return cells that have a particular cell reporter status.
 
+        species: list
+            Filter for cells that belong to one or more species.  If None, return all.
+            Must be one of [ CellTypesApi.MOUSE, CellTypesApi.HUMAN ].
+
         Returns
         -------
         list
@@ -58,9 +86,9 @@ class CellTypesApi(RmaApi):
         if id:
             criteria = "[id$eq'%d']" % id
         else:
-            criteria = "[is_cell_specimen$eq'true'],products[name$eq'Mouse Cell Types'],ephys_result[failed$eqfalse]"
+            criteria = "[is_cell_specimen$eq'true'],products[name$in'Mouse Cell Types','Human Cell Types'],ephys_result[failed$eqfalse]"
         
-        include = ('structure,donor(transgenic_lines),specimen_tags,cell_soma_locations,' +
+        include = ('structure,cortex_layer,donor(transgenic_lines,organism,conditions),specimen_tags,cell_soma_locations,' +
                    'ephys_features,data_sets,neuron_reconstructions,cell_reporter')
 
         cells = self.model_query(
@@ -85,9 +113,26 @@ class CellTypesApi(RmaApi):
                     cell['transgenic_line'] = tl['name']
 
             # cell reporter status
-            cell['reporter_status'] = cell['cell_reporter']['name']
+            cell['reporter_status'] = cell.get('cell_reporter', {}).get('name', None)
 
-        result = self.filter_cells(cells, require_morphology, require_reconstruction, reporter_status)
+            # species
+            cell['species'] = cell.get('donor',{}).get('organism',{}).get('name', None)
+
+            # conditions (whitelist)
+            condition_types = [ 'disease categories' ]
+            condition_keys = dict(zip(condition_types, 
+                                      [ ct.replace(' ', '_') for ct in condition_types ]))
+            for ct, ck in condition_keys.items():
+                cell[ck] = []
+
+            conditions = cell.get('donor',{}).get('conditions', [])
+            for condition in conditions:
+                c_type, c_val = condition['name'].split(' - ')
+                if c_type in condition_keys:
+                    cell[condition_keys[c_type]].append(c_val)
+
+        result = self.filter_cells(cells, require_morphology, require_reconstruction, reporter_status, species)
+
         return result
 
     def get_cell(self, id):
@@ -124,7 +169,7 @@ class CellTypesApi(RmaApi):
             'EphysSweep', criteria=criteria, num_rows='all')
         return sorted(sweeps, key=lambda x: x['sweep_number'])
 
-    def filter_cells(self, cells, require_morphology, require_reconstruction, reporter_status):
+    def filter_cells(self, cells, require_morphology, require_reconstruction, reporter_status, species):
         """
         Filter a list of cell specimens to those that optionally have morphologies
         or have morphological reconstructions.
@@ -143,6 +188,10 @@ class CellTypesApi(RmaApi):
 
         reporter_status: list
             Filter for cells that have a particular cell reporter status
+
+        species: list
+            Filter for cells that belong to one or more species.  If None, return all.
+            Must be one of [ CellTypesApi.MOUSE, CellTypesApi.HUMAN ].
         """
 
         if require_morphology:
@@ -154,6 +203,10 @@ class CellTypesApi(RmaApi):
         if reporter_status:
             cells = [c for c in cells if c[
                 'reporter_status'] in reporter_status]
+
+        if species:
+            species_lower = [ s.lower() for s in species ]
+            cells = [c for c in cells if c['donor']['organism']['name'].lower() in species_lower]
 
         return cells
 

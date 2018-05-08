@@ -1,18 +1,38 @@
-# Copyright 2016 Allen Institute for Brain Science
-# This file is part of Allen SDK.
+# Allen Institute Software License - This software license is the 2-clause BSD
+# license plus a third clause that prohibits redistribution for commercial
+# purposes without further permission.
 #
-# Allen SDK is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, version 3 of the License.
+# Copyright 2017. Allen Institute. All rights reserved.
 #
-# Allen SDK is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# Merchantability Or Fitness FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
 #
-# You should have received a copy of the GNU General Public License
-# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
-
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+#
+# 3. Redistributions for commercial purposes are not permitted without the
+# Allen Institute's written permission.
+# For purposes of this license, commercial purposes is the incorporation of the
+# Allen Institute's software into anything for which you will charge fees or
+# other compensation. Contact terms@alleninstitute.org for commercial licensing
+# opportunities.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
 import pytest
 from allensdk.api.queries.glif_api import GlifApi
 import allensdk.core.json_utilities as json_utilities
@@ -21,6 +41,17 @@ from allensdk.model.glif.simulate_neuron import simulate_neuron
 from allensdk.core.nwb_data_set import NwbDataSet
 import os
 # import matplotlib.pyplot as plt
+
+
+@pytest.fixture
+def neuron_config_file(fn_temp_dir):
+    return os.path.join(fn_temp_dir, "neuron_config.json")
+
+
+@pytest.fixture
+def ephys_sweeps_file(fn_temp_dir):
+    return os.path.join(fn_temp_dir, "ephys_sweeps.json")
+
 
 @pytest.fixture
 def glif_api():
@@ -32,6 +63,7 @@ def glif_api():
     else:
         return GlifApi()
 
+
 @pytest.fixture
 def neuronal_model_id():
     neuronal_model_id = 566302806
@@ -40,9 +72,24 @@ def neuronal_model_id():
 
 
 @pytest.fixture
-def output():
-    neuron_config = json_utilities.read('neuron_config.json')
-    ephys_sweeps = json_utilities.read('ephys_sweeps.json')
+def configured_glif_api(glif_api, neuronal_model_id, neuron_config_file,
+                        ephys_sweeps_file):
+    glif_api.get_neuronal_model(neuronal_model_id)
+
+    neuron_config = glif_api.get_neuron_config()
+    json_utilities.write(neuron_config_file, neuron_config)
+
+    ephys_sweeps = glif_api.get_ephys_sweeps()
+    json_utilities.write(ephys_sweeps_file, ephys_sweeps)
+
+    return glif_api
+
+
+
+@pytest.fixture
+def output(neuron_config_file, ephys_sweeps_file):
+    neuron_config = json_utilities.read(neuron_config_file)
+    ephys_sweeps = json_utilities.read(ephys_sweeps_file)
     ephys_file_name = 'stimulus.nwb'
 
     # pull out the stimulus for the first sweep
@@ -63,20 +110,30 @@ def output():
     return output
 
 
-def test_1(glif_api, neuronal_model_id):
-    glif_api.get_neuronal_model(neuronal_model_id)
-    glif_api.cache_stimulus_file('stimulus.nwb')
+@pytest.fixture
+def stimulus(neuron_config_file, ephys_sweeps_file):
+    neuron_config = json_utilities.read(neuron_config_file)
+    ephys_sweeps = json_utilities.read(ephys_sweeps_file)
+    ephys_file_name = 'stimulus.nwb'
 
-    neuron_config = glif_api.get_neuron_config()
-    json_utilities.write('neuron_config.json', neuron_config)
+    # pull out the stimulus for the first sweep
+    ephys_sweep = ephys_sweeps[0]
+    ds = NwbDataSet(ephys_file_name)
+    data = ds.get_sweep(ephys_sweep['sweep_number'])
+    stimulus = data['stimulus']
 
-    ephys_sweeps = glif_api.get_ephys_sweeps()
-    json_utilities.write('ephys_sweeps.json', ephys_sweeps)
+    return stimulus
 
 
-def test_2():
+def test_cache_stimulus(neuron_config_file, ephys_sweeps_file, fn_temp_dir,
+                        configured_glif_api):
+    nwb_path = os.path.join(fn_temp_dir, 'stimulus.nwb')
+    configured_glif_api.cache_stimulus_file(nwb_path)
+
+
+def test_run_glifneuron(configured_glif_api, neuron_config_file):
     # initialize the neuron
-    neuron_config = json_utilities.read('neuron_config.json')
+    neuron_config = json_utilities.read(neuron_config_file)
     neuron = GlifNeuron.from_dict(neuron_config)
 
     # make a short square pulse. stimulus units should be in Amps.
@@ -94,9 +151,9 @@ def test_2():
 
 
 @pytest.mark.skipif(True, reason="needs nwb file")
-def test_3():
-    neuron_config = json_utilities.read('neuron_config.json')
-    ephys_sweeps = json_utilities.read('ephys_sweeps.json')
+def test_3(configured_glif_api, neuron_config_file, ephys_sweeps_file):
+    neuron_config = json_utilities.read(neuron_config_file)
+    ephys_sweeps = json_utilities.read(ephys_sweeps_file)
     ephys_file_name = 'stimulus.nwb'
 
     neuron = GlifNeuron.from_dict(neuron_config)
@@ -106,21 +163,6 @@ def test_3():
     sweep_numbers = [7]
     simulate_neuron(neuron, sweep_numbers,
                     ephys_file_name, ephys_file_name, 0.05)
-
-
-@pytest.fixture
-def stimulus():
-    neuron_config = json_utilities.read('neuron_config.json')
-    ephys_sweeps = json_utilities.read('ephys_sweeps.json')
-    ephys_file_name = 'stimulus.nwb'
-
-    # pull out the stimulus for the first sweep
-    ephys_sweep = ephys_sweeps[0]
-    ds = NwbDataSet(ephys_file_name)
-    data = ds.get_sweep(ephys_sweep['sweep_number'])
-    stimulus = data['stimulus']
-
-    return stimulus
 
 
 @pytest.mark.skipif(True, reason="needs nwb file")
@@ -184,14 +226,14 @@ def test_5(output):
 
 
 @pytest.mark.skipif(True, reason="needs nwb file")
-def test_6(stimulus):
+def test_6(configured_glif_api, neuron_config_file, stimulus):
     # define your own custom voltage reset rule
     # this one linearly scales the input voltage
     def custom_voltage_reset_rule(neuron, voltage_t0, custom_param_a, custom_param_b):
         return custom_param_a * voltage_t0 + custom_param_b
 
     # initialize a neuron from a neuron config file
-    neuron_config = json_utilities.read('neuron_config.json')
+    neuron_config = json_utilities.read(neuron_config_file)
     neuron = GlifNeuron.from_dict(neuron_config)
 
     # configure a new method and overwrite the neuron's old method

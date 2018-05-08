@@ -1,40 +1,66 @@
-# Copyright 2015-2017 Allen Institute for Brain Science
-# This file is part of Allen SDK.
+# Allen Institute Software License - This software license is the 2-clause BSD
+# license plus a third clause that prohibits redistribution for commercial
+# purposes without further permission.
 #
-# Allen SDK is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, version 3 of the License.
+# Copyright 2015-2017. Allen Institute. All rights reserved.
 #
-# Allen SDK is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
 #
-# You should have received a copy of the GNU General Public License
-# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
-
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+#
+# 3. Redistributions for commercial purposes are not permitted without the
+# Allen Institute's written permission.
+# For purposes of this license, commercial purposes is the incorporation of the
+# Allen Institute's software into anything for which you will charge fees or
+# other compensation. Contact terms@alleninstitute.org for commercial licensing
+# opportunities.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
 from allensdk.config.manifest import Manifest, ManifestVersionError
+from allensdk.config.manifest_builder import ManifestBuilder
 import allensdk.core.json_utilities as ju
+from allensdk.deprecated import deprecated
+
 import pandas as pd
 import pandas.io.json as pj
+
 import functools
+from functools import wraps
 import os
 import logging
-from allensdk.deprecated import deprecated
 import csv
 
+
 def memoize(f):
-    """ Memoization decorator for a function taking one or more arguments. """
-    class memodict(dict):
-        def __getitem__(self, *key, **kwargs):
-            return dict.__getitem__(self, (key, tuple(kwargs.items())))
+   memodict = dict()
 
-        def __missing__(self, key):
+   @wraps(f)
+   def wrapper(*args, **kwargs):
+       key = (args, tuple(kwargs.items()))
 
-            ret = self[key] = f(*key[0], **dict(key[1]))
-            return ret
+       if key not in memodict:
+           memodict[key] = f(*args, **kwargs)
 
-    return memodict().__getitem__
+       return memodict[key]
+
+   return wrapper
 
 class Cache(object):
     _log = logging.getLogger('allensdk.api.cache')
@@ -42,7 +68,8 @@ class Cache(object):
     def __init__(self,
                  manifest=None,
                  cache=True,
-                 version=None):
+                 version=None, 
+                 **kwargs):
         self.cache = cache
         self.load_manifest(manifest, version)
 
@@ -101,19 +128,35 @@ class Cache(object):
                                             " and it will be regenerated for you the next"
                                             " time you instantiate this class.") % (file_name, e.found_version, e.version),
                                            e.version, e.found_version)
+
+            self.manifest_path = file_name
         else:
             self.manifest = None
 
     def build_manifest(self, file_name):
-        '''Creation of default path speifications.
+        '''Creation of default path specifications.
 
         Parameters
         ----------
         file_name : string
             where to save it
         '''
-        raise Exception(
-            "This function must be defined in the appropriate subclass")
+
+        manifest_builder = ManifestBuilder()
+        manifest_builder.set_version(self.MANIFEST_VERSION)
+        
+        manifest_builder = self.add_manifest_paths(manifest_builder)
+
+        manifest_builder.write_json_file(file_name)
+
+
+    def add_manifest_paths(self, manifest_builder):
+        '''Add cache-class specific paths to the manifest. In derived classes, 
+        should call super.
+        '''
+        manifest_builder.add_path('BASEDIR', '.')
+        return manifest_builder
+
 
     def manifest_dataframe(self):
         '''Convenience method to view manifest as a pandas dataframe.
@@ -313,7 +356,7 @@ class Cache(object):
         with open(pth, 'w') as output:
             for row in gen:
                 if first_row:
-                    field_names = map(str, row.keys())
+                    field_names = [ str(k) for k in row.keys() ]
                     csv_writer = csv.DictWriter(output,
                                                 fieldnames=field_names,
                                                 delimiter=',',

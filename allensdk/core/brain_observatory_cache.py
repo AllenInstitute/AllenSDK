@@ -1,18 +1,38 @@
-# Copyright 2016 Allen Institute for Brain Science
-# This file is part of Allen SDK.
+# Allen Institute Software License - This software license is the 2-clause BSD
+# license plus a third clause that prohibits redistribution for commercial
+# purposes without further permission.
 #
-# Allen SDK is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, version 3 of the License.
+# Copyright 2017. Allen Institute. All rights reserved.
 #
-# Allen SDK is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
 #
-# You should have received a copy of the GNU General Public License
-# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
-
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+#
+# 3. Redistributions for commercial purposes are not permitted without the
+# Allen Institute's written permission.
+# For purposes of this license, commercial purposes is the incorporation of the
+# Allen Institute's software into anything for which you will charge fees or
+# other compensation. Contact terms@alleninstitute.org for commercial licensing
+# opportunities.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
 import os
 from . import json_utilities as ju
 from allensdk.api.cache import Cache
@@ -59,10 +79,14 @@ class BrainObservatoryCache(Cache):
     STIMULUS_MAPPINGS_KEY = 'STIMULUS_MAPPINGS'
     MANIFEST_VERSION=None
 
-    def __init__(self, cache=True, manifest_file='brain_observatory_manifest.json', base_uri=None):
+    def __init__(self, cache=True, manifest_file='brain_observatory_manifest.json', base_uri=None, api=None):
         super(BrainObservatoryCache, self).__init__(
             manifest=manifest_file, cache=cache, version=self.MANIFEST_VERSION)
-        self.api = BrainObservatoryApi(base_uri=base_uri)
+        
+        if api is None:
+            self.api = BrainObservatoryApi(base_uri=base_uri)
+        else:
+            self.api = api
 
     def get_all_targeted_structures(self):
         """ Return a list of all targeted structures in the data set. """
@@ -205,6 +229,7 @@ class BrainObservatoryCache(Cache):
                               session_types=None,
                               cell_specimen_ids=None,
                               include_failed=False,
+                              require_eye_tracking=False, 
                               simple=True):
         """ Get a list of ophys experiments matching certain criteria.
 
@@ -256,6 +281,9 @@ class BrainObservatoryCache(Cache):
             Whether or not to simplify the dictionary properties returned by this method
             to a more concise subset.
 
+        require_eye_tracking: boolean
+            If True, only return experiments that have eye tracking results. Default: False.
+
         Returns
         -------
         list of dictionaries
@@ -290,7 +318,8 @@ class BrainObservatoryCache(Cache):
                                                  transgenic_lines=transgenic_lines,
                                                  stimuli=stimuli,
                                                  session_types=session_types,
-                                                 include_failed=include_failed)
+                                                 include_failed=include_failed,
+                                                 require_eye_tracking=require_eye_tracking)
 
         if simple:
             exps = [{
@@ -303,7 +332,8 @@ class BrainObservatoryCache(Cache):
                     'experiment_container_id': e['experiment_container_id'],
                     'session_type': e['stimulus_name'],
                     'donor_name': e['specimen']['donor']['external_donor_name'],
-                    'specimen_name': e['specimen']['name']
+                    'specimen_name': e['specimen']['name'],
+                    'fail_eye_tracking': e.get('fail_eye_tracking', None)
                     } for e in exps]
             
         return exps
@@ -369,6 +399,7 @@ class BrainObservatoryCache(Cache):
 
         cell_specimens = self.api.get_cell_metrics(path=file_name,
                                                    strategy='lazy',
+                                                   pre= lambda x: [y for y in x], 
                                                    **Cache.cache_json())
 
         cell_specimens = self.api.filter_cell_specimens(cell_specimens,

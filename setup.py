@@ -29,7 +29,7 @@ setup(
     author = 'David Feng',
     author_email = 'davidf@alleninstitute.org',
     packages = prepend_find_packages('allensdk'),
-    package_data={'': ['*.conf', '*.cfg', '*.md', '*.json', '*.dat', '*.env', '*.sh', '*.txt', 'bps', 'Makefile', 'COPYING'] },
+    package_data={'': ['*.conf', '*.cfg', '*.md', '*.json', '*.dat', '*.env', '*.sh', '*.txt', 'bps', 'Makefile', 'LICENSE'] },
     description = 'core libraries for the allensdk.',
     install_requires = required,
     tests_require=test_required,
@@ -41,9 +41,10 @@ setup(
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Science/Research',
-        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+        'License :: Allen Institute Software License',
         'Natural Language :: English',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.6', 
         'Topic :: Scientific/Engineering :: Bio-Informatics'
         ])

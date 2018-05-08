@@ -1,39 +1,109 @@
-# Copyright 2016 Allen Institute for Brain Science
-# This file is part of Allen SDK.
+# Allen Institute Software License - This software license is the 2-clause BSD
+# license plus a third clause that prohibits redistribution for commercial
+# purposes without further permission.
 #
-# Allen SDK is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, version 3 of the License.
+# Copyright 2017. Allen Institute. All rights reserved.
 #
-# Allen SDK is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
 #
-# You should have received a copy of the GNU General Public License
-# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
-
-from ..api import Api
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+#
+# 3. Redistributions for commercial purposes are not permitted without the
+# Allen Institute's written permission.
+# For purposes of this license, commercial purposes is the incorporation of the
+# Allen Institute's software into anything for which you will charge fees or
+# other compensation. Contact terms@alleninstitute.org for commercial licensing
+# opportunities.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
+from allensdk.api.queries.rma_template import RmaTemplate
+from allensdk.api.cache import cacheable
 import os
 import simplejson as json
 from collections import OrderedDict
 from allensdk.config.manifest import Manifest
 
 
-class BiophysicalApi(Api):
+class BiophysicalApi(RmaTemplate):
     _NWB_file_type = 'NWBDownload'
     _SWC_file_type = '3DNeuronReconstruction'
     _MOD_file_type = 'BiophysicalModelDescription'
     _FIT_file_type = 'NeuronalModelParameters'
     _MARKER_file_type = '3DNeuronMarker'
+    BIOPHYSICAL_MODEL_TYPE_IDS = (491455321, 32923071,)
+
+    rma_templates = \
+        {"model_queries": [
+            {'name': 'models_by_specimen',
+             'description': 'see name',
+             'model': 'NeuronalModel',
+             'num_rows': 'all',
+             'count': False,
+             'criteria': '[neuronal_model_template_id$in{{biophysical_model_types}}],[specimen_id$in{{specimen_ids}}]', 
+             'criteria_params': ['specimen_ids', 'biophysical_model_types']
+             }]}
+
 
     def __init__(self, base_uri=None):
-        super(BiophysicalApi, self).__init__(base_uri)
+        super(BiophysicalApi, self).__init__(base_uri, query_manifest=BiophysicalApi.rma_templates)
         self.cache_stimulus = True
         self.ids = {}
         self.sweeps = []
         self.manifest = {}
         self.model_type = None
+
+
+    @cacheable()
+    def get_neuronal_models(self, specimen_ids, num_rows='all', count=False, model_type_ids=None, **kwargs):
+        '''Fetch all of the biophysically detailed model records associated with 
+        a particular specimen_id
+
+        Parameters
+        ----------
+        specimen_ids : list
+            One or more integer ids identifying specimen records.
+        num_rows : int, optional
+            how many records to retrieve. Default is 'all'.
+        count : bool, optional
+            If True, return a count of the lines found by the query. Default is False.
+        model_type_ids : list, optional
+            One or more integer ids identifying categories of neuronal model. Defaults 
+            to all-active and perisomatic biophysical_models.
+
+        Returns
+        -------
+        List of dict
+            Each element is a biophysical model record, containing a unique integer 
+            id, the id of the associated specimen, and the id of the model type to 
+            which this model belongs.
+  
+        '''
+
+        if model_type_ids is None:
+            model_type_ids = self.BIOPHYSICAL_MODEL_TYPE_IDS
+
+        return self.template_query('model_queries', 'models_by_specimen', 
+                                   specimen_ids=specimen_ids, 
+                                   biophysical_model_types=list(model_type_ids), 
+                                   num_rows=num_rows, count=count)
+
 
     def build_rma(self, neuronal_model_id, fmt='json'):
         '''Construct a query to find all files related to a neuronal model.
@@ -278,7 +348,7 @@ class BiophysicalApi(Api):
             neuronal_model_id)
 
         if not well_known_file_id_dict or \
-           (not any(well_known_file_id_dict.values())):
+           (not any(list(well_known_file_id_dict.values()))):
             raise(Exception("No data found for neuronal model id %d" %
                             (neuronal_model_id)))
 
@@ -301,11 +371,11 @@ class BiophysicalApi(Api):
                 self.retrieve_file_over_http(
                     well_known_file_url, cached_file_path)
 
-        fit_path = self.ids['fit'].values()[0]
-        stimulus_filename = self.ids['stimulus'].values()[0]
-        swc_morphology_path = self.ids['morphology'].values()[0]
+        fit_path = list(self.ids['fit'].values())[0]
+        stimulus_filename = list(self.ids['stimulus'].values())[0]
+        swc_morphology_path = list(self.ids['morphology'].values())[0]
         marker_path = \
-            self.ids['marker'].values()[0] if 'marker' in self.ids else ''
+            list(self.ids['marker'].values())[0] if 'marker' in self.ids else ''
         sweeps = sorted(self.sweeps)
 
         self.create_manifest(fit_path,
@@ -316,5 +386,5 @@ class BiophysicalApi(Api):
                              sweeps)
 
         manifest_path = os.path.join(working_directory, 'manifest.json')
-        with open(manifest_path, 'wb') as f:
-            f.write(json.dumps(self.manifest, indent=2))
+        with open(manifest_path, 'w') as f:
+            json.dump(self.manifest, f, indent=2)

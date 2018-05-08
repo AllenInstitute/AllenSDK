@@ -1,18 +1,38 @@
-# Copyright 2016 Allen Institute for Brain Science
-# This file is part of Allen SDK.
+# Allen Institute Software License - This software license is the 2-clause BSD
+# license plus a third clause that prohibits redistribution for commercial
+# purposes without further permission.
 #
-# Allen SDK is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, version 3 of the License.
+# Copyright 2017. Allen Institute. All rights reserved.
 #
-# Allen SDK is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# Merchantability Or Fitness FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
 #
-# You should have received a copy of the GNU General Public License
-# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
-
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+#
+# 3. Redistributions for commercial purposes are not permitted without the
+# Allen Institute's written permission.
+# For purposes of this license, commercial purposes is the incorporation of the
+# Allen Institute's software into anything for which you will charge fees or
+# other compensation. Contact terms@alleninstitute.org for commercial licensing
+# opportunities.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
 from mock import patch, MagicMock
 from pkg_resources import resource_filename  # @UnresolvedImport
 import numpy as np
@@ -89,6 +109,45 @@ def mock_data_set():
     return data_set
 
 
+def test_fill_sweep_responses_extend(mock_data_set):
+    data_set = mock_data_set
+    DATA_LENGTH = 5
+
+    class H5Scalar(object):
+        def __init__(self, i):
+            self.i = i
+            self.value = i
+        def __eq__(self, j):
+            return j == self.i
+        
+    h5 = {
+        'epochs': {
+            'Sweep_1': {
+                'response': {
+                    'timeseries': {
+                        'data': np.ones(DATA_LENGTH)
+                    }
+                }
+            },
+            'Experiment_1': {
+                'stimulus': {
+                    'idx_start': H5Scalar(1),
+                    'count': H5Scalar(3), # truncation is here
+                    'timeseries': {
+                        'data': np.ones(DATA_LENGTH)
+                        }
+                    }
+                }
+        }
+        }
+
+    with patch('h5py.File', mock_h5py_file(data=h5)):
+        data_set.fill_sweep_responses(0.0, [1], extend_experiment=True)
+
+    assert h5['epochs']['Experiment_1']['stimulus']['count'] == 4
+    assert h5['epochs']['Experiment_1']['stimulus']['idx_start'] == 1
+    assert np.all(h5['epochs']['Sweep_1']['response']['timeseries']['data']== 0.0)
+
 def test_fill_sweep_responses(mock_data_set):
     data_set = mock_data_set
     DATA_LENGTH = 5
@@ -118,7 +177,7 @@ def test_fill_sweep_responses(mock_data_set):
                 }
             }
         }
-    }
+        }
 
     with patch('h5py.File', mock_h5py_file(data=h5)):
         data_set.fill_sweep_responses(0.0, [1])

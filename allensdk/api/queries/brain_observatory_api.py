@@ -1,26 +1,50 @@
-# Copyright 2016 Allen Institute for Brain Science
-# This file is part of Allen SDK.
+# Allen Institute Software License - This software license is the 2-clause BSD
+# license plus a third clause that prohibits redistribution for commercial
+# purposes without further permission.
 #
-# Allen SDK is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, version 3 of the License.
+# Copyright 2017. Allen Institute. All rights reserved.
 #
-# Allen SDK is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
 #
-# You should have received a copy of the GNU General Public License
-# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+#
+# 3. Redistributions for commercial purposes are not permitted without the
+# Allen Institute's written permission.
+# For purposes of this license, commercial purposes is the incorporation of the
+# Allen Institute's software into anything for which you will charge fees or
+# other compensation. Contact terms@alleninstitute.org for commercial licensing
+# opportunities.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
+
+import logging
 
 import pandas as pd
 from six import string_types
+
+from allensdk.config.manifest import Manifest
+import allensdk.brain_observatory.stimulus_info as stimulus_info
+
 from .rma_template import RmaTemplate
 from ..cache import cacheable, Cache
 from .rma_pager import pageable
-from allensdk.config.manifest import Manifest
-import allensdk.brain_observatory.stimulus_info as stimulus_info
-import logging
 
 
 class BrainObservatoryApi(RmaTemplate):
@@ -344,8 +368,9 @@ class BrainObservatoryApi(RmaTemplate):
                 'imaging_depth'] in imaging_depths]
 
         if transgenic_lines is not None:
+            tls = [ tl.lower() for tl in transgenic_lines ]
             containers = [c for c in containers for tl in c['specimen'][
-                'donor']['transgenic_lines'] if tl['name'] in transgenic_lines]
+                'donor']['transgenic_lines'] if tl['name'].lower() in tls]
 
         return containers
 
@@ -357,7 +382,8 @@ class BrainObservatoryApi(RmaTemplate):
                                  transgenic_lines=None,
                                  stimuli=None,
                                  session_types=None,
-                                 include_failed=False):
+                                 include_failed=False,
+                                 require_eye_tracking=False):
 
         # re-using the code from above
         experiments = self.filter_experiment_containers(experiments,
@@ -366,6 +392,9 @@ class BrainObservatoryApi(RmaTemplate):
                                                         imaging_depths=imaging_depths,
                                                         transgenic_lines=transgenic_lines)
 
+        if require_eye_tracking:
+            experiments = [e for e in experiments
+                           if e.get('fail_eye_tracking', None) is False]
         if not include_failed:
             experiments = [e for e in experiments 
                            if not e.get('experiment_container',{}).get('failed', False)]
@@ -485,6 +514,7 @@ class BrainObservatoryApi(RmaTemplate):
            { 'field': 'osi_dg', 'op': '>', 'value': 1.0 }.  See _QUERY_TEMPLATES for a full list
            of operators.
         """
+
         queries = self.dataframe_query_string(filters)
         result_dataframe = pd.DataFrame(data)
         result_dataframe = result_dataframe.query(queries)

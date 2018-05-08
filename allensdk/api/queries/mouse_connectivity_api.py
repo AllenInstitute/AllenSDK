@@ -1,19 +1,39 @@
-# Copyright 2015-2016 Allen Institute for Brain Science
-# This file is part of Allen SDK.
+# Allen Institute Software License - This software license is the 2-clause BSD
+# license plus a third clause that prohibits redistribution for commercial
+# purposes without further permission.
 #
-# Allen SDK is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, version 3 of the License.
+# Copyright 2015-2017. Allen Institute. All rights reserved.
 #
-# Allen SDK is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
 #
-# You should have received a copy of the GNU General Public License
-# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
-
-from .rma_api import RmaApi
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+#
+# 3. Redistributions for commercial purposes are not permitted without the
+# Allen Institute's written permission.
+# For purposes of this license, commercial purposes is the incorporation of the
+# Allen Institute's software into anything for which you will charge fees or
+# other compensation. Contact terms@alleninstitute.org for commercial licensing
+# opportunities.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
+from .reference_space_api import ReferenceSpaceApi
 from .grid_data_api import GridDataApi
 from ..cache import cacheable, Cache
 import numpy as np
@@ -21,7 +41,7 @@ import nrrd
 import six
 
 
-class MouseConnectivityApi(RmaApi):
+class MouseConnectivityApi(ReferenceSpaceApi, GridDataApi):
     '''
     HTTP Client for the Allen Mouse Brain Connectivity Atlas.
 
@@ -31,71 +51,6 @@ class MouseConnectivityApi(RmaApi):
 
     def __init__(self, base_uri=None):
         super(MouseConnectivityApi, self).__init__(base_uri)
-
-    AVERAGE_TEMPLATE = 'average_template'
-    ARA_NISSL = 'ara_nissl'
-    MOUSE_2011 = 'annotation/mouse_2011'
-    DEVMOUSE_2012 = 'annotation/devmouse_2012'
-    CCF_2015 = 'annotation/ccf_2015'
-    CCF_2016 = 'annotation/ccf_2016'
-    CCF_VERSION_DEFAULT = CCF_2016
-
-    VOXEL_RESOLUTION_10_MICRONS = 10
-    VOXEL_RESOLUTION_25_MICRONS = 25
-    VOXEL_RESOLUTION_50_MICRONS = 50
-    VOXEL_RESOLUTION_100_MICRONS = 100
-
-    @cacheable(strategy='create',
-               reader=nrrd.read,
-               pathfinder=Cache.pathfinder(file_name_position=3,
-                                           path_keyword='file_name'))
-    def download_annotation_volume(self,
-                                   ccf_version,
-                                   resolution,
-                                   file_name):
-        '''
-        Download the annotation volume at a particular resolution.
-
-        Parameters
-        ----------
-        ccf_version: string
-            MouseConnectivityApi.CCF_2016 (default) or MouseConnectivityApi.CCF_2015
-        resolution: int
-            Desired resolution to download in microns.
-            Must be 10, 25, 50, or 100.
-        file_name: string
-            Where to save the annotation volume.
-        
-        Note: the parameters must be used as positional parameters, not keywords
-        '''
-
-        if ccf_version is None:
-            ccf_version = MouseConnectivityApi.CCF_VERSION_DEFAULT
-
-        self.download_volumetric_data(ccf_version,
-                                      'annotation_%d.nrrd' % resolution, 
-                                      save_file_path=file_name)
-
-    @cacheable(strategy='create',
-               reader=nrrd.read,
-               pathfinder=Cache.pathfinder(file_name_position=2,
-                                           path_keyword='file_name'))
-    def download_template_volume(self, resolution, file_name):
-        '''
-        Download the registration template volume at a particular resolution.
-
-        Parameters
-        ----------
-
-        resolution: int
-            Desired resolution to download in microns.  Must be 10, 25, 50, or 100.
-
-        file_name: string
-            Where to save the registration template volume.
-        '''
-        self.download_volumetric_data(MouseConnectivityApi.AVERAGE_TEMPLATE,
-                                      'average_template_%d.nrrd' % resolution, 
-                                      save_file_path=file_name)
 
 
     @cacheable()
@@ -218,86 +173,6 @@ class MouseConnectivityApi(RmaApi):
         return self.model_query('SectionDataSet',
                                 criteria=criteria,
                                 include=include)
-
-    def build_volumetric_data_download_url(self,
-                                           data_path,
-                                           file_name,
-                                           voxel_resolution=None,
-                                           release=None,
-                                           coordinate_framework=None):
-        '''Construct url to download 3D reference model in NRRD format.
-
-        Parameters
-        ----------
-        data_path : string
-            'average_template', 'ara_nissl', 'annotation/ccf_2015', 'annotation/mouse_2011', or 'annotation/devmouse_2012'
-        voxel_resolution : int
-            10, 25, 50 or 100
-        coordinate_framework : string
-            'mouse_ccf' (default) or 'mouse_annotation'
-
-        Notes
-        -----
-        See: `3-D Reference Models <http://help.brain-map.org/display/mouseconnectivity/API#API-3DReferenceModels>`_
-        for additional documentation.
-        '''
-
-        if voxel_resolution is None:
-            voxel_resolution = MouseConnectivityApi.VOXEL_RESOLUTION_10_MICRONS
-
-        if release is None:
-            release = 'current-release'
-
-        if coordinate_framework is None:
-            coordinate_framework = 'mouse_ccf'
-
-        url = ''.join([self.informatics_archive_endpoint,
-                       '/%s/%s/' % (release, coordinate_framework),
-                       data_path,
-                       '/',
-                       file_name])
-
-        return url
-
-
-    def download_volumetric_data(self,
-                                 data_path,
-                                 file_name,
-                                 voxel_resolution=None,
-                                 save_file_path=None,
-                                 release=None,
-                                 coordinate_framework=None):
-        '''Download 3D reference model in NRRD format.
-
-        Parameters
-        ----------
-        data_path : string
-            'average_template', 'ara_nissl', 'annotation/ccf_2015', 'annotation/mouse_2011', or 'annotation/devmouse_2012'
-        file_name : string
-            server-side file name. 'annotation_10.nrrd' for example.
-        voxel_resolution : int
-            10, 25, 50 or 100
-        coordinate_framework : string
-            'mouse_ccf' (default) or 'mouse_annotation'
-
-        Notes
-        -----
-        See: `3-D Reference Models <http://help.brain-map.org/display/mouseconnectivity/API#API-3DReferenceModels>`_
-        for additional documentation.
-        '''
-        url = self.build_volumetric_data_download_url(data_path,
-                                                      file_name,
-                                                      voxel_resolution,
-                                                      release,
-                                                      coordinate_framework)
-
-        if save_file_path is None:
-            save_file_path = file_name
-
-        if save_file_path is None:
-            save_file_path = 'volumetric_data.nrrd'
-
-        self.retrieve_file_over_http(url, save_file_path)
         
 
     def download_reference_aligned_image_channel_volumes(self,
@@ -560,28 +435,28 @@ class MouseConnectivityApi(RmaApi):
                pathfinder=Cache.pathfinder(file_name_position=1,
                                            path_keyword='path'))
     def download_injection_density(self, path, experiment_id, resolution):
-        GridDataApi(base_uri=self.api_url).download_projection_grid_data(
+        self.download_projection_grid_data(
             experiment_id, [GridDataApi.INJECTION_DENSITY], resolution, path)
 
     @cacheable(strategy='create', 
                pathfinder=Cache.pathfinder(file_name_position=1,
                                            path_keyword='path'))
     def download_projection_density(self, path, experiment_id, resolution):
-        GridDataApi(base_uri=self.api_url).download_projection_grid_data(
+        self.download_projection_grid_data(
             experiment_id, [GridDataApi.PROJECTION_DENSITY], resolution, path)
 
     @cacheable(strategy='create', 
                pathfinder=Cache.pathfinder(file_name_position=1,
                                            path_keyword='path'))
     def download_injection_fraction(self, path, experiment_id, resolution):
-        GridDataApi(base_uri=self.api_url).download_projection_grid_data(
+        self.download_projection_grid_data(
             experiment_id, [GridDataApi.INJECTION_FRACTION], resolution, path)
 
     @cacheable(strategy='create', 
                pathfinder=Cache.pathfinder(file_name_position=1,
                                            path_keyword='path'))
     def download_data_mask(self, path, experiment_id, resolution):
-        GridDataApi(base_uri=self.api_url).download_projection_grid_data(
+        self.download_projection_grid_data(
             experiment_id, [GridDataApi.DATA_MASK], resolution, path)
 
     def calculate_injection_centroid(self,

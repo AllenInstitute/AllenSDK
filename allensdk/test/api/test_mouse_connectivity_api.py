@@ -1,118 +1,93 @@
-# Copyright 2016-2017 Allen Institute for Brain Science
-# This file is part of Allen SDK.
+# Allen Institute Software License - This software license is the 2-clause BSD
+# license plus a third clause that prohibits redistribution for commercial
+# purposes without further permission.
 #
-# Allen SDK is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, version 3 of the License.
+# Copyright 2016-2017. Allen Institute. All rights reserved.
 #
-# Allen SDK is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
 #
-# You should have received a copy of the GNU General Public License
-# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+#
+# 3. Redistributions for commercial purposes are not permitted without the
+# Allen Institute's written permission.
+# For purposes of this license, commercial purposes is the incorporation of the
+# Allen Institute's software into anything for which you will charge fees or
+# other compensation. Contact terms@alleninstitute.org for commercial licensing
+# opportunities.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
+import os
 import pytest
 from mock import patch, Mock
 import itertools as it
 import numpy as np
+from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi as MCA
 
+MOCK_ANNOTATION_DATA = 'mock_annotation_data'
+MOCK_ANNOTATION_IMAGE = 'mock_annotation_image'
+DOWNLOAD_LINK = '/path/to/link'
 
-try:
-    reload
-except NameError:
-    try:
-        from importlib import reload
-    except ImportError:
-        from imp import reload
-
-        
-@pytest.fixture
-def nrrd_read():
-    with patch('nrrd.read',
-               Mock(name='nrrd_read_file_mcm',
-                    return_value=('mock_annotation_data',
-                                  'mock_annotation_image'))) as nrrd_read:
-        import allensdk.core.mouse_connectivity_cache as MCC
-        import allensdk.api.queries.mouse_connectivity_api as MCA
-        reload(MCC)
-        reload(MCA)
-
-    return nrrd_read
 
 @pytest.fixture
-def MCA(nrrd_read):
-    import allensdk.api.queries.mouse_connectivity_api as MCA
-
-    download_link = '/path/to/link'
-    MCA.MouseConnectivityApi.do_query = Mock(return_value=download_link)
-    MCA.MouseConnectivityApi.json_msg_query = Mock(name='json_msg_query')
-    MCA.MouseConnectivityApi.retrieve_file_over_http = \
-        Mock(name='retrieve_file_over_http')
-    
-    return MCA
-
-@pytest.fixture
-def connectivity(MCA):
-    mca = MCA.MouseConnectivityApi()
+def connectivity():
+    mca = MCA()
     
     return mca
 
 
-@pytest.fixture
-def MCC(nrrd_read):
-    import allensdk.core.mouse_connectivity_cache as MCC
-
-    return MCC
-
-
 def CCF_VERSIONS():
-    from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
-     
-    return [MouseConnectivityApi.CCF_2015,
-            MouseConnectivityApi.CCF_2016]
+    return [MCA.CCF_2015,
+            MCA.CCF_2016]
 
 
 def DATA_PATHS(): 
-    from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
-
-    return [MouseConnectivityApi.AVERAGE_TEMPLATE,
-            MouseConnectivityApi.ARA_NISSL,
-            MouseConnectivityApi.MOUSE_2011,
-            MouseConnectivityApi.DEVMOUSE_2012,
-            MouseConnectivityApi.CCF_2015,
-            MouseConnectivityApi.CCF_2016]
+    return [MCA.AVERAGE_TEMPLATE,
+            MCA.ARA_NISSL,
+            MCA.MOUSE_2011,
+            MCA.DEVMOUSE_2012,
+            MCA.CCF_2015,
+            MCA.CCF_2016]
 
 
 def RESOLUTIONS():
-    from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
-
-    return [MouseConnectivityApi.VOXEL_RESOLUTION_10_MICRONS,
-            MouseConnectivityApi.VOXEL_RESOLUTION_25_MICRONS,
-            MouseConnectivityApi.VOXEL_RESOLUTION_50_MICRONS,
-            MouseConnectivityApi.VOXEL_RESOLUTION_100_MICRONS]
-
-MOCK_ANNOTATION_DATA = 'mock_annotation_data'
-MOCK_ANNOTATION_IMAGE = 'mock_annotation_image'
+    return [MCA.VOXEL_RESOLUTION_10_MICRONS,
+            MCA.VOXEL_RESOLUTION_25_MICRONS,
+            MCA.VOXEL_RESOLUTION_50_MICRONS,
+            MCA.VOXEL_RESOLUTION_100_MICRONS]
 
 
 @pytest.mark.parametrize("data_path,resolution",
                          it.product(DATA_PATHS(),
                                     RESOLUTIONS()))
-def test_download_volumetric_data(nrrd_read,
+@patch.object(MCA, "retrieve_file_over_http")
+def test_download_volumetric_data(mock_retrieve,
                                   connectivity,
                                   data_path,
                                   resolution):
     cache_filename = "annotation_%d.nrrd" % (resolution)
 
-    nrrd_read.reset_mock()
-    connectivity.retrieve_file_over_http.reset_mock()
-
     connectivity.download_volumetric_data(data_path,
                                           cache_filename,
                                           resolution)
 
-    connectivity.retrieve_file_over_http.assert_called_once_with(
+    mock_retrieve.assert_called_once_with(
         "http://download.alleninstitute.org/informatics-archive/"
         "current-release/mouse_ccf/%s/annotation_%d.nrrd" % 
         (data_path,
@@ -123,25 +98,27 @@ def test_download_volumetric_data(nrrd_read,
 @pytest.mark.parametrize("ccf_version,resolution",
                          it.product(CCF_VERSIONS(),
                                     RESOLUTIONS()))
+@patch.object(MCA, "retrieve_file_over_http")
+@patch("nrrd.read", return_value=('mock_annotation_data',
+                                  'mock_annotation_image'))
 @patch('os.makedirs')
 def test_download_annotation_volume(os_makedirs,
                                     nrrd_read,
+                                    mock_retrieve,
                                     connectivity,
                                     ccf_version,
                                     resolution):
-    nrrd_read.reset_mock()
-    connectivity.retrieve_file_over_http.reset_mock()
-
     cache_file = '/path/to/annotation_%d.nrrd' % (resolution)
 
     connectivity.download_annotation_volume(
         ccf_version,
         resolution,
-        cache_file)
+        cache_file,
+        reader=nrrd_read)
 
     nrrd_read.assert_called_once_with(cache_file)
 
-    connectivity.retrieve_file_over_http.assert_called_once_with(
+    mock_retrieve.assert_called_once_with(
         "http://download.alleninstitute.org/informatics-archive/"
         "current-release/mouse_ccf/%s/annotation_%d.nrrd" % 
         (ccf_version,
@@ -153,14 +130,15 @@ def test_download_annotation_volume(os_makedirs,
 
 @pytest.mark.parametrize("resolution",
                          RESOLUTIONS())
+@patch.object(MCA, "retrieve_file_over_http")
+@patch("nrrd.read", return_value=('mock_annotation_data',
+                                  'mock_annotation_image'))
 @patch('os.makedirs')
 def test_download_annotation_volume_default(os_makedirs,
                                             nrrd_read,
-                                            MCA,
+                                            mock_retrieve,
                                             connectivity,
                                             resolution):
-    connectivity.retrieve_file_over_http.reset_mock()
-
     a, b = connectivity.download_annotation_volume(
         None,
         resolution,
@@ -170,12 +148,10 @@ def test_download_annotation_volume_default(os_makedirs,
     assert a
     assert b
 
-    print(connectivity.retrieve_file_over_http.call_args_list)
-
-    connectivity.retrieve_file_over_http.assert_called_once_with(
+    mock_retrieve.assert_called_once_with(
         "http://download.alleninstitute.org/informatics-archive/"
         "current-release/mouse_ccf/%s/annotation_%d.nrrd" % 
-        (MCA.MouseConnectivityApi.CCF_VERSION_DEFAULT,
+        (MCA.CCF_VERSION_DEFAULT,
          resolution),
         "/path/to/annotation_%d.nrrd" % (resolution))
 
@@ -184,17 +160,54 @@ def test_download_annotation_volume_default(os_makedirs,
 
 @pytest.mark.parametrize("resolution",
                          RESOLUTIONS())
+@patch.object(MCA, "retrieve_file_over_http")
+@patch("nrrd.read", return_value=('mock_annotation_data',
+                                  'mock_annotation_image'))
+@patch('os.makedirs')
+def test_download_structure_mask(os_makedirs, 
+                                 nrrd_read, 
+                                 mock_retrieve,
+                                 connectivity, 
+                                 resolution):
+
+    structure_id = 12
+
+    a, b = connectivity.download_structure_mask(structure_id,
+                                                None,
+                                                resolution,'/path/to/foo.nrrd',
+                                                reader=nrrd_read)
+
+    assert a
+    assert b
+
+    expected = 'http://download.alleninstitute.org/informatics-archive/'\
+               'current-release/mouse_ccf/{0}/structure_masks/'\
+               'structure_masks_{1}/structure_{2}.nrrd'.format(MCA.CCF_VERSION_DEFAULT, 
+                                                               resolution, 
+                                                               structure_id)
+    mock_retrieve.assert_called_once_with(expected, '/path/to/foo.nrrd')
+    os_makedirs.assert_any_call('/path/to')
+
+
+@pytest.mark.parametrize("resolution",
+                         RESOLUTIONS())
+@patch.object(MCA, "retrieve_file_over_http")
+@patch("nrrd.read", return_value=('mock_annotation_data',
+                                  'mock_annotation_image'))
 @patch('os.makedirs')
 def test_download_template_volume(os_makedirs,
+                                  nrrd_read,
+                                  mock_retrieve,
                                   connectivity,
                                   resolution):
-    connectivity.retrieve_file_over_http.reset_mock()
-
     connectivity.download_template_volume(
         resolution,
-        '/path/to/average_template_%d.nrrd' % (resolution))
+        '/path/to/average_template_%d.nrrd' % (resolution),
+        reader=nrrd_read)
 
-    connectivity.retrieve_file_over_http.assert_called_once_with(
+    nrrd_read.assert_called_once_with('/path/to/average_template_%d.nrrd' % (resolution))
+
+    mock_retrieve.assert_called_once_with(
         "http://download.alleninstitute.org/informatics-archive/"
         "current-release/mouse_ccf/average_template/average_template_%d.nrrd" % 
         (resolution),
@@ -203,43 +216,45 @@ def test_download_template_volume(os_makedirs,
     os_makedirs.assert_any_call('/path/to')
 
 
-def test_get_experiments_no_ids(connectivity):
+@patch.object(MCA, "json_msg_query")
+def test_get_experiments_no_ids(mock_query,
+                                connectivity):
     connectivity.get_experiments(None)
 
-    connectivity.json_msg_query.assert_called_once_with(
+    mock_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::SectionDataSet,rma::criteria,[failed$eqfalse],"
         "products[id$in5,31]")
 
 
-def test_get_experiments_one_id(connectivity):
-    connectivity.json_msg_query.reset_mock()
-
+@patch.object(MCA, "json_msg_query")
+def test_get_experiments_one_id(mock_query,
+                                connectivity):
     connectivity.get_experiments(987)
 
-    connectivity.json_msg_query.assert_called_once_with(
+    mock_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::SectionDataSet,rma::criteria,[failed$eqfalse],"
         "products[id$in5,31],[id$in987]")
 
 
-def test_get_experiments_ids(connectivity):
-    connectivity.json_msg_query.reset_mock()
-    
+@patch.object(MCA, "json_msg_query")
+def test_get_experiments_ids(mock_query,
+                             connectivity):
     connectivity.get_experiments([9,8,7])
 
-    connectivity.json_msg_query.assert_called_once_with(
+    mock_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::SectionDataSet,rma::criteria,[failed$eqfalse],"
         "products[id$in5,31],[id$in9,8,7]")
 
 
-def test_get_manual_injection_summary(connectivity):
-    connectivity.json_msg_query.reset_mock()
-
+@patch.object(MCA, "json_msg_query")
+def test_get_manual_injection_summary(mock_query,
+                                      connectivity):
     connectivity.get_manual_injection_summary(123)
 
-    connectivity.json_msg_query.assert_called_once_with(
+    mock_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::SectionDataSet,rma::criteria,[id$in123],"
         "rma::include,specimen(donor(transgenic_mouse(transgenic_lines)),"
@@ -254,12 +269,12 @@ def test_get_manual_injection_summary(connectivity):
         "transgenic_lines.id,donors.id]")
 
 
-def test_get_experiment_detail(connectivity):
-    connectivity.json_msg_query.reset_mock()
-    
+@patch.object(MCA, "json_msg_query")
+def test_get_experiment_detail(mock_query,
+                               connectivity):
     connectivity.get_experiment_detail(123)
 
-    connectivity.json_msg_query.assert_called_once_with(
+    mock_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::SectionDataSet,rma::criteria,[id$eq123],"
         "rma::include,specimen(stereotaxic_injections"
@@ -268,12 +283,12 @@ def test_get_experiment_detail(connectivity):
         "rma::options[order$eq'sub_images.section_number$asc']")
 
 
-def test_get_projection_image_info(connectivity):
-    connectivity.json_msg_query.reset_mock()
-
+@patch.object(MCA, "json_msg_query")
+def test_get_projection_image_info(mock_query,
+                                   connectivity):
     connectivity.get_projection_image_info(123, 456)
 
-    connectivity.json_msg_query.assert_called_once_with(
+    mock_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::SectionDataSet,rma::criteria,[id$eq123],rma::include,"
         "equalization,sub_images[section_number$eq456]")
@@ -289,60 +304,62 @@ def test_build_reference_aligned_channel_volumes_url(connectivity):
                    "[attachable_id$eq123456]")
 
 
-def test_reference_aligned_channel_volumes(connectivity):
-    connectivity.retrieve_file_over_http.reset_mock()
-
+@patch.object(MCA, "retrieve_file_over_http")
+@patch.object(MCA, "do_query", return_value=DOWNLOAD_LINK)
+def test_reference_aligned_channel_volumes(mock_query,
+                                           mock_retrieve,
+                                           connectivity):
     connectivity.download_reference_aligned_image_channel_volumes(123456)
 
-    connectivity.retrieve_file_over_http.assert_called_once_with(
+    mock_retrieve.assert_called_once_with(
         "http://api.brain-map.org/path/to/link",
         "123456.zip")
 
 
-def test_experiment_source_search(connectivity):
-    connectivity.json_msg_query.reset_mock()
-
+@patch.object(MCA, "json_msg_query")
+def test_experiment_source_search(mock_query,
+                                  connectivity):
     connectivity.experiment_source_search(
         injection_structures='Isocortex',
         primary_structure_only=True)
 
-    connectivity.json_msg_query.assert_called_once_with(
+    mock_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "service::mouse_connectivity_injection_structure"
         "[injection_structures$eqIsocortex][primary_structure_only$eqtrue]")
 
 
-def test_experiment_spatial_search(connectivity):
-    connectivity.json_msg_query.reset_mock()
-
+@patch.object(MCA, "json_msg_query")
+def test_experiment_spatial_search(mock_query,
+                                   connectivity):
     connectivity.experiment_spatial_search(
         seed_point=[6900,5050,6450])
 
-    connectivity.json_msg_query.assert_called_once_with(
+    mock_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "service::mouse_connectivity_target_spatial"
         "[seed_point$eq6900,5050,6450]")
 
 
-def test_injection_coordinate_search(connectivity):
-    connectivity.json_msg_query.reset_mock()
-
+@patch.object(MCA, "json_msg_query")
+def test_injection_coordinate_search(mock_query,
+                                     connectivity):
     connectivity.experiment_injection_coordinate_search(
         seed_point=[6900,5050,6450])
 
-    connectivity.json_msg_query.assert_called_once_with(
+    mock_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "service::mouse_connectivity_injection_coordinate"
         "[seed_point$eq6900,5050,6450]")
 
 
-def test_experiment_correlation_search(connectivity):
-    connectivity.json_msg_query.reset_mock()
-
+@patch.object(MCA, "json_msg_query")
+def test_experiment_correlation_search(mock_query,
+                                       connectivity):
     connectivity.experiment_correlation_search(
         row=112670853, structure='TH')
 
-    connectivity.json_msg_query.assert_called_once_with(
+    mock_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "service::mouse_connectivity_correlation"
         "[row$eq112670853][structure$eqTH]")
@@ -351,11 +368,11 @@ def test_experiment_correlation_search(connectivity):
 @pytest.mark.parametrize("injection,hemisphere",
                          it.product([True, False,None],
                                     [['left'],['right'],None]))
-def test_get_structure_unionizes(connectivity,
+@patch.object(MCA, "json_msg_query")
+def test_get_structure_unionizes(mock_query,
+                                 connectivity,
                                  injection,
                                  hemisphere):
-    connectivity.json_msg_query.reset_mock()
-
     connectivity.get_structure_unionizes(
         experiment_ids=[126862385],
         is_injection=injection,
@@ -372,7 +389,7 @@ def test_get_structure_unionizes(connectivity,
     if hemisphere is not None:
         h = "[hemisphere_id$in%s]" % (hemisphere[0])
 
-    connectivity.json_msg_query.assert_called_once_with(
+    mock_query.assert_called_once_with(
         ("http://api.brain-map.org/api/v2/data/query.json?q="
          "model::ProjectionStructureUnionize,rma::criteria,"
          "[section_data_set_id$in126862385]%s%s,"
@@ -442,11 +459,3 @@ def test_calculate_injection_centroid(connectivity):
         density, fraction, resolution=25)
     
     assert np.array_equal(centroid, [37.5, 37.5])
-
-
-@pytest.mark.run('last')
-def test_cleanup():
-    import allensdk.api.queries.mouse_connectivity_api
-    reload(allensdk.api.queries.mouse_connectivity_api)
-    import allensdk.core.mouse_connectivity_cache
-    reload(allensdk.core.mouse_connectivity_cache)

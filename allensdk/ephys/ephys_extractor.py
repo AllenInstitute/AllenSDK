@@ -1,18 +1,38 @@
-# Copyright 2015-2016 Allen Institute for Brain Science
-# This file is part of Allen SDK.
+# Allen Institute Software License - This software license is the 2-clause BSD
+# license plus a third clause that prohibits redistribution for commercial
+# purposes without further permission.
 #
-# Allen SDK is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, version 3 of the License.
+# Copyright 2015-2016. Allen Institute. All rights reserved.
 #
-# Allen SDK is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# Merchantability Or Fitness FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
 #
-# You should have received a copy of the GNU General Public License
-# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
-
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+#
+# 3. Redistributions for commercial purposes are not permitted without the
+# Allen Institute's written permission.
+# For purposes of this license, commercial purposes is the incorporation of the
+# Allen Institute's software into anything for which you will charge fees or
+# other compensation. Contact terms@alleninstitute.org for commercial licensing
+# opportunities.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
 import numpy as np
 from pandas import DataFrame
 import warnings
@@ -73,6 +93,7 @@ class EphysSweepFeatureExtractor:
         self.stimulus_amplitude_calculator = None
 
         self._sweep_features = {}
+        self._affected_by_clipping = []
 
     def process_spikes(self):
         """Perform spike-related feature analysis"""
@@ -89,7 +110,8 @@ class EphysSweepFeatureExtractor:
                                                     self.filter, self.dv_cutoff)
         peaks = ft.find_peak_indexes(v, t, putative_spikes, self.end)
         putative_spikes, peaks = ft.filter_putative_spikes(v, t, putative_spikes, peaks,
-                                                           self.min_height, self.min_peak)
+                                                           self.min_height, self.min_peak, 
+                                                           dvdt=dvdt, filter=self.filter)
 
         if not putative_spikes.size:
             # Save time if no spikes detected
@@ -99,22 +121,22 @@ class EphysSweepFeatureExtractor:
         upstrokes = ft.find_upstroke_indexes(v, t, putative_spikes, peaks, self.filter, dvdt)
         thresholds = ft.refine_threshold_indexes(v, t, upstrokes, self.thresh_frac,
                                                  self.filter, dvdt)
-        thresholds, peaks, upstrokes = ft.check_thresholds_and_peaks(v, t, thresholds, peaks,
-                                                                     upstrokes, self.max_interval)
-
+        thresholds, peaks, upstrokes, clipped = ft.check_thresholds_and_peaks(v, t, thresholds, peaks,
+                                                                     upstrokes, self.end, self.max_interval)
         if not thresholds.size:
             # Save time if no spikes detected
             self._spikes_df = DataFrame()
             return
 
-
         # Spike list and thresholds have been refined - now find other features
         upstrokes = ft.find_upstroke_indexes(v, t, thresholds, peaks, self.filter, dvdt)
-        troughs = ft.find_trough_indexes(v, t, thresholds, peaks, self.end)
-        downstrokes = ft.find_downstroke_indexes(v, t, peaks, troughs, self.filter, dvdt)
-        trough_details = ft.analyze_trough_details(v, t, thresholds, peaks, self.end,
-                                                   self.filter, dvdt=dvdt)
-        widths = ft.find_widths(v, t, thresholds, peaks, trough_details[1])
+        troughs = ft.find_trough_indexes(v, t, thresholds, peaks, clipped, self.end)
+        downstrokes = ft.find_downstroke_indexes(v, t, peaks, troughs, clipped, self.filter, dvdt)
+        trough_details, clipped = ft.analyze_trough_details(v, t, thresholds, peaks, clipped, self.end,
+                                                            self.filter, dvdt=dvdt)
+        widths = ft.find_widths(v, t, thresholds, peaks, trough_details[1], clipped)
+
+        base_clipped_list = []
 
         # Points where we care about t, v, and i if available
         vit_data_indexes = {
@@ -122,70 +144,101 @@ class EphysSweepFeatureExtractor:
             "peak": peaks,
             "trough": troughs,
         }
+        base_clipped_list += ["trough"]
 
         # Points where we care about t and dv/dt
         dvdt_data_indexes = {
             "upstroke": upstrokes,
             "downstroke": downstrokes
         }
+        base_clipped_list += ["downstroke"]
 
         # Trough details
         isi_types = trough_details[0]
         trough_detail_indexes = dict(zip(["fast_trough", "adp", "slow_trough"], trough_details[1:]))
+        base_clipped_list += ["fast_trough", "adp", "slow_trough"]
 
         # Redundant, but ensures that DataFrame has right number of rows
         # Any better way to do it?
         spikes_df = DataFrame(data=thresholds, columns=["threshold_index"])
+        spikes_df["clipped"] = clipped
 
-        for k, vals in six.iteritems(vit_data_indexes):
+        for k, all_vals in six.iteritems(vit_data_indexes):
+            valid_ind = ~np.isnan(all_vals)
+            vals = all_vals[valid_ind].astype(int)
             spikes_df[k + "_index"] = np.nan
             spikes_df[k + "_t"] = np.nan
             spikes_df[k + "_v"] = np.nan
 
             if len(vals) > 0:
-                spikes_df.ix[:len(vals) - 1, k + "_index"] = vals
-                spikes_df.ix[:len(vals) - 1, k + "_t"] = t[vals]
-                spikes_df.ix[:len(vals) - 1, k + "_v"] = v[vals]
+                spikes_df.ix[valid_ind, k + "_index"] = vals
+                spikes_df.ix[valid_ind, k + "_t"] = t[vals]
+                spikes_df.ix[valid_ind, k + "_v"] = v[vals]
 
             if self.i is not None:
                 spikes_df[k + "_i"] = np.nan
                 if len(vals) > 0:
-                    spikes_df.ix[:len(vals) - 1, k + "_i"] = self.i[vals]
+                    spikes_df.ix[valid_ind, k + "_i"] = self.i[vals]
 
-        for k, vals in six.iteritems(dvdt_data_indexes):
+            if k in base_clipped_list:
+                self._affected_by_clipping += [
+                    k + "_index",
+                    k + "_t",
+                    k + "_v",
+                    k + "_i",
+                ]
+
+        for k, all_vals in six.iteritems(dvdt_data_indexes):
+            valid_ind = ~np.isnan(all_vals)
+            vals = all_vals[valid_ind].astype(int)
             spikes_df[k + "_index"] = np.nan
             spikes_df[k] = np.nan
             if len(vals) > 0:
-                spikes_df.ix[:len(vals) - 1, k + "_index"] = vals
-                spikes_df.ix[:len(vals) - 1, k + "_t"] = t[vals]
-                spikes_df.ix[:len(vals) - 1, k + "_v"] = v[vals]
-                spikes_df.ix[:len(vals) - 1, k] = dvdt[vals]
+                spikes_df.ix[valid_ind, k + "_index"] = vals
+                spikes_df.ix[valid_ind, k + "_t"] = t[vals]
+                spikes_df.ix[valid_ind, k + "_v"] = v[vals]
+                spikes_df.ix[valid_ind, k] = dvdt[vals]
+
+                if k in base_clipped_list:
+                    self._affected_by_clipping += [
+                    k + "_index",
+                    k + "_t",
+                    k + "_v",
+                    k,
+                ]
 
         spikes_df["isi_type"] = isi_types
+        self._affected_by_clipping += ["isi_type"]
 
-        for k, vals in six.iteritems(trough_detail_indexes):
+        for k, all_vals in six.iteritems(trough_detail_indexes):
+            valid_ind = ~np.isnan(all_vals)
+            vals = all_vals[valid_ind].astype(int)
             spikes_df[k + "_index"] = np.nan
-            if np.any(~np.isnan(vals)):
-                spikes_df.ix[~np.isnan(vals), k + "_index"] = vals[~np.isnan(vals)]
-
             spikes_df[k + "_t"] = np.nan
-            if np.any(~np.isnan(vals)):
-                spikes_df.ix[~np.isnan(vals), k + "_t"] = t[vals[~np.isnan(vals)].astype(int)]
-
             spikes_df[k + "_v"] = np.nan
-            if np.any(~np.isnan(vals)):
-                spikes_df.ix[~np.isnan(vals), k + "_v"] = v[vals[~np.isnan(vals)].astype(int)]
+            if len(vals) > 0:
+                spikes_df.ix[valid_ind, k + "_index"] = vals
+                spikes_df.ix[valid_ind, k + "_t"] = t[vals]
+                spikes_df.ix[valid_ind, k + "_v"] = v[vals]
 
             if self.i is not None:
                 spikes_df[k + "_i"] = np.nan
-                if np.any(~np.isnan(vals)):
-                    spikes_df.ix[~np.isnan(vals), k + "_i"] = self.i[vals[~np.isnan(vals)].astype(int)]
+                if len(vals) > 0:
+                    spikes_df.ix[valid_ind, k + "_i"] = self.i[vals]
 
-        spikes_df["width"] = np.nan
-        spikes_df.ix[:len(widths)-1, "width"] = widths
+            if k in base_clipped_list:
+                self._affected_by_clipping += [
+                    k + "_index",
+                    k + "_t",
+                    k + "_v",
+                    k + "_i",
+                ]
 
+        spikes_df["width"] = widths
+        self._affected_by_clipping += ["width"]
 
         spikes_df["upstroke_downstroke_ratio"] = spikes_df["upstroke"] / -spikes_df["downstroke"]
+        self._affected_by_clipping += ["upstroke_downstroke_ratio"]
 
         self._spikes_df = spikes_df
 
@@ -206,7 +259,7 @@ class EphysSweepFeatureExtractor:
                 "adapt": ft.adaptation_index(isis),
                 "latency": ft.latency(t, thresholds, self.start),
                 "isi_cv": (isis.std() / isis.mean()) if len(isis) >= 1 else np.nan,
-                "mean_isi": isis.mean(),
+                "mean_isi": isis.mean() if len(isis) > 0 else np.nan,
                 "median_isi": np.median(isis),
                 "first_isi": isis[0] if len(isis) >= 1 else np.nan,
                 "avg_rate": ft.average_rate(t, thresholds, self.start, self.end),
@@ -450,17 +503,21 @@ class EphysSweepFeatureExtractor:
         """Get all features for each spike as a list of records."""
         return self._spikes_df.to_dict('records')
 
-    def spike_feature(self, key):
+    def spike_feature(self, key, include_clipped=False, force_exclude_clipped=False):
         """Get specified feature for every spike.
 
         Parameters
         ----------
         key : feature name
+        include_clipped: return values for every identified spike, even when clipping means they will be incorrect/undefined
 
         Returns
         -------
         spike_feature_values : ndarray of features for each spike
         """
+
+        if not hasattr(self, "_spikes_df"):
+            raise AttributeError("EphysSweepFeatureExtractor instance attribute with spike information does not exist yet - have spikes been processed?")
 
         if len(self._spikes_df) == 0:
             return np.array([])
@@ -468,7 +525,20 @@ class EphysSweepFeatureExtractor:
         if key not in self._spikes_df.columns:
             raise KeyError("requested feature '{:s}' not available".format(key))
 
-        return self._spikes_df[key].values
+        values = self._spikes_df[key].values
+
+        if include_clipped and force_exclude_clipped:
+            raise ValueError("include_clipped and force_exclude_clipped cannot both be true")
+
+        if not include_clipped and self.is_spike_feature_affected_by_clipping(key):
+            values = values[~self._spikes_df["clipped"].values]
+        elif force_exclude_clipped:
+            values = values[~self._spikes_df["clipped"].values]
+
+        return values
+
+    def is_spike_feature_affected_by_clipping(self, key):
+        return key in self._affected_by_clipping
 
     def spike_feature_keys(self):
         """Get list of every available spike feature."""
@@ -509,7 +579,7 @@ class EphysSweepFeatureExtractor:
 
         return self._sweep_features[key]
 
-    def process_new_spike_feature(self, feature_name, feature_func):
+    def process_new_spike_feature(self, feature_name, feature_func, affected_by_clipping=False):
         """Add new spike-level feature calculation function
 
            The function should take this sweep extractor as its argument. Its results
@@ -519,9 +589,10 @@ class EphysSweepFeatureExtractor:
         if feature_name in self._spikes_df.columns:
             raise KeyError("Feature {:s} already exists for sweep".format(feature_name))
 
-        features = feature_func(self)
-        self._spikes_df[feature_name] = np.nan
-        self._spikes_df.ix[:len(features) - 1, feature_name] = features
+        self._spikes_df[feature_name] = feature_func(self)
+
+        if affected_by_clipping:
+            self._affected_by_clipping.append(feature_name)
 
     def process_new_sweep_feature(self, feature_name, feature_func):
         """Add new sweep-level feature calculation function
@@ -721,6 +792,8 @@ class EphysCellFeatureExtractor:
         ext = self._ramps_ext
         ext.process_spikes()
 
+        self._all_ramps_ext = ext
+
         # pull out the spiking sweeps
         spiking_sweeps = [ sweep for sweep in self._ramps_ext.sweeps() if sweep.sweep_feature("avg_rate") > 0 ]
         ext = EphysSweepSetFeatureExtractor.from_sweeps(spiking_sweeps)
@@ -728,9 +801,11 @@ class EphysCellFeatureExtractor:
 
         self._features["ramps"]["spiking_sweeps"] = ext.sweeps()
 
-
-    def ramps_features(self):
-        return self._ramps_ext
+    def ramps_features(self, all=False):
+        if all:
+            return self._all_ramps_ext
+        else:
+            return self._ramps_ext
 
     def _analyze_short_squares(self):
         ext = self._short_squares_ext
@@ -815,16 +890,18 @@ class EphysCellFeatureExtractor:
         for s in self._features["long_squares"]["subthreshold_sweeps"]:
             s.set_stimulus_amplitude_calculator(_step_stim_amp)
 
+        logging.debug("subthresh_sweeps: %d", len(subthresh_sweeps))
         calc_subthresh_sweeps = [sweep for sweep in subthresh_sweeps if
                                  sweep.sweep_feature("stim_amp") < self.SUBTHRESH_MAX_AMP and
                                  sweep.sweep_feature("stim_amp") > self._subthresh_min_amp]
 
+        logging.debug("calc_subthresh_sweeps: %d", len(calc_subthresh_sweeps))
         calc_subthresh_ext = EphysSweepSetFeatureExtractor.from_sweeps(calc_subthresh_sweeps)
         self._subthreshold_membrane_property_ext = calc_subthresh_ext
         self._features["long_squares"]["subthreshold_membrane_property_sweeps"] = calc_subthresh_ext.sweeps()
         self._features["long_squares"]["input_resistance"] = input_resistance(calc_subthresh_ext)
         self._features["long_squares"]["tau"] = membrane_time_constant(calc_subthresh_ext)
-
+        self._features["long_squares"]["v_baseline"] = np.nanmean(ext.sweep_features("v_baseline"))
 
     def long_squares_features(self, option=None):
         option_table = {
@@ -937,6 +1014,13 @@ def fit_fi_slope(ext):
     m, c = np.linalg.lstsq(A, y)[0]
 
     return m
+
+
+def reset_long_squares_start(when):
+    global LONG_SQUARES_START, LONG_SQUARES_END
+    delta = LONG_SQUARES_END - LONG_SQUARES_START
+    LONG_SQUARES_START = when
+    LONG_SQUARES_END = when + delta
 
 
 def cell_extractor_for_nwb(dataset, ramps, short_squares, long_squares, subthresh_min_amp=-100):
