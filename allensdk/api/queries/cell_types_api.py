@@ -242,16 +242,16 @@ class CellTypesApi(RmaApi):
         """
         """
 
+        print(cells, require_morphology, require_reconstruction, reporter_status, species)
         if require_morphology or require_reconstruction:
-            cells = [c for c in cells if c['nr__reconstruction_type'] is not None]
+            cells = [c for c in cells if c.get('nr__reconstruction_type') is not None]
 
         if reporter_status:
-            cells = [c for c in cells if c[
-                'cell_reporter_status'] in reporter_status]
+            cells = [c for c in cells if c.get('cell_reporter_status') in reporter_status]
 
         if species:
             species_lower = [ s.lower() for s in species ]
-            cells = [c for c in cells if c['donor__species'].lower() in species_lower]
+            cells = [c for c in cells if c.get('donor__species',"").lower() in species_lower]
 
         return cells
 

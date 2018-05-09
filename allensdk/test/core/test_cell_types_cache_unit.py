@@ -149,23 +149,24 @@ def test_get_cells(cache_fixture,
     # this downloads metadata for all cells with morphology images
     with patch.object(ctc, "get_cache_path", return_value=_MOCK_PATH):
         with patch('allensdk.api.queries.cell_types_api.CellTypesApi.list_cells',
-                MagicMock(return_value=['mock_cells_from_server'])) as list_cells_mock:
-            with patch('allensdk.api.queries.cell_types_api.CellTypesApi.filter_cells',
-                    MagicMock(return_value=['mock_cells'])) as filter_cells_mock:
+                   MagicMock(return_value=['mock_cells_from_server'])) as list_cells_mock:
+            with patch('allensdk.api.queries.cell_types_api.CellTypesApi.filter_cells_api',
+                       MagicMock(return_value=['mock_cells'])) as filter_cells_mock:
                 with patch('os.path.exists', MagicMock(return_value=path_exists)) as ope:
                     with patch('allensdk.core.json_utilities.read',
-                            return_value=['mock_data']) as ju_read:
+                               return_value=['mock_cells']) as ju_read:
                         with patch('allensdk.core.json_utilities.write') as ju_write:
                             cells = ctc.get_cells(require_morphology=morph_flag,
-                                                require_reconstruction=recon_flag,
-                                                reporter_status=statuses,
-                                                species=species)
+                                                  require_reconstruction=recon_flag,
+                                                  reporter_status=statuses,
+                                                  species=species,
+                                                  simple=False)
 
     assert len(cells) > 0
 
     if path_exists:
         ju_read.assert_called_once_with(_MOCK_PATH)
-        expected_cells = ['mock_data']
+        expected_cells = ['mock_cells']
     else:
         list_cells_mock.assert_called_once_with(False, False)
         expected_cells = ['mock_cells_from_server']
