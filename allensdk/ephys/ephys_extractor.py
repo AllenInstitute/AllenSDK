@@ -783,9 +783,9 @@ class EphysCellFeatureExtractor:
             keys = list(dispatch.keys())
 
         if type(keys) is not list:
-            keys = [keys]
+            keys = list(keys)
 
-        for k in [j for j in keys if j in list(dispatch.keys())]:
+        for k in [j for j in keys if j in dispatch]:
             dispatch[k]()
 
     def _analyze_ramps(self):
