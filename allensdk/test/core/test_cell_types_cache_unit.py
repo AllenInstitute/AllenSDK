@@ -148,13 +148,13 @@ def test_get_cells(cache_fixture,
     ctc = cache_fixture
     # this downloads metadata for all cells with morphology images
     with patch.object(ctc, "get_cache_path", return_value=_MOCK_PATH):
-        with patch('allensdk.api.queries.cell_types_api.CellTypesApi.list_cells',
-                   MagicMock(return_value=['mock_cells_from_server'])) as list_cells_mock:
-            with patch('allensdk.api.queries.cell_types_api.CellTypesApi.filter_cells_api',
-                       MagicMock(return_value=['mock_cells'])) as filter_cells_mock:
-                with patch('os.path.exists', MagicMock(return_value=path_exists)) as ope:
-                    with patch('allensdk.core.json_utilities.read',
-                               return_value=['mock_cells']) as ju_read:
+        with patch('os.path.exists', MagicMock(return_value=path_exists)) as ope:
+            with patch('allensdk.core.json_utilities.read',
+                       return_value=['mock_cells_from_server']) as ju_read:
+                with patch('allensdk.api.queries.cell_types_api.CellTypesApi.list_cells_api',
+                           MagicMock(return_value=['mock_cells_from_server'])) as list_cells_mock:
+                    with patch('allensdk.api.queries.cell_types_api.CellTypesApi.filter_cells_api',
+                               MagicMock(return_value=['mock_cells'])) as filter_cells_mock:
                         with patch('allensdk.core.json_utilities.write') as ju_write:
                             cells = ctc.get_cells(require_morphology=morph_flag,
                                                   require_reconstruction=recon_flag,
@@ -162,21 +162,14 @@ def test_get_cells(cache_fixture,
                                                   species=species,
                                                   simple=False)
 
-    assert len(cells) > 0
-
-    if path_exists:
-        ju_read.assert_called_once_with(_MOCK_PATH)
-        expected_cells = ['mock_cells']
-    else:
-        list_cells_mock.assert_called_once_with(False, False)
-        expected_cells = ['mock_cells_from_server']
+    assert cells == ['mock_cells']
 
     if (statuses == RS.POSITIVE):
         expected_status = [statuses]
     else:
         expected_status = statuses
 
-    filter_cells_mock.assert_called_once_with(expected_cells,
+    filter_cells_mock.assert_called_once_with(['mock_cells_from_server'],
                                               morph_flag,
                                               recon_flag,
                                               expected_status,
