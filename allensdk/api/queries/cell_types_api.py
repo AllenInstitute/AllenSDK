@@ -238,11 +238,10 @@ class CellTypesApi(RmaApi):
                          require_morphology=False,
                          require_reconstruction=False,
                          reporter_status=None,
-                         species=None):
+                         species=None,
+                         simple=True):
         """
         """
-
-        print(cells, require_morphology, require_reconstruction, reporter_status, species)
         if require_morphology or require_reconstruction:
             cells = [c for c in cells if c.get('nr__reconstruction_type') is not None]
 
@@ -253,7 +252,27 @@ class CellTypesApi(RmaApi):
             species_lower = [ s.lower() for s in species ]
             cells = [c for c in cells if c.get('donor__species',"").lower() in species_lower]
 
+        if simple:
+            cells = self.simplify_cells_api(cells)
+
         return cells
+
+    def simplify_cells_api(self, cells):
+        return [{
+                'reporter_status': cell['cell_reporter_status'],
+                'cell_soma_location': [ cell['csl__x'], cell['csl__y'], cell['csl__z'] ],
+                'species': cell['donor__species'],
+                'id': cell['specimen__id'],
+                'name': cell['specimen__name'],
+                'structure_layer_name':  cell['structure__layer'],
+                'structure_area_id': cell['structure_parent__id'],
+                'structure_area_abbrev': cell['structure_parent__acronym'],
+                'transgenic_line': cell['line_name'],
+                'dendrite_type': cell['tag__dendrite_type'],
+                'apical': cell['tag__apical'],
+                'reconstruction_type': cell['nr__reconstruction_type'],
+                'disease_state': cell['donor__disease_state']
+        } for cell in cells ]
 
     @cacheable()
     def get_ephys_features(self):

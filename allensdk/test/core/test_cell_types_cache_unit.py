@@ -133,18 +133,21 @@ def test_sweep_data_exception(cache_fixture):
     assert 'has no ephys data' in str(exc.value)
 
 
-@pytest.mark.parametrize('path_exists,morph_flag,recon_flag,statuses,species',
+@pytest.mark.parametrize('path_exists,morph_flag,recon_flag,statuses,species,simple',
                          it.product((False, True),
                                     (False, True),
                                     (False, True),
                                     (RS.POSITIVE, ['list', 'of', 'statuses']),
-                                    (None, ['mouse'], ['human'])))
+                                    (None, ['mouse'], ['human']),
+                                    (False,)))
+
 def test_get_cells(cache_fixture,
                    path_exists,
                    morph_flag,
                    recon_flag,
                    statuses,
-                   species):
+                   species,
+                   simple):
     ctc = cache_fixture
     # this downloads metadata for all cells with morphology images
     with patch.object(ctc, "get_cache_path", return_value=_MOCK_PATH):
@@ -160,7 +163,7 @@ def test_get_cells(cache_fixture,
                                                   require_reconstruction=recon_flag,
                                                   reporter_status=statuses,
                                                   species=species,
-                                                  simple=False)
+                                                  simple=simple)
 
     assert cells == ['mock_cells']
 
@@ -173,7 +176,8 @@ def test_get_cells(cache_fixture,
                                               morph_flag,
                                               recon_flag,
                                               expected_status,
-                                              species)
+                                              species,
+                                              simple)
 
 
 @pytest.mark.parametrize('path_exists,morph_flag,recon_flag,statuses',
@@ -207,17 +211,16 @@ def test_get_cells_with_api(cache_fixture,
 
     with patch.object(ctc, "get_cache_path", return_value=_MOCK_PATH):
         with patch('allensdk.api.queries.cell_types_api.CellTypesApi.model_query',
-                MagicMock(name='model query',
-                            return_value=return_dicts)) as query_mock:
+                MagicMock(name='model query', return_value=return_dicts)) as query_mock:
             with patch('os.path.exists', MagicMock(return_value=path_exists)) as ope:
                 with patch('allensdk.core.json_utilities.read',
                         return_value=return_dicts) as ju_read:
                     with patch('allensdk.core.json_utilities.write') as ju_write:
                         with patch('allensdk.config.manifest.Manifest.safe_make_parent_dirs'):
                             cells = ctc.get_cells(require_morphology=morph_flag,
-                                                require_reconstruction=recon_flag,
-                                                reporter_status=statuses)
-
+                                                  require_reconstruction=recon_flag,
+                                                  reporter_status=statuses,
+                                                  simple=True)
     if path_exists:
         ju_read.assert_called_once_with(_MOCK_PATH)
     else:

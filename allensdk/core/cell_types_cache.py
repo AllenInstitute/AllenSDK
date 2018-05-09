@@ -127,7 +127,7 @@ class CellTypesCache(Cache):
         cells = self.api.list_cells_api(path=file_name,
                                         strategy='lazy',
                                         **Cache.cache_json())
-
+        
         if isinstance(reporter_status, string_types):
             reporter_status = [reporter_status]
 
@@ -136,24 +136,9 @@ class CellTypesCache(Cache):
                                           require_morphology,
                                           require_reconstruction,
                                           reporter_status,
-                                          species)
-        
-        if simple:
-            cells = [{
-                'reporter_status': cell['cell_reporter_status'],
-                'cell_soma_location': [ cell['csl__x'], cell['csl__y'], cell['csl__z'] ],
-                'species': cell['donor__species'],
-                'id': cell['specimen__id'],
-                'name': cell['specimen__name'],
-                'structure_layer_name':  cell['structure__layer'],
-                'structure_area_id': cell['structure_parent__id'],
-                'structure_area_abbrev': cell['structure_parent__acronym'],
-                'transgenic_line': cell['line_name'],
-                'dendrite_type': cell['tag__dendrite_type'],
-                'apical': cell['tag__apical'],
-                'reconstruction_type': cell['nr__reconstruction_type'],
-                'disease_state': cell['donor__disease_state']
-            } for cell in cells ]
+                                          species,
+                                          simple)
+    
                 
         return cells
                 
