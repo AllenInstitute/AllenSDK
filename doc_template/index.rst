@@ -92,18 +92,23 @@ What's New - Release 0.14.5 (June 14th, 2018)
 ---------------------------------------------
 
 The 0.14.5 release coincides with the release of additional mouse electrophysiology and morphology data in the Allen Cell Types Database. 
-We have simplified the data structure returned by :py:meth:`~allensdk.core.cell_types_cache.CellTypesCache.get_cells` to be simpler and more
-flat, so you will be prompted to update your manifest version.  To use the simpler format and access the new data, remove the following files:
+We have simplified the data structure returned by :py:meth:`~allensdk.core.cell_types_cache.CellTypesCache.get_cells` to be more
+flat, so you will be prompted to update your manifest.  To use the simpler format and access the new data, remove the following files:
 
     * :py:meth:`~allensdk.core.cell_types_cache.CellTypesCache` manifest.json
     * ``cells.json`` 
     * ``ephys_features.csv`` 
     * ``morphology_features.csv`` 
 
+We have also simplified the data structure returned by :py:meth:`~allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_experiments`, so you will 
+be prompted to update your connectivity manifest.  To use the simpler format and access the new data, remove the following files:
+
+    * :py:meth:`~allensdk.core.mouse_connectivity_cache.MouseConnectivityCache` manifest.json
+    * ``experiments.json`` 
 
 Additional changes:
 
-    * increased ``pandas`` minimum version to 0.17, removed the upper limit 
+    * increased ``pandas`` minimum version to 0.17, removed the upper limit
     * added regression tests to the Brain Observatory analysis modules to ensure py3/py2 numerical compatibility.
 
 What's New - Release 0.14.4 (January 30th, 2018)
