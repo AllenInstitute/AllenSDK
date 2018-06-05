@@ -69,10 +69,8 @@ def old_nodes():
 
 @pytest.fixture(scope='function')
 def experiments():
-
-    return [{'num-voxels': 100, 'injection-volume': 99, 'sum': 98, 
-             'name': 'foo', 'transgenic-line': 'most_creish', 
-             'structure-id': 97}]
+    return [{'name': 'foo', 'storage_directory': 'meep', 'transgenic_line': { 'name': 'most_creish' },
+             'injection_structures': '234/324', 'structure_id': 97}]
 
 
 @pytest.fixture(scope='function')
@@ -256,17 +254,19 @@ def test_get_experiments(mcc, fn_temp_dir, experiments):
 
     file_path = os.path.join(fn_temp_dir, 'experiments.json')
 
-    with mock.patch.object(mcc.api, "service_query",
-                           new=lambda a, parameters: experiments):
+    def new_fn(*args, **kwargs): return experiments
+    
+    with mock.patch.object(mcc.api, "model_query",
+                           new=new_fn):
         obtained = mcc.get_experiments()
 
-    with mock.patch.object(mcc.api, "service_query") as mock_squery:
+    with mock.patch.object(mcc.api, "model_query") as mock_squery:
         mcc.get_experiments()
 
     mock_squery.assert_not_called()
     assert os.path.exists(file_path)
-    assert 'num_voxels' not in obtained[0]
-    assert obtained[0]['transgenic-line'] == 'most_creish' 
+    assert 'storage_directory' not in obtained[0]
+    assert obtained[0]['transgenic_line'] == 'most_creish' 
 
     obtained = mcc.get_experiments(cre=['MOST_CREISH'])
     assert len(obtained) == 1
