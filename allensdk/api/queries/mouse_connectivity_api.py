@@ -88,12 +88,7 @@ class MouseConnectivityApi(ReferenceSpaceApi, GridDataApi):
     @cacheable()
     def get_experiments_api(self):
         '''
-        Fetch experiment metadata from the Mouse Brain Connectivity Atlas.
-
-        Parameters
-        ----------
-        structure_ids : integer or list, optional
-            injection structure
+        Fetch experiment metadata from the Mouse Brain Connectivity Atlas via the ApiConnectivity table.
 
         Returns
         -------
