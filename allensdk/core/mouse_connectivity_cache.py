@@ -295,7 +295,10 @@ class MouseConnectivityCache(ReferenceSpaceCache):
                                                    **Cache.cache_json())
 
         for e in experiments:
-
+            # renaming id
+            e['id'] = e['data_set_id']
+            del e['data_set_id']
+            
             # simplify trangsenic line
             tl = e.get('transgenic_line', None)
             if tl:
@@ -343,7 +346,7 @@ class MouseConnectivityCache(ReferenceSpaceCache):
             experiments = [e for e in experiments if not e['transgenic_line']]
         elif cre is not None:
             cre = [ c.lower() for c in cre ]
-            experiments = [e for e in experiments if e['transgenic_line'].lower() in cre]
+            experiments = [e for e in experiments if e['transgenic_line'] is not None and e['transgenic_line'].lower() in cre]
 
         if injection_structure_ids is not None:
             structure_ids = MouseConnectivityCache.validate_structure_ids(injection_structure_ids)

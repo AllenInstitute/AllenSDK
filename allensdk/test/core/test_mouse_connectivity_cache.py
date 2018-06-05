@@ -69,8 +69,10 @@ def old_nodes():
 
 @pytest.fixture(scope='function')
 def experiments():
-    return [{'name': 'foo', 'storage_directory': 'meep', 'transgenic_line': { 'name': 'most_creish' },
-             'injection_structures': '234/324', 'structure_id': 97}]
+    return [{'data_set_id': 1, 'name': 'foo', 'storage_directory': 'meep', 'transgenic_line': { 'name': 'most_creish' },
+             'injection_structures': '234/324', 'structure_id': 97},
+            {'data_set_id': 2, 'name': 'bar', 'storage_directory': 'meep',  'transgenic_line': None,
+             'injection_structures': '234/324/234', 'structure_id': 21}]
 
 
 @pytest.fixture(scope='function')
@@ -278,7 +280,7 @@ def test_filter_experiments(mcc, fn_temp_dir, experiments):
     fail_line = mcc.filter_experiments(experiments, cre=False)
 
     assert len(pass_line) == 1
-    assert len(fail_line) == 0
+    assert len(fail_line) == 1
 
     sid_line = mcc.filter_experiments(experiments, cre=True,
                                       injection_structure_ids=[97,98])
