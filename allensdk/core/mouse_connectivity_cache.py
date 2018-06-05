@@ -290,24 +290,25 @@ class MouseConnectivityCache(ReferenceSpaceCache):
 
         file_name = self.get_cache_path(file_name, self.EXPERIMENTS_KEY)
 
-        if os.path.exists(file_name):
-            experiments = json_utilities.read(file_name)
-        else:
-            experiments = self.api.experiment_source_search(
-                injection_structures='root')
+        experiments = self.api.get_experiments_api(path=file_name,
+                                                   strategy='lazy',
+                                                   **Cache.cache_json())
 
-            # removing these elements because they are specific to a particular
-            # resolution
-            for e in experiments:
-                del e['num-voxels']
-                del e['injection-volume']
-                del e['sum']
-                del e['name']
+        for e in experiments:
 
-            if self.cache:
-                Manifest.safe_make_parent_dirs(file_name)
+            # simplify trangsenic line
+            tl = e.get('transgenic_line', None)
+            if tl:
+                e['transgenic_line'] = tl['name']
 
-                json_utilities.write(file_name, experiments)
+            # parse the injection structures
+            injs = [ int(i) for i in e['injection_structures'].split('/') ]
+            e['injection_structures'] = injs
+            e['primary_injection_structure'] = injs[0]
+
+            # remove storage dir
+            del e['storage_directory']
+
 
         # filter the read/downloaded list of experiments
         experiments = self.filter_experiments(
@@ -337,12 +338,12 @@ class MouseConnectivityCache(ReferenceSpaceCache):
         """
 
         if cre is True:
-            experiments = [e for e in experiments if e['transgenic-line']]
+            experiments = [e for e in experiments if e['transgenic_line']]
         elif cre is False:
-            experiments = [e for e in experiments if not e['transgenic-line']]
+            experiments = [e for e in experiments if not e['transgenic_line']]
         elif cre is not None:
             cre = [ c.lower() for c in cre ]
-            experiments = [e for e in experiments if e['transgenic-line'].lower() in cre]
+            experiments = [e for e in experiments if e['transgenic_line'].lower() in cre]
 
         if injection_structure_ids is not None:
             structure_ids = MouseConnectivityCache.validate_structure_ids(injection_structure_ids)
@@ -350,7 +351,7 @@ class MouseConnectivityCache(ReferenceSpaceCache):
             descendant_ids = reduce(op.add, self.get_structure_tree()\
                                     .descendant_ids(injection_structure_ids))
             experiments = [e for e in experiments 
-                           if e['structure-id'] in descendant_ids]
+                           if e['structure_id'] in descendant_ids]
 
         return experiments
 
