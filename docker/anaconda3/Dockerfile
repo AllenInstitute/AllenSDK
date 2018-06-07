@@ -5,7 +5,7 @@
 #
 FROM continuumio/anaconda3
 
-MAINTAINER Tim Fliss <timf@alleninstitute.org>
+MAINTAINER David Feng <davidf@alleninstitute.org>
 
 # neuron installation
 WORKDIR root
