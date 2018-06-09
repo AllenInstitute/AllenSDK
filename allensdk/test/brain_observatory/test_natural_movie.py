@@ -92,7 +92,12 @@ def mock_sweep_response():
 @patch.object(StimulusAnalysis,
               'get_sweep_response',
               mock_sweep_response())
-@pytest.mark.parametrize('trigger', (1, 2))
+@pytest.mark.parametrize(
+    'trigger', [
+        ('stim_table', 'sweep_response', 'peak'),
+        ('sweeplength', 'sweep_response', 'peak')
+    ]
+)
 def test_harness(dataset, trigger):
     movie_name = "Mock Movie Name"
     nm = NaturalMovie(dataset, movie_name)
@@ -102,14 +107,8 @@ def test_harness(dataset, trigger):
     assert nm._sweep_response is StimulusAnalysis._PRELOAD
     assert nm._peak is StimulusAnalysis._PRELOAD
 
-    if trigger == 1:
-        print(nm.stim_table)
-        print(nm.sweep_response)
-        print(nm.peak)
-    if trigger == 2:
-        print(nm.sweeplength)
-        print(nm.sweep_response)
-        print(nm.peak)
+    for attr in trigger:
+        print(getattr(nm, attr))
 
     assert nm._stim_table is not StimulusAnalysis._PRELOAD
     assert nm._sweeplength is not StimulusAnalysis._PRELOAD
