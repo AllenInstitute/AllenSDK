@@ -37,10 +37,20 @@ from allensdk.brain_observatory.natural_movie import NaturalMovie
 from allensdk.brain_observatory.stimulus_analysis import StimulusAnalysis
 import pytest
 from mock import patch, MagicMock
+import pandas as pd
 
 
 @pytest.fixture
-def dataset():
+def stimulus_table():
+    return pd.DataFrame([
+        {'frame': 0, 'start': 0, 'stop': 1},
+        {'frame': 0, 'start': 1, 'stop': 2},
+        {'frame': 1, 'start': 2, 'stop': 3},
+    ])
+
+
+@pytest.fixture
+def dataset(stimulus_table):
     dataset = MagicMock(name='dataset')
     
     timestamps = MagicMock(name='timestamps')
@@ -58,7 +68,7 @@ def dataset():
     dataset.get_running_speed=MagicMock(name='get_running_speed',
                                         return_value=(dxcm, dxtime))
     dataset.get_stimulus_table=MagicMock(name='get_stimulus_table',
-                                         return_value=MagicMock())
+                                         return_value=stimulus_table)
     
     return dataset
 
@@ -92,7 +102,12 @@ def mock_sweep_response():
 @patch.object(StimulusAnalysis,
               'get_sweep_response',
               mock_sweep_response())
-@pytest.mark.parametrize('trigger', (1, 2))
+@pytest.mark.parametrize(
+    'trigger', [
+        ('stim_table', 'sweep_response', 'peak'),
+        ('sweeplength', 'sweep_response', 'peak')
+    ]
+)
 def test_harness(dataset, trigger):
     movie_name = "Mock Movie Name"
     nm = NaturalMovie(dataset, movie_name)
@@ -102,14 +117,8 @@ def test_harness(dataset, trigger):
     assert nm._sweep_response is StimulusAnalysis._PRELOAD
     assert nm._peak is StimulusAnalysis._PRELOAD
 
-    if trigger == 1:
-        print(nm.stim_table)
-        print(nm.sweep_response)
-        print(nm.peak)
-    if trigger == 2:
-        print(nm.sweeplength)
-        print(nm.sweep_response)
-        print(nm.peak)
+    for attr in trigger:
+        print(getattr(nm, attr))
 
     assert nm._stim_table is not StimulusAnalysis._PRELOAD
     assert nm._sweeplength is not StimulusAnalysis._PRELOAD
