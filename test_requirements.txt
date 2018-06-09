@@ -1,5 +1,5 @@
 pep8==1.7.0
-pytest>=2.9.2
+pytest>=2.10.0
 pytest-cov>=2.2.1
 pytest-cover>=3.0.0
 pytest-pep8>=1.0.6
