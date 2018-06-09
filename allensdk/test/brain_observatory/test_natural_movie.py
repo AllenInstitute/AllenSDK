@@ -37,10 +37,20 @@ from allensdk.brain_observatory.natural_movie import NaturalMovie
 from allensdk.brain_observatory.stimulus_analysis import StimulusAnalysis
 import pytest
 from mock import patch, MagicMock
+import pandas as pd
 
 
 @pytest.fixture
-def dataset():
+def stimulus_table():
+    return pd.DataFrame([
+        {'frame': 0, 'start': 0, 'stop': 1},
+        {'frame': 0, 'start': 1, 'stop': 2},
+        {'frame': 1, 'start': 2, 'stop': 3},
+    ])
+
+
+@pytest.fixture
+def dataset(stimulus_table):
     dataset = MagicMock(name='dataset')
     
     timestamps = MagicMock(name='timestamps')
@@ -58,7 +68,7 @@ def dataset():
     dataset.get_running_speed=MagicMock(name='get_running_speed',
                                         return_value=(dxcm, dxtime))
     dataset.get_stimulus_table=MagicMock(name='get_stimulus_table',
-                                         return_value=MagicMock())
+                                         return_value=stimulus_table)
     
     return dataset
 
