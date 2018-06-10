@@ -59,7 +59,7 @@ EXAMPLES=doc/_static/examples
 doc: FORCE
 	mkdir -p $(DOCDIR)
 	cp -r doc_template/* $(DOCDIR)
-	cd $(DOCDIR); sphinx-build -b html . _build/html
+	cd $(DOCDIR); sphinx-build -b html . _build/html;
 
 notebooks:
 	cd doc_template/examples/nb && find . -maxdepth 1 -name '*.ipynb' -exec jupyter-nbconvert --to notebook --execute --ExecutePreprocessor.timeout=1800 {} \;

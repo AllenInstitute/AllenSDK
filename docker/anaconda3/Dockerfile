@@ -9,5 +9,7 @@ MAINTAINER David Feng <davidf@alleninstitute.org>
 
 # neuron installation
 WORKDIR root
+COPY shared/apt_get_dependencies.sh ./shared/
+RUN /bin/bash shared/apt_get_dependencies.sh
 COPY shared/conda_27.sh ./shared/
 RUN /bin/bash shared/conda_27.sh

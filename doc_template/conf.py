@@ -311,12 +311,10 @@ def render_notebooks(_):
             os.system('jupyter-nbconvert --to html %s --output %s' % (nb, nb_html))
             
 def run_apidoc(_):
-    from sphinx.apidoc import main
-    import sys
     sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
     cur_dir = os.path.abspath(os.path.dirname(__file__))
     module = os.path.join(cur_dir,"..","allensdk")
-    main(['-e', '-o', cur_dir, module, '--force'])
+    os.system('sphinx-apidoc -e -o %s %s --force' % (cur_dir, module))
 
 def setup(app):
     app.connect('autodoc-skip-member', skip_autodoc)
