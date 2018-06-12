@@ -83,7 +83,7 @@ class CellTypesCache(Cache):
     EPHYS_SWEEPS_KEY = 'EPHYS_SWEEPS'
     RECONSTRUCTION_KEY = 'RECONSTRUCTION'
     MARKER_KEY = 'MARKER'
-    MANIFEST_VERSION = "1.0"
+    MANIFEST_VERSION = "1.1"
 
     def __init__(self, cache=True, manifest_file='cell_types_manifest.json', base_uri=None):
         super(CellTypesCache, self).__init__(
@@ -94,7 +94,8 @@ class CellTypesCache(Cache):
                   require_morphology=False,
                   require_reconstruction=False,
                   reporter_status=None,
-                  species=None):
+                  species=None,
+                  simple=True):
         """
         Download metadata for all cells in the database and optionally return a
         subset filtered by whether or not they have a morphology or reconstruction.
@@ -123,23 +124,25 @@ class CellTypesCache(Cache):
 
         file_name = self.get_cache_path(file_name, self.CELLS_KEY)
 
-        if os.path.exists(file_name):
-            cells = json_utilities.read(file_name)
-        else:
-            cells = self.api.list_cells(False, False)
-
-            if self.cache:
-                json_utilities.write(file_name, cells)
-
+        cells = self.api.list_cells_api(path=file_name,
+                                        strategy='lazy',
+                                        **Cache.cache_json())
+        
         if isinstance(reporter_status, string_types):
             reporter_status = [reporter_status]
 
         # filter the cells on the way out
-        return self.api.filter_cells(cells,
-                                     require_morphology,
-                                     require_reconstruction,
-                                     reporter_status,
-                                     species)
+        cells = self.api.filter_cells_api(cells,
+                                          require_morphology,
+                                          require_reconstruction,
+                                          reporter_status,
+                                          species,
+                                          simple)
+    
+                
+        return cells
+                
+       
         
 
     def get_ephys_sweeps(self, specimen_id, file_name=None):
@@ -406,7 +409,7 @@ class ReporterStatus:
     Valid strings for filtering by cell reporter status.
     """
 
-    POSITIVE = 'cre reporter positive'
-    NEGATIVE = 'cre reporter negative'
-    NA = 'not applicable'
-    INDETERMINATE = 'cre reporter indeterminate'
+    POSITIVE = 'positive'
+    NEGATIVE = 'negative'
+    NA = None
+    INDETERMINATE = None

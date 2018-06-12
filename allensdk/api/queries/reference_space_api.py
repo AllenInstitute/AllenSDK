@@ -60,7 +60,7 @@ class ReferenceSpaceApi(RmaApi):
 
 
     def __init__(self, base_uri=None):
-        super(ReferenceSpaceApi, self).__init__(base_uri)
+        super(ReferenceSpaceApi, self).__init__(base_uri=base_uri)
 
 
     @cacheable(strategy='create',

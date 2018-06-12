@@ -1,6 +1,17 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [0.14.5] = 2018-06-14
+
+### Changed
+- bumped lower limit of pandas to 0.17, removed upper limit
+- changed CellTypesCache cell data structure to be less nested, more flat. Requires update to manifest and re-download of cells.json.
+- simplified MouseConnectivityCache data structure.  Requires update to manifest and re-download of experiments.json.
+- stopped using deprecated function in SimpleTree
+
+### Added
+- regression tests for Brain Observatory analysis
+
 ## [0.14.4] - 2018-01-30
 
 ### Changed

@@ -133,53 +133,51 @@ def test_sweep_data_exception(cache_fixture):
     assert 'has no ephys data' in str(exc.value)
 
 
-@pytest.mark.parametrize('path_exists,morph_flag,recon_flag,statuses,species',
+@pytest.mark.parametrize('path_exists,morph_flag,recon_flag,statuses,species,simple',
                          it.product((False, True),
                                     (False, True),
                                     (False, True),
                                     (RS.POSITIVE, ['list', 'of', 'statuses']),
-                                    (None, ['mouse'], ['human'])))
+                                    (None, ['mouse'], ['human']),
+                                    (False,)))
+
 def test_get_cells(cache_fixture,
                    path_exists,
                    morph_flag,
                    recon_flag,
                    statuses,
-                   species):
+                   species,
+                   simple):
     ctc = cache_fixture
     # this downloads metadata for all cells with morphology images
     with patch.object(ctc, "get_cache_path", return_value=_MOCK_PATH):
-        with patch('allensdk.api.queries.cell_types_api.CellTypesApi.list_cells',
-                MagicMock(return_value=['mock_cells_from_server'])) as list_cells_mock:
-            with patch('allensdk.api.queries.cell_types_api.CellTypesApi.filter_cells',
-                    MagicMock(return_value=['mock_cells'])) as filter_cells_mock:
-                with patch('os.path.exists', MagicMock(return_value=path_exists)) as ope:
-                    with patch('allensdk.core.json_utilities.read',
-                            return_value=['mock_data']) as ju_read:
+        with patch('os.path.exists', MagicMock(return_value=path_exists)) as ope:
+            with patch('allensdk.core.json_utilities.read',
+                       return_value=['mock_cells_from_server']) as ju_read:
+                with patch('allensdk.api.queries.cell_types_api.CellTypesApi.list_cells_api',
+                           MagicMock(return_value=['mock_cells_from_server'])) as list_cells_mock:
+                    with patch('allensdk.api.queries.cell_types_api.CellTypesApi.filter_cells_api',
+                               MagicMock(return_value=['mock_cells'])) as filter_cells_mock:
                         with patch('allensdk.core.json_utilities.write') as ju_write:
                             cells = ctc.get_cells(require_morphology=morph_flag,
-                                                require_reconstruction=recon_flag,
-                                                reporter_status=statuses,
-                                                species=species)
+                                                  require_reconstruction=recon_flag,
+                                                  reporter_status=statuses,
+                                                  species=species,
+                                                  simple=simple)
 
-    assert len(cells) > 0
-
-    if path_exists:
-        ju_read.assert_called_once_with(_MOCK_PATH)
-        expected_cells = ['mock_data']
-    else:
-        list_cells_mock.assert_called_once_with(False, False)
-        expected_cells = ['mock_cells_from_server']
+    assert cells == ['mock_cells']
 
     if (statuses == RS.POSITIVE):
         expected_status = [statuses]
     else:
         expected_status = statuses
 
-    filter_cells_mock.assert_called_once_with(expected_cells,
+    filter_cells_mock.assert_called_once_with(['mock_cells_from_server'],
                                               morph_flag,
                                               recon_flag,
                                               expected_status,
-                                              species)
+                                              species,
+                                              simple)
 
 
 @pytest.mark.parametrize('path_exists,morph_flag,recon_flag,statuses',
@@ -213,17 +211,16 @@ def test_get_cells_with_api(cache_fixture,
 
     with patch.object(ctc, "get_cache_path", return_value=_MOCK_PATH):
         with patch('allensdk.api.queries.cell_types_api.CellTypesApi.model_query',
-                MagicMock(name='model query',
-                            return_value=return_dicts)) as query_mock:
+                MagicMock(name='model query', return_value=return_dicts)) as query_mock:
             with patch('os.path.exists', MagicMock(return_value=path_exists)) as ope:
                 with patch('allensdk.core.json_utilities.read',
                         return_value=return_dicts) as ju_read:
                     with patch('allensdk.core.json_utilities.write') as ju_write:
                         with patch('allensdk.config.manifest.Manifest.safe_make_parent_dirs'):
                             cells = ctc.get_cells(require_morphology=morph_flag,
-                                                require_reconstruction=recon_flag,
-                                                reporter_status=statuses)
-
+                                                  require_reconstruction=recon_flag,
+                                                  reporter_status=statuses,
+                                                  simple=True)
     if path_exists:
         ju_read.assert_called_once_with(_MOCK_PATH)
     else:

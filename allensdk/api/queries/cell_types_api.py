@@ -37,6 +37,7 @@ from .rma_api import RmaApi
 from ..cache import cacheable
 from allensdk.config.manifest import Manifest
 from allensdk.api.cache import Cache
+from allensdk.deprecated import deprecated
 
 
 class CellTypesApi(RmaApi):
@@ -49,7 +50,28 @@ class CellTypesApi(RmaApi):
 
     def __init__(self, base_uri=None):
         super(CellTypesApi, self).__init__(base_uri)
+        
 
+    @cacheable()
+    def list_cells_api(self,
+                       id=None,
+                       require_morphology=False, 
+                       require_reconstruction=False, 
+                       reporter_status=None, 
+                       species=None):
+        
+ 
+        criteria = None
+
+        if id:
+            criteria = "[specimen__id$eq%d]" % id
+
+        cells = self.model_query(
+            'ApiCellTypesSpecimenDetail', criteria=criteria, num_rows='all')
+                
+        return cells
+
+    @deprecated("please use list_cells_api instead")
     def list_cells(self, 
                    id=None, 
                    require_morphology=False, 
@@ -146,7 +168,7 @@ class CellTypesApi(RmaApi):
             Meta data for one cell.
         '''
 
-        cells = self.list_cells(id=id)
+        cells = self.list_cells_api(id=id)
         cell = None if not cells else cells[0]
         return cell
 
@@ -169,6 +191,8 @@ class CellTypesApi(RmaApi):
             'EphysSweep', criteria=criteria, num_rows='all')
         return sorted(sweeps, key=lambda x: x['sweep_number'])
 
+
+    @deprecated("please use filter_cells_api")
     def filter_cells(self, cells, require_morphology, require_reconstruction, reporter_status, species):
         """
         Filter a list of cell specimens to those that optionally have morphologies
@@ -209,6 +233,46 @@ class CellTypesApi(RmaApi):
             cells = [c for c in cells if c['donor']['organism']['name'].lower() in species_lower]
 
         return cells
+
+    def filter_cells_api(self, cells,
+                         require_morphology=False,
+                         require_reconstruction=False,
+                         reporter_status=None,
+                         species=None,
+                         simple=True):
+        """
+        """
+        if require_morphology or require_reconstruction:
+            cells = [c for c in cells if c.get('nr__reconstruction_type') is not None]
+
+        if reporter_status:
+            cells = [c for c in cells if c.get('cell_reporter_status') in reporter_status]
+
+        if species:
+            species_lower = [ s.lower() for s in species ]
+            cells = [c for c in cells if c.get('donor__species',"").lower() in species_lower]
+
+        if simple:
+            cells = self.simplify_cells_api(cells)
+
+        return cells
+
+    def simplify_cells_api(self, cells):
+        return [{
+                'reporter_status': cell['cell_reporter_status'],
+                'cell_soma_location': [ cell['csl__x'], cell['csl__y'], cell['csl__z'] ],
+                'species': cell['donor__species'],
+                'id': cell['specimen__id'],
+                'name': cell['specimen__name'],
+                'structure_layer_name':  cell['structure__layer'],
+                'structure_area_id': cell['structure_parent__id'],
+                'structure_area_abbrev': cell['structure_parent__acronym'],
+                'transgenic_line': cell['line_name'],
+                'dendrite_type': cell['tag__dendrite_type'],
+                'apical': cell['tag__apical'],
+                'reconstruction_type': cell['nr__reconstruction_type'],
+                'disease_state': cell['donor__disease_state']
+        } for cell in cells ]
 
     @cacheable()
     def get_ephys_features(self):

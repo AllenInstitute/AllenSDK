@@ -88,6 +88,29 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
 
+What's New - Release 0.14.5 (June 14th, 2018)
+---------------------------------------------
+
+The 0.14.5 release coincides with the release of additional mouse electrophysiology and morphology data in the Allen Cell Types Database. 
+We have simplified the data structure returned by :py:meth:`~allensdk.core.cell_types_cache.CellTypesCache.get_cells` to be more
+flat, so you will be prompted to update your manifest.  To use the simpler format and access the new data, remove the following files:
+
+    * :py:meth:`~allensdk.core.cell_types_cache.CellTypesCache` manifest.json
+    * ``cells.json`` 
+    * ``ephys_features.csv`` 
+    * ``morphology_features.csv`` 
+
+We have also simplified the data structure returned by :py:meth:`~allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_experiments`, so you will 
+be prompted to update your connectivity manifest.  To use the simpler format and access the new data, remove the following files:
+
+    * :py:meth:`~allensdk.core.mouse_connectivity_cache.MouseConnectivityCache` manifest.json
+    * ``experiments.json`` 
+
+Additional changes:
+
+    * increased ``pandas`` minimum version to 0.17, removed the upper limit
+    * added regression tests to the Brain Observatory analysis modules to ensure py3/py2 numerical compatibility.
+
 What's New - Release 0.14.4 (January 30th, 2018)
 ------------------------------------------------
 
@@ -99,7 +122,7 @@ decrease between the candidate's peak and the next candidate's threshold-crossin
 
 
 What's New - Release 0.14.3 (October 19th, 2017)
------------------------------------------------
+------------------------------------------------
 
 The 0.14.3 release coincides with the first release of human data and models in the Allen Cell Types Database and a complete requantification of structure unionize
 records in the Allen Mouse Brain Connectivity Atlas based on a new revision of the Common Coordinate Framework structure ontology and voxel annotations.  For details 

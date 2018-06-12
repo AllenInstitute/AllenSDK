@@ -50,7 +50,7 @@ class MouseConnectivityApi(ReferenceSpaceApi, GridDataApi):
     PRODUCT_IDS = [5, 31]
 
     def __init__(self, base_uri=None):
-        super(MouseConnectivityApi, self).__init__(base_uri)
+        super(MouseConnectivityApi, self).__init__(base_uri=base_uri)
 
 
     @cacheable()
@@ -84,6 +84,18 @@ class MouseConnectivityApi(ReferenceSpaceApi, GridDataApi):
         return self.model_query('SectionDataSet',
                                 criteria=criteria_string,
                                 **kwargs)
+
+    @cacheable()
+    def get_experiments_api(self):
+        '''
+        Fetch experiment metadata from the Mouse Brain Connectivity Atlas via the ApiConnectivity table.
+
+        Returns
+        -------
+        url : string
+            The constructed URL
+        '''
+        return self.model_query('ApiConnectivity', num_rows='all')
 
     @cacheable()
     def get_manual_injection_summary(self, experiment_id):

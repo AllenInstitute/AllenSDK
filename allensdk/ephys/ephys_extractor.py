@@ -780,12 +780,12 @@ class EphysCellFeatureExtractor:
         }
 
         if keys is None:
-            keys = dispatch.keys()
+            keys = list(dispatch.keys())
 
         if type(keys) is not list:
-            keys = [keys]
+            keys = list(keys)
 
-        for k in [j for j in keys if j in dispatch.keys()]:
+        for k in [j for j in keys if j in dispatch]:
             dispatch[k]()
 
     def _analyze_ramps(self):
@@ -1011,6 +1011,7 @@ def fit_fi_slope(ext):
     y = ext.sweep_features("avg_rate")
 
     A = np.vstack([x, np.ones_like(x)]).T
+
     m, c = np.linalg.lstsq(A, y)[0]
 
     return m
