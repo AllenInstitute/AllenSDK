@@ -1,0 +1,7 @@
+allensdk.brain\_observatory.natural\_movie module
+=================================================
+
+.. automodule:: allensdk.brain_observatory.natural_movie
+    :members:
+    :undoc-members:
+    :show-inheritance:

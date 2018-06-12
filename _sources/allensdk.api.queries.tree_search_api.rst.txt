@@ -1,0 +1,7 @@
+allensdk.api.queries.tree\_search\_api module
+=============================================
+
+.. automodule:: allensdk.api.queries.tree_search_api
+    :members:
+    :undoc-members:
+    :show-inheritance:

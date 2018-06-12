@@ -1,0 +1,7 @@
+allensdk.api.queries.brain\_observatory\_api module
+===================================================
+
+.. automodule:: allensdk.api.queries.brain_observatory_api
+    :members:
+    :undoc-members:
+    :show-inheritance:

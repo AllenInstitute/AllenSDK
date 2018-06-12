@@ -1,0 +1,7 @@
+allensdk.brain\_observatory.roi\_masks module
+=============================================
+
+.. automodule:: allensdk.brain_observatory.roi_masks
+    :members:
+    :undoc-members:
+    :show-inheritance:

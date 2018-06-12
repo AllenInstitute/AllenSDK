@@ -1,0 +1,7 @@
+allensdk.api.queries.rma\_pager module
+======================================
+
+.. automodule:: allensdk.api.queries.rma_pager
+    :members:
+    :undoc-members:
+    :show-inheritance:

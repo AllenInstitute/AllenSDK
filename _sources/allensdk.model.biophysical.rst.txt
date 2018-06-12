@@ -1,0 +1,19 @@
+allensdk.model.biophysical package
+==================================
+
+Submodules
+----------
+
+.. toctree::
+
+   allensdk.model.biophysical.run_simulate
+   allensdk.model.biophysical.runner
+   allensdk.model.biophysical.utils
+
+Module contents
+---------------
+
+.. automodule:: allensdk.model.biophysical
+    :members:
+    :undoc-members:
+    :show-inheritance:

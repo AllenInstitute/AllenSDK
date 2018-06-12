@@ -1,0 +1,7 @@
+allensdk.core.reference\_space module
+=====================================
+
+.. automodule:: allensdk.core.reference_space
+    :members:
+    :undoc-members:
+    :show-inheritance:

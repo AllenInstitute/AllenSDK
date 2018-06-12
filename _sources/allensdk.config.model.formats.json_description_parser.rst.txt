@@ -1,0 +1,7 @@
+allensdk.config.model.formats.json\_description\_parser module
+==============================================================
+
+.. automodule:: allensdk.config.model.formats.json_description_parser
+    :members:
+    :undoc-members:
+    :show-inheritance:

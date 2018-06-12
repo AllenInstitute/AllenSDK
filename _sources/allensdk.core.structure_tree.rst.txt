@@ -1,0 +1,7 @@
+allensdk.core.structure\_tree module
+====================================
+
+.. automodule:: allensdk.core.structure_tree
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,7 @@
+allensdk.config.model.description\_parser module
+================================================
+
+.. automodule:: allensdk.config.model.description_parser
+    :members:
+    :undoc-members:
+    :show-inheritance:

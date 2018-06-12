@@ -1,32 +1,21 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>allensdk.core.reference_space &mdash; Allen SDK dev documentation</title>
-    
+    <title>allensdk.core.reference_space &#8212; Allen SDK dev documentation</title>
     <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../',
-        VERSION:     'dev',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK dev documentation" href="../../../index.html" />
-    <link rel="up" title="Module code" href="../../index.html" /> 
-  </head>
-  <body role="document">
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
 <script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
@@ -104,21 +93,21 @@
 <span class="c1"># ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="c1">#</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
-<span class="kn">import</span> <span class="nn">operator</span> <span class="kn">as</span> <span class="nn">op</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">defaultdict</span>
+<span class="kn">import</span> <span class="nn">operator</span> <span class="k">as</span> <span class="nn">op</span>
 <span class="kn">import</span> <span class="nn">functools</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
-<span class="kn">from</span> <span class="nn">scipy.misc</span> <span class="kn">import</span> <span class="n">imresize</span>
-<span class="kn">from</span> <span class="nn">scipy.ndimage.interpolation</span> <span class="kn">import</span> <span class="n">zoom</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.misc</span> <span class="k">import</span> <span class="n">imresize</span>
+<span class="kn">from</span> <span class="nn">scipy.ndimage.interpolation</span> <span class="k">import</span> <span class="n">zoom</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">nrrd</span>
 
-<span class="kn">from</span> <span class="nn">allensdk.core.structure_tree</span> <span class="kn">import</span> <span class="n">StructureTree</span>
+<span class="kn">from</span> <span class="nn">allensdk.core.structure_tree</span> <span class="k">import</span> <span class="n">StructureTree</span>
 
 
-<div class="viewcode-block" id="ReferenceSpace"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.reference_space.ReferenceSpace">[docs]</a><span class="k">class</span> <span class="nc">ReferenceSpace</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="ReferenceSpace"><a class="viewcode-back" href="../../../allensdk.core.reference_space.html#allensdk.core.reference_space.ReferenceSpace">[docs]</a><span class="k">class</span> <span class="nc">ReferenceSpace</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">direct_voxel_map</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -126,7 +115,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">direct_voxel_counts</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_direct_voxel_map</span> 
         
-    <span class="nd">@direct_voxel_map.setter</span>
+    <span class="nd">@direct_voxel_map</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">direct_voxel_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_direct_voxel_map</span> <span class="o">=</span> <span class="n">data</span>
     
@@ -136,7 +125,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">total_voxel_counts</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_total_voxel_map</span>
         
-    <span class="nd">@total_voxel_map.setter</span>
+    <span class="nd">@total_voxel_map</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">total_voxel_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_total_voxel_map</span> <span class="o">=</span> <span class="n">data</span>
         
@@ -159,7 +148,7 @@
         
         <span class="bp">self</span><span class="o">.</span><span class="n">annotation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">annotation</span><span class="p">)</span>
         
-<div class="viewcode-block" id="ReferenceSpace.direct_voxel_counts"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.reference_space.ReferenceSpace.direct_voxel_counts">[docs]</a>    <span class="k">def</span> <span class="nf">direct_voxel_counts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ReferenceSpace.direct_voxel_counts"><a class="viewcode-back" href="../../../allensdk.core.reference_space.html#allensdk.core.reference_space.ReferenceSpace.direct_voxel_counts">[docs]</a>    <span class="k">def</span> <span class="nf">direct_voxel_counts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Determines the number of voxels directly assigned to one or more </span>
 <span class="sd">        structures.</span>
 <span class="sd">        </span>
@@ -171,13 +160,13 @@
 <span class="sd">        </span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
-        <span class="n">uniques</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">annotation</span><span class="p">,</span> <span class="n">return_counts</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">uniques</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">annotation</span><span class="p">,</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">found</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">uniques</span><span class="p">)</span> <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">}</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_direct_voxel_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="p">(</span><span class="n">found</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">found</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> 
                                   <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">structure_tree</span><span class="o">.</span><span class="n">node_ids</span><span class="p">()}</span></div>
           
-<div class="viewcode-block" id="ReferenceSpace.total_voxel_counts"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.reference_space.ReferenceSpace.total_voxel_counts">[docs]</a>    <span class="k">def</span> <span class="nf">total_voxel_counts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ReferenceSpace.total_voxel_counts"><a class="viewcode-back" href="../../../allensdk.core.reference_space.html#allensdk.core.reference_space.ReferenceSpace.total_voxel_counts">[docs]</a>    <span class="k">def</span> <span class="nf">total_voxel_counts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Determines the number of voxels assigned to a structure or its </span>
 <span class="sd">        descendants</span>
 <span class="sd">            </span>
@@ -196,7 +185,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_total_voxel_map</span><span class="p">[</span><span class="n">stid</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">direct_voxel_map</span><span class="p">[</span><span class="n">dscid</span><span class="p">]</span> 
                                                <span class="k">for</span> <span class="n">dscid</span> <span class="ow">in</span> <span class="n">desc_ids</span><span class="p">])</span></div>
     
-<div class="viewcode-block" id="ReferenceSpace.remove_unassigned"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.reference_space.ReferenceSpace.remove_unassigned">[docs]</a>    <span class="k">def</span> <span class="nf">remove_unassigned</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_self</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+<div class="viewcode-block" id="ReferenceSpace.remove_unassigned"><a class="viewcode-back" href="../../../allensdk.core.reference_space.html#allensdk.core.reference_space.ReferenceSpace.remove_unassigned">[docs]</a>    <span class="k">def</span> <span class="nf">remove_unassigned</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_self</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Obtains a structure tree consisting only of structures that have </span>
 <span class="sd">        at least one voxel in the annotation.</span>
 <span class="sd">        </span>
@@ -220,7 +209,7 @@
             
         <span class="k">return</span> <span class="n">structures</span></div>
     
-<div class="viewcode-block" id="ReferenceSpace.make_structure_mask"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.reference_space.ReferenceSpace.make_structure_mask">[docs]</a>    <span class="k">def</span> <span class="nf">make_structure_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_ids</span><span class="p">,</span> <span class="n">direct_only</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="ReferenceSpace.make_structure_mask"><a class="viewcode-back" href="../../../allensdk.core.reference_space.html#allensdk.core.reference_space.ReferenceSpace.make_structure_mask">[docs]</a>    <span class="k">def</span> <span class="nf">make_structure_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_ids</span><span class="p">,</span> <span class="n">direct_only</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Return an indicator array for one or more structures</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
@@ -245,17 +234,17 @@
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direct_voxel_map</span><span class="p">[</span><span class="n">stid</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="k">continue</span>
                     
-                <span class="n">mask</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">annotation</span> <span class="o">==</span> <span class="n">stid</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="n">mask</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">annotation</span> <span class="o">==</span> <span class="n">stid</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
                 
             <span class="k">return</span> <span class="n">mask</span>
             
         <span class="k">else</span><span class="p">:</span>
             <span class="n">structure_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">structure_tree</span><span class="o">.</span><span class="n">descendant_ids</span><span class="p">(</span><span class="n">structure_ids</span><span class="p">)</span>
             <span class="n">structure_ids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">add</span><span class="p">,</span> <span class="n">structure_ids</span><span class="p">))</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_structure_mask</span><span class="p">(</span><span class="n">structure_ids</span><span class="p">,</span> <span class="n">direct_only</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span></div>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_structure_mask</span><span class="p">(</span><span class="n">structure_ids</span><span class="p">,</span> <span class="n">direct_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
                         
-<div class="viewcode-block" id="ReferenceSpace.many_structure_masks"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.reference_space.ReferenceSpace.many_structure_masks">[docs]</a>    <span class="k">def</span> <span class="nf">many_structure_masks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_ids</span><span class="p">,</span> <span class="n">output_cb</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
-                             <span class="n">direct_only</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="ReferenceSpace.many_structure_masks"><a class="viewcode-back" href="../../../allensdk.core.reference_space.html#allensdk.core.reference_space.ReferenceSpace.many_structure_masks">[docs]</a>    <span class="k">def</span> <span class="nf">many_structure_masks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_ids</span><span class="p">,</span> <span class="n">output_cb</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                             <span class="n">direct_only</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Build one or more structure masks and do something with them</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
@@ -284,7 +273,7 @@
 <span class="sd">        </span>
 <span class="sd">        &#39;&#39;&#39;</span>
         
-        <span class="k">if</span> <span class="n">output_cb</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">output_cb</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">output_cb</span> <span class="o">=</span> <span class="n">ReferenceSpace</span><span class="o">.</span><span class="n">return_mask_cb</span>
                                               
         <span class="k">for</span> <span class="n">stid</span> <span class="ow">in</span> <span class="n">structure_ids</span><span class="p">:</span>
@@ -292,7 +281,7 @@
                                                     <span class="p">[</span><span class="n">stid</span><span class="p">],</span> <span class="n">direct_only</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="ReferenceSpace.check_coverage"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.reference_space.ReferenceSpace.check_coverage">[docs]</a>    <span class="k">def</span> <span class="nf">check_coverage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_ids</span><span class="p">,</span> <span class="n">domain_mask</span><span class="p">):</span>
+<div class="viewcode-block" id="ReferenceSpace.check_coverage"><a class="viewcode-back" href="../../../allensdk.core.reference_space.html#allensdk.core.reference_space.ReferenceSpace.check_coverage">[docs]</a>    <span class="k">def</span> <span class="nf">check_coverage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_ids</span><span class="p">,</span> <span class="n">domain_mask</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Determines whether a spatial domain is completely covered by </span>
 <span class="sd">        structures in a set.</span>
 <span class="sd">        </span>
@@ -315,7 +304,7 @@
         <span class="n">candidate_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_structure_mask</span><span class="p">(</span><span class="n">structure_ids</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">domain_mask</span> <span class="o">-</span> <span class="n">candidate_mask</span></div>
         
-<div class="viewcode-block" id="ReferenceSpace.validate_structures"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.reference_space.ReferenceSpace.validate_structures">[docs]</a>    <span class="k">def</span> <span class="nf">validate_structures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_ids</span><span class="p">,</span> <span class="n">domain_mask</span><span class="p">):</span>
+<div class="viewcode-block" id="ReferenceSpace.validate_structures"><a class="viewcode-back" href="../../../allensdk.core.reference_space.html#allensdk.core.reference_space.ReferenceSpace.validate_structures">[docs]</a>    <span class="k">def</span> <span class="nf">validate_structures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_ids</span><span class="p">,</span> <span class="n">domain_mask</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Determines whether a set of structures produces an exact and </span>
 <span class="sd">        nonoverlapping tiling of a spatial domain</span>
 <span class="sd">        </span>
@@ -341,7 +330,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">check_coverage</span><span class="p">(</span><span class="n">structure_ids</span><span class="p">,</span> <span class="n">domain_mask</span><span class="p">)]</span></div>
         
         
-<div class="viewcode-block" id="ReferenceSpace.downsample"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.reference_space.ReferenceSpace.downsample">[docs]</a>    <span class="k">def</span> <span class="nf">downsample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_resolution</span><span class="p">):</span>
+<div class="viewcode-block" id="ReferenceSpace.downsample"><a class="viewcode-back" href="../../../allensdk.core.reference_space.html#allensdk.core.reference_space.ReferenceSpace.downsample">[docs]</a>    <span class="k">def</span> <span class="nf">downsample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_resolution</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Obtain a smaller reference space by downsampling</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
@@ -368,7 +357,7 @@
         <span class="k">return</span> <span class="n">ReferenceSpace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">structure_tree</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">target_resolution</span><span class="p">)</span></div>
         
         
-<div class="viewcode-block" id="ReferenceSpace.get_slice_image"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.reference_space.ReferenceSpace.get_slice_image">[docs]</a>    <span class="k">def</span> <span class="nf">get_slice_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ReferenceSpace.get_slice_image"><a class="viewcode-back" href="../../../allensdk.core.reference_space.html#allensdk.core.reference_space.ReferenceSpace.get_slice_image">[docs]</a>    <span class="k">def</span> <span class="nf">get_slice_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Produce a AxBx3 RGB image from a slice in the annotation</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
@@ -394,7 +383,7 @@
 <span class="sd">        </span>
 <span class="sd">        &#39;&#39;&#39;</span>
         
-        <span class="k">if</span> <span class="n">cmap</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">cmap</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">cmap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">structure_tree</span><span class="o">.</span><span class="n">get_colormap</span><span class="p">()</span>
             <span class="n">cmap</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
         
@@ -405,22 +394,22 @@
                       <span class="nb">list</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="mi">3</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span></div>
             
             
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="ReferenceSpace.return_mask_cb"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.reference_space.ReferenceSpace.return_mask_cb">[docs]</a>    <span class="k">def</span> <span class="nf">return_mask_cb</span><span class="p">(</span><span class="n">structure_id</span><span class="p">,</span> <span class="n">fn</span><span class="p">):</span>
+<div class="viewcode-block" id="ReferenceSpace.return_mask_cb"><a class="viewcode-back" href="../../../allensdk.core.reference_space.html#allensdk.core.reference_space.ReferenceSpace.return_mask_cb">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">return_mask_cb</span><span class="p">(</span><span class="n">structure_id</span><span class="p">,</span> <span class="n">fn</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;A basic callback for many_structure_masks</span>
 <span class="sd">        &#39;&#39;&#39;</span>
     
         <span class="k">return</span> <span class="n">structure_id</span><span class="p">,</span> <span class="n">fn</span><span class="p">()</span></div>
         
         
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="ReferenceSpace.check_and_write"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.reference_space.ReferenceSpace.check_and_write">[docs]</a>    <span class="k">def</span> <span class="nf">check_and_write</span><span class="p">(</span><span class="n">base_dir</span><span class="p">,</span> <span class="n">structure_id</span><span class="p">,</span> <span class="n">fn</span><span class="p">):</span>
+<div class="viewcode-block" id="ReferenceSpace.check_and_write"><a class="viewcode-back" href="../../../allensdk.core.reference_space.html#allensdk.core.reference_space.ReferenceSpace.check_and_write">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">check_and_write</span><span class="p">(</span><span class="n">base_dir</span><span class="p">,</span> <span class="n">structure_id</span><span class="p">,</span> <span class="n">fn</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;A many_structure_masks callback that writes the mask to a nrrd file </span>
 <span class="sd">        if the file does not already exist.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
     
         <span class="n">mask_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_dir</span><span class="p">,</span> 
-                                 <span class="s1">&#39;structure_{0}.nrrd&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">structure_id</span><span class="p">))</span>
+                                 <span class="s1">&#39;structure_</span><span class="si">{0}</span><span class="s1">.nrrd&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">structure_id</span><span class="p">))</span>
         
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">mask_path</span><span class="p">):</span>
             <span class="n">nrrd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">mask_path</span><span class="p">,</span> <span class="n">fn</span><span class="p">())</span>
@@ -436,9 +425,7 @@
         <div class="sphinxsidebarwrapper">
 <h3><a href="../../../index.html">Contents</a></h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install Guide</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../cell_types.html">Cell Types</a></li>
@@ -463,6 +450,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.model.html">allensdk.model package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.morphology.html">allensdk.morphology package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.deprecated.html">allensdk.deprecated module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
@@ -480,12 +468,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

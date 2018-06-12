@@ -1,0 +1,19 @@
+allensdk.model.glif package
+===========================
+
+Submodules
+----------
+
+.. toctree::
+
+   allensdk.model.glif.glif_neuron
+   allensdk.model.glif.glif_neuron_methods
+   allensdk.model.glif.simulate_neuron
+
+Module contents
+---------------
+
+.. automodule:: allensdk.model.glif
+    :members:
+    :undoc-members:
+    :show-inheritance:

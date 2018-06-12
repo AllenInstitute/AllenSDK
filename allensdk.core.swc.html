@@ -1,0 +1,730 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>allensdk.core.swc module &#8212; Allen SDK dev documentation</title>
+    <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="allensdk.ephys package" href="allensdk.ephys.html" />
+    <link rel="prev" title="allensdk.core.structure_tree module" href="allensdk.core.structure_tree.html" /> 
+  </head><body>
+<link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
+<script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var _pSupressBrowserFlashWarning = true;
+    var _pTabId = "pHome";
+    var _pMoreProjectsId = "pMoreProjects";
+    var _pImagePath = "http://www.brain-map.org/assets/images/";
+    var _pSiteWarnings = function() {
+        this.show_warning() = {};
+    }
+</script>
+<script type="text/javascript">
+    function initialize() {
+        /*** do your stuff, then initialize the portal plugin ***/
+        _pPortalOnLoad();
+    }
+</script>
+<style>
+  #header_content > a {
+  display: inline-block;
+  width: 250px;
+  height: 75px;
+  background-image:url("_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-size: 235px 37px;
+  background-position: 0px 20px;
+  background-repeat: no-repeat;
+  }
+</style>
+
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
+<link rel="stylesheet" type="text/css" href="_static/external_assets/stylesheets/common_layout.css" />
+
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-allensdk.core.swc">
+<span id="allensdk-core-swc-module"></span><h1>allensdk.core.swc module<a class="headerlink" href="#module-allensdk.core.swc" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="allensdk.core.swc.Compartment">
+<em class="property">class </em><code class="descclassname">allensdk.core.swc.</code><code class="descname">Compartment</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/swc.html#Compartment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.swc.Compartment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+<p>A dictionary class storing information about a single morphology node</p>
+<dl class="method">
+<dt id="allensdk.core.swc.Compartment.print_node">
+<code class="descname">print_node</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/swc.html#Compartment.print_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.swc.Compartment.print_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>print out compartment information with field names</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="allensdk.core.swc.Marker">
+<em class="property">class </em><code class="descclassname">allensdk.core.swc.</code><code class="descname">Marker</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/swc.html#Marker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.swc.Marker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+<p>Simple dictionary class for handling reconstruction marker objects.</p>
+<dl class="attribute">
+<dt id="allensdk.core.swc.Marker.CUT_DENDRITE">
+<code class="descname">CUT_DENDRITE</code><em class="property"> = 10</em><a class="headerlink" href="#allensdk.core.swc.Marker.CUT_DENDRITE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.swc.Marker.NO_RECONSTRUCTION">
+<code class="descname">NO_RECONSTRUCTION</code><em class="property"> = 20</em><a class="headerlink" href="#allensdk.core.swc.Marker.NO_RECONSTRUCTION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.swc.Marker.SPACING">
+<code class="descname">SPACING</code><em class="property"> = [0.1144, 0.1144, 0.28]</em><a class="headerlink" href="#allensdk.core.swc.Marker.SPACING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="allensdk.core.swc.Morphology">
+<em class="property">class </em><code class="descclassname">allensdk.core.swc.</code><code class="descname">Morphology</code><span class="sig-paren">(</span><em>compartment_list=None</em>, <em>compartment_index=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/swc.html#Morphology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.swc.Morphology" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Keep track of the list of compartments in a morphology and provide
+a few helper methods (soma, tree information, pruning, etc).</p>
+<dl class="attribute">
+<dt id="allensdk.core.swc.Morphology.APICAL_DENDRITE">
+<code class="descname">APICAL_DENDRITE</code><em class="property"> = 4</em><a class="headerlink" href="#allensdk.core.swc.Morphology.APICAL_DENDRITE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.swc.Morphology.AXON">
+<code class="descname">AXON</code><em class="property"> = 2</em><a class="headerlink" href="#allensdk.core.swc.Morphology.AXON" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.swc.Morphology.BASAL_DENDRITE">
+<code class="descname">BASAL_DENDRITE</code><em class="property"> = 3</em><a class="headerlink" href="#allensdk.core.swc.Morphology.BASAL_DENDRITE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.swc.Morphology.DENDRITE">
+<code class="descname">DENDRITE</code><em class="property"> = 3</em><a class="headerlink" href="#allensdk.core.swc.Morphology.DENDRITE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.swc.Morphology.NODE_TYPES">
+<code class="descname">NODE_TYPES</code><em class="property"> = [1, 2, 3, 3, 4]</em><a class="headerlink" href="#allensdk.core.swc.Morphology.NODE_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.swc.Morphology.SOMA">
+<code class="descname">SOMA</code><em class="property"> = 1</em><a class="headerlink" href="#allensdk.core.swc.Morphology.SOMA" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.swc.Morphology.append">
+<code class="descname">append</code><span class="sig-paren">(</span><em>node_list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/swc.html#Morphology.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.swc.Morphology.append" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add additional nodes to this Morphology. Those nodes must
+originate from another morphology object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>node_list: list of Morphology nodes</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.swc.Morphology.apply_affine">
+<code class="descname">apply_affine</code><span class="sig-paren">(</span><em>aff</em>, <em>scale=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/swc.html#Morphology.apply_affine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.swc.Morphology.apply_affine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply an affine transform to all compartments in this
+morphology. Node radius is adjusted as well.</p>
+<p>Format of the affine matrix is:</p>
+<p>[x0 y0 z0]  [tx]
+[x1 y1 z1]  [ty]
+[x2 y2 z2]  [tz]</p>
+<p>where the left 3x3 the matrix defines the affine rotation
+and scaling, and the right column is the translation
+vector.</p>
+<p>The matrix must be collapsed and stored in a list as follows:</p>
+<p>[x0 y0, z0, x1, y1, z1, x2, y2, z2, tx, ty, tz]</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>aff: 3x4 array of floats (python 2D list, or numpy 2D array)</strong></dt>
+<dd><p class="first last">the transformation matrix</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.swc.Morphology.change_parent">
+<code class="descname">change_parent</code><span class="sig-paren">(</span><em>child</em>, <em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/swc.html#Morphology.change_parent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.swc.Morphology.change_parent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change the parent of a node. The child node is adjusted to
+point to the new parent, the child is taken off of the previous
+parent’s child list, and it is added to the new parent’s child list.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>child: integer or Morphology Object</strong></dt>
+<dd><p class="first last">The ID of the child node, or the child node itself</p>
+</dd>
+<dt><strong>parent: integer or Morphology Object</strong></dt>
+<dd><p class="first last">The ID of the parent node, or the parent node itself</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>Nothing</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.swc.Morphology.children_of">
+<code class="descname">children_of</code><span class="sig-paren">(</span><em>seg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/swc.html#Morphology.children_of"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.swc.Morphology.children_of" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of the children of the specified node</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>seg: integer or Morphology Object</strong></dt>
+<dd><p class="first last">The ID of the parent node, or the parent node itself</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>A list of the child morphology objects. If the ID of the parent</strong></dt>
+<dd></dd>
+<dt><strong>node is invalid, None is returned.</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.swc.Morphology.compartment_index">
+<code class="descname">compartment_index</code><a class="headerlink" href="#allensdk.core.swc.Morphology.compartment_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the compartment index.  This is a property to ensure that the
+compartment list and compartment index are in sync.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.swc.Morphology.compartment_index_by_type">
+<code class="descname">compartment_index_by_type</code><span class="sig-paren">(</span><em>compartment_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/swc.html#Morphology.compartment_index_by_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.swc.Morphology.compartment_index_by_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an dictionary of compartments indexed by id that all have
+a particular compartment type.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>compartment_type: int</strong></dt>
+<dd><p class="first last">Desired compartment type</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>A dictionary of Morphology Objects, indexed by ID</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.swc.Morphology.compartment_list">
+<code class="descname">compartment_list</code><a class="headerlink" href="#allensdk.core.swc.Morphology.compartment_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the compartment list.  This is a property to ensure that the
+compartment list and compartment index are in sync.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.swc.Morphology.compartment_list_by_type">
+<code class="descname">compartment_list_by_type</code><span class="sig-paren">(</span><em>compartment_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/swc.html#Morphology.compartment_list_by_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.swc.Morphology.compartment_list_by_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an list of all compartments having the specified
+compartment type.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>compartment_type: int</strong></dt>
+<dd><p class="first last">Desired compartment type</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>A list of of Morphology Objects</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.swc.Morphology.convert_type">
+<code class="descname">convert_type</code><span class="sig-paren">(</span><em>old_type</em>, <em>new_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/swc.html#Morphology.convert_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.swc.Morphology.convert_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts all compartments from one type to another.
+Nodes of the original type are not affected so this
+procedure can also be used as a merge procedure.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>old_type: enum</strong></dt>
+<dd><p class="first last">The compartment type to be changed.
+Use one of the following constants: SOMA, AXON, DENDRITE,
+BASAL_DENDRITE, or APICAL_DENDRITE</p>
+</dd>
+<dt><strong>new_type: enum</strong></dt>
+<dd><p class="first last">The target compartment type.
+Use one of the following constants: SOMA, AXON, DENDRITE,
+BASAL_DENDRITE, or APICAL_DENDRITE</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.swc.Morphology.delete_tree">
+<code class="descname">delete_tree</code><span class="sig-paren">(</span><em>n</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/swc.html#Morphology.delete_tree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.swc.Morphology.delete_tree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete tree, and all of its compartments, from the morphology.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>n: Integer</strong></dt>
+<dd><p class="first last">The tree number to delete</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.swc.Morphology.find">
+<code class="descname">find</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>z</em>, <em>dist</em>, <em>node_type=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/swc.html#Morphology.find"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.swc.Morphology.find" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of Morphology Objects located within ‘dist’
+of coordinate (x,y,z). If node_type is specified, the search
+will be constrained to return only nodes of that type.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>x, y, z: float</strong></dt>
+<dd><p class="first last">The x,y,z coordinates from which to search around</p>
+</dd>
+<dt><strong>dist: float</strong></dt>
+<dd><p class="first last">The search radius</p>
+</dd>
+<dt><strong>node_type: enum (optional)</strong></dt>
+<dd><p class="first last">One of the following constants: SOMA, AXON, DENDRITE,
+BASAL_DENDRITE or APICAL_DENDRITE</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>A list of all Morphology Objects matching the search criteria</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.swc.Morphology.node">
+<code class="descname">node</code><span class="sig-paren">(</span><em>n</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/swc.html#Morphology.node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.swc.Morphology.node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the morphology node having the specified ID.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>n: integer</strong></dt>
+<dd><p class="first last">ID of desired node</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>A morphology object having the specified ID, or None if such a</strong></dt>
+<dd></dd>
+<dt><strong>node doesn’t exist</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.swc.Morphology.num_nodes">
+<code class="descname">num_nodes</code><a class="headerlink" href="#allensdk.core.swc.Morphology.num_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the number of compartments in the morphology.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.swc.Morphology.num_trees">
+<code class="descname">num_trees</code><a class="headerlink" href="#allensdk.core.swc.Morphology.num_trees" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the number of trees in the morphology. A tree is
+defined as everything following from a single root compartment.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.swc.Morphology.parent_of">
+<code class="descname">parent_of</code><span class="sig-paren">(</span><em>seg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/swc.html#Morphology.parent_of"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.swc.Morphology.parent_of" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns parent of the specified node.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>seg: integer or Morphology Object</strong></dt>
+<dd><p class="first last">The ID of the child node, or the child node itself</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>A morphology object, or None if no parent exists or if the</strong></dt>
+<dd></dd>
+<dt><strong>specified node ID doesn’t exist</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.swc.Morphology.root">
+<code class="descname">root</code><a class="headerlink" href="#allensdk.core.swc.Morphology.root" title="Permalink to this definition">¶</a></dt>
+<dd><p>[deprecated] Returns root node of soma, if present. Use ‘soma’ instead of ‘root’</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.swc.Morphology.save">
+<code class="descname">save</code><span class="sig-paren">(</span><em>file_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/swc.html#Morphology.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.swc.Morphology.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write this morphology out to an SWC file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>file_name: string</strong></dt>
+<dd><p class="first last">desired name of your SWC file</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.swc.Morphology.soma">
+<code class="descname">soma</code><a class="headerlink" href="#allensdk.core.swc.Morphology.soma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns root node of soma, if present</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.swc.Morphology.sparsify">
+<code class="descname">sparsify</code><span class="sig-paren">(</span><em>modulo</em>, <em>compress_ids=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/swc.html#Morphology.sparsify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.swc.Morphology.sparsify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a new Morphology object that has a given number of non-leaf,
+non-root nodes removed.  IDs can be reassigned so as to be continuous.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>modulo: int</strong></dt>
+<dd><p class="first last">keep 1 out of every modulo nodes.</p>
+</dd>
+<dt><strong>compress_ids: boolean</strong></dt>
+<dd><p class="first last">Reassign ids so that ids are continuous (no missing id numbers).</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>Morphology</strong></dt>
+<dd><p class="first last">A new morphology instance</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.swc.Morphology.strip_all_other_types">
+<code class="descname">strip_all_other_types</code><span class="sig-paren">(</span><em>node_type</em>, <em>keep_soma=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/swc.html#Morphology.strip_all_other_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.swc.Morphology.strip_all_other_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>Strips everything from the morphology except for the
+specified type.
+Parent and child relationships are updated accordingly, creating
+new roots when necessary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>node_type: enum</strong></dt>
+<dd><p class="first last">The compartment type to keep in the morphology.
+Use one of the following constants: SOMA, AXON, DENDRITE,
+BASAL_DENDRITE, or APICAL_DENDRITE</p>
+</dd>
+<dt><strong>keep_soma: Boolean (optional)</strong></dt>
+<dd><p class="first last">True (default) if soma nodes should remain in the
+morpyhology, and False if the soma should also be stripped</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.swc.Morphology.strip_type">
+<code class="descname">strip_type</code><span class="sig-paren">(</span><em>node_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/swc.html#Morphology.strip_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.swc.Morphology.strip_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Strips all compartments of the specified type from the
+morphology.
+Parent and child relationships are updated accordingly, creating
+new roots when necessary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>node_type: enum</strong></dt>
+<dd><p class="first last">The compartment type to strip from the morphology.
+Use one of the following constants: SOMA, AXON, DENDRITE,
+BASAL_DENDRITE, or APICAL_DENDRITE</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.swc.Morphology.stumpify_axon">
+<code class="descname">stumpify_axon</code><span class="sig-paren">(</span><em>count=10</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/swc.html#Morphology.stumpify_axon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.swc.Morphology.stumpify_axon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove all axon compartments except the first ‘count’
+nodes, as counted from the connected axon root.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>count: Integer</strong></dt>
+<dd><p class="first last">The length of the axon ‘stump’, in number of compartments</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.swc.Morphology.tree">
+<code class="descname">tree</code><span class="sig-paren">(</span><em>n</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/swc.html#Morphology.tree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.swc.Morphology.tree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of all Morphology Nodes within the specified
+tree. A tree is defined as a fully connected graph of nodes.
+Each tree has exactly one root.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>n: integer</strong></dt>
+<dd><p class="first last">ID of desired tree</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>A list of all morphology objects in the specified tree, or None</strong></dt>
+<dd></dd>
+<dt><strong>if the tree doesn’t exist</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.swc.Morphology.write">
+<code class="descname">write</code><span class="sig-paren">(</span><em>file_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/swc.html#Morphology.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.swc.Morphology.write" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.core.swc.read_marker_file">
+<code class="descclassname">allensdk.core.swc.</code><code class="descname">read_marker_file</code><span class="sig-paren">(</span><em>file_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/swc.html#read_marker_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.swc.read_marker_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>read in a marker file and return a list of dictionaries</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.core.swc.read_swc">
+<code class="descclassname">allensdk.core.swc.</code><code class="descname">read_swc</code><span class="sig-paren">(</span><em>file_name</em>, <em>columns='NOT_USED'</em>, <em>numeric_columns='NOT_USED'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/swc.html#read_swc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.swc.read_swc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read in an SWC file and return a Morphology object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>file_name: string</strong></dt>
+<dd><p class="first last">SWC file name.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>Morphology</strong></dt>
+<dd><p class="first last">A Morphology instance.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_space.html">Reference Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="glif_models.html">Generalized LIF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html">Biophysical</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.deprecated.html">allensdk.deprecated module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
+</ul>
+
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allen-sdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    </div>
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalFooter.js"></script>
+
+
+  </body>
+</html>

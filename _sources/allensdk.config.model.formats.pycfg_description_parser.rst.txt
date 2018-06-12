@@ -1,0 +1,7 @@
+allensdk.config.model.formats.pycfg\_description\_parser module
+===============================================================
+
+.. automodule:: allensdk.config.model.formats.pycfg_description_parser
+    :members:
+    :undoc-members:
+    :show-inheritance:

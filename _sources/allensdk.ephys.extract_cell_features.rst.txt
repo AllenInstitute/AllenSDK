@@ -1,0 +1,7 @@
+allensdk.ephys.extract\_cell\_features module
+=============================================
+
+.. automodule:: allensdk.ephys.extract_cell_features
+    :members:
+    :undoc-members:
+    :show-inheritance:

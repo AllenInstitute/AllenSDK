@@ -1,0 +1,7 @@
+allensdk.core.dat\_utilities module
+===================================
+
+.. automodule:: allensdk.core.dat_utilities
+    :members:
+    :undoc-members:
+    :show-inheritance:

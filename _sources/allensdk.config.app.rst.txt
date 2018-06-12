@@ -1,0 +1,17 @@
+allensdk.config.app package
+===========================
+
+Submodules
+----------
+
+.. toctree::
+
+   allensdk.config.app.application_config
+
+Module contents
+---------------
+
+.. automodule:: allensdk.config.app
+    :members:
+    :undoc-members:
+    :show-inheritance:

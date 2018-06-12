@@ -1,0 +1,488 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>allensdk.core.cell_types_cache module &#8212; Allen SDK dev documentation</title>
+    <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="allensdk.core.dat_utilities module" href="allensdk.core.dat_utilities.html" />
+    <link rel="prev" title="allensdk.core.brain_observatory_nwb_data_set module" href="allensdk.core.brain_observatory_nwb_data_set.html" /> 
+  </head><body>
+<link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
+<script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var _pSupressBrowserFlashWarning = true;
+    var _pTabId = "pHome";
+    var _pMoreProjectsId = "pMoreProjects";
+    var _pImagePath = "http://www.brain-map.org/assets/images/";
+    var _pSiteWarnings = function() {
+        this.show_warning() = {};
+    }
+</script>
+<script type="text/javascript">
+    function initialize() {
+        /*** do your stuff, then initialize the portal plugin ***/
+        _pPortalOnLoad();
+    }
+</script>
+<style>
+  #header_content > a {
+  display: inline-block;
+  width: 250px;
+  height: 75px;
+  background-image:url("_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-size: 235px 37px;
+  background-position: 0px 20px;
+  background-repeat: no-repeat;
+  }
+</style>
+
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
+<link rel="stylesheet" type="text/css" href="_static/external_assets/stylesheets/common_layout.css" />
+
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-allensdk.core.cell_types_cache">
+<span id="allensdk-core-cell-types-cache-module"></span><h1>allensdk.core.cell_types_cache module<a class="headerlink" href="#module-allensdk.core.cell_types_cache" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="allensdk.core.cell_types_cache.CellTypesCache">
+<em class="property">class </em><code class="descclassname">allensdk.core.cell_types_cache.</code><code class="descname">CellTypesCache</code><span class="sig-paren">(</span><em>cache=True</em>, <em>manifest_file='cell_types_manifest.json'</em>, <em>base_uri=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/cell_types_cache.html#CellTypesCache"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.cell_types_cache.CellTypesCache" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="allensdk.api.cache.html#allensdk.api.cache.Cache" title="allensdk.api.cache.Cache"><code class="xref py py-class docutils literal notranslate"><span class="pre">allensdk.api.cache.Cache</span></code></a></p>
+<p>Cache class for storing and accessing data from the Cell Types Database.
+By default, this class will cache any downloaded metadata or files in
+well known locations defined in a manifest file.  This behavior can be
+disabled.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>cache: boolean</strong></dt>
+<dd><p class="first last">Whether the class should save results of API queries to locations specified
+in the manifest file.  Queries for files (as opposed to metadata) must have a
+file location.  If caching is disabled, those locations must be specified
+in the function call (e.g. get_ephys_data(file_name=’file.nwb’)).</p>
+</dd>
+<dt><strong>manifest_file: string</strong></dt>
+<dd><p class="first last">File name of the manifest to be read.  Default is “cell_types_manifest.json”.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Attributes:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>api: CellTypesApi instance</strong></dt>
+<dd><p class="first last">The object used for making API queries related to the Cell Types Database</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="allensdk.core.cell_types_cache.CellTypesCache.CELLS_KEY">
+<code class="descname">CELLS_KEY</code><em class="property"> = 'CELLS'</em><a class="headerlink" href="#allensdk.core.cell_types_cache.CellTypesCache.CELLS_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.cell_types_cache.CellTypesCache.EPHYS_DATA_KEY">
+<code class="descname">EPHYS_DATA_KEY</code><em class="property"> = 'EPHYS_DATA'</em><a class="headerlink" href="#allensdk.core.cell_types_cache.CellTypesCache.EPHYS_DATA_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.cell_types_cache.CellTypesCache.EPHYS_FEATURES_KEY">
+<code class="descname">EPHYS_FEATURES_KEY</code><em class="property"> = 'EPHYS_FEATURES'</em><a class="headerlink" href="#allensdk.core.cell_types_cache.CellTypesCache.EPHYS_FEATURES_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.cell_types_cache.CellTypesCache.EPHYS_SWEEPS_KEY">
+<code class="descname">EPHYS_SWEEPS_KEY</code><em class="property"> = 'EPHYS_SWEEPS'</em><a class="headerlink" href="#allensdk.core.cell_types_cache.CellTypesCache.EPHYS_SWEEPS_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.cell_types_cache.CellTypesCache.MANIFEST_VERSION">
+<code class="descname">MANIFEST_VERSION</code><em class="property"> = '1.1'</em><a class="headerlink" href="#allensdk.core.cell_types_cache.CellTypesCache.MANIFEST_VERSION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.cell_types_cache.CellTypesCache.MARKER_KEY">
+<code class="descname">MARKER_KEY</code><em class="property"> = 'MARKER'</em><a class="headerlink" href="#allensdk.core.cell_types_cache.CellTypesCache.MARKER_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.cell_types_cache.CellTypesCache.MORPHOLOGY_FEATURES_KEY">
+<code class="descname">MORPHOLOGY_FEATURES_KEY</code><em class="property"> = 'MORPHOLOGY_FEATURES'</em><a class="headerlink" href="#allensdk.core.cell_types_cache.CellTypesCache.MORPHOLOGY_FEATURES_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.cell_types_cache.CellTypesCache.RECONSTRUCTION_KEY">
+<code class="descname">RECONSTRUCTION_KEY</code><em class="property"> = 'RECONSTRUCTION'</em><a class="headerlink" href="#allensdk.core.cell_types_cache.CellTypesCache.RECONSTRUCTION_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.cell_types_cache.CellTypesCache.build_manifest">
+<code class="descname">build_manifest</code><span class="sig-paren">(</span><em>file_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/cell_types_cache.html#CellTypesCache.build_manifest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.cell_types_cache.CellTypesCache.build_manifest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a manifest for this Cache class and save it in a file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>file_name: string</strong></dt>
+<dd><p class="first last">File location to save the manifest.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.cell_types_cache.CellTypesCache.get_all_features">
+<code class="descname">get_all_features</code><span class="sig-paren">(</span><em>dataframe=False</em>, <em>require_reconstruction=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/cell_types_cache.html#CellTypesCache.get_all_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.cell_types_cache.CellTypesCache.get_all_features" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download morphology and electrophysiology features for all cells and merge them
+into a single table.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>dataframe: boolean</strong></dt>
+<dd><p class="first last">Return the output as a Pandas DataFrame.  If False, return
+a list of dictionaries.</p>
+</dd>
+<dt><strong>require_reconstruction: boolean</strong></dt>
+<dd><p class="first last">Only return ephys and morphology features for cells that have
+reconstructions. Default True.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.cell_types_cache.CellTypesCache.get_cells">
+<code class="descname">get_cells</code><span class="sig-paren">(</span><em>file_name=None</em>, <em>require_morphology=False</em>, <em>require_reconstruction=False</em>, <em>reporter_status=None</em>, <em>species=None</em>, <em>simple=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/cell_types_cache.html#CellTypesCache.get_cells"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.cell_types_cache.CellTypesCache.get_cells" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download metadata for all cells in the database and optionally return a
+subset filtered by whether or not they have a morphology or reconstruction.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>file_name: string</strong></dt>
+<dd><p class="first last">File name to save/read the cell metadata as JSON.  If file_name is None,
+the file_name will be pulled out of the manifest.  If caching
+is disabled, no file will be saved. Default is None.</p>
+</dd>
+<dt><strong>require_morphology: boolean</strong></dt>
+<dd><p class="first last">Filter out cells that have no morphological images.</p>
+</dd>
+<dt><strong>require_reconstruction: boolean</strong></dt>
+<dd><p class="first last">Filter out cells that have no morphological reconstructions.</p>
+</dd>
+<dt><strong>reporter_status: list</strong></dt>
+<dd><p class="first last">Filter for cells that have one or more cell reporter statuses.</p>
+</dd>
+<dt><strong>species: list</strong></dt>
+<dd><p class="first last">Filter for cells that belong to one or more species.  If None, return all.
+Must be one of [ CellTypesApi.MOUSE, CellTypesApi.HUMAN ].</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.cell_types_cache.CellTypesCache.get_ephys_data">
+<code class="descname">get_ephys_data</code><span class="sig-paren">(</span><em>specimen_id</em>, <em>file_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/cell_types_cache.html#CellTypesCache.get_ephys_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.cell_types_cache.CellTypesCache.get_ephys_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download electrophysiology traces for a single cell in the database.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>specimen_id: int</strong></dt>
+<dd><p class="first last">The ID of a cell specimen to download.</p>
+</dd>
+<dt><strong>file_name: string</strong></dt>
+<dd><p class="first last">File name to save/read the ephys features metadata as CSV.
+If file_name is None, the file_name will be pulled out of the
+manifest.  If caching is disabled, no file will be saved.
+Default is None.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>NwbDataSet</strong></dt>
+<dd><p class="first last">A class instance with helper methods for retrieving stimulus
+and response traces out of an NWB file.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.cell_types_cache.CellTypesCache.get_ephys_features">
+<code class="descname">get_ephys_features</code><span class="sig-paren">(</span><em>dataframe=False</em>, <em>file_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/cell_types_cache.html#CellTypesCache.get_ephys_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.cell_types_cache.CellTypesCache.get_ephys_features" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download electrophysiology features for all cells in the database.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>file_name: string</strong></dt>
+<dd><p class="first last">File name to save/read the ephys features metadata as CSV.
+If file_name is None, the file_name will be pulled out of the
+manifest.  If caching is disabled, no file will be saved.
+Default is None.</p>
+</dd>
+<dt><strong>dataframe: boolean</strong></dt>
+<dd><p class="first last">Return the output as a Pandas DataFrame.  If False, return
+a list of dictionaries.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.cell_types_cache.CellTypesCache.get_ephys_sweeps">
+<code class="descname">get_ephys_sweeps</code><span class="sig-paren">(</span><em>specimen_id</em>, <em>file_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/cell_types_cache.html#CellTypesCache.get_ephys_sweeps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.cell_types_cache.CellTypesCache.get_ephys_sweeps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download sweep metadata for a single cell specimen.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>specimen_id: int</strong></dt>
+<dd><p class="first last">ID of a cell.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.cell_types_cache.CellTypesCache.get_morphology_features">
+<code class="descname">get_morphology_features</code><span class="sig-paren">(</span><em>dataframe=False</em>, <em>file_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/cell_types_cache.html#CellTypesCache.get_morphology_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.cell_types_cache.CellTypesCache.get_morphology_features" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download morphology features for all cells with reconstructions in the database.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>file_name: string</strong></dt>
+<dd><p class="first last">File name to save/read the ephys features metadata as CSV.
+If file_name is None, the file_name will be pulled out of the
+manifest.  If caching is disabled, no file will be saved.
+Default is None.</p>
+</dd>
+<dt><strong>dataframe: boolean</strong></dt>
+<dd><p class="first last">Return the output as a Pandas DataFrame.  If False, return
+a list of dictionaries.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.cell_types_cache.CellTypesCache.get_reconstruction">
+<code class="descname">get_reconstruction</code><span class="sig-paren">(</span><em>specimen_id</em>, <em>file_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/cell_types_cache.html#CellTypesCache.get_reconstruction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.cell_types_cache.CellTypesCache.get_reconstruction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download and open a reconstruction for a single cell in the database.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>specimen_id: int</strong></dt>
+<dd><p class="first last">The ID of a cell specimen to download.</p>
+</dd>
+<dt><strong>file_name: string</strong></dt>
+<dd><p class="first last">File name to save/read the reconstruction SWC.
+If file_name is None, the file_name will be pulled out of the
+manifest.  If caching is disabled, no file will be saved.
+Default is None.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>Morphology</strong></dt>
+<dd><p class="first last">A class instance with methods for accessing morphology compartments.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.cell_types_cache.CellTypesCache.get_reconstruction_markers">
+<code class="descname">get_reconstruction_markers</code><span class="sig-paren">(</span><em>specimen_id</em>, <em>file_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/cell_types_cache.html#CellTypesCache.get_reconstruction_markers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.cell_types_cache.CellTypesCache.get_reconstruction_markers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download and open a reconstruction marker file for a single cell in the database.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>specimen_id: int</strong></dt>
+<dd><p class="first last">The ID of a cell specimen to download.</p>
+</dd>
+<dt><strong>file_name: string</strong></dt>
+<dd><p class="first last">File name to save/read the reconstruction marker.
+If file_name is None, the file_name will be pulled out of the
+manifest.  If caching is disabled, no file will be saved.
+Default is None.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>Morphology</strong></dt>
+<dd><p class="first last">A class instance with methods for accessing morphology compartments.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="allensdk.core.cell_types_cache.ReporterStatus">
+<em class="property">class </em><code class="descclassname">allensdk.core.cell_types_cache.</code><code class="descname">ReporterStatus</code><a class="reference internal" href="_modules/allensdk/core/cell_types_cache.html#ReporterStatus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.cell_types_cache.ReporterStatus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Valid strings for filtering by cell reporter status.</p>
+<dl class="attribute">
+<dt id="allensdk.core.cell_types_cache.ReporterStatus.INDETERMINATE">
+<code class="descname">INDETERMINATE</code><em class="property"> = None</em><a class="headerlink" href="#allensdk.core.cell_types_cache.ReporterStatus.INDETERMINATE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.cell_types_cache.ReporterStatus.NA">
+<code class="descname">NA</code><em class="property"> = None</em><a class="headerlink" href="#allensdk.core.cell_types_cache.ReporterStatus.NA" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.cell_types_cache.ReporterStatus.NEGATIVE">
+<code class="descname">NEGATIVE</code><em class="property"> = 'negative'</em><a class="headerlink" href="#allensdk.core.cell_types_cache.ReporterStatus.NEGATIVE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.cell_types_cache.ReporterStatus.POSITIVE">
+<code class="descname">POSITIVE</code><em class="property"> = 'positive'</em><a class="headerlink" href="#allensdk.core.cell_types_cache.ReporterStatus.POSITIVE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_space.html">Reference Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="glif_models.html">Generalized LIF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html">Biophysical</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.deprecated.html">allensdk.deprecated module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
+</ul>
+
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allen-sdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    </div>
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalFooter.js"></script>
+
+
+  </body>
+</html>

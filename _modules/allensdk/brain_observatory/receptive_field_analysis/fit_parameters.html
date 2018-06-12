@@ -1,32 +1,21 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>allensdk.brain_observatory.receptive_field_analysis.fit_parameters &mdash; Allen SDK dev documentation</title>
-    
+    <title>allensdk.brain_observatory.receptive_field_analysis.fit_parameters &#8212; Allen SDK dev documentation</title>
     <link rel="stylesheet" href="../../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../../',
-        VERSION:     'dev',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="../../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK dev documentation" href="../../../../index.html" />
-    <link rel="up" title="Module code" href="../../../index.html" /> 
-  </head>
-  <body role="document">
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
 <script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
@@ -104,14 +93,14 @@
 <span class="c1"># ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="c1">#</span>
-<span class="kn">from</span> <span class="nn">.fitgaussian2D</span> <span class="kn">import</span> <span class="n">fitgaussian2D</span><span class="p">,</span> <span class="n">GaussianFitError</span><span class="p">,</span> <span class="n">gaussian2D</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">.fitgaussian2D</span> <span class="k">import</span> <span class="n">fitgaussian2D</span><span class="p">,</span> <span class="n">GaussianFitError</span><span class="p">,</span> <span class="n">gaussian2D</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">collections</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
-<div class="viewcode-block" id="add_to_fit_parameters_dict_single"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.fit_parameters.add_to_fit_parameters_dict_single">[docs]</a><span class="k">def</span> <span class="nf">add_to_fit_parameters_dict_single</span><span class="p">(</span><span class="n">fit_parameters_dict</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+<div class="viewcode-block" id="add_to_fit_parameters_dict_single"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.fit_parameters.html#allensdk.brain_observatory.receptive_field_analysis.fit_parameters.add_to_fit_parameters_dict_single">[docs]</a><span class="k">def</span> <span class="nf">add_to_fit_parameters_dict_single</span><span class="p">(</span><span class="n">fit_parameters_dict</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 
     <span class="n">fit_parameters_dict</span><span class="p">[</span><span class="s1">&#39;height&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="n">fit_parameters_dict</span><span class="p">[</span><span class="s1">&#39;center_y&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
@@ -119,12 +108,12 @@
     <span class="n">fit_parameters_dict</span><span class="p">[</span><span class="s1">&#39;width_y&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
     <span class="n">fit_parameters_dict</span><span class="p">[</span><span class="s1">&#39;width_x&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
     <span class="n">fit_parameters_dict</span><span class="p">[</span><span class="s1">&#39;rotation&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
-        <span class="n">fit_parameters_dict</span><span class="p">[</span><span class="s1">&#39;area&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">fit_parameters_dict</span><span class="p">[</span><span class="s1">&#39;area&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">fit_parameters_dict</span><span class="p">[</span><span class="s1">&#39;area&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="mf">3.</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">4</span><span class="p">]))</span></div>
 
-<div class="viewcode-block" id="get_gaussian_fit_single_channel"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.fit_parameters.get_gaussian_fit_single_channel">[docs]</a><span class="k">def</span> <span class="nf">get_gaussian_fit_single_channel</span><span class="p">(</span><span class="n">rf</span><span class="p">,</span> <span class="n">fit_parameters_dict</span><span class="p">):</span>
+<div class="viewcode-block" id="get_gaussian_fit_single_channel"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.fit_parameters.html#allensdk.brain_observatory.receptive_field_analysis.fit_parameters.get_gaussian_fit_single_channel">[docs]</a><span class="k">def</span> <span class="nf">get_gaussian_fit_single_channel</span><span class="p">(</span><span class="n">rf</span><span class="p">,</span> <span class="n">fit_parameters_dict</span><span class="p">):</span>
 
     <span class="k">try</span><span class="p">:</span>
         <span class="n">p_fit</span> <span class="o">=</span> <span class="n">fitgaussian2D</span><span class="p">(</span><span class="n">rf</span><span class="p">)</span>
@@ -133,20 +122,20 @@
         <span class="n">fit_parameters_dict</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data_fitted_on</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">GaussianFitError</span><span class="p">:</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;GaussianFitError (on subfield) caught&#39;</span><span class="p">)</span>
-        <span class="n">add_to_fit_parameters_dict_single</span><span class="p">(</span><span class="n">fit_parameters_dict</span><span class="p">,</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span><span class="o">*</span><span class="mi">6</span><span class="p">)</span>
+        <span class="n">add_to_fit_parameters_dict_single</span><span class="p">(</span><span class="n">fit_parameters_dict</span><span class="p">,</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="mi">6</span><span class="p">)</span>
         <span class="n">fit_parameters_dict</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">rf</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="compute_distance"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.fit_parameters.compute_distance">[docs]</a><span class="k">def</span> <span class="nf">compute_distance</span><span class="p">(</span><span class="n">center_on</span><span class="p">,</span> <span class="n">center_off</span><span class="p">):</span>
+<div class="viewcode-block" id="compute_distance"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.fit_parameters.html#allensdk.brain_observatory.receptive_field_analysis.fit_parameters.compute_distance">[docs]</a><span class="k">def</span> <span class="nf">compute_distance</span><span class="p">(</span><span class="n">center_on</span><span class="p">,</span> <span class="n">center_off</span><span class="p">):</span>
 
     <span class="n">center_x_on</span><span class="p">,</span> <span class="n">center_y_on</span> <span class="o">=</span> <span class="n">center_on</span>
     <span class="n">center_x_off</span><span class="p">,</span> <span class="n">center_y_off</span> <span class="o">=</span> <span class="n">center_off</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="n">center_x_on</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">center_y_on</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">center_x_off</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">center_y_off</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">None</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">center_x_on</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">center_y_on</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">center_x_off</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">center_y_off</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">center_x_off</span><span class="o">-</span><span class="n">center_x_on</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span><span class="p">(</span><span class="n">center_y_off</span><span class="o">-</span><span class="n">center_y_on</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="compute_overlap"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.fit_parameters.compute_overlap">[docs]</a><span class="k">def</span> <span class="nf">compute_overlap</span><span class="p">(</span><span class="n">data_fitted_on</span><span class="p">,</span> <span class="n">data_fitted_off</span><span class="p">):</span>
+<div class="viewcode-block" id="compute_overlap"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.fit_parameters.html#allensdk.brain_observatory.receptive_field_analysis.fit_parameters.compute_overlap">[docs]</a><span class="k">def</span> <span class="nf">compute_overlap</span><span class="p">(</span><span class="n">data_fitted_on</span><span class="p">,</span> <span class="n">data_fitted_off</span><span class="p">):</span>
 
     <span class="n">on_bin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">data_fitted_on</span> <span class="o">&gt;</span> <span class="mf">0.001</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
     <span class="n">off_bin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">data_fitted_off</span> <span class="o">&gt;</span> <span class="mf">0.001</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
@@ -164,9 +153,7 @@
         <div class="sphinxsidebarwrapper">
 <h3><a href="../../../../index.html">Contents</a></h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Install Guide</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Install Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../cell_types.html">Cell Types</a></li>
@@ -191,6 +178,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.model.html">allensdk.model package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.morphology.html">allensdk.morphology package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.deprecated.html">allensdk.deprecated module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
@@ -208,12 +196,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

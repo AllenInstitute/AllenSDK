@@ -1,0 +1,7 @@
+allensdk.api.queries.reference\_space\_api module
+=================================================
+
+.. automodule:: allensdk.api.queries.reference_space_api
+    :members:
+    :undoc-members:
+    :show-inheritance:

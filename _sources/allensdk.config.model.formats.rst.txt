@@ -1,0 +1,19 @@
+allensdk.config.model.formats package
+=====================================
+
+Submodules
+----------
+
+.. toctree::
+
+   allensdk.config.model.formats.hdf5_util
+   allensdk.config.model.formats.json_description_parser
+   allensdk.config.model.formats.pycfg_description_parser
+
+Module contents
+---------------
+
+.. automodule:: allensdk.config.model.formats
+    :members:
+    :undoc-members:
+    :show-inheritance:

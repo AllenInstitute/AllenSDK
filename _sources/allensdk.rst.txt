@@ -1,0 +1,31 @@
+allensdk package
+================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    allensdk.api
+    allensdk.brain_observatory
+    allensdk.config
+    allensdk.core
+    allensdk.ephys
+    allensdk.model
+    allensdk.morphology
+    allensdk.test_utilities
+
+Submodules
+----------
+
+.. toctree::
+
+   allensdk.deprecated
+
+Module contents
+---------------
+
+.. automodule:: allensdk
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,7 @@
+allensdk.brain\_observatory.brain\_observatory\_exceptions module
+=================================================================
+
+.. automodule:: allensdk.brain_observatory.brain_observatory_exceptions
+    :members:
+    :undoc-members:
+    :show-inheritance:

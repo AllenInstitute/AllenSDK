@@ -1,32 +1,21 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>allensdk.ephys.ephys_features &mdash; Allen SDK dev documentation</title>
-    
+    <title>allensdk.ephys.ephys_features &#8212; Allen SDK dev documentation</title>
     <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../',
-        VERSION:     'dev',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK dev documentation" href="../../../index.html" />
-    <link rel="up" title="Module code" href="../../index.html" /> 
-  </head>
-  <body role="document">
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
 <script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
@@ -106,12 +95,12 @@
 <span class="c1">#</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">scipy.signal</span> <span class="kn">as</span> <span class="nn">signal</span>
-<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">curve_fit</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.signal</span> <span class="k">as</span> <span class="nn">signal</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="k">import</span> <span class="n">curve_fit</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">partial</span>
 
-<div class="viewcode-block" id="detect_putative_spikes"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_features.detect_putative_spikes">[docs]</a><span class="k">def</span> <span class="nf">detect_putative_spikes</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span> <span class="n">dv_cutoff</span><span class="o">=</span><span class="mf">20.</span><span class="p">):</span>
+<div class="viewcode-block" id="detect_putative_spikes"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_features.html#allensdk.ephys.ephys_features.detect_putative_spikes">[docs]</a><span class="k">def</span> <span class="nf">detect_putative_spikes</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span> <span class="n">dv_cutoff</span><span class="o">=</span><span class="mf">20.</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Perform initial detection of spikes and return their indexes.</span>
 
 <span class="sd">    Parameters</span>
@@ -138,10 +127,10 @@
     <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">t</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">FeatureError</span><span class="p">(</span><span class="s2">&quot;Voltage and time series do not have the same dimensions&quot;</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">start</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">start</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">start</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-    <span class="k">if</span> <span class="n">end</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">end</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">end</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
     <span class="n">start_index</span> <span class="o">=</span> <span class="n">find_time_index</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span>
@@ -166,7 +155,7 @@
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">putative_spikes</span><span class="p">)</span> <span class="o">+</span> <span class="n">start_index</span></div>
 
 
-<div class="viewcode-block" id="find_peak_indexes"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_features.find_peak_indexes">[docs]</a><span class="k">def</span> <span class="nf">find_peak_indexes</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">spike_indexes</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="find_peak_indexes"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_features.html#allensdk.ephys.ephys_features.find_peak_indexes">[docs]</a><span class="k">def</span> <span class="nf">find_peak_indexes</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">spike_indexes</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Find indexes of spike peaks.</span>
 
 <span class="sd">    Parameters</span>
@@ -188,8 +177,8 @@
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">peak_indexes</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="filter_putative_spikes"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_features.filter_putative_spikes">[docs]</a><span class="k">def</span> <span class="nf">filter_putative_spikes</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">spike_indexes</span><span class="p">,</span> <span class="n">peak_indexes</span><span class="p">,</span> <span class="n">min_height</span><span class="o">=</span><span class="mf">2.</span><span class="p">,</span>
-                           <span class="n">min_peak</span><span class="o">=-</span><span class="mf">30.</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span> <span class="n">dvdt</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="filter_putative_spikes"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_features.html#allensdk.ephys.ephys_features.filter_putative_spikes">[docs]</a><span class="k">def</span> <span class="nf">filter_putative_spikes</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">spike_indexes</span><span class="p">,</span> <span class="n">peak_indexes</span><span class="p">,</span> <span class="n">min_height</span><span class="o">=</span><span class="mf">2.</span><span class="p">,</span>
+                           <span class="n">min_peak</span><span class="o">=-</span><span class="mf">30.</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span> <span class="n">dvdt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Filter out events that are unlikely to be spikes based on:</span>
 <span class="sd">        * Voltage failing to go down between peak and the next spike&#39;s threshold</span>
 <span class="sd">        * Height (threshold to peak)</span>
@@ -215,14 +204,14 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">spike_indexes</span><span class="o">.</span><span class="n">size</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">peak_indexes</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([]),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
 
-    <span class="k">if</span> <span class="n">dvdt</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">dvdt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">dvdt</span> <span class="o">=</span> <span class="n">calculate_dvdt</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="nb">filter</span><span class="p">)</span>
 
     <span class="n">diff_mask</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">dvdt</span><span class="p">[</span><span class="n">peak_ind</span><span class="p">:</span><span class="n">spike_ind</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
                  <span class="k">for</span> <span class="n">peak_ind</span><span class="p">,</span> <span class="n">spike_ind</span>
                  <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">peak_indexes</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">spike_indexes</span><span class="p">[</span><span class="mi">1</span><span class="p">:])]</span>
-    <span class="n">peak_indexes</span> <span class="o">=</span> <span class="n">peak_indexes</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">diff_mask</span> <span class="o">+</span> <span class="p">[</span><span class="bp">True</span><span class="p">])]</span>
-    <span class="n">spike_indexes</span> <span class="o">=</span> <span class="n">spike_indexes</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">True</span><span class="p">]</span> <span class="o">+</span> <span class="n">diff_mask</span><span class="p">)]</span>
+    <span class="n">peak_indexes</span> <span class="o">=</span> <span class="n">peak_indexes</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">diff_mask</span> <span class="o">+</span> <span class="p">[</span><span class="kc">True</span><span class="p">])]</span>
+    <span class="n">spike_indexes</span> <span class="o">=</span> <span class="n">spike_indexes</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="kc">True</span><span class="p">]</span> <span class="o">+</span> <span class="n">diff_mask</span><span class="p">)]</span>
 
     <span class="n">peak_level_mask</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">peak_indexes</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">min_peak</span>
     <span class="n">spike_indexes</span> <span class="o">=</span> <span class="n">spike_indexes</span><span class="p">[</span><span class="n">peak_level_mask</span><span class="p">]</span>
@@ -235,7 +224,7 @@
     <span class="k">return</span> <span class="n">spike_indexes</span><span class="p">,</span> <span class="n">peak_indexes</span></div>
 
 
-<div class="viewcode-block" id="find_upstroke_indexes"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_features.find_upstroke_indexes">[docs]</a><span class="k">def</span> <span class="nf">find_upstroke_indexes</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">spike_indexes</span><span class="p">,</span> <span class="n">peak_indexes</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span> <span class="n">dvdt</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="find_upstroke_indexes"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_features.html#allensdk.ephys.ephys_features.find_upstroke_indexes">[docs]</a><span class="k">def</span> <span class="nf">find_upstroke_indexes</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">spike_indexes</span><span class="p">,</span> <span class="n">peak_indexes</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span> <span class="n">dvdt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Find indexes of maximum upstroke of spike.</span>
 
 <span class="sd">    Parameters</span>
@@ -253,7 +242,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">if</span> <span class="n">dvdt</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">dvdt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">dvdt</span> <span class="o">=</span> <span class="n">calculate_dvdt</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="nb">filter</span><span class="p">)</span>
 
     <span class="n">upstroke_indexes</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">dvdt</span><span class="p">[</span><span class="n">spike</span><span class="p">:</span><span class="n">peak</span><span class="p">])</span> <span class="o">+</span> <span class="n">spike</span> <span class="k">for</span> <span class="n">spike</span><span class="p">,</span> <span class="n">peak</span> <span class="ow">in</span>
@@ -262,7 +251,7 @@
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">upstroke_indexes</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="refine_threshold_indexes"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_features.refine_threshold_indexes">[docs]</a><span class="k">def</span> <span class="nf">refine_threshold_indexes</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">upstroke_indexes</span><span class="p">,</span> <span class="n">thresh_frac</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span> <span class="n">dvdt</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="refine_threshold_indexes"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_features.html#allensdk.ephys.ephys_features.refine_threshold_indexes">[docs]</a><span class="k">def</span> <span class="nf">refine_threshold_indexes</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">upstroke_indexes</span><span class="p">,</span> <span class="n">thresh_frac</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span> <span class="n">dvdt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Refine threshold detection of previously-found spikes.</span>
 
 <span class="sd">    Parameters</span>
@@ -282,7 +271,7 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">upstroke_indexes</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
 
-    <span class="k">if</span> <span class="n">dvdt</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">dvdt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">dvdt</span> <span class="o">=</span> <span class="n">calculate_dvdt</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="nb">filter</span><span class="p">)</span>
 
     <span class="n">avg_upstroke</span> <span class="o">=</span> <span class="n">dvdt</span><span class="p">[</span><span class="n">upstroke_indexes</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
@@ -302,8 +291,8 @@
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">threshold_indexes</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="check_thresholds_and_peaks"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_features.check_thresholds_and_peaks">[docs]</a><span class="k">def</span> <span class="nf">check_thresholds_and_peaks</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">spike_indexes</span><span class="p">,</span> <span class="n">peak_indexes</span><span class="p">,</span> <span class="n">upstroke_indexes</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                               <span class="n">max_interval</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span> <span class="n">thresh_frac</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span> <span class="n">dvdt</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+<div class="viewcode-block" id="check_thresholds_and_peaks"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_features.html#allensdk.ephys.ephys_features.check_thresholds_and_peaks">[docs]</a><span class="k">def</span> <span class="nf">check_thresholds_and_peaks</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">spike_indexes</span><span class="p">,</span> <span class="n">peak_indexes</span><span class="p">,</span> <span class="n">upstroke_indexes</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                               <span class="n">max_interval</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span> <span class="n">thresh_frac</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span> <span class="n">dvdt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                <span class="n">tol</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Validate thresholds and peaks for set of spikes</span>
 
@@ -339,15 +328,15 @@
     <span class="n">overlaps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">spike_indexes</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">&lt;=</span> <span class="n">peak_indexes</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">overlaps</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
         <span class="n">spike_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">spike_indexes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
-        <span class="n">spike_mask</span><span class="p">[</span><span class="n">overlaps</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">spike_mask</span><span class="p">[</span><span class="n">overlaps</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">spike_indexes</span> <span class="o">=</span> <span class="n">spike_indexes</span><span class="p">[</span><span class="n">spike_mask</span><span class="p">]</span>
 
         <span class="n">peak_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">peak_indexes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
-        <span class="n">peak_mask</span><span class="p">[</span><span class="n">overlaps</span><span class="p">]</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">peak_mask</span><span class="p">[</span><span class="n">overlaps</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">peak_indexes</span> <span class="o">=</span> <span class="n">peak_indexes</span><span class="p">[</span><span class="n">peak_mask</span><span class="p">]</span>
 
         <span class="n">upstroke_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">upstroke_indexes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
-        <span class="n">upstroke_mask</span><span class="p">[</span><span class="n">overlaps</span><span class="p">]</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">upstroke_mask</span><span class="p">[</span><span class="n">overlaps</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">upstroke_indexes</span> <span class="o">=</span> <span class="n">upstroke_indexes</span><span class="p">[</span><span class="n">upstroke_mask</span><span class="p">]</span>
 
     <span class="c1"># Validate that peaks don&#39;t occur too long after the threshold</span>
@@ -355,11 +344,11 @@
     <span class="n">too_long_spikes</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">spk</span><span class="p">,</span> <span class="n">peak</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">spike_indexes</span><span class="p">,</span> <span class="n">peak_indexes</span><span class="p">)):</span>
         <span class="k">if</span> <span class="n">t</span><span class="p">[</span><span class="n">peak</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="n">spk</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">max_interval</span><span class="p">:</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Need to recalculate threshold-peak pair that exceeds maximum allowed interval ({:f} s)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">max_interval</span><span class="p">))</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Need to recalculate threshold-peak pair that exceeds maximum allowed interval (</span><span class="si">{:f}</span><span class="s2"> s)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">max_interval</span><span class="p">))</span>
             <span class="n">too_long_spikes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">too_long_spikes</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">dvdt</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">dvdt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">dvdt</span> <span class="o">=</span> <span class="n">calculate_dvdt</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="nb">filter</span><span class="p">)</span>
         <span class="n">avg_upstroke</span> <span class="o">=</span> <span class="n">dvdt</span><span class="p">[</span><span class="n">upstroke_indexes</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
         <span class="n">target</span> <span class="o">=</span> <span class="n">avg_upstroke</span> <span class="o">*</span> <span class="n">thresh_frac</span>
@@ -403,12 +392,12 @@
     <span class="n">end_index</span> <span class="o">=</span> <span class="n">find_time_index</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">spike_indexes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">peak_indexes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span><span class="n">end_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">v</span><span class="p">[</span><span class="n">spike_indexes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="o">+</span> <span class="n">tol</span><span class="p">):</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Failed to return to threshold voltage + tolerance (</span><span class="si">%.2f</span><span class="s2">) after last spike (min </span><span class="si">%.2f</span><span class="s2">) - marking last spike as clipped&quot;</span><span class="p">,</span> <span class="n">v</span><span class="p">[</span><span class="n">spike_indexes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="o">+</span> <span class="n">tol</span><span class="p">,</span> <span class="n">v</span><span class="p">[</span><span class="n">peak_indexes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span><span class="n">end_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">())</span>
-        <span class="n">clipped</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">clipped</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="k">return</span> <span class="n">spike_indexes</span><span class="p">,</span> <span class="n">peak_indexes</span><span class="p">,</span> <span class="n">upstroke_indexes</span><span class="p">,</span> <span class="n">clipped</span></div>
 
 
-<div class="viewcode-block" id="find_trough_indexes"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_features.find_trough_indexes">[docs]</a><span class="k">def</span> <span class="nf">find_trough_indexes</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">spike_indexes</span><span class="p">,</span> <span class="n">peak_indexes</span><span class="p">,</span> <span class="n">clipped</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="find_trough_indexes"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_features.html#allensdk.ephys.ephys_features.find_trough_indexes">[docs]</a><span class="k">def</span> <span class="nf">find_trough_indexes</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">spike_indexes</span><span class="p">,</span> <span class="n">peak_indexes</span><span class="p">,</span> <span class="n">clipped</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Find indexes of minimum voltage (trough) between spikes.</span>
 
@@ -428,10 +417,10 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">spike_indexes</span><span class="o">.</span><span class="n">size</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">peak_indexes</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
 
-    <span class="k">if</span> <span class="n">clipped</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">clipped</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">clipped</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">spike_indexes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">end</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">end</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">end</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">end_index</span> <span class="o">=</span> <span class="n">find_time_index</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
 
@@ -453,7 +442,7 @@
     <span class="k">return</span> <span class="n">trough_indexes</span></div>
 
 
-<div class="viewcode-block" id="find_downstroke_indexes"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_features.find_downstroke_indexes">[docs]</a><span class="k">def</span> <span class="nf">find_downstroke_indexes</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">peak_indexes</span><span class="p">,</span> <span class="n">trough_indexes</span><span class="p">,</span> <span class="n">clipped</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span> <span class="n">dvdt</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="find_downstroke_indexes"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_features.html#allensdk.ephys.ephys_features.find_downstroke_indexes">[docs]</a><span class="k">def</span> <span class="nf">find_downstroke_indexes</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">peak_indexes</span><span class="p">,</span> <span class="n">trough_indexes</span><span class="p">,</span> <span class="n">clipped</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span> <span class="n">dvdt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Find indexes of minimum voltage (troughs) between spikes.</span>
 
 <span class="sd">    Parameters</span>
@@ -474,10 +463,10 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">trough_indexes</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
 
-    <span class="k">if</span> <span class="n">dvdt</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">dvdt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">dvdt</span> <span class="o">=</span> <span class="n">calculate_dvdt</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="nb">filter</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">clipped</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">clipped</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">clipped</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">peak_indexes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">peak_indexes</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">trough_indexes</span><span class="p">):</span>
@@ -496,7 +485,7 @@
     <span class="k">return</span> <span class="n">downstroke_indexes</span></div>
 
 
-<div class="viewcode-block" id="find_widths"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_features.find_widths">[docs]</a><span class="k">def</span> <span class="nf">find_widths</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">spike_indexes</span><span class="p">,</span> <span class="n">peak_indexes</span><span class="p">,</span> <span class="n">trough_indexes</span><span class="p">,</span> <span class="n">clipped</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="find_widths"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_features.html#allensdk.ephys.ephys_features.find_widths">[docs]</a><span class="k">def</span> <span class="nf">find_widths</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">spike_indexes</span><span class="p">,</span> <span class="n">peak_indexes</span><span class="p">,</span> <span class="n">trough_indexes</span><span class="p">,</span> <span class="n">clipped</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Find widths at half-height for spikes.</span>
 
 <span class="sd">    Widths are only returned when heights are defined</span>
@@ -520,11 +509,11 @@
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">spike_indexes</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">trough_indexes</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">FeatureError</span><span class="p">(</span><span class="s2">&quot;Cannot have more troughs than spikes&quot;</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">clipped</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">clipped</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">clipped</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">spike_indexes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
 
     <span class="n">use_indexes</span> <span class="o">=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">trough_indexes</span><span class="p">)</span>
-    <span class="n">use_indexes</span><span class="p">[</span><span class="n">clipped</span><span class="p">]</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">use_indexes</span><span class="p">[</span><span class="n">clipped</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="n">heights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">trough_indexes</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
     <span class="n">heights</span><span class="p">[</span><span class="n">use_indexes</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">peak_indexes</span><span class="p">[</span><span class="n">use_indexes</span><span class="p">]]</span> <span class="o">-</span> <span class="n">v</span><span class="p">[</span><span class="n">trough_indexes</span><span class="p">[</span><span class="n">use_indexes</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)]</span>
@@ -560,9 +549,9 @@
     <span class="k">return</span> <span class="n">widths</span></div>
 
 
-<div class="viewcode-block" id="analyze_trough_details"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_features.analyze_trough_details">[docs]</a><span class="k">def</span> <span class="nf">analyze_trough_details</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">spike_indexes</span><span class="p">,</span> <span class="n">peak_indexes</span><span class="p">,</span> <span class="n">clipped</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span>
+<div class="viewcode-block" id="analyze_trough_details"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_features.html#allensdk.ephys.ephys_features.analyze_trough_details">[docs]</a><span class="k">def</span> <span class="nf">analyze_trough_details</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">spike_indexes</span><span class="p">,</span> <span class="n">peak_indexes</span><span class="p">,</span> <span class="n">clipped</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span>
                            <span class="n">heavy_filter</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">term_frac</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">adp_thresh</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-                           <span class="n">flat_interval</span><span class="o">=</span><span class="mf">0.002</span><span class="p">,</span> <span class="n">adp_max_delta_t</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span> <span class="n">adp_max_delta_v</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span> <span class="n">dvdt</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+                           <span class="n">flat_interval</span><span class="o">=</span><span class="mf">0.002</span><span class="p">,</span> <span class="n">adp_max_delta_t</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span> <span class="n">adp_max_delta_v</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span> <span class="n">dvdt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Analyze trough to determine if an ADP exists and whether the reset is a &#39;detour&#39; or &#39;direct&#39;</span>
 
 <span class="sd">    Parameters</span>
@@ -591,11 +580,11 @@
 <span class="sd">                          (if there wasn&#39;t just a fast phase)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">if</span> <span class="n">end</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">end</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">end</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">end_index</span> <span class="o">=</span> <span class="n">find_time_index</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">clipped</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">clipped</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">clipped</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">peak_indexes</span><span class="p">)</span>
 
     <span class="c1"># Can&#39;t evaluate for spikes that are clipped by the window</span>
@@ -603,7 +592,7 @@
     <span class="n">valid_spike_indexes</span> <span class="o">=</span> <span class="n">spike_indexes</span><span class="p">[</span><span class="o">~</span><span class="n">clipped</span><span class="p">]</span>
     <span class="n">valid_peak_indexes</span> <span class="o">=</span> <span class="n">peak_indexes</span><span class="p">[</span><span class="o">~</span><span class="n">clipped</span><span class="p">]</span>
 
-    <span class="k">if</span> <span class="n">dvdt</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">dvdt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">dvdt</span> <span class="o">=</span> <span class="n">calculate_dvdt</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="nb">filter</span><span class="p">)</span>
 
     <span class="n">dvdt_hvy</span> <span class="o">=</span> <span class="n">calculate_dvdt</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">heavy_filter</span><span class="p">)</span>
@@ -622,14 +611,14 @@
         <span class="n">terminated_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">dvdt</span><span class="p">[</span><span class="n">downstroke</span><span class="p">:</span><span class="n">next_spk</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">target</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">terminated_points</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
             <span class="n">terminated</span> <span class="o">=</span> <span class="n">terminated_points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">downstroke</span>
-            <span class="n">update_clipped</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+            <span class="n">update_clipped</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Could not identify fast trough - marking spike as clipped&quot;</span><span class="p">)</span>
             <span class="n">isi_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
             <span class="n">fast_trough_indexes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
             <span class="n">adp_indexes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
             <span class="n">slow_trough_indexes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
-            <span class="n">update_clipped</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+            <span class="n">update_clipped</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">continue</span>
 
         <span class="c1"># Could there be an ADP?</span>
@@ -697,7 +686,7 @@
     <span class="k">return</span> <span class="n">output</span><span class="p">,</span> <span class="n">clipped</span></div>
 
 
-<div class="viewcode-block" id="find_time_index"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_features.find_time_index">[docs]</a><span class="k">def</span> <span class="nf">find_time_index</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">t_0</span><span class="p">):</span>
+<div class="viewcode-block" id="find_time_index"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_features.html#allensdk.ephys.ephys_features.find_time_index">[docs]</a><span class="k">def</span> <span class="nf">find_time_index</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">t_0</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Find the index value of a given time (t_0) in a time series (t).&quot;&quot;&quot;</span>
 
     <span class="n">t_gte</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">t</span> <span class="o">&gt;=</span> <span class="n">t_0</span><span class="p">)</span>
@@ -707,7 +696,7 @@
     <span class="k">return</span> <span class="n">t_gte</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="calculate_dvdt"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_features.calculate_dvdt">[docs]</a><span class="k">def</span> <span class="nf">calculate_dvdt</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="calculate_dvdt"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_features.html#allensdk.ephys.ephys_features.calculate_dvdt">[docs]</a><span class="k">def</span> <span class="nf">calculate_dvdt</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Low-pass filters (if requested) and differentiates voltage by time.</span>
 
 <span class="sd">    Parameters</span>
@@ -726,7 +715,7 @@
         <span class="n">sample_freq</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">delta_t</span>
         <span class="n">filt_coeff</span> <span class="o">=</span> <span class="p">(</span><span class="nb">filter</span> <span class="o">*</span> <span class="mf">1e3</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">sample_freq</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">)</span> <span class="c1"># filter kHz -&gt; Hz, then get fraction of Nyquist frequency</span>
         <span class="k">if</span> <span class="n">filt_coeff</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">filt_coeff</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;bessel coeff ({:f}) is outside of valid range [0,1); cannot filter sampling frequency {:.1f} kHz with cutoff frequency {:.1f} kHz.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filt_coeff</span><span class="p">,</span> <span class="n">sample_freq</span> <span class="o">/</span> <span class="mf">1e3</span><span class="p">,</span> <span class="nb">filter</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;bessel coeff (</span><span class="si">{:f}</span><span class="s2">) is outside of valid range [0,1); cannot filter sampling frequency </span><span class="si">{:.1f}</span><span class="s2"> kHz with cutoff frequency </span><span class="si">{:.1f}</span><span class="s2"> kHz.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filt_coeff</span><span class="p">,</span> <span class="n">sample_freq</span> <span class="o">/</span> <span class="mf">1e3</span><span class="p">,</span> <span class="nb">filter</span><span class="p">))</span>
         <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">bessel</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">filt_coeff</span><span class="p">,</span> <span class="s2">&quot;low&quot;</span><span class="p">)</span>
         <span class="n">v_filt</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">filtfilt</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">dv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">v_filt</span><span class="p">)</span>
@@ -742,7 +731,7 @@
     <span class="k">return</span> <span class="n">dvdt</span></div>
 
 
-<div class="viewcode-block" id="get_isis"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_features.get_isis">[docs]</a><span class="k">def</span> <span class="nf">get_isis</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">spikes</span><span class="p">):</span>
+<div class="viewcode-block" id="get_isis"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_features.html#allensdk.ephys.ephys_features.get_isis">[docs]</a><span class="k">def</span> <span class="nf">get_isis</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">spikes</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Find interspike intervals in sec between spikes (as indexes).&quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">spikes</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
@@ -751,7 +740,7 @@
     <span class="k">return</span> <span class="n">t</span><span class="p">[</span><span class="n">spikes</span><span class="p">[</span><span class="mi">1</span><span class="p">:]]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="n">spikes</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span></div>
 
 
-<div class="viewcode-block" id="average_voltage"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_features.average_voltage">[docs]</a><span class="k">def</span> <span class="nf">average_voltage</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="average_voltage"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_features.html#allensdk.ephys.ephys_features.average_voltage">[docs]</a><span class="k">def</span> <span class="nf">average_voltage</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Calculate average voltage between start and end.</span>
 
 <span class="sd">    Parameters</span>
@@ -766,10 +755,10 @@
 <span class="sd">    v_avg : average voltage</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">if</span> <span class="n">start</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">start</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">start</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-    <span class="k">if</span> <span class="n">end</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">end</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">end</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
     <span class="n">start_index</span> <span class="o">=</span> <span class="n">find_time_index</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span>
@@ -778,7 +767,7 @@
     <span class="k">return</span> <span class="n">v</span><span class="p">[</span><span class="n">start_index</span><span class="p">:</span><span class="n">end_index</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="adaptation_index"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_features.adaptation_index">[docs]</a><span class="k">def</span> <span class="nf">adaptation_index</span><span class="p">(</span><span class="n">isis</span><span class="p">):</span>
+<div class="viewcode-block" id="adaptation_index"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_features.html#allensdk.ephys.ephys_features.adaptation_index">[docs]</a><span class="k">def</span> <span class="nf">adaptation_index</span><span class="p">(</span><span class="n">isis</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Calculate adaptation index of `isis`.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">isis</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
@@ -786,19 +775,19 @@
     <span class="k">return</span> <span class="n">norm_diff</span><span class="p">(</span><span class="n">isis</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="latency"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_features.latency">[docs]</a><span class="k">def</span> <span class="nf">latency</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">spikes</span><span class="p">,</span> <span class="n">start</span><span class="p">):</span>
+<div class="viewcode-block" id="latency"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_features.html#allensdk.ephys.ephys_features.latency">[docs]</a><span class="k">def</span> <span class="nf">latency</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">spikes</span><span class="p">,</span> <span class="n">start</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Calculate time to the first spike.&quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">spikes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
 
-    <span class="k">if</span> <span class="n">start</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">start</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">start</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="k">return</span> <span class="n">t</span><span class="p">[</span><span class="n">spikes</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">-</span> <span class="n">start</span></div>
 
 
-<div class="viewcode-block" id="average_rate"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_features.average_rate">[docs]</a><span class="k">def</span> <span class="nf">average_rate</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">spikes</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+<div class="viewcode-block" id="average_rate"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_features.html#allensdk.ephys.ephys_features.average_rate">[docs]</a><span class="k">def</span> <span class="nf">average_rate</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">spikes</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Calculate average firing rate during interval between `start` and `end`.</span>
 
 <span class="sd">    Parameters</span>
@@ -813,10 +802,10 @@
 <span class="sd">    avg_rate : average firing rate in spikes/sec</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">if</span> <span class="n">start</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">start</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">start</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-    <span class="k">if</span> <span class="n">end</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">end</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">end</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
     <span class="n">spikes_in_interval</span> <span class="o">=</span> <span class="p">[</span><span class="n">spk</span> <span class="k">for</span> <span class="n">spk</span> <span class="ow">in</span> <span class="n">spikes</span> <span class="k">if</span> <span class="n">t</span><span class="p">[</span><span class="n">spk</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">start</span> <span class="ow">and</span> <span class="n">t</span><span class="p">[</span><span class="n">spk</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">end</span><span class="p">]</span>
@@ -824,7 +813,7 @@
     <span class="k">return</span> <span class="n">avg_rate</span></div>
 
 
-<div class="viewcode-block" id="norm_diff"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_features.norm_diff">[docs]</a><span class="k">def</span> <span class="nf">norm_diff</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+<div class="viewcode-block" id="norm_diff"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_features.html#allensdk.ephys.ephys_features.norm_diff">[docs]</a><span class="k">def</span> <span class="nf">norm_diff</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Calculate average of (a[i] - a[i+1]) / (a[i] + a[i+1]).&quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
@@ -841,7 +830,7 @@
     <span class="k">return</span> <span class="n">avg</span></div>
 
 
-<div class="viewcode-block" id="norm_sq_diff"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_features.norm_sq_diff">[docs]</a><span class="k">def</span> <span class="nf">norm_sq_diff</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+<div class="viewcode-block" id="norm_sq_diff"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_features.html#allensdk.ephys.ephys_features.norm_sq_diff">[docs]</a><span class="k">def</span> <span class="nf">norm_sq_diff</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Calculate average of (a[i] - a[i+1])^2 / (a[i] + a[i+1])^2.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
@@ -851,13 +840,13 @@
     <span class="k">return</span> <span class="n">norm_sq_diffs</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="has_fixed_dt"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_features.has_fixed_dt">[docs]</a><span class="k">def</span> <span class="nf">has_fixed_dt</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="has_fixed_dt"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_features.html#allensdk.ephys.ephys_features.has_fixed_dt">[docs]</a><span class="k">def</span> <span class="nf">has_fixed_dt</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Check that all time intervals are identical.&quot;&quot;&quot;</span>
     <span class="n">dt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span> <span class="o">*</span> <span class="n">dt</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
 
 
-<div class="viewcode-block" id="fit_membrane_time_constant"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_features.fit_membrane_time_constant">[docs]</a><span class="k">def</span> <span class="nf">fit_membrane_time_constant</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">min_rsme</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">):</span>
+<div class="viewcode-block" id="fit_membrane_time_constant"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_features.html#allensdk.ephys.ephys_features.fit_membrane_time_constant">[docs]</a><span class="k">def</span> <span class="nf">fit_membrane_time_constant</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">min_rsme</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Fit an exponential to estimate membrane time constant between start and end</span>
 
 <span class="sd">    Parameters</span>
@@ -896,7 +885,7 @@
     <span class="k">return</span> <span class="n">popt</span></div>
 
 
-<div class="viewcode-block" id="detect_pauses"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_features.detect_pauses">[docs]</a><span class="k">def</span> <span class="nf">detect_pauses</span><span class="p">(</span><span class="n">isis</span><span class="p">,</span> <span class="n">isi_types</span><span class="p">,</span> <span class="n">cost_weight</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+<div class="viewcode-block" id="detect_pauses"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_features.html#allensdk.ephys.ephys_features.detect_pauses">[docs]</a><span class="k">def</span> <span class="nf">detect_pauses</span><span class="p">(</span><span class="n">isis</span><span class="p">,</span> <span class="n">isi_types</span><span class="p">,</span> <span class="n">cost_weight</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Determine which ISIs are &quot;pauses&quot; in ongoing firing.</span>
 
 <span class="sd">    Pauses are unusually long ISIs with a &quot;detour reset&quot; among &quot;direct resets&quot;.</span>
@@ -956,7 +945,7 @@
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">pause_list</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="detect_bursts"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_features.detect_bursts">[docs]</a><span class="k">def</span> <span class="nf">detect_bursts</span><span class="p">(</span><span class="n">isis</span><span class="p">,</span> <span class="n">isi_types</span><span class="p">,</span> <span class="n">fast_tr_v</span><span class="p">,</span> <span class="n">fast_tr_t</span><span class="p">,</span> <span class="n">slow_tr_v</span><span class="p">,</span> <span class="n">slow_tr_t</span><span class="p">,</span>
+<div class="viewcode-block" id="detect_bursts"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_features.html#allensdk.ephys.ephys_features.detect_bursts">[docs]</a><span class="k">def</span> <span class="nf">detect_bursts</span><span class="p">(</span><span class="n">isis</span><span class="p">,</span> <span class="n">isi_types</span><span class="p">,</span> <span class="n">fast_tr_v</span><span class="p">,</span> <span class="n">fast_tr_t</span><span class="p">,</span> <span class="n">slow_tr_v</span><span class="p">,</span> <span class="n">slow_tr_t</span><span class="p">,</span>
                   <span class="n">thr_v</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">pause_cost</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Detect bursts in spike train.</span>
 
@@ -1025,7 +1014,7 @@
                 <span class="n">drop_into</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
                 <span class="k">break</span>
     <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">into_burst</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
-    <span class="n">mask</span><span class="p">[</span><span class="n">drop_into</span><span class="p">]</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">mask</span><span class="p">[</span><span class="n">drop_into</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">into_burst</span> <span class="o">=</span> <span class="n">into_burst</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
 
     <span class="n">out_of_burst</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">out_of_burst</span><span class="p">)</span>
@@ -1077,7 +1066,7 @@
     <span class="k">return</span> <span class="n">bursts</span></div>
 
 
-<div class="viewcode-block" id="fit_prespike_time_constant"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_features.fit_prespike_time_constant">[docs]</a><span class="k">def</span> <span class="nf">fit_prespike_time_constant</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">spike_time</span><span class="p">,</span> <span class="n">dv_limit</span><span class="o">=-</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">tau_limit</span><span class="o">=</span><span class="mf">0.3</span><span class="p">):</span>
+<div class="viewcode-block" id="fit_prespike_time_constant"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_features.html#allensdk.ephys.ephys_features.fit_prespike_time_constant">[docs]</a><span class="k">def</span> <span class="nf">fit_prespike_time_constant</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">spike_time</span><span class="p">,</span> <span class="n">dv_limit</span><span class="o">=-</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">tau_limit</span><span class="o">=</span><span class="mf">0.3</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Finds the dominant time constant of the pre-spike rise in voltage</span>
 
 <span class="sd">    Parameters</span>
@@ -1151,7 +1140,7 @@
     <span class="k">return</span> <span class="n">tau</span></div>
 
 
-<div class="viewcode-block" id="estimate_adjusted_detection_parameters"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_features.estimate_adjusted_detection_parameters">[docs]</a><span class="k">def</span> <span class="nf">estimate_adjusted_detection_parameters</span><span class="p">(</span><span class="n">v_set</span><span class="p">,</span> <span class="n">t_set</span><span class="p">,</span> <span class="n">interval_start</span><span class="p">,</span> <span class="n">interval_end</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+<div class="viewcode-block" id="estimate_adjusted_detection_parameters"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_features.html#allensdk.ephys.ephys_features.estimate_adjusted_detection_parameters">[docs]</a><span class="k">def</span> <span class="nf">estimate_adjusted_detection_parameters</span><span class="p">(</span><span class="n">v_set</span><span class="p">,</span> <span class="n">t_set</span><span class="p">,</span> <span class="n">interval_start</span><span class="p">,</span> <span class="n">interval_end</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Estimate adjusted values for spike detection by analyzing a period when the voltage</span>
 <span class="sd">    changes quickly but passively (due to strong current stimulation), which can result</span>
@@ -1207,7 +1196,7 @@
     <span class="k">for</span> <span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">dv</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">v_set</span><span class="p">,</span> <span class="n">t_set</span><span class="p">,</span> <span class="n">dv_set</span><span class="p">):</span>
         <span class="n">putative_spikes</span> <span class="o">=</span> <span class="n">detect_putative_spikes</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">dv_cutoff</span><span class="o">=</span><span class="n">new_dv_cutoff</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="nb">filter</span><span class="p">)</span>
         <span class="n">peaks</span> <span class="o">=</span> <span class="n">find_peak_indexes</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">putative_spikes</span><span class="p">)</span>
-        <span class="n">putative_spikes</span><span class="p">,</span> <span class="n">peaks</span> <span class="o">=</span> <span class="n">filter_putative_spikes</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">putative_spikes</span><span class="p">,</span> <span class="n">peaks</span><span class="p">)</span>
+        <span class="n">putative_spikes</span><span class="p">,</span> <span class="n">peaks</span> <span class="o">=</span> <span class="n">filter_putative_spikes</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">putative_spikes</span><span class="p">,</span> <span class="n">peaks</span><span class="p">,</span> <span class="n">dvdt</span><span class="o">=</span><span class="n">dv</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="nb">filter</span><span class="p">)</span>
         <span class="n">upstrokes</span> <span class="o">=</span> <span class="n">find_upstroke_indexes</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">putative_spikes</span><span class="p">,</span> <span class="n">peaks</span><span class="p">,</span> <span class="n">dvdt</span><span class="o">=</span><span class="n">dv</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">upstrokes</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
             <span class="n">all_upstrokes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">all_upstrokes</span><span class="p">,</span> <span class="n">dv</span><span class="p">[</span><span class="n">upstrokes</span><span class="p">])</span>
@@ -1219,7 +1208,7 @@
 <span class="k">def</span> <span class="nf">_score_burst_set</span><span class="p">(</span><span class="n">bursts</span><span class="p">,</span> <span class="n">isis</span><span class="p">,</span> <span class="n">delta_t</span><span class="p">,</span> <span class="n">c_n</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">c_tx</span><span class="o">=</span><span class="mf">0.01</span><span class="p">):</span>
     <span class="n">in_burst</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">isis</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bursts</span><span class="p">:</span>
-        <span class="n">in_burst</span><span class="p">[</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">in_burst</span><span class="p">[</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="c1"># If all ISIs are part of a burst, give it a bad score</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">isis</span><span class="p">[</span><span class="o">~</span><span class="n">in_burst</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -1257,7 +1246,7 @@
     <span class="k">return</span> <span class="n">y0</span> <span class="o">+</span> <span class="n">A1</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">x</span> <span class="o">/</span> <span class="n">tau1</span><span class="p">)</span> <span class="o">+</span> <span class="n">A2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">x</span> <span class="o">/</span> <span class="n">tau2</span><span class="p">)</span> <span class="o">+</span> <span class="n">penalty</span>
 
 
-<div class="viewcode-block" id="FeatureError"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_features.FeatureError">[docs]</a><span class="k">class</span> <span class="nc">FeatureError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<div class="viewcode-block" id="FeatureError"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_features.html#allensdk.ephys.ephys_features.FeatureError">[docs]</a><span class="k">class</span> <span class="nc">FeatureError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Generic Python-exception-derived object raised by feature detection functions.&quot;&quot;&quot;</span>
     <span class="k">pass</span></div>
 </pre></div>
@@ -1269,9 +1258,7 @@
         <div class="sphinxsidebarwrapper">
 <h3><a href="../../../index.html">Contents</a></h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install Guide</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../cell_types.html">Cell Types</a></li>
@@ -1296,6 +1283,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.model.html">allensdk.model package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.morphology.html">allensdk.morphology package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.deprecated.html">allensdk.deprecated module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
@@ -1313,12 +1301,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

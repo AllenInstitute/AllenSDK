@@ -1,0 +1,7 @@
+allensdk.morphology.validate\_swc module
+========================================
+
+.. automodule:: allensdk.morphology.validate_swc
+    :members:
+    :undoc-members:
+    :show-inheritance:

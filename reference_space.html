@@ -1,34 +1,23 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Reference Space &mdash; Allen SDK dev documentation</title>
-    
+    <title>Reference Space &#8212; Allen SDK dev documentation</title>
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     'dev',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK dev documentation" href="index.html" />
-    <link rel="up" title="Data Resources" href="data_resources.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="API Access" href="data_api_client.html" />
     <link rel="prev" title="Mouse Connectivity" href="connectivity.html" /> 
-  </head>
-  <body role="document">
+  </head><body>
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
 <script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
@@ -79,21 +68,21 @@ easily compare data across subjects and experimental modalities.</p>
 <div class="section" id="structure-tree">
 <h2>Structure Tree<a class="headerlink" href="#structure-tree" title="Permalink to this headline">¶</a></h2>
 <p>Brain structures in our reference spaces are arranged in trees. The leaf nodes of the tree describe the very fine anatomical divisions
-of the space, while nodes closer to the root correspond to gross divisions. The <a class="reference internal" href="allensdk.core.html#allensdk.core.structure_tree.StructureTree" title="allensdk.core.structure_tree.StructureTree"><code class="xref py py-class docutils literal"><span class="pre">StructureTree</span></code></a>
+of the space, while nodes closer to the root correspond to gross divisions. The <a class="reference internal" href="allensdk.core.structure_tree.html#allensdk.core.structure_tree.StructureTree" title="allensdk.core.structure_tree.StructureTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructureTree</span></code></a>
 class provides an interface for interacting with a structure tree.</p>
-<p>To download a structure tree, use the <a class="reference internal" href="allensdk.api.queries.html#allensdk.api.queries.ontologies_api.OntologiesApi" title="allensdk.api.queries.ontologies_api.OntologiesApi"><code class="xref py py-class docutils literal"><span class="pre">allensdk.api.queries.ontologies_api.OntologiesApi</span></code></a> class as seen in
+<p>To download a structure tree, use the <a class="reference internal" href="allensdk.api.queries.ontologies_api.html#allensdk.api.queries.ontologies_api.OntologiesApi" title="allensdk.api.queries.ontologies_api.OntologiesApi"><code class="xref py py-class docutils literal notranslate"><span class="pre">allensdk.api.queries.ontologies_api.OntologiesApi</span></code></a> class as seen in
 <a class="reference external" href="_static/examples/nb/reference_space.html#Constructing-a-structure-tree">this example</a></p>
 </div>
 <div class="section" id="annotation-volumes">
 <h2>Annotation Volumes<a class="headerlink" href="#annotation-volumes" title="Permalink to this headline">¶</a></h2>
 <p>An annotation volume is a 3d raster image that segments the reference space into structures. Each voxel in the annotation volume is assigned
 an integer value that describes the finest structure to which that point in space definitely belongs.</p>
-<p>To download a nrrd formatted annotation volume at a specified isometric resolution, use the <a class="reference internal" href="allensdk.api.queries.html#module-allensdk.api.queries.mouse_connectivity_api" title="allensdk.api.queries.mouse_connectivity_api"><code class="xref py py-class docutils literal"><span class="pre">allensdk.api.queries.mouse_connectivity_api</span></code></a> class.
+<p>To download a nrrd formatted annotation volume at a specified isometric resolution, use the <a class="reference internal" href="allensdk.api.queries.mouse_connectivity_api.html#module-allensdk.api.queries.mouse_connectivity_api" title="allensdk.api.queries.mouse_connectivity_api"><code class="xref py py-class docutils literal notranslate"><span class="pre">allensdk.api.queries.mouse_connectivity_api</span></code></a> class.
 There is <a class="reference external" href="_static/examples/nb/reference_space.html#Downloading-an-annotation-volume">an example</a> in the notebook.</p>
 </div>
 <div class="section" id="referencespace-class">
 <h2>ReferenceSpace Class<a class="headerlink" href="#referencespace-class" title="Permalink to this headline">¶</a></h2>
-<p>The <a class="reference internal" href="allensdk.core.html#allensdk.core.reference_space.ReferenceSpace" title="allensdk.core.reference_space.ReferenceSpace"><code class="xref py py-class docutils literal"><span class="pre">allensdk.core.reference_space.ReferenceSpace</span></code></a> class contains methods for working with our reference spaces. Some use cases might include:</p>
+<p>The <a class="reference internal" href="allensdk.core.reference_space.html#allensdk.core.reference_space.ReferenceSpace" title="allensdk.core.reference_space.ReferenceSpace"><code class="xref py py-class docutils literal notranslate"><span class="pre">allensdk.core.reference_space.ReferenceSpace</span></code></a> class contains methods for working with our reference spaces. Some use cases might include:</p>
 <blockquote>
 <div><ul class="simple">
 <li><a class="reference external" href="_static/examples/nb/reference_space.html#making-structure-masks">Building an indicator mask for one or more structures</a></li>
@@ -113,9 +102,7 @@ There is <a class="reference external" href="_static/examples/nb/reference_space
         <div class="sphinxsidebarwrapper">
 <h3><a href="index.html">Contents</a></h3>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="data_resources.html">Data Resources</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
@@ -140,6 +127,7 @@ There is <a class="reference external" href="_static/examples/nb/reference_space
 <li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.deprecated.html">allensdk.deprecated module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
@@ -157,12 +145,14 @@ There is <a class="reference external" href="_static/examples/nb/reference_space
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

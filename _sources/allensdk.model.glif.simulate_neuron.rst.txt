@@ -1,0 +1,7 @@
+allensdk.model.glif.simulate\_neuron module
+===========================================
+
+.. automodule:: allensdk.model.glif.simulate_neuron
+    :members:
+    :undoc-members:
+    :show-inheritance:

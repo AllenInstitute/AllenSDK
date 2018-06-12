@@ -1,0 +1,7 @@
+allensdk.core.h5\_utilities module
+==================================
+
+.. automodule:: allensdk.core.h5_utilities
+    :members:
+    :undoc-members:
+    :show-inheritance:

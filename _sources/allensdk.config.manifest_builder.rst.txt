@@ -1,0 +1,7 @@
+allensdk.config.manifest\_builder module
+========================================
+
+.. automodule:: allensdk.config.manifest_builder
+    :members:
+    :undoc-members:
+    :show-inheritance:

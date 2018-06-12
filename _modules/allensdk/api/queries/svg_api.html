@@ -1,32 +1,21 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>allensdk.api.queries.svg_api &mdash; Allen SDK dev documentation</title>
-    
+    <title>allensdk.api.queries.svg_api &#8212; Allen SDK dev documentation</title>
     <link rel="stylesheet" href="../../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../../',
-        VERSION:     'dev',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="../../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK dev documentation" href="../../../../index.html" />
-    <link rel="up" title="Module code" href="../../../index.html" /> 
-  </head>
-  <body role="document">
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
 <script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
@@ -104,15 +93,15 @@
 <span class="c1"># ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="c1">#</span>
-<span class="kn">from</span> <span class="nn">..api</span> <span class="kn">import</span> <span class="n">Api</span>
+<span class="kn">from</span> <span class="nn">..api</span> <span class="k">import</span> <span class="n">Api</span>
 
 
-<div class="viewcode-block" id="SvgApi"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.svg_api.SvgApi">[docs]</a><span class="k">class</span> <span class="nc">SvgApi</span><span class="p">(</span><span class="n">Api</span><span class="p">):</span>
+<div class="viewcode-block" id="SvgApi"><a class="viewcode-back" href="../../../../allensdk.api.queries.svg_api.html#allensdk.api.queries.svg_api.SvgApi">[docs]</a><span class="k">class</span> <span class="nc">SvgApi</span><span class="p">(</span><span class="n">Api</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">SvgApi</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">base_uri</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SvgApi</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">base_uri</span><span class="p">)</span>
 
-<div class="viewcode-block" id="SvgApi.build_query"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.svg_api.SvgApi.build_query">[docs]</a>    <span class="k">def</span> <span class="nf">build_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section_image_id</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="SvgApi.build_query"><a class="viewcode-back" href="../../../../allensdk.api.queries.svg_api.html#allensdk.api.queries.svg_api.SvgApi.build_query">[docs]</a>    <span class="k">def</span> <span class="nf">build_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section_image_id</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Build the URL that will fetch meta data for the specified structure.</span>
 
 <span class="sd">        Parameters</span>
@@ -127,12 +116,12 @@
 <span class="sd">        url : string</span>
 <span class="sd">            The constructed URL</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="n">download</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">download</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
             <span class="n">endpoint</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">svg_download_endpoint</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">endpoint</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">svg_endpoint</span>
 
-        <span class="k">if</span> <span class="n">groups</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">groups</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">groups</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">if</span> <span class="n">groups</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -147,20 +136,20 @@
 
         <span class="k">return</span> <span class="n">url</span></div>
 
-<div class="viewcode-block" id="SvgApi.download_svg"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.svg_api.SvgApi.download_svg">[docs]</a>    <span class="k">def</span> <span class="nf">download_svg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="SvgApi.download_svg"><a class="viewcode-back" href="../../../../allensdk.api.queries.svg_api.html#allensdk.api.queries.svg_api.SvgApi.download_svg">[docs]</a>    <span class="k">def</span> <span class="nf">download_svg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                      <span class="n">section_image_id</span><span class="p">,</span>
-                     <span class="n">groups</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                     <span class="n">file_path</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+                     <span class="n">groups</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">file_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Download the svg file&#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="n">file_path</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">file_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">file_path</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%d</span><span class="s1">.svg&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">section_image_id</span><span class="p">)</span>
 
-        <span class="n">svg_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_query</span><span class="p">(</span><span class="n">section_image_id</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">svg_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_query</span><span class="p">(</span><span class="n">section_image_id</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_file_over_http</span><span class="p">(</span><span class="n">svg_url</span><span class="p">,</span> <span class="n">file_path</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SvgApi.get_svg"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.svg_api.SvgApi.get_svg">[docs]</a>    <span class="k">def</span> <span class="nf">get_svg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="SvgApi.get_svg"><a class="viewcode-back" href="../../../../allensdk.api.queries.svg_api.html#allensdk.api.queries.svg_api.SvgApi.get_svg">[docs]</a>    <span class="k">def</span> <span class="nf">get_svg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                 <span class="n">section_image_id</span><span class="p">,</span>
-                <span class="n">groups</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+                <span class="n">groups</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Get the svg document.&#39;&#39;&#39;</span>
         <span class="n">svg_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_query</span><span class="p">(</span><span class="n">section_image_id</span><span class="p">,</span> <span class="n">groups</span><span class="p">)</span>
 
@@ -174,9 +163,7 @@
         <div class="sphinxsidebarwrapper">
 <h3><a href="../../../../index.html">Contents</a></h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Install Guide</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Install Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../cell_types.html">Cell Types</a></li>
@@ -201,6 +188,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.model.html">allensdk.model package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.morphology.html">allensdk.morphology package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.deprecated.html">allensdk.deprecated module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
@@ -218,12 +206,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

@@ -1,0 +1,7 @@
+allensdk.brain\_observatory.dff module
+======================================
+
+.. automodule:: allensdk.brain_observatory.dff
+    :members:
+    :undoc-members:
+    :show-inheritance:

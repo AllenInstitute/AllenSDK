@@ -1,0 +1,7 @@
+allensdk.core.cell\_types\_cache module
+=======================================
+
+.. automodule:: allensdk.core.cell_types_cache
+    :members:
+    :undoc-members:
+    :show-inheritance:

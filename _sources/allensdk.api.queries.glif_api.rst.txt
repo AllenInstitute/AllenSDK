@@ -1,0 +1,7 @@
+allensdk.api.queries.glif\_api module
+=====================================
+
+.. automodule:: allensdk.api.queries.glif_api
+    :members:
+    :undoc-members:
+    :show-inheritance:

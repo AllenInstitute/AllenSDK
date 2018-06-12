@@ -1,0 +1,7 @@
+allensdk.brain\_observatory.receptive\_field\_analysis.postprocessing module
+============================================================================
+
+.. automodule:: allensdk.brain_observatory.receptive_field_analysis.postprocessing
+    :members:
+    :undoc-members:
+    :show-inheritance:

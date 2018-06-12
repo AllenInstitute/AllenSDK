@@ -1,0 +1,7 @@
+allensdk.api.api module
+=======================
+
+.. automodule:: allensdk.api.api
+    :members:
+    :undoc-members:
+    :show-inheritance:

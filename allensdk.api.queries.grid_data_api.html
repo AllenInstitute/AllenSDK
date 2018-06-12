@@ -1,0 +1,280 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>allensdk.api.queries.grid_data_api module &#8212; Allen SDK dev documentation</title>
+    <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="allensdk.api.queries.image_download_api module" href="allensdk.api.queries.image_download_api.html" />
+    <link rel="prev" title="allensdk.api.queries.glif_api module" href="allensdk.api.queries.glif_api.html" /> 
+  </head><body>
+<link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
+<script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var _pSupressBrowserFlashWarning = true;
+    var _pTabId = "pHome";
+    var _pMoreProjectsId = "pMoreProjects";
+    var _pImagePath = "http://www.brain-map.org/assets/images/";
+    var _pSiteWarnings = function() {
+        this.show_warning() = {};
+    }
+</script>
+<script type="text/javascript">
+    function initialize() {
+        /*** do your stuff, then initialize the portal plugin ***/
+        _pPortalOnLoad();
+    }
+</script>
+<style>
+  #header_content > a {
+  display: inline-block;
+  width: 250px;
+  height: 75px;
+  background-image:url("_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-size: 235px 37px;
+  background-position: 0px 20px;
+  background-repeat: no-repeat;
+  }
+</style>
+
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
+<link rel="stylesheet" type="text/css" href="_static/external_assets/stylesheets/common_layout.css" />
+
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-allensdk.api.queries.grid_data_api">
+<span id="allensdk-api-queries-grid-data-api-module"></span><h1>allensdk.api.queries.grid_data_api module<a class="headerlink" href="#module-allensdk.api.queries.grid_data_api" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="allensdk.api.queries.grid_data_api.GridDataApi">
+<em class="property">class </em><code class="descclassname">allensdk.api.queries.grid_data_api.</code><code class="descname">GridDataApi</code><span class="sig-paren">(</span><em>resolution=None</em>, <em>base_uri=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/grid_data_api.html#GridDataApi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.grid_data_api.GridDataApi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="allensdk.api.queries.rma_api.html#allensdk.api.queries.rma_api.RmaApi" title="allensdk.api.queries.rma_api.RmaApi"><code class="xref py py-class docutils literal notranslate"><span class="pre">allensdk.api.queries.rma_api.RmaApi</span></code></a></p>
+<p>HTTP Client for the Allen 3-D Expression Grid Data Service.</p>
+<p>See: <a class="reference external" href="http://help.brain-map.org/display/api/Downloading+3-D+Expression+Grid+Data">Downloading 3-D Expression Grid Data</a></p>
+<dl class="attribute">
+<dt id="allensdk.api.queries.grid_data_api.GridDataApi.DATA_MASK">
+<code class="descname">DATA_MASK</code><em class="property"> = 'data_mask'</em><a class="headerlink" href="#allensdk.api.queries.grid_data_api.GridDataApi.DATA_MASK" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.grid_data_api.GridDataApi.DENSITY">
+<code class="descname">DENSITY</code><em class="property"> = 'density'</em><a class="headerlink" href="#allensdk.api.queries.grid_data_api.GridDataApi.DENSITY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.grid_data_api.GridDataApi.ENERGY">
+<code class="descname">ENERGY</code><em class="property"> = 'energy'</em><a class="headerlink" href="#allensdk.api.queries.grid_data_api.GridDataApi.ENERGY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.grid_data_api.GridDataApi.INJECTION_DENSITY">
+<code class="descname">INJECTION_DENSITY</code><em class="property"> = 'injection_density'</em><a class="headerlink" href="#allensdk.api.queries.grid_data_api.GridDataApi.INJECTION_DENSITY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.grid_data_api.GridDataApi.INJECTION_ENERGY">
+<code class="descname">INJECTION_ENERGY</code><em class="property"> = 'injection_energy'</em><a class="headerlink" href="#allensdk.api.queries.grid_data_api.GridDataApi.INJECTION_ENERGY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.grid_data_api.GridDataApi.INJECTION_FRACTION">
+<code class="descname">INJECTION_FRACTION</code><em class="property"> = 'injection_fraction'</em><a class="headerlink" href="#allensdk.api.queries.grid_data_api.GridDataApi.INJECTION_FRACTION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.grid_data_api.GridDataApi.INTENSITY">
+<code class="descname">INTENSITY</code><em class="property"> = 'intensity'</em><a class="headerlink" href="#allensdk.api.queries.grid_data_api.GridDataApi.INTENSITY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.grid_data_api.GridDataApi.PROJECTION_DENSITY">
+<code class="descname">PROJECTION_DENSITY</code><em class="property"> = 'projection_density'</em><a class="headerlink" href="#allensdk.api.queries.grid_data_api.GridDataApi.PROJECTION_DENSITY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.grid_data_api.GridDataApi.PROJECTION_ENERGY">
+<code class="descname">PROJECTION_ENERGY</code><em class="property"> = 'projection_energy'</em><a class="headerlink" href="#allensdk.api.queries.grid_data_api.GridDataApi.PROJECTION_ENERGY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.grid_data_api.GridDataApi.download_expression_grid_data">
+<code class="descname">download_expression_grid_data</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/grid_data_api.html#GridDataApi.download_expression_grid_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.grid_data_api.GridDataApi.download_expression_grid_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download in zipped metaimage format.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>section_data_set_id</strong> <span class="classifier-delimiter">:</span> <span class="classifier">integer</span></dt>
+<dd><p class="first last">What to download.</p>
+</dd>
+<dt><strong>include</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of strings, optional</span></dt>
+<dd><p class="first last">Image volumes. ‘energy’ (default), ‘density’, ‘intensity’.</p>
+</dd>
+<dt><strong>path</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string, optional</span></dt>
+<dd><p class="first last">File name to save as.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>file</strong> <span class="classifier-delimiter">:</span> <span class="classifier">3-D expression grid data packaged into a compressed archive file (.zip).</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.grid_data_api.GridDataApi.download_gene_expression_grid_data">
+<code class="descname">download_gene_expression_grid_data</code><span class="sig-paren">(</span><em>section_data_set_id</em>, <em>volume_type</em>, <em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/grid_data_api.html#GridDataApi.download_gene_expression_grid_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.grid_data_api.GridDataApi.download_gene_expression_grid_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download a metaimage file containing registered gene expression grid data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>section_data_set_id</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">Download data from this experiment</p>
+</dd>
+<dt><strong>volume_type</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Download this type of data (options are GridDataApi.ENERGY, 
+GridDataApi.DENSITY, GridDataApi.INTENSITY)</p>
+</dd>
+<dt><strong>path</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Download to this path</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.grid_data_api.GridDataApi.download_projection_grid_data">
+<code class="descname">download_projection_grid_data</code><span class="sig-paren">(</span><em>section_data_set_id</em>, <em>image=None</em>, <em>resolution=None</em>, <em>save_file_path=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/grid_data_api.html#GridDataApi.download_projection_grid_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.grid_data_api.GridDataApi.download_projection_grid_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download in NRRD format.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>section_data_set_id</strong> <span class="classifier-delimiter">:</span> <span class="classifier">integer</span></dt>
+<dd><p class="first last">What to download.</p>
+</dd>
+<dt><strong>image</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of strings, optional</span></dt>
+<dd><p class="first last">Image volume. ‘projection_density’, ‘projection_energy’, ‘injection_fraction’, ‘injection_density’, ‘injection_energy’, ‘data_mask’.</p>
+</dd>
+<dt><strong>resolution</strong> <span class="classifier-delimiter">:</span> <span class="classifier">integer, optional</span></dt>
+<dd><p class="first last">in microns. 10, 25, 50, or 100 (default).</p>
+</dd>
+<dt><strong>save_file_path</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string, optional</span></dt>
+<dd><p class="first last">File name to save as.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>See <a class="reference external" href="http://help.brain-map.org/display/api/Downloading+3-D+Expression+Grid+Data#name=&quot;Downloading3-DExpressionGridData-DOWNLOADING3DPROJECTIONGRIDDATA&quot;">Downloading 3-D Projection Grid Data</a>
+for additional documentation.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_space.html">Reference Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="glif_models.html">Generalized LIF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html">Biophysical</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.deprecated.html">allensdk.deprecated module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
+</ul>
+
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allen-sdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    </div>
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalFooter.js"></script>
+
+
+  </body>
+</html>

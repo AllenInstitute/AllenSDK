@@ -1,0 +1,7 @@
+allensdk.core.ontology module
+=============================
+
+.. automodule:: allensdk.core.ontology
+    :members:
+    :undoc-members:
+    :show-inheritance:

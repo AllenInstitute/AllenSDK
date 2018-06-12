@@ -1,0 +1,17 @@
+allensdk.model.biophys\_sim.neuron package
+==========================================
+
+Submodules
+----------
+
+.. toctree::
+
+   allensdk.model.biophys_sim.neuron.hoc_utils
+
+Module contents
+---------------
+
+.. automodule:: allensdk.model.biophys_sim.neuron
+    :members:
+    :undoc-members:
+    :show-inheritance:

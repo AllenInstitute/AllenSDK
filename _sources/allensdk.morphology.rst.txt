@@ -1,0 +1,17 @@
+allensdk.morphology package
+===========================
+
+Submodules
+----------
+
+.. toctree::
+
+   allensdk.morphology.validate_swc
+
+Module contents
+---------------
+
+.. automodule:: allensdk.morphology
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,31 +1,21 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Structure Unionize Records &mdash; Allen SDK dev documentation</title>
-    
+    <title>Structure Unionize Records &#8212; Allen SDK dev documentation</title>
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     'dev',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK dev documentation" href="index.html" /> 
-  </head>
-  <body role="document">
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
 <script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
@@ -73,14 +63,14 @@
 registered to the expert-annotated Common Coordinate Framework.  This enables
 signal quantification at all annotated levels of the brain structure ontology.
 In the AllenSDK and Allen Brain Atlas API we call structure-level signal
-integration &#8220;unionization&#8221;.</p>
+integration “unionization”.</p>
 <p>AAV unionize records are available for download directly through the API or via
 the MouseConnectivityCache.  The following methods return a Pandas DataFrame
 of records that describe projection signal in all structures in the adult
 mouse ontology:</p>
 <blockquote>
-<div><p><a class="reference internal" href="allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_structure_unionizes" title="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_structure_unionizes"><code class="xref py py-meth docutils literal"><span class="pre">allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_structure_unionizes()</span></code></a></p>
-<p><a class="reference internal" href="allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_experiment_structure_unionizes" title="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_experiment_structure_unionizes"><code class="xref py py-meth docutils literal"><span class="pre">allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_experiment_structure_unionizes()</span></code></a></p>
+<div><p><a class="reference internal" href="allensdk.core.mouse_connectivity_cache.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_structure_unionizes" title="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_structure_unionizes"><code class="xref py py-meth docutils literal notranslate"><span class="pre">allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_structure_unionizes()</span></code></a></p>
+<p><a class="reference internal" href="allensdk.core.mouse_connectivity_cache.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_experiment_structure_unionizes" title="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_experiment_structure_unionizes"><code class="xref py py-meth docutils literal notranslate"><span class="pre">allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_experiment_structure_unionizes()</span></code></a></p>
 </div></blockquote>
 <p>Take a look at the Structure Signal Unionization section of the
 <a class="reference external" href="_static/examples/nb/mouse_connectivity.html#Structure-Signal-Unionization">Mouse Connectivity Jupyter notebook</a> to see how these methods can be used.</p>
@@ -164,9 +154,7 @@ mouse ontology:</p>
         <div class="sphinxsidebarwrapper">
 <h3><a href="index.html">Contents</a></h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
@@ -191,6 +179,7 @@ mouse ontology:</p>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.deprecated.html">allensdk.deprecated module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
@@ -208,12 +197,14 @@ mouse ontology:</p>
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

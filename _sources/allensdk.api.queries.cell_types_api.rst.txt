@@ -1,0 +1,7 @@
+allensdk.api.queries.cell\_types\_api module
+============================================
+
+.. automodule:: allensdk.api.queries.cell_types_api
+    :members:
+    :undoc-members:
+    :show-inheritance:

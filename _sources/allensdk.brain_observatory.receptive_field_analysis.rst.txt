@@ -1,0 +1,25 @@
+allensdk.brain\_observatory.receptive\_field\_analysis package
+==============================================================
+
+Submodules
+----------
+
+.. toctree::
+
+   allensdk.brain_observatory.receptive_field_analysis.chisquarerf
+   allensdk.brain_observatory.receptive_field_analysis.eventdetection
+   allensdk.brain_observatory.receptive_field_analysis.fit_parameters
+   allensdk.brain_observatory.receptive_field_analysis.fitgaussian2D
+   allensdk.brain_observatory.receptive_field_analysis.postprocessing
+   allensdk.brain_observatory.receptive_field_analysis.receptive_field
+   allensdk.brain_observatory.receptive_field_analysis.tools
+   allensdk.brain_observatory.receptive_field_analysis.utilities
+   allensdk.brain_observatory.receptive_field_analysis.visualization
+
+Module contents
+---------------
+
+.. automodule:: allensdk.brain_observatory.receptive_field_analysis
+    :members:
+    :undoc-members:
+    :show-inheritance:

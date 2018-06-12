@@ -1,0 +1,10 @@
+allensdk.model.biophys\_sim.scripts package
+===========================================
+
+Module contents
+---------------
+
+.. automodule:: allensdk.model.biophys_sim.scripts
+    :members:
+    :undoc-members:
+    :show-inheritance:

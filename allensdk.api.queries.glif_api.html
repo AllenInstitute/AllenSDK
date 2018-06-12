@@ -1,0 +1,277 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>allensdk.api.queries.glif_api module &#8212; Allen SDK dev documentation</title>
+    <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="allensdk.api.queries.grid_data_api module" href="allensdk.api.queries.grid_data_api.html" />
+    <link rel="prev" title="allensdk.api.queries.connected_services module" href="allensdk.api.queries.connected_services.html" /> 
+  </head><body>
+<link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
+<script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var _pSupressBrowserFlashWarning = true;
+    var _pTabId = "pHome";
+    var _pMoreProjectsId = "pMoreProjects";
+    var _pImagePath = "http://www.brain-map.org/assets/images/";
+    var _pSiteWarnings = function() {
+        this.show_warning() = {};
+    }
+</script>
+<script type="text/javascript">
+    function initialize() {
+        /*** do your stuff, then initialize the portal plugin ***/
+        _pPortalOnLoad();
+    }
+</script>
+<style>
+  #header_content > a {
+  display: inline-block;
+  width: 250px;
+  height: 75px;
+  background-image:url("_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-size: 235px 37px;
+  background-position: 0px 20px;
+  background-repeat: no-repeat;
+  }
+</style>
+
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
+<link rel="stylesheet" type="text/css" href="_static/external_assets/stylesheets/common_layout.css" />
+
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-allensdk.api.queries.glif_api">
+<span id="allensdk-api-queries-glif-api-module"></span><h1>allensdk.api.queries.glif_api module<a class="headerlink" href="#module-allensdk.api.queries.glif_api" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="allensdk.api.queries.glif_api.GlifApi">
+<em class="property">class </em><code class="descclassname">allensdk.api.queries.glif_api.</code><code class="descname">GlifApi</code><span class="sig-paren">(</span><em>base_uri=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/glif_api.html#GlifApi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.glif_api.GlifApi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="allensdk.api.queries.rma_template.html#allensdk.api.queries.rma_template.RmaTemplate" title="allensdk.api.queries.rma_template.RmaTemplate"><code class="xref py py-class docutils literal notranslate"><span class="pre">allensdk.api.queries.rma_template.RmaTemplate</span></code></a></p>
+<dl class="attribute">
+<dt id="allensdk.api.queries.glif_api.GlifApi.GLIF_TYPES">
+<code class="descname">GLIF_TYPES</code><em class="property"> = [395310498, 395310469, 395310475, 395310479, 471355161]</em><a class="headerlink" href="#allensdk.api.queries.glif_api.GlifApi.GLIF_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.glif_api.GlifApi.NWB_FILE_TYPE">
+<code class="descname">NWB_FILE_TYPE</code><em class="property"> = None</em><a class="headerlink" href="#allensdk.api.queries.glif_api.GlifApi.NWB_FILE_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.glif_api.GlifApi.cache_stimulus_file">
+<code class="descname">cache_stimulus_file</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/glif_api.html#GlifApi.cache_stimulus_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.glif_api.GlifApi.cache_stimulus_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>DEPRECATED Download the NWB file for the current neuronal model and save it to a file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>output_file_name: string</strong></dt>
+<dd><p class="first last">File name to store the NWB file.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.glif_api.GlifApi.get_ephys_sweeps">
+<code class="descname">get_ephys_sweeps</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/glif_api.html#GlifApi.get_ephys_sweeps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.glif_api.GlifApi.get_ephys_sweeps" title="Permalink to this definition">¶</a></dt>
+<dd><p>DEPRECATED Retrieve ephys sweep information out of downloaded metadata for a neuronal model</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>list</strong></dt>
+<dd><p class="first last">A list of sweeps metadata dictionaries</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.glif_api.GlifApi.get_neuron_config">
+<code class="descname">get_neuron_config</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/glif_api.html#GlifApi.get_neuron_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.glif_api.GlifApi.get_neuron_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>DEPRECATED Retrieve a model configuration file from the API, optionally save it to disk, and
+return the contents of that file as a dictionary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>output_file_name: string</strong></dt>
+<dd><p class="first last">File name to store the neuron configuration (optional).</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.glif_api.GlifApi.get_neuron_configs">
+<code class="descname">get_neuron_configs</code><span class="sig-paren">(</span><em>neuronal_model_ids=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/glif_api.html#GlifApi.get_neuron_configs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.glif_api.GlifApi.get_neuron_configs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.glif_api.GlifApi.get_neuronal_model">
+<code class="descname">get_neuronal_model</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/glif_api.html#GlifApi.get_neuronal_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.glif_api.GlifApi.get_neuronal_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>DEPRECATED Query the current RMA endpoint with a neuronal_model id
+to get the corresponding well known files and meta data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>dict</strong></dt>
+<dd><p class="first last">A dictionary containing</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.glif_api.GlifApi.get_neuronal_model_templates">
+<code class="descname">get_neuronal_model_templates</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/glif_api.html#GlifApi.get_neuronal_model_templates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.glif_api.GlifApi.get_neuronal_model_templates" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.glif_api.GlifApi.get_neuronal_models">
+<code class="descname">get_neuronal_models</code><span class="sig-paren">(</span><em>ephys_experiment_ids=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/glif_api.html#GlifApi.get_neuronal_models"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.glif_api.GlifApi.get_neuronal_models" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.glif_api.GlifApi.get_neuronal_models_by_id">
+<code class="descname">get_neuronal_models_by_id</code><span class="sig-paren">(</span><em>neuronal_model_ids=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/glif_api.html#GlifApi.get_neuronal_models_by_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.glif_api.GlifApi.get_neuronal_models_by_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.glif_api.GlifApi.list_neuronal_models">
+<code class="descname">list_neuronal_models</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/glif_api.html#GlifApi.list_neuronal_models"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.glif_api.GlifApi.list_neuronal_models" title="Permalink to this definition">¶</a></dt>
+<dd><p>DEPRECATED Query the API for a list of all GLIF neuronal models.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>list</strong></dt>
+<dd><p class="first last">Meta data for all GLIF neuronal models.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.glif_api.GlifApi.rma_templates">
+<code class="descname">rma_templates</code><em class="property"> = {'glif_queries': [{'num_rows': 'all', 'count': False, 'model': 'NeuronalModelTemplate', 'name': 'neuronal_model_templates', 'description': 'see name'}, {'count': False, 'criteria_params': ['ephys_experiment_ids'], 'name': 'neuronal_models', 'criteria': '{% if ephys_experiment_ids is defined %}[id$in{{ ephys_experiment_ids }}]{%endif%}', 'num_rows': 'all', 'model': 'Specimen', 'include': 'neuronal_models(well_known_files,neuronal_model_template[id$in395310498,395310469,395310475,395310479,471355161],neuronal_model_runs(well_known_files))', 'description': 'see name'}, {'count': False, 'criteria_params': ['neuronal_model_ids'], 'name': 'neuron_config', 'criteria': '[id$in{{ neuronal_model_ids }}]', 'num_rows': 'all', 'model': 'NeuronalModel', 'include': 'well_known_files(well_known_file_type)', 'description': 'see name'}]}</em><a class="headerlink" href="#allensdk.api.queries.glif_api.GlifApi.rma_templates" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_space.html">Reference Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="glif_models.html">Generalized LIF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html">Biophysical</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.deprecated.html">allensdk.deprecated module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
+</ul>
+
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allen-sdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    </div>
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalFooter.js"></script>
+
+
+  </body>
+</html>

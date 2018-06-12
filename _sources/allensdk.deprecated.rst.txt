@@ -1,0 +1,7 @@
+allensdk.deprecated module
+==========================
+
+.. automodule:: allensdk.deprecated
+    :members:
+    :undoc-members:
+    :show-inheritance:

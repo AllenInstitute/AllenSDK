@@ -1,0 +1,7 @@
+allensdk.ephys.ephys\_features module
+=====================================
+
+.. automodule:: allensdk.ephys.ephys_features
+    :members:
+    :undoc-members:
+    :show-inheritance:

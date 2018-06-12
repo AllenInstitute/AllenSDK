@@ -1,0 +1,7 @@
+allensdk.api.queries.image\_download\_api module
+================================================
+
+.. automodule:: allensdk.api.queries.image_download_api
+    :members:
+    :undoc-members:
+    :show-inheritance:

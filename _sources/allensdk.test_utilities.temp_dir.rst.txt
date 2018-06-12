@@ -1,0 +1,7 @@
+allensdk.test\_utilities.temp\_dir module
+=========================================
+
+.. automodule:: allensdk.test_utilities.temp_dir
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,519 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>allensdk.core.simple_tree module &#8212; Allen SDK dev documentation</title>
+    <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="allensdk.core.sitk_utilities module" href="allensdk.core.sitk_utilities.html" />
+    <link rel="prev" title="allensdk.core.reference_space_cache module" href="allensdk.core.reference_space_cache.html" /> 
+  </head><body>
+<link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
+<script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var _pSupressBrowserFlashWarning = true;
+    var _pTabId = "pHome";
+    var _pMoreProjectsId = "pMoreProjects";
+    var _pImagePath = "http://www.brain-map.org/assets/images/";
+    var _pSiteWarnings = function() {
+        this.show_warning() = {};
+    }
+</script>
+<script type="text/javascript">
+    function initialize() {
+        /*** do your stuff, then initialize the portal plugin ***/
+        _pPortalOnLoad();
+    }
+</script>
+<style>
+  #header_content > a {
+  display: inline-block;
+  width: 250px;
+  height: 75px;
+  background-image:url("_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-size: 235px 37px;
+  background-position: 0px 20px;
+  background-repeat: no-repeat;
+  }
+</style>
+
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
+<link rel="stylesheet" type="text/css" href="_static/external_assets/stylesheets/common_layout.css" />
+
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-allensdk.core.simple_tree">
+<span id="allensdk-core-simple-tree-module"></span><h1>allensdk.core.simple_tree module<a class="headerlink" href="#module-allensdk.core.simple_tree" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="allensdk.core.simple_tree.SimpleTree">
+<em class="property">class </em><code class="descclassname">allensdk.core.simple_tree.</code><code class="descname">SimpleTree</code><span class="sig-paren">(</span><em>nodes</em>, <em>node_id_cb</em>, <em>parent_id_cb</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/simple_tree.html#SimpleTree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.simple_tree.SimpleTree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="allensdk.core.simple_tree.SimpleTree.ancestor_ids">
+<code class="descname">ancestor_ids</code><span class="sig-paren">(</span><em>node_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/simple_tree.html#SimpleTree.ancestor_ids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.simple_tree.SimpleTree.ancestor_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Obtain the ids of one or more nodes’ ancestors</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>node_ids</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of hashable</span></dt>
+<dd><p class="first last">Items are ids of nodes whose ancestors you wish to find.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>list of list of hashable :</strong></dt>
+<dd><p class="first last">Items are lists of input nodes’ ancestors’ ids.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Given the tree:
+A -&gt; B -&gt; C</p>
+<blockquote>
+<div><a href="#id1"><span class="problematic" id="id2">`</span></a>-&gt; D</div></blockquote>
+<p>The ancestors of C are [C, B, A]. The ancestors of A are [A]. The 
+ancestors of D are [D, A]</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.simple_tree.SimpleTree.ancestors">
+<code class="descname">ancestors</code><span class="sig-paren">(</span><em>node_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/simple_tree.html#SimpleTree.ancestors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.simple_tree.SimpleTree.ancestors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get one or mode nodes’ ancestor nodes</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>node_ids</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of hashable</span></dt>
+<dd><p class="first last">Items are ids of nodes whose ancestors will be found.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>list of list of dict :</strong></dt>
+<dd><p class="first last">Items are lists of ancestor nodes corresponding to argued ids.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.simple_tree.SimpleTree.child_ids">
+<code class="descname">child_ids</code><span class="sig-paren">(</span><em>node_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/simple_tree.html#SimpleTree.child_ids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.simple_tree.SimpleTree.child_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Obtain the ids of one or more nodes’ children</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>node_ids</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of hashable</span></dt>
+<dd><p class="first last">Items are ids of nodes whose children you wish to find.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>list of list of hashable :</strong></dt>
+<dd><p class="first last">Items are lists of input nodes’ children’s ids.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.simple_tree.SimpleTree.children">
+<code class="descname">children</code><span class="sig-paren">(</span><em>node_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/simple_tree.html#SimpleTree.children"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.simple_tree.SimpleTree.children" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get one or mode nodes’ child nodes</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>node_ids</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of hashable</span></dt>
+<dd><p class="first last">Items are ids of nodes whose children will be found.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>list of list of dict :</strong></dt>
+<dd><p class="first last">Items are lists of child nodes corresponding to argued ids.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.simple_tree.SimpleTree.descendant_ids">
+<code class="descname">descendant_ids</code><span class="sig-paren">(</span><em>node_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/simple_tree.html#SimpleTree.descendant_ids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.simple_tree.SimpleTree.descendant_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Obtain the ids of one or more nodes’ descendants</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>node_ids</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of hashable</span></dt>
+<dd><p class="first last">Items are ids of nodes whose descendants you wish to find.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>list of list of hashable :</strong></dt>
+<dd><p class="first last">Items are lists of input nodes’ descendants’ ids.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Given the tree:
+A -&gt; B -&gt; C</p>
+<blockquote>
+<div><a href="#id3"><span class="problematic" id="id4">`</span></a>-&gt; D</div></blockquote>
+<p>The descendants of A are [B, C, D]. The descendants of C are [].</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.simple_tree.SimpleTree.descendants">
+<code class="descname">descendants</code><span class="sig-paren">(</span><em>node_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/simple_tree.html#SimpleTree.descendants"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.simple_tree.SimpleTree.descendants" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get one or mode nodes’ descendant nodes</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>node_ids</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of hashable</span></dt>
+<dd><p class="first last">Items are ids of nodes whose descendants will be found.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>list of list of dict :</strong></dt>
+<dd><p class="first last">Items are lists of descendant nodes corresponding to argued ids.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.simple_tree.SimpleTree.filter_nodes">
+<code class="descname">filter_nodes</code><span class="sig-paren">(</span><em>criterion</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/simple_tree.html#SimpleTree.filter_nodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.simple_tree.SimpleTree.filter_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Obtain a list of nodes filtered by some criterion</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>criterion</strong> <span class="classifier-delimiter">:</span> <span class="classifier">function | node dict =&gt; bool</span></dt>
+<dd><p class="first last">Only nodes for which criterion returns true will be returned.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>list of dict :</strong></dt>
+<dd><p class="first last">Items are node dictionaries that passed the filter.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.simple_tree.SimpleTree.node">
+<code class="descname">node</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/simple_tree.html#SimpleTree.node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.simple_tree.SimpleTree.node" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.simple_tree.SimpleTree.node_ids">
+<code class="descname">node_ids</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/simple_tree.html#SimpleTree.node_ids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.simple_tree.SimpleTree.node_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Obtain the node ids of each node in the tree</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>list :</strong></dt>
+<dd><p class="first last">elements are node ids</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.simple_tree.SimpleTree.nodes">
+<code class="descname">nodes</code><span class="sig-paren">(</span><em>node_ids=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/simple_tree.html#SimpleTree.nodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.simple_tree.SimpleTree.nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get one or more nodes’ full dictionaries from their ids.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>node_ids</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of hashable</span></dt>
+<dd><p class="first last">Items are ids of nodes to be returned. Default is all.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>list of dict :</strong></dt>
+<dd><p class="first last">Items are nodes corresponding to argued ids.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.simple_tree.SimpleTree.nodes_by_property">
+<code class="descname">nodes_by_property</code><span class="sig-paren">(</span><em>key</em>, <em>values</em>, <em>to_fn=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/simple_tree.html#SimpleTree.nodes_by_property"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.simple_tree.SimpleTree.nodes_by_property" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get nodes by a specified property</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>key</strong> <span class="classifier-delimiter">:</span> <span class="classifier">hashable or function</span></dt>
+<dd><p class="first last">The property used for lookup. Should be unique. If a function, will 
+be invoked on each node.</p>
+</dd>
+<dt><strong>values</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list</span></dt>
+<dd><p class="first last">Select matching elements from the lookup.</p>
+</dd>
+<dt><strong>to_fn</strong> <span class="classifier-delimiter">:</span> <span class="classifier">function, optional</span></dt>
+<dd><p class="first last">Defines the outputs, on a per-node basis. Defaults to returning 
+the whole node.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>list :</strong></dt>
+<dd><p class="first last">outputs, 1 for each input value.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.simple_tree.SimpleTree.parent">
+<code class="descname">parent</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/simple_tree.html#SimpleTree.parent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.simple_tree.SimpleTree.parent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.simple_tree.SimpleTree.parent_id">
+<code class="descname">parent_id</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/simple_tree.html#SimpleTree.parent_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.simple_tree.SimpleTree.parent_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.simple_tree.SimpleTree.parent_ids">
+<code class="descname">parent_ids</code><span class="sig-paren">(</span><em>node_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/simple_tree.html#SimpleTree.parent_ids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.simple_tree.SimpleTree.parent_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Obtain the ids of one or more nodes’ parents</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>node_ids</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of hashable</span></dt>
+<dd><p class="first last">Items are ids of nodes whose parents you wish to find.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>list of hashable :</strong></dt>
+<dd><p class="first last">Items are ids of input nodes’ parents in order.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.simple_tree.SimpleTree.parents">
+<code class="descname">parents</code><span class="sig-paren">(</span><em>node_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/simple_tree.html#SimpleTree.parents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.simple_tree.SimpleTree.parents" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get one or mode nodes’ parent nodes</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>node_ids</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of hashable</span></dt>
+<dd><p class="first last">Items are ids of nodes whose parents will be found.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>list of dict :</strong></dt>
+<dd><p class="first last">Items are parents of nodes corresponding to argued ids.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.simple_tree.SimpleTree.value_map">
+<code class="descname">value_map</code><span class="sig-paren">(</span><em>from_fn</em>, <em>to_fn</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/simple_tree.html#SimpleTree.value_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.simple_tree.SimpleTree.value_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Obtain a look-up table relating a pair of node properties across 
+nodes</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>from_fn</strong> <span class="classifier-delimiter">:</span> <span class="classifier">function | node dict =&gt; hashable value</span></dt>
+<dd><p class="first last">The keys of the output dictionary will be obtained by calling 
+from_fn on each node. Should be unique.</p>
+</dd>
+<dt><strong>to_fn</strong> <span class="classifier-delimiter">:</span> <span class="classifier">function | node_dict =&gt; value</span></dt>
+<dd><p class="first last">The values of the output function will be obtained by calling 
+to_fn on each node.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>dict :</strong></dt>
+<dd><p class="first last">Maps the node property defined by from_fn to the node property 
+defined by to_fn across nodes.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_space.html">Reference Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="glif_models.html">Generalized LIF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html">Biophysical</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.deprecated.html">allensdk.deprecated module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
+</ul>
+
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allen-sdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    </div>
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalFooter.js"></script>
+
+
+  </body>
+</html>

@@ -1,0 +1,7 @@
+allensdk.brain\_observatory.stimulus\_info module
+=================================================
+
+.. automodule:: allensdk.brain_observatory.stimulus_info
+    :members:
+    :undoc-members:
+    :show-inheritance:

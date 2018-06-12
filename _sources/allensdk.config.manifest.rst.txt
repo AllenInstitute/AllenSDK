@@ -1,0 +1,7 @@
+allensdk.config.manifest module
+===============================
+
+.. automodule:: allensdk.config.manifest
+    :members:
+    :undoc-members:
+    :show-inheritance:

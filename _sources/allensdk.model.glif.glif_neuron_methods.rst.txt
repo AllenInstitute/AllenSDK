@@ -1,0 +1,7 @@
+allensdk.model.glif.glif\_neuron\_methods module
+================================================
+
+.. automodule:: allensdk.model.glif.glif_neuron_methods
+    :members:
+    :undoc-members:
+    :show-inheritance:

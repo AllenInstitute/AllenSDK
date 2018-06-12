@@ -1,0 +1,7 @@
+allensdk.config.app.application\_config module
+==============================================
+
+.. automodule:: allensdk.config.app.application_config
+    :members:
+    :undoc-members:
+    :show-inheritance:

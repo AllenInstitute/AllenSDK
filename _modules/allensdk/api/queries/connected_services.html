@@ -1,32 +1,21 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>allensdk.api.queries.connected_services &mdash; Allen SDK dev documentation</title>
-    
+    <title>allensdk.api.queries.connected_services &#8212; Allen SDK dev documentation</title>
     <link rel="stylesheet" href="../../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../../',
-        VERSION:     'dev',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="../../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK dev documentation" href="../../../../index.html" />
-    <link rel="up" title="Module code" href="../../../index.html" /> 
-  </head>
-  <body role="document">
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
 <script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
@@ -104,10 +93,10 @@
 <span class="c1"># ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="c1">#</span>
-<span class="kn">from</span> <span class="nn">.rma_api</span> <span class="kn">import</span> <span class="n">RmaApi</span>
+<span class="kn">from</span> <span class="nn">.rma_api</span> <span class="k">import</span> <span class="n">RmaApi</span>
 
 
-<div class="viewcode-block" id="ConnectedServices"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.connected_services.ConnectedServices">[docs]</a><span class="k">class</span> <span class="nc">ConnectedServices</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="ConnectedServices"><a class="viewcode-back" href="../../../../allensdk.api.queries.connected_services.html#allensdk.api.queries.connected_services.ConnectedServices">[docs]</a><span class="k">class</span> <span class="nc">ConnectedServices</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    A class representing a schema of informatics web services.</span>
 
@@ -131,7 +120,7 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
-<div class="viewcode-block" id="ConnectedServices.build_url"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.connected_services.ConnectedServices.build_url">[docs]</a>    <span class="k">def</span> <span class="nf">build_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service_name</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="ConnectedServices.build_url"><a class="viewcode-back" href="../../../../allensdk.api.queries.connected_services.html#allensdk.api.queries.connected_services.ConnectedServices.build_url">[docs]</a>    <span class="k">def</span> <span class="nf">build_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service_name</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Create a single stage RMA url from a service name and parameters.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">rma</span> <span class="o">=</span> <span class="n">RmaApi</span><span class="p">()</span>
@@ -142,8 +131,8 @@
         <span class="n">params</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">for</span> <span class="n">parameter</span> <span class="ow">in</span> <span class="n">schema_entry</span><span class="p">[</span><span class="s1">&#39;parameters&#39;</span><span class="p">]:</span>
-            <span class="n">value</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">parameter</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="bp">None</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">parameter</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">parameter</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">value</span><span class="p">))</span>
 
         <span class="n">service_stage</span> <span class="o">=</span> <span class="n">rma</span><span class="o">.</span><span class="n">service_stage</span><span class="p">(</span><span class="n">service_name</span><span class="p">,</span>
@@ -155,7 +144,7 @@
 
     <span class="nd">@classmethod</span>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">schema</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">schema</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Dictionary of service names and parameters.</span>
 
 <span class="sd">        Notes</span>
@@ -163,13 +152,13 @@
 <span class="sd">        See `Connected Services and Pipes &lt;http://help.brain-map.org/display/api/Connected+Services+and+Pipes&gt;`_</span>
 <span class="sd">        for a human-readable list of connected services and their parameters.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">_schema</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_schema</span>
 
     <span class="n">_schema</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s1">&#39;dev_human_correlation&#39;</span><span class="p">:</span> <span class="p">{</span>
             <span class="s1">&#39;parameters&#39;</span><span class="p">:</span> <span class="p">[</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;set&#39;</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">STRING</span><span class="p">,</span>
                  <span class="s1">&#39;values&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;rna_seq_genes&#39;</span><span class="p">,</span>
                             <span class="s1">&#39;rna_seq_exons&#39;</span><span class="p">,</span>
@@ -177,31 +166,31 @@
                             <span class="s1">&#39;exon_microarray_exons&#39;</span><span class="p">]</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;donors&#39;</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;structures&#39;</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;probes&#39;</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;sort_order&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">STRING</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;values&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;asc&#39;</span><span class="p">,</span> <span class="s1">&#39;desc&#39;</span><span class="p">],</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;desc&#39;</span><span class="p">]</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;start_row&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">0</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;num_rows&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2000</span>
                  <span class="p">}</span>
             <span class="p">]</span>
@@ -218,7 +207,7 @@
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;donors1&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;structures1&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
@@ -226,7 +215,7 @@
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;donors2&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;structures2&#39;</span><span class="p">,</span>
@@ -235,18 +224,18 @@
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;sort_by&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">STRING</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;values&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;p-value&#39;</span><span class="p">,</span> <span class="s1">&#39;fold-change&#39;</span><span class="p">],</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;p-value&#39;</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;start_row&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">0</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;num_rows&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2000</span>
                  <span class="p">}</span>
             <span class="p">]</span>
@@ -266,21 +255,21 @@
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;donors&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;structures&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;start_row&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">0</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;num_rows&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2000</span>
                  <span class="p">}</span>
             <span class="p">]</span>
@@ -290,7 +279,7 @@
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;donors&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;structures&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
@@ -301,18 +290,18 @@
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;sort_order&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">STRING</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;values&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;asc&#39;</span><span class="p">,</span> <span class="s1">&#39;desc&#39;</span><span class="p">],</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;desc&#39;</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;start_row&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">0</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;num_rows&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2000</span>
                  <span class="p">}</span>
             <span class="p">]</span>
@@ -322,7 +311,7 @@
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;donors1&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;structures1&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
@@ -331,7 +320,7 @@
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;donors2&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;structures2&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
@@ -339,18 +328,18 @@
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;sort_by&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">STRING</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;values&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;p-value&#39;</span><span class="p">,</span> <span class="s1">&#39;fold-change&#39;</span><span class="p">],</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;p-value&#39;</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;start_row&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">0</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;num_rows&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2000</span>
                  <span class="p">}</span>
             <span class="p">]</span>
@@ -363,21 +352,21 @@
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;start_row&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">0</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;num_rows&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2000</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;donors&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;structures&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">}</span>
             <span class="p">]</span>
         <span class="p">},</span>
@@ -404,21 +393,21 @@
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;contrast_threshold&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;target_threshold&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;start_row&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">0</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;num_rows&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2000</span>
                  <span class="p">}</span>
             <span class="p">]</span>
@@ -431,27 +420,27 @@
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;structures&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">INTEGER</span><span class="p">,</span> <span class="n">STRING</span><span class="p">],</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;ages&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="n">STRING</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;sort_order&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">STRING</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;values&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;asc&#39;</span><span class="p">,</span> <span class="s1">&#39;desc&#39;</span><span class="p">],</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;desc&#39;</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;start_row&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">0</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;num_rows&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2000</span>
                  <span class="p">}</span>
             <span class="p">]</span>
@@ -461,7 +450,7 @@
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;donors&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;structures&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
@@ -472,18 +461,18 @@
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;sort_order&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">STRING</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;values&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;asc&#39;</span><span class="p">,</span> <span class="s1">&#39;desc&#39;</span><span class="p">],</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;desc&#39;</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;start_row&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">0</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;num_rows&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2000</span>
                  <span class="p">}</span>
             <span class="p">]</span>
@@ -493,7 +482,7 @@
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;donors1&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;structures1&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
@@ -502,7 +491,7 @@
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;donors2&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;structures2&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
@@ -510,18 +499,18 @@
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;sort_by&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">STRING</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;values&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;p-value&#39;</span><span class="p">,</span> <span class="s1">&#39;fold-change&#39;</span><span class="p">],</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;p-value&#39;</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;start_row&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">0</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;num_rows&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2000</span>
                  <span class="p">}</span>
             <span class="p">]</span>
@@ -534,21 +523,21 @@
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;start_row&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">0</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;num_rows&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2000</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;donors&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;structures&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">}</span>
             <span class="p">]</span>
         <span class="p">},</span>
@@ -565,21 +554,21 @@
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;threshold1&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;threshold2&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;start_row&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">0</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;num_rows&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2000</span>
                  <span class="p">}</span>
             <span class="p">]</span>
@@ -593,16 +582,16 @@
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;threshold&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;start_row&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">0</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;num_rows&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2000</span>
                  <span class="p">}</span>
             <span class="p">]</span>
@@ -612,7 +601,7 @@
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;donors&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;structures&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
@@ -623,18 +612,18 @@
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;sort_order&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">STRING</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;values&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;asc&#39;</span><span class="p">,</span> <span class="s1">&#39;desc&#39;</span><span class="p">],</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;desc&#39;</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;start_row&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">0</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;num_rows&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2000</span>
                  <span class="p">}</span>
             <span class="p">]</span>
@@ -644,7 +633,7 @@
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;donors1&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;structures1&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
@@ -652,7 +641,7 @@
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;donors2&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;structures2&#39;</span><span class="p">,</span>
@@ -666,12 +655,12 @@
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;start_row&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">0</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;num_rows&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2000</span>
                  <span class="p">}</span>
             <span class="p">]</span>
@@ -685,21 +674,21 @@
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;donors&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;structures&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;start_row&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">0</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;num_rows&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2000</span>
                  <span class="p">}</span>
             <span class="p">]</span>
@@ -721,30 +710,30 @@
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;correlation_threshold1&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">FLOAT</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;correlation_threshold2&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">FLOAT</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;threshold1&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;threshold2&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;start_row&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">0</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;num_rows&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2000</span>
                  <span class="p">}</span>
             <span class="p">]</span>
@@ -758,25 +747,25 @@
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;structures&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">INTEGER</span><span class="p">,</span> <span class="n">STRING</span><span class="p">],</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;row&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;sort_order&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">STRING</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;values&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;asc&#39;</span><span class="p">,</span> <span class="s1">&#39;desc&#39;</span><span class="p">],</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;desc&#39;</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;start_row&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">0</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;num_rows&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2000</span>
                  <span class="p">}</span>
             <span class="p">]</span>
@@ -798,21 +787,21 @@
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;threshold1&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;threshold2&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;start_row&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">0</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;num_rows&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2000</span>
                  <span class="p">}</span>
             <span class="p">]</span>
@@ -825,46 +814,46 @@
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;structures&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">INTEGER</span><span class="p">,</span> <span class="n">STRING</span><span class="p">],</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;product_ids&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">INTEGER</span><span class="p">],</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;hemisphere&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">STRING</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;values&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;right&#39;</span><span class="p">,</span> <span class="s1">&#39;left&#39;</span><span class="p">]</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;transgenic_lines&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">INTEGER</span><span class="p">,</span> <span class="n">STRING</span><span class="p">],</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;injection_structures&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;Array&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">INTEGER</span><span class="p">,</span> <span class="n">STRING</span><span class="p">],</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;primary_structure_only&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">BOOLEAN</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;sort_order&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">STRING</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;values&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;asc&#39;</span><span class="p">,</span> <span class="s1">&#39;desc&#39;</span><span class="p">],</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;desc&#39;</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;start_row&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">0</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;num_rows&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2000</span>
                  <span class="p">}</span>
             <span class="p">]</span>
@@ -874,34 +863,34 @@
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;seed_point&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="n">FLOAT</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;transgenic_lines&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">INTEGER</span><span class="p">,</span> <span class="n">STRING</span><span class="p">],</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;injection_structures&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">INTEGER</span><span class="p">,</span> <span class="n">STRING</span><span class="p">],</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;product_ids&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">INTEGER</span><span class="p">],</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;primary_structure_only&#39;</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;start_row&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">0</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;num_rows&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2000</span>
                  <span class="p">}</span>
             <span class="p">]</span>
@@ -915,45 +904,45 @@
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;target_domain&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">INTEGER</span><span class="p">,</span> <span class="n">STRING</span><span class="p">],</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;injection_hemisphere&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">STRING</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;values&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;right&#39;</span><span class="p">,</span> <span class="s1">&#39;left&#39;</span><span class="p">]</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;target_hemisphere&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">STRING</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;values&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;right&#39;</span><span class="p">,</span> <span class="s1">&#39;left&#39;</span><span class="p">]</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;transgenic_lines&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">INTEGER</span><span class="p">,</span> <span class="n">STRING</span><span class="p">],</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;injection_domain&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">INTEGER</span><span class="p">,</span> <span class="n">STRING</span><span class="p">],</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;product_ids&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">INTEGER</span><span class="p">],</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;primary_structure_only&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">BOOLEAN</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;start_row&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">0</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;num_rows&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2000</span>
                  <span class="p">}</span>
             <span class="p">]</span>
@@ -967,34 +956,34 @@
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;transgenic_lines&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">INTEGER</span><span class="p">,</span> <span class="n">STRING</span><span class="p">],</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;section_data_set&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;injection_structures&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">INTEGER</span><span class="p">,</span> <span class="n">STRING</span><span class="p">],</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;product_ids&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">INTEGER</span><span class="p">],</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;primary_structure_only&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">BOOLEAN</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;start_row&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">0</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;num_rows&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2000</span>
                  <span class="p">}</span>
             <span class="p">]</span>
@@ -1004,7 +993,7 @@
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;donors&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;structures&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
@@ -1016,18 +1005,18 @@
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;sort_order&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">STRING</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;values&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;asc&#39;</span><span class="p">,</span> <span class="s1">&#39;desc&#39;</span><span class="p">],</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;desc&#39;</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;start_row&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">0</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;num_rows&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2000</span>
                  <span class="p">}</span>
             <span class="p">]</span>
@@ -1037,7 +1026,7 @@
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;donors1&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;structures1&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
@@ -1046,7 +1035,7 @@
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;donors2&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;structures2&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
@@ -1054,18 +1043,18 @@
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;sort_by&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">STRING</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;values&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;p-value&#39;</span><span class="p">,</span> <span class="s1">&#39;fold-change&#39;</span><span class="p">],</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;p-value&#39;</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;start_row&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">0</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;num_rows&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2000</span>
                  <span class="p">}</span>
             <span class="p">]</span>
@@ -1078,12 +1067,12 @@
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;start_row&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">0</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;num_rows&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2000</span>
                  <span class="p">}</span>
             <span class="p">]</span>
@@ -1093,7 +1082,7 @@
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;donors&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;structures&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
@@ -1105,18 +1094,18 @@
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;sort_order&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">STRING</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;values&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;asc&#39;</span><span class="p">,</span> <span class="s1">&#39;desc&#39;</span><span class="p">],</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;desc&#39;</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;start_row&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">0</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;num_rows&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2000</span>
                  <span class="p">}</span>
             <span class="p">]</span>
@@ -1126,7 +1115,7 @@
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;donors1&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;structures1&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
@@ -1135,7 +1124,7 @@
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;donors2&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ARRAY</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;structures2&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;array_type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
@@ -1143,18 +1132,18 @@
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;sort_by&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">STRING</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;values&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;p-value&#39;</span><span class="p">,</span> <span class="s1">&#39;fold-change&#39;</span><span class="p">],</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;p-value&#39;</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;start_row&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">0</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;num_rows&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2000</span>
                  <span class="p">}</span>
             <span class="p">]</span>
@@ -1167,12 +1156,12 @@
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;start_row&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">0</span>
                  <span class="p">},</span>
                 <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;num_rows&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">,</span>
-                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                 <span class="s1">&#39;optional&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2000</span>
                  <span class="p">}</span>
             <span class="p">]</span>
@@ -1197,9 +1186,7 @@
         <div class="sphinxsidebarwrapper">
 <h3><a href="../../../../index.html">Contents</a></h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Install Guide</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Install Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../cell_types.html">Cell Types</a></li>
@@ -1224,6 +1211,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.model.html">allensdk.model package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.morphology.html">allensdk.morphology package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.deprecated.html">allensdk.deprecated module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
@@ -1241,12 +1229,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

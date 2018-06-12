@@ -1,32 +1,21 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>allensdk.core.structure_tree &mdash; Allen SDK dev documentation</title>
-    
+    <title>allensdk.core.structure_tree &#8212; Allen SDK dev documentation</title>
     <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../',
-        VERSION:     'dev',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK dev documentation" href="../../../index.html" />
-    <link rel="up" title="Module code" href="../../index.html" /> 
-  </head>
-  <body role="document">
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
 <script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
@@ -104,18 +93,18 @@
 <span class="c1"># ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="c1">#</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
 <span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">import</span> <span class="nn">operator</span> <span class="kn">as</span> <span class="nn">op</span>
-<span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">iteritems</span><span class="p">,</span> <span class="n">string_types</span>
+<span class="kn">import</span> <span class="nn">operator</span> <span class="k">as</span> <span class="nn">op</span>
+<span class="kn">from</span> <span class="nn">six</span> <span class="k">import</span> <span class="n">iteritems</span><span class="p">,</span> <span class="n">string_types</span>
 <span class="kn">import</span> <span class="nn">functools</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">.simple_tree</span> <span class="kn">import</span> <span class="n">SimpleTree</span>
+<span class="kn">from</span> <span class="nn">.simple_tree</span> <span class="k">import</span> <span class="n">SimpleTree</span>
 
 
-<div class="viewcode-block" id="StructureTree"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.structure_tree.StructureTree">[docs]</a><span class="k">class</span> <span class="nc">StructureTree</span><span class="p">(</span> <span class="n">SimpleTree</span> <span class="p">):</span>
+<div class="viewcode-block" id="StructureTree"><a class="viewcode-back" href="../../../allensdk.core.structure_tree.html#allensdk.core.structure_tree.StructureTree">[docs]</a><span class="k">class</span> <span class="nc">StructureTree</span><span class="p">(</span> <span class="n">SimpleTree</span> <span class="p">):</span>
                  
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nodes</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;A tree whose nodes are brain structures and whose edges indicate </span>
@@ -147,16 +136,16 @@
 <span class="sd">        </span>
 <span class="sd">        &#39;&#39;&#39;</span>
         
-        <span class="nb">super</span><span class="p">(</span><span class="n">StructureTree</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">nodes</span><span class="p">,</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">StructureTree</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">nodes</span><span class="p">,</span>
                                             <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]),</span>
                                             <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;structure_id_path&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> \
                                                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;structure_id_path&#39;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">1</span> \
-                                                <span class="ow">and</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;structure_id_path&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> \
+                                                <span class="ow">and</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;structure_id_path&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> \
                                                 <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;structure_id_path&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span> \
-                                                <span class="k">else</span> <span class="bp">None</span><span class="p">)</span>
+                                                <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
                                                 
                                              
-<div class="viewcode-block" id="StructureTree.get_structures_by_id"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.structure_tree.StructureTree.get_structures_by_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_structures_by_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_ids</span><span class="p">):</span>
+<div class="viewcode-block" id="StructureTree.get_structures_by_id"><a class="viewcode-back" href="../../../allensdk.core.structure_tree.html#allensdk.core.structure_tree.StructureTree.get_structures_by_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_structures_by_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_ids</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Obtain a list of brain structures from their structure ids</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
@@ -174,7 +163,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">(</span><span class="n">structure_ids</span><span class="p">)</span></div>
         
     
-<div class="viewcode-block" id="StructureTree.get_structures_by_name"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.structure_tree.StructureTree.get_structures_by_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_structures_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="p">):</span>
+<div class="viewcode-block" id="StructureTree.get_structures_by_name"><a class="viewcode-back" href="../../../allensdk.core.structure_tree.html#allensdk.core.structure_tree.StructureTree.get_structures_by_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_structures_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Obtain a list of brain structures from their names,</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
@@ -192,7 +181,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes_by_property</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="n">names</span><span class="p">)</span></div>
         
         
-<div class="viewcode-block" id="StructureTree.get_structures_by_acronym"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.structure_tree.StructureTree.get_structures_by_acronym">[docs]</a>    <span class="k">def</span> <span class="nf">get_structures_by_acronym</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acronyms</span><span class="p">):</span>
+<div class="viewcode-block" id="StructureTree.get_structures_by_acronym"><a class="viewcode-back" href="../../../allensdk.core.structure_tree.html#allensdk.core.structure_tree.StructureTree.get_structures_by_acronym">[docs]</a>    <span class="k">def</span> <span class="nf">get_structures_by_acronym</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acronyms</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Obtain a list of brain structures from their acronyms</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
@@ -210,7 +199,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes_by_property</span><span class="p">(</span><span class="s1">&#39;acronym&#39;</span><span class="p">,</span> <span class="n">acronyms</span><span class="p">)</span></div>
         
         
-<div class="viewcode-block" id="StructureTree.get_structures_by_set_id"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.structure_tree.StructureTree.get_structures_by_set_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_structures_by_set_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_set_ids</span><span class="p">):</span>
+<div class="viewcode-block" id="StructureTree.get_structures_by_set_id"><a class="viewcode-back" href="../../../allensdk.core.structure_tree.html#allensdk.core.structure_tree.StructureTree.get_structures_by_set_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_structures_by_set_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_set_ids</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Obtain a list of brain structures from by the sets that contain </span>
 <span class="sd">        them.</span>
 <span class="sd">        </span>
@@ -230,7 +219,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_nodes</span><span class="p">(</span><span class="n">overlap</span><span class="p">)</span></div>
         
         
-<div class="viewcode-block" id="StructureTree.get_colormap"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.structure_tree.StructureTree.get_colormap">[docs]</a>    <span class="k">def</span> <span class="nf">get_colormap</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="StructureTree.get_colormap"><a class="viewcode-back" href="../../../allensdk.core.structure_tree.html#allensdk.core.structure_tree.StructureTree.get_colormap">[docs]</a>    <span class="k">def</span> <span class="nf">get_colormap</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Get a dictionary mapping structure ids to colors across all nodes.</span>
 <span class="sd">        </span>
 <span class="sd">        Returns</span>
@@ -245,7 +234,7 @@
 
                               
                               
-<div class="viewcode-block" id="StructureTree.get_name_map"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.structure_tree.StructureTree.get_name_map">[docs]</a>    <span class="k">def</span> <span class="nf">get_name_map</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="StructureTree.get_name_map"><a class="viewcode-back" href="../../../allensdk.core.structure_tree.html#allensdk.core.structure_tree.StructureTree.get_name_map">[docs]</a>    <span class="k">def</span> <span class="nf">get_name_map</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Get a dictionary mapping structure ids to names across all nodes.</span>
 <span class="sd">        </span>
 <span class="sd">        Returns</span>
@@ -259,7 +248,7 @@
                               <span class="k">lambda</span> <span class="n">y</span><span class="p">:</span> <span class="n">y</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span></div>
         
         
-<div class="viewcode-block" id="StructureTree.get_id_acronym_map"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.structure_tree.StructureTree.get_id_acronym_map">[docs]</a>    <span class="k">def</span> <span class="nf">get_id_acronym_map</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="StructureTree.get_id_acronym_map"><a class="viewcode-back" href="../../../allensdk.core.structure_tree.html#allensdk.core.structure_tree.StructureTree.get_id_acronym_map">[docs]</a>    <span class="k">def</span> <span class="nf">get_id_acronym_map</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Get a dictionary mapping structure acronyms to ids across all nodes.</span>
 <span class="sd">        </span>
 <span class="sd">        Returns</span>
@@ -273,7 +262,7 @@
                               <span class="k">lambda</span> <span class="n">y</span><span class="p">:</span> <span class="n">y</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])</span></div>
         
         
-<div class="viewcode-block" id="StructureTree.get_ancestor_id_map"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.structure_tree.StructureTree.get_ancestor_id_map">[docs]</a>    <span class="k">def</span> <span class="nf">get_ancestor_id_map</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="StructureTree.get_ancestor_id_map"><a class="viewcode-back" href="../../../allensdk.core.structure_tree.html#allensdk.core.structure_tree.StructureTree.get_ancestor_id_map">[docs]</a>    <span class="k">def</span> <span class="nf">get_ancestor_id_map</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Get a dictionary mapping structure ids to ancestor ids across all </span>
 <span class="sd">        nodes. </span>
 <span class="sd">        </span>
@@ -288,7 +277,7 @@
                               <span class="k">lambda</span> <span class="n">y</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestor_ids</span><span class="p">([</span><span class="n">y</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]])[</span><span class="mi">0</span><span class="p">])</span></div>
         
         
-<div class="viewcode-block" id="StructureTree.structure_descends_from"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.structure_tree.StructureTree.structure_descends_from">[docs]</a>    <span class="k">def</span> <span class="nf">structure_descends_from</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">child_id</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">):</span>
+<div class="viewcode-block" id="StructureTree.structure_descends_from"><a class="viewcode-back" href="../../../allensdk.core.structure_tree.html#allensdk.core.structure_tree.StructureTree.structure_descends_from">[docs]</a>    <span class="k">def</span> <span class="nf">structure_descends_from</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">child_id</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Tests whether one structure descends from another. </span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
@@ -309,7 +298,7 @@
         <span class="k">return</span> <span class="n">parent_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestor_ids</span><span class="p">([</span><span class="n">child_id</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span></div>
     
     
-<div class="viewcode-block" id="StructureTree.get_structure_sets"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.structure_tree.StructureTree.get_structure_sets">[docs]</a>    <span class="k">def</span> <span class="nf">get_structure_sets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="StructureTree.get_structure_sets"><a class="viewcode-back" href="../../../allensdk.core.structure_tree.html#allensdk.core.structure_tree.StructureTree.get_structure_sets">[docs]</a>    <span class="k">def</span> <span class="nf">get_structure_sets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Lists all unique structure sets that are assigned to at least one </span>
 <span class="sd">        structure in the tree.</span>
 <span class="sd">        </span>
@@ -321,10 +310,10 @@
 <span class="sd">        &#39;&#39;&#39;</span>
         
         <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">add</span><span class="p">,</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;structure_set_ids&#39;</span><span class="p">],</span> 
-                                                <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="p">())))</span></div>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">())))</span></div>
         
         
-<div class="viewcode-block" id="StructureTree.has_overlaps"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.structure_tree.StructureTree.has_overlaps">[docs]</a>    <span class="k">def</span> <span class="nf">has_overlaps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_ids</span><span class="p">):</span>
+<div class="viewcode-block" id="StructureTree.has_overlaps"><a class="viewcode-back" href="../../../allensdk.core.structure_tree.html#allensdk.core.structure_tree.StructureTree.has_overlaps">[docs]</a>    <span class="k">def</span> <span class="nf">has_overlaps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_ids</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Determine if a list of structures contains structures along with </span>
 <span class="sd">        their ancestors</span>
 <span class="sd">        </span>
@@ -347,8 +336,8 @@
         <span class="k">return</span> <span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">ancestor_ids</span><span class="p">)</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">structure_ids</span><span class="p">))</span></div>
         
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="StructureTree.clean_structures"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.structure_tree.StructureTree.clean_structures">[docs]</a>    <span class="k">def</span> <span class="nf">clean_structures</span><span class="p">(</span><span class="n">structures</span><span class="p">,</span> <span class="n">whitelist</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">data_transforms</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">renames</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="StructureTree.clean_structures"><a class="viewcode-back" href="../../../allensdk.core.structure_tree.html#allensdk.core.structure_tree.StructureTree.clean_structures">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">clean_structures</span><span class="p">(</span><span class="n">structures</span><span class="p">,</span> <span class="n">whitelist</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">data_transforms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">renames</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Convert structures_with_sets query results into a form that can be </span>
 <span class="sd">        used to construct a StructureTree</span>
 <span class="sd">        </span>
@@ -375,13 +364,13 @@
 <span class="sd">        </span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
-        <span class="k">if</span> <span class="n">whitelist</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">whitelist</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">whitelist</span> <span class="o">=</span> <span class="n">StructureTree</span><span class="o">.</span><span class="n">whitelist</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="n">data_transforms</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">data_transforms</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">data_transforms</span> <span class="o">=</span> <span class="n">StructureTree</span><span class="o">.</span><span class="n">data_transforms</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="n">renames</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>        
+        <span class="k">if</span> <span class="n">renames</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>        
             <span class="n">renames</span> <span class="o">=</span> <span class="n">StructureTree</span><span class="o">.</span><span class="n">renames</span><span class="p">()</span>
             <span class="n">whitelist</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">renames</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
 
@@ -408,24 +397,24 @@
 
         <span class="k">return</span> <span class="n">structures</span></div>
        
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="StructureTree.data_transforms"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.structure_tree.StructureTree.data_transforms">[docs]</a>    <span class="k">def</span> <span class="nf">data_transforms</span><span class="p">():</span>
+<div class="viewcode-block" id="StructureTree.data_transforms"><a class="viewcode-back" href="../../../allensdk.core.structure_tree.html#allensdk.core.structure_tree.StructureTree.data_transforms">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">data_transforms</span><span class="p">():</span>
         <span class="k">return</span>  <span class="p">{</span><span class="s1">&#39;color_hex_triplet&#39;</span><span class="p">:</span> <span class="n">StructureTree</span><span class="o">.</span><span class="n">hex_to_rgb</span><span class="p">,</span> 
                  <span class="s1">&#39;structure_id_path&#39;</span><span class="p">:</span> <span class="n">StructureTree</span><span class="o">.</span><span class="n">path_to_list</span><span class="p">}</span></div>
 
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="StructureTree.renames"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.structure_tree.StructureTree.renames">[docs]</a>    <span class="k">def</span> <span class="nf">renames</span><span class="p">():</span>
+<div class="viewcode-block" id="StructureTree.renames"><a class="viewcode-back" href="../../../allensdk.core.structure_tree.html#allensdk.core.structure_tree.StructureTree.renames">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">renames</span><span class="p">():</span>
         <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;color_hex_triplet&#39;</span><span class="p">:</span> <span class="s1">&#39;rgb_triplet&#39;</span><span class="p">}</span></div>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="StructureTree.whitelist"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.structure_tree.StructureTree.whitelist">[docs]</a>    <span class="k">def</span> <span class="nf">whitelist</span><span class="p">():</span>
+<div class="viewcode-block" id="StructureTree.whitelist"><a class="viewcode-back" href="../../../allensdk.core.structure_tree.html#allensdk.core.structure_tree.StructureTree.whitelist">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">whitelist</span><span class="p">():</span>
         <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;acronym&#39;</span><span class="p">,</span> <span class="s1">&#39;color_hex_triplet&#39;</span><span class="p">,</span> <span class="s1">&#39;graph_id&#39;</span><span class="p">,</span> <span class="s1">&#39;graph_order&#39;</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">,</span> 
                 <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;structure_id_path&#39;</span><span class="p">,</span> <span class="s1">&#39;structure_set_ids&#39;</span><span class="p">]</span> </div>
     
         
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="StructureTree.hex_to_rgb"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.structure_tree.StructureTree.hex_to_rgb">[docs]</a>    <span class="k">def</span> <span class="nf">hex_to_rgb</span><span class="p">(</span><span class="n">hex_color</span><span class="p">):</span>
+<div class="viewcode-block" id="StructureTree.hex_to_rgb"><a class="viewcode-back" href="../../../allensdk.core.structure_tree.html#allensdk.core.structure_tree.StructureTree.hex_to_rgb">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">hex_to_rgb</span><span class="p">(</span><span class="n">hex_color</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Convert a hexadecimal color string to a uint8 triplet</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
@@ -451,8 +440,8 @@
         <span class="k">return</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">hex_color</span><span class="p">[</span><span class="n">a</span> <span class="o">*</span> <span class="mi">2</span><span class="p">:</span> <span class="n">a</span><span class="o">*</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">2</span><span class="p">],</span> <span class="mi">16</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span> </div>
     
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="StructureTree.path_to_list"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.structure_tree.StructureTree.path_to_list">[docs]</a>    <span class="k">def</span> <span class="nf">path_to_list</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+<div class="viewcode-block" id="StructureTree.path_to_list"><a class="viewcode-back" href="../../../allensdk.core.structure_tree.html#allensdk.core.structure_tree.StructureTree.path_to_list">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">path_to_list</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Structure id paths are sometimes formatted as &quot;/&quot;-seperated strings. </span>
 <span class="sd">        This method converts them to a list of integers, if needed.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
@@ -463,8 +452,8 @@
         <span class="k">return</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">stid</span><span class="p">)</span> <span class="k">for</span> <span class="n">stid</span> <span class="ow">in</span> <span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">stid</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">]</span></div>
 
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="StructureTree.collect_sets"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.structure_tree.StructureTree.collect_sets">[docs]</a>    <span class="k">def</span> <span class="nf">collect_sets</span><span class="p">(</span><span class="n">structure</span><span class="p">):</span>
+<div class="viewcode-block" id="StructureTree.collect_sets"><a class="viewcode-back" href="../../../allensdk.core.structure_tree.html#allensdk.core.structure_tree.StructureTree.collect_sets">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">collect_sets</span><span class="p">(</span><span class="n">structure</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Structure sets may be specified by full records or id. This method </span>
 <span class="sd">        collects all of the structure set records/ids in a structure record and </span>
 <span class="sd">        replaces them with a single list of id records.</span>
@@ -490,9 +479,7 @@
         <div class="sphinxsidebarwrapper">
 <h3><a href="../../../index.html">Contents</a></h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install Guide</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../cell_types.html">Cell Types</a></li>
@@ -517,6 +504,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.model.html">allensdk.model package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.morphology.html">allensdk.morphology package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.deprecated.html">allensdk.deprecated module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
@@ -534,12 +522,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

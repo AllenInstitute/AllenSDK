@@ -1,32 +1,21 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>allensdk.api.queries.annotated_section_data_sets_api &mdash; Allen SDK dev documentation</title>
-    
+    <title>allensdk.api.queries.annotated_section_data_sets_api &#8212; Allen SDK dev documentation</title>
     <link rel="stylesheet" href="../../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../../',
-        VERSION:     'dev',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="../../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK dev documentation" href="../../../../index.html" />
-    <link rel="up" title="Module code" href="../../../index.html" /> 
-  </head>
-  <body role="document">
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
 <script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
@@ -104,24 +93,24 @@
 <span class="c1"># ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="c1">#</span>
-<span class="kn">from</span> <span class="nn">.rma_api</span> <span class="kn">import</span> <span class="n">RmaApi</span>
-<span class="kn">from</span> <span class="nn">..cache</span> <span class="kn">import</span> <span class="n">cacheable</span>
+<span class="kn">from</span> <span class="nn">.rma_api</span> <span class="k">import</span> <span class="n">RmaApi</span>
+<span class="kn">from</span> <span class="nn">..cache</span> <span class="k">import</span> <span class="n">cacheable</span>
 
 
-<div class="viewcode-block" id="AnnotatedSectionDataSetsApi"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.annotated_section_data_sets_api.AnnotatedSectionDataSetsApi">[docs]</a><span class="k">class</span> <span class="nc">AnnotatedSectionDataSetsApi</span><span class="p">(</span><span class="n">RmaApi</span><span class="p">):</span>
+<div class="viewcode-block" id="AnnotatedSectionDataSetsApi"><a class="viewcode-back" href="../../../../allensdk.api.queries.annotated_section_data_sets_api.html#allensdk.api.queries.annotated_section_data_sets_api.AnnotatedSectionDataSetsApi">[docs]</a><span class="k">class</span> <span class="nc">AnnotatedSectionDataSetsApi</span><span class="p">(</span><span class="n">RmaApi</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;See:</span>
 <span class="sd">    `Searching Annotated SectionDataSets &lt;http://help.brain-map.org/display/api/Searching+Annotated+SectionDataSets&gt;`_</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">AnnotatedSectionDataSetsApi</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">base_uri</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">AnnotatedSectionDataSetsApi</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">base_uri</span><span class="p">)</span>
 
-<div class="viewcode-block" id="AnnotatedSectionDataSetsApi.get_annotated_section_data_sets"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.annotated_section_data_sets_api.AnnotatedSectionDataSetsApi.get_annotated_section_data_sets">[docs]</a>    <span class="k">def</span> <span class="nf">get_annotated_section_data_sets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="AnnotatedSectionDataSetsApi.get_annotated_section_data_sets"><a class="viewcode-back" href="../../../../allensdk.api.queries.annotated_section_data_sets_api.html#allensdk.api.queries.annotated_section_data_sets_api.AnnotatedSectionDataSetsApi.get_annotated_section_data_sets">[docs]</a>    <span class="k">def</span> <span class="nf">get_annotated_section_data_sets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                         <span class="n">structures</span><span class="p">,</span>
-                                        <span class="n">intensity_values</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                                        <span class="n">density_values</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                                        <span class="n">pattern_values</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                                        <span class="n">age_names</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+                                        <span class="n">intensity_values</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                        <span class="n">density_values</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                        <span class="n">pattern_values</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                        <span class="n">age_names</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;For a list of target structures, find the SectionDataSet</span>
 <span class="sd">        that matches the parameters for intensity_values, density_values, pattern_values, and Age.</span>
 
@@ -149,19 +138,19 @@
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;structures=&#39;</span> <span class="o">+</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">structures</span><span class="p">))]</span>
 
-        <span class="k">if</span> <span class="n">intensity_values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">intensity_values</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">intensity_values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">intensity_values</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;intensity_values=&#39;</span> <span class="o">+</span>
                           <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">intensity_values</span><span class="p">)))</span>
 
-        <span class="k">if</span> <span class="n">density_values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">density_values</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">density_values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">density_values</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;density_values=&#39;</span> <span class="o">+</span>
                           <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">density_values</span><span class="p">)))</span>
 
-        <span class="k">if</span> <span class="n">pattern_values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">pattern_values</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">pattern_values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">pattern_values</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;pattern_values=&#39;</span> <span class="o">+</span>
                           <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">pattern_values</span><span class="p">)))</span>
 
-        <span class="k">if</span> <span class="n">age_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">age_names</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">age_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">age_names</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;age_names=&#39;</span> <span class="o">+</span>
                           <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">age_names</span><span class="p">)))</span>
 
@@ -173,13 +162,13 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">json_msg_query</span><span class="p">(</span><span class="n">url</span><span class="p">)</span></div>
 
-    <span class="nd">@cacheable</span><span class="p">()</span>
-<div class="viewcode-block" id="AnnotatedSectionDataSetsApi.get_annotated_section_data_sets_via_rma"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.annotated_section_data_sets_api.AnnotatedSectionDataSetsApi.get_annotated_section_data_sets_via_rma">[docs]</a>    <span class="k">def</span> <span class="nf">get_annotated_section_data_sets_via_rma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="AnnotatedSectionDataSetsApi.get_annotated_section_data_sets_via_rma"><a class="viewcode-back" href="../../../../allensdk.api.queries.annotated_section_data_sets_api.html#allensdk.api.queries.annotated_section_data_sets_api.AnnotatedSectionDataSetsApi.get_annotated_section_data_sets_via_rma">[docs]</a>    <span class="nd">@cacheable</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">get_annotated_section_data_sets_via_rma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                                 <span class="n">structures</span><span class="p">,</span>
-                                                <span class="n">intensity_values</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                                                <span class="n">density_values</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                                                <span class="n">pattern_values</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                                                <span class="n">age_names</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+                                                <span class="n">intensity_values</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                                <span class="n">density_values</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                                <span class="n">pattern_values</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                                <span class="n">age_names</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;For a list of target structures, find the SectionDataSet</span>
 <span class="sd">        that matches the parameters for intensity_values, density_values, pattern_values, and Age.</span>
 
@@ -207,7 +196,7 @@
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">age_include_strings</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="n">age_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">age_names</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">age_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">age_names</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">age_include_strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;[name$in&#39;</span><span class="p">)</span>
             <span class="n">age_include_strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">age_names</span><span class="p">)))</span>
@@ -216,15 +205,15 @@
 
         <span class="n">criteria_strings</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;manual_annotations&#39;</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="n">intensity_values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">intensity_values</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">intensity_values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">intensity_values</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">criteria_strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;[intensity_call$in</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span>
                                     <span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">intensity_values</span><span class="p">))))</span>
 
-        <span class="k">if</span> <span class="n">density_values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">density_values</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">density_values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">density_values</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">criteria_strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;[density_call$in</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span>
                                     <span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">density_values</span><span class="p">))))</span>
 
-        <span class="k">if</span> <span class="n">pattern_values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">pattern_values</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">pattern_values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">pattern_values</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">criteria_strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;[pattern_call$in</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span>
                                     <span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">pattern_values</span><span class="p">))))</span>
 
@@ -254,7 +243,7 @@
 
         <span class="k">return</span> <span class="n">data</span></div>
 
-<div class="viewcode-block" id="AnnotatedSectionDataSetsApi.get_compound_annotated_section_data_sets"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.annotated_section_data_sets_api.AnnotatedSectionDataSetsApi.get_compound_annotated_section_data_sets">[docs]</a>    <span class="k">def</span> <span class="nf">get_compound_annotated_section_data_sets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="AnnotatedSectionDataSetsApi.get_compound_annotated_section_data_sets"><a class="viewcode-back" href="../../../../allensdk.api.queries.annotated_section_data_sets_api.html#allensdk.api.queries.annotated_section_data_sets_api.AnnotatedSectionDataSetsApi.get_compound_annotated_section_data_sets">[docs]</a>    <span class="k">def</span> <span class="nf">get_compound_annotated_section_data_sets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                                  <span class="n">queries</span><span class="p">,</span>
                                                  <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;json&#39;</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Find the SectionDataSet that matches several annotated_section_data_sets queries</span>
@@ -312,9 +301,7 @@
         <div class="sphinxsidebarwrapper">
 <h3><a href="../../../../index.html">Contents</a></h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Install Guide</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Install Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../cell_types.html">Cell Types</a></li>
@@ -339,6 +326,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.model.html">allensdk.model package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.morphology.html">allensdk.morphology package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.deprecated.html">allensdk.deprecated module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
@@ -356,12 +344,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

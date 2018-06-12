@@ -1,0 +1,7 @@
+allensdk.ephys.ephys\_extractor module
+======================================
+
+.. automodule:: allensdk.ephys.ephys_extractor
+    :members:
+    :undoc-members:
+    :show-inheritance:

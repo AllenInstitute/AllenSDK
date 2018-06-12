@@ -1,0 +1,7 @@
+allensdk.core.mouse\_connectivity\_cache module
+===============================================
+
+.. automodule:: allensdk.core.mouse_connectivity_cache
+    :members:
+    :undoc-members:
+    :show-inheritance:

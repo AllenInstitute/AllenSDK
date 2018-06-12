@@ -1,0 +1,433 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>allensdk.config.manifest module &#8212; Allen SDK dev documentation</title>
+    <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="allensdk.config.manifest_builder module" href="allensdk.config.manifest_builder.html" />
+    <link rel="prev" title="allensdk.config.model.description_parser module" href="allensdk.config.model.description_parser.html" /> 
+  </head><body>
+<link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
+<script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var _pSupressBrowserFlashWarning = true;
+    var _pTabId = "pHome";
+    var _pMoreProjectsId = "pMoreProjects";
+    var _pImagePath = "http://www.brain-map.org/assets/images/";
+    var _pSiteWarnings = function() {
+        this.show_warning() = {};
+    }
+</script>
+<script type="text/javascript">
+    function initialize() {
+        /*** do your stuff, then initialize the portal plugin ***/
+        _pPortalOnLoad();
+    }
+</script>
+<style>
+  #header_content > a {
+  display: inline-block;
+  width: 250px;
+  height: 75px;
+  background-image:url("_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-size: 235px 37px;
+  background-position: 0px 20px;
+  background-repeat: no-repeat;
+  }
+</style>
+
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
+<link rel="stylesheet" type="text/css" href="_static/external_assets/stylesheets/common_layout.css" />
+
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-allensdk.config.manifest">
+<span id="allensdk-config-manifest-module"></span><h1>allensdk.config.manifest module<a class="headerlink" href="#module-allensdk.config.manifest" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="allensdk.config.manifest.Manifest">
+<em class="property">class </em><code class="descclassname">allensdk.config.manifest.</code><code class="descname">Manifest</code><span class="sig-paren">(</span><em>config=None</em>, <em>relative_base_dir='.'</em>, <em>version=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/manifest.html#Manifest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.manifest.Manifest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Manages the location of external files
+referenced in an Allen SDK configuration</p>
+<dl class="attribute">
+<dt id="allensdk.config.manifest.Manifest.DIR">
+<code class="descname">DIR</code><em class="property"> = 'dir'</em><a class="headerlink" href="#allensdk.config.manifest.Manifest.DIR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.config.manifest.Manifest.DIRNAME">
+<code class="descname">DIRNAME</code><em class="property"> = 'dir_name'</em><a class="headerlink" href="#allensdk.config.manifest.Manifest.DIRNAME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.config.manifest.Manifest.FILE">
+<code class="descname">FILE</code><em class="property"> = 'file'</em><a class="headerlink" href="#allensdk.config.manifest.Manifest.FILE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.config.manifest.Manifest.VERSION">
+<code class="descname">VERSION</code><em class="property"> = 'manifest_version'</em><a class="headerlink" href="#allensdk.config.manifest.Manifest.VERSION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.config.manifest.Manifest.add_file">
+<code class="descname">add_file</code><span class="sig-paren">(</span><em>file_key</em>, <em>file_name</em>, <em>dir_key=None</em>, <em>path_format=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/manifest.html#Manifest.add_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.manifest.Manifest.add_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert a new file entry.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>file_key</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">Reference to the entry.</p>
+</dd>
+<dt><strong>file_name</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">Subtitutions of the %s, %d style allowed.</p>
+</dd>
+<dt><strong>dir_key</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">Reference to the parent directory entry.</p>
+</dd>
+<dt><strong>path_format</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string, optional</span></dt>
+<dd><p class="first last">File type for further parsing.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.config.manifest.Manifest.add_path">
+<code class="descname">add_path</code><span class="sig-paren">(</span><em>key</em>, <em>path</em>, <em>path_type='dir'</em>, <em>absolute=True</em>, <em>path_format=None</em>, <em>parent_key=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/manifest.html#Manifest.add_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.manifest.Manifest.add_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert a new entry.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>key</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">Identifier for referencing the entry.</p>
+</dd>
+<dt><strong>path</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">Specification for a path using %s, %d style substitution.</p>
+</dd>
+<dt><strong>path_type</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string enumeration</span></dt>
+<dd><p class="first last">‘dir’ (default) or ‘file’</p>
+</dd>
+<dt><strong>absolute</strong> <span class="classifier-delimiter">:</span> <span class="classifier">boolean</span></dt>
+<dd><p class="first last">Is the spec relative to the process current directory.</p>
+</dd>
+<dt><strong>path_format</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string, optional</span></dt>
+<dd><p class="first last">Indicate a known file type for further parsing.</p>
+</dd>
+<dt><strong>parent_key</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">Refer to another entry.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.config.manifest.Manifest.add_paths">
+<code class="descname">add_paths</code><span class="sig-paren">(</span><em>path_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/manifest.html#Manifest.add_paths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.manifest.Manifest.add_paths" title="Permalink to this definition">¶</a></dt>
+<dd><p>add information about paths stored in the manifest.</p>
+<dl class="docutils">
+<dt>Parameters</dt>
+<dd><dl class="first last docutils">
+<dt>path_info <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd>Information about the new paths</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.config.manifest.Manifest.as_dataframe">
+<code class="descname">as_dataframe</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/manifest.html#Manifest.as_dataframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.manifest.Manifest.as_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.config.manifest.Manifest.check_dir">
+<code class="descname">check_dir</code><span class="sig-paren">(</span><em>path_key</em>, <em>do_exit=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/manifest.html#Manifest.check_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.manifest.Manifest.check_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Verify a directories existence or optionally exit.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>path_key</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">Reference to the entry.</p>
+</dd>
+<dt><strong>do_exit</strong> <span class="classifier-delimiter">:</span> <span class="classifier">boolean</span></dt>
+<dd><p class="first last">What to do if the directory is not present.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.config.manifest.Manifest.create_dir">
+<code class="descname">create_dir</code><span class="sig-paren">(</span><em>path_key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/manifest.html#Manifest.create_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.manifest.Manifest.create_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make a directory for an entry.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>path_key</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">Reference to the entry.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.config.manifest.Manifest.get_format">
+<code class="descname">get_format</code><span class="sig-paren">(</span><em>path_key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/manifest.html#Manifest.get_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.manifest.Manifest.get_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the type of a path entry.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>path_key</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">reference to the entry</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>string</strong></dt>
+<dd><p class="first last">File type.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.config.manifest.Manifest.get_path">
+<code class="descname">get_path</code><span class="sig-paren">(</span><em>path_key</em>, <em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/manifest.html#Manifest.get_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.manifest.Manifest.get_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve an entry with substitutions.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>path_key</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">Refer to the entry to retrieve.</p>
+</dd>
+<dt><strong>args</strong> <span class="classifier-delimiter">:</span> <span class="classifier">any types, optional</span></dt>
+<dd><p class="first last">arguments to be substituted into the path spec for %s, %d, etc.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>string</strong></dt>
+<dd><p class="first last">Path with parent structure and substitutions applied.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.config.manifest.Manifest.load_config">
+<code class="descname">load_config</code><span class="sig-paren">(</span><em>config</em>, <em>version=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/manifest.html#Manifest.load_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.manifest.Manifest.load_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load paths into the manifest from an Allen SDK config section.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>config</strong> <span class="classifier-delimiter">:</span> <span class="classifier">Config</span></dt>
+<dd><p class="first last">Manifest section of an Allen SDK config.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.config.manifest.Manifest.log">
+<code class="descname">log</code><em class="property"> = &lt;logging.Logger object&gt;</em><a class="headerlink" href="#allensdk.config.manifest.Manifest.log" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.config.manifest.Manifest.resolve_paths">
+<code class="descname">resolve_paths</code><span class="sig-paren">(</span><em>description_dict</em>, <em>suffix='_key'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/manifest.html#Manifest.resolve_paths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.manifest.Manifest.resolve_paths" title="Permalink to this definition">¶</a></dt>
+<dd><p>Walk input items and expand those that refer to a manifest entry.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>description_dict</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd><p class="first last">Any entries with key names ending in suffix will be expanded.</p>
+</dd>
+<dt><strong>suffix</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">Indicates the entries to be expanded.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="allensdk.config.manifest.Manifest.safe_make_parent_dirs">
+<em class="property">classmethod </em><code class="descname">safe_make_parent_dirs</code><span class="sig-paren">(</span><em>file_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/manifest.html#Manifest.safe_make_parent_dirs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.manifest.Manifest.safe_make_parent_dirs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a parent directories for file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>file_name</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="allensdk.config.manifest.Manifest.safe_mkdir">
+<em class="property">classmethod </em><code class="descname">safe_mkdir</code><span class="sig-paren">(</span><em>directory</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/manifest.html#Manifest.safe_mkdir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.manifest.Manifest.safe_mkdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create path if not already there.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>directory</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">create it if it doesn’t exist</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="allensdk.config.manifest.ManifestVersionError">
+<em class="property">exception </em><code class="descclassname">allensdk.config.manifest.</code><code class="descname">ManifestVersionError</code><span class="sig-paren">(</span><em>message</em>, <em>version</em>, <em>found_version</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/manifest.html#ManifestVersionError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.manifest.ManifestVersionError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">exceptions.Exception</span></code></p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_space.html">Reference Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="glif_models.html">Generalized LIF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html">Biophysical</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.deprecated.html">allensdk.deprecated module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
+</ul>
+
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allen-sdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    </div>
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalFooter.js"></script>
+
+
+  </body>
+</html>

@@ -1,0 +1,7 @@
+allensdk.brain\_observatory.drifting\_gratings module
+=====================================================
+
+.. automodule:: allensdk.brain_observatory.drifting_gratings
+    :members:
+    :undoc-members:
+    :show-inheritance:

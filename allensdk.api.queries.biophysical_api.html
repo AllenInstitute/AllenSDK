@@ -1,0 +1,351 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>allensdk.api.queries.biophysical_api module &#8212; Allen SDK dev documentation</title>
+    <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="allensdk.api.queries.brain_observatory_api module" href="allensdk.api.queries.brain_observatory_api.html" />
+    <link rel="prev" title="allensdk.api.queries.annotated_section_data_sets_api module" href="allensdk.api.queries.annotated_section_data_sets_api.html" /> 
+  </head><body>
+<link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
+<script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var _pSupressBrowserFlashWarning = true;
+    var _pTabId = "pHome";
+    var _pMoreProjectsId = "pMoreProjects";
+    var _pImagePath = "http://www.brain-map.org/assets/images/";
+    var _pSiteWarnings = function() {
+        this.show_warning() = {};
+    }
+</script>
+<script type="text/javascript">
+    function initialize() {
+        /*** do your stuff, then initialize the portal plugin ***/
+        _pPortalOnLoad();
+    }
+</script>
+<style>
+  #header_content > a {
+  display: inline-block;
+  width: 250px;
+  height: 75px;
+  background-image:url("_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-size: 235px 37px;
+  background-position: 0px 20px;
+  background-repeat: no-repeat;
+  }
+</style>
+
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
+<link rel="stylesheet" type="text/css" href="_static/external_assets/stylesheets/common_layout.css" />
+
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-allensdk.api.queries.biophysical_api">
+<span id="allensdk-api-queries-biophysical-api-module"></span><h1>allensdk.api.queries.biophysical_api module<a class="headerlink" href="#module-allensdk.api.queries.biophysical_api" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="allensdk.api.queries.biophysical_api.BiophysicalApi">
+<em class="property">class </em><code class="descclassname">allensdk.api.queries.biophysical_api.</code><code class="descname">BiophysicalApi</code><span class="sig-paren">(</span><em>base_uri=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_api.html#BiophysicalApi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_api.BiophysicalApi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="allensdk.api.queries.rma_template.html#allensdk.api.queries.rma_template.RmaTemplate" title="allensdk.api.queries.rma_template.RmaTemplate"><code class="xref py py-class docutils literal notranslate"><span class="pre">allensdk.api.queries.rma_template.RmaTemplate</span></code></a></p>
+<dl class="attribute">
+<dt id="allensdk.api.queries.biophysical_api.BiophysicalApi.BIOPHYSICAL_MODEL_TYPE_IDS">
+<code class="descname">BIOPHYSICAL_MODEL_TYPE_IDS</code><em class="property"> = (491455321, 32923071)</em><a class="headerlink" href="#allensdk.api.queries.biophysical_api.BiophysicalApi.BIOPHYSICAL_MODEL_TYPE_IDS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.biophysical_api.BiophysicalApi.build_rma">
+<code class="descname">build_rma</code><span class="sig-paren">(</span><em>neuronal_model_id</em>, <em>fmt='json'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_api.html#BiophysicalApi.build_rma"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_api.BiophysicalApi.build_rma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a query to find all files related to a neuronal model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>neuronal_model_id</strong> <span class="classifier-delimiter">:</span> <span class="classifier">integer or string representation</span></dt>
+<dd><p class="first last">key of experiment to retrieve.</p>
+</dd>
+<dt><strong>fmt</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string, optional</span></dt>
+<dd><p class="first last">json (default) or xml</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>string</strong></dt>
+<dd><p class="first last">RMA query url.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.biophysical_api.BiophysicalApi.cache_data">
+<code class="descname">cache_data</code><span class="sig-paren">(</span><em>neuronal_model_id</em>, <em>working_directory=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_api.html#BiophysicalApi.cache_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_api.BiophysicalApi.cache_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Take a an experiment id, query the Api RMA to get well-known-files
+download the files, and store them in the working directory.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>neuronal_model_id</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int or string representation</span></dt>
+<dd><p class="first last">found in the neuronal_model table in the api</p>
+</dd>
+<dt><strong>working_directory</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">Absolute path name where the downloaded well-known files will be stored.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.biophysical_api.BiophysicalApi.create_manifest">
+<code class="descname">create_manifest</code><span class="sig-paren">(</span><em>fit_path=''</em>, <em>model_type=''</em>, <em>stimulus_filename=''</em>, <em>swc_morphology_path=''</em>, <em>marker_path=''</em>, <em>sweeps=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_api.html#BiophysicalApi.create_manifest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_api.BiophysicalApi.create_manifest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a json configuration file with parameters for a
+a biophysical experiment.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>fit_path</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">filename of a json configuration file with cell parameters.</p>
+</dd>
+<dt><strong>stimulus_filename</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">path to an NWB file with input currents.</p>
+</dd>
+<dt><strong>swc_morphology_path</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">file in SWC format.</p>
+</dd>
+<dt><strong>sweeps</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array of integers</span></dt>
+<dd><p class="first last">which sweeps in the stimulus file are to be used.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.biophysical_api.BiophysicalApi.get_neuronal_models">
+<code class="descname">get_neuronal_models</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_api.html#BiophysicalApi.get_neuronal_models"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_api.BiophysicalApi.get_neuronal_models" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch all of the biophysically detailed model records associated with 
+a particular specimen_id</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>specimen_ids</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list</span></dt>
+<dd><p class="first last">One or more integer ids identifying specimen records.</p>
+</dd>
+<dt><strong>num_rows</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int, optional</span></dt>
+<dd><p class="first last">how many records to retrieve. Default is ‘all’.</p>
+</dd>
+<dt><strong>count</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool, optional</span></dt>
+<dd><p class="first last">If True, return a count of the lines found by the query. Default is False.</p>
+</dd>
+<dt><strong>model_type_ids</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list, optional</span></dt>
+<dd><p class="first last">One or more integer ids identifying categories of neuronal model. Defaults 
+to all-active and perisomatic biophysical_models.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>List of dict</strong></dt>
+<dd><p class="first last">Each element is a biophysical model record, containing a unique integer 
+id, the id of the associated specimen, and the id of the model type to 
+which this model belongs.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.biophysical_api.BiophysicalApi.get_well_known_file_ids">
+<code class="descname">get_well_known_file_ids</code><span class="sig-paren">(</span><em>neuronal_model_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_api.html#BiophysicalApi.get_well_known_file_ids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_api.BiophysicalApi.get_well_known_file_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Query the current RMA endpoint with a neuronal_model id
+to get the corresponding well known file ids.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>list</strong></dt>
+<dd><p class="first last">A list of well known file id strings.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.biophysical_api.BiophysicalApi.is_well_known_file_type">
+<code class="descname">is_well_known_file_type</code><span class="sig-paren">(</span><em>wkf</em>, <em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_api.html#BiophysicalApi.is_well_known_file_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_api.BiophysicalApi.is_well_known_file_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if a structure has the expected name.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>wkf</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd><p class="first last">A well-known-file structure with nested type information.</p>
+</dd>
+<dt><strong>name</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">The expected type name</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<dl class="last docutils">
+<dt><a class="reference internal" href="#allensdk.api.queries.biophysical_api.BiophysicalApi.read_json" title="allensdk.api.queries.biophysical_api.BiophysicalApi.read_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_json</span></code></a></dt>
+<dd>where this helper function is used.</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.biophysical_api.BiophysicalApi.read_json">
+<code class="descname">read_json</code><span class="sig-paren">(</span><em>json_parsed_data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_api.html#BiophysicalApi.read_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_api.BiophysicalApi.read_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the list of well_known_file ids from a response body
+containing nested sample,microarray_slides,well_known_files.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>json_parsed_data</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd><p class="first last">Response from the Allen Institute Api RMA.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>list of strings</strong></dt>
+<dd><p class="first last">Well known file ids.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.biophysical_api.BiophysicalApi.rma_templates">
+<code class="descname">rma_templates</code><em class="property"> = {'model_queries': [{'count': False, 'name': 'models_by_specimen', 'criteria_params': ['specimen_ids', 'biophysical_model_types'], 'criteria': '[neuronal_model_template_id$in{{biophysical_model_types}}],[specimen_id$in{{specimen_ids}}]', 'num_rows': 'all', 'model': 'NeuronalModel', 'description': 'see name'}]}</em><a class="headerlink" href="#allensdk.api.queries.biophysical_api.BiophysicalApi.rma_templates" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_space.html">Reference Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="glif_models.html">Generalized LIF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html">Biophysical</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.deprecated.html">allensdk.deprecated module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
+</ul>
+
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allen-sdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    </div>
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalFooter.js"></script>
+
+
+  </body>
+</html>

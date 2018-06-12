@@ -1,0 +1,7 @@
+allensdk.brain\_observatory.session\_analysis module
+====================================================
+
+.. automodule:: allensdk.brain_observatory.session_analysis
+    :members:
+    :undoc-members:
+    :show-inheritance:

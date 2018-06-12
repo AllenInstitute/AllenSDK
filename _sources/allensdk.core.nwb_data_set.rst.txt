@@ -1,0 +1,7 @@
+allensdk.core.nwb\_data\_set module
+===================================
+
+.. automodule:: allensdk.core.nwb_data_set
+    :members:
+    :undoc-members:
+    :show-inheritance:

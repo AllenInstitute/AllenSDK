@@ -1,0 +1,7 @@
+allensdk.model.biophys\_sim.bps\_command module
+===============================================
+
+.. automodule:: allensdk.model.biophys_sim.bps_command
+    :members:
+    :undoc-members:
+    :show-inheritance:

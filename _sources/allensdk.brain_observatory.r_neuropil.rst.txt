@@ -1,0 +1,7 @@
+allensdk.brain\_observatory.r\_neuropil module
+==============================================
+
+.. automodule:: allensdk.brain_observatory.r_neuropil
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,7 @@
+allensdk.core.sitk\_utilities module
+====================================
+
+.. automodule:: allensdk.core.sitk_utilities
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,7 @@
+allensdk.api.queries.rma\_template module
+=========================================
+
+.. automodule:: allensdk.api.queries.rma_template
+    :members:
+    :undoc-members:
+    :show-inheritance:

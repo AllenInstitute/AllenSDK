@@ -1,32 +1,21 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>allensdk.config.model.description_parser &mdash; Allen SDK dev documentation</title>
-    
+    <title>allensdk.config.model.description_parser &#8212; Allen SDK dev documentation</title>
     <link rel="stylesheet" href="../../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../../',
-        VERSION:     'dev',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="../../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK dev documentation" href="../../../../index.html" />
-    <link rel="up" title="allensdk.config" href="../../config.html" /> 
-  </head>
-  <body role="document">
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
 <script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
@@ -105,16 +94,16 @@
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="c1">#</span>
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">allensdk.config.model.description</span> <span class="kn">import</span> <span class="n">Description</span>
+<span class="kn">from</span> <span class="nn">allensdk.config.model.description</span> <span class="k">import</span> <span class="n">Description</span>
 
 
-<div class="viewcode-block" id="DescriptionParser"><a class="viewcode-back" href="../../../../allensdk.config.model.html#allensdk.config.model.description_parser.DescriptionParser">[docs]</a><span class="k">class</span> <span class="nc">DescriptionParser</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+<div class="viewcode-block" id="DescriptionParser"><a class="viewcode-back" href="../../../../allensdk.config.model.description_parser.html#allensdk.config.model.description_parser.DescriptionParser">[docs]</a><span class="k">class</span> <span class="nc">DescriptionParser</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
-<div class="viewcode-block" id="DescriptionParser.read"><a class="viewcode-back" href="../../../../allensdk.config.model.html#allensdk.config.model.description_parser.DescriptionParser.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="DescriptionParser.read"><a class="viewcode-back" href="../../../../allensdk.config.model.description_parser.html#allensdk.config.model.description_parser.DescriptionParser.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Parse data needed for a simulation.</span>
 
 <span class="sd">        Parameters</span>
@@ -124,7 +113,7 @@
 <span class="sd">        section : string, optional</span>
 <span class="sd">            What configuration section to read it into if the file does not specify.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="n">description</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">description</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">description</span> <span class="o">=</span> <span class="n">Description</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">reader</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser_for_extension</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
@@ -132,11 +121,11 @@
 
         <span class="k">return</span> <span class="n">description</span></div>
 
-<div class="viewcode-block" id="DescriptionParser.read_string"><a class="viewcode-back" href="../../../../allensdk.config.model.html#allensdk.config.model.description_parser.DescriptionParser.read_string">[docs]</a>    <span class="k">def</span> <span class="nf">read_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_string</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="DescriptionParser.read_string"><a class="viewcode-back" href="../../../../allensdk.config.model.description_parser.html#allensdk.config.model.description_parser.DescriptionParser.read_string">[docs]</a>    <span class="k">def</span> <span class="nf">read_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_string</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Parse data needed for a simulation from a string.&#39;&#39;&#39;</span>
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Not implemented, use a sub class&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="DescriptionParser.write"><a class="viewcode-back" href="../../../../allensdk.config.model.html#allensdk.config.model.description_parser.DescriptionParser.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+<div class="viewcode-block" id="DescriptionParser.write"><a class="viewcode-back" href="../../../../allensdk.config.model.description_parser.html#allensdk.config.model.description_parser.DescriptionParser.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Save the configuration.</span>
 
 <span class="sd">        Parameters</span>
@@ -148,7 +137,7 @@
 
         <span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="DescriptionParser.parser_for_extension"><a class="viewcode-back" href="../../../../allensdk.config.model.html#allensdk.config.model.description_parser.DescriptionParser.parser_for_extension">[docs]</a>    <span class="k">def</span> <span class="nf">parser_for_extension</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+<div class="viewcode-block" id="DescriptionParser.parser_for_extension"><a class="viewcode-back" href="../../../../allensdk.config.model.description_parser.html#allensdk.config.model.description_parser.DescriptionParser.parser_for_extension">[docs]</a>    <span class="k">def</span> <span class="nf">parser_for_extension</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Choose a subclass that can read the format.</span>
 
 <span class="sd">        Parameters</span>
@@ -162,10 +151,10 @@
 <span class="sd">            Appropriate subclass.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="c1"># Circular imports</span>
-        <span class="kn">from</span> <span class="nn">allensdk.config.model.formats.json_description_parser</span> <span class="kn">import</span> <span class="n">JsonDescriptionParser</span>
-        <span class="kn">from</span> <span class="nn">allensdk.config.model.formats.pycfg_description_parser</span> <span class="kn">import</span> <span class="n">PycfgDescriptionParser</span>
+        <span class="kn">from</span> <span class="nn">allensdk.config.model.formats.json_description_parser</span> <span class="k">import</span> <span class="n">JsonDescriptionParser</span>
+        <span class="kn">from</span> <span class="nn">allensdk.config.model.formats.pycfg_description_parser</span> <span class="k">import</span> <span class="n">PycfgDescriptionParser</span>
 
-        <span class="n">parser</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.json&#39;</span><span class="p">):</span>
             <span class="n">parser</span> <span class="o">=</span> <span class="n">JsonDescriptionParser</span><span class="p">()</span>
@@ -184,9 +173,7 @@
         <div class="sphinxsidebarwrapper">
 <h3><a href="../../../../index.html">Contents</a></h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Install Guide</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Install Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../cell_types.html">Cell Types</a></li>
@@ -211,6 +198,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.model.html">allensdk.model package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.morphology.html">allensdk.morphology package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.deprecated.html">allensdk.deprecated module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
@@ -228,12 +216,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

@@ -1,0 +1,7 @@
+allensdk.config.model.description module
+========================================
+
+.. automodule:: allensdk.config.model.description
+    :members:
+    :undoc-members:
+    :show-inheritance:

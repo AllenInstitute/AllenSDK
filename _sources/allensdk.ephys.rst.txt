@@ -1,0 +1,20 @@
+allensdk.ephys package
+======================
+
+Submodules
+----------
+
+.. toctree::
+
+   allensdk.ephys.ephys_extractor
+   allensdk.ephys.ephys_features
+   allensdk.ephys.extract_cell_features
+   allensdk.ephys.feature_extractor
+
+Module contents
+---------------
+
+.. automodule:: allensdk.ephys
+    :members:
+    :undoc-members:
+    :show-inheritance:

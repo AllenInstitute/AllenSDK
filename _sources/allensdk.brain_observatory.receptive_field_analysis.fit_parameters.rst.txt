@@ -1,0 +1,7 @@
+allensdk.brain\_observatory.receptive\_field\_analysis.fit\_parameters module
+=============================================================================
+
+.. automodule:: allensdk.brain_observatory.receptive_field_analysis.fit_parameters
+    :members:
+    :undoc-members:
+    :show-inheritance:

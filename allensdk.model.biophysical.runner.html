@@ -1,0 +1,260 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>allensdk.model.biophysical.runner module &#8212; Allen SDK dev documentation</title>
+    <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="allensdk.model.biophysical.utils module" href="allensdk.model.biophysical.utils.html" />
+    <link rel="prev" title="allensdk.model.biophysical.run_simulate module" href="allensdk.model.biophysical.run_simulate.html" /> 
+  </head><body>
+<link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
+<script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var _pSupressBrowserFlashWarning = true;
+    var _pTabId = "pHome";
+    var _pMoreProjectsId = "pMoreProjects";
+    var _pImagePath = "http://www.brain-map.org/assets/images/";
+    var _pSiteWarnings = function() {
+        this.show_warning() = {};
+    }
+</script>
+<script type="text/javascript">
+    function initialize() {
+        /*** do your stuff, then initialize the portal plugin ***/
+        _pPortalOnLoad();
+    }
+</script>
+<style>
+  #header_content > a {
+  display: inline-block;
+  width: 250px;
+  height: 75px;
+  background-image:url("_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-size: 235px 37px;
+  background-position: 0px 20px;
+  background-repeat: no-repeat;
+  }
+</style>
+
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
+<link rel="stylesheet" type="text/css" href="_static/external_assets/stylesheets/common_layout.css" />
+
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-allensdk.model.biophysical.runner">
+<span id="allensdk-model-biophysical-runner-module"></span><h1>allensdk.model.biophysical.runner module<a class="headerlink" href="#module-allensdk.model.biophysical.runner" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="allensdk.model.biophysical.runner.load_description">
+<code class="descclassname">allensdk.model.biophysical.runner.</code><code class="descname">load_description</code><span class="sig-paren">(</span><em>manifest_json_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/model/biophysical/runner.html#load_description"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.model.biophysical.runner.load_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read configuration file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>manifest_json_path</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">File containing the experiment configuration.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>Config</strong></dt>
+<dd><p class="first last">Object with all information needed to run the experiment.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.model.biophysical.runner.prepare_nwb_output">
+<code class="descclassname">allensdk.model.biophysical.runner.</code><code class="descname">prepare_nwb_output</code><span class="sig-paren">(</span><em>nwb_stimulus_path</em>, <em>nwb_result_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/model/biophysical/runner.html#prepare_nwb_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.model.biophysical.runner.prepare_nwb_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy the stimulus file, zero out the recorded voltages and spike times.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>nwb_stimulus_path</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">NWB file name</p>
+</dd>
+<dt><strong>nwb_result_path</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">NWB file name</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.model.biophysical.runner.run">
+<code class="descclassname">allensdk.model.biophysical.runner.</code><code class="descname">run</code><span class="sig-paren">(</span><em>description</em>, <em>sweeps=None</em>, <em>procs=6</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/model/biophysical/runner.html#run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.model.biophysical.runner.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main function for simulating sweeps in a biophysical experiment.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>description</strong> <span class="classifier-delimiter">:</span> <span class="classifier">Config</span></dt>
+<dd><p class="first last">All information needed to run the experiment.</p>
+</dd>
+<dt><strong>procs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">number of sweeps to simulate simultaneously.</p>
+</dd>
+<dt><strong>sweeps</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list</span></dt>
+<dd><p class="first last">list of experiment sweep numbers to simulate.  If None, simulate all sweeps.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.model.biophysical.runner.run_sync">
+<code class="descclassname">allensdk.model.biophysical.runner.</code><code class="descname">run_sync</code><span class="sig-paren">(</span><em>description</em>, <em>sweeps=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/model/biophysical/runner.html#run_sync"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.model.biophysical.runner.run_sync" title="Permalink to this definition">¶</a></dt>
+<dd><p>Single-process main function for simulating sweeps in a biophysical experiment.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>description</strong> <span class="classifier-delimiter">:</span> <span class="classifier">Config</span></dt>
+<dd><p class="first last">All information needed to run the experiment.</p>
+</dd>
+<dt><strong>sweeps</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list</span></dt>
+<dd><p class="first last">list of experiment sweep numbers to simulate.  If None, simulate all sweeps.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.model.biophysical.runner.save_nwb">
+<code class="descclassname">allensdk.model.biophysical.runner.</code><code class="descname">save_nwb</code><span class="sig-paren">(</span><em>output_path</em>, <em>v</em>, <em>sweep</em>, <em>sweeps_by_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/model/biophysical/runner.html#save_nwb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.model.biophysical.runner.save_nwb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save a single voltage output result into an existing sweep in a NWB file.
+This is intended to overwrite a recorded trace with a simulated voltage.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>output_path</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">file name of a pre-existing NWB file.</p>
+</dd>
+<dt><strong>v</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array</span></dt>
+<dd><p class="first last">voltage</p>
+</dd>
+<dt><strong>sweep</strong> <span class="classifier-delimiter">:</span> <span class="classifier">integer</span></dt>
+<dd><p class="first last">which entry to overwrite in the file.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_space.html">Reference Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="glif_models.html">Generalized LIF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html">Biophysical</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.deprecated.html">allensdk.deprecated module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
+</ul>
+
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allen-sdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    </div>
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalFooter.js"></script>
+
+
+  </body>
+</html>

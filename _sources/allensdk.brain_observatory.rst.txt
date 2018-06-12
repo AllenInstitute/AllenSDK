@@ -1,0 +1,40 @@
+allensdk.brain\_observatory package
+===================================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    allensdk.brain_observatory.receptive_field_analysis
+
+Submodules
+----------
+
+.. toctree::
+
+   allensdk.brain_observatory.brain_observatory_exceptions
+   allensdk.brain_observatory.brain_observatory_plotting
+   allensdk.brain_observatory.circle_plots
+   allensdk.brain_observatory.demixer
+   allensdk.brain_observatory.dff
+   allensdk.brain_observatory.drifting_gratings
+   allensdk.brain_observatory.findlevel
+   allensdk.brain_observatory.locally_sparse_noise
+   allensdk.brain_observatory.natural_movie
+   allensdk.brain_observatory.natural_scenes
+   allensdk.brain_observatory.observatory_plots
+   allensdk.brain_observatory.r_neuropil
+   allensdk.brain_observatory.roi_masks
+   allensdk.brain_observatory.session_analysis
+   allensdk.brain_observatory.static_gratings
+   allensdk.brain_observatory.stimulus_analysis
+   allensdk.brain_observatory.stimulus_info
+
+Module contents
+---------------
+
+.. automodule:: allensdk.brain_observatory
+    :members:
+    :undoc-members:
+    :show-inheritance:

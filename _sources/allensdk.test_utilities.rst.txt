@@ -1,0 +1,17 @@
+allensdk.test\_utilities package
+================================
+
+Submodules
+----------
+
+.. toctree::
+
+   allensdk.test_utilities.temp_dir
+
+Module contents
+---------------
+
+.. automodule:: allensdk.test_utilities
+    :members:
+    :undoc-members:
+    :show-inheritance:

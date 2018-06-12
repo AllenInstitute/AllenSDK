@@ -1,34 +1,23 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>allensdk.config.model.formats package &mdash; Allen SDK dev documentation</title>
-    
+    <title>allensdk.config.model.formats package &#8212; Allen SDK dev documentation</title>
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     'dev',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK dev documentation" href="index.html" />
-    <link rel="up" title="allensdk.config.model package" href="allensdk.config.model.html" />
-    <link rel="next" title="allensdk.core package" href="allensdk.core.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="allensdk.config.model.formats.hdf5_util module" href="allensdk.config.model.formats.hdf5_util.html" />
     <link rel="prev" title="allensdk.config.model package" href="allensdk.config.model.html" /> 
-  </head>
-  <body role="document">
+  </head><body>
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
 <script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
@@ -74,245 +63,13 @@
 <h1>allensdk.config.model.formats package<a class="headerlink" href="#allensdk-config-model-formats-package" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="allensdk.config.model.formats.hdf5_util.html">allensdk.config.model.formats.hdf5_util module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="allensdk.config.model.formats.json_description_parser.html">allensdk.config.model.formats.json_description_parser module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="allensdk.config.model.formats.pycfg_description_parser.html">allensdk.config.model.formats.pycfg_description_parser module</a></li>
+</ul>
 </div>
-<div class="section" id="module-allensdk.config.model.formats.hdf5_util">
-<span id="allensdk-config-model-formats-hdf5-util-module"></span><h2>allensdk.config.model.formats.hdf5_util module<a class="headerlink" href="#module-allensdk.config.model.formats.hdf5_util" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="allensdk.config.model.formats.hdf5_util.Hdf5Util">
-<em class="property">class </em><code class="descclassname">allensdk.config.model.formats.hdf5_util.</code><code class="descname">Hdf5Util</code><a class="reference internal" href="_modules/allensdk/config/model/formats/hdf5_util.html#Hdf5Util"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.formats.hdf5_util.Hdf5Util" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<dl class="method">
-<dt id="allensdk.config.model.formats.hdf5_util.Hdf5Util.read">
-<code class="descname">read</code><span class="sig-paren">(</span><em>file_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/model/formats/hdf5_util.html#Hdf5Util.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.formats.hdf5_util.Hdf5Util.read" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="allensdk.config.model.formats.hdf5_util.Hdf5Util.write">
-<code class="descname">write</code><span class="sig-paren">(</span><em>file_path</em>, <em>m</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/model/formats/hdf5_util.html#Hdf5Util.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.formats.hdf5_util.Hdf5Util.write" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="module-allensdk.config.model.formats.json_description_parser">
-<span id="allensdk-config-model-formats-json-description-parser-module"></span><h2>allensdk.config.model.formats.json_description_parser module<a class="headerlink" href="#module-allensdk.config.model.formats.json_description_parser" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="allensdk.config.model.formats.json_description_parser.JsonDescriptionParser">
-<em class="property">class </em><code class="descclassname">allensdk.config.model.formats.json_description_parser.</code><code class="descname">JsonDescriptionParser</code><a class="reference internal" href="_modules/allensdk/config/model/formats/json_description_parser.html#JsonDescriptionParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.formats.json_description_parser.JsonDescriptionParser" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="allensdk.config.model.html#allensdk.config.model.description_parser.DescriptionParser" title="allensdk.config.model.description_parser.DescriptionParser"><code class="xref py py-class docutils literal"><span class="pre">allensdk.config.model.description_parser.DescriptionParser</span></code></a></p>
-<dl class="attribute">
-<dt id="allensdk.config.model.formats.json_description_parser.JsonDescriptionParser.log">
-<code class="descname">log</code><em class="property"> = &lt;logging.Logger object&gt;</em><a class="headerlink" href="#allensdk.config.model.formats.json_description_parser.JsonDescriptionParser.log" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="allensdk.config.model.formats.json_description_parser.JsonDescriptionParser.read">
-<code class="descname">read</code><span class="sig-paren">(</span><em>file_path</em>, <em>description=None</em>, <em>section=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/model/formats/json_description_parser.html#JsonDescriptionParser.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.formats.json_description_parser.JsonDescriptionParser.read" title="Permalink to this definition">¶</a></dt>
-<dd><p>Parse a complete or partial configuration.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>json_string</strong> : string</p>
-<blockquote>
-<div><p>Input to parse.</p>
-</div></blockquote>
-<p><strong>description</strong> : Description, optional</p>
-<blockquote>
-<div><p>Where to put the parsed configuration.  If None a new one is created.</p>
-</div></blockquote>
-<p><strong>section</strong> : string, optional</p>
-<blockquote>
-<div><p>Where to put the parsed configuration within the description.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description</p>
-<blockquote>
-<div><p>The input description with parsed configuration added.</p>
-</div></blockquote>
-<p class="last">Section is only specified for &#8220;bare&#8221; objects that are to be added to a section array.</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="allensdk.config.model.formats.json_description_parser.JsonDescriptionParser.read_string">
-<code class="descname">read_string</code><span class="sig-paren">(</span><em>json_string</em>, <em>description=None</em>, <em>section=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/model/formats/json_description_parser.html#JsonDescriptionParser.read_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.formats.json_description_parser.JsonDescriptionParser.read_string" title="Permalink to this definition">¶</a></dt>
-<dd><p>Parse a complete or partial configuration.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>json_string</strong> : string</p>
-<blockquote>
-<div><p>Input to parse.</p>
-</div></blockquote>
-<p><strong>description</strong> : Description, optional</p>
-<blockquote>
-<div><p>Where to put the parsed configuration.  If None a new one is created.</p>
-</div></blockquote>
-<p><strong>section</strong> : string, optional</p>
-<blockquote>
-<div><p>Where to put the parsed configuration within the description.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description</p>
-<blockquote>
-<div><p>The input description with parsed configuration added.</p>
-</div></blockquote>
-<p class="last">Section is only specified for &#8220;bare&#8221; objects that are to be added to a section array.</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="allensdk.config.model.formats.json_description_parser.JsonDescriptionParser.write">
-<code class="descname">write</code><span class="sig-paren">(</span><em>filename</em>, <em>description</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/model/formats/json_description_parser.html#JsonDescriptionParser.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.formats.json_description_parser.JsonDescriptionParser.write" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write the description to a JSON file.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>description</strong> : Description</p>
-<blockquote class="last">
-<div><p>Object to write.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="allensdk.config.model.formats.json_description_parser.JsonDescriptionParser.write_string">
-<code class="descname">write_string</code><span class="sig-paren">(</span><em>description</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/model/formats/json_description_parser.html#JsonDescriptionParser.write_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.formats.json_description_parser.JsonDescriptionParser.write_string" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write the description to a JSON string.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>description</strong> : Description</p>
-<blockquote>
-<div><p>Object to write.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">string</p>
-<blockquote class="last">
-<div><p>JSON serialization of the input.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="module-allensdk.config.model.formats.pycfg_description_parser">
-<span id="allensdk-config-model-formats-pycfg-description-parser-module"></span><h2>allensdk.config.model.formats.pycfg_description_parser module<a class="headerlink" href="#module-allensdk.config.model.formats.pycfg_description_parser" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="allensdk.config.model.formats.pycfg_description_parser.PycfgDescriptionParser">
-<em class="property">class </em><code class="descclassname">allensdk.config.model.formats.pycfg_description_parser.</code><code class="descname">PycfgDescriptionParser</code><a class="reference internal" href="_modules/allensdk/config/model/formats/pycfg_description_parser.html#PycfgDescriptionParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.formats.pycfg_description_parser.PycfgDescriptionParser" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="allensdk.config.model.html#allensdk.config.model.description_parser.DescriptionParser" title="allensdk.config.model.description_parser.DescriptionParser"><code class="xref py py-class docutils literal"><span class="pre">allensdk.config.model.description_parser.DescriptionParser</span></code></a></p>
-<dl class="attribute">
-<dt id="allensdk.config.model.formats.pycfg_description_parser.PycfgDescriptionParser.log">
-<code class="descname">log</code><em class="property"> = &lt;logging.Logger object&gt;</em><a class="headerlink" href="#allensdk.config.model.formats.pycfg_description_parser.PycfgDescriptionParser.log" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="allensdk.config.model.formats.pycfg_description_parser.PycfgDescriptionParser.read">
-<code class="descname">read</code><span class="sig-paren">(</span><em>pycfg_file_path</em>, <em>description=None</em>, <em>section=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/model/formats/pycfg_description_parser.html#PycfgDescriptionParser.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.formats.pycfg_description_parser.PycfgDescriptionParser.read" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read a serialized description from a Python (.pycfg) file.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : string</p>
-<blockquote>
-<div><p>Name of the .pycfg file.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description</p>
-<blockquote class="last">
-<div><p>Configuration object.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="allensdk.config.model.formats.pycfg_description_parser.PycfgDescriptionParser.read_string">
-<code class="descname">read_string</code><span class="sig-paren">(</span><em>python_string</em>, <em>description=None</em>, <em>section=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/model/formats/pycfg_description_parser.html#PycfgDescriptionParser.read_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.formats.pycfg_description_parser.PycfgDescriptionParser.read_string" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read a serialized description from a Python (.pycfg) string.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>python_string</strong> : string</p>
-<blockquote>
-<div><p>Python string with a serialized description.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description</p>
-<blockquote class="last">
-<div><p>Configuration object.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="allensdk.config.model.formats.pycfg_description_parser.PycfgDescriptionParser.write">
-<code class="descname">write</code><span class="sig-paren">(</span><em>filename</em>, <em>description</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/model/formats/pycfg_description_parser.html#PycfgDescriptionParser.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.formats.pycfg_description_parser.PycfgDescriptionParser.write" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write the description to a Python (.pycfg) file.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : string</p>
-<blockquote class="last">
-<div><p>Name of the file to write.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="allensdk.config.model.formats.pycfg_description_parser.PycfgDescriptionParser.write_string">
-<code class="descname">write_string</code><span class="sig-paren">(</span><em>description</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/model/formats/pycfg_description_parser.html#PycfgDescriptionParser.write_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.formats.pycfg_description_parser.PycfgDescriptionParser.write_string" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write the description to a pretty-printed Python string.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>description</strong> : Description</p>
-<blockquote class="last">
-<div><p>Configuration object to write.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
 </div>
 <div class="section" id="module-allensdk.config.model.formats">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-allensdk.config.model.formats" title="Permalink to this headline">¶</a></h2>
@@ -327,9 +84,7 @@
         <div class="sphinxsidebarwrapper">
 <h3><a href="index.html">Contents</a></h3>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
@@ -354,6 +109,7 @@
 <li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.deprecated.html">allensdk.deprecated module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
@@ -371,12 +127,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

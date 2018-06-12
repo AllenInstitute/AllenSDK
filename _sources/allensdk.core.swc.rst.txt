@@ -1,0 +1,7 @@
+allensdk.core.swc module
+========================
+
+.. automodule:: allensdk.core.swc
+    :members:
+    :undoc-members:
+    :show-inheritance:

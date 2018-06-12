@@ -1,0 +1,32 @@
+allensdk.core package
+=====================
+
+Submodules
+----------
+
+.. toctree::
+
+   allensdk.core.brain_observatory_cache
+   allensdk.core.brain_observatory_nwb_data_set
+   allensdk.core.cell_types_cache
+   allensdk.core.dat_utilities
+   allensdk.core.h5_utilities
+   allensdk.core.json_utilities
+   allensdk.core.mouse_connectivity_cache
+   allensdk.core.nwb_data_set
+   allensdk.core.obj_utilities
+   allensdk.core.ontology
+   allensdk.core.reference_space
+   allensdk.core.reference_space_cache
+   allensdk.core.simple_tree
+   allensdk.core.sitk_utilities
+   allensdk.core.structure_tree
+   allensdk.core.swc
+
+Module contents
+---------------
+
+.. automodule:: allensdk.core
+    :members:
+    :undoc-members:
+    :show-inheritance:

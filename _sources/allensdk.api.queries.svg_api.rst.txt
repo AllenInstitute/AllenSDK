@@ -1,0 +1,7 @@
+allensdk.api.queries.svg\_api module
+====================================
+
+.. automodule:: allensdk.api.queries.svg_api
+    :members:
+    :undoc-members:
+    :show-inheritance:

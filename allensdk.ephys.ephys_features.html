@@ -1,0 +1,841 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>allensdk.ephys.ephys_features module &#8212; Allen SDK dev documentation</title>
+    <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="allensdk.ephys.extract_cell_features module" href="allensdk.ephys.extract_cell_features.html" />
+    <link rel="prev" title="allensdk.ephys.ephys_extractor module" href="allensdk.ephys.ephys_extractor.html" /> 
+  </head><body>
+<link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
+<script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var _pSupressBrowserFlashWarning = true;
+    var _pTabId = "pHome";
+    var _pMoreProjectsId = "pMoreProjects";
+    var _pImagePath = "http://www.brain-map.org/assets/images/";
+    var _pSiteWarnings = function() {
+        this.show_warning() = {};
+    }
+</script>
+<script type="text/javascript">
+    function initialize() {
+        /*** do your stuff, then initialize the portal plugin ***/
+        _pPortalOnLoad();
+    }
+</script>
+<style>
+  #header_content > a {
+  display: inline-block;
+  width: 250px;
+  height: 75px;
+  background-image:url("_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-size: 235px 37px;
+  background-position: 0px 20px;
+  background-repeat: no-repeat;
+  }
+</style>
+
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
+<link rel="stylesheet" type="text/css" href="_static/external_assets/stylesheets/common_layout.css" />
+
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-allensdk.ephys.ephys_features">
+<span id="allensdk-ephys-ephys-features-module"></span><h1>allensdk.ephys.ephys_features module<a class="headerlink" href="#module-allensdk.ephys.ephys_features" title="Permalink to this headline">¶</a></h1>
+<dl class="exception">
+<dt id="allensdk.ephys.ephys_features.FeatureError">
+<em class="property">exception </em><code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">FeatureError</code><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#FeatureError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.FeatureError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">exceptions.Exception</span></code></p>
+<p>Generic Python-exception-derived object raised by feature detection functions.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.ephys.ephys_features.adaptation_index">
+<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">adaptation_index</code><span class="sig-paren">(</span><em>isis</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#adaptation_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.adaptation_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate adaptation index of <cite>isis</cite>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.ephys.ephys_features.analyze_trough_details">
+<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">analyze_trough_details</code><span class="sig-paren">(</span><em>v</em>, <em>t</em>, <em>spike_indexes</em>, <em>peak_indexes</em>, <em>clipped=None</em>, <em>end=None</em>, <em>filter=10.0</em>, <em>heavy_filter=1.0</em>, <em>term_frac=0.01</em>, <em>adp_thresh=0.5</em>, <em>tol=0.5</em>, <em>flat_interval=0.002</em>, <em>adp_max_delta_t=0.005</em>, <em>adp_max_delta_v=10.0</em>, <em>dvdt=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#analyze_trough_details"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.analyze_trough_details" title="Permalink to this definition">¶</a></dt>
+<dd><p>Analyze trough to determine if an ADP exists and whether the reset is a ‘detour’ or ‘direct’</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>v</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of voltage time series in mV</span></dt>
+<dd></dd>
+<dt><strong>t</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of times in seconds</span></dt>
+<dd></dd>
+<dt><strong>spike_indexes</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of spike indexes</span></dt>
+<dd></dd>
+<dt><strong>peak_indexes</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of spike peak indexes</span></dt>
+<dd></dd>
+<dt><strong>end</strong> <span class="classifier-delimiter">:</span> <span class="classifier">end of time window (optional)</span></dt>
+<dd></dd>
+<dt><strong>filter</strong> <span class="classifier-delimiter">:</span> <span class="classifier">cutoff frequency for 4-pole low-pass Bessel filter in kHz (default 1)</span></dt>
+<dd></dd>
+<dt><strong>heavy_filter</strong> <span class="classifier-delimiter">:</span> <span class="classifier">lower cutoff frequency for 4-pole low-pass Bessel filter in kHz (default 1)</span></dt>
+<dd></dd>
+<dt><strong>thresh_frac</strong> <span class="classifier-delimiter">:</span> <span class="classifier">fraction of average upstroke for threshold calculation (optional, default 0.05)</span></dt>
+<dd></dd>
+<dt><strong>adp_thresh: minimum dV/dt in V/s to exceed to be considered to have an ADP (optional, default 1.5)</strong></dt>
+<dd></dd>
+<dt><strong>tol</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tolerance for evaluating whether Vm drops appreciably further after end of spike (default 1.0 mV)</span></dt>
+<dd></dd>
+<dt><strong>flat_interval: if the trace is flat for this duration, stop looking for an ADP (default 0.002 s)</strong></dt>
+<dd></dd>
+<dt><strong>adp_max_delta_t: max possible ADP delta t (default 0.005 s)</strong></dt>
+<dd></dd>
+<dt><strong>adp_max_delta_v: max possible ADP delta v (default 10 mV)</strong></dt>
+<dd></dd>
+<dt><strong>dvdt</strong> <span class="classifier-delimiter">:</span> <span class="classifier">pre-calculated time-derivative of voltage (optional)</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>isi_types</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of isi reset types (direct or detour)</span></dt>
+<dd></dd>
+<dt><strong>fast_trough_indexes</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of indexes at the start of the trough (i.e. end of the spike)</span></dt>
+<dd></dd>
+<dt><strong>adp_indexes</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of adp indexes (np.nan if there was no ADP in that ISI</span></dt>
+<dd></dd>
+<dt><strong>slow_trough_indexes</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of indexes at the minimum of the slow phase of the trough</span></dt>
+<dd><p class="first last">(if there wasn’t just a fast phase)</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.ephys.ephys_features.average_rate">
+<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">average_rate</code><span class="sig-paren">(</span><em>t</em>, <em>spikes</em>, <em>start</em>, <em>end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#average_rate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.average_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate average firing rate during interval between <cite>start</cite> and <cite>end</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>t</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of times in seconds</span></dt>
+<dd></dd>
+<dt><strong>spikes</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of spike indexes</span></dt>
+<dd></dd>
+<dt><strong>start</strong> <span class="classifier-delimiter">:</span> <span class="classifier">start of time window for spike detection</span></dt>
+<dd></dd>
+<dt><strong>end</strong> <span class="classifier-delimiter">:</span> <span class="classifier">end of time window for spike detection</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>avg_rate</strong> <span class="classifier-delimiter">:</span> <span class="classifier">average firing rate in spikes/sec</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.ephys.ephys_features.average_voltage">
+<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">average_voltage</code><span class="sig-paren">(</span><em>v</em>, <em>t</em>, <em>start=None</em>, <em>end=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#average_voltage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.average_voltage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate average voltage between start and end.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>v</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of voltage time series in mV</span></dt>
+<dd></dd>
+<dt><strong>t</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of times in seconds</span></dt>
+<dd></dd>
+<dt><strong>start</strong> <span class="classifier-delimiter">:</span> <span class="classifier">start of time window for spike detection (optional, default None)</span></dt>
+<dd></dd>
+<dt><strong>end</strong> <span class="classifier-delimiter">:</span> <span class="classifier">end of time window for spike detection (optional, default None)</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>v_avg</strong> <span class="classifier-delimiter">:</span> <span class="classifier">average voltage</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.ephys.ephys_features.calculate_dvdt">
+<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">calculate_dvdt</code><span class="sig-paren">(</span><em>v</em>, <em>t</em>, <em>filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#calculate_dvdt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.calculate_dvdt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Low-pass filters (if requested) and differentiates voltage by time.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>v</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of voltage time series in mV</span></dt>
+<dd></dd>
+<dt><strong>t</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of times in seconds</span></dt>
+<dd></dd>
+<dt><strong>filter</strong> <span class="classifier-delimiter">:</span> <span class="classifier">cutoff frequency for 4-pole low-pass Bessel filter in kHz (optional, default None)</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>dvdt</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of time-derivative of voltage (V/s = mV/ms)</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.ephys.ephys_features.check_thresholds_and_peaks">
+<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">check_thresholds_and_peaks</code><span class="sig-paren">(</span><em>v</em>, <em>t</em>, <em>spike_indexes</em>, <em>peak_indexes</em>, <em>upstroke_indexes</em>, <em>end=None</em>, <em>max_interval=0.005</em>, <em>thresh_frac=0.05</em>, <em>filter=10.0</em>, <em>dvdt=None</em>, <em>tol=1.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#check_thresholds_and_peaks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.check_thresholds_and_peaks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate thresholds and peaks for set of spikes</p>
+<p>Check that peaks and thresholds for consecutive spikes do not overlap
+Spikes with overlapping thresholds and peaks will be merged.</p>
+<p>Check that peaks and thresholds for a given spike are not too far apart.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>v</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of voltage time series in mV</span></dt>
+<dd></dd>
+<dt><strong>t</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of times in seconds</span></dt>
+<dd></dd>
+<dt><strong>spike_indexes</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of spike indexes</span></dt>
+<dd></dd>
+<dt><strong>peak_indexes</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of indexes of spike peaks</span></dt>
+<dd></dd>
+<dt><strong>upstroke_indexes</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of indexes of spike upstrokes</span></dt>
+<dd></dd>
+<dt><strong>max_interval</strong> <span class="classifier-delimiter">:</span> <span class="classifier">maximum allowed time between start of spike and time of peak in sec (default 0.005)</span></dt>
+<dd></dd>
+<dt><strong>thresh_frac</strong> <span class="classifier-delimiter">:</span> <span class="classifier">fraction of average upstroke for threshold calculation (optional, default 0.05)</span></dt>
+<dd></dd>
+<dt><strong>filter</strong> <span class="classifier-delimiter">:</span> <span class="classifier">cutoff frequency for 4-pole low-pass Bessel filter in kHz (optional, default 10)</span></dt>
+<dd></dd>
+<dt><strong>dvdt</strong> <span class="classifier-delimiter">:</span> <span class="classifier">pre-calculated time-derivative of voltage (optional)</span></dt>
+<dd></dd>
+<dt><strong>tol</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tolerance for returning to threshold in mV (optional, default 1)</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>spike_indexes</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of modified spike indexes</span></dt>
+<dd></dd>
+<dt><strong>peak_indexes</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of modified spike peak indexes</span></dt>
+<dd></dd>
+<dt><strong>upstroke_indexes</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of modified spike upstroke indexes</span></dt>
+<dd></dd>
+<dt><strong>clipped</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of clipped status of spikes</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.ephys.ephys_features.detect_bursts">
+<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">detect_bursts</code><span class="sig-paren">(</span><em>isis</em>, <em>isi_types</em>, <em>fast_tr_v</em>, <em>fast_tr_t</em>, <em>slow_tr_v</em>, <em>slow_tr_t</em>, <em>thr_v</em>, <em>tol=0.5</em>, <em>pause_cost=1.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#detect_bursts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.detect_bursts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Detect bursts in spike train.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>isis</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of n interspike intervals</span></dt>
+<dd></dd>
+<dt><strong>isi_types</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of n interspike interval types</span></dt>
+<dd></dd>
+<dt><strong>fast_tr_v</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of fast trough voltages for the n + 1 spikes of the train</span></dt>
+<dd></dd>
+<dt><strong>fast_tr_t</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of fast trough times for the n + 1 spikes of the train</span></dt>
+<dd></dd>
+<dt><strong>slow_tr_v</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of slow trough voltages for the n + 1 spikes of the train</span></dt>
+<dd></dd>
+<dt><strong>slow_tr_t</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of slow trough times for the n + 1 spikes of the train</span></dt>
+<dd></dd>
+<dt><strong>thr_v</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of threshold voltages for the n + 1 spikes of the train</span></dt>
+<dd></dd>
+<dt><strong>tol</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tolerance for the difference in slow trough voltages and thresholds (default 0.5 mV)</span></dt>
+<dd><p class="first last">Used to identify “delay” interspike intervals that occur within a burst</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>bursts</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of bursts</span></dt>
+<dd><p class="first last">Each item in list is a tuple of the form (burst_index, start, end) where <cite>burst_index</cite>
+is a comparison index between the highest instantaneous rate within the burst vs
+the highest instantaneous rate outside the burst. <cite>start</cite> is the index of the first
+ISI of the burst, and <cite>end</cite> is the ISI index immediately following the burst.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.ephys.ephys_features.detect_pauses">
+<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">detect_pauses</code><span class="sig-paren">(</span><em>isis</em>, <em>isi_types</em>, <em>cost_weight=1.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#detect_pauses"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.detect_pauses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine which ISIs are “pauses” in ongoing firing.</p>
+<p>Pauses are unusually long ISIs with a “detour reset” among “direct resets”.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>isis</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of interspike intervals</span></dt>
+<dd></dd>
+<dt><strong>isi_types</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of interspike interval types (‘direct’ or ‘detour’)</span></dt>
+<dd></dd>
+<dt><strong>cost_weight</strong> <span class="classifier-delimiter">:</span> <span class="classifier">weight for cost function for calling an ISI a pause</span></dt>
+<dd><p class="first last">Higher cost weights lead to fewer ISIs identified as pauses. The cost function
+also depends on the difference between the duration of the “pause” ISIs and the
+average duration and standard deviation of “non-pause” ISIs.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>pauses</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of indices corresponding to pauses in <cite>isis</cite></span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.ephys.ephys_features.detect_putative_spikes">
+<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">detect_putative_spikes</code><span class="sig-paren">(</span><em>v</em>, <em>t</em>, <em>start=None</em>, <em>end=None</em>, <em>filter=10.0</em>, <em>dv_cutoff=20.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#detect_putative_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.detect_putative_spikes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform initial detection of spikes and return their indexes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>v</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of voltage time series in mV</span></dt>
+<dd></dd>
+<dt><strong>t</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of times in seconds</span></dt>
+<dd></dd>
+<dt><strong>start</strong> <span class="classifier-delimiter">:</span> <span class="classifier">start of time window for spike detection (optional)</span></dt>
+<dd></dd>
+<dt><strong>end</strong> <span class="classifier-delimiter">:</span> <span class="classifier">end of time window for spike detection (optional)</span></dt>
+<dd></dd>
+<dt><strong>filter</strong> <span class="classifier-delimiter">:</span> <span class="classifier">cutoff frequency for 4-pole low-pass Bessel filter in kHz (optional, default 10)</span></dt>
+<dd></dd>
+<dt><strong>dv_cutoff</strong> <span class="classifier-delimiter">:</span> <span class="classifier">minimum dV/dt to qualify as a spike in V/s (optional, default 20)</span></dt>
+<dd></dd>
+<dt><strong>dvdt</strong> <span class="classifier-delimiter">:</span> <span class="classifier">pre-calculated time-derivative of voltage (optional)</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>putative_spikes</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of preliminary spike indexes</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.ephys.ephys_features.estimate_adjusted_detection_parameters">
+<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">estimate_adjusted_detection_parameters</code><span class="sig-paren">(</span><em>v_set</em>, <em>t_set</em>, <em>interval_start</em>, <em>interval_end</em>, <em>filter=10</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#estimate_adjusted_detection_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.estimate_adjusted_detection_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimate adjusted values for spike detection by analyzing a period when the voltage
+changes quickly but passively (due to strong current stimulation), which can result
+in spurious spike detection results.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>v_set</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of numpy arrays of voltage time series in mV</span></dt>
+<dd></dd>
+<dt><strong>t_set</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of numpy arrays of times in seconds</span></dt>
+<dd></dd>
+<dt><strong>interval_start</strong> <span class="classifier-delimiter">:</span> <span class="classifier">start of analysis interval (sec)</span></dt>
+<dd></dd>
+<dt><strong>interval_end</strong> <span class="classifier-delimiter">:</span> <span class="classifier">end of analysis interval (sec)</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>new_dv_cutoff</strong> <span class="classifier-delimiter">:</span> <span class="classifier">adjusted dv/dt cutoff (V/s)</span></dt>
+<dd></dd>
+<dt><strong>new_thresh_frac</strong> <span class="classifier-delimiter">:</span> <span class="classifier">adjusted fraction of avg upstroke to find threshold</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.ephys.ephys_features.filter_putative_spikes">
+<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">filter_putative_spikes</code><span class="sig-paren">(</span><em>v</em>, <em>t</em>, <em>spike_indexes</em>, <em>peak_indexes</em>, <em>min_height=2.0</em>, <em>min_peak=-30.0</em>, <em>filter=10.0</em>, <em>dvdt=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#filter_putative_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.filter_putative_spikes" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Filter out events that are unlikely to be spikes based on:</dt>
+<dd><ul class="first last simple">
+<li>Voltage failing to go down between peak and the next spike’s threshold</li>
+<li>Height (threshold to peak)</li>
+<li>Absolute peak level</li>
+</ul>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>v</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of voltage time series in mV</span></dt>
+<dd></dd>
+<dt><strong>t</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of times in seconds</span></dt>
+<dd></dd>
+<dt><strong>spike_indexes</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of preliminary spike indexes</span></dt>
+<dd></dd>
+<dt><strong>peak_indexes</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of indexes of spike peaks</span></dt>
+<dd></dd>
+<dt><strong>min_height</strong> <span class="classifier-delimiter">:</span> <span class="classifier">minimum acceptable height from threshold to peak in mV (optional, default 2)</span></dt>
+<dd></dd>
+<dt><strong>min_peak</strong> <span class="classifier-delimiter">:</span> <span class="classifier">minimum acceptable absolute peak level in mV (optional, default -30)</span></dt>
+<dd></dd>
+<dt><strong>filter</strong> <span class="classifier-delimiter">:</span> <span class="classifier">cutoff frequency for 4-pole low-pass Bessel filter in kHz (optional, default 10)</span></dt>
+<dd></dd>
+<dt><strong>dvdt</strong> <span class="classifier-delimiter">:</span> <span class="classifier">pre-calculated time-derivative of voltage (optional)</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>spike_indexes</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of threshold indexes</span></dt>
+<dd></dd>
+<dt><strong>peak_indexes</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of peak indexes</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.ephys.ephys_features.find_downstroke_indexes">
+<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">find_downstroke_indexes</code><span class="sig-paren">(</span><em>v</em>, <em>t</em>, <em>peak_indexes</em>, <em>trough_indexes</em>, <em>clipped=None</em>, <em>filter=10.0</em>, <em>dvdt=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#find_downstroke_indexes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.find_downstroke_indexes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find indexes of minimum voltage (troughs) between spikes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>v</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of voltage time series in mV</span></dt>
+<dd></dd>
+<dt><strong>t</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of times in seconds</span></dt>
+<dd></dd>
+<dt><strong>peak_indexes</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of spike peak indexes</span></dt>
+<dd></dd>
+<dt><strong>trough_indexes</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of threshold indexes</span></dt>
+<dd></dd>
+<dt><strong>clipped: boolean array - False if spike not clipped by edge of window</strong></dt>
+<dd></dd>
+<dt><strong>filter</strong> <span class="classifier-delimiter">:</span> <span class="classifier">cutoff frequency for 4-pole low-pass Bessel filter in kHz (optional, default 10)</span></dt>
+<dd></dd>
+<dt><strong>dvdt</strong> <span class="classifier-delimiter">:</span> <span class="classifier">pre-calculated time-derivative of voltage (optional)</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>downstroke_indexes</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of downstroke indexes</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.ephys.ephys_features.find_peak_indexes">
+<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">find_peak_indexes</code><span class="sig-paren">(</span><em>v</em>, <em>t</em>, <em>spike_indexes</em>, <em>end=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#find_peak_indexes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.find_peak_indexes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find indexes of spike peaks.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>v</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of voltage time series in mV</span></dt>
+<dd></dd>
+<dt><strong>t</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of times in seconds</span></dt>
+<dd></dd>
+<dt><strong>spike_indexes</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of preliminary spike indexes</span></dt>
+<dd></dd>
+<dt><strong>end</strong> <span class="classifier-delimiter">:</span> <span class="classifier">end of time window for spike detection (optional)</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.ephys.ephys_features.find_time_index">
+<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">find_time_index</code><span class="sig-paren">(</span><em>t</em>, <em>t_0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#find_time_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.find_time_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the index value of a given time (t_0) in a time series (t).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.ephys.ephys_features.find_trough_indexes">
+<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">find_trough_indexes</code><span class="sig-paren">(</span><em>v</em>, <em>t</em>, <em>spike_indexes</em>, <em>peak_indexes</em>, <em>clipped=None</em>, <em>end=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#find_trough_indexes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.find_trough_indexes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find indexes of minimum voltage (trough) between spikes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>v</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of voltage time series in mV</span></dt>
+<dd></dd>
+<dt><strong>t</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of times in seconds</span></dt>
+<dd></dd>
+<dt><strong>spike_indexes</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of spike indexes</span></dt>
+<dd></dd>
+<dt><strong>peak_indexes</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of spike peak indexes</span></dt>
+<dd></dd>
+<dt><strong>end</strong> <span class="classifier-delimiter">:</span> <span class="classifier">end of time window (optional)</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>trough_indexes</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of threshold indexes</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.ephys.ephys_features.find_upstroke_indexes">
+<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">find_upstroke_indexes</code><span class="sig-paren">(</span><em>v</em>, <em>t</em>, <em>spike_indexes</em>, <em>peak_indexes</em>, <em>filter=10.0</em>, <em>dvdt=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#find_upstroke_indexes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.find_upstroke_indexes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find indexes of maximum upstroke of spike.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>v</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of voltage time series in mV</span></dt>
+<dd></dd>
+<dt><strong>t</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of times in seconds</span></dt>
+<dd></dd>
+<dt><strong>spike_indexes</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of preliminary spike indexes</span></dt>
+<dd></dd>
+<dt><strong>peak_indexes</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of indexes of spike peaks</span></dt>
+<dd></dd>
+<dt><strong>filter</strong> <span class="classifier-delimiter">:</span> <span class="classifier">cutoff frequency for 4-pole low-pass Bessel filter in kHz (optional, default 10)</span></dt>
+<dd></dd>
+<dt><strong>dvdt</strong> <span class="classifier-delimiter">:</span> <span class="classifier">pre-calculated time-derivative of voltage (optional)</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>upstroke_indexes</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of upstroke indexes</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.ephys.ephys_features.find_widths">
+<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">find_widths</code><span class="sig-paren">(</span><em>v</em>, <em>t</em>, <em>spike_indexes</em>, <em>peak_indexes</em>, <em>trough_indexes</em>, <em>clipped=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#find_widths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.find_widths" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find widths at half-height for spikes.</p>
+<p>Widths are only returned when heights are defined</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>v</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of voltage time series in mV</span></dt>
+<dd></dd>
+<dt><strong>t</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of times in seconds</span></dt>
+<dd></dd>
+<dt><strong>spike_indexes</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of spike indexes</span></dt>
+<dd></dd>
+<dt><strong>peak_indexes</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of spike peak indexes</span></dt>
+<dd></dd>
+<dt><strong>trough_indexes</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of trough indexes</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>widths</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of spike widths in sec</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.ephys.ephys_features.fit_membrane_time_constant">
+<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">fit_membrane_time_constant</code><span class="sig-paren">(</span><em>v</em>, <em>t</em>, <em>start</em>, <em>end</em>, <em>min_rsme=0.0001</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#fit_membrane_time_constant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.fit_membrane_time_constant" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit an exponential to estimate membrane time constant between start and end</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>v</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of voltages in mV</span></dt>
+<dd></dd>
+<dt><strong>t</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of times in seconds</span></dt>
+<dd></dd>
+<dt><strong>start</strong> <span class="classifier-delimiter">:</span> <span class="classifier">start of time window for exponential fit</span></dt>
+<dd></dd>
+<dt><strong>end</strong> <span class="classifier-delimiter">:</span> <span class="classifier">end of time window for exponential fit</span></dt>
+<dd></dd>
+<dt><strong>min_rsme: minimal acceptable root mean square error (default 1e-4)</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>a, inv_tau, y0</strong> <span class="classifier-delimiter">:</span> <span class="classifier">Coeffients of equation y0 + a * exp(-inv_tau * x)</span></dt>
+<dd></dd>
+<dt><strong>returns np.nan for values if fit fails</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.ephys.ephys_features.fit_prespike_time_constant">
+<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">fit_prespike_time_constant</code><span class="sig-paren">(</span><em>v</em>, <em>t</em>, <em>start</em>, <em>spike_time</em>, <em>dv_limit=-0.001</em>, <em>tau_limit=0.3</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#fit_prespike_time_constant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.fit_prespike_time_constant" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds the dominant time constant of the pre-spike rise in voltage</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>v</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of voltage time series in mV</span></dt>
+<dd></dd>
+<dt><strong>t</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of times in seconds</span></dt>
+<dd></dd>
+<dt><strong>start</strong> <span class="classifier-delimiter">:</span> <span class="classifier">start of voltage rise (seconds)</span></dt>
+<dd></dd>
+<dt><strong>spike_time</strong> <span class="classifier-delimiter">:</span> <span class="classifier">time of first spike (seconds)</span></dt>
+<dd></dd>
+<dt><strong>dv_limit</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dV/dt cutoff (default -0.001)</span></dt>
+<dd><p class="first last">Shortens fit window if rate of voltage drop exceeds this limit</p>
+</dd>
+<dt><strong>tau_limit</strong> <span class="classifier-delimiter">:</span> <span class="classifier">upper bound for slow time constant (seconds, default 0.3)</span></dt>
+<dd><p class="first last">If the slower time constant of a double-exponential fit is twice that of the faster
+and exceeds this limit, the faster one will be considered the dominant one</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>tau</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dominant time constant (seconds)</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.ephys.ephys_features.get_isis">
+<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">get_isis</code><span class="sig-paren">(</span><em>t</em>, <em>spikes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#get_isis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.get_isis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find interspike intervals in sec between spikes (as indexes).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.ephys.ephys_features.has_fixed_dt">
+<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">has_fixed_dt</code><span class="sig-paren">(</span><em>t</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#has_fixed_dt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.has_fixed_dt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that all time intervals are identical.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.ephys.ephys_features.latency">
+<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">latency</code><span class="sig-paren">(</span><em>t</em>, <em>spikes</em>, <em>start</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#latency"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.latency" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate time to the first spike.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.ephys.ephys_features.norm_diff">
+<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">norm_diff</code><span class="sig-paren">(</span><em>a</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#norm_diff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.norm_diff" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate average of (a[i] - a[i+1]) / (a[i] + a[i+1]).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.ephys.ephys_features.norm_sq_diff">
+<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">norm_sq_diff</code><span class="sig-paren">(</span><em>a</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#norm_sq_diff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.norm_sq_diff" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate average of (a[i] - a[i+1])^2 / (a[i] + a[i+1])^2.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.ephys.ephys_features.refine_threshold_indexes">
+<code class="descclassname">allensdk.ephys.ephys_features.</code><code class="descname">refine_threshold_indexes</code><span class="sig-paren">(</span><em>v</em>, <em>t</em>, <em>upstroke_indexes</em>, <em>thresh_frac=0.05</em>, <em>filter=10.0</em>, <em>dvdt=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_features.html#refine_threshold_indexes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_features.refine_threshold_indexes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Refine threshold detection of previously-found spikes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>v</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of voltage time series in mV</span></dt>
+<dd></dd>
+<dt><strong>t</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of times in seconds</span></dt>
+<dd></dd>
+<dt><strong>upstroke_indexes</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of indexes of spike upstrokes (for threshold target calculation)</span></dt>
+<dd></dd>
+<dt><strong>thresh_frac</strong> <span class="classifier-delimiter">:</span> <span class="classifier">fraction of average upstroke for threshold calculation (optional, default 0.05)</span></dt>
+<dd></dd>
+<dt><strong>filter</strong> <span class="classifier-delimiter">:</span> <span class="classifier">cutoff frequency for 4-pole low-pass Bessel filter in kHz (optional, default 10)</span></dt>
+<dd></dd>
+<dt><strong>dvdt</strong> <span class="classifier-delimiter">:</span> <span class="classifier">pre-calculated time-derivative of voltage (optional)</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>threshold_indexes</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array of threshold indexes</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_space.html">Reference Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="glif_models.html">Generalized LIF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html">Biophysical</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.deprecated.html">allensdk.deprecated module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
+</ul>
+
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allen-sdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    </div>
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalFooter.js"></script>
+
+
+  </body>
+</html>

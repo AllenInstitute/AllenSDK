@@ -1,32 +1,21 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>allensdk.core.swc &mdash; Allen SDK dev documentation</title>
-    
+    <title>allensdk.core.swc &#8212; Allen SDK dev documentation</title>
     <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../',
-        VERSION:     'dev',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK dev documentation" href="../../../index.html" />
-    <link rel="up" title="Module code" href="../../index.html" /> 
-  </head>
-  <body role="document">
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
 <script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
@@ -135,7 +124,7 @@
 
 
 <span class="c1">########################################################################</span>
-<div class="viewcode-block" id="read_swc"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.read_swc">[docs]</a><span class="k">def</span> <span class="nf">read_swc</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="s2">&quot;NOT_USED&quot;</span><span class="p">,</span> <span class="n">numeric_columns</span><span class="o">=</span><span class="s2">&quot;NOT_USED&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="read_swc"><a class="viewcode-back" href="../../../allensdk.core.swc.html#allensdk.core.swc.read_swc">[docs]</a><span class="k">def</span> <span class="nf">read_swc</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="s2">&quot;NOT_USED&quot;</span><span class="p">,</span> <span class="n">numeric_columns</span><span class="o">=</span><span class="s2">&quot;NOT_USED&quot;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Read in an SWC file and return a Morphology object.</span>
 
@@ -177,7 +166,7 @@
     <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
         <span class="n">err</span> <span class="o">=</span> <span class="s2">&quot;File not recognized as valid SWC file.</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="n">err</span> <span class="o">+=</span> <span class="s2">&quot;Problem parsing line </span><span class="si">%d</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">line_num</span>
-        <span class="k">if</span> <span class="n">line</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">line</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">err</span> <span class="o">+=</span> <span class="s2">&quot;Content: &#39;</span><span class="si">%s</span><span class="s2">&#39;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">line</span>
         <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
 
@@ -186,13 +175,13 @@
 
 <span class="c1">########################################################################</span>
 <span class="c1">########################################################################</span>
-<div class="viewcode-block" id="Compartment"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Compartment">[docs]</a><span class="k">class</span> <span class="nc">Compartment</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+<div class="viewcode-block" id="Compartment"><a class="viewcode-back" href="../../../allensdk.core.swc.html#allensdk.core.swc.Compartment">[docs]</a><span class="k">class</span> <span class="nc">Compartment</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A dictionary class storing information about a single morphology node</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Compartment</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Compartment</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">NODE_ID</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span> <span class="ow">or</span>
                 <span class="n">NODE_TYPE</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span> <span class="ow">or</span>
                 <span class="n">NODE_X</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span> <span class="ow">or</span>
@@ -209,13 +198,13 @@
         <span class="c1"># IDs of child nodes</span>
         <span class="bp">self</span><span class="p">[</span><span class="n">NODE_CHILDREN</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
-<div class="viewcode-block" id="Compartment.print_node"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Compartment.print_node">[docs]</a>    <span class="k">def</span> <span class="nf">print_node</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Compartment.print_node"><a class="viewcode-back" href="../../../allensdk.core.swc.html#allensdk.core.swc.Compartment.print_node">[docs]</a>    <span class="k">def</span> <span class="nf">print_node</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; print out compartment information with field names &quot;&quot;&quot;</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> </span><span class="si">%d</span><span class="s2"> </span><span class="si">%.4f</span><span class="s2"> </span><span class="si">%.4f</span><span class="s2"> </span><span class="si">%.4f</span><span class="s2"> </span><span class="si">%.4f</span><span class="s2"> </span><span class="si">%d</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">_N</span><span class="p">],</span> <span class="bp">self</span><span class="p">[</span><span class="n">_TYP</span><span class="p">],</span> <span class="bp">self</span><span class="p">[</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> </span><span class="si">%d</span><span class="s2"> </span><span class="si">%.4f</span><span class="s2"> </span><span class="si">%.4f</span><span class="s2"> </span><span class="si">%.4f</span><span class="s2"> </span><span class="si">%.4f</span><span class="s2"> </span><span class="si">%d</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">_N</span><span class="p">],</span> <span class="bp">self</span><span class="p">[</span><span class="n">_TYP</span><span class="p">],</span> <span class="bp">self</span><span class="p">[</span>
               <span class="n">_X</span><span class="p">],</span> <span class="bp">self</span><span class="p">[</span><span class="n">_Y</span><span class="p">],</span> <span class="bp">self</span><span class="p">[</span><span class="n">_Z</span><span class="p">],</span> <span class="bp">self</span><span class="p">[</span><span class="n">_R</span><span class="p">],</span> <span class="bp">self</span><span class="p">[</span><span class="n">_P</span><span class="p">],</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">_C</span><span class="p">]),</span> <span class="bp">self</span><span class="p">[</span><span class="n">_TID</span><span class="p">]))</span></div></div>
 
 
-<div class="viewcode-block" id="Morphology"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology">[docs]</a><span class="k">class</span> <span class="nc">Morphology</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Morphology"><a class="viewcode-back" href="../../../allensdk.core.swc.html#allensdk.core.swc.Morphology">[docs]</a><span class="k">class</span> <span class="nc">Morphology</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Keep track of the list of compartments in a morphology and provide</span>
 <span class="sd">    a few helper methods (soma, tree information, pruning, etc).</span>
@@ -229,7 +218,7 @@
 
     <span class="n">NODE_TYPES</span> <span class="o">=</span> <span class="p">[</span><span class="n">SOMA</span><span class="p">,</span> <span class="n">AXON</span><span class="p">,</span> <span class="n">DENDRITE</span><span class="p">,</span> <span class="n">BASAL_DENDRITE</span><span class="p">,</span> <span class="n">APICAL_DENDRITE</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compartment_list</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">compartment_index</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compartment_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">compartment_index</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Try to initialize from a list of compartments first, then from</span>
 <span class="sd">        a dictionary indexed by compartment id if that fails, and finally just</span>
@@ -267,11 +256,11 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Morphology appears to be inconsistent&quot;</span><span class="p">)</span>
         <span class="c1">##############################################</span>
         <span class="c1"># root node (this must be part of the soma)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_soma</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_soma</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">)):</span>
             <span class="n">seg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_TYPE</span><span class="p">]</span> <span class="o">==</span> <span class="n">Morphology</span><span class="o">.</span><span class="n">SOMA</span> <span class="ow">and</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_soma</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_soma</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Multiple somas detected in SWC file&quot;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_soma</span> <span class="o">=</span> <span class="n">seg</span>
 
@@ -285,7 +274,7 @@
 <span class="sd">        compartment list and compartment index are in sync. &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compartment_list</span>
 
-    <span class="nd">@compartment_list.setter</span>
+    <span class="nd">@compartment_list</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">compartment_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compartment_list</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Update the compartment list.  Update the compartment index. &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_compartments</span><span class="p">(</span><span class="n">compartment_list</span><span class="p">)</span>
@@ -296,7 +285,7 @@
 <span class="sd">        compartment list and compartment index are in sync. &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compartment_index</span>
 
-    <span class="nd">@compartment_index.setter</span>
+    <span class="nd">@compartment_index</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">compartment_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compartment_index</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Update the compartment index.  Update the compartment list. &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_compartments</span><span class="p">(</span><span class="n">compartment_index</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
@@ -347,7 +336,7 @@
     <span class="c1">####################################################################</span>
     <span class="c1"># tree and node access</span>
 
-<div class="viewcode-block" id="Morphology.tree"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.tree">[docs]</a>    <span class="k">def</span> <span class="nf">tree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+<div class="viewcode-block" id="Morphology.tree"><a class="viewcode-back" href="../../../allensdk.core.swc.html#allensdk.core.swc.Morphology.tree">[docs]</a>    <span class="k">def</span> <span class="nf">tree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a list of all Morphology Nodes within the specified</span>
 <span class="sd">        tree. A tree is defined as a fully connected graph of nodes.</span>
@@ -364,10 +353,10 @@
 <span class="sd">        if the tree doesn&#39;t exist</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">n</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tree_list</span><span class="p">):</span>
-            <span class="k">return</span> <span class="bp">None</span>
+            <span class="k">return</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tree_list</span><span class="p">[</span><span class="n">n</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="Morphology.node"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.node">[docs]</a>    <span class="k">def</span> <span class="nf">node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+<div class="viewcode-block" id="Morphology.node"><a class="viewcode-back" href="../../../allensdk.core.swc.html#allensdk.core.swc.Morphology.node">[docs]</a>    <span class="k">def</span> <span class="nf">node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the morphology node having the specified ID.</span>
 
@@ -385,7 +374,7 @@
         <span class="c1">#   node ID, the node is returned and no error is triggered</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_node_type</span><span class="p">(</span><span class="n">n</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Morphology.parent_of"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.parent_of">[docs]</a>    <span class="k">def</span> <span class="nf">parent_of</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seg</span><span class="p">):</span>
+<div class="viewcode-block" id="Morphology.parent_of"><a class="viewcode-back" href="../../../allensdk.core.swc.html#allensdk.core.swc.Morphology.parent_of">[docs]</a>    <span class="k">def</span> <span class="nf">parent_of</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seg</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Returns parent of the specified node.</span>
 
 <span class="sd">        Parameters</span>
@@ -403,11 +392,11 @@
         <span class="c1">#   incorrect, make sure the user knows about it</span>
         <span class="n">seg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_node_type</span><span class="p">(</span><span class="n">seg</span><span class="p">)</span>
         <span class="c1"># return parent of specified node</span>
-        <span class="k">if</span> <span class="n">seg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">seg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compartment_list</span><span class="p">[</span><span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]]</span>
-        <span class="k">return</span> <span class="bp">None</span></div>
+        <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="Morphology.children_of"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.children_of">[docs]</a>    <span class="k">def</span> <span class="nf">children_of</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seg</span><span class="p">):</span>
+<div class="viewcode-block" id="Morphology.children_of"><a class="viewcode-back" href="../../../allensdk.core.swc.html#allensdk.core.swc.Morphology.children_of">[docs]</a>    <span class="k">def</span> <span class="nf">children_of</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seg</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Returns a list of the children of the specified node</span>
 
 <span class="sd">        Parameters</span>
@@ -437,14 +426,14 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">seg</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">seg</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">seg</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">seg</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_compartment_list</span><span class="p">):</span>
-                    <span class="k">return</span> <span class="bp">None</span>
+                    <span class="k">return</span> <span class="kc">None</span>
                 <span class="n">seg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compartment_list</span><span class="p">[</span><span class="n">seg</span><span class="p">]</span>
             <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                     <span class="s2">&quot;Object not recognized as morphology node or index&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">seg</span>
 
-<div class="viewcode-block" id="Morphology.change_parent"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.change_parent">[docs]</a>    <span class="k">def</span> <span class="nf">change_parent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">child</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+<div class="viewcode-block" id="Morphology.change_parent"><a class="viewcode-back" href="../../../allensdk.core.swc.html#allensdk.core.swc.Morphology.change_parent">[docs]</a>    <span class="k">def</span> <span class="nf">change_parent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">child</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Change the parent of a node. The child node is adjusted to</span>
 <span class="sd">        point to the new parent, the child is taken off of the previous</span>
 <span class="sd">        parent&#39;s child list, and it is added to the new parent&#39;s child list.</span>
@@ -471,7 +460,7 @@
         <span class="n">child_seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="o">=</span> <span class="n">parent_seg</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">]</span></div>
 
     <span class="c1"># returns a list of nodes located within dist of x,y,z</span>
-<div class="viewcode-block" id="Morphology.find"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.find">[docs]</a>    <span class="k">def</span> <span class="nf">find</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">dist</span><span class="p">,</span> <span class="n">node_type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Morphology.find"><a class="viewcode-back" href="../../../allensdk.core.swc.html#allensdk.core.swc.Morphology.find">[docs]</a>    <span class="k">def</span> <span class="nf">find</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">dist</span><span class="p">,</span> <span class="n">node_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Returns a list of Morphology Objects located within &#39;dist&#39;</span>
 <span class="sd">        of coordinate (x,y,z). If node_type is specified, the search</span>
 <span class="sd">        will be constrained to return only nodes of that type.</span>
@@ -498,11 +487,11 @@
             <span class="n">dy</span> <span class="o">=</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_Y</span><span class="p">]</span> <span class="o">-</span> <span class="n">y</span>
             <span class="n">dz</span> <span class="o">=</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_Z</span><span class="p">]</span> <span class="o">-</span> <span class="n">z</span>
             <span class="k">if</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dx</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">+</span> <span class="n">dy</span> <span class="o">*</span> <span class="n">dy</span> <span class="o">+</span> <span class="n">dz</span> <span class="o">*</span> <span class="n">dz</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">dist</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">node_type</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_TYPE</span><span class="p">]</span> <span class="o">==</span> <span class="n">node_type</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">node_type</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_TYPE</span><span class="p">]</span> <span class="o">==</span> <span class="n">node_type</span><span class="p">:</span>
                     <span class="n">found</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">seg</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">found</span></div>
 
-<div class="viewcode-block" id="Morphology.compartment_list_by_type"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.compartment_list_by_type">[docs]</a>    <span class="k">def</span> <span class="nf">compartment_list_by_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compartment_type</span><span class="p">):</span>
+<div class="viewcode-block" id="Morphology.compartment_list_by_type"><a class="viewcode-back" href="../../../allensdk.core.swc.html#allensdk.core.swc.Morphology.compartment_list_by_type">[docs]</a>    <span class="k">def</span> <span class="nf">compartment_list_by_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compartment_type</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Return an list of all compartments having the specified</span>
 <span class="sd">        compartment type.</span>
 
@@ -517,7 +506,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compartment_list</span> <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="n">NODE_TYPE</span><span class="p">]</span> <span class="o">==</span> <span class="n">compartment_type</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="Morphology.compartment_index_by_type"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.compartment_index_by_type">[docs]</a>    <span class="k">def</span> <span class="nf">compartment_index_by_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compartment_type</span><span class="p">):</span>
+<div class="viewcode-block" id="Morphology.compartment_index_by_type"><a class="viewcode-back" href="../../../allensdk.core.swc.html#allensdk.core.swc.Morphology.compartment_index_by_type">[docs]</a>    <span class="k">def</span> <span class="nf">compartment_index_by_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compartment_type</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Return an dictionary of compartments indexed by id that all have</span>
 <span class="sd">        a particular compartment type.</span>
 
@@ -532,7 +521,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span><span class="n">c</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">]:</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compartment_list</span> <span class="k">if</span> <span class="n">c</span><span class="p">[</span><span class="n">NODE_TYPE</span><span class="p">]</span> <span class="o">==</span> <span class="n">compartment_type</span><span class="p">}</span></div>
 
-<div class="viewcode-block" id="Morphology.save"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
+<div class="viewcode-block" id="Morphology.save"><a class="viewcode-back" href="../../../allensdk.core.swc.html#allensdk.core.swc.Morphology.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Write this morphology out to an SWC file</span>
 
 <span class="sd">        Parameters</span>
@@ -552,10 +541,10 @@
         <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
     <span class="c1"># keep for backward compatibility, but don&#39;t publish in docs</span>
-<div class="viewcode-block" id="Morphology.write"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
+<div class="viewcode-block" id="Morphology.write"><a class="viewcode-back" href="../../../allensdk.core.swc.html#allensdk.core.swc.Morphology.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Morphology.sparsify"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.sparsify">[docs]</a>    <span class="k">def</span> <span class="nf">sparsify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modulo</span><span class="p">,</span> <span class="n">compress_ids</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="Morphology.sparsify"><a class="viewcode-back" href="../../../allensdk.core.swc.html#allensdk.core.swc.Morphology.sparsify">[docs]</a>    <span class="k">def</span> <span class="nf">sparsify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modulo</span><span class="p">,</span> <span class="n">compress_ids</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Return a new Morphology object that has a given number of non-leaf,</span>
 <span class="sd">        non-root nodes removed.  IDs can be reassigned so as to be continuous.</span>
 
@@ -584,7 +573,7 @@
             <span class="c1"># keep the root, soma, junctions, and the first child of the root</span>
             <span class="c1"># (for visualization)</span>
             <span class="k">if</span> <span class="n">pid</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="n">NODE_CHILDREN</span><span class="p">])</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">pid</span> <span class="o">==</span> <span class="n">root</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">]</span> <span class="ow">or</span> <span class="n">ctype</span> <span class="o">==</span> <span class="n">Morphology</span><span class="o">.</span><span class="n">SOMA</span><span class="p">:</span>
-                <span class="n">keep</span><span class="p">[</span><span class="n">cid</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="n">keep</span><span class="p">[</span><span class="n">cid</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">keep</span><span class="p">[</span><span class="n">cid</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">ct</span> <span class="o">%</span> <span class="n">modulo</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
             <span class="n">ct</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -592,9 +581,9 @@
         <span class="c1"># hook children up to their new parents</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">compartments</span><span class="p">):</span>
             <span class="n">comp_id</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">keep</span><span class="p">[</span><span class="n">comp_id</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">False</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">keep</span><span class="p">[</span><span class="n">comp_id</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
                 <span class="n">parent_id</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span>
-                <span class="k">while</span> <span class="n">keep</span><span class="p">[</span><span class="n">parent_id</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">False</span><span class="p">:</span>
+                <span class="k">while</span> <span class="n">keep</span><span class="p">[</span><span class="n">parent_id</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
                     <span class="n">parent_id</span> <span class="o">=</span> <span class="n">compartments</span><span class="p">[</span><span class="n">parent_id</span><span class="p">][</span><span class="n">NODE_PN</span><span class="p">]</span>
                 <span class="k">for</span> <span class="n">child_id</span> <span class="ow">in</span> <span class="n">c</span><span class="p">[</span><span class="n">NODE_CHILDREN</span><span class="p">]:</span>
                     <span class="n">compartments</span><span class="p">[</span><span class="n">child_id</span><span class="p">][</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="o">=</span> <span class="n">parent_id</span>
@@ -637,7 +626,7 @@
         <span class="n">new_id</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">tmp_list</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">seg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">seg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">remap</span><span class="p">[</span><span class="n">seg</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">]]</span> <span class="o">=</span> <span class="n">new_id</span>
                 <span class="n">seg</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_id</span>
                 <span class="n">tmp_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">seg</span><span class="p">)</span>
@@ -681,7 +670,7 @@
                 <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
                     <span class="s2">&quot;Internal error detected -- compartment list not properly formed&quot;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Morphology.append"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_list</span><span class="p">):</span>
+<div class="viewcode-block" id="Morphology.append"><a class="viewcode-back" href="../../../allensdk.core.swc.html#allensdk.core.swc.Morphology.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_list</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Add additional nodes to this Morphology. Those nodes must</span>
 <span class="sd">        originate from another morphology object.</span>
 
@@ -698,7 +687,7 @@
         <span class="n">old_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">)</span>
         <span class="n">new_id</span> <span class="o">=</span> <span class="n">old_count</span>
         <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="n">node_list</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">seg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">seg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">remap</span><span class="p">[</span><span class="n">seg</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">]]</span> <span class="o">=</span> <span class="n">new_id</span>
                 <span class="n">seg</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_id</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_compartment_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">seg</span><span class="p">)</span>
@@ -710,7 +699,7 @@
                 <span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="o">=</span> <span class="n">remap</span><span class="p">[</span><span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_reconstruct</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="Morphology.stumpify_axon"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.stumpify_axon">[docs]</a>    <span class="k">def</span> <span class="nf">stumpify_axon</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+<div class="viewcode-block" id="Morphology.stumpify_axon"><a class="viewcode-back" href="../../../allensdk.core.swc.html#allensdk.core.swc.Morphology.stumpify_axon">[docs]</a>    <span class="k">def</span> <span class="nf">stumpify_axon</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Remove all axon compartments except the first &#39;count&#39;</span>
 <span class="sd">        nodes, as counted from the connected axon root.</span>
 
@@ -720,7 +709,7 @@
 <span class="sd">            The length of the axon &#39;stump&#39;, in number of compartments</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># find connected axon root</span>
-        <span class="n">axon_root</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">axon_root</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_TYPE</span><span class="p">]</span> <span class="o">==</span> <span class="n">Morphology</span><span class="o">.</span><span class="n">AXON</span><span class="p">:</span>
                 <span class="n">par_id</span> <span class="o">=</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span>
@@ -729,7 +718,7 @@
                     <span class="k">if</span> <span class="n">par</span><span class="p">[</span><span class="n">NODE_TYPE</span><span class="p">]</span> <span class="o">!=</span> <span class="n">Morphology</span><span class="o">.</span><span class="n">AXON</span><span class="p">:</span>
                         <span class="n">axon_root</span> <span class="o">=</span> <span class="n">seg</span>
                         <span class="k">break</span>
-        <span class="k">if</span> <span class="n">axon_root</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">axon_root</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span>
         <span class="c1"># flag the first &#39;count&#39; nodes from the axon root</span>
         <span class="n">ax</span> <span class="o">=</span> <span class="n">axon_root</span>
@@ -744,11 +733,11 @@
             <span class="n">seg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_TYPE</span><span class="p">]</span> <span class="o">==</span> <span class="n">Morphology</span><span class="o">.</span><span class="n">AXON</span><span class="p">:</span>
                 <span class="k">if</span> <span class="s2">&quot;flag&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seg</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_reconstruct</span><span class="p">()</span></div>
 
     <span class="c1"># strip out everything but the soma and the specified SWC type</span>
-<div class="viewcode-block" id="Morphology.strip_all_other_types"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.strip_all_other_types">[docs]</a>    <span class="k">def</span> <span class="nf">strip_all_other_types</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_type</span><span class="p">,</span> <span class="n">keep_soma</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+<div class="viewcode-block" id="Morphology.strip_all_other_types"><a class="viewcode-back" href="../../../allensdk.core.swc.html#allensdk.core.swc.Morphology.strip_all_other_types">[docs]</a>    <span class="k">def</span> <span class="nf">strip_all_other_types</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_type</span><span class="p">,</span> <span class="n">keep_soma</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Strips everything from the morphology except for the</span>
 <span class="sd">        specified type.</span>
 <span class="sd">        Parent and child relationships are updated accordingly, creating</span>
@@ -770,26 +759,26 @@
         <span class="c1">#   of them</span>
         <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_TYPE</span><span class="p">]</span> <span class="o">==</span> <span class="n">node_type</span><span class="p">:</span>
-                <span class="n">remove</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="n">remove</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="k">elif</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_TYPE</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">keep_soma</span><span class="p">:</span>
-                <span class="n">remove</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="n">remove</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">remove</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="n">remove</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">if</span> <span class="n">remove</span><span class="p">:</span>
-                <span class="n">flagged_for_removal</span><span class="p">[</span><span class="n">seg</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">]]</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="n">flagged_for_removal</span><span class="p">[</span><span class="n">seg</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="c1"># remove selected nodes andreset parent links</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">)):</span>
             <span class="n">seg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">]</span> <span class="ow">in</span> <span class="n">flagged_for_removal</span><span class="p">:</span>
                 <span class="c1"># eliminate node</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">elif</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="ow">in</span> <span class="n">flagged_for_removal</span><span class="p">:</span>
                 <span class="c1"># parent was eliminated. make this a new root</span>
                 <span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_reconstruct</span><span class="p">()</span></div>
 
     <span class="c1"># strip out the specified SWC type</span>
-<div class="viewcode-block" id="Morphology.strip_type"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.strip_type">[docs]</a>    <span class="k">def</span> <span class="nf">strip_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_type</span><span class="p">):</span>
+<div class="viewcode-block" id="Morphology.strip_type"><a class="viewcode-back" href="../../../allensdk.core.swc.html#allensdk.core.swc.Morphology.strip_type">[docs]</a>    <span class="k">def</span> <span class="nf">strip_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_type</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Strips all compartments of the specified type from the</span>
 <span class="sd">        morphology.</span>
 <span class="sd">        Parent and child relationships are updated accordingly, creating</span>
@@ -805,23 +794,23 @@
         <span class="n">flagged_for_removal</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_TYPE</span><span class="p">]</span> <span class="o">==</span> <span class="n">node_type</span><span class="p">:</span>
-                <span class="n">remove</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="n">remove</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">remove</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="n">remove</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="k">if</span> <span class="n">remove</span><span class="p">:</span>
-                <span class="n">flagged_for_removal</span><span class="p">[</span><span class="n">seg</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">]]</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="n">flagged_for_removal</span><span class="p">[</span><span class="n">seg</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">)):</span>
             <span class="n">seg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">]</span> <span class="ow">in</span> <span class="n">flagged_for_removal</span><span class="p">:</span>
                 <span class="c1"># eliminate node</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">elif</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="ow">in</span> <span class="n">flagged_for_removal</span><span class="p">:</span>
                 <span class="c1"># parent was eliminated. make this a new root</span>
                 <span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_reconstruct</span><span class="p">()</span></div>
 
     <span class="c1"># strip out the specified SWC type</span>
-<div class="viewcode-block" id="Morphology.convert_type"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.convert_type">[docs]</a>    <span class="k">def</span> <span class="nf">convert_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">old_type</span><span class="p">,</span> <span class="n">new_type</span><span class="p">):</span>
+<div class="viewcode-block" id="Morphology.convert_type"><a class="viewcode-back" href="../../../allensdk.core.swc.html#allensdk.core.swc.Morphology.convert_type">[docs]</a>    <span class="k">def</span> <span class="nf">convert_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">old_type</span><span class="p">,</span> <span class="n">new_type</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Converts all compartments from one type to another.</span>
 <span class="sd">        Nodes of the original type are not affected so this</span>
 <span class="sd">        procedure can also be used as a merge procedure.</span>
@@ -842,7 +831,7 @@
             <span class="k">if</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_TYPE</span><span class="p">]</span> <span class="o">==</span> <span class="n">old_type</span><span class="p">:</span>
                 <span class="n">seg</span><span class="p">[</span><span class="n">NODE_TYPE</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_type</span></div>
 
-<div class="viewcode-block" id="Morphology.apply_affine"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.apply_affine">[docs]</a>    <span class="k">def</span> <span class="nf">apply_affine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aff</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Morphology.apply_affine"><a class="viewcode-back" href="../../../allensdk.core.swc.html#allensdk.core.swc.Morphology.apply_affine">[docs]</a>    <span class="k">def</span> <span class="nf">apply_affine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aff</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Apply an affine transform to all compartments in this</span>
 <span class="sd">        morphology. Node radius is adjusted as well.</span>
 
@@ -875,7 +864,7 @@
         <span class="c1">#   scale along all 3 axes (eg, isotropic assumption), so calculate</span>
         <span class="c1">#   scale using the determinant</span>
         <span class="c1">#</span>
-        <span class="k">if</span> <span class="n">scale</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">scale</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># calculate the determinant</span>
             <span class="n">det0</span> <span class="o">=</span> <span class="n">aff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">aff</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">*</span> <span class="n">aff</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span> <span class="o">-</span> <span class="n">aff</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">*</span> <span class="n">aff</span><span class="p">[</span><span class="mi">7</span><span class="p">])</span>
             <span class="n">det1</span> <span class="o">=</span> <span class="n">aff</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">aff</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="n">aff</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span> <span class="o">-</span> <span class="n">aff</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">*</span> <span class="n">aff</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span>
@@ -990,7 +979,7 @@
         <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">n</span><span class="p">:</span>
-                    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Parent for node </span><span class="si">%d</span><span class="s2"> is invalid (</span><span class="si">%d</span><span class="s2">)&quot;</span> <span class="o">%</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Parent for node </span><span class="si">%d</span><span class="s2"> is invalid (</span><span class="si">%d</span><span class="s2">)&quot;</span> <span class="o">%</span>
                           <span class="p">(</span><span class="n">seg</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">],</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]))</span>
                     <span class="n">errs</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="c1"># make sure that each tree has exactly one root</span>
@@ -1000,11 +989,11 @@
             <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tree</span><span class="p">)):</span>
                 <span class="k">if</span> <span class="n">tree</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">root</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
-                        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Too many roots in tree </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Too many roots in tree </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
                         <span class="n">errs</span> <span class="o">+=</span> <span class="mi">1</span>
                     <span class="n">root</span> <span class="o">=</span> <span class="n">j</span>
             <span class="k">if</span> <span class="n">root</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-                <span class="k">print</span><span class="p">(</span><span class="s2">&quot;No root present in tree </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No root present in tree </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
                 <span class="n">errs</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="c1"># make sure each axon has at most one root</span>
         <span class="c1"># find type boundaries. at each axon boundary, walk back up</span>
@@ -1017,14 +1006,14 @@
                 <span class="k">while</span> <span class="n">par_id</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">par</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">[</span><span class="n">par_id</span><span class="p">]</span>
                     <span class="k">if</span> <span class="n">par</span><span class="p">[</span><span class="n">NODE_TYPE</span><span class="p">]</span> <span class="o">==</span> <span class="n">Morphology</span><span class="o">.</span><span class="n">AXON</span><span class="p">:</span>
-                        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Branch has multiple axon roots&quot;</span><span class="p">)</span>
-                        <span class="k">print</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
-                        <span class="k">print</span><span class="p">(</span><span class="n">par</span><span class="p">)</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Branch has multiple axon roots&quot;</span><span class="p">)</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="n">par</span><span class="p">)</span>
                         <span class="n">errs</span> <span class="o">+=</span> <span class="mi">1</span>
                         <span class="k">break</span>
                     <span class="n">par_id</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">errs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Failed consistency check: </span><span class="si">%d</span><span class="s2"> errors encountered&quot;</span> <span class="o">%</span> <span class="n">errs</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Failed consistency check: </span><span class="si">%d</span><span class="s2"> errors encountered&quot;</span> <span class="o">%</span> <span class="n">errs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">errs</span>
 
     <span class="k">def</span> <span class="nf">_find_type_boundary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1034,14 +1023,14 @@
         <span class="n">adoptees</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">:</span>
             <span class="n">par</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent_of</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">par</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">par</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">node</span><span class="p">[</span><span class="n">NODE_TYPE</span><span class="p">]</span> <span class="o">!=</span> <span class="n">par</span><span class="p">[</span><span class="n">NODE_TYPE</span><span class="p">]:</span>
                 <span class="n">adoptees</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">adoptees</span>
 
     <span class="c1"># remove tree from swc&#39;s &quot;forest&quot;</span>
-<div class="viewcode-block" id="Morphology.delete_tree"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.delete_tree">[docs]</a>    <span class="k">def</span> <span class="nf">delete_tree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+<div class="viewcode-block" id="Morphology.delete_tree"><a class="viewcode-back" href="../../../allensdk.core.swc.html#allensdk.core.swc.Morphology.delete_tree">[docs]</a>    <span class="k">def</span> <span class="nf">delete_tree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Delete tree, and all of its compartments, from the morphology.</span>
 
 <span class="sd">        Parameters</span>
@@ -1052,11 +1041,11 @@
         <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span>
         <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_trees</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Error -- attempted to delete non-existing tree (</span><span class="si">%d</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error -- attempted to delete non-existing tree (</span><span class="si">%d</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
             <span class="k">raise</span> <span class="ne">ValueError</span>
         <span class="n">tree</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tree</span><span class="p">)):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">[</span><span class="n">tree</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">NODE_ID</span><span class="p">]]</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">[</span><span class="n">tree</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">NODE_ID</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tree_list</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_reconstruct</span><span class="p">()</span>
         <span class="c1"># reset node tree_id to correct tree number</span>
@@ -1067,10 +1056,10 @@
 <span class="sd">        debugging function. prints all nodes</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="n">node</span><span class="p">)</span></div>
+            <span class="nb">print</span><span class="p">(</span><span class="n">node</span><span class="p">)</span></div>
 
 <span class="c1">########################################################################</span>
-<div class="viewcode-block" id="Marker"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Marker">[docs]</a><span class="k">class</span> <span class="nc">Marker</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+<div class="viewcode-block" id="Marker"><a class="viewcode-back" href="../../../allensdk.core.swc.html#allensdk.core.swc.Marker">[docs]</a><span class="k">class</span> <span class="nc">Marker</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Simple dictionary class for handling reconstruction marker objects. &quot;&quot;&quot;</span>
 
     <span class="n">SPACING</span> <span class="o">=</span> <span class="p">[</span><span class="o">.</span><span class="mi">1144</span><span class="p">,</span> <span class="o">.</span><span class="mi">1144</span><span class="p">,</span> <span class="o">.</span><span class="mi">28</span><span class="p">]</span>
@@ -1079,7 +1068,7 @@
     <span class="n">NO_RECONSTRUCTION</span> <span class="o">=</span> <span class="mi">20</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Marker</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Marker</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="c1"># marker file x,y,z coordinates are offset by a single image-space</span>
         <span class="c1"># pixel</span>
@@ -1088,7 +1077,7 @@
         <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;z&#39;</span><span class="p">]</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SPACING</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="read_marker_file"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.read_marker_file">[docs]</a><span class="k">def</span> <span class="nf">read_marker_file</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
+<div class="viewcode-block" id="read_marker_file"><a class="viewcode-back" href="../../../allensdk.core.swc.html#allensdk.core.swc.read_marker_file">[docs]</a><span class="k">def</span> <span class="nf">read_marker_file</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; read in a marker file and return a list of dictionaries &quot;&quot;&quot;</span>
 
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -1109,9 +1098,7 @@
         <div class="sphinxsidebarwrapper">
 <h3><a href="../../../index.html">Contents</a></h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install Guide</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../cell_types.html">Cell Types</a></li>
@@ -1136,6 +1123,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.model.html">allensdk.model package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.morphology.html">allensdk.morphology package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.deprecated.html">allensdk.deprecated module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
@@ -1153,12 +1141,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

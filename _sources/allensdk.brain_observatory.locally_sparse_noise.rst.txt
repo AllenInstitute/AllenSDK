@@ -1,0 +1,7 @@
+allensdk.brain\_observatory.locally\_sparse\_noise module
+=========================================================
+
+.. automodule:: allensdk.brain_observatory.locally_sparse_noise
+    :members:
+    :undoc-members:
+    :show-inheritance:

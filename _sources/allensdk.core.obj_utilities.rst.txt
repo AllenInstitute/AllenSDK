@@ -1,0 +1,7 @@
+allensdk.core.obj\_utilities module
+===================================
+
+.. automodule:: allensdk.core.obj_utilities
+    :members:
+    :undoc-members:
+    :show-inheritance:

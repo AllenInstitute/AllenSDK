@@ -1,0 +1,362 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>allensdk.core.nwb_data_set module &#8212; Allen SDK dev documentation</title>
+    <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="allensdk.core.obj_utilities module" href="allensdk.core.obj_utilities.html" />
+    <link rel="prev" title="allensdk.core.mouse_connectivity_cache module" href="allensdk.core.mouse_connectivity_cache.html" /> 
+  </head><body>
+<link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
+<script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var _pSupressBrowserFlashWarning = true;
+    var _pTabId = "pHome";
+    var _pMoreProjectsId = "pMoreProjects";
+    var _pImagePath = "http://www.brain-map.org/assets/images/";
+    var _pSiteWarnings = function() {
+        this.show_warning() = {};
+    }
+</script>
+<script type="text/javascript">
+    function initialize() {
+        /*** do your stuff, then initialize the portal plugin ***/
+        _pPortalOnLoad();
+    }
+</script>
+<style>
+  #header_content > a {
+  display: inline-block;
+  width: 250px;
+  height: 75px;
+  background-image:url("_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-size: 235px 37px;
+  background-position: 0px 20px;
+  background-repeat: no-repeat;
+  }
+</style>
+
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
+<link rel="stylesheet" type="text/css" href="_static/external_assets/stylesheets/common_layout.css" />
+
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-allensdk.core.nwb_data_set">
+<span id="allensdk-core-nwb-data-set-module"></span><h1>allensdk.core.nwb_data_set module<a class="headerlink" href="#module-allensdk.core.nwb_data_set" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="allensdk.core.nwb_data_set.NwbDataSet">
+<em class="property">class </em><code class="descclassname">allensdk.core.nwb_data_set.</code><code class="descname">NwbDataSet</code><span class="sig-paren">(</span><em>file_name</em>, <em>spike_time_key=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/nwb_data_set.html#NwbDataSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.nwb_data_set.NwbDataSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A very simple interface for exracting electrophysiology data
+from an NWB file.</p>
+<dl class="attribute">
+<dt id="allensdk.core.nwb_data_set.NwbDataSet.DEPRECATED_SPIKE_TIMES">
+<code class="descname">DEPRECATED_SPIKE_TIMES</code><em class="property"> = 'aibs_spike_times'</em><a class="headerlink" href="#allensdk.core.nwb_data_set.NwbDataSet.DEPRECATED_SPIKE_TIMES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.nwb_data_set.NwbDataSet.SPIKE_TIMES">
+<code class="descname">SPIKE_TIMES</code><em class="property"> = 'spike_times'</em><a class="headerlink" href="#allensdk.core.nwb_data_set.NwbDataSet.SPIKE_TIMES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.nwb_data_set.NwbDataSet.fill_sweep_responses">
+<code class="descname">fill_sweep_responses</code><span class="sig-paren">(</span><em>fill_value=0.0</em>, <em>sweep_numbers=None</em>, <em>extend_experiment=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/nwb_data_set.html#NwbDataSet.fill_sweep_responses"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.nwb_data_set.NwbDataSet.fill_sweep_responses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fill sweep response arrays with a single value.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>fill_value: float</strong></dt>
+<dd><p class="first last">Value used to fill sweep response array</p>
+</dd>
+<dt><strong>sweep_numbers: list</strong></dt>
+<dd><p class="first last">List of integer sweep numbers to be filled (default all sweeps)</p>
+</dd>
+<dt><strong>extend_experiment: bool</strong></dt>
+<dd><p class="first last">If True, extend experiment epoch length to the end of the sweep (undo any truncation)</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.nwb_data_set.NwbDataSet.get_experiment_sweep_numbers">
+<code class="descname">get_experiment_sweep_numbers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/nwb_data_set.html#NwbDataSet.get_experiment_sweep_numbers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.nwb_data_set.NwbDataSet.get_experiment_sweep_numbers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all of the sweep numbers for experiment epochs in the file, not including test sweeps.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.nwb_data_set.NwbDataSet.get_pipeline_version">
+<code class="descname">get_pipeline_version</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/nwb_data_set.html#NwbDataSet.get_pipeline_version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.nwb_data_set.NwbDataSet.get_pipeline_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the AI pipeline version number, stored in the 
+metadata field ‘generated_by’. If that field is
+missing, version 0.0 is returned.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>int tuple: (major, minor)</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.nwb_data_set.NwbDataSet.get_spike_times">
+<code class="descname">get_spike_times</code><span class="sig-paren">(</span><em>sweep_number</em>, <em>key=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/nwb_data_set.html#NwbDataSet.get_spike_times"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.nwb_data_set.NwbDataSet.get_spike_times" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return any spike times stored in the NWB file for a sweep.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>sweep_number: int</strong></dt>
+<dd><p class="first last">index to access</p>
+</dd>
+<dt><strong>key</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">label where the spike times are stored (default NwbDataSet.SPIKE_TIMES)</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>list</strong></dt>
+<dd><p class="first last">list of spike times in seconds relative to the start of the sweep</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.nwb_data_set.NwbDataSet.get_sweep">
+<code class="descname">get_sweep</code><span class="sig-paren">(</span><em>sweep_number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/nwb_data_set.html#NwbDataSet.get_sweep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.nwb_data_set.NwbDataSet.get_sweep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the stimulus, response, index_range, and sampling rate
+for a particular sweep.  This method hides the NWB file’s distinction
+between a “Sweep” and an “Experiment”.  An experiment is a subset of
+of a sweep that excludes the initial test pulse.  It also excludes
+any erroneous response data at the end of the sweep (usually for
+ramp sweeps, where recording was terminated mid-stimulus).</p>
+<p>Some sweeps do not have an experiment, so full data arrays are
+returned.  Sweeps that have an experiment return full data arrays
+(include the test pulse) with any erroneous data trimmed from the
+back of the sweep.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>sweep_number: int</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>dict</strong></dt>
+<dd><p class="first last">A dictionary with ‘stimulus’, ‘response’, ‘index_range’, and
+‘sampling_rate’ elements.  The index range is a 2-tuple where
+the first element indicates the end of the test pulse and the
+second index is the end of valid response data.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.nwb_data_set.NwbDataSet.get_sweep_metadata">
+<code class="descname">get_sweep_metadata</code><span class="sig-paren">(</span><em>sweep_number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/nwb_data_set.html#NwbDataSet.get_sweep_metadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.nwb_data_set.NwbDataSet.get_sweep_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the sweep level metadata associated with each sweep.
+Includes information on stimulus parameters like its name and amplitude
+as well as recording quality metadata, like access resistance and
+seal quality.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>sweep_number: int</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>dict</strong></dt>
+<dd><p class="first last">A dictionary with ‘aibs_stimulus_amplitude_pa’, ‘aibs_stimulus_name’,
+‘gain’, ‘initial_access_resistance’, ‘seal’ elements.  These specific
+fields are ones encoded in the original AIBS in vitro .nwb files.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.nwb_data_set.NwbDataSet.get_sweep_numbers">
+<code class="descname">get_sweep_numbers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/nwb_data_set.html#NwbDataSet.get_sweep_numbers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.nwb_data_set.NwbDataSet.get_sweep_numbers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all of the sweep numbers in the file, including test sweeps.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.nwb_data_set.NwbDataSet.set_spike_times">
+<code class="descname">set_spike_times</code><span class="sig-paren">(</span><em>sweep_number</em>, <em>spike_times</em>, <em>key=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/nwb_data_set.html#NwbDataSet.set_spike_times"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.nwb_data_set.NwbDataSet.set_spike_times" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set or overwrite the spikes times for a sweep.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>sweep_number</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">index to access</p>
+</dd>
+<dt><strong>key</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">where the times are stored (default NwbDataSet.SPIKE_TIME)</p>
+</dd>
+<dt><strong>spike_times: np.array</strong></dt>
+<dd><p class="first last">array of spike times in seconds</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.nwb_data_set.NwbDataSet.set_sweep">
+<code class="descname">set_sweep</code><span class="sig-paren">(</span><em>sweep_number</em>, <em>stimulus</em>, <em>response</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/nwb_data_set.html#NwbDataSet.set_sweep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.nwb_data_set.NwbDataSet.set_sweep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overwrite the stimulus or response of an NWB file.
+If the supplied arrays are shorter than stored arrays,
+they are padded with zeros to match the original data
+size.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>sweep_number: int</strong></dt>
+<dd></dd>
+<dt><strong>stimulus: np.array</strong></dt>
+<dd><p class="first last">Overwrite the stimulus with this array.  If None, stimulus is unchanged.</p>
+</dd>
+<dt><strong>response: np.array</strong></dt>
+<dd><p class="first last">Overwrite the response with this array.  If None, response is unchanged.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_space.html">Reference Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="glif_models.html">Generalized LIF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html">Biophysical</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.deprecated.html">allensdk.deprecated module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
+</ul>
+
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allen-sdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    </div>
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalFooter.js"></script>
+
+
+  </body>
+</html>

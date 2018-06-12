@@ -1,0 +1,34 @@
+allensdk.api.queries package
+============================
+
+Submodules
+----------
+
+.. toctree::
+
+   allensdk.api.queries.annotated_section_data_sets_api
+   allensdk.api.queries.biophysical_api
+   allensdk.api.queries.brain_observatory_api
+   allensdk.api.queries.cell_types_api
+   allensdk.api.queries.connected_services
+   allensdk.api.queries.glif_api
+   allensdk.api.queries.grid_data_api
+   allensdk.api.queries.image_download_api
+   allensdk.api.queries.mouse_atlas_api
+   allensdk.api.queries.mouse_connectivity_api
+   allensdk.api.queries.ontologies_api
+   allensdk.api.queries.reference_space_api
+   allensdk.api.queries.rma_api
+   allensdk.api.queries.rma_pager
+   allensdk.api.queries.rma_template
+   allensdk.api.queries.svg_api
+   allensdk.api.queries.synchronization_api
+   allensdk.api.queries.tree_search_api
+
+Module contents
+---------------
+
+.. automodule:: allensdk.api.queries
+    :members:
+    :undoc-members:
+    :show-inheritance:

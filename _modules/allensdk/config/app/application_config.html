@@ -1,32 +1,21 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>allensdk.config.app.application_config &mdash; Allen SDK dev documentation</title>
-    
+    <title>allensdk.config.app.application_config &#8212; Allen SDK dev documentation</title>
     <link rel="stylesheet" href="../../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../../',
-        VERSION:     'dev',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="../../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK dev documentation" href="../../../../index.html" />
-    <link rel="up" title="allensdk.config" href="../../config.html" /> 
-  </head>
-  <body role="document">
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
 <script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
@@ -104,40 +93,40 @@
 <span class="c1"># ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="c1">#</span>
-<span class="kn">from</span> <span class="nn">allensdk.core.json_utilities</span> <span class="kn">import</span> <span class="n">JsonComments</span>
+<span class="kn">from</span> <span class="nn">allensdk.core.json_utilities</span> <span class="k">import</span> <span class="n">JsonComments</span>
 <span class="kn">import</span> <span class="nn">argparse</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">io</span>
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">logging.config</span> <span class="kn">as</span> <span class="nn">lc</span>
-<span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="kn">import</span> <span class="n">resource_filename</span>  <span class="c1"># @UnresolvedImport</span>
+<span class="kn">import</span> <span class="nn">logging.config</span> <span class="k">as</span> <span class="nn">lc</span>
+<span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="k">import</span> <span class="n">resource_filename</span>  <span class="c1"># @UnresolvedImport</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">configparser</span> <span class="kn">import</span> <span class="n">ConfigParser</span>  <span class="c1"># @UnresolvedImport</span>
+    <span class="kn">from</span> <span class="nn">configparser</span> <span class="k">import</span> <span class="n">ConfigParser</span>  <span class="c1"># @UnresolvedImport</span>
 <span class="k">except</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ConfigParser</span> <span class="kn">import</span> <span class="n">ConfigParser</span>  <span class="c1"># @UnresolvedImport</span>
+    <span class="kn">from</span> <span class="nn">ConfigParser</span> <span class="k">import</span> <span class="n">ConfigParser</span>  <span class="c1"># @UnresolvedImport</span>
 
 
-<div class="viewcode-block" id="ApplicationConfig"><a class="viewcode-back" href="../../../../allensdk.config.app.html#allensdk.config.app.application_config.ApplicationConfig">[docs]</a><span class="k">class</span> <span class="nc">ApplicationConfig</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="ApplicationConfig"><a class="viewcode-back" href="../../../../allensdk.config.app.application_config.html#allensdk.config.app.application_config.ApplicationConfig">[docs]</a><span class="k">class</span> <span class="nc">ApplicationConfig</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39; Convenience class that handles of application configuration</span>
 <span class="sd">    from environment variables, .conf files and the command line</span>
 <span class="sd">    using Python standard libraries and formats.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
-    <span class="n">_log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+    <span class="n">_log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
     <span class="n">_DEFAULT_LOG_CONFIG</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span>
-        <span class="s1">&#39;LOG_CFG&#39;</span><span class="p">,</span> <span class="n">resource_filename</span><span class="p">(</span><span class="n">__name__</span><span class="p">,</span> <span class="s1">&#39;logging.conf&#39;</span><span class="p">))</span>
+        <span class="s1">&#39;LOG_CFG&#39;</span><span class="p">,</span> <span class="n">resource_filename</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="s1">&#39;logging.conf&#39;</span><span class="p">))</span>
     <span class="n">lc</span><span class="o">.</span><span class="n">fileConfig</span><span class="p">(</span><span class="n">_DEFAULT_LOG_CONFIG</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">defaults</span><span class="p">,</span>
                  <span class="n">name</span><span class="o">=</span><span class="s2">&quot;app&quot;</span><span class="p">,</span>
                  <span class="n">halp</span><span class="o">=</span><span class="s2">&quot;Run application.&quot;</span><span class="p">,</span>
-                 <span class="n">default_log_config</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+                 <span class="n">default_log_config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">application_name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">help</span> <span class="o">=</span> <span class="n">halp</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug_enabled</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug_enabled</span> <span class="o">=</span> <span class="kc">False</span>
 
-        <span class="k">if</span> <span class="n">default_log_config</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">default_log_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">default_log_config</span> <span class="o">=</span> <span class="n">ApplicationConfig</span><span class="o">.</span><span class="n">_DEFAULT_LOG_CONFIG</span>
 
         <span class="n">ApplicationConfig</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
@@ -163,7 +152,7 @@
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">defaults</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">])</span>
 
-<div class="viewcode-block" id="ApplicationConfig.load"><a class="viewcode-back" href="../../../../allensdk.config.app.html#allensdk.config.app.application_config.ApplicationConfig.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command_line_args</span><span class="p">,</span> <span class="n">disable_existing_loggers</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+<div class="viewcode-block" id="ApplicationConfig.load"><a class="viewcode-back" href="../../../../allensdk.config.app.application_config.html#allensdk.config.app.application_config.ApplicationConfig.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command_line_args</span><span class="p">,</span> <span class="n">disable_existing_loggers</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Load application configuration options, first from the environment,</span>
 <span class="sd">        then from the configuration file, then from the command line.</span>
 
@@ -215,7 +204,7 @@
             <span class="c1"># TODO: configure default logging</span>
             <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="ApplicationConfig.create_argparser"><a class="viewcode-back" href="../../../../allensdk.config.app.html#allensdk.config.app.application_config.ApplicationConfig.create_argparser">[docs]</a>    <span class="k">def</span> <span class="nf">create_argparser</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ApplicationConfig.create_argparser"><a class="viewcode-back" href="../../../../allensdk.config.app.application_config.html#allensdk.config.app.application_config.ApplicationConfig.create_argparser">[docs]</a>    <span class="k">def</span> <span class="nf">create_argparser</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Initialization for the command-line parsing stage.</span>
 
 <span class="sd">        An application specific prefix is applied to argument names.</span>
@@ -242,14 +231,14 @@
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">defaults</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;config_file_path&#39;</span><span class="p">:</span>
                 <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-                    <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">value</span><span class="p">[</span><span class="s1">&#39;help&#39;</span><span class="p">])</span>
+                    <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">value</span><span class="p">[</span><span class="s1">&#39;help&#39;</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
-                                    <span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">value</span><span class="p">[</span><span class="s1">&#39;help&#39;</span><span class="p">])</span>
+                                    <span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">value</span><span class="p">[</span><span class="s1">&#39;help&#39;</span><span class="p">])</span>
 
         <span class="k">return</span> <span class="n">parser</span></div>
 
-<div class="viewcode-block" id="ApplicationConfig.parse_command_line_args"><a class="viewcode-back" href="../../../../allensdk.config.app.html#allensdk.config.app.application_config.ApplicationConfig.parse_command_line_args">[docs]</a>    <span class="k">def</span> <span class="nf">parse_command_line_args</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+<div class="viewcode-block" id="ApplicationConfig.parse_command_line_args"><a class="viewcode-back" href="../../../../allensdk.config.app.application_config.html#allensdk.config.app.application_config.ApplicationConfig.parse_command_line_args">[docs]</a>    <span class="k">def</span> <span class="nf">parse_command_line_args</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Simply call the internal argparser object.</span>
 
 <span class="sd">        Parameters</span>
@@ -264,7 +253,7 @@
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">argparser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">args</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ApplicationConfig.apply_configuration_from_command_line"><a class="viewcode-back" href="../../../../allensdk.config.app.html#allensdk.config.app.application_config.ApplicationConfig.apply_configuration_from_command_line">[docs]</a>    <span class="k">def</span> <span class="nf">apply_configuration_from_command_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_args</span><span class="p">):</span>
+<div class="viewcode-block" id="ApplicationConfig.apply_configuration_from_command_line"><a class="viewcode-back" href="../../../../allensdk.config.app.application_config.html#allensdk.config.app.application_config.ApplicationConfig.apply_configuration_from_command_line">[docs]</a>    <span class="k">def</span> <span class="nf">apply_configuration_from_command_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_args</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Read application configuration variables from the command line.</span>
 
 <span class="sd">        Unassigned variables are left unchanged if previously assigned,</span>
@@ -284,10 +273,10 @@
 
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">defaults</span><span class="p">:</span>
             <span class="n">parsed_value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">parsed_args</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">parsed_value</span> <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">parsed_value</span> <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">parsed_value</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ApplicationConfig.apply_configuration_from_environment"><a class="viewcode-back" href="../../../../allensdk.config.app.html#allensdk.config.app.application_config.ApplicationConfig.apply_configuration_from_environment">[docs]</a>    <span class="k">def</span> <span class="nf">apply_configuration_from_environment</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ApplicationConfig.apply_configuration_from_environment"><a class="viewcode-back" href="../../../../allensdk.config.app.application_config.html#allensdk.config.app.application_config.ApplicationConfig.apply_configuration_from_environment">[docs]</a>    <span class="k">def</span> <span class="nf">apply_configuration_from_environment</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Read application configuration variables from the environment.</span>
 
 <span class="sd">        The variable names are upper case and have a</span>
@@ -302,7 +291,7 @@
             <span class="k">if</span> <span class="n">environment_value</span><span class="p">:</span>
                 <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">environment_value</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ApplicationConfig.from_json_file"><a class="viewcode-back" href="../../../../allensdk.config.app.html#allensdk.config.app.application_config.ApplicationConfig.from_json_file">[docs]</a>    <span class="k">def</span> <span class="nf">from_json_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">json_path</span><span class="p">):</span>
+<div class="viewcode-block" id="ApplicationConfig.from_json_file"><a class="viewcode-back" href="../../../../allensdk.config.app.application_config.html#allensdk.config.app.application_config.ApplicationConfig.from_json_file">[docs]</a>    <span class="k">def</span> <span class="nf">from_json_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">json_path</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Read an application configuration from a JSON format file.</span>
 
 <span class="sd">        Parameters</span>
@@ -320,7 +309,7 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_config_string</span><span class="p">(</span><span class="n">description</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ApplicationConfig.from_json_string"><a class="viewcode-back" href="../../../../allensdk.config.app.html#allensdk.config.app.application_config.ApplicationConfig.from_json_string">[docs]</a>    <span class="k">def</span> <span class="nf">from_json_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">json_string</span><span class="p">):</span>
+<div class="viewcode-block" id="ApplicationConfig.from_json_string"><a class="viewcode-back" href="../../../../allensdk.config.app.application_config.html#allensdk.config.app.application_config.ApplicationConfig.from_json_string">[docs]</a>    <span class="k">def</span> <span class="nf">from_json_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">json_string</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Read a configuration from a JSON format string.</span>
 
 <span class="sd">        Parameters</span>
@@ -337,7 +326,7 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_config_string</span><span class="p">(</span><span class="n">description</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ApplicationConfig.to_config_string"><a class="viewcode-back" href="../../../../allensdk.config.app.html#allensdk.config.app.application_config.ApplicationConfig.to_config_string">[docs]</a>    <span class="k">def</span> <span class="nf">to_config_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+<div class="viewcode-block" id="ApplicationConfig.to_config_string"><a class="viewcode-back" href="../../../../allensdk.config.app.application_config.html#allensdk.config.app.application_config.ApplicationConfig.to_config_string">[docs]</a>    <span class="k">def</span> <span class="nf">to_config_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Create a configuration string from a dict.</span>
 
 <span class="sd">        Parameters</span>
@@ -380,7 +369,7 @@
 
         <span class="k">return</span> <span class="n">bps_cfg_string</span></div>
 
-<div class="viewcode-block" id="ApplicationConfig.apply_configuration_from_file"><a class="viewcode-back" href="../../../../allensdk.config.app.html#allensdk.config.app.application_config.ApplicationConfig.apply_configuration_from_file">[docs]</a>    <span class="k">def</span> <span class="nf">apply_configuration_from_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_file_path</span><span class="p">):</span>
+<div class="viewcode-block" id="ApplicationConfig.apply_configuration_from_file"><a class="viewcode-back" href="../../../../allensdk.config.app.application_config.html#allensdk.config.app.application_config.ApplicationConfig.apply_configuration_from_file">[docs]</a>    <span class="k">def</span> <span class="nf">apply_configuration_from_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_file_path</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Read application configuration variables from a .conf file.</span>
 
 <span class="sd">        Unassigned variables are set to their default values</span>
@@ -402,15 +391,15 @@
         <span class="c1"># defaults are set in environment</span>
         <span class="c1"># they are only overriden by the config file if present</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">defaults</span><span class="p">:</span>
-            <span class="n">none_defaults</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">none_defaults</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;none_defaults: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">none_defaults</span><span class="p">))</span>
 
-        <span class="n">config</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="n">config</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="p">(</span><span class="n">defaults</span><span class="o">=</span><span class="n">none_defaults</span><span class="p">,</span>
-                                  <span class="n">allow_no_value</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                                  <span class="n">allow_no_value</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
                 <span class="s2">&quot;This python installation does not support configuration defaults.&quot;</span><span class="p">)</span>
@@ -443,9 +432,7 @@
         <div class="sphinxsidebarwrapper">
 <h3><a href="../../../../index.html">Contents</a></h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Install Guide</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Install Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../cell_types.html">Cell Types</a></li>
@@ -470,6 +457,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.model.html">allensdk.model package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.morphology.html">allensdk.morphology package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.deprecated.html">allensdk.deprecated module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
@@ -487,12 +475,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

@@ -1,0 +1,7 @@
+allensdk.model.biophysical.utils module
+=======================================
+
+.. automodule:: allensdk.model.biophysical.utils
+    :members:
+    :undoc-members:
+    :show-inheritance:

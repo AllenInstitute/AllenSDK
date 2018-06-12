@@ -1,32 +1,21 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>allensdk.ephys.ephys_extractor &mdash; Allen SDK dev documentation</title>
-    
+    <title>allensdk.ephys.ephys_extractor &#8212; Allen SDK dev documentation</title>
     <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../',
-        VERSION:     'dev',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK dev documentation" href="../../../index.html" />
-    <link rel="up" title="Module code" href="../../index.html" /> 
-  </head>
-  <body role="document">
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
 <script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
@@ -104,13 +93,13 @@
 <span class="c1"># ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="c1">#</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="k">import</span> <span class="n">DataFrame</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">Counter</span>
 
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">ephys_features</span> <span class="k">as</span> <span class="n">ft</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">ephys_features</span> <span class="k">as</span> <span class="n">ft</span>
 <span class="kn">import</span> <span class="nn">six</span>
 
 <span class="c1"># Constants for stimulus-specific analysis</span>
@@ -122,13 +111,13 @@
 <span class="n">SHORT_SQUARE_TRIPLE_WINDOW_START</span> <span class="o">=</span> <span class="mf">2.02</span>
 <span class="n">SHORT_SQUARE_TRIPLE_WINDOW_END</span> <span class="o">=</span> <span class="mf">2.021</span>
 
-<div class="viewcode-block" id="EphysSweepFeatureExtractor"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor">[docs]</a><span class="k">class</span> <span class="nc">EphysSweepFeatureExtractor</span><span class="p">:</span>
+<div class="viewcode-block" id="EphysSweepFeatureExtractor"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor">[docs]</a><span class="k">class</span> <span class="nc">EphysSweepFeatureExtractor</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Feature calculation for a sweep (voltage and/or current time series).&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">i</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">i</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span>
                  <span class="n">dv_cutoff</span><span class="o">=</span><span class="mf">20.</span><span class="p">,</span> <span class="n">max_interval</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span> <span class="n">min_height</span><span class="o">=</span><span class="mf">2.</span><span class="p">,</span> <span class="n">min_peak</span><span class="o">=-</span><span class="mf">30.</span><span class="p">,</span>
                  <span class="n">thresh_frac</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">baseline_interval</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">baseline_detect_thresh</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
-                 <span class="nb">id</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+                 <span class="nb">id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Initialize SweepFeatures object.</span>
 
 <span class="sd">        Parameters</span>
@@ -161,12 +150,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">thresh_frac</span> <span class="o">=</span> <span class="n">thresh_frac</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">baseline_interval</span> <span class="o">=</span> <span class="n">baseline_interval</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">baseline_detect_thresh</span> <span class="o">=</span> <span class="n">baseline_detect_thresh</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">stimulus_amplitude_calculator</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stimulus_amplitude_calculator</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_features</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_affected_by_clipping</span> <span class="o">=</span> <span class="p">[]</span>
 
-<div class="viewcode-block" id="EphysSweepFeatureExtractor.process_spikes"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.process_spikes">[docs]</a>    <span class="k">def</span> <span class="nf">process_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="EphysSweepFeatureExtractor.process_spikes"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.process_spikes">[docs]</a>    <span class="k">def</span> <span class="nf">process_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Perform spike-related feature analysis&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_process_individual_spikes</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_process_spike_related_features</span><span class="p">()</span></div>
@@ -181,7 +170,8 @@
                                                     <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dv_cutoff</span><span class="p">)</span>
         <span class="n">peaks</span> <span class="o">=</span> <span class="n">ft</span><span class="o">.</span><span class="n">find_peak_indexes</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">putative_spikes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">)</span>
         <span class="n">putative_spikes</span><span class="p">,</span> <span class="n">peaks</span> <span class="o">=</span> <span class="n">ft</span><span class="o">.</span><span class="n">filter_putative_spikes</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">putative_spikes</span><span class="p">,</span> <span class="n">peaks</span><span class="p">,</span>
-                                                           <span class="bp">self</span><span class="o">.</span><span class="n">min_height</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_peak</span><span class="p">)</span>
+                                                           <span class="bp">self</span><span class="o">.</span><span class="n">min_height</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_peak</span><span class="p">,</span> 
+                                                           <span class="n">dvdt</span><span class="o">=</span><span class="n">dvdt</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">putative_spikes</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
             <span class="c1"># Save time if no spikes detected</span>
@@ -245,7 +235,7 @@
                 <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">valid_ind</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_t&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">vals</span><span class="p">]</span>
                 <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">valid_ind</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">vals</span><span class="p">]</span>
 
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">i</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">i</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">spikes_df</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_i&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">valid_ind</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_i&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="p">[</span><span class="n">vals</span><span class="p">]</span>
@@ -291,7 +281,7 @@
                 <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">valid_ind</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_t&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">vals</span><span class="p">]</span>
                 <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">valid_ind</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">vals</span><span class="p">]</span>
 
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">i</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">i</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">spikes_df</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_i&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">valid_ind</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_i&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="p">[</span><span class="n">vals</span><span class="p">]</span>
@@ -346,7 +336,7 @@
 
         <span class="k">return</span> <span class="n">ft</span><span class="o">.</span><span class="n">detect_pauses</span><span class="p">(</span><span class="n">isis</span><span class="p">,</span> <span class="n">isi_types</span><span class="p">,</span> <span class="n">cost_weight</span><span class="p">)</span>
 
-<div class="viewcode-block" id="EphysSweepFeatureExtractor.pause_metrics"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.pause_metrics">[docs]</a>    <span class="k">def</span> <span class="nf">pause_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="EphysSweepFeatureExtractor.pause_metrics"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.pause_metrics">[docs]</a>    <span class="k">def</span> <span class="nf">pause_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Estimate average number of pauses and average fraction of time spent in a pause</span>
 
 <span class="sd">        Attempts to detect pauses with a variety of conditions and averages results together.</span>
@@ -393,7 +383,7 @@
 
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">bursts</span><span class="p">)</span>
 
-<div class="viewcode-block" id="EphysSweepFeatureExtractor.burst_metrics"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.burst_metrics">[docs]</a>    <span class="k">def</span> <span class="nf">burst_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="EphysSweepFeatureExtractor.burst_metrics"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.burst_metrics">[docs]</a>    <span class="k">def</span> <span class="nf">burst_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Find bursts and return max &quot;burstiness&quot; index (normalized max rate in burst vs out).</span>
 
 <span class="sd">        Returns</span>
@@ -409,7 +399,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="mf">0.</span><span class="p">,</span> <span class="mi">0</span></div>
 
-<div class="viewcode-block" id="EphysSweepFeatureExtractor.delay_metrics"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.delay_metrics">[docs]</a>    <span class="k">def</span> <span class="nf">delay_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="EphysSweepFeatureExtractor.delay_metrics"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.delay_metrics">[docs]</a>    <span class="k">def</span> <span class="nf">delay_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Calculates ratio of latency to dominant time constant of rise before spike</span>
 
 <span class="sd">        Returns</span>
@@ -436,7 +426,7 @@
         <span class="n">filter_frequency</span> <span class="o">=</span> <span class="mf">1.</span> <span class="c1"># in kHz</span>
 
         <span class="c1"># Look at baseline interval before start if start is defined</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">ft</span><span class="o">.</span><span class="n">average_voltage</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseline_interval</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
 
         <span class="c1"># Otherwise try to find an interval where things are pretty flat</span>
@@ -453,7 +443,7 @@
             <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Could not find sufficiently flat interval for automatic baseline voltage&quot;</span><span class="p">,</span> <span class="ne">RuntimeWarning</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
 
-<div class="viewcode-block" id="EphysSweepFeatureExtractor.voltage_deflection"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.voltage_deflection">[docs]</a>    <span class="k">def</span> <span class="nf">voltage_deflection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deflect_type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="EphysSweepFeatureExtractor.voltage_deflection"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.voltage_deflection">[docs]</a>    <span class="k">def</span> <span class="nf">voltage_deflection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deflect_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Measure deflection (min or max, between start and end if specified).</span>
 
 <span class="sd">        Parameters</span>
@@ -485,8 +475,8 @@
         <span class="n">end_index</span> <span class="o">=</span> <span class="n">ft</span><span class="o">.</span><span class="n">find_time_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
 
 
-        <span class="k">if</span> <span class="n">deflect_type</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">i</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">deflect_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">i</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">halfway_index</span> <span class="o">=</span> <span class="n">ft</span><span class="o">.</span><span class="n">find_time_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.</span> <span class="o">+</span> <span class="n">start</span><span class="p">)</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="p">[</span><span class="n">halfway_index</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">deflect_type</span> <span class="o">=</span> <span class="s2">&quot;max&quot;</span>
@@ -502,14 +492,14 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">[</span><span class="n">deflect_index</span><span class="p">],</span> <span class="n">deflect_index</span></div>
 
-<div class="viewcode-block" id="EphysSweepFeatureExtractor.stimulus_amplitude"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.stimulus_amplitude">[docs]</a>    <span class="k">def</span> <span class="nf">stimulus_amplitude</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="EphysSweepFeatureExtractor.stimulus_amplitude"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.stimulus_amplitude">[docs]</a>    <span class="k">def</span> <span class="nf">stimulus_amplitude</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stimulus_amplitude_calculator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stimulus_amplitude_calculator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">stimulus_amplitude_calculator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span></div>
 
-<div class="viewcode-block" id="EphysSweepFeatureExtractor.estimate_time_constant"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.estimate_time_constant">[docs]</a>    <span class="k">def</span> <span class="nf">estimate_time_constant</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="EphysSweepFeatureExtractor.estimate_time_constant"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.estimate_time_constant">[docs]</a>    <span class="k">def</span> <span class="nf">estimate_time_constant</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Calculate the membrane time constant by fitting the voltage response with a</span>
 <span class="sd">        single exponential.</span>
 
@@ -538,7 +528,7 @@
 
         <span class="k">return</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">inv_tau</span></div>
 
-<div class="viewcode-block" id="EphysSweepFeatureExtractor.estimate_sag"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.estimate_sag">[docs]</a>    <span class="k">def</span> <span class="nf">estimate_sag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">peak_width</span><span class="o">=</span><span class="mf">0.005</span><span class="p">):</span>
+<div class="viewcode-block" id="EphysSweepFeatureExtractor.estimate_sag"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.estimate_sag">[docs]</a>    <span class="k">def</span> <span class="nf">estimate_sag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">peak_width</span><span class="o">=</span><span class="mf">0.005</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Calculate the sag in a hyperpolarizing voltage response.</span>
 
 <span class="sd">        Parameters</span>
@@ -569,11 +559,11 @@
         <span class="n">sag</span> <span class="o">=</span> <span class="p">(</span><span class="n">v_peak_avg</span> <span class="o">-</span> <span class="n">v_steady</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">v_peak_avg</span> <span class="o">-</span> <span class="n">v_baseline</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">sag</span></div>
 
-<div class="viewcode-block" id="EphysSweepFeatureExtractor.spikes"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.spikes">[docs]</a>    <span class="k">def</span> <span class="nf">spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="EphysSweepFeatureExtractor.spikes"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.spikes">[docs]</a>    <span class="k">def</span> <span class="nf">spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get all features for each spike as a list of records.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s1">&#39;records&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="EphysSweepFeatureExtractor.spike_feature"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.spike_feature">[docs]</a>    <span class="k">def</span> <span class="nf">spike_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">include_clipped</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">force_exclude_clipped</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="EphysSweepFeatureExtractor.spike_feature"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.spike_feature">[docs]</a>    <span class="k">def</span> <span class="nf">spike_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">include_clipped</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">force_exclude_clipped</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get specified feature for every spike.</span>
 
 <span class="sd">        Parameters</span>
@@ -593,7 +583,7 @@
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
 
         <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;requested feature &#39;{:s}&#39; not available&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;requested feature &#39;</span><span class="si">{:s}</span><span class="s2">&#39; not available&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
 
         <span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
 
@@ -607,14 +597,14 @@
 
         <span class="k">return</span> <span class="n">values</span></div>
 
-<div class="viewcode-block" id="EphysSweepFeatureExtractor.is_spike_feature_affected_by_clipping"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.is_spike_feature_affected_by_clipping">[docs]</a>    <span class="k">def</span> <span class="nf">is_spike_feature_affected_by_clipping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+<div class="viewcode-block" id="EphysSweepFeatureExtractor.is_spike_feature_affected_by_clipping"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.is_spike_feature_affected_by_clipping">[docs]</a>    <span class="k">def</span> <span class="nf">is_spike_feature_affected_by_clipping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_affected_by_clipping</span></div>
 
-<div class="viewcode-block" id="EphysSweepFeatureExtractor.spike_feature_keys"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.spike_feature_keys">[docs]</a>    <span class="k">def</span> <span class="nf">spike_feature_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="EphysSweepFeatureExtractor.spike_feature_keys"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.spike_feature_keys">[docs]</a>    <span class="k">def</span> <span class="nf">spike_feature_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get list of every available spike feature.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="EphysSweepFeatureExtractor.sweep_feature"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.sweep_feature">[docs]</a>    <span class="k">def</span> <span class="nf">sweep_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">allow_missing</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="EphysSweepFeatureExtractor.sweep_feature"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.sweep_feature">[docs]</a>    <span class="k">def</span> <span class="nf">sweep_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">allow_missing</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get sweep-level feature (`key`).</span>
 
 <span class="sd">        Parameters</span>
@@ -638,18 +628,18 @@
         <span class="k">if</span> <span class="n">allow_missing</span> <span class="ow">and</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_features</span> <span class="ow">and</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">on_request_dispatch</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
         <span class="k">elif</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_features</span> <span class="ow">and</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">on_request_dispatch</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;requested feature &#39;{:s}&#39; not available&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;requested feature &#39;</span><span class="si">{:s}</span><span class="s2">&#39; not available&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_features</span> <span class="ow">and</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">on_request_dispatch</span><span class="p">:</span>
             <span class="n">fn</span> <span class="o">=</span> <span class="n">on_request_dispatch</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">fn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">fn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_features</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">fn</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;requested feature &#39;{:s}&#39; not defined&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;requested feature &#39;</span><span class="si">{:s}</span><span class="s2">&#39; not defined&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_features</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="EphysSweepFeatureExtractor.process_new_spike_feature"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.process_new_spike_feature">[docs]</a>    <span class="k">def</span> <span class="nf">process_new_spike_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feature_name</span><span class="p">,</span> <span class="n">feature_func</span><span class="p">,</span> <span class="n">affected_by_clipping</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="EphysSweepFeatureExtractor.process_new_spike_feature"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.process_new_spike_feature">[docs]</a>    <span class="k">def</span> <span class="nf">process_new_spike_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feature_name</span><span class="p">,</span> <span class="n">feature_func</span><span class="p">,</span> <span class="n">affected_by_clipping</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Add new spike-level feature calculation function</span>
 
 <span class="sd">           The function should take this sweep extractor as its argument. Its results</span>
@@ -657,14 +647,14 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">feature_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Feature {:s} already exists for sweep&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">feature_name</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Feature </span><span class="si">{:s}</span><span class="s2"> already exists for sweep&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">feature_name</span><span class="p">))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="p">[</span><span class="n">feature_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">feature_func</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">affected_by_clipping</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_affected_by_clipping</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">feature_name</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="EphysSweepFeatureExtractor.process_new_sweep_feature"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.process_new_sweep_feature">[docs]</a>    <span class="k">def</span> <span class="nf">process_new_sweep_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feature_name</span><span class="p">,</span> <span class="n">feature_func</span><span class="p">):</span>
+<div class="viewcode-block" id="EphysSweepFeatureExtractor.process_new_sweep_feature"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.process_new_sweep_feature">[docs]</a>    <span class="k">def</span> <span class="nf">process_new_sweep_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feature_name</span><span class="p">,</span> <span class="n">feature_func</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Add new sweep-level feature calculation function</span>
 
 <span class="sd">           The function should take this sweep extractor as its argument. Its results</span>
@@ -672,31 +662,31 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">feature_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_features</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Feature {:s} already exists for sweep&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">feature_name</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Feature </span><span class="si">{:s}</span><span class="s2"> already exists for sweep&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">feature_name</span><span class="p">))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_features</span><span class="p">[</span><span class="n">feature_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">feature_func</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="EphysSweepFeatureExtractor.set_stimulus_amplitude_calculator"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.set_stimulus_amplitude_calculator">[docs]</a>    <span class="k">def</span> <span class="nf">set_stimulus_amplitude_calculator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">function</span><span class="p">):</span>
+<div class="viewcode-block" id="EphysSweepFeatureExtractor.set_stimulus_amplitude_calculator"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.set_stimulus_amplitude_calculator">[docs]</a>    <span class="k">def</span> <span class="nf">set_stimulus_amplitude_calculator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">function</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stimulus_amplitude_calculator</span> <span class="o">=</span> <span class="n">function</span></div>
 
-<div class="viewcode-block" id="EphysSweepFeatureExtractor.sweep_feature_keys"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.sweep_feature_keys">[docs]</a>    <span class="k">def</span> <span class="nf">sweep_feature_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="EphysSweepFeatureExtractor.sweep_feature_keys"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.sweep_feature_keys">[docs]</a>    <span class="k">def</span> <span class="nf">sweep_feature_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get list of every available sweep-level feature.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_features</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="EphysSweepFeatureExtractor.as_dict"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.as_dict">[docs]</a>    <span class="k">def</span> <span class="nf">as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="EphysSweepFeatureExtractor.as_dict"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.as_dict">[docs]</a>    <span class="k">def</span> <span class="nf">as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create dict of features and spikes.&quot;&quot;&quot;</span>
         <span class="n">output_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_features</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">output_dict</span><span class="p">[</span><span class="s2">&quot;spikes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spikes</span><span class="p">()</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">output_dict</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span>
         <span class="k">return</span> <span class="n">output_dict</span></div></div>
 
 
-<div class="viewcode-block" id="EphysSweepSetFeatureExtractor"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepSetFeatureExtractor">[docs]</a><span class="k">class</span> <span class="nc">EphysSweepSetFeatureExtractor</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t_set</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">v_set</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">i_set</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+<div class="viewcode-block" id="EphysSweepSetFeatureExtractor"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.EphysSweepSetFeatureExtractor">[docs]</a><span class="k">class</span> <span class="nc">EphysSweepSetFeatureExtractor</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t_set</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">v_set</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">i_set</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="nb">filter</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span> <span class="n">dv_cutoff</span><span class="o">=</span><span class="mf">20.</span><span class="p">,</span> <span class="n">max_interval</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span> <span class="n">min_height</span><span class="o">=</span><span class="mf">2.</span><span class="p">,</span>
                  <span class="n">min_peak</span><span class="o">=-</span><span class="mf">30.</span><span class="p">,</span> <span class="n">thresh_frac</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">baseline_interval</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-                 <span class="n">baseline_detect_thresh</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">id_set</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+                 <span class="n">baseline_detect_thresh</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">id_set</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Initialize EphysSweepSetFeatureExtractor object.</span>
 
 <span class="sd">        Parameters</span>
@@ -716,20 +706,20 @@
 <span class="sd">        baseline_detect_thresh : dV/dt threshold for evaluating flatness of baseline region (optional, default 0.3)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span> <span class="n">t_set</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">v_set</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">t_set</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">v_set</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_set_sweeps</span><span class="p">(</span><span class="n">t_set</span><span class="p">,</span> <span class="n">v_set</span><span class="p">,</span> <span class="n">i_set</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="nb">filter</span><span class="p">,</span> <span class="n">dv_cutoff</span><span class="p">,</span> <span class="n">max_interval</span><span class="p">,</span>
                              <span class="n">min_height</span><span class="p">,</span> <span class="n">min_peak</span><span class="p">,</span> <span class="n">thresh_frac</span><span class="p">,</span> <span class="n">baseline_interval</span><span class="p">,</span>
                              <span class="n">baseline_detect_thresh</span><span class="p">,</span> <span class="n">id_set</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_sweeps</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sweeps</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="EphysSweepSetFeatureExtractor.from_sweeps"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepSetFeatureExtractor.from_sweeps">[docs]</a>    <span class="k">def</span> <span class="nf">from_sweeps</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">sweep_list</span><span class="p">):</span>
+<div class="viewcode-block" id="EphysSweepSetFeatureExtractor.from_sweeps"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.EphysSweepSetFeatureExtractor.from_sweeps">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_sweeps</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">sweep_list</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Initialize EphysSweepSetFeatureExtractor object with a list of pre-existing</span>
 <span class="sd">        sweep feature extractor objects.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">obj</span> <span class="o">=</span> <span class="n">cls</span><span class="p">()</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">()</span>
         <span class="n">obj</span><span class="o">.</span><span class="n">_sweeps</span> <span class="o">=</span> <span class="n">sweep_list</span>
         <span class="k">return</span> <span class="n">obj</span></div>
 
@@ -742,7 +732,7 @@
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">v_set</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">list</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;v_set must be a list&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">i_set</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">i_set</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">i_set</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">i_set</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">list</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;i_set must be a list&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">t_set</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">v_set</span><span class="p">):</span>
@@ -751,14 +741,14 @@
         <span class="k">if</span> <span class="n">i_set</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">t_set</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">i_set</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;t_set and i_set must have the same number of items&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">id_set</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">id_set</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">id_set</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">t_set</span><span class="p">))</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">id_set</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">t_set</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;t_set and id_set must have the same number of items&quot;</span><span class="p">)</span>
 
         <span class="n">sweeps</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="n">i_set</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">i_set</span> <span class="o">=</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">t_set</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">i_set</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">i_set</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">t_set</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">start</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">list</span><span class="p">:</span>
             <span class="n">start</span> <span class="o">=</span> <span class="p">[</span><span class="n">start</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">t_set</span><span class="p">)</span>
@@ -776,16 +766,16 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_sweeps</span> <span class="o">=</span> <span class="n">sweeps</span>
 
-<div class="viewcode-block" id="EphysSweepSetFeatureExtractor.sweeps"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepSetFeatureExtractor.sweeps">[docs]</a>    <span class="k">def</span> <span class="nf">sweeps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="EphysSweepSetFeatureExtractor.sweeps"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.EphysSweepSetFeatureExtractor.sweeps">[docs]</a>    <span class="k">def</span> <span class="nf">sweeps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get list of EphysSweepFeatureExtractor objects.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweeps</span></div>
 
-<div class="viewcode-block" id="EphysSweepSetFeatureExtractor.process_spikes"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepSetFeatureExtractor.process_spikes">[docs]</a>    <span class="k">def</span> <span class="nf">process_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="EphysSweepSetFeatureExtractor.process_spikes"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.EphysSweepSetFeatureExtractor.process_spikes">[docs]</a>    <span class="k">def</span> <span class="nf">process_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Analyze spike features for all sweeps.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">sweep</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweeps</span><span class="p">:</span>
             <span class="n">sweep</span><span class="o">.</span><span class="n">process_spikes</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="EphysSweepSetFeatureExtractor.sweep_features"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepSetFeatureExtractor.sweep_features">[docs]</a>    <span class="k">def</span> <span class="nf">sweep_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">allow_missing</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="EphysSweepSetFeatureExtractor.sweep_features"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.EphysSweepSetFeatureExtractor.sweep_features">[docs]</a>    <span class="k">def</span> <span class="nf">sweep_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">allow_missing</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get nparray of sweep-level feature (`key`) for all sweeps</span>
 
 <span class="sd">        Parameters</span>
@@ -800,12 +790,12 @@
 
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">swp</span><span class="o">.</span><span class="n">sweep_feature</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">allow_missing</span><span class="p">)</span> <span class="k">for</span> <span class="n">swp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweeps</span><span class="p">])</span></div>
 
-<div class="viewcode-block" id="EphysSweepSetFeatureExtractor.spike_feature_averages"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepSetFeatureExtractor.spike_feature_averages">[docs]</a>    <span class="k">def</span> <span class="nf">spike_feature_averages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+<div class="viewcode-block" id="EphysSweepSetFeatureExtractor.spike_feature_averages"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.EphysSweepSetFeatureExtractor.spike_feature_averages">[docs]</a>    <span class="k">def</span> <span class="nf">spike_feature_averages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get nparray of average spike-level feature (`key`) for all sweeps&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">swp</span><span class="o">.</span><span class="n">spike_feature</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="k">for</span> <span class="n">swp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweeps</span><span class="p">])</span></div></div>
 
 
-<div class="viewcode-block" id="EphysCellFeatureExtractor"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor">[docs]</a><span class="k">class</span> <span class="nc">EphysCellFeatureExtractor</span><span class="p">:</span>
+<div class="viewcode-block" id="EphysCellFeatureExtractor"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor">[docs]</a><span class="k">class</span> <span class="nc">EphysCellFeatureExtractor</span><span class="p">:</span>
     <span class="c1"># Class constants for specific processing</span>
     <span class="n">SUBTHRESH_MAX_AMP</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">SAG_TARGET</span> <span class="o">=</span> <span class="o">-</span><span class="mf">100.</span>
@@ -834,12 +824,12 @@
             <span class="s2">&quot;long_squares&quot;</span><span class="p">:</span> <span class="p">{},</span>
         <span class="p">}</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_spiking_long_squares_ext</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_subthreshold_long_squares_ext</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_subthreshold_membrane_property_ext</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_spiking_long_squares_ext</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subthreshold_long_squares_ext</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subthreshold_membrane_property_ext</span> <span class="o">=</span> <span class="kc">None</span>
 
 
-<div class="viewcode-block" id="EphysCellFeatureExtractor.process"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="EphysCellFeatureExtractor.process"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Processes features. Can take a specific key (or set of keys) to do a subset of processing.&quot;&quot;&quot;</span>
 
         <span class="n">dispatch</span> <span class="o">=</span> <span class="p">{</span>
@@ -849,13 +839,13 @@
             <span class="s2">&quot;long_squares_spiking&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_analyze_long_squares_spiking</span><span class="p">,</span>
         <span class="p">}</span>
 
-        <span class="k">if</span> <span class="n">keys</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">keys</span> <span class="o">=</span> <span class="n">dispatch</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">keys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">dispatch</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">list</span><span class="p">:</span>
-            <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">keys</span><span class="p">]</span>
+            <span class="n">keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="n">j</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">keys</span> <span class="k">if</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">dispatch</span><span class="o">.</span><span class="n">keys</span><span class="p">()]:</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="n">j</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">keys</span> <span class="k">if</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">dispatch</span><span class="p">]:</span>
             <span class="n">dispatch</span><span class="p">[</span><span class="n">k</span><span class="p">]()</span></div>
 
     <span class="k">def</span> <span class="nf">_analyze_ramps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -871,7 +861,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s2">&quot;ramps&quot;</span><span class="p">][</span><span class="s2">&quot;spiking_sweeps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">()</span>
 
-<div class="viewcode-block" id="EphysCellFeatureExtractor.ramps_features"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.ramps_features">[docs]</a>    <span class="k">def</span> <span class="nf">ramps_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">all</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="EphysCellFeatureExtractor.ramps_features"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.ramps_features">[docs]</a>    <span class="k">def</span> <span class="nf">ramps_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">all</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">all</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_ramps_ext</span>
         <span class="k">else</span><span class="p">:</span>
@@ -903,14 +893,14 @@
         <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s2">&quot;short_squares&quot;</span><span class="p">][</span><span class="s2">&quot;common_amp_sweeps&quot;</span><span class="p">]:</span>
             <span class="n">s</span><span class="o">.</span><span class="n">set_stimulus_amplitude_calculator</span><span class="p">(</span><span class="n">_short_step_stim_amp</span><span class="p">)</span>
 
-<div class="viewcode-block" id="EphysCellFeatureExtractor.short_squares_features"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.short_squares_features">[docs]</a>    <span class="k">def</span> <span class="nf">short_squares_features</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="EphysCellFeatureExtractor.short_squares_features"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.short_squares_features">[docs]</a>    <span class="k">def</span> <span class="nf">short_squares_features</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_short_squares_ext</span></div>
 
     <span class="k">def</span> <span class="nf">_analyze_long_squares</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_analyze_long_squares_spiking</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_analyze_long_squares_subthreshold</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_analyze_long_squares_spiking</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">force_reprocess</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_analyze_long_squares_spiking</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">force_reprocess</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">force_reprocess</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spiking_long_squares_ext</span><span class="p">:</span>
             <span class="k">return</span>
 
@@ -973,7 +963,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s2">&quot;long_squares&quot;</span><span class="p">][</span><span class="s2">&quot;tau&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">membrane_time_constant</span><span class="p">(</span><span class="n">calc_subthresh_ext</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s2">&quot;long_squares&quot;</span><span class="p">][</span><span class="s2">&quot;v_baseline&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">ext</span><span class="o">.</span><span class="n">sweep_features</span><span class="p">(</span><span class="s2">&quot;v_baseline&quot;</span><span class="p">))</span>
 
-<div class="viewcode-block" id="EphysCellFeatureExtractor.long_squares_features"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.long_squares_features">[docs]</a>    <span class="k">def</span> <span class="nf">long_squares_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">option</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="EphysCellFeatureExtractor.long_squares_features"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.long_squares_features">[docs]</a>    <span class="k">def</span> <span class="nf">long_squares_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">option</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">option_table</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;spiking&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spiking_long_squares_ext</span><span class="p">,</span>
             <span class="s2">&quot;subthreshold&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subthreshold_long_squares_ext</span><span class="p">,</span>
@@ -984,7 +974,7 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_long_squares_ext</span></div>
 
-<div class="viewcode-block" id="EphysCellFeatureExtractor.long_squares_stim_amps"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.long_squares_stim_amps">[docs]</a>    <span class="k">def</span> <span class="nf">long_squares_stim_amps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">option</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="EphysCellFeatureExtractor.long_squares_stim_amps"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.long_squares_stim_amps">[docs]</a>    <span class="k">def</span> <span class="nf">long_squares_stim_amps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">option</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">option_table</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;spiking&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spiking_long_squares_ext</span><span class="p">,</span>
             <span class="s2">&quot;subthreshold&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subthreshold_long_squares_ext</span><span class="p">,</span>
@@ -997,10 +987,10 @@
 
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">_step_stim_amp</span><span class="p">,</span> <span class="n">ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">()))</span></div>
 
-<div class="viewcode-block" id="EphysCellFeatureExtractor.cell_features"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.cell_features">[docs]</a>    <span class="k">def</span> <span class="nf">cell_features</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="EphysCellFeatureExtractor.cell_features"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.cell_features">[docs]</a>    <span class="k">def</span> <span class="nf">cell_features</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_features</span></div>
 
-<div class="viewcode-block" id="EphysCellFeatureExtractor.as_dict"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.as_dict">[docs]</a>    <span class="k">def</span> <span class="nf">as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="EphysCellFeatureExtractor.as_dict"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.as_dict">[docs]</a>    <span class="k">def</span> <span class="nf">as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create dict of cell features.&quot;&quot;&quot;</span>
 
         <span class="c1"># get shallow copies of the sub-type dictionaries</span>
@@ -1030,7 +1020,7 @@
         <span class="k">return</span> <span class="n">out</span></div></div>
 
 
-<div class="viewcode-block" id="input_resistance"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.input_resistance">[docs]</a><span class="k">def</span> <span class="nf">input_resistance</span><span class="p">(</span><span class="n">ext</span><span class="p">):</span>
+<div class="viewcode-block" id="input_resistance"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.input_resistance">[docs]</a><span class="k">def</span> <span class="nf">input_resistance</span><span class="p">(</span><span class="n">ext</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Estimate input resistance in MOhms, assuming all sweeps in passed extractor</span>
 <span class="sd">    are hyperpolarizing responses.&quot;&quot;&quot;</span>
 
@@ -1041,7 +1031,7 @@
     <span class="n">v_vals</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">i_vals</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">sweep</span> <span class="ow">in</span> <span class="n">sweeps</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">sweep</span><span class="o">.</span><span class="n">i</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">sweep</span><span class="o">.</span><span class="n">i</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ft</span><span class="o">.</span><span class="n">FeatureError</span><span class="p">(</span><span class="s2">&quot;cannot calculate input resistance: i not defined for a sweep&quot;</span><span class="p">)</span>
 
         <span class="n">v_peak</span><span class="p">,</span> <span class="n">min_index</span> <span class="o">=</span> <span class="n">sweep</span><span class="o">.</span><span class="n">voltage_deflection</span><span class="p">(</span><span class="s1">&#39;min&#39;</span><span class="p">)</span>
@@ -1063,7 +1053,7 @@
     <span class="k">return</span> <span class="n">m</span> <span class="o">*</span> <span class="mf">1e3</span></div>
 
 
-<div class="viewcode-block" id="membrane_time_constant"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.membrane_time_constant">[docs]</a><span class="k">def</span> <span class="nf">membrane_time_constant</span><span class="p">(</span><span class="n">ext</span><span class="p">):</span>
+<div class="viewcode-block" id="membrane_time_constant"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.membrane_time_constant">[docs]</a><span class="k">def</span> <span class="nf">membrane_time_constant</span><span class="p">(</span><span class="n">ext</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Average the membrane time constant values estimated from each sweep in passed extractor.&quot;&quot;&quot;</span>
 
     <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
@@ -1072,7 +1062,7 @@
     <span class="k">return</span> <span class="n">avg_tau</span></div>
 
 
-<div class="viewcode-block" id="fit_fi_slope"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.fit_fi_slope">[docs]</a><span class="k">def</span> <span class="nf">fit_fi_slope</span><span class="p">(</span><span class="n">ext</span><span class="p">):</span>
+<div class="viewcode-block" id="fit_fi_slope"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.fit_fi_slope">[docs]</a><span class="k">def</span> <span class="nf">fit_fi_slope</span><span class="p">(</span><span class="n">ext</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Fit the rate and stimulus amplitude to a line and return the slope of the fit.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">())</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">ft</span><span class="o">.</span><span class="n">FeatureError</span><span class="p">(</span><span class="s2">&quot;Cannot fit f-I curve slope with less than two suprathreshold sweeps&quot;</span><span class="p">)</span>
@@ -1081,19 +1071,20 @@
     <span class="n">y</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">sweep_features</span><span class="p">(</span><span class="s2">&quot;avg_rate&quot;</span><span class="p">)</span>
 
     <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">x</span><span class="p">)])</span><span class="o">.</span><span class="n">T</span>
+
     <span class="n">m</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">y</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="k">return</span> <span class="n">m</span></div>
 
 
-<div class="viewcode-block" id="reset_long_squares_start"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.reset_long_squares_start">[docs]</a><span class="k">def</span> <span class="nf">reset_long_squares_start</span><span class="p">(</span><span class="n">when</span><span class="p">):</span>
+<div class="viewcode-block" id="reset_long_squares_start"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.reset_long_squares_start">[docs]</a><span class="k">def</span> <span class="nf">reset_long_squares_start</span><span class="p">(</span><span class="n">when</span><span class="p">):</span>
     <span class="k">global</span> <span class="n">LONG_SQUARES_START</span><span class="p">,</span> <span class="n">LONG_SQUARES_END</span>
     <span class="n">delta</span> <span class="o">=</span> <span class="n">LONG_SQUARES_END</span> <span class="o">-</span> <span class="n">LONG_SQUARES_START</span>
     <span class="n">LONG_SQUARES_START</span> <span class="o">=</span> <span class="n">when</span>
     <span class="n">LONG_SQUARES_END</span> <span class="o">=</span> <span class="n">when</span> <span class="o">+</span> <span class="n">delta</span></div>
 
 
-<div class="viewcode-block" id="cell_extractor_for_nwb"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.cell_extractor_for_nwb">[docs]</a><span class="k">def</span> <span class="nf">cell_extractor_for_nwb</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">ramps</span><span class="p">,</span> <span class="n">short_squares</span><span class="p">,</span> <span class="n">long_squares</span><span class="p">,</span> <span class="n">subthresh_min_amp</span><span class="o">=-</span><span class="mi">100</span><span class="p">):</span>
+<div class="viewcode-block" id="cell_extractor_for_nwb"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.cell_extractor_for_nwb">[docs]</a><span class="k">def</span> <span class="nf">cell_extractor_for_nwb</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">ramps</span><span class="p">,</span> <span class="n">short_squares</span><span class="p">,</span> <span class="n">long_squares</span><span class="p">,</span> <span class="n">subthresh_min_amp</span><span class="o">=-</span><span class="mi">100</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Initialize EphysCellFeatureExtractor object from NWB data set</span>
 
 <span class="sd">    Parameters</span>
@@ -1131,8 +1122,8 @@
     <span class="k">return</span> <span class="n">EphysCellFeatureExtractor</span><span class="p">(</span><span class="n">ramps_ext</span><span class="p">,</span> <span class="n">short_squares_ext</span><span class="p">,</span> <span class="n">long_squares_ext</span><span class="p">,</span> <span class="n">subthresh_min_amp</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="extractor_for_nwb_sweeps"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.extractor_for_nwb_sweeps">[docs]</a><span class="k">def</span> <span class="nf">extractor_for_nwb_sweeps</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">sweep_numbers</span><span class="p">,</span>
-                             <span class="n">fixed_start</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">fixed_end</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+<div class="viewcode-block" id="extractor_for_nwb_sweeps"><a class="viewcode-back" href="../../../allensdk.ephys.ephys_extractor.html#allensdk.ephys.ephys_extractor.extractor_for_nwb_sweeps">[docs]</a><span class="k">def</span> <span class="nf">extractor_for_nwb_sweeps</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">sweep_numbers</span><span class="p">,</span>
+                             <span class="n">fixed_start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fixed_end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                              <span class="n">dv_cutoff</span><span class="o">=</span><span class="mf">20.</span><span class="p">,</span> <span class="n">thresh_frac</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
     <span class="n">v_set</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">t_set</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1184,9 +1175,7 @@
         <div class="sphinxsidebarwrapper">
 <h3><a href="../../../index.html">Contents</a></h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install Guide</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../cell_types.html">Cell Types</a></li>
@@ -1211,6 +1200,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.model.html">allensdk.model package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.morphology.html">allensdk.morphology package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.deprecated.html">allensdk.deprecated module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
@@ -1228,12 +1218,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

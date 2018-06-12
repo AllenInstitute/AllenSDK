@@ -1,32 +1,21 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>allensdk.core.reference_space_cache &mdash; Allen SDK dev documentation</title>
-    
+    <title>allensdk.core.reference_space_cache &#8212; Allen SDK dev documentation</title>
     <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../',
-        VERSION:     'dev',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK dev documentation" href="../../../index.html" />
-    <link rel="up" title="Module code" href="../../index.html" /> 
-  </head>
-  <body role="document">
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
 <script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
@@ -104,18 +93,18 @@
 <span class="c1"># ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="c1">#</span>
-<span class="kn">from</span> <span class="nn">allensdk.config.manifest_builder</span> <span class="kn">import</span> <span class="n">ManifestBuilder</span>
-<span class="kn">from</span> <span class="nn">allensdk.api.cache</span> <span class="kn">import</span> <span class="n">Cache</span>
-<span class="kn">from</span> <span class="nn">allensdk.api.queries.reference_space_api</span> <span class="kn">import</span> <span class="n">ReferenceSpaceApi</span>
-<span class="kn">from</span> <span class="nn">allensdk.api.queries.ontologies_api</span> <span class="kn">import</span> <span class="n">OntologiesApi</span>
-<span class="kn">from</span> <span class="nn">allensdk.deprecated</span> <span class="kn">import</span> <span class="n">deprecated</span>
+<span class="kn">from</span> <span class="nn">allensdk.config.manifest_builder</span> <span class="k">import</span> <span class="n">ManifestBuilder</span>
+<span class="kn">from</span> <span class="nn">allensdk.api.cache</span> <span class="k">import</span> <span class="n">Cache</span>
+<span class="kn">from</span> <span class="nn">allensdk.api.queries.reference_space_api</span> <span class="k">import</span> <span class="n">ReferenceSpaceApi</span>
+<span class="kn">from</span> <span class="nn">allensdk.api.queries.ontologies_api</span> <span class="k">import</span> <span class="n">OntologiesApi</span>
+<span class="kn">from</span> <span class="nn">allensdk.deprecated</span> <span class="k">import</span> <span class="n">deprecated</span>
 
-<span class="kn">from</span> <span class="nn">.ontology</span> <span class="kn">import</span> <span class="n">Ontology</span>
-<span class="kn">from</span> <span class="nn">.structure_tree</span> <span class="kn">import</span> <span class="n">StructureTree</span>
-<span class="kn">from</span> <span class="nn">.reference_space</span> <span class="kn">import</span> <span class="n">ReferenceSpace</span>
+<span class="kn">from</span> <span class="nn">.ontology</span> <span class="k">import</span> <span class="n">Ontology</span>
+<span class="kn">from</span> <span class="nn">.structure_tree</span> <span class="k">import</span> <span class="n">StructureTree</span>
+<span class="kn">from</span> <span class="nn">.reference_space</span> <span class="k">import</span> <span class="n">ReferenceSpace</span>
 
 
-<div class="viewcode-block" id="ReferenceSpaceCache"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.reference_space_cache.ReferenceSpaceCache">[docs]</a><span class="k">class</span> <span class="nc">ReferenceSpaceCache</span><span class="p">(</span><span class="n">Cache</span><span class="p">):</span>
+<div class="viewcode-block" id="ReferenceSpaceCache"><a class="viewcode-back" href="../../../allensdk.core.reference_space_cache.html#allensdk.core.reference_space_cache.ReferenceSpaceCache">[docs]</a><span class="k">class</span> <span class="nc">ReferenceSpaceCache</span><span class="p">(</span><span class="n">Cache</span><span class="p">):</span>
 
     <span class="n">REFERENCE_SPACE_VERSION_KEY</span> <span class="o">=</span> <span class="s1">&#39;REFERENCE_SPACE_VERSION&#39;</span>
     <span class="n">ANNOTATION_KEY</span> <span class="o">=</span> <span class="s1">&#39;ANNOTATION&#39;</span>
@@ -136,9 +125,9 @@
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MANIFEST_VERSION</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;base_uri&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;base_uri&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;base_uri&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="nb">super</span><span class="p">(</span><span class="n">ReferenceSpaceCache</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ReferenceSpaceCache</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span> <span class="o">=</span> <span class="n">resolution</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reference_space_key</span> <span class="o">=</span> <span class="n">reference_space_key</span>        
@@ -146,7 +135,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">api</span> <span class="o">=</span> <span class="n">ReferenceSpaceApi</span><span class="p">(</span><span class="n">base_uri</span><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;base_uri&#39;</span><span class="p">])</span>
 
         
-<div class="viewcode-block" id="ReferenceSpaceCache.get_annotation_volume"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.reference_space_cache.ReferenceSpaceCache.get_annotation_volume">[docs]</a>    <span class="k">def</span> <span class="nf">get_annotation_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ReferenceSpaceCache.get_annotation_volume"><a class="viewcode-back" href="../../../allensdk.core.reference_space_cache.html#allensdk.core.reference_space_cache.ReferenceSpaceCache.get_annotation_volume">[docs]</a>    <span class="k">def</span> <span class="nf">get_annotation_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Read the annotation volume.  Download it first if it doesn&#39;t exist.</span>
 
@@ -172,7 +161,7 @@
         <span class="k">return</span> <span class="n">annotation</span><span class="p">,</span> <span class="n">info</span></div>
 
 
-<div class="viewcode-block" id="ReferenceSpaceCache.get_template_volume"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.reference_space_cache.ReferenceSpaceCache.get_template_volume">[docs]</a>    <span class="k">def</span> <span class="nf">get_template_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ReferenceSpaceCache.get_template_volume"><a class="viewcode-back" href="../../../allensdk.core.reference_space_cache.html#allensdk.core.reference_space_cache.ReferenceSpaceCache.get_template_volume">[docs]</a>    <span class="k">def</span> <span class="nf">get_template_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Read the template volume.  Download it first if it doesn&#39;t exist.</span>
 
@@ -196,7 +185,7 @@
         <span class="k">return</span> <span class="n">template</span><span class="p">,</span> <span class="n">info</span></div>
 
 
-<div class="viewcode-block" id="ReferenceSpaceCache.get_structure_tree"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.reference_space_cache.ReferenceSpaceCache.get_structure_tree">[docs]</a>    <span class="k">def</span> <span class="nf">get_structure_tree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">structure_graph_id</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<div class="viewcode-block" id="ReferenceSpaceCache.get_structure_tree"><a class="viewcode-back" href="../../../allensdk.core.reference_space_cache.html#allensdk.core.reference_space_cache.ReferenceSpaceCache.get_structure_tree">[docs]</a>    <span class="k">def</span> <span class="nf">get_structure_tree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">structure_graph_id</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Read the list of adult mouse structures and return an StructureTree </span>
 <span class="sd">        instance.</span>
@@ -223,8 +212,8 @@
             <span class="o">**</span><span class="n">Cache</span><span class="o">.</span><span class="n">cache_json</span><span class="p">())</span></div>
 
 
-<div class="viewcode-block" id="ReferenceSpaceCache.get_reference_space"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.reference_space_cache.ReferenceSpaceCache.get_reference_space">[docs]</a>    <span class="k">def</span> <span class="nf">get_reference_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
-                            <span class="n">annotation_file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ReferenceSpaceCache.get_reference_space"><a class="viewcode-back" href="../../../allensdk.core.reference_space_cache.html#allensdk.core.reference_space_cache.ReferenceSpaceCache.get_reference_space">[docs]</a>    <span class="k">def</span> <span class="nf">get_reference_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                            <span class="n">annotation_file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Build a ReferenceSpace from this cache&#39;s annotation volume and </span>
 <span class="sd">        structure tree. The ReferenceSpace does operations that relate brain </span>
@@ -249,7 +238,7 @@
                               <span class="bp">self</span><span class="o">.</span><span class="n">get_annotation_volume</span><span class="p">(</span><span class="n">annotation_file_name</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> 
                               <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ReferenceSpaceCache.get_structure_mask"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.reference_space_cache.ReferenceSpaceCache.get_structure_mask">[docs]</a>    <span class="k">def</span> <span class="nf">get_structure_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_id</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">annotation_file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ReferenceSpaceCache.get_structure_mask"><a class="viewcode-back" href="../../../allensdk.core.reference_space_cache.html#allensdk.core.reference_space_cache.ReferenceSpaceCache.get_structure_mask">[docs]</a>    <span class="k">def</span> <span class="nf">get_structure_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_id</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">annotation_file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Read a 3D numpy array shaped like the annotation volume that has non-zero values where</span>
 <span class="sd">        voxels belong to a particular structure.  This will take care of identifying substructures.</span>
@@ -288,7 +277,7 @@
                                                 <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;lazy&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="ReferenceSpaceCache.get_structure_mesh"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.reference_space_cache.ReferenceSpaceCache.get_structure_mesh">[docs]</a>    <span class="k">def</span> <span class="nf">get_structure_mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_id</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ReferenceSpaceCache.get_structure_mesh"><a class="viewcode-back" href="../../../allensdk.core.reference_space_cache.html#allensdk.core.reference_space_cache.ReferenceSpaceCache.get_structure_mesh">[docs]</a>    <span class="k">def</span> <span class="nf">get_structure_mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_id</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Obtain a 3D mesh specifying the surface of an annotated structure.</span>
 <span class="sd">    </span>
 <span class="sd">        Parameters</span>
@@ -332,7 +321,7 @@
                                                 <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;lazy&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="ReferenceSpaceCache.add_manifest_paths"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.reference_space_cache.ReferenceSpaceCache.add_manifest_paths">[docs]</a>    <span class="k">def</span> <span class="nf">add_manifest_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">manifest_builder</span><span class="p">):</span>
+<div class="viewcode-block" id="ReferenceSpaceCache.add_manifest_paths"><a class="viewcode-back" href="../../../allensdk.core.reference_space_cache.html#allensdk.core.reference_space_cache.ReferenceSpaceCache.add_manifest_paths">[docs]</a>    <span class="k">def</span> <span class="nf">add_manifest_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">manifest_builder</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Construct a manifest for this Cache class and save it in a file.</span>
 
@@ -381,8 +370,8 @@
 
        
  
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="ReferenceSpaceCache.validate_structure_id"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.reference_space_cache.ReferenceSpaceCache.validate_structure_id">[docs]</a>    <span class="k">def</span> <span class="nf">validate_structure_id</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">structure_id</span><span class="p">):</span>
+<div class="viewcode-block" id="ReferenceSpaceCache.validate_structure_id"><a class="viewcode-back" href="../../../allensdk.core.reference_space_cache.html#allensdk.core.reference_space_cache.ReferenceSpaceCache.validate_structure_id">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">validate_structure_id</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">structure_id</span><span class="p">):</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="n">structure_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">structure_id</span><span class="p">)</span>
@@ -392,11 +381,11 @@
         <span class="k">return</span> <span class="n">structure_id</span></div>
 
 
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="ReferenceSpaceCache.validate_structure_ids"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.reference_space_cache.ReferenceSpaceCache.validate_structure_ids">[docs]</a>    <span class="k">def</span> <span class="nf">validate_structure_ids</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">structure_ids</span><span class="p">):</span>
+<div class="viewcode-block" id="ReferenceSpaceCache.validate_structure_ids"><a class="viewcode-back" href="../../../allensdk.core.reference_space_cache.html#allensdk.core.reference_space_cache.ReferenceSpaceCache.validate_structure_ids">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">validate_structure_ids</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">structure_ids</span><span class="p">):</span>
 
         <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">sid</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">structure_ids</span><span class="p">):</span>
-            <span class="n">structure_ids</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">validate_structure_id</span><span class="p">(</span><span class="n">sid</span><span class="p">)</span>
+            <span class="n">structure_ids</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">validate_structure_id</span><span class="p">(</span><span class="n">sid</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">structure_ids</span></div></div>
 </pre></div>
@@ -408,9 +397,7 @@
         <div class="sphinxsidebarwrapper">
 <h3><a href="../../../index.html">Contents</a></h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install Guide</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../cell_types.html">Cell Types</a></li>
@@ -435,6 +422,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.model.html">allensdk.model package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.morphology.html">allensdk.morphology package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.deprecated.html">allensdk.deprecated module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
@@ -452,12 +440,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

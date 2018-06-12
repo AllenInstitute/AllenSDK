@@ -1,0 +1,7 @@
+allensdk.brain\_observatory.natural\_scenes module
+==================================================
+
+.. automodule:: allensdk.brain_observatory.natural_scenes
+    :members:
+    :undoc-members:
+    :show-inheritance:

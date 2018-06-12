@@ -1,0 +1,7 @@
+allensdk.api.queries.mouse\_atlas\_api module
+=============================================
+
+.. automodule:: allensdk.api.queries.mouse_atlas_api
+    :members:
+    :undoc-members:
+    :show-inheritance:

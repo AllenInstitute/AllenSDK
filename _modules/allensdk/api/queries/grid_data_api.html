@@ -1,32 +1,21 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>allensdk.api.queries.grid_data_api &mdash; Allen SDK dev documentation</title>
-    
+    <title>allensdk.api.queries.grid_data_api &#8212; Allen SDK dev documentation</title>
     <link rel="stylesheet" href="../../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../../',
-        VERSION:     'dev',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="../../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK dev documentation" href="../../../../index.html" />
-    <link rel="up" title="Module code" href="../../../index.html" /> 
-  </head>
-  <body role="document">
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
 <script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
@@ -104,10 +93,12 @@
 <span class="c1"># ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="c1">#</span>
-<span class="kn">from</span> <span class="nn">.rma_api</span> <span class="kn">import</span> <span class="n">RmaApi</span>
+
+<span class="kn">from</span> <span class="nn">allensdk.deprecated</span> <span class="k">import</span> <span class="n">deprecated</span>
+<span class="kn">from</span> <span class="nn">.rma_api</span> <span class="k">import</span> <span class="n">RmaApi</span>
 
 
-<div class="viewcode-block" id="GridDataApi"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.grid_data_api.GridDataApi">[docs]</a><span class="k">class</span> <span class="nc">GridDataApi</span><span class="p">(</span><span class="n">RmaApi</span><span class="p">):</span>
+<div class="viewcode-block" id="GridDataApi"><a class="viewcode-back" href="../../../../allensdk.api.queries.grid_data_api.html#allensdk.api.queries.grid_data_api.GridDataApi">[docs]</a><span class="k">class</span> <span class="nc">GridDataApi</span><span class="p">(</span><span class="n">RmaApi</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;HTTP Client for the Allen 3-D Expression Grid Data Service.</span>
 
 <span class="sd">    See: `Downloading 3-D Expression Grid Data &lt;http://help.brain-map.org/display/api/Downloading+3-D+Expression+Grid+Data&gt;`_</span>
@@ -125,19 +116,44 @@
     <span class="n">INTENSITY</span> <span class="o">=</span> <span class="s1">&#39;intensity&#39;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">resolution</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                 <span class="n">base_uri</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">GridDataApi</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">base_uri</span><span class="p">)</span>
+                 <span class="n">resolution</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">base_uri</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">GridDataApi</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">base_uri</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">resolution</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">resolution</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">resolution</span> <span class="o">=</span> <span class="mi">25</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span> <span class="o">=</span> <span class="n">resolution</span>
 
-<div class="viewcode-block" id="GridDataApi.download_expression_grid_data"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.grid_data_api.GridDataApi.download_expression_grid_data">[docs]</a>    <span class="k">def</span> <span class="nf">download_expression_grid_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+
+<div class="viewcode-block" id="GridDataApi.download_gene_expression_grid_data"><a class="viewcode-back" href="../../../../allensdk.api.queries.grid_data_api.html#allensdk.api.queries.grid_data_api.GridDataApi.download_gene_expression_grid_data">[docs]</a>    <span class="k">def</span> <span class="nf">download_gene_expression_grid_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+                                           <span class="n">section_data_set_id</span><span class="p">,</span> 
+                                           <span class="n">volume_type</span><span class="p">,</span> 
+                                           <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Download a metaimage file containing registered gene expression grid data</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        section_data_set_id : int</span>
+<span class="sd">            Download data from this experiment</span>
+<span class="sd">        volume_type : str</span>
+<span class="sd">            Download this type of data (options are GridDataApi.ENERGY, </span>
+<span class="sd">            GridDataApi.DENSITY, GridDataApi.INTENSITY)</span>
+<span class="sd">        path : str</span>
+<span class="sd">            Download to this path</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">include</span> <span class="o">=</span> <span class="s1">&#39;?include=</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">volume_type</span><span class="p">)</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">grid_data_endpoint</span><span class="p">,</span> <span class="s1">&#39;/download/&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">section_data_set_id</span><span class="p">),</span> <span class="n">include</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_file_over_http</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">zipped</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GridDataApi.download_expression_grid_data"><a class="viewcode-back" href="../../../../allensdk.api.queries.grid_data_api.html#allensdk.api.queries.grid_data_api.GridDataApi.download_expression_grid_data">[docs]</a>    <span class="nd">@deprecated</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s1">&#39;Use download_gene_expression_grid_data instead&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">download_expression_grid_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                       <span class="n">section_data_set_id</span><span class="p">,</span>
-                                      <span class="n">include</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                                      <span class="n">path</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Download in NRRD format.</span>
+                                      <span class="n">include</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                      <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Download in zipped metaimage format.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -147,7 +163,7 @@
 <span class="sd">            Image volumes. &#39;energy&#39; (default), &#39;density&#39;, &#39;intensity&#39;.</span>
 <span class="sd">        path : string, optional</span>
 <span class="sd">            File name to save as.</span>
-<span class="sd">        i</span>
+<span class="sd">        </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">            file : 3-D expression grid data packaged into a compressed archive file (.zip).</span>
@@ -155,7 +171,7 @@
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="n">include</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">include</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">include_clause</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;?include=&#39;</span><span class="p">,</span>
                                       <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">include</span><span class="p">)])</span>
         <span class="k">else</span><span class="p">:</span>
@@ -166,16 +182,16 @@
                        <span class="nb">str</span><span class="p">(</span><span class="n">section_data_set_id</span><span class="p">),</span>
                        <span class="n">include_clause</span><span class="p">])</span>
 
-        <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">section_data_set_id</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.zip&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_file_over_http</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="GridDataApi.download_projection_grid_data"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.grid_data_api.GridDataApi.download_projection_grid_data">[docs]</a>    <span class="k">def</span> <span class="nf">download_projection_grid_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="GridDataApi.download_projection_grid_data"><a class="viewcode-back" href="../../../../allensdk.api.queries.grid_data_api.html#allensdk.api.queries.grid_data_api.GridDataApi.download_projection_grid_data">[docs]</a>    <span class="k">def</span> <span class="nf">download_projection_grid_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                       <span class="n">section_data_set_id</span><span class="p">,</span>
-                                      <span class="n">image</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                                      <span class="n">resolution</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                                      <span class="n">save_file_path</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+                                      <span class="n">image</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                      <span class="n">resolution</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                      <span class="n">save_file_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Download in NRRD format.</span>
 
 <span class="sd">        Parameters</span>
@@ -196,10 +212,10 @@
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">params_list</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="k">if</span> <span class="n">image</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">image</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">params_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;image=&#39;</span> <span class="o">+</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">image</span><span class="p">))</span>
 
-        <span class="k">if</span> <span class="n">resolution</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">resolution</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">params_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;resolution=</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">resolution</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">params_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -212,7 +228,7 @@
                        <span class="nb">str</span><span class="p">(</span><span class="n">section_data_set_id</span><span class="p">),</span>
                        <span class="n">params_clause</span><span class="p">])</span>
 
-        <span class="k">if</span> <span class="n">save_file_path</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">save_file_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">save_file_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">section_data_set_id</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.nrrd&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_file_over_http</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">save_file_path</span><span class="p">)</span></div></div>
@@ -225,9 +241,7 @@
         <div class="sphinxsidebarwrapper">
 <h3><a href="../../../../index.html">Contents</a></h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Install Guide</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Install Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../cell_types.html">Cell Types</a></li>
@@ -252,6 +266,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.model.html">allensdk.model package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.morphology.html">allensdk.morphology package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.deprecated.html">allensdk.deprecated module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
@@ -269,12 +284,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

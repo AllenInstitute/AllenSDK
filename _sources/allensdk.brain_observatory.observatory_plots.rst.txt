@@ -1,0 +1,7 @@
+allensdk.brain\_observatory.observatory\_plots module
+=====================================================
+
+.. automodule:: allensdk.brain_observatory.observatory_plots
+    :members:
+    :undoc-members:
+    :show-inheritance:

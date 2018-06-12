@@ -1,0 +1,7 @@
+allensdk.model.biophysical.run\_simulate module
+===============================================
+
+.. automodule:: allensdk.model.biophysical.run_simulate
+    :members:
+    :undoc-members:
+    :show-inheritance:

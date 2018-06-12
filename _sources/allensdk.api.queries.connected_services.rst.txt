@@ -1,0 +1,7 @@
+allensdk.api.queries.connected\_services module
+===============================================
+
+.. automodule:: allensdk.api.queries.connected_services
+    :members:
+    :undoc-members:
+    :show-inheritance:

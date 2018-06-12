@@ -1,0 +1,7 @@
+allensdk.config.model.formats.hdf5\_util module
+===============================================
+
+.. automodule:: allensdk.config.model.formats.hdf5_util
+    :members:
+    :undoc-members:
+    :show-inheritance:

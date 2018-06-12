@@ -1,0 +1,300 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>allensdk.api.queries.ontologies_api module &#8212; Allen SDK dev documentation</title>
+    <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="allensdk.api.queries.reference_space_api module" href="allensdk.api.queries.reference_space_api.html" />
+    <link rel="prev" title="allensdk.api.queries.mouse_connectivity_api module" href="allensdk.api.queries.mouse_connectivity_api.html" /> 
+  </head><body>
+<link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
+<script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var _pSupressBrowserFlashWarning = true;
+    var _pTabId = "pHome";
+    var _pMoreProjectsId = "pMoreProjects";
+    var _pImagePath = "http://www.brain-map.org/assets/images/";
+    var _pSiteWarnings = function() {
+        this.show_warning() = {};
+    }
+</script>
+<script type="text/javascript">
+    function initialize() {
+        /*** do your stuff, then initialize the portal plugin ***/
+        _pPortalOnLoad();
+    }
+</script>
+<style>
+  #header_content > a {
+  display: inline-block;
+  width: 250px;
+  height: 75px;
+  background-image:url("_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-size: 235px 37px;
+  background-position: 0px 20px;
+  background-repeat: no-repeat;
+  }
+</style>
+
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
+<link rel="stylesheet" type="text/css" href="_static/external_assets/stylesheets/common_layout.css" />
+
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-allensdk.api.queries.ontologies_api">
+<span id="allensdk-api-queries-ontologies-api-module"></span><h1>allensdk.api.queries.ontologies_api module<a class="headerlink" href="#module-allensdk.api.queries.ontologies_api" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="allensdk.api.queries.ontologies_api.OntologiesApi">
+<em class="property">class </em><code class="descclassname">allensdk.api.queries.ontologies_api.</code><code class="descname">OntologiesApi</code><span class="sig-paren">(</span><em>base_uri=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/ontologies_api.html#OntologiesApi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.ontologies_api.OntologiesApi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="allensdk.api.queries.rma_template.html#allensdk.api.queries.rma_template.RmaTemplate" title="allensdk.api.queries.rma_template.RmaTemplate"><code class="xref py py-class docutils literal notranslate"><span class="pre">allensdk.api.queries.rma_template.RmaTemplate</span></code></a></p>
+<p>See: <a class="reference external" href="http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies">Atlas Drawings and Ontologies</a></p>
+<dl class="method">
+<dt id="allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases">
+<code class="descname">get_atlases</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/ontologies_api.html#OntologiesApi.get_atlases"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases_table">
+<code class="descname">get_atlases_table</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/ontologies_api.html#OntologiesApi.get_atlases_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>List Atlases available through the API
+with associated ontologies and structure graphs.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>atlas_ids</strong> <span class="classifier-delimiter">:</span> <span class="classifier">integer or list of integers, optional</span></dt>
+<dd><p class="first last">only select specific atlases</p>
+</dd>
+<dt><strong>brief</strong> <span class="classifier-delimiter">:</span> <span class="classifier">boolean, optional</span></dt>
+<dd><p class="first last">True (default) requests only name and id fields.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>dict</strong> <span class="classifier-delimiter">:</span> <span class="classifier">atlas metadata</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This query is based on the
+<a class="reference external" href="http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies">table of available Atlases</a>.
+See also: <a class="reference external" href="http://api.brain-map.org/doc/Atlas.html">Class: Atlas</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.ontologies_api.OntologiesApi.get_structure_graphs">
+<code class="descname">get_structure_graphs</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/ontologies_api.html#OntologiesApi.get_structure_graphs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.ontologies_api.OntologiesApi.get_structure_graphs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.ontologies_api.OntologiesApi.get_structure_sets">
+<code class="descname">get_structure_sets</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/ontologies_api.html#OntologiesApi.get_structure_sets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.ontologies_api.OntologiesApi.get_structure_sets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.ontologies_api.OntologiesApi.get_structures">
+<code class="descname">get_structures</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/ontologies_api.html#OntologiesApi.get_structures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.ontologies_api.OntologiesApi.get_structures" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve data about anatomical structures.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>structure_graph_ids</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int or list of ints, optional</span></dt>
+<dd><p class="first last">database keys to get all structures in particular graphs</p>
+</dd>
+<dt><strong>structure_graph_names</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string or list of strings, optional</span></dt>
+<dd><p class="first last">list of graph names to narrow the query</p>
+</dd>
+<dt><strong>structure_set_ids</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int or list of ints, optional</span></dt>
+<dd><p class="first last">database keys to get all structures in a particular set</p>
+</dd>
+<dt><strong>structure_set_names</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string or list of strings, optional</span></dt>
+<dd><p class="first last">list of set names to narrow the query.</p>
+</dd>
+<dt><strong>order</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of strings</span></dt>
+<dd><p class="first last">list of RMA order clauses for sorting</p>
+</dd>
+<dt><strong>num_rows</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">how many records to retrieve</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>dict</strong></dt>
+<dd><p class="first last">the parsed json response containing data from the API</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Only one of the methods of limiting the query should be used at a time.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.ontologies_api.OntologiesApi.get_structures_with_sets">
+<code class="descname">get_structures_with_sets</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/ontologies_api.html#OntologiesApi.get_structures_with_sets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.ontologies_api.OntologiesApi.get_structures_with_sets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download structures along with the sets to which they belong.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>structure_graph_ids</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int or list of int</span></dt>
+<dd><p class="first last">Only fetch structure records from these graphs.</p>
+</dd>
+<dt><strong>order</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of strings</span></dt>
+<dd><p class="first last">list of RMA order clauses for sorting</p>
+</dd>
+<dt><strong>num_rows</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">how many records to retrieve</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>dict</strong></dt>
+<dd><p class="first last">the parsed json response containing data from the API</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.ontologies_api.OntologiesApi.rma_templates">
+<code class="descname">rma_templates</code><em class="property"> = {'ontology_queries': [{'count': False, 'name': 'structures_by_graph_ids', 'criteria': '[graph_id$in{{ graph_ids }}]', 'num_rows': 'all', 'model': 'Structure', 'criteria_params': ['graph_ids'], 'order': ['structures.graph_order'], 'description': 'see name'}, {'count': False, 'name': 'structures_by_graph_names', 'criteria': 'graph[structure_graphs.name$in{{ graph_names }}]', 'num_rows': 'all', 'model': 'Structure', 'criteria_params': ['graph_names'], 'order': ['structures.graph_order'], 'description': 'see name'}, {'count': False, 'name': 'structures_by_set_ids', 'criteria': '[structure_set_id$in{{ set_ids }}]', 'num_rows': 'all', 'model': 'Structure', 'criteria_params': ['set_ids'], 'order': ['structures.graph_order'], 'description': 'see name'}, {'count': False, 'name': 'structures_by_set_names', 'criteria': 'structure_sets[name$in{{ set_names }}]', 'num_rows': 'all', 'model': 'Structure', 'criteria_params': ['set_names'], 'order': ['structures.graph_order'], 'description': 'see name'}, {'num_rows': 'all', 'count': False, 'model': 'StructureGraph', 'name': 'structure_graphs_list', 'description': 'see name'}, {'num_rows': 'all', 'count': False, 'model': 'StructureSet', 'name': 'structure_sets_list', 'description': 'see name'}, {'num_rows': 'all', 'count': False, 'model': 'Atlas', 'name': 'atlases_list', 'description': 'see name'}, {'count': False, 'only': ['atlases.id', 'atlases.name', 'atlases.image_type', 'ontologies.id', 'ontologies.name', 'structure_graphs.id', 'structure_graphs.name', 'graphic_group_labels.id', 'graphic_group_labels.name'], 'criteria_params': ['atlas_ids'], 'name': 'atlases_table', 'criteria': '{% if atlas_ids is defined %}[id$in{{ atlas_ids }}],{%endif%}structure_graph(ontology),graphic_group_labels', 'num_rows': 'all', 'model': 'Atlas', 'include': 'structure_graph(ontology),graphic_group_labels', 'description': 'see name'}, {'count': False, 'criteria_params': ['graph_ids'], 'name': 'structures_with_sets', 'criteria': '[graph_id$in{{ graph_ids }}]', 'num_rows': 'all', 'model': 'Structure', 'include': 'structure_sets', 'order': ['structures.graph_order'], 'description': 'see name'}, {'count': False, 'name': 'structure_sets_by_id', 'criteria_params': ['set_ids'], 'criteria': '[id$in{{ set_ids }}]', 'num_rows': 'all', 'model': 'StructureSet', 'description': 'see name'}]}</em><a class="headerlink" href="#allensdk.api.queries.ontologies_api.OntologiesApi.rma_templates" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.ontologies_api.OntologiesApi.unpack_structure_set_ancestors">
+<code class="descname">unpack_structure_set_ancestors</code><span class="sig-paren">(</span><em>structure_dataframe</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/ontologies_api.html#OntologiesApi.unpack_structure_set_ancestors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.ontologies_api.OntologiesApi.unpack_structure_set_ancestors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a slash-separated structure_id_path field to a list.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>structure_dataframe</strong> <span class="classifier-delimiter">:</span> <span class="classifier">DataFrame</span></dt>
+<dd><p class="first last">structure data from the API</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>None</strong></dt>
+<dd><p class="first last">A new column is added to the dataframe containing the ancestor list.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_space.html">Reference Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="glif_models.html">Generalized LIF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html">Biophysical</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.deprecated.html">allensdk.deprecated module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
+</ul>
+
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allen-sdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    </div>
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalFooter.js"></script>
+
+
+  </body>
+</html>

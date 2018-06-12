@@ -1,0 +1,7 @@
+allensdk.api.queries.mouse\_connectivity\_api module
+====================================================
+
+.. automodule:: allensdk.api.queries.mouse_connectivity_api
+    :members:
+    :undoc-members:
+    :show-inheritance:

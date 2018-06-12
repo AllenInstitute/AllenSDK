@@ -1,0 +1,714 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>allensdk.api.queries.rma_api module &#8212; Allen SDK dev documentation</title>
+    <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="allensdk.api.queries.rma_pager module" href="allensdk.api.queries.rma_pager.html" />
+    <link rel="prev" title="allensdk.api.queries.reference_space_api module" href="allensdk.api.queries.reference_space_api.html" /> 
+  </head><body>
+<link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
+<script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var _pSupressBrowserFlashWarning = true;
+    var _pTabId = "pHome";
+    var _pMoreProjectsId = "pMoreProjects";
+    var _pImagePath = "http://www.brain-map.org/assets/images/";
+    var _pSiteWarnings = function() {
+        this.show_warning() = {};
+    }
+</script>
+<script type="text/javascript">
+    function initialize() {
+        /*** do your stuff, then initialize the portal plugin ***/
+        _pPortalOnLoad();
+    }
+</script>
+<style>
+  #header_content > a {
+  display: inline-block;
+  width: 250px;
+  height: 75px;
+  background-image:url("_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-size: 235px 37px;
+  background-position: 0px 20px;
+  background-repeat: no-repeat;
+  }
+</style>
+
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
+<link rel="stylesheet" type="text/css" href="_static/external_assets/stylesheets/common_layout.css" />
+
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-allensdk.api.queries.rma_api">
+<span id="allensdk-api-queries-rma-api-module"></span><h1>allensdk.api.queries.rma_api module<a class="headerlink" href="#module-allensdk.api.queries.rma_api" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="allensdk.api.queries.rma_api.RmaApi">
+<em class="property">class </em><code class="descclassname">allensdk.api.queries.rma_api.</code><code class="descname">RmaApi</code><span class="sig-paren">(</span><em>base_uri=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/rma_api.html#RmaApi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="allensdk.api.api.html#allensdk.api.api.Api" title="allensdk.api.api.Api"><code class="xref py py-class docutils literal notranslate"><span class="pre">allensdk.api.api.Api</span></code></a></p>
+<p>See: <a class="reference external" href="http://help.brain-map.org/display/api/RESTful+Model+Access+%28RMA%29">RESTful Model Access (RMA)</a></p>
+<dl class="attribute">
+<dt id="allensdk.api.queries.rma_api.RmaApi.ALL">
+<code class="descname">ALL</code><em class="property"> = 'all'</em><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.ALL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.rma_api.RmaApi.COUNT">
+<code class="descname">COUNT</code><em class="property"> = 'count'</em><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.COUNT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.rma_api.RmaApi.CRITERIA">
+<code class="descname">CRITERIA</code><em class="property"> = 'rma::criteria'</em><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.CRITERIA" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.rma_api.RmaApi.DEBUG">
+<code class="descname">DEBUG</code><em class="property"> = 'debug'</em><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.DEBUG" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.rma_api.RmaApi.EQ">
+<code class="descname">EQ</code><em class="property"> = '$eq'</em><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.EQ" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.rma_api.RmaApi.EXCEPT">
+<code class="descname">EXCEPT</code><em class="property"> = 'except'</em><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.EXCEPT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.rma_api.RmaApi.EXCPT">
+<code class="descname">EXCPT</code><em class="property"> = 'excpt'</em><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.EXCPT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.rma_api.RmaApi.FALSE">
+<code class="descname">FALSE</code><em class="property"> = 'false'</em><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.FALSE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.rma_api.RmaApi.INCLUDE">
+<code class="descname">INCLUDE</code><em class="property"> = 'rma::include'</em><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.INCLUDE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.rma_api.RmaApi.IS">
+<code class="descname">IS</code><em class="property"> = '$is'</em><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.IS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.rma_api.RmaApi.MODEL">
+<code class="descname">MODEL</code><em class="property"> = 'model::'</em><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.MODEL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.rma_api.RmaApi.NUM_ROWS">
+<code class="descname">NUM_ROWS</code><em class="property"> = 'num_rows'</em><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.NUM_ROWS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.rma_api.RmaApi.ONLY">
+<code class="descname">ONLY</code><em class="property"> = 'only'</em><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.ONLY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.rma_api.RmaApi.OPTIONS">
+<code class="descname">OPTIONS</code><em class="property"> = 'rma::options'</em><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.OPTIONS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.rma_api.RmaApi.ORDER">
+<code class="descname">ORDER</code><em class="property"> = 'order'</em><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.ORDER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.rma_api.RmaApi.PIPE">
+<code class="descname">PIPE</code><em class="property"> = 'pipe::'</em><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.PIPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.rma_api.RmaApi.PREVIEW">
+<code class="descname">PREVIEW</code><em class="property"> = 'preview'</em><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.PREVIEW" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.rma_api.RmaApi.SERVICE">
+<code class="descname">SERVICE</code><em class="property"> = 'service::'</em><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.SERVICE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.rma_api.RmaApi.START_ROW">
+<code class="descname">START_ROW</code><em class="property"> = 'start_row'</em><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.START_ROW" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.rma_api.RmaApi.TABULAR">
+<code class="descname">TABULAR</code><em class="property"> = 'tabular'</em><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.TABULAR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.rma_api.RmaApi.TRUE">
+<code class="descname">TRUE</code><em class="property"> = 'true'</em><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.TRUE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.rma_api.RmaApi.build_query_url">
+<code class="descname">build_query_url</code><span class="sig-paren">(</span><em>stage_clauses</em>, <em>fmt='json'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/rma_api.html#RmaApi.build_query_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.build_query_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combine one or more RMA query stages into a single RMA query.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>stage_clauses</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of strings</span></dt>
+<dd><p class="first last">subqueries</p>
+</dd>
+<dt><strong>fmt</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string, optional</span></dt>
+<dd><p class="first last">json (default), xml, or csv</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>string</strong></dt>
+<dd><p class="first last">complete RMA url</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.rma_api.RmaApi.build_schema_query">
+<code class="descname">build_schema_query</code><span class="sig-paren">(</span><em>clazz=None</em>, <em>fmt='json'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/rma_api.html#RmaApi.build_schema_query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.build_schema_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build the URL that will fetch the data schema.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>clazz</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string, optional</span></dt>
+<dd><p class="first last">Name of a specific class or None (default).</p>
+</dd>
+<dt><strong>fmt</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string, optional</span></dt>
+<dd><p class="first last">json (default) or xml</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>url</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">The constructed URL</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>If a class is specified, only the schema information for that class
+will be requested, otherwise the url requests the entire schema.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.rma_api.RmaApi.debug_clause">
+<code class="descname">debug_clause</code><span class="sig-paren">(</span><em>debug_value=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/rma_api.html#RmaApi.debug_clause"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.debug_clause" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a debug clause for use in an rma::options clause.
+Parameters
+———-
+debug_value : string or boolean</p>
+<blockquote>
+<div>True, False, None (default) or ‘preview’</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>clause</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">The query clause for inclusion in an RMA query URL.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>True will request debugging information in the response.
+False will request no debugging information.
+None will return an empty clause.
+‘preview’ will request debugging information without the query being run.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.rma_api.RmaApi.filter">
+<code class="descname">filter</code><span class="sig-paren">(</span><em>key</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/rma_api.html#RmaApi.filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>serialize a single RMA query filter clause.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>key</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">keys for narrowing a query.</p>
+</dd>
+<dt><strong>value</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">value for narrowing a query.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>string</strong></dt>
+<dd><p class="first last">a single filter clause for an RMA query string.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.rma_api.RmaApi.filters">
+<code class="descname">filters</code><span class="sig-paren">(</span><em>filters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/rma_api.html#RmaApi.filters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.filters" title="Permalink to this definition">¶</a></dt>
+<dd><p>serialize RMA query filter clauses.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>filters</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd><p class="first last">keys and values for narrowing a query.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>string</strong></dt>
+<dd><p class="first last">filter clause for an RMA query string.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.rma_api.RmaApi.get_schema">
+<code class="descname">get_schema</code><span class="sig-paren">(</span><em>clazz=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/rma_api.html#RmaApi.get_schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.get_schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve schema information.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.rma_api.RmaApi.model_query">
+<code class="descname">model_query</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/rma_api.html#RmaApi.model_query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.model_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct and execute a model stage of an RMA query string.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>model</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">The top level data type</p>
+</dd>
+<dt><strong>filters</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd><p class="first last">key, value comparisons applied to the top-level model to narrow the results.</p>
+</dd>
+<dt><strong>criteria</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">raw RMA criteria clause to choose what object are returned</p>
+</dd>
+<dt><strong>include</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">raw RMA include clause to return associated objects</p>
+</dd>
+<dt><strong>only</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of strings, optional</span></dt>
+<dd><p class="first last">to be joined into an rma::options only filter to limit what data is returned</p>
+</dd>
+<dt><strong>except</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of strings, optional</span></dt>
+<dd><p class="first last">to be joined into an rma::options except filter to limit what data is returned</p>
+</dd>
+<dt><strong>excpt</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of strings, optional</span></dt>
+<dd><p class="first last">synonym for except parameter to avoid a reserved word conflict.</p>
+</dd>
+<dt><strong>tabular</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of string, optional</span></dt>
+<dd><p class="first last">return columns as a tabular data structure rather than a nested tree.</p>
+</dd>
+<dt><strong>count</strong> <span class="classifier-delimiter">:</span> <span class="classifier">boolean, optional</span></dt>
+<dd><p class="first last">False to skip the extra database count query.</p>
+</dd>
+<dt><strong>debug</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string, optional</span></dt>
+<dd><p class="first last">‘true’, ‘false’ or ‘preview’</p>
+</dd>
+<dt><strong>num_rows</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int or string, optional</span></dt>
+<dd><p class="first last">how many database rows are returned (may not correspond directly to JSON tree structure)</p>
+</dd>
+<dt><strong>start_row</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int or string, optional</span></dt>
+<dd><p class="first last">which database row is start of returned data  (may not correspond directly to JSON tree structure)</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>See <a class="reference external" href="http://help.brain-map.org/display/api/RMA+Path+Syntax#RMAPathSyntax-DoubleColonforAxis">RMA Path Syntax</a>
+for a brief overview of the normalized RMA syntax.
+Normalized RMA syntax differs from the legacy syntax
+used in much of the RMA documentation.
+Using the &amp;debug=true option with an RMA URL will include debugging information in the
+response, including the normalized query.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.rma_api.RmaApi.model_stage">
+<code class="descname">model_stage</code><span class="sig-paren">(</span><em>model</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/rma_api.html#RmaApi.model_stage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.model_stage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a model stage of an RMA query string.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>model</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">The top level data type</p>
+</dd>
+<dt><strong>filters</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd><p class="first last">key, value comparisons applied to the top-level model to narrow the results.</p>
+</dd>
+<dt><strong>criteria</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">raw RMA criteria clause to choose what object are returned</p>
+</dd>
+<dt><strong>include</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">raw RMA include clause to return associated objects</p>
+</dd>
+<dt><strong>only</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of strings, optional</span></dt>
+<dd><p class="first last">to be joined into an rma::options only filter to limit what data is returned</p>
+</dd>
+<dt><strong>except</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of strings, optional</span></dt>
+<dd><p class="first last">to be joined into an rma::options except filter to limit what data is returned</p>
+</dd>
+<dt><strong>tabular</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of string, optional</span></dt>
+<dd><p class="first last">return columns as a tabular data structure rather than a nested tree.</p>
+</dd>
+<dt><strong>count</strong> <span class="classifier-delimiter">:</span> <span class="classifier">boolean, optional</span></dt>
+<dd><p class="first last">False to skip the extra database count query.</p>
+</dd>
+<dt><strong>debug</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string, optional</span></dt>
+<dd><p class="first last">‘true’, ‘false’ or ‘preview’</p>
+</dd>
+<dt><strong>num_rows</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int or string, optional</span></dt>
+<dd><p class="first last">how many database rows are returned (may not correspond directly to JSON tree structure)</p>
+</dd>
+<dt><strong>start_row</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int or string, optional</span></dt>
+<dd><p class="first last">which database row is start of returned data  (may not correspond directly to JSON tree structure)</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>See <a class="reference external" href="http://help.brain-map.org/display/api/RMA+Path+Syntax#RMAPathSyntax-DoubleColonforAxis">RMA Path Syntax</a>
+for a brief overview of the normalized RMA syntax.
+Normalized RMA syntax differs from the legacy syntax
+used in much of the RMA documentation.
+Using the &amp;debug=true option with an RMA URL will include debugging information in the
+response, including the normalized query.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.rma_api.RmaApi.only_except_tabular_clause">
+<code class="descname">only_except_tabular_clause</code><span class="sig-paren">(</span><em>filter_type</em>, <em>attribute_list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/rma_api.html#RmaApi.only_except_tabular_clause"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.only_except_tabular_clause" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a clause to filter which attributes are returned
+for use in an rma::options clause.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>filter_type</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">‘only’, ‘except’, or ‘tabular’</p>
+</dd>
+<dt><strong>attribute_list</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of strings</span></dt>
+<dd><p class="first last">for example [‘acronym’, ‘products.name’, ‘structure.id’]</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>clause</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">The query clause for inclusion in an RMA query URL.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The title of tabular columns can be set by adding ‘+as+&lt;title&gt;’
+to the attribute.
+The tabular filter type requests a response that is row-oriented
+rather than a nested structure.
+Because of this, the tabular option can mask the lazy query behavior
+of an rma::include clause.
+The tabular option does not mask the inner-join behavior of an rma::include
+clause.
+The tabular filter is required for .csv format RMA requests.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.rma_api.RmaApi.options_clause">
+<code class="descname">options_clause</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/rma_api.html#RmaApi.options_clause"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.options_clause" title="Permalink to this definition">¶</a></dt>
+<dd><p>build rma:: options clause.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>only</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of strings, optional</span></dt>
+<dd></dd>
+<dt><strong>except</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of strings, optional</span></dt>
+<dd></dd>
+<dt><strong>tabular</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of string, optional</span></dt>
+<dd></dd>
+<dt><strong>count</strong> <span class="classifier-delimiter">:</span> <span class="classifier">boolean, optional</span></dt>
+<dd></dd>
+<dt><strong>debug</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string, optional</span></dt>
+<dd><p class="first last">‘true’, ‘false’ or ‘preview’</p>
+</dd>
+<dt><strong>num_rows</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int or string, optional</span></dt>
+<dd></dd>
+<dt><strong>start_row</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int or string, optional</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.rma_api.RmaApi.order_clause">
+<code class="descname">order_clause</code><span class="sig-paren">(</span><em>order_list=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/rma_api.html#RmaApi.order_clause"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.order_clause" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a debug clause for use in an rma::options clause.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>order_list</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of strings</span></dt>
+<dd><p class="first last">for example [‘acronym’, ‘products.name+asc’, ‘structure.id+desc’]</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>clause</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">The query clause for inclusion in an RMA query URL.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Optionally adding ‘+asc’ (default) or ‘+desc’ after an attribute
+will change the sort order.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.rma_api.RmaApi.pipe_stage">
+<code class="descname">pipe_stage</code><span class="sig-paren">(</span><em>pipe_name</em>, <em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/rma_api.html#RmaApi.pipe_stage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.pipe_stage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connect model and service stages via their JSON responses.</p>
+<p class="rubric">Notes</p>
+<p>See: <a class="reference external" href="http://help.brain-map.org/display/api/Service+Pipelines">Service Pipelines</a>
+and
+<a class="reference external" href="http://help.brain-map.org/display/api/Connected+Services+and+Pipes">Connected Services and Pipes</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.rma_api.RmaApi.quote_string">
+<code class="descname">quote_string</code><span class="sig-paren">(</span><em>the_string</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/rma_api.html#RmaApi.quote_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.quote_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrap a clause in single quotes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>the_string</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">a clause to be included in an rma query that needs to be quoted</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>string</strong></dt>
+<dd><p class="first last">input wrapped in single quotes</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.rma_api.RmaApi.service_query">
+<code class="descname">service_query</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/rma_api.html#RmaApi.service_query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.service_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct and Execute a single-stage RMA query
+to send a request to a connected service.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>service_name</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">Name of a documented connected service.</p>
+</dd>
+<dt><strong>parameters</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd><p class="first last">key-value pairs as in the online documentation.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>See: <a class="reference external" href="http://help.brain-map.org/display/api/Service+Pipelines">Service Pipelines</a>
+and
+<a class="reference external" href="http://help.brain-map.org/display/api/Connected+Services+and+Pipes">Connected Services and Pipes</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.rma_api.RmaApi.service_stage">
+<code class="descname">service_stage</code><span class="sig-paren">(</span><em>service_name</em>, <em>parameters=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/rma_api.html#RmaApi.service_stage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.service_stage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct an RMA query fragment to send a request to a connected service.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>service_name</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">Name of a documented connected service.</p>
+</dd>
+<dt><strong>parameters</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd><p class="first last">key-value pairs as in the online documentation.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>See: <a class="reference external" href="http://help.brain-map.org/display/api/Service+Pipelines">Service Pipelines</a>
+and
+<a class="reference external" href="http://help.brain-map.org/display/api/Connected+Services+and+Pipes">Connected Services and Pipes</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.rma_api.RmaApi.tuple_filters">
+<code class="descname">tuple_filters</code><span class="sig-paren">(</span><em>filters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/rma_api.html#RmaApi.tuple_filters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.tuple_filters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct an RMA filter clause.</p>
+<p class="rubric">Notes</p>
+<p>See <a class="reference external" href="http://help.brain-map.org/display/api/RMA+Path+Syntax#RMAPathSyntax-SquareBracketsforFilters">RMA Path Syntax - Square Brackets for Filters</a> for additional documentation.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_space.html">Reference Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="glif_models.html">Generalized LIF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html">Biophysical</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.deprecated.html">allensdk.deprecated module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
+</ul>
+
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allen-sdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    </div>
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalFooter.js"></script>
+
+
+  </body>
+</html>

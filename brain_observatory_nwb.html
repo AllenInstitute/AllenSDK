@@ -1,31 +1,21 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Organization of a Brain Observatory NWB file &mdash; Allen SDK dev documentation</title>
-    
+    <title>Organization of a Brain Observatory NWB file &#8212; Allen SDK dev documentation</title>
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     'dev',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK dev documentation" href="index.html" /> 
-  </head>
-  <body role="document">
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
 <script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
@@ -69,7 +59,7 @@
             
   <div class="section" id="organization-of-a-brain-observatory-nwb-file">
 <h1>Organization of a Brain Observatory NWB file<a class="headerlink" href="#organization-of-a-brain-observatory-nwb-file" title="Permalink to this headline">¶</a></h1>
-<p>The Allen Institute&#8217;s Brain Observatory data sets include data from 2-photon microscope recordings including image segmentation, motion correction and fluorescence traces.
+<p>The Allen Institute’s Brain Observatory data sets include data from 2-photon microscope recordings including image segmentation, motion correction and fluorescence traces.
 It also includes information about the visual stimuli presented during the recording. This information is packaged in the <a class="reference external" href="http://www.nwb.org">NWB format</a>.
 Here is a brief description how the data is stored in the NWB file.</p>
 <div class="section" id="browsing-the-file">
@@ -87,7 +77,7 @@ It is <em>highly</em> recommended that anyone using an NWB file download and ins
 </div>
 <div class="section" id="nwb-file-organization">
 <h2>NWB file organization<a class="headerlink" href="#nwb-file-organization" title="Permalink to this headline">¶</a></h2>
-<p>Each NWB file is organized into six sections. These sections store acquired data (&#8216;acquisition&#8217;), stimulus data (&#8216;stimulus&#8217;), general metadata about the experiment (&#8216;general&#8217;), experiment organization (&#8216;epochs&#8217;), processed data (&#8216;processing&#8217;) and a free-form area for storing analysis data (&#8216;analysis&#8217;).</p>
+<p>Each NWB file is organized into six sections. These sections store acquired data (‘acquisition’), stimulus data (‘stimulus’), general metadata about the experiment (‘general’), experiment organization (‘epochs’), processed data (‘processing’) and a free-form area for storing analysis data (‘analysis’).</p>
 <div class="figure" id="id1">
 <img alt="_static/fig-1.png" src="_static/fig-1.png" />
 <p class="caption"><span class="caption-text"><strong>Figure 1. An NWB file, viewed in HDFView</strong></span></p>
@@ -96,16 +86,16 @@ It is <em>highly</em> recommended that anyone using an NWB file download and ins
 It is most useful to imagine an HDF5 file as a container that stores many files and folders within it.
 Because of this structure, you can browse an HDF5 file, and an NWB file, in the same way that you browse the files and folders on your computer.
 Folders can be opened by double-clicking on the folder icon.
-The contents of a &#8216;file&#8217; within HDF5, which called a dataset, can be seen by double-clicking it.
+The contents of a ‘file’ within HDF5, which called a dataset, can be seen by double-clicking it.
 An NWB file has six top-level folders and five top-level datasets.
-In Figure 1, the contents of the &#8216;session_description&#8217; dataset is displayed.
+In Figure 1, the contents of the ‘session_description’ dataset is displayed.
 An NWB file is designed to store data from a single experimental session in a single animal.
 The session_description dataset provides a quick summary of the information available in the file.
 The NWB specification, describing the format and how data is stored, can be downloaded <a class="reference external" href="http://github.com/NeurodataWithoutBorders/specification/blob/master/version_1.0.3/nwb_file_format_specification_v1.0.3.pdf">here</a>.</p>
 </div>
 <div class="section" id="stimulus-data">
 <h2>Stimulus data<a class="headerlink" href="#stimulus-data" title="Permalink to this headline">¶</a></h2>
-<p>Within an NWB file, stimulus data is organized into &#8216;templates&#8217;, which are stimulus descriptions that can be used one or more times, and &#8216;presentation&#8217;, which stores the time-series data about what was presented and when.</p>
+<p>Within an NWB file, stimulus data is organized into ‘templates’, which are stimulus descriptions that can be used one or more times, and ‘presentation’, which stores the time-series data about what was presented and when.</p>
 <div class="figure" id="id2">
 <img alt="_static/fig-2.png" src="_static/fig-2.png" />
 <p class="caption"><span class="caption-text"><strong>Figure 2. Stimuli presented during the experiment</strong></span></p>
@@ -118,7 +108,7 @@ This information can include the type of data stored, the unit that stored in, a
 <div class="section" id="processing">
 <h2>Processing<a class="headerlink" href="#processing" title="Permalink to this headline">¶</a></h2>
 <p>In the NWB file, the processing folder is designed to store the contents the different levels of intermediate processing of data that are necessary to convert raw data into something that can be used for scientific analysis.
-In the Allen Institute&#8217;s NWB file, these levels of processing include motion correction of the acquired 2-photon move frames, image segmentation into regions of interest, the fluorescence signal for each of these regions, and the dF/F signal that is useful for correlating cell activity with presented stimuli.</p>
+In the Allen Institute’s NWB file, these levels of processing include motion correction of the acquired 2-photon move frames, image segmentation into regions of interest, the fluorescence signal for each of these regions, and the dF/F signal that is useful for correlating cell activity with presented stimuli.</p>
 <div class="figure" id="id3">
 <img alt="_static/fig-3.png" src="_static/fig-3.png" />
 <p class="caption"><span class="caption-text"><strong>Figure 3. Location of dF/F data</strong></span></p>
@@ -127,7 +117,7 @@ In the Allen Institute&#8217;s NWB file, these levels of processing include moti
 </div>
 <div class="section" id="organization-of-data">
 <h2>Organization of data<a class="headerlink" href="#organization-of-data" title="Permalink to this headline">¶</a></h2>
-<p>This data release was based on three different sets of stimuli, name &#8216;A&#8217;, &#8216;B&#8217; and &#8216;C&#8217;.</p>
+<p>This data release was based on three different sets of stimuli, name ‘A’, ‘B’ and ‘C’.</p>
 <p>Stimulus A included:</p>
 <blockquote>
 <div><ol class="arabic simple">
@@ -264,9 +254,7 @@ data</td>
         <div class="sphinxsidebarwrapper">
 <h3><a href="index.html">Contents</a></h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
@@ -291,6 +279,7 @@ data</td>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.deprecated.html">allensdk.deprecated module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
@@ -308,12 +297,14 @@ data</td>
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

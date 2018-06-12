@@ -1,0 +1,7 @@
+allensdk.core.brain\_observatory\_nwb\_data\_set module
+=======================================================
+
+.. automodule:: allensdk.core.brain_observatory_nwb_data_set
+    :members:
+    :undoc-members:
+    :show-inheritance:

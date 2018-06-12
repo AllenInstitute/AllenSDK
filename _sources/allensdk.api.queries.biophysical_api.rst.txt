@@ -1,0 +1,7 @@
+allensdk.api.queries.biophysical\_api module
+============================================
+
+.. automodule:: allensdk.api.queries.biophysical_api
+    :members:
+    :undoc-members:
+    :show-inheritance:

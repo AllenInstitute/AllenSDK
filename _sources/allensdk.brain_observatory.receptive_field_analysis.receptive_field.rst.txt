@@ -1,0 +1,7 @@
+allensdk.brain\_observatory.receptive\_field\_analysis.receptive\_field module
+==============================================================================
+
+.. automodule:: allensdk.brain_observatory.receptive_field_analysis.receptive_field
+    :members:
+    :undoc-members:
+    :show-inheritance:

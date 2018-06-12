@@ -1,32 +1,21 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>allensdk.api.cache &mdash; Allen SDK dev documentation</title>
-    
+    <title>allensdk.api.cache &#8212; Allen SDK dev documentation</title>
     <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../',
-        VERSION:     'dev',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK dev documentation" href="../../../index.html" />
-    <link rel="up" title="Module code" href="../../index.html" /> 
-  </head>
-  <body role="document">
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
 <script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
@@ -104,22 +93,22 @@
 <span class="c1"># ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="c1">#</span>
-<span class="kn">from</span> <span class="nn">allensdk.config.manifest</span> <span class="kn">import</span> <span class="n">Manifest</span><span class="p">,</span> <span class="n">ManifestVersionError</span>
-<span class="kn">from</span> <span class="nn">allensdk.config.manifest_builder</span> <span class="kn">import</span> <span class="n">ManifestBuilder</span>
-<span class="kn">import</span> <span class="nn">allensdk.core.json_utilities</span> <span class="kn">as</span> <span class="nn">ju</span>
-<span class="kn">from</span> <span class="nn">allensdk.deprecated</span> <span class="kn">import</span> <span class="n">deprecated</span>
+<span class="kn">from</span> <span class="nn">allensdk.config.manifest</span> <span class="k">import</span> <span class="n">Manifest</span><span class="p">,</span> <span class="n">ManifestVersionError</span>
+<span class="kn">from</span> <span class="nn">allensdk.config.manifest_builder</span> <span class="k">import</span> <span class="n">ManifestBuilder</span>
+<span class="kn">import</span> <span class="nn">allensdk.core.json_utilities</span> <span class="k">as</span> <span class="nn">ju</span>
+<span class="kn">from</span> <span class="nn">allensdk.deprecated</span> <span class="k">import</span> <span class="n">deprecated</span>
 
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">pandas.io.json</span> <span class="kn">as</span> <span class="nn">pj</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">pandas.io.json</span> <span class="k">as</span> <span class="nn">pj</span>
 
 <span class="kn">import</span> <span class="nn">functools</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">wraps</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">csv</span>
 
 
-<div class="viewcode-block" id="memoize"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.memoize">[docs]</a><span class="k">def</span> <span class="nf">memoize</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+<div class="viewcode-block" id="memoize"><a class="viewcode-back" href="../../../allensdk.api.cache.html#allensdk.api.cache.memoize">[docs]</a><span class="k">def</span> <span class="nf">memoize</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
    <span class="n">memodict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
    <span class="nd">@wraps</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
@@ -133,18 +122,18 @@
 
    <span class="k">return</span> <span class="n">wrapper</span></div>
 
-<div class="viewcode-block" id="Cache"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.Cache">[docs]</a><span class="k">class</span> <span class="nc">Cache</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Cache"><a class="viewcode-back" href="../../../allensdk.api.cache.html#allensdk.api.cache.Cache">[docs]</a><span class="k">class</span> <span class="nc">Cache</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="n">_log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;allensdk.api.cache&#39;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">manifest</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                 <span class="n">cache</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-                 <span class="n">version</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
+                 <span class="n">manifest</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">version</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="n">cache</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">load_manifest</span><span class="p">(</span><span class="n">manifest</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Cache.get_cache_path"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.Cache.get_cache_path">[docs]</a>    <span class="k">def</span> <span class="nf">get_cache_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">manifest_key</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<div class="viewcode-block" id="Cache.get_cache_path"><a class="viewcode-back" href="../../../allensdk.api.cache.html#allensdk.api.cache.Cache.get_cache_path">[docs]</a>    <span class="k">def</span> <span class="nf">get_cache_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">manifest_key</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Helper method for accessing path specs from manifest keys.</span>
 
 <span class="sd">        Parameters</span>
@@ -164,9 +153,9 @@
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="n">manifest_key</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="bp">None</span></div>
+        <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="Cache.load_manifest"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.Cache.load_manifest">[docs]</a>    <span class="k">def</span> <span class="nf">load_manifest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Cache.load_manifest"><a class="viewcode-back" href="../../../allensdk.api.cache.html#allensdk.api.cache.Cache.load_manifest">[docs]</a>    <span class="k">def</span> <span class="nf">load_manifest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Read a keyed collection of path specifications.</span>
 
 <span class="sd">        Parameters</span>
@@ -178,7 +167,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        Manifest</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="n">file_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">file_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
 
                 <span class="c1"># make the directory if it doesn&#39;t exist already</span>
@@ -199,10 +188,13 @@
                                             <span class="s2">&quot; and it will be regenerated for you the next&quot;</span>
                                             <span class="s2">&quot; time you instantiate this class.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">found_version</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">version</span><span class="p">),</span>
                                            <span class="n">e</span><span class="o">.</span><span class="n">version</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">found_version</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span> <span class="o">=</span> <span class="bp">None</span></div>
 
-<div class="viewcode-block" id="Cache.build_manifest"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.Cache.build_manifest">[docs]</a>    <span class="k">def</span> <span class="nf">build_manifest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">manifest_path</span> <span class="o">=</span> <span class="n">file_name</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Cache.build_manifest"><a class="viewcode-back" href="../../../allensdk.api.cache.html#allensdk.api.cache.Cache.build_manifest">[docs]</a>    <span class="k">def</span> <span class="nf">build_manifest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Creation of default path specifications.</span>
 
 <span class="sd">        Parameters</span>
@@ -219,7 +211,7 @@
         <span class="n">manifest_builder</span><span class="o">.</span><span class="n">write_json_file</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="Cache.add_manifest_paths"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.Cache.add_manifest_paths">[docs]</a>    <span class="k">def</span> <span class="nf">add_manifest_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">manifest_builder</span><span class="p">):</span>
+<div class="viewcode-block" id="Cache.add_manifest_paths"><a class="viewcode-back" href="../../../allensdk.api.cache.html#allensdk.api.cache.Cache.add_manifest_paths">[docs]</a>    <span class="k">def</span> <span class="nf">add_manifest_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">manifest_builder</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Add cache-class specific paths to the manifest. In derived classes, </span>
 <span class="sd">        should call super.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
@@ -227,33 +219,33 @@
         <span class="k">return</span> <span class="n">manifest_builder</span></div>
 
 
-<div class="viewcode-block" id="Cache.manifest_dataframe"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.Cache.manifest_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">manifest_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Cache.manifest_dataframe"><a class="viewcode-back" href="../../../allensdk.api.cache.html#allensdk.api.cache.Cache.manifest_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">manifest_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Convenience method to view manifest as a pandas dataframe.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">path_info</span><span class="p">,</span>
                                       <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span></div>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="Cache.json_remove_keys"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.Cache.json_remove_keys">[docs]</a>    <span class="k">def</span> <span class="nf">json_remove_keys</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">keys</span><span class="p">):</span>
+<div class="viewcode-block" id="Cache.json_remove_keys"><a class="viewcode-back" href="../../../allensdk.api.cache.html#allensdk.api.cache.Cache.json_remove_keys">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">json_remove_keys</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">keys</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
                 <span class="k">del</span> <span class="n">r</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">data</span></div>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="Cache.remove_keys"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.Cache.remove_keys">[docs]</a>    <span class="k">def</span> <span class="nf">remove_keys</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Cache.remove_keys"><a class="viewcode-back" href="../../../allensdk.api.cache.html#allensdk.api.cache.Cache.remove_keys">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">remove_keys</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; DataFrame version</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="n">keys</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">keys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">keys</span> <span class="o">=</span> <span class="p">[]</span>
         
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
             <span class="k">del</span> <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="Cache.json_rename_columns"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.Cache.json_rename_columns">[docs]</a>    <span class="k">def</span> <span class="nf">json_rename_columns</span><span class="p">(</span><span class="n">data</span><span class="p">,</span>
-                            <span class="n">new_old_name_tuples</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Cache.json_rename_columns"><a class="viewcode-back" href="../../../allensdk.api.cache.html#allensdk.api.cache.Cache.json_rename_columns">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">json_rename_columns</span><span class="p">(</span><span class="n">data</span><span class="p">,</span>
+                            <span class="n">new_old_name_tuples</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Convenience method to rename columns in a pandas dataframe.</span>
 
 <span class="sd">        Parameters</span>
@@ -262,7 +254,7 @@
 <span class="sd">            edited in place.</span>
 <span class="sd">        new_old_name_tuples : list of string tuples (new, old)</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="n">new_old_name_tuples</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">new_old_name_tuples</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">new_old_name_tuples</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">for</span> <span class="n">new_name</span><span class="p">,</span> <span class="n">old_name</span> <span class="ow">in</span> <span class="n">new_old_name_tuples</span><span class="p">:</span>
@@ -270,9 +262,9 @@
                 <span class="n">r</span><span class="p">[</span><span class="n">new_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="n">old_name</span><span class="p">]</span>
                 <span class="k">del</span> <span class="n">r</span><span class="p">[</span><span class="n">old_name</span><span class="p">]</span></div>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="Cache.rename_columns"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.Cache.rename_columns">[docs]</a>    <span class="k">def</span> <span class="nf">rename_columns</span><span class="p">(</span><span class="n">data</span><span class="p">,</span>
-                       <span class="n">new_old_name_tuples</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Cache.rename_columns"><a class="viewcode-back" href="../../../allensdk.api.cache.html#allensdk.api.cache.Cache.rename_columns">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">rename_columns</span><span class="p">(</span><span class="n">data</span><span class="p">,</span>
+                       <span class="n">new_old_name_tuples</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Convenience method to rename columns in a pandas dataframe.</span>
 
 <span class="sd">        Parameters</span>
@@ -281,17 +273,17 @@
 <span class="sd">            edited in place.</span>
 <span class="sd">        new_old_name_tuples : list of string tuples (new, old)</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="n">new_old_name_tuples</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">new_old_name_tuples</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">new_old_name_tuples</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">for</span> <span class="n">new_name</span><span class="p">,</span> <span class="n">old_name</span> <span class="ow">in</span> <span class="n">new_old_name_tuples</span><span class="p">:</span>
             <span class="n">data</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">new_name</span> <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="n">old_name</span> <span class="k">else</span> <span class="n">c</span>
                             <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="Cache.load_csv"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.Cache.load_csv">[docs]</a>    <span class="k">def</span> <span class="nf">load_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="Cache.load_csv"><a class="viewcode-back" href="../../../allensdk.api.cache.html#allensdk.api.cache.Cache.load_csv">[docs]</a>    <span class="k">def</span> <span class="nf">load_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">path</span><span class="p">,</span>
-                 <span class="n">rename</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                 <span class="n">index</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+                 <span class="n">rename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Read a csv file as a pandas dataframe.</span>
 
 <span class="sd">        Parameters</span>
@@ -305,15 +297,15 @@
 
         <span class="n">Cache</span><span class="o">.</span><span class="n">rename_columns</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">rename</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">data</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="n">index</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="n">index</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">data</span></div>
 
-<div class="viewcode-block" id="Cache.load_json"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.Cache.load_json">[docs]</a>    <span class="k">def</span> <span class="nf">load_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="Cache.load_json"><a class="viewcode-back" href="../../../allensdk.api.cache.html#allensdk.api.cache.Cache.load_json">[docs]</a>    <span class="k">def</span> <span class="nf">load_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                   <span class="n">path</span><span class="p">,</span>
-                  <span class="n">rename</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                  <span class="n">index</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+                  <span class="n">rename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                  <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Read a json file as a pandas dataframe.</span>
 
 <span class="sd">        Parameters</span>
@@ -327,13 +319,13 @@
 
         <span class="n">Cache</span><span class="o">.</span><span class="n">rename_columns</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">rename</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">data</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="n">index</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="n">index</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">data</span></div>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="Cache.cacher"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.Cache.cacher">[docs]</a>    <span class="k">def</span> <span class="nf">cacher</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span>
+<div class="viewcode-block" id="Cache.cacher"><a class="viewcode-back" href="../../../allensdk.api.cache.html#allensdk.api.cache.Cache.cacher">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">cacher</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span>
                <span class="o">*</span><span class="n">args</span><span class="p">,</span>
                <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;make an rma query, save it and return the dataframe.</span>
@@ -365,21 +357,21 @@
 <span class="sd">        Object or None</span>
 <span class="sd">            data type depends on fn, reader and/or post methods.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">path</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;path&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-        <span class="n">strategy</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;strategy&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;path&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">strategy</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;strategy&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">pre</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;pre&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="n">d</span><span class="p">)</span>
-        <span class="n">post</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;post&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-        <span class="n">reader</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;reader&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-        <span class="n">writer</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;writer&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="n">post</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;post&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">reader</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;reader&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">writer</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;writer&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">strategy</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">strategy</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">writer</span> <span class="ow">or</span> <span class="n">path</span><span class="p">:</span>
                 <span class="n">strategy</span> <span class="o">=</span> <span class="s1">&#39;lazy&#39;</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">strategy</span> <span class="o">=</span> <span class="s1">&#39;pass_through&#39;</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">strategy</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;lazy&#39;</span><span class="p">,</span> <span class="s1">&#39;pass_through&#39;</span><span class="p">,</span> <span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="s1">&#39;create&#39;</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown query strategy: {}.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">strategy</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown query strategy: </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">strategy</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="s1">&#39;lazy&#39;</span> <span class="o">==</span> <span class="n">strategy</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
@@ -415,11 +407,11 @@
 
         <span class="k">return</span></div>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="Cache.csv_writer"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.Cache.csv_writer">[docs]</a>    <span class="k">def</span> <span class="nf">csv_writer</span><span class="p">(</span><span class="n">pth</span><span class="p">,</span> <span class="n">gen</span><span class="p">):</span>
-        <span class="n">csv_writer</span> <span class="o">=</span> <span class="bp">None</span>
+<div class="viewcode-block" id="Cache.csv_writer"><a class="viewcode-back" href="../../../allensdk.api.cache.html#allensdk.api.cache.Cache.csv_writer">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">csv_writer</span><span class="p">(</span><span class="n">pth</span><span class="p">,</span> <span class="n">gen</span><span class="p">):</span>
+        <span class="n">csv_writer</span> <span class="o">=</span> <span class="kc">None</span>
     
-        <span class="n">first_row</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">first_row</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">row_count</span> <span class="o">=</span> <span class="mi">1</span>
     
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">pth</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">output</span><span class="p">:</span>
@@ -431,61 +423,61 @@
                                                 <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span>
                                                 <span class="n">quoting</span><span class="o">=</span><span class="n">csv</span><span class="o">.</span><span class="n">QUOTE_ALL</span><span class="p">)</span>
                     <span class="n">csv_writer</span><span class="o">.</span><span class="n">writeheader</span><span class="p">()</span>
-                    <span class="n">first_row</span> <span class="o">=</span> <span class="bp">False</span>
-                <span class="n">Cache</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;row: {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">row_count</span><span class="p">))</span>
+                    <span class="n">first_row</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">Cache</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;row: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">row_count</span><span class="p">))</span>
                 <span class="n">row_count</span> <span class="o">=</span> <span class="n">row_count</span> <span class="o">+</span> <span class="mi">1</span>
                 <span class="n">csv_writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">row</span><span class="p">)</span></div>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="Cache.cache_csv_json"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.Cache.cache_csv_json">[docs]</a>    <span class="k">def</span> <span class="nf">cache_csv_json</span><span class="p">():</span>
+<div class="viewcode-block" id="Cache.cache_csv_json"><a class="viewcode-back" href="../../../allensdk.api.cache.html#allensdk.api.cache.Cache.cache_csv_json">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">cache_csv_json</span><span class="p">():</span>
         <span class="k">return</span> <span class="p">{</span>
              <span class="s1">&#39;writer&#39;</span><span class="p">:</span> <span class="n">Cache</span><span class="o">.</span><span class="n">csv_writer</span><span class="p">,</span>
              <span class="s1">&#39;reader&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">f</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s1">&#39;records&#39;</span><span class="p">)</span>
         <span class="p">}</span></div>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="Cache.cache_csv_dataframe"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.Cache.cache_csv_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">cache_csv_dataframe</span><span class="p">():</span>
+<div class="viewcode-block" id="Cache.cache_csv_dataframe"><a class="viewcode-back" href="../../../allensdk.api.cache.html#allensdk.api.cache.Cache.cache_csv_dataframe">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">cache_csv_dataframe</span><span class="p">():</span>
         <span class="k">return</span> <span class="p">{</span>
              <span class="s1">&#39;writer&#39;</span><span class="p">:</span> <span class="n">Cache</span><span class="o">.</span><span class="n">csv_writer</span><span class="p">,</span>
              <span class="s1">&#39;reader&#39;</span> <span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_csv</span>
         <span class="p">}</span></div>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="Cache.nocache_dataframe"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.Cache.nocache_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">nocache_dataframe</span><span class="p">():</span>
+<div class="viewcode-block" id="Cache.nocache_dataframe"><a class="viewcode-back" href="../../../allensdk.api.cache.html#allensdk.api.cache.Cache.nocache_dataframe">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">nocache_dataframe</span><span class="p">():</span>
         <span class="k">return</span> <span class="p">{</span>
              <span class="s1">&#39;post&#39;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span>
         <span class="p">}</span></div>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="Cache.nocache_json"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.Cache.nocache_json">[docs]</a>    <span class="k">def</span> <span class="nf">nocache_json</span><span class="p">():</span>
+<div class="viewcode-block" id="Cache.nocache_json"><a class="viewcode-back" href="../../../allensdk.api.cache.html#allensdk.api.cache.Cache.nocache_json">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">nocache_json</span><span class="p">():</span>
         <span class="k">return</span> <span class="p">{</span>
         <span class="p">}</span></div>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="Cache.cache_json_dataframe"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.Cache.cache_json_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">cache_json_dataframe</span><span class="p">():</span>
+<div class="viewcode-block" id="Cache.cache_json_dataframe"><a class="viewcode-back" href="../../../allensdk.api.cache.html#allensdk.api.cache.Cache.cache_json_dataframe">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">cache_json_dataframe</span><span class="p">():</span>
         <span class="k">return</span> <span class="p">{</span>
              <span class="s1">&#39;writer&#39;</span><span class="p">:</span> <span class="n">ju</span><span class="o">.</span><span class="n">write</span><span class="p">,</span>
              <span class="s1">&#39;reader&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">pj</span><span class="o">.</span><span class="n">read_json</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;records&#39;</span><span class="p">)</span>
         <span class="p">}</span></div>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="Cache.cache_json"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.Cache.cache_json">[docs]</a>    <span class="k">def</span> <span class="nf">cache_json</span><span class="p">():</span>
+<div class="viewcode-block" id="Cache.cache_json"><a class="viewcode-back" href="../../../allensdk.api.cache.html#allensdk.api.cache.Cache.cache_json">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">cache_json</span><span class="p">():</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="s1">&#39;writer&#39;</span><span class="p">:</span> <span class="n">ju</span><span class="o">.</span><span class="n">write</span><span class="p">,</span>
             <span class="s1">&#39;reader&#39;</span> <span class="p">:</span> <span class="n">ju</span><span class="o">.</span><span class="n">read</span>
         <span class="p">}</span></div>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="Cache.cache_csv"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.Cache.cache_csv">[docs]</a>    <span class="k">def</span> <span class="nf">cache_csv</span><span class="p">():</span>
+<div class="viewcode-block" id="Cache.cache_csv"><a class="viewcode-back" href="../../../allensdk.api.cache.html#allensdk.api.cache.Cache.cache_csv">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">cache_csv</span><span class="p">():</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="s1">&#39;writer&#39;</span><span class="p">:</span> <span class="n">Cache</span><span class="o">.</span><span class="n">csv_writer</span><span class="p">,</span>
             <span class="s1">&#39;reader&#39;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_csv</span>
         <span class="p">}</span></div>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="Cache.pathfinder"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.Cache.pathfinder">[docs]</a>    <span class="k">def</span> <span class="nf">pathfinder</span><span class="p">(</span><span class="n">file_name_position</span><span class="p">,</span>
-                   <span class="n">secondary_file_name_position</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                   <span class="n">path_keyword</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Cache.pathfinder"><a class="viewcode-back" href="../../../allensdk.api.cache.html#allensdk.api.cache.Cache.pathfinder">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">pathfinder</span><span class="p">(</span><span class="n">file_name_position</span><span class="p">,</span>
+                   <span class="n">secondary_file_name_position</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                   <span class="n">path_keyword</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;helper method to find path argument in legacy methods written</span>
 <span class="sd">        prior to the @cacheable decorator.  Do not use for new @cacheable methods.</span>
 <span class="sd">        </span>
@@ -505,15 +497,15 @@
 <span class="sd">        decorator.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">def</span> <span class="nf">pf</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-            <span class="n">file_name</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">file_name</span> <span class="o">=</span> <span class="kc">None</span>
 
-            <span class="k">if</span> <span class="n">path_keyword</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">path_keyword</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">path_keyword</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">path_keyword</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
                 <span class="n">file_name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">path_keyword</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">file_name_position</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
                     <span class="n">file_name</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="n">file_name_position</span><span class="p">]</span>
 
-                <span class="k">if</span> <span class="p">(</span><span class="n">file_name</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">file_name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span>
                     <span class="n">secondary_file_name_position</span> <span class="ow">and</span> 
                     <span class="n">secondary_file_name_position</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)):</span>
                     <span class="n">file_name</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="n">secondary_file_name_position</span><span class="p">]</span>
@@ -521,12 +513,12 @@
             <span class="k">return</span> <span class="n">file_name</span>
         <span class="k">return</span> <span class="n">pf</span></div>
 
-    <span class="nd">@deprecated</span><span class="p">()</span>
-<div class="viewcode-block" id="Cache.wrap"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.Cache.wrap">[docs]</a>    <span class="k">def</span> <span class="nf">wrap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">cache</span><span class="p">,</span>
-             <span class="n">save_as_json</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-             <span class="n">return_dataframe</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-             <span class="n">index</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-             <span class="n">rename</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+<div class="viewcode-block" id="Cache.wrap"><a class="viewcode-back" href="../../../allensdk.api.cache.html#allensdk.api.cache.Cache.wrap">[docs]</a>    <span class="nd">@deprecated</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">wrap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">cache</span><span class="p">,</span>
+             <span class="n">save_as_json</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+             <span class="n">return_dataframe</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+             <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+             <span class="n">rename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
              <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;make an rma query, save it and return the dataframe.</span>
 <span class="sd">    </span>
@@ -558,30 +550,30 @@
 <span class="sd">        -----</span>
 <span class="sd">        Column renaming happens after the file is reloaded for json</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="n">cache</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">cache</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
             <span class="n">json_data</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">save_as_json</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">save_as_json</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
                 <span class="n">ju</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">json_data</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">json_data</span><span class="p">)</span>
                 <span class="n">Cache</span><span class="o">.</span><span class="n">rename_columns</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">rename</span><span class="p">)</span>
 
-                <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-                    <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="n">index</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="n">index</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
                 <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 
         <span class="c1"># read it back in</span>
-        <span class="k">if</span> <span class="n">save_as_json</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">return_dataframe</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">save_as_json</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">return_dataframe</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
                 <span class="n">data</span> <span class="o">=</span> <span class="n">pj</span><span class="o">.</span><span class="n">read_json</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;records&#39;</span><span class="p">)</span>
                 <span class="n">Cache</span><span class="o">.</span><span class="n">rename_columns</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">rename</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-                    <span class="n">data</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="n">index</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">data</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="n">index</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">data</span> <span class="o">=</span> <span class="n">ju</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">return_dataframe</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">return_dataframe</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -590,12 +582,12 @@
         <span class="k">return</span> <span class="n">data</span></div></div>
 
 
-<div class="viewcode-block" id="cacheable"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.cacheable">[docs]</a><span class="k">def</span> <span class="nf">cacheable</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-              <span class="n">pre</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-              <span class="n">writer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-              <span class="n">reader</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-              <span class="n">post</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-              <span class="n">pathfinder</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="cacheable"><a class="viewcode-back" href="../../../allensdk.api.cache.html#allensdk.api.cache.cacheable">[docs]</a><span class="k">def</span> <span class="nf">cacheable</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+              <span class="n">pre</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+              <span class="n">writer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+              <span class="n">reader</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+              <span class="n">post</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+              <span class="n">pathfinder</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;decorator for rma queries, save it and return the dataframe.</span>
 
 <span class="sd">    Parameters</span>
@@ -637,13 +629,13 @@
         <span class="n">decor</span><span class="o">.</span><span class="n">post</span> <span class="o">=</span> <span class="n">post</span>
         <span class="n">decor</span><span class="o">.</span><span class="n">pathfinder</span> <span class="o">=</span> <span class="n">pathfinder</span>
 
-        <span class="nd">@functools.wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+        <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">w</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span>
               <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">decor</span><span class="o">.</span><span class="n">pathfinder</span> <span class="ow">and</span> <span class="ow">not</span> <span class="s1">&#39;pathfinder&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
                 <span class="n">pathfinder</span> <span class="o">=</span> <span class="n">decor</span><span class="o">.</span><span class="n">pathfinder</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">pathfinder</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;pathfinder&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+                <span class="n">pathfinder</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;pathfinder&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">pathfinder</span> <span class="ow">and</span> <span class="ow">not</span> <span class="s1">&#39;path&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
                 <span class="n">found_path</span> <span class="o">=</span> <span class="n">pathfinder</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -677,9 +669,7 @@
         <div class="sphinxsidebarwrapper">
 <h3><a href="../../../index.html">Contents</a></h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install Guide</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../cell_types.html">Cell Types</a></li>
@@ -704,6 +694,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.model.html">allensdk.model package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.morphology.html">allensdk.morphology package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.deprecated.html">allensdk.deprecated module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
@@ -721,12 +712,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

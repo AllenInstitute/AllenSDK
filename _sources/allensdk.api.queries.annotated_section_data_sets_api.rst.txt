@@ -1,0 +1,7 @@
+allensdk.api.queries.annotated\_section\_data\_sets\_api module
+===============================================================
+
+.. automodule:: allensdk.api.queries.annotated_section_data_sets_api
+    :members:
+    :undoc-members:
+    :show-inheritance:

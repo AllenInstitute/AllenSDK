@@ -1,32 +1,22 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Welcome to the Allen SDK &mdash; Allen SDK dev documentation</title>
-    
+    <title>Welcome to the Allen SDK &#8212; Allen SDK dev documentation</title>
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     'dev',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK dev documentation" href="#" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Install Guide" href="install.html" /> 
-  </head>
-  <body role="document">
+  </head><body>
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
 <script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
@@ -122,34 +112,63 @@ your own simulations using stimuli from the Allen Cell Types Database or custom 
 <p>The Allen SDK provides Python code for accessing experimental metadata along with projection signal volumes registered to a common coordinate framework.  This framework has structural annotations, which allows users to compute structure-level signal statistics.</p>
 <p>See the <a class="reference external" href="connectivity.html">mouse connectivity section</a> for more details.</p>
 </div>
+<div class="section" id="what-s-new-release-0-14-5-june-14th-2018">
+<h2>What’s New - Release 0.14.5 (June 14th, 2018)<a class="headerlink" href="#what-s-new-release-0-14-5-june-14th-2018" title="Permalink to this headline">¶</a></h2>
+<p>The 0.14.5 release coincides with the release of additional mouse electrophysiology and morphology data in the Allen Cell Types Database.
+We have simplified the data structure returned by <a class="reference internal" href="allensdk.core.cell_types_cache.html#allensdk.core.cell_types_cache.CellTypesCache.get_cells" title="allensdk.core.cell_types_cache.CellTypesCache.get_cells"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_cells()</span></code></a> to be more
+flat, so you will be prompted to update your manifest.  To use the simpler format and access the new data, remove the following files:</p>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="allensdk.core.cell_types_cache.html#allensdk.core.cell_types_cache.CellTypesCache" title="allensdk.core.cell_types_cache.CellTypesCache"><code class="xref py py-meth docutils literal notranslate"><span class="pre">CellTypesCache()</span></code></a> manifest.json</li>
+<li><code class="docutils literal notranslate"><span class="pre">cells.json</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">ephys_features.csv</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">morphology_features.csv</span></code></li>
+</ul>
+</div></blockquote>
+<p>We have also simplified the data structure returned by <a class="reference internal" href="allensdk.core.mouse_connectivity_cache.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_experiments" title="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_experiments"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_experiments()</span></code></a>, so you will
+be prompted to update your connectivity manifest.  To use the simpler format and access the new data, remove the following files:</p>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="allensdk.core.mouse_connectivity_cache.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache" title="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache"><code class="xref py py-meth docutils literal notranslate"><span class="pre">MouseConnectivityCache()</span></code></a> manifest.json</li>
+<li><code class="docutils literal notranslate"><span class="pre">experiments.json</span></code></li>
+</ul>
+</div></blockquote>
+<p>Additional changes:</p>
+<blockquote>
+<div><ul class="simple">
+<li>increased <code class="docutils literal notranslate"><span class="pre">pandas</span></code> minimum version to 0.17, removed the upper limit</li>
+<li>added regression tests to the Brain Observatory analysis modules to ensure py3/py2 numerical compatibility.</li>
+</ul>
+</div></blockquote>
+</div>
 <div class="section" id="what-s-new-release-0-14-4-january-30th-2018">
-<h2>What&#8217;s New - Release 0.14.4 (January 30th, 2018)<a class="headerlink" href="#what-s-new-release-0-14-4-january-30th-2018" title="Permalink to this headline">¶</a></h2>
+<h2>What’s New - Release 0.14.4 (January 30th, 2018)<a class="headerlink" href="#what-s-new-release-0-14-4-january-30th-2018" title="Permalink to this headline">¶</a></h2>
 <p>The 0.14.4 release brings support for Python 3.6 along with Python 2.7. These changes maintain compatibility with Python 2.7, so users who continue
 to work in Python 2.7 will not experience any disruptions.</p>
-<p>The <a class="reference internal" href="allensdk.ephys.html#allensdk.ephys.ephys_features.filter_putative_spikes" title="allensdk.ephys.ephys_features.filter_putative_spikes"><code class="xref py py-func docutils literal"><span class="pre">filter_putative_spikes()</span></code></a> function now excludes candidate spikes when the voltage trace does not show a
-decrease between the candidate&#8217;s peak and the next candidate&#8217;s threshold-crossing.</p>
+<p>The <a class="reference internal" href="allensdk.ephys.ephys_features.html#allensdk.ephys.ephys_features.filter_putative_spikes" title="allensdk.ephys.ephys_features.filter_putative_spikes"><code class="xref py py-func docutils literal notranslate"><span class="pre">filter_putative_spikes()</span></code></a> function now excludes candidate spikes when the voltage trace does not show a
+decrease between the candidate’s peak and the next candidate’s threshold-crossing.</p>
 </div>
 <div class="section" id="what-s-new-release-0-14-3-october-19th-2017">
-<h2>What&#8217;s New - Release 0.14.3 (October 19th, 2017)<a class="headerlink" href="#what-s-new-release-0-14-3-october-19th-2017" title="Permalink to this headline">¶</a></h2>
+<h2>What’s New - Release 0.14.3 (October 19th, 2017)<a class="headerlink" href="#what-s-new-release-0-14-3-october-19th-2017" title="Permalink to this headline">¶</a></h2>
 <p>The 0.14.3 release coincides with the first release of human data and models in the Allen Cell Types Database and a complete requantification of structure unionize
 records in the Allen Mouse Brain Connectivity Atlas based on a new revision of the Common Coordinate Framework structure ontology and voxel annotations.  For details
 on what types of data were added to the two atlases, take a look at the <a class="reference external" href="https://github.com/AllenInstitute/AllenSDK/wiki/Release-Notes-(0.14.3)">data release notes</a>.</p>
-<p>Users of the <a class="reference internal" href="allensdk.core.html#allensdk.core.cell_types_cache.CellTypesCache" title="allensdk.core.cell_types_cache.CellTypesCache"><code class="xref py py-class docutils literal"><span class="pre">CellTypesCache</span></code></a> can filter for cells based on the species of the cell&#8217;s donor using the <code class="docutils literal"><span class="pre">species</span></code> argument of
-<a class="reference internal" href="allensdk.core.html#allensdk.core.cell_types_cache.CellTypesCache.get_cells" title="allensdk.core.cell_types_cache.CellTypesCache.get_cells"><code class="xref py py-meth docutils literal"><span class="pre">get_cells()</span></code></a>.  Examples of this are shown in the metadata filtering section of the example
+<p>Users of the <a class="reference internal" href="allensdk.core.cell_types_cache.html#allensdk.core.cell_types_cache.CellTypesCache" title="allensdk.core.cell_types_cache.CellTypesCache"><code class="xref py py-class docutils literal notranslate"><span class="pre">CellTypesCache</span></code></a> can filter for cells based on the species of the cell’s donor using the <code class="docutils literal notranslate"><span class="pre">species</span></code> argument of
+<a class="reference internal" href="allensdk.core.cell_types_cache.html#allensdk.core.cell_types_cache.CellTypesCache.get_cells" title="allensdk.core.cell_types_cache.CellTypesCache.get_cells"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_cells()</span></code></a>.  Examples of this are shown in the metadata filtering section of the example
 <a class="reference external" href="_static/examples/nb/cell_types.html">Jupyter notebook</a></p>
 <p>The Allen Mouse Brain Connectivity Atlas contains over 350 new data sets and structure unionize records have been completely reprocessed with updated 3D annotations of the Common Coordinate Framework.
-The structure ontology contains new structures, with subcortical annotations having changed the most.  The <a class="reference internal" href="allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache" title="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache"><code class="xref py py-class docutils literal"><span class="pre">MouseConnectivityCache</span></code></a> <code class="code docutils literal"><span class="pre">get_annotation_volume</span></code> method will by default return a new volume by default.  You can choose which version of annotations you would like using the <code class="docutils literal"><span class="pre">ccf_version</span></code> <a class="reference internal" href="allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache" title="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache"><code class="xref py py-class docutils literal"><span class="pre">MouseConnectivityCache</span></code></a> constructor.</p>
+The structure ontology contains new structures, with subcortical annotations having changed the most.  The <a class="reference internal" href="allensdk.core.mouse_connectivity_cache.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache" title="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache"><code class="xref py py-class docutils literal notranslate"><span class="pre">MouseConnectivityCache</span></code></a> <code class="code docutils literal notranslate"><span class="pre">get_annotation_volume</span></code> method will by default return a new volume by default.  You can choose which version of annotations you would like using the <code class="docutils literal notranslate"><span class="pre">ccf_version</span></code> <a class="reference internal" href="allensdk.core.mouse_connectivity_cache.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache" title="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache"><code class="xref py py-class docutils literal notranslate"><span class="pre">MouseConnectivityCache</span></code></a> constructor.</p>
 <p>To access new experiments and unionize records, you will need to remove a number of files in your manifest directory so that
-<a class="reference internal" href="allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache" title="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache"><code class="xref py py-class docutils literal"><span class="pre">MouseConnectivityCache</span></code></a> will know to download the new copies:</p>
+<a class="reference internal" href="allensdk.core.mouse_connectivity_cache.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache" title="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache"><code class="xref py py-class docutils literal notranslate"><span class="pre">MouseConnectivityCache</span></code></a> will know to download the new copies:</p>
 <blockquote>
 <div><ul class="simple">
-<li><a class="reference internal" href="allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache" title="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache"><code class="xref py py-class docutils literal"><span class="pre">MouseConnectivityCache</span></code></a> manifest JSON</li>
-<li><code class="docutils literal"><span class="pre">experiments.json</span></code></li>
-<li><code class="docutils literal"><span class="pre">structures.json</span></code></li>
-<li><code class="docutils literal"><span class="pre">structure_unionizes.csv</span></code> (one per experiment within experiment subdirectories)</li>
+<li><a class="reference internal" href="allensdk.core.mouse_connectivity_cache.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache" title="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache"><code class="xref py py-class docutils literal notranslate"><span class="pre">MouseConnectivityCache</span></code></a> manifest JSON</li>
+<li><code class="docutils literal notranslate"><span class="pre">experiments.json</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">structures.json</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">structure_unionizes.csv</span></code> (one per experiment within experiment subdirectories)</li>
 </ul>
 </div></blockquote>
-<p>You can then call the <a class="reference internal" href="allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache" title="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache"><code class="xref py py-class docutils literal"><span class="pre">MouseConnectivityCache</span></code></a> <code class="code docutils literal"><span class="pre">get_experiments</span></code>, <code class="code docutils literal"><span class="pre">get_structure_tree</span></code>, and <code class="code docutils literal"><span class="pre">get_structure_unionizes</span></code> methods to download the files above.</p>
+<p>You can then call the <a class="reference internal" href="allensdk.core.mouse_connectivity_cache.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache" title="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache"><code class="xref py py-class docutils literal notranslate"><span class="pre">MouseConnectivityCache</span></code></a> <code class="code docutils literal notranslate"><span class="pre">get_experiments</span></code>, <code class="code docutils literal notranslate"><span class="pre">get_structure_tree</span></code>, and <code class="code docutils literal notranslate"><span class="pre">get_structure_unionizes</span></code> methods to download the files above.</p>
 <p>To find out more, take a look at our <a class="reference external" href="http://github.com/AllenInstitute/AllenSDK/blob/master/CHANGELOG.md">CHANGELOG</a>.</p>
 </div>
 </div>
@@ -162,9 +181,7 @@ The structure ontology contains new structures, with subcortical annotations hav
         <div class="sphinxsidebarwrapper">
 <h3><a href="#">Contents</a></h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
@@ -189,6 +206,7 @@ The structure ontology contains new structures, with subcortical annotations hav
 <li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.deprecated.html">allensdk.deprecated module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
@@ -206,12 +224,14 @@ The structure ontology contains new structures, with subcortical annotations hav
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

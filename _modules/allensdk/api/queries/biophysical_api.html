@@ -1,32 +1,21 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>allensdk.api.queries.biophysical_api &mdash; Allen SDK dev documentation</title>
-    
+    <title>allensdk.api.queries.biophysical_api &#8212; Allen SDK dev documentation</title>
     <link rel="stylesheet" href="../../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../../',
-        VERSION:     'dev',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="../../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK dev documentation" href="../../../../index.html" />
-    <link rel="up" title="Module code" href="../../../index.html" /> 
-  </head>
-  <body role="document">
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
 <script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
@@ -104,29 +93,79 @@
 <span class="c1"># ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="c1">#</span>
-<span class="kn">from</span> <span class="nn">..api</span> <span class="kn">import</span> <span class="n">Api</span>
+<span class="kn">from</span> <span class="nn">allensdk.api.queries.rma_template</span> <span class="k">import</span> <span class="n">RmaTemplate</span>
+<span class="kn">from</span> <span class="nn">allensdk.api.cache</span> <span class="k">import</span> <span class="n">cacheable</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">simplejson</span> <span class="kn">as</span> <span class="nn">json</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
-<span class="kn">from</span> <span class="nn">allensdk.config.manifest</span> <span class="kn">import</span> <span class="n">Manifest</span>
+<span class="kn">import</span> <span class="nn">simplejson</span> <span class="k">as</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">allensdk.config.manifest</span> <span class="k">import</span> <span class="n">Manifest</span>
 
 
-<div class="viewcode-block" id="BiophysicalApi"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.biophysical_api.BiophysicalApi">[docs]</a><span class="k">class</span> <span class="nc">BiophysicalApi</span><span class="p">(</span><span class="n">Api</span><span class="p">):</span>
+<div class="viewcode-block" id="BiophysicalApi"><a class="viewcode-back" href="../../../../allensdk.api.queries.biophysical_api.html#allensdk.api.queries.biophysical_api.BiophysicalApi">[docs]</a><span class="k">class</span> <span class="nc">BiophysicalApi</span><span class="p">(</span><span class="n">RmaTemplate</span><span class="p">):</span>
     <span class="n">_NWB_file_type</span> <span class="o">=</span> <span class="s1">&#39;NWBDownload&#39;</span>
     <span class="n">_SWC_file_type</span> <span class="o">=</span> <span class="s1">&#39;3DNeuronReconstruction&#39;</span>
     <span class="n">_MOD_file_type</span> <span class="o">=</span> <span class="s1">&#39;BiophysicalModelDescription&#39;</span>
     <span class="n">_FIT_file_type</span> <span class="o">=</span> <span class="s1">&#39;NeuronalModelParameters&#39;</span>
     <span class="n">_MARKER_file_type</span> <span class="o">=</span> <span class="s1">&#39;3DNeuronMarker&#39;</span>
+    <span class="n">BIOPHYSICAL_MODEL_TYPE_IDS</span> <span class="o">=</span> <span class="p">(</span><span class="mi">491455321</span><span class="p">,</span> <span class="mi">32923071</span><span class="p">,)</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">BiophysicalApi</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">base_uri</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cache_stimulus</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">rma_templates</span> <span class="o">=</span> \
+        <span class="p">{</span><span class="s2">&quot;model_queries&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;models_by_specimen&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;see name&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="s1">&#39;NeuronalModel&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;num_rows&#39;</span><span class="p">:</span> <span class="s1">&#39;all&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+             <span class="s1">&#39;criteria&#39;</span><span class="p">:</span> <span class="s1">&#39;[neuronal_model_template_id$in{{biophysical_model_types}}],[specimen_id$in{{specimen_ids}}]&#39;</span><span class="p">,</span> 
+             <span class="s1">&#39;criteria_params&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;specimen_ids&#39;</span><span class="p">,</span> <span class="s1">&#39;biophysical_model_types&#39;</span><span class="p">]</span>
+             <span class="p">}]}</span>
+
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BiophysicalApi</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">base_uri</span><span class="p">,</span> <span class="n">query_manifest</span><span class="o">=</span><span class="n">BiophysicalApi</span><span class="o">.</span><span class="n">rma_templates</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache_stimulus</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ids</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sweeps</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="BiophysicalApi.build_rma"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.biophysical_api.BiophysicalApi.build_rma">[docs]</a>    <span class="k">def</span> <span class="nf">build_rma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">neuronal_model_id</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;json&#39;</span><span class="p">):</span>
+
+<div class="viewcode-block" id="BiophysicalApi.get_neuronal_models"><a class="viewcode-back" href="../../../../allensdk.api.queries.biophysical_api.html#allensdk.api.queries.biophysical_api.BiophysicalApi.get_neuronal_models">[docs]</a>    <span class="nd">@cacheable</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">get_neuronal_models</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">specimen_ids</span><span class="p">,</span> <span class="n">num_rows</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">model_type_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Fetch all of the biophysically detailed model records associated with </span>
+<span class="sd">        a particular specimen_id</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        specimen_ids : list</span>
+<span class="sd">            One or more integer ids identifying specimen records.</span>
+<span class="sd">        num_rows : int, optional</span>
+<span class="sd">            how many records to retrieve. Default is &#39;all&#39;.</span>
+<span class="sd">        count : bool, optional</span>
+<span class="sd">            If True, return a count of the lines found by the query. Default is False.</span>
+<span class="sd">        model_type_ids : list, optional</span>
+<span class="sd">            One or more integer ids identifying categories of neuronal model. Defaults </span>
+<span class="sd">            to all-active and perisomatic biophysical_models.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List of dict</span>
+<span class="sd">            Each element is a biophysical model record, containing a unique integer </span>
+<span class="sd">            id, the id of the associated specimen, and the id of the model type to </span>
+<span class="sd">            which this model belongs.</span>
+<span class="sd">  </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="n">model_type_ids</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">model_type_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">BIOPHYSICAL_MODEL_TYPE_IDS</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_query</span><span class="p">(</span><span class="s1">&#39;model_queries&#39;</span><span class="p">,</span> <span class="s1">&#39;models_by_specimen&#39;</span><span class="p">,</span> 
+                                   <span class="n">specimen_ids</span><span class="o">=</span><span class="n">specimen_ids</span><span class="p">,</span> 
+                                   <span class="n">biophysical_model_types</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">model_type_ids</span><span class="p">),</span> 
+                                   <span class="n">num_rows</span><span class="o">=</span><span class="n">num_rows</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="n">count</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BiophysicalApi.build_rma"><a class="viewcode-back" href="../../../../allensdk.api.queries.biophysical_api.html#allensdk.api.queries.biophysical_api.BiophysicalApi.build_rma">[docs]</a>    <span class="k">def</span> <span class="nf">build_rma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">neuronal_model_id</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;json&#39;</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Construct a query to find all files related to a neuronal model.</span>
 
 <span class="sd">        Parameters</span>
@@ -161,7 +200,7 @@
                         <span class="s1">&#39;,rma::include,&#39;</span><span class="p">,</span>
                         <span class="n">include_associations</span><span class="p">])</span></div>
 
-<div class="viewcode-block" id="BiophysicalApi.read_json"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.biophysical_api.BiophysicalApi.read_json">[docs]</a>    <span class="k">def</span> <span class="nf">read_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">json_parsed_data</span><span class="p">):</span>
+<div class="viewcode-block" id="BiophysicalApi.read_json"><a class="viewcode-back" href="../../../../allensdk.api.queries.biophysical_api.html#allensdk.api.queries.biophysical_api.BiophysicalApi.read_json">[docs]</a>    <span class="k">def</span> <span class="nf">read_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">json_parsed_data</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Get the list of well_known_file ids from a response body</span>
 <span class="sd">        containing nested sample,microarray_slides,well_known_files.</span>
 
@@ -242,7 +281,7 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ids</span></div>
 
-<div class="viewcode-block" id="BiophysicalApi.is_well_known_file_type"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.biophysical_api.BiophysicalApi.is_well_known_file_type">[docs]</a>    <span class="k">def</span> <span class="nf">is_well_known_file_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wkf</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<div class="viewcode-block" id="BiophysicalApi.is_well_known_file_type"><a class="viewcode-back" href="../../../../allensdk.api.queries.biophysical_api.html#allensdk.api.queries.biophysical_api.BiophysicalApi.is_well_known_file_type">[docs]</a>    <span class="k">def</span> <span class="nf">is_well_known_file_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wkf</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Check if a structure has the expected name.</span>
 
 <span class="sd">        Parameters</span>
@@ -259,9 +298,9 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">wkf</span><span class="p">[</span><span class="s1">&#39;well_known_file_type&#39;</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">name</span>
         <span class="k">except</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">False</span></div>
+            <span class="k">return</span> <span class="kc">False</span></div>
 
-<div class="viewcode-block" id="BiophysicalApi.get_well_known_file_ids"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.biophysical_api.BiophysicalApi.get_well_known_file_ids">[docs]</a>    <span class="k">def</span> <span class="nf">get_well_known_file_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">neuronal_model_id</span><span class="p">):</span>
+<div class="viewcode-block" id="BiophysicalApi.get_well_known_file_ids"><a class="viewcode-back" href="../../../../allensdk.api.queries.biophysical_api.html#allensdk.api.queries.biophysical_api.BiophysicalApi.get_well_known_file_ids">[docs]</a>    <span class="k">def</span> <span class="nf">get_well_known_file_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">neuronal_model_id</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Query the current RMA endpoint with a neuronal_model id</span>
 <span class="sd">        to get the corresponding well known file ids.</span>
 
@@ -275,7 +314,7 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_query</span><span class="p">(</span><span class="n">rma_builder_fn</span><span class="p">,</span> <span class="n">json_traversal_fn</span><span class="p">,</span> <span class="n">neuronal_model_id</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="BiophysicalApi.create_manifest"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.biophysical_api.BiophysicalApi.create_manifest">[docs]</a>    <span class="k">def</span> <span class="nf">create_manifest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="BiophysicalApi.create_manifest"><a class="viewcode-back" href="../../../../allensdk.api.queries.biophysical_api.html#allensdk.api.queries.biophysical_api.BiophysicalApi.create_manifest">[docs]</a>    <span class="k">def</span> <span class="nf">create_manifest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                         <span class="n">fit_path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
                         <span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
                         <span class="n">stimulus_filename</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
@@ -349,9 +388,9 @@
             <span class="p">}</span>
         <span class="p">]</span></div>
 
-<div class="viewcode-block" id="BiophysicalApi.cache_data"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.biophysical_api.BiophysicalApi.cache_data">[docs]</a>    <span class="k">def</span> <span class="nf">cache_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="BiophysicalApi.cache_data"><a class="viewcode-back" href="../../../../allensdk.api.queries.biophysical_api.html#allensdk.api.queries.biophysical_api.BiophysicalApi.cache_data">[docs]</a>    <span class="k">def</span> <span class="nf">cache_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                    <span class="n">neuronal_model_id</span><span class="p">,</span>
-                   <span class="n">working_directory</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+                   <span class="n">working_directory</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Take a an experiment id, query the Api RMA to get well-known-files</span>
 <span class="sd">        download the files, and store them in the working directory.</span>
 
@@ -362,14 +401,14 @@
 <span class="sd">        working_directory : string</span>
 <span class="sd">            Absolute path name where the downloaded well-known files will be stored.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="n">working_directory</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">working_directory</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">working_directory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_working_directory</span>
 
         <span class="n">well_known_file_id_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_well_known_file_ids</span><span class="p">(</span>
             <span class="n">neuronal_model_id</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">well_known_file_id_dict</span> <span class="ow">or</span> \
-           <span class="p">(</span><span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">well_known_file_id_dict</span><span class="o">.</span><span class="n">values</span><span class="p">())):</span>
+           <span class="p">(</span><span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">well_known_file_id_dict</span><span class="o">.</span><span class="n">values</span><span class="p">()))):</span>
             <span class="k">raise</span><span class="p">(</span><span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;No data found for neuronal model id </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span>
                             <span class="p">(</span><span class="n">neuronal_model_id</span><span class="p">)))</span>
 
@@ -392,11 +431,11 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_file_over_http</span><span class="p">(</span>
                     <span class="n">well_known_file_url</span><span class="p">,</span> <span class="n">cached_file_path</span><span class="p">)</span>
 
-        <span class="n">fit_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ids</span><span class="p">[</span><span class="s1">&#39;fit&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">stimulus_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ids</span><span class="p">[</span><span class="s1">&#39;stimulus&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">swc_morphology_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ids</span><span class="p">[</span><span class="s1">&#39;morphology&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">fit_path</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ids</span><span class="p">[</span><span class="s1">&#39;fit&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">stimulus_filename</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ids</span><span class="p">[</span><span class="s1">&#39;stimulus&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">swc_morphology_path</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ids</span><span class="p">[</span><span class="s1">&#39;morphology&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">marker_path</span> <span class="o">=</span> \
-            <span class="bp">self</span><span class="o">.</span><span class="n">ids</span><span class="p">[</span><span class="s1">&#39;marker&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;marker&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ids</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
+            <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ids</span><span class="p">[</span><span class="s1">&#39;marker&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;marker&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ids</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
         <span class="n">sweeps</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sweeps</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">create_manifest</span><span class="p">(</span><span class="n">fit_path</span><span class="p">,</span>
@@ -407,8 +446,8 @@
                              <span class="n">sweeps</span><span class="p">)</span>
 
         <span class="n">manifest_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_directory</span><span class="p">,</span> <span class="s1">&#39;manifest.json&#39;</span><span class="p">)</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">manifest_path</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">manifest</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span></div></div>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">manifest_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">manifest</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span></div></div>
 </pre></div>
 
           </div>
@@ -418,9 +457,7 @@
         <div class="sphinxsidebarwrapper">
 <h3><a href="../../../../index.html">Contents</a></h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Install Guide</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Install Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../cell_types.html">Cell Types</a></li>
@@ -445,6 +482,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.model.html">allensdk.model package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.morphology.html">allensdk.morphology package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.deprecated.html">allensdk.deprecated module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
@@ -462,12 +500,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

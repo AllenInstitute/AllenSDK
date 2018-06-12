@@ -1,0 +1,7 @@
+allensdk.api.cache module
+=========================
+
+.. automodule:: allensdk.api.cache
+    :members:
+    :undoc-members:
+    :show-inheritance:

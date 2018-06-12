@@ -1,0 +1,7 @@
+allensdk.api.queries.synchronization\_api module
+================================================
+
+.. automodule:: allensdk.api.queries.synchronization_api
+    :members:
+    :undoc-members:
+    :show-inheritance:

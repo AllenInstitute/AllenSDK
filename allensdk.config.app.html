@@ -1,34 +1,23 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>allensdk.config.app package &mdash; Allen SDK dev documentation</title>
-    
+    <title>allensdk.config.app package &#8212; Allen SDK dev documentation</title>
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     'dev',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK dev documentation" href="index.html" />
-    <link rel="up" title="allensdk.config package" href="allensdk.config.html" />
-    <link rel="next" title="allensdk.config.model package" href="allensdk.config.model.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="allensdk.config.app.application_config module" href="allensdk.config.app.application_config.html" />
     <link rel="prev" title="allensdk.config package" href="allensdk.config.html" /> 
-  </head>
-  <body role="document">
+  </head><body>
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
 <script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
@@ -74,234 +63,11 @@
 <h1>allensdk.config.app package<a class="headerlink" href="#allensdk-config-app-package" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="allensdk.config.app.application_config.html">allensdk.config.app.application_config module</a></li>
+</ul>
 </div>
-<div class="section" id="module-allensdk.config.app.application_config">
-<span id="allensdk-config-app-application-config-module"></span><h2>allensdk.config.app.application_config module<a class="headerlink" href="#module-allensdk.config.app.application_config" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="allensdk.config.app.application_config.ApplicationConfig">
-<em class="property">class </em><code class="descclassname">allensdk.config.app.application_config.</code><code class="descname">ApplicationConfig</code><span class="sig-paren">(</span><em>defaults</em>, <em>name='app'</em>, <em>halp='Run application.'</em>, <em>default_log_config=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/app/application_config.html#ApplicationConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.app.application_config.ApplicationConfig" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<p>Convenience class that handles of application configuration
-from environment variables, .conf files and the command line
-using Python standard libraries and formats.</p>
-<dl class="method">
-<dt id="allensdk.config.app.application_config.ApplicationConfig.apply_configuration_from_command_line">
-<code class="descname">apply_configuration_from_command_line</code><span class="sig-paren">(</span><em>parsed_args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/app/application_config.html#ApplicationConfig.apply_configuration_from_command_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.app.application_config.ApplicationConfig.apply_configuration_from_command_line" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read application configuration variables from the command line.</p>
-<p>Unassigned variables are left unchanged if previously assigned,
-set to their default values,
-or None if no default is specified at init time.
-Assigned variables will overwrite the previous value.</p>
-<p>see: <a class="reference external" href="https://docs.python.org/2/howto/argparse.html">https://docs.python.org/2/howto/argparse.html</a></p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>parsed_args</strong> : dict</p>
-<blockquote class="last">
-<div><p>the arguments as parsed from the command line.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="allensdk.config.app.application_config.ApplicationConfig.apply_configuration_from_environment">
-<code class="descname">apply_configuration_from_environment</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/app/application_config.html#ApplicationConfig.apply_configuration_from_environment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.app.application_config.ApplicationConfig.apply_configuration_from_environment" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read application configuration variables from the environment.</p>
-<p>The variable names are upper case and have a
-prefix defined by the application.</p>
-<p>See: <a class="reference external" href="https://docs.python.org/2/library/os.html">https://docs.python.org/2/library/os.html</a></p>
-</dd></dl>
-
-<dl class="method">
-<dt id="allensdk.config.app.application_config.ApplicationConfig.apply_configuration_from_file">
-<code class="descname">apply_configuration_from_file</code><span class="sig-paren">(</span><em>config_file_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/app/application_config.html#ApplicationConfig.apply_configuration_from_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.app.application_config.ApplicationConfig.apply_configuration_from_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read application configuration variables from a .conf file.</p>
-<p>Unassigned variables are set to their default values
-or None if no default is specified at init time.
-The variables are found in a section named by the application.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>config_file_path</strong> : string</p>
-<blockquote>
-<div><p>path to to an INI (.conf) or JSON format application config file.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">see: <a class="reference external" href="https://docs.python.org/2/library/configparser.html">https://docs.python.org/2/library/configparser.html</a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="allensdk.config.app.application_config.ApplicationConfig.create_argparser">
-<code class="descname">create_argparser</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/app/application_config.html#ApplicationConfig.create_argparser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.app.application_config.ApplicationConfig.create_argparser" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialization for the command-line parsing stage.</p>
-<p>An application specific prefix is applied to argument names.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>prog</strong> : string</p>
-<blockquote>
-<div><p>Application specific prefix for argument names.</p>
-</div></blockquote>
-<p><strong>description</strong> : string</p>
-<blockquote>
-<div><p>A brief &#8216;help&#8217; description of the application.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">argParse.ArgumentParser</p>
-<blockquote class="last">
-<div><p>The initialized argument parser object.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Notes</p>
-<p>Defaults are set at the first environment reading.
-Command line args only override them when present</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="allensdk.config.app.application_config.ApplicationConfig.from_json_file">
-<code class="descname">from_json_file</code><span class="sig-paren">(</span><em>json_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/app/application_config.html#ApplicationConfig.from_json_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.app.application_config.ApplicationConfig.from_json_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read an application configuration from a JSON format file.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>json_path</strong> : string</p>
-<blockquote>
-<div><p>Path to the JSON file.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">string</p>
-<blockquote class="last">
-<div><p>An application configuration in INI format</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="allensdk.config.app.application_config.ApplicationConfig.from_json_string">
-<code class="descname">from_json_string</code><span class="sig-paren">(</span><em>json_string</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/app/application_config.html#ApplicationConfig.from_json_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.app.application_config.ApplicationConfig.from_json_string" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read a configuration from a JSON format string.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>json_string</strong> : string</p>
-<blockquote>
-<div><p>A JSON-formatted string containing an application configuration.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">string</p>
-<blockquote class="last">
-<div><p>An application configuration in INI format</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="allensdk.config.app.application_config.ApplicationConfig.load">
-<code class="descname">load</code><span class="sig-paren">(</span><em>command_line_args</em>, <em>disable_existing_loggers=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/app/application_config.html#ApplicationConfig.load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.app.application_config.ApplicationConfig.load" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load application configuration options, first from the environment,
-then from the configuration file, then from the command line.</p>
-<p>Each stage of loading can override the previous stage.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>command_line_args</strong> : dict</p>
-<blockquote>
-<div><p>Parameters passed to the application.</p>
-</div></blockquote>
-<p><strong>disable_existing_loggers</strong> : boolean</p>
-<blockquote>
-<div><p>Reset the logging system or not.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">fileConfig</p>
-<blockquote class="last">
-<div><p>Configuration object with all levels applied</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="allensdk.config.app.application_config.ApplicationConfig.parse_command_line_args">
-<code class="descname">parse_command_line_args</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/app/application_config.html#ApplicationConfig.parse_command_line_args"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.app.application_config.ApplicationConfig.parse_command_line_args" title="Permalink to this definition">¶</a></dt>
-<dd><p>Simply call the internal argparser object.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>args</strong> : array</p>
-<blockquote>
-<div><p>Parameters passed to the application.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Namespace</p>
-<blockquote class="last">
-<div><p>Parsed paramenters.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="allensdk.config.app.application_config.ApplicationConfig.to_config_string">
-<code class="descname">to_config_string</code><span class="sig-paren">(</span><em>description</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/app/application_config.html#ApplicationConfig.to_config_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.app.application_config.ApplicationConfig.to_config_string" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a configuration string from a dict.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>description</strong> : dict</p>
-<blockquote>
-<div><p>Configuration options for an application.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">string</p>
-<blockquote class="last">
-<div><p>Equivalent configuration as an INI format string</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Notes</p>
-<p>The Python configparser library natively supports this functionality in Python 3.</p>
-</dd></dl>
-
-</dd></dl>
-
 </div>
 <div class="section" id="module-allensdk.config.app">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-allensdk.config.app" title="Permalink to this headline">¶</a></h2>
@@ -319,9 +85,7 @@ domain-specific configuration.</p>
         <div class="sphinxsidebarwrapper">
 <h3><a href="index.html">Contents</a></h3>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
@@ -346,6 +110,7 @@ domain-specific configuration.</p>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.deprecated.html">allensdk.deprecated module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
@@ -363,12 +128,14 @@ domain-specific configuration.</p>
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

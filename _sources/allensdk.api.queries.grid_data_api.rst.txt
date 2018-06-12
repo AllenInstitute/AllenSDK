@@ -1,0 +1,7 @@
+allensdk.api.queries.grid\_data\_api module
+===========================================
+
+.. automodule:: allensdk.api.queries.grid_data_api
+    :members:
+    :undoc-members:
+    :show-inheritance:

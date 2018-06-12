@@ -1,0 +1,557 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>allensdk.ephys.ephys_extractor module &#8212; Allen SDK dev documentation</title>
+    <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="allensdk.ephys.ephys_features module" href="allensdk.ephys.ephys_features.html" />
+    <link rel="prev" title="allensdk.ephys package" href="allensdk.ephys.html" /> 
+  </head><body>
+<link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
+<script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var _pSupressBrowserFlashWarning = true;
+    var _pTabId = "pHome";
+    var _pMoreProjectsId = "pMoreProjects";
+    var _pImagePath = "http://www.brain-map.org/assets/images/";
+    var _pSiteWarnings = function() {
+        this.show_warning() = {};
+    }
+</script>
+<script type="text/javascript">
+    function initialize() {
+        /*** do your stuff, then initialize the portal plugin ***/
+        _pPortalOnLoad();
+    }
+</script>
+<style>
+  #header_content > a {
+  display: inline-block;
+  width: 250px;
+  height: 75px;
+  background-image:url("_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-size: 235px 37px;
+  background-position: 0px 20px;
+  background-repeat: no-repeat;
+  }
+</style>
+
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
+<link rel="stylesheet" type="text/css" href="_static/external_assets/stylesheets/common_layout.css" />
+
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-allensdk.ephys.ephys_extractor">
+<span id="allensdk-ephys-ephys-extractor-module"></span><h1>allensdk.ephys.ephys_extractor module<a class="headerlink" href="#module-allensdk.ephys.ephys_extractor" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor">
+<em class="property">class </em><code class="descclassname">allensdk.ephys.ephys_extractor.</code><code class="descname">EphysCellFeatureExtractor</code><span class="sig-paren">(</span><em>ramps_ext</em>, <em>short_squares_ext</em>, <em>long_squares_ext</em>, <em>subthresh_min_amp=-100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysCellFeatureExtractor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.SAG_TARGET">
+<code class="descname">SAG_TARGET</code><em class="property"> = -100.0</em><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.SAG_TARGET" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.SUBTHRESH_MAX_AMP">
+<code class="descname">SUBTHRESH_MAX_AMP</code><em class="property"> = 0</em><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.SUBTHRESH_MAX_AMP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.as_dict">
+<code class="descname">as_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysCellFeatureExtractor.as_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.as_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create dict of cell features.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.cell_features">
+<code class="descname">cell_features</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysCellFeatureExtractor.cell_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.cell_features" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.long_squares_features">
+<code class="descname">long_squares_features</code><span class="sig-paren">(</span><em>option=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysCellFeatureExtractor.long_squares_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.long_squares_features" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.long_squares_stim_amps">
+<code class="descname">long_squares_stim_amps</code><span class="sig-paren">(</span><em>option=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysCellFeatureExtractor.long_squares_stim_amps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.long_squares_stim_amps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.process">
+<code class="descname">process</code><span class="sig-paren">(</span><em>keys=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysCellFeatureExtractor.process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Processes features. Can take a specific key (or set of keys) to do a subset of processing.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.ramps_features">
+<code class="descname">ramps_features</code><span class="sig-paren">(</span><em>all=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysCellFeatureExtractor.ramps_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.ramps_features" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.short_squares_features">
+<code class="descname">short_squares_features</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysCellFeatureExtractor.short_squares_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.short_squares_features" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor">
+<em class="property">class </em><code class="descclassname">allensdk.ephys.ephys_extractor.</code><code class="descname">EphysSweepFeatureExtractor</code><span class="sig-paren">(</span><em>t=None</em>, <em>v=None</em>, <em>i=None</em>, <em>start=None</em>, <em>end=None</em>, <em>filter=10.0</em>, <em>dv_cutoff=20.0</em>, <em>max_interval=0.005</em>, <em>min_height=2.0</em>, <em>min_peak=-30.0</em>, <em>thresh_frac=0.05</em>, <em>baseline_interval=0.1</em>, <em>baseline_detect_thresh=0.3</em>, <em>id=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysSweepFeatureExtractor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Feature calculation for a sweep (voltage and/or current time series).</p>
+<dl class="method">
+<dt id="allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.as_dict">
+<code class="descname">as_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysSweepFeatureExtractor.as_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.as_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create dict of features and spikes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.burst_metrics">
+<code class="descname">burst_metrics</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysSweepFeatureExtractor.burst_metrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.burst_metrics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find bursts and return max “burstiness” index (normalized max rate in burst vs out).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>max_burstiness_index</strong> <span class="classifier-delimiter">:</span> <span class="classifier">max “burstiness” index across detected bursts</span></dt>
+<dd></dd>
+<dt><strong>num_bursts</strong> <span class="classifier-delimiter">:</span> <span class="classifier">number of bursts detected</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.delay_metrics">
+<code class="descname">delay_metrics</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysSweepFeatureExtractor.delay_metrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.delay_metrics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates ratio of latency to dominant time constant of rise before spike</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>delay_ratio</strong> <span class="classifier-delimiter">:</span> <span class="classifier">ratio of latency to tau (higher means more delay)</span></dt>
+<dd></dd>
+<dt><strong>tau</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dominant time constant of rise before spike</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.estimate_sag">
+<code class="descname">estimate_sag</code><span class="sig-paren">(</span><em>peak_width=0.005</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysSweepFeatureExtractor.estimate_sag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.estimate_sag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the sag in a hyperpolarizing voltage response.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>peak_width</strong> <span class="classifier-delimiter">:</span> <span class="classifier">window width to get more robust peak estimate in sec (default 0.005)</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>sag</strong> <span class="classifier-delimiter">:</span> <span class="classifier">fraction that membrane potential relaxes back to baseline</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.estimate_time_constant">
+<code class="descname">estimate_time_constant</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysSweepFeatureExtractor.estimate_time_constant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.estimate_time_constant" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the membrane time constant by fitting the voltage response with a
+single exponential.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>tau</strong> <span class="classifier-delimiter">:</span> <span class="classifier">membrane time constant in seconds</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.is_spike_feature_affected_by_clipping">
+<code class="descname">is_spike_feature_affected_by_clipping</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysSweepFeatureExtractor.is_spike_feature_affected_by_clipping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.is_spike_feature_affected_by_clipping" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.pause_metrics">
+<code class="descname">pause_metrics</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysSweepFeatureExtractor.pause_metrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.pause_metrics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimate average number of pauses and average fraction of time spent in a pause</p>
+<p>Attempts to detect pauses with a variety of conditions and averages results together.</p>
+<p>Pauses that are consistently detected contribute more to estimates.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>avg_n_pauses</strong> <span class="classifier-delimiter">:</span> <span class="classifier">average number of pauses detected across conditions</span></dt>
+<dd></dd>
+<dt><strong>avg_pause_frac</strong> <span class="classifier-delimiter">:</span> <span class="classifier">average fraction of interval (between start and end) spent in a pause</span></dt>
+<dd></dd>
+<dt><strong>max_reliability</strong> <span class="classifier-delimiter">:</span> <span class="classifier">max fraction of times most reliable pause was detected given weights tested</span></dt>
+<dd></dd>
+<dt><strong>n_max_rel_pauses</strong> <span class="classifier-delimiter">:</span> <span class="classifier">number of pauses detected with <cite>max_reliability</cite></span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.process_new_spike_feature">
+<code class="descname">process_new_spike_feature</code><span class="sig-paren">(</span><em>feature_name</em>, <em>feature_func</em>, <em>affected_by_clipping=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysSweepFeatureExtractor.process_new_spike_feature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.process_new_spike_feature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add new spike-level feature calculation function</p>
+<p>The function should take this sweep extractor as its argument. Its results
+can be accessed by calling the method spike_feature(&lt;feature_name&gt;).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.process_new_sweep_feature">
+<code class="descname">process_new_sweep_feature</code><span class="sig-paren">(</span><em>feature_name</em>, <em>feature_func</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysSweepFeatureExtractor.process_new_sweep_feature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.process_new_sweep_feature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add new sweep-level feature calculation function</p>
+<p>The function should take this sweep extractor as its argument. Its results
+can be accessed by calling the method sweep_feature(&lt;feature_name&gt;).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.process_spikes">
+<code class="descname">process_spikes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysSweepFeatureExtractor.process_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.process_spikes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform spike-related feature analysis</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.set_stimulus_amplitude_calculator">
+<code class="descname">set_stimulus_amplitude_calculator</code><span class="sig-paren">(</span><em>function</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysSweepFeatureExtractor.set_stimulus_amplitude_calculator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.set_stimulus_amplitude_calculator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.spike_feature">
+<code class="descname">spike_feature</code><span class="sig-paren">(</span><em>key</em>, <em>include_clipped=False</em>, <em>force_exclude_clipped=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysSweepFeatureExtractor.spike_feature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.spike_feature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get specified feature for every spike.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>key</strong> <span class="classifier-delimiter">:</span> <span class="classifier">feature name</span></dt>
+<dd></dd>
+<dt><strong>include_clipped: return values for every identified spike, even when clipping means they will be incorrect/undefined</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>spike_feature_values</strong> <span class="classifier-delimiter">:</span> <span class="classifier">ndarray of features for each spike</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.spike_feature_keys">
+<code class="descname">spike_feature_keys</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysSweepFeatureExtractor.spike_feature_keys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.spike_feature_keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get list of every available spike feature.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.spikes">
+<code class="descname">spikes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysSweepFeatureExtractor.spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.spikes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all features for each spike as a list of records.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.stimulus_amplitude">
+<code class="descname">stimulus_amplitude</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysSweepFeatureExtractor.stimulus_amplitude"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.stimulus_amplitude" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.sweep_feature">
+<code class="descname">sweep_feature</code><span class="sig-paren">(</span><em>key</em>, <em>allow_missing=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysSweepFeatureExtractor.sweep_feature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.sweep_feature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get sweep-level feature (<cite>key</cite>).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>key</strong> <span class="classifier-delimiter">:</span> <span class="classifier">name of sweep-level feature</span></dt>
+<dd></dd>
+<dt><strong>allow_missing</strong> <span class="classifier-delimiter">:</span> <span class="classifier">return np.nan if key is missing for sweep (default False)</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>sweep_feature</strong> <span class="classifier-delimiter">:</span> <span class="classifier">sweep-level feature value</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.sweep_feature_keys">
+<code class="descname">sweep_feature_keys</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysSweepFeatureExtractor.sweep_feature_keys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.sweep_feature_keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get list of every available sweep-level feature.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.voltage_deflection">
+<code class="descname">voltage_deflection</code><span class="sig-paren">(</span><em>deflect_type=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysSweepFeatureExtractor.voltage_deflection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.voltage_deflection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Measure deflection (min or max, between start and end if specified).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>deflect_type</strong> <span class="classifier-delimiter">:</span> <span class="classifier">measure minimal (‘min’) or maximal (‘max’) voltage deflection</span></dt>
+<dd><p class="first last">If not specified, it will check to see if the current (i) is positive or negative
+between start and end, then choose ‘max’ or ‘min’, respectively
+If the current is not defined, it will default to ‘min’.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>deflect_v</strong> <span class="classifier-delimiter">:</span> <span class="classifier">peak</span></dt>
+<dd></dd>
+<dt><strong>deflect_index</strong> <span class="classifier-delimiter">:</span> <span class="classifier">index of peak deflection</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="allensdk.ephys.ephys_extractor.EphysSweepSetFeatureExtractor">
+<em class="property">class </em><code class="descclassname">allensdk.ephys.ephys_extractor.</code><code class="descname">EphysSweepSetFeatureExtractor</code><span class="sig-paren">(</span><em>t_set=None</em>, <em>v_set=None</em>, <em>i_set=None</em>, <em>start=None</em>, <em>end=None</em>, <em>filter=10.0</em>, <em>dv_cutoff=20.0</em>, <em>max_interval=0.005</em>, <em>min_height=2.0</em>, <em>min_peak=-30.0</em>, <em>thresh_frac=0.05</em>, <em>baseline_interval=0.1</em>, <em>baseline_detect_thresh=0.3</em>, <em>id_set=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysSweepSetFeatureExtractor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysSweepSetFeatureExtractor" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="classmethod">
+<dt id="allensdk.ephys.ephys_extractor.EphysSweepSetFeatureExtractor.from_sweeps">
+<em class="property">classmethod </em><code class="descname">from_sweeps</code><span class="sig-paren">(</span><em>sweep_list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysSweepSetFeatureExtractor.from_sweeps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysSweepSetFeatureExtractor.from_sweeps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize EphysSweepSetFeatureExtractor object with a list of pre-existing
+sweep feature extractor objects.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.ephys.ephys_extractor.EphysSweepSetFeatureExtractor.process_spikes">
+<code class="descname">process_spikes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysSweepSetFeatureExtractor.process_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysSweepSetFeatureExtractor.process_spikes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Analyze spike features for all sweeps.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.ephys.ephys_extractor.EphysSweepSetFeatureExtractor.spike_feature_averages">
+<code class="descname">spike_feature_averages</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysSweepSetFeatureExtractor.spike_feature_averages"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysSweepSetFeatureExtractor.spike_feature_averages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get nparray of average spike-level feature (<cite>key</cite>) for all sweeps</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.ephys.ephys_extractor.EphysSweepSetFeatureExtractor.sweep_features">
+<code class="descname">sweep_features</code><span class="sig-paren">(</span><em>key</em>, <em>allow_missing=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysSweepSetFeatureExtractor.sweep_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysSweepSetFeatureExtractor.sweep_features" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get nparray of sweep-level feature (<cite>key</cite>) for all sweeps</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>key</strong> <span class="classifier-delimiter">:</span> <span class="classifier">name of sweep-level feature</span></dt>
+<dd></dd>
+<dt><strong>allow_missing</strong> <span class="classifier-delimiter">:</span> <span class="classifier">return np.nan if key is missing for sweep (default False)</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>sweep_feature</strong> <span class="classifier-delimiter">:</span> <span class="classifier">nparray of sweep-level feature values</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.ephys.ephys_extractor.EphysSweepSetFeatureExtractor.sweeps">
+<code class="descname">sweeps</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#EphysSweepSetFeatureExtractor.sweeps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.EphysSweepSetFeatureExtractor.sweeps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get list of EphysSweepFeatureExtractor objects.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.ephys.ephys_extractor.cell_extractor_for_nwb">
+<code class="descclassname">allensdk.ephys.ephys_extractor.</code><code class="descname">cell_extractor_for_nwb</code><span class="sig-paren">(</span><em>dataset</em>, <em>ramps</em>, <em>short_squares</em>, <em>long_squares</em>, <em>subthresh_min_amp=-100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#cell_extractor_for_nwb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.cell_extractor_for_nwb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize EphysCellFeatureExtractor object from NWB data set</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>dataset</strong> <span class="classifier-delimiter">:</span> <span class="classifier">NwbDataSet</span></dt>
+<dd></dd>
+<dt><strong>ramps</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of sweep numbers of ramp sweeps</span></dt>
+<dd></dd>
+<dt><strong>short_squares</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of sweep numbers of short square sweeps</span></dt>
+<dd></dd>
+<dt><strong>long_squares</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of sweep numbers of long square sweeps</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.ephys.ephys_extractor.extractor_for_nwb_sweeps">
+<code class="descclassname">allensdk.ephys.ephys_extractor.</code><code class="descname">extractor_for_nwb_sweeps</code><span class="sig-paren">(</span><em>dataset</em>, <em>sweep_numbers</em>, <em>fixed_start=None</em>, <em>fixed_end=None</em>, <em>dv_cutoff=20.0</em>, <em>thresh_frac=0.05</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#extractor_for_nwb_sweeps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.extractor_for_nwb_sweeps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.ephys.ephys_extractor.fit_fi_slope">
+<code class="descclassname">allensdk.ephys.ephys_extractor.</code><code class="descname">fit_fi_slope</code><span class="sig-paren">(</span><em>ext</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#fit_fi_slope"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.fit_fi_slope" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit the rate and stimulus amplitude to a line and return the slope of the fit.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.ephys.ephys_extractor.input_resistance">
+<code class="descclassname">allensdk.ephys.ephys_extractor.</code><code class="descname">input_resistance</code><span class="sig-paren">(</span><em>ext</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#input_resistance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.input_resistance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimate input resistance in MOhms, assuming all sweeps in passed extractor
+are hyperpolarizing responses.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.ephys.ephys_extractor.membrane_time_constant">
+<code class="descclassname">allensdk.ephys.ephys_extractor.</code><code class="descname">membrane_time_constant</code><span class="sig-paren">(</span><em>ext</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#membrane_time_constant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.membrane_time_constant" title="Permalink to this definition">¶</a></dt>
+<dd><p>Average the membrane time constant values estimated from each sweep in passed extractor.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.ephys.ephys_extractor.reset_long_squares_start">
+<code class="descclassname">allensdk.ephys.ephys_extractor.</code><code class="descname">reset_long_squares_start</code><span class="sig-paren">(</span><em>when</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/ephys/ephys_extractor.html#reset_long_squares_start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.ephys.ephys_extractor.reset_long_squares_start" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_space.html">Reference Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="glif_models.html">Generalized LIF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html">Biophysical</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.deprecated.html">allensdk.deprecated module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
+</ul>
+
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allen-sdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    </div>
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalFooter.js"></script>
+
+
+  </body>
+</html>

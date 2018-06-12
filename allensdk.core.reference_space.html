@@ -1,0 +1,443 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>allensdk.core.reference_space module &#8212; Allen SDK dev documentation</title>
+    <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="allensdk.core.reference_space_cache module" href="allensdk.core.reference_space_cache.html" />
+    <link rel="prev" title="allensdk.core.ontology module" href="allensdk.core.ontology.html" /> 
+  </head><body>
+<link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
+<script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var _pSupressBrowserFlashWarning = true;
+    var _pTabId = "pHome";
+    var _pMoreProjectsId = "pMoreProjects";
+    var _pImagePath = "http://www.brain-map.org/assets/images/";
+    var _pSiteWarnings = function() {
+        this.show_warning() = {};
+    }
+</script>
+<script type="text/javascript">
+    function initialize() {
+        /*** do your stuff, then initialize the portal plugin ***/
+        _pPortalOnLoad();
+    }
+</script>
+<style>
+  #header_content > a {
+  display: inline-block;
+  width: 250px;
+  height: 75px;
+  background-image:url("_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-size: 235px 37px;
+  background-position: 0px 20px;
+  background-repeat: no-repeat;
+  }
+</style>
+
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
+<link rel="stylesheet" type="text/css" href="_static/external_assets/stylesheets/common_layout.css" />
+
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-allensdk.core.reference_space">
+<span id="allensdk-core-reference-space-module"></span><h1>allensdk.core.reference_space module<a class="headerlink" href="#module-allensdk.core.reference_space" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="allensdk.core.reference_space.ReferenceSpace">
+<em class="property">class </em><code class="descclassname">allensdk.core.reference_space.</code><code class="descname">ReferenceSpace</code><span class="sig-paren">(</span><em>structure_tree</em>, <em>annotation</em>, <em>resolution</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/reference_space.html#ReferenceSpace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.reference_space.ReferenceSpace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="staticmethod">
+<dt id="allensdk.core.reference_space.ReferenceSpace.check_and_write">
+<em class="property">static </em><code class="descname">check_and_write</code><span class="sig-paren">(</span><em>base_dir</em>, <em>structure_id</em>, <em>fn</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/reference_space.html#ReferenceSpace.check_and_write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.reference_space.ReferenceSpace.check_and_write" title="Permalink to this definition">¶</a></dt>
+<dd><p>A many_structure_masks callback that writes the mask to a nrrd file 
+if the file does not already exist.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.reference_space.ReferenceSpace.check_coverage">
+<code class="descname">check_coverage</code><span class="sig-paren">(</span><em>structure_ids</em>, <em>domain_mask</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/reference_space.html#ReferenceSpace.check_coverage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.reference_space.ReferenceSpace.check_coverage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines whether a spatial domain is completely covered by 
+structures in a set.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>structure_ids</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of int</span></dt>
+<dd><p class="first last">Specifies the set of structures to check.</p>
+</dd>
+<dt><strong>domain_mask</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy ndarray</span></dt>
+<dd><p class="first last">Same shape as annotation. 1 inside the mask, 0 out. Specifies 
+spatial domain.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>numpy ndarray :</strong></dt>
+<dd><p class="first last">1 where voxels are missing from the candidate, 0 where the 
+candidate exceeds the domain</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.reference_space.ReferenceSpace.direct_voxel_counts">
+<code class="descname">direct_voxel_counts</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/reference_space.html#ReferenceSpace.direct_voxel_counts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.reference_space.ReferenceSpace.direct_voxel_counts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines the number of voxels directly assigned to one or more 
+structures.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>dict :</strong></dt>
+<dd><p class="first last">Keys are structure ids, values are the number of voxels directly 
+assigned to those structures.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.reference_space.ReferenceSpace.direct_voxel_map">
+<code class="descname">direct_voxel_map</code><a class="headerlink" href="#allensdk.core.reference_space.ReferenceSpace.direct_voxel_map" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.reference_space.ReferenceSpace.downsample">
+<code class="descname">downsample</code><span class="sig-paren">(</span><em>target_resolution</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/reference_space.html#ReferenceSpace.downsample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.reference_space.ReferenceSpace.downsample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Obtain a smaller reference space by downsampling</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>target_resolution</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple of numeric</span></dt>
+<dd><p class="first last">Resolution in microns of the output space.</p>
+</dd>
+<dt><strong>interpolator</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">Method used to interpolate the volume. Currently only ‘nearest’ 
+is supported</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>ReferenceSpace :</strong></dt>
+<dd><p class="first last">A new ReferenceSpace with the same structure tree and a 
+downsampled annotation.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.reference_space.ReferenceSpace.get_slice_image">
+<code class="descname">get_slice_image</code><span class="sig-paren">(</span><em>axis</em>, <em>position</em>, <em>cmap=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/reference_space.html#ReferenceSpace.get_slice_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.reference_space.ReferenceSpace.get_slice_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Produce a AxBx3 RGB image from a slice in the annotation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>axis</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">Along which to slice the annotation volume. 0 is coronal, 1 is 
+horizontal, and 2 is sagittal.</p>
+</dd>
+<dt><strong>position</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">In microns. Take the slice from this far along the specified axis.</p>
+</dd>
+<dt><strong>cmap</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict, optional</span></dt>
+<dd><p class="first last">Keys are structure ids, values are rgb triplets. Defaults to 
+structure rgb_triplets.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>np.ndarray :</strong></dt>
+<dd><p class="first last">RGB image array.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>If you assign a custom colormap, make sure that you take care of the 
+background in addition to the structures.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.reference_space.ReferenceSpace.make_structure_mask">
+<code class="descname">make_structure_mask</code><span class="sig-paren">(</span><em>structure_ids</em>, <em>direct_only=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/reference_space.html#ReferenceSpace.make_structure_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.reference_space.ReferenceSpace.make_structure_mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an indicator array for one or more structures</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>structure_ids</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of int</span></dt>
+<dd><p class="first last">Make a mask that indicates the union of these structures’ voxels</p>
+</dd>
+<dt><strong>direct_only</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool, optional</span></dt>
+<dd><p class="first last">If True, only include voxels directly assigned to a structure in 
+the mask. Otherwise include voxels assigned to descendants.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>numpy ndarray :</strong></dt>
+<dd><p class="first last">Same shape as annotation. 1 inside mask, 0 outside.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.reference_space.ReferenceSpace.many_structure_masks">
+<code class="descname">many_structure_masks</code><span class="sig-paren">(</span><em>structure_ids</em>, <em>output_cb=None</em>, <em>direct_only=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/reference_space.html#ReferenceSpace.many_structure_masks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.reference_space.ReferenceSpace.many_structure_masks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build one or more structure masks and do something with them</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>structure_ids</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of int</span></dt>
+<dd><p class="first last">Specify structures to be masked</p>
+</dd>
+<dt><strong>output_cb</strong> <span class="classifier-delimiter">:</span> <span class="classifier">function, optional</span></dt>
+<dd><p class="first last">Must have the following signature: output_cb(structure_id, fn). 
+On each requested id, fn will be curried to make a mask for that 
+id. Defaults to returning the structure id and mask.</p>
+</dd>
+<dt><strong>direct_only</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool, optional</span></dt>
+<dd><p class="first last">If True, only include voxels directly assigned to a structure in 
+the mask. Otherwise include voxels assigned to descendants.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>Return values of output_cb called on each structure_id, structure_mask</strong></dt>
+<dd></dd>
+<dt><strong>pair.</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>output_cb is called on every yield, so any side-effects (such as 
+writing to a file) will be carried out regardless of what you do with 
+the return values. You do actually have to iterate through the output, 
+though.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.reference_space.ReferenceSpace.remove_unassigned">
+<code class="descname">remove_unassigned</code><span class="sig-paren">(</span><em>update_self=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/reference_space.html#ReferenceSpace.remove_unassigned"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.reference_space.ReferenceSpace.remove_unassigned" title="Permalink to this definition">¶</a></dt>
+<dd><p>Obtains a structure tree consisting only of structures that have 
+at least one voxel in the annotation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>update_self</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool, optional</span></dt>
+<dd><p class="first last">If True, the contained structure tree will be replaced,</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>list of dict :</strong></dt>
+<dd><p class="first last">elements are filtered structures</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="allensdk.core.reference_space.ReferenceSpace.return_mask_cb">
+<em class="property">static </em><code class="descname">return_mask_cb</code><span class="sig-paren">(</span><em>structure_id</em>, <em>fn</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/reference_space.html#ReferenceSpace.return_mask_cb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.reference_space.ReferenceSpace.return_mask_cb" title="Permalink to this definition">¶</a></dt>
+<dd><p>A basic callback for many_structure_masks</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.reference_space.ReferenceSpace.total_voxel_counts">
+<code class="descname">total_voxel_counts</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/reference_space.html#ReferenceSpace.total_voxel_counts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.reference_space.ReferenceSpace.total_voxel_counts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines the number of voxels assigned to a structure or its 
+descendants</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>dict :</strong></dt>
+<dd><p class="first last">Keys are structure ids, values are the number of voxels assigned 
+to structures’ descendants.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.reference_space.ReferenceSpace.total_voxel_map">
+<code class="descname">total_voxel_map</code><a class="headerlink" href="#allensdk.core.reference_space.ReferenceSpace.total_voxel_map" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.reference_space.ReferenceSpace.validate_structures">
+<code class="descname">validate_structures</code><span class="sig-paren">(</span><em>structure_ids</em>, <em>domain_mask</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/reference_space.html#ReferenceSpace.validate_structures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.reference_space.ReferenceSpace.validate_structures" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines whether a set of structures produces an exact and 
+nonoverlapping tiling of a spatial domain</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>structure_ids</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of int</span></dt>
+<dd><p class="first last">Specifies the set of structures to check.</p>
+</dd>
+<dt><strong>domain_mask</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy ndarray</span></dt>
+<dd><p class="first last">Same shape as annotation. 1 inside the mask, 0 out. Specifies 
+spatial domain.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>set :</strong></dt>
+<dd><p class="first last">Ids of structures that are the ancestors of other structures in 
+the supplied set.</p>
+</dd>
+<dt><strong>numpy ndarray :</strong></dt>
+<dd><p class="first last">Indicator for missing voxels.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_space.html">Reference Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="glif_models.html">Generalized LIF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html">Biophysical</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.deprecated.html">allensdk.deprecated module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
+</ul>
+
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allen-sdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    </div>
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalFooter.js"></script>
+
+
+  </body>
+</html>

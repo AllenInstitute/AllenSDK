@@ -1,0 +1,596 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>allensdk.core.mouse_connectivity_cache module &#8212; Allen SDK dev documentation</title>
+    <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="allensdk.core.nwb_data_set module" href="allensdk.core.nwb_data_set.html" />
+    <link rel="prev" title="allensdk.core.json_utilities module" href="allensdk.core.json_utilities.html" /> 
+  </head><body>
+<link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
+<script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var _pSupressBrowserFlashWarning = true;
+    var _pTabId = "pHome";
+    var _pMoreProjectsId = "pMoreProjects";
+    var _pImagePath = "http://www.brain-map.org/assets/images/";
+    var _pSiteWarnings = function() {
+        this.show_warning() = {};
+    }
+</script>
+<script type="text/javascript">
+    function initialize() {
+        /*** do your stuff, then initialize the portal plugin ***/
+        _pPortalOnLoad();
+    }
+</script>
+<style>
+  #header_content > a {
+  display: inline-block;
+  width: 250px;
+  height: 75px;
+  background-image:url("_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-size: 235px 37px;
+  background-position: 0px 20px;
+  background-repeat: no-repeat;
+  }
+</style>
+
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
+<link rel="stylesheet" type="text/css" href="_static/external_assets/stylesheets/common_layout.css" />
+
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-allensdk.core.mouse_connectivity_cache">
+<span id="allensdk-core-mouse-connectivity-cache-module"></span><h1>allensdk.core.mouse_connectivity_cache module<a class="headerlink" href="#module-allensdk.core.mouse_connectivity_cache" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache">
+<em class="property">class </em><code class="descclassname">allensdk.core.mouse_connectivity_cache.</code><code class="descname">MouseConnectivityCache</code><span class="sig-paren">(</span><em>resolution=None</em>, <em>cache=True</em>, <em>manifest_file='mouse_connectivity_manifest.json'</em>, <em>ccf_version=None</em>, <em>base_uri=None</em>, <em>version=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="allensdk.core.reference_space_cache.html#allensdk.core.reference_space_cache.ReferenceSpaceCache" title="allensdk.core.reference_space_cache.ReferenceSpaceCache"><code class="xref py py-class docutils literal notranslate"><span class="pre">allensdk.core.reference_space_cache.ReferenceSpaceCache</span></code></a></p>
+<p>Cache class for storing and accessing data related to the adult mouse
+Connectivity Atlas.  By default, this class will cache any downloaded
+metadata or files in well known locations defined in a manifest file.
+This behavior can be disabled.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>resolution: int</strong></dt>
+<dd><p class="first last">Resolution of grid data to be downloaded when accessing projection volume,
+the annotation volume, and the annotation volume.  Must be one of (10, 25,
+50, 100).  Default is 25.</p>
+</dd>
+<dt><strong>ccf_version: string</strong></dt>
+<dd><p class="first last">Desired version of the Common Coordinate Framework.  This affects the annotation 
+volume (get_annotation_volume) and structure masks (get_structure_mask). 
+Must be one of (MouseConnectivityApi.CCF_2015, MouseConnectivityApi.CCF_2016). 
+Default: MouseConnectivityApi.CCF_2016</p>
+</dd>
+<dt><strong>cache: boolean</strong></dt>
+<dd><p class="first last">Whether the class should save results of API queries to locations specified
+in the manifest file.  Queries for files (as opposed to metadata) must have a
+file location.  If caching is disabled, those locations must be specified
+in the function call (e.g. get_projection_density(file_name=’file.nrrd’)).</p>
+</dd>
+<dt><strong>manifest_file: string</strong></dt>
+<dd><p class="first last">File name of the manifest to be read.  Default is “mouse_connectivity_manifest.json”.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Attributes:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>resolution: int</strong></dt>
+<dd><p class="first last">Resolution of grid data to be downloaded when accessing projection volume,
+the annotation volume, and the annotation volume.  Must be one of (10, 25,
+50, 100).  Default is 25.</p>
+</dd>
+<dt><strong>api: MouseConnectivityApi instance</strong></dt>
+<dd><p class="first last">Used internally to make API queries.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.DATA_MASK_KEY">
+<code class="descname">DATA_MASK_KEY</code><em class="property"> = 'DATA_MASK'</em><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.DATA_MASK_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.DEFAULT_STRUCTURE_SET_IDS">
+<code class="descname">DEFAULT_STRUCTURE_SET_IDS</code><em class="property"> = (167587189,)</em><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.DEFAULT_STRUCTURE_SET_IDS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.EXPERIMENTS_KEY">
+<code class="descname">EXPERIMENTS_KEY</code><em class="property"> = 'EXPERIMENTS'</em><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.EXPERIMENTS_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.INJECTION_DENSITY_KEY">
+<code class="descname">INJECTION_DENSITY_KEY</code><em class="property"> = 'INJECTION_DENSITY'</em><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.INJECTION_DENSITY_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.INJECTION_FRACTION_KEY">
+<code class="descname">INJECTION_FRACTION_KEY</code><em class="property"> = 'INJECTION_FRACTION'</em><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.INJECTION_FRACTION_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.MANIFEST_VERSION">
+<code class="descname">MANIFEST_VERSION</code><em class="property"> = 1.3</em><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.MANIFEST_VERSION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.PROJECTION_DENSITY_KEY">
+<code class="descname">PROJECTION_DENSITY_KEY</code><em class="property"> = 'PROJECTION_DENSITY'</em><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.PROJECTION_DENSITY_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.STRUCTURE_UNIONIZES_KEY">
+<code class="descname">STRUCTURE_UNIONIZES_KEY</code><em class="property"> = 'STRUCTURE_UNIONIZES'</em><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.STRUCTURE_UNIONIZES_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.SUMMARY_STRUCTURE_SET_ID">
+<code class="descname">SUMMARY_STRUCTURE_SET_ID</code><em class="property"> = 167587189</em><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.SUMMARY_STRUCTURE_SET_ID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.add_manifest_paths">
+<code class="descname">add_manifest_paths</code><span class="sig-paren">(</span><em>manifest_builder</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.add_manifest_paths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.add_manifest_paths" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a manifest for this Cache class and save it in a file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>file_name: string</strong></dt>
+<dd><p class="first last">File location to save the manifest.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.default_structure_ids">
+<code class="descname">default_structure_ids</code><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.default_structure_ids" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.filter_experiments">
+<code class="descname">filter_experiments</code><span class="sig-paren">(</span><em>experiments</em>, <em>cre=None</em>, <em>injection_structure_ids=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.filter_experiments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.filter_experiments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Take a list of experiments and filter them by cre status and injection structure.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>cre: boolean or list</strong></dt>
+<dd><p class="first last">If True, return only cre-positive experiments.  If False, return only
+cre-negative experiments.  If None, return all experients. If list, return
+all experiments with cre line names in the supplied list. Default None.</p>
+</dd>
+<dt><strong>injection_structure_ids: list</strong></dt>
+<dd><p class="first last">Only return experiments that were injected in the structures provided here.
+If None, return all experiments.  Default None.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.filter_structure_unionizes">
+<code class="descname">filter_structure_unionizes</code><span class="sig-paren">(</span><em>unionizes</em>, <em>is_injection=None</em>, <em>structure_ids=None</em>, <em>include_descendants=False</em>, <em>hemisphere_ids=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.filter_structure_unionizes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.filter_structure_unionizes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Take a list of unionzes and return a subset of records filtered by injection status, structure, and
+hemisphere.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>is_injection: boolean</strong></dt>
+<dd><p class="first last">If True, only return unionize records that disregard non-injection pixels.
+If False, only return unionize records that disregard injection pixels.
+If None, return all records.  Default None.</p>
+</dd>
+<dt><strong>structure_ids: list</strong></dt>
+<dd><p class="first last">Only return unionize records for a set of structures.
+If None, return all records. Default None.</p>
+</dd>
+<dt><strong>include_descendants: boolean</strong></dt>
+<dd><p class="first last">Include all descendant records for specified structures. Default False.</p>
+</dd>
+<dt><strong>hemisphere_ids: list</strong></dt>
+<dd><p class="first last">Only return unionize records that disregard pixels outside of a hemisphere.
+or set of hemispheres. Left = 1, Right = 2, Both = 3.  If None, include all
+records [1, 2, 3].  Default None.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_data_mask">
+<code class="descname">get_data_mask</code><span class="sig-paren">(</span><em>experiment_id</em>, <em>file_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.get_data_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_data_mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a data mask volume for a single experiment. Download it
+first if it doesn’t exist.  Data mask is a binary mask of
+voxels that have valid data.  Only use valid data in analysis!</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>experiment_id: int</strong></dt>
+<dd><p class="first last">ID of the experiment to download/read.  This corresponds to
+section_data_set_id in the API.</p>
+</dd>
+<dt><strong>file_name: string</strong></dt>
+<dd><p class="first last">File name to store the template volume.  If it already exists,
+it will be read from this file.  If file_name is None, the
+file_name will be pulled out of the manifest.  Default is None.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_experiment_structure_unionizes">
+<code class="descname">get_experiment_structure_unionizes</code><span class="sig-paren">(</span><em>experiment_id</em>, <em>file_name=None</em>, <em>is_injection=None</em>, <em>structure_ids=None</em>, <em>include_descendants=False</em>, <em>hemisphere_ids=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.get_experiment_structure_unionizes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_experiment_structure_unionizes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the structure unionize data for a specific experiment.  Filter by
+structure, injection status, and hemisphere.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>experiment_id: int</strong></dt>
+<dd><p class="first last">ID of the experiment of interest.  Corresponds to section_data_set_id in the API.</p>
+</dd>
+<dt><strong>file_name: string</strong></dt>
+<dd><p class="first last">File name to save/read the experiments list.  If file_name is None,
+the file_name will be pulled out of the manifest.  If caching
+is disabled, no file will be saved. Default is None.</p>
+</dd>
+<dt><strong>is_injection: boolean</strong></dt>
+<dd><p class="first last">If True, only return unionize records that disregard non-injection pixels.
+If False, only return unionize records that disregard injection pixels.
+If None, return all records.  Default None.</p>
+</dd>
+<dt><strong>structure_ids: list</strong></dt>
+<dd><p class="first last">Only return unionize records for a specific set of structures.
+If None, return all records. Default None.</p>
+</dd>
+<dt><strong>include_descendants: boolean</strong></dt>
+<dd><p class="first last">Include all descendant records for specified structures. Default False.</p>
+</dd>
+<dt><strong>hemisphere_ids: list</strong></dt>
+<dd><p class="first last">Only return unionize records that disregard pixels outside of a hemisphere.
+or set of hemispheres. Left = 1, Right = 2, Both = 3.  If None, include all
+records [1, 2, 3].  Default None.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_experiments">
+<code class="descname">get_experiments</code><span class="sig-paren">(</span><em>dataframe=False</em>, <em>file_name=None</em>, <em>cre=None</em>, <em>injection_structure_ids=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.get_experiments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_experiments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a list of experiments that match certain criteria.  If caching is enabled,
+this will save the whole (unfiltered) list of experiments to a file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>dataframe: boolean</strong></dt>
+<dd><p class="first last">Return the list of experiments as a Pandas DataFrame.  If False,
+return a list of dictionaries.  Default False.</p>
+</dd>
+<dt><strong>file_name: string</strong></dt>
+<dd><p class="first last">File name to save/read the structures table.  If file_name is None,
+the file_name will be pulled out of the manifest.  If caching
+is disabled, no file will be saved. Default is None.</p>
+</dd>
+<dt><strong>cre: boolean or list</strong></dt>
+<dd><p class="first last">If True, return only cre-positive experiments.  If False, return only
+cre-negative experiments.  If None, return all experients. If list, return
+all experiments with cre line names in the supplied list. Default None.</p>
+</dd>
+<dt><strong>injection_structure_ids: list</strong></dt>
+<dd><p class="first last">Only return experiments that were injected in the structures provided here.
+If None, return all experiments.  Default None.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_injection_density">
+<code class="descname">get_injection_density</code><span class="sig-paren">(</span><em>experiment_id</em>, <em>file_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.get_injection_density"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_injection_density" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read an injection density volume for a single experiment. Download it
+first if it doesn’t exist.  Injection density is the proportion of
+projecting pixels in a grid voxel only including pixels that are
+part of the injection site in [0,1].</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>experiment_id: int</strong></dt>
+<dd><p class="first last">ID of the experiment to download/read.  This corresponds to
+section_data_set_id in the API.</p>
+</dd>
+<dt><strong>file_name: string</strong></dt>
+<dd><p class="first last">File name to store the template volume.  If it already exists,
+it will be read from this file.  If file_name is None, the
+file_name will be pulled out of the manifest.  Default is None.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_injection_fraction">
+<code class="descname">get_injection_fraction</code><span class="sig-paren">(</span><em>experiment_id</em>, <em>file_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.get_injection_fraction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_injection_fraction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read an injection fraction volume for a single experiment. Download it
+first if it doesn’t exist.  Injection fraction is the proportion of
+pixels in the injection site in a grid voxel in [0,1].</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>experiment_id: int</strong></dt>
+<dd><p class="first last">ID of the experiment to download/read.  This corresponds to
+section_data_set_id in the API.</p>
+</dd>
+<dt><strong>file_name: string</strong></dt>
+<dd><p class="first last">File name to store the template volume.  If it already exists,
+it will be read from this file.  If file_name is None, the
+file_name will be pulled out of the manifest.  Default is None.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_projection_density">
+<code class="descname">get_projection_density</code><span class="sig-paren">(</span><em>experiment_id</em>, <em>file_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.get_projection_density"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_projection_density" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a projection density volume for a single experiment.  Download it
+first if it doesn’t exist.  Projection density is the proportion of
+of projecting pixels in a grid voxel in [0,1].</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>experiment_id: int</strong></dt>
+<dd><p class="first last">ID of the experiment to download/read.  This corresponds to
+section_data_set_id in the API.</p>
+</dd>
+<dt><strong>file_name: string</strong></dt>
+<dd><p class="first last">File name to store the template volume.  If it already exists,
+it will be read from this file.  If file_name is None, the
+file_name will be pulled out of the manifest.  Default is None.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_projection_matrix">
+<code class="descname">get_projection_matrix</code><span class="sig-paren">(</span><em>experiment_ids</em>, <em>projection_structure_ids=None</em>, <em>hemisphere_ids=None</em>, <em>parameter='projection_volume'</em>, <em>dataframe=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.get_projection_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_projection_matrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_structure_unionizes">
+<code class="descname">get_structure_unionizes</code><span class="sig-paren">(</span><em>experiment_ids</em>, <em>is_injection=None</em>, <em>structure_ids=None</em>, <em>include_descendants=False</em>, <em>hemisphere_ids=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.get_structure_unionizes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_structure_unionizes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get structure unionizes for a set of experiment IDs.  Filter the results by injection status,
+structure, and hemisphere.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>experiment_ids: list</strong></dt>
+<dd><p class="first last">List of experiment IDs.  Corresponds to section_data_set_id in the API.</p>
+</dd>
+<dt><strong>is_injection: boolean</strong></dt>
+<dd><p class="first last">If True, only return unionize records that disregard non-injection pixels.
+If False, only return unionize records that disregard injection pixels.
+If None, return all records.  Default None.</p>
+</dd>
+<dt><strong>structure_ids: list</strong></dt>
+<dd><p class="first last">Only return unionize records for a specific set of structures.
+If None, return all records. Default None.</p>
+</dd>
+<dt><strong>include_descendants: boolean</strong></dt>
+<dd><p class="first last">Include all descendant records for specified structures. Default False.</p>
+</dd>
+<dt><strong>hemisphere_ids: list</strong></dt>
+<dd><p class="first last">Only return unionize records that disregard pixels outside of a hemisphere.
+or set of hemispheres. Left = 1, Right = 2, Both = 3.  If None, include all
+records [1, 2, 3].  Default None.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.rank_structures">
+<code class="descname">rank_structures</code><span class="sig-paren">(</span><em>experiment_ids</em>, <em>is_injection</em>, <em>structure_ids=None</em>, <em>hemisphere_ids=None</em>, <em>rank_on='normalized_projection_volume'</em>, <em>n=5</em>, <em>threshold=0.01</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.rank_structures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.rank_structures" title="Permalink to this definition">¶</a></dt>
+<dd><p>Produces one or more (per experiment) ranked lists of brain structures, using a specified data field.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>experiment_ids</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of int</span></dt>
+<dd><p class="first last">Obtain injection_structures for these experiments.</p>
+</dd>
+<dt><strong>is_injection</strong> <span class="classifier-delimiter">:</span> <span class="classifier">boolean</span></dt>
+<dd><p class="first last">Use data from only injection (or non-injection) unionizes.</p>
+</dd>
+<dt><strong>structure_ids</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of int, optional</span></dt>
+<dd><p class="first last">Consider only these structures. It is a good idea to make sure that these structures are not spatially 
+overlapping; otherwise your results will contain redundant information. Defaults to the summary 
+structures - a brain-wide list of nonoverlapping mid-level structures.</p>
+</dd>
+<dt><strong>hemisphere_ids</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of int, optional</span></dt>
+<dd><p class="first last">Consider only these hemispheres (1: left, 2: right, 3: both). Like with structures, 
+you might get redundant results if you select overlapping options. Defaults to [1, 2].</p>
+</dd>
+<dt><strong>rank_on</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd><p class="first last">Rank unionize data using this field (descending). Defaults to normalized_projection_volume.</p>
+</dd>
+<dt><strong>n</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int, optional</span></dt>
+<dd><p class="first last">Return only the top n structures.</p>
+</dd>
+<dt><strong>threshold</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float, optional</span></dt>
+<dd><p class="first last">Consider only records whose data value - specified by the rank_on parameter - exceeds this value.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>list :</strong></dt>
+<dd><p class="first last">Each element (1 for each input experiment) is a list of dictionaries. The dictionaries describe the top
+injection structures in descending order. They are specified by their structure and hemisphere id fields and 
+additionally report the value specified by the rank_on parameter.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_space.html">Reference Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="glif_models.html">Generalized LIF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html">Biophysical</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.deprecated.html">allensdk.deprecated module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
+</ul>
+
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allen-sdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    </div>
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalFooter.js"></script>
+
+
+  </body>
+</html>

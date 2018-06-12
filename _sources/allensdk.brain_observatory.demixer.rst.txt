@@ -1,0 +1,7 @@
+allensdk.brain\_observatory.demixer module
+==========================================
+
+.. automodule:: allensdk.brain_observatory.demixer
+    :members:
+    :undoc-members:
+    :show-inheritance:

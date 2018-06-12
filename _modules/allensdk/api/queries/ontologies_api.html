@@ -1,32 +1,21 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>allensdk.api.queries.ontologies_api &mdash; Allen SDK dev documentation</title>
-    
+    <title>allensdk.api.queries.ontologies_api &#8212; Allen SDK dev documentation</title>
     <link rel="stylesheet" href="../../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../../',
-        VERSION:     'dev',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="../../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK dev documentation" href="../../../../index.html" />
-    <link rel="up" title="Module code" href="../../../index.html" /> 
-  </head>
-  <body role="document">
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
 <script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
@@ -104,13 +93,13 @@
 <span class="c1"># ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="c1">#</span>
-<span class="kn">from</span> <span class="nn">.rma_template</span> <span class="kn">import</span> <span class="n">RmaTemplate</span>
-<span class="kn">from</span> <span class="nn">..cache</span> <span class="kn">import</span> <span class="n">cacheable</span>
+<span class="kn">from</span> <span class="nn">.rma_template</span> <span class="k">import</span> <span class="n">RmaTemplate</span>
+<span class="kn">from</span> <span class="nn">..cache</span> <span class="k">import</span> <span class="n">cacheable</span>
 
-<span class="kn">from</span> <span class="nn">allensdk.core.structure_tree</span> <span class="kn">import</span> <span class="n">StructureTree</span>
+<span class="kn">from</span> <span class="nn">allensdk.core.structure_tree</span> <span class="k">import</span> <span class="n">StructureTree</span>
 
 
-<div class="viewcode-block" id="OntologiesApi"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.ontologies_api.OntologiesApi">[docs]</a><span class="k">class</span> <span class="nc">OntologiesApi</span><span class="p">(</span><span class="n">RmaTemplate</span><span class="p">):</span>
+<div class="viewcode-block" id="OntologiesApi"><a class="viewcode-back" href="../../../../allensdk.api.queries.ontologies_api.html#allensdk.api.queries.ontologies_api.OntologiesApi">[docs]</a><span class="k">class</span> <span class="nc">OntologiesApi</span><span class="p">(</span><span class="n">RmaTemplate</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    See: `Atlas Drawings and Ontologies</span>
 <span class="sd">    &lt;http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies&gt;`_</span>
@@ -124,7 +113,7 @@
              <span class="s1">&#39;criteria&#39;</span><span class="p">:</span> <span class="s1">&#39;[graph_id$in{{ graph_ids }}]&#39;</span><span class="p">,</span>
              <span class="s1">&#39;order&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;structures.graph_order&#39;</span><span class="p">],</span>
              <span class="s1">&#39;num_rows&#39;</span><span class="p">:</span> <span class="s1">&#39;all&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
              <span class="s1">&#39;criteria_params&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;graph_ids&#39;</span><span class="p">]</span>
              <span class="p">},</span>
             <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;structures_by_graph_names&#39;</span><span class="p">,</span>
@@ -133,7 +122,7 @@
              <span class="s1">&#39;criteria&#39;</span><span class="p">:</span> <span class="s1">&#39;graph[structure_graphs.name$in{{ graph_names }}]&#39;</span><span class="p">,</span>
              <span class="s1">&#39;order&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;structures.graph_order&#39;</span><span class="p">],</span>
              <span class="s1">&#39;num_rows&#39;</span><span class="p">:</span> <span class="s1">&#39;all&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
              <span class="s1">&#39;criteria_params&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;graph_names&#39;</span><span class="p">]</span>
              <span class="p">},</span>
             <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;structures_by_set_ids&#39;</span><span class="p">,</span>
@@ -142,7 +131,7 @@
              <span class="s1">&#39;criteria&#39;</span><span class="p">:</span> <span class="s1">&#39;[structure_set_id$in{{ set_ids }}]&#39;</span><span class="p">,</span>
              <span class="s1">&#39;order&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;structures.graph_order&#39;</span><span class="p">],</span>
              <span class="s1">&#39;num_rows&#39;</span><span class="p">:</span> <span class="s1">&#39;all&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
              <span class="s1">&#39;criteria_params&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;set_ids&#39;</span><span class="p">]</span>
              <span class="p">},</span>
             <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;structures_by_set_names&#39;</span><span class="p">,</span>
@@ -151,26 +140,26 @@
              <span class="s1">&#39;criteria&#39;</span><span class="p">:</span> <span class="s1">&#39;structure_sets[name$in{{ set_names }}]&#39;</span><span class="p">,</span>
              <span class="s1">&#39;order&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;structures.graph_order&#39;</span><span class="p">],</span>
              <span class="s1">&#39;num_rows&#39;</span><span class="p">:</span> <span class="s1">&#39;all&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
              <span class="s1">&#39;criteria_params&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;set_names&#39;</span><span class="p">]</span>
              <span class="p">},</span>
             <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;structure_graphs_list&#39;</span><span class="p">,</span>
              <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;see name&#39;</span><span class="p">,</span>
              <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="s1">&#39;StructureGraph&#39;</span><span class="p">,</span>
              <span class="s1">&#39;num_rows&#39;</span><span class="p">:</span> <span class="s1">&#39;all&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="bp">False</span>
+             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="kc">False</span>
              <span class="p">},</span>
             <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;structure_sets_list&#39;</span><span class="p">,</span>
              <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;see name&#39;</span><span class="p">,</span>
              <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="s1">&#39;StructureSet&#39;</span><span class="p">,</span>
              <span class="s1">&#39;num_rows&#39;</span><span class="p">:</span> <span class="s1">&#39;all&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="bp">False</span>
+             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="kc">False</span>
              <span class="p">},</span>
             <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;atlases_list&#39;</span><span class="p">,</span>
              <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;see name&#39;</span><span class="p">,</span>
              <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="s1">&#39;Atlas&#39;</span><span class="p">,</span>
              <span class="s1">&#39;num_rows&#39;</span><span class="p">:</span> <span class="s1">&#39;all&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="bp">False</span>
+             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="kc">False</span>
              <span class="p">},</span>
             <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;atlases_table&#39;</span><span class="p">,</span>
              <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;see name&#39;</span><span class="p">,</span>
@@ -187,7 +176,7 @@
                       <span class="s1">&#39;graphic_group_labels.id&#39;</span><span class="p">,</span>
                       <span class="s1">&#39;graphic_group_labels.name&#39;</span><span class="p">],</span>
              <span class="s1">&#39;num_rows&#39;</span><span class="p">:</span> <span class="s1">&#39;all&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
              <span class="s1">&#39;criteria_params&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;atlas_ids&#39;</span><span class="p">]</span>
              <span class="p">},</span> 
              <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;structures_with_sets&#39;</span><span class="p">,</span> 
@@ -197,7 +186,7 @@
              <span class="s1">&#39;criteria&#39;</span><span class="p">:</span> <span class="s1">&#39;[graph_id$in{{ graph_ids }}]&#39;</span><span class="p">,</span>
              <span class="s1">&#39;order&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;structures.graph_order&#39;</span><span class="p">],</span> 
              <span class="s1">&#39;num_rows&#39;</span><span class="p">:</span> <span class="s1">&#39;all&#39;</span><span class="p">,</span> 
-             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> 
+             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> 
              <span class="s1">&#39;criteria_params&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;graph_ids&#39;</span><span class="p">]</span>
              <span class="p">},</span>
              <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;structure_sets_by_id&#39;</span><span class="p">,</span> 
@@ -205,24 +194,24 @@
               <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="s1">&#39;StructureSet&#39;</span><span class="p">,</span>
               <span class="s1">&#39;criteria&#39;</span><span class="p">:</span> <span class="s1">&#39;[id$in{{ set_ids }}]&#39;</span><span class="p">,</span> 
               <span class="s1">&#39;num_rows&#39;</span><span class="p">:</span> <span class="s1">&#39;all&#39;</span><span class="p">,</span>
-              <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> 
+              <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> 
               <span class="s1">&#39;criteria_params&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;set_ids&#39;</span><span class="p">]</span>
              <span class="p">}</span>
         <span class="p">]}</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">OntologiesApi</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">base_uri</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">OntologiesApi</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">base_uri</span><span class="p">,</span>
                                             <span class="n">query_manifest</span><span class="o">=</span><span class="n">OntologiesApi</span><span class="o">.</span><span class="n">rma_templates</span><span class="p">)</span>
 
-    <span class="nd">@cacheable</span><span class="p">()</span>
-<div class="viewcode-block" id="OntologiesApi.get_structures"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.ontologies_api.OntologiesApi.get_structures">[docs]</a>    <span class="k">def</span> <span class="nf">get_structures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                       <span class="n">structure_graph_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                       <span class="n">structure_graph_names</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                       <span class="n">structure_set_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                       <span class="n">structure_set_names</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+<div class="viewcode-block" id="OntologiesApi.get_structures"><a class="viewcode-back" href="../../../../allensdk.api.queries.ontologies_api.html#allensdk.api.queries.ontologies_api.OntologiesApi.get_structures">[docs]</a>    <span class="nd">@cacheable</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">get_structures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                       <span class="n">structure_graph_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">structure_graph_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">structure_set_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">structure_set_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                        <span class="n">order</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;structures.graph_order&#39;</span><span class="p">],</span>
                        <span class="n">num_rows</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span>
-                       <span class="n">count</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                       <span class="n">count</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                        <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Retrieve data about anatomical structures.</span>
 
@@ -250,28 +239,28 @@
 <span class="sd">        -----</span>
 <span class="sd">        Only one of the methods of limiting the query should be used at a time.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="n">structure_graph_ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">structure_graph_ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_query</span><span class="p">(</span><span class="s1">&#39;ontology_queries&#39;</span><span class="p">,</span>
                                        <span class="s1">&#39;structures_by_graph_ids&#39;</span><span class="p">,</span>
                                        <span class="n">graph_ids</span><span class="o">=</span><span class="n">structure_graph_ids</span><span class="p">,</span>
                                        <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
                                        <span class="n">num_rows</span><span class="o">=</span><span class="n">num_rows</span><span class="p">,</span>
                                        <span class="n">count</span><span class="o">=</span><span class="n">count</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">structure_graph_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">structure_graph_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_query</span><span class="p">(</span><span class="s1">&#39;ontology_queries&#39;</span><span class="p">,</span>
                                        <span class="s1">&#39;structures_by_graph_names&#39;</span><span class="p">,</span>
                                        <span class="n">graph_names</span><span class="o">=</span><span class="n">structure_graph_names</span><span class="p">,</span>
                                        <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
                                        <span class="n">num_rows</span><span class="o">=</span><span class="n">num_rows</span><span class="p">,</span>
                                        <span class="n">count</span><span class="o">=</span><span class="n">count</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">structure_set_ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">structure_set_ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_query</span><span class="p">(</span><span class="s1">&#39;ontology_queries&#39;</span><span class="p">,</span>
                                        <span class="s1">&#39;structures_by_set_ids&#39;</span><span class="p">,</span>
                                        <span class="n">set_ids</span><span class="o">=</span><span class="n">structure_set_ids</span><span class="p">,</span>
                                        <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
                                        <span class="n">num_rows</span><span class="o">=</span><span class="n">num_rows</span><span class="p">,</span>
                                        <span class="n">count</span><span class="o">=</span><span class="n">count</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">structure_set_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">structure_set_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_query</span><span class="p">(</span><span class="s1">&#39;ontology_queries&#39;</span><span class="p">,</span>
                                        <span class="s1">&#39;structures_by_set_names&#39;</span><span class="p">,</span>
                                        <span class="n">set_names</span><span class="o">=</span><span class="n">structure_set_names</span><span class="p">,</span>
@@ -282,9 +271,9 @@
         <span class="k">return</span> <span class="n">data</span> </div>
         
         
-    <span class="nd">@cacheable</span><span class="p">()</span>
-<div class="viewcode-block" id="OntologiesApi.get_structures_with_sets"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.ontologies_api.OntologiesApi.get_structures_with_sets">[docs]</a>    <span class="k">def</span> <span class="nf">get_structures_with_sets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_graph_ids</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;structures.graph_order&#39;</span><span class="p">],</span> 
-                                 <span class="n">num_rows</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="OntologiesApi.get_structures_with_sets"><a class="viewcode-back" href="../../../../allensdk.api.queries.ontologies_api.html#allensdk.api.queries.ontologies_api.OntologiesApi.get_structures_with_sets">[docs]</a>    <span class="nd">@cacheable</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">get_structures_with_sets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_graph_ids</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;structures.graph_order&#39;</span><span class="p">],</span> 
+                                 <span class="n">num_rows</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Download structures along with the sets to which they belong.</span>
 
 <span class="sd">        Parameters</span>
@@ -309,7 +298,7 @@
                                    <span class="n">count</span><span class="o">=</span><span class="n">count</span><span class="p">)</span></div>
     
 
-<div class="viewcode-block" id="OntologiesApi.unpack_structure_set_ancestors"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.ontologies_api.OntologiesApi.unpack_structure_set_ancestors">[docs]</a>    <span class="k">def</span> <span class="nf">unpack_structure_set_ancestors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_dataframe</span><span class="p">):</span>
+<div class="viewcode-block" id="OntologiesApi.unpack_structure_set_ancestors"><a class="viewcode-back" href="../../../../allensdk.api.queries.ontologies_api.html#allensdk.api.queries.ontologies_api.OntologiesApi.unpack_structure_set_ancestors">[docs]</a>    <span class="k">def</span> <span class="nf">unpack_structure_set_ancestors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_dataframe</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Convert a slash-separated structure_id_path field to a list.</span>
 
 <span class="sd">        Parameters</span>
@@ -329,8 +318,8 @@
         <span class="p">]</span>
         <span class="n">structure_dataframe</span><span class="p">[</span><span class="s1">&#39;structure_set_ancestor&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">structure_ancestors</span></div>
 
-    <span class="nd">@cacheable</span><span class="p">()</span>
-<div class="viewcode-block" id="OntologiesApi.get_atlases_table"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases_table">[docs]</a>    <span class="k">def</span> <span class="nf">get_atlases_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atlas_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">brief</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+<div class="viewcode-block" id="OntologiesApi.get_atlases_table"><a class="viewcode-back" href="../../../../allensdk.api.queries.ontologies_api.html#allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases_table">[docs]</a>    <span class="nd">@cacheable</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">get_atlases_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atlas_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">brief</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;List Atlases available through the API</span>
 <span class="sd">        with associated ontologies and structure graphs.</span>
 
@@ -351,7 +340,7 @@
 <span class="sd">        `table of available Atlases &lt;http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies&gt;`_.</span>
 <span class="sd">        See also: `Class: Atlas &lt;http://api.brain-map.org/doc/Atlas.html&gt;`_</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="n">brief</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">brief</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_query</span><span class="p">(</span><span class="s1">&#39;ontology_queries&#39;</span><span class="p">,</span>
                                        <span class="s1">&#39;atlases_table&#39;</span><span class="p">,</span>
                                        <span class="n">atlas_ids</span><span class="o">=</span><span class="n">atlas_ids</span><span class="p">)</span>
@@ -359,24 +348,24 @@
             <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_query</span><span class="p">(</span><span class="s1">&#39;ontology_queries&#39;</span><span class="p">,</span>
                                        <span class="s1">&#39;atlases_table&#39;</span><span class="p">,</span>
                                        <span class="n">atlas_ids</span><span class="o">=</span><span class="n">atlas_ids</span><span class="p">,</span>
-                                       <span class="n">only</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+                                       <span class="n">only</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">data</span></div>
 
-    <span class="nd">@cacheable</span><span class="p">()</span>
-<div class="viewcode-block" id="OntologiesApi.get_atlases"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases">[docs]</a>    <span class="k">def</span> <span class="nf">get_atlases</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="OntologiesApi.get_atlases"><a class="viewcode-back" href="../../../../allensdk.api.queries.ontologies_api.html#allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases">[docs]</a>    <span class="nd">@cacheable</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">get_atlases</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_query</span><span class="p">(</span><span class="s1">&#39;ontology_queries&#39;</span><span class="p">,</span>
                                    <span class="s1">&#39;atlases_list&#39;</span><span class="p">)</span></div>
 
-    <span class="nd">@cacheable</span><span class="p">()</span>
-<div class="viewcode-block" id="OntologiesApi.get_structure_graphs"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.ontologies_api.OntologiesApi.get_structure_graphs">[docs]</a>    <span class="k">def</span> <span class="nf">get_structure_graphs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="OntologiesApi.get_structure_graphs"><a class="viewcode-back" href="../../../../allensdk.api.queries.ontologies_api.html#allensdk.api.queries.ontologies_api.OntologiesApi.get_structure_graphs">[docs]</a>    <span class="nd">@cacheable</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">get_structure_graphs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_query</span><span class="p">(</span><span class="s1">&#39;ontology_queries&#39;</span><span class="p">,</span>
                                    <span class="s1">&#39;structure_graphs_list&#39;</span><span class="p">)</span></div>
 
-    <span class="nd">@cacheable</span><span class="p">()</span>
-<div class="viewcode-block" id="OntologiesApi.get_structure_sets"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.ontologies_api.OntologiesApi.get_structure_sets">[docs]</a>    <span class="k">def</span> <span class="nf">get_structure_sets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_set_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="OntologiesApi.get_structure_sets"><a class="viewcode-back" href="../../../../allensdk.api.queries.ontologies_api.html#allensdk.api.queries.ontologies_api.OntologiesApi.get_structure_sets">[docs]</a>    <span class="nd">@cacheable</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">get_structure_sets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_set_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
-        <span class="k">if</span> <span class="n">structure_set_ids</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">structure_set_ids</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_query</span><span class="p">(</span><span class="s1">&#39;ontology_queries&#39;</span><span class="p">,</span>
                                        <span class="s1">&#39;structure_sets_list&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -392,9 +381,7 @@
         <div class="sphinxsidebarwrapper">
 <h3><a href="../../../../index.html">Contents</a></h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Install Guide</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Install Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../cell_types.html">Cell Types</a></li>
@@ -419,6 +406,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.model.html">allensdk.model package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.morphology.html">allensdk.morphology package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.deprecated.html">allensdk.deprecated module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
@@ -436,12 +424,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

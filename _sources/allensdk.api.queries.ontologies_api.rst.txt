@@ -1,0 +1,7 @@
+allensdk.api.queries.ontologies\_api module
+===========================================
+
+.. automodule:: allensdk.api.queries.ontologies_api
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,6 +1,6 @@
 from allensdk.core.cell_types_cache import CellTypesCache
 
-ctc = CellTypesCache()
+ctc = CellTypesCache(manifest_file='cell_types/manifest.json')
 
 # a list of cell metadata for cells with reconstructions, download if necessary
 cells = ctc.get_cells(require_reconstruction=True)

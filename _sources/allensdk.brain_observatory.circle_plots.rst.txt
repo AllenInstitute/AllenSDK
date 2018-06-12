@@ -1,0 +1,7 @@
+allensdk.brain\_observatory.circle\_plots module
+================================================
+
+.. automodule:: allensdk.brain_observatory.circle_plots
+    :members:
+    :undoc-members:
+    :show-inheritance:

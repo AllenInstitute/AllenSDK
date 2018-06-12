@@ -1,0 +1,431 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>allensdk.api.queries.image_download_api module &#8212; Allen SDK dev documentation</title>
+    <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="allensdk.api.queries.mouse_atlas_api module" href="allensdk.api.queries.mouse_atlas_api.html" />
+    <link rel="prev" title="allensdk.api.queries.grid_data_api module" href="allensdk.api.queries.grid_data_api.html" /> 
+  </head><body>
+<link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
+<script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var _pSupressBrowserFlashWarning = true;
+    var _pTabId = "pHome";
+    var _pMoreProjectsId = "pMoreProjects";
+    var _pImagePath = "http://www.brain-map.org/assets/images/";
+    var _pSiteWarnings = function() {
+        this.show_warning() = {};
+    }
+</script>
+<script type="text/javascript">
+    function initialize() {
+        /*** do your stuff, then initialize the portal plugin ***/
+        _pPortalOnLoad();
+    }
+</script>
+<style>
+  #header_content > a {
+  display: inline-block;
+  width: 250px;
+  height: 75px;
+  background-image:url("_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-size: 235px 37px;
+  background-position: 0px 20px;
+  background-repeat: no-repeat;
+  }
+</style>
+
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
+<link rel="stylesheet" type="text/css" href="_static/external_assets/stylesheets/common_layout.css" />
+
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-allensdk.api.queries.image_download_api">
+<span id="allensdk-api-queries-image-download-api-module"></span><h1>allensdk.api.queries.image_download_api module<a class="headerlink" href="#module-allensdk.api.queries.image_download_api" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="allensdk.api.queries.image_download_api.ImageDownloadApi">
+<em class="property">class </em><code class="descclassname">allensdk.api.queries.image_download_api.</code><code class="descname">ImageDownloadApi</code><span class="sig-paren">(</span><em>base_uri=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/image_download_api.html#ImageDownloadApi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.image_download_api.ImageDownloadApi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="allensdk.api.queries.rma_template.html#allensdk.api.queries.rma_template.RmaTemplate" title="allensdk.api.queries.rma_template.RmaTemplate"><code class="xref py py-class docutils literal notranslate"><span class="pre">allensdk.api.queries.rma_template.RmaTemplate</span></code></a></p>
+<p>HTTP Client to download whole or partial two-dimensional images from the Allen Institute
+with the SectionImage, AtlasImage and ProjectionImage Download Services.</p>
+<p>See <a class="reference external" href="http://help.brain-map.org/display/api/Downloading+an+Image">Downloading an Image</a>
+for more documentation.</p>
+<dl class="attribute">
+<dt id="allensdk.api.queries.image_download_api.ImageDownloadApi.COLORMAPS">
+<code class="descname">COLORMAPS</code><em class="property"> = {'aba': 8, 'aibsmap_alt': 9, 'blue': 6, 'colormap': 10, 'expression': 4, 'gray': 0, 'green': 7, 'hotmetal': 1, 'jet': 2, 'projection': 11, 'red': 5, 'redtemp': 3}</em><a class="headerlink" href="#allensdk.api.queries.image_download_api.ImageDownloadApi.COLORMAPS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.image_download_api.ImageDownloadApi.atlas_image_query">
+<code class="descname">atlas_image_query</code><span class="sig-paren">(</span><em>atlas_id</em>, <em>image_type_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/image_download_api.html#ImageDownloadApi.atlas_image_query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.image_download_api.ImageDownloadApi.atlas_image_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>List atlas images belonging to a specified atlas</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>atlas_id</strong> <span class="classifier-delimiter">:</span> <span class="classifier">integer, optional</span></dt>
+<dd><p class="first last">Find images from this atlas.</p>
+</dd>
+<dt><strong>image_type_name</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string, optional</span></dt>
+<dd><p class="first last">Restrict response to images of this type. If not provided, 
+the query will get it from the atlas id.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>list of dict :</strong></dt>
+<dd><p class="first last">Each element is an AtlasImage record.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>See <a class="reference external" href="http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies#AtlasDrawingsandOntologies-DownloadingAtlasImagesAndGraphics">Downloading Atlas Images and Graphics</a>
+for additional documentation.
+<a class="reference internal" href="allensdk.api.queries.ontologies_api.html#allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases" title="allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases"><code class="xref py py-meth docutils literal notranslate"><span class="pre">allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases()</span></code></a> can also be used to list atlases along with their ids.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.image_download_api.ImageDownloadApi.download_atlas_image">
+<code class="descname">download_atlas_image</code><span class="sig-paren">(</span><em>atlas_image_id</em>, <em>file_path=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/image_download_api.html#ImageDownloadApi.download_atlas_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.image_download_api.ImageDownloadApi.download_atlas_image" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.image_download_api.ImageDownloadApi.download_image">
+<code class="descname">download_image</code><span class="sig-paren">(</span><em>image_id</em>, <em>file_path=None</em>, <em>endpoint=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/image_download_api.html#ImageDownloadApi.download_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.image_download_api.ImageDownloadApi.download_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download whole or partial two-dimensional images
+from the Allen Institute with the SectionImage or AtlasImage service.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>image_id</strong> <span class="classifier-delimiter">:</span> <span class="classifier">integer</span></dt>
+<dd><p class="first last">SubImage to download.</p>
+</dd>
+<dt><strong>file_path</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string, optional</span></dt>
+<dd><p class="first last">where to put it, defaults to image_id.jpg</p>
+</dd>
+<dt><strong>downsample</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int, optional</span></dt>
+<dd><p class="first last">Number of times to downsample the original image.</p>
+</dd>
+<dt><strong>quality</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int, optional</span></dt>
+<dd><p class="first last">jpeg quality of the returned image, 0 to 100 (default)</p>
+</dd>
+<dt><strong>expression</strong> <span class="classifier-delimiter">:</span> <span class="classifier">boolean, optional</span></dt>
+<dd><p class="first last">Request the expression mask for the SectionImage.</p>
+</dd>
+<dt><strong>view</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string, optional</span></dt>
+<dd><p class="first last">‘expression’, ‘projection’, ‘tumor_feature_annotation’
+or ‘tumor_feature_boundary’</p>
+</dd>
+<dt><strong>top</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int, optional</span></dt>
+<dd><p class="first last">Index of the topmost row of the region of interest.</p>
+</dd>
+<dt><strong>left :int, optional</strong></dt>
+<dd><p class="first last">Index of the leftmost column of the region of interest.</p>
+</dd>
+<dt><strong>width</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int, optional</span></dt>
+<dd><p class="first last">Number of columns in the output image.</p>
+</dd>
+<dt><strong>height</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int, optional</span></dt>
+<dd><p class="first last">Number of rows in the output image.</p>
+</dd>
+<dt><strong>range</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of ints, optional</span></dt>
+<dd><p class="first last">Filter to specify the RGB channels. low,high,low,high,low,high</p>
+</dd>
+<dt><strong>colormap</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of floats, optional</span></dt>
+<dd><p class="first last">Filter to specify the RGB channels. [lower_threshold,colormap]
+gain 0-1, colormap id is a string from ImageDownloadApi.COLORMAPS</p>
+</dd>
+<dt><strong>rgb</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of floats, optional</span></dt>
+<dd><p class="first last">Filter to specify the RGB channels. [red,green,blue] 0-1</p>
+</dd>
+<dt><strong>contrast</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of floats, optional</span></dt>
+<dd><p class="first last">Filter to specify contrast parameters. [gain,bias] 0-1</p>
+</dd>
+<dt><strong>annotation</strong> <span class="classifier-delimiter">:</span> <span class="classifier">boolean, optional</span></dt>
+<dd><p class="first last">Request the annotated AtlasImage</p>
+</dd>
+<dt><strong>atlas</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int, optional</span></dt>
+<dd><p class="first last">Specify the desired Atlas’ annotations.</p>
+</dd>
+<dt><strong>projection</strong> <span class="classifier-delimiter">:</span> <span class="classifier">boolean, optional</span></dt>
+<dd><p class="first last">Request projection for the specified image.</p>
+</dd>
+<dt><strong>downsample_dimensions</strong> <span class="classifier-delimiter">:</span> <span class="classifier">boolean, optional</span></dt>
+<dd><p class="first last">Indicates if the width and height should be adjusted
+to account for downsampling.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>None</strong></dt>
+<dd><p class="first last">the file is downloaded and saved to the path.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>By default, an unfiltered full-sized image with the highest quality
+is returned as a download if no parameters are provided.</p>
+<p>‘downsample=1’ halves the number of pixels of the original image
+both horizontally and vertically.        range_list = kwargs.get(‘range’, None)</p>
+<p>Specifying ‘downsample=2’ quarters the height and width values.</p>
+<p>Quality must be an integer from 0, for the lowest quality,
+up to as high as 100. If it is not specified,
+it defaults to the highest quality.</p>
+<p>Top is specified in full-resolution (largest tier) pixel coordinates.
+SectionImage.y is the default value.</p>
+<p>Left is specified in full-resolution (largest tier) pixel coordinates.
+SectionImage.x is the default value.</p>
+<p>Width is specified in tier-resolution (desired tier) pixel coordinates.
+SectionImage.width is the default value. It is automatically adjusted when downsampled.</p>
+<p>Height is specified in tier-resolution (desired tier) pixel coordinates.
+SectionImage.height is the default value. It is automatically adjusted when downsampled.</p>
+<p>The range parameter consists of 6 comma delimited integers
+that define the lower (0) and upper (4095) bound for each channel in red-green-blue order
+(i.e. “range=0,1500,0,1000,0,4095”).
+The default range values can be determined by referring to the following fields
+on the Equalization model associated with the SectionDataSet:
+red_lower, red_uppper, green_lower, green_upper, blue_lower, blue_upper.
+For more information, see the
+<a class="reference external" href="http://help.brain-map.org/display/mouseconnectivity/Projection#Projection-ImageControls">Image Controls</a>
+section of the Allen Mouse Brain Connectivity Atlas:
+<a class="reference external" href="http://help.brain-map.org/display/mouseconnectivity/Projection">Projection Dataset</a>
+help topic.
+See: <a href="#id1"><span class="problematic" id="id2">`</span></a>Image Download Service <a href="#id3"><span class="problematic" id="id4">`</span></a>&lt;<a class="reference external" href="http://help.brain-map.org/display/api/Downloading+an+Image">http://help.brain-map.org/display/api/Downloading+an+Image</a>&gt;_</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.image_download_api.ImageDownloadApi.download_projection_image">
+<code class="descname">download_projection_image</code><span class="sig-paren">(</span><em>projection_image_id</em>, <em>file_path=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/image_download_api.html#ImageDownloadApi.download_projection_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.image_download_api.ImageDownloadApi.download_projection_image" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.image_download_api.ImageDownloadApi.download_section_image">
+<code class="descname">download_section_image</code><span class="sig-paren">(</span><em>section_image_id</em>, <em>file_path=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/image_download_api.html#ImageDownloadApi.download_section_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.image_download_api.ImageDownloadApi.download_section_image" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.image_download_api.ImageDownloadApi.get_section_data_sets_by_product">
+<code class="descname">get_section_data_sets_by_product</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/image_download_api.html#ImageDownloadApi.get_section_data_sets_by_product"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.image_download_api.ImageDownloadApi.get_section_data_sets_by_product" title="Permalink to this definition">¶</a></dt>
+<dd><p>List all of the section data sets produced as part of one or more products</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>product_ids</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of int</span></dt>
+<dd><p class="first last">Integer specifiers for Allen Institute products. A product is a set of related data.</p>
+</dd>
+<dt><strong>include_failed</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool, optional</span></dt>
+<dd><p class="first last">If True, find both failed and passed datasets. Default is False</p>
+</dd>
+<dt><strong>num_rows</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int, optional</span></dt>
+<dd><p class="first last">how many records to retrieve. Default is ‘all’.</p>
+</dd>
+<dt><strong>count</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool, optional</span></dt>
+<dd><p class="first last">If True, return a count of the lines found by the query. Default is False.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>list of dict :</strong></dt>
+<dd><p class="first last">Each returned element is a section data set record.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>See <a class="reference external" href="http://api.brain-map.org/api/v2/data/query.json?criteria=model::Product">http://api.brain-map.org/api/v2/data/query.json?criteria=model::Product</a> for a list of products.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.image_download_api.ImageDownloadApi.get_section_image_ranges">
+<code class="descname">get_section_image_ranges</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/image_download_api.html#ImageDownloadApi.get_section_image_ranges"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.image_download_api.ImageDownloadApi.get_section_image_ranges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Section images from the Mouse Connectivity Atlas are displayed on connectivity.brain-map.org after having been 
+linearly windowed and leveled. This method obtains parameters defining channelwise upper and lower bounds of the windows used for 
+one or more images.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>section_image_ids</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of int</span></dt>
+<dd><p class="first last">Each element is a unique identifier for a section image.</p>
+</dd>
+<dt><strong>num_rows</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int, optional</span></dt>
+<dd><p class="first last">how many records to retrieve. Default is ‘all’.</p>
+</dd>
+<dt><strong>count</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool, optional</span></dt>
+<dd><p class="first last">If True, return a count of the lines found by the query. Default is False.</p>
+</dd>
+<dt><strong>as_lists</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool, optional</span></dt>
+<dd><p class="first last">If True, return the window parameters in a list, rather than a dict 
+(this is the format of the range parameter on ImageDownloadApi.download_image). 
+Default is False.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>list of dict or list of list :</strong></dt>
+<dd><p class="first last">For each section image id provided, return the window bounds for each channel.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.image_download_api.ImageDownloadApi.rma_templates">
+<code class="descname">rma_templates</code><em class="property"> = {'image_queries': [{'count': False, 'only': ['blue_lower', 'blue_upper', 'red_lower', 'red_upper', 'green_lower', 'green_upper'], 'name': 'section_image_ranges', 'criteria': 'section_data_set(section_images[id$in{{ section_image_ids }}])', 'num_rows': 'all', 'model': 'Equalization', 'criteria_params': ['section_image_ids'], 'description': 'see name'}, {'count': False, 'name': 'section_images_by_data_set_id', 'criteria_params': ['data_set_id'], 'criteria': '[data_set_id$eq{{ data_set_id }}]', 'num_rows': 'all', 'model': 'SectionImage', 'description': 'see name'}, {'count': False, 'name': 'section_data_sets_by_product_id', 'criteria_params': ['product_ids', 'failed'], 'criteria': '[failed$in{{failed}}],products[id$in{{ product_ids }}]', 'num_rows': 'all', 'model': 'SectionDataSet', 'description': 'see name'}]}</em><a class="headerlink" href="#allensdk.api.queries.image_download_api.ImageDownloadApi.rma_templates" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.image_download_api.ImageDownloadApi.section_image_query">
+<code class="descname">section_image_query</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/queries/image_download_api.html#ImageDownloadApi.section_image_query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.image_download_api.ImageDownloadApi.section_image_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>List section images belonging to a specified section data set</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>atlas_id</strong> <span class="classifier-delimiter">:</span> <span class="classifier">integer, optional</span></dt>
+<dd><p class="first last">Find images from this section data set.</p>
+</dd>
+<dt><strong>num_rows</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">how many records to retrieve. Default is ‘all’</p>
+</dd>
+<dt><strong>count</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd><p class="first last">If True, return a count of the lines found by the query.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>list of dict :</strong></dt>
+<dd><p class="first last">Each element is an SectionImage record.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The SectionDataSet model is used to represent single experiments which produce an array of images. 
+This includes Mouse Connectivity and Mouse Brain Atlas experiments, among other projects.
+You may see references to the ids of experiments from those projects. 
+These are the same as section data set ids.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_space.html">Reference Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="glif_models.html">Generalized LIF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html">Biophysical</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.deprecated.html">allensdk.deprecated module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
+</ul>
+
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allen-sdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    </div>
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalFooter.js"></script>
+
+
+  </body>
+</html>

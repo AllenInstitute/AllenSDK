@@ -1,0 +1,7 @@
+allensdk.brain\_observatory.receptive\_field\_analysis.fitgaussian2D module
+===========================================================================
+
+.. automodule:: allensdk.brain_observatory.receptive_field_analysis.fitgaussian2D
+    :members:
+    :undoc-members:
+    :show-inheritance:

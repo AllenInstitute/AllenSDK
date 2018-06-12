@@ -1,0 +1,25 @@
+allensdk.api package
+====================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    allensdk.api.queries
+
+Submodules
+----------
+
+.. toctree::
+
+   allensdk.api.api
+   allensdk.api.cache
+
+Module contents
+---------------
+
+.. automodule:: allensdk.api
+    :members:
+    :undoc-members:
+    :show-inheritance:

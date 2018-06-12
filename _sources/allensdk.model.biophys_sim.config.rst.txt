@@ -1,0 +1,7 @@
+allensdk.model.biophys\_sim.config module
+=========================================
+
+.. automodule:: allensdk.model.biophys_sim.config
+    :members:
+    :undoc-members:
+    :show-inheritance:

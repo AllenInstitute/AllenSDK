@@ -1,34 +1,23 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Cell Types &mdash; Allen SDK dev documentation</title>
-    
+    <title>Cell Types &#8212; Allen SDK dev documentation</title>
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     'dev',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK dev documentation" href="index.html" />
-    <link rel="up" title="Data Resources" href="data_resources.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Mouse Connectivity" href="connectivity.html" />
     <link rel="prev" title="Brain Observatory" href="brain_observatory.html" /> 
-  </head>
-  <body role="document">
+  </head><body>
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
 <script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
@@ -91,44 +80,23 @@ started with analysis:</p>
 <blockquote>
 <div><ul class="simple">
 <li><a class="reference external" href="_static/examples/nb/cell_types.html#Cell-Types-Database">Download and plot stimuli and responses from an NWB file for a cell</a></li>
-<li><a class="reference external" href="_static/examples/nb/cell_types.html#Cell-Morphology-Reconstructions">Download and plot a cell&#8217;s morphological reconstruction</a></li>
+<li><a class="reference external" href="_static/examples/nb/cell_types.html#Cell-Morphology-Reconstructions">Download and plot a cell’s morphological reconstruction</a></li>
 <li><a class="reference external" href="_static/examples/nb/cell_types.html#Electrophysiology-Features">Download and plot precomputed electrophysiology features</a></li>
 <li><a class="reference external" href="_static/examples/nb/cell_types.html#Morphology-Features">Download precomputed morphology features to a table</a></li>
 <li><a class="reference external" href="_static/examples/nb/cell_types.html#Computing-Electrophysiology-Features">Compute electrophysiology features for a single sweep</a></li>
 </ul>
 </div></blockquote>
 </div>
-<div class="section" id="cell-types-api">
-<h2>Cell Types API<a class="headerlink" href="#cell-types-api" title="Permalink to this headline">¶</a></h2>
-<p>The <a class="reference internal" href="allensdk.api.queries.html#allensdk.api.queries.cell_types_api.CellTypesApi" title="allensdk.api.queries.cell_types_api.CellTypesApi"><code class="xref py py-class docutils literal"><span class="pre">CellTypesApi</span></code></a> class provides a Python interface for downloading data
-in the Allen Cell Types Database.  The following example demonstrates how to download meta data for
-all cells with 3D reconstructions, then download the reconstruction and electrophysiology recordings
-for one of those cells:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">allensdk.api.queries.cell_types_api</span> <span class="k">import</span> <span class="n">CellTypesApi</span>
-
-<span class="n">ct</span> <span class="o">=</span> <span class="n">CellTypesApi</span><span class="p">()</span>
-
-<span class="c1"># a list of dictionaries containing metadata for cells with reconstructions</span>
-<span class="n">cells</span> <span class="o">=</span> <span class="n">ct</span><span class="o">.</span><span class="n">list_cells</span><span class="p">(</span><span class="n">require_reconstruction</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-<span class="c1"># download the electrophysiology data for one cell</span>
-<span class="n">ct</span><span class="o">.</span><span class="n">save_ephys_data</span><span class="p">(</span><span class="n">cells</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">],</span> <span class="s1">&#39;example.nwb&#39;</span><span class="p">)</span>
-
-<span class="c1"># download the reconstruction for the same cell</span>
-<span class="n">ct</span><span class="o">.</span><span class="n">save_reconstruction</span><span class="p">(</span><span class="n">cells</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">],</span> <span class="s1">&#39;example.swc&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
 <div class="section" id="cell-types-cache">
 <h2>Cell Types Cache<a class="headerlink" href="#cell-types-cache" title="Permalink to this headline">¶</a></h2>
-<p>The <a class="reference internal" href="allensdk.core.html#allensdk.core.cell_types_cache.CellTypesCache" title="allensdk.core.cell_types_cache.CellTypesCache"><code class="xref py py-class docutils literal"><span class="pre">CellTypesCache</span></code></a> class saves all of the data you can download via the
-<a class="reference internal" href="allensdk.api.queries.html#allensdk.api.queries.cell_types_api.CellTypesApi" title="allensdk.api.queries.cell_types_api.CellTypesApi"><code class="xref py py-class docutils literal"><span class="pre">CellTypesApi</span></code></a> in well known locations so that you don&#8217;t have to think
-about file names and directories.  It also takes care of knowing if you&#8217;ve already downloaded some files and reads
-them from disk instead of downloading them again.  The following example demonstrates how to download meta data for
-all cells with 3D reconstructions:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">allensdk.core.cell_types_cache</span> <span class="k">import</span> <span class="n">CellTypesCache</span>
+<p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">CellTypesCache</span></code> class provides a Python interface for downloading data
+in the Allen Cell Types Database into well known locations so that you don’t have to think
+about file names and directories.  The following example demonstrates how to download meta data for
+all cells with 3D reconstructions, then download the reconstruction and electrophysiology recordings
+for one of those cells:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">allensdk.core.cell_types_cache</span> <span class="k">import</span> <span class="n">CellTypesCache</span>
 
-<span class="n">ctc</span> <span class="o">=</span> <span class="n">CellTypesCache</span><span class="p">()</span>
+<span class="n">ctc</span> <span class="o">=</span> <span class="n">CellTypesCache</span><span class="p">(</span><span class="n">manifest_file</span><span class="o">=</span><span class="s1">&#39;cell_types/manifest.json&#39;</span><span class="p">)</span>
 
 <span class="c1"># a list of cell metadata for cells with reconstructions, download if necessary</span>
 <span class="n">cells</span> <span class="o">=</span> <span class="n">ctc</span><span class="o">.</span><span class="n">get_cells</span><span class="p">(</span><span class="n">require_reconstruction</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -140,25 +108,27 @@ all cells with 3D reconstructions:</p>
 <span class="n">reconstruction</span> <span class="o">=</span> <span class="n">ctc</span><span class="o">.</span><span class="n">get_reconstruction</span><span class="p">(</span><span class="n">cells</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
+<p><code class="xref py py-class docutils literal notranslate"><span class="pre">CellTypesCache</span></code> takes takes care of knowing if you’ve already downloaded some files and reads
+them from disk instead of downloading them again.  All data is stored in the same directory as the <cite>manifest_file</cite> argument to the constructor.</p>
 </div>
 <div class="section" id="feature-extraction">
 <h2>Feature Extraction<a class="headerlink" href="#feature-extraction" title="Permalink to this headline">¶</a></h2>
-<p>The <code class="xref py py-class docutils literal"><span class="pre">EphysFeatureExtractor</span></code> class calculates electrophysiology
-features from cell recordings.  <a class="reference internal" href="allensdk.ephys.html#allensdk.ephys.extract_cell_features.extract_cell_features" title="allensdk.ephys.extract_cell_features.extract_cell_features"><code class="xref py py-func docutils literal"><span class="pre">extract_cell_features()</span></code></a> can
+<p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">EphysFeatureExtractor</span></code> class calculates electrophysiology
+features from cell recordings.  <a class="reference internal" href="allensdk.ephys.extract_cell_features.html#allensdk.ephys.extract_cell_features.extract_cell_features" title="allensdk.ephys.extract_cell_features.extract_cell_features"><code class="xref py py-func docutils literal notranslate"><span class="pre">extract_cell_features()</span></code></a> can
 be used to extract the precise feature values available in the Cell Types Database:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">allensdk.api.queries.cell_types_api</span> <span class="k">import</span> <span class="n">CellTypesApi</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">allensdk.core.cell_types_cache</span> <span class="k">import</span> <span class="n">CellTypesCache</span>
 <span class="kn">from</span> <span class="nn">allensdk.ephys.extract_cell_features</span> <span class="k">import</span> <span class="n">extract_cell_features</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">defaultdict</span>
-<span class="kn">from</span> <span class="nn">allensdk.core.nwb_data_set</span> <span class="k">import</span> <span class="n">NwbDataSet</span>
+
+<span class="c1"># initialize the cache</span>
+<span class="n">ctc</span> <span class="o">=</span> <span class="n">CellTypesCache</span><span class="p">(</span><span class="n">manifest_file</span><span class="o">=</span><span class="s1">&#39;cell_types/manifest.json&#39;</span><span class="p">)</span>
 
 <span class="c1"># pick a cell to analyze</span>
 <span class="n">specimen_id</span> <span class="o">=</span> <span class="mi">324257146</span>
-<span class="n">nwb_file</span> <span class="o">=</span> <span class="s1">&#39;ephys.nwb&#39;</span>
 
 <span class="c1"># download the ephys data and sweep metadata</span>
-<span class="n">cta</span> <span class="o">=</span> <span class="n">CellTypesApi</span><span class="p">()</span>
-<span class="n">sweeps</span> <span class="o">=</span> <span class="n">cta</span><span class="o">.</span><span class="n">get_ephys_sweeps</span><span class="p">(</span><span class="n">specimen_id</span><span class="p">)</span>
-<span class="n">cta</span><span class="o">.</span><span class="n">save_ephys_data</span><span class="p">(</span><span class="n">specimen_id</span><span class="p">,</span> <span class="n">nwb_file</span><span class="p">)</span>
+<span class="n">data_set</span> <span class="o">=</span> <span class="n">ctc</span><span class="o">.</span><span class="n">get_ephys_data</span><span class="p">(</span><span class="n">specimen_id</span><span class="p">)</span>
+<span class="n">sweeps</span> <span class="o">=</span> <span class="n">ctc</span><span class="o">.</span><span class="n">get_ephys_sweeps</span><span class="p">(</span><span class="n">specimen_id</span><span class="p">)</span>
 
 <span class="c1"># group the sweeps by stimulus </span>
 <span class="n">sweep_numbers</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
@@ -166,7 +136,7 @@ be used to extract the precise feature values available in the Cell Types Databa
     <span class="n">sweep_numbers</span><span class="p">[</span><span class="n">sweep</span><span class="p">[</span><span class="s1">&#39;stimulus_name&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sweep</span><span class="p">[</span><span class="s1">&#39;sweep_number&#39;</span><span class="p">])</span>
 
 <span class="c1"># calculate features</span>
-<span class="n">cell_features</span> <span class="o">=</span> <span class="n">extract_cell_features</span><span class="p">(</span><span class="n">NwbDataSet</span><span class="p">(</span><span class="n">nwb_file</span><span class="p">),</span>
+<span class="n">cell_features</span> <span class="o">=</span> <span class="n">extract_cell_features</span><span class="p">(</span><span class="n">data_set</span><span class="p">,</span>
                                       <span class="n">sweep_numbers</span><span class="p">[</span><span class="s1">&#39;Ramp&#39;</span><span class="p">],</span>
                                       <span class="n">sweep_numbers</span><span class="p">[</span><span class="s1">&#39;Short Square&#39;</span><span class="p">],</span>
                                       <span class="n">sweep_numbers</span><span class="p">[</span><span class="s1">&#39;Long Square&#39;</span><span class="p">])</span>
@@ -223,7 +193,7 @@ be used to extract the precise feature values available in the Cell Types Databa
 </tr>
 </tbody>
 </table>
-<p>Comment lines begin with a &#8216;#&#8217;.  Reconstructions in the Allen Cell Types Database can contain the following compartment types:</p>
+<p>Comment lines begin with a ‘#’.  Reconstructions in the Allen Cell Types Database can contain the following compartment types:</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="21%" />
@@ -252,10 +222,11 @@ be used to extract the precise feature values available in the Cell Types Databa
 </tr>
 </tbody>
 </table>
-<p>The Allen SDK comes with a <a class="reference internal" href="allensdk.core.html#module-allensdk.core.swc" title="allensdk.core.swc"><code class="xref py py-mod docutils literal"><span class="pre">swc</span></code></a> Python module that provides helper functions and classes for manipulating SWC files.  Consider the following example:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">allensdk.core.swc</span> <span class="k">as</span> <span class="nn">swc</span>
+<p>The Allen SDK comes with a <a class="reference internal" href="allensdk.core.swc.html#module-allensdk.core.swc" title="allensdk.core.swc"><code class="xref py py-mod docutils literal notranslate"><span class="pre">swc</span></code></a> Python module that provides helper functions and classes for manipulating SWC files.  Consider the following example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">allensdk.core.swc</span> <span class="k">as</span> <span class="nn">swc</span>
 
-<span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;example.swc&#39;</span>
+<span class="c1"># if you ran the examples above, you will have a reconstruction here</span>
+<span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;cell_types/specimen_478499902/reconstruction.swc&#39;</span>
 <span class="n">morphology</span> <span class="o">=</span> <span class="n">swc</span><span class="o">.</span><span class="n">read_swc</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
 
 <span class="c1"># subsample the morphology 3x. root, soma, junctions, and the first child of the root are preserved.</span>
@@ -288,14 +259,15 @@ as well as tracking and stimulus data.  It has a defined schema and metadata
 labeling system designed so software tools can easily access contained data.</p>
 <p>The Allen SDK provides a basic Python class for extracting data from
 Allen Cell Types Database NWB files. These files store data from intracellular
-patch-clamp recordings. A stimulus current is presented to the cell and the cell&#8217;s
+patch-clamp recordings. A stimulus current is presented to the cell and the cell’s
 voltage response is recorded.  The file stores both stimulus and response for
-several experimental trials, here called &#8220;sweeps.&#8221;  The following code snippet
-demonstrates how to extract a sweep&#8217;s stimulus, response, sampling rate,
+several experimental trials, here called “sweeps.”  The following code snippet
+demonstrates how to extract a sweep’s stimulus, response, sampling rate,
 and estimated spike times:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">allensdk.core.nwb_data_set</span> <span class="k">import</span> <span class="n">NwbDataSet</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">allensdk.core.nwb_data_set</span> <span class="k">import</span> <span class="n">NwbDataSet</span>
 
-<span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;example.nwb&#39;</span>
+<span class="c1"># if you ran the examples above, you will have a NWB file here</span>
+<span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;cell_types/specimen_478499902/ephys.nwb&#39;</span>
 <span class="n">data_set</span> <span class="o">=</span> <span class="n">NwbDataSet</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
 
 <span class="n">sweep_numbers</span> <span class="o">=</span> <span class="n">data_set</span><span class="o">.</span><span class="n">get_sweep_numbers</span><span class="p">()</span>
@@ -335,9 +307,7 @@ and estimated spike times:</p>
         <div class="sphinxsidebarwrapper">
 <h3><a href="index.html">Contents</a></h3>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="data_resources.html">Data Resources</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Cell Types</a></li>
@@ -362,6 +332,7 @@ and estimated spike times:</p>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.deprecated.html">allensdk.deprecated module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
@@ -379,12 +350,14 @@ and estimated spike times:</p>
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

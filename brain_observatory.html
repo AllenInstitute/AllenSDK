@@ -1,34 +1,23 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Brain Observatory &mdash; Allen SDK dev documentation</title>
-    
+    <title>Brain Observatory &#8212; Allen SDK dev documentation</title>
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     'dev',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK dev documentation" href="index.html" />
-    <link rel="up" title="Data Resources" href="data_resources.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Cell Types" href="cell_types.html" />
     <link rel="prev" title="Data Resources" href="data_resources.html" /> 
-  </head>
-  <body role="document">
+  </head><body>
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
 <script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
@@ -81,7 +70,7 @@ an experiment container have different stimulus protocols, but cover the same im
 <img alt="_static/container_session_layout.png" class="align-center" src="_static/container_session_layout.png" />
 <p><strong>Note:</strong> Data collected after September 2016 uses a new session C stimulus designed to better-characterize spatial receptive fields in
 higher visual areas.  The original locally sparse noise stimulus used 4.65 visual degree pixels.  Session C2 broke that stimulus
-into two separate stimulus blocks: one with 4.65 degree pixels and one with 9.3 degree pixels.  Note that the <a class="reference internal" href="allensdk.brain_observatory.html#module-allensdk.brain_observatory.stimulus_info" title="allensdk.brain_observatory.stimulus_info"><code class="xref py py-mod docutils literal"><span class="pre">stimulus_info</span></code></a>
+into two separate stimulus blocks: one with 4.65 degree pixels and one with 9.3 degree pixels.  Note that the <code class="xref py py-mod docutils literal notranslate"><span class="pre">stimulus_info</span></code>
 module refers to these as <cite>locally_sparse_noise_4deg</cite> and <cite>locally_sparse_noise_8deg</cite>, respectively.</p>
 <p>For more information on experimental design and a data overview, please visit the <a class="reference external" href="http://observatory.brain-map.org/visualcoding">Allen Brain Observatory data portal</a>.</p>
 <div class="section" id="data-processing">
@@ -89,10 +78,10 @@ module refers to these as <cite>locally_sparse_noise_4deg</cite> and <cite>local
 <p>For all data in Allen Brain Observatory, we perform the following processing:</p>
 <blockquote>
 <div><ol class="arabic simple">
-<li>Segment cell masks from each experiment&#8217;s 2-photon fluorescence video</li>
+<li>Segment cell masks from each experiment’s 2-photon fluorescence video</li>
 <li>Associate cells from experiments belonging to the same experiment container and assign unique IDs</li>
-<li>Extract each cell&#8217;s mean fluorescence trace</li>
-<li>Extract mean fluorescence traces from each cell&#8217;s surrounding neuropil</li>
+<li>Extract each cell’s mean fluorescence trace</li>
+<li>Extract mean fluorescence traces from each cell’s surrounding neuropil</li>
 <li>Demix traces from overlapping ROIs</li>
 <li>Estimate neuropil-corrected fluorescence traces</li>
 <li>Compute dF/F</li>
@@ -103,7 +92,7 @@ module refers to these as <cite>locally_sparse_noise_4deg</cite> and <cite>local
 Stored traces include the raw fluoresence trace, neuropil trace, demixed trace, and dF/F trace.  Code for extracting neuropil-corrected
 fluorescence traces, computing dF/F, and computing tuning metrics is available in the SDK.</p>
 <p><strong>New in June 2017:</strong> Trace demixing is a new addition as of June 2017.  All past data was reprocessed using the new demixing algorithm.
-We have also developed a new module to better characterize a cell&#8217;s receptive field.  Take a look at the
+We have also developed a new module to better characterize a cell’s receptive field.  Take a look at the
 <a class="reference external" href="_static/examples/nb/receptive_fields.html">receptive field analysis example notebook</a></p>
 <p>For more information about data processing, please <a class="reference external" href="http://help.brain-map.org/display/observatory/Documentation">read the technical whitepapers</a>.</p>
 </div>
@@ -126,8 +115,8 @@ started with the available data:</p>
 is available as part of the SDK.  Take a look at this <a class="reference external" href="_static/examples/nb/brain_observatory_analysis.html">Jupyter notebook</a> to find out how to:</p>
 <blockquote>
 <div><ul class="simple">
-<li><a class="reference external" href="_static/examples/nb/brain_observatory_analysis.html#Drifting-Gratings">Plot cell&#8217;s response to its preferred stimulus condition</a></li>
-<li><a class="reference external" href="_static/examples/nb/receptive_fields.html">Compute a cell&#8217;s on/off receptive field based on the locally sparse noise stimulus</a></li>
+<li><a class="reference external" href="_static/examples/nb/brain_observatory_analysis.html#Drifting-Gratings">Plot cell’s response to its preferred stimulus condition</a></li>
+<li><a class="reference external" href="_static/examples/nb/receptive_fields.html">Compute a cell’s on/off receptive field based on the locally sparse noise stimulus</a></li>
 </ul>
 </div></blockquote>
 <p>More detailed documentation is available demonstrating how to:</p>
@@ -142,7 +131,7 @@ is available as part of the SDK.  Take a look at this <a class="reference extern
 <div class="section" id="precomputed-cell-metrics">
 <h2>Precomputed Cell Metrics<a class="headerlink" href="#precomputed-cell-metrics" title="Permalink to this headline">¶</a></h2>
 <p>A large table of precomputed metrics are available for download to support population analysis and filtering.  The table below describes
-all of the metrics in the table.  The <a class="reference internal" href="allensdk.core.html#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_cell_specimens" title="allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_cell_specimens"><code class="xref py py-meth docutils literal"><span class="pre">get_cell_specimens()</span></code></a> method
+all of the metrics in the table.  The <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_cell_specimens()</span></code> method
 will download this table as a list of dictionaries which can be converted to a pandas DataFrame as shown in this
 <a class="reference external" href="_static/examples/nb/brain_observatory.html#Find-Cells-of-Interest">Jupyter notebook</a>.</p>
 <table border="1" class="docutils">
@@ -307,9 +296,7 @@ will download this table as a list of dictionaries which can be converted to a p
         <div class="sphinxsidebarwrapper">
 <h3><a href="index.html">Contents</a></h3>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="data_resources.html">Data Resources</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
@@ -334,6 +321,7 @@ will download this table as a list of dictionaries which can be converted to a p
 <li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.deprecated.html">allensdk.deprecated module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
@@ -351,12 +339,14 @@ will download this table as a list of dictionaries which can be converted to a p
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

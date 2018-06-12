@@ -1,0 +1,560 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>allensdk.api.api module &#8212; Allen SDK dev documentation</title>
+    <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="allensdk.api.cache module" href="allensdk.api.cache.html" />
+    <link rel="prev" title="allensdk.api.queries.tree_search_api module" href="allensdk.api.queries.tree_search_api.html" /> 
+  </head><body>
+<link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
+<script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var _pSupressBrowserFlashWarning = true;
+    var _pTabId = "pHome";
+    var _pMoreProjectsId = "pMoreProjects";
+    var _pImagePath = "http://www.brain-map.org/assets/images/";
+    var _pSiteWarnings = function() {
+        this.show_warning() = {};
+    }
+</script>
+<script type="text/javascript">
+    function initialize() {
+        /*** do your stuff, then initialize the portal plugin ***/
+        _pPortalOnLoad();
+    }
+</script>
+<style>
+  #header_content > a {
+  display: inline-block;
+  width: 250px;
+  height: 75px;
+  background-image:url("_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-size: 235px 37px;
+  background-position: 0px 20px;
+  background-repeat: no-repeat;
+  }
+</style>
+
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
+<link rel="stylesheet" type="text/css" href="_static/external_assets/stylesheets/common_layout.css" />
+
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-allensdk.api.api">
+<span id="allensdk-api-api-module"></span><h1>allensdk.api.api module<a class="headerlink" href="#module-allensdk.api.api" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="allensdk.api.api.Api">
+<em class="property">class </em><code class="descclassname">allensdk.api.api.</code><code class="descname">Api</code><span class="sig-paren">(</span><em>api_base_url_string=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/api.html#Api"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.api.Api" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="allensdk.api.api.Api.cleanup_truncated_file">
+<code class="descname">cleanup_truncated_file</code><span class="sig-paren">(</span><em>file_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/api.html#Api.cleanup_truncated_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.api.Api.cleanup_truncated_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper for removing files.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>file_path</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">Absolute path including the file name to remove.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.api.Api.construct_well_known_file_download_url">
+<code class="descname">construct_well_known_file_download_url</code><span class="sig-paren">(</span><em>well_known_file_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/api.html#Api.construct_well_known_file_download_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.api.Api.construct_well_known_file_download_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Join data api endpoint and id.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>well_known_file_id</strong> <span class="classifier-delimiter">:</span> <span class="classifier">integer or string representing an integer</span></dt>
+<dd><p class="first last">well known file id</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>string</strong></dt>
+<dd><p class="first last">the well-known-file download url for the current api api server</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<dl class="last docutils">
+<dt><a class="reference internal" href="#allensdk.api.api.Api.retrieve_file_over_http" title="allensdk.api.api.Api.retrieve_file_over_http"><code class="xref py py-obj docutils literal notranslate"><span class="pre">retrieve_file_over_http</span></code></a></dt>
+<dd>Can be used to retrieve the file from the url.</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.api.Api.default_api_url">
+<code class="descname">default_api_url</code><em class="property"> = 'http://api.brain-map.org'</em><a class="headerlink" href="#allensdk.api.api.Api.default_api_url" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.api.Api.do_query">
+<code class="descname">do_query</code><span class="sig-paren">(</span><em>url_builder_fn</em>, <em>json_traversal_fn</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/api.html#Api.do_query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.api.Api.do_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bundle an query url construction function
+with a corresponding response json traversal function.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>url_builder_fn</strong> <span class="classifier-delimiter">:</span> <span class="classifier">function</span></dt>
+<dd><p class="first last">A function that takes parameters and returns an rma url.</p>
+</dd>
+<dt><strong>json_traversal_fn</strong> <span class="classifier-delimiter">:</span> <span class="classifier">function</span></dt>
+<dd><p class="first last">A function that takes a json-parsed python data structure and returns data from it.</p>
+</dd>
+<dt><strong>post</strong> <span class="classifier-delimiter">:</span> <span class="classifier">boolean, optional kwarg</span></dt>
+<dd><p class="first last">True does an HTTP POST, False (default) does a GET</p>
+</dd>
+<dt><strong>args</strong> <span class="classifier-delimiter">:</span> <span class="classifier">arguments</span></dt>
+<dd><p class="first last">Arguments to be passed to the url builder function.</p>
+</dd>
+<dt><strong>kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">keyword arguments</span></dt>
+<dd><p class="first last">Keyword arguments to be passed to the rma builder function.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>any type</strong></dt>
+<dd><p class="first last">The data extracted from the json response.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p><a class="reference external" href="data_api_client.html#creating-new-api-query-classes">A simple Api subclass example</a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.api.Api.do_rma_query">
+<code class="descname">do_rma_query</code><span class="sig-paren">(</span><em>rma_builder_fn</em>, <em>json_traversal_fn</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/api.html#Api.do_rma_query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.api.Api.do_rma_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bundle an RMA query url construction function
+with a corresponding response json traversal function.</p>
+<dl class="docutils">
+<dt>..note:: Deprecated in AllenSDK 0.9.2</dt>
+<dd><cite>do_rma_query</cite> will be removed in AllenSDK 1.0, it is replaced by
+<cite>do_query</cite> because the latter is more general.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>rma_builder_fn</strong> <span class="classifier-delimiter">:</span> <span class="classifier">function</span></dt>
+<dd><p class="first last">A function that takes parameters and returns an rma url.</p>
+</dd>
+<dt><strong>json_traversal_fn</strong> <span class="classifier-delimiter">:</span> <span class="classifier">function</span></dt>
+<dd><p class="first last">A function that takes a json-parsed python data structure and returns data from it.</p>
+</dd>
+<dt><strong>args</strong> <span class="classifier-delimiter">:</span> <span class="classifier">arguments</span></dt>
+<dd><p class="first last">Arguments to be passed to the rma builder function.</p>
+</dd>
+<dt><strong>kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">keyword arguments</span></dt>
+<dd><p class="first last">Keyword arguments to be passed to the rma builder function.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>any type</strong></dt>
+<dd><p class="first last">The data extracted from the json response.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p><a class="reference external" href="data_api_client.html#creating-new-api-query-classes">A simple Api subclass example</a>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.api.Api.download_url">
+<code class="descname">download_url</code><em class="property"> = 'http://download.alleninstitute.org'</em><a class="headerlink" href="#allensdk.api.api.Api.download_url" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.api.Api.json_msg_query">
+<code class="descname">json_msg_query</code><span class="sig-paren">(</span><em>url</em>, <em>dataframe=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/api.html#Api.json_msg_query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.api.Api.json_msg_query" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Common case where the url is fully constructed</dt>
+<dd>and the response data is stored in the ‘msg’ field.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>url</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">Where to get the data in json form</p>
+</dd>
+<dt><strong>dataframe</strong> <span class="classifier-delimiter">:</span> <span class="classifier">boolean</span></dt>
+<dd><p class="first last">True converts to a pandas dataframe, False (default) doesn’t</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>dict or DataFrame</strong></dt>
+<dd><p class="first last">returned data; type depends on dataframe option</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.api.Api.load_api_schema">
+<code class="descname">load_api_schema</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/api.html#Api.load_api_schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.api.Api.load_api_schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download the RMA schema from the current RMA endpoint</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>dict</strong></dt>
+<dd><p class="first last">the parsed json schema message</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This information and other
+<a class="reference external" href="http://help.brain-map.org/display/api/Data+Model">Allen Brain Atlas Data Portal Data Model</a>
+documentation is also available as a
+<a class="reference external" href="http://api.brain-map.org/class_hierarchy">Class Hierarchy</a>
+and <a class="reference external" href="http://api.brain-map.org/class_hierarchy">Class List</a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.api.Api.read_data">
+<code class="descname">read_data</code><span class="sig-paren">(</span><em>parsed_json</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/api.html#Api.read_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.api.Api.read_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the message data from the parsed query.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>parsed_json</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd><p class="first last">A python structure corresponding to the JSON data returned from the API.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>See <a class="reference external" href="http://help.brain-map.org/display/api/API+Response+Formats#APIResponseFormats-ResponseEnvelope">API Response Formats - Response Envelope</a>
+for additional documentation.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.api.Api.retrieve_file_over_http">
+<code class="descname">retrieve_file_over_http</code><span class="sig-paren">(</span><em>url</em>, <em>file_path</em>, <em>zipped=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/api.html#Api.retrieve_file_over_http"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.api.Api.retrieve_file_over_http" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a file from the data api and save it.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>url</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">Url[R099781a1d33c-1]_ from which to get the file.</p>
+</dd>
+<dt><strong>file_path</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">Absolute path including the file name to save.</p>
+</dd>
+<dt><strong>zipped</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool, optional</span></dt>
+<dd><p class="first last">If true, assume that the response is a zipped directory and attempt 
+to extract contained files into the directory containing file_path. 
+Default is False.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<dl class="last docutils">
+<dt><a class="reference internal" href="#allensdk.api.api.Api.construct_well_known_file_download_url" title="allensdk.api.api.Api.construct_well_known_file_download_url"><code class="xref py py-obj docutils literal notranslate"><span class="pre">construct_well_known_file_download_url</span></code></a></dt>
+<dd>Can be used to construct the url.</dd>
+</dl>
+</div>
+<p class="rubric">References</p>
+<table class="docutils citation" frame="void" id="r099781a1d33c-1" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[1]</a></td><td>Allen Brain Atlas Data Portal: <a class="reference external" href="http://help.brain-map.org/display/api/Downloading+a+WellKnownFile">Downloading a WellKnownFile</a>.</td></tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.api.Api.retrieve_parsed_json_over_http">
+<code class="descname">retrieve_parsed_json_over_http</code><span class="sig-paren">(</span><em>url</em>, <em>post=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/api.html#Api.retrieve_parsed_json_over_http"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.api.Api.retrieve_parsed_json_over_http" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the document and put it in a Python data structure</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>url</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">Full API query url.</p>
+</dd>
+<dt><strong>post</strong> <span class="classifier-delimiter">:</span> <span class="classifier">boolean</span></dt>
+<dd><p class="first last">True does an HTTP POST, False (default) encodes the URL and does a GET</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>dict</strong></dt>
+<dd><p class="first last">Result document as parsed by the JSON library.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.api.Api.retrieve_xml_over_http">
+<code class="descname">retrieve_xml_over_http</code><span class="sig-paren">(</span><em>url</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/api.html#Api.retrieve_xml_over_http"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.api.Api.retrieve_xml_over_http" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the document and put it in a Python data structure</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>url</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">Full API query url.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>string</strong></dt>
+<dd><p class="first last">Unparsed xml string.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.api.Api.set_api_urls">
+<code class="descname">set_api_urls</code><span class="sig-paren">(</span><em>api_base_url_string</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/api.html#Api.set_api_urls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.api.Api.set_api_urls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the internal RMA and well known file download endpoint urls
+based on a api server endpoint.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>api_base_url_string</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">url of the api to point to</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.api.Api.set_default_working_directory">
+<code class="descname">set_default_working_directory</code><span class="sig-paren">(</span><em>working_directory</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/api.html#Api.set_default_working_directory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.api.Api.set_default_working_directory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the working directory where files will be saved.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>working_directory</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first last">the absolute path string of the working directory.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.api.api.stream_file_over_http">
+<code class="descclassname">allensdk.api.api.</code><code class="descname">stream_file_over_http</code><span class="sig-paren">(</span><em>url</em>, <em>file_path</em>, <em>timeout=(9.05</em>, <em>31.1)</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/api.html#stream_file_over_http"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.api.stream_file_over_http" title="Permalink to this definition">¶</a></dt>
+<dd><p>Supply an http get request and stream the response to a file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>url</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Send the request to this url</p>
+</dd>
+<dt><strong>file_path</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Stream the response to this path</p>
+</dd>
+<dt><strong>timeout</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float or tuple of float, optional</span></dt>
+<dd><p class="first last">Specify a timeout for the request. If a tuple, specify seperate connect 
+and read timeouts.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.api.api.stream_zip_directory_over_http">
+<code class="descclassname">allensdk.api.api.</code><code class="descname">stream_zip_directory_over_http</code><span class="sig-paren">(</span><em>url</em>, <em>directory</em>, <em>members=None</em>, <em>timeout=(9.05</em>, <em>31.1)</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/api.html#stream_zip_directory_over_http"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.api.stream_zip_directory_over_http" title="Permalink to this definition">¶</a></dt>
+<dd><p>Supply an http get request and stream the response to a file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>url</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Send the request to this url</p>
+</dd>
+<dt><strong>directory</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Extract the response to this directory</p>
+</dd>
+<dt><strong>members</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of str, optional</span></dt>
+<dd><p class="first last">Extract only these files</p>
+</dd>
+<dt><strong>timeout</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float or tuple of float, optional</span></dt>
+<dd><p class="first last">Specify a timeout for the request. If a tuple, specify seperate connect 
+and read timeouts.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_space.html">Reference Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="glif_models.html">Generalized LIF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html">Biophysical</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.deprecated.html">allensdk.deprecated module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
+</ul>
+
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allen-sdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    </div>
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalFooter.js"></script>
+
+
+  </body>
+</html>

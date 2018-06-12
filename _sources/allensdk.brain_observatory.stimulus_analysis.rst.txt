@@ -1,0 +1,7 @@
+allensdk.brain\_observatory.stimulus\_analysis module
+=====================================================
+
+.. automodule:: allensdk.brain_observatory.stimulus_analysis
+    :members:
+    :undoc-members:
+    :show-inheritance:

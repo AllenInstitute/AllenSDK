@@ -1,0 +1,432 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>allensdk.brain_observatory.roi_masks module &#8212; Allen SDK dev documentation</title>
+    <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="allensdk.brain_observatory.session_analysis module" href="allensdk.brain_observatory.session_analysis.html" />
+    <link rel="prev" title="allensdk.brain_observatory.r_neuropil module" href="allensdk.brain_observatory.r_neuropil.html" /> 
+  </head><body>
+<link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
+<script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var _pSupressBrowserFlashWarning = true;
+    var _pTabId = "pHome";
+    var _pMoreProjectsId = "pMoreProjects";
+    var _pImagePath = "http://www.brain-map.org/assets/images/";
+    var _pSiteWarnings = function() {
+        this.show_warning() = {};
+    }
+</script>
+<script type="text/javascript">
+    function initialize() {
+        /*** do your stuff, then initialize the portal plugin ***/
+        _pPortalOnLoad();
+    }
+</script>
+<style>
+  #header_content > a {
+  display: inline-block;
+  width: 250px;
+  height: 75px;
+  background-image:url("_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-size: 235px 37px;
+  background-position: 0px 20px;
+  background-repeat: no-repeat;
+  }
+</style>
+
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
+<link rel="stylesheet" type="text/css" href="_static/external_assets/stylesheets/common_layout.css" />
+
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-allensdk.brain_observatory.roi_masks">
+<span id="allensdk-brain-observatory-roi-masks-module"></span><h1>allensdk.brain_observatory.roi_masks module<a class="headerlink" href="#module-allensdk.brain_observatory.roi_masks" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="allensdk.brain_observatory.roi_masks.Mask">
+<em class="property">class </em><code class="descclassname">allensdk.brain_observatory.roi_masks.</code><code class="descname">Mask</code><span class="sig-paren">(</span><em>image_w</em>, <em>image_h</em>, <em>label</em>, <em>mask_group</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/roi_masks.html#Mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.roi_masks.Mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Abstract class to represent image segmentation mask. Its two
+main subclasses are RoiMask and NeuropilMask. The former represents
+the mask of a region of interest (ROI), such as a cell observed in
+2-photon imaging. The latter represents the neuropil around that cell,
+and is useful when subtracting the neuropil signal from the measured
+ROI signal.</p>
+<p>This class should not be instantiated directly.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>image_w: integer</strong></dt>
+<dd><p class="first last">Width of image that ROI resides in</p>
+</dd>
+<dt><strong>image_h: integer</strong></dt>
+<dd><p class="first last">Height of image that ROI resides in</p>
+</dd>
+<dt><strong>label: text</strong></dt>
+<dd><p class="first last">User-defined text label to identify mask</p>
+</dd>
+<dt><strong>mask_group: integer</strong></dt>
+<dd><p class="first last">User-defined number to help put masks into different categories</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="allensdk.brain_observatory.roi_masks.Mask.get_mask_plane">
+<code class="descname">get_mask_plane</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/roi_masks.html#Mask.get_mask_plane"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.roi_masks.Mask.get_mask_plane" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns mask content on full-size image plane</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>numpy 2D array [img_rows][img_cols]</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.roi_masks.Mask.init_by_pixels">
+<code class="descname">init_by_pixels</code><span class="sig-paren">(</span><em>border</em>, <em>pix_list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/roi_masks.html#Mask.init_by_pixels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.roi_masks.Mask.init_by_pixels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize mask using a list of mask pixels</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>border: float[4]</strong></dt>
+<dd><p class="first last">Coordinates defining useable area of image. See create_roi_mask()</p>
+</dd>
+<dt><strong>pix_list: integer[][2]</strong></dt>
+<dd><p class="first last">List of pixel coordinates (x,y) that define the mask</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="allensdk.brain_observatory.roi_masks.NeuropilMask">
+<em class="property">class </em><code class="descclassname">allensdk.brain_observatory.roi_masks.</code><code class="descname">NeuropilMask</code><span class="sig-paren">(</span><em>w</em>, <em>h</em>, <em>label</em>, <em>mask_group</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/roi_masks.html#NeuropilMask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.roi_masks.NeuropilMask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#allensdk.brain_observatory.roi_masks.Mask" title="allensdk.brain_observatory.roi_masks.Mask"><code class="xref py py-class docutils literal notranslate"><span class="pre">allensdk.brain_observatory.roi_masks.Mask</span></code></a></p>
+<dl class="method">
+<dt id="allensdk.brain_observatory.roi_masks.NeuropilMask.init_by_mask">
+<code class="descname">init_by_mask</code><span class="sig-paren">(</span><em>border</em>, <em>array</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/roi_masks.html#NeuropilMask.init_by_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.roi_masks.NeuropilMask.init_by_mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize mask using spatial mask</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>border: float[4]</strong></dt>
+<dd><p class="first last">Coordinates defining useable area of image. See create_roi_mask().</p>
+</dd>
+<dt><strong>array: integer[image height][image width]</strong></dt>
+<dd><p class="first last">Image-sized array that describes the mask. Active parts of the
+mask should have values &gt;0. Background pixels must be zero</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="allensdk.brain_observatory.roi_masks.RoiMask">
+<em class="property">class </em><code class="descclassname">allensdk.brain_observatory.roi_masks.</code><code class="descname">RoiMask</code><span class="sig-paren">(</span><em>image_w</em>, <em>image_h</em>, <em>label</em>, <em>mask_group</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/roi_masks.html#RoiMask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.roi_masks.RoiMask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#allensdk.brain_observatory.roi_masks.Mask" title="allensdk.brain_observatory.roi_masks.Mask"><code class="xref py py-class docutils literal notranslate"><span class="pre">allensdk.brain_observatory.roi_masks.Mask</span></code></a></p>
+<dl class="method">
+<dt id="allensdk.brain_observatory.roi_masks.RoiMask.init_by_mask">
+<code class="descname">init_by_mask</code><span class="sig-paren">(</span><em>border</em>, <em>array</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/roi_masks.html#RoiMask.init_by_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.roi_masks.RoiMask.init_by_mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize mask using spatial mask</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>border: float[4]</strong></dt>
+<dd><p class="first last">Coordinates defining useable area of image. See create_roi_mask().</p>
+</dd>
+<dt><strong>roi_mask: integer[image height][image width]</strong></dt>
+<dd><p class="first last">Image-sized array that describes the mask. Active parts of the
+mask should have values &gt;0. Background pixels must be zero</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.roi_masks.calculate_roi_and_neuropil_traces">
+<code class="descclassname">allensdk.brain_observatory.roi_masks.</code><code class="descname">calculate_roi_and_neuropil_traces</code><span class="sig-paren">(</span><em>movie_h5</em>, <em>roi_mask_list</em>, <em>motion_border</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/roi_masks.html#calculate_roi_and_neuropil_traces"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.roi_masks.calculate_roi_and_neuropil_traces" title="Permalink to this definition">¶</a></dt>
+<dd><p>get roi and neuropil masks</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.roi_masks.calculate_traces">
+<code class="descclassname">allensdk.brain_observatory.roi_masks.</code><code class="descname">calculate_traces</code><span class="sig-paren">(</span><em>stack</em>, <em>mask_list</em>, <em>block_size=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/roi_masks.html#calculate_traces"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.roi_masks.calculate_traces" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the average response of the specified masks in the
+image stack</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>stack: float[image height][image width]</strong></dt>
+<dd><p class="first last">Image stack that masks are applied to</p>
+</dd>
+<dt><strong>mask_list: list&lt;Mask&gt;</strong></dt>
+<dd><p class="first last">List of masks</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>float[number masks][number frames]</strong></dt>
+<dd><p class="first last">This is the average response for each Mask in each image frame</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.roi_masks.create_neuropil_mask">
+<code class="descclassname">allensdk.brain_observatory.roi_masks.</code><code class="descname">create_neuropil_mask</code><span class="sig-paren">(</span><em>roi</em>, <em>border</em>, <em>combined_binary_mask</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/roi_masks.html#create_neuropil_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.roi_masks.create_neuropil_mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Conveninece function to create and initializes a Neuropil mask.
+Neuropil masks are defined as the region around an ROI, up to 13
+pixels out, that does not include other ROIs</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>roi: RoiMask object</strong></dt>
+<dd><p class="first last">The ROI that the neuropil masks will be based on</p>
+</dd>
+<dt><strong>border: float[4]</strong></dt>
+<dd><p class="first last">Coordinates defining useable area of image. See create_roi_mask().</p>
+</dd>
+<dt><strong>combined_binary_mask</strong></dt>
+<dd><p class="first last">List of pixel coordinates (x,y) that define the mask</p>
+</dd>
+<dt><strong>combined_binary_mask: integer[image_h][image_w]</strong></dt>
+<dd><p class="first last">Image-sized array that shows the position of all ROIs in the
+image. ROI masks should have a value of one. Background pixels
+must be zero. In other words, ithe combined_binary_mask is a
+bitmap union of all ROI masks</p>
+</dd>
+<dt><strong>label: text</strong></dt>
+<dd><p class="first last">User-defined text label to identify the mask</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>NeuropilMask object</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.roi_masks.create_roi_mask">
+<code class="descclassname">allensdk.brain_observatory.roi_masks.</code><code class="descname">create_roi_mask</code><span class="sig-paren">(</span><em>image_w</em>, <em>image_h</em>, <em>border</em>, <em>pix_list=None</em>, <em>roi_mask=None</em>, <em>label=None</em>, <em>mask_group=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/roi_masks.html#create_roi_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.roi_masks.create_roi_mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Conveninece function to create and initializes an RoiMask</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>image_w: integer</strong></dt>
+<dd><p class="first last">Width of image that ROI resides in</p>
+</dd>
+<dt><strong>image_h: integer</strong></dt>
+<dd><p class="first last">Height of image that ROI resides in</p>
+</dd>
+<dt><strong>border: float[4]</strong></dt>
+<dd><p class="first">Coordinates defining useable area of image. If the entire image
+is usable, and masks are valid anywhere in the image, this should
+be [(image_w-1), 0, (image_h-1), 0]. The following constants
+help describe the array order:</p>
+<blockquote>
+<div><p>RIGHT_SHIFT = 0</p>
+<p>LEFT_SHIFT = 1</p>
+<p>DOWN_SHIFT = 2</p>
+<p>UP_SHIFT = 3</p>
+</div></blockquote>
+<p class="last">When parts of the image are unusable, for example due motion
+correction shifting of different image frames, the border array
+should store the usable image area</p>
+</dd>
+<dt><strong>pix_list: integer[][2]</strong></dt>
+<dd><p class="first last">List of pixel coordinates (x,y) that define the mask</p>
+</dd>
+<dt><strong>roi_mask: integer[image_h][image_w]</strong></dt>
+<dd><p class="first last">Image-sized array that describes the mask. Active parts of the
+mask should have values &gt;0. Background pixels must be zero</p>
+</dd>
+<dt><strong>label: text</strong></dt>
+<dd><p class="first last">User-defined text label to identify mask</p>
+</dd>
+<dt><strong>mask_group: integer</strong></dt>
+<dd><p class="first last">User-defined number to help put masks into different categories</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>RoiMask object</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.roi_masks.create_roi_mask_array">
+<code class="descclassname">allensdk.brain_observatory.roi_masks.</code><code class="descname">create_roi_mask_array</code><span class="sig-paren">(</span><em>rois</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/roi_masks.html#create_roi_mask_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.roi_masks.create_roi_mask_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create full image mask array from list of RoiMasks.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>rois: list&lt;RoiMask&gt;</strong></dt>
+<dd><p class="first last">List of roi masks.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>np.ndarray: NxWxH array</strong></dt>
+<dd><p class="first last">Boolean array of of len(rois) image masks.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_space.html">Reference Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="glif_models.html">Generalized LIF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html">Biophysical</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.deprecated.html">allensdk.deprecated module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
+</ul>
+
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allen-sdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    </div>
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalFooter.js"></script>
+
+
+  </body>
+</html>
