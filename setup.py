@@ -41,7 +41,7 @@ setup(
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Science/Research',
-        'License :: Allen Institute Software License',
+        'License :: Other/Proprietary License', # Allen Institute Software License
         'Natural Language :: English',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 2.7',
