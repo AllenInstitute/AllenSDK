@@ -12,10 +12,10 @@ EXAMPLE_DIR = os.path.join(
     'examples_root',
     'examples'
 )
+EXAMPLES = [filename for filename in os.listdir(EXAMPLE_DIR) if filename.split('.')[-1] == 'py']
 
 
 @pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true', reason="partial testing")
-def test_inline_examples():
-    for filename in os.listdir(EXAMPLE_DIR):
-        if filename.split('.')[-1] == 'py':
-            sp.check_call(['python', os.path.join(EXAMPLE_DIR, filename)])
+@pytest.mark.parametrize('script_name', EXAMPLES)
+def test_inline_examples(script_name):
+    sp.check_call(['python', os.path.join(EXAMPLE_DIR, script_name)])
