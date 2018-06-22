@@ -72,6 +72,6 @@ example Dockerfiles are available.
  
  #. Start a Jupyter Notebook::
  
-     cd allensdk/doc_template/examples/nb
+     cd allensdk/doc_template/examples_root/examples/nb
      jupyter-notebook --ip=* --no-browser
      
