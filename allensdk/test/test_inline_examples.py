@@ -17,5 +17,7 @@ EXAMPLES = [filename for filename in os.listdir(EXAMPLE_DIR) if filename.split('
 
 @pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true', reason="partial testing")
 @pytest.mark.parametrize('script_name', EXAMPLES)
-def test_inline_examples(script_name):
-    sp.check_call(['python', os.path.join(EXAMPLE_DIR, script_name)])
+def test_inline_examples(script_name, tmpdir_factory):
+
+    data_dir = tmpdir_factory.mktemp('inline_examples_data')
+    sp.check_call(['python', os.path.join(EXAMPLE_DIR, script_name)], cwd=str(data_dir))
