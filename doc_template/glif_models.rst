@@ -104,6 +104,7 @@ these ``NaN`` values generated during action potentials (in this case 0.05 Volts
 If you would like to run a single sweep instead of all sweeps, try the following:
 
 .. literalinclude:: examples_root/examples/glif_ex4.py
+    :lines: 1-26
 
 .. note:: 
     
@@ -114,7 +115,8 @@ If you would like to run a single sweep instead of all sweeps, try the following
 
 If you would like to plot the outputs of this simulation using numpy and matplotlib, try:
 
-.. literalinclude:: examples_root/examples/glif_ex5.py
+.. literalinclude:: examples_root/examples/glif_ex4.py
+    :lines: 29-80
 
 .. note:: 
 
@@ -169,7 +171,8 @@ AScurrent_reset_method    Reset afterspike current coefficients after a spike oc
 The GLIF neuron configuration files available from the Allen Brain Atlas API use built-in
 methods, however you can supply your own custom method if you like:
 
-.. literalinclude:: examples_root/examples/glif_ex6.py    
+.. literalinclude:: examples_root/examples/glif_ex4.py    
+    :lines: 83-
 
 Notice that the function is allowed to take custom parameters (here ``custom_param_a`` and 
 ``custom_param_b``), which are configured on method initialization from a dictionary. For more details, 
