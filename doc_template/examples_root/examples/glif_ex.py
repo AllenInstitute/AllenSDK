@@ -1,3 +1,7 @@
+# set matplotlib headless - this turns off the production of visible plots!
+import matplotlib
+matplotlib.use("Agg")
+
 #===============================================================================
 # example 1
 #===============================================================================
@@ -30,7 +34,7 @@ import allensdk.core.json_utilities as json_utilities
 from allensdk.model.glif.glif_neuron import GlifNeuron
 
 # initialize the neuron
-neuron_config = json_utilities.read('neuron_config.json')
+neuron_config = json_utilities.read('neuron_config.json')['566302806']
 neuron = GlifNeuron.from_dict(neuron_config)
 
 # make a short square pulse. stimulus units should be in Amps.
@@ -55,14 +59,14 @@ import allensdk.core.json_utilities as json_utilities
 from allensdk.model.glif.glif_neuron import GlifNeuron
 from allensdk.model.glif.simulate_neuron import simulate_neuron
 
-neuron_config = json_utilities.read('neuron_config.json')
+neuron_config = json_utilities.read('neuron_config.json')['566302806']
 ephys_sweeps = json_utilities.read('ephys_sweeps.json')
 ephys_file_name = 'stimulus.nwb'
 
 neuron = GlifNeuron.from_dict(neuron_config)
 
-sweep_numbers = [ s['sweep_number'] for s in ephys_sweeps 
-                  if s['stimulus_units'] == 'Amps' ]
+sweep_numbers = [ s['sweep_number'] for s in ephys_sweeps if s['stimulus_units'] == 'Amps' ]
+sweep_numbers = sweep_numbers[:1] # for the sake of a speedy example, just run the first one
 simulate_neuron(neuron, sweep_numbers, ephys_file_name, ephys_file_name, 0.05)
 
 #===============================================================================
@@ -73,7 +77,7 @@ import allensdk.core.json_utilities as json_utilities
 from allensdk.model.glif.glif_neuron import GlifNeuron
 from allensdk.core.nwb_data_set import NwbDataSet
 
-neuron_config = json_utilities.read('neuron_config.json')
+neuron_config = json_utilities.read('neuron_config.json')['566302806']
 ephys_sweeps = json_utilities.read('ephys_sweeps.json')
 ephys_file_name = 'stimulus.nwb'
 
@@ -163,7 +167,7 @@ def custom_voltage_reset_rule(neuron, voltage_t0, custom_param_a, custom_param_b
     return custom_param_a * voltage_t0 + custom_param_b
 
 # initialize a neuron from a neuron config file
-neuron_config = json_utilities.read('neuron_config.json')
+neuron_config = json_utilities.read('neuron_config.json')['566302806']
 neuron = GlifNeuron.from_dict(neuron_config)
 
 # configure a new method and overwrite the neuron's old method
