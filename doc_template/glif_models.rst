@@ -68,7 +68,7 @@ using the :py:class:`GlifApi <allensdk.api.queries.glif_api.GlifApi>`
 class:
 
 .. literalinclude:: examples_root/examples/glif_ex.py
-    :lines: 5-23
+    :lines: 9-27
 
 Running a GLIF Simulation
 -------------------------
@@ -77,7 +77,7 @@ To run a GLIF simulation, the most important file you you need is the ``neuron_c
 JSON file.  You can use this file to instantiate a simulator and feed in your own stimulus:
 
 .. literalinclude:: examples_root/examples/glif_ex.py
-    :lines: 29-47
+    :lines: 33-51
 
 .. note:: 
     
@@ -91,7 +91,7 @@ the Allen SDK provides the :py:mod:`allensdk.core.model.glif.simulate_neuron`
 module for simulating all sweeps presented to a cell and storing them in the NWB format:
 
 .. literalinclude:: examples_root/examples/glif_ex.py
-    :lines: 53-66
+    :lines: 57-70
 
 .. warning::
 
@@ -107,7 +107,7 @@ these ``NaN`` values generated during action potentials (in this case 0.05 Volts
 If you would like to run a single sweep instead of all sweeps, try the following:
 
 .. literalinclude:: examples_root/examples/glif_ex.py
-    :lines: 72-97
+    :lines: 76-101
 
 .. note:: 
     
@@ -119,7 +119,7 @@ If you would like to run a single sweep instead of all sweeps, try the following
 If you would like to plot the outputs of this simulation using numpy and matplotlib, try:
 
 .. literalinclude:: examples_root/examples/glif_ex.py
-    :lines: 103-154
+    :lines: 107-158
 
 .. note:: 
 
@@ -175,7 +175,7 @@ The GLIF neuron configuration files available from the Allen Brain Atlas API use
 methods, however you can supply your own custom method if you like:
 
 .. literalinclude:: examples_root/examples/glif_ex.py    
-    :lines: 160-
+    :lines: 164-178
 
 Notice that the function is allowed to take custom parameters (here ``custom_param_a`` and 
 ``custom_param_b``), which are configured on method initialization from a dictionary. For more details, 
