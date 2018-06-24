@@ -1,3 +1,7 @@
+#===============================================================================
+# example 1
+#===============================================================================
+
 from allensdk.core.mouse_connectivity_cache import MouseConnectivityCache
 
 # tell the cache class what resolution (in microns) of data you want to download
@@ -14,3 +18,11 @@ experiments = mcc.get_experiments(file_name='non_cre.json',
 # download the projection density volume for one of the experiments
 pd = mcc.get_projection_density(experiments[0]['id'])
 
+#===============================================================================
+# example 2
+#===============================================================================
+
+import nrrd
+
+file_name = 'experiment_644250774/projection_density_25.nrrd'
+data_array, metadata = nrrd.read(file_name)
