@@ -1013,7 +1013,6 @@ def fit_fi_slope(ext):
     A = np.vstack([x, np.ones_like(x)]).T
 
     m, c = np.linalg.lstsq(A, y)[0]
-
     return m
 
 
