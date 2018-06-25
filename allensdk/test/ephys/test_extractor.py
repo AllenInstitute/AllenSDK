@@ -33,9 +33,13 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
+
+from unittest import mock
+
 import pytest
 import numpy as np
 from allensdk.ephys.ephys_extractor import EphysSweepSetFeatureExtractor, input_resistance
+import allensdk.ephys.ephys_extractor as ephys_extractor
 import os
 path = os.path.dirname(__file__)
 
@@ -143,3 +147,29 @@ def test_extractor_input_resistance():
     ext = EphysSweepSetFeatureExtractor([t, t], [v1, v2], [i1, i2])
     ri = input_resistance(ext)
     assert np.allclose(ri, 100.)
+
+
+def test_fit_fi_slope():
+
+    nsweeps = 5
+    weights = np.array([ 2, 1 ])
+
+    amps = np.random.rand(nsweeps)
+    iteramps = iter(amps)
+
+    design = np.array([amps, np.ones_like(amps)]).T
+    rates = np.dot(design, weights)
+    build_stim_amps = lambda: lambda sweep: next(iteramps)
+
+    class Ext(object):
+        def sweeps(self):
+            return np.zeros([nsweeps])
+        def sweep_features(self, key):
+            return rates
+
+    with mock.patch(
+        'allensdk.ephys.ephys_extractor._step_stim_amp', 
+        new_callable=build_stim_amps) as p:
+
+        slope_obt = ephys_extractor.fit_fi_slope(Ext())
+        assert(np.allclose(weights[0], slope_obt))
