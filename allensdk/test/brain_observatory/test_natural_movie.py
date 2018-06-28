@@ -99,7 +99,7 @@ def mock_sweep_response():
 @patch.object(StimulusAnalysis,
               'get_speed_tuning',
               mock_speed_tuning())
-@patch.object(StimulusAnalysis,
+@patch.object(NaturalMovie,
               'get_sweep_response',
               mock_sweep_response())
 @pytest.mark.parametrize(
