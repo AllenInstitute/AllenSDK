@@ -33,12 +33,13 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-from .eventdetection import detect_events
-from statsmodels.sandbox.stats.multicomp import multipletests
-import numpy as np
-from .utilities import get_A, get_A_blur, get_shuffle_matrix, get_components, dict_generator
-from .postprocessing import run_postprocessing
 import h5py
+import numpy as np
+
+from .eventdetection import detect_events
+from .postprocessing import run_postprocessing
+from .utilities import (get_A, get_A_blur, get_shuffle_matrix, get_components,
+                        dict_generator, holm_sidak_correction)
 
 def events_to_pvalues_no_fdr_correction(data, event_vector, A, number_of_shuffles=5000, response_detection_error_std_dev=.1, seed=1):
 
@@ -78,7 +79,7 @@ def compute_receptive_field(data, cell_index, stimulus, **kwargs):
 
 
 
-    fdr_corrected_pvalues = multipletests(pvalues, alpha=alpha)[1]
+    fdr_corrected_pvalues = holm_sidak_correction(pvalues, alpha=alpha)[1]
 
     fdr_corrected_pvalues_on = fdr_corrected_pvalues[:number_of_pixels].reshape(s1, s2)
     _fdr_mask_on = np.zeros_like(pvalues_on, dtype=np.bool)

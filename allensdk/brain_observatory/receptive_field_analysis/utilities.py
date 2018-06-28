@@ -291,3 +291,56 @@ def get_attribute_dict(rf):
 
     return attribute_dict
 
+def holm_sidak_correction(p_values, alpha=0.05):
+    """Multiple test correction algorithm.
+
+    Controls the family wise error rate using the Holm-Bonferonni method with
+    Sidak corrections. The Holm-Bonferroni method is uniformly more powerful than
+    the Bonferroni correction, and if the hypotheses tests are not negatively
+    dependent, using Sidak corrections provides an even more powerful test.
+
+
+    Parameters
+    ----------
+    p_values : array-like
+        The uncorrected p_values from the hypotheses tests. p_values must be
+        one dimensional, and be bounded within 0 and 1 (inclusive).
+
+    alpha : float, optional (default: 0.05)
+        The significance level at which to reject a hypothesis.
+
+
+    Returns
+    -------
+    reject : array
+        Boolean array indicating wether there is sufficient evidence to reject
+        the null hypothesis of each test.
+
+    corrected : array
+        Corrected p-values.
+    """
+    p_values = np.asarray(p_values)
+    n_tests = len(p_values)
+
+    if p_values.ndim != 1:
+        raise ValueError('p_values must be 1 dimensional list or array')
+
+    if np.any((p_values < 0) | (p_values > 1)):
+        raise ValueError('p_valuse must be between 0 and 1 (inclusive)')
+
+    # sort p values
+    sort_idx = np.argsort(p_values)
+    p_values = p_values[sort_idx]
+
+    # correct p_values
+    corrected = 1 - (1 - p_values) ** np.arange(n_tests, 0, -1)
+    np.maximum.accumulate(corrected, out=corrected)
+
+    # return unsorted
+    unsort_idx = np.argsort(sort_idx)
+    corrected = corrected[unsort_idx]
+
+    # return rejected hypotheses
+    reject = corrected < alpha
+
+    return reject, corrected
