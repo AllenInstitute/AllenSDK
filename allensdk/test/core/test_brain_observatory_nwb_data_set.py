@@ -64,6 +64,7 @@ else:
 
 @pytest.fixture(params=NWB_FLAVORS)
 def data_set(request):
+    assert os.path.exists(request.param)
     data_set = BrainObservatoryNwbDataSet(request.param)
 
     return data_set
@@ -103,14 +104,10 @@ def test_acceptance(data_set):
     data_set.get_motion_correction()
 
 
-@pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
-                    reason="test NWB file not available")
 def test_get_roi_ids(data_set):
     ids = data_set.get_roi_ids()
     assert len(ids) == len(data_set.get_cell_specimen_ids())
 
-@pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
-                    reason="test NWB file not available")
 def test_get_metadata(data_set):
     md = data_set.get_metadata()
 
@@ -128,8 +125,6 @@ def test_get_metadata(data_set):
     
 
 
-@pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
-                    reason="test NWB file not available")
 def test_get_cell_specimen_indices(data_set):
     inds = data_set.get_cell_specimen_indices([])
     assert len(inds) == 0
@@ -143,8 +138,6 @@ def test_get_cell_specimen_indices(data_set):
     assert inds[0] == 0
 
 
-@pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
-                    reason="test NWB file not available")
 def test_get_fluorescence_traces(data_set):
     ids = data_set.get_cell_specimen_ids()
 
@@ -159,8 +152,6 @@ def test_get_fluorescence_traces(data_set):
     assert traces.shape[0] == 1
 
 
-@pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
-                    reason="test NWB file not available")
 def test_get_neuropil_traces(data_set):
     ids = data_set.get_cell_specimen_ids()
 
@@ -175,8 +166,6 @@ def test_get_neuropil_traces(data_set):
     assert traces.shape[0] == 1
 
 
-@pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
-                    reason="test NWB file not available")
 def test_get_dff_traces(data_set):
     ids = data_set.get_cell_specimen_ids()
 
@@ -190,8 +179,6 @@ def test_get_dff_traces(data_set):
     timestamps, traces = data_set.get_dff_traces([ids[0]])
     assert traces.shape[0] == 1
 
-@pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
-                    reason="test NWB file not available")
 def test_get_neuropil_r(data_set):
 
     ids = data_set.get_cell_specimen_ids()
@@ -205,8 +192,6 @@ def test_get_neuropil_r(data_set):
     r = data_set.get_neuropil_r(short_list)
     assert len(short_list) == len(r)
 
-@pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
-                    reason="test NWB file not available")
 def test_get_corrected_fluorescence_traces(data_set):
     ids = data_set.get_cell_specimen_ids()
 
@@ -221,8 +206,6 @@ def test_get_corrected_fluorescence_traces(data_set):
     assert traces.shape[0] == 1
 
 
-@pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
-                    reason="test NWB file not available")
 def test_get_roi_mask(data_set):
     ids = data_set.get_cell_specimen_ids()
     roi_masks = data_set.get_roi_mask()
@@ -238,8 +221,6 @@ def test_get_roi_mask(data_set):
     assert len(roi_masks) == 1
 
 
-@pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
-                    reason="test NWB file not available")
 def test_get_roi_mask_array(data_set):
     ids = data_set.get_cell_specimen_ids()
     arr = data_set.get_roi_mask_array()
@@ -254,8 +235,6 @@ def test_get_roi_mask_array(data_set):
         assert str(e).startswith("Cell specimen not found")
 
 
-@pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
-                    reason="test NWB file not available")
 def test_get_stimulus_epoch_table(data_set):
 
     summary_df = data_set.get_stimulus_epoch_table()
@@ -270,8 +249,6 @@ def test_get_stimulus_epoch_table(data_set):
     else:
         raise NotImplementedError('Code not tested for session of type: %s' % session_type)
 
-@pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
-                    reason="test NWB file not available")
 def test_get_stimulus_table_master(data_set):
 
     master_df = data_set.get_stimulus_table('master')
