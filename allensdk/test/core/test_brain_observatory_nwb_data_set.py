@@ -49,15 +49,12 @@ from test_h5_utilities import mem_h5
 
 NWB_FLAVORS = []
 
-
 if 'TEST_NWB_FILES' in os.environ:
     nwb_list_file = os.environ['TEST_NWB_FILES']
 else:
     nwb_list_file = resource_filename(__name__, 'nwb_files.txt')
 
-if nwb_list_file == 'skip':
-    NWB_FLAVORS = []
-else:
+if os.environ.get('TEST_COMPLETE', None) == 'true':
     with open(nwb_list_file, 'r') as f:
         NWB_FLAVORS = [l.strip() for l in f]
 
