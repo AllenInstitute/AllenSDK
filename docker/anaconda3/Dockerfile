@@ -3,7 +3,7 @@
 # docker build --tag alleninstitute/allensdk:anaconda3 .
 # docker run -it alleninstitute/allensdk:anaconda3 /bin/bash
 #
-FROM continuumio/anaconda3
+FROM continuumio/miniconda3
 
 MAINTAINER David Feng <davidf@alleninstitute.org>
 
@@ -13,3 +13,5 @@ COPY shared/apt_get_dependencies.sh ./shared/
 RUN /bin/bash shared/apt_get_dependencies.sh
 COPY shared/conda_27.sh ./shared/
 RUN /bin/bash shared/conda_27.sh
+COPY shared/conda_36.sh ./shared/
+RUN /bin/bash shared/conda_36.sh
