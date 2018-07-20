@@ -34,11 +34,9 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import six
-import matplotlib.colors as mcolors
 import numpy as np
 import scipy.ndimage.interpolation as spndi
 from scipy.misc import imresize
-import matplotlib.pyplot as plt
 from allensdk.api.cache import memoize
 import itertools
 
@@ -587,6 +585,7 @@ class Monitor(object):
         return mask
 
     def show_image(self, img, ax=None, show=True, mask=False, warp=False, origin='lower'):
+        import matplotlib.pyplot as plt
 
         assert img.shape == (self.n_pixels_r, self.n_pixels_c) or img.shape == (self.n_pixels_r, self.n_pixels_c, 4)
 
