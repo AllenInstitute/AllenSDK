@@ -406,7 +406,7 @@ class BrainObservatoryNwbDataSet(object):
 
         return timestamps, fc
 
-    def get_cell_specimen_indices(self, cell_specimen_ids=None):
+    def get_cell_specimen_indices(self, cell_specimen_ids):
         ''' Given a list of cell specimen ids, return their index based on their order in this file.
 
         Parameters
@@ -416,7 +416,7 @@ class BrainObservatoryNwbDataSet(object):
         '''
 
         all_cell_specimen_ids = list(self.get_cell_specimen_ids())
-
+        
         try:
             inds = [list(all_cell_specimen_ids).index(i)
                     for i in cell_specimen_ids]

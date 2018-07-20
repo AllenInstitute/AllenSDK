@@ -1007,13 +1007,12 @@ def fit_fi_slope(ext):
     if len(ext.sweeps()) < 2:
         raise ft.FeatureError("Cannot fit f-I curve slope with less than two suprathreshold sweeps")
 
-    x = np.array(map(_step_stim_amp, ext.sweeps()))
+    x = np.array(list(map(_step_stim_amp, ext.sweeps())))
     y = ext.sweep_features("avg_rate")
 
     A = np.vstack([x, np.ones_like(x)]).T
 
     m, c = np.linalg.lstsq(A, y)[0]
-
     return m
 
 
