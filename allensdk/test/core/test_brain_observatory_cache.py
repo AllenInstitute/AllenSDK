@@ -107,7 +107,7 @@ def brain_observatory_cache(md_temp_dir):
                    mock_open(read_data=manifest_data)):
             # Download a list of all targeted areas
             manifest_file = os.path.join(md_temp_dir, "boc", "manifest.json")
-            boc = BrainObservatoryCache(manifest_file=manifest_file,
+            boc = BrainObservatoryCache(manifest_file=str(manifest_file),
                                         base_uri='http://api.brain-map.org')
 
     return boc
