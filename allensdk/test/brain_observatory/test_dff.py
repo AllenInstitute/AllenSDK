@@ -110,5 +110,5 @@ def test_calculate_dff():
     with patch("os.makedirs") as mock_makedirs:
         with patch.object(Figure, "savefig") as mock_save:
             y = dff.calculate_dff(x, save_plot_dir="./test")
-    assert mock_makedirs.called_once_with("./test")
-    assert mock_save.called_once()
+    mock_makedirs.assert_called_once_with("./test")
+    mock_save.assert_called_once()
