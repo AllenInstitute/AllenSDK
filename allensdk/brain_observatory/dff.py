@@ -37,25 +37,27 @@ import logging
 import os
 import argparse
 import matplotlib.pyplot as plt
+import warnings
 import h5py
 import numpy as np
+from functools import partial
 
 from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
 
 
 def movingmode_fast(x, kernelsize, y):
-    """ Compute the windowed mode of an array.  A running mode is initialized
+    """Compute the windowed mode of an array.  A running mode is initialized
     with a histogram of values over the initial kernelsize/2 values.  The mode
     is then updated as the kernel moves by adding and subtracting values from
     the histogram.
 
     Parameters
     ----------
-    x: np.ndarray
+    x : np.ndarray
         Array to be analyzed
-    kernelsize: int
+    kernelsize : int
         Size of the moving window
-    y: np.ndarray
+    y : np.ndarray
         Output array to store the results
     """
 
@@ -120,15 +122,15 @@ def movingmode_fast(x, kernelsize, y):
 
 
 def movingaverage(x, kernelsize, y):
-    """ Compute the windowed average of an array.
+    """Compute the windowed average of an array.
 
     Parameters
     ----------
-    x: np.ndarray
+    x : np.ndarray
         Array to be analyzed
-    kernelsize: int
+    kernelsize : int
         Size of the moving window
-    y: np.ndarray
+    y : np.ndarray
         Output array to store the results
     """
 
@@ -151,7 +153,7 @@ def movingaverage(x, kernelsize, y):
 
 
 def plot_onetrace(dff, fc):
-    """ Debug plotting function """
+    """Debug plotting function"""
     qs = np.rint(np.linspace(0, len(dff), 5)).astype(int)
 
     dff_max = dff.max()
@@ -179,8 +181,11 @@ def plot_onetrace(dff, fc):
     return 0
 
 
-def compute_dff(traces, save_plot_dir=None, mode_kernelsize=5400, mean_kernelsize=3000):
-    """ Compute dF/F of a set of traces using a low-pass windowed-mode operator.
+def compute_dff_windowed_mode(traces,
+                              mode_kernelsize=5400,
+                              mean_kernelsize=3000):
+    """Compute dF/F of a set of traces using a low-pass windowed-mode operator.
+
     The operation is basically:
 
         T_mm = windowed_mean(windowed_mode(T))
@@ -189,27 +194,28 @@ def compute_dff(traces, save_plot_dir=None, mode_kernelsize=5400, mean_kernelsiz
 
     Parameters
     ----------
-    traces: np.ndarray
-       2D array of traces to be analyzed
+    traces : np.ndarray
+       2D array of traces to be analyzed.
+    mode_kernelsize : int
+        Window size to use for windowed_mode.
+    mean_kernelsize : int
+        Window size to use for windowed_mean.
 
     Returns
     -------
-    np.ndarray with the same shape as the input array.
+    dff : np.ndarray
+        2D array of dF/F traces.
     """
-
     if mode_kernelsize >= traces.shape[1]:
-        mode_kernelsize = traces.shape[1]//2 # make mode_kernelsize smaller than lenght of trace
+        mode_kernelsize = traces.shape[1] // 2
         logging.warning("Changing mode_kernelsize to " + str(mode_kernelsize))
 
     if mean_kernelsize >= traces.shape[1]:
-        mean_kernelsize = traces.shape[1]//4 # make mean_kernelsize smaller than lenght of trace
+        mean_kernelsize = traces.shape[1] // 4
         logging.warning("Changing mean_kernelsize to " + str(mean_kernelsize))
 
     if mode_kernelsize == 0 or mean_kernelsize == 0:
-        raise Exception("Kernel length is 0!")
-
-    if save_plot_dir is not None and not os.path.exists(save_plot_dir):
-        os.makedirs(save_plot_dir)
+        raise ValueError("Kernel length is 0!")
 
     logging.debug("trace matrix shape: %d %d" %
                   (traces.shape[0], traces.shape[1]))
@@ -232,7 +238,43 @@ def compute_dff(traces, save_plot_dir=None, mode_kernelsize=5400, mean_kernelsiz
 
         logging.debug("finished trace %d/%d" % (n + 1, traces.shape[0]))
 
-        if save_plot_dir:
+    return dff
+
+
+def calculate_dff(traces, dff_computation_cb=None, save_plot_dir=None):
+    """Apply dF/F computation to a set of traces.
+
+    The default computation method is :func:`compute_dff_windowed_mode`
+    using default window parameters.
+
+    Parameters
+    ----------
+    traces : np.ndarray
+        2D array of traces to be analyzed.
+    dff_computation_cb : function
+        Function that takes traces as an argument and returns an array
+        of the same shape that is the calculated dF/F.
+    save_plot_dir : str
+        Directory to save dF/F plots to. By default no plots are saved.
+
+    Returns
+    -------
+    dff : np.ndarray
+        2D array of dF/F traces.
+    """
+    if dff_computation_cb is None:
+        dff_computation_cb = compute_dff_windowed_mode
+
+    dff = dff_computation_cb(traces)
+
+    if save_plot_dir is not None:
+        if not os.path.exists(save_plot_dir):
+            os.makedirs(save_plot_dir)
+
+        for n in range(0, traces.shape[0]):
+            if np.any(np.isnan(traces[n])):
+                continue
+
             fig = plt.figure(figsize=(150, 40))
             plot_onetrace(dff[n, :], traces[n, :])
 
@@ -242,6 +284,36 @@ def compute_dff(traces, save_plot_dir=None, mode_kernelsize=5400, mean_kernelsiz
             plt.close(fig)
 
     return dff
+
+
+def compute_dff(traces,
+                save_plot_dir=None,
+                mode_kernelsize=5400,
+                mean_kernelsize=3000):
+    """ Compute dF/F of a set of traces using a low-pass windowed-mode operator.
+    The operation is basically:
+
+        T_mm = windowed_mean(windowed_mode(T))
+
+        T_dff = (T - T_mm) / T_mm
+
+    Parameters
+    ----------
+    traces: np.ndarray
+       2D array of traces to be analyzed
+
+    Returns
+    -------
+    np.ndarray with the same shape as the input array.
+    """
+    warnings.warn(
+        FutureWarning("The default computation for dff has been changed. Use"
+                      " `calculate_dff` to compute dff now."))
+    computation_cb = partial(compute_dff_windowed_mode,
+                             mode_kernelsize=mode_kernelsize,
+                             mean_kernelsize=mean_kernelsize)
+    return calculate_dff(traces, dff_computation_cb=computation_cb,
+                         save_plot_dir=save_plot_dir)
 
 
 def main():
@@ -264,7 +336,7 @@ def main():
         traces = input_h5["data"].value
         input_h5.close()
 
-    dff = compute_dff(traces, args.plot_dir)
+    dff = calculate_dff(traces, save_plot_dir=args.plot_dir)
 
     # write to "data"
     output_h5 = h5py.File(args.output_h5, "w")

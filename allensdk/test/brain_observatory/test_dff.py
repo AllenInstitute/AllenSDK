@@ -35,6 +35,9 @@
 #
 import allensdk.brain_observatory.dff as dff
 import numpy as np
+import pytest
+from matplotlib.pyplot import Figure
+from mock import patch
 
 
 def test_movingmode_fast():
@@ -74,7 +77,38 @@ def test_movingmode_fast():
 
     assert np.all(x == y)
 
+
 def test_compute_dff():
     x = np.array([[1, 5, 0, 0, 1, 10, 0, 0, 30, 5]])
 
-    dff.compute_dff(x)
+    with pytest.warns(FutureWarning):
+        dff.compute_dff(x)
+
+
+def test_compute_dff_windowed_mode():
+    x = np.array([[1, 5, -2, 3, 1, 10, 1, -2, 30, 5]])
+
+    with pytest.raises(ValueError):
+        dff.compute_dff_windowed_mode(x, mode_kernelsize=0)
+    with pytest.raises(ValueError):
+        dff.compute_dff_windowed_mode(x, mean_kernelsize=0)
+
+    y = dff.compute_dff_windowed_mode(x)
+
+    assert(y.shape == x.shape)
+
+
+def test_calculate_dff():
+    x = np.array([[1, 5, -2, 3, 1, 10, 1, -2, 30, 5]])
+
+    with patch("os.makedirs") as mock_makedirs:
+        with patch.object(Figure, "savefig") as mock_save:
+            y = dff.calculate_dff(x)
+    assert mock_makedirs.call_count == 0
+    assert mock_save.call_count == 0
+
+    with patch("os.makedirs") as mock_makedirs:
+        with patch.object(Figure, "savefig") as mock_save:
+            y = dff.calculate_dff(x, save_plot_dir="./test")
+    assert mock_makedirs.called_once_with("./test")
+    assert mock_save.called_once()
