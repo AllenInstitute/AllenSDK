@@ -41,8 +41,11 @@ import warnings
 import h5py
 import numpy as np
 from functools import partial
+from scipy.ndimage.filters import median_filter
 
 from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
+
+GAUSSIAN_MAD_STD_SCALE = 1.4826
 
 
 def movingmode_fast(x, kernelsize, y):
@@ -134,7 +137,7 @@ def movingaverage(x, kernelsize, y):
         Output array to store the results
     """
 
-    halfsize = int( kernelsize / 2 )
+    halfsize = int(kernelsize / 2)
     sumkernel = np.sum(x[0:halfsize])
     for m in range(0, halfsize):
         sumkernel = sumkernel + x[m + halfsize]
@@ -228,8 +231,9 @@ def compute_dff_windowed_mode(traces,
 
     for n in range(0, traces.shape[0]):
         if np.any(np.isnan(traces[n])):
-            logging.warning("trace for roi %d contains NaNs, setting to NaN", n)
-            dff[n,:] = np.nan
+            logging.warning(
+                "trace for roi %d contains NaNs, setting to NaN", n)
+            dff[n, :] = np.nan
             continue
 
         movingmode_fast(traces[n, :], mode_kernelsize, modeline[:])
@@ -239,6 +243,64 @@ def compute_dff_windowed_mode(traces,
         logging.debug("finished trace %d/%d" % (n + 1, traces.shape[0]))
 
     return dff
+
+
+def compute_dff_windowed_median(traces,
+                                median_kernel_long=5401,
+                                median_kernel_short=101,
+                                noise_kernel_length=31):
+    for k in [median_kernel_long, median_kernel_short, noise_kernel_length]:
+        _check_kernel(k, traces.shape[1])
+
+    dff_traces = np.copy(traces)
+
+    for dff in dff_traces:
+        sigma_f = noise_std(dff, window_length=noise_kernel_length)
+
+        # long timescale median filter for baseline subtraction
+        tf = median_filter(dff, median_kernel_long, mode='constant')
+        dff -= tf
+        dff /= np.maximum(tf, sigma_f)
+
+        sigma_dff = noise_std(dff, window_length=noise_kernel_length)
+
+        # short timescale detrending
+        tf = median_filter(dff, median_kernel_short, mode='constant')
+        tf = np.minimum(tf, 2.5*sigma_dff)
+        dff -= tf
+
+    return dff_traces
+
+
+def _check_kernel(kernel_size, data_size):
+    if kernel_size % 2 == 0 or kernel_size <= 0 or kernel_size >= data_size:
+        raise ValueError("Invalid kernel length {} for data length {}. Kernel "
+                         "length must be positive and odd, and less than data "
+                         "length.".format(kernel_size, data_size))
+
+
+def noise_std(x, window_length=31):
+    """Robust estimate of the standard deviation of the trace noise."""
+    if any(np.isnan(x)):
+        return np.NaN
+    x = x - median_filter(x, window_length, mode='constant')
+    # first pass removing big pos peak outliers
+    x = x[x < 1.5*np.abs(x.min())]
+    rstd = robust_std(x)
+    # second pass removing remaining pos and neg peak outliers
+    x = x[abs(x) < 2.5*rstd]
+    print(x)
+    return robust_std(x)
+
+
+def robust_std(x):
+    """Robust estimate of standard deviation.
+
+    Estimate of the standard deviation using the median absolute
+    deviation of x.
+    """
+    median_absolute_deviation = np.median(np.abs(x - np.median(x)))
+    return GAUSSIAN_MAD_STD_SCALE*median_absolute_deviation
 
 
 def calculate_dff(traces, dff_computation_cb=None, save_plot_dir=None):
@@ -263,7 +325,7 @@ def calculate_dff(traces, dff_computation_cb=None, save_plot_dir=None):
         2D array of dF/F traces.
     """
     if dff_computation_cb is None:
-        dff_computation_cb = compute_dff_windowed_mode
+        dff_computation_cb = compute_dff_windowed_median
 
     dff = dff_computation_cb(traces)
 
@@ -342,6 +404,7 @@ def main():
     output_h5 = h5py.File(args.output_h5, "w")
     output_h5["data"] = dff
     output_h5.close()
+
 
 if __name__ == "__main__":
     main()

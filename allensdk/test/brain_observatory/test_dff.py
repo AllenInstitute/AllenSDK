@@ -37,7 +37,7 @@ import allensdk.brain_observatory.dff as dff
 import numpy as np
 import pytest
 from matplotlib.pyplot import Figure
-from mock import patch
+from mock import patch, MagicMock
 
 
 def test_movingmode_fast():
@@ -98,17 +98,44 @@ def test_compute_dff_windowed_mode():
     assert(y.shape == x.shape)
 
 
+def test_compute_dff_windowed_median():
+    x = np.array([[1, 5, -2, 3, 1, 10, 1, -2, 30, 5]], dtype=float)
+
+    with pytest.raises(ValueError):
+        dff.compute_dff_windowed_median(x, median_kernel_long=2)
+    with pytest.raises(ValueError):
+        dff.compute_dff_windowed_median(x, median_kernel_short=-5)
+    with pytest.raises(ValueError):
+        dff.compute_dff_windowed_median(x, noise_kernel_length=50)
+    with pytest.raises(ValueError):
+        dff.compute_dff_windowed_median(x)
+
+    x = np.sin(np.arange(0, 200)).reshape(1,200)
+
+    y = dff.compute_dff_windowed_median(x, median_kernel_long=101,
+                                        median_kernel_short=11,
+                                        noise_kernel_length=5)
+
+    assert(y.shape == x.shape)
+
+
 def test_calculate_dff():
-    x = np.array([[1, 5, -2, 3, 1, 10, 1, -2, 30, 5]])
+    x = np.array([[1, 5, -2, 3, 1, 10, 1, -2, 30, 5]], dtype=float)
 
     with patch("os.makedirs") as mock_makedirs:
         with patch.object(Figure, "savefig") as mock_save:
-            y = dff.calculate_dff(x)
+            with patch.object(dff, "compute_dff_windowed_median",
+                       return_value=x) as mock_computation:
+                dff.calculate_dff(x)
     assert mock_makedirs.call_count == 0
     assert mock_save.call_count == 0
+    mock_computation.assert_called_once_with(x)
 
     with patch("os.makedirs") as mock_makedirs:
         with patch.object(Figure, "savefig") as mock_save:
-            y = dff.calculate_dff(x, save_plot_dir="./test")
+            mock_computation = MagicMock(return_value=x)
+            dff.calculate_dff(x, dff_computation_cb=mock_computation,
+                              save_plot_dir="./test")
     mock_makedirs.assert_called_once_with("./test")
     mock_save.assert_called_once()
+    mock_computation.assert_called_once_with(x)
