@@ -40,7 +40,7 @@ import os
 
 @pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
                     reason="partial testing")
-def test_notebook(fn_temp_dir):
+def test_notebook(tmpdir_factory):
 
     # coding: utf-8
 
@@ -60,7 +60,8 @@ def test_notebook(fn_temp_dir):
     # the data that has already been downloaded onto the hard drives.
     # If you supply a relative path, it is assumed to be relative to your
     # current working directory.
-    mcc = MouseConnectivityCache(manifest_file='connectivity/mouse_connectivity_manifest.json')
+    manifest_file = tmpdir_factory.mktemp('mcc').join('manifest.json')
+    mcc = MouseConnectivityCache(manifest_file=str(manifest_file))
 
     # open up a list of all of the experiments
     all_experiments = mcc.get_experiments(dataframe=True)
