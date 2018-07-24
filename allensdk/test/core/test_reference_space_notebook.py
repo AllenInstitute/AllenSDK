@@ -40,7 +40,7 @@ import os
 
 @pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
                     reason="partial testing")
-def test_notebook(fn_temp_dir):
+def test_notebook(tmpdir_factory):
 
     # coding: utf-8
 
@@ -142,8 +142,7 @@ def test_notebook(fn_temp_dir):
     from allensdk.config.manifest import Manifest
 
     # the annotation download writes a file, so we will need somwhere to put it
-    annotation_dir = 'annotation'
-    Manifest.safe_mkdir(annotation_dir)
+    annotation_dir = str(tmpdir_factory.mktemp('annotation'))
 
     annotation_path = os.path.join(annotation_dir, 'annotation.nrrd')
 
