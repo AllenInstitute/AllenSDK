@@ -36,6 +36,7 @@
 import allensdk.brain_observatory.dff as dff
 import numpy as np
 import pytest
+from functools import partial
 from matplotlib.pyplot import Figure
 from mock import patch, MagicMock
 
@@ -126,8 +127,8 @@ def test_compute_dff_windowed_median():
                                         n_small_baseline_frames=small_frames,
                                         noise_kernel_length=5)
 
-    assert(len(noise_stds) == 1)
-    assert(len(small_frames) == 1)
+    assert len(noise_stds) == 1
+    assert len(small_frames) == 1
 
 
 def test_calculate_dff():
@@ -150,3 +151,17 @@ def test_calculate_dff():
     mock_makedirs.assert_called_once_with("./test")
     mock_save.assert_called_once()
     mock_computation.assert_called_once_with(x)
+
+    x = np.sin(np.arange(0, 200)).reshape(1,200)
+
+    noise_stds = []
+    small_frames = []
+    computation_cb = partial(dff.compute_dff_windowed_median,
+                             median_kernel_long=101,
+                             median_kernel_short=11,
+                             noise_stds=noise_stds,
+                             n_small_baseline_frames=small_frames,
+                             noise_kernel_length=5)
+    dff.calculate_dff(x, dff_computation_cb=computation_cb)
+    assert len(noise_stds) == 1
+    assert len(small_frames) == 1
