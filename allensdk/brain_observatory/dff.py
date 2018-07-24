@@ -248,7 +248,9 @@ def compute_dff_windowed_mode(traces,
 def compute_dff_windowed_median(traces,
                                 median_kernel_long=5401,
                                 median_kernel_short=101,
-                                noise_kernel_length=31):
+                                noise_stds=None,
+                                n_small_baseline_frames=None,
+                                **kwargs):
     """Compute dF/F of a set of traces with median filter detrending.
 
     The operation is basically:
@@ -269,28 +271,40 @@ def compute_dff_windowed_median(traces,
         Window size to use for long timescale median detrending.
     median_kernel_short : int
         Window size to use for short timescale median detrending.
-    noise_kernel_length : int
-        Window size to use for high pass filtering noise.
+    noise_stds : list
+        List that will contain noise_std(T_dff1) for each trace. The
+        value for each trace will be appended to the list if provided.
+    n_small_baseline_frames : list
+        List that will contain the number of frames for each trace where
+        the long-timescale median window is less than noise_std(T). The
+        value for each trace will be appended to the list if provided.
+    kwargs:
+        Additional keyword arguments are passed to :func:`noise_std` .
 
     Returns
     -------
     dff : np.ndarray
         2D array of dF/F traces.
     """
-    for k in [median_kernel_long, median_kernel_short, noise_kernel_length]:
-        _check_kernel(k, traces.shape[1])
+    _check_kernel(median_kernel_long, traces.shape[1])
+    _check_kernel(median_kernel_short, traces.shape[1])
 
     dff_traces = np.copy(traces)
 
     for dff in dff_traces:
-        sigma_f = noise_std(dff, window_length=noise_kernel_length)
+        sigma_f = noise_std(dff, **kwargs)
 
         # long timescale median filter for baseline subtraction
         tf = median_filter(dff, median_kernel_long, mode='constant')
         dff -= tf
         dff /= np.maximum(tf, sigma_f)
 
-        sigma_dff = noise_std(dff, window_length=noise_kernel_length)
+        if n_small_baseline_frames is not None:
+            n_small_baseline_frames.append(np.sum(tf <= sigma_f))
+
+        sigma_dff = noise_std(dff, **kwargs)
+        if noise_stds is not None:
+            noise_stds.append(sigma_dff)
 
         # short timescale detrending
         tf = median_filter(dff, median_kernel_short, mode='constant')
@@ -307,17 +321,18 @@ def _check_kernel(kernel_size, data_size):
                          "length.".format(kernel_size, data_size))
 
 
-def noise_std(x, window_length=31):
+def noise_std(x, noise_kernel_length=31, positive_peak_scale=1.5,
+              outlier_std_scale=2.5):
     """Robust estimate of the standard deviation of the trace noise."""
+    _check_kernel(noise_kernel_length, len(x))
     if any(np.isnan(x)):
         return np.NaN
-    x = x - median_filter(x, window_length, mode='constant')
+    x = x - median_filter(x, noise_kernel_length, mode='constant')
     # first pass removing big pos peak outliers
-    x = x[x < 1.5*np.abs(x.min())]
+    x = x[x < positive_peak_scale*np.abs(x.min())]
     rstd = robust_std(x)
     # second pass removing remaining pos and neg peak outliers
-    x = x[abs(x) < 2.5*rstd]
-    print(x)
+    x = x[abs(x) < outlier_std_scale*rstd]
     return robust_std(x)
 
 
