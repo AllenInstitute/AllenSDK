@@ -249,6 +249,34 @@ def compute_dff_windowed_median(traces,
                                 median_kernel_long=5401,
                                 median_kernel_short=101,
                                 noise_kernel_length=31):
+    """Compute dF/F of a set of traces with median filter detrending.
+
+    The operation is basically:
+
+        T_long = windowed_median(T) # long timescale kernel
+
+        T_dff1 = (T - T_long) / elementwise_max(T_long, noise_std(T))
+
+        T_short = windowed_median(T_dff1) # short timescale kernel
+
+        T_dff = T_dff1 - elementwise_min(T_short, 2.5*noise_std(T_dff1))
+
+    Parameters
+    ----------
+    traces : np.ndarray
+       2D array of traces to be analyzed.
+    median_kernel_long : int
+        Window size to use for long timescale median detrending.
+    median_kernel_short : int
+        Window size to use for short timescale median detrending.
+    noise_kernel_length : int
+        Window size to use for high pass filtering noise.
+
+    Returns
+    -------
+    dff : np.ndarray
+        2D array of dF/F traces.
+    """
     for k in [median_kernel_long, median_kernel_short, noise_kernel_length]:
         _check_kernel(k, traces.shape[1])
 
@@ -306,7 +334,7 @@ def robust_std(x):
 def calculate_dff(traces, dff_computation_cb=None, save_plot_dir=None):
     """Apply dF/F computation to a set of traces.
 
-    The default computation method is :func:`compute_dff_windowed_mode`
+    The default computation method is :func:`compute_dff_windowed_median`
     using default window parameters.
 
     Parameters
@@ -352,7 +380,11 @@ def compute_dff(traces,
                 save_plot_dir=None,
                 mode_kernelsize=5400,
                 mean_kernelsize=3000):
-    """ Compute dF/F of a set of traces using a low-pass windowed-mode operator.
+    """Compute dF/F of a set of traces using a low-pass windowed-mode operator.
+
+    This method is deprecated. Use :func:`calculate_dff` with
+    dff_computation_cb = :func:`compute_dff_windowed_mode` .
+
     The operation is basically:
 
         T_mm = windowed_mean(windowed_mode(T))
