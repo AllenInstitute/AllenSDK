@@ -93,7 +93,7 @@ CACHE_MANIFEST = """
 
 
 @pytest.fixture
-def brain_observatory_cache(md_temp_dir):
+def brain_observatory_cache(tmpdir_factory):
     boc = None
 
     try:
@@ -106,7 +106,7 @@ def brain_observatory_cache(md_temp_dir):
         with patch(builtins.__name__ + ".open",
                    mock_open(read_data=manifest_data)):
             # Download a list of all targeted areas
-            manifest_file = os.path.join(md_temp_dir, "boc", "manifest.json")
+            manifest_file = tmpdir_factory.mktemp("boc").join("manifest.json")
             boc = BrainObservatoryCache(manifest_file=str(manifest_file),
                                         base_uri='http://api.brain-map.org')
 
