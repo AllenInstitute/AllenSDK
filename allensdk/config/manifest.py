@@ -41,6 +41,14 @@ import errno
 import pandas as pd
 
 class ManifestVersionError(Exception): 
+
+    @property
+    def outdated(self):
+        try:
+            return self.found_version < self.version 
+        except TypeError:
+            return
+
     def __init__(self, message, version, found_version):
         super(ManifestVersionError, self).__init__(message)
         self.found_version = found_version
