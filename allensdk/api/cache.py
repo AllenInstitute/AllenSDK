@@ -123,10 +123,17 @@ class Cache(object):
                     os.path.dirname(file_name), 
                     version=version)
             except ManifestVersionError as e:
-                raise ManifestVersionError(("Your manifest file (%s) is out of date" +
-                                            " (version '%s' vs '%s').  Please remove this file" +
+                if e.outdated is True:
+                    intro = "is out of date"
+                elif e.outdated is False:
+                    intro = "was made with a newer version of the AllenSDK"
+                elif e.outdated is None:
+                    intro = "version did not match the expected version"
+
+                raise ManifestVersionError(("Your manifest file (%s) %s" +
+                                            " (its version is '%s', but version '%s' is expected).  Please remove this file" +
                                             " and it will be regenerated for you the next"
-                                            " time you instantiate this class.") % (file_name, e.found_version, e.version),
+                                            " time you instantiate this class.") % (file_name, intro, e.found_version, e.version),
                                            e.version, e.found_version)
 
             self.manifest_path = file_name
