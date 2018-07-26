@@ -11,6 +11,10 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
+# this lets the docs build in a headless environment
+import matplotlib
+matplotlib.use('agg')
+
 import sys, os
 
 
