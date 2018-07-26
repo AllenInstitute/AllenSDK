@@ -61,14 +61,13 @@ def cell_id():
 
 
 @pytest.fixture
-def cache_fixture(md_temp_dir):
+def cache_fixture(tmpdir_factory):
     # Instantiate the CellTypesCache instance.  The manifest_file argument
     # tells it where to store the manifest, which is a JSON file that tracks
     # file paths.  If you supply a relative path (like this), it will go
     # into your current working directory
-    ctc = CTC.CellTypesCache(
-        manifest_file=os.path.join(md_temp_dir,
-        'cell_types_manifest.json'))
+    manifest_file = str(tmpdir_factory.mktemp("ctc").join("manifest.json"))
+    ctc = CTC.CellTypesCache(manifest_file=manifest_file)
 
     return ctc
 
