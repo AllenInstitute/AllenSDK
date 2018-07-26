@@ -1,7 +1,7 @@
 allensdk/internal
 .cache
 .idea
-.coverage
+.coverage*
 htmlcov
 .settings
 cell_types
@@ -10,5 +10,10 @@ test-reports/*
 doc_template/examples/nb/connectivity/experiment_*
 doc_template/examples/nb/Website_Inquiry_RT_45792 /experiment_*
 *pyc
+.eggs/
+.pytest_cache/
+allensdk.egg-info/
+.vscode/
+debug.log
 *~
 *#*#
