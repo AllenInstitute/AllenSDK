@@ -1,32 +1,21 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>allensdk.brain_observatory.stimulus_analysis &mdash; Allen SDK dev documentation</title>
-    
+    <title>allensdk.brain_observatory.stimulus_analysis &#8212; Allen SDK dev documentation</title>
     <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../',
-        VERSION:     'dev',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK dev documentation" href="../../../index.html" />
-    <link rel="up" title="Module code" href="../../index.html" /> 
-  </head>
-  <body role="document">
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
 <script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
@@ -104,16 +93,16 @@
 <span class="c1"># ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="c1">#</span>
-<span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="kn">as</span> <span class="nn">st</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="k">as</span> <span class="nn">st</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">.findlevel</span> <span class="kn">import</span> <span class="n">findlevel</span>
-<span class="kn">from</span> <span class="nn">.brain_observatory_exceptions</span> <span class="kn">import</span> <span class="n">BrainObservatoryAnalysisException</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">observatory_plots</span> <span class="k">as</span> <span class="n">oplots</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">.findlevel</span> <span class="k">import</span> <span class="n">findlevel</span>
+<span class="kn">from</span> <span class="nn">.brain_observatory_exceptions</span> <span class="k">import</span> <span class="n">BrainObservatoryAnalysisException</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">observatory_plots</span> <span class="k">as</span> <span class="n">oplots</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
-<div class="viewcode-block" id="StimulusAnalysis"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis">[docs]</a><span class="k">class</span> <span class="nc">StimulusAnalysis</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="StimulusAnalysis"><a class="viewcode-back" href="../../../allensdk.brain_observatory.stimulus_analysis.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis">[docs]</a><span class="k">class</span> <span class="nc">StimulusAnalysis</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Base class for all response analysis code. Subclasses are responsible</span>
 <span class="sd">    for computing metrics and traces relevant to a particular stimulus.</span>
 <span class="sd">    The base class contains methods for organizing sweep responses row of</span>
@@ -202,7 +191,7 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_peak</span>
 
-<div class="viewcode-block" id="StimulusAnalysis.get_fluorescence"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.get_fluorescence">[docs]</a>    <span class="k">def</span> <span class="nf">get_fluorescence</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="StimulusAnalysis.get_fluorescence"><a class="viewcode-back" href="../../../allensdk.brain_observatory.stimulus_analysis.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.get_fluorescence">[docs]</a>    <span class="k">def</span> <span class="nf">get_fluorescence</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># get fluorescence</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_timestamps</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_celltraces</span> <span class="o">=</span> \
             <span class="bp">self</span><span class="o">.</span><span class="n">data_set</span><span class="o">.</span><span class="n">get_corrected_fluorescence_traces</span><span class="p">()</span>
@@ -317,19 +306,19 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_peak_run</span>
 
-<div class="viewcode-block" id="StimulusAnalysis.populate_stimulus_table"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.populate_stimulus_table">[docs]</a>    <span class="k">def</span> <span class="nf">populate_stimulus_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="StimulusAnalysis.populate_stimulus_table"><a class="viewcode-back" href="../../../allensdk.brain_observatory.stimulus_analysis.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.populate_stimulus_table">[docs]</a>    <span class="k">def</span> <span class="nf">populate_stimulus_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Implemented by subclasses. &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="n">BrainObservatoryAnalysisException</span><span class="p">(</span><span class="s2">&quot;populate_stimulus_table not implemented&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="StimulusAnalysis.get_response"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.get_response">[docs]</a>    <span class="k">def</span> <span class="nf">get_response</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="StimulusAnalysis.get_response"><a class="viewcode-back" href="../../../allensdk.brain_observatory.stimulus_analysis.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.get_response">[docs]</a>    <span class="k">def</span> <span class="nf">get_response</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Implemented by subclasses. &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="n">BrainObservatoryAnalysisException</span><span class="p">(</span><span class="s2">&quot;get_response not implemented&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="StimulusAnalysis.get_peak"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.get_peak">[docs]</a>    <span class="k">def</span> <span class="nf">get_peak</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="StimulusAnalysis.get_peak"><a class="viewcode-back" href="../../../allensdk.brain_observatory.stimulus_analysis.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.get_peak">[docs]</a>    <span class="k">def</span> <span class="nf">get_peak</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Implemented by subclasses. &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="n">BrainObservatoryAnalysisException</span><span class="p">(</span><span class="s2">&quot;get_peak not implemented&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="StimulusAnalysis.get_speed_tuning"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.get_speed_tuning">[docs]</a>    <span class="k">def</span> <span class="nf">get_speed_tuning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">binsize</span><span class="p">):</span>
+<div class="viewcode-block" id="StimulusAnalysis.get_speed_tuning"><a class="viewcode-back" href="../../../allensdk.brain_observatory.stimulus_analysis.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.get_speed_tuning">[docs]</a>    <span class="k">def</span> <span class="nf">get_speed_tuning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">binsize</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Calculates speed tuning, spontaneous versus visually driven.  The return is a 5-tuple</span>
 <span class="sd">        of speed and dF/F histograms.</span>
 
@@ -399,7 +388,7 @@
 
             <span class="n">offset</span> <span class="o">=</span> <span class="n">findlevel</span><span class="p">(</span><span class="n">dx_sorted</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;up&#39;</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">offset</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">offset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">StimulusAnalysis</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
                     <span class="s2">&quot;dx never crosses 1, all speed data going into single bin&quot;</span><span class="p">)</span>
                 <span class="n">offset</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dx_sorted</span><span class="p">)</span>
@@ -431,7 +420,7 @@
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbins</span><span class="p">):</span>
                 <span class="n">offset</span> <span class="o">=</span> <span class="n">findlevel</span><span class="p">(</span><span class="n">dx_sorted</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;up&#39;</span><span class="p">)</span>
 
-                <span class="k">if</span> <span class="n">offset</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">offset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">StimulusAnalysis</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
                         <span class="s2">&quot;dx never crosses 1, all speed data going into single bin&quot;</span><span class="p">)</span>
                     <span class="n">offset</span> <span class="o">=</span> <span class="n">celltraces_shuffled_sorted</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -456,7 +445,7 @@
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbins</span><span class="p">):</span>
             <span class="n">offset</span> <span class="o">=</span> <span class="n">findlevel</span><span class="p">(</span><span class="n">dx_sorted</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;up&#39;</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">offset</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">offset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">StimulusAnalysis</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
                     <span class="s2">&quot;dx never crosses 1, all speed data going into single bin&quot;</span><span class="p">)</span>
                 <span class="n">offset</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dx_sorted</span><span class="p">)</span>
@@ -488,7 +477,7 @@
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbins</span><span class="p">):</span>
                 <span class="n">offset</span> <span class="o">=</span> <span class="n">findlevel</span><span class="p">(</span><span class="n">dx_sorted</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;up&#39;</span><span class="p">)</span>
 
-                <span class="k">if</span> <span class="n">offset</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">offset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">StimulusAnalysis</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
                         <span class="s2">&quot;dx never crosses 1, all speed data going into single bin&quot;</span><span class="p">)</span>
                     <span class="n">offset</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dx_sorted</span><span class="p">)</span>
@@ -519,13 +508,13 @@
 
         <span class="k">for</span> <span class="n">nc</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">numbercells</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">response_variance_vis</span><span class="p">[</span><span class="n">nc</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">variance_threshold_vis</span><span class="p">[</span><span class="n">nc</span><span class="p">]:</span>
-                <span class="n">peak_run</span><span class="o">.</span><span class="n">mod_vis</span><span class="p">[</span><span class="n">nc</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="n">peak_run</span><span class="o">.</span><span class="n">mod_vis</span><span class="p">[</span><span class="n">nc</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">if</span> <span class="n">response_variance_vis</span><span class="p">[</span><span class="n">nc</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">variance_threshold_vis</span><span class="p">[</span><span class="n">nc</span><span class="p">]:</span>
-                <span class="n">peak_run</span><span class="o">.</span><span class="n">mod_vis</span><span class="p">[</span><span class="n">nc</span><span class="p">]</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="n">peak_run</span><span class="o">.</span><span class="n">mod_vis</span><span class="p">[</span><span class="n">nc</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="k">if</span> <span class="n">response_variance_sp</span><span class="p">[</span><span class="n">nc</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">variance_threshold_sp</span><span class="p">[</span><span class="n">nc</span><span class="p">]:</span>
-                <span class="n">peak_run</span><span class="o">.</span><span class="n">mod_sp</span><span class="p">[</span><span class="n">nc</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="n">peak_run</span><span class="o">.</span><span class="n">mod_sp</span><span class="p">[</span><span class="n">nc</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">if</span> <span class="n">response_variance_sp</span><span class="p">[</span><span class="n">nc</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">variance_threshold_sp</span><span class="p">[</span><span class="n">nc</span><span class="p">]:</span>
-                <span class="n">peak_run</span><span class="o">.</span><span class="n">mod_sp</span><span class="p">[</span><span class="n">nc</span><span class="p">]</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="n">peak_run</span><span class="o">.</span><span class="n">mod_sp</span><span class="p">[</span><span class="n">nc</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="n">temp</span> <span class="o">=</span> <span class="n">binned_cells_sp</span><span class="p">[</span><span class="n">nc</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span>
             <span class="n">start_max</span> <span class="o">=</span> <span class="n">temp</span><span class="o">.</span><span class="n">argmax</span><span class="p">()</span>
             <span class="n">peak_run</span><span class="o">.</span><span class="n">speed_max_sp</span><span class="p">[</span><span class="n">nc</span><span class="p">]</span> <span class="o">=</span> <span class="n">binned_dx_sp</span><span class="p">[</span><span class="n">start_max</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
@@ -565,7 +554,7 @@
 
         <span class="k">return</span> <span class="n">binned_dx_sp</span><span class="p">,</span> <span class="n">binned_cells_sp</span><span class="p">,</span> <span class="n">binned_dx_vis</span><span class="p">,</span> <span class="n">binned_cells_vis</span><span class="p">,</span> <span class="n">peak_run</span></div>
 
-<div class="viewcode-block" id="StimulusAnalysis.get_sweep_response"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.get_sweep_response">[docs]</a>    <span class="k">def</span> <span class="nf">get_sweep_response</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="StimulusAnalysis.get_sweep_response"><a class="viewcode-back" href="../../../allensdk.brain_observatory.stimulus_analysis.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.get_sweep_response">[docs]</a>    <span class="k">def</span> <span class="nf">get_sweep_response</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Calculates the response to each sweep in the stimulus table for each cell and the mean response.</span>
 <span class="sd">        The return is a 3-tuple of:</span>
 
@@ -590,9 +579,11 @@
 
         <span class="n">StimulusAnalysis</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Calculating responses for each sweep&#39;</span><span class="p">)</span>
         <span class="n">sweep_response</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">stim_table</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> 
-                                      <span class="n">columns</span><span class="o">=</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">numbercells</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)))</span>
+                                      <span class="n">columns</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">numbercells</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))))</span>
+
         <span class="n">sweep_response</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
-            <span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">numbercells</span><span class="p">):</span> <span class="s1">&#39;dx&#39;</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">numbercells</span><span class="p">):</span> <span class="s1">&#39;dx&#39;</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
         <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stim_table</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
             <span class="n">start</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">interlength</span><span class="p">)</span>
             <span class="n">end</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">sweeplength</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">interlength</span><span class="p">)</span>
@@ -608,17 +599,17 @@
         <span class="n">pval</span> <span class="o">=</span> <span class="n">sweep_response</span><span class="o">.</span><span class="n">applymap</span><span class="p">(</span><span class="n">do_p_value</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">sweep_response</span><span class="p">,</span> <span class="n">mean_sweep_response</span><span class="p">,</span> <span class="n">pval</span></div>
 
-<div class="viewcode-block" id="StimulusAnalysis.plot_representational_similarity"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.plot_representational_similarity">[docs]</a>    <span class="k">def</span> <span class="nf">plot_representational_similarity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repsim</span><span class="p">,</span> <span class="n">stimulus</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="StimulusAnalysis.plot_representational_similarity"><a class="viewcode-back" href="../../../allensdk.brain_observatory.stimulus_analysis.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.plot_representational_similarity">[docs]</a>    <span class="k">def</span> <span class="nf">plot_representational_similarity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repsim</span><span class="p">,</span> <span class="n">stimulus</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">stimulus</span><span class="p">:</span>
             <span class="k">pass</span>
 
         <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">repsim</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;plasma&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="StimulusAnalysis.plot_running_speed_histogram"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.plot_running_speed_histogram">[docs]</a>    <span class="k">def</span> <span class="nf">plot_running_speed_histogram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">nbins</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">xlim</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+<div class="viewcode-block" id="StimulusAnalysis.plot_running_speed_histogram"><a class="viewcode-back" href="../../../allensdk.brain_observatory.stimulus_analysis.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.plot_running_speed_histogram">[docs]</a>    <span class="k">def</span> <span class="nf">plot_running_speed_histogram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nbins</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">xlim</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">xlim</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="mi">100</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">nbins</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">nbins</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">nbins</span> <span class="o">=</span> <span class="mi">40</span>
 
         <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
@@ -627,8 +618,8 @@
         <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;running speed (cm/s)&quot;</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;time points&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="StimulusAnalysis.plot_speed_tuning"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.plot_speed_tuning">[docs]</a>    <span class="k">def</span> <span class="nf">plot_speed_tuning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_id</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
-                          <span class="n">cell_index</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+<div class="viewcode-block" id="StimulusAnalysis.plot_speed_tuning"><a class="viewcode-back" href="../../../allensdk.brain_observatory.stimulus_analysis.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.plot_speed_tuning">[docs]</a>    <span class="k">def</span> <span class="nf">plot_speed_tuning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                          <span class="n">cell_index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                           <span class="n">evoked_color</span><span class="o">=</span><span class="n">oplots</span><span class="o">.</span><span class="n">EVOKED_COLOR</span><span class="p">,</span> 
                           <span class="n">spontaneous_color</span><span class="o">=</span><span class="n">oplots</span><span class="o">.</span><span class="n">SPONTANEOUS_COLOR</span><span class="p">):</span>
         <span class="n">cell_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">row_from_cell_id</span><span class="p">(</span><span class="n">cell_specimen_id</span><span class="p">,</span> <span class="n">cell_index</span><span class="p">)</span>
@@ -641,11 +632,11 @@
         <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;running speed (cm/s)&quot;</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;percent dF/F&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="StimulusAnalysis.row_from_cell_id"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.row_from_cell_id">[docs]</a>    <span class="k">def</span> <span class="nf">row_from_cell_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">csid</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">idx</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="StimulusAnalysis.row_from_cell_id"><a class="viewcode-back" href="../../../allensdk.brain_observatory.stimulus_analysis.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.row_from_cell_id">[docs]</a>    <span class="k">def</span> <span class="nf">row_from_cell_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">csid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">idx</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
-        <span class="k">if</span> <span class="n">csid</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">csid</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">csid</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">csid</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_set</span><span class="o">.</span><span class="n">get_cell_specimen_ids</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">csid</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">idx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">idx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">idx</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Could not find row for csid(</span><span class="si">%s</span><span class="s2">) idx(</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">csid</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">idx</span><span class="p">)))</span></div></div>
@@ -659,9 +650,7 @@
         <div class="sphinxsidebarwrapper">
 <h3><a href="../../../index.html">Contents</a></h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install Guide</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../cell_types.html">Cell Types</a></li>
@@ -686,6 +675,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.model.html">allensdk.model package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.morphology.html">allensdk.morphology package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.deprecated.html">allensdk.deprecated module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
@@ -703,12 +693,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

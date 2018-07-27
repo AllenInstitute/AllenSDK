@@ -59,8 +59,238 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="allensdk-brain-observatory-stimulus-analysis-module">
-<h1>allensdk.brain_observatory.stimulus_analysis module<a class="headerlink" href="#allensdk-brain-observatory-stimulus-analysis-module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-allensdk.brain_observatory.stimulus_analysis">
+<span id="allensdk-brain-observatory-stimulus-analysis-module"></span><h1>allensdk.brain_observatory.stimulus_analysis module<a class="headerlink" href="#module-allensdk.brain_observatory.stimulus_analysis" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis">
+<em class="property">class </em><code class="descclassname">allensdk.brain_observatory.stimulus_analysis.</code><code class="descname">StimulusAnalysis</code><span class="sig-paren">(</span><em>data_set</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_analysis.html#StimulusAnalysis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Base class for all response analysis code. Subclasses are responsible
+for computing metrics and traces relevant to a particular stimulus.
+The base class contains methods for organizing sweep responses row of
+a stimulus stable (get_sweep_response).  Subclasses implement the
+get_response method, computes the mean sweep response to all sweeps for
+a each stimulus condition.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>data_set: BrainObservatoryNwbDataSet instance</strong></dt>
+<dd></dd>
+<dt><strong>speed_tuning: boolean, deprecated</strong></dt>
+<dd><p class="first last">Whether or not to compute speed tuning histograms</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.acquisition_rate">
+<code class="descname">acquisition_rate</code><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.acquisition_rate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.binned_cells_sp">
+<code class="descname">binned_cells_sp</code><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.binned_cells_sp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.binned_cells_vis">
+<code class="descname">binned_cells_vis</code><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.binned_cells_vis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.binned_dx_sp">
+<code class="descname">binned_dx_sp</code><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.binned_dx_sp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.binned_dx_vis">
+<code class="descname">binned_dx_vis</code><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.binned_dx_vis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.cell_id">
+<code class="descname">cell_id</code><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.cell_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.celltraces">
+<code class="descname">celltraces</code><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.celltraces" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.dfftraces">
+<code class="descname">dfftraces</code><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.dfftraces" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.dxcm">
+<code class="descname">dxcm</code><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.dxcm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.dxtime">
+<code class="descname">dxtime</code><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.dxtime" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.get_fluorescence">
+<code class="descname">get_fluorescence</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_analysis.html#StimulusAnalysis.get_fluorescence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.get_fluorescence" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.get_peak">
+<code class="descname">get_peak</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_analysis.html#StimulusAnalysis.get_peak"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.get_peak" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implemented by subclasses.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.get_response">
+<code class="descname">get_response</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_analysis.html#StimulusAnalysis.get_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.get_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implemented by subclasses.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.get_speed_tuning">
+<code class="descname">get_speed_tuning</code><span class="sig-paren">(</span><em>binsize</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_analysis.html#StimulusAnalysis.get_speed_tuning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.get_speed_tuning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates speed tuning, spontaneous versus visually driven.  The return is a 5-tuple
+of speed and dF/F histograms.</p>
+<blockquote>
+<div><p>binned_dx_sp: (bins,2) np.ndarray of running speeds binned during spontaneous activity stimulus.
+The first bin contains all speeds below 1 cm/s.  Dimension 0 is mean running speed in the bin.
+Dimension 1 is the standard error of the mean.</p>
+<p>binned_cells_sp: (bins,2) np.ndarray of fluorescence during spontaneous activity stimulus.
+First bin contains all data for speeds below 1 cm/s. Dimension 0 is mean fluorescence in the bin.
+Dimension 1 is the standard error of the mean.</p>
+<p>binned_dx_vis: (bins,2) np.ndarray of running speeds outside of spontaneous activity stimulus.
+The first bin contains all speeds below 1 cm/s.  Dimension 0 is mean running speed in the bin.
+Dimension 1 is the standard error of the mean.</p>
+<p>binned_cells_vis: np.ndarray of fluorescence outside of spontaneous activity stimulu.
+First bin contains all data for speeds below 1 cm/s. Dimension 0 is mean fluorescence in the bin.
+Dimension 1 is the standard error of the mean.</p>
+<p>peak_run: pd.DataFrame of speed-related properties of a cell.</p>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>tuple: binned_dx_sp, binned_cells_sp, binned_dx_vis, binned_cells_vis, peak_run</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.get_sweep_response">
+<code class="descname">get_sweep_response</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_analysis.html#StimulusAnalysis.get_sweep_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.get_sweep_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the response to each sweep in the stimulus table for each cell and the mean response.
+The return is a 3-tuple of:</p>
+<blockquote>
+<div><ul class="simple">
+<li>sweep_response: pd.DataFrame of response dF/F traces organized by cell (column) and sweep (row)</li>
+<li>mean_sweep_response: mean values of the traces returned in sweep_response</li>
+<li>pval: p value from 1-way ANOVA comparing response during sweep to response prior to sweep</li>
+</ul>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>3-tuple: sweep_response, mean_sweep_response, pval</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.mean_sweep_response">
+<code class="descname">mean_sweep_response</code><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.mean_sweep_response" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.numbercells">
+<code class="descname">numbercells</code><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.numbercells" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.peak">
+<code class="descname">peak</code><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.peak" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.peak_run">
+<code class="descname">peak_run</code><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.peak_run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.plot_representational_similarity">
+<code class="descname">plot_representational_similarity</code><span class="sig-paren">(</span><em>repsim</em>, <em>stimulus=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_analysis.html#StimulusAnalysis.plot_representational_similarity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.plot_representational_similarity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.plot_running_speed_histogram">
+<code class="descname">plot_running_speed_histogram</code><span class="sig-paren">(</span><em>xlim=None</em>, <em>nbins=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_analysis.html#StimulusAnalysis.plot_running_speed_histogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.plot_running_speed_histogram" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.plot_speed_tuning">
+<code class="descname">plot_speed_tuning</code><span class="sig-paren">(</span><em>cell_specimen_id=None</em>, <em>cell_index=None</em>, <em>evoked_color='#b30000'</em>, <em>spontaneous_color='#0000b3'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_analysis.html#StimulusAnalysis.plot_speed_tuning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.plot_speed_tuning" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.populate_stimulus_table">
+<code class="descname">populate_stimulus_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_analysis.html#StimulusAnalysis.populate_stimulus_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.populate_stimulus_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implemented by subclasses.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.pval">
+<code class="descname">pval</code><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.pval" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.response">
+<code class="descname">response</code><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.response" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.roi_id">
+<code class="descname">roi_id</code><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.roi_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.row_from_cell_id">
+<code class="descname">row_from_cell_id</code><span class="sig-paren">(</span><em>csid=None</em>, <em>idx=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_analysis.html#StimulusAnalysis.row_from_cell_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.row_from_cell_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.stim_table">
+<code class="descname">stim_table</code><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.stim_table" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.sweep_response">
+<code class="descname">sweep_response</code><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.sweep_response" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.timestamps">
+<code class="descname">timestamps</code><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.timestamps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
 
 

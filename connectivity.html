@@ -98,28 +98,6 @@ started with analysis:</p>
 </ul>
 </div></blockquote>
 </div>
-<div class="section" id="mouse-connectivity-api">
-<h2>Mouse Connectivity API<a class="headerlink" href="#mouse-connectivity-api" title="Permalink to this headline">¶</a></h2>
-<p>The <a class="reference internal" href="allensdk.api.queries.mouse_connectivity_api.html#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi"><code class="xref py py-class docutils literal notranslate"><span class="pre">MouseConnectivityApi</span></code></a> class provides a Python interface
-for downloading data in the Allen Mouse Brain Connectivity Atlas.  The following example demonstrates how to download
-meta data for all wild-type injections and the projection signal density for one experiment:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">allensdk.api.queries.mouse_connectivity_api</span> <span class="k">import</span> <span class="n">MouseConnectivityApi</span>
-<span class="kn">import</span> <span class="nn">nrrd</span>
-
-<span class="n">mca</span> <span class="o">=</span> <span class="n">MouseConnectivityApi</span><span class="p">()</span>
-
-<span class="c1"># get metadata for all non-Cre experiments</span>
-<span class="n">experiments</span> <span class="o">=</span> <span class="n">mca</span><span class="o">.</span><span class="n">experiment_source_search</span><span class="p">(</span><span class="n">injection_structures</span><span class="o">=</span><span class="s1">&#39;root&#39;</span><span class="p">,</span> <span class="n">transgenic_lines</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-
-<span class="c1"># download the projection density volume for one of the experiments</span>
-<span class="n">mca</span><span class="o">.</span><span class="n">download_projection_density</span><span class="p">(</span><span class="s1">&#39;example.nrrd&#39;</span><span class="p">,</span> <span class="n">experiments</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">],</span> <span class="n">resolution</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
-
-<span class="c1"># read it into memory</span>
-<span class="n">pd_array</span><span class="p">,</span> <span class="n">pd_info</span> <span class="o">=</span> <span class="n">nrrd</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;example.nrrd&#39;</span><span class="p">)</span>
-
-</pre></div>
-</div>
-</div>
 <div class="section" id="mouse-connectivity-cache">
 <h2>Mouse Connectivity Cache<a class="headerlink" href="#mouse-connectivity-cache" title="Permalink to this headline">¶</a></h2>
 <p>The <a class="reference internal" href="allensdk.core.mouse_connectivity_cache.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache" title="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache"><code class="xref py py-class docutils literal notranslate"><span class="pre">MouseConnectivityCache</span></code></a> class saves all of the data you can download
@@ -138,11 +116,10 @@ all experiments with injections in the isocortex and download the projetion dens
 
 <span class="c1"># a list of dictionaries containing metadata for non-Cre experiments</span>
 <span class="n">experiments</span> <span class="o">=</span> <span class="n">mcc</span><span class="o">.</span><span class="n">get_experiments</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="s1">&#39;non_cre.json&#39;</span><span class="p">,</span>
-                                  <span class="n">injection_structure_ids</span><span class="o">=</span><span class="n">isocortex</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
+                                  <span class="n">injection_structure_ids</span><span class="o">=</span><span class="p">[</span><span class="n">isocortex_id</span><span class="p">])</span>
 
 <span class="c1"># download the projection density volume for one of the experiments</span>
 <span class="n">pd</span> <span class="o">=</span> <span class="n">mcc</span><span class="o">.</span><span class="n">get_projection_density</span><span class="p">(</span><span class="n">experiments</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
-
 </pre></div>
 </div>
 </div>
@@ -158,7 +135,7 @@ consists of a short ASCII header followed by a binary array of data values.</p>
 Usage is straightforward:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">nrrd</span>
 
-<span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;experiment_180435652/projection_density_25.nrrd&#39;</span>
+<span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;experiment_644250774/projection_density_25.nrrd&#39;</span>
 <span class="n">data_array</span><span class="p">,</span> <span class="n">metadata</span> <span class="o">=</span> <span class="n">nrrd</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
 </pre></div>
 </div>

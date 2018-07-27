@@ -59,8 +59,147 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="allensdk-brain-observatory-natural-scenes-module">
-<h1>allensdk.brain_observatory.natural_scenes module<a class="headerlink" href="#allensdk-brain-observatory-natural-scenes-module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-allensdk.brain_observatory.natural_scenes">
+<span id="allensdk-brain-observatory-natural-scenes-module"></span><h1>allensdk.brain_observatory.natural_scenes module<a class="headerlink" href="#module-allensdk.brain_observatory.natural_scenes" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="allensdk.brain_observatory.natural_scenes.NaturalScenes">
+<em class="property">class </em><code class="descclassname">allensdk.brain_observatory.natural_scenes.</code><code class="descname">NaturalScenes</code><span class="sig-paren">(</span><em>data_set</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/natural_scenes.html#NaturalScenes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.natural_scenes.NaturalScenes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="allensdk.brain_observatory.stimulus_analysis.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis" title="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis"><code class="xref py py-class docutils literal notranslate"><span class="pre">allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis</span></code></a></p>
+<p>Perform tuning analysis specific to natural scenes stimulus.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>data_set: BrainObservatoryNwbDataSet object</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.natural_scenes.NaturalScenes.extralength">
+<code class="descname">extralength</code><a class="headerlink" href="#allensdk.brain_observatory.natural_scenes.NaturalScenes.extralength" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="allensdk.brain_observatory.natural_scenes.NaturalScenes.from_analysis_file">
+<em class="property">static </em><code class="descname">from_analysis_file</code><span class="sig-paren">(</span><em>data_set</em>, <em>analysis_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/natural_scenes.html#NaturalScenes.from_analysis_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.natural_scenes.NaturalScenes.from_analysis_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.natural_scenes.NaturalScenes.get_noise_correlation">
+<code class="descname">get_noise_correlation</code><span class="sig-paren">(</span><em>corr='spearman'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/natural_scenes.html#NaturalScenes.get_noise_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.natural_scenes.NaturalScenes.get_noise_correlation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.natural_scenes.NaturalScenes.get_peak">
+<code class="descname">get_peak</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/natural_scenes.html#NaturalScenes.get_peak"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.natural_scenes.NaturalScenes.get_peak" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes metrics about peak response condition for each cell.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>Pandas data frame with the following fields (‘_ns’ suffix is for</strong></dt>
+<dd></dd>
+<dt><strong>natural scene):</strong></dt>
+<dd><ul class="first last simple">
+<li>scene_ns (scene number)</li>
+<li>reliability_ns</li>
+<li>peak_dff_ns (peak dF/F)</li>
+<li>ptest_ns</li>
+<li>p_run_ns</li>
+<li>run_modulation_ns</li>
+<li>time_to_peak_ns</li>
+</ul>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.natural_scenes.NaturalScenes.get_representational_similarity">
+<code class="descname">get_representational_similarity</code><span class="sig-paren">(</span><em>corr='spearman'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/natural_scenes.html#NaturalScenes.get_representational_similarity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.natural_scenes.NaturalScenes.get_representational_similarity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.natural_scenes.NaturalScenes.get_response">
+<code class="descname">get_response</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/natural_scenes.html#NaturalScenes.get_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.natural_scenes.NaturalScenes.get_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the mean response for each cell to each stimulus condition.  Return is
+a (# scenes, # cells, 3) np.ndarray.  The final dimension
+contains the mean response to the condition (index 0), standard error of the mean of the response
+to the condition (index 1), and the number of trials with a significant (p &lt; 0.05) response 
+to that condition (index 2).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>Numpy array storing mean responses.</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.natural_scenes.NaturalScenes.get_signal_correlation">
+<code class="descname">get_signal_correlation</code><span class="sig-paren">(</span><em>corr='spearman'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/natural_scenes.html#NaturalScenes.get_signal_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.natural_scenes.NaturalScenes.get_signal_correlation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.natural_scenes.NaturalScenes.interlength">
+<code class="descname">interlength</code><a class="headerlink" href="#allensdk.brain_observatory.natural_scenes.NaturalScenes.interlength" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.natural_scenes.NaturalScenes.number_scenes">
+<code class="descname">number_scenes</code><a class="headerlink" href="#allensdk.brain_observatory.natural_scenes.NaturalScenes.number_scenes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.natural_scenes.NaturalScenes.open_corona_plot">
+<code class="descname">open_corona_plot</code><span class="sig-paren">(</span><em>cell_specimen_id=None</em>, <em>cell_index=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/natural_scenes.html#NaturalScenes.open_corona_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.natural_scenes.NaturalScenes.open_corona_plot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.natural_scenes.NaturalScenes.plot_time_to_peak">
+<code class="descname">plot_time_to_peak</code><span class="sig-paren">(</span><em>p_value_max=0.05</em>, <em>color_map=&lt;matplotlib.colors.LinearSegmentedColormap object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/natural_scenes.html#NaturalScenes.plot_time_to_peak"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.natural_scenes.NaturalScenes.plot_time_to_peak" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.natural_scenes.NaturalScenes.populate_stimulus_table">
+<code class="descname">populate_stimulus_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/natural_scenes.html#NaturalScenes.populate_stimulus_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.natural_scenes.NaturalScenes.populate_stimulus_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implemented by subclasses.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.natural_scenes.NaturalScenes.reshape_response_array">
+<code class="descname">reshape_response_array</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/natural_scenes.html#NaturalScenes.reshape_response_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.natural_scenes.NaturalScenes.reshape_response_array" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">response array in cells x stim x repetition for noise correlations</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.natural_scenes.NaturalScenes.sweeplength">
+<code class="descname">sweeplength</code><a class="headerlink" href="#allensdk.brain_observatory.natural_scenes.NaturalScenes.sweeplength" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
 
 

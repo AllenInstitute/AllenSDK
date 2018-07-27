@@ -59,8 +59,176 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="allensdk-brain-observatory-locally-sparse-noise-module">
-<h1>allensdk.brain_observatory.locally_sparse_noise module<a class="headerlink" href="#allensdk-brain-observatory-locally-sparse-noise-module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-allensdk.brain_observatory.locally_sparse_noise">
+<span id="allensdk-brain-observatory-locally-sparse-noise-module"></span><h1>allensdk.brain_observatory.locally_sparse_noise module<a class="headerlink" href="#module-allensdk.brain_observatory.locally_sparse_noise" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise">
+<em class="property">class </em><code class="descclassname">allensdk.brain_observatory.locally_sparse_noise.</code><code class="descname">LocallySparseNoise</code><span class="sig-paren">(</span><em>data_set</em>, <em>stimulus=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/locally_sparse_noise.html#LocallySparseNoise"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="allensdk.brain_observatory.stimulus_analysis.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis" title="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis"><code class="xref py py-class docutils literal notranslate"><span class="pre">allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis</span></code></a></p>
+<p>Perform tuning analysis specific to the locally sparse noise stimulus.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>data_set: BrainObservatoryNwbDataSet object</strong></dt>
+<dd></dd>
+<dt><strong>stimulus: string</strong></dt>
+<dd><p class="first last">Name of locally sparse noise stimulus.  See brain_observatory.stimulus_info.</p>
+</dd>
+<dt><strong>nrows: int</strong></dt>
+<dd><p class="first last">Number of rows in the stimulus template</p>
+</dd>
+<dt><strong>ncol: int</strong></dt>
+<dd><p class="first last">Number of columns in the stimulus template</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.LSN">
+<code class="descname">LSN</code><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.LSN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.LSN_GREY">
+<code class="descname">LSN_GREY</code><em class="property"> = 127</em><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.LSN_GREY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.LSN_OFF">
+<code class="descname">LSN_OFF</code><em class="property"> = 0</em><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.LSN_OFF" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.LSN_OFF_SCREEN">
+<code class="descname">LSN_OFF_SCREEN</code><em class="property"> = 64</em><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.LSN_OFF_SCREEN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.LSN_ON">
+<code class="descname">LSN_ON</code><em class="property"> = 255</em><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.LSN_ON" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.LSN_mask">
+<code class="descname">LSN_mask</code><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.LSN_mask" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.cell_index_receptive_field_analysis_data">
+<code class="descname">cell_index_receptive_field_analysis_data</code><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.cell_index_receptive_field_analysis_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.extralength">
+<code class="descname">extralength</code><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.extralength" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.from_analysis_file">
+<em class="property">static </em><code class="descname">from_analysis_file</code><span class="sig-paren">(</span><em>data_set</em>, <em>analysis_file</em>, <em>stimulus</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/locally_sparse_noise.html#LocallySparseNoise.from_analysis_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.from_analysis_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.get_mean_response">
+<code class="descname">get_mean_response</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/locally_sparse_noise.html#LocallySparseNoise.get_mean_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.get_mean_response" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.get_peak">
+<code class="descname">get_peak</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/locally_sparse_noise.html#LocallySparseNoise.get_peak"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.get_peak" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implemented by subclasses.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.get_receptive_field">
+<code class="descname">get_receptive_field</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/locally_sparse_noise.html#LocallySparseNoise.get_receptive_field"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.get_receptive_field" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates receptive fields for each cell</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.get_receptive_field_analysis_data">
+<code class="descname">get_receptive_field_analysis_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/locally_sparse_noise.html#LocallySparseNoise.get_receptive_field_analysis_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.get_receptive_field_analysis_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates receptive fields for each cell</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.get_receptive_field_attribute_df">
+<code class="descname">get_receptive_field_attribute_df</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/locally_sparse_noise.html#LocallySparseNoise.get_receptive_field_attribute_df"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.get_receptive_field_attribute_df" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.interlength">
+<code class="descname">interlength</code><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.interlength" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.mean_response">
+<code class="descname">mean_response</code><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.mean_response" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.merge_mean_response">
+<em class="property">static </em><code class="descname">merge_mean_response</code><span class="sig-paren">(</span><em>rc1</em>, <em>rc2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/locally_sparse_noise.html#LocallySparseNoise.merge_mean_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.merge_mean_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move out of this class, to session analysis</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.open_pincushion_plot">
+<code class="descname">open_pincushion_plot</code><span class="sig-paren">(</span><em>on</em>, <em>cell_specimen_id=None</em>, <em>color_map=None</em>, <em>cell_index=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/locally_sparse_noise.html#LocallySparseNoise.open_pincushion_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.open_pincushion_plot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.plot_cell_receptive_field">
+<code class="descname">plot_cell_receptive_field</code><span class="sig-paren">(</span><em>on</em>, <em>cell_specimen_id=None</em>, <em>color_map=None</em>, <em>clim=None</em>, <em>mask=None</em>, <em>cell_index=None</em>, <em>scalebar=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/locally_sparse_noise.html#LocallySparseNoise.plot_cell_receptive_field"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.plot_cell_receptive_field" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.plot_population_receptive_field">
+<code class="descname">plot_population_receptive_field</code><span class="sig-paren">(</span><em>color_map='RdPu'</em>, <em>clim=None</em>, <em>mask=None</em>, <em>scalebar=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/locally_sparse_noise.html#LocallySparseNoise.plot_population_receptive_field"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.plot_population_receptive_field" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.plot_receptive_field_analysis_data">
+<code class="descname">plot_receptive_field_analysis_data</code><span class="sig-paren">(</span><em>cell_index</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/locally_sparse_noise.html#LocallySparseNoise.plot_receptive_field_analysis_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.plot_receptive_field_analysis_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.populate_stimulus_table">
+<code class="descname">populate_stimulus_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/locally_sparse_noise.html#LocallySparseNoise.populate_stimulus_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.populate_stimulus_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implemented by subclasses.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.read_cell_index_receptive_field_analysis">
+<em class="property">static </em><code class="descname">read_cell_index_receptive_field_analysis</code><span class="sig-paren">(</span><em>file_handle</em>, <em>prefix</em>, <em>path=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/locally_sparse_noise.html#LocallySparseNoise.read_cell_index_receptive_field_analysis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.read_cell_index_receptive_field_analysis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.receptive_field">
+<code class="descname">receptive_field</code><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.receptive_field" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.save_cell_index_receptive_field_analysis">
+<em class="property">static </em><code class="descname">save_cell_index_receptive_field_analysis</code><span class="sig-paren">(</span><em>cell_index_receptive_field_analysis_data</em>, <em>new_nwb</em>, <em>prefix</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/locally_sparse_noise.html#LocallySparseNoise.save_cell_index_receptive_field_analysis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.save_cell_index_receptive_field_analysis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.sort_trials">
+<code class="descname">sort_trials</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/locally_sparse_noise.html#LocallySparseNoise.sort_trials"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.sort_trials" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.sweeplength">
+<code class="descname">sweeplength</code><a class="headerlink" href="#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.sweeplength" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
 
 

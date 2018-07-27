@@ -59,8 +59,165 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="allensdk-brain-observatory-drifting-gratings-module">
-<h1>allensdk.brain_observatory.drifting_gratings module<a class="headerlink" href="#allensdk-brain-observatory-drifting-gratings-module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-allensdk.brain_observatory.drifting_gratings">
+<span id="allensdk-brain-observatory-drifting-gratings-module"></span><h1>allensdk.brain_observatory.drifting_gratings module<a class="headerlink" href="#module-allensdk.brain_observatory.drifting_gratings" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="allensdk.brain_observatory.drifting_gratings.DriftingGratings">
+<em class="property">class </em><code class="descclassname">allensdk.brain_observatory.drifting_gratings.</code><code class="descname">DriftingGratings</code><span class="sig-paren">(</span><em>data_set</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/drifting_gratings.html#DriftingGratings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.drifting_gratings.DriftingGratings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="allensdk.brain_observatory.stimulus_analysis.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis" title="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis"><code class="xref py py-class docutils literal notranslate"><span class="pre">allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis</span></code></a></p>
+<p>Perform tuning analysis specific to drifting gratings stimulus.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>data_set: BrainObservatoryNwbDataSet object</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="staticmethod">
+<dt id="allensdk.brain_observatory.drifting_gratings.DriftingGratings.from_analysis_file">
+<em class="property">static </em><code class="descname">from_analysis_file</code><span class="sig-paren">(</span><em>data_set</em>, <em>analysis_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/drifting_gratings.html#DriftingGratings.from_analysis_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.drifting_gratings.DriftingGratings.from_analysis_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.drifting_gratings.DriftingGratings.get_noise_correlation">
+<code class="descname">get_noise_correlation</code><span class="sig-paren">(</span><em>corr='spearman'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/drifting_gratings.html#DriftingGratings.get_noise_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.drifting_gratings.DriftingGratings.get_noise_correlation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.drifting_gratings.DriftingGratings.get_peak">
+<code class="descname">get_peak</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/drifting_gratings.html#DriftingGratings.get_peak"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.drifting_gratings.DriftingGratings.get_peak" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes metrics related to each cell’s peak response condition.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>Pandas data frame containing the following columns (_dg suffix is</strong></dt>
+<dd></dd>
+<dt><strong>for drifting grating):</strong></dt>
+<dd><ul class="first last simple">
+<li>ori_dg (orientation)</li>
+<li>tf_dg (temporal frequency)</li>
+<li>reliability_dg</li>
+<li>osi_dg (orientation selectivity index)</li>
+<li>dsi_dg (direction selectivity index)</li>
+<li>peak_dff_dg (peak dF/F)</li>
+<li>ptest_dg</li>
+<li>p_run_dg</li>
+<li>run_modulation_dg</li>
+<li>cv_dg (circular variance)</li>
+</ul>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.drifting_gratings.DriftingGratings.get_representational_similarity">
+<code class="descname">get_representational_similarity</code><span class="sig-paren">(</span><em>corr='spearman'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/drifting_gratings.html#DriftingGratings.get_representational_similarity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.drifting_gratings.DriftingGratings.get_representational_similarity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.drifting_gratings.DriftingGratings.get_response">
+<code class="descname">get_response</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/drifting_gratings.html#DriftingGratings.get_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.drifting_gratings.DriftingGratings.get_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the mean response for each cell to each stimulus condition.  Return is
+a (# orientations, # temporal frequencies, # cells, 3) np.ndarray.  The final dimension
+contains the mean response to the condition (index 0), standard error of the mean of the response
+to the condition (index 1), and the number of trials with a significant response (p &lt; 0.05)
+to that condition (index 2).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>Numpy array storing mean responses.</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.drifting_gratings.DriftingGratings.get_signal_correlation">
+<code class="descname">get_signal_correlation</code><span class="sig-paren">(</span><em>corr='spearman'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/drifting_gratings.html#DriftingGratings.get_signal_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.drifting_gratings.DriftingGratings.get_signal_correlation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.drifting_gratings.DriftingGratings.number_ori">
+<code class="descname">number_ori</code><a class="headerlink" href="#allensdk.brain_observatory.drifting_gratings.DriftingGratings.number_ori" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.drifting_gratings.DriftingGratings.number_tf">
+<code class="descname">number_tf</code><a class="headerlink" href="#allensdk.brain_observatory.drifting_gratings.DriftingGratings.number_tf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.drifting_gratings.DriftingGratings.open_star_plot">
+<code class="descname">open_star_plot</code><span class="sig-paren">(</span><em>cell_specimen_id=None</em>, <em>include_labels=False</em>, <em>cell_index=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/drifting_gratings.html#DriftingGratings.open_star_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.drifting_gratings.DriftingGratings.open_star_plot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.drifting_gratings.DriftingGratings.orivals">
+<code class="descname">orivals</code><a class="headerlink" href="#allensdk.brain_observatory.drifting_gratings.DriftingGratings.orivals" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.drifting_gratings.DriftingGratings.plot_direction_selectivity">
+<code class="descname">plot_direction_selectivity</code><span class="sig-paren">(</span><em>si_range=[0, 1.5], n_hist_bins=50, color='#ccccdd', p_value_max=0.05, peak_dff_min=3</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/drifting_gratings.html#DriftingGratings.plot_direction_selectivity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.drifting_gratings.DriftingGratings.plot_direction_selectivity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.drifting_gratings.DriftingGratings.plot_orientation_selectivity">
+<code class="descname">plot_orientation_selectivity</code><span class="sig-paren">(</span><em>si_range=[0, 1.5], n_hist_bins=50, color='#ccccdd', p_value_max=0.05, peak_dff_min=3</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/drifting_gratings.html#DriftingGratings.plot_orientation_selectivity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.drifting_gratings.DriftingGratings.plot_orientation_selectivity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.drifting_gratings.DriftingGratings.plot_preferred_direction">
+<code class="descname">plot_preferred_direction</code><span class="sig-paren">(</span><em>include_labels=False, si_range=[0, 1.5], color='#ccccdd', p_value_max=0.05, peak_dff_min=3</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/drifting_gratings.html#DriftingGratings.plot_preferred_direction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.drifting_gratings.DriftingGratings.plot_preferred_direction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.drifting_gratings.DriftingGratings.plot_preferred_temporal_frequency">
+<code class="descname">plot_preferred_temporal_frequency</code><span class="sig-paren">(</span><em>si_range=[0, 1.5], color='#ccccdd', p_value_max=0.05, peak_dff_min=3</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/drifting_gratings.html#DriftingGratings.plot_preferred_temporal_frequency"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.drifting_gratings.DriftingGratings.plot_preferred_temporal_frequency" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.drifting_gratings.DriftingGratings.populate_stimulus_table">
+<code class="descname">populate_stimulus_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/drifting_gratings.html#DriftingGratings.populate_stimulus_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.drifting_gratings.DriftingGratings.populate_stimulus_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implemented by subclasses.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.drifting_gratings.DriftingGratings.reshape_response_array">
+<code class="descname">reshape_response_array</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/drifting_gratings.html#DriftingGratings.reshape_response_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.drifting_gratings.DriftingGratings.reshape_response_array" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">response array in cells x stim x repetition for noise correlations</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.drifting_gratings.DriftingGratings.tfvals">
+<code class="descname">tfvals</code><a class="headerlink" href="#allensdk.brain_observatory.drifting_gratings.DriftingGratings.tfvals" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
 
 

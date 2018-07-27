@@ -59,8 +59,206 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="allensdk-brain-observatory-circle-plots-module">
-<h1>allensdk.brain_observatory.circle_plots module<a class="headerlink" href="#allensdk-brain-observatory-circle-plots-module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-allensdk.brain_observatory.circle_plots">
+<span id="allensdk-brain-observatory-circle-plots-module"></span><h1>allensdk.brain_observatory.circle_plots module<a class="headerlink" href="#module-allensdk.brain_observatory.circle_plots" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="allensdk.brain_observatory.circle_plots.CoronaPlotter">
+<em class="property">class </em><code class="descclassname">allensdk.brain_observatory.circle_plots.</code><code class="descname">CoronaPlotter</code><span class="sig-paren">(</span><em>angle_start=270</em>, <em>plot_scale=1.2</em>, <em>inner_radius=0.3</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/circle_plots.html#CoronaPlotter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.circle_plots.CoronaPlotter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#allensdk.brain_observatory.circle_plots.PolarPlotter" title="allensdk.brain_observatory.circle_plots.PolarPlotter"><code class="xref py py-class docutils literal notranslate"><span class="pre">allensdk.brain_observatory.circle_plots.PolarPlotter</span></code></a></p>
+<dl class="method">
+<dt id="allensdk.brain_observatory.circle_plots.CoronaPlotter.infer_dims">
+<code class="descname">infer_dims</code><span class="sig-paren">(</span><em>category_data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/circle_plots.html#CoronaPlotter.infer_dims"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.circle_plots.CoronaPlotter.infer_dims" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.circle_plots.CoronaPlotter.plot">
+<code class="descname">plot</code><span class="sig-paren">(</span><em>category_data</em>, <em>data=None</em>, <em>clim=None</em>, <em>cmap=&lt;matplotlib.colors.LinearSegmentedColormap object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/circle_plots.html#CoronaPlotter.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.circle_plots.CoronaPlotter.plot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.circle_plots.CoronaPlotter.set_dims">
+<code class="descname">set_dims</code><span class="sig-paren">(</span><em>categories</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/circle_plots.html#CoronaPlotter.set_dims"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.circle_plots.CoronaPlotter.set_dims" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.circle_plots.CoronaPlotter.show_arrow">
+<code class="descname">show_arrow</code><span class="sig-paren">(</span><em>color=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/circle_plots.html#CoronaPlotter.show_arrow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.circle_plots.CoronaPlotter.show_arrow" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="allensdk.brain_observatory.circle_plots.FanPlotter">
+<em class="property">class </em><code class="descclassname">allensdk.brain_observatory.circle_plots.</code><code class="descname">FanPlotter</code><span class="sig-paren">(</span><em>group_scale=0.9</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/circle_plots.html#FanPlotter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.circle_plots.FanPlotter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#allensdk.brain_observatory.circle_plots.PolarPlotter" title="allensdk.brain_observatory.circle_plots.PolarPlotter"><code class="xref py py-class docutils literal notranslate"><span class="pre">allensdk.brain_observatory.circle_plots.PolarPlotter</span></code></a></p>
+<dl class="staticmethod">
+<dt id="allensdk.brain_observatory.circle_plots.FanPlotter.for_drifting_gratings">
+<em class="property">static </em><code class="descname">for_drifting_gratings</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/circle_plots.html#FanPlotter.for_drifting_gratings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.circle_plots.FanPlotter.for_drifting_gratings" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="allensdk.brain_observatory.circle_plots.FanPlotter.for_static_gratings">
+<em class="property">static </em><code class="descname">for_static_gratings</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/circle_plots.html#FanPlotter.for_static_gratings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.circle_plots.FanPlotter.for_static_gratings" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.circle_plots.FanPlotter.infer_dims">
+<code class="descname">infer_dims</code><span class="sig-paren">(</span><em>r_data</em>, <em>angle_data</em>, <em>group_data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/circle_plots.html#FanPlotter.infer_dims"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.circle_plots.FanPlotter.infer_dims" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.circle_plots.FanPlotter.plot">
+<code class="descname">plot</code><span class="sig-paren">(</span><em>r_data</em>, <em>angle_data</em>, <em>group_data=None</em>, <em>data=None</em>, <em>cmap=&lt;matplotlib.colors.LinearSegmentedColormap object&gt;</em>, <em>clim=None</em>, <em>rmap=None</em>, <em>rlim=None</em>, <em>axis_color=None</em>, <em>label_color=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/circle_plots.html#FanPlotter.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.circle_plots.FanPlotter.plot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.circle_plots.FanPlotter.set_dims">
+<code class="descname">set_dims</code><span class="sig-paren">(</span><em>rs</em>, <em>angles</em>, <em>groups</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/circle_plots.html#FanPlotter.set_dims"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.circle_plots.FanPlotter.set_dims" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.circle_plots.FanPlotter.show_angle_labels">
+<code class="descname">show_angle_labels</code><span class="sig-paren">(</span><em>angles=None</em>, <em>labels=None</em>, <em>color=None</em>, <em>offset=0.05</em>, <em>fontdict=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/circle_plots.html#FanPlotter.show_angle_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.circle_plots.FanPlotter.show_angle_labels" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.circle_plots.FanPlotter.show_axes">
+<code class="descname">show_axes</code><span class="sig-paren">(</span><em>angles=None</em>, <em>radii=None</em>, <em>closed=False</em>, <em>color=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/circle_plots.html#FanPlotter.show_axes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.circle_plots.FanPlotter.show_axes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.circle_plots.FanPlotter.show_group_labels">
+<code class="descname">show_group_labels</code><span class="sig-paren">(</span><em>groups=None</em>, <em>color=None</em>, <em>fontdict=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/circle_plots.html#FanPlotter.show_group_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.circle_plots.FanPlotter.show_group_labels" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.circle_plots.FanPlotter.show_r_labels">
+<code class="descname">show_r_labels</code><span class="sig-paren">(</span><em>radii=None</em>, <em>labels=None</em>, <em>color=None</em>, <em>offset=0.1</em>, <em>fontdict=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/circle_plots.html#FanPlotter.show_r_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.circle_plots.FanPlotter.show_r_labels" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="allensdk.brain_observatory.circle_plots.PolarPlotter">
+<em class="property">class </em><code class="descclassname">allensdk.brain_observatory.circle_plots.</code><code class="descname">PolarPlotter</code><span class="sig-paren">(</span><em>direction=-1</em>, <em>angle_start=0</em>, <em>circle_scale=1.1</em>, <em>inner_radius=None</em>, <em>plot_center=(0.0</em>, <em>0.0)</em>, <em>plot_scale=0.9</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/circle_plots.html#PolarPlotter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.circle_plots.PolarPlotter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.circle_plots.PolarPlotter.DIR_CCW">
+<code class="descname">DIR_CCW</code><em class="property"> = 1</em><a class="headerlink" href="#allensdk.brain_observatory.circle_plots.PolarPlotter.DIR_CCW" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.brain_observatory.circle_plots.PolarPlotter.DIR_CW">
+<code class="descname">DIR_CW</code><em class="property"> = -1</em><a class="headerlink" href="#allensdk.brain_observatory.circle_plots.PolarPlotter.DIR_CW" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.circle_plots.PolarPlotter.finalize">
+<code class="descname">finalize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/circle_plots.html#PolarPlotter.finalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.circle_plots.PolarPlotter.finalize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="allensdk.brain_observatory.circle_plots.TrackPlotter">
+<em class="property">class </em><code class="descclassname">allensdk.brain_observatory.circle_plots.</code><code class="descname">TrackPlotter</code><span class="sig-paren">(</span><em>direction=-1</em>, <em>angle_start=270.0</em>, <em>inner_radius=0.45</em>, <em>ring_length=None</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/circle_plots.html#TrackPlotter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.circle_plots.TrackPlotter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#allensdk.brain_observatory.circle_plots.PolarPlotter" title="allensdk.brain_observatory.circle_plots.PolarPlotter"><code class="xref py py-class docutils literal notranslate"><span class="pre">allensdk.brain_observatory.circle_plots.PolarPlotter</span></code></a></p>
+<dl class="method">
+<dt id="allensdk.brain_observatory.circle_plots.TrackPlotter.plot">
+<code class="descname">plot</code><span class="sig-paren">(</span><em>data</em>, <em>clim=None</em>, <em>cmap=&lt;matplotlib.colors.LinearSegmentedColormap object&gt;</em>, <em>mean_cmap=&lt;matplotlib.colors.LinearSegmentedColormap object&gt;</em>, <em>norm=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/circle_plots.html#TrackPlotter.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.circle_plots.TrackPlotter.plot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.circle_plots.TrackPlotter.show_arrow">
+<code class="descname">show_arrow</code><span class="sig-paren">(</span><em>color=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/circle_plots.html#TrackPlotter.show_arrow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.circle_plots.TrackPlotter.show_arrow" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.circle_plots.add_angle_labels">
+<code class="descclassname">allensdk.brain_observatory.circle_plots.</code><code class="descname">add_angle_labels</code><span class="sig-paren">(</span><em>ax</em>, <em>angles</em>, <em>labels</em>, <em>radius</em>, <em>color=None</em>, <em>fontdict=None</em>, <em>offset=0.05</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/circle_plots.html#add_angle_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.circle_plots.add_angle_labels" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.circle_plots.add_arrow">
+<code class="descclassname">allensdk.brain_observatory.circle_plots.</code><code class="descname">add_arrow</code><span class="sig-paren">(</span><em>ax</em>, <em>radius</em>, <em>start_angle</em>, <em>end_angle</em>, <em>color=None</em>, <em>width=18.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/circle_plots.html#add_arrow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.circle_plots.add_arrow" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.circle_plots.angle_lines">
+<code class="descclassname">allensdk.brain_observatory.circle_plots.</code><code class="descname">angle_lines</code><span class="sig-paren">(</span><em>angles</em>, <em>inner_radius</em>, <em>outer_radius</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/circle_plots.html#angle_lines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.circle_plots.angle_lines" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.circle_plots.build_hex_pack">
+<code class="descclassname">allensdk.brain_observatory.circle_plots.</code><code class="descname">build_hex_pack</code><span class="sig-paren">(</span><em>n</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/circle_plots.html#build_hex_pack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.circle_plots.build_hex_pack" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.circle_plots.hex_pack">
+<code class="descclassname">allensdk.brain_observatory.circle_plots.</code><code class="descname">hex_pack</code><span class="sig-paren">(</span><em>radius</em>, <em>n</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/circle_plots.html#hex_pack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.circle_plots.hex_pack" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.circle_plots.make_pincushion_plot">
+<code class="descclassname">allensdk.brain_observatory.circle_plots.</code><code class="descname">make_pincushion_plot</code><span class="sig-paren">(</span><em>data</em>, <em>trials</em>, <em>on</em>, <em>nrows</em>, <em>ncols</em>, <em>clim=None</em>, <em>color_map=None</em>, <em>radius=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/circle_plots.html#make_pincushion_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.circle_plots.make_pincushion_plot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.circle_plots.polar_line_circles">
+<code class="descclassname">allensdk.brain_observatory.circle_plots.</code><code class="descname">polar_line_circles</code><span class="sig-paren">(</span><em>radii</em>, <em>theta</em>, <em>start_r=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/circle_plots.html#polar_line_circles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.circle_plots.polar_line_circles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.circle_plots.polar_linspace">
+<code class="descclassname">allensdk.brain_observatory.circle_plots.</code><code class="descname">polar_linspace</code><span class="sig-paren">(</span><em>radius</em>, <em>start_angle</em>, <em>stop_angle</em>, <em>num</em>, <em>endpoint=False</em>, <em>degrees=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/circle_plots.html#polar_linspace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.circle_plots.polar_linspace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evenly distributed list of x,y coordinates from an input range of angles 
+and a radius in polar coordinates.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.circle_plots.polar_to_xy">
+<code class="descclassname">allensdk.brain_observatory.circle_plots.</code><code class="descname">polar_to_xy</code><span class="sig-paren">(</span><em>angles</em>, <em>radius</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/circle_plots.html#polar_to_xy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.circle_plots.polar_to_xy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert an array of angles (in radians) and a radius in polar coordinates 
+to an array of x,y coordinates.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.circle_plots.radial_arcs">
+<code class="descclassname">allensdk.brain_observatory.circle_plots.</code><code class="descname">radial_arcs</code><span class="sig-paren">(</span><em>rs</em>, <em>start_theta</em>, <em>end_theta</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/circle_plots.html#radial_arcs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.circle_plots.radial_arcs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.circle_plots.radial_circles">
+<code class="descclassname">allensdk.brain_observatory.circle_plots.</code><code class="descname">radial_circles</code><span class="sig-paren">(</span><em>rs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/circle_plots.html#radial_circles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.circle_plots.radial_circles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.circle_plots.reset_hex_pack">
+<code class="descclassname">allensdk.brain_observatory.circle_plots.</code><code class="descname">reset_hex_pack</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/circle_plots.html#reset_hex_pack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.circle_plots.reset_hex_pack" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.circle_plots.rings_in_hex_pack">
+<code class="descclassname">allensdk.brain_observatory.circle_plots.</code><code class="descname">rings_in_hex_pack</code><span class="sig-paren">(</span><em>ct</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/circle_plots.html#rings_in_hex_pack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.circle_plots.rings_in_hex_pack" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.circle_plots.spiral_trials">
+<code class="descclassname">allensdk.brain_observatory.circle_plots.</code><code class="descname">spiral_trials</code><span class="sig-paren">(</span><em>radii</em>, <em>x=0.0</em>, <em>y=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/circle_plots.html#spiral_trials"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.circle_plots.spiral_trials" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.circle_plots.spiral_trials_polar">
+<code class="descclassname">allensdk.brain_observatory.circle_plots.</code><code class="descname">spiral_trials_polar</code><span class="sig-paren">(</span><em>r</em>, <em>theta</em>, <em>radii</em>, <em>offset=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/circle_plots.html#spiral_trials_polar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.circle_plots.spiral_trials_polar" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.circle_plots.wedge_ring">
+<code class="descclassname">allensdk.brain_observatory.circle_plots.</code><code class="descname">wedge_ring</code><span class="sig-paren">(</span><em>N</em>, <em>inner_radius</em>, <em>outer_radius</em>, <em>start=0</em>, <em>stop=360</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/circle_plots.html#wedge_ring"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.circle_plots.wedge_ring" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 
 

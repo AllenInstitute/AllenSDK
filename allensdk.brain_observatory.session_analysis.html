@@ -59,8 +59,342 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="allensdk-brain-observatory-session-analysis-module">
-<h1>allensdk.brain_observatory.session_analysis module<a class="headerlink" href="#allensdk-brain-observatory-session-analysis-module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-allensdk.brain_observatory.session_analysis">
+<span id="allensdk-brain-observatory-session-analysis-module"></span><h1>allensdk.brain_observatory.session_analysis module<a class="headerlink" href="#module-allensdk.brain_observatory.session_analysis" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="allensdk.brain_observatory.session_analysis.SessionAnalysis">
+<em class="property">class </em><code class="descclassname">allensdk.brain_observatory.session_analysis.</code><code class="descname">SessionAnalysis</code><span class="sig-paren">(</span><em>nwb_path</em>, <em>save_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#SessionAnalysis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.SessionAnalysis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Run all of the stimulus-specific analyses associated with a single experiment session.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>nwb_path: string, path to NWB file</strong></dt>
+<dd></dd>
+<dt><strong>save_path: string, path to HDF5 file to store outputs.  Recommended NOT to modify the NWB file.</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="allensdk.brain_observatory.session_analysis.SessionAnalysis.append_experiment_metrics">
+<code class="descname">append_experiment_metrics</code><span class="sig-paren">(</span><em>metrics</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#SessionAnalysis.append_experiment_metrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_experiment_metrics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract stimulus-agnostic metrics from an experiment into a dictionary</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metadata">
+<code class="descname">append_metadata</code><span class="sig-paren">(</span><em>df</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#SessionAnalysis.append_metadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Append the metadata fields from the NWB file as columns to a pd.DataFrame</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_drifting_grating">
+<code class="descname">append_metrics_drifting_grating</code><span class="sig-paren">(</span><em>metrics</em>, <em>dg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#SessionAnalysis.append_metrics_drifting_grating"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_drifting_grating" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract metrics from the DriftingGratings peak response table into a dictionary.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_locally_sparse_noise">
+<code class="descname">append_metrics_locally_sparse_noise</code><span class="sig-paren">(</span><em>metrics</em>, <em>lsn</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#SessionAnalysis.append_metrics_locally_sparse_noise"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_locally_sparse_noise" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract metrics from the LocallySparseNoise peak response table into a dictionary.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_natural_movie_one">
+<code class="descname">append_metrics_natural_movie_one</code><span class="sig-paren">(</span><em>metrics</em>, <em>nma</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#SessionAnalysis.append_metrics_natural_movie_one"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_natural_movie_one" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract metrics from the NaturalMovie(stimulus_info.NATURAL_MOVIE_ONE) peak response table into a dictionary.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_natural_movie_three">
+<code class="descname">append_metrics_natural_movie_three</code><span class="sig-paren">(</span><em>metrics</em>, <em>nma</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#SessionAnalysis.append_metrics_natural_movie_three"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_natural_movie_three" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract metrics from the NaturalMovie(stimulus_info.NATURAL_MOVIE_THREE) peak response table into a dictionary.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_natural_movie_two">
+<code class="descname">append_metrics_natural_movie_two</code><span class="sig-paren">(</span><em>metrics</em>, <em>nma</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#SessionAnalysis.append_metrics_natural_movie_two"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_natural_movie_two" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract metrics from the NaturalMovie(stimulus_info.NATURAL_MOVIE_TWO) peak response table into a dictionary.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_natural_scene">
+<code class="descname">append_metrics_natural_scene</code><span class="sig-paren">(</span><em>metrics</em>, <em>ns</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#SessionAnalysis.append_metrics_natural_scene"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_natural_scene" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract metrics from the NaturalScenes peak response table into a dictionary.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_static_grating">
+<code class="descname">append_metrics_static_grating</code><span class="sig-paren">(</span><em>metrics</em>, <em>sg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#SessionAnalysis.append_metrics_static_grating"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_static_grating" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract metrics from the StaticGratings peak response table into a dictionary.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.session_analysis.SessionAnalysis.save_session_a">
+<code class="descname">save_session_a</code><span class="sig-paren">(</span><em>dg</em>, <em>nm1</em>, <em>nm3</em>, <em>peak</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#SessionAnalysis.save_session_a"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.SessionAnalysis.save_session_a" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the output of session A analysis to self.save_path.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>dg: DriftingGratings instance</strong></dt>
+<dd></dd>
+<dt><strong>nm1: NaturalMovie instance</strong></dt>
+<dd><p class="first last">This NaturalMovie instance should have been created with
+movie_name = stimulus_info.NATURAL_MOVIE_ONE</p>
+</dd>
+<dt><strong>nm3: NaturalMovie instance</strong></dt>
+<dd><p class="first last">This NaturalMovie instance should have been created with
+movie_name = stimulus_info.NATURAL_MOVIE_THREE</p>
+</dd>
+<dt><strong>peak: pd.DataFrame</strong></dt>
+<dd><p class="first last">The combined peak response property table created in self.session_a().</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.session_analysis.SessionAnalysis.save_session_b">
+<code class="descname">save_session_b</code><span class="sig-paren">(</span><em>sg</em>, <em>nm1</em>, <em>ns</em>, <em>peak</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#SessionAnalysis.save_session_b"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.SessionAnalysis.save_session_b" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the output of session B analysis to self.save_path.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>sg: StaticGratings instance</strong></dt>
+<dd></dd>
+<dt><strong>nm1: NaturalMovie instance</strong></dt>
+<dd><p class="first last">This NaturalMovie instance should have been created with
+movie_name = stimulus_info.NATURAL_MOVIE_ONE</p>
+</dd>
+<dt><strong>ns: NaturalScenes instance</strong></dt>
+<dd></dd>
+<dt><strong>peak: pd.DataFrame</strong></dt>
+<dd><p class="first last">The combined peak response property table created in self.session_b().</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.session_analysis.SessionAnalysis.save_session_c">
+<code class="descname">save_session_c</code><span class="sig-paren">(</span><em>lsn</em>, <em>nm1</em>, <em>nm2</em>, <em>peak</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#SessionAnalysis.save_session_c"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.SessionAnalysis.save_session_c" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the output of session C analysis to self.save_path.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>lsn: LocallySparseNoise instance</strong></dt>
+<dd></dd>
+<dt><strong>nm1: NaturalMovie instance</strong></dt>
+<dd><p class="first last">This NaturalMovie instance should have been created with
+movie_name = stimulus_info.NATURAL_MOVIE_ONE</p>
+</dd>
+<dt><strong>nm2: NaturalMovie instance</strong></dt>
+<dd><p class="first last">This NaturalMovie instance should have been created with
+movie_name = stimulus_info.NATURAL_MOVIE_TWO</p>
+</dd>
+<dt><strong>peak: pd.DataFrame</strong></dt>
+<dd><p class="first last">The combined peak response property table created in self.session_c().</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.session_analysis.SessionAnalysis.save_session_c2">
+<code class="descname">save_session_c2</code><span class="sig-paren">(</span><em>lsn4</em>, <em>lsn8</em>, <em>nm1</em>, <em>nm2</em>, <em>peak</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#SessionAnalysis.save_session_c2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.SessionAnalysis.save_session_c2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the output of session C2 analysis to self.save_path.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>lsn4: LocallySparseNoise instance</strong></dt>
+<dd><p class="first last">This LocallySparseNoise instance should have been created with 
+self.stimulus = stimulus_info.LOCALLY_SPARSE_NOISE_4DEG.</p>
+</dd>
+<dt><strong>lsn8: LocallySparseNoise instance</strong></dt>
+<dd><p class="first last">This LocallySparseNoise instance should have been created with 
+self.stimulus = stimulus_info.LOCALLY_SPARSE_NOISE_8DEG.</p>
+</dd>
+<dt><strong>nm1: NaturalMovie instance</strong></dt>
+<dd><p class="first last">This NaturalMovie instance should have been created with
+movie_name = stimulus_info.NATURAL_MOVIE_ONE</p>
+</dd>
+<dt><strong>nm2: NaturalMovie instance</strong></dt>
+<dd><p class="first last">This NaturalMovie instance should have been created with
+movie_name = stimulus_info.NATURAL_MOVIE_TWO</p>
+</dd>
+<dt><strong>peak: pd.DataFrame</strong></dt>
+<dd><p class="first last">The combined peak response property table created in self.session_c2().</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.session_analysis.SessionAnalysis.session_a">
+<code class="descname">session_a</code><span class="sig-paren">(</span><em>plot_flag=False</em>, <em>save_flag=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#SessionAnalysis.session_a"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.SessionAnalysis.session_a" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run stimulus-specific analysis for natural movie one, natural movie three, and drifting gratings.
+The input NWB be for a stimulus_info.THREE_SESSION_A experiment.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>plot_flag: bool</strong></dt>
+<dd><p class="first last">Whether to generate brain_observatory_plotting work plots after running analysis.</p>
+</dd>
+<dt><strong>save_flag: bool</strong></dt>
+<dd><p class="first last">Whether to save the output of analysis to self.save_path upon completion.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.session_analysis.SessionAnalysis.session_b">
+<code class="descname">session_b</code><span class="sig-paren">(</span><em>plot_flag=False</em>, <em>save_flag=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#SessionAnalysis.session_b"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.SessionAnalysis.session_b" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run stimulus-specific analysis for natural scenes, static gratings, and natural movie one.
+The input NWB be for a stimulus_info.THREE_SESSION_B experiment.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>plot_flag: bool</strong></dt>
+<dd><p class="first last">Whether to generate brain_observatory_plotting work plots after running analysis.</p>
+</dd>
+<dt><strong>save_flag: bool</strong></dt>
+<dd><p class="first last">Whether to save the output of analysis to self.save_path upon completion.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.session_analysis.SessionAnalysis.session_c">
+<code class="descname">session_c</code><span class="sig-paren">(</span><em>plot_flag=False</em>, <em>save_flag=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#SessionAnalysis.session_c"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.SessionAnalysis.session_c" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run stimulus-specific analysis for natural movie one, natural movie two, and locally sparse noise.
+The input NWB be for a stimulus_info.THREE_SESSION_C experiment.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>plot_flag: bool</strong></dt>
+<dd><p class="first last">Whether to generate brain_observatory_plotting work plots after running analysis.</p>
+</dd>
+<dt><strong>save_flag: bool</strong></dt>
+<dd><p class="first last">Whether to save the output of analysis to self.save_path upon completion.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.session_analysis.SessionAnalysis.session_c2">
+<code class="descname">session_c2</code><span class="sig-paren">(</span><em>plot_flag=False</em>, <em>save_flag=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#SessionAnalysis.session_c2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.SessionAnalysis.session_c2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run stimulus-specific analysis for locally sparse noise (4 deg.), locally sparse noise (8 deg.),
+natural movie one, and natural movie two. The input NWB be for a stimulus_info.THREE_SESSION_C2 experiment.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>plot_flag: bool</strong></dt>
+<dd><p class="first last">Whether to generate brain_observatory_plotting work plots after running analysis.</p>
+</dd>
+<dt><strong>save_flag: bool</strong></dt>
+<dd><p class="first last">Whether to save the output of analysis to self.save_path upon completion.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.session_analysis.SessionAnalysis.verify_roi_lists_equal">
+<code class="descname">verify_roi_lists_equal</code><span class="sig-paren">(</span><em>roi1</em>, <em>roi2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#SessionAnalysis.verify_roi_lists_equal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.SessionAnalysis.verify_roi_lists_equal" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO: replace this with simpler numpy comparisons</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.session_analysis.main">
+<code class="descclassname">allensdk.brain_observatory.session_analysis.</code><code class="descname">main</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.session_analysis.multi_dataframe_merge">
+<code class="descclassname">allensdk.brain_observatory.session_analysis.</code><code class="descname">multi_dataframe_merge</code><span class="sig-paren">(</span><em>dfs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#multi_dataframe_merge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.multi_dataframe_merge" title="Permalink to this definition">¶</a></dt>
+<dd><p>merge a number of pd.DataFrames into a single dataframe on their index columns. 
+If any columns are duplicated, prefer the first occuring instance of the column</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.session_analysis.run_session_analysis">
+<code class="descclassname">allensdk.brain_observatory.session_analysis.</code><code class="descname">run_session_analysis</code><span class="sig-paren">(</span><em>nwb_path</em>, <em>save_path</em>, <em>plot_flag=False</em>, <em>save_flag=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#run_session_analysis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.run_session_analysis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inspect an NWB file to determine which experiment session was run
+and compute all stimulus-specific analyses.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>nwb_path: string</strong></dt>
+<dd><p class="first last">Path to NWB file.</p>
+</dd>
+<dt><strong>save_path: string</strong></dt>
+<dd><p class="first last">path to save results. Recommended NOT to use NWB file.</p>
+</dd>
+<dt><strong>plot_flag: bool</strong></dt>
+<dd><p class="first last">Whether to save brain_observatory_plotting work plots.</p>
+</dd>
+<dt><strong>save_flag: bool</strong></dt>
+<dd><p class="first last">Whether to save results to save_path.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 
 

@@ -59,8 +59,102 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="allensdk-brain-observatory-dff-module">
-<h1>allensdk.brain_observatory.dff module<a class="headerlink" href="#allensdk-brain-observatory-dff-module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-allensdk.brain_observatory.dff">
+<span id="allensdk-brain-observatory-dff-module"></span><h1>allensdk.brain_observatory.dff module<a class="headerlink" href="#module-allensdk.brain_observatory.dff" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="allensdk.brain_observatory.dff.compute_dff">
+<code class="descclassname">allensdk.brain_observatory.dff.</code><code class="descname">compute_dff</code><span class="sig-paren">(</span><em>traces</em>, <em>save_plot_dir=None</em>, <em>mode_kernelsize=5400</em>, <em>mean_kernelsize=3000</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/dff.html#compute_dff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.dff.compute_dff" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute dF/F of a set of traces using a low-pass windowed-mode operator.
+The operation is basically:</p>
+<blockquote>
+<div><p>T_mm = windowed_mean(windowed_mode(T))</p>
+<p>T_dff = (T - T_mm) / T_mm</p>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>traces: np.ndarray</strong></dt>
+<dd><p class="first last">2D array of traces to be analyzed</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>np.ndarray with the same shape as the input array.</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.dff.main">
+<code class="descclassname">allensdk.brain_observatory.dff.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/dff.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.dff.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.dff.movingaverage">
+<code class="descclassname">allensdk.brain_observatory.dff.</code><code class="descname">movingaverage</code><span class="sig-paren">(</span><em>x</em>, <em>kernelsize</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/dff.html#movingaverage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.dff.movingaverage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the windowed average of an array.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>x: np.ndarray</strong></dt>
+<dd><p class="first last">Array to be analyzed</p>
+</dd>
+<dt><strong>kernelsize: int</strong></dt>
+<dd><p class="first last">Size of the moving window</p>
+</dd>
+<dt><strong>y: np.ndarray</strong></dt>
+<dd><p class="first last">Output array to store the results</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.dff.movingmode_fast">
+<code class="descclassname">allensdk.brain_observatory.dff.</code><code class="descname">movingmode_fast</code><span class="sig-paren">(</span><em>x</em>, <em>kernelsize</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/dff.html#movingmode_fast"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.dff.movingmode_fast" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the windowed mode of an array.  A running mode is initialized
+with a histogram of values over the initial kernelsize/2 values.  The mode
+is then updated as the kernel moves by adding and subtracting values from
+the histogram.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>x: np.ndarray</strong></dt>
+<dd><p class="first last">Array to be analyzed</p>
+</dd>
+<dt><strong>kernelsize: int</strong></dt>
+<dd><p class="first last">Size of the moving window</p>
+</dd>
+<dt><strong>y: np.ndarray</strong></dt>
+<dd><p class="first last">Output array to store the results</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.dff.plot_onetrace">
+<code class="descclassname">allensdk.brain_observatory.dff.</code><code class="descname">plot_onetrace</code><span class="sig-paren">(</span><em>dff</em>, <em>fc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/dff.html#plot_onetrace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.dff.plot_onetrace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Debug plotting function</p>
+</dd></dl>
+
 </div>
 
 

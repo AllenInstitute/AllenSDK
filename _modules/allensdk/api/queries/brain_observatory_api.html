@@ -1,32 +1,21 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>allensdk.api.queries.brain_observatory_api &mdash; Allen SDK dev documentation</title>
-    
+    <title>allensdk.api.queries.brain_observatory_api &#8212; Allen SDK dev documentation</title>
     <link rel="stylesheet" href="../../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../../',
-        VERSION:     'dev',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="../../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK dev documentation" href="../../../../index.html" />
-    <link rel="up" title="Module code" href="../../../index.html" /> 
-  </head>
-  <body role="document">
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
 <script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
@@ -107,18 +96,18 @@
 
 <span class="kn">import</span> <span class="nn">logging</span>
 
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">string_types</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">six</span> <span class="k">import</span> <span class="n">string_types</span>
 
-<span class="kn">from</span> <span class="nn">allensdk.config.manifest</span> <span class="kn">import</span> <span class="n">Manifest</span>
-<span class="kn">import</span> <span class="nn">allensdk.brain_observatory.stimulus_info</span> <span class="kn">as</span> <span class="nn">stimulus_info</span>
+<span class="kn">from</span> <span class="nn">allensdk.config.manifest</span> <span class="k">import</span> <span class="n">Manifest</span>
+<span class="kn">import</span> <span class="nn">allensdk.brain_observatory.stimulus_info</span> <span class="k">as</span> <span class="nn">stimulus_info</span>
 
-<span class="kn">from</span> <span class="nn">.rma_template</span> <span class="kn">import</span> <span class="n">RmaTemplate</span>
-<span class="kn">from</span> <span class="nn">..cache</span> <span class="kn">import</span> <span class="n">cacheable</span><span class="p">,</span> <span class="n">Cache</span>
-<span class="kn">from</span> <span class="nn">.rma_pager</span> <span class="kn">import</span> <span class="n">pageable</span>
+<span class="kn">from</span> <span class="nn">.rma_template</span> <span class="k">import</span> <span class="n">RmaTemplate</span>
+<span class="kn">from</span> <span class="nn">..cache</span> <span class="k">import</span> <span class="n">cacheable</span><span class="p">,</span> <span class="n">Cache</span>
+<span class="kn">from</span> <span class="nn">.rma_pager</span> <span class="k">import</span> <span class="n">pageable</span>
 
 
-<div class="viewcode-block" id="BrainObservatoryApi"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi">[docs]</a><span class="k">class</span> <span class="nc">BrainObservatoryApi</span><span class="p">(</span><span class="n">RmaTemplate</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryApi"><a class="viewcode-back" href="../../../../allensdk.api.queries.brain_observatory_api.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi">[docs]</a><span class="k">class</span> <span class="nc">BrainObservatoryApi</span><span class="p">(</span><span class="n">RmaTemplate</span><span class="p">):</span>
     <span class="n">_log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;allensdk.api.queries.brain_observatory_api&#39;</span><span class="p">)</span>
 
     <span class="n">NWB_FILE_TYPE</span> <span class="o">=</span> <span class="s1">&#39;NWBOphys&#39;</span>
@@ -130,7 +119,7 @@
              <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;see name&#39;</span><span class="p">,</span>
              <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="s1">&#39;IsiExperiment&#39;</span><span class="p">,</span>
              <span class="s1">&#39;num_rows&#39;</span><span class="p">:</span> <span class="s1">&#39;all&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
              <span class="s1">&#39;criteria_params&#39;</span><span class="p">:</span> <span class="p">[]</span>
              <span class="p">},</span>
             <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;isi_experiment_by_ids&#39;</span><span class="p">,</span>
@@ -139,7 +128,7 @@
              <span class="s1">&#39;criteria&#39;</span><span class="p">:</span> <span class="s1">&#39;[id$in{{ isi_experiment_ids }}]&#39;</span><span class="p">,</span>
              <span class="s1">&#39;include&#39;</span><span class="p">:</span> <span class="s1">&#39;experiment_container(ophys_experiments,targeted_structure)&#39;</span><span class="p">,</span>
              <span class="s1">&#39;num_rows&#39;</span><span class="p">:</span> <span class="s1">&#39;all&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
              <span class="s1">&#39;criteria_params&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;isi_experiment_ids&#39;</span><span class="p">]</span>
              <span class="p">},</span>
             <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;ophys_experiment_by_ids&#39;</span><span class="p">,</span>
@@ -148,7 +137,7 @@
              <span class="s1">&#39;criteria&#39;</span><span class="p">:</span> <span class="s1">&#39;{</span><span class="si">% i</span><span class="s1">f ophys_experiment_ids is defined %}[id$in{{ ophys_experiment_ids }}]{</span><span class="si">%e</span><span class="s1">ndif%}&#39;</span><span class="p">,</span>
              <span class="s1">&#39;include&#39;</span><span class="p">:</span> <span class="s1">&#39;experiment_container,well_known_files(well_known_file_type),targeted_structure,specimen(donor(age,transgenic_lines))&#39;</span><span class="p">,</span>
              <span class="s1">&#39;num_rows&#39;</span><span class="p">:</span> <span class="s1">&#39;all&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
              <span class="s1">&#39;criteria_params&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;ophys_experiment_ids&#39;</span><span class="p">]</span>
              <span class="p">},</span>
             <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;ophys_experiment_data&#39;</span><span class="p">,</span>
@@ -156,7 +145,7 @@
              <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="s1">&#39;WellKnownFile&#39;</span><span class="p">,</span>
              <span class="s1">&#39;criteria&#39;</span><span class="p">:</span> <span class="s1">&#39;[attachable_id$eq{{ ophys_experiment_id }}],well_known_file_type[name$eq</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="n">NWB_FILE_TYPE</span><span class="p">,</span>
              <span class="s1">&#39;num_rows&#39;</span><span class="p">:</span> <span class="s1">&#39;all&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
              <span class="s1">&#39;criteria_params&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;ophys_experiment_id&#39;</span><span class="p">]</span>
              <span class="p">},</span>
             <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;column_definitions&#39;</span><span class="p">,</span>
@@ -164,7 +153,7 @@
              <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="s1">&#39;ApiColumnDefinition&#39;</span><span class="p">,</span>
              <span class="s1">&#39;criteria&#39;</span><span class="p">:</span> <span class="s1">&#39;[api_class_name$eq{{ api_class_name }}]&#39;</span><span class="p">,</span>
              <span class="s1">&#39;num_rows&#39;</span><span class="p">:</span> <span class="s1">&#39;all&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
              <span class="s1">&#39;criteria_params&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;api_class_name&#39;</span><span class="p">]</span>
              <span class="p">},</span>
             <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;column_definition_class_names&#39;</span><span class="p">,</span>
@@ -172,14 +161,14 @@
              <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="s1">&#39;ApiColumnDefinition&#39;</span><span class="p">,</span>
              <span class="s1">&#39;only&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;api_class_name&#39;</span><span class="p">],</span>
              <span class="s1">&#39;num_rows&#39;</span><span class="p">:</span> <span class="s1">&#39;all&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
              <span class="p">},</span>
             <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;stimulus_mapping&#39;</span><span class="p">,</span>
              <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;see name&#39;</span><span class="p">,</span>
              <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="s1">&#39;ApiCamStimulusMapping&#39;</span><span class="p">,</span>
              <span class="s1">&#39;criteria&#39;</span><span class="p">:</span> <span class="s1">&#39;{</span><span class="si">% i</span><span class="s1">f stimulus_mapping_ids is defined %}[id$in{{ stimulus_mapping_ids }}]{</span><span class="si">%e</span><span class="s1">ndif%}&#39;</span><span class="p">,</span>
              <span class="s1">&#39;num_rows&#39;</span><span class="p">:</span> <span class="s1">&#39;all&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
              <span class="s1">&#39;criteria_params&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;stimulus_mapping_ids&#39;</span><span class="p">]</span>
              <span class="p">},</span>
             <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;experiment_container&#39;</span><span class="p">,</span>
@@ -188,7 +177,7 @@
              <span class="s1">&#39;criteria&#39;</span><span class="p">:</span> <span class="s1">&#39;{</span><span class="si">% i</span><span class="s1">f experiment_container_ids is defined %}[id$in{{ experiment_container_ids }}]{</span><span class="si">%e</span><span class="s1">ndif%}&#39;</span><span class="p">,</span>
              <span class="s1">&#39;include&#39;</span><span class="p">:</span> <span class="s1">&#39;ophys_experiments,isi_experiment,specimen(donor(conditions,age,transgenic_lines)),targeted_structure&#39;</span><span class="p">,</span>
              <span class="s1">&#39;num_rows&#39;</span><span class="p">:</span> <span class="s1">&#39;all&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
              <span class="s1">&#39;criteria_params&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;experiment_container_ids&#39;</span><span class="p">]</span>
              <span class="p">},</span>
             <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;experiment_container_metric&#39;</span><span class="p">,</span>
@@ -196,7 +185,7 @@
              <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="s1">&#39;ApiCamExperimentContainerMetric&#39;</span><span class="p">,</span>
              <span class="s1">&#39;criteria&#39;</span><span class="p">:</span> <span class="s1">&#39;{</span><span class="si">% i</span><span class="s1">f experiment_container_metric_ids is defined %}[id$in{{ experiment_container_metric_ids }}]{</span><span class="si">%e</span><span class="s1">ndif%}&#39;</span><span class="p">,</span>
              <span class="s1">&#39;num_rows&#39;</span><span class="p">:</span> <span class="s1">&#39;all&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
              <span class="s1">&#39;criteria_params&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;experiment_container_metric_ids&#39;</span><span class="p">]</span>
              <span class="p">},</span>
             <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;cell_metric&#39;</span><span class="p">,</span>
@@ -210,29 +199,29 @@
              <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="s1">&#39;WellKnownFile&#39;</span><span class="p">,</span>
              <span class="s1">&#39;criteria&#39;</span><span class="p">:</span> <span class="s1">&#39;[id$eq{{ mapping_table_id }}],well_known_file_type[name$eqOphysCellSpecimenIdMapping]&#39;</span><span class="p">,</span>
              <span class="s1">&#39;num_rows&#39;</span><span class="p">:</span> <span class="s1">&#39;all&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
              <span class="s1">&#39;criteria_params&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;mapping_table_id&#39;</span><span class="p">]}</span>
         <span class="p">]}</span>
 
     <span class="n">_QUERY_TEMPLATES</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;=&quot;</span><span class="p">:</span> <span class="s1">&#39;({0} == {1})&#39;</span><span class="p">,</span>
-        <span class="s2">&quot;&lt;&quot;</span><span class="p">:</span> <span class="s1">&#39;({0} &lt; {1})&#39;</span><span class="p">,</span>
-        <span class="s2">&quot;&gt;&quot;</span><span class="p">:</span> <span class="s1">&#39;({0} &gt; {1})&#39;</span><span class="p">,</span>
-        <span class="s2">&quot;&lt;=&quot;</span><span class="p">:</span> <span class="s1">&#39;({0} &lt;= {1})&#39;</span><span class="p">,</span>
-        <span class="s2">&quot;&gt;=&quot;</span><span class="p">:</span> <span class="s1">&#39;({0} &gt;= {1})&#39;</span><span class="p">,</span>
-        <span class="s2">&quot;between&quot;</span><span class="p">:</span> <span class="s1">&#39;({0} &gt;= {1}) and ({0} &lt;= {2})&#39;</span><span class="p">,</span>
-        <span class="s2">&quot;in&quot;</span><span class="p">:</span> <span class="s1">&#39;({0} == {1})&#39;</span><span class="p">,</span>
-        <span class="s2">&quot;is&quot;</span><span class="p">:</span> <span class="s1">&#39;({0} == {1})&#39;</span>
+        <span class="s2">&quot;=&quot;</span><span class="p">:</span> <span class="s1">&#39;(</span><span class="si">{0}</span><span class="s1"> == </span><span class="si">{1}</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s2">&quot;&lt;&quot;</span><span class="p">:</span> <span class="s1">&#39;(</span><span class="si">{0}</span><span class="s1"> &lt; </span><span class="si">{1}</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s2">&quot;&gt;&quot;</span><span class="p">:</span> <span class="s1">&#39;(</span><span class="si">{0}</span><span class="s1"> &gt; </span><span class="si">{1}</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s2">&quot;&lt;=&quot;</span><span class="p">:</span> <span class="s1">&#39;(</span><span class="si">{0}</span><span class="s1"> &lt;= </span><span class="si">{1}</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s2">&quot;&gt;=&quot;</span><span class="p">:</span> <span class="s1">&#39;(</span><span class="si">{0}</span><span class="s1"> &gt;= </span><span class="si">{1}</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s2">&quot;between&quot;</span><span class="p">:</span> <span class="s1">&#39;(</span><span class="si">{0}</span><span class="s1"> &gt;= </span><span class="si">{1}</span><span class="s1">) and (</span><span class="si">{0}</span><span class="s1"> &lt;= </span><span class="si">{2}</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s2">&quot;in&quot;</span><span class="p">:</span> <span class="s1">&#39;(</span><span class="si">{0}</span><span class="s1"> == </span><span class="si">{1}</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s2">&quot;is&quot;</span><span class="p">:</span> <span class="s1">&#39;(</span><span class="si">{0}</span><span class="s1"> == </span><span class="si">{1}</span><span class="s1">)&#39;</span>
     <span class="p">}</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">datacube_uri</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">BrainObservatoryApi</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">base_uri</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">datacube_uri</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BrainObservatoryApi</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">base_uri</span><span class="p">,</span>
                                                   <span class="n">query_manifest</span><span class="o">=</span><span class="n">BrainObservatoryApi</span><span class="o">.</span><span class="n">rma_templates</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">datacube_uri</span> <span class="o">=</span> <span class="n">datacube_uri</span>
 
-    <span class="nd">@cacheable</span><span class="p">()</span>
-<div class="viewcode-block" id="BrainObservatoryApi.get_ophys_experiments"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.get_ophys_experiments">[docs]</a>    <span class="k">def</span> <span class="nf">get_ophys_experiments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ophys_experiment_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryApi.get_ophys_experiments"><a class="viewcode-back" href="../../../../allensdk.api.queries.brain_observatory_api.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.get_ophys_experiments">[docs]</a>    <span class="nd">@cacheable</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">get_ophys_experiments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ophys_experiment_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Get OPhys Experiments by id</span>
 
 <span class="sd">        Parameters</span>
@@ -250,7 +239,7 @@
 
         <span class="k">return</span> <span class="n">data</span></div>
 
-<div class="viewcode-block" id="BrainObservatoryApi.get_isi_experiments"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.get_isi_experiments">[docs]</a>    <span class="k">def</span> <span class="nf">get_isi_experiments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">isi_experiment_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryApi.get_isi_experiments"><a class="viewcode-back" href="../../../../allensdk.api.queries.brain_observatory_api.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.get_isi_experiments">[docs]</a>    <span class="k">def</span> <span class="nf">get_isi_experiments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">isi_experiment_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Get ISI Experiments by id</span>
 
 <span class="sd">        Parameters</span>
@@ -268,7 +257,7 @@
 
         <span class="k">return</span> <span class="n">data</span></div>
 
-<div class="viewcode-block" id="BrainObservatoryApi.list_isi_experiments"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.list_isi_experiments">[docs]</a>    <span class="k">def</span> <span class="nf">list_isi_experiments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">isi_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryApi.list_isi_experiments"><a class="viewcode-back" href="../../../../allensdk.api.queries.brain_observatory_api.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.list_isi_experiments">[docs]</a>    <span class="k">def</span> <span class="nf">list_isi_experiments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">isi_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;List ISI experiments available through the Allen Institute API</span>
 
 <span class="sd">        Parameters</span>
@@ -285,7 +274,7 @@
 
         <span class="k">return</span> <span class="n">data</span></div>
 
-<div class="viewcode-block" id="BrainObservatoryApi.list_column_definition_class_names"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.list_column_definition_class_names">[docs]</a>    <span class="k">def</span> <span class="nf">list_column_definition_class_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryApi.list_column_definition_class_names"><a class="viewcode-back" href="../../../../allensdk.api.queries.brain_observatory_api.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.list_column_definition_class_names">[docs]</a>    <span class="k">def</span> <span class="nf">list_column_definition_class_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Get column definitions</span>
 
 <span class="sd">        Parameters</span>
@@ -302,7 +291,7 @@
 
         <span class="k">return</span> <span class="n">names</span></div>
 
-<div class="viewcode-block" id="BrainObservatoryApi.get_column_definitions"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.get_column_definitions">[docs]</a>    <span class="k">def</span> <span class="nf">get_column_definitions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">api_class_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryApi.get_column_definitions"><a class="viewcode-back" href="../../../../allensdk.api.queries.brain_observatory_api.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.get_column_definitions">[docs]</a>    <span class="k">def</span> <span class="nf">get_column_definitions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">api_class_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Get column definitions</span>
 
 <span class="sd">        Parameters</span>
@@ -320,8 +309,8 @@
 
         <span class="k">return</span> <span class="n">data</span></div>
 
-    <span class="nd">@cacheable</span><span class="p">()</span>
-<div class="viewcode-block" id="BrainObservatoryApi.get_stimulus_mappings"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.get_stimulus_mappings">[docs]</a>    <span class="k">def</span> <span class="nf">get_stimulus_mappings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stimulus_mapping_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryApi.get_stimulus_mappings"><a class="viewcode-back" href="../../../../allensdk.api.queries.brain_observatory_api.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.get_stimulus_mappings">[docs]</a>    <span class="nd">@cacheable</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">get_stimulus_mappings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stimulus_mapping_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Get stimulus mappings by id</span>
 
 <span class="sd">        Parameters</span>
@@ -339,9 +328,9 @@
 
         <span class="k">return</span> <span class="n">data</span></div>
 
-    <span class="nd">@cacheable</span><span class="p">()</span>
+<div class="viewcode-block" id="BrainObservatoryApi.get_cell_metrics"><a class="viewcode-back" href="../../../../allensdk.api.queries.brain_observatory_api.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.get_cell_metrics">[docs]</a>    <span class="nd">@cacheable</span><span class="p">()</span>
     <span class="nd">@pageable</span><span class="p">(</span><span class="n">num_rows</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">total_rows</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
-<div class="viewcode-block" id="BrainObservatoryApi.get_cell_metrics"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.get_cell_metrics">[docs]</a>    <span class="k">def</span> <span class="nf">get_cell_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_cell_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Get cell metrics by id</span>
 
 <span class="sd">        Parameters</span>
@@ -361,8 +350,8 @@
 
         <span class="k">return</span> <span class="n">data</span></div>
 
-    <span class="nd">@cacheable</span><span class="p">()</span>
-<div class="viewcode-block" id="BrainObservatoryApi.get_experiment_containers"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.get_experiment_containers">[docs]</a>    <span class="k">def</span> <span class="nf">get_experiment_containers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">experiment_container_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryApi.get_experiment_containers"><a class="viewcode-back" href="../../../../allensdk.api.queries.brain_observatory_api.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.get_experiment_containers">[docs]</a>    <span class="nd">@cacheable</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">get_experiment_containers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">experiment_container_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Get experiment container by id</span>
 
 <span class="sd">        Parameters</span>
@@ -380,7 +369,7 @@
 
         <span class="k">return</span> <span class="n">data</span></div>
 
-<div class="viewcode-block" id="BrainObservatoryApi.get_experiment_container_metrics"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.get_experiment_container_metrics">[docs]</a>    <span class="k">def</span> <span class="nf">get_experiment_container_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">experiment_container_metric_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryApi.get_experiment_container_metrics"><a class="viewcode-back" href="../../../../allensdk.api.queries.brain_observatory_api.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.get_experiment_container_metrics">[docs]</a>    <span class="k">def</span> <span class="nf">get_experiment_container_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">experiment_container_metric_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Get experiment container metrics by id</span>
 
 <span class="sd">        Parameters</span>
@@ -398,10 +387,10 @@
 
         <span class="k">return</span> <span class="n">data</span></div>
 
-    <span class="nd">@cacheable</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;create&#39;</span><span class="p">,</span>
+<div class="viewcode-block" id="BrainObservatoryApi.save_ophys_experiment_data"><a class="viewcode-back" href="../../../../allensdk.api.queries.brain_observatory_api.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.save_ophys_experiment_data">[docs]</a>    <span class="nd">@cacheable</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;create&#39;</span><span class="p">,</span>
                <span class="n">pathfinder</span><span class="o">=</span><span class="n">Cache</span><span class="o">.</span><span class="n">pathfinder</span><span class="p">(</span><span class="n">file_name_position</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
                                            <span class="n">path_keyword</span><span class="o">=</span><span class="s1">&#39;file_name&#39;</span><span class="p">))</span>
-<div class="viewcode-block" id="BrainObservatoryApi.save_ophys_experiment_data"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.save_ophys_experiment_data">[docs]</a>    <span class="k">def</span> <span class="nf">save_ophys_experiment_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ophys_experiment_id</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">save_ophys_experiment_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ophys_experiment_id</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_query</span><span class="p">(</span><span class="s1">&#39;brain_observatory_queries&#39;</span><span class="p">,</span>
                                    <span class="s1">&#39;ophys_experiment_data&#39;</span><span class="p">,</span>
                                    <span class="n">ophys_experiment_id</span><span class="o">=</span><span class="n">ophys_experiment_id</span><span class="p">)</span>
@@ -417,44 +406,44 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_file_over_http</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api_url</span> <span class="o">+</span> <span class="n">file_url</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="BrainObservatoryApi.filter_experiment_containers"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.filter_experiment_containers">[docs]</a>    <span class="k">def</span> <span class="nf">filter_experiment_containers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">containers</span><span class="p">,</span>
-                                     <span class="n">ids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                                     <span class="n">targeted_structures</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                                     <span class="n">imaging_depths</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                                     <span class="n">transgenic_lines</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                                     <span class="n">include_failed</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryApi.filter_experiment_containers"><a class="viewcode-back" href="../../../../allensdk.api.queries.brain_observatory_api.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.filter_experiment_containers">[docs]</a>    <span class="k">def</span> <span class="nf">filter_experiment_containers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">containers</span><span class="p">,</span>
+                                     <span class="n">ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                     <span class="n">targeted_structures</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                     <span class="n">imaging_depths</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                     <span class="n">transgenic_lines</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                     <span class="n">include_failed</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">include_failed</span><span class="p">:</span>
-            <span class="n">containers</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">containers</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">c</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;failed&#39;</span><span class="p">,</span> <span class="bp">False</span><span class="p">)]</span>
+            <span class="n">containers</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">containers</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">c</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;failed&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)]</span>
 
-        <span class="k">if</span> <span class="n">ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">containers</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">containers</span> <span class="k">if</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="n">targeted_structures</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">targeted_structures</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">containers</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">containers</span> <span class="k">if</span> <span class="n">c</span><span class="p">[</span>
                 <span class="s1">&#39;targeted_structure&#39;</span><span class="p">][</span><span class="s1">&#39;acronym&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">targeted_structures</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="n">imaging_depths</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">imaging_depths</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">containers</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">containers</span> <span class="k">if</span> <span class="n">c</span><span class="p">[</span>
                 <span class="s1">&#39;imaging_depth&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">imaging_depths</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="n">transgenic_lines</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">transgenic_lines</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">tls</span> <span class="o">=</span> <span class="p">[</span> <span class="n">tl</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">tl</span> <span class="ow">in</span> <span class="n">transgenic_lines</span> <span class="p">]</span>
             <span class="n">containers</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">containers</span> <span class="k">for</span> <span class="n">tl</span> <span class="ow">in</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;specimen&#39;</span><span class="p">][</span>
                 <span class="s1">&#39;donor&#39;</span><span class="p">][</span><span class="s1">&#39;transgenic_lines&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">tl</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">tls</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">containers</span></div>
 
-<div class="viewcode-block" id="BrainObservatoryApi.filter_ophys_experiments"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.filter_ophys_experiments">[docs]</a>    <span class="k">def</span> <span class="nf">filter_ophys_experiments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">experiments</span><span class="p">,</span>
-                                 <span class="n">ids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                                 <span class="n">experiment_container_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                                 <span class="n">targeted_structures</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                                 <span class="n">imaging_depths</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                                 <span class="n">transgenic_lines</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                                 <span class="n">stimuli</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                                 <span class="n">session_types</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                                 <span class="n">include_failed</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-                                 <span class="n">require_eye_tracking</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryApi.filter_ophys_experiments"><a class="viewcode-back" href="../../../../allensdk.api.queries.brain_observatory_api.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.filter_ophys_experiments">[docs]</a>    <span class="k">def</span> <span class="nf">filter_ophys_experiments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">experiments</span><span class="p">,</span>
+                                 <span class="n">ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                 <span class="n">experiment_container_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                 <span class="n">targeted_structures</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                 <span class="n">imaging_depths</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                 <span class="n">transgenic_lines</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                 <span class="n">stimuli</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                 <span class="n">session_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                 <span class="n">include_failed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                 <span class="n">require_eye_tracking</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 
         <span class="c1"># re-using the code from above</span>
         <span class="n">experiments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_experiment_containers</span><span class="p">(</span><span class="n">experiments</span><span class="p">,</span>
@@ -465,30 +454,30 @@
 
         <span class="k">if</span> <span class="n">require_eye_tracking</span><span class="p">:</span>
             <span class="n">experiments</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">experiments</span>
-                           <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;fail_eye_tracking&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">False</span><span class="p">]</span>
+                           <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;fail_eye_tracking&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">include_failed</span><span class="p">:</span>
             <span class="n">experiments</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">experiments</span> 
-                           <span class="k">if</span> <span class="ow">not</span> <span class="n">e</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;experiment_container&#39;</span><span class="p">,{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;failed&#39;</span><span class="p">,</span> <span class="bp">False</span><span class="p">)]</span>
+                           <span class="k">if</span> <span class="ow">not</span> <span class="n">e</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;experiment_container&#39;</span><span class="p">,{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;failed&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)]</span>
 
-        <span class="k">if</span> <span class="n">experiment_container_ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">experiment_container_ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">experiments</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">experiments</span> <span class="k">if</span> <span class="n">e</span><span class="p">[</span>
                 <span class="s1">&#39;experiment_container_id&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">experiment_container_ids</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="n">session_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">session_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">experiments</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">experiments</span> <span class="k">if</span> <span class="n">e</span><span class="p">[</span>
                 <span class="s1">&#39;stimulus_name&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">session_types</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="n">stimuli</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">stimuli</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">experiments</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">experiments</span>
                            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">stimuli</span><span class="p">)</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">stimulus_info</span><span class="o">.</span><span class="n">stimuli_in_session</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="s1">&#39;stimulus_name&#39;</span><span class="p">])))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">experiments</span></div>
 
-<div class="viewcode-block" id="BrainObservatoryApi.filter_cell_specimens"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.filter_cell_specimens">[docs]</a>    <span class="k">def</span> <span class="nf">filter_cell_specimens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimens</span><span class="p">,</span>
-                              <span class="n">ids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                              <span class="n">experiment_container_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                              <span class="n">include_failed</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-                              <span class="n">filters</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryApi.filter_cell_specimens"><a class="viewcode-back" href="../../../../allensdk.api.queries.brain_observatory_api.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.filter_cell_specimens">[docs]</a>    <span class="k">def</span> <span class="nf">filter_cell_specimens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimens</span><span class="p">,</span>
+                              <span class="n">ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                              <span class="n">experiment_container_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                              <span class="n">include_failed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                              <span class="n">filters</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Filter a list of cell specimen records returned from the get_cell_metrics method according </span>
 <span class="sd">        some of their properties.</span>
@@ -516,24 +505,24 @@
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">include_failed</span><span class="p">:</span>
             <span class="n">cell_specimens</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cell_specimens</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">c</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-                    <span class="s1">&#39;failed_experiment_container&#39;</span><span class="p">,</span> <span class="bp">False</span><span class="p">)]</span>
+                    <span class="s1">&#39;failed_experiment_container&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)]</span>
 
-        <span class="k">if</span> <span class="n">ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">cell_specimens</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cell_specimens</span> <span class="k">if</span> <span class="n">c</span><span class="p">[</span>
                 <span class="s1">&#39;cell_specimen_id&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="n">experiment_container_ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">experiment_container_ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">cell_specimens</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cell_specimens</span> <span class="k">if</span> <span class="n">c</span><span class="p">[</span>
                 <span class="s1">&#39;experiment_container_id&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">experiment_container_ids</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="n">filters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">filters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">cell_specimens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataframe_query</span><span class="p">(</span><span class="n">cell_specimens</span><span class="p">,</span>
                                                   <span class="n">filters</span><span class="p">,</span>
                                                   <span class="s1">&#39;cell_specimen_id&#39;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">cell_specimens</span></div>
 
-<div class="viewcode-block" id="BrainObservatoryApi.dataframe_query_string"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.dataframe_query_string">[docs]</a>    <span class="k">def</span> <span class="nf">dataframe_query_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="BrainObservatoryApi.dataframe_query_string"><a class="viewcode-back" href="../../../../allensdk.api.queries.brain_observatory_api.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.dataframe_query_string">[docs]</a>    <span class="k">def</span> <span class="nf">dataframe_query_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                <span class="n">filters</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert a list of cell metric filter dictionaries into a </span>
@@ -555,7 +544,7 @@
                 <span class="n">query_args</span> <span class="o">=</span> <span class="p">[</span><span class="n">field</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)]</span>
 
             <span class="n">cluster_string</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_QUERY_TEMPLATES</span><span class="p">[</span><span class="n">op</span><span class="p">]</span><span class="o">.</span>\
-                <span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">query_args</span><span class="p">)</span>
+                <span class="nb">format</span><span class="p">(</span><span class="o">*</span><span class="n">query_args</span><span class="p">)</span>
 
             <span class="k">return</span> <span class="n">cluster_string</span>
 
@@ -565,7 +554,7 @@
 
         <span class="k">return</span> <span class="n">query_string</span></div>
 
-<div class="viewcode-block" id="BrainObservatoryApi.dataframe_query"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.dataframe_query">[docs]</a>    <span class="k">def</span> <span class="nf">dataframe_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="BrainObservatoryApi.dataframe_query"><a class="viewcode-back" href="../../../../allensdk.api.queries.brain_observatory_api.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.dataframe_query">[docs]</a>    <span class="k">def</span> <span class="nf">dataframe_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                         <span class="n">data</span><span class="p">,</span>
                         <span class="n">filters</span><span class="p">,</span>
                         <span class="n">primary_key</span><span class="p">):</span>
@@ -597,7 +586,7 @@
 
         <span class="k">return</span> <span class="n">result</span></div>
 
-<div class="viewcode-block" id="BrainObservatoryApi.get_cell_specimen_id_mapping"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.get_cell_specimen_id_mapping">[docs]</a>    <span class="k">def</span> <span class="nf">get_cell_specimen_id_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">mapping_table_id</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryApi.get_cell_specimen_id_mapping"><a class="viewcode-back" href="../../../../allensdk.api.queries.brain_observatory_api.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.get_cell_specimen_id_mapping">[docs]</a>    <span class="k">def</span> <span class="nf">get_cell_specimen_id_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">mapping_table_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Download mapping table from old to new cell specimen IDs.</span>
 
 <span class="sd">        The mapping table is a CSV file that maps cell specimen ids</span>
@@ -617,7 +606,7 @@
 <span class="sd">        pandas.DataFrame</span>
 <span class="sd">            Mapping table as a DataFrame.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="n">mapping_table_id</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">mapping_table_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">mapping_table_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">CELL_MAPPING_ID</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_query</span><span class="p">(</span><span class="s1">&#39;brain_observatory_queries&#39;</span><span class="p">,</span>
                                    <span class="s1">&#39;cell_specimen_id_mapping_table&#39;</span><span class="p">,</span>
@@ -639,9 +628,7 @@
         <div class="sphinxsidebarwrapper">
 <h3><a href="../../../../index.html">Contents</a></h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Install Guide</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Install Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../cell_types.html">Cell Types</a></li>
@@ -666,6 +653,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.model.html">allensdk.model package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.morphology.html">allensdk.morphology package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.deprecated.html">allensdk.deprecated module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
@@ -683,12 +671,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

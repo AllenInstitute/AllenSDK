@@ -1,32 +1,21 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>allensdk.brain_observatory.demixer &mdash; Allen SDK dev documentation</title>
-    
+    <title>allensdk.brain_observatory.demixer &#8212; Allen SDK dev documentation</title>
     <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../',
-        VERSION:     'dev',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK dev documentation" href="../../../index.html" />
-    <link rel="up" title="Module code" href="../../index.html" /> 
-  </head>
-  <body role="document">
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
 <script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
@@ -104,16 +93,16 @@
 <span class="c1"># ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="c1">#</span>
-<span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="kn">as</span> <span class="nn">sparse</span>
-<span class="kn">import</span> <span class="nn">scipy.linalg</span> <span class="kn">as</span> <span class="nn">linalg</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sparse</span>
+<span class="kn">import</span> <span class="nn">scipy.linalg</span> <span class="k">as</span> <span class="nn">linalg</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">matplotlib.colors</span> <span class="kn">as</span> <span class="nn">colors</span>
-<span class="kn">from</span> <span class="nn">allensdk.config.manifest</span> <span class="kn">import</span> <span class="n">Manifest</span>
+<span class="kn">import</span> <span class="nn">matplotlib.colors</span> <span class="k">as</span> <span class="nn">colors</span>
+<span class="kn">from</span> <span class="nn">allensdk.config.manifest</span> <span class="k">import</span> <span class="n">Manifest</span>
 
-<div class="viewcode-block" id="demix_time_dep_masks"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.demixer.demix_time_dep_masks">[docs]</a><span class="k">def</span> <span class="nf">demix_time_dep_masks</span><span class="p">(</span><span class="n">raw_traces</span><span class="p">,</span> <span class="n">stack</span><span class="p">,</span> <span class="n">masks</span><span class="p">):</span>
+<div class="viewcode-block" id="demix_time_dep_masks"><a class="viewcode-back" href="../../../allensdk.brain_observatory.demixer.html#allensdk.brain_observatory.demixer.demix_time_dep_masks">[docs]</a><span class="k">def</span> <span class="nf">demix_time_dep_masks</span><span class="p">(</span><span class="n">raw_traces</span><span class="p">,</span> <span class="n">stack</span><span class="p">,</span> <span class="n">masks</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
 
 <span class="sd">    :param raw_traces: extracted traces</span>
@@ -157,14 +146,14 @@
                 <span class="n">x</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">overlap</span><span class="p">,</span> <span class="n">F</span><span class="p">[:,</span> <span class="n">t</span><span class="p">])</span>
                 <span class="n">demix_traces</span><span class="p">[:,</span> <span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
 
-            <span class="n">drop_frames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+            <span class="n">drop_frames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">drop_frames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+            <span class="n">drop_frames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">demix_traces</span><span class="p">,</span> <span class="n">drop_frames</span></div>
 
-<div class="viewcode-block" id="plot_traces"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.demixer.plot_traces">[docs]</a><span class="k">def</span> <span class="nf">plot_traces</span><span class="p">(</span><span class="n">raw_trace</span><span class="p">,</span> <span class="n">demix_trace</span><span class="p">,</span> <span class="n">roi_id</span><span class="p">,</span> <span class="n">roi_ind</span><span class="p">,</span> <span class="n">save_file</span><span class="p">):</span>
+<div class="viewcode-block" id="plot_traces"><a class="viewcode-back" href="../../../allensdk.brain_observatory.demixer.html#allensdk.brain_observatory.demixer.plot_traces">[docs]</a><span class="k">def</span> <span class="nf">plot_traces</span><span class="p">(</span><span class="n">raw_trace</span><span class="p">,</span> <span class="n">demix_trace</span><span class="p">,</span> <span class="n">roi_id</span><span class="p">,</span> <span class="n">roi_ind</span><span class="p">,</span> <span class="n">save_file</span><span class="p">):</span>
     <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
 
     <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">raw_trace</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Fluoresence&#39;</span><span class="p">)</span>
@@ -174,12 +163,12 @@
     <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_file</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="find_zero_baselines"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.demixer.find_zero_baselines">[docs]</a><span class="k">def</span> <span class="nf">find_zero_baselines</span><span class="p">(</span><span class="n">traces</span><span class="p">):</span>
+<div class="viewcode-block" id="find_zero_baselines"><a class="viewcode-back" href="../../../allensdk.brain_observatory.demixer.html#allensdk.brain_observatory.demixer.find_zero_baselines">[docs]</a><span class="k">def</span> <span class="nf">find_zero_baselines</span><span class="p">(</span><span class="n">traces</span><span class="p">):</span>
     <span class="n">means</span> <span class="o">=</span> <span class="n">traces</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">stds</span> <span class="o">=</span>  <span class="n">traces</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">means</span><span class="o">-</span><span class="n">stds</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span></div>
     
-<div class="viewcode-block" id="plot_negative_baselines"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.demixer.plot_negative_baselines">[docs]</a><span class="k">def</span> <span class="nf">plot_negative_baselines</span><span class="p">(</span><span class="n">raw_traces</span><span class="p">,</span> <span class="n">demix_traces</span><span class="p">,</span> <span class="n">mask_array</span><span class="p">,</span> <span class="n">roi_ids_mask</span><span class="p">,</span> <span class="n">plot_dir</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;png&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="plot_negative_baselines"><a class="viewcode-back" href="../../../allensdk.brain_observatory.demixer.html#allensdk.brain_observatory.demixer.plot_negative_baselines">[docs]</a><span class="k">def</span> <span class="nf">plot_negative_baselines</span><span class="p">(</span><span class="n">raw_traces</span><span class="p">,</span> <span class="n">demix_traces</span><span class="p">,</span> <span class="n">mask_array</span><span class="p">,</span> <span class="n">roi_ids_mask</span><span class="p">,</span> <span class="n">plot_dir</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;png&#39;</span><span class="p">):</span>
     <span class="n">N</span><span class="p">,</span> <span class="n">T</span> <span class="o">=</span> <span class="n">raw_traces</span><span class="o">.</span><span class="n">shape</span>
     <span class="n">_</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">mask_array</span><span class="o">.</span><span class="n">shape</span>
 
@@ -209,7 +198,7 @@
 
     
         
-<div class="viewcode-block" id="plot_negative_transients"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.demixer.plot_negative_transients">[docs]</a><span class="k">def</span> <span class="nf">plot_negative_transients</span><span class="p">(</span><span class="n">raw_traces</span><span class="p">,</span> <span class="n">demix_traces</span><span class="p">,</span> <span class="n">valid_roi</span><span class="p">,</span> <span class="n">mask_array</span><span class="p">,</span> <span class="n">roi_ids_mask</span><span class="p">,</span> <span class="n">plot_dir</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;png&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="plot_negative_transients"><a class="viewcode-back" href="../../../allensdk.brain_observatory.demixer.html#allensdk.brain_observatory.demixer.plot_negative_transients">[docs]</a><span class="k">def</span> <span class="nf">plot_negative_transients</span><span class="p">(</span><span class="n">raw_traces</span><span class="p">,</span> <span class="n">demix_traces</span><span class="p">,</span> <span class="n">valid_roi</span><span class="p">,</span> <span class="n">mask_array</span><span class="p">,</span> <span class="n">roi_ids_mask</span><span class="p">,</span> <span class="n">plot_dir</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;png&#39;</span><span class="p">):</span>
 
     <span class="n">N</span><span class="p">,</span> <span class="n">T</span> <span class="o">=</span> <span class="n">raw_traces</span><span class="o">.</span><span class="n">shape</span>
     <span class="n">_</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">mask_array</span><span class="o">.</span><span class="n">shape</span>
@@ -279,7 +268,7 @@
     <span class="k">return</span> <span class="n">rois_with_trans</span></div>
 
 
-<div class="viewcode-block" id="rolling_window"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.demixer.rolling_window">[docs]</a><span class="k">def</span> <span class="nf">rolling_window</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="mi">500</span><span class="p">):</span>
+<div class="viewcode-block" id="rolling_window"><a class="viewcode-back" href="../../../allensdk.brain_observatory.demixer.html#allensdk.brain_observatory.demixer.rolling_window">[docs]</a><span class="k">def</span> <span class="nf">rolling_window</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="mi">500</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
 
 <span class="sd">    :param trace:</span>
@@ -293,12 +282,12 @@
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">stride_tricks</span><span class="o">.</span><span class="n">as_strided</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">,</span> <span class="n">strides</span><span class="o">=</span><span class="n">strides</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="find_negative_baselines"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.demixer.find_negative_baselines">[docs]</a><span class="k">def</span> <span class="nf">find_negative_baselines</span><span class="p">(</span><span class="n">trace</span><span class="p">):</span>
+<div class="viewcode-block" id="find_negative_baselines"><a class="viewcode-back" href="../../../allensdk.brain_observatory.demixer.html#allensdk.brain_observatory.demixer.find_negative_baselines">[docs]</a><span class="k">def</span> <span class="nf">find_negative_baselines</span><span class="p">(</span><span class="n">trace</span><span class="p">):</span>
     <span class="n">means</span> <span class="o">=</span> <span class="n">trace</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">stds</span> <span class="o">=</span> <span class="n">trace</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">means</span><span class="o">+</span><span class="n">stds</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="find_negative_transients_threshold"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.demixer.find_negative_transients_threshold">[docs]</a><span class="k">def</span> <span class="nf">find_negative_transients_threshold</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">std_devs</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+<div class="viewcode-block" id="find_negative_transients_threshold"><a class="viewcode-back" href="../../../allensdk.brain_observatory.demixer.html#allensdk.brain_observatory.demixer.find_negative_transients_threshold">[docs]</a><span class="k">def</span> <span class="nf">find_negative_transients_threshold</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">std_devs</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
     <span class="n">trace</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">pad_width</span><span class="o">=</span><span class="p">(</span><span class="n">window</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;constant&#39;</span><span class="p">,</span> <span class="n">constant_values</span><span class="o">=</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">trace</span><span class="p">[:</span><span class="n">window</span><span class="p">])])</span>
     <span class="n">rolling_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">rolling_window</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">window</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">rolling_std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">rolling_window</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">window</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
@@ -313,7 +302,7 @@
     <span class="k">return</span> <span class="n">trans_ind</span></div>
 
 
-<div class="viewcode-block" id="plot_overlap_masks_lengthOne"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.demixer.plot_overlap_masks_lengthOne">[docs]</a><span class="k">def</span> <span class="nf">plot_overlap_masks_lengthOne</span><span class="p">(</span><span class="n">roi_ind</span><span class="p">,</span> <span class="n">masks</span><span class="p">,</span> <span class="n">savefile</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">weighted</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="plot_overlap_masks_lengthOne"><a class="viewcode-back" href="../../../allensdk.brain_observatory.demixer.html#allensdk.brain_observatory.demixer.plot_overlap_masks_lengthOne">[docs]</a><span class="k">def</span> <span class="nf">plot_overlap_masks_lengthOne</span><span class="p">(</span><span class="n">roi_ind</span><span class="p">,</span> <span class="n">masks</span><span class="p">,</span> <span class="n">savefile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">weighted</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 
     <span class="n">masks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">masks</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
     <span class="n">N</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">masks</span><span class="o">.</span><span class="n">shape</span>
@@ -356,14 +345,14 @@
     <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask_y</span><span class="p">))</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask_y</span><span class="p">))</span><span class="o">+</span><span class="mi">5</span><span class="p">))</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Masks&#39;</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">savefile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">savefile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">savefile</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">ind_plot</span></div>
 
 
-<div class="viewcode-block" id="plot_transients"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.demixer.plot_transients">[docs]</a><span class="k">def</span> <span class="nf">plot_transients</span><span class="p">(</span><span class="n">roi_ind</span><span class="p">,</span> <span class="n">t_trans</span><span class="p">,</span> <span class="n">masks</span><span class="p">,</span> <span class="n">traces</span><span class="p">,</span> <span class="n">demix_traces</span><span class="p">,</span> <span class="n">savefile</span><span class="p">):</span>
+<div class="viewcode-block" id="plot_transients"><a class="viewcode-back" href="../../../allensdk.brain_observatory.demixer.html#allensdk.brain_observatory.demixer.plot_transients">[docs]</a><span class="k">def</span> <span class="nf">plot_transients</span><span class="p">(</span><span class="n">roi_ind</span><span class="p">,</span> <span class="n">t_trans</span><span class="p">,</span> <span class="n">masks</span><span class="p">,</span> <span class="n">traces</span><span class="p">,</span> <span class="n">demix_traces</span><span class="p">,</span> <span class="n">savefile</span><span class="p">):</span>
 
     <span class="n">masks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">masks</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
     <span class="n">N</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">masks</span><span class="o">.</span><span class="n">shape</span>
@@ -387,7 +376,7 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">plot_t</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">t_trans</span> <span class="o">+</span> <span class="mi">150</span><span class="p">)</span>
 
-    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">sharex</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">color_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">]</span>
     <span class="n">Ncol</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">color_list</span><span class="p">)</span>
 
@@ -413,9 +402,7 @@
         <div class="sphinxsidebarwrapper">
 <h3><a href="../../../index.html">Contents</a></h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install Guide</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../cell_types.html">Cell Types</a></li>
@@ -440,6 +427,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.model.html">allensdk.model package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.morphology.html">allensdk.morphology package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.deprecated.html">allensdk.deprecated module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
@@ -457,12 +445,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

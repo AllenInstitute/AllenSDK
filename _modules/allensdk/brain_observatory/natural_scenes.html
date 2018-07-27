@@ -1,32 +1,21 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>allensdk.brain_observatory.natural_scenes &mdash; Allen SDK dev documentation</title>
-    
+    <title>allensdk.brain_observatory.natural_scenes &#8212; Allen SDK dev documentation</title>
     <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../',
-        VERSION:     'dev',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK dev documentation" href="../../../index.html" />
-    <link rel="up" title="Module code" href="../../index.html" /> 
-  </head>
-  <body role="document">
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
 <script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
@@ -104,17 +93,17 @@
 <span class="c1"># ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="c1">#</span>
-<span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="kn">as</span> <span class="nn">st</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">.stimulus_analysis</span> <span class="kn">import</span> <span class="n">StimulusAnalysis</span>
+<span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="k">as</span> <span class="nn">st</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">.stimulus_analysis</span> <span class="k">import</span> <span class="n">StimulusAnalysis</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">h5py</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">observatory_plots</span> <span class="k">as</span> <span class="n">oplots</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">circle_plots</span> <span class="k">as</span> <span class="n">cplots</span>
-<span class="kn">from</span> <span class="nn">.brain_observatory_exceptions</span> <span class="kn">import</span> <span class="n">MissingStimulusException</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">observatory_plots</span> <span class="k">as</span> <span class="n">oplots</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">circle_plots</span> <span class="k">as</span> <span class="n">cplots</span>
+<span class="kn">from</span> <span class="nn">.brain_observatory_exceptions</span> <span class="k">import</span> <span class="n">MissingStimulusException</span>
 
-<div class="viewcode-block" id="NaturalScenes"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.natural_scenes.NaturalScenes">[docs]</a><span class="k">class</span> <span class="nc">NaturalScenes</span><span class="p">(</span><span class="n">StimulusAnalysis</span><span class="p">):</span>
+<div class="viewcode-block" id="NaturalScenes"><a class="viewcode-back" href="../../../allensdk.brain_observatory.natural_scenes.html#allensdk.brain_observatory.natural_scenes.NaturalScenes">[docs]</a><span class="k">class</span> <span class="nc">NaturalScenes</span><span class="p">(</span><span class="n">StimulusAnalysis</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Perform tuning analysis specific to natural scenes stimulus.</span>
 
 <span class="sd">    Parameters</span>
@@ -125,7 +114,7 @@
     <span class="n">_log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;allensdk.brain_observatory.natural_scenes&#39;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_set</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">NaturalScenes</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">data_set</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">NaturalScenes</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">data_set</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_number_scenes</span> <span class="o">=</span> <span class="n">StimulusAnalysis</span><span class="o">.</span><span class="n">_PRELOAD</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sweeplength</span> <span class="o">=</span> <span class="n">StimulusAnalysis</span><span class="o">.</span><span class="n">_PRELOAD</span>
@@ -160,7 +149,7 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extralength</span>
 
-<div class="viewcode-block" id="NaturalScenes.populate_stimulus_table"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.natural_scenes.NaturalScenes.populate_stimulus_table">[docs]</a>    <span class="k">def</span> <span class="nf">populate_stimulus_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="NaturalScenes.populate_stimulus_table"><a class="viewcode-back" href="../../../allensdk.brain_observatory.natural_scenes.html#allensdk.brain_observatory.natural_scenes.NaturalScenes.populate_stimulus_table">[docs]</a>    <span class="k">def</span> <span class="nf">populate_stimulus_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_stim_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_set</span><span class="o">.</span><span class="n">get_stimulus_table</span><span class="p">(</span><span class="s1">&#39;natural_scenes&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_number_scenes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_stim_table</span><span class="o">.</span><span class="n">frame</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sweeplength</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stim_table</span><span class="o">.</span><span class="n">end</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span>
@@ -168,7 +157,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_interlength</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweeplength</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_extralength</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweeplength</span></div>
 
-<div class="viewcode-block" id="NaturalScenes.get_response"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.natural_scenes.NaturalScenes.get_response">[docs]</a>    <span class="k">def</span> <span class="nf">get_response</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="NaturalScenes.get_response"><a class="viewcode-back" href="../../../allensdk.brain_observatory.natural_scenes.html#allensdk.brain_observatory.natural_scenes.NaturalScenes.get_response">[docs]</a>    <span class="k">def</span> <span class="nf">get_response</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Computes the mean response for each cell to each stimulus condition.  Return is</span>
 <span class="sd">        a (# scenes, # cells, 3) np.ndarray.  The final dimension</span>
 <span class="sd">        contains the mean response to the condition (index 0), standard error of the mean of the response</span>
@@ -197,7 +186,7 @@
 
         <span class="k">return</span> <span class="n">response</span></div>
 
-<div class="viewcode-block" id="NaturalScenes.get_peak"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.natural_scenes.NaturalScenes.get_peak">[docs]</a>    <span class="k">def</span> <span class="nf">get_peak</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="NaturalScenes.get_peak"><a class="viewcode-back" href="../../../allensdk.brain_observatory.natural_scenes.html#allensdk.brain_observatory.natural_scenes.NaturalScenes.get_peak">[docs]</a>    <span class="k">def</span> <span class="nf">get_peak</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Computes metrics about peak response condition for each cell.</span>
 
 <span class="sd">        Returns</span>
@@ -253,7 +242,7 @@
             <span class="n">subset_run</span> <span class="o">=</span> <span class="n">subset</span><span class="p">[</span><span class="n">subset</span><span class="o">.</span><span class="n">dx</span><span class="o">&gt;=</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">subset_stat</span> <span class="o">=</span> <span class="n">subset</span><span class="p">[</span><span class="n">subset</span><span class="o">.</span><span class="n">dx</span><span class="o">&lt;</span><span class="mi">1</span><span class="p">]</span>
             <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">subset_run</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">4</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">subset_stat</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">4</span><span class="p">):</span>
-                <span class="p">(</span><span class="n">_</span><span class="p">,</span><span class="n">peak</span><span class="o">.</span><span class="n">p_run_ns</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">nc</span><span class="p">])</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">ttest_ind</span><span class="p">(</span><span class="n">subset_run</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">nc</span><span class="p">)],</span> <span class="n">subset_stat</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">nc</span><span class="p">)],</span> <span class="n">equal_var</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+                <span class="p">(</span><span class="n">_</span><span class="p">,</span><span class="n">peak</span><span class="o">.</span><span class="n">p_run_ns</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">nc</span><span class="p">])</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">ttest_ind</span><span class="p">(</span><span class="n">subset_run</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">nc</span><span class="p">)],</span> <span class="n">subset_stat</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">nc</span><span class="p">)],</span> <span class="n">equal_var</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
                 
                 <span class="k">if</span> <span class="n">subset_run</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">nc</span><span class="p">)]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">&gt;</span><span class="n">subset_stat</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">nc</span><span class="p">)]</span><span class="o">.</span><span class="n">mean</span><span class="p">():</span>
                     <span class="n">peak</span><span class="o">.</span><span class="n">run_modulation_ns</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">nc</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">subset_run</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">nc</span><span class="p">)]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">-</span> <span class="n">subset_stat</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">nc</span><span class="p">)]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">subset_run</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">nc</span><span class="p">)]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
@@ -298,7 +287,7 @@
 
         <span class="k">return</span> <span class="n">peak</span></div>
 
-<div class="viewcode-block" id="NaturalScenes.plot_time_to_peak"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.natural_scenes.NaturalScenes.plot_time_to_peak">[docs]</a>    <span class="k">def</span> <span class="nf">plot_time_to_peak</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+<div class="viewcode-block" id="NaturalScenes.plot_time_to_peak"><a class="viewcode-back" href="../../../allensdk.brain_observatory.natural_scenes.html#allensdk.brain_observatory.natural_scenes.NaturalScenes.plot_time_to_peak">[docs]</a>    <span class="k">def</span> <span class="nf">plot_time_to_peak</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
                           <span class="n">p_value_max</span><span class="o">=</span><span class="n">oplots</span><span class="o">.</span><span class="n">P_VALUE_MAX</span><span class="p">,</span> 
                           <span class="n">color_map</span><span class="o">=</span><span class="n">oplots</span><span class="o">.</span><span class="n">STIMULUS_COLOR_MAP</span><span class="p">):</span>
         <span class="n">stimulus_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_set</span><span class="o">.</span><span class="n">get_stimulus_table</span><span class="p">(</span><span class="s1">&#39;natural_scenes&#39;</span><span class="p">)</span>
@@ -311,7 +300,7 @@
 
         <span class="n">mean_responses</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">resps</span><span class="p">)</span>
 
-        <span class="n">sorted_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">peak</span><span class="o">.</span><span class="n">ptest_ns</span> <span class="o">&lt;</span> <span class="n">p_value_max</span><span class="p">]</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="s1">&#39;time_to_peak_ns&#39;</span><span class="p">)</span>
+        <span class="n">sorted_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">peak</span><span class="o">.</span><span class="n">ptest_ns</span> <span class="o">&lt;</span> <span class="n">p_value_max</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;time_to_peak_ns&#39;</span><span class="p">)</span>
         <span class="n">cell_order</span> <span class="o">=</span> <span class="n">sorted_table</span><span class="o">.</span><span class="n">index</span>
 
         <span class="c1"># time to peak is relative to stimulus start in seconds</span>
@@ -324,7 +313,7 @@
                                  <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interlength</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">sweeplength</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_rate</span><span class="p">,</span> 
                                  <span class="n">color_map</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="NaturalScenes.open_corona_plot"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.natural_scenes.NaturalScenes.open_corona_plot">[docs]</a>    <span class="k">def</span> <span class="nf">open_corona_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_id</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">cell_index</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="NaturalScenes.open_corona_plot"><a class="viewcode-back" href="../../../allensdk.brain_observatory.natural_scenes.html#allensdk.brain_observatory.natural_scenes.NaturalScenes.open_corona_plot">[docs]</a>    <span class="k">def</span> <span class="nf">open_corona_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cell_index</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">cell_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">row_from_cell_id</span><span class="p">(</span><span class="n">cell_specimen_id</span><span class="p">,</span> <span class="n">cell_index</span><span class="p">)</span>
 
         <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean_sweep_response</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">cell_index</span><span class="p">)]</span>
@@ -342,7 +331,7 @@
                 <span class="n">clim</span><span class="o">=</span><span class="p">[</span><span class="n">cmin</span><span class="p">,</span> <span class="n">cmax</span><span class="p">])</span>
         <span class="n">cp</span><span class="o">.</span><span class="n">show_arrow</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="NaturalScenes.reshape_response_array"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.natural_scenes.NaturalScenes.reshape_response_array">[docs]</a>    <span class="k">def</span> <span class="nf">reshape_response_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="NaturalScenes.reshape_response_array"><a class="viewcode-back" href="../../../allensdk.brain_observatory.natural_scenes.html#allensdk.brain_observatory.natural_scenes.NaturalScenes.reshape_response_array">[docs]</a>    <span class="k">def</span> <span class="nf">reshape_response_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        :return: response array in cells x stim x repetition for noise correlations</span>
 <span class="sd">        &#39;&#39;&#39;</span>
@@ -363,7 +352,7 @@
 
         <span class="k">return</span> <span class="n">response_new</span></div>
 
-<div class="viewcode-block" id="NaturalScenes.get_signal_correlation"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.natural_scenes.NaturalScenes.get_signal_correlation">[docs]</a>    <span class="k">def</span> <span class="nf">get_signal_correlation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">corr</span><span class="o">=</span><span class="s1">&#39;spearman&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="NaturalScenes.get_signal_correlation"><a class="viewcode-back" href="../../../allensdk.brain_observatory.natural_scenes.html#allensdk.brain_observatory.natural_scenes.NaturalScenes.get_signal_correlation">[docs]</a>    <span class="k">def</span> <span class="nf">get_signal_correlation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">corr</span><span class="o">=</span><span class="s1">&#39;spearman&#39;</span><span class="p">):</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Calculating signal correlations&quot;</span><span class="p">)</span>
 
         <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">response</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span>
@@ -390,7 +379,7 @@
 
         <span class="k">return</span> <span class="n">signal_corr</span><span class="p">,</span> <span class="n">signal_p</span></div>
 
-<div class="viewcode-block" id="NaturalScenes.get_representational_similarity"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.natural_scenes.NaturalScenes.get_representational_similarity">[docs]</a>    <span class="k">def</span> <span class="nf">get_representational_similarity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">corr</span><span class="o">=</span><span class="s1">&#39;spearman&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="NaturalScenes.get_representational_similarity"><a class="viewcode-back" href="../../../allensdk.brain_observatory.natural_scenes.html#allensdk.brain_observatory.natural_scenes.NaturalScenes.get_representational_similarity">[docs]</a>    <span class="k">def</span> <span class="nf">get_representational_similarity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">corr</span><span class="o">=</span><span class="s1">&#39;spearman&#39;</span><span class="p">):</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Calculating representational similarity&quot;</span><span class="p">)</span>
 
         <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">response</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span>
@@ -417,7 +406,7 @@
 
         <span class="k">return</span> <span class="n">rep_sim</span><span class="p">,</span> <span class="n">rep_sim_p</span></div>
 
-<div class="viewcode-block" id="NaturalScenes.get_noise_correlation"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.natural_scenes.NaturalScenes.get_noise_correlation">[docs]</a>    <span class="k">def</span> <span class="nf">get_noise_correlation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">corr</span><span class="o">=</span><span class="s1">&#39;spearman&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="NaturalScenes.get_noise_correlation"><a class="viewcode-back" href="../../../allensdk.brain_observatory.natural_scenes.html#allensdk.brain_observatory.natural_scenes.NaturalScenes.get_noise_correlation">[docs]</a>    <span class="k">def</span> <span class="nf">get_noise_correlation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">corr</span><span class="o">=</span><span class="s1">&#39;spearman&#39;</span><span class="p">):</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Calculating noise correlations&quot;</span><span class="p">)</span>
 
         <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reshape_response_array</span><span class="p">()</span>
@@ -447,8 +436,8 @@
 
         <span class="k">return</span> <span class="n">noise_corr</span><span class="p">,</span> <span class="n">noise_corr_p</span></div>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="NaturalScenes.from_analysis_file"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.natural_scenes.NaturalScenes.from_analysis_file">[docs]</a>    <span class="k">def</span> <span class="nf">from_analysis_file</span><span class="p">(</span><span class="n">data_set</span><span class="p">,</span> <span class="n">analysis_file</span><span class="p">):</span>
+<div class="viewcode-block" id="NaturalScenes.from_analysis_file"><a class="viewcode-back" href="../../../allensdk.brain_observatory.natural_scenes.html#allensdk.brain_observatory.natural_scenes.NaturalScenes.from_analysis_file">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_analysis_file</span><span class="p">(</span><span class="n">data_set</span><span class="p">,</span> <span class="n">analysis_file</span><span class="p">):</span>
         <span class="n">ns</span> <span class="o">=</span> <span class="n">NaturalScenes</span><span class="p">(</span><span class="n">data_set</span><span class="p">)</span>
         <span class="n">ns</span><span class="o">.</span><span class="n">populate_stimulus_table</span><span class="p">()</span>
 
@@ -485,9 +474,7 @@
         <div class="sphinxsidebarwrapper">
 <h3><a href="../../../index.html">Contents</a></h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install Guide</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../cell_types.html">Cell Types</a></li>
@@ -512,6 +499,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.model.html">allensdk.model package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.morphology.html">allensdk.morphology package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.deprecated.html">allensdk.deprecated module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
@@ -529,12 +517,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

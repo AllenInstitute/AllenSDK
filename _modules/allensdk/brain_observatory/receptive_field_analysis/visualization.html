@@ -1,32 +1,21 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>allensdk.brain_observatory.receptive_field_analysis.visualization &mdash; Allen SDK dev documentation</title>
-    
+    <title>allensdk.brain_observatory.receptive_field_analysis.visualization &#8212; Allen SDK dev documentation</title>
     <link rel="stylesheet" href="../../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../../',
-        VERSION:     'dev',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="../../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK dev documentation" href="../../../../index.html" />
-    <link rel="up" title="Module code" href="../../../index.html" /> 
-  </head>
-  <body role="document">
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
 <script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
@@ -104,16 +93,16 @@
 <span class="c1"># ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="c1">#</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">ticker</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">matplotlib.gridspec</span> <span class="kn">as</span> <span class="nn">gridspec</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">matplotlib.patches</span> <span class="kn">as</span> <span class="nn">mpatches</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="k">import</span> <span class="n">ticker</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.gridspec</span> <span class="k">as</span> <span class="nn">gridspec</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib.patches</span> <span class="k">as</span> <span class="nn">mpatches</span>
 
 <span class="n">DEFAULT_CMAP</span> <span class="o">=</span> <span class="s1">&#39;magma&#39;</span>
 
-<div class="viewcode-block" id="plot_ellipses"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.visualization.plot_ellipses">[docs]</a><span class="k">def</span> <span class="nf">plot_ellipses</span><span class="p">(</span><span class="n">gaussian_fit_dict</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">close</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">save_file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="plot_ellipses"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.visualization.html#allensdk.brain_observatory.receptive_field_analysis.visualization.plot_ellipses">[docs]</a><span class="k">def</span> <span class="nf">plot_ellipses</span><span class="p">(</span><span class="n">gaussian_fit_dict</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">close</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save_file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;Example Usage:</span>
 <span class="sd">    oeid, cell_index, stimulus = 512176430, 12, &#39;locally_sparse_noise&#39;</span>
 <span class="sd">    brain_observatory_cache = BrainObservatoryCache()</span>
@@ -123,7 +112,7 @@
 <span class="sd">    plot_ellipses(result[&#39;off&#39;][&#39;gaussian_fit&#39;], color=&#39;r&#39;)</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
-    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">130</span><span class="p">)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">74</span><span class="p">)</span>
@@ -140,10 +129,10 @@
                                        <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
             <span class="n">ax</span><span class="o">.</span><span class="n">add_artist</span><span class="p">(</span><span class="n">ellipse</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">save_file_name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">save_file_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_file_name</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">show</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">show</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="n">close</span><span class="p">:</span>
@@ -151,12 +140,12 @@
 
     <span class="k">return</span> <span class="n">ax</span></div>
 
-<div class="viewcode-block" id="pvalue_to_NLL"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.visualization.pvalue_to_NLL">[docs]</a><span class="k">def</span> <span class="nf">pvalue_to_NLL</span><span class="p">(</span><span class="n">p_values</span><span class="p">,</span>
+<div class="viewcode-block" id="pvalue_to_NLL"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.visualization.html#allensdk.brain_observatory.receptive_field_analysis.visualization.pvalue_to_NLL">[docs]</a><span class="k">def</span> <span class="nf">pvalue_to_NLL</span><span class="p">(</span><span class="n">p_values</span><span class="p">,</span>
                   <span class="n">max_NLL</span><span class="o">=</span><span class="mf">10.0</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">p_values</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">max_NLL</span><span class="p">,</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">p_values</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="plot_chi_square_summary"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.visualization.plot_chi_square_summary">[docs]</a><span class="k">def</span> <span class="nf">plot_chi_square_summary</span><span class="p">(</span><span class="n">rf_data</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">cax</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">DEFAULT_CMAP</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+<div class="viewcode-block" id="plot_chi_square_summary"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.visualization.html#allensdk.brain_observatory.receptive_field_analysis.visualization.plot_chi_square_summary">[docs]</a><span class="k">def</span> <span class="nf">plot_chi_square_summary</span><span class="p">(</span><span class="n">rf_data</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">DEFAULT_CMAP</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
 
     <span class="n">chi_squared_grid</span> <span class="o">=</span> <span class="n">rf_data</span><span class="p">[</span><span class="s1">&#39;chi_squared_analysis&#39;</span><span class="p">][</span><span class="s1">&#39;pvalues&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
@@ -164,7 +153,7 @@
     <span class="n">clim</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">chi_square_grid_NLL</span><span class="o">.</span><span class="n">max</span><span class="p">()))</span>
     <span class="n">img</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">chi_square_grid_NLL</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">,</span> <span class="n">clim</span><span class="o">=</span><span class="n">clim</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">cax</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">cax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">cb</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">ticks</span><span class="o">=</span><span class="n">clim</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">cb</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">cax</span><span class="o">=</span><span class="n">cax</span><span class="p">,</span> <span class="n">ticks</span><span class="o">=</span><span class="n">clim</span><span class="p">)</span>
@@ -172,24 +161,24 @@
     <span class="n">tick_locator</span> <span class="o">=</span> <span class="n">ticker</span><span class="o">.</span><span class="n">MaxNLocator</span><span class="p">(</span><span class="n">nbins</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
     <span class="n">cb</span><span class="o">.</span><span class="n">locator</span> <span class="o">=</span> <span class="n">tick_locator</span>
     <span class="n">cb</span><span class="o">.</span><span class="n">update_ticks</span><span class="p">()</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">get_xaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">get_yaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">get_xaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">get_yaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Significant: </span><span class="si">%s</span><span class="s1"> (min_p=</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">rf_data</span><span class="p">[</span><span class="s1">&#39;chi_squared_analysis&#39;</span><span class="p">][</span><span class="s1">&#39;attrs&#39;</span><span class="p">][</span><span class="s1">&#39;significant&#39;</span><span class="p">],</span> 
                                                  <span class="n">rf_data</span><span class="p">[</span><span class="s1">&#39;chi_squared_analysis&#39;</span><span class="p">][</span><span class="s1">&#39;attrs&#39;</span><span class="p">][</span><span class="s1">&#39;min_p&#39;</span><span class="p">])</span> <span class="p">)</span>    </div>
 
-<div class="viewcode-block" id="plot_msr_summary"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.visualization.plot_msr_summary">[docs]</a><span class="k">def</span> <span class="nf">plot_msr_summary</span><span class="p">(</span><span class="n">lsn</span><span class="p">,</span> <span class="n">cell_index</span><span class="p">,</span> <span class="n">ax_on</span><span class="p">,</span> <span class="n">ax_off</span><span class="p">,</span> <span class="n">ax_cbar</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="plot_msr_summary"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.visualization.html#allensdk.brain_observatory.receptive_field_analysis.visualization.plot_msr_summary">[docs]</a><span class="k">def</span> <span class="nf">plot_msr_summary</span><span class="p">(</span><span class="n">lsn</span><span class="p">,</span> <span class="n">cell_index</span><span class="p">,</span> <span class="n">ax_on</span><span class="p">,</span> <span class="n">ax_off</span><span class="p">,</span> <span class="n">ax_cbar</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">min_clim</span> <span class="o">=</span> <span class="n">lsn</span><span class="o">.</span><span class="n">mean_response</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">cell_index</span><span class="p">,:]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
     <span class="n">max_clim</span> <span class="o">=</span> <span class="n">lsn</span><span class="o">.</span><span class="n">mean_response</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">cell_index</span><span class="p">,:]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
     <span class="n">plot_fields</span><span class="p">(</span><span class="n">lsn</span><span class="o">.</span><span class="n">mean_response</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">cell_index</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> 
                 <span class="n">lsn</span><span class="o">.</span><span class="n">mean_response</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">cell_index</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> 
                 <span class="n">ax_on</span><span class="p">,</span> <span class="n">ax_off</span><span class="p">,</span> <span class="n">clim</span><span class="o">=</span><span class="p">(</span><span class="n">min_clim</span><span class="p">,</span> <span class="n">max_clim</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">cbar_axes</span><span class="o">=</span><span class="n">ax_cbar</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="plot_fields"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.visualization.plot_fields">[docs]</a><span class="k">def</span> <span class="nf">plot_fields</span><span class="p">(</span><span class="n">on_data</span><span class="p">,</span> <span class="n">off_data</span><span class="p">,</span> <span class="n">on_axes</span><span class="p">,</span> <span class="n">off_axes</span><span class="p">,</span> <span class="n">cbar_axes</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">clim</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">DEFAULT_CMAP</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">cbar_axes</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+<div class="viewcode-block" id="plot_fields"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.visualization.html#allensdk.brain_observatory.receptive_field_analysis.visualization.plot_fields">[docs]</a><span class="k">def</span> <span class="nf">plot_fields</span><span class="p">(</span><span class="n">on_data</span><span class="p">,</span> <span class="n">off_data</span><span class="p">,</span> <span class="n">on_axes</span><span class="p">,</span> <span class="n">off_axes</span><span class="p">,</span> <span class="n">cbar_axes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">clim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">DEFAULT_CMAP</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">cbar_axes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">on_axes</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">right</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
         <span class="n">cbar_axes</span> <span class="o">=</span> <span class="n">on_axes</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">0.93</span><span class="p">,</span> <span class="mf">0.37</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="o">.</span><span class="mi">28</span><span class="p">])</span>
     
-    <span class="k">if</span> <span class="n">clim</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">clim</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">clim_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">on_data</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">off_data</span><span class="p">))</span>
         <span class="n">clim</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">clim_max</span><span class="p">)</span>
     <span class="n">on_axes</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">on_data</span><span class="p">,</span> <span class="n">clim</span><span class="o">=</span><span class="n">clim</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">)</span>
@@ -201,26 +190,26 @@
     <span class="n">cb</span><span class="o">.</span><span class="n">locator</span> <span class="o">=</span> <span class="n">tick_locator</span>
     <span class="n">cb</span><span class="o">.</span><span class="n">update_ticks</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="p">[</span><span class="n">on_axes</span><span class="p">,</span> <span class="n">off_axes</span><span class="p">]:</span>
-        <span class="n">frame</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">get_xaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
-        <span class="n">frame</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">get_yaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></div>
+        <span class="n">frame</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">get_xaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">frame</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">get_yaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="plot_rts_summary"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.visualization.plot_rts_summary">[docs]</a><span class="k">def</span> <span class="nf">plot_rts_summary</span><span class="p">(</span><span class="n">rf_data</span><span class="p">,</span> <span class="n">ax_on</span><span class="p">,</span> <span class="n">ax_off</span><span class="p">,</span> <span class="n">ax_cbar</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">DEFAULT_CMAP</span><span class="p">):</span>
+<div class="viewcode-block" id="plot_rts_summary"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.visualization.html#allensdk.brain_observatory.receptive_field_analysis.visualization.plot_rts_summary">[docs]</a><span class="k">def</span> <span class="nf">plot_rts_summary</span><span class="p">(</span><span class="n">rf_data</span><span class="p">,</span> <span class="n">ax_on</span><span class="p">,</span> <span class="n">ax_off</span><span class="p">,</span> <span class="n">ax_cbar</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">DEFAULT_CMAP</span><span class="p">):</span>
     <span class="n">rts_on</span> <span class="o">=</span> <span class="n">rf_data</span><span class="p">[</span><span class="s1">&#39;on&#39;</span><span class="p">][</span><span class="s1">&#39;rts&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
     <span class="n">rts_off</span> <span class="o">=</span> <span class="n">rf_data</span><span class="p">[</span><span class="s1">&#39;off&#39;</span><span class="p">][</span><span class="s1">&#39;rts&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
     <span class="n">plot_fields</span><span class="p">(</span><span class="n">rts_on</span><span class="p">,</span> <span class="n">rts_off</span><span class="p">,</span> <span class="n">ax_on</span><span class="p">,</span> <span class="n">ax_off</span><span class="p">,</span> <span class="n">cbar_axes</span><span class="o">=</span><span class="n">ax_cbar</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="plot_rts_blur_summary"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.visualization.plot_rts_blur_summary">[docs]</a><span class="k">def</span> <span class="nf">plot_rts_blur_summary</span><span class="p">(</span><span class="n">rf_data</span><span class="p">,</span> <span class="n">ax_on</span><span class="p">,</span> <span class="n">ax_off</span><span class="p">,</span> <span class="n">ax_cbar</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">DEFAULT_CMAP</span><span class="p">):</span>
+<div class="viewcode-block" id="plot_rts_blur_summary"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.visualization.html#allensdk.brain_observatory.receptive_field_analysis.visualization.plot_rts_blur_summary">[docs]</a><span class="k">def</span> <span class="nf">plot_rts_blur_summary</span><span class="p">(</span><span class="n">rf_data</span><span class="p">,</span> <span class="n">ax_on</span><span class="p">,</span> <span class="n">ax_off</span><span class="p">,</span> <span class="n">ax_cbar</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">DEFAULT_CMAP</span><span class="p">):</span>
     <span class="n">rts_on_blur</span> <span class="o">=</span> <span class="n">rf_data</span><span class="p">[</span><span class="s1">&#39;on&#39;</span><span class="p">][</span><span class="s1">&#39;rts_convolution&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
     <span class="n">rts_off_blur</span> <span class="o">=</span> <span class="n">rf_data</span><span class="p">[</span><span class="s1">&#39;off&#39;</span><span class="p">][</span><span class="s1">&#39;rts_convolution&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
     <span class="n">plot_fields</span><span class="p">(</span><span class="n">rts_on_blur</span><span class="p">,</span> <span class="n">rts_off_blur</span><span class="p">,</span> <span class="n">ax_on</span><span class="p">,</span> <span class="n">ax_off</span><span class="p">,</span> <span class="n">cbar_axes</span><span class="o">=</span><span class="n">ax_cbar</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="plot_p_values"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.visualization.plot_p_values">[docs]</a><span class="k">def</span> <span class="nf">plot_p_values</span><span class="p">(</span><span class="n">rf_data</span><span class="p">,</span> <span class="n">ax_on</span><span class="p">,</span> <span class="n">ax_off</span><span class="p">,</span> <span class="n">ax_cbar</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">DEFAULT_CMAP</span><span class="p">):</span>
+<div class="viewcode-block" id="plot_p_values"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.visualization.html#allensdk.brain_observatory.receptive_field_analysis.visualization.plot_p_values">[docs]</a><span class="k">def</span> <span class="nf">plot_p_values</span><span class="p">(</span><span class="n">rf_data</span><span class="p">,</span> <span class="n">ax_on</span><span class="p">,</span> <span class="n">ax_off</span><span class="p">,</span> <span class="n">ax_cbar</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">DEFAULT_CMAP</span><span class="p">):</span>
     <span class="n">pvalues_on</span> <span class="o">=</span> <span class="n">rf_data</span><span class="p">[</span><span class="s1">&#39;on&#39;</span><span class="p">][</span><span class="s1">&#39;pvalues&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
     <span class="n">pvalues_off</span> <span class="o">=</span> <span class="n">rf_data</span><span class="p">[</span><span class="s1">&#39;off&#39;</span><span class="p">][</span><span class="s1">&#39;pvalues&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
     <span class="n">clim_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">pvalues_on</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">pvalues_off</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
     <span class="n">plot_fields</span><span class="p">(</span><span class="n">pvalues_on</span><span class="p">,</span> <span class="n">pvalues_off</span><span class="p">,</span> <span class="n">ax_on</span><span class="p">,</span> <span class="n">ax_off</span><span class="p">,</span> <span class="n">cbar_axes</span><span class="o">=</span><span class="n">ax_cbar</span><span class="p">,</span> <span class="n">clim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">clim_max</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="plot_mask"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.visualization.plot_mask">[docs]</a><span class="k">def</span> <span class="nf">plot_mask</span><span class="p">(</span><span class="n">rf_data</span><span class="p">,</span> <span class="n">ax_on</span><span class="p">,</span> <span class="n">ax_off</span><span class="p">,</span> <span class="n">ax_cbar</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">DEFAULT_CMAP</span><span class="p">):</span>
+<div class="viewcode-block" id="plot_mask"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.visualization.html#allensdk.brain_observatory.receptive_field_analysis.visualization.plot_mask">[docs]</a><span class="k">def</span> <span class="nf">plot_mask</span><span class="p">(</span><span class="n">rf_data</span><span class="p">,</span> <span class="n">ax_on</span><span class="p">,</span> <span class="n">ax_off</span><span class="p">,</span> <span class="n">ax_cbar</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">DEFAULT_CMAP</span><span class="p">):</span>
     <span class="n">pvalues_on</span> <span class="o">=</span> <span class="n">rf_data</span><span class="p">[</span><span class="s1">&#39;on&#39;</span><span class="p">][</span><span class="s1">&#39;pvalues&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
     <span class="n">pvalues_off</span> <span class="o">=</span> <span class="n">rf_data</span><span class="p">[</span><span class="s1">&#39;off&#39;</span><span class="p">][</span><span class="s1">&#39;pvalues&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
 
@@ -232,7 +221,7 @@
 
     <span class="n">plot_fields</span><span class="p">(</span><span class="n">rf_on</span><span class="p">,</span> <span class="n">rf_off</span><span class="p">,</span> <span class="n">ax_on</span><span class="p">,</span> <span class="n">ax_off</span><span class="p">,</span> <span class="n">cbar_axes</span><span class="o">=</span><span class="n">ax_cbar</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="plot_gaussian_fit"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.visualization.plot_gaussian_fit">[docs]</a><span class="k">def</span> <span class="nf">plot_gaussian_fit</span><span class="p">(</span><span class="n">rf_data</span><span class="p">,</span> <span class="n">ax_on</span><span class="p">,</span> <span class="n">ax_off</span><span class="p">,</span> <span class="n">ax_cbar</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">DEFAULT_CMAP</span><span class="p">):</span>
+<div class="viewcode-block" id="plot_gaussian_fit"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.visualization.html#allensdk.brain_observatory.receptive_field_analysis.visualization.plot_gaussian_fit">[docs]</a><span class="k">def</span> <span class="nf">plot_gaussian_fit</span><span class="p">(</span><span class="n">rf_data</span><span class="p">,</span> <span class="n">ax_on</span><span class="p">,</span> <span class="n">ax_off</span><span class="p">,</span> <span class="n">ax_cbar</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">DEFAULT_CMAP</span><span class="p">):</span>
 
     <span class="n">gf_on_exists</span> <span class="o">=</span> <span class="s1">&#39;gaussian_fit&#39;</span> <span class="ow">in</span> <span class="n">rf_data</span><span class="p">[</span><span class="s1">&#39;on&#39;</span><span class="p">]</span>
     <span class="n">gf_off_exists</span> <span class="o">=</span> <span class="s1">&#39;gaussian_fit&#39;</span> <span class="ow">in</span> <span class="n">rf_data</span><span class="p">[</span><span class="s1">&#39;off&#39;</span><span class="p">]</span>
@@ -240,8 +229,8 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">gf_on_exists</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">gf_off_exists</span><span class="p">:</span>
         <span class="k">return</span>
 
-    <span class="n">img_data_on</span> <span class="o">=</span> <span class="n">rf_data</span><span class="p">[</span><span class="s1">&#39;on&#39;</span><span class="p">][</span><span class="s1">&#39;gaussian_fit&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="n">gf_on_exists</span> <span class="k">else</span> <span class="bp">None</span>
-    <span class="n">img_data_off</span> <span class="o">=</span> <span class="n">rf_data</span><span class="p">[</span><span class="s1">&#39;off&#39;</span><span class="p">][</span><span class="s1">&#39;gaussian_fit&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="n">gf_off_exists</span> <span class="k">else</span> <span class="bp">None</span>
+    <span class="n">img_data_on</span> <span class="o">=</span> <span class="n">rf_data</span><span class="p">[</span><span class="s1">&#39;on&#39;</span><span class="p">][</span><span class="s1">&#39;gaussian_fit&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="n">gf_on_exists</span> <span class="k">else</span> <span class="kc">None</span>
+    <span class="n">img_data_off</span> <span class="o">=</span> <span class="n">rf_data</span><span class="p">[</span><span class="s1">&#39;off&#39;</span><span class="p">][</span><span class="s1">&#39;gaussian_fit&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="n">gf_off_exists</span> <span class="k">else</span> <span class="kc">None</span>
 
     <span class="k">if</span> <span class="n">gf_on_exists</span> <span class="ow">and</span> <span class="n">gf_off_exists</span><span class="p">:</span>
         <span class="n">plot_fields</span><span class="p">(</span><span class="n">img_data_on</span><span class="p">,</span> <span class="n">img_data_off</span><span class="p">,</span> <span class="n">ax_on</span><span class="p">,</span> <span class="n">ax_off</span><span class="p">,</span> <span class="n">cbar_axes</span><span class="o">=</span><span class="n">ax_cbar</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">)</span>
@@ -253,7 +242,7 @@
 
         <span class="n">plot_fields</span><span class="p">(</span><span class="n">img_data_on</span><span class="p">,</span> <span class="n">img_data_off</span><span class="p">,</span> <span class="n">ax_on</span><span class="p">,</span> <span class="n">ax_off</span><span class="p">,</span> <span class="n">cbar_axes</span><span class="o">=</span><span class="n">ax_cbar</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="plot_receptive_field_data"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.html#allensdk.brain_observatory.receptive_field_analysis.visualization.plot_receptive_field_data">[docs]</a><span class="k">def</span> <span class="nf">plot_receptive_field_data</span><span class="p">(</span><span class="n">rf</span><span class="p">,</span> <span class="n">lsn</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">save_file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">close</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">DEFAULT_CMAP</span><span class="p">):</span>
+<div class="viewcode-block" id="plot_receptive_field_data"><a class="viewcode-back" href="../../../../allensdk.brain_observatory.receptive_field_analysis.visualization.html#allensdk.brain_observatory.receptive_field_analysis.visualization.plot_receptive_field_data">[docs]</a><span class="k">def</span> <span class="nf">plot_receptive_field_data</span><span class="p">(</span><span class="n">rf</span><span class="p">,</span> <span class="n">lsn</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save_file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">close</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">DEFAULT_CMAP</span><span class="p">):</span>
     <span class="n">cell_index</span> <span class="o">=</span> <span class="n">rf</span><span class="p">[</span><span class="s1">&#39;attrs&#39;</span><span class="p">][</span><span class="s1">&#39;cell_index&#39;</span><span class="p">]</span>
 
     <span class="c1"># Prepare plotting figure:n</span>
@@ -272,7 +261,7 @@
     <span class="n">plot_chi_square_summary</span><span class="p">(</span><span class="n">rf</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">curr_axes</span><span class="p">,</span> <span class="n">cax</span><span class="o">=</span><span class="n">cbar_axes</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">)</span>
 
     <span class="c1"># MSR plot:</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">lsn</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">lsn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">row</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="n">curr_on_axes</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">gsp</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
         <span class="n">curr_off_axes</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">gsp</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
@@ -327,10 +316,10 @@
     <span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="n">ax_list</span><span class="p">:</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">set_adjustable</span><span class="p">(</span><span class="s1">&#39;box-forced&#39;</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">save_file_name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">save_file_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_file_name</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">show</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">show</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="n">close</span><span class="p">:</span>
@@ -344,9 +333,7 @@
         <div class="sphinxsidebarwrapper">
 <h3><a href="../../../../index.html">Contents</a></h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Install Guide</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Install Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../cell_types.html">Cell Types</a></li>
@@ -371,6 +358,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.model.html">allensdk.model package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.morphology.html">allensdk.morphology package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.deprecated.html">allensdk.deprecated module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
@@ -388,12 +376,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

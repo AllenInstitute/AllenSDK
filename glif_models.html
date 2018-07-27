@@ -143,8 +143,6 @@ class:</p>
 <span class="n">ctc</span> <span class="o">=</span> <span class="n">CellTypesCache</span><span class="p">()</span>
 <span class="n">ctc</span><span class="o">.</span><span class="n">get_ephys_data</span><span class="p">(</span><span class="n">nm</span><span class="p">[</span><span class="s1">&#39;specimen_id&#39;</span><span class="p">],</span> <span class="n">file_name</span><span class="o">=</span><span class="s1">&#39;stimulus.nwb&#39;</span><span class="p">)</span>
 <span class="n">ctc</span><span class="o">.</span><span class="n">get_ephys_sweeps</span><span class="p">(</span><span class="n">nm</span><span class="p">[</span><span class="s1">&#39;specimen_id&#39;</span><span class="p">],</span> <span class="n">file_name</span><span class="o">=</span><span class="s1">&#39;ephys_sweeps.json&#39;</span><span class="p">)</span>
-
-
 </pre></div>
 </div>
 </div>
@@ -156,7 +154,7 @@ JSON file.  You can use this file to instantiate a simulator and feed in your ow
 <span class="kn">from</span> <span class="nn">allensdk.model.glif.glif_neuron</span> <span class="k">import</span> <span class="n">GlifNeuron</span>
 
 <span class="c1"># initialize the neuron</span>
-<span class="n">neuron_config</span> <span class="o">=</span> <span class="n">json_utilities</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;neuron_config.json&#39;</span><span class="p">)</span>
+<span class="n">neuron_config</span> <span class="o">=</span> <span class="n">json_utilities</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;neuron_config.json&#39;</span><span class="p">)[</span><span class="s1">&#39;566302806&#39;</span><span class="p">]</span>
 <span class="n">neuron</span> <span class="o">=</span> <span class="n">GlifNeuron</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">neuron_config</span><span class="p">)</span>
 
 <span class="c1"># make a short square pulse. stimulus units should be in Amps.</span>
@@ -188,14 +186,14 @@ module for simulating all sweeps presented to a cell and storing them in the NWB
 <span class="kn">from</span> <span class="nn">allensdk.model.glif.glif_neuron</span> <span class="k">import</span> <span class="n">GlifNeuron</span>
 <span class="kn">from</span> <span class="nn">allensdk.model.glif.simulate_neuron</span> <span class="k">import</span> <span class="n">simulate_neuron</span>
 
-<span class="n">neuron_config</span> <span class="o">=</span> <span class="n">json_utilities</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;neuron_config.json&#39;</span><span class="p">)</span>
+<span class="n">neuron_config</span> <span class="o">=</span> <span class="n">json_utilities</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;neuron_config.json&#39;</span><span class="p">)[</span><span class="s1">&#39;566302806&#39;</span><span class="p">]</span>
 <span class="n">ephys_sweeps</span> <span class="o">=</span> <span class="n">json_utilities</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;ephys_sweeps.json&#39;</span><span class="p">)</span>
 <span class="n">ephys_file_name</span> <span class="o">=</span> <span class="s1">&#39;stimulus.nwb&#39;</span>
 
 <span class="n">neuron</span> <span class="o">=</span> <span class="n">GlifNeuron</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">neuron_config</span><span class="p">)</span>
 
-<span class="n">sweep_numbers</span> <span class="o">=</span> <span class="p">[</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;sweep_number&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">ephys_sweeps</span> 
-                  <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;stimulus_units&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Amps&#39;</span> <span class="p">]</span>
+<span class="n">sweep_numbers</span> <span class="o">=</span> <span class="p">[</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;sweep_number&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">ephys_sweeps</span> <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;stimulus_units&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Amps&#39;</span> <span class="p">]</span>
+<span class="n">sweep_numbers</span> <span class="o">=</span> <span class="n">sweep_numbers</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># for the sake of a speedy example, just run the first one</span>
 <span class="n">simulate_neuron</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">sweep_numbers</span><span class="p">,</span> <span class="n">ephys_file_name</span><span class="p">,</span> <span class="n">ephys_file_name</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -214,7 +212,7 @@ these <code class="docutils literal notranslate"><span class="pre">NaN</span></c
 <span class="kn">from</span> <span class="nn">allensdk.model.glif.glif_neuron</span> <span class="k">import</span> <span class="n">GlifNeuron</span>
 <span class="kn">from</span> <span class="nn">allensdk.core.nwb_data_set</span> <span class="k">import</span> <span class="n">NwbDataSet</span>
 
-<span class="n">neuron_config</span> <span class="o">=</span> <span class="n">json_utilities</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;neuron_config.json&#39;</span><span class="p">)</span>
+<span class="n">neuron_config</span> <span class="o">=</span> <span class="n">json_utilities</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;neuron_config.json&#39;</span><span class="p">)[</span><span class="s1">&#39;566302806&#39;</span><span class="p">]</span>
 <span class="n">ephys_sweeps</span> <span class="o">=</span> <span class="n">json_utilities</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;ephys_sweeps.json&#39;</span><span class="p">)</span>
 <span class="n">ephys_file_name</span> <span class="o">=</span> <span class="s1">&#39;stimulus.nwb&#39;</span>
 
@@ -419,7 +417,7 @@ methods, however you can supply your own custom method if you like:</p>
     <span class="k">return</span> <span class="n">custom_param_a</span> <span class="o">*</span> <span class="n">voltage_t0</span> <span class="o">+</span> <span class="n">custom_param_b</span>
 
 <span class="c1"># initialize a neuron from a neuron config file</span>
-<span class="n">neuron_config</span> <span class="o">=</span> <span class="n">json_utilities</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;neuron_config.json&#39;</span><span class="p">)</span>
+<span class="n">neuron_config</span> <span class="o">=</span> <span class="n">json_utilities</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;neuron_config.json&#39;</span><span class="p">)[</span><span class="s1">&#39;566302806&#39;</span><span class="p">]</span>
 <span class="n">neuron</span> <span class="o">=</span> <span class="n">GlifNeuron</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">neuron_config</span><span class="p">)</span>
 
 <span class="c1"># configure a new method and overwrite the neuron&#39;s old method</span>

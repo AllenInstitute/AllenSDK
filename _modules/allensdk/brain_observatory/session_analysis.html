@@ -1,32 +1,21 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>allensdk.brain_observatory.session_analysis &mdash; Allen SDK dev documentation</title>
-    
+    <title>allensdk.brain_observatory.session_analysis &#8212; Allen SDK dev documentation</title>
     <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../',
-        VERSION:     'dev',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK dev documentation" href="../../../index.html" />
-    <link rel="up" title="Module code" href="../../index.html" /> 
-  </head>
-  <body role="document">
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
 <script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
@@ -104,46 +93,46 @@
 <span class="c1"># ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="c1">#</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">.static_gratings</span> <span class="kn">import</span> <span class="n">StaticGratings</span>
-<span class="kn">from</span> <span class="nn">.locally_sparse_noise</span> <span class="kn">import</span> <span class="n">LocallySparseNoise</span>
-<span class="kn">from</span> <span class="nn">.natural_scenes</span> <span class="kn">import</span> <span class="n">NaturalScenes</span>
-<span class="kn">from</span> <span class="nn">.drifting_gratings</span> <span class="kn">import</span> <span class="n">DriftingGratings</span>
-<span class="kn">from</span> <span class="nn">.natural_movie</span> <span class="kn">import</span> <span class="n">NaturalMovie</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">.static_gratings</span> <span class="k">import</span> <span class="n">StaticGratings</span>
+<span class="kn">from</span> <span class="nn">.locally_sparse_noise</span> <span class="k">import</span> <span class="n">LocallySparseNoise</span>
+<span class="kn">from</span> <span class="nn">.natural_scenes</span> <span class="k">import</span> <span class="n">NaturalScenes</span>
+<span class="kn">from</span> <span class="nn">.drifting_gratings</span> <span class="k">import</span> <span class="n">DriftingGratings</span>
+<span class="kn">from</span> <span class="nn">.natural_movie</span> <span class="k">import</span> <span class="n">NaturalMovie</span>
 <span class="kn">import</span> <span class="nn">six</span>
 <span class="kn">from</span> <span class="nn">allensdk.core.brain_observatory_nwb_data_set</span> \
-    <span class="kn">import</span> <span class="n">BrainObservatoryNwbDataSet</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">stimulus_info</span>
+    <span class="kn">import</span> <span class="nn">BrainObservatoryNwbDataSet</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">stimulus_info</span>
 <span class="kn">from</span> <span class="nn">allensdk.brain_observatory.brain_observatory_exceptions</span> \
-    <span class="kn">import</span> <span class="n">BrainObservatoryAnalysisException</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">brain_observatory_plotting</span> <span class="k">as</span> <span class="n">cp</span>
+    <span class="kn">import</span> <span class="nn">BrainObservatoryAnalysisException</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">brain_observatory_plotting</span> <span class="k">as</span> <span class="n">cp</span>
 <span class="kn">import</span> <span class="nn">argparse</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
-<span class="kn">from</span> <span class="nn">allensdk.deprecated</span> <span class="kn">import</span> <span class="n">deprecated</span>
+<span class="kn">from</span> <span class="nn">allensdk.deprecated</span> <span class="k">import</span> <span class="n">deprecated</span>
 
 
 
-<div class="viewcode-block" id="multi_dataframe_merge"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.multi_dataframe_merge">[docs]</a><span class="k">def</span> <span class="nf">multi_dataframe_merge</span><span class="p">(</span><span class="n">dfs</span><span class="p">):</span>
+<div class="viewcode-block" id="multi_dataframe_merge"><a class="viewcode-back" href="../../../allensdk.brain_observatory.session_analysis.html#allensdk.brain_observatory.session_analysis.multi_dataframe_merge">[docs]</a><span class="k">def</span> <span class="nf">multi_dataframe_merge</span><span class="p">(</span><span class="n">dfs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; merge a number of pd.DataFrames into a single dataframe on their index columns. </span>
 <span class="sd">    If any columns are duplicated, prefer the first occuring instance of the column &quot;&quot;&quot;</span>
 
-    <span class="n">out_df</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">out_df</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">df</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dfs</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">out_df</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">out_df</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">out_df</span> <span class="o">=</span> <span class="n">df</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">out_df</span> <span class="o">=</span> <span class="n">out_df</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">left_index</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-                                  <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">suffixes</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;_deleteme&#39;</span><span class="p">])</span>
+            <span class="n">out_df</span> <span class="o">=</span> <span class="n">out_df</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">left_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                  <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">suffixes</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;_deleteme&#39;</span><span class="p">])</span>
 
     <span class="n">bad_columns</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">out_df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;deleteme&#39;</span><span class="p">)])</span>
-    <span class="n">out_df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">bad_columns</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">out_df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">bad_columns</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">out_df</span></div>
 
 
-<div class="viewcode-block" id="SessionAnalysis"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis">[docs]</a><span class="k">class</span> <span class="nc">SessionAnalysis</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="SessionAnalysis"><a class="viewcode-back" href="../../../allensdk.brain_observatory.session_analysis.html#allensdk.brain_observatory.session_analysis.SessionAnalysis">[docs]</a><span class="k">class</span> <span class="nc">SessionAnalysis</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; </span>
 <span class="sd">    Run all of the stimulus-specific analyses associated with a single experiment session. </span>
 
@@ -167,13 +156,13 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nwb</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">()</span>
 
-<div class="viewcode-block" id="SessionAnalysis.append_metadata"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">append_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
+<div class="viewcode-block" id="SessionAnalysis.append_metadata"><a class="viewcode-back" href="../../../allensdk.brain_observatory.session_analysis.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">append_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Append the metadata fields from the NWB file as columns to a pd.DataFrame &quot;&quot;&quot;</span>
 
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">):</span>
             <span class="n">df</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span></div>
 
-<div class="viewcode-block" id="SessionAnalysis.save_session_a"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.save_session_a">[docs]</a>    <span class="k">def</span> <span class="nf">save_session_a</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dg</span><span class="p">,</span> <span class="n">nm1</span><span class="p">,</span> <span class="n">nm3</span><span class="p">,</span> <span class="n">peak</span><span class="p">):</span>
+<div class="viewcode-block" id="SessionAnalysis.save_session_a"><a class="viewcode-back" href="../../../allensdk.brain_observatory.session_analysis.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.save_session_a">[docs]</a>    <span class="k">def</span> <span class="nf">save_session_a</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dg</span><span class="p">,</span> <span class="n">nm1</span><span class="p">,</span> <span class="n">nm3</span><span class="p">,</span> <span class="n">peak</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Save the output of session A analysis to self.save_path.  </span>
 
 <span class="sd">        Parameters</span>
@@ -215,7 +204,7 @@
             <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="SessionAnalysis.save_session_b"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.save_session_b">[docs]</a>    <span class="k">def</span> <span class="nf">save_session_b</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sg</span><span class="p">,</span> <span class="n">nm1</span><span class="p">,</span> <span class="n">ns</span><span class="p">,</span> <span class="n">peak</span><span class="p">):</span>
+<div class="viewcode-block" id="SessionAnalysis.save_session_b"><a class="viewcode-back" href="../../../allensdk.brain_observatory.session_analysis.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.save_session_b">[docs]</a>    <span class="k">def</span> <span class="nf">save_session_b</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sg</span><span class="p">,</span> <span class="n">nm1</span><span class="p">,</span> <span class="n">ns</span><span class="p">,</span> <span class="n">peak</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Save the output of session B analysis to self.save_path.  </span>
 
 <span class="sd">        Parameters</span>
@@ -260,7 +249,7 @@
             <span class="p">(</span><span class="s1">&#39;rep_similarity_ns&#39;</span><span class="p">,</span> <span class="n">ns</span><span class="o">.</span><span class="n">representational_similarity</span><span class="p">)</span>
             <span class="p">)</span></div>
 
-<div class="viewcode-block" id="SessionAnalysis.save_session_c"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.save_session_c">[docs]</a>    <span class="k">def</span> <span class="nf">save_session_c</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lsn</span><span class="p">,</span> <span class="n">nm1</span><span class="p">,</span> <span class="n">nm2</span><span class="p">,</span> <span class="n">peak</span><span class="p">):</span>
+<div class="viewcode-block" id="SessionAnalysis.save_session_c"><a class="viewcode-back" href="../../../allensdk.brain_observatory.session_analysis.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.save_session_c">[docs]</a>    <span class="k">def</span> <span class="nf">save_session_c</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lsn</span><span class="p">,</span> <span class="n">nm1</span><span class="p">,</span> <span class="n">nm2</span><span class="p">,</span> <span class="n">peak</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Save the output of session C analysis to self.save_path.  </span>
 
 <span class="sd">        Parameters</span>
@@ -299,7 +288,7 @@
 
         <span class="n">LocallySparseNoise</span><span class="o">.</span><span class="n">save_cell_index_receptive_field_analysis</span><span class="p">(</span><span class="n">lsn</span><span class="o">.</span><span class="n">cell_index_receptive_field_analysis_data</span><span class="p">,</span> <span class="n">nwb</span><span class="p">,</span> <span class="n">stimulus_info</span><span class="o">.</span><span class="n">LOCALLY_SPARSE_NOISE</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SessionAnalysis.save_session_c2"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.save_session_c2">[docs]</a>    <span class="k">def</span> <span class="nf">save_session_c2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lsn4</span><span class="p">,</span> <span class="n">lsn8</span><span class="p">,</span> <span class="n">nm1</span><span class="p">,</span> <span class="n">nm2</span><span class="p">,</span> <span class="n">peak</span><span class="p">):</span>        
+<div class="viewcode-block" id="SessionAnalysis.save_session_c2"><a class="viewcode-back" href="../../../allensdk.brain_observatory.session_analysis.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.save_session_c2">[docs]</a>    <span class="k">def</span> <span class="nf">save_session_c2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lsn4</span><span class="p">,</span> <span class="n">lsn8</span><span class="p">,</span> <span class="n">nm1</span><span class="p">,</span> <span class="n">nm2</span><span class="p">,</span> <span class="n">peak</span><span class="p">):</span>        
         <span class="sd">&quot;&quot;&quot; Save the output of session C2 analysis to self.save_path. </span>
 
 <span class="sd">        Parameters</span>
@@ -355,7 +344,7 @@
         <span class="n">LocallySparseNoise</span><span class="o">.</span><span class="n">save_cell_index_receptive_field_analysis</span><span class="p">(</span><span class="n">lsn4</span><span class="o">.</span><span class="n">cell_index_receptive_field_analysis_data</span><span class="p">,</span> <span class="n">nwb</span><span class="p">,</span> <span class="n">stimulus_info</span><span class="o">.</span><span class="n">LOCALLY_SPARSE_NOISE_4DEG</span><span class="p">)</span>
         <span class="n">LocallySparseNoise</span><span class="o">.</span><span class="n">save_cell_index_receptive_field_analysis</span><span class="p">(</span><span class="n">lsn8</span><span class="o">.</span><span class="n">cell_index_receptive_field_analysis_data</span><span class="p">,</span> <span class="n">nwb</span><span class="p">,</span> <span class="n">stimulus_info</span><span class="o">.</span><span class="n">LOCALLY_SPARSE_NOISE_8DEG</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SessionAnalysis.append_metrics_drifting_grating"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_drifting_grating">[docs]</a>    <span class="k">def</span> <span class="nf">append_metrics_drifting_grating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">dg</span><span class="p">):</span>
+<div class="viewcode-block" id="SessionAnalysis.append_metrics_drifting_grating"><a class="viewcode-back" href="../../../allensdk.brain_observatory.session_analysis.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_drifting_grating">[docs]</a>    <span class="k">def</span> <span class="nf">append_metrics_drifting_grating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">dg</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Extract metrics from the DriftingGratings peak response table into a dictionary. &quot;&quot;&quot;</span>
 
         <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;osi_dg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;osi_dg&quot;</span><span class="p">]</span>
@@ -372,7 +361,7 @@
         <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;p_run_mod_dg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;p_run_dg&quot;</span><span class="p">]</span>
         <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;peak_dff_dg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;peak_dff_dg&quot;</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="SessionAnalysis.append_metrics_static_grating"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_static_grating">[docs]</a>    <span class="k">def</span> <span class="nf">append_metrics_static_grating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">sg</span><span class="p">):</span>
+<div class="viewcode-block" id="SessionAnalysis.append_metrics_static_grating"><a class="viewcode-back" href="../../../allensdk.brain_observatory.session_analysis.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_static_grating">[docs]</a>    <span class="k">def</span> <span class="nf">append_metrics_static_grating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">sg</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Extract metrics from the StaticGratings peak response table into a dictionary. &quot;&quot;&quot;</span>
 
         <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;osi_sg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;osi_sg&quot;</span><span class="p">]</span>
@@ -390,7 +379,7 @@
         <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;peak_dff_sg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;peak_dff_sg&quot;</span><span class="p">]</span>
         <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;reliability_sg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;reliability_sg&quot;</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="SessionAnalysis.append_metrics_natural_scene"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_natural_scene">[docs]</a>    <span class="k">def</span> <span class="nf">append_metrics_natural_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">ns</span><span class="p">):</span>
+<div class="viewcode-block" id="SessionAnalysis.append_metrics_natural_scene"><a class="viewcode-back" href="../../../allensdk.brain_observatory.session_analysis.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_natural_scene">[docs]</a>    <span class="k">def</span> <span class="nf">append_metrics_natural_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">ns</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Extract metrics from the NaturalScenes peak response table into a dictionary. &quot;&quot;&quot;</span>
 
         <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;pref_image_ns&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;scene_ns&quot;</span><span class="p">]</span>
@@ -402,7 +391,7 @@
         <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;p_run_mod_ns&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;p_run_ns&quot;</span><span class="p">]</span>
         <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;peak_dff_ns&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;peak_dff_ns&quot;</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="SessionAnalysis.append_metrics_locally_sparse_noise"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_locally_sparse_noise">[docs]</a>    <span class="k">def</span> <span class="nf">append_metrics_locally_sparse_noise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">lsn</span><span class="p">):</span>
+<div class="viewcode-block" id="SessionAnalysis.append_metrics_locally_sparse_noise"><a class="viewcode-back" href="../../../allensdk.brain_observatory.session_analysis.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_locally_sparse_noise">[docs]</a>    <span class="k">def</span> <span class="nf">append_metrics_locally_sparse_noise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">lsn</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Extract metrics from the LocallySparseNoise peak response table into a dictionary. &quot;&quot;&quot;</span>
 
         <span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;rf_chi2_lsn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lsn</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s1">&#39;rf_chi2_lsn&#39;</span><span class="p">]</span>
@@ -415,24 +404,24 @@
         <span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;rf_distance_lsn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lsn</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s1">&#39;rf_distance_lsn&#39;</span><span class="p">]</span>
         <span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;rf_overlap_index_lsn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lsn</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s1">&#39;rf_overlap_index_lsn&#39;</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="SessionAnalysis.append_metrics_natural_movie_one"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_natural_movie_one">[docs]</a>    <span class="k">def</span> <span class="nf">append_metrics_natural_movie_one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">nma</span><span class="p">):</span>
+<div class="viewcode-block" id="SessionAnalysis.append_metrics_natural_movie_one"><a class="viewcode-back" href="../../../allensdk.brain_observatory.session_analysis.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_natural_movie_one">[docs]</a>    <span class="k">def</span> <span class="nf">append_metrics_natural_movie_one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">nma</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Extract metrics from the NaturalMovie(stimulus_info.NATURAL_MOVIE_ONE) peak response table into a dictionary. &quot;&quot;&quot;</span>
         <span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;reliability_nm1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nma</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s1">&#39;response_reliability_nm1&#39;</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="SessionAnalysis.append_metrics_natural_movie_two"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_natural_movie_two">[docs]</a>    <span class="k">def</span> <span class="nf">append_metrics_natural_movie_two</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">nma</span><span class="p">):</span>
+<div class="viewcode-block" id="SessionAnalysis.append_metrics_natural_movie_two"><a class="viewcode-back" href="../../../allensdk.brain_observatory.session_analysis.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_natural_movie_two">[docs]</a>    <span class="k">def</span> <span class="nf">append_metrics_natural_movie_two</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">nma</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Extract metrics from the NaturalMovie(stimulus_info.NATURAL_MOVIE_TWO) peak response table into a dictionary. &quot;&quot;&quot;</span>
         <span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;reliability_nm2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nma</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s1">&#39;response_reliability_nm2&#39;</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="SessionAnalysis.append_metrics_natural_movie_three"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_natural_movie_three">[docs]</a>    <span class="k">def</span> <span class="nf">append_metrics_natural_movie_three</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">nma</span><span class="p">):</span>
+<div class="viewcode-block" id="SessionAnalysis.append_metrics_natural_movie_three"><a class="viewcode-back" href="../../../allensdk.brain_observatory.session_analysis.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_natural_movie_three">[docs]</a>    <span class="k">def</span> <span class="nf">append_metrics_natural_movie_three</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">nma</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Extract metrics from the NaturalMovie(stimulus_info.NATURAL_MOVIE_THREE) peak response table into a dictionary. &quot;&quot;&quot;</span>
         <span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;reliability_nm3&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nma</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s1">&#39;response_reliability_nm3&#39;</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="SessionAnalysis.append_experiment_metrics"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_experiment_metrics">[docs]</a>    <span class="k">def</span> <span class="nf">append_experiment_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">):</span>
+<div class="viewcode-block" id="SessionAnalysis.append_experiment_metrics"><a class="viewcode-back" href="../../../allensdk.brain_observatory.session_analysis.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_experiment_metrics">[docs]</a>    <span class="k">def</span> <span class="nf">append_experiment_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Extract stimulus-agnostic metrics from an experiment into a dictionary &quot;&quot;&quot;</span>
         <span class="n">dxcm</span><span class="p">,</span> <span class="n">dxtime</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nwb</span><span class="o">.</span><span class="n">get_running_speed</span><span class="p">()</span>
         <span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;mean_running_speed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">dxcm</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SessionAnalysis.verify_roi_lists_equal"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.verify_roi_lists_equal">[docs]</a>    <span class="k">def</span> <span class="nf">verify_roi_lists_equal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">roi1</span><span class="p">,</span> <span class="n">roi2</span><span class="p">):</span>
+<div class="viewcode-block" id="SessionAnalysis.verify_roi_lists_equal"><a class="viewcode-back" href="../../../allensdk.brain_observatory.session_analysis.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.verify_roi_lists_equal">[docs]</a>    <span class="k">def</span> <span class="nf">verify_roi_lists_equal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">roi1</span><span class="p">,</span> <span class="n">roi2</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; TODO: replace this with simpler numpy comparisons &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">roi1</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">roi2</span><span class="p">):</span>
@@ -444,7 +433,7 @@
                 <span class="k">raise</span> <span class="n">BrainObservatoryAnalysisException</span><span class="p">(</span>
                     <span class="s2">&quot;Error -- ROI lists have different entries&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SessionAnalysis.session_a"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.session_a">[docs]</a>    <span class="k">def</span> <span class="nf">session_a</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plot_flag</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">save_flag</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+<div class="viewcode-block" id="SessionAnalysis.session_a"><a class="viewcode-back" href="../../../allensdk.brain_observatory.session_analysis.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.session_a">[docs]</a>    <span class="k">def</span> <span class="nf">session_a</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plot_flag</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">save_flag</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Run stimulus-specific analysis for natural movie one, natural movie three, and drifting gratings.</span>
 <span class="sd">        The input NWB be for a stimulus_info.THREE_SESSION_A experiment.</span>
 
@@ -484,7 +473,7 @@
             <span class="n">cp</span><span class="o">.</span><span class="n">_plot_3sa</span><span class="p">(</span><span class="n">dg</span><span class="p">,</span> <span class="n">nm1</span><span class="p">,</span> <span class="n">nm3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">)</span>
             <span class="n">cp</span><span class="o">.</span><span class="n">plot_drifting_grating_traces</span><span class="p">(</span><span class="n">dg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SessionAnalysis.session_b"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.session_b">[docs]</a>    <span class="k">def</span> <span class="nf">session_b</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plot_flag</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">save_flag</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+<div class="viewcode-block" id="SessionAnalysis.session_b"><a class="viewcode-back" href="../../../allensdk.brain_observatory.session_analysis.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.session_b">[docs]</a>    <span class="k">def</span> <span class="nf">session_b</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plot_flag</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">save_flag</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Run stimulus-specific analysis for natural scenes, static gratings, and natural movie one.</span>
 <span class="sd">        The input NWB be for a stimulus_info.THREE_SESSION_B experiment.</span>
 
@@ -528,7 +517,7 @@
             <span class="n">cp</span><span class="o">.</span><span class="n">plot_ns_traces</span><span class="p">(</span><span class="n">ns</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">)</span>
             <span class="n">cp</span><span class="o">.</span><span class="n">plot_sg_traces</span><span class="p">(</span><span class="n">sg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SessionAnalysis.session_c"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.session_c">[docs]</a>    <span class="k">def</span> <span class="nf">session_c</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plot_flag</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">save_flag</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+<div class="viewcode-block" id="SessionAnalysis.session_c"><a class="viewcode-back" href="../../../allensdk.brain_observatory.session_analysis.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.session_c">[docs]</a>    <span class="k">def</span> <span class="nf">session_c</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plot_flag</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">save_flag</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Run stimulus-specific analysis for natural movie one, natural movie two, and locally sparse noise.</span>
 <span class="sd">        The input NWB be for a stimulus_info.THREE_SESSION_C experiment.</span>
 
@@ -561,7 +550,7 @@
             <span class="n">cp</span><span class="o">.</span><span class="n">_plot_3sc</span><span class="p">(</span><span class="n">lsn</span><span class="p">,</span> <span class="n">nm1</span><span class="p">,</span> <span class="n">nm2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">)</span>
             <span class="n">cp</span><span class="o">.</span><span class="n">plot_lsn_traces</span><span class="p">(</span><span class="n">lsn</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SessionAnalysis.session_c2"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.session_c2">[docs]</a>    <span class="k">def</span> <span class="nf">session_c2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plot_flag</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">save_flag</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+<div class="viewcode-block" id="SessionAnalysis.session_c2"><a class="viewcode-back" href="../../../allensdk.brain_observatory.session_analysis.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.session_c2">[docs]</a>    <span class="k">def</span> <span class="nf">session_c2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plot_flag</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">save_flag</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Run stimulus-specific analysis for locally sparse noise (4 deg.), locally sparse noise (8 deg.),</span>
 <span class="sd">        natural movie one, and natural movie two. The input NWB be for a stimulus_info.THREE_SESSION_C2 experiment.</span>
 
@@ -605,7 +594,7 @@
             <span class="n">cp</span><span class="o">.</span><span class="n">plot_lsn_traces</span><span class="p">(</span><span class="n">lsn4</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">,</span> <span class="s1">&#39;_8deg&#39;</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="run_session_analysis"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.run_session_analysis">[docs]</a><span class="k">def</span> <span class="nf">run_session_analysis</span><span class="p">(</span><span class="n">nwb_path</span><span class="p">,</span> <span class="n">save_path</span><span class="p">,</span> <span class="n">plot_flag</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">save_flag</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+<div class="viewcode-block" id="run_session_analysis"><a class="viewcode-back" href="../../../allensdk.brain_observatory.session_analysis.html#allensdk.brain_observatory.session_analysis.run_session_analysis">[docs]</a><span class="k">def</span> <span class="nf">run_session_analysis</span><span class="p">(</span><span class="n">nwb_path</span><span class="p">,</span> <span class="n">save_path</span><span class="p">,</span> <span class="n">plot_flag</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">save_flag</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Inspect an NWB file to determine which experiment session was run</span>
 <span class="sd">    and compute all stimulus-specific analyses.</span>
 
@@ -651,8 +640,8 @@
     <span class="k">return</span> <span class="n">metrics</span></div>
 
 
-<span class="nd">@deprecated</span><span class="p">(</span><span class="s1">&#39;use the standalone version in bin/brain_observatory&#39;</span><span class="p">)</span>
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../allensdk.brain_observatory.session_analysis.html#allensdk.brain_observatory.session_analysis.main">[docs]</a><span class="nd">@deprecated</span><span class="p">(</span><span class="s1">&#39;use the standalone version in bin/brain_observatory&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;input_nwb&quot;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;output_h5&quot;</span><span class="p">)</span>
@@ -666,7 +655,7 @@
     <span class="n">run_session_analysis</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">input_nwb</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_h5</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">plot</span><span class="p">)</span></div>
 
 
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
 
@@ -677,9 +666,7 @@
         <div class="sphinxsidebarwrapper">
 <h3><a href="../../../index.html">Contents</a></h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install Guide</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../cell_types.html">Cell Types</a></li>
@@ -704,6 +691,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.model.html">allensdk.model package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.morphology.html">allensdk.morphology package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.deprecated.html">allensdk.deprecated module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
@@ -721,12 +709,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

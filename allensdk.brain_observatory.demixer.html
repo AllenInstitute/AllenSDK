@@ -59,8 +59,89 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="allensdk-brain-observatory-demixer-module">
-<h1>allensdk.brain_observatory.demixer module<a class="headerlink" href="#allensdk-brain-observatory-demixer-module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-allensdk.brain_observatory.demixer">
+<span id="allensdk-brain-observatory-demixer-module"></span><h1>allensdk.brain_observatory.demixer module<a class="headerlink" href="#module-allensdk.brain_observatory.demixer" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="allensdk.brain_observatory.demixer.demix_time_dep_masks">
+<code class="descclassname">allensdk.brain_observatory.demixer.</code><code class="descname">demix_time_dep_masks</code><span class="sig-paren">(</span><em>raw_traces</em>, <em>stack</em>, <em>masks</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/demixer.html#demix_time_dep_masks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.demixer.demix_time_dep_masks" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>raw_traces</strong> – extracted traces</li>
+<li><strong>stack</strong> – movie (same length as traces)</li>
+<li><strong>masks</strong> – binary roi masks</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">demixed traces</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.demixer.find_negative_baselines">
+<code class="descclassname">allensdk.brain_observatory.demixer.</code><code class="descname">find_negative_baselines</code><span class="sig-paren">(</span><em>trace</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/demixer.html#find_negative_baselines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.demixer.find_negative_baselines" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.demixer.find_negative_transients_threshold">
+<code class="descclassname">allensdk.brain_observatory.demixer.</code><code class="descname">find_negative_transients_threshold</code><span class="sig-paren">(</span><em>trace</em>, <em>window=500</em>, <em>length=10</em>, <em>std_devs=3</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/demixer.html#find_negative_transients_threshold"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.demixer.find_negative_transients_threshold" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.demixer.find_zero_baselines">
+<code class="descclassname">allensdk.brain_observatory.demixer.</code><code class="descname">find_zero_baselines</code><span class="sig-paren">(</span><em>traces</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/demixer.html#find_zero_baselines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.demixer.find_zero_baselines" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.demixer.plot_negative_baselines">
+<code class="descclassname">allensdk.brain_observatory.demixer.</code><code class="descname">plot_negative_baselines</code><span class="sig-paren">(</span><em>raw_traces</em>, <em>demix_traces</em>, <em>mask_array</em>, <em>roi_ids_mask</em>, <em>plot_dir</em>, <em>ext='png'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/demixer.html#plot_negative_baselines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.demixer.plot_negative_baselines" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.demixer.plot_negative_transients">
+<code class="descclassname">allensdk.brain_observatory.demixer.</code><code class="descname">plot_negative_transients</code><span class="sig-paren">(</span><em>raw_traces</em>, <em>demix_traces</em>, <em>valid_roi</em>, <em>mask_array</em>, <em>roi_ids_mask</em>, <em>plot_dir</em>, <em>ext='png'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/demixer.html#plot_negative_transients"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.demixer.plot_negative_transients" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.demixer.plot_overlap_masks_lengthOne">
+<code class="descclassname">allensdk.brain_observatory.demixer.</code><code class="descname">plot_overlap_masks_lengthOne</code><span class="sig-paren">(</span><em>roi_ind</em>, <em>masks</em>, <em>savefile=None</em>, <em>weighted=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/demixer.html#plot_overlap_masks_lengthOne"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.demixer.plot_overlap_masks_lengthOne" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.demixer.plot_traces">
+<code class="descclassname">allensdk.brain_observatory.demixer.</code><code class="descname">plot_traces</code><span class="sig-paren">(</span><em>raw_trace</em>, <em>demix_trace</em>, <em>roi_id</em>, <em>roi_ind</em>, <em>save_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/demixer.html#plot_traces"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.demixer.plot_traces" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.demixer.plot_transients">
+<code class="descclassname">allensdk.brain_observatory.demixer.</code><code class="descname">plot_transients</code><span class="sig-paren">(</span><em>roi_ind</em>, <em>t_trans</em>, <em>masks</em>, <em>traces</em>, <em>demix_traces</em>, <em>savefile</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/demixer.html#plot_transients"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.demixer.plot_transients" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.demixer.rolling_window">
+<code class="descclassname">allensdk.brain_observatory.demixer.</code><code class="descname">rolling_window</code><span class="sig-paren">(</span><em>trace</em>, <em>window=500</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/brain_observatory/demixer.html#rolling_window"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.demixer.rolling_window" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>trace</strong> – </li>
+<li><strong>window</strong> – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 
 

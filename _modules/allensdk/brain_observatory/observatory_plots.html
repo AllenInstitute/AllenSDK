@@ -1,32 +1,21 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>allensdk.brain_observatory.observatory_plots &mdash; Allen SDK dev documentation</title>
-    
+    <title>allensdk.brain_observatory.observatory_plots &#8212; Allen SDK dev documentation</title>
     <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../',
-        VERSION:     'dev',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK dev documentation" href="../../../index.html" />
-    <link rel="up" title="Module code" href="../../index.html" /> 
-  </head>
-  <body role="document">
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
 <script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
@@ -104,21 +93,21 @@
 <span class="c1"># ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="c1">#</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">matplotlib.colors</span> <span class="kn">as</span> <span class="nn">mcolors</span>
-<span class="kn">from</span> <span class="nn">matplotlib.colors</span> <span class="kn">import</span> <span class="n">LinearSegmentedColormap</span>
-<span class="kn">from</span> <span class="nn">matplotlib.collections</span> <span class="kn">import</span> <span class="n">PatchCollection</span>
-<span class="kn">import</span> <span class="nn">matplotlib.lines</span> <span class="kn">as</span> <span class="nn">mlines</span>
-<span class="kn">import</span> <span class="nn">matplotlib.patches</span> <span class="kn">as</span> <span class="nn">mpatches</span>
-<span class="kn">import</span> <span class="nn">scipy.interpolate</span> <span class="kn">as</span> <span class="nn">si</span>
-<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">gaussian_kde</span>
-<span class="kn">import</span> <span class="nn">matplotlib.colorbar</span> <span class="kn">as</span> <span class="nn">cbar</span>
-<span class="kn">from</span> <span class="nn">mpl_toolkits.axes_grid1</span> <span class="kn">import</span> <span class="n">ImageGrid</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib.colors</span> <span class="k">as</span> <span class="nn">mcolors</span>
+<span class="kn">from</span> <span class="nn">matplotlib.colors</span> <span class="k">import</span> <span class="n">LinearSegmentedColormap</span>
+<span class="kn">from</span> <span class="nn">matplotlib.collections</span> <span class="k">import</span> <span class="n">PatchCollection</span>
+<span class="kn">import</span> <span class="nn">matplotlib.lines</span> <span class="k">as</span> <span class="nn">mlines</span>
+<span class="kn">import</span> <span class="nn">matplotlib.patches</span> <span class="k">as</span> <span class="nn">mpatches</span>
+<span class="kn">import</span> <span class="nn">scipy.interpolate</span> <span class="k">as</span> <span class="nn">si</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="k">import</span> <span class="n">gaussian_kde</span>
+<span class="kn">import</span> <span class="nn">matplotlib.colorbar</span> <span class="k">as</span> <span class="nn">cbar</span>
+<span class="kn">from</span> <span class="nn">mpl_toolkits.axes_grid1</span> <span class="k">import</span> <span class="n">ImageGrid</span>
 
-<span class="kn">import</span> <span class="nn">allensdk.brain_observatory.circle_plots</span> <span class="kn">as</span> <span class="nn">cplots</span>
-<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
+<span class="kn">import</span> <span class="nn">allensdk.brain_observatory.circle_plots</span> <span class="k">as</span> <span class="nn">cplots</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="k">import</span> <span class="n">contextmanager</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="n">SI_RANGE</span> <span class="o">=</span> <span class="p">[</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">1.5</span> <span class="p">]</span>
 <span class="n">P_VALUE_MAX</span> <span class="o">=</span> <span class="mf">0.05</span>
@@ -136,7 +125,7 @@
 <span class="n">EVOKED_COLOR</span> <span class="o">=</span> <span class="s2">&quot;#b30000&quot;</span>
 <span class="n">SPONTANEOUS_COLOR</span> <span class="o">=</span> <span class="s2">&quot;#0000b3&quot;</span>
 
-<div class="viewcode-block" id="plot_cell_correlation"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.observatory_plots.plot_cell_correlation">[docs]</a><span class="k">def</span> <span class="nf">plot_cell_correlation</span><span class="p">(</span><span class="n">sig_corrs</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">15</span><span class="p">):</span>
+<div class="viewcode-block" id="plot_cell_correlation"><a class="viewcode-back" href="../../../allensdk.brain_observatory.observatory_plots.html#allensdk.brain_observatory.observatory_plots.plot_cell_correlation">[docs]</a><span class="k">def</span> <span class="nf">plot_cell_correlation</span><span class="p">(</span><span class="n">sig_corrs</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">15</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sig_corrs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">alpha</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sig_corrs</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
@@ -154,20 +143,20 @@
                   
     <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;signal correlation&quot;</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;cell count&quot;</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
     
-    <span class="n">leg</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">,</span> <span class="n">frameon</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">leg</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">,</span> <span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">leg</span><span class="o">.</span><span class="n">get_texts</span><span class="p">()):</span>
         <span class="n">t</span><span class="o">.</span><span class="n">set_color</span><span class="p">(</span><span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
         
-    <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="o">.</span><span class="mi">125</span><span class="p">,</span> <span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="s1">u&#39;</span><span class="se">\u2014</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span><span class="p">,</span> 
+    <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="o">.</span><span class="mi">125</span><span class="p">,</span> <span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="sa">u</span><span class="s1">&#39;</span><span class="se">\u2014</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span><span class="p">,</span> 
               <span class="n">horizontalalignment</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">verticalalignment</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span>
               <span class="n">weight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;xx-large&#39;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="o">.</span><span class="mi">875</span><span class="p">,</span> <span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span><span class="p">,</span> 
               <span class="n">horizontalalignment</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">verticalalignment</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span>
               <span class="n">weight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;xx-large&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="population_correlation_scatter"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.observatory_plots.population_correlation_scatter">[docs]</a><span class="k">def</span> <span class="nf">population_correlation_scatter</span><span class="p">(</span><span class="n">sig_corrs</span><span class="p">,</span> <span class="n">noise_corrs</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">15</span><span class="p">):</span>
+<div class="viewcode-block" id="population_correlation_scatter"><a class="viewcode-back" href="../../../allensdk.brain_observatory.observatory_plots.html#allensdk.brain_observatory.observatory_plots.population_correlation_scatter">[docs]</a><span class="k">def</span> <span class="nf">population_correlation_scatter</span><span class="p">(</span><span class="n">sig_corrs</span><span class="p">,</span> <span class="n">noise_corrs</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">15</span><span class="p">):</span>
     <span class="n">alpha</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.85</span> <span class="o">-</span> <span class="mf">0.15</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sig_corrs</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="mf">0.2</span><span class="p">)</span>
     <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">sig_corr</span><span class="p">,</span> <span class="n">noise_corr</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">sig_corrs</span><span class="p">,</span> <span class="n">noise_corrs</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
@@ -182,12 +171,12 @@
     <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;noise correlation&quot;</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">leg</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">,</span> <span class="n">frameon</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">leg</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">,</span> <span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">leg</span><span class="o">.</span><span class="n">get_texts</span><span class="p">()):</span>
         <span class="n">t</span><span class="o">.</span><span class="n">set_color</span><span class="p">(</span><span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">])</span></div>
 
 
-<div class="viewcode-block" id="plot_mask_outline"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.observatory_plots.plot_mask_outline">[docs]</a><span class="k">def</span> <span class="nf">plot_mask_outline</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="plot_mask_outline"><a class="viewcode-back" href="../../../allensdk.brain_observatory.observatory_plots.html#allensdk.brain_observatory.observatory_plots.plot_mask_outline">[docs]</a><span class="k">def</span> <span class="nf">plot_mask_outline</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">):</span>
     <span class="n">pim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;constant&#39;</span><span class="p">,</span> <span class="n">constant_values</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
     <span class="n">hedges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">pim</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
     <span class="n">vedges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">pim</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
@@ -199,17 +188,17 @@
                                   <span class="p">[</span> <span class="n">p1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">p2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">],</span> 
                                   <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> 
                                   <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> 
-                                  <span class="n">clip_on</span><span class="o">=</span><span class="bp">False</span><span class="p">))</span></div>
+                                  <span class="n">clip_on</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span></div>
         
 
-<div class="viewcode-block" id="DimensionPatchHandler"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.observatory_plots.DimensionPatchHandler">[docs]</a><span class="k">class</span> <span class="nc">DimensionPatchHandler</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="DimensionPatchHandler"><a class="viewcode-back" href="../../../allensdk.brain_observatory.observatory_plots.html#allensdk.brain_observatory.observatory_plots.DimensionPatchHandler">[docs]</a><span class="k">class</span> <span class="nc">DimensionPatchHandler</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vals</span><span class="p">,</span> <span class="n">start_color</span><span class="p">,</span> <span class="n">end_color</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">DimensionPatchHandler</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">DimensionPatchHandler</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">vals</span> <span class="o">=</span> <span class="n">vals</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">start_color</span> <span class="o">=</span> <span class="n">start_color</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">end_color</span> <span class="o">=</span> <span class="n">end_color</span>
 
-<div class="viewcode-block" id="DimensionPatchHandler.legend_artist"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.observatory_plots.DimensionPatchHandler.legend_artist">[docs]</a>    <span class="k">def</span> <span class="nf">legend_artist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legend</span><span class="p">,</span> <span class="n">orig_handle</span><span class="p">,</span> <span class="n">fontsize</span><span class="p">,</span> <span class="n">handlebox</span><span class="p">):</span>
+<div class="viewcode-block" id="DimensionPatchHandler.legend_artist"><a class="viewcode-back" href="../../../allensdk.brain_observatory.observatory_plots.html#allensdk.brain_observatory.observatory_plots.DimensionPatchHandler.legend_artist">[docs]</a>    <span class="k">def</span> <span class="nf">legend_artist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legend</span><span class="p">,</span> <span class="n">orig_handle</span><span class="p">,</span> <span class="n">fontsize</span><span class="p">,</span> <span class="n">handlebox</span><span class="p">):</span>
         <span class="n">x0</span><span class="p">,</span> <span class="n">y0</span> <span class="o">=</span> <span class="n">handlebox</span><span class="o">.</span><span class="n">xdescent</span><span class="p">,</span> <span class="n">handlebox</span><span class="o">.</span><span class="n">ydescent</span>
         <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">handlebox</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">handlebox</span><span class="o">.</span><span class="n">height</span>
 
@@ -222,18 +211,18 @@
                                    <span class="n">sub_width</span><span class="p">,</span> <span class="n">y0</span><span class="o">+</span><span class="n">height</span><span class="p">,</span> 
                                    <span class="n">facecolor</span><span class="o">=</span><span class="n">rgb</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
-            <span class="n">r</span><span class="o">.</span><span class="n">set_clip_on</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+            <span class="n">r</span><span class="o">.</span><span class="n">set_clip_on</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
             <span class="n">handlebox</span><span class="o">.</span><span class="n">add_artist</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">r</span></div>
 
-<div class="viewcode-block" id="DimensionPatchHandler.dim_color"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.observatory_plots.DimensionPatchHandler.dim_color">[docs]</a>    <span class="k">def</span> <span class="nf">dim_color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<div class="viewcode-block" id="DimensionPatchHandler.dim_color"><a class="viewcode-back" href="../../../allensdk.brain_observatory.observatory_plots.html#allensdk.brain_observatory.observatory_plots.DimensionPatchHandler.dim_color">[docs]</a>    <span class="k">def</span> <span class="nf">dim_color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
         <span class="n">rgb1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">mcolors</span><span class="o">.</span><span class="n">colorConverter</span><span class="o">.</span><span class="n">to_rgb</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start_color</span><span class="p">))</span>
         <span class="n">rgb2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">mcolors</span><span class="o">.</span><span class="n">colorConverter</span><span class="o">.</span><span class="n">to_rgb</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">end_color</span><span class="p">))</span>
         <span class="n">t</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">rgb</span> <span class="o">=</span> <span class="n">t</span> <span class="o">*</span> <span class="n">rgb2</span> <span class="o">+</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">t</span><span class="p">)</span> <span class="o">*</span> <span class="n">rgb1</span>
         <span class="k">return</span> <span class="n">rgb</span></div></div>
 
-<div class="viewcode-block" id="float_label"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.observatory_plots.float_label">[docs]</a><span class="k">def</span> <span class="nf">float_label</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+<div class="viewcode-block" id="float_label"><a class="viewcode-back" href="../../../allensdk.brain_observatory.observatory_plots.html#allensdk.brain_observatory.observatory_plots.float_label">[docs]</a><span class="k">def</span> <span class="nf">float_label</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">is_integer</span><span class="p">():</span>
@@ -241,8 +230,8 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">n</span></div>
 
-<div class="viewcode-block" id="plot_representational_similarity"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.observatory_plots.plot_representational_similarity">[docs]</a><span class="k">def</span> <span class="nf">plot_representational_similarity</span><span class="p">(</span><span class="n">rs</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">dim_labels</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">dim_order</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">dim_order</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+<div class="viewcode-block" id="plot_representational_similarity"><a class="viewcode-back" href="../../../allensdk.brain_observatory.observatory_plots.html#allensdk.brain_observatory.observatory_plots.plot_representational_similarity">[docs]</a><span class="k">def</span> <span class="nf">plot_representational_similarity</span><span class="p">(</span><span class="n">rs</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dim_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dim_order</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">dim_order</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">rsr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rs</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">*</span><span class="nb">map</span><span class="p">(</span><span class="nb">len</span><span class="p">,</span><span class="n">dims</span><span class="p">))</span>
         <span class="n">rsrt</span> <span class="o">=</span> <span class="n">rsr</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">dim_order</span><span class="p">)</span>
         <span class="n">ri</span> <span class="o">=</span> <span class="n">rsrt</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
@@ -253,7 +242,7 @@
         <span class="n">dim_labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dim_labels</span><span class="p">)[</span><span class="n">dim_order</span><span class="p">]</span>
     
     <span class="c1"># force the color map to be centered at zero</span>
-    <span class="n">clim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanpercentile</span><span class="p">(</span><span class="n">rs</span><span class="p">,</span> <span class="p">[</span><span class="mf">5.0</span><span class="p">,</span><span class="mf">95.0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+    <span class="n">clim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanpercentile</span><span class="p">(</span><span class="n">rs</span><span class="p">,</span> <span class="p">[</span><span class="mf">5.0</span><span class="p">,</span><span class="mf">95.0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
     <span class="n">vrange</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">clim</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">abs</span><span class="p">(</span><span class="n">clim</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
 
     <span class="n">rs</span> <span class="o">=</span> <span class="n">rs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -281,7 +270,7 @@
         <span class="n">cbar</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">cax</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">)</span>
         <span class="n">cbar</span><span class="o">.</span><span class="n">set_label_text</span><span class="p">(</span><span class="s1">&#39;stimulus correlation&#39;</span><span class="p">)</span>
     
-    <span class="k">if</span> <span class="n">dims</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">dims</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">dim_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">(</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">dim_labels</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">float_label</span><span class="p">,</span> <span class="n">dims</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dims</span><span class="p">))</span> <span class="p">]</span>
         <span class="n">dim_handlers</span> <span class="o">=</span> <span class="p">[</span> <span class="n">DimensionPatchHandler</span><span class="p">(</span><span class="n">dims</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dims</span><span class="p">))</span> <span class="p">]</span>
 
@@ -297,13 +286,13 @@
                 <span class="n">r</span> <span class="o">=</span> <span class="n">mpatches</span><span class="o">.</span><span class="n">Rectangle</span><span class="p">((</span><span class="n">start</span> <span class="o">+</span> <span class="n">dim_i</span> <span class="o">*</span> <span class="n">width</span><span class="p">,</span> <span class="n">cell_i</span><span class="o">-.</span><span class="mi">5</span><span class="p">),</span> 
                                        <span class="n">width</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> 
                                        <span class="n">facecolor</span><span class="o">=</span><span class="n">rgb</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-                <span class="n">r</span><span class="o">.</span><span class="n">set_clip_on</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+                <span class="n">r</span><span class="o">.</span><span class="n">set_clip_on</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
                 <span class="n">ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
 
                 <span class="n">r</span> <span class="o">=</span> <span class="n">mpatches</span><span class="o">.</span><span class="n">Rectangle</span><span class="p">((</span><span class="n">cell_i</span><span class="o">-.</span><span class="mi">5</span><span class="p">,</span> <span class="n">start</span> <span class="o">+</span> <span class="n">dim_i</span> <span class="o">*</span> <span class="n">width</span><span class="p">),</span> 
                                        <span class="mf">1.2</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span>
                                        <span class="n">facecolor</span><span class="o">=</span><span class="n">rgb</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-                <span class="n">r</span><span class="o">.</span><span class="n">set_clip_on</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+                <span class="n">r</span><span class="o">.</span><span class="n">set_clip_on</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
                 <span class="n">ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">labels</span><span class="p">:</span>
@@ -314,20 +303,22 @@
                       <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span>
                       <span class="n">ncol</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
                       <span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span>
-                      <span class="n">frameon</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+                      <span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">labels</span><span class="p">:</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mf">0.07</span><span class="p">,</span>
                             <span class="n">right</span><span class="o">=.</span><span class="mi">88</span><span class="p">,</span>
                             <span class="n">wspace</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">hspace</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="plot_condition_histogram"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.observatory_plots.plot_condition_histogram">[docs]</a><span class="k">def</span> <span class="nf">plot_condition_histogram</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">STIM_COLOR</span><span class="p">):</span>
+<div class="viewcode-block" id="plot_condition_histogram"><a class="viewcode-back" href="../../../allensdk.brain_observatory.observatory_plots.html#allensdk.brain_observatory.observatory_plots.plot_condition_histogram">[docs]</a><span class="k">def</span> <span class="nf">plot_condition_histogram</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">STIM_COLOR</span><span class="p">):</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">vals</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()]</span>  <span class="c1"># matplotlib &gt;= 2.1 needs this</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">n</span><span class="p">,</span> <span class="n">hbins</span><span class="p">,</span> <span class="n">patches</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span>
                                      <span class="n">bins</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bins</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span>
                                      <span class="n">align</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>
-                                     <span class="n">normed</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                                     <span class="n">normed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                                      <span class="n">rwidth</span><span class="o">=.</span><span class="mi">8</span><span class="p">,</span>
                                      <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
                                      <span class="n">zorder</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
@@ -336,11 +327,14 @@
     <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">hbins</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">bins</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span></div>
    
 
-<div class="viewcode-block" id="plot_selectivity_cumulative_histogram"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.observatory_plots.plot_selectivity_cumulative_histogram">[docs]</a><span class="k">def</span> <span class="nf">plot_selectivity_cumulative_histogram</span><span class="p">(</span><span class="n">sis</span><span class="p">,</span> 
+<div class="viewcode-block" id="plot_selectivity_cumulative_histogram"><a class="viewcode-back" href="../../../allensdk.brain_observatory.observatory_plots.html#allensdk.brain_observatory.observatory_plots.plot_selectivity_cumulative_histogram">[docs]</a><span class="k">def</span> <span class="nf">plot_selectivity_cumulative_histogram</span><span class="p">(</span><span class="n">sis</span><span class="p">,</span> 
                                           <span class="n">xlabel</span><span class="p">,</span>
                                           <span class="n">si_range</span><span class="o">=</span><span class="n">SI_RANGE</span><span class="p">,</span> 
                                           <span class="n">n_hist_bins</span><span class="o">=</span><span class="n">N_HIST_BINS</span><span class="p">,</span> 
                                           <span class="n">color</span><span class="o">=</span><span class="n">STIM_COLOR</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sis</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">sis</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sis</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()]</span>  <span class="c1"># matplotlib &gt;= 2.1 needs this</span>
+
     <span class="n">bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">si_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">si_range</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">n_hist_bins</span><span class="p">)</span>
     <span class="n">yticks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span>
     <span class="n">xticks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">si_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">si_range</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">4</span><span class="p">)</span>
@@ -351,8 +345,8 @@
 
     <span class="c1"># orientation selectivity cumulative histogram</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sis</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">n</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">patches</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">sis</span><span class="p">,</span> <span class="n">normed</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span>
-                                    <span class="n">cumulative</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s1">&#39;stepfilled&#39;</span><span class="p">,</span>
+        <span class="n">n</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">patches</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">sis</span><span class="p">,</span> <span class="n">normed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span>
+                                    <span class="n">cumulative</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s1">&#39;stepfilled&#39;</span><span class="p">,</span>
                                     <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="n">si_range</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="n">yscale</span><span class="p">])</span>
@@ -363,15 +357,15 @@
     <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;fraction of cells&quot;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="plot_radial_histogram"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.observatory_plots.plot_radial_histogram">[docs]</a><span class="k">def</span> <span class="nf">plot_radial_histogram</span><span class="p">(</span><span class="n">angles</span><span class="p">,</span>
+<div class="viewcode-block" id="plot_radial_histogram"><a class="viewcode-back" href="../../../allensdk.brain_observatory.observatory_plots.html#allensdk.brain_observatory.observatory_plots.plot_radial_histogram">[docs]</a><span class="k">def</span> <span class="nf">plot_radial_histogram</span><span class="p">(</span><span class="n">angles</span><span class="p">,</span>
                           <span class="n">counts</span><span class="p">,</span>
-                          <span class="n">all_angles</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                          <span class="n">include_labels</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                          <span class="n">all_angles</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                          <span class="n">include_labels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                           <span class="n">offset</span><span class="o">=</span><span class="mf">180.0</span><span class="p">,</span>
                           <span class="n">direction</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
-                          <span class="n">closed</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                          <span class="n">closed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                           <span class="n">color</span><span class="o">=</span><span class="n">STIM_COLOR</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">all_angles</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">all_angles</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">angles</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
             <span class="n">all_angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">315</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -425,7 +419,7 @@
                <span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="n">max_count</span><span class="o">*</span><span class="mf">1.05</span><span class="p">,</span> <span class="n">max_count</span><span class="o">*</span><span class="mf">1.05</span><span class="p">),</span>
                <span class="n">aspect</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span></div>
         
-<div class="viewcode-block" id="plot_time_to_peak"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.observatory_plots.plot_time_to_peak">[docs]</a><span class="k">def</span> <span class="nf">plot_time_to_peak</span><span class="p">(</span><span class="n">msrs</span><span class="p">,</span> <span class="n">ttps</span><span class="p">,</span> <span class="n">t_start</span><span class="p">,</span> <span class="n">t_end</span><span class="p">,</span> <span class="n">stim_start</span><span class="p">,</span> <span class="n">stim_end</span><span class="p">,</span> <span class="n">cmap</span><span class="p">):</span>
+<div class="viewcode-block" id="plot_time_to_peak"><a class="viewcode-back" href="../../../allensdk.brain_observatory.observatory_plots.html#allensdk.brain_observatory.observatory_plots.plot_time_to_peak">[docs]</a><span class="k">def</span> <span class="nf">plot_time_to_peak</span><span class="p">(</span><span class="n">msrs</span><span class="p">,</span> <span class="n">ttps</span><span class="p">,</span> <span class="n">t_start</span><span class="p">,</span> <span class="n">t_end</span><span class="p">,</span> <span class="n">stim_start</span><span class="p">,</span> <span class="n">stim_end</span><span class="p">,</span> <span class="n">cmap</span><span class="p">):</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ttps</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">msrs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">msrs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">msrs</span><span class="p">,</span>
@@ -447,8 +441,8 @@
     <span class="n">yticks</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">()</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;cell number&quot;</span><span class="p">)</span></div>
 
-<span class="nd">@contextmanager</span>
-<div class="viewcode-block" id="figure_in_px"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.observatory_plots.figure_in_px">[docs]</a><span class="k">def</span> <span class="nf">figure_in_px</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mf">96.0</span><span class="p">,</span> <span class="n">transparent</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="figure_in_px"><a class="viewcode-back" href="../../../allensdk.brain_observatory.observatory_plots.html#allensdk.brain_observatory.observatory_plots.figure_in_px">[docs]</a><span class="nd">@contextmanager</span>
+<span class="k">def</span> <span class="nf">figure_in_px</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mf">96.0</span><span class="p">,</span> <span class="n">transparent</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">w</span><span class="o">/</span><span class="n">dpi</span><span class="p">,</span> <span class="n">h</span><span class="o">/</span><span class="n">dpi</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span>
 
     <span class="k">yield</span> <span class="n">fig</span>
@@ -456,7 +450,7 @@
     <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">,</span> <span class="n">transparent</span><span class="o">=</span><span class="n">transparent</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="finalize_no_axes"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.observatory_plots.finalize_no_axes">[docs]</a><span class="k">def</span> <span class="nf">finalize_no_axes</span><span class="p">(</span><span class="n">pad</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+<div class="viewcode-block" id="finalize_no_axes"><a class="viewcode-back" href="../../../allensdk.brain_observatory.observatory_plots.html#allensdk.brain_observatory.observatory_plots.finalize_no_axes">[docs]</a><span class="k">def</span> <span class="nf">finalize_no_axes</span><span class="p">(</span><span class="n">pad</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="n">pad</span><span class="p">,</span> 
                         <span class="n">right</span><span class="o">=</span><span class="mf">1.0</span><span class="o">-</span><span class="n">pad</span><span class="p">,</span> 
@@ -464,20 +458,20 @@
                         <span class="n">top</span><span class="o">=</span><span class="mf">1.0</span><span class="o">-</span><span class="n">pad</span><span class="p">,</span> 
                         <span class="n">wspace</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">hspace</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="finalize_with_axes"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.observatory_plots.finalize_with_axes">[docs]</a><span class="k">def</span> <span class="nf">finalize_with_axes</span><span class="p">(</span><span class="n">pad</span><span class="o">=.</span><span class="mi">3</span><span class="p">):</span>
+<div class="viewcode-block" id="finalize_with_axes"><a class="viewcode-back" href="../../../allensdk.brain_observatory.observatory_plots.html#allensdk.brain_observatory.observatory_plots.finalize_with_axes">[docs]</a><span class="k">def</span> <span class="nf">finalize_with_axes</span><span class="p">(</span><span class="n">pad</span><span class="o">=.</span><span class="mi">3</span><span class="p">):</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">(</span><span class="n">pad</span><span class="o">=</span><span class="n">pad</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="finalize_no_labels"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.observatory_plots.finalize_no_labels">[docs]</a><span class="k">def</span> <span class="nf">finalize_no_labels</span><span class="p">(</span><span class="n">pad</span><span class="o">=.</span><span class="mi">3</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="finalize_no_labels"><a class="viewcode-back" href="../../../allensdk.brain_observatory.observatory_plots.html#allensdk.brain_observatory.observatory_plots.finalize_no_labels">[docs]</a><span class="k">def</span> <span class="nf">finalize_no_labels</span><span class="p">(</span><span class="n">pad</span><span class="o">=.</span><span class="mi">3</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">([])</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">([])</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">legend</span> <span class="ow">and</span> <span class="n">ax</span><span class="o">.</span><span class="n">legend_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">legend</span> <span class="ow">and</span> <span class="n">ax</span><span class="o">.</span><span class="n">legend_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">legend_</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">(</span><span class="n">pad</span><span class="o">=</span><span class="n">pad</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="plot_combined_speed"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.observatory_plots.plot_combined_speed">[docs]</a><span class="k">def</span> <span class="nf">plot_combined_speed</span><span class="p">(</span><span class="n">binned_resp_vis</span><span class="p">,</span> <span class="n">binned_dx_vis</span><span class="p">,</span> <span class="n">binned_resp_sp</span><span class="p">,</span> <span class="n">binned_dx_sp</span><span class="p">,</span>
+<div class="viewcode-block" id="plot_combined_speed"><a class="viewcode-back" href="../../../allensdk.brain_observatory.observatory_plots.html#allensdk.brain_observatory.observatory_plots.plot_combined_speed">[docs]</a><span class="k">def</span> <span class="nf">plot_combined_speed</span><span class="p">(</span><span class="n">binned_resp_vis</span><span class="p">,</span> <span class="n">binned_dx_vis</span><span class="p">,</span> <span class="n">binned_resp_sp</span><span class="p">,</span> <span class="n">binned_dx_sp</span><span class="p">,</span>
                         <span class="n">evoked_color</span><span class="p">,</span> <span class="n">spont_color</span><span class="p">):</span>
     <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
     <span class="n">num_bins</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">binned_dx_vis</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">binned_dx_sp</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -492,14 +486,14 @@
     <span class="n">ymin</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">binned_resp_vis</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">binned_resp_sp</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">())</span>
     <span class="n">ymax</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">binned_resp_vis</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">binned_resp_sp</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
 
-    <span class="n">xpadding</span> <span class="o">=</span> <span class="p">(</span><span class="n">xmax</span><span class="o">-</span><span class="n">xmin</span><span class="p">)</span><span class="o">*.</span><span class="mo">05</span>
+    <span class="n">xpadding</span> <span class="o">=</span> <span class="p">(</span><span class="n">xmax</span><span class="o">-</span><span class="n">xmin</span><span class="p">)</span><span class="o">*.</span><span class="mi">05</span>
     <span class="n">ypadding</span> <span class="o">=</span> <span class="p">(</span><span class="n">ymax</span><span class="o">-</span><span class="n">ymin</span><span class="p">)</span><span class="o">*.</span><span class="mi">20</span>
 
     <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="n">xmin</span> <span class="o">-</span> <span class="n">xpadding</span><span class="p">,</span> <span class="n">xmax</span> <span class="o">+</span> <span class="n">xpadding</span><span class="p">])</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="n">ymin</span> <span class="o">-</span> <span class="n">ypadding</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">+</span> <span class="n">ypadding</span><span class="p">])</span></div>
 
 
-<div class="viewcode-block" id="plot_speed"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.observatory_plots.plot_speed">[docs]</a><span class="k">def</span> <span class="nf">plot_speed</span><span class="p">(</span><span class="n">binned_resp</span><span class="p">,</span> <span class="n">binned_dx</span><span class="p">,</span> <span class="n">num_bins</span><span class="p">,</span> <span class="n">color</span><span class="p">):</span> 
+<div class="viewcode-block" id="plot_speed"><a class="viewcode-back" href="../../../allensdk.brain_observatory.observatory_plots.html#allensdk.brain_observatory.observatory_plots.plot_speed">[docs]</a><span class="k">def</span> <span class="nf">plot_speed</span><span class="p">(</span><span class="n">binned_resp</span><span class="p">,</span> <span class="n">binned_dx</span><span class="p">,</span> <span class="n">num_bins</span><span class="p">,</span> <span class="n">color</span><span class="p">):</span> 
     <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
 
     <span class="c1"># plot the zero bin as a dot with whiskers</span>
@@ -510,7 +504,7 @@
         <span class="k">return</span>
 
     <span class="n">f</span> <span class="o">=</span> <span class="n">si</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="n">binned_dx</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">binned_resp</span><span class="p">[:,</span><span class="mi">0</span><span class="p">])</span>    
-    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">binned_dx</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">max</span><span class="p">(</span><span class="n">binned_dx</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]),</span> <span class="n">num</span><span class="o">=</span><span class="n">num_bins</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">binned_dx</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">max</span><span class="p">(</span><span class="n">binned_dx</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]),</span> <span class="n">num</span><span class="o">=</span><span class="n">num_bins</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">y</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
     
     <span class="n">f_up</span> <span class="o">=</span> <span class="n">si</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="n">binned_dx</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">binned_resp</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">binned_resp</span><span class="p">[:,</span><span class="mi">1</span><span class="p">])</span>
@@ -523,21 +517,21 @@
     <span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y_down</span><span class="p">,</span> <span class="n">y_up</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="plot_receptive_field"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.observatory_plots.plot_receptive_field">[docs]</a><span class="k">def</span> <span class="nf">plot_receptive_field</span><span class="p">(</span><span class="n">rf</span><span class="p">,</span> <span class="n">color_map</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">clim</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
-                         <span class="n">mask</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">outline_color</span><span class="o">=</span><span class="s1">&#39;#cccccc&#39;</span><span class="p">,</span>
-                         <span class="n">scalebar</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+<div class="viewcode-block" id="plot_receptive_field"><a class="viewcode-back" href="../../../allensdk.brain_observatory.observatory_plots.html#allensdk.brain_observatory.observatory_plots.plot_receptive_field">[docs]</a><span class="k">def</span> <span class="nf">plot_receptive_field</span><span class="p">(</span><span class="n">rf</span><span class="p">,</span> <span class="n">color_map</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">clim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                         <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">outline_color</span><span class="o">=</span><span class="s1">&#39;#cccccc&#39;</span><span class="p">,</span>
+                         <span class="n">scalebar</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">rf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rf</span><span class="p">,</span> <span class="n">mask</span><span class="o">=~</span><span class="n">mask</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">clim</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-        <span class="n">clim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanpercentile</span><span class="p">(</span><span class="n">rf</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">99.0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">clim</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">clim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanpercentile</span><span class="p">(</span><span class="n">rf</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">99.0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 
     <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">rf</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">,</span> 
                <span class="n">cmap</span><span class="o">=</span><span class="n">color_map</span><span class="p">,</span> 
                <span class="n">clim</span><span class="o">=</span><span class="n">clim</span><span class="p">,</span>
                <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;bottom&#39;</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">plot_mask_outline</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">(),</span> <span class="n">outline_color</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">scalebar</span><span class="p">:</span>
@@ -560,9 +554,9 @@
         
 
 
-<div class="viewcode-block" id="plot_pupil_location"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.observatory_plots.plot_pupil_location">[docs]</a><span class="k">def</span> <span class="nf">plot_pupil_location</span><span class="p">(</span><span class="n">xy_deg</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">PUPIL_COLOR_MAP</span><span class="p">,</span>
-                        <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">include_labels</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">c</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+<div class="viewcode-block" id="plot_pupil_location"><a class="viewcode-back" href="../../../allensdk.brain_observatory.observatory_plots.html#allensdk.brain_observatory.observatory_plots.plot_pupil_location">[docs]</a><span class="k">def</span> <span class="nf">plot_pupil_location</span><span class="p">(</span><span class="n">xy_deg</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">PUPIL_COLOR_MAP</span><span class="p">,</span>
+                        <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">include_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">c</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">xy_deg</span> <span class="o">=</span> <span class="n">xy_deg</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">xy_deg</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span>
         <span class="n">c</span> <span class="o">=</span> <span class="n">gaussian_kde</span><span class="p">(</span><span class="n">xy_deg</span><span class="o">.</span><span class="n">T</span><span class="p">)(</span><span class="n">xy_deg</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xy_deg</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">xy_deg</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="n">s</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">c</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
@@ -582,9 +576,7 @@
         <div class="sphinxsidebarwrapper">
 <h3><a href="../../../index.html">Contents</a></h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install Guide</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../cell_types.html">Cell Types</a></li>
@@ -609,6 +601,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.model.html">allensdk.model package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.morphology.html">allensdk.morphology package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.deprecated.html">allensdk.deprecated module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
@@ -626,12 +619,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

@@ -1,32 +1,21 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>allensdk.core.brain_observatory_nwb_data_set &mdash; Allen SDK dev documentation</title>
-    
+    <title>allensdk.core.brain_observatory_nwb_data_set &#8212; Allen SDK dev documentation</title>
     <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../',
-        VERSION:     'dev',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK dev documentation" href="../../../index.html" />
-    <link rel="up" title="Module code" href="../../index.html" /> 
-  </head>
-  <body role="document">
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
 <script src="http://www.brain-map.org/assets/javascripts/ga.js" type="text/javascript"></script>
@@ -104,31 +93,41 @@
 <span class="c1"># ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="c1">#</span>
-<span class="kn">import</span> <span class="nn">h5py</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">six</span>
-<span class="kn">import</span> <span class="nn">allensdk.brain_observatory.roi_masks</span> <span class="kn">as</span> <span class="nn">roi</span>
-<span class="kn">import</span> <span class="nn">itertools</span>
-<span class="kn">from</span> <span class="nn">allensdk.brain_observatory.locally_sparse_noise</span> <span class="kn">import</span> <span class="n">LocallySparseNoise</span>
-<span class="kn">import</span> <span class="nn">allensdk.brain_observatory.stimulus_info</span> <span class="kn">as</span> <span class="nn">si</span>
+<span class="kn">import</span> <span class="nn">functools</span>
 <span class="kn">import</span> <span class="nn">dateutil</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="kn">import</span> <span class="n">parse_version</span>
-<span class="kn">from</span> <span class="nn">allensdk.brain_observatory.brain_observatory_exceptions</span> <span class="kn">import</span> <span class="p">(</span><span class="n">MissingStimulusException</span><span class="p">,</span>
+<span class="kn">import</span> <span class="nn">six</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="k">import</span> <span class="n">parse_version</span>
+
+<span class="kn">import</span> <span class="nn">h5py</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">allensdk.brain_observatory.roi_masks</span> <span class="k">as</span> <span class="nn">roi</span>
+<span class="kn">from</span> <span class="nn">allensdk.brain_observatory.locally_sparse_noise</span> <span class="k">import</span> <span class="n">LocallySparseNoise</span>
+<span class="kn">import</span> <span class="nn">allensdk.brain_observatory.stimulus_info</span> <span class="k">as</span> <span class="nn">si</span>
+
+<span class="kn">from</span> <span class="nn">allensdk.brain_observatory.brain_observatory_exceptions</span> <span class="k">import</span> <span class="p">(</span><span class="n">MissingStimulusException</span><span class="p">,</span>
                                                                      <span class="n">NoEyeTrackingException</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">allensdk.api.cache</span> <span class="kn">import</span> <span class="n">memoize</span>
+<span class="kn">from</span> <span class="nn">allensdk.api.cache</span> <span class="k">import</span> <span class="n">memoize</span>
+<span class="kn">from</span> <span class="nn">allensdk.core</span> <span class="k">import</span> <span class="n">h5_utilities</span> 
 
 <span class="c1"># Deprecation rerouting:</span>
-<span class="kn">from</span> <span class="nn">allensdk.deprecated</span> <span class="kn">import</span> <span class="n">deprecated</span>
-<span class="kn">from</span> <span class="nn">allensdk.brain_observatory.stimulus_info</span> <span class="kn">import</span> <span class="n">warp_stimulus_coords</span> <span class="k">as</span> <span class="n">si_warp_stimulus_coords</span>
-<span class="kn">from</span> <span class="nn">allensdk.brain_observatory.stimulus_info</span> <span class="kn">import</span> <span class="n">make_display_mask</span> <span class="k">as</span> <span class="n">si_make_display_mask</span>
-<span class="kn">from</span> <span class="nn">allensdk.brain_observatory.stimulus_info</span> <span class="kn">import</span> <span class="n">mask_stimulus_template</span> <span class="k">as</span> <span class="n">si_mask_stimulus_template</span>
-<span class="kn">from</span> <span class="nn">allensdk.brain_observatory.brain_observatory_exceptions</span> <span class="kn">import</span> <span class="n">EpochSeparationException</span>
+<span class="kn">from</span> <span class="nn">allensdk.deprecated</span> <span class="k">import</span> <span class="n">deprecated</span>
+<span class="kn">from</span> <span class="nn">allensdk.brain_observatory.stimulus_info</span> <span class="k">import</span> <span class="n">warp_stimulus_coords</span> <span class="k">as</span> <span class="n">si_warp_stimulus_coords</span>
+<span class="kn">from</span> <span class="nn">allensdk.brain_observatory.stimulus_info</span> <span class="k">import</span> <span class="n">make_display_mask</span> <span class="k">as</span> <span class="n">si_make_display_mask</span>
+<span class="kn">from</span> <span class="nn">allensdk.brain_observatory.stimulus_info</span> <span class="k">import</span> <span class="n">mask_stimulus_template</span> <span class="k">as</span> <span class="n">si_mask_stimulus_template</span>
+<span class="kn">from</span> <span class="nn">allensdk.brain_observatory.brain_observatory_exceptions</span> <span class="k">import</span> <span class="n">EpochSeparationException</span>
 
-<div class="viewcode-block" id="get_epoch_mask_list"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.get_epoch_mask_list">[docs]</a><span class="k">def</span> <span class="nf">get_epoch_mask_list</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">max_cuts</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+
+<span class="n">_STIMULUS_PRESENTATION_PATH</span> <span class="o">=</span> <span class="s1">&#39;stimulus/presentation&#39;</span>
+<span class="n">_STIMULUS_PRESENTATION_PATTERNS</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_stimulus&#39;</span><span class="p">,)</span>
+
+
+<div class="viewcode-block" id="get_epoch_mask_list"><a class="viewcode-back" href="../../../allensdk.core.brain_observatory_nwb_data_set.html#allensdk.core.brain_observatory_nwb_data_set.get_epoch_mask_list">[docs]</a><span class="k">def</span> <span class="nf">get_epoch_mask_list</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">max_cuts</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;Convenience function to cut a stim table into multiple epochs</span>
 
 <span class="sd">    :param st: input stimtable</span>
@@ -137,7 +136,7 @@
 <span class="sd">    :return: epoch_mask_list, a list of indices that define the start and end of sub-epochs</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
-    <span class="k">if</span> <span class="n">threshold</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">threshold</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;threshold not set for this type of session&#39;</span><span class="p">)</span>
 
     <span class="n">delta</span> <span class="o">=</span> <span class="p">(</span><span class="n">st</span><span class="o">.</span><span class="n">start</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="n">st</span><span class="o">.</span><span class="n">end</span><span class="o">.</span><span class="n">values</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
@@ -168,7 +167,7 @@
     <span class="k">return</span> <span class="n">epoch_mask_list</span></div>
 
 
-<div class="viewcode-block" id="BrainObservatoryNwbDataSet"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet">[docs]</a><span class="k">class</span> <span class="nc">BrainObservatoryNwbDataSet</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryNwbDataSet"><a class="viewcode-back" href="../../../allensdk.core.brain_observatory_nwb_data_set.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet">[docs]</a><span class="k">class</span> <span class="nc">BrainObservatoryNwbDataSet</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="n">PIPELINE_DATASET</span> <span class="o">=</span> <span class="s1">&#39;brain_observatory_pipeline&#39;</span>
     <span class="n">SUPPORTED_PIPELINE_VERSION</span> <span class="o">=</span> <span class="s2">&quot;2.0&quot;</span>
 
@@ -205,7 +204,7 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nwb_file</span><span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span> <span class="o">=</span> <span class="n">nwb_file</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_version</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_version</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">):</span>
             <span class="n">meta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">()</span>
@@ -217,9 +216,9 @@
                     <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;File </span><span class="si">%s</span><span class="s2"> has a pipeline version newer than the version supported by this class (</span><span class="si">%s</span><span class="s2"> vs </span><span class="si">%s</span><span class="s2">).&quot;</span>
                                     <span class="s2">&quot; Please update your AllenSDK.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">nwb_file</span><span class="p">,</span> <span class="n">pipeline_version_str</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SUPPORTED_PIPELINE_VERSION</span><span class="p">))</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_stimulus_search</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stimulus_search</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_stimulus_epoch_table"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_stimulus_epoch_table">[docs]</a>    <span class="k">def</span> <span class="nf">get_stimulus_epoch_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_stimulus_epoch_table"><a class="viewcode-back" href="../../../allensdk.core.brain_observatory_nwb_data_set.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_stimulus_epoch_table">[docs]</a>    <span class="k">def</span> <span class="nf">get_stimulus_epoch_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Returns a pandas dataframe that summarizes the stimulus epoch duration for each acquisition time index in</span>
 <span class="sd">        the experiment</span>
 
@@ -257,7 +256,7 @@
         <span class="n">interval_list</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">interval_stimulus_dict</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">stimulus</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">list_stimuli</span><span class="p">():</span>
-            <span class="n">stimulus_interval_list</span> <span class="o">=</span> <span class="n">get_epoch_mask_list</span><span class="p">(</span><span class="n">stimulus_table_dict</span><span class="p">[</span><span class="n">stimulus</span><span class="p">],</span> <span class="n">threshold</span><span class="o">=</span><span class="n">threshold_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_session_type</span><span class="p">(),</span> <span class="bp">None</span><span class="p">))</span>
+            <span class="n">stimulus_interval_list</span> <span class="o">=</span> <span class="n">get_epoch_mask_list</span><span class="p">(</span><span class="n">stimulus_table_dict</span><span class="p">[</span><span class="n">stimulus</span><span class="p">],</span> <span class="n">threshold</span><span class="o">=</span><span class="n">threshold_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_session_type</span><span class="p">(),</span> <span class="kc">None</span><span class="p">))</span>
             <span class="k">for</span> <span class="n">stimulus_interval</span> <span class="ow">in</span> <span class="n">stimulus_interval_list</span><span class="p">:</span>
                 <span class="n">interval_stimulus_dict</span><span class="p">[</span><span class="n">stimulus_interval</span><span class="p">]</span> <span class="o">=</span> <span class="n">stimulus</span>
             <span class="n">interval_list</span> <span class="o">+=</span> <span class="n">stimulus_interval_list</span>
@@ -289,12 +288,12 @@
         <span class="n">interval_df</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">interval_df</span><span class="p">[</span><span class="s1">&#39;interval&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
         <span class="n">interval_df</span><span class="p">[</span><span class="s1">&#39;end&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">interval_df</span><span class="p">[</span><span class="s1">&#39;interval&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
 
-        <span class="n">interval_df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-        <span class="n">interval_df</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;interval&#39;</span><span class="p">,</span> <span class="s1">&#39;duration&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">interval_df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">interval_df</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;interval&#39;</span><span class="p">,</span> <span class="s1">&#39;duration&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">interval_df</span></div>
 
 
-<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_fluorescence_traces"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_fluorescence_traces">[docs]</a>    <span class="k">def</span> <span class="nf">get_fluorescence_traces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_fluorescence_traces"><a class="viewcode-back" href="../../../allensdk.core.brain_observatory_nwb_data_set.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_fluorescence_traces">[docs]</a>    <span class="k">def</span> <span class="nf">get_fluorescence_traces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Returns an array of fluorescence traces for all ROI and</span>
 <span class="sd">        the timestamps for each datapoint</span>
 
@@ -317,7 +316,7 @@
             <span class="n">ds</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
                 <span class="s1">&#39;Fluorescence&#39;</span><span class="p">][</span><span class="s1">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
 
-            <span class="k">if</span> <span class="n">cell_specimen_ids</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">cell_specimen_ids</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">cell_traces</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">value</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">inds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cell_specimen_indices</span><span class="p">(</span><span class="n">cell_specimen_ids</span><span class="p">)</span>
@@ -325,7 +324,7 @@
 
         <span class="k">return</span> <span class="n">timestamps</span><span class="p">,</span> <span class="n">cell_traces</span></div>
 
-<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_fluorescence_timestamps"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_fluorescence_timestamps">[docs]</a>    <span class="k">def</span> <span class="nf">get_fluorescence_timestamps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_fluorescence_timestamps"><a class="viewcode-back" href="../../../allensdk.core.brain_observatory_nwb_data_set.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_fluorescence_timestamps">[docs]</a>    <span class="k">def</span> <span class="nf">get_fluorescence_timestamps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Returns an array of timestamps in seconds for the fluorescence traces &#39;&#39;&#39;</span>
 
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -333,7 +332,7 @@
                 <span class="s1">&#39;Fluorescence&#39;</span><span class="p">][</span><span class="s1">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s1">&#39;timestamps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
         <span class="k">return</span> <span class="n">timestamps</span></div>
 
-<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_neuropil_traces"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_neuropil_traces">[docs]</a>    <span class="k">def</span> <span class="nf">get_neuropil_traces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_neuropil_traces"><a class="viewcode-back" href="../../../allensdk.core.brain_observatory_nwb_data_set.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_neuropil_traces">[docs]</a>    <span class="k">def</span> <span class="nf">get_neuropil_traces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Returns an array of neuropil fluorescence traces for all ROIs</span>
 <span class="sd">        and the timestamps for each datapoint</span>
 
@@ -362,7 +361,7 @@
                 <span class="n">ds</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
                     <span class="s1">&#39;Fluorescence&#39;</span><span class="p">][</span><span class="s1">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s1">&#39;neuropil_traces&#39;</span><span class="p">]</span>
 
-            <span class="k">if</span> <span class="n">cell_specimen_ids</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">cell_specimen_ids</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">np_traces</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">value</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">inds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cell_specimen_indices</span><span class="p">(</span><span class="n">cell_specimen_ids</span><span class="p">)</span>
@@ -371,7 +370,7 @@
         <span class="k">return</span> <span class="n">timestamps</span><span class="p">,</span> <span class="n">np_traces</span></div>
 
 
-<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_neuropil_r"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_neuropil_r">[docs]</a>    <span class="k">def</span> <span class="nf">get_neuropil_r</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_neuropil_r"><a class="viewcode-back" href="../../../allensdk.core.brain_observatory_nwb_data_set.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_neuropil_r">[docs]</a>    <span class="k">def</span> <span class="nf">get_neuropil_r</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Returns a scalar value of r for neuropil correction of flourescence traces</span>
 
 <span class="sd">        Parameters</span>
@@ -394,7 +393,7 @@
                 <span class="n">r_ds</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
                     <span class="s1">&#39;Fluorescence&#39;</span><span class="p">][</span><span class="s1">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s1">&#39;r&#39;</span><span class="p">]</span>
 
-            <span class="k">if</span> <span class="n">cell_specimen_ids</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">cell_specimen_ids</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">r</span> <span class="o">=</span> <span class="n">r_ds</span><span class="o">.</span><span class="n">value</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">inds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cell_specimen_indices</span><span class="p">(</span><span class="n">cell_specimen_ids</span><span class="p">)</span>
@@ -402,7 +401,7 @@
 
         <span class="k">return</span> <span class="n">r</span></div>
 
-<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_demixed_traces"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_demixed_traces">[docs]</a>    <span class="k">def</span> <span class="nf">get_demixed_traces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_demixed_traces"><a class="viewcode-back" href="../../../allensdk.core.brain_observatory_nwb_data_set.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_demixed_traces">[docs]</a>    <span class="k">def</span> <span class="nf">get_demixed_traces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Returns an array of demixed fluorescence traces for all ROIs</span>
 <span class="sd">        and the timestamps for each datapoint</span>
 
@@ -426,7 +425,7 @@
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">ds</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
                 <span class="s1">&#39;Fluorescence&#39;</span><span class="p">][</span><span class="s1">&#39;imaging_plane_1_demixed_signal&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">cell_specimen_ids</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">cell_specimen_ids</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">traces</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">value</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">inds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cell_specimen_indices</span><span class="p">(</span><span class="n">cell_specimen_ids</span><span class="p">)</span>
@@ -434,7 +433,7 @@
 
         <span class="k">return</span> <span class="n">timestamps</span><span class="p">,</span> <span class="n">traces</span></div>
 
-<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_corrected_fluorescence_traces"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_corrected_fluorescence_traces">[docs]</a>    <span class="k">def</span> <span class="nf">get_corrected_fluorescence_traces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_corrected_fluorescence_traces"><a class="viewcode-back" href="../../../allensdk.core.brain_observatory_nwb_data_set.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_corrected_fluorescence_traces">[docs]</a>    <span class="k">def</span> <span class="nf">get_corrected_fluorescence_traces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Returns an array of demixed and neuropil-corrected fluorescence traces</span>
 <span class="sd">        for all ROIs and the timestamps for each datapoint</span>
 
@@ -467,7 +466,7 @@
 
         <span class="k">return</span> <span class="n">timestamps</span><span class="p">,</span> <span class="n">fc</span></div>
 
-<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_cell_specimen_indices"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_cell_specimen_indices">[docs]</a>    <span class="k">def</span> <span class="nf">get_cell_specimen_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_cell_specimen_indices"><a class="viewcode-back" href="../../../allensdk.core.brain_observatory_nwb_data_set.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_cell_specimen_indices">[docs]</a>    <span class="k">def</span> <span class="nf">get_cell_specimen_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_ids</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Given a list of cell specimen ids, return their index based on their order in this file.</span>
 
 <span class="sd">        Parameters</span>
@@ -477,7 +476,7 @@
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">all_cell_specimen_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_cell_specimen_ids</span><span class="p">())</span>
-
+        
         <span class="k">try</span><span class="p">:</span>
             <span class="n">inds</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">all_cell_specimen_ids</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
                     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">cell_specimen_ids</span><span class="p">]</span>
@@ -486,7 +485,7 @@
 
         <span class="k">return</span> <span class="n">inds</span></div>
 
-<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_dff_traces"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_dff_traces">[docs]</a>    <span class="k">def</span> <span class="nf">get_dff_traces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_dff_traces"><a class="viewcode-back" href="../../../allensdk.core.brain_observatory_nwb_data_set.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_dff_traces">[docs]</a>    <span class="k">def</span> <span class="nf">get_dff_traces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Returns an array of dF/F traces for all ROIs and</span>
 <span class="sd">        the timestamps for each datapoint</span>
 
@@ -510,7 +509,7 @@
 
             <span class="n">timestamps</span> <span class="o">=</span> <span class="n">dff_ds</span><span class="p">[</span><span class="s1">&#39;timestamps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
 
-            <span class="k">if</span> <span class="n">cell_specimen_ids</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">cell_specimen_ids</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">cell_traces</span> <span class="o">=</span> <span class="n">dff_ds</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">inds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cell_specimen_indices</span><span class="p">(</span><span class="n">cell_specimen_ids</span><span class="p">)</span>
@@ -518,7 +517,7 @@
 
         <span class="k">return</span> <span class="n">timestamps</span><span class="p">,</span> <span class="n">cell_traces</span></div>
 
-<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_roi_ids"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_roi_ids">[docs]</a>    <span class="k">def</span> <span class="nf">get_roi_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_roi_ids"><a class="viewcode-back" href="../../../allensdk.core.brain_observatory_nwb_data_set.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_roi_ids">[docs]</a>    <span class="k">def</span> <span class="nf">get_roi_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Returns an array of IDs for all ROIs in the file</span>
 
 <span class="sd">        Returns</span>
@@ -530,7 +529,7 @@
                 <span class="s1">&#39;ImageSegmentation&#39;</span><span class="p">][</span><span class="s1">&#39;roi_ids&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
         <span class="k">return</span> <span class="n">roi_id</span></div>
 
-<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_cell_specimen_ids"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_cell_specimen_ids">[docs]</a>    <span class="k">def</span> <span class="nf">get_cell_specimen_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_cell_specimen_ids"><a class="viewcode-back" href="../../../allensdk.core.brain_observatory_nwb_data_set.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_cell_specimen_ids">[docs]</a>    <span class="k">def</span> <span class="nf">get_cell_specimen_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Returns an array of cell IDs for all cells in the file</span>
 
 <span class="sd">        Returns</span>
@@ -542,7 +541,7 @@
                 <span class="s1">&#39;ImageSegmentation&#39;</span><span class="p">][</span><span class="s1">&#39;cell_specimen_ids&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
         <span class="k">return</span> <span class="n">cell_id</span></div>
 
-<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_session_type"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_session_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_session_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_session_type"><a class="viewcode-back" href="../../../allensdk.core.brain_observatory_nwb_data_set.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_session_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_session_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Returns the type of experimental session, presently one of the</span>
 <span class="sd">        following: three_session_A, three_session_B, three_session_C</span>
 
@@ -554,7 +553,7 @@
             <span class="n">session_type</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;general/session_type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
         <span class="k">return</span> <span class="n">session_type</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_max_projection"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_max_projection">[docs]</a>    <span class="k">def</span> <span class="nf">get_max_projection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_max_projection"><a class="viewcode-back" href="../../../allensdk.core.brain_observatory_nwb_data_set.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_max_projection">[docs]</a>    <span class="k">def</span> <span class="nf">get_max_projection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Returns the maximum projection image for the 2P movie.</span>
 
 <span class="sd">        Returns</span>
@@ -567,7 +566,7 @@
                 <span class="s1">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s1">&#39;reference_images&#39;</span><span class="p">][</span><span class="s1">&#39;maximum_intensity_projection_image&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
         <span class="k">return</span> <span class="n">max_projection</span></div>
 
-<div class="viewcode-block" id="BrainObservatoryNwbDataSet.list_stimuli"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.list_stimuli">[docs]</a>    <span class="k">def</span> <span class="nf">list_stimuli</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryNwbDataSet.list_stimuli"><a class="viewcode-back" href="../../../allensdk.core.brain_observatory_nwb_data_set.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.list_stimuli">[docs]</a>    <span class="k">def</span> <span class="nf">list_stimuli</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Return a list of the stimuli presented in the experiment.</span>
 
 <span class="sd">        Returns</span>
@@ -579,77 +578,89 @@
             <span class="n">keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s2">&quot;stimulus/presentation/&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="k">return</span> <span class="p">[</span> <span class="n">k</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_stimulus&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span> <span class="p">]</span></div>
 
-<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_stimulus_table"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_stimulus_table">[docs]</a>    <span class="k">def</span> <span class="nf">get_stimulus_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stimulus_name</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39; Return a stimulus table given a stimulus name &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="n">stimulus_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">STIMULUS_TABLE_TYPES</span><span class="p">[</span><span class="s1">&#39;abstract_feature_series&#39;</span><span class="p">]:</span>
-            <span class="k">return</span> <span class="n">_get_abstract_feature_series_stimulus_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="n">stimulus_name</span> <span class="o">+</span> <span class="s2">&quot;_stimulus&quot;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">stimulus_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">STIMULUS_TABLE_TYPES</span><span class="p">[</span><span class="s1">&#39;indexed_time_series&#39;</span><span class="p">]:</span>
-            <span class="k">return</span> <span class="n">_get_indexed_time_series_stimulus_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="n">stimulus_name</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">stimulus_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">STIMULUS_TABLE_TYPES</span><span class="p">[</span><span class="s1">&#39;repeated_indexed_time_series&#39;</span><span class="p">]:</span>
-            <span class="k">return</span> <span class="n">_get_repeated_indexed_time_series_stimulus_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="n">stimulus_name</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">stimulus_name</span> <span class="o">==</span> <span class="s1">&#39;spontaneous&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_spontaneous_activity_stimulus_table</span><span class="p">()</span>
-        <span class="k">elif</span> <span class="n">stimulus_name</span> <span class="o">==</span> <span class="s1">&#39;master&#39;</span><span class="p">:</span>
 
-            <span class="n">epoch_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_stimulus_epoch_table</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">_get_master_stimulus_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Builds a table for all stimuli by concatenating (vertically) the </span>
+<span class="sd">        sub-tables describing presentation of each stimulus</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
-            <span class="n">stimulus_table_dict</span> <span class="o">=</span> <span class="p">{}</span>
-            <span class="k">for</span> <span class="n">stimulus</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">list_stimuli</span><span class="p">():</span>
-                <span class="n">stimulus_table_dict</span><span class="p">[</span><span class="n">stimulus</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_stimulus_table</span><span class="p">(</span><span class="n">stimulus</span><span class="p">)</span>
+        <span class="n">epoch_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_stimulus_epoch_table</span><span class="p">()</span>
 
-            <span class="n">table_list</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">for</span> <span class="n">stimulus</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">list_stimuli</span><span class="p">():</span>
-                <span class="n">curr_stimtable</span> <span class="o">=</span> <span class="n">stimulus_table_dict</span><span class="p">[</span><span class="n">stimulus</span><span class="p">]</span>
+        <span class="n">stimulus_table_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">stimulus</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">list_stimuli</span><span class="p">():</span>
+            <span class="n">stimulus_table_dict</span><span class="p">[</span><span class="n">stimulus</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_stimulus_table</span><span class="p">(</span><span class="n">stimulus</span><span class="p">)</span>
 
-                <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">epoch_table</span><span class="p">[</span><span class="n">epoch_table</span><span class="p">[</span><span class="s1">&#39;stimulus&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">stimulus</span><span class="p">]</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="n">table_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">stimulus</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">list_stimuli</span><span class="p">():</span>
+            <span class="n">curr_stimtable</span> <span class="o">=</span> <span class="n">stimulus_table_dict</span><span class="p">[</span><span class="n">stimulus</span><span class="p">]</span>
 
-                    <span class="n">epoch_start_ind</span><span class="p">,</span> <span class="n">epoch_end_ind</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;end&#39;</span><span class="p">]</span>
-                    <span class="n">curr_subtable</span> <span class="o">=</span> <span class="n">curr_stimtable</span><span class="p">[(</span><span class="n">epoch_start_ind</span> <span class="o">&lt;=</span> <span class="n">curr_stimtable</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">])</span> <span class="o">&amp;</span>
-                                                   <span class="p">(</span><span class="n">curr_stimtable</span><span class="p">[</span><span class="s1">&#39;end&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">epoch_end_ind</span><span class="p">)]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-                    <span class="n">curr_subtable</span><span class="p">[</span><span class="s1">&#39;stimulus&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stimulus</span>
-                    <span class="n">table_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">curr_subtable</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">epoch_table</span><span class="p">[</span><span class="n">epoch_table</span><span class="p">[</span><span class="s1">&#39;stimulus&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">stimulus</span><span class="p">]</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
 
-            <span class="n">table_list</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">table_list</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;start&#39;</span><span class="p">])</span>
+                <span class="n">epoch_start_ind</span><span class="p">,</span> <span class="n">epoch_end_ind</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;end&#39;</span><span class="p">]</span>
+                <span class="n">curr_subtable</span> <span class="o">=</span> <span class="n">curr_stimtable</span><span class="p">[(</span><span class="n">epoch_start_ind</span> <span class="o">&lt;=</span> <span class="n">curr_stimtable</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">])</span> <span class="o">&amp;</span>
+                                                <span class="p">(</span><span class="n">curr_stimtable</span><span class="p">[</span><span class="s1">&#39;end&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">epoch_end_ind</span><span class="p">)]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">curr_subtable</span><span class="p">[</span><span class="s1">&#39;stimulus&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stimulus</span>
+                <span class="n">table_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">curr_subtable</span><span class="p">)</span>
 
-            <span class="n">new_table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">table_list</span><span class="p">)</span>
-            <span class="n">new_table</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">new_table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">table_list</span><span class="p">)</span>
+        <span class="n">new_table</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-            <span class="k">return</span> <span class="n">new_table</span>
+        <span class="k">return</span> <span class="n">new_table</span>
 
 
+<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_stimulus_table"><a class="viewcode-back" href="../../../allensdk.core.brain_observatory_nwb_data_set.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_stimulus_table">[docs]</a>    <span class="k">def</span> <span class="nf">get_stimulus_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stimulus_name</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Return a stimulus table given a stimulus name </span>
+<span class="sd">        </span>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        For more information, see:</span>
+<span class="sd">        http://help.brain-map.org/display/observatory/Documentation?preview=/10616846/10813485/VisualCoding_VisualStimuli.pdf </span>
 
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span>
-                <span class="s2">&quot;Could not find a stimulus table named &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">stimulus_name</span><span class="p">)</span></div>
+<span class="sd">        &#39;&#39;&#39;</span>
 
-<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_spontaneous_activity_stimulus_table"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_spontaneous_activity_stimulus_table">[docs]</a>    <span class="k">def</span> <span class="nf">get_spontaneous_activity_stimulus_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">stimulus_name</span> <span class="o">==</span> <span class="s1">&#39;master&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_master_stimulus_table</span><span class="p">()</span>
+
+        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">nwb_file</span><span class="p">:</span>
+
+            <span class="n">stimulus_group</span> <span class="o">=</span> <span class="n">_find_stimulus_presentation_group</span><span class="p">(</span><span class="n">nwb_file</span><span class="p">,</span> <span class="n">stimulus_name</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">stimulus_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">STIMULUS_TABLE_TYPES</span><span class="p">[</span><span class="s1">&#39;abstract_feature_series&#39;</span><span class="p">]:</span>
+                <span class="n">datasets</span> <span class="o">=</span> <span class="n">h5_utilities</span><span class="o">.</span><span class="n">load_datasets_by_relnames</span><span class="p">(</span>
+                    <span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;features&#39;</span><span class="p">,</span> <span class="s1">&#39;frame_duration&#39;</span><span class="p">],</span> <span class="n">nwb_file</span><span class="p">,</span> <span class="n">stimulus_group</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">_make_abstract_feature_series_stimulus_table</span><span class="p">(</span>
+                    <span class="n">datasets</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">],</span> <span class="n">h5_utilities</span><span class="o">.</span><span class="n">decode_bytes</span><span class="p">(</span><span class="n">datasets</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">]),</span> <span class="n">datasets</span><span class="p">[</span><span class="s1">&#39;frame_duration&#39;</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="n">stimulus_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">STIMULUS_TABLE_TYPES</span><span class="p">[</span><span class="s1">&#39;indexed_time_series&#39;</span><span class="p">]:</span>
+                <span class="n">datasets</span> <span class="o">=</span> <span class="n">h5_utilities</span><span class="o">.</span><span class="n">load_datasets_by_relnames</span><span class="p">([</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;frame_duration&#39;</span><span class="p">],</span> <span class="n">nwb_file</span><span class="p">,</span> <span class="n">stimulus_group</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">_make_indexed_time_series_stimulus_table</span><span class="p">(</span><span class="n">datasets</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">],</span> <span class="n">datasets</span><span class="p">[</span><span class="s1">&#39;frame_duration&#39;</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="n">stimulus_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">STIMULUS_TABLE_TYPES</span><span class="p">[</span><span class="s1">&#39;repeated_indexed_time_series&#39;</span><span class="p">]:</span>
+                <span class="n">datasets</span> <span class="o">=</span> <span class="n">h5_utilities</span><span class="o">.</span><span class="n">load_datasets_by_relnames</span><span class="p">([</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;frame_duration&#39;</span><span class="p">],</span> <span class="n">nwb_file</span><span class="p">,</span> <span class="n">stimulus_group</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">_make_repeated_indexed_time_series_stimulus_table</span><span class="p">(</span><span class="n">datasets</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">],</span> <span class="n">datasets</span><span class="p">[</span><span class="s1">&#39;frame_duration&#39;</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="n">stimulus_name</span> <span class="o">==</span> <span class="s1">&#39;spontaneous&#39;</span><span class="p">:</span>
+                <span class="n">datasets</span> <span class="o">=</span> <span class="n">h5_utilities</span><span class="o">.</span><span class="n">load_datasets_by_relnames</span><span class="p">([</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;frame_duration&#39;</span><span class="p">],</span> <span class="n">nwb_file</span><span class="p">,</span> <span class="n">stimulus_group</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">_make_spontaneous_activity_stimulus_table</span><span class="p">(</span><span class="n">datasets</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">],</span> <span class="n">datasets</span><span class="p">[</span><span class="s1">&#39;frame_duration&#39;</span><span class="p">])</span>
+
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Could not find a stimulus table named &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">stimulus_name</span><span class="p">)</span></div>
+                
+
+<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_spontaneous_activity_stimulus_table"><a class="viewcode-back" href="../../../allensdk.core.brain_observatory_nwb_data_set.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_spontaneous_activity_stimulus_table">[docs]</a>    <span class="nd">@deprecated</span><span class="p">(</span><span class="s1">&#39;Use BrainObservatoryNWBDataset.get_stimulus_table instead&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_spontaneous_activity_stimulus_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Return the spontaneous activity stimulus table, if it exists.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        stimulus table: pd.DataFrame</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">k</span> <span class="o">=</span> <span class="s2">&quot;stimulus/presentation/spontaneous_stimulus&quot;</span>
-        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">events</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s1">&#39;/data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-            <span class="n">frame_dur</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s1">&#39;/frame_duration&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
 
-        <span class="n">start_inds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">events</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">stop_inds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">events</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">nwb_file</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">make_spontaneous_activity_stimulus_table</span><span class="p">(</span><span class="n">nwb_file</span><span class="p">)</span></div>
 
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">start_inds</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">stop_inds</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
-                <span class="s2">&quot;inconsistent start and time times in spontaneous activity stimulus table&quot;</span><span class="p">)</span>
 
-        <span class="n">stim_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">frame_dur</span><span class="p">[</span><span class="n">start_inds</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">frame_dur</span><span class="p">[</span><span class="n">stop_inds</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-
-        <span class="n">stimulus_table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">stim_data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">,</span> <span class="s1">&#39;end&#39;</span><span class="p">])</span>
-
-        <span class="k">return</span> <span class="n">stimulus_table</span></div>
-
-    <span class="nd">@memoize</span>
-<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_stimulus_template"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_stimulus_template">[docs]</a>    <span class="k">def</span> <span class="nf">get_stimulus_template</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stimulus_name</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_stimulus_template"><a class="viewcode-back" href="../../../allensdk.core.brain_observatory_nwb_data_set.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_stimulus_template">[docs]</a>    <span class="nd">@memoize</span>
+    <span class="k">def</span> <span class="nf">get_stimulus_template</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stimulus_name</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Return an array of the stimulus template for the specified stimulus.</span>
 
 <span class="sd">        Parameters</span>
@@ -666,9 +677,9 @@
             <span class="n">image_stack</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;stimulus&#39;</span><span class="p">][</span><span class="s1">&#39;templates&#39;</span><span class="p">][</span><span class="n">stim_name</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
         <span class="k">return</span> <span class="n">image_stack</span></div>
 
-<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_locally_sparse_noise_stimulus_template"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_locally_sparse_noise_stimulus_template">[docs]</a>    <span class="k">def</span> <span class="nf">get_locally_sparse_noise_stimulus_template</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_locally_sparse_noise_stimulus_template"><a class="viewcode-back" href="../../../allensdk.core.brain_observatory_nwb_data_set.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_locally_sparse_noise_stimulus_template">[docs]</a>    <span class="k">def</span> <span class="nf">get_locally_sparse_noise_stimulus_template</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                                    <span class="n">stimulus</span><span class="p">,</span>
-                                                   <span class="n">mask_off_screen</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+                                                   <span class="n">mask_off_screen</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Return an array of the stimulus template for the specified stimulus.</span>
 
 <span class="sd">        Parameters</span>
@@ -724,7 +735,7 @@
 
         <span class="k">return</span> <span class="n">template</span><span class="p">,</span> <span class="n">template_mask</span><span class="o">.</span><span class="n">T</span></div>
 
-<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_roi_mask_array"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_roi_mask_array">[docs]</a>    <span class="k">def</span> <span class="nf">get_roi_mask_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_roi_mask_array"><a class="viewcode-back" href="../../../allensdk.core.brain_observatory_nwb_data_set.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_roi_mask_array">[docs]</a>    <span class="k">def</span> <span class="nf">get_roi_mask_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Return a numpy array containing all of the ROI masks for requested cells.</span>
 <span class="sd">        If cell_specimen_ids is omitted, return all masks.</span>
 
@@ -747,7 +758,7 @@
 
         <span class="k">return</span> <span class="n">roi_arr</span></div>
 
-<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_roi_mask"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_roi_mask">[docs]</a>    <span class="k">def</span> <span class="nf">get_roi_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_roi_mask"><a class="viewcode-back" href="../../../allensdk.core.brain_observatory_nwb_data_set.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_roi_mask">[docs]</a>    <span class="k">def</span> <span class="nf">get_roi_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Returns an array of all the ROI masks</span>
 
 <span class="sd">        Parameters</span>
@@ -767,8 +778,8 @@
             <span class="n">roi_list</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
                 <span class="s1">&#39;ImageSegmentation&#39;</span><span class="p">][</span><span class="s1">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s1">&#39;roi_list&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
 
-            <span class="n">inds</span> <span class="o">=</span> <span class="bp">None</span>
-            <span class="k">if</span> <span class="n">cell_specimen_ids</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">inds</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">cell_specimen_ids</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">inds</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_cells</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">inds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cell_specimen_indices</span><span class="p">(</span><span class="n">cell_specimen_ids</span><span class="p">)</span>
@@ -791,7 +802,7 @@
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_cell_specimen_ids</span><span class="p">())</span>
 
 
-<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_metadata"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_metadata"><a class="viewcode-back" href="../../../allensdk.core.brain_observatory_nwb_data_set.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Returns a dictionary of meta data associated with each</span>
 <span class="sd">        experiment, including Cre line, specimen number,</span>
 <span class="sd">        visual area imaged, imaging depth</span>
@@ -823,23 +834,23 @@
 
         <span class="c1"># extract cre line from genotype string</span>
         <span class="n">genotype</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;genotype&#39;</span><span class="p">)</span>
-        <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;cre_line&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;genotype&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">genotype</span> <span class="k">else</span> <span class="bp">None</span>
+        <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;cre_line&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;genotype&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">genotype</span> <span class="k">else</span> <span class="kc">None</span>
 
-        <span class="n">imaging_depth</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;imaging_depth&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-        <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;imaging_depth_um&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">imaging_depth</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="n">imaging_depth</span> <span class="k">else</span> <span class="bp">None</span>
+        <span class="n">imaging_depth</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;imaging_depth&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;imaging_depth_um&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">imaging_depth</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="n">imaging_depth</span> <span class="k">else</span> <span class="kc">None</span>
 
         <span class="n">ophys_experiment_id</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ophys_experiment_id&#39;</span><span class="p">)</span>
-        <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;ophys_experiment_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ophys_experiment_id</span><span class="p">)</span> <span class="k">if</span> <span class="n">ophys_experiment_id</span> <span class="k">else</span> <span class="bp">None</span>
+        <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;ophys_experiment_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ophys_experiment_id</span><span class="p">)</span> <span class="k">if</span> <span class="n">ophys_experiment_id</span> <span class="k">else</span> <span class="kc">None</span>
 
         <span class="n">experiment_container_id</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;experiment_container_id&#39;</span><span class="p">)</span>
-        <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;experiment_container_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">experiment_container_id</span><span class="p">)</span> <span class="k">if</span> <span class="n">experiment_container_id</span> <span class="k">else</span> <span class="bp">None</span>
+        <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;experiment_container_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">experiment_container_id</span><span class="p">)</span> <span class="k">if</span> <span class="n">experiment_container_id</span> <span class="k">else</span> <span class="kc">None</span>
 
         <span class="c1"># convert start time to a date object</span>
         <span class="n">session_start_time</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;session_start_time&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">session_start_time</span><span class="p">,</span> <span class="n">six</span><span class="o">.</span><span class="n">string_types</span> <span class="p">):</span>
             <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;session_start_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dateutil</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">session_start_time</span><span class="p">)</span>
 
-        <span class="n">age</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="n">age</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">age</span><span class="p">:</span>
             <span class="c1"># parse the age in days</span>
             <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">&quot;(.*?) days&quot;</span><span class="p">,</span> <span class="n">age</span><span class="p">)</span>
@@ -850,7 +861,7 @@
 
 
         <span class="c1"># parse the device string (ugly, sorry)</span>
-        <span class="n">device_string</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;device_string&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="n">device_string</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;device_string&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">device_string</span><span class="p">:</span>
             <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">&quot;(.*?)\.\s(.*?)\sPlease*&quot;</span><span class="p">,</span> <span class="n">device_string</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
@@ -861,13 +872,13 @@
                 <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Could not parse device string.&quot;</span><span class="p">)</span>
 
         <span class="c1"># file version</span>
-        <span class="n">generated_by</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;generated_by&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="n">generated_by</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;generated_by&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">version</span> <span class="o">=</span> <span class="n">generated_by</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">generated_by</span> <span class="k">else</span> <span class="s2">&quot;0.9&quot;</span>
         <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;pipeline_version&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">version</span>
 
         <span class="k">return</span> <span class="n">meta</span></div>
 
-<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_running_speed"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_running_speed">[docs]</a>    <span class="k">def</span> <span class="nf">get_running_speed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_running_speed"><a class="viewcode-back" href="../../../allensdk.core.brain_observatory_nwb_data_set.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_running_speed">[docs]</a>    <span class="k">def</span> <span class="nf">get_running_speed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Returns the mouse running speed in cm/s</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -886,7 +897,7 @@
 
         <span class="k">return</span> <span class="n">dxcm</span><span class="p">,</span> <span class="n">dxtime</span></div>
 
-<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_pupil_location"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_pupil_location">[docs]</a>    <span class="k">def</span> <span class="nf">get_pupil_location</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">as_spherical</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_pupil_location"><a class="viewcode-back" href="../../../allensdk.core.brain_observatory_nwb_data_set.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_pupil_location">[docs]</a>    <span class="k">def</span> <span class="nf">get_pupil_location</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">as_spherical</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Returns the x, y pupil location.</span>
 
 <span class="sd">        Parameters</span>
@@ -918,7 +929,7 @@
 
         <span class="k">return</span> <span class="n">pupil_times</span><span class="p">,</span> <span class="n">pupil_location</span></div>
 
-<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_pupil_size"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_pupil_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_pupil_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_pupil_size"><a class="viewcode-back" href="../../../allensdk.core.brain_observatory_nwb_data_set.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_pupil_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_pupil_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Returns the pupil area in pixels.</span>
 
 <span class="sd">        Returns</span>
@@ -938,11 +949,11 @@
 
         <span class="k">return</span> <span class="n">pupil_times</span><span class="p">,</span> <span class="n">pupil_size</span></div>
 
-<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_motion_correction"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_motion_correction">[docs]</a>    <span class="k">def</span> <span class="nf">get_motion_correction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_motion_correction"><a class="viewcode-back" href="../../../allensdk.core.brain_observatory_nwb_data_set.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_motion_correction">[docs]</a>    <span class="k">def</span> <span class="nf">get_motion_correction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Returns a Panda DataFrame containing the x- and y- translation of each image used for image alignment</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
-        <span class="n">motion_correction</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">motion_correction</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">pipeline_ds</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">]</span>
 
@@ -964,18 +975,18 @@
                 <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                     <span class="k">pass</span>
 
-        <span class="k">if</span> <span class="n">motion_correction</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">motion_correction</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Could not find motion correction data.&quot;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">motion_correction</span></div>
 
-<div class="viewcode-block" id="BrainObservatoryNwbDataSet.save_analysis_dataframes"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.save_analysis_dataframes">[docs]</a>    <span class="k">def</span> <span class="nf">save_analysis_dataframes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">tables</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryNwbDataSet.save_analysis_dataframes"><a class="viewcode-back" href="../../../allensdk.core.brain_observatory_nwb_data_set.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.save_analysis_dataframes">[docs]</a>    <span class="k">def</span> <span class="nf">save_analysis_dataframes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">tables</span><span class="p">):</span>
         <span class="n">store</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">HDFStore</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;a&#39;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">tables</span><span class="p">:</span>
             <span class="n">store</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s1">&#39;analysis/</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">),</span> <span class="n">v</span><span class="p">)</span>
         <span class="n">store</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="BrainObservatoryNwbDataSet.save_analysis_arrays"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.save_analysis_arrays">[docs]</a>    <span class="k">def</span> <span class="nf">save_analysis_arrays</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">datasets</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryNwbDataSet.save_analysis_arrays"><a class="viewcode-back" href="../../../allensdk.core.brain_observatory_nwb_data_set.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.save_analysis_arrays">[docs]</a>    <span class="k">def</span> <span class="nf">save_analysis_arrays</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">datasets</span><span class="p">):</span>
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;analysis&#39;</span><span class="p">]:</span>
@@ -985,16 +996,16 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">stimulus_search</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stimulus_search</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stimulus_search</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_stimulus_search</span> <span class="o">=</span> <span class="n">si</span><span class="o">.</span><span class="n">StimulusSearch</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stimulus_search</span>
 
-<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_stimulus"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_stimulus">[docs]</a>    <span class="k">def</span> <span class="nf">get_stimulus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame_ind</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_stimulus"><a class="viewcode-back" href="../../../allensdk.core.brain_observatory_nwb_data_set.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_stimulus">[docs]</a>    <span class="k">def</span> <span class="nf">get_stimulus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame_ind</span><span class="p">):</span>
 
         <span class="n">search_result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stimulus_search</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">frame_ind</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">search_result</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">search_result</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="s1">&#39;stimulus&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">si</span><span class="o">.</span><span class="n">SPONTANEOUS_ACTIVITY</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="n">search_result</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">search_result</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="s1">&#39;stimulus&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">si</span><span class="o">.</span><span class="n">SPONTANEOUS_ACTIVITY</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
 
         <span class="k">else</span><span class="p">:</span>
 
@@ -1003,9 +1014,55 @@
                 <span class="n">curr_frame</span> <span class="o">=</span> <span class="n">search_result</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="s1">&#39;frame&#39;</span><span class="p">]</span>
                 <span class="k">return</span> <span class="n">search_result</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_stimulus_template</span><span class="p">(</span><span class="n">curr_stimulus</span><span class="p">)[</span><span class="nb">int</span><span class="p">(</span><span class="n">curr_frame</span><span class="p">),</span> <span class="p">:,</span> <span class="p">:]</span>
             <span class="k">elif</span> <span class="n">curr_stimulus</span> <span class="o">==</span> <span class="n">si</span><span class="o">.</span><span class="n">STATIC_GRATINGS</span> <span class="ow">or</span> <span class="n">curr_stimulus</span> <span class="o">==</span> <span class="n">si</span><span class="o">.</span><span class="n">DRIFTING_GRATINGS</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">search_result</span><span class="p">,</span> <span class="bp">None</span></div></div>
+                <span class="k">return</span> <span class="n">search_result</span><span class="p">,</span> <span class="kc">None</span></div></div>
 
-<div class="viewcode-block" id="align_running_speed"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.align_running_speed">[docs]</a><span class="k">def</span> <span class="nf">align_running_speed</span><span class="p">(</span><span class="n">dxcm</span><span class="p">,</span> <span class="n">dxtime</span><span class="p">,</span> <span class="n">timestamps</span><span class="p">):</span>
+
+<span class="k">def</span> <span class="nf">_find_stimulus_presentation_group</span><span class="p">(</span><span class="n">nwb_file</span><span class="p">,</span>
+                                      <span class="n">stimulus_name</span><span class="p">,</span> 
+                                      <span class="n">base_path</span><span class="o">=</span><span class="n">_STIMULUS_PRESENTATION_PATH</span><span class="p">,</span> 
+                                      <span class="n">group_patterns</span><span class="o">=</span><span class="n">_STIMULUS_PRESENTATION_PATTERNS</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Searches an NWB file for a stimulus presentation group.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nwb_file : h5py.File</span>
+<span class="sd">        File to search</span>
+<span class="sd">    stimulus_name : str</span>
+<span class="sd">        Identifier for this stimulus. Corresponds to the relative name of its h5 </span>
+<span class="sd">        group.</span>
+<span class="sd">    base_path : str, optional</span>
+<span class="sd">        Begin the search from here. Defaults to &#39;stimulus/presentation&#39;</span>
+<span class="sd">    group_patterns : array-like of str, optional</span>
+<span class="sd">        Patterns for the relative name of the stimulus&#39; h5 group. Defaults to </span>
+<span class="sd">        the name, and the name suffixed by &#39;_stimulus&#39;</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    h5py.Group, h5py.Dataset : </span>
+<span class="sd">        h5 object found</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">group_candidates</span> <span class="o">=</span> <span class="p">[</span> <span class="n">pattern</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stimulus_name</span><span class="p">)</span> <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="n">group_patterns</span> <span class="p">]</span>
+    <span class="n">matcher</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">h5_utilities</span><span class="o">.</span><span class="n">h5_object_matcher_relname_in</span><span class="p">,</span> <span class="n">group_candidates</span><span class="p">)</span>
+    <span class="n">matches</span> <span class="o">=</span> <span class="n">h5_utilities</span><span class="o">.</span><span class="n">locate_h5_objects</span><span class="p">(</span><span class="n">matcher</span><span class="p">,</span> <span class="n">nwb_file</span><span class="p">,</span> <span class="n">base_path</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">matches</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">MissingStimulusException</span><span class="p">(</span>
+            <span class="s1">&#39;Unable to locate stimulus: </span><span class="si">{}</span><span class="s1">. &#39;</span>
+            <span class="s1">&#39;Looked for this stimulus under the names: </span><span class="si">{}</span><span class="s1"> &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stimulus_name</span><span class="p">,</span> <span class="n">group_candidates</span><span class="p">)</span>
+            <span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">matches</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">MissingStimulusException</span><span class="p">(</span>
+            <span class="s1">&#39;Unable to locate stimulus: </span><span class="si">{}</span><span class="s1">. &#39;</span>
+            <span class="s1">&#39;Found multiple matching stimuli: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stimulus_name</span><span class="p">,</span> <span class="p">[</span><span class="n">match</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">match</span> <span class="ow">in</span> <span class="n">matches</span><span class="p">])</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">matches</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="align_running_speed"><a class="viewcode-back" href="../../../allensdk.core.brain_observatory_nwb_data_set.html#allensdk.core.brain_observatory_nwb_data_set.align_running_speed">[docs]</a><span class="k">def</span> <span class="nf">align_running_speed</span><span class="p">(</span><span class="n">dxcm</span><span class="p">,</span> <span class="n">dxtime</span><span class="p">,</span> <span class="n">timestamps</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39; If running speed timestamps differ from fluorescence</span>
 <span class="sd">    timestamps, adjust by inserting NaNs to running speed.</span>
 
@@ -1024,76 +1081,71 @@
 
     <span class="k">return</span> <span class="n">dxcm</span><span class="p">,</span> <span class="n">dxtime</span></div>
 
-<span class="c1">#</span>
-<span class="nd">@deprecated</span><span class="p">(</span><span class="s1">&#39;Use allensdk.brain_observatory.stimulus_info.warp_stimulus_coords instead&#39;</span><span class="p">)</span>
-<div class="viewcode-block" id="warp_stimulus_coords"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.warp_stimulus_coords">[docs]</a><span class="k">def</span> <span class="nf">warp_stimulus_coords</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">si_warp_stimulus_coords</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-
-<span class="nd">@deprecated</span><span class="p">(</span><span class="s1">&#39;Use allensdk.brain_observatory.stimulus_info.make_display_mask instead&#39;</span><span class="p">)</span>
-<div class="viewcode-block" id="make_display_mask"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.make_display_mask">[docs]</a><span class="k">def</span> <span class="nf">make_display_mask</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">si_make_display_mask</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
-
-
-
-<span class="nd">@deprecated</span><span class="p">(</span><span class="s1">&#39;Use allensdk.brain_observatory.stimulus_info.mask_stimulus_template instead&#39;</span><span class="p">)</span>
-<div class="viewcode-block" id="mask_stimulus_template"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.mask_stimulus_template">[docs]</a><span class="k">def</span> <span class="nf">mask_stimulus_template</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">si_mask_stimulus_template</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
-
-
-<span class="k">def</span> <span class="nf">_get_abstract_feature_series_stimulus_table</span><span class="p">(</span><span class="n">nwb_file</span><span class="p">,</span> <span class="n">stimulus_name</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_make_abstract_feature_series_stimulus_table</span><span class="p">(</span><span class="n">stim_data</span><span class="p">,</span> <span class="n">features</span><span class="p">,</span> <span class="n">frame_dur</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39; Return the a stimulus table for an abstract feature series.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    stim_data : array-like</span>
+<span class="sd">        Stimulus feature values at each interval</span>
+<span class="sd">    features : array-like of str</span>
+<span class="sd">        Stimulus feature labels</span>
+<span class="sd">    frame_dur : array-like</span>
+<span class="sd">        Start and end times of presentation intervals</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    stimulus table: pd.DataFrame</span>
+<span class="sd">    stimulus table : pd.DataFrame</span>
+<span class="sd">        Describes the intervals of presentation of the stimulus</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    For more information, see:</span>
+<span class="sd">    http://help.brain-map.org/display/observatory/Documentation?preview=/10616846/10813485/VisualCoding_VisualStimuli.pdf </span>
+
 <span class="sd">    &#39;&#39;&#39;</span>
-
-
-    <span class="n">k</span> <span class="o">=</span> <span class="s2">&quot;stimulus/presentation/</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">stimulus_name</span>
-
-    <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">MissingStimulusException</span><span class="p">(</span>
-                <span class="s2">&quot;Stimulus not found: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">stimulus_name</span><span class="p">)</span>
-        <span class="n">stim_data</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s1">&#39;/data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-        <span class="n">features</span> <span class="o">=</span> <span class="p">[</span> <span class="n">v</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;UTF-8&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">f</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s1">&#39;/features&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="p">]</span>
-        <span class="n">frame_dur</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s1">&#39;/frame_duration&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
 
     <span class="n">stimulus_table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">stim_data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">features</span><span class="p">)</span>
     <span class="n">stimulus_table</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;start&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">frame_dur</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
     <span class="n">stimulus_table</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;end&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">frame_dur</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
 
+    <span class="n">stimulus_table</span> <span class="o">=</span> <span class="n">stimulus_table</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">&#39;start&#39;</span><span class="p">,</span> <span class="s1">&#39;end&#39;</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">stimulus_table</span>
 
 
-<span class="k">def</span> <span class="nf">_get_indexed_time_series_stimulus_table</span><span class="p">(</span><span class="n">nwb_file</span><span class="p">,</span> <span class="n">stimulus_name</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_make_indexed_time_series_stimulus_table</span><span class="p">(</span><span class="n">inds</span><span class="p">,</span> <span class="n">frame_dur</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39; Return the a stimulus table for an indexed time series.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    inds : </span>
+<span class="sd">    frame_durations : np.ndarray</span>
+<span class="sd">        start and stop times (s) of frames</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    stimulus table: pd.DataFrame</span>
+<span class="sd">    stimulus table : pd.DataFrame</span>
+<span class="sd">        Describes the intervals of presentation of the stimulus</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    For more information, see:</span>
+<span class="sd">    http://help.brain-map.org/display/observatory/Documentation?preview=/10616846/10813485/VisualCoding_VisualStimuli.pdf </span>
+
 <span class="sd">    &#39;&#39;&#39;</span>
-
-    <span class="n">k</span> <span class="o">=</span> <span class="s2">&quot;stimulus/presentation/</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">stimulus_name</span>
-
-    <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">k</span> <span class="o">=</span> <span class="s2">&quot;stimulus/presentation/</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">stimulus_name</span> <span class="o">+</span> <span class="s2">&quot;_stimulus&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">MissingStimulusException</span><span class="p">(</span><span class="s2">&quot;Stimulus not found: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">stimulus_name</span><span class="p">)</span>
-        <span class="n">inds</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s1">&#39;/data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-        <span class="n">frame_dur</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s1">&#39;/frame_duration&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
 
     <span class="n">stimulus_table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">inds</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;frame&#39;</span><span class="p">])</span>
     <span class="n">stimulus_table</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;start&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">frame_dur</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
     <span class="n">stimulus_table</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;end&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">frame_dur</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-
+    
+    <span class="n">stimulus_table</span> <span class="o">=</span> <span class="n">stimulus_table</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">&#39;start&#39;</span><span class="p">,</span> <span class="s1">&#39;end&#39;</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">stimulus_table</span>
 
-<span class="k">def</span> <span class="nf">_get_repeated_indexed_time_series_stimulus_table</span><span class="p">(</span><span class="n">nwb_file</span><span class="p">,</span> <span class="n">stimulus_name</span><span class="p">):</span>
 
-    <span class="n">stimulus_table</span> <span class="o">=</span> <span class="n">_get_indexed_time_series_stimulus_table</span><span class="p">(</span><span class="n">nwb_file</span><span class="p">,</span> <span class="n">stimulus_name</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_make_repeated_indexed_time_series_stimulus_table</span><span class="p">(</span><span class="n">inds</span><span class="p">,</span> <span class="n">frame_dur</span><span class="p">):</span>
+
+    <span class="n">stimulus_table</span> <span class="o">=</span> <span class="n">_make_indexed_time_series_stimulus_table</span><span class="p">(</span><span class="n">inds</span><span class="p">,</span> <span class="n">frame_dur</span><span class="p">)</span>
     <span class="n">a</span> <span class="o">=</span> <span class="n">stimulus_table</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s1">&#39;frame&#39;</span><span class="p">)</span>
 
     <span class="c1"># If this ever occurs, the repeat counter cant be trusted!</span>
@@ -1102,6 +1154,79 @@
     <span class="n">stimulus_table</span><span class="p">[</span><span class="s1">&#39;repeat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">stimulus_table</span><span class="p">)</span><span class="o">//</span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)),</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">stimulus_table</span>
+
+
+<span class="k">def</span> <span class="nf">_make_spontaneous_activity_stimulus_table</span><span class="p">(</span><span class="n">events</span><span class="p">,</span> <span class="n">frame_durations</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Builds a table describing the start and end times of the spontaneous viewing</span>
+<span class="sd">    intervals. </span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    events : np.ndarray</span>
+<span class="sd">        events data</span>
+<span class="sd">    frame_durations : np.ndarray</span>
+<span class="sd">        start and stop times (s) of frames</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pd.DataFrame : </span>
+<span class="sd">        Each row describes an interval of spontaneous viewing. Columns are start and end times.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    For more information, see:</span>
+<span class="sd">    http://help.brain-map.org/display/observatory/Documentation?preview=/10616846/10813485/VisualCoding_VisualStimuli.pdf </span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">start_inds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">events</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">stop_inds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">events</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">start_inds</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">stop_inds</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+            <span class="s2">&quot;inconsistent start and time times in spontaneous activity stimulus table&quot;</span><span class="p">)</span>
+
+    <span class="n">stim_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span>
+        <span class="n">frame_durations</span><span class="p">[</span><span class="n">start_inds</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> 
+        <span class="n">frame_durations</span><span class="p">[</span><span class="n">stop_inds</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">]</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="n">stimulus_table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">stim_data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">,</span> <span class="s1">&#39;end&#39;</span><span class="p">])</span>
+    <span class="n">stimulus_table</span> <span class="o">=</span> <span class="n">stimulus_table</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">&#39;start&#39;</span><span class="p">,</span> <span class="s1">&#39;end&#39;</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">stimulus_table</span>
+
+
+<div class="viewcode-block" id="warp_stimulus_coords"><a class="viewcode-back" href="../../../allensdk.core.brain_observatory_nwb_data_set.html#allensdk.core.brain_observatory_nwb_data_set.warp_stimulus_coords">[docs]</a><span class="nd">@deprecated</span><span class="p">(</span><span class="s1">&#39;Use allensdk.brain_observatory.stimulus_info.warp_stimulus_coords instead&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">warp_stimulus_coords</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">si_warp_stimulus_coords</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="make_display_mask"><a class="viewcode-back" href="../../../allensdk.core.brain_observatory_nwb_data_set.html#allensdk.core.brain_observatory_nwb_data_set.make_display_mask">[docs]</a><span class="nd">@deprecated</span><span class="p">(</span><span class="s1">&#39;Use allensdk.brain_observatory.stimulus_info.make_display_mask instead&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">make_display_mask</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">si_make_display_mask</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="mask_stimulus_template"><a class="viewcode-back" href="../../../allensdk.core.brain_observatory_nwb_data_set.html#allensdk.core.brain_observatory_nwb_data_set.mask_stimulus_template">[docs]</a><span class="nd">@deprecated</span><span class="p">(</span><span class="s1">&#39;Use allensdk.brain_observatory.stimulus_info.mask_stimulus_template instead&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">mask_stimulus_template</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">si_mask_stimulus_template</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<span class="nd">@deprecated</span><span class="p">(</span><span class="s1">&#39;Use BrainObservatoryNWBDataset.get_stimulus_table instead&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_get_abstract_feature_series_stimulus_table</span><span class="p">(</span><span class="n">nwb_file</span><span class="p">,</span> <span class="n">stimulus_name</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">nwb_file</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">make_abstract_feature_series_stimulus_table</span><span class="p">(</span><span class="n">nwb_file</span><span class="p">,</span> <span class="n">stimulus_name</span><span class="p">)</span>
+
+
+<span class="nd">@deprecated</span><span class="p">(</span><span class="s1">&#39;Use BrainObservatoryNWBDataset.get_stimulus_table instead&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_get_indexed_time_series_stimulus_table</span><span class="p">(</span><span class="n">nwb_file</span><span class="p">,</span> <span class="n">stimulus_name</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">nwb_file</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">make_indexed_time_series_stimulus_table</span><span class="p">(</span><span class="n">nwb_file</span><span class="p">,</span> <span class="n">stimulus_name</span><span class="p">)</span>
+
+<span class="nd">@deprecated</span><span class="p">(</span><span class="s1">&#39;Use BrainObservatoryNWBDataset.get_stimulus_table instead&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_get_repeated_indexed_time_series_stimulus_table</span><span class="p">(</span><span class="n">nwb_file</span><span class="p">,</span> <span class="n">stimulus_name</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">nwb_file</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">make_repeated_indexed_time_series_stimulus_table</span><span class="p">(</span><span class="n">nwb_file</span><span class="p">,</span> <span class="n">stimulus_name</span><span class="p">)</span>
 </pre></div>
 
           </div>
@@ -1111,9 +1236,7 @@
         <div class="sphinxsidebarwrapper">
 <h3><a href="../../../index.html">Contents</a></h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install Guide</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../cell_types.html">Cell Types</a></li>
@@ -1138,6 +1261,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.model.html">allensdk.model package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.morphology.html">allensdk.morphology package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.deprecated.html">allensdk.deprecated module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
@@ -1155,12 +1279,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

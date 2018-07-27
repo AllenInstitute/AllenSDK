@@ -140,7 +140,6 @@ be used to extract the precise feature values available in the Cell Types Databa
                                       <span class="n">sweep_numbers</span><span class="p">[</span><span class="s1">&#39;Ramp&#39;</span><span class="p">],</span>
                                       <span class="n">sweep_numbers</span><span class="p">[</span><span class="s1">&#39;Short Square&#39;</span><span class="p">],</span>
                                       <span class="n">sweep_numbers</span><span class="p">[</span><span class="s1">&#39;Long Square&#39;</span><span class="p">])</span>
-
 </pre></div>
 </div>
 </div>
@@ -226,7 +225,7 @@ be used to extract the precise feature values available in the Cell Types Databa
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">allensdk.core.swc</span> <span class="k">as</span> <span class="nn">swc</span>
 
 <span class="c1"># if you ran the examples above, you will have a reconstruction here</span>
-<span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;cell_types/specimen_478499902/reconstruction.swc&#39;</span>
+<span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;cell_types/specimen_485909730/reconstruction.swc&#39;</span>
 <span class="n">morphology</span> <span class="o">=</span> <span class="n">swc</span><span class="o">.</span><span class="n">read_swc</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
 
 <span class="c1"># subsample the morphology 3x. root, soma, junctions, and the first child of the root are preserved.</span>
@@ -267,7 +266,7 @@ and estimated spike times:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">allensdk.core.nwb_data_set</span> <span class="k">import</span> <span class="n">NwbDataSet</span>
 
 <span class="c1"># if you ran the examples above, you will have a NWB file here</span>
-<span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;cell_types/specimen_478499902/ephys.nwb&#39;</span>
+<span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;cell_types/specimen_485909730/ephys.nwb&#39;</span>
 <span class="n">data_set</span> <span class="o">=</span> <span class="n">NwbDataSet</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
 
 <span class="n">sweep_numbers</span> <span class="o">=</span> <span class="n">data_set</span><span class="o">.</span><span class="n">get_sweep_numbers</span><span class="p">()</span>

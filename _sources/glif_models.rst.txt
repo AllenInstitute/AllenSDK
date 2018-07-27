@@ -67,7 +67,8 @@ You can also download all of these files, including the cell's NWB file,
 using the :py:class:`GlifApi <allensdk.api.queries.glif_api.GlifApi>` 
 class:
 
-.. literalinclude:: examples_root/examples/glif_ex1.py
+.. literalinclude:: examples_root/examples/glif_ex.py
+    :lines: 9-27
 
 Running a GLIF Simulation
 -------------------------
@@ -75,7 +76,8 @@ Running a GLIF Simulation
 To run a GLIF simulation, the most important file you you need is the ``neuron_config`` 
 JSON file.  You can use this file to instantiate a simulator and feed in your own stimulus:
 
-.. literalinclude:: examples_root/examples/glif_ex2.py
+.. literalinclude:: examples_root/examples/glif_ex.py
+    :lines: 33-51
 
 .. note:: 
     
@@ -88,7 +90,8 @@ To reproduce the model's traces displayed on the Allen Cell Types Database web p
 the Allen SDK provides the :py:mod:`allensdk.core.model.glif.simulate_neuron` 
 module for simulating all sweeps presented to a cell and storing them in the NWB format:
 
-.. literalinclude:: examples_root/examples/glif_ex3.py
+.. literalinclude:: examples_root/examples/glif_ex.py
+    :lines: 57-70
 
 .. warning::
 
@@ -103,7 +106,8 @@ these ``NaN`` values generated during action potentials (in this case 0.05 Volts
 
 If you would like to run a single sweep instead of all sweeps, try the following:
 
-.. literalinclude:: examples_root/examples/glif_ex4.py
+.. literalinclude:: examples_root/examples/glif_ex.py
+    :lines: 76-101
 
 .. note:: 
     
@@ -114,7 +118,8 @@ If you would like to run a single sweep instead of all sweeps, try the following
 
 If you would like to plot the outputs of this simulation using numpy and matplotlib, try:
 
-.. literalinclude:: examples_root/examples/glif_ex5.py
+.. literalinclude:: examples_root/examples/glif_ex.py
+    :lines: 107-158
 
 .. note:: 
 
@@ -169,7 +174,8 @@ AScurrent_reset_method    Reset afterspike current coefficients after a spike oc
 The GLIF neuron configuration files available from the Allen Brain Atlas API use built-in
 methods, however you can supply your own custom method if you like:
 
-.. literalinclude:: examples_root/examples/glif_ex6.py    
+.. literalinclude:: examples_root/examples/glif_ex.py    
+    :lines: 164-178
 
 Notice that the function is allowed to take custom parameters (here ``custom_param_a`` and 
 ``custom_param_b``), which are configured on method initialization from a dictionary. For more details, 

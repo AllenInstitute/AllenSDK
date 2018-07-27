@@ -59,8 +59,343 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="allensdk-core-brain-observatory-cache-module">
-<h1>allensdk.core.brain_observatory_cache module<a class="headerlink" href="#allensdk-core-brain-observatory-cache-module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-allensdk.core.brain_observatory_cache">
+<span id="allensdk-core-brain-observatory-cache-module"></span><h1>allensdk.core.brain_observatory_cache module<a class="headerlink" href="#module-allensdk.core.brain_observatory_cache" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache">
+<em class="property">class </em><code class="descclassname">allensdk.core.brain_observatory_cache.</code><code class="descname">BrainObservatoryCache</code><span class="sig-paren">(</span><em>cache=True</em>, <em>manifest_file='brain_observatory_manifest.json'</em>, <em>base_uri=None</em>, <em>api=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="allensdk.api.cache.html#allensdk.api.cache.Cache" title="allensdk.api.cache.Cache"><code class="xref py py-class docutils literal notranslate"><span class="pre">allensdk.api.cache.Cache</span></code></a></p>
+<p>Cache class for storing and accessing data from the Brain Observatory.
+By default, this class will cache any downloaded metadata or files in
+well known locations defined in a manifest file.  This behavior can be
+disabled.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>cache: boolean</strong></dt>
+<dd><p class="first last">Whether the class should save results of API queries to locations specified
+in the manifest file.  Queries for files (as opposed to metadata) must have a
+file location.  If caching is disabled, those locations must be specified
+in the function call (e.g. get_ophys_experiment_data(file_name=’file.nwb’)).</p>
+</dd>
+<dt><strong>manifest_file: string</strong></dt>
+<dd><p class="first last">File name of the manifest to be read.  Default is “brain_observatory_manifest.json”.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Attributes:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>api: BrainObservatoryApi instance</strong></dt>
+<dd><p class="first last">The object used for making API queries related to the Brain
+Observatory.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.CELL_SPECIMENS_KEY">
+<code class="descname">CELL_SPECIMENS_KEY</code><em class="property"> = 'CELL_SPECIMENS'</em><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.CELL_SPECIMENS_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.EXPERIMENTS_KEY">
+<code class="descname">EXPERIMENTS_KEY</code><em class="property"> = 'EXPERIMENTS'</em><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.EXPERIMENTS_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.EXPERIMENT_CONTAINERS_KEY">
+<code class="descname">EXPERIMENT_CONTAINERS_KEY</code><em class="property"> = 'EXPERIMENT_CONTAINERS'</em><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.EXPERIMENT_CONTAINERS_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.EXPERIMENT_DATA_KEY">
+<code class="descname">EXPERIMENT_DATA_KEY</code><em class="property"> = 'EXPERIMENT_DATA'</em><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.EXPERIMENT_DATA_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.MANIFEST_VERSION">
+<code class="descname">MANIFEST_VERSION</code><em class="property"> = None</em><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.MANIFEST_VERSION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.STIMULUS_MAPPINGS_KEY">
+<code class="descname">STIMULUS_MAPPINGS_KEY</code><em class="property"> = 'STIMULUS_MAPPINGS'</em><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.STIMULUS_MAPPINGS_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.build_manifest">
+<code class="descname">build_manifest</code><span class="sig-paren">(</span><em>file_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.build_manifest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.build_manifest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a manifest for this Cache class and save it in a file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>file_name: string</strong></dt>
+<dd><p class="first last">File location to save the manifest.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_all_cre_lines">
+<code class="descname">get_all_cre_lines</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.get_all_cre_lines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_all_cre_lines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of all cre driver lines in the data set.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_all_imaging_depths">
+<code class="descname">get_all_imaging_depths</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.get_all_imaging_depths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_all_imaging_depths" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of all imaging depths in the data set.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_all_reporter_lines">
+<code class="descname">get_all_reporter_lines</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.get_all_reporter_lines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_all_reporter_lines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of all reporter lines in the data set.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_all_session_types">
+<code class="descname">get_all_session_types</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.get_all_session_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_all_session_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of all stimulus sessions in the data set.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_all_stimuli">
+<code class="descname">get_all_stimuli</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.get_all_stimuli"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_all_stimuli" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of all stimuli in the data set.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_all_targeted_structures">
+<code class="descname">get_all_targeted_structures</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.get_all_targeted_structures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_all_targeted_structures" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of all targeted structures in the data set.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_cell_specimens">
+<code class="descname">get_cell_specimens</code><span class="sig-paren">(</span><em>file_name=None</em>, <em>ids=None</em>, <em>experiment_container_ids=None</em>, <em>include_failed=False</em>, <em>simple=True</em>, <em>filters=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.get_cell_specimens"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_cell_specimens" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return cell specimens that have certain properies.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>file_name: string</strong></dt>
+<dd><p class="first last">File name to save/read the cell specimens.  If file_name is None,
+the file_name will be pulled out of the manifest.  If caching
+is disabled, no file will be saved. Default is None.</p>
+</dd>
+<dt><strong>ids: list</strong></dt>
+<dd><p class="first last">List of cell specimen ids.</p>
+</dd>
+<dt><strong>experiment_container_ids: list</strong></dt>
+<dd><p class="first last">List of experiment container ids.</p>
+</dd>
+<dt><strong>include_failed: bool</strong></dt>
+<dd><p class="first last">Whether to include cells from failed experiment containers</p>
+</dd>
+<dt><strong>simple: boolean</strong></dt>
+<dd><p class="first last">Whether or not to simplify the dictionary properties returned by this method
+to a more concise subset.</p>
+</dd>
+<dt><strong>filters: list of dicts</strong></dt>
+<dd><p class="first last">List of filter dictionaries.  The Allen Brain Observatory web site can 
+generate filters in this format to reproduce a filtered set of cells
+found there.  To see what these look like, visit 
+<a class="reference external" href="http://observatory.brain-map.org/visualcoding">http://observatory.brain-map.org/visualcoding</a>, perform a cell search
+and apply some filters (e.g. find cells in a particular area), then 
+click the “view these cells in the AllenSDK” link on the bottom-left
+of the search results page.  This will take you to a page that contains
+a code sample you can use to apply those same filters via this argument.
+For more detail on the filter syntax, see BrainObservatoryApi.dataframe_query.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>list of dictionaries</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_experiment_containers">
+<code class="descname">get_experiment_containers</code><span class="sig-paren">(</span><em>file_name=None</em>, <em>ids=None</em>, <em>targeted_structures=None</em>, <em>imaging_depths=None</em>, <em>cre_lines=None</em>, <em>transgenic_lines=None</em>, <em>include_failed=False</em>, <em>simple=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.get_experiment_containers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_experiment_containers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a list of experiment containers matching certain criteria.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>file_name: string</strong></dt>
+<dd><p class="first last">File name to save/read the experiment containers.  If file_name is None,
+the file_name will be pulled out of the manifest.  If caching
+is disabled, no file will be saved. Default is None.</p>
+</dd>
+<dt><strong>ids: list</strong></dt>
+<dd><p class="first last">List of experiment container ids.</p>
+</dd>
+<dt><strong>targeted_structures: list</strong></dt>
+<dd><p class="first last">List of structure acronyms.  Must be in the list returned by
+BrainObservatoryCache.get_all_targeted_structures().</p>
+</dd>
+<dt><strong>imaging_depths: list</strong></dt>
+<dd><p class="first last">List of imaging depths.  Must be in the list returned by
+BrainObservatoryCache.get_all_imaging_depths().</p>
+</dd>
+<dt><strong>cre_lines: list</strong></dt>
+<dd><p class="first last">List of cre lines.  Must be in the list returned by
+BrainObservatoryCache.get_all_cre_lines().</p>
+</dd>
+<dt><strong>transgenic_lines: list</strong></dt>
+<dd><p class="first last">List of transgenic lines. Must be in the list returned by
+BrainObservatoryCache.get_all_cre_lines() or.
+BrainObservatoryCache.get_all_reporter_lines().</p>
+</dd>
+<dt><strong>include_failed: boolean</strong></dt>
+<dd><p class="first last">Whether or not to include failed experiment containers.</p>
+</dd>
+<dt><strong>simple: boolean</strong></dt>
+<dd><p class="first last">Whether or not to simplify the dictionary properties returned by this method
+to a more concise subset.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>list of dictionaries</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiment_data">
+<code class="descname">get_ophys_experiment_data</code><span class="sig-paren">(</span><em>ophys_experiment_id</em>, <em>file_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.get_ophys_experiment_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiment_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download the NWB file for an ophys_experiment (if it hasn’t already been
+downloaded) and return a data accessor object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>file_name: string</strong></dt>
+<dd><p class="first last">File name to save/read the data set.  If file_name is None,
+the file_name will be pulled out of the manifest.  If caching
+is disabled, no file will be saved. Default is None.</p>
+</dd>
+<dt><strong>ophys_experiment_id: integer</strong></dt>
+<dd><p class="first last">id of the ophys_experiment to retrieve</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>BrainObservatoryNwbDataSet</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiment_stimuli">
+<code class="descname">get_ophys_experiment_stimuli</code><span class="sig-paren">(</span><em>experiment_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.get_ophys_experiment_stimuli"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiment_stimuli" title="Permalink to this definition">¶</a></dt>
+<dd><p>For a single experiment, return the list of stimuli present in that experiment.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiments">
+<code class="descname">get_ophys_experiments</code><span class="sig-paren">(</span><em>file_name=None</em>, <em>ids=None</em>, <em>experiment_container_ids=None</em>, <em>targeted_structures=None</em>, <em>imaging_depths=None</em>, <em>cre_lines=None</em>, <em>transgenic_lines=None</em>, <em>stimuli=None</em>, <em>session_types=None</em>, <em>cell_specimen_ids=None</em>, <em>include_failed=False</em>, <em>require_eye_tracking=False</em>, <em>simple=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.get_ophys_experiments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a list of ophys experiments matching certain criteria.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>file_name: string</strong></dt>
+<dd><p class="first last">File name to save/read the ophys experiments.  If file_name is None,
+the file_name will be pulled out of the manifest.  If caching
+is disabled, no file will be saved. Default is None.</p>
+</dd>
+<dt><strong>ids: list</strong></dt>
+<dd><p class="first last">List of ophys experiment ids.</p>
+</dd>
+<dt><strong>experiment_container_ids: list</strong></dt>
+<dd><p class="first last">List of experiment container ids.</p>
+</dd>
+<dt><strong>targeted_structures: list</strong></dt>
+<dd><p class="first last">List of structure acronyms.  Must be in the list returned by
+BrainObservatoryCache.get_all_targeted_structures().</p>
+</dd>
+<dt><strong>imaging_depths: list</strong></dt>
+<dd><p class="first last">List of imaging depths.  Must be in the list returned by
+BrainObservatoryCache.get_all_imaging_depths().</p>
+</dd>
+<dt><strong>cre_lines: list</strong></dt>
+<dd><p class="first last">List of cre lines.  Must be in the list returned by
+BrainObservatoryCache.get_all_cre_lines().</p>
+</dd>
+<dt><strong>transgenic_lines: list</strong></dt>
+<dd><p class="first last">List of transgenic lines. Must be in the list returned by
+BrainObservatoryCache.get_all_cre_lines() or.
+BrainObservatoryCache.get_all_reporter_lines().</p>
+</dd>
+<dt><strong>stimuli: list</strong></dt>
+<dd><p class="first last">List of stimulus names.  Must be in the list returned by
+BrainObservatoryCache.get_all_stimuli().</p>
+</dd>
+<dt><strong>session_types: list</strong></dt>
+<dd><p class="first last">List of stimulus session type names.  Must be in the list returned by
+BrainObservatoryCache.get_all_session_types().</p>
+</dd>
+<dt><strong>cell_specimen_ids: list</strong></dt>
+<dd><p class="first last">Only include experiments that contain cells with these ids.</p>
+</dd>
+<dt><strong>include_failed: boolean</strong></dt>
+<dd><p class="first last">Whether or not to include experiments from failed experiment containers.</p>
+</dd>
+<dt><strong>simple: boolean</strong></dt>
+<dd><p class="first last">Whether or not to simplify the dictionary properties returned by this method
+to a more concise subset.</p>
+</dd>
+<dt><strong>require_eye_tracking: boolean</strong></dt>
+<dd><p class="first last">If True, only return experiments that have eye tracking results. Default: False.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>list of dictionaries</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 
 
