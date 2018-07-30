@@ -43,6 +43,7 @@ from six.moves import builtins
 import itertools as it
 import allensdk.core.json_utilities as ju
 import pandas.io.json as pj
+import pandas as pd
 import os
 
 _MOCK_PATH = '/path/to/xyz.txt'
@@ -58,6 +59,12 @@ def cell_id():
     cell_id = 480114344
 
     return cell_id
+
+
+@pytest.fixture
+def cached_csv(tmpdir_factory):
+    csv = str(tmpdir_factory.mktemp("cache_test").join("data.csv"))
+    return csv
 
 
 @pytest.fixture
@@ -435,6 +442,28 @@ def test_get_ephys_features_with_api(read_csv,
     else:
         mkd.assert_called_once_with(_MOCK_PATH)
         assert query_mock.called
+
+
+@pytest.mark.parametrize('df', (False, True))
+def test_get_ephys_features_cache_roundtrip(cached_csv,
+                                            cache_fixture,
+                                            df):
+    ctc = cache_fixture
+
+    mock_data = [{'lorem': 1,
+                  'ipsum': 2 },
+                 {'lorem': 3,
+                  'ipsum': 4 }]
+
+    with patch.object(ctc, "get_cache_path", return_value=cached_csv):
+        with patch('allensdk.api.queries.cell_types_api.CellTypesApi.model_query',
+                MagicMock(name='model query',
+                            return_value=mock_data)) as query_mock:
+            data = ctc.get_ephys_features()
+    pandas_data = pd.read_csv(cached_csv, parse_dates=True)
+
+    assert len(data) == 2
+    assert sorted(data[0].keys()) == sorted(pandas_data.columns)
 
 
 @pytest.mark.parametrize('path_exists,df',
