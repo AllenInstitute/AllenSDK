@@ -145,11 +145,11 @@ def test_all(ju_read_url_get, rma):
                          (Cache.cache_csv,
                           Cache.cache_csv_json,
                           Cache.cache_csv_dataframe))
-@patch.object(pd.DataFrame, "from_csv", return_value=_csv_msg)
+@patch("pandas.read_csv", return_value=_csv_msg)
 @patch("allensdk.core.json_utilities.read_url_get",
        side_effect=_read_url_get_msg5)
 @patch("os.makedirs")
-def test_cacheable_pageable_csv(os_makedirs, ju_read_url_get, from_csv,
+def test_cacheable_pageable_csv(os_makedirs, ju_read_url_get, read_csv,
                                 cache_style):
     archive_templates = \
         {"cam_cell_queries": [
@@ -193,7 +193,7 @@ def test_cacheable_pageable_csv(os_makedirs, ju_read_url_get, from_csv,
                          [0, 1, 2, 3, 4, 5])
 
     assert ju_read_url_get.call_args_list == list(expected_calls)
-    from_csv.assert_called_once_with('/path/to/cam_cell_metrics.csv')
+    read_csv.assert_called_once_with('/path/to/cam_cell_metrics.csv', parse_dates=True)
 
     assert csv_writerow.call_args_list == [call({'whatever': 'whatever'}),
                                            call({'whatever': True}),

@@ -410,8 +410,8 @@ def test_get_ephys_features(cache_fixture,
                          it.product((False,True),
                                     (False,True)))
 @patch.object(DataFrame, "to_csv")
-@patch.object(DataFrame, "from_csv")
-def test_get_ephys_features_with_api(from_csv,
+@patch("pandas.read_csv")
+def test_get_ephys_features_with_api(read_csv,
                                      to_csv,
                                      cache_fixture,
                                      df,
@@ -435,7 +435,7 @@ def test_get_ephys_features_with_api(from_csv,
                         _ = ctc.get_ephys_features(dataframe=df)
 
     if path_exists:
-        from_csv.assert_called_once_with(_MOCK_PATH)
+        read_csv.assert_called_once_with(_MOCK_PATH, parse_dates=True)
     else:
         mkd.assert_called_once_with(_MOCK_PATH)
         assert query_mock.called
@@ -445,10 +445,10 @@ def test_get_ephys_features_with_api(from_csv,
                          it.product((False, True),
                                     (False, True)))
 @patch.object(DataFrame, "to_csv")
-@patch.object(DataFrame, "from_csv",
+@patch("pandas.read_csv",
               return_value=DataFrame([{ 'stuff': 'whatever'},
                                       { 'stuff': 'nonsense'}]))
-def test_get_morphology_features(from_csv,
+def test_get_morphology_features(read_csv,
                                  to_csv,
                                  cache_fixture,
                                  path_exists,
@@ -467,8 +467,7 @@ def test_get_morphology_features(from_csv,
                     with patch('allensdk.api.queries.cell_types_api.CellTypesApi.model_query',
                             MagicMock(name='model query',
                                         return_value=json_data)) as query_mock:
-                        data = ctc.get_morphology_features(df,
-                                                        _MOCK_PATH)
+                        data = ctc.get_morphology_features(df, _MOCK_PATH)
 
     if df:
         assert ('stuff' in data) == True
@@ -478,7 +477,7 @@ def test_get_morphology_features(from_csv,
     
     if path_exists:
         if df:
-            from_csv.assert_called_once_with(_MOCK_PATH)
+            read_csv.assert_called_once_with(_MOCK_PATH, parse_dates=True)
         else:
             assert True
         assert not mkd.called
@@ -546,10 +545,10 @@ def test_get_ephys_sweeps_with_api(cache_fixture,
                                     (False, True)))
 @patch('pandas.DataFrame.merge')
 @patch.object(DataFrame, "to_csv")
-@patch.object(DataFrame, "from_csv",
+@patch("pandas.read_csv",
               return_value=DataFrame([{ 'stuff': 'whatever'},
                                       { 'stuff': 'nonsense'}]))
-def test_get_all_features(from_csv,
+def test_get_all_features(read_csv,
                           to_csv,
                           mock_merge,
                           cache_fixture,
@@ -577,7 +576,7 @@ def test_get_all_features(from_csv,
                                         require_reconstruction=require_reconstruction)
 
     if path_exists:
-        assert from_csv.called
+        assert read_csv.called
     else:
         assert query_mock.called
     
