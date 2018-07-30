@@ -58,9 +58,9 @@ def pager():
 
 _msg = [{'whatever': True}]
 _pd_msg = pd.DataFrame(_msg)
-_csv_msg = pd.DataFrame.from_csv(StringIO.StringIO(""",whatever
+_csv_msg = pd.read_csv(StringIO.StringIO(""",whatever
 0,True
-"""))
+"""), index_col=0)
 
 _read_url_get_msg5 = [{'msg': _msg},
                       {'msg': _msg},

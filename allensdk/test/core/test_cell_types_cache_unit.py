@@ -64,7 +64,7 @@ def cell_id():
 def cache_fixture(tmpdir_factory):
     # Instantiate the CellTypesCache instance.  The manifest_file argument
     # tells it where to store the manifest, which is a JSON file that tracks
-    # file paths.  If you supply a relative path (like this), it will go
+    # file paths.  If you supply a relative path, it will go
     # into your current working directory
     manifest_file = str(tmpdir_factory.mktemp("ctc").join("manifest.json"))
     ctc = CTC.CellTypesCache(manifest_file=manifest_file)
@@ -250,9 +250,7 @@ def test_get_reconstruction(cache_fixture,
 @pytest.mark.parametrize('path_exists',
                          (False, True))
 @patch.object(DataFrame, "to_csv")
-@patch.object(DataFrame, "from_csv")
-def test_get_reconstruction_with_api(from_csv,
-                                     to_csv,
+def test_get_reconstruction_with_api(to_csv,
                                      cache_fixture,
                                      cell_id,
                                      path_exists):
@@ -279,9 +277,7 @@ def test_get_reconstruction_with_api(from_csv,
 
 
 @patch.object(DataFrame, "to_csv")
-@patch.object(DataFrame, "from_csv")
-def test_get_reconstruction_exception(from_csv,
-                                      to_csv,
+def test_get_reconstruction_exception(to_csv,
                                       cache_fixture,
                                       cell_id):
     ctc = cache_fixture

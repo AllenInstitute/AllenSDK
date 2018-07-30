@@ -50,9 +50,9 @@ import os
 
 _msg = [{'whatever': True}]
 _pd_msg = pd.DataFrame(_msg)
-_csv_msg = pd.DataFrame.from_csv(StringIO.StringIO(""",whatever
+_csv_msg = pd.read_csv(StringIO.StringIO(""",whatever
 0,True
-"""))
+"""), index_col=0)
 
 
 @patch("allensdk.core.json_utilities.write")
@@ -90,8 +90,8 @@ def test_cacheable_csv_dataframe(read_csv, dictwriter, ju_read_url_get,
 @patch("allensdk.core.json_utilities.read", return_value=_msg)
 @patch("allensdk.core.json_utilities.read_url_get", return_value={'msg': _msg})
 @patch.object(Manifest, 'safe_mkdir')
-@patch.object(pd.DataFrame, 'from_csv', return_value=_csv_msg)
-def test_cacheable_json(from_csv, mkdir, ju_read_url_get, ju_read, ju_write):
+@patch('pandas.read_csv', return_value=_csv_msg)
+def test_cacheable_json(read_csv, mkdir, ju_read_url_get, ju_read, ju_write):
     @cacheable()
     def get_hemispheres():
         return RmaApi().model_query(model='Hemisphere')
@@ -104,7 +104,7 @@ def test_cacheable_json(from_csv, mkdir, ju_read_url_get, ju_read, ju_write):
 
     ju_read_url_get.assert_called_once_with(
         'http://api.brain-map.org/api/v2/data/query.json?q=model::Hemisphere')
-    assert not from_csv.called, 'from_csv should not have been called'
+    assert not read_csv.called, 'read_csv should not have been called'
     ju_write.assert_called_once_with('/xyz/abc/example.json',
                                                       _msg)
     ju_read.assert_called_once_with('/xyz/abc/example.json')
@@ -219,9 +219,9 @@ def test_cacheable_csv_json(mkdir, dictwriter, ju_read_url_get, ju_read,
 @patch("allensdk.core.json_utilities.write")
 @patch("allensdk.core.json_utilities.read", return_value=_msg)
 @patch("allensdk.core.json_utilities.read_url_get", return_value={'msg': _msg})
-@patch.object(pd.DataFrame, "from_csv")
+@patch("pandas.read_csv")
 @patch.object(pd.DataFrame, "to_csv")
-def test_cacheable_no_save(to_csv, from_csv, ju_read_url_get, ju_read,
+def test_cacheable_no_save(to_csv, read_csv, ju_read_url_get, ju_read,
                            ju_write):
     @cacheable()
     def get_hemispheres():
@@ -234,7 +234,7 @@ def test_cacheable_no_save(to_csv, from_csv, ju_read_url_get, ju_read,
     ju_read_url_get.assert_called_once_with(
         'http://api.brain-map.org/api/v2/data/query.json?q=model::Hemisphere')
     assert not to_csv.called, 'to_csv should not have been called'
-    assert not from_csv.called, 'from_csv should not have been called'
+    assert not read_csv.called, 'read_csv should not have been called'
     assert not ju_write.called, 'json write should not have been called'
     assert not ju_read.called, 'json read should not have been called'
 
@@ -242,9 +242,9 @@ def test_cacheable_no_save(to_csv, from_csv, ju_read_url_get, ju_read,
 @patch("allensdk.core.json_utilities.write")
 @patch("allensdk.core.json_utilities.read", return_value=_msg)
 @patch("allensdk.core.json_utilities.read_url_get", return_value={'msg': _msg})
-@patch.object(pd.DataFrame, "from_csv", return_value=_csv_msg)
+@patch("pandas.read_csv", return_value=_csv_msg)
 @patch.object(pd.DataFrame, "to_csv")
-def test_cacheable_no_save_dataframe(to_csv, from_csv, ju_read_url_get,
+def test_cacheable_no_save_dataframe(to_csv, read_csv, ju_read_url_get,
                                      ju_read, ju_write):
     @cacheable()
     def get_hemispheres():
@@ -257,7 +257,7 @@ def test_cacheable_no_save_dataframe(to_csv, from_csv, ju_read_url_get,
     ju_read_url_get.assert_called_once_with(
         'http://api.brain-map.org/api/v2/data/query.json?q=model::Hemisphere')
     assert not to_csv.called, 'to_csv should not have been called'
-    assert not from_csv.called, 'from_csv should not have been called'
+    assert not read_csv.called, 'read_csv should not have been called'
     assert not ju_write.called, 'json write should not have been called'
     assert not ju_read.called, 'json read should not have been called'
 
