@@ -1,2 +1,3 @@
 ignore:
   - allensdk/test/
+threshold: 0.01
