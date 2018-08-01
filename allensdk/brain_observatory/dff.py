@@ -248,7 +248,6 @@ def compute_dff_windowed_mode(traces,
 def compute_dff_windowed_median(traces,
                                 median_kernel_long=5401,
                                 median_kernel_short=101,
-                                scale_to_noise_std=None,
                                 noise_stds=None,
                                 n_small_baseline_frames=None,
                                 **kwargs):
@@ -272,9 +271,6 @@ def compute_dff_windowed_median(traces,
         Window size to use for long timescale median detrending.
     median_kernel_short : int
         Window size to use for short timescale median detrending.
-    scale_to_noise_std : float
-        If provided, rescale T_dff1 so noise_std(T_dff1) = 
-        scale_to_noise_std.
     noise_stds : list
         List that will contain noise_std(T_dff1) for each trace. The
         value for each trace will be appended to the list if provided.
@@ -309,10 +305,6 @@ def compute_dff_windowed_median(traces,
         sigma_dff = noise_std(dff, **kwargs)
         if noise_stds is not None:
             noise_stds.append(sigma_dff)
-
-        if scale_to_noise_std is not None:
-            dff *= (scale_to_noise_std / sigma_dff)
-            sigma_dff = scale_to_noise_std
 
         # short timescale detrending
         tf = median_filter(dff, median_kernel_short, mode='constant')
