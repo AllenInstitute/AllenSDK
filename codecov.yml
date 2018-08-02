@@ -1,3 +1,7 @@
 ignore:
   - allensdk/test/
-threshold: 0.01
+coverage:
+  status:
+    project:
+      default:
+        threshold: 0.1
