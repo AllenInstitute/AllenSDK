@@ -37,25 +37,30 @@ import logging
 import os
 import argparse
 import matplotlib.pyplot as plt
+import warnings
 import h5py
 import numpy as np
+from functools import partial
+from scipy.ndimage.filters import median_filter
 
 from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
 
+GAUSSIAN_MAD_STD_SCALE = 1.4826
+
 
 def movingmode_fast(x, kernelsize, y):
-    """ Compute the windowed mode of an array.  A running mode is initialized
+    """Compute the windowed mode of an array.  A running mode is initialized
     with a histogram of values over the initial kernelsize/2 values.  The mode
     is then updated as the kernel moves by adding and subtracting values from
     the histogram.
 
     Parameters
     ----------
-    x: np.ndarray
+    x : np.ndarray
         Array to be analyzed
-    kernelsize: int
+    kernelsize : int
         Size of the moving window
-    y: np.ndarray
+    y : np.ndarray
         Output array to store the results
     """
 
@@ -120,19 +125,19 @@ def movingmode_fast(x, kernelsize, y):
 
 
 def movingaverage(x, kernelsize, y):
-    """ Compute the windowed average of an array.
+    """Compute the windowed average of an array.
 
     Parameters
     ----------
-    x: np.ndarray
+    x : np.ndarray
         Array to be analyzed
-    kernelsize: int
+    kernelsize : int
         Size of the moving window
-    y: np.ndarray
+    y : np.ndarray
         Output array to store the results
     """
 
-    halfsize = int( kernelsize / 2 )
+    halfsize = int(kernelsize / 2)
     sumkernel = np.sum(x[0:halfsize])
     for m in range(0, halfsize):
         sumkernel = sumkernel + x[m + halfsize]
@@ -151,7 +156,7 @@ def movingaverage(x, kernelsize, y):
 
 
 def plot_onetrace(dff, fc):
-    """ Debug plotting function """
+    """Debug plotting function"""
     qs = np.rint(np.linspace(0, len(dff), 5)).astype(int)
 
     dff_max = dff.max()
@@ -179,8 +184,222 @@ def plot_onetrace(dff, fc):
     return 0
 
 
-def compute_dff(traces, save_plot_dir=None, mode_kernelsize=5400, mean_kernelsize=3000):
-    """ Compute dF/F of a set of traces using a low-pass windowed-mode operator.
+def compute_dff_windowed_mode(traces,
+                              mode_kernelsize=5400,
+                              mean_kernelsize=3000):
+    """Compute dF/F of a set of traces using a low-pass windowed-mode operator.
+
+    The operation is basically:
+
+        T_mm = windowed_mean(windowed_mode(T))
+
+        T_dff = (T - T_mm) / T_mm
+
+    Parameters
+    ----------
+    traces : np.ndarray
+       2D array of traces to be analyzed.
+    mode_kernelsize : int
+        Window size to use for windowed_mode.
+    mean_kernelsize : int
+        Window size to use for windowed_mean.
+
+    Returns
+    -------
+    dff : np.ndarray
+        2D array of dF/F traces.
+    """
+    if mode_kernelsize >= traces.shape[1]:
+        mode_kernelsize = traces.shape[1] // 2
+        logging.warning("Changing mode_kernelsize to " + str(mode_kernelsize))
+
+    if mean_kernelsize >= traces.shape[1]:
+        mean_kernelsize = traces.shape[1] // 4
+        logging.warning("Changing mean_kernelsize to " + str(mean_kernelsize))
+
+    if mode_kernelsize == 0 or mean_kernelsize == 0:
+        raise ValueError("Kernel length is 0!")
+
+    logging.debug("trace matrix shape: %d %d" %
+                  (traces.shape[0], traces.shape[1]))
+
+    modeline = np.zeros(traces.shape[1])
+    modelineLP = np.zeros(traces.shape[1])
+    dff = np.zeros((traces.shape[0], traces.shape[1]))
+
+    logging.debug("computing df/f")
+
+    for n in range(0, traces.shape[0]):
+        if np.any(np.isnan(traces[n])):
+            logging.warning(
+                "trace for roi %d contains NaNs, setting to NaN", n)
+            dff[n, :] = np.nan
+            continue
+
+        movingmode_fast(traces[n, :], mode_kernelsize, modeline[:])
+        movingaverage(modeline[:], mean_kernelsize, modelineLP[:])
+        dff[n, :] = (traces[n, :] - modelineLP[:]) / modelineLP[:]
+
+        logging.debug("finished trace %d/%d" % (n + 1, traces.shape[0]))
+
+    return dff
+
+
+def compute_dff_windowed_median(traces,
+                                median_kernel_long=5401,
+                                median_kernel_short=101,
+                                noise_stds=None,
+                                n_small_baseline_frames=None,
+                                **kwargs):
+    """Compute dF/F of a set of traces with median filter detrending.
+
+    The operation is basically:
+
+        T_long = windowed_median(T) # long timescale kernel
+
+        T_dff1 = (T - T_long) / elementwise_max(T_long, noise_std(T))
+
+        T_short = windowed_median(T_dff1) # short timescale kernel
+
+        T_dff = T_dff1 - elementwise_min(T_short, 2.5*noise_std(T_dff1))
+
+    Parameters
+    ----------
+    traces : np.ndarray
+       2D array of traces to be analyzed.
+    median_kernel_long : int
+        Window size to use for long timescale median detrending.
+    median_kernel_short : int
+        Window size to use for short timescale median detrending.
+    noise_stds : list
+        List that will contain noise_std(T_dff1) for each trace. The
+        value for each trace will be appended to the list if provided.
+    n_small_baseline_frames : list
+        List that will contain the number of frames for each trace where
+        the long-timescale median window is less than noise_std(T). The
+        value for each trace will be appended to the list if provided.
+    kwargs:
+        Additional keyword arguments are passed to :func:`noise_std` .
+
+    Returns
+    -------
+    dff : np.ndarray
+        2D array of dF/F traces.
+    """
+    _check_kernel(median_kernel_long, traces.shape[1])
+    _check_kernel(median_kernel_short, traces.shape[1])
+
+    dff_traces = np.copy(traces)
+
+    for dff in dff_traces:
+        sigma_f = noise_std(dff, **kwargs)
+
+        # long timescale median filter for baseline subtraction
+        tf = median_filter(dff, median_kernel_long, mode='constant')
+        dff -= tf
+        dff /= np.maximum(tf, sigma_f)
+
+        if n_small_baseline_frames is not None:
+            n_small_baseline_frames.append(np.sum(tf <= sigma_f))
+
+        sigma_dff = noise_std(dff, **kwargs)
+        if noise_stds is not None:
+            noise_stds.append(sigma_dff)
+
+        # short timescale detrending
+        tf = median_filter(dff, median_kernel_short, mode='constant')
+        tf = np.minimum(tf, 2.5*sigma_dff)
+        dff -= tf
+
+    return dff_traces
+
+
+def _check_kernel(kernel_size, data_size):
+    if kernel_size % 2 == 0 or kernel_size <= 0 or kernel_size >= data_size:
+        raise ValueError("Invalid kernel length {} for data length {}. Kernel "
+                         "length must be positive and odd, and less than data "
+                         "length.".format(kernel_size, data_size))
+
+
+def noise_std(x, noise_kernel_length=31, positive_peak_scale=1.5,
+              outlier_std_scale=2.5):
+    """Robust estimate of the standard deviation of the trace noise."""
+    _check_kernel(noise_kernel_length, len(x))
+    if any(np.isnan(x)):
+        return np.NaN
+    x = x - median_filter(x, noise_kernel_length, mode='constant')
+    # first pass removing big pos peak outliers
+    x = x[x < positive_peak_scale*np.abs(x.min())]
+    rstd = robust_std(x)
+    # second pass removing remaining pos and neg peak outliers
+    x = x[abs(x) < outlier_std_scale*rstd]
+    return robust_std(x)
+
+
+def robust_std(x):
+    """Robust estimate of standard deviation.
+
+    Estimate of the standard deviation using the median absolute
+    deviation of x.
+    """
+    median_absolute_deviation = np.median(np.abs(x - np.median(x)))
+    return GAUSSIAN_MAD_STD_SCALE*median_absolute_deviation
+
+
+def calculate_dff(traces, dff_computation_cb=None, save_plot_dir=None):
+    """Apply dF/F computation to a set of traces.
+
+    The default computation method is :func:`compute_dff_windowed_median`
+    using default window parameters.
+
+    Parameters
+    ----------
+    traces : np.ndarray
+        2D array of traces to be analyzed.
+    dff_computation_cb : function
+        Function that takes traces as an argument and returns an array
+        of the same shape that is the calculated dF/F.
+    save_plot_dir : str
+        Directory to save dF/F plots to. By default no plots are saved.
+
+    Returns
+    -------
+    dff : np.ndarray
+        2D array of dF/F traces.
+    """
+    if dff_computation_cb is None:
+        dff_computation_cb = compute_dff_windowed_median
+
+    dff = dff_computation_cb(traces)
+
+    if save_plot_dir is not None:
+        if not os.path.exists(save_plot_dir):
+            os.makedirs(save_plot_dir)
+
+        for n in range(0, traces.shape[0]):
+            if np.any(np.isnan(traces[n])):
+                continue
+
+            fig = plt.figure(figsize=(150, 40))
+            plot_onetrace(dff[n, :], traces[n, :])
+
+            plt.title('ROI ' + str(n) + ' ', fontsize=18)
+            fig.savefig(os.path.join(save_plot_dir, 'dff_%d.png' %
+                                     n), orientation='landscape')
+            plt.close(fig)
+
+    return dff
+
+
+def compute_dff(traces,
+                save_plot_dir=None,
+                mode_kernelsize=5400,
+                mean_kernelsize=3000):
+    """Compute dF/F of a set of traces using a low-pass windowed-mode operator.
+
+    This method is deprecated. Use :func:`calculate_dff` with
+    dff_computation_cb = :func:`compute_dff_windowed_mode` .
+
     The operation is basically:
 
         T_mm = windowed_mean(windowed_mode(T))
@@ -196,52 +415,14 @@ def compute_dff(traces, save_plot_dir=None, mode_kernelsize=5400, mean_kernelsiz
     -------
     np.ndarray with the same shape as the input array.
     """
-
-    if mode_kernelsize >= traces.shape[1]:
-        mode_kernelsize = traces.shape[1]//2 # make mode_kernelsize smaller than lenght of trace
-        logging.warning("Changing mode_kernelsize to " + str(mode_kernelsize))
-
-    if mean_kernelsize >= traces.shape[1]:
-        mean_kernelsize = traces.shape[1]//4 # make mean_kernelsize smaller than lenght of trace
-        logging.warning("Changing mean_kernelsize to " + str(mean_kernelsize))
-
-    if mode_kernelsize == 0 or mean_kernelsize == 0:
-        raise Exception("Kernel length is 0!")
-
-    if save_plot_dir is not None and not os.path.exists(save_plot_dir):
-        os.makedirs(save_plot_dir)
-
-    logging.debug("trace matrix shape: %d %d" %
-                  (traces.shape[0], traces.shape[1]))
-
-    modeline = np.zeros(traces.shape[1])
-    modelineLP = np.zeros(traces.shape[1])
-    dff = np.zeros((traces.shape[0], traces.shape[1]))
-
-    logging.debug("computing df/f")
-
-    for n in range(0, traces.shape[0]):
-        if np.any(np.isnan(traces[n])):
-            logging.warning("trace for roi %d contains NaNs, setting to NaN", n)
-            dff[n,:] = np.nan
-            continue
-
-        movingmode_fast(traces[n, :], mode_kernelsize, modeline[:])
-        movingaverage(modeline[:], mean_kernelsize, modelineLP[:])
-        dff[n, :] = (traces[n, :] - modelineLP[:]) / modelineLP[:]
-
-        logging.debug("finished trace %d/%d" % (n + 1, traces.shape[0]))
-
-        if save_plot_dir:
-            fig = plt.figure(figsize=(150, 40))
-            plot_onetrace(dff[n, :], traces[n, :])
-
-            plt.title('ROI ' + str(n) + ' ', fontsize=18)
-            fig.savefig(os.path.join(save_plot_dir, 'dff_%d.png' %
-                                     n), orientation='landscape')
-            plt.close(fig)
-
-    return dff
+    warnings.warn(
+        FutureWarning("The default computation for dff has been changed. Use"
+                      " `calculate_dff` to compute dff now."))
+    computation_cb = partial(compute_dff_windowed_mode,
+                             mode_kernelsize=mode_kernelsize,
+                             mean_kernelsize=mean_kernelsize)
+    return calculate_dff(traces, dff_computation_cb=computation_cb,
+                         save_plot_dir=save_plot_dir)
 
 
 def main():
@@ -264,12 +445,13 @@ def main():
         traces = input_h5["data"].value
         input_h5.close()
 
-    dff = compute_dff(traces, args.plot_dir)
+    dff = calculate_dff(traces, save_plot_dir=args.plot_dir)
 
     # write to "data"
     output_h5 = h5py.File(args.output_h5, "w")
     output_h5["data"] = dff
     output_h5.close()
+
 
 if __name__ == "__main__":
     main()
