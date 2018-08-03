@@ -42,6 +42,7 @@ from allensdk.core.brain_observatory_cache import (BrainObservatoryCache,
                                                    _find_specimen_cre_line,
                                                    _find_specimen_reporter_line)
 from allensdk.api.queries.brain_observatory_api import BrainObservatoryApi
+import json
 
 try:
     import __builtin__ as builtins  # @UnresolvedImport
@@ -93,7 +94,7 @@ CACHE_MANIFEST = """
 
 
 @pytest.fixture
-def brain_observatory_cache(md_temp_dir):
+def brain_observatory_cache():
     boc = None
 
     try:
@@ -106,8 +107,7 @@ def brain_observatory_cache(md_temp_dir):
         with patch(builtins.__name__ + ".open",
                    mock_open(read_data=manifest_data)):
             # Download a list of all targeted areas
-            manifest_file = os.path.join(md_temp_dir, "boc", "manifest.json")
-            boc = BrainObservatoryCache(manifest_file=manifest_file,
+            boc = BrainObservatoryCache(manifest_file="some_path/manifest.json",
                                         base_uri='http://api.brain-map.org')
 
     return boc
@@ -254,27 +254,22 @@ def test_get_cell_specimens(mock_json_msg_query,
         "http://api.brain-map.org/api/v2/data/query.json?q=")
 
 
-def test_build_manifest():
+def test_build_manifest(tmpdir_factory):
     try:
         manifest_data = bytes(CACHE_MANIFEST, 'UTF-8')  # Python 3
     except:
         manifest_data = bytes(CACHE_MANIFEST)  # Python 2.7
 
-    with patch('os.path.exists') as m:
-        m.return_value = False
+    manifest_file = str(tmpdir_factory.mktemp("boc").join("manifest.json"))
+    with patch('allensdk.config.manifest_builder.ManifestBuilder.write_json_string') as mock_write_json_string:
+        mock_write_json_string.return_value = manifest_data
 
-        with patch('allensdk.config.manifest.Manifest.safe_mkdir') as mkdir:
-            with patch('allensdk.config.manifest_builder.'
-                       'ManifestBuilder.write_json_file',
-                       MagicMock(name='write_json_file')) as mock_write_json:
-                with patch(builtins.__name__ + ".open",
-                           mock_open(read_data=manifest_data)):
-                    brain_observatory_cache = BrainObservatoryCache(
-                        manifest_file='boc/manifest.json',
-                        base_uri='http://api.brain-map.org')
-                    mkdir.assert_called_once_with('boc')
-                    mock_write_json.assert_called_once_with(
-                        'boc/manifest.json')
+        brain_observatory_cache = BrainObservatoryCache(manifest_file=manifest_file)
+        with open(manifest_file, 'rb') as f:
+            read_manifest_data = f.read()
+
+        assert manifest_data == read_manifest_data
+        
 
 
 def test_string_argument_errors(brain_observatory_cache):

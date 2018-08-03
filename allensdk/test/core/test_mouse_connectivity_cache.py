@@ -47,9 +47,9 @@ from allensdk.core.structure_tree import StructureTree
 
 
 @pytest.fixture(scope='function')
-def mcc(fn_temp_dir):
-    manifest_path = os.path.join(fn_temp_dir, 'manifest.json')
-    return MouseConnectivityCache(manifest_file=manifest_path)
+def mcc(tmpdir_factory):
+    manifest_file = tmpdir_factory.mktemp("mcc").join('manifest.json')
+    return MouseConnectivityCache(manifest_file=str(manifest_file))
 
 
 @pytest.fixture(scope='function')
@@ -111,16 +111,15 @@ def top_injection_unionizes():
                          {'experiment_id': 1, 'is_injection': False, 'hemisphere_id': 2, 'structure_id': 11, 'normalized_projection_volume': 0.001}])
 
 
-def test_init(mcc, fn_temp_dir):
-
-    manifest_path = os.path.join(fn_temp_dir, 'manifest.json')
-    assert( os.path.exists(manifest_path) )
+def test_init(mcc):
+    assert( os.path.exists(mcc.manifest_path) )
 
 
-def test_get_annotation_volume(mcc, fn_temp_dir):
+def test_get_annotation_volume(mcc):
 
     eye = np.eye(100)
-    path = os.path.join(fn_temp_dir, 'annotation', 'ccf_2017', 
+    path = os.path.join(os.path.dirname(mcc.manifest_path), 
+                        'annotation', 'ccf_2017', 
                         'annotation_25.nrrd')
  
     with mock.patch.object(mcc.api, "retrieve_file_over_http",
@@ -135,9 +134,10 @@ def test_get_annotation_volume(mcc, fn_temp_dir):
     assert( os.path.exists(path) )
 
 
-def test_get_template_volume(mcc, fn_temp_dir):
+def test_get_template_volume(mcc):
     eye = np.eye(100)
-    path = os.path.join(fn_temp_dir, 'average_template_25.nrrd')
+    path = os.path.join(os.path.dirname(mcc.manifest_path), 
+                        'average_template_25.nrrd')
 
     with mock.patch.object(mcc.api, "retrieve_file_over_http",
                            new=lambda a, b: nrrd.write(b, eye)):
@@ -151,11 +151,12 @@ def test_get_template_volume(mcc, fn_temp_dir):
     assert( os.path.exists(path) )
 
 
-def test_get_projection_density(mcc, fn_temp_dir):
+def test_get_projection_density(mcc):
 
     eye = np.eye(100)
     eid = 123456789
-    path = os.path.join(fn_temp_dir, 'experiment_{0}'.format(eid), 
+    path = os.path.join(os.path.dirname(mcc.manifest_path),
+                        'experiment_{0}'.format(eid), 
                         'projection_density_25.nrrd')
 
     with mock.patch('allensdk.api.queries.grid_data_api.GridDataApi.'
@@ -171,11 +172,12 @@ def test_get_projection_density(mcc, fn_temp_dir):
     assert( os.path.exists(path) )
 
 
-def test_get_injection_density(mcc, fn_temp_dir):
+def test_get_injection_density(mcc):
 
     eye = np.eye(100)
     eid = 123456789
-    path = os.path.join(fn_temp_dir, 'experiment_{0}'.format(eid), 
+    path = os.path.join(os.path.dirname(mcc.manifest_path), 
+                        'experiment_{0}'.format(eid), 
                         'injection_density_25.nrrd')
 
     with mock.patch('allensdk.api.queries.grid_data_api.GridDataApi.'
@@ -191,11 +193,12 @@ def test_get_injection_density(mcc, fn_temp_dir):
     assert( os.path.exists(path) )
 
 
-def test_get_injection_fraction(mcc, fn_temp_dir):
+def test_get_injection_fraction(mcc):
 
     eye = np.eye(100)
     eid = 123456789
-    path = os.path.join(fn_temp_dir, 'experiment_{0}'.format(eid), 
+    path = os.path.join(os.path.dirname(mcc.manifest_path),
+                        'experiment_{0}'.format(eid), 
                         'injection_fraction_25.nrrd')
 
     with mock.patch('allensdk.api.queries.grid_data_api.GridDataApi.'
@@ -211,11 +214,12 @@ def test_get_injection_fraction(mcc, fn_temp_dir):
     assert( os.path.exists(path) )
 
 
-def test_get_data_mask(mcc, fn_temp_dir):
+def test_get_data_mask(mcc):
 
     eye = np.eye(100)
     eid = 123456789
-    path = os.path.join(fn_temp_dir, 'experiment_{0}'.format(eid), 
+    path = os.path.join(os.path.dirname(mcc.manifest_path), 
+                        'experiment_{0}'.format(eid), 
                         'data_mask_25.nrrd')
 
     with mock.patch('allensdk.api.queries.grid_data_api.GridDataApi.'
@@ -231,9 +235,10 @@ def test_get_data_mask(mcc, fn_temp_dir):
     assert( os.path.exists(path) )
 
 
-def test_get_structure_tree(mcc, fn_temp_dir, new_nodes):
+def test_get_structure_tree(mcc, new_nodes):
 
-    path = os.path.join(fn_temp_dir, 'structures.json')
+    path = os.path.join(os.path.dirname(mcc.manifest_path), 
+                        'structures.json')
 
     with mock.patch('allensdk.api.queries.ontologies_api.'
                     'OntologiesApi.model_query', 
@@ -252,9 +257,9 @@ def test_get_structure_tree(mcc, fn_temp_dir, new_nodes):
     assert( os.path.exists(path) )
 
 
-def test_get_experiments(mcc, fn_temp_dir, experiments):
+def test_get_experiments(mcc, experiments):
 
-    file_path = os.path.join(fn_temp_dir, 'experiments.json')
+    file_path = os.path.join(os.path.dirname(mcc.manifest_path), 'experiments.json')
 
     def new_fn(*args, **kwargs): return experiments
     
@@ -274,7 +279,7 @@ def test_get_experiments(mcc, fn_temp_dir, experiments):
     assert len(obtained) == 1
 
 
-def test_filter_experiments(mcc, fn_temp_dir, experiments):
+def test_filter_experiments(mcc, experiments):
 
     pass_line = mcc.filter_experiments(experiments, cre=True)
     fail_line = mcc.filter_experiments(experiments, cre=False)
@@ -287,9 +292,10 @@ def test_filter_experiments(mcc, fn_temp_dir, experiments):
 
     assert len(sid_line) == 1
 
-def test_rank_structures(mcc, top_injection_unionizes, fn_temp_dir):
+def test_rank_structures(mcc, top_injection_unionizes):
 
-    path = os.path.join(fn_temp_dir, 'experiment_{0}'.format(1), 
+    path = os.path.join(os.path.dirname(mcc.manifest_path), 
+                        'experiment_{0}'.format(1), 
                         'structure_unionizes.csv')
 
     with mock.patch.object(mcc.api, "model_query",
@@ -304,9 +310,10 @@ def test_rank_structures(mcc, top_injection_unionizes, fn_temp_dir):
     assert(st['normalized_projection_volume'] == 0.25)
 
 
-def test_default_structure_ids(mcc, fn_temp_dir, new_nodes):
+def test_default_structure_ids(mcc, new_nodes):
 
-    path = os.path.join(fn_temp_dir, 'structures.json')
+    path = os.path.join(os.path.dirname(mcc.manifest_path), 
+                        'structures.json')
 
     with mock.patch('allensdk.api.queries.ontologies_api.'
                     'OntologiesApi.model_query', 
@@ -317,10 +324,11 @@ def test_default_structure_ids(mcc, fn_temp_dir, new_nodes):
         assert(default_structure_ids[0] == 0)
 
 
-def test_get_experiment_structure_unionizes(mcc, fn_temp_dir, unionizes):
+def test_get_experiment_structure_unionizes(mcc, unionizes):
 
     eid = 166218353
-    path = os.path.join(fn_temp_dir, 'experiment_{0}'.format(eid), 
+    path = os.path.join(os.path.dirname(mcc.manifest_path), 
+                        'experiment_{0}'.format(eid), 
                         'structure_unionizes.csv')
 
     with mock.patch.object(mcc.api, "model_query",
@@ -397,12 +405,13 @@ def test_get_reference_space(mcc, new_nodes):
     assert( np.allclose( rsp_obt.annotation, annot ) )
 
 
-def test_get_structure_mask(mcc, fn_temp_dir):
+def test_get_structure_mask(mcc):
   
     sid = 12
 
     eye = np.eye(100)
-    path = os.path.join(fn_temp_dir, 'annotation', 'ccf_2017', 'structure_masks', 
+    path = os.path.join(os.path.dirname(mcc.manifest_path), 
+                        'annotation', 'ccf_2017', 'structure_masks', 
                         'resolution_25', 'structure_{0}.nrrd'.format(sid))
 
     with mock.patch.object(mcc.api, "retrieve_file_over_http",

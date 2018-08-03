@@ -179,16 +179,17 @@ def brain_observatory_cache(fn_temp_dir):
 
 
 @pytest.fixture(scope="module")
-def cell_specimen_table(md_temp_dir):
+def cell_specimen_table(tmpdir_factory):
     # download a zipped version of the cell specimen table for filter tests
     # as it is orders of magnitude faster
     api = BrainObservatoryApi()
-    zipped = os.path.join(md_temp_dir, "cell_specimens.zip")
+    data_dir = str(tmpdir_factory.mktemp("data"))
+    zipped = os.path.join("cell_specimens.zip")
     api.retrieve_file_over_http(CELL_SPECIMEN_ZIP_URL, zipped)
     df = pd.read_csv(ZipFile(zipped).open("cell_metrics.csv"),
                      true_values="t", false_values="f")
     js = json.loads(df.to_json(orient="records"))
-    table_file = os.path.join(md_temp_dir, "cell_specimens.json")
+    table_file = os.path.join(data_dir, "cell_specimens.json")
     with open(table_file, "w") as f:
         json.dump(js, f, indent=1)
     return table_file

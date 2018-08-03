@@ -68,7 +68,7 @@ class Cache(object):
     def __init__(self,
                  manifest=None,
                  cache=True,
-                 version=None, 
+                 version=None,
                  **kwargs):
         self.cache = cache
         self.load_manifest(manifest, version)
@@ -119,14 +119,21 @@ class Cache(object):
 
             try:
                 self.manifest = Manifest(
-                    ju.read(file_name)['manifest'], 
-                    os.path.dirname(file_name), 
+                    ju.read(file_name)['manifest'],
+                    os.path.dirname(file_name),
                     version=version)
             except ManifestVersionError as e:
-                raise ManifestVersionError(("Your manifest file (%s) is out of date" +
-                                            " (version '%s' vs '%s').  Please remove this file" +
+                if e.outdated is True:
+                    intro = "is out of date"
+                elif e.outdated is False:
+                    intro = "was made with a newer version of the AllenSDK"
+                elif e.outdated is None:
+                    intro = "version did not match the expected version"
+
+                raise ManifestVersionError(("Your manifest file (%s) %s" +
+                                            " (its version is '%s', but version '%s' is expected).  Please remove this file" +
                                             " and it will be regenerated for you the next"
-                                            " time you instantiate this class.") % (file_name, e.found_version, e.version),
+                                            " time you instantiate this class.") % (file_name, intro, e.found_version, e.version),
                                            e.version, e.found_version)
 
             self.manifest_path = file_name
@@ -145,14 +152,14 @@ class Cache(object):
 
         manifest_builder = ManifestBuilder()
         manifest_builder.set_version(self.MANIFEST_VERSION)
-        
+
         manifest_builder = self.add_manifest_paths(manifest_builder)
 
         manifest_builder.write_json_file(file_name)
 
 
     def add_manifest_paths(self, manifest_builder):
-        '''Add cache-class specific paths to the manifest. In derived classes, 
+        '''Add cache-class specific paths to the manifest. In derived classes,
         should call super.
         '''
         manifest_builder.add_path('BASEDIR', '.')
@@ -179,7 +186,7 @@ class Cache(object):
         '''
         if keys is None:
             keys = []
-        
+
         for key in keys:
             del data[key]
 
@@ -269,7 +276,7 @@ class Cache(object):
                *args,
                **kwargs):
         '''make an rma query, save it and return the dataframe.
-    
+
         Parameters
         ----------
         fn : function reference
@@ -350,10 +357,10 @@ class Cache(object):
     @staticmethod
     def csv_writer(pth, gen):
         csv_writer = None
-    
+
         first_row = True
         row_count = 1
-    
+
         with open(pth, 'w') as output:
             for row in gen:
                 if first_row:
@@ -420,7 +427,7 @@ class Cache(object):
                    path_keyword=None):
         '''helper method to find path argument in legacy methods written
         prior to the @cacheable decorator.  Do not use for new @cacheable methods.
-        
+
         Parameters
         ----------
         file_name_position : integer
@@ -429,7 +436,7 @@ class Cache(object):
             zero indexed position in the decorated method args where tha file path may be found.
         path_keyword : string
             kwarg that may have the file path.
-        
+
         Notes
         -----
         This method is only intended to provide backward-compatibility for some
@@ -446,7 +453,7 @@ class Cache(object):
                     file_name = args[file_name_position]
 
                 if (file_name is None and
-                    secondary_file_name_position and 
+                    secondary_file_name_position and
                     secondary_file_name_position < len(args)):
                     file_name = args[secondary_file_name_position]
 
@@ -461,7 +468,7 @@ class Cache(object):
              rename=None,
              **kwargs):
         '''make an rma query, save it and return the dataframe.
-    
+
         Parameters
         ----------
         fn : function reference
@@ -480,12 +487,12 @@ class Cache(object):
             (new, old) columns to rename
         kwargs : objects
             passed through to the query function
-    
+
         Returns
         -------
         dict or DataFrame
             data type depends on return_dataframe option.
-    
+
         Notes
         -----
         Column renaming happens after the file is reloaded for json
@@ -518,7 +525,7 @@ class Cache(object):
         else:
             raise ValueError(
                 'save_as_json=False cannot be used with return_dataframe=False')
-    
+
         return data
 
 
@@ -579,7 +586,7 @@ def cacheable(strategy=None,
 
             if pathfinder and not 'path' in kwargs:
                 found_path = pathfinder(*args, **kwargs)
-                
+
                 if found_path:
                     kwargs['path'] = found_path
             if decor.strategy and not 'strategy' in kwargs:
@@ -597,6 +604,13 @@ def cacheable(strategy=None,
                                   *args,
                                   **kwargs)
             return result
-        
+
         return w
     return decor
+
+
+def get_default_manifest_file(cache_name):
+    return os.environ(
+        '{}_MANIFEST'.format(cache_name.upper()),
+        '{}/manifest.json'.format(cache_name.lower())
+    )

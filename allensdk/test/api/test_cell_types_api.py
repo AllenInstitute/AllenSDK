@@ -20,7 +20,10 @@ def mock_cells_api():
             'tag__dendrite_type': 'spikey',
             'tag__apical': 'stumpy',
             'nr__reconstruction_type': 'fancy',
-            'donor__disease_state': 'influenza'
+            'donor__disease_state': 'influenza',
+            'donor__id': 1,
+            'specimen__hemisphere': 'hi',
+            'csl__normalized_depth': 1
         },{
 
             'cell_reporter_status': "nofish",
@@ -37,7 +40,10 @@ def mock_cells_api():
             'tag__dendrite_type': 'spikey',
             'tag__apical': 'stumpy',
             'nr__reconstruction_type': None,
-            'donor__disease_state': None
+            'donor__disease_state': None,
+            'donor__id': 1,
+            'specimen__hemisphere': 'hi',
+            'csl__normalized_depth': 1
         }
     ]
     
