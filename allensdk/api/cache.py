@@ -610,7 +610,7 @@ def cacheable(strategy=None,
 
 
 def get_default_manifest_file(cache_name):
-    return os.environ(
+    return os.environ.get(
         '{}_MANIFEST'.format(cache_name.upper()),
         '{}/manifest.json'.format(cache_name.lower())
     )
