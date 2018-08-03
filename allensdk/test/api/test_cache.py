@@ -191,5 +191,5 @@ def test_memoize():
 
 def test_get_default_manifest_file():
     assert get_default_manifest_file('brain_observatory') == 'brain_observatory/manifest.json'
-    assert get_default_manifest_file('cell_types') == 'cell_type/manifest.json'
+    assert get_default_manifest_file('cell_types') == 'cell_types/manifest.json'
     assert get_default_manifest_file('mouse_connectivity') == 'mouse_connectivity/manifest.json'
