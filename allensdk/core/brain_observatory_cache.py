@@ -35,14 +35,13 @@
 #
 import os
 from . import json_utilities as ju
-from allensdk.api.cache import Cache
+from allensdk.api.cache import Cache, get_default_manifest_file
 from allensdk.api.queries.brain_observatory_api import BrainObservatoryApi
 from allensdk.config.manifest_builder import ManifestBuilder
 from .brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
 import allensdk.brain_observatory.stimulus_info as stim_info
 import six
 from dateutil.parser import parse as parse_date
-
 
 
 class BrainObservatoryCache(Cache):
@@ -79,10 +78,14 @@ class BrainObservatoryCache(Cache):
     STIMULUS_MAPPINGS_KEY = 'STIMULUS_MAPPINGS'
     MANIFEST_VERSION=None
 
-    def __init__(self, cache=True, manifest_file='brain_observatory_manifest.json', base_uri=None, api=None):
+    def __init__(self, cache=True, manifest_file=None, base_uri=None, api=None):
+
+        if manifest_file is None:
+            manifest_file = get_default_manifest_file('brain_observatory')
+
         super(BrainObservatoryCache, self).__init__(
             manifest=manifest_file, cache=cache, version=self.MANIFEST_VERSION)
-        
+
         if api is None:
             self.api = BrainObservatoryApi(base_uri=base_uri)
         else:
@@ -216,8 +219,8 @@ class BrainObservatoryCache(Cache):
 
         return stim_info.stimuli_in_session(exps[0]['session_type'])
 
-        
-        
+
+
     def get_ophys_experiments(self, file_name=None,
                               ids=None,
                               experiment_container_ids=None,
@@ -229,7 +232,7 @@ class BrainObservatoryCache(Cache):
                               session_types=None,
                               cell_specimen_ids=None,
                               include_failed=False,
-                              require_eye_tracking=False, 
+                              require_eye_tracking=False,
                               simple=True):
         """ Get a list of ophys experiments matching certain criteria.
 
@@ -295,9 +298,9 @@ class BrainObservatoryCache(Cache):
         _assert_not_string(session_types, "session_types")
 
         file_name = self.get_cache_path(file_name, self.EXPERIMENTS_KEY)
-        
-        exps = self.api.get_ophys_experiments(path=file_name, 
-                                              strategy='lazy', 
+
+        exps = self.api.get_ophys_experiments(path=file_name,
+                                              strategy='lazy',
                                               **Cache.cache_json())
 
         transgenic_lines = _merge_transgenic_lines(cre_lines, transgenic_lines)
@@ -335,7 +338,7 @@ class BrainObservatoryCache(Cache):
                     'specimen_name': e['specimen']['name'],
                     'fail_eye_tracking': e.get('fail_eye_tracking', None)
                     } for e in exps]
-            
+
         return exps
 
     def _get_stimulus_mappings(self, file_name=None):
@@ -379,16 +382,16 @@ class BrainObservatoryCache(Cache):
             to a more concise subset.
 
         filters: list of dicts
-            List of filter dictionaries.  The Allen Brain Observatory web site can 
+            List of filter dictionaries.  The Allen Brain Observatory web site can
             generate filters in this format to reproduce a filtered set of cells
-            found there.  To see what these look like, visit 
+            found there.  To see what these look like, visit
             http://observatory.brain-map.org/visualcoding, perform a cell search
-            and apply some filters (e.g. find cells in a particular area), then 
+            and apply some filters (e.g. find cells in a particular area), then
             click the "view these cells in the AllenSDK" link on the bottom-left
             of the search results page.  This will take you to a page that contains
             a code sample you can use to apply those same filters via this argument.
             For more detail on the filter syntax, see BrainObservatoryApi.dataframe_query.
-            
+
 
         Returns
         -------
@@ -399,7 +402,7 @@ class BrainObservatoryCache(Cache):
 
         cell_specimens = self.api.get_cell_metrics(path=file_name,
                                                    strategy='lazy',
-                                                   pre= lambda x: [y for y in x], 
+                                                   pre= lambda x: [y for y in x],
                                                    **Cache.cache_json())
 
         cell_specimens = self.api.filter_cell_specimens(cell_specimens,
@@ -511,7 +514,7 @@ def _merge_transgenic_lines(*lines_list):
         return None
 
 def _find_container_tags(container):
-    """ Custom logic for extracting tags from donor conditions.  Filtering 
+    """ Custom logic for extracting tags from donor conditions.  Filtering
     out tissuecyte tags. """
     conditions = container['specimen']['donor'].get('conditions', [])
     return [c['name'] for c in conditions if not c['name'].startswith('tissuecyte')]
