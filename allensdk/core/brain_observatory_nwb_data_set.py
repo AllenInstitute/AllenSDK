@@ -109,7 +109,7 @@ def get_epoch_mask_list(st, threshold, max_cuts=2):
 
 class BrainObservatoryNwbDataSet(object):
     PIPELINE_DATASET = 'brain_observatory_pipeline'
-    SUPPORTED_PIPELINE_VERSION = "2.0"
+    SUPPORTED_PIPELINE_VERSION = "3.0"
 
     FILE_METADATA_MAPPING = {
         'age': 'general/subject/age',
