@@ -43,6 +43,7 @@ from allensdk.core.brain_observatory_cache import (BrainObservatoryCache,
                                                    _find_specimen_reporter_line)
 from allensdk.api.queries.brain_observatory_api import BrainObservatoryApi
 import json
+import allensdk.brain_observatory.stimulus_info as si
 
 try:
     import __builtin__ as builtins  # @UnresolvedImport
@@ -87,13 +88,19 @@ CACHE_MANIFEST = """
       "type": "file",
       "spec": "stimulus_mappings.json",
       "key": "STIMULUS_MAPPINGS"
+    },
+    {
+      "parent_key": "BASEDIR",
+      "type": "file",
+      "spec": "ophys_analysis_data/%d_%s_analysis.h5",
+      "key": "ANALYSIS_DATA"
     }
   ]
 }
 """
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def brain_observatory_cache():
     boc = None
 
@@ -367,6 +374,47 @@ def test_find_specimen_reporter_line():
     s = { "donor": { "transgenic_lines": [ { "transgenic_line_type_name": "driver", "name": "bananaCre" } ] } }
     cre = _find_specimen_reporter_line(s)
     assert cre is None
+
+from pkg_resources import resource_filename  # @UnresolvedImport
+import sys
+import json
+import logging
+
+if 'TEST_SESSION_ANALYSIS_REGRESSION_DATA' in os.environ:
+    data_file = os.environ['TEST_SESSION_ANALYSIS_REGRESSION_DATA']
+else:
+    data_file = resource_filename(__name__, '../brain_observatory/test_session_analysis_regression_data.json')
+
+@pytest.fixture(scope="module")
+def paths():
+    pyversion = sys.version_info[0]
+    logging.debug("loading " + data_file)
+    with open(data_file,'r') as f:
+        data = json.load(f)
+        return data[str(pyversion)]
+
+
+
+@pytest.mark.parametrize("session_type", ['a', 'b', 'c'])
+def test_brain_observatory_cache_get_analysis_file(brain_observatory_cache, paths, session_type):
+    
+    manifest = brain_observatory_cache.manifest    
+    oeid_list = []
+    for key, val in paths.items():
+        path_type, session_type_char = key.split('_')
+        if path_type == 'nwb' and session_type_char == session_type:
+            path = os.path.join(os.path.dirname(val), '%d.nwb') 
+            oeid_list.append(int(os.path.basename(val).split('.')[0]))
+            manifest.add_path(brain_observatory_cache.EXPERIMENT_DATA_KEY, path)
+        elif path_type == 'analysis' and session_type_char == session_type:
+            path = os.path.join(os.path.dirname(val), '%d_%s_analysis.h5') 
+            manifest.add_path(brain_observatory_cache.ANALYSIS_DATA_KEY, path)
+
+    for oeid in oeid_list:
+        data_set = brain_observatory_cache.get_ophys_experiment_data(oeid)
+        for stimulus in data_set.list_stimuli():
+            if stimulus != si.SPONTANEOUS_ACTIVITY:
+                analysis_data = brain_observatory_cache.get_ophys_experiment_analysis(oeid, stimulus)
 
 
     
