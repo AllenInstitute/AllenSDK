@@ -51,6 +51,7 @@ class BrainObservatoryApi(RmaTemplate):
     _log = logging.getLogger('allensdk.api.queries.brain_observatory_api')
 
     NWB_FILE_TYPE = 'NWBOphys'
+    OPHYS_ANALYSIS_FILE_TYPE = 'OphysExperimentCellRoiMetricsFile'
     CELL_MAPPING_ID = 590985414
 
     rma_templates = \
@@ -84,6 +85,14 @@ class BrainObservatoryApi(RmaTemplate):
              'description': 'see name',
              'model': 'WellKnownFile',
              'criteria': '[attachable_id$eq{{ ophys_experiment_id }}],well_known_file_type[name$eq%s]' % NWB_FILE_TYPE,
+             'num_rows': 'all',
+             'count': False,
+             'criteria_params': ['ophys_experiment_id']
+             },
+            {'name': 'ophys_analysis_file',
+             'description': 'see name',
+             'model': 'WellKnownFile',
+             'criteria': '[attachable_id$eq{{ ophys_experiment_id }}],well_known_file_type[name$eq%s]' % OPHYS_ANALYSIS_FILE_TYPE,
              'num_rows': 'all',
              'count': False,
              'criteria_params': ['ophys_experiment_id']
@@ -345,6 +354,27 @@ class BrainObservatoryApi(RmaTemplate):
             "Downloading ophys_experiment %d NWB. This can take some time." % ophys_experiment_id)
 
         self.retrieve_file_over_http(self.api_url + file_url, file_name)
+
+    @cacheable(strategy='create',
+               pathfinder=Cache.pathfinder(file_name_position=2,
+                                           path_keyword='file_name'))
+    def save_ophys_experiment_analysis_data(self, ophys_experiment_id, file_name):
+
+        data = self.template_query('brain_observatory_queries',
+                                   'ophys_analysis_file',
+                                   ophys_experiment_id=ophys_experiment_id)
+
+        try:
+            file_url = data[0]['download_link']
+        except Exception as _:
+            raise Exception("ophys experiment %d has no %s analysis file" %
+                            (ophys_experiment_id, ))
+
+        self._log.warning(
+            "Downloading ophys_experiment %d analysis file. This can take some time." % (ophys_experiment_id, ))
+
+        self.retrieve_file_over_http(self.api_url + file_url, file_name)
+
 
     def filter_experiment_containers(self, containers,
                                      ids=None,
