@@ -93,7 +93,7 @@ class BrainObservatoryCache(Cache):
     EXPERIMENT_DATA_KEY = 'EXPERIMENT_DATA'
     ANALYSIS_DATA_KEY = 'ANALYSIS_DATA'
     STIMULUS_MAPPINGS_KEY = 'STIMULUS_MAPPINGS'
-    MANIFEST_VERSION='1.0'
+    MANIFEST_VERSION='1.1'
 
     def __init__(self, cache=True, manifest_file='brain_observatory_manifest.json', base_uri=None, api=None):
         super(BrainObservatoryCache, self).__init__(
@@ -524,7 +524,7 @@ class BrainObservatoryCache(Cache):
                     typename='file', parent_key='BASEDIR')
         mb.add_path(self.EXPERIMENT_DATA_KEY, 'ophys_experiment_data/%d.nwb',
                     typename='file', parent_key='BASEDIR')
-        mb.add_path(self.ANALYSIS_DATA_KEY, 'ophys_experiment_data/%d_%s_analysis.h5',
+        mb.add_path(self.ANALYSIS_DATA_KEY, 'ophys_experiment_analysis/%d_%s_analysis.h5',
                     typename='file', parent_key='BASEDIR')
         mb.add_path(self.CELL_SPECIMENS_KEY, 'cell_specimens.json',
                     typename='file', parent_key='BASEDIR')
