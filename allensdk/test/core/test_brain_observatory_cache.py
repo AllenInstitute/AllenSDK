@@ -57,7 +57,7 @@ CACHE_MANIFEST = """
   "manifest": [
     {
       "type": "manifest_version",
-      "value": "1.0"
+      "value": "1.1"
     },
     {
       "type": "dir",
