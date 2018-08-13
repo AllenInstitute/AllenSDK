@@ -442,9 +442,10 @@ class CoronaPlotter( PolarPlotter ):
         if color is None:
             color = DEFAULT_LABEL_COLOR
         ax = plt.gca()
-        collection = radial_circles([0.95 * self.inner_radius])
+        collection = radial_circles([0.96 * self.inner_radius])
         collection.set_facecolor((0,0,0,0))
         collection.set_edgecolor(color)
+        collection.set_zorder(1)
         ax.add_collection(collection)
 
     def plot(self, category_data, 
@@ -487,6 +488,7 @@ class CoronaPlotter( PolarPlotter ):
             circles.set_cmap(cmap)
             circles.set_clim(clim)
             circles.set_edgecolors((0,0,0,0))
+            circles.set_zorder(2)
 
             ax.add_collection(circles)
 
