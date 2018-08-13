@@ -438,6 +438,15 @@ class CoronaPlotter( PolarPlotter ):
         start, end = self.angle_transform([0.0, 40.0])
         add_arrow(plt.gca(), self.inner_radius * .85, start, end, color)
 
+    def show_circle(self, color=None):
+        if color is None:
+            color = DEFAULT_LABEL_COLOR
+        ax = plt.gca()
+        collection = radial_circles([0.95 * self.inner_radius])
+        collection.set_facecolor((0,0,0,0))
+        collection.set_edgecolor(color)
+        ax.add_collection(collection)
+
     def plot(self, category_data, 
              data=None,
              clim=None, 
@@ -471,7 +480,7 @@ class CoronaPlotter( PolarPlotter ):
 
             circles = polar_line_circles(radii[trial_order],
                                          degs[idx], 
-                                         self.inner_radius)                                         
+                                         self.inner_radius)
 
             circles.set_transform(circles.get_transform() + ax.transData)
             circles.set_array(data[trial_order])

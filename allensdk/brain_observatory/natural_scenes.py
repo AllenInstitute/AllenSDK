@@ -263,13 +263,14 @@ class NaturalScenes(StimulusAnalysis):
         mask = st[st.frame >= 0].index
 
         cmin = self.response[0,cell_index,0]
-        cmax = max(cmin, data.mean() + data.std()*3) # this makes the plot look bad, maybe do something else?
+        cmax = max(cmin, data.mean() + data.std()*3)
 
         cp = cplots.CoronaPlotter()
         cp.plot(st.frame.ix[mask].values, 
                 data=df.ix[mask].values,
                 clim=[cmin, cmax])
         cp.show_arrow()
+        cp.show_circle()
 
     def reshape_response_array(self):
         '''
