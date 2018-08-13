@@ -263,7 +263,7 @@ class NaturalScenes(StimulusAnalysis):
         mask = st[st.frame >= 0].index
 
         cmin = self.response[0,cell_index,0]
-        cmax = data.mean() + data.std()*3
+        cmax = max(cmin, data.mean() + data.std()*3) # this makes the plot look bad, maybe do something else?
 
         cp = cplots.CoronaPlotter()
         cp.plot(st.frame.ix[mask].values, 
