@@ -309,8 +309,7 @@ class LocallySparseNoise(StimulusAnalysis):
             curr_df = pd.DataFrame.from_dict(massaged_dict)
             df_list.append(curr_df)
 
-            attribute_df = pd.concat(df_list)
-
+            attribute_df = pd.concat(df_list, sort=True)
 
         return attribute_df.sort_values('cell_index')
 

@@ -37,7 +37,7 @@ import os
 from six import string_types
 
 from allensdk.config.manifest_builder import ManifestBuilder
-from allensdk.api.cache import Cache
+from allensdk.api.cache import Cache, get_default_manifest_file
 from allensdk.api.queries.cell_types_api import CellTypesApi
 
 from . import json_utilities as json_utilities
@@ -85,7 +85,11 @@ class CellTypesCache(Cache):
     MARKER_KEY = 'MARKER'
     MANIFEST_VERSION = "1.1"
 
-    def __init__(self, cache=True, manifest_file='cell_types_manifest.json', base_uri=None):
+    def __init__(self, cache=True, manifest_file=None, base_uri=None):
+
+        if manifest_file is None:
+            manifest_file = get_default_manifest_file('cell_types')
+
         super(CellTypesCache, self).__init__(
             manifest=manifest_file, cache=cache, version=self.MANIFEST_VERSION)
         self.api = CellTypesApi(base_uri=base_uri)
@@ -127,7 +131,7 @@ class CellTypesCache(Cache):
         cells = self.api.list_cells_api(path=file_name,
                                         strategy='lazy',
                                         **Cache.cache_json())
-        
+
         if isinstance(reporter_status, string_types):
             reporter_status = [reporter_status]
 
@@ -138,12 +142,12 @@ class CellTypesCache(Cache):
                                           reporter_status,
                                           species,
                                           simple)
-    
-                
+
+
         return cells
-                
-       
-        
+
+
+
 
     def get_ephys_sweeps(self, specimen_id, file_name=None):
         """
@@ -159,9 +163,9 @@ class CellTypesCache(Cache):
         file_name = self.get_cache_path(
             file_name, self.EPHYS_SWEEPS_KEY, specimen_id)
 
-        sweeps = self.api.get_ephys_sweeps(specimen_id, 
-                                           strategy='lazy', 
-                                           path=file_name, 
+        sweeps = self.api.get_ephys_sweeps(specimen_id,
+                                           strategy='lazy',
+                                           path=file_name,
                                            **Cache.cache_json())
 
         return sweeps
@@ -253,7 +257,7 @@ class CellTypesCache(Cache):
             Only return ephys and morphology features for cells that have
             reconstructions. Default True.
         """
-        
+
         ephys_features = pd.DataFrame(self.get_ephys_features())
         morphology_features = pd.DataFrame(self.get_morphology_features())
 
