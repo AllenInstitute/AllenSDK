@@ -667,7 +667,7 @@ class BrainObservatoryNwbDataSet(object):
         template_display_coords = np.rint(template_display_coords).astype(int)
 
         # build mask
-        template_mask, template_frac = mask_stimulus_template(
+        template_mask, template_frac = si_mask_stimulus_template(
             template_display_coords, template_shape)
 
         if mask_off_screen:
