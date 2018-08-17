@@ -32,9 +32,9 @@ Nathan Gouwens @gouwens
 
 Nile Graddis @nilegraddis
 
-Gabe Ocker
+Gabe Ocker @gocker
 
-Corinne Teeter
+Corinne Teeter @corinneteeter
 
 Shreejoy Tripathy @stripathy
 

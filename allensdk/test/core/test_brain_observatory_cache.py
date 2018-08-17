@@ -43,6 +43,8 @@ from allensdk.core.brain_observatory_cache import (BrainObservatoryCache,
                                                    _find_specimen_reporter_line)
 from allensdk.api.queries.brain_observatory_api import BrainObservatoryApi
 import json
+import allensdk.brain_observatory.stimulus_info as si
+from allensdk.test_utilities.regression_fixture import get_list_of_path_dict
 
 try:
     import __builtin__ as builtins  # @UnresolvedImport
@@ -53,6 +55,10 @@ except:
 CACHE_MANIFEST = """
 {
   "manifest": [
+    {
+      "type": "manifest_version",
+      "value": "1.1"
+    },
     {
       "type": "dir",
       "spec": ".",
@@ -87,13 +93,19 @@ CACHE_MANIFEST = """
       "type": "file",
       "spec": "stimulus_mappings.json",
       "key": "STIMULUS_MAPPINGS"
+    },
+    {
+      "parent_key": "BASEDIR",
+      "type": "file",
+      "spec": "ophys_analysis_data/%d_%s_analysis.h5",
+      "key": "ANALYSIS_DATA"
     }
   ]
 }
 """
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def brain_observatory_cache():
     boc = None
 
@@ -369,4 +381,18 @@ def test_find_specimen_reporter_line():
     assert cre is None
 
 
-    
+@pytest.mark.skipif(not os.path.exists('/allen/aibs/informatics/module_test_data'), reason='AIBS path not available')
+@pytest.mark.parametrize("path_dict", get_list_of_path_dict())
+def test_brain_observatory_cache_get_analysis_file(brain_observatory_cache, path_dict): 
+
+    nwb_path_pattern = os.path.join(os.path.dirname(path_dict['nwb_file']), '%d.nwb') 
+    brain_observatory_cache.manifest.add_path(brain_observatory_cache.EXPERIMENT_DATA_KEY, nwb_path_pattern)
+
+    analysis_path_pattern = os.path.join(os.path.dirname(path_dict['analysis_file']), '%d_%s_analysis.h5') 
+    brain_observatory_cache.manifest.add_path(brain_observatory_cache.ANALYSIS_DATA_KEY, analysis_path_pattern)
+
+    oeid = path_dict['ophys_experiment_id']
+    data_set = brain_observatory_cache.get_ophys_experiment_data(oeid)
+    for stimulus in data_set.list_stimuli():
+        if stimulus != si.SPONTANEOUS_ACTIVITY:
+            brain_observatory_cache.get_ophys_experiment_analysis(oeid, stimulus)

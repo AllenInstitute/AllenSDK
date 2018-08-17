@@ -43,6 +43,21 @@ import allensdk.brain_observatory.stimulus_info as stim_info
 import six
 from dateutil.parser import parse as parse_date
 
+from allensdk.brain_observatory.locally_sparse_noise import LocallySparseNoise
+from allensdk.brain_observatory.natural_scenes import NaturalScenes
+from allensdk.brain_observatory.natural_movie import NaturalMovie
+from allensdk.brain_observatory.static_gratings import StaticGratings
+from allensdk.brain_observatory.drifting_gratings import DriftingGratings
+
+ANALYSIS_CLASS_DICT = {stim_info.LOCALLY_SPARSE_NOISE: LocallySparseNoise,
+                       stim_info.LOCALLY_SPARSE_NOISE_4DEG: LocallySparseNoise,
+                       stim_info.LOCALLY_SPARSE_NOISE_8DEG: LocallySparseNoise,
+                       stim_info.NATURAL_MOVIE_ONE:NaturalMovie,
+                       stim_info.NATURAL_MOVIE_TWO:NaturalMovie,
+                       stim_info.NATURAL_MOVIE_THREE:NaturalMovie,
+                       stim_info.NATURAL_SCENES:NaturalScenes,
+                       stim_info.STATIC_GRATINGS:StaticGratings,
+                       stim_info.DRIFTING_GRATINGS:DriftingGratings}
 
 class BrainObservatoryCache(Cache):
     """
@@ -75,8 +90,9 @@ class BrainObservatoryCache(Cache):
     EXPERIMENTS_KEY = 'EXPERIMENTS'
     CELL_SPECIMENS_KEY = 'CELL_SPECIMENS'
     EXPERIMENT_DATA_KEY = 'EXPERIMENT_DATA'
+    ANALYSIS_DATA_KEY = 'ANALYSIS_DATA'
     STIMULUS_MAPPINGS_KEY = 'STIMULUS_MAPPINGS'
-    MANIFEST_VERSION=None
+    MANIFEST_VERSION='1.1'
 
     def __init__(self, cache=True, manifest_file=None, base_uri=None, api=None):
 
@@ -448,6 +464,48 @@ class BrainObservatoryCache(Cache):
 
         return BrainObservatoryNwbDataSet(file_name)
 
+    def get_ophys_experiment_analysis(self, ophys_experiment_id, stimulus_type, file_name=None):
+        """ Download the h5 analysis file for a stimulus set, for a particular ophys_experiment 
+        (if it hasn't already been downloaded) and return a data accessor object.
+
+        Parameters
+        ----------
+        file_name: string
+            File name to save/read the data set.  If file_name is None,
+            the file_name will be pulled out of the manifest.  If caching
+            is disabled, no file will be saved. Default is None.
+
+        ophys_experiment_id: int
+            id of the ophys_experiment to retrieve
+
+        stimulus_name: str
+            stimulus type; should be an element of self.list_stimuli()
+
+        Returns
+        -------
+        BrainObservatoryNwbDataSet
+        """
+        
+
+        data_set = self.get_ophys_experiment_data(ophys_experiment_id, file_name=None)
+        session_type = data_set.get_session_type()
+
+        if not stimulus_type in stim_info.SESSION_STIMULUS_MAP[session_type]:
+            raise RuntimeError('Stimulus %s not available session type: %s' % (stimulus_type, stim_info.SESSION_STIMULUS_MAP[stimulus_type]))
+
+        # Use manifest to figure out where to cache the file:
+        file_name = self.get_cache_path(file_name, self.ANALYSIS_DATA_KEY, ophys_experiment_id, session_type)
+
+        # Cache the analsis file from an RMA query:
+        self.api.save_ophys_experiment_analysis_data(ophys_experiment_id, file_name, strategy='lazy')
+
+        # Get the analysis class from ANALYSIS_CLASS_DICT, and build from the static method:
+        if stimulus_type in stim_info.LOCALLY_SPARSE_NOISE_STIMULUS_TYPES+stim_info.NATURAL_MOVIE_STIMULUS_TYPES:
+            return ANALYSIS_CLASS_DICT[stimulus_type].from_analysis_file(data_set, file_name, stimulus_type)
+        else:
+            return ANALYSIS_CLASS_DICT[stimulus_type].from_analysis_file(data_set, file_name)
+
+
     def build_manifest(self, file_name):
         """
         Construct a manifest for this Cache class and save it in a file.
@@ -468,6 +526,8 @@ class BrainObservatoryCache(Cache):
         mb.add_path(self.EXPERIMENTS_KEY, 'ophys_experiments.json',
                     typename='file', parent_key='BASEDIR')
         mb.add_path(self.EXPERIMENT_DATA_KEY, 'ophys_experiment_data/%d.nwb',
+                    typename='file', parent_key='BASEDIR')
+        mb.add_path(self.ANALYSIS_DATA_KEY, 'ophys_experiment_analysis/%d_%s_analysis.h5',
                     typename='file', parent_key='BASEDIR')
         mb.add_path(self.CELL_SPECIMENS_KEY, 'cell_specimens.json',
                     typename='file', parent_key='BASEDIR')
