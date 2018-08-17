@@ -542,7 +542,7 @@ class BrainObservatoryNwbDataSet(object):
                 curr_subtable['stimulus'] = stimulus
                 table_list.append(curr_subtable)
 
-        new_table = pd.concat(table_list)
+        new_table = pd.concat(table_list, sort=True)
         new_table.reset_index(drop=True, inplace=True)
 
         return new_table
