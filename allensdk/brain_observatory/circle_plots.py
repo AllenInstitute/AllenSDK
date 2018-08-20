@@ -379,7 +379,10 @@ class TrackPlotter( PolarPlotter ):
 
         clim = self._clim(clim, data)
         if self.ring_length:
-            data = skimage.transform.resize(data.astype(np.float64), (data.shape[0], self.ring_length))
+            data = skimage.transform.resize(data.astype(np.float64),
+                                            (data.shape[0], self.ring_length),
+                                            mode='constant',
+                                            anti_aliasing=False)
    
         data_mean = data.mean(axis=0)
         data = np.vstack((data, data_mean))
