@@ -41,6 +41,7 @@ from allensdk.config.manifest_builder import ManifestBuilder
 from .brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
 import allensdk.brain_observatory.stimulus_info as stim_info
 import six
+import numpy as np
 from dateutil.parser import parse as parse_date
 
 from allensdk.brain_observatory.locally_sparse_noise import LocallySparseNoise
@@ -91,8 +92,9 @@ class BrainObservatoryCache(Cache):
     CELL_SPECIMENS_KEY = 'CELL_SPECIMENS'
     EXPERIMENT_DATA_KEY = 'EXPERIMENT_DATA'
     ANALYSIS_DATA_KEY = 'ANALYSIS_DATA'
+    EVENTS_DATA_KEY = 'EVENTS_DATA'
     STIMULUS_MAPPINGS_KEY = 'STIMULUS_MAPPINGS'
-    MANIFEST_VERSION='1.1'
+    MANIFEST_VERSION='1.2'
 
     def __init__(self, cache=True, manifest_file=None, base_uri=None, api=None):
 
@@ -234,8 +236,6 @@ class BrainObservatoryCache(Cache):
             return None
 
         return stim_info.stimuli_in_session(exps[0]['session_type'])
-
-
 
     def get_ophys_experiments(self, file_name=None,
                               ids=None,
@@ -438,7 +438,6 @@ class BrainObservatoryCache(Cache):
 
         return cell_specimens
 
-
     def get_ophys_experiment_data(self, ophys_experiment_id, file_name=None):
         """ Download the NWB file for an ophys_experiment (if it hasn't already been
         downloaded) and return a data accessor object.
@@ -485,8 +484,6 @@ class BrainObservatoryCache(Cache):
         -------
         BrainObservatoryNwbDataSet
         """
-        
-
         data_set = self.get_ophys_experiment_data(ophys_experiment_id, file_name=None)
         session_type = data_set.get_session_type()
 
@@ -505,6 +502,29 @@ class BrainObservatoryCache(Cache):
         else:
             return ANALYSIS_CLASS_DICT[stimulus_type].from_analysis_file(data_set, file_name)
 
+    def get_ophys_experiment_events(self, ophys_experiment_id, file_name=None):
+        """ Download the npz events file for an ophys_experiment if it hasn't
+        already been downloaded and return the events array.
+
+        Parameters
+        ----------
+        file_name: string
+            File name to save/read the data set.  If file_name is None,
+            the file_name will be pulled out of the manifest.  If caching
+            is disabled, no file will be saved. Default is None.
+        ophys_experiment_id: int
+            id of the ophys_experiment to retrieve events for
+        Returns
+        -------
+        events: numpy.ndarray
+            [N_cells,N_times] array of events.
+        """
+        file_name = self.get_cache_path(
+            file_name, self.EVENTS_DATA_KEY, ophys_experiment_id)
+
+        self.api.save_ophys_experiment_event_data(ophys_experiment_id, file_name, strategy='lazy')
+
+        return np.load(file_name, allow_pickle=False)["ev"]
 
     def build_manifest(self, file_name):
         """
@@ -528,6 +548,8 @@ class BrainObservatoryCache(Cache):
         mb.add_path(self.EXPERIMENT_DATA_KEY, 'ophys_experiment_data/%d.nwb',
                     typename='file', parent_key='BASEDIR')
         mb.add_path(self.ANALYSIS_DATA_KEY, 'ophys_experiment_analysis/%d_%s_analysis.h5',
+                    typename='file', parent_key='BASEDIR')
+        mb.add_path(self.EVENTS_DATA_KEY, 'ophys_experiment_events/%d_events.npz',
                     typename='file', parent_key='BASEDIR')
         mb.add_path(self.CELL_SPECIMENS_KEY, 'cell_specimens.json',
                     typename='file', parent_key='BASEDIR')
