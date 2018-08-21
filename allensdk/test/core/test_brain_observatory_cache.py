@@ -35,6 +35,7 @@
 #
 import pytest
 import os
+import numpy as np
 from mock import patch, mock_open, MagicMock
 from allensdk.core.brain_observatory_cache import (BrainObservatoryCache, 
                                                    _find_container_tags,
@@ -57,7 +58,7 @@ CACHE_MANIFEST = """
   "manifest": [
     {
       "type": "manifest_version",
-      "value": "1.1"
+      "value": "1.2"
     },
     {
       "type": "dir",
@@ -99,10 +100,22 @@ CACHE_MANIFEST = """
       "type": "file",
       "spec": "ophys_analysis_data/%d_%s_analysis.h5",
       "key": "ANALYSIS_DATA"
+    },
+    {
+      "parent_key": "BASEDIR",
+      "type": "file",
+      "spec": "ophys_experiment_events/%d_events.npz",
+      "key": "EVENTS_DATA"
     }
   ]
 }
 """
+
+
+@pytest.fixture()
+def events_test_data():
+    return {"pattern": "/allen/aibs/informatics/module_test_data/observatory/events/%d_events.npz",
+            "experiment_id": 715923832}
 
 
 @pytest.fixture(scope="function")
@@ -281,7 +294,6 @@ def test_build_manifest(tmpdir_factory):
             read_manifest_data = f.read()
 
         assert manifest_data == read_manifest_data
-        
 
 
 def test_string_argument_errors(brain_observatory_cache):
@@ -396,3 +408,15 @@ def test_brain_observatory_cache_get_analysis_file(brain_observatory_cache, path
     for stimulus in data_set.list_stimuli():
         if stimulus != si.SPONTANEOUS_ACTIVITY:
             brain_observatory_cache.get_ophys_experiment_analysis(oeid, stimulus)
+
+
+@pytest.mark.skipif(not os.path.exists('/allen/aibs/informatics/module_test_data'), reason='AIBS path not available')
+def test_brain_observatory_cache_get_events_data(brain_observatory_cache, events_test_data):
+    eid = events_test_data["experiment_id"]
+    data_file = events_test_data["pattern"] % eid
+
+    brain_observatory_cache.manifest.add_path(brain_observatory_cache.EVENTS_DATA_KEY, events_test_data["pattern"])
+
+    events = brain_observatory_cache.get_ophys_experiment_events(eid)
+    true_events = np.load(data_file, allow_pickle=False)["ev"]
+    assert(np.all(events == true_events))

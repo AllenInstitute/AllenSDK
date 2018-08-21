@@ -378,6 +378,27 @@ def test_save_ophys_experiment_data(mock_json_msg_query,
 
 @patch.object(BrainObservatoryApi, "retrieve_file_over_http")
 @patch.object(BrainObservatoryApi, "json_msg_query", return_value=[{'download_link': '/url/path/to/file'}])
+def test_save_ophys_experiment_event_data(mock_json_msg_query,
+                                          mock_retrieve_file_over_http,
+                                          bo_api):
+    with patch('allensdk.config.manifest.Manifest.safe_mkdir') as mkdir:
+        bo_api.save_ophys_experiment_event_data(1, '/path/to/filename')
+
+        mkdir.assert_called_once_with('/path/to')
+
+    mock_json_msg_query.assert_called_once_with(
+        bo_api.api_url + "/api/v2/data/query.json?q="
+        "model::WellKnownFile,"
+        "rma::criteria,"
+        "[attachable_id$eq1],well_known_file_type[name$eqObservatoryEventsFile],"
+        "rma::options[num_rows$eq'all'][count$eqfalse]")
+    mock_retrieve_file_over_http.assert_called_with(
+        bo_api.api_url +  '/url/path/to/file',
+        '/path/to/filename')
+
+
+@patch.object(BrainObservatoryApi, "retrieve_file_over_http")
+@patch.object(BrainObservatoryApi, "json_msg_query", return_value=[{'download_link': '/url/path/to/file'}])
 def test_get_cell_specimen_id_mapping(mock_json_msg_query,
                                       mock_retrieve_file_over_http,
                                       bo_api):
