@@ -46,6 +46,7 @@ from .rma_template import RmaTemplate
 from ..cache import cacheable, Cache
 from .rma_pager import pageable
 
+from dateutil.parser import parse as parse_date
 
 class BrainObservatoryApi(RmaTemplate):
     _log = logging.getLogger('allensdk.api.queries.brain_observatory_api')
@@ -384,6 +385,7 @@ class BrainObservatoryApi(RmaTemplate):
 
         self.retrieve_file_over_http(self.api_url + file_url, file_name)
 
+
     @cacheable(strategy='create',
                pathfinder=Cache.pathfinder(file_name_position=2,
                                            path_keyword='file_name'))
@@ -401,31 +403,65 @@ class BrainObservatoryApi(RmaTemplate):
 
         self.retrieve_file_over_http(self.api_url + file_url, file_name)
 
+    def filter_experiments_and_containers(self, objs,
+                                          ids=None,
+                                          targeted_structures=None,
+                                          imaging_depths=None,
+                                          cre_lines=None,
+                                          reporter_lines=None,
+                                          transgenic_lines=None,
+                                          include_failed=False):
+
+        if not include_failed:
+            objs = [o for o in objs if not o.get('failed', False)]
+
+        if ids is not None:
+            objs = [o for o in objs if o['id'] in ids]
+
+        if targeted_structures is not None:
+            objs = [o for o in objs if o[
+                'targeted_structure']['acronym'] in targeted_structures]
+
+        if imaging_depths is not None:
+            objs = [o for o in objs if o[
+                'imaging_depth'] in imaging_depths]
+
+        if cre_lines is not None:
+            tls = [ tl.lower() for tl in cre_lines ]
+            objs = [o for o in objs if find_specimen_cre_line(o['specimen']).lower() in tls]
+
+        if reporter_lines is not None:
+            tls = [ tl.lower() for tl in reporter_lines ]
+            objs = [o for o in objs if find_specimen_reporter_line(o['specimen']).lower() in tls]
+            
+        if transgenic_lines is not None:
+            tls = set([ tl.lower() for tl in transgenic_lines ])
+            ctls = set([ find_specimen_cre_line(o['specimen']), find_specimen_reporter_line(o['specimen']) ])
+            objs = [ o for o in objs if len(tls & ctls) ]
+
+        return objs
+
     def filter_experiment_containers(self, containers,
                                      ids=None,
                                      targeted_structures=None,
                                      imaging_depths=None,
+                                     cre_lines=None,
+                                     reporter_lines=None,
                                      transgenic_lines=None,
-                                     include_failed=False):
+                                     include_failed=False,
+                                     simple=False):
 
-        if not include_failed:
-            containers = [c for c in containers if not c.get('failed', False)]
-
-        if ids is not None:
-            containers = [c for c in containers if c['id'] in ids]
-
-        if targeted_structures is not None:
-            containers = [c for c in containers if c[
-                'targeted_structure']['acronym'] in targeted_structures]
-
-        if imaging_depths is not None:
-            containers = [c for c in containers if c[
-                'imaging_depth'] in imaging_depths]
-
-        if transgenic_lines is not None:
-            tls = [ tl.lower() for tl in transgenic_lines ]
-            containers = [c for c in containers for tl in c['specimen'][
-                'donor']['transgenic_lines'] if tl['name'].lower() in tls]
+        containers = self.filter_experiments_and_containers(containers,
+                                                            ids=ids,
+                                                            targeted_structures=targeted_structures,
+                                                            imaging_depths=imaging_depths,
+                                                            cre_lines=cre_lines,
+                                                            reporter_lines=reporter_lines,
+                                                            transgenic_lines=transgenic_lines,
+                                                            include_failed=include_failed)
+        
+        if simple:
+            containers = self.simplify_experiment_containers(containers)
 
         return containers
 
@@ -434,18 +470,22 @@ class BrainObservatoryApi(RmaTemplate):
                                  experiment_container_ids=None,
                                  targeted_structures=None,
                                  imaging_depths=None,
+                                 cre_lines=None,
+                                 reporter_lines=None,
                                  transgenic_lines=None,
                                  stimuli=None,
                                  session_types=None,
                                  include_failed=False,
-                                 require_eye_tracking=False):
+                                 require_eye_tracking=False,
+                                 simple=False):
 
-        # re-using the code from above
-        experiments = self.filter_experiment_containers(experiments,
-                                                        ids=ids,
-                                                        targeted_structures=targeted_structures,
-                                                        imaging_depths=imaging_depths,
-                                                        transgenic_lines=transgenic_lines)
+        experiments = self.filter_experiments_and_containers(experiments,
+                                                             ids=ids,
+                                                             targeted_structures=targeted_structures,
+                                                             imaging_depths=imaging_depths,
+                                                             cre_lines=cre_lines,
+                                                             reporter_lines=reporter_lines,
+                                                             transgenic_lines=transgenic_lines)
 
         if require_eye_tracking:
             experiments = [e for e in experiments
@@ -465,6 +505,9 @@ class BrainObservatoryApi(RmaTemplate):
         if stimuli is not None:
             experiments = [e for e in experiments
                            if len(set(stimuli) & set(stimulus_info.stimuli_in_session(e['stimulus_name']))) > 0]
+
+        if simple:
+            experiments = self.simplify_ophys_experiments(experiments)
 
         return experiments
 
@@ -613,4 +656,64 @@ class BrainObservatoryApi(RmaTemplate):
             raise Exception("No OphysCellSpecimenIdMapping file found.")
 
         self.retrieve_file_over_http(self.api_url + file_url, file_name)
+
         return pd.read_csv(file_name)
+
+    def simplify_experiment_containers(self, containers):
+        return [{
+            'id': c['id'],
+            'imaging_depth': c['imaging_depth'],
+            'targeted_structure': c['targeted_structure']['acronym'],
+            'cre_line': find_specimen_cre_line(c['specimen']),
+            'reporter_line': find_specimen_reporter_line(c['specimen']),
+            'donor_name': c['specimen']['donor']['external_donor_name'],
+            'specimen_name': c['specimen']['name'],
+            'tags': find_container_tags(c),
+            'failed': c['failed']
+        } for c in containers]
+
+
+    def simplify_ophys_experiments(self, exps):
+        return [{
+            'id': e['id'],
+            'imaging_depth': e['imaging_depth'],
+            'targeted_structure': e['targeted_structure']['acronym'],
+            'cre_line': find_specimen_cre_line(e['specimen']),
+            'reporter_line': find_specimen_reporter_line(e['specimen']),
+            'acquisition_age_days': find_experiment_acquisition_age(e),
+            'experiment_container_id': e['experiment_container_id'],
+            'session_type': e['stimulus_name'],
+            'donor_name': e['specimen']['donor']['external_donor_name'],
+            'specimen_name': e['specimen']['name'],
+                'fail_eye_tracking': e.get('fail_eye_tracking', None)
+        } for e in exps]
+
+
+
+def find_specimen_cre_line(specimen):
+    try:
+        return next(tl['name'] for tl in specimen['donor']['transgenic_lines']
+                    if tl['transgenic_line_type_name'] == 'driver' and
+                    'Cre' in tl['name'])
+    except StopIteration:
+        return None
+
+def find_specimen_reporter_line(specimen):
+    try:
+        return next(tl['name'] for tl in specimen['donor']['transgenic_lines']
+                    if tl['transgenic_line_type_name'] == 'reporter')
+    except StopIteration:
+        return None
+
+def find_experiment_acquisition_age(exp):
+    try:
+        return (parse_date(exp['date_of_acquisition']) - parse_date(exp['specimen']['donor']['date_of_birth'])).days
+    except KeyError as e:
+        return None
+
+
+def find_container_tags(container):
+    """ Custom logic for extracting tags from donor conditions.  Filtering 
+    out tissuecyte tags. """
+    conditions = container['specimen']['donor'].get('conditions', [])
+    return [c['name'] for c in conditions if not c['name'].startswith('tissuecyte')]

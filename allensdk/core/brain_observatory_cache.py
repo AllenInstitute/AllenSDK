@@ -42,7 +42,6 @@ from .brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
 import allensdk.brain_observatory.stimulus_info as stim_info
 import six
 import numpy as np
-from dateutil.parser import parse as parse_date
 
 from allensdk.brain_observatory.locally_sparse_noise import LocallySparseNoise
 from allensdk.brain_observatory.natural_scenes import NaturalScenes
@@ -118,21 +117,19 @@ class BrainObservatoryCache(Cache):
 
     def get_all_cre_lines(self):
         """ Return a list of all cre driver lines in the data set. """
-        containers = self.get_experiment_containers(simple=False)
-        cre_lines = set([_find_specimen_cre_line(c['specimen'])
-                         for c in containers])
+        containers = self.get_experiment_containers(simple=True)
+        cre_lines = set([c['cre_line'] for c in containers])
         return sorted(list(cre_lines))
 
     def get_all_reporter_lines(self):
         """ Return a list of all reporter lines in the data set. """
-        containers = self.get_experiment_containers(simple=False)
-        reporter_lines = set([_find_specimen_reporter_line(c['specimen'])
-                              for c in containers])
+        containers = self.get_experiment_containers(simple=True)
+        reporter_lines = set([c['reporter_line'] for c in containers])
         return sorted(list(reporter_lines))
 
     def get_all_imaging_depths(self):
         """ Return a list of all imaging depths in the data set. """
-        containers = self.get_experiment_containers(simple=False)
+        containers = self.get_experiment_containers(simple=True)
         imaging_depths = set([c['imaging_depth'] for c in containers])
         return sorted(list(imaging_depths))
 
@@ -151,6 +148,7 @@ class BrainObservatoryCache(Cache):
                                   targeted_structures=None,
                                   imaging_depths=None,
                                   cre_lines=None,
+                                  reporter_lines=None,
                                   transgenic_lines=None,
                                   include_failed=False,
                                   simple=True):
@@ -178,6 +176,10 @@ class BrainObservatoryCache(Cache):
             List of cre lines.  Must be in the list returned by
             BrainObservatoryCache.get_all_cre_lines().
 
+        reporter_lines: list
+            List of reporter lines.  Must be in the list returned by
+            BrainObservatoryCache.get_all_reporter_lines().
+
         transgenic_lines: list
             List of transgenic lines. Must be in the list returned by
             BrainObservatoryCache.get_all_cre_lines() or.
@@ -196,6 +198,7 @@ class BrainObservatoryCache(Cache):
         """
         _assert_not_string(targeted_structures, "targeted_structures")
         _assert_not_string(cre_lines, "cre_lines")
+        _assert_not_string(reporter_lines, "reporter_lines")
         _assert_not_string(transgenic_lines, "transgenic_lines")
 
         file_name = self.get_cache_path(
@@ -205,26 +208,14 @@ class BrainObservatoryCache(Cache):
                                                         strategy='lazy',
                                                         **Cache.cache_json())
 
-        transgenic_lines = _merge_transgenic_lines(cre_lines, transgenic_lines)
-
         containers = self.api.filter_experiment_containers(containers, ids=ids,
                                                            targeted_structures=targeted_structures,
                                                            imaging_depths=imaging_depths,
+                                                           cre_lines=cre_lines,
+                                                           reporter_lines=reporter_lines,
                                                            transgenic_lines=transgenic_lines,
-                                                           include_failed=include_failed)
-
-        if simple:
-            containers = [{
-                'id': c['id'],
-                'imaging_depth': c['imaging_depth'],
-                'targeted_structure': c['targeted_structure']['acronym'],
-                'cre_line': _find_specimen_cre_line(c['specimen']),
-                'reporter_line': _find_specimen_reporter_line(c['specimen']),
-                'donor_name': c['specimen']['donor']['external_donor_name'],
-                'specimen_name': c['specimen']['name'],
-                'tags': _find_container_tags(c),
-                'failed': c['failed']
-            } for c in containers]
+                                                           include_failed=include_failed,
+                                                           simple=simple)
 
         return containers
 
@@ -243,6 +234,7 @@ class BrainObservatoryCache(Cache):
                               targeted_structures=None,
                               imaging_depths=None,
                               cre_lines=None,
+                              reporter_lines=None,
                               transgenic_lines=None,
                               stimuli=None,
                               session_types=None,
@@ -276,6 +268,10 @@ class BrainObservatoryCache(Cache):
         cre_lines: list
             List of cre lines.  Must be in the list returned by
             BrainObservatoryCache.get_all_cre_lines().
+        
+        reporter_lines: list
+            List of reporter lines.  Must be in the list returned by
+            BrainObservatoryCache.get_all_reporter_lines().
 
         transgenic_lines: list
             List of transgenic lines. Must be in the list returned by
@@ -309,6 +305,7 @@ class BrainObservatoryCache(Cache):
         """
         _assert_not_string(targeted_structures, "targeted_structures")
         _assert_not_string(cre_lines, "cre_lines")
+        _assert_not_string(reporter_lines, "reporter_lines")
         _assert_not_string(transgenic_lines, "transgenic_lines")
         _assert_not_string(stimuli, "stimuli")
         _assert_not_string(session_types, "session_types")
@@ -318,8 +315,6 @@ class BrainObservatoryCache(Cache):
         exps = self.api.get_ophys_experiments(path=file_name,
                                               strategy='lazy',
                                               **Cache.cache_json())
-
-        transgenic_lines = _merge_transgenic_lines(cre_lines, transgenic_lines)
 
         if cell_specimen_ids is not None:
             cells = self.get_cell_specimens(ids=cell_specimen_ids)
@@ -334,26 +329,14 @@ class BrainObservatoryCache(Cache):
                                                  experiment_container_ids=experiment_container_ids,
                                                  targeted_structures=targeted_structures,
                                                  imaging_depths=imaging_depths,
+                                                 cre_lines=cre_lines,
+                                                 reporter_lines=reporter_lines,
                                                  transgenic_lines=transgenic_lines,
                                                  stimuli=stimuli,
                                                  session_types=session_types,
                                                  include_failed=include_failed,
-                                                 require_eye_tracking=require_eye_tracking)
-
-        if simple:
-            exps = [{
-                    'id': e['id'],
-                    'imaging_depth': e['imaging_depth'],
-                    'targeted_structure': e['targeted_structure']['acronym'],
-                    'cre_line': _find_specimen_cre_line(e['specimen']),
-                    'reporter_line': _find_specimen_reporter_line(e['specimen']),
-                    'acquisition_age_days': _find_experiment_acquisition_age(e),
-                    'experiment_container_id': e['experiment_container_id'],
-                    'session_type': e['stimulus_name'],
-                    'donor_name': e['specimen']['donor']['external_donor_name'],
-                    'specimen_name': e['specimen']['name'],
-                    'fail_eye_tracking': e.get('fail_eye_tracking', None)
-                    } for e in exps]
+                                                 require_eye_tracking=require_eye_tracking,
+                                                 simple=simple)
 
         return exps
 
@@ -558,48 +541,6 @@ class BrainObservatoryCache(Cache):
 
         mb.write_json_file(file_name)
 
-
-def _find_specimen_cre_line(specimen):
-    try:
-        return next(tl['name'] for tl in specimen['donor']['transgenic_lines']
-                    if tl['transgenic_line_type_name'] == 'driver' and
-                    'Cre' in tl['name'])
-    except StopIteration:
-        return None
-
-def _find_specimen_reporter_line(specimen):
-    try:
-        return next(tl['name'] for tl in specimen['donor']['transgenic_lines']
-                    if tl['transgenic_line_type_name'] == 'reporter')
-    except StopIteration:
-        return None
-
-
-def _find_experiment_acquisition_age(exp):
-    try:
-        return (parse_date(exp['date_of_acquisition']) - parse_date(exp['specimen']['donor']['date_of_birth'])).days
-    except KeyError as e:
-        return None
-
-
-def _merge_transgenic_lines(*lines_list):
-    transgenic_lines = set()
-
-    for lines in lines_list:
-        if lines is not None:
-            for line in lines:
-                transgenic_lines.add(line)
-
-    if len(transgenic_lines):
-        return list(transgenic_lines)
-    else:
-        return None
-
-def _find_container_tags(container):
-    """ Custom logic for extracting tags from donor conditions.  Filtering
-    out tissuecyte tags. """
-    conditions = container['specimen']['donor'].get('conditions', [])
-    return [c['name'] for c in conditions if not c['name'].startswith('tissuecyte')]
 
 def _assert_not_string(arg, name):
     if isinstance(arg, six.string_types):
