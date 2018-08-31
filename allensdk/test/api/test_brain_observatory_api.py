@@ -37,7 +37,12 @@ import os
 import pytest
 from mock import patch, MagicMock, call
 from collections import Counter
-from allensdk.api.queries.brain_observatory_api import BrainObservatoryApi
+import datetime
+from allensdk.api.queries.brain_observatory_api import (BrainObservatoryApi,
+                                                        find_container_tags,
+                                                        find_specimen_cre_line,
+                                                        find_specimen_reporter_line,
+                                                        find_experiment_acquisition_age)
 
 _rows_per_message = 2000
 _msg = [{'whatever': True}] * _rows_per_message
@@ -54,16 +59,27 @@ def bo_api():
 @pytest.fixture
 def mock_containers():
     containers = [
-        {'targeted_structure': {'acronym': 'CBS'},
-         'imaging_depth': 100,
-         'specimen': {
-            'donor': {'transgenic_lines': [{'name': 'Shiny'}]}}
-         },
-        {'targeted_structure': {'acronym': 'NBC'},
-         'imaging_depth': 200,
-         'specimen': {
-            'donor': {'transgenic_lines': [{'name': 'Don'}]}}
-         }
+        {
+            'targeted_structure': {'acronym': 'CBS'},
+            'imaging_depth': 100,
+            'specimen': {
+            'donor': {'transgenic_lines': [{ 'name': 'Shiny', 
+                                             'transgenic_line_type_name': 'driver' }]}}
+        },
+        {
+            'targeted_structure': {'acronym': 'ABC'},
+            'imaging_depth': 150,
+            'specimen': {
+            'donor': {'transgenic_lines': [{ 'name': 'ShinyCre', 
+                                             'transgenic_line_type_name': 'driver' }]}}
+        },
+        {
+            'targeted_structure': {'acronym': 'NBC'},
+            'imaging_depth': 200,
+            'specimen': {
+                'donor': {'transgenic_lines': [{ 'name': 'Don', 
+                                                 'transgenic_line_type_name': 'reporter' }]}}
+        }
     ]
 
     return containers
@@ -277,7 +293,7 @@ def test_get_cell_metrics_five_messages(ju_read_url_get, bo_api):
 
 def test_filter_experiment_containers_no_filters(bo_api, mock_containers):
     containers = bo_api.filter_experiment_containers(mock_containers)
-    assert len(containers) == 2
+    assert len(containers) == 3
 
 
 def test_filter_experiment_containers_depth_filter(bo_api, mock_containers):
@@ -303,9 +319,30 @@ def test_filter_experiment_containers_lines_all_filters(bo_api, mock_containers)
 
     assert len(containers) == 1
 
-def test_filter_experiment_containers_caseless(bo_api, mock_containers):
+    containers = \
+        bo_api.filter_experiment_containers(mock_containers,
+                                            imaging_depths=[200],
+                                            targeted_structures=['NBC'],
+                                            reporter_lines=['don'])
+
+    assert len(containers) == 1
+
+def test_filter_experiment_containers_transgenic_lines(bo_api, mock_containers):
+    containers = \
+        bo_api.filter_experiment_containers(mock_containers,
+                                            cre_lines=['Shiny'])
+
+    assert len(containers) == 0
+
+    containers = \
+        bo_api.filter_experiment_containers(mock_containers,
+                                            cre_lines=['ShinyCre'])
+
+    assert len(containers) == 1
+
     containers = \
         bo_api.filter_experiment_containers(mock_containers, transgenic_lines=['DON'])
+
     assert len(containers) == 1
 
 
@@ -416,3 +453,77 @@ def test_get_cell_specimen_id_mapping(mock_json_msg_query,
     mock_retrieve_file_over_http.assert_called_with(
         bo_api.api_url + '/url/path/to/file',
         '/path/to/filename')
+
+
+def test_find_container_tags():
+    # no conditions no tags
+    c = { "specimen": { "donor": { "conditions": [] } } }
+    tags = find_container_tags(c)
+    assert len(tags) == 0
+
+    # tissue tags are ignored
+    c = { "specimen": { "donor": { "conditions": [ { "name": "tissuecyte" } ] } } }
+    tags = find_container_tags(c)
+    assert len(tags) == 0
+
+    # no conditions is okay
+    c = { "specimen": { "donor": { } } }
+    tags = find_container_tags(c)
+    assert len(tags) == 0
+
+    # everything else goes through
+    c = { "specimen": { "donor": { "conditions": [ { "name": "fish" } ] } } }
+    tags = find_container_tags(c)
+    assert len(tags) == 1
+
+
+def test_find_specimen_cre_line():
+    # None if no TLs
+    s = { "donor": { "transgenic_lines": [ ] } }
+    cre = find_specimen_cre_line(s)
+    assert cre is None
+
+    # None if no 'Cre'
+    s = { "donor": { "transgenic_lines": [ { "transgenic_line_type_name": "driver", "name": "banana" } ] } }
+    cre = find_specimen_cre_line(s)
+    assert cre is None
+
+    # None if no 'Cre'
+    s = { "donor": { "transgenic_lines": [ { "transgenic_line_type_name": "driver", "name": "bananaCre" } ] } }
+    cre = find_specimen_cre_line(s)
+    assert cre == "bananaCre"
+
+    # None if no 'driver'
+    s = { "donor": { "transgenic_lines": [ { "transgenic_line_type_name": "reporter", "name": "bananaCre" } ] } }
+    cre = find_specimen_cre_line(s)
+    assert cre == None
+
+def test_find_specimen_reporter_line():
+    # None if no TLs
+    s = { "donor": { "transgenic_lines": [ ] } }
+    cre = find_specimen_reporter_line(s)
+    assert cre is None
+
+    s = { "donor": { "transgenic_lines": [ { "transgenic_line_type_name": "reporter", "name": "banana" } ] } }
+    cre = find_specimen_reporter_line(s)
+    assert cre == "banana"
+
+    # None if no "reporter"
+    s = { "donor": { "transgenic_lines": [ { "transgenic_line_type_name": "driver", "name": "bananaCre" } ] } }
+    cre = find_specimen_reporter_line(s)
+    assert cre is None
+
+def test_find_experiment_acquisition_age():
+    exp = {}
+    age = find_experiment_acquisition_age(exp)
+    assert age is None
+
+    d2 = datetime.datetime.now()
+    d1 = d2 - datetime.timedelta(days=1)
+
+    exp = { 'date_of_acquisition': str(d2),
+            'specimen': { 'donor': { 'date_of_birth': str(d1) } } }
+
+    age = find_experiment_acquisition_age(exp)
+
+    assert age == 1

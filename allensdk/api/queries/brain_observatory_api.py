@@ -428,16 +428,21 @@ class BrainObservatoryApi(RmaTemplate):
 
         if cre_lines is not None:
             tls = [ tl.lower() for tl in cre_lines ]
-            objs = [o for o in objs if find_specimen_cre_line(o['specimen']).lower() in tls]
+            obj_tls = [ find_specimen_cre_line(o['specimen']) for o in objs ]
+            obj_tls = [ o.lower() if o else None for o in obj_tls ]
+            objs = [o for i,o in enumerate(objs) if obj_tls[i] in tls]
 
         if reporter_lines is not None:
             tls = [ tl.lower() for tl in reporter_lines ]
-            objs = [o for o in objs if find_specimen_reporter_line(o['specimen']).lower() in tls]
+            obj_tls = [ find_specimen_reporter_line(o['specimen']) for o in objs ]
+            obj_tls = [ o.lower() if o else None for o in obj_tls ]
+            objs = [o for i,o in enumerate(objs) if obj_tls[i] in tls]
             
         if transgenic_lines is not None:
             tls = set([ tl.lower() for tl in transgenic_lines ])
-            ctls = set([ find_specimen_cre_line(o['specimen']), find_specimen_reporter_line(o['specimen']) ])
-            objs = [ o for o in objs if len(tls & ctls) ]
+            objs = [ o for o in objs 
+                     if len(tls & set([ tl.lower() 
+                                        for tl in find_specimen_transgenic_lines(o['specimen']) ]) ) ]
 
         return objs
 
@@ -698,12 +703,18 @@ def find_specimen_cre_line(specimen):
     except StopIteration:
         return None
 
+
 def find_specimen_reporter_line(specimen):
     try:
         return next(tl['name'] for tl in specimen['donor']['transgenic_lines']
                     if tl['transgenic_line_type_name'] == 'reporter')
     except StopIteration:
         return None
+
+
+def find_specimen_transgenic_lines(specimen):
+    return [ tl['name'] for tl in specimen['donor']['transgenic_lines'] ]
+
 
 def find_experiment_acquisition_age(exp):
     try:
