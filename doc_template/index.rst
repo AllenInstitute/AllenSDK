@@ -87,62 +87,39 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
+What's New - Release 0.15.2 (October 4th, 2018)
+-----------------------------------------------
 
-What's New - Release 0.14.5 (June 14th, 2018)
----------------------------------------------
+The 0.15.2 release coincides with the release of significantly more data in the Allen Brain Observatory.  To access the new data, remove the following files from your `BrainObservatoryCache` manifest directory: 
 
-The 0.14.5 release coincides with the release of additional mouse electrophysiology and morphology data in the Allen Cell Types Database. 
-We have simplified the data structure returned by :py:meth:`~allensdk.core.cell_types_cache.CellTypesCache.get_cells` to be more
-flat, so you will be prompted to update your manifest.  To use the simpler format and access the new data, remove the following files:
+    * ``cell_specimens.json``
+    * ``experiment_containers.json``
+    * ``ophys_experiments.json``
+
+Users now have access to methods for accessing new data derived from fluorescence traces:
+
+    * :py:meth:`~allensdk.core.BrainObservatoryCache.get_ophys_experiment_analysis`: traces and metrics organized by stimulus condition
+    * :py:meth:`~allensdk.core.BrainObservatoryCache.get_ophys_experiment_events`: calcium events determined with `FastLZeroSpikeInference <https://github.com/jewellsean/FastLZeroSpikeInference>`_
+
+Note: we addressed `GitHub issue #69 <https://github.com/AllenInstitute/AllenSDK/issues/69>`_ and a more general time alignment error in our processing pipeline.  Handling of additional frame pulses has been corrected, resulting in 2-photon movie frames being assigned times 30ms earlier than before.  We have updated all previously published NWB files accordingly.  Delete these files and re-download them to access updated time stamps.
+
+This release also contains more mouse and human data in the Allen Cell Types Database.  To access the new data, remove the following files from your `CellTypesCache` manifest directory:
 
     * :py:meth:`~allensdk.core.cell_types_cache.CellTypesCache` manifest.json
     * ``cells.json`` 
     * ``ephys_features.csv`` 
     * ``morphology_features.csv`` 
 
-We have also simplified the data structure returned by :py:meth:`~allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_experiments`, so you will 
-be prompted to update your connectivity manifest.  To use the simpler format and access the new data, remove the following files:
 
-    * :py:meth:`~allensdk.core.mouse_connectivity_cache.MouseConnectivityCache` manifest.json
-    * ``experiments.json`` 
+Previous Release Notes
+----------------------
 
-Additional changes:
+    * `0.14.5 <https://github.com/AllenInstitute/AllenSDK/wiki/Release-Notes-(0.14.5)>`_
+    * `0.14.4 <https://github.com/AllenInstitute/AllenSDK/wiki/Release-Notes-(0.14.4)>`_
+    * `0.14.3 <https://github.com/AllenInstitute/AllenSDK/wiki/Release-Notes-(0.14.3)>`_
+    * `0.14.2 <https://github.com/AllenInstitute/AllenSDK/wiki/Release-Notes-(0.14.2)>`_
+    * `0.13.2 <https://github.com/AllenInstitute/AllenSDK/wiki/Release-Notes-(0.13.2)>`_
+    * `0.13.1 <https://github.com/AllenInstitute/AllenSDK/wiki/Release-Notes-(0.13.1)>`_
+    * `0.13.0 <https://github.com/AllenInstitute/AllenSDK/wiki/Release-Notes-(0.13.0)>`_
+    * `0.12.4 <https://github.com/AllenInstitute/AllenSDK/wiki/Release-Notes-(0.12.4)>`_
 
-    * increased ``pandas`` minimum version to 0.17, removed the upper limit
-    * added regression tests to the Brain Observatory analysis modules to ensure py3/py2 numerical compatibility.
-
-What's New - Release 0.14.4 (January 30th, 2018)
-------------------------------------------------
-
-The 0.14.4 release brings support for Python 3.6 along with Python 2.7. These changes maintain compatibility with Python 2.7, so users who continue 
-to work in Python 2.7 will not experience any disruptions.
-
-The :py:func:`~allensdk.ephys.ephys_features.filter_putative_spikes` function now excludes candidate spikes when the voltage trace does not show a 
-decrease between the candidate's peak and the next candidate's threshold-crossing.
-
-
-What's New - Release 0.14.3 (October 19th, 2017)
-------------------------------------------------
-
-The 0.14.3 release coincides with the first release of human data and models in the Allen Cell Types Database and a complete requantification of structure unionize
-records in the Allen Mouse Brain Connectivity Atlas based on a new revision of the Common Coordinate Framework structure ontology and voxel annotations.  For details 
-on what types of data were added to the two atlases, take a look at the `data release notes <https://github.com/AllenInstitute/AllenSDK/wiki/Release-Notes-(0.14.3)>`_.
-
-Users of the :py:class:`~allensdk.core.cell_types_cache.CellTypesCache` can filter for cells based on the species of the cell's donor using the ``species`` argument of 
-:py:meth:`~allensdk.core.cell_types_cache.CellTypesCache.get_cells`.  Examples of this are shown in the metadata filtering section of the example 
-`Jupyter notebook <_static/examples/nb/cell_types.html>`_
-
-The Allen Mouse Brain Connectivity Atlas contains over 350 new data sets and structure unionize records have been completely reprocessed with updated 3D annotations of the Common Coordinate Framework.
-The structure ontology contains new structures, with subcortical annotations having changed the most.  The :py:class:`~allensdk.core.mouse_connectivity_cache.MouseConnectivityCache` :code:`get_annotation_volume` method will by default return a new volume by default.  You can choose which version of annotations you would like using the ``ccf_version`` :py:class:`~allensdk.core.mouse_connectivity_cache.MouseConnectivityCache` constructor.
-
-To access new experiments and unionize records, you will need to remove a number of files in your manifest directory so that 
-:py:class:`~allensdk.core.mouse_connectivity_cache.MouseConnectivityCache` will know to download the new copies:
-
-    * :py:class:`~allensdk.core.mouse_connectivity_cache.MouseConnectivityCache` manifest JSON
-    * ``experiments.json`` 
-    * ``structures.json`` 
-    * ``structure_unionizes.csv`` (one per experiment within experiment subdirectories)  
-
-You can then call the :py:class:`~allensdk.core.mouse_connectivity_cache.MouseConnectivityCache` :code:`get_experiments`, :code:`get_structure_tree`, and :code:`get_structure_unionizes` methods to download the files above.
-
-To find out more, take a look at our `CHANGELOG <http://github.com/AllenInstitute/AllenSDK/blob/master/CHANGELOG.md>`_. 

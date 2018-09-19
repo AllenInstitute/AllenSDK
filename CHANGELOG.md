@@ -1,6 +1,14 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [0.15.2] = 2018-10-04
+
+### Added
+- BrainObservatoryCache.get_ophys_experiment_events
+- BrainObservatoryCache.get_ophys_experiments and get_experiment_containers accept reporter_lines argument
+- BrainObservatoryCache.ge_ophys_experiment_analysis
+- Cache subclasses can have their manifest locations set via environment variable
+
 ## [0.14.5] = 2018-06-14
 
 ### Changed
