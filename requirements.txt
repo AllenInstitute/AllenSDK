@@ -14,3 +14,4 @@ scikit-image>=0.13.0
 statsmodels>=0.8.0
 simpleitk
 tables
+pynwb
