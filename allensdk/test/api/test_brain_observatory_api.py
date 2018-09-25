@@ -250,7 +250,7 @@ def test_get_cell_metrics_no_ids(mock_json_msg_query, bo_api):
     mock_json_msg_query.assert_called_once_with(
         bo_api.api_url + "/api/v2/data/query.json?q="
         "model::ApiCamCellMetric,"
-        "rma::options[num_rows$eq2000][start_row$eq0][count$eqfalse]")
+        "rma::options[num_rows$eq2000][start_row$eq0][order$eq\'cell_specimen_id\'][count$eqfalse]")
 
 
 @patch.object(BrainObservatoryApi, "json_msg_query")
@@ -261,7 +261,7 @@ def test_get_cell_metrics_one_ids(mock_json_msg_query, bo_api):
         bo_api.api_url + "/api/v2/data/query.json?q="
         "model::ApiCamCellMetric,"
         "rma::criteria,[cell_specimen_id$in517394843],"
-        "rma::options[num_rows$eq2000][start_row$eq0][count$eqfalse]")
+        "rma::options[num_rows$eq2000][start_row$eq0][order$eq\'cell_specimen_id\'][count$eqfalse]")
 
 
 @patch.object(BrainObservatoryApi, "json_msg_query")
@@ -272,7 +272,7 @@ def test_get_cell_metrics_two_ids(mock_json_msg_query, bo_api):
         bo_api.api_url + "/api/v2/data/query.json?q="
         "model::ApiCamCellMetric,"
         "rma::criteria,[cell_specimen_id$in517394843,517394850],"
-        "rma::options[num_rows$eq2000][start_row$eq0][count$eqfalse]")
+        "rma::options[num_rows$eq2000][start_row$eq0][order$eq\'cell_specimen_id\'][count$eqfalse]")
 
 
 @patch("allensdk.core.json_utilities.read_url_get", side_effect=_msg5)
@@ -284,7 +284,7 @@ def test_get_cell_metrics_five_messages(ju_read_url_get, bo_api):
        (bo_api.api_url + '/api/v2/data/query.json?q='
         'model::ApiCamCellMetric,'
         'rma::criteria,%5Bcell_specimen_id$in517394843,517394850%5D,'
-        'rma::options%5Bnum_rows$eq2000%5D%5Bstart_row$eq{}%5D%5Bcount$eqfalse%5D')
+        'rma::options%5Bnum_rows$eq2000%5D%5Bstart_row$eq{}%5D%5Border$eq%27cell_specimen_id%27%5D%5Bcount$eqfalse%5D')
     expected_calls = map(lambda c: call(base_query.format(c)),
                          [0, 2000, 4000, 6000, 8000, 10000])
 
