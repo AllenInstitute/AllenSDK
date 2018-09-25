@@ -120,7 +120,7 @@ class MouseAtlasApi(ReferenceSpaceApi, GridDataApi):
         return self.model_query(model='Gene', 
                                 criteria=criteria,
                                 include='chromosome',
-                                order=order
+                                order=order,
                                 **kwargs)
 
     @cacheable(strategy='create', 
