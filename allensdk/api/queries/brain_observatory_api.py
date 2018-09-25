@@ -301,9 +301,13 @@ class BrainObservatoryApi(RmaTemplate):
         -------
         dict : cell metric metadata
         '''
+
+        order = kwargs.pop('order', ['\'cell_specimen_id\''])
+
         data = self.template_query('brain_observatory_queries',
                                    'cell_metric',
                                    cell_specimen_ids=cell_specimen_ids,
+                                   order=order,
                                    *args,
                                    **kwargs)
 
