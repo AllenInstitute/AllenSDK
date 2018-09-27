@@ -38,6 +38,7 @@ For more details on how to use these methods, see :doc:`glif_models`.
 """
 import functools
 import numpy as np
+import numba
 
 
 class GlifNeuronMethod( object ):
@@ -158,11 +159,11 @@ def dynamics_AScurrent_none(neuron, AScurrents_t0, time_step, spike_time_steps):
     """ This method always returns zeros for the afterspike currents, regardless of input. """
     return np.zeros(len(AScurrents_t0))
 
-
+@jit
 def dynamics_voltage_linear_forward_euler(neuron, voltage_t0, AScurrents_t0, inj):
     """ (TODO) Linear voltage dynamics. """
     return voltage_t0 + (inj + np.sum(AScurrents_t0) - neuron.G * neuron.coeffs['G'] * (voltage_t0 - neuron.El)) * neuron.dt / (neuron.C * neuron.coeffs['C'])
-
+@jit
 def dynamics_voltage_linear_exact(neuron, voltage_t0, AScurrents_t0, inj):
     """ (TODO) Linear voltage dynamics. """
 
@@ -189,7 +190,8 @@ def spike_component_of_threshold_forward_euler(th_t0, b_spike, dt):
     '''
     b_spike=-b_spike #TODO: this is here because b_spike is always input as positive although it is negative
     return th_t0 + th_t0*b_spike * dt                                                                         
-    
+
+@jit
 def spike_component_of_threshold_exact(th0, b_spike, t):
     '''Spike component of threshold modeled as an exponential decay. Implemented 
     here as exact analytical solution. 
@@ -207,6 +209,7 @@ def spike_component_of_threshold_exact(th0, b_spike, t):
     b_spike=-b_spike
     return th0*np.exp(b_spike * t)
 
+@jit
 def voltage_component_of_threshold_forward_euler(th_t0, v_t0, dt, a_voltage, b_voltage, El):
     '''Equation 2.1 of Mihalas and Nieber, 2009 implemented for use in forward Euler. Note 
     here all variables are in reference to threshold infinity.  Therefore thr_inf is zero 
@@ -230,6 +233,7 @@ def voltage_component_of_threshold_forward_euler(th_t0, v_t0, dt, a_voltage, b_v
     '''
     return th_t0 + (a_voltage*(v_t0-El)-b_voltage*(th_t0-0))*dt
 
+@jit
 def voltage_component_of_threshold_exact(th0, v0, I, t, a_voltage, b_voltage, C, g, El):
     '''Note this function is the exact formulation; however, dt is used because t0 is the initial time and dt
     is the time the function is exactly evaluated at. Note: that here, this equation is in reference to th_inf.
@@ -263,7 +267,7 @@ def voltage_component_of_threshold_exact(th0, v0, I, t, a_voltage, b_voltage, C,
     return phi*(v0-beta)*np.exp(-g*t/C)+1/(np.exp(b_voltage*t))*(th0-phi*(v0-beta)-
                         (a_voltage/b_voltage)*(beta-El)-0) +(a_voltage/b_voltage)*(beta-El) +0
 
-
+@jit
 def dynamics_threshold_three_components_exact(neuron, threshold_t0, voltage_t0, AScurrents_t0, inj,
                                               a_spike, b_spike, a_voltage, b_voltage):
     """Analytical solution for threshold dynamics. The threshold will adapt via two mechanisms: 
@@ -368,7 +372,7 @@ def dynamics_threshold_inf(neuron, threshold_t0, voltage_t0, AScurrents_t0, inj)
     """   
     return neuron.coeffs['th_inf'] * neuron.th_inf
 
-
+@jit
 def reset_AScurrent_sum(neuron, AScurrents_t0, r):
     """ Reset afterspike currents by adding summed exponentials. Left over currents from last spikes as 
     well as newly initiated currents from current spike.  Currents amplitudes in neuron.asc_amp_array need
