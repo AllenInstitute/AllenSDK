@@ -132,8 +132,12 @@ class Cache(object):
 
                 raise ManifestVersionError(("Your manifest file (%s) %s" +
                                             " (its version is '%s', but version '%s' is expected).  Please remove this file" +
-                                            " and it will be regenerated for you the next"
-                                            " time you instantiate this class.") % (file_name, intro, e.found_version, e.version),
+                                            " and it will be regenerated for you the next" +
+                                            " time you instantiate this class." +
+                                            " WARNING: There may be new data files available that replace the ones you already have downloaded." +
+                                            " Read the notes for this release for more details on what has changed" +
+                                            " (https://github.com/alleninstitute/allensdk/wiki).") % 
+                                           (file_name, intro, e.found_version, e.version),
                                            e.version, e.found_version)
 
             self.manifest_path = file_name
