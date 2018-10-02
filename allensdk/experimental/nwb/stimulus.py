@@ -54,11 +54,14 @@ class BaseStimulusAdapter(object):
     def core_data(self):
         raise NotImplementedError()
 
+    def get_times(self):
+        return get_timestamps_from_sync(self.sync_file, self.stim_key)
+
     @property
     def running_speed(self):
         running_df = self.core_data['running']
         speed = running_df.speed
-        times = get_timestamps_from_sync(self.sync_file, self.stim_key)
+        times = get_times()
         if len(times) > len(speed):
             logger.warning("Got times of length %s but speed of length %s, truncating times from the end",
                            len(times), len(speed))
@@ -76,6 +79,11 @@ class BaseStimulusAdapter(object):
 class VisualBehaviorStimulusAdapter(BaseStimulusAdapter):
     _source = 'Allen Brain Observatory: Visual Behavior'
 
+    def __init__(self, pkl_file, sync_file=None, stim_key='stim_vsync', compress=True):
+        '''Cleaning up init signature for optional kwarg sync'''
+
+        super(VisualBehaviorStimulusAdapter, self).__init__(pkl_file, sync_file, stim_key='stim_vsync', compress=True)
+
     @property
     def core_data(self):
         if self._data is None:
@@ -83,6 +91,12 @@ class VisualBehaviorStimulusAdapter(BaseStimulusAdapter):
             self._data = data_to_change_detection_core(loaded)
 
         return self._data
+
+    def get_times(self):
+        if self.sync_file is not None:
+            return super(VisualBehaviorStimulusAdapter, self).get_times()
+        else:
+            return self.core_data['time']
 
 
 class VisualCodingStimulusAdapter(BaseStimulusAdapter):
