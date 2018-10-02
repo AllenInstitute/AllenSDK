@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 
 import pynwb
+from pynwb import NWBHDF5IO
 from pynwb.device import Device
 from pynwb.ecephys import ElectrodeGroup
 
@@ -110,6 +111,13 @@ def main(ecephys_session_id, nwb_path):
                 horizontal_pos=probe['probe_info']['vertical_pos'][ii]
                 # id= TODO: track these in lims and use globally valid ids - till then just use local
             )
+
+    io = NWBHDF5IO(nwb_path, mode='w')
+    io.write(nwbfile)
+    io.close()
+
+    return nwbfile, nwb_path
+
 
 
 if __name__ == '__main__':
