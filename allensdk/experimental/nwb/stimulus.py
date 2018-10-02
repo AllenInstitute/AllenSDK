@@ -107,7 +107,6 @@ class VisualBehaviorStimulusAdapter(BaseStimulusAdapter):
 
     @property
     def session_start_time(self):
-        # TODO: Move this upstream to parent class?
         return self.core_data['metadata']['startdatetime']
 
 
