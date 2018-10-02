@@ -110,6 +110,25 @@ class VisualBehaviorStimulusAdapter(BaseStimulusAdapter):
         return self.core_data['metadata']['startdatetime']
 
 
+    def add_stimulus_epochs(self, nwbfile):
+
+        stimulus_table = self.core_data['visual_stimuli']
+        timestamps = self.core_data['time']
+
+        for ri, row_series in stimulus_table.iterrows():
+            row = row_series.to_dict()
+            start_time = timestamps[int(row.pop('frame'))]
+            stop_time = timestamps[int(row.pop('end_frame'))]
+            assert start_time == row.pop('time')
+
+            nwbfile.create_epoch(start_time=start_time,
+                            stop_time=stop_time,
+                            timeseries=[self.running_speed],
+                            tags='stimulus',
+                            description='Stimulus Presentation Epoch',
+                            metadata=row)
+
+
 class VisualCodingStimulusAdapter(BaseStimulusAdapter):
     _source = 'Allen Brain Observatory: Visual Coding'
 

@@ -5,28 +5,6 @@ from visual_behavior.translator.foraging2 import data_to_change_detection_core
 import datetime
 from allensdk.experimental.nwb.stimulus import VisualBehaviorStimulusAdapter
 
-def add_epochs(nwbfile, ts_list, core_data):
-
-    # REFACTOR to stimulus?
-
-    stimulus_table = core_data['visual_stimuli']
-    timestamps = core_data['time']
-
-    for ri, row_series in stimulus_table.iterrows():
-        row = row_series.to_dict()
-        start_time = timestamps[int(row.pop('frame'))]
-        stop_time = timestamps[int(row.pop('end_frame'))]
-        assert start_time == row.pop('time')
-
-        nwbfile.create_epoch(start_time=start_time,
-                         stop_time=stop_time,
-                         timeseries=ts_list,
-                         tags='stimulus',
-                         description='Stimulus Presentation Epoch',
-                         metadata=row)
-
-
-
 
 def test_visbeh_nwb(tmpdir_factory):
 
@@ -46,8 +24,7 @@ def test_visbeh_nwb(tmpdir_factory):
     )
 
     nwbfile.add_acquisition(visbeh_data.running_speed)
-    add_epochs(nwbfile, [visbeh_data.running_speed], visbeh_data.core_data)
-
+    visbeh_data.add_stimulus_epochs(nwbfile)
 
     with NWBHDF5IO(save_file_name, mode='w') as io:
         io.write(nwbfile)
