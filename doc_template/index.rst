@@ -87,10 +87,10 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
-What's New - Release 0.15.2 (October 4th, 2018)
+What's New - Release 0.16.0 (October 4th, 2018)
 -----------------------------------------------
 
-The 0.15.2 release coincides with the release of significantly more data in the Allen Brain Observatory.  To access the new data, remove the following files from your `BrainObservatoryCache` manifest directory: 
+The 0.16.0 release coincides with the release of significantly more data in the Allen Brain Observatory.  To access the new data, remove the following files from your `BrainObservatoryCache` manifest directory: 
 
     * ``cell_specimens.json``
     * ``experiment_containers.json``
