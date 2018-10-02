@@ -43,6 +43,7 @@ class BaseStimulusAdapter(object):
         self.sync_file = sync_file
         self.stim_key = stim_key
         self._data = None
+        self._running_speed = None
         if compress:
             self.compression_opts = {"compression": True,
                                      "compression_opts": 9}
@@ -53,26 +54,33 @@ class BaseStimulusAdapter(object):
     def core_data(self):
         raise NotImplementedError()
 
+    @property
+    def session_start_time(self):
+        raise NotImplementedError()
+
     def get_times(self):
         return get_timestamps_from_sync(self.sync_file, self.stim_key)
 
     @property
     def running_speed(self):
-        running_df = self.core_data['running']
-        speed = running_df.speed
-        times = self.get_times()
-        if len(times) > len(speed):
-            logger.warning("Got times of length %s but speed of length %s, truncating times from the end",
-                           len(times), len(speed))
-            times = times[:len(speed)]
 
-        ts = TimeSeries(name='running_speed',
-                        source=self._source,
-                        data=H5DataIO(speed.values, **self.compression_opts),
-                        timestamps=times,
-                        unit='cm/s')
+        if self._running_speed is None:
 
-        return ts
+            running_df = self.core_data['running']
+            speed = running_df.speed
+            times = self.get_times()
+            if len(times) > len(speed):
+                logger.warning("Got times of length %s but speed of length %s, truncating times from the end",
+                            len(times), len(speed))
+                times = times[:len(speed)]
+
+            self._running_speed = TimeSeries(name='running_speed',
+                            source=self._source,
+                            data=H5DataIO(speed.values, **self.compression_opts),
+                            timestamps=times,
+                            unit='cm/s')
+
+        return self._running_speed
 
 
 class VisualBehaviorStimulusAdapter(BaseStimulusAdapter):
@@ -96,6 +104,11 @@ class VisualBehaviorStimulusAdapter(BaseStimulusAdapter):
             return super(VisualBehaviorStimulusAdapter, self).get_times()
         else:
             return self.core_data['time']
+
+    @property
+    def session_start_time(self):
+        # TODO: Move this upstream to parent class?
+        return self.core_data['metadata']['startdatetime']
 
 
 class VisualCodingStimulusAdapter(BaseStimulusAdapter):
