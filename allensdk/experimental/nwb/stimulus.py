@@ -5,26 +5,25 @@ from pynwb import TimeSeries
 from pynwb.form.backends.hdf5.h5_utils import H5DataIO
 from scipy.signal import medfilt
 from visual_behavior.translator.foraging2 import data_to_change_detection_core
-from visual_behavior.analyze import calc_deriv, rad_to_dist
+from visual_behavior.analyze import compute_running_speed
 from .timestamps import get_timestamps_from_sync
 
 logger = logging.getLogger(__name__)
 
 
 def visual_coding_running_speed(exp_data):
-    # mostly copy-paste from visual_behavior runing speed code, but with different source
     dx_raw = exp_data['items']['foraging']['encoders'][0]['dx']
+    v_sig = exp_data['items']['foraging']['encoders'][0]['vsig']
+    v_in = exp_data['items']['foraging']['encoders'][0]['vin']
     time = exp_data['intervalsms']
-    dx = medfilt(dx_raw, kernel_size=5)  # remove big, single frame spikes in encoder values
-    dx = np.cumsum(dx)  # wheel rotations
 
-    if len(time) < len(dx):
+    if len(time) < len(dx_raw):
         logger.error('intervalsms record appears to be missing entries')
-        dx = dx[:len(time)]
         dx_raw = dx_raw[:len(time)]
+        v_sig = v_sig[:len(time)]
+        v_in = v_in[:len(time)]
 
-    speed = calc_deriv(dx, time)
-    speed = rad_to_dist(speed)
+    speed = compute_running_speed(dx_raw, time, v_sig, v_in)
 
     running_speed = pd.DataFrame({
         'time': time,
