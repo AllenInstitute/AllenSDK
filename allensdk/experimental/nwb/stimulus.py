@@ -52,7 +52,10 @@ class BaseStimulusAdapter(object):
         running_df = self.core_data['running']
         speed = running_df.speed
         times = get_timestamps_from_sync(self.sync_file, self.stim_key)
-        assert(len(times) == len(speed))
+        if len(times) > len(speed):
+            logger.warning("Got times of length %s but speed of length %s, truncating times from the end",
+                           len(times), len(speed))
+            times = times[:len(speed)]
 
         ts = TimeSeries(name='running_speed',
                         source=self._source,
