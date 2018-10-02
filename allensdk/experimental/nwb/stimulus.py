@@ -61,7 +61,7 @@ class BaseStimulusAdapter(object):
     def running_speed(self):
         running_df = self.core_data['running']
         speed = running_df.speed
-        times = get_times()
+        times = self.get_times()
         if len(times) > len(speed):
             logger.warning("Got times of length %s but speed of length %s, truncating times from the end",
                            len(times), len(speed))
