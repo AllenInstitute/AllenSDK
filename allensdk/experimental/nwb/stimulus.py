@@ -2,6 +2,7 @@ import logging
 import pandas as pd
 import numpy as np
 from pynwb import TimeSeries
+from pynwb.form.backends.hdf5.h5_utils import H5DataIO
 from scipy.signal import medfilt
 from visual_behavior.translator.foraging2 import data_to_change_detection_core
 from visual_behavior.analyze import calc_deriv, rad_to_dist
@@ -37,11 +38,17 @@ def visual_coding_running_speed(exp_data):
 class BaseStimulusAdapter(object):
     _source = ''
 
-    def __init__(self, pkl_file, sync_file, stim_key='stim_vsync'):
+    def __init__(self, pkl_file, sync_file, stim_key='stim_vsync',
+                 compress=True):
         self.pkl_file = pkl_file
         self.sync_file = sync_file
         self.stim_key = stim_key
         self._data = None
+        if compress:
+            self.compression_opts = {"compression": True,
+                                     "compression_opts": 9}
+        else:
+            self.compression_opts = {}
 
     @property
     def core_data(self):
@@ -59,7 +66,7 @@ class BaseStimulusAdapter(object):
 
         ts = TimeSeries(name='running_speed',
                         source=self._source,
-                        data=speed.values,
+                        data=H5DataIO(speed.values, **self.compression_opts),
                         timestamps=times,
                         unit='cm/s')
 

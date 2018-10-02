@@ -11,17 +11,21 @@ import pytest
 def vb_pkl():
     return '/allen/programs/braintv/production/visualbehavior/prod0/specimen_710269829/ophys_session_759332825/759332825_stim.pkl'
 
+
 @pytest.fixture
 def vb_sync():
     return '/allen/programs/braintv/production/visualbehavior/prod0/specimen_710269829/ophys_session_759332825/759332825_sync.h5'
+
 
 @pytest.fixture
 def vc_pkl():
     return '/allen/programs/braintv/production/neuralcoding/prod53/specimen_691654617/ophys_session_714254764/714254764_388801_20180626_stim.pkl'
 
+
 @pytest.fixture
 def vc_sync():
     return '/allen/programs/braintv/production/neuralcoding/prod53/specimen_691654617/ophys_session_714254764/714254764_388801_20180626_sync.h5'
+
 
 @pytest.fixture
 def nwb_filename(tmpdir_factory):
@@ -29,8 +33,11 @@ def nwb_filename(tmpdir_factory):
     return str(nwb)
 
 
-def test_visual_behavior_running_speed(nwb_filename, vb_pkl, vb_sync):
-    adapter = VisualBehaviorStimulusAdapter(vb_pkl, vb_sync, stim_key=2)
+@pytest.mark.parametrize("compress", (True, False))
+def test_visual_behavior_running_speed(nwb_filename, vb_pkl, vb_sync,
+                                       compress):
+    adapter = VisualBehaviorStimulusAdapter(vb_pkl, vb_sync, stim_key=2,
+                                            compress=compress)
 
     nwbfile = NWBFile(
         source='Data source',
@@ -48,12 +55,14 @@ def test_visual_behavior_running_speed(nwb_filename, vb_pkl, vb_sync):
 
     nwbfile_in = NWBHDF5IO(nwb_filename, mode='r').read()
     running_speed_in = nwbfile_in.get_acquisition('running_speed')
-    assert(np.allclose(running_speed_in.data, running_speed.data))
+    assert(np.allclose(running_speed_in.data, running_speed.data.data))
     assert(np.allclose(running_speed_in.timestamps, running_speed.timestamps))
 
 
-def test_visual_coding_running_speed(nwb_filename, vc_pkl, vc_sync):
-    adapter = VisualCodingStimulusAdapter(vc_pkl, vc_sync)
+@pytest.mark.parametrize("compress", (True, False))
+def test_visual_coding_running_speed(nwb_filename, vc_pkl, vc_sync,
+                                     compress):
+    adapter = VisualCodingStimulusAdapter(vc_pkl, vc_sync, compress=compress)
 
     nwbfile = NWBFile(
         source='Data source',
@@ -71,5 +80,5 @@ def test_visual_coding_running_speed(nwb_filename, vc_pkl, vc_sync):
 
     nwbfile_in = NWBHDF5IO(nwb_filename, mode='r').read()
     running_speed_in = nwbfile_in.get_acquisition('running_speed')
-    assert(np.allclose(running_speed_in.data, running_speed.data))
+    assert(np.allclose(running_speed_in.data, running_speed.data.data))
     assert(np.allclose(running_speed_in.timestamps, running_speed.timestamps))
