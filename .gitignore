@@ -6,7 +6,7 @@ htmlcov
 .settings
 cell_types
 dist
-test-reports/*
+*test-reports/
 doc_template/examples/nb/connectivity/experiment_*
 doc_template/examples/nb/Website_Inquiry_RT_45792 /experiment_*
 *pyc
@@ -17,3 +17,5 @@ allensdk.egg-info/
 debug.log
 *~
 *#*#
+*.ipynb_checkpoints
+*__pycache__/
