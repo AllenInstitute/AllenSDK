@@ -90,7 +90,7 @@ See the `mouse connectivity section <connectivity.html>`_ for more details.
 What's New - Release 0.16.0 (October 4th, 2018)
 -----------------------------------------------
 
-The 0.16.0 release coincides with the release of significantly more data in the Allen Brain Observatory.  To access the new data, remove the following files from your `BrainObservatoryCache` manifest directory: 
+The 0.16.0 release coincides with the release of significantly more data in the Allen Brain Observatory.  To access the new data, remove the following files from your :py:class:`~allensdk.core.brain_observatory_cache.BrainObservatoryCache` manifest directory: 
 
     * ``cell_specimens.json``
     * ``experiment_containers.json``
@@ -98,14 +98,14 @@ The 0.16.0 release coincides with the release of significantly more data in the 
 
 Users now have access to methods for accessing new data derived from fluorescence traces:
 
-    * :py:meth:`~allensdk.core.BrainObservatoryCache.get_ophys_experiment_analysis`: traces and metrics organized by stimulus condition
-    * :py:meth:`~allensdk.core.BrainObservatoryCache.get_ophys_experiment_events`: calcium events determined with `FastLZeroSpikeInference <https://github.com/jewellsean/FastLZeroSpikeInference>`_
+    * :py:meth:`~allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiment_analysis`: traces and metrics organized by stimulus condition
+    * :py:meth:`~allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiment_events`: calcium events determined with `FastLZeroSpikeInference <https://github.com/jewellsean/FastLZeroSpikeInference>`_
 
 Note: we addressed `GitHub issue #69 <https://github.com/AllenInstitute/AllenSDK/issues/69>`_ and a more general time alignment error in our processing pipeline.  Handling of additional frame pulses has been corrected, resulting in 2-photon movie frames being assigned times 30ms earlier than before.  We have updated all previously published NWB files accordingly.  Delete these files and re-download them to access updated time stamps.
 
-This release also contains more mouse and human data in the Allen Cell Types Database.  To access the new data, remove the following files from your `CellTypesCache` manifest directory:
+This release also contains more mouse and human data in the Allen Cell Types Database.  To access the new data, remove the following files from your :py:class:`~allensdk.core.cell_types_cache.CellTypesCache` manifest directory:
 
-    * :py:meth:`~allensdk.core.cell_types_cache.CellTypesCache` manifest.json
+    * ``manifest.json``
     * ``cells.json`` 
     * ``ephys_features.csv`` 
     * ``morphology_features.csv`` 
