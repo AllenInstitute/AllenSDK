@@ -113,13 +113,12 @@ class VisualBehaviorStimulusAdapter(BaseStimulusAdapter):
     def add_stimulus_epochs(self, nwbfile):
 
         stimulus_table = self.core_data['visual_stimuli']
-        timestamps = self.core_data['time']
+        timestamps = self.get_times()
 
         for ri, row_series in stimulus_table.iterrows():
             row = row_series.to_dict()
             start_time = timestamps[int(row.pop('frame'))]
             stop_time = timestamps[int(row.pop('end_frame'))]
-            assert start_time == row.pop('time')
 
             nwbfile.create_epoch(start_time=start_time,
                             stop_time=stop_time,
