@@ -2,7 +2,6 @@ from datetime import datetime
 from pynwb import NWBFile
 import nwb1_reader
 from pynwb import NWBHDF5IO
-import icephys
 import logging
 import numpy as np
 from pynwb.icephys import CurrentClampStimulusSeries, VoltageClampStimulusSeries
@@ -12,7 +11,6 @@ import ipfx.lab_notebook_reader as lab_notebook_reader
 
 #NWB1_FILE_NAME = "/allen/programs/celltypes/production/mousecelltypes/prod589/Ephys_Roi_Result_500844779/500844779.nwb"
 #NWB2_FILE_NAME = "/local1/ephys/ivscc/nwb2/500844779_ver2.nwb"
-H5_FILE_NAME = None
 NWB1_FILE_NAME ="/local1/ephys/patchseq/nwb2/Npr3-IRES2-CreSst-IRES-FlpOAi65-401243.04.01.01.nwb"
 NWB2_FILE_NAME = "/local1/ephys/patchseq/nwb2/patchseq_nwb_ver2.nwb"
 
@@ -27,7 +25,6 @@ def build_nwb2file(nwb_data,notebook):
                        file_create_date=datetime.now()
     )
 
-
     device = nwb2file.create_device(name='electrode_0', source='a source')
 
     elec = nwb2file.create_ic_electrode(
@@ -37,9 +34,25 @@ def build_nwb2file(nwb_data,notebook):
 
     for sweep_name in nwb_data.get_sweep_names():
 
+
+
         sweep_number = nwb_data.get_sweep_number(sweep_name)
         acquisition = nwb_data.get_acquisition(sweep_number)
         stimulus = nwb_data.get_stimulus(sweep_number)
+
+        # Container for metadata that does not have an obvious place in pynwb timeseries
+        # These properties actually are not used by the ipfx code
+        sweep_metadata = {}
+
+        scale_factor = notebook.get_value("Scale Factor", sweep_number, None)
+        if scale_factor is None:
+            raise Exception("Unable to read scale factor for " + sweep_name)
+        sweep_metadata["stimulus_scale_factor"] = scale_factor
+        cnt = notebook.get_value("Set Sweep Count", sweep_number, 0)
+        stim_code_ext = acquisition["stimulus_description"] + "[%d]" % int(cnt)
+        sweep_metadata["stimulus_code_ext"] = stim_code_ext
+
+        # ------------------------------------------------------------------------------
 
         if stimulus["clamp_mode"] == "voltage_clamp":
 
@@ -71,6 +84,7 @@ def build_nwb2file(nwb_data,notebook):
 
             bridge_balance = notebook.get_value("Bridge Bal Value", sweep_number, np.nan)
             bias_current = notebook.get_value("I-Clamp Holding Level", sweep_number, np.nan)
+
             acquisition_series = CurrentClampSeries(
                 name=sweep_name, source=acquisition['source'], data=acquisition['data'],
                 unit=acquisition['unit'], conversion=np.nan, resolution=np.nan, starting_time=np.nan,
@@ -105,13 +119,11 @@ def load_nwb2_file(nwb2_file_name):
 def main():
 
     logging.basicConfig(level="INFO")
+    nwb1_file_name = NWB1_FILE_NAME
     nwb2_file_name = NWB2_FILE_NAME
 
-    nwb1_file_name = NWB1_FILE_NAME
-    h5_file_name = H5_FILE_NAME
-
     nwb_data = nwb1_reader.create_nwb_reader(nwb1_file_name)
-    notebook = lab_notebook_reader.create_lab_notebook_reader(nwb1_file_name, h5_file_name)
+    notebook = lab_notebook_reader.create_lab_notebook_reader(nwb1_file_name)
 
     nwb2file = build_nwb2file(nwb_data,notebook)
     logging.info("Created nwb2 file")
