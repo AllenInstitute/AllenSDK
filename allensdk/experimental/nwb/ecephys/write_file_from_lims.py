@@ -40,6 +40,7 @@ def main(ecephys_session_id, nwb_path, remove_file=False):
 
     # get a channel table and add nwb-required attributes
     channel_table = api.get_channel_table(ecephys_session_id)  # re: ids TODO: track these in lims and use globally valid ids - till then just use local
+    channel_table.set_index('id', drop=True, inplace=True)
     channel_table['x'] = -1.0  # TODO when we get CCF positions from alignment we can write those here, till then there is no option to not supply these fields, so ...
     channel_table['y'] = -1.0
     channel_table['z'] = -1.0
@@ -48,6 +49,10 @@ def main(ecephys_session_id, nwb_path, remove_file=False):
     channel_table['filtering'] = electrode_filtering
     channel_table['group'] = None
     channel_table['group_name'] = ''
+
+    # get a unit table
+    unit_table = api.get_unit_table(session_id=ecephys_session_id)
+    unit_table.set_index('id', drop=True, inplace=True)
 
     # setup a file
 
@@ -61,15 +66,15 @@ def main(ecephys_session_id, nwb_path, remove_file=False):
 
     # add probes (as devices), each with an electrode group
 
-    for probe_id, probe in probe_table.iterrows():
+    for _, probe in probe_table.iterrows():
 
         probe_nwb_device = Device(
-            name=str(probe_id), # why not name? probe names are actually codes for targeted structure. ids are the appropriate primary key
+            name=str(probe['id']), # why not name? probe names are actually codes for targeted structure. ids are the appropriate primary key
             source=source
         )
 
         probe_nwb_electrode_group = ElectrodeGroup(
-            name=str(probe_id),
+            name=str(probe['id']),
             source=source, 
             description=probe['name'], # TODO probe name currently describes the targeting of the probe - the closest we have to a meaningful "kind"
             location='', # TODO not actailly sure where to get this
@@ -79,9 +84,10 @@ def main(ecephys_session_id, nwb_path, remove_file=False):
         nwbfile.add_device(probe_nwb_device)
         nwbfile.add_electrode_group(probe_nwb_electrode_group)
 
-        channel_table.loc[channel_table['probe_id'] == probe_id, 'group'] = probe_nwb_electrode_group
+        channel_table.loc[channel_table['probe_id'] == probe['id'], 'group'] = probe_nwb_electrode_group
 
     nwbfile.electrodes = ElectrodeTable().from_dataframe(channel_table, source=source, name='electrodes')
+    nwbfile.units = DynamicTable.from_dataframe(unit_table, source=source, name='units')
 
     if remove_file:
         os.remove(nwb_path)
