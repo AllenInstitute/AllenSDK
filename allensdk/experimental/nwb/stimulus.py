@@ -110,38 +110,33 @@ class VisualBehaviorStimulusAdapter(BaseStimulusAdapter):
             return self.core_data['time']
 
     @property
+    def timestamp_source(self):
+        if self.sync_file is not None:
+            return 'sync_file_timestamps'
+        else:
+            return 'pkl_file_timestamps'
+
+    @property
     def session_start_time(self):
         return self.core_data['metadata']['startdatetime']
 
 
     def get_epoch_table(self):
 
-        df = pd.DataFrame({'start_time':[0.,1.], 
-                           'stop_time':[1.,2.], 
-                           'stimulus':['a', 'b'], 
-                           'tags':['a', 'b'], 
-                           'description':['a', 'b'], 
-                           'timeseries':[[self.running_speed], [self.running_speed]]
-                           })
+        timestamps = self.get_times()
+        df = self.core_data['visual_stimuli'].copy()
+
+        df['stop_time'] = timestamps[df['end_frame']]
+        df['start_time'] = timestamps[df['frame']]
+        df['description'] = ['stimulus presentation']*len(df) 
+        df['timeseries'] = [[self.running_speed]]*len(df) 
+        df['tags'] = [[self.timestamp_source]]*len(df) 
+        df.drop('time', inplace=True, axis=1)
 
         epochs = Epochs.from_dataframe(df, 'nosource', self.EPOCHS)
 
         return epochs
 
-        # stimulus_table = self.core_data['visual_stimuli']
-        # timestamps = self.get_times()
-
-        # for ri, row_series in stimulus_table.iterrows():
-        #     row = row_series.to_dict()
-        #     start_time = timestamps[int(row.pop('frame'))]
-        #     stop_time = timestamps[int(row.pop('end_frame'))]
-
-        #     nwbfile.create_epoch(start_time=start_time,
-        #                     stop_time=stop_time,
-        #                     timeseries=[self.running_speed],
-        #                     tags='stimulus',
-        #                     description='Stimulus Presentation Epoch',
-        #                     metadata=row)
 
 
 class VisualCodingStimulusAdapter(BaseStimulusAdapter):
