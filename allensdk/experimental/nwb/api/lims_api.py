@@ -1,3 +1,6 @@
+import os
+import six
+
 import pandas as pd
 import psycopg2
 import psycopg2.extras
@@ -31,8 +34,10 @@ def clean_multiline_query(query):
 
 
 def produce_in_clause_target(values, sep=',', left='(', right=')'):
-    return left + sep.join([str(val) for val in values]) + right
-
+    return left + sep.join([
+        str(val) if not isinstance(val, six.string_types) else '\'{}\''.format(val)
+        for val in values
+        ]) + right
 
 
 class LimsApi(object):
@@ -46,37 +51,30 @@ class LimsApi(object):
         super(LimsApi, self).__init__(*args, **kwargs)
 
 
-    def get_well_known_file_table(self):
-        '''Queries for a global table of all well known files and their paths, for all experiments and probes
-
-        Notes
-        -----
-        only valid for LIMS
-
+    def get_well_known_file_table(self, attachable_types=None, attachable_ids=None, well_known_file_type_names=None):
+        '''Grab (a subset of) the well_known_files table from LIMS.
         '''
 
-        session_query = clean_multiline_query('''
-            select wkft.name as file_type, wkf.storage_directory, wkf.filename, wkf.attachable_id as session_id
-            from well_known_files wkf
-            join well_known_file_types wkft on wkft.id = wkf.well_known_file_type_id
-            where wkf.attachable_type = \'EcephysSession\'
+        query = clean_multiline_query('''
+        select wkf.*, wkft.name as file_type_name from well_known_files wkf
+        join well_known_file_types wkft on wkft.id = wkf.well_known_file_type_id
         ''')
-        session_response = self.query_fn(session_query)
-        session_response['probe_id'] = None
 
-        probe_query = clean_multiline_query('''
-            select wkft.name as file_type, wkf.storage_directory, wkf.filename, wkf.attachable_id as probe_id, ep.ecephys_session_id as session_id
-            from well_known_files wkf
-            join ecephys_probes ep on ep.id = wkf.attachable_id
-            join well_known_file_types wkft on wkft.id = wkf.well_known_file_type_id
-            where wkf.attachable_type = \'EcephysProbe\'
-        ''')
-        probe_response = self.query_fn(probe_query)
-        
-        output = pd.concat([session_response, probe_response], sort=False)
-        output['path'] = output.apply(lambda row: os.path.join(row['storage_directory'], row['filename']), axis=1)
-        output = output.drop(columns=['storage_directory', 'filename'])
-        return output.sort_values(by='session_id')
+        where = []
+        if attachable_types is not None:
+            where.append('wkf.attachable_type in {}'.format(produce_in_clause_target(attachable_types)))
+        if attachable_ids is not None:
+            where.append('wkf.attachable_id in {}'.format(produce_in_clause_target(attachable_ids)))
+        if well_known_file_type_names is  not None:
+            where.append('wkft.name in {}'.format(produce_in_clause_target(well_known_file_type_names)))
+
+        if len(where) > 0:
+            query = '{} where {}'.format(query, ' and '.join(where))
+
+        response = self.query_fn(query)
+        response['path'] = response.apply(lambda row: os.path.join(row['storage_directory'], row['filename']), axis=1)
+        response = response.drop(columns=['storage_directory', 'filename'])
+        return response
 
 
     def _get_well_known_file_path(self, attachable_id, well_known_file_type_name, attachable_type):

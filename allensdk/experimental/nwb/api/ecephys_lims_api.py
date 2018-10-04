@@ -109,3 +109,34 @@ class EcephysLimsApi(LimsApi, EcephysApi):
         return response 
 
 
+    def get_probe_and_session_well_known_files(self):
+        '''Queries for a global table of all well known files and their paths, for all experiments and probes
+
+        Notes
+        -----
+        only valid for LIMS
+
+        '''
+
+        session_query = clean_multiline_query('''
+            select wkft.name as file_type, wkf.storage_directory, wkf.filename, wkf.attachable_id as session_id
+            from well_known_files wkf
+            join well_known_file_types wkft on wkft.id = wkf.well_known_file_type_id
+            where wkf.attachable_type = \'EcephysSession\'
+        ''')
+        session_response = self.query_fn(session_query)
+        session_response['probe_id'] = None
+
+        probe_query = clean_multiline_query('''
+            select wkft.name as file_type, wkf.storage_directory, wkf.filename, wkf.attachable_id as probe_id, ep.ecephys_session_id as session_id
+            from well_known_files wkf
+            join ecephys_probes ep on ep.id = wkf.attachable_id
+            join well_known_file_types wkft on wkft.id = wkf.well_known_file_type_id
+            where wkf.attachable_type = \'EcephysProbe\'
+        ''')
+        probe_response = self.query_fn(probe_query)
+        
+        output = pd.concat([session_response, probe_response], sort=False)
+        output['path'] = output.apply(lambda row: os.path.join(row['storage_directory'], row['filename']), axis=1)
+        output = output.drop(columns=['storage_directory', 'filename'])
+        return output.sort_values(by='session_id')
