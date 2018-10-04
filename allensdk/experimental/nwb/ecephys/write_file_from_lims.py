@@ -1,5 +1,6 @@
 import argparse
 from datetime import datetime
+import os
 
 import psycopg2
 import psycopg2.extras
@@ -7,9 +8,13 @@ import pandas as pd
 import numpy as np
 
 import pynwb
+from pynwb.core import DynamicTable
+from pynwb.file import ElectrodeTable
 from pynwb import NWBHDF5IO
 from pynwb.device import Device
 from pynwb.ecephys import ElectrodeGroup
+
+from allensdk.experimental.nwb.ecephys.api.ecephys_lims_api import EcephysLimsApi
 
 
 DEFAULT_DATABASE = 'lims2'
@@ -46,9 +51,10 @@ def get_session_start_time(ecephys_session_id):
 
 def get_probe_info(ecephys_session_id):
     return psycopg2_select('select * from ecephys_probes where ecephys_session_id = {}'.format(ecephys_session_id)) 
+    
 
 
-def main(ecephys_session_id, nwb_path):
+def main(ecephys_session_id, nwb_path, remove_file=False):
 
     source = 'Allen Institute for Brain Science'
     electrode_filtering = 'here is a description of our filtering' # TODO do we have a standard filtering string?
@@ -56,6 +62,8 @@ def main(ecephys_session_id, nwb_path):
     session_start_time = get_session_start_time(ecephys_session_id)
     session_identifier = '{}'.format(ecephys_session_id)
     probe_info = get_probe_info(ecephys_session_id)
+
+    api = EcephysLimsApi()
 
     # setup a file
 
@@ -68,11 +76,16 @@ def main(ecephys_session_id, nwb_path):
     )
 
 
-    # add columns to the electrode table
-    nwbfile.add_electrode_column(name='local_channel_index', description='an index into a flattened array of all of the channels on this probe')
-    nwbfile.add_electrode_column(name='mask', description='true if this channel\'s data can be used, false otherwise (if it is damaged, or a reference channel, for instance)')
-    nwbfile.add_electrode_column(name='vertical_pos', description='position along the length of the probe in microns. Higher is deeper.')
-    nwbfile.add_electrode_column(name='horizontal_pos', description='position along the width of the probe, in microns')
+    # get a channel table and add nwb-required attributes
+    channel_table = api.get_channel_table(ecephys_session_id)  # re: ids TODO: track these in lims and use globally valid ids - till then just use local
+    channel_table['x'] = -1.0  # TODO when we get CCF positions from alignment we can write those here, till then there is no option to not supply these fields, so ...
+    channel_table['y'] = -1.0
+    channel_table['z'] = -1.0
+    channel_table['imp'] = -1.0   # TODO: we don't currently have this info (at least not in a form I know about)
+    channel_table['location'] = 'null'  # TODO: again, waits on CCF registration for accurate information. Will be acronym of CCF structure
+    channel_table['filtering'] = electrode_filtering
+    channel_table['group'] = None
+    channel_table['group_name'] = ''
 
     # add probes (as devices), each with an electrode group
 
@@ -94,23 +107,12 @@ def main(ecephys_session_id, nwb_path):
         nwbfile.add_device(probe_nwb_device)
         nwbfile.add_electrode_group(probe_nwb_electrode_group)
 
-        max_vertical_pos = np.amax(probe['probe_info']['vertical_pos'])
-        for ii, local_index in enumerate(probe['probe_info']['channel']):
-            nwbfile.add_electrode(
-                x=-1.0, # TODO when we get CCF positions from alignment we can write those here, till then there is no option to not supply these fields, so ...
-                y=-1.0,
-                z=-1.0,
-                imp=-1.0, # TODO: we don't currently have this info (at least not in a form I know about)
-                location='null', # TODO: again, waits on CCF registration for accurate information. Will be acronym of CCF structure
-                filtering=electrode_filtering,
-                group=probe_nwb_electrode_group,
-                group_name=None, # use group?
-                local_channel_index = local_index,
-                mask=probe['probe_info']['mask'][ii],
-                vertical_pos=probe['probe_info']['vertical_pos'][ii] - max_vertical_pos, 
-                horizontal_pos=probe['probe_info']['vertical_pos'][ii]
-                # id= TODO: track these in lims and use globally valid ids - till then just use local
-            )
+        channel_table.loc[channel_table['probe_id'] == probe['id'], 'group'] = probe_nwb_electrode_group
+
+    nwbfile.electrodes = ElectrodeTable().from_dataframe(channel_table, source=source, name='electrodes')
+
+    if remove_file:
+        os.remove(nwb_path)
 
     io = NWBHDF5IO(nwb_path, mode='w')
     io.write(nwbfile)
@@ -124,6 +126,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('ecephys_session_id', type=int) # 754312389, for instance
     parser.add_argument('--nwb_path', type=str, default=None)
+    parser.add_argument('--remove_file', action='store_true', default=False)
 
     args = parser.parse_args()
     if args.nwb_path is None:
@@ -131,4 +134,4 @@ if __name__ == '__main__':
     else:
         nwb_path = args.nwb_path
 
-    main(args.ecephys_session_id, nwb_path)
+    main(args.ecephys_session_id, nwb_path, args.remove_file)
