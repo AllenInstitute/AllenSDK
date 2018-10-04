@@ -1,22 +1,26 @@
 from datetime import datetime
 from pynwb import NWBFile
-import nwb1_reader
-from pynwb import NWBHDF5IO
-import logging
 import numpy as np
 from pynwb.icephys import CurrentClampStimulusSeries, VoltageClampStimulusSeries
 from pynwb.icephys import CurrentClampSeries, VoltageClampSeries
-import time
-import ipfx.lab_notebook_reader as lab_notebook_reader
-
-#NWB1_FILE_NAME = "/allen/programs/celltypes/production/mousecelltypes/prod589/Ephys_Roi_Result_500844779/500844779.nwb"
-#NWB2_FILE_NAME = "/local1/ephys/ivscc/nwb2/500844779_ver2.nwb"
-NWB1_FILE_NAME ="/local1/ephys/patchseq/nwb2/Npr3-IRES2-CreSst-IRES-FlpOAi65-401243.04.01.01.nwb"
-NWB2_FILE_NAME = "/local1/ephys/patchseq/nwb2/patchseq_nwb_ver2.nwb"
+from pynwb import NWBHDF5IO
+import pandas as pd
 
 
 def build_nwb2file(nwb_data,notebook):
+    """
 
+    Parameters
+    ----------
+    nwb_data: NwbReader Class
+        methods to access nwb data
+    notebook: ipfx.LabNotebookReader Class
+        methods to access notebook data from nwb file
+    Returns
+    -------
+    nwbfile: pynwb.NWBFile object with timeseries data
+
+    """
 
     nwb2file = NWBFile('pynwb sprint', 'example file for kitware', 'EXAMPLE_ID', datetime.now(),
                        lab='Intracellular Ephys Lab',
@@ -58,13 +62,17 @@ def build_nwb2file(nwb_data,notebook):
 
             stimulus_series = VoltageClampStimulusSeries(
                 name=sweep_name, source=stimulus['source'], data=stimulus['data'], unit=stimulus['unit'],
-                starting_time=np.nan, rate=stimulus['rate'], electrode=elec,
-                gain=np.nan,
+                conversion = stimulus['conversion'],
+                starting_time=np.nan,
+                electrode=elec, gain=np.nan,
+                rate=stimulus['rate'],
             )
         elif stimulus["clamp_mode"] == "current_clamp":
 
             stimulus_series = CurrentClampStimulusSeries(
                 name=sweep_name, source=stimulus['source'], data=stimulus['data'], unit=stimulus['unit'],
+                conversion = stimulus['conversion'],
+                starting_time=np.nan,
                 electrode=elec, gain=np.nan,
                 rate=stimulus['rate'],
             )
@@ -87,7 +95,7 @@ def build_nwb2file(nwb_data,notebook):
 
             acquisition_series = CurrentClampSeries(
                 name=sweep_name, source=acquisition['source'], data=acquisition['data'],
-                unit=acquisition['unit'], conversion=np.nan, resolution=np.nan, starting_time=np.nan,
+                unit=acquisition['unit'], conversion=acquisition['conversion'], resolution=np.nan, starting_time=np.nan,
                 rate=acquisition['rate'],
                 electrode=elec, gain=np.nan,
                 bias_current=bias_current,
@@ -102,36 +110,67 @@ def build_nwb2file(nwb_data,notebook):
     return nwb2file
 
 
+def build_sweep_table(nwbfile):
+    """
+
+    Parameters
+    ----------
+    nwbfile: pynwb.NWBFile Class
+        object containing timeseries data
+
+    Returns
+    -------
+    sweep_table: pandas DF
+        table of sweep properties
+    """
+
+    sweep_names = nwbfile.acquisition.keys()
+    sweep_info = {}
+
+    for sweep_name in sweep_names:
+
+        ts = nwbfile.get_acquisition(sweep_name)
+        sweep_info[sweep_name] = {
+            "stimulus_description":ts.stimulus_description,
+        }
+
+    sweep_table = pd.DataFrame.from_dict(sweep_info, orient="index")
+    sweep_table.index.name = 'sweep_name'
+    return sweep_table
+
+
 def save_nwb2_file(nwb2file,nwb2_file_name):
 
+    """
+
+    Parameters
+    ----------
+    nwb2file: pynwb.NWBFile Class
+
+    nwb2_file_name: string
+        output file name
+
+    Returns
+    -------
+
+    """
     io = NWBHDF5IO(nwb2_file_name, 'w')
     io.write(nwb2file)
     io.close()
 
 
 def load_nwb2_file(nwb2_file_name):
+    """
 
+    Parameters
+    ----------
+    nwb2_file_name: string
+
+    Returns
+    -------
+    nwbfile: pynwb.NWBFile Class
+
+    """
     io = NWBHDF5IO(nwb2_file_name, 'r')
 
     return io.read()
-
-
-def main():
-
-    logging.basicConfig(level="INFO")
-    nwb1_file_name = NWB1_FILE_NAME
-    nwb2_file_name = NWB2_FILE_NAME
-
-    nwb_data = nwb1_reader.create_nwb_reader(nwb1_file_name)
-    notebook = lab_notebook_reader.create_lab_notebook_reader(nwb1_file_name)
-
-    nwb2file = build_nwb2file(nwb_data,notebook)
-    logging.info("Created nwb2 file")
-
-    save_nwb2_file(nwb2file,nwb2_file_name)
-    logging.info("Saved the nwb2 file")
-
-    load_nwb2_file(nwb2_file_name)
-    logging.info("Loaded back the nwb2 file")
-
-if __name__ == "__main__": main()
