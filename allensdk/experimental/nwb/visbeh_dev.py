@@ -15,16 +15,18 @@ def test_visbeh_nwb(tmpdir_factory):
     
     visbeh_data = VisualBehaviorStimulusAdapter(foraging_file_name)
 
+    epoch_table = visbeh_data.get_epoch_table()
+
     nwbfile = NWBFile(
         source='Data source',
         session_description='test foraging2',
         identifier='behavior_session_uuid',
         session_start_time=visbeh_data.session_start_time,
-        file_create_date=datetime.datetime.now()
+        file_create_date=datetime.datetime.now(),
+        epochs = epoch_table
     )
 
     nwbfile.add_acquisition(visbeh_data.running_speed)
-    visbeh_data.add_stimulus_epochs(nwbfile)
 
     with NWBHDF5IO(save_file_name, mode='w') as io:
         io.write(nwbfile)

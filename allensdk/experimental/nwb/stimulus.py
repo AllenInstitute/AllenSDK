@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from pynwb import TimeSeries
 from pynwb.form.backends.hdf5.h5_utils import H5DataIO
+from pynwb.epoch import Epochs
 from scipy.signal import medfilt
 from visual_behavior.translator.foraging2 import data_to_change_detection_core
 from visual_behavior.analyze import compute_running_speed
@@ -49,6 +50,9 @@ class BaseStimulusAdapter(object):
                                      "compression_opts": 9}
         else:
             self.compression_opts = {}
+
+        self.EPOCHS = 'epochs' # Dont change this without looking at https://github.com/NeurodataWithoutBorders/pynwb/issues/646
+
 
     @property
     def core_data(self):
@@ -110,22 +114,34 @@ class VisualBehaviorStimulusAdapter(BaseStimulusAdapter):
         return self.core_data['metadata']['startdatetime']
 
 
-    def add_stimulus_epochs(self, nwbfile):
+    def get_epoch_table(self):
 
-        stimulus_table = self.core_data['visual_stimuli']
-        timestamps = self.get_times()
+        df = pd.DataFrame({'start_time':[0.,1.], 
+                           'stop_time':[1.,2.], 
+                           'stimulus':['a', 'b'], 
+                           'tags':['a', 'b'], 
+                           'description':['a', 'b'], 
+                           'timeseries':[[self.running_speed], [self.running_speed]]
+                           })
 
-        for ri, row_series in stimulus_table.iterrows():
-            row = row_series.to_dict()
-            start_time = timestamps[int(row.pop('frame'))]
-            stop_time = timestamps[int(row.pop('end_frame'))]
+        epochs = Epochs.from_dataframe(df, 'nosource', self.EPOCHS)
 
-            nwbfile.create_epoch(start_time=start_time,
-                            stop_time=stop_time,
-                            timeseries=[self.running_speed],
-                            tags='stimulus',
-                            description='Stimulus Presentation Epoch',
-                            metadata=row)
+        return epochs
+
+        # stimulus_table = self.core_data['visual_stimuli']
+        # timestamps = self.get_times()
+
+        # for ri, row_series in stimulus_table.iterrows():
+        #     row = row_series.to_dict()
+        #     start_time = timestamps[int(row.pop('frame'))]
+        #     stop_time = timestamps[int(row.pop('end_frame'))]
+
+        #     nwbfile.create_epoch(start_time=start_time,
+        #                     stop_time=stop_time,
+        #                     timeseries=[self.running_speed],
+        #                     tags='stimulus',
+        #                     description='Stimulus Presentation Epoch',
+        #                     metadata=row)
 
 
 class VisualCodingStimulusAdapter(BaseStimulusAdapter):
