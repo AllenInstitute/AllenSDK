@@ -3,14 +3,14 @@ from typing import List
 import pandas as pd
 
 
-class EcephysApi:
+class EcephysApi(object):
 
 
     def __init__(self, *args, **kwargs):
-        pass
+        super(EcephysApi, self).__init__(*args, **kwargs)
 
     
-    def get_session_table(self):
+    def get_session_table(self, session_ids=None):
         raise NotImplementedError()
 
 

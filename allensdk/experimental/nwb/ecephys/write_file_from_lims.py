@@ -14,7 +14,7 @@ from pynwb import NWBHDF5IO
 from pynwb.device import Device
 from pynwb.ecephys import ElectrodeGroup
 
-from allensdk.experimental.nwb.ecephys.api.ecephys_lims_api import EcephysLimsApi
+from allensdk.experimental.nwb.api.ecephys_lims_api import EcephysLimsApi
 
 
 DEFAULT_DATABASE = 'lims2'
@@ -23,58 +23,20 @@ DEFAULT_PORT = 5432
 DEFAULT_USERNAME = 'limsreader'
 
 
-def psycopg2_select(query, database=DEFAULT_DATABASE, host=DEFAULT_HOST, port=DEFAULT_PORT, username=DEFAULT_USERNAME):
-
-    connection = psycopg2.connect(
-        'host={} port={} dbname={} user={}'.format(host, port, database, username), 
-        cursor_factory=psycopg2.extras.RealDictCursor
-    )
-    cursor = connection.cursor()
-
-    try:
-        cursor.execute(query)
-        response = cursor.fetchall()
-    finally:
-        cursor.close()
-        connection.close()
-
-    return response
-
-
-def get_session_start_time(ecephys_session_id):
-    session_info = psycopg2_select('select * from ecephys_sessions where id = {}'.format(ecephys_session_id))
-    result = session_info[0]['date_of_acquisition']
-    if result is None:
-        return '1' # TODO: why no acquisition dates?
-    return result
-
-
-def get_probe_info(ecephys_session_id):
-    return psycopg2_select('select * from ecephys_probes where ecephys_session_id = {}'.format(ecephys_session_id)) 
-    
-
-
 def main(ecephys_session_id, nwb_path, remove_file=False):
 
     source = 'Allen Institute for Brain Science'
     electrode_filtering = 'here is a description of our filtering' # TODO do we have a standard filtering string?
-
-    session_start_time = get_session_start_time(ecephys_session_id)
+    session_start_time = datetime.now() #  TODO: this is not present in the date_of_acquisition column in lims 
     session_identifier = '{}'.format(ecephys_session_id)
-    probe_info = get_probe_info(ecephys_session_id)
 
     api = EcephysLimsApi()
 
-    # setup a file
+    # get session_info
+    session_info = api.get_session_table(session_ids=[ecephys_session_id]).to_dict('record')[0]
 
-    nwbfile = pynwb.NWBFile(
-        source=source,
-        session_description='EcephysSession',
-        identifier=session_identifier,
-        session_start_time=session_start_time,
-        file_create_date=datetime.now()
-    )
-
+    # get a probe_table
+    probe_table = api.get_probe_table(session_ids=[ecephys_session_id])
 
     # get a channel table and add nwb-required attributes
     channel_table = api.get_channel_table(ecephys_session_id)  # re: ids TODO: track these in lims and use globally valid ids - till then just use local
@@ -87,17 +49,27 @@ def main(ecephys_session_id, nwb_path, remove_file=False):
     channel_table['group'] = None
     channel_table['group_name'] = ''
 
+    # setup a file
+
+    nwbfile = pynwb.NWBFile(
+        source=source,
+        session_description='EcephysSession',
+        identifier=session_identifier,
+        session_start_time=session_start_time,
+        file_create_date=datetime.now()
+    )
+
     # add probes (as devices), each with an electrode group
 
-    for probe in probe_info:
+    for probe_id, probe in probe_table.iterrows():
 
         probe_nwb_device = Device(
-            name=str(probe['id']), # why not name? probe names are actually codes for targeted structure. ids are the appropriate primary key
+            name=str(probe_id), # why not name? probe names are actually codes for targeted structure. ids are the appropriate primary key
             source=source
         )
 
         probe_nwb_electrode_group = ElectrodeGroup(
-            name=str(probe['id']),
+            name=str(probe_id),
             source=source, 
             description=probe['name'], # TODO probe name currently describes the targeting of the probe - the closest we have to a meaningful "kind"
             location='', # TODO not actailly sure where to get this
@@ -107,7 +79,7 @@ def main(ecephys_session_id, nwb_path, remove_file=False):
         nwbfile.add_device(probe_nwb_device)
         nwbfile.add_electrode_group(probe_nwb_electrode_group)
 
-        channel_table.loc[channel_table['probe_id'] == probe['id'], 'group'] = probe_nwb_electrode_group
+        channel_table.loc[channel_table['probe_id'] == probe_id, 'group'] = probe_nwb_electrode_group
 
     nwbfile.electrodes = ElectrodeTable().from_dataframe(channel_table, source=source, name='electrodes')
 
