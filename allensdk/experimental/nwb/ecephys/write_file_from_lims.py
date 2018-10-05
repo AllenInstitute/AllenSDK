@@ -8,69 +8,68 @@ import pandas as pd
 import numpy as np
 
 import pynwb
-from pynwb.core import DynamicTable
+from pynwb.core import DynamicTable, VectorData, VectorIndex
 from pynwb.file import ElectrodeTable
 from pynwb import NWBHDF5IO
 from pynwb.device import Device
 from pynwb.ecephys import ElectrodeGroup
+from pynwb.misc import UnitTimes
+from pynwb.base import ProcessingModule
 
 from allensdk.experimental.nwb.api.ecephys_lims_api import EcephysLimsApi
 
 
-DEFAULT_DATABASE = 'lims2'
-DEFAULT_HOST = 'limsdb2'
-DEFAULT_PORT = 5432
-DEFAULT_USERNAME = 'limsreader'
+SOURCE_PLACEHOLDER = 'Allen Institute for Brain Science'
+SESSION_START_TIME_PLACEHOLDER = datetime.now()  # TODO: this is not present in the date_of_acquisition column in lims 
+CT_PLACEHOLDERS = {
+    'x': -1.0,  # TODO when we get CCF positions from alignment we can write those here, till then there is no option to not supply these fields, so ...
+    'y': -1.0,
+    'z': -1.0,
+    'imp': -1.0,  # TODO: we don't currently have this info (at least not in a form I know about)
+    'location': 'null',  # TODO: again, waits on CCF registration for accurate information. Will be acronym of CCF structure
+    'filtering': 'here is a description of our filtering'  # TODO do we have a standard filtering string?
+}
+STIM_TABLE_RENAMES_MAP = {
+    'Start': 'start_time',
+    'End': 'stop_time',
+}
 
 
-def main(ecephys_session_id, nwb_path, remove_file=False):
+def process_channel_table_for_nwb(channel_table, placeholders=None):
+    if placeholders is None:
+        placeholders = CT_PLACEHOLDERS
 
-    source = 'Allen Institute for Brain Science'
-    electrode_filtering = 'here is a description of our filtering' # TODO do we have a standard filtering string?
-    session_start_time = datetime.now() #  TODO: this is not present in the date_of_acquisition column in lims 
-    session_identifier = '{}'.format(ecephys_session_id)
-
-    api = EcephysLimsApi()
-
-    # get session_info
-    session_info = api.get_session_table(session_ids=[ecephys_session_id]).to_dict('record')[0]
-
-    # get a probe_table
-    probe_table = api.get_probe_table(session_ids=[ecephys_session_id])
-
-    # get a channel table and add nwb-required attributes
-    channel_table = api.get_channel_table(ecephys_session_id)  # re: ids TODO: track these in lims and use globally valid ids - till then just use local
-    channel_table['x'] = -1.0  # TODO when we get CCF positions from alignment we can write those here, till then there is no option to not supply these fields, so ...
-    channel_table['y'] = -1.0
-    channel_table['z'] = -1.0
-    channel_table['imp'] = -1.0   # TODO: we don't currently have this info (at least not in a form I know about)
-    channel_table['location'] = 'null'  # TODO: again, waits on CCF registration for accurate information. Will be acronym of CCF structure
-    channel_table['filtering'] = electrode_filtering
+    channel_table.set_index('id', drop=True, inplace=True) # re: ids TODO: track these in lims and use globally valid ids - till then just use local
     channel_table['group'] = None
     channel_table['group_name'] = ''
 
-    # setup a file
+    for key, value in placeholders.items():
+        channel_table[key] = value
 
-    nwbfile = pynwb.NWBFile(
-        source=source,
-        session_description='EcephysSession',
-        identifier=session_identifier,
-        session_start_time=session_start_time,
-        file_create_date=datetime.now()
-    )
+    return channel_table
 
-    # add probes (as devices), each with an electrode group
 
-    for probe_id, probe in probe_table.iterrows():
+def process_stimulus_table_for_nwb(stimulus_table, renames_map=None):
+    stimulus_table  = stimulus_table.rename(columns=renames_map, index={})
+    stimulus_table['description'] = ''  # TODO: I guess it makes sense for epochs to have descriptions?
+    stimulus_table['timeseries'] = [tuple()] * stimulus_table.shape[0]
+    stimulus_table['tags'] = [tuple()] * stimulus_table.shape[0]
+    
+    return stimulus_table
+
+
+def add_units_to_file(nwbfile, probe_table, channel_table, unit_table):
+
+    for _, probe in probe_table.iterrows():
 
         probe_nwb_device = Device(
-            name=str(probe_id), # why not name? probe names are actually codes for targeted structure. ids are the appropriate primary key
-            source=source
+            name=str(probe['id']), # why not name? probe names are actually codes for targeted structure. ids are the appropriate primary key
+            source=SOURCE_PLACEHOLDER
         )
 
         probe_nwb_electrode_group = ElectrodeGroup(
-            name=str(probe_id),
-            source=source, 
+            name=str(probe['id']),
+            source=SOURCE_PLACEHOLDER, 
             description=probe['name'], # TODO probe name currently describes the targeting of the probe - the closest we have to a meaningful "kind"
             location='', # TODO not actailly sure where to get this
             device=probe_nwb_device
@@ -79,9 +78,56 @@ def main(ecephys_session_id, nwb_path, remove_file=False):
         nwbfile.add_device(probe_nwb_device)
         nwbfile.add_electrode_group(probe_nwb_electrode_group)
 
-        channel_table.loc[channel_table['probe_id'] == probe_id, 'group'] = probe_nwb_electrode_group
+        channel_table.loc[channel_table['probe_id'] == probe['id'], 'group'] = probe_nwb_electrode_group
 
-    nwbfile.electrodes = ElectrodeTable().from_dataframe(channel_table, source=source, name='electrodes')
+    nwbfile.electrodes = ElectrodeTable().from_dataframe(channel_table, source=SOURCE_PLACEHOLDER, name='electrodes')
+    nwbfile.units = DynamicTable.from_dataframe(unit_table, source=SOURCE_PLACEHOLDER, name='units')
+
+    return nwbfile
+
+
+def add_spike_times_to_file(nwbfile, spike_times):  # TODO how to add waveforms?
+    unit_times = UnitTimes(
+        source=SOURCE_PLACEHOLDER
+    )
+    for key, value in spike_times.items():
+        unit_times.add_spike_times(
+            unit_id=key,
+            spike_times=np.array(value)
+        )
+
+    unit_times_module = ProcessingModule(
+        name='spike_detection',
+        source=SOURCE_PLACEHOLDER,
+        description='spike_times',
+        data_interfaces=[unit_times]
+    )
+    nwbfile.add_processing_module(unit_times_module)
+    return nwbfile
+
+
+def main(ecephys_session_id, nwb_path, remove_file=False):
+
+    api = EcephysLimsApi()
+
+    session_info = api.get_session_table(session_ids=[ecephys_session_id]).to_dict('record')[0]
+    # stimulus_table = process_stimulus_table_for_nwb(api.get_stimulus_table(ecephys_session_id))
+    probe_table = api.get_probe_table(session_ids=[ecephys_session_id])
+    channel_table = process_channel_table_for_nwb(api.get_channel_table(ecephys_session_id))  # TODO: 706875901 breaks here
+    unit_table = api.get_unit_table(session_id=ecephys_session_id)
+    unit_table.set_index('id', drop=True, inplace=True)
+
+    nwbfile = pynwb.NWBFile(
+        source=SOURCE_PLACEHOLDER,
+        session_description='EcephysSession',
+        identifier='{}'.format(ecephys_session_id),
+        session_start_time=SESSION_START_TIME_PLACEHOLDER,
+        file_create_date=datetime.now()
+    )
+
+    nwbfile = add_units_to_file(nwbfile, probe_table, channel_table, unit_table)
+    # nwbfile.epochs = Epochs.from_dataframe(stimulus_table)  # TODO: I can't actually find an experiment that both as a stim table and has the current format for its other data
+    nwbfile = add_spike_times_to_file(nwbfile, api.get_spike_times(ecephys_session_id))
 
     if remove_file:
         os.remove(nwb_path)
@@ -93,10 +139,9 @@ def main(ecephys_session_id, nwb_path, remove_file=False):
     return nwbfile, nwb_path
 
 
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('ecephys_session_id', type=int) # 754312389, for instance
+    parser.add_argument('ecephys_session_id', type=int) # 754312389, for instance ... TODO: 754312389 ONLY
     parser.add_argument('--nwb_path', type=str, default=None)
     parser.add_argument('--remove_file', action='store_true', default=False)
 

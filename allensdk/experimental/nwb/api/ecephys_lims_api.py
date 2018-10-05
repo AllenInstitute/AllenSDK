@@ -11,6 +11,43 @@ from .lims_api import LimsApi, clean_multiline_query, produce_in_clause_target
 
 class EcephysLimsApi(LimsApi, EcephysApi):
 
+
+    def get_spike_times(self, session_id, probe_ids=None):
+
+        wkf = self.get_probe_and_session_well_known_files()
+        wkf = wkf[(wkf['session_id'] == session_id) & ~wkf['probe_id'].isnull()]
+        if probe_ids is not None:
+            wkf = wkf[wkf['probe_id'].isin(probe_ids)]
+        probe_ids = np.sort(wkf['probe_id'].unique())
+
+        unit_table = self.get_unit_table(session_id, probe_ids=probe_ids)
+
+        spike_times_files = wkf[wkf['file_type'] == 'EcephysSortedSpikeTimes']  # TODO example case has no aligned times
+        spike_units_files = wkf[wkf['file_type'] == 'EcephysSortedSpikeClusters']
+
+        output_times = {}
+        for ii, probe_id in enumerate(probe_ids):
+
+            probe_unit_table = unit_table[unit_table['probe_id'] == probe_id]
+
+            spike_times = np.squeeze(np.load(spike_times_files[spike_times_files['probe_id'] == probe_id]['path'].values[0], allow_pickle=False)).astype(float) / 30000.0  # TODO since we don't have aligned event times in s ...
+            spike_units = np.squeeze(np.load(spike_units_files[spike_units_files['probe_id'] == probe_id]['path'].values[0], allow_pickle=False))
+
+            sort_order = np.argsort(spike_units)
+            spike_units = spike_units[sort_order]
+            spike_times = spike_times[sort_order]
+            changes = np.concatenate([np.array([0]), np.where(np.diff(spike_units))[0] - 1, np.array([-1])])
+
+            for jj, (low, high) in enumerate(zip(changes[:-1], changes[1:])):
+                local_unit = spike_units[high]
+                unit_times = spike_times[low:high+1]
+
+                global_unit = probe_unit_table['id'].values[local_unit]  
+                output_times[global_unit] = unit_times
+
+        return output_times
+
+
     def get_session_table(self, session_ids=None):
         '''
         '''
@@ -23,7 +60,8 @@ class EcephysLimsApi(LimsApi, EcephysApi):
         if session_ids is not None:
             query = '{} where es.id in {}'.format(query, produce_in_clause_target(session_ids))
 
-        return self.query_fn(query)
+        df = self.query_fn(query)
+        return df
 
 
     def get_probe_table(self, session_ids=None):
@@ -38,8 +76,62 @@ class EcephysLimsApi(LimsApi, EcephysApi):
             query = '{} where ep.ecephys_session_id in {}'.format(query, produce_in_clause_target(session_ids))
 
         df = self.query_fn(query)
-        df = df.set_index('id')
         return df
+
+
+    def get_unit_table(self, session_id, probe_ids=None):
+        '''
+        '''
+
+        probe_ids = [
+            pid for pid in self.get_probe_table(session_ids=[session_id])['id'].values 
+            if probe_ids is None or pid in probe_ids
+        ] #  O(n**2), but max about 6 - might change if we can fit more probes in a brain
+
+        files = self.get_well_known_file_table(
+            attachable_types=['EcephysProbe'],
+            attachable_ids=probe_ids,
+            file_type_names=['EcephysSortedClusterGroup', 'EcephysSortedMetrics']
+        )
+        channel_table = self.get_channel_table(session_id, probe_ids=probe_ids)
+        channel_table = channel_table.loc[:, ('probe_id', 'local_index', 'id')]
+
+        unit_table = []
+        current_id = 0
+        for ii, (index, probe_files) in enumerate(files.groupby(['attachable_id'])):
+            probe_id = probe_files['attachable_id'].values[0]
+
+            cg_path = probe_files[probe_files['file_type_name'] == 'EcephysSortedClusterGroup']['path'].values[0]
+            try:
+                metrics_path = probe_files[probe_files['file_type_name'] == 'EcephysSortedMetrics']['path'].values[0]
+            except IndexError: # TODO: for some reason some probes have metrics files in place, but no records
+                metrics_path = os.path.join(os.path.dirname(cg_path), 'metrics.csv')
+
+            cluster_groups = pd.read_csv(cg_path, delim_whitespace=True, index_col=False)
+            metrics = pd.read_csv(metrics_path, index_col=0)
+
+            probe_channels = channel_table[channel_table['probe_id'] == probe_id]
+
+            probe_unit_table = pd.DataFrame({
+                'id': metrics['cluster_ids'].values + current_id,
+                'local_peak_channel_index': metrics['peak_chan'].values,
+                'quality': metrics['unit_quality'],
+                'snr': metrics['snr'].values,
+                'firing_rate': metrics['firing_rate'].values,
+                'isi_violations': metrics['isi_viol'].values,
+            })
+            probe_unit_table = probe_unit_table.merge(probe_channels, left_on='local_peak_channel_index', right_on='local_index', suffixes=['', '_channel'])
+            probe_unit_table = probe_unit_table.drop(columns=['local_peak_channel_index', 'local_index'])
+            probe_unit_table = probe_unit_table.rename(columns=lambda colname: 'peak_channel_id' if colname == 'id_channel' else colname)
+
+            unit_table.append(probe_unit_table)
+            current_id = np.amax(probe_unit_table['id']) + 1
+
+        unit_table = pd.concat(unit_table)
+        unit_table = unit_table.sort_values(by='id')
+        unit_table = unit_table.reset_index(drop=True)
+        return unit_table
+        
 
 
     def get_stimulus_table(self, session_id):
@@ -64,17 +156,16 @@ class EcephysLimsApi(LimsApi, EcephysApi):
         '''.format(session_id))
 
         if probe_ids is not None:
-            query = '{} where ep.id in {}'.format(query, produce_in_clause_target(probe_ids))
-
+            query = '{} and ep.id in {}'.format(query, produce_in_clause_target(probe_ids))
         response = self.query_fn(query).to_dict('record')
+
         probe_dfs = []
         last_num_channels = 0
         for ii, probe in enumerate(response):
             max_vertical_pos = np.amax(probe['probe_info']['vertical_pos'])
             num_channels = len(probe['probe_info']['channel'])
-
             probe_df = pd.DataFrame({
-                'id': np.array(probe['probe_info']['channel']) + ii * last_num_channels, # we don't really have ids for these ...
+                'id': np.array(probe['probe_info']['channel']) + ii * last_num_channels, #  TODO: we don't really have ids for these ...
                 'local_index': probe['probe_info']['channel'],
                 'probe_id': np.zeros(num_channels, dtype=int) + probe['id'],
                 'mask': probe['probe_info']['mask'],
@@ -87,8 +178,8 @@ class EcephysLimsApi(LimsApi, EcephysApi):
 
         df = pd.concat(probe_dfs)
         df = df.sort_values(by='id')
-        df.reset_index()
-        return df.set_index('id')
+        df.reset_index(drop=True)
+        return df
 
 
     def get_lims_labtracks_map(self):

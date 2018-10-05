@@ -51,7 +51,7 @@ class LimsApi(object):
         super(LimsApi, self).__init__(*args, **kwargs)
 
 
-    def get_well_known_file_table(self, attachable_types=None, attachable_ids=None, well_known_file_type_names=None):
+    def get_well_known_file_table(self, attachable_types=None, attachable_ids=None, file_type_names=None):
         '''Grab (a subset of) the well_known_files table from LIMS.
         '''
 
@@ -65,8 +65,8 @@ class LimsApi(object):
             where.append('wkf.attachable_type in {}'.format(produce_in_clause_target(attachable_types)))
         if attachable_ids is not None:
             where.append('wkf.attachable_id in {}'.format(produce_in_clause_target(attachable_ids)))
-        if well_known_file_type_names is  not None:
-            where.append('wkft.name in {}'.format(produce_in_clause_target(well_known_file_type_names)))
+        if file_type_names is  not None:
+            where.append('wkft.name in {}'.format(produce_in_clause_target(file_type_names)))
 
         if len(where) > 0:
             query = '{} where {}'.format(query, ' and '.join(where))
