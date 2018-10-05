@@ -141,7 +141,7 @@ def sessions_with_stimulus(stimulus):
     return sorted(list(sessions))
 
 
-def stimuli_in_session(session):
+def stimuli_in_session(session, allow_unknown=True):
     """ Return a list what stimuli are available in a given session.
 
     Parameters
@@ -149,7 +149,13 @@ def stimuli_in_session(session):
     session: string
         Must be one of: [stimulus_info.THREE_SESSION_A, stimulus_info.THREE_SESSION_B, stimulus_info.THREE_SESSION_C, stimulus_info.THREE_SESSION_C2]
     """
-    return SESSION_STIMULUS_MAP[session]
+    try:
+        return SESSION_STIMULUS_MAP[session]
+    except KeyError as e:
+        if allow_unknown:
+            return []
+        else:
+            raise
 
 
 def all_stimuli():
