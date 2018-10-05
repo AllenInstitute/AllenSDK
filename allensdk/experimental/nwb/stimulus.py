@@ -8,6 +8,8 @@ from scipy.signal import medfilt
 from visual_behavior.translator.foraging2 import data_to_change_detection_core
 from visual_behavior.analyze import compute_running_speed
 from .timestamps import get_timestamps_from_sync
+from pynwb.image import ImageSeries, IndexSeries
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -62,6 +64,14 @@ class BaseStimulusAdapter(object):
     def session_start_time(self):
         raise NotImplementedError()
 
+    @property
+    def image_series_list(self):
+        raise NotImplementedError()
+
+    @property
+    def index_series_list(self):
+        raise NotImplementedError()
+
     def get_times(self):
         return get_timestamps_from_sync(self.sync_file, self.stim_key)
 
@@ -95,6 +105,11 @@ class VisualBehaviorStimulusAdapter(BaseStimulusAdapter):
 
         super(VisualBehaviorStimulusAdapter, self).__init__(pkl_file, sync_file, stim_key='stim_vsync', compress=True)
 
+        self._stimulus_epoch_df = None
+        self._stimulus_epoch_table = None
+        self._visual_stimulus_image_series = None
+        self._index_series_list = None
+
     @property
     def core_data(self):
         if self._data is None:
@@ -120,22 +135,92 @@ class VisualBehaviorStimulusAdapter(BaseStimulusAdapter):
     def session_start_time(self):
         return self.core_data['metadata']['startdatetime']
 
+    @property
+    def stimulus_epoch_df(self):
 
-    def get_epoch_table(self):
+        if self._stimulus_epoch_df is None:
 
-        timestamps = self.get_times()
-        df = self.core_data['visual_stimuli'].copy()
+            timestamps = self.get_times()
+            df = self.core_data['visual_stimuli'].copy()
+            df['stop_time'] = timestamps[df['end_frame']]
+            df['start_time'] = timestamps[df['frame']]
+            df['description'] = ['stimulus presentation']*len(df) 
+            df['timeseries'] = [[self.running_speed]]*len(df) 
+            df['tags'] = [[self.timestamp_source]]*len(df) 
+            df.drop('time', inplace=True, axis=1)
+            self._stimulus_epoch_df = df
 
-        df['stop_time'] = timestamps[df['end_frame']]
-        df['start_time'] = timestamps[df['frame']]
-        df['description'] = ['stimulus presentation']*len(df) 
-        df['timeseries'] = [[self.running_speed]]*len(df) 
-        df['tags'] = [[self.timestamp_source]]*len(df) 
-        df.drop('time', inplace=True, axis=1)
+        return self._stimulus_epoch_df
 
-        epochs = Epochs.from_dataframe(df, 'nosource', self.EPOCHS)
+    @property
+    def stimulus_epoch_table(self):
 
-        return epochs
+        if self._stimulus_epoch_table is None:
+            self._stimulus_epoch_table = Epochs.from_dataframe(self.stimulus_epoch_df, 'nosource', self.EPOCHS)
+
+        return self._stimulus_epoch_table
+
+    @property
+    def visual_stimulus_image_series(self):
+
+        if self._visual_stimulus_image_series is None:
+
+            image_set = self.core_data['image_set']
+            name = image_set.get('name', 'TODO_visual_behavior_analysis_issues_389')
+            image_data =  np.array(image_set['images'])
+            source = image_set['metadata']['image_set']
+
+            
+            image_index = []
+            for x in image_set['image_attributes']:
+                image_index.append(x['image_index'])
+
+            self._visual_stimulus_image_series = ImageSeries(
+                                                name=name,
+                                                source=source,
+                                                data=image_data,
+                                                unit='NA',
+                                                format='raw',
+                                                timestamps=image_index)
+
+            
+
+        return self._visual_stimulus_image_series
+
+
+    @property
+    def image_series_list(self):
+
+        return [self.visual_stimulus_image_series]
+
+
+    @property
+    def index_series_list(self):
+        
+        if self._index_series_list is None:
+
+            stimulus_epoch_df = self.stimulus_epoch_df
+            image_set = self.core_data['image_set']
+
+            mapper_dict = {}
+            for x in image_set['image_attributes']:
+                mapper_dict[x['image_name'], x['image_category']] = x['image_index']
+
+            index_timeseries = []
+            for cn, cc in zip(stimulus_epoch_df['image_name'].values, stimulus_epoch_df['image_category'].values):
+                index_timeseries.append(mapper_dict[cn,cc])
+
+            image_index_series = IndexSeries(
+                            name='image_index',
+                            source='NA',
+                            data=index_timeseries,
+                            unit='NA',
+                            indexed_timeseries=self.visual_stimulus_image_series,
+                            timestamps=stimulus_epoch_df['start_time'].values)
+
+            self._index_series_list  = [image_index_series]
+   
+        return self._index_series_list 
 
 
 
