@@ -33,6 +33,7 @@ def nwb_filename(tmpdir_factory):
     return str(nwb)
 
 
+@pytest.mark.skipif(not os.environ.get('ALLENSDK_EXPERIMENTAL',''), reason='Experimental')
 @pytest.mark.parametrize("compress", (True, False))
 def test_visual_behavior_running_speed(nwb_filename, vb_pkl, vb_sync,
                                        compress):
@@ -59,6 +60,7 @@ def test_visual_behavior_running_speed(nwb_filename, vb_pkl, vb_sync,
     assert(np.allclose(running_speed_in.timestamps, running_speed.timestamps))
 
 
+@pytest.mark.skipif(not os.environ.get('ALLENSDK_EXPERIMENTAL',''), reason='Experimental')
 @pytest.mark.parametrize("compress", (True, False))
 def test_visual_coding_running_speed(nwb_filename, vc_pkl, vc_sync,
                                      compress):

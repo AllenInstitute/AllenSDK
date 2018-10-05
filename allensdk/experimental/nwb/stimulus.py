@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from pynwb import TimeSeries
 from pynwb.form.backends.hdf5.h5_utils import H5DataIO
+from pynwb.epoch import Epochs
 from scipy.signal import medfilt
 from visual_behavior.translator.foraging2 import data_to_change_detection_core
 from visual_behavior.analyze import compute_running_speed
@@ -49,6 +50,9 @@ class BaseStimulusAdapter(object):
                                      "compression_opts": 9}
         else:
             self.compression_opts = {}
+
+        self.EPOCHS = 'epochs' # Dont change this without looking at https://github.com/NeurodataWithoutBorders/pynwb/issues/646
+
 
     @property
     def core_data(self):
@@ -106,26 +110,33 @@ class VisualBehaviorStimulusAdapter(BaseStimulusAdapter):
             return self.core_data['time']
 
     @property
+    def timestamp_source(self):
+        if self.sync_file is not None:
+            return 'sync_file_timestamps'
+        else:
+            return 'pkl_file_timestamps'
+
+    @property
     def session_start_time(self):
         return self.core_data['metadata']['startdatetime']
 
 
-    def add_stimulus_epochs(self, nwbfile):
+    def get_epoch_table(self):
 
-        stimulus_table = self.core_data['visual_stimuli']
         timestamps = self.get_times()
+        df = self.core_data['visual_stimuli'].copy()
 
-        for ri, row_series in stimulus_table.iterrows():
-            row = row_series.to_dict()
-            start_time = timestamps[int(row.pop('frame'))]
-            stop_time = timestamps[int(row.pop('end_frame'))]
+        df['stop_time'] = timestamps[df['end_frame']]
+        df['start_time'] = timestamps[df['frame']]
+        df['description'] = ['stimulus presentation']*len(df) 
+        df['timeseries'] = [[self.running_speed]]*len(df) 
+        df['tags'] = [[self.timestamp_source]]*len(df) 
+        df.drop('time', inplace=True, axis=1)
 
-            nwbfile.create_epoch(start_time=start_time,
-                            stop_time=stop_time,
-                            timeseries=[self.running_speed],
-                            tags='stimulus',
-                            description='Stimulus Presentation Epoch',
-                            metadata=row)
+        epochs = Epochs.from_dataframe(df, 'nosource', self.EPOCHS)
+
+        return epochs
+
 
 
 class VisualCodingStimulusAdapter(BaseStimulusAdapter):
