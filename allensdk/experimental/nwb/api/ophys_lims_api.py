@@ -60,6 +60,8 @@ class OphysLimsApi(LimsApi):
         roi_dict = {}
 
         for _, row in table.iterrows():
+            if str(row[key]) in roi_dict:
+                raise KeyError("key {} already in roi dictionary".format(row[key]))
             mask = np.zeros((row.movie_height, row.movie_width), dtype=bool)
             roi_mask = np.array(row.mask_matrix)
             h, w = roi_mask.shape
