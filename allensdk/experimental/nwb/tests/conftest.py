@@ -30,12 +30,20 @@ def visbeh_pkl():
     D = {}
     D['items'] = {}
     D['items']['behavior'] = {}
-    D['items']['behavior']["intervalsms"] = [16.6198723]*4
+    D['items']['behavior']["intervalsms"] = [16.6198723]*5
     D['items']['behavior']["update_count"] = 4
     D['start_time'] = datetime.datetime.now()
     D['platform_info'] = {}
     D['platform_info']['computer_name'] = 'test'
     D['items']['behavior']['stimuli'] = {}
+    D['items']['behavior']['stimuli']['images'] = {}
+    D['items']['behavior']['stimuli']['images']['size'] = (1174, 918)
+    D['items']['behavior']['stimuli']['images']['obj_type'] = 'DoCImageStimulus'
+    D['items']['behavior']['stimuli']['images']['sampling'] = 'even'
+    D['items']['behavior']['stimuli']['images']['set_log'] = [('Image', 'im065', .05, 0),('Image', 'im077', 26.01941239779431, 2)]
+    D['items']['behavior']['stimuli']['images']['change_log'] = [(('im065', 'im065'), ('im077', 'im077'), 26.019579445142398, 2)]
+    D['items']['behavior']['stimuli']['images']['draw_log'] = [0,1,0,1,0,0]
+    D['items']['behavior']['stimuli']['images']['image_path'] = ''
     D["items"]["behavior"]["config"] = {}
     D["items"]["behavior"]["config"]["reward"] = {}
     D["items"]["behavior"]["config"]["reward"]["reward_volume"] = 0
@@ -63,9 +71,9 @@ def visbeh_pkl():
     D["items"]["behavior"]["config"]["behavior"]["volume_limit"] = 0
     D["items"]["behavior"]["trial_log"] = []
     D['items']['behavior']['encoders'] = [{}]
-    D['items']['behavior']['encoders'][0]['dx'] = [ 1.397514e+02, -2.327280e-01,  4.668198e-02,  8.853951e-01,  7.473094e-01]
-    D['items']['behavior']['encoders'][0]['vsig'] = [ 1.397514e+02, -2.327280e-01,  4.668198e-02,  8.853951e-01,  7.473094e-01]
-    D['items']['behavior']['encoders'][0]['vin'] = [4.98354226257652, 4.987414049450308, 4.988704645074904, 4.982251666951925, 4.977089284453541]
+    D['items']['behavior']['encoders'][0]['dx'] = [ 1.397514e+02, -2.327280e-01,  4.668198e-02,  8.853951e-01,  7.473094e-01,  7.473094e-01]
+    D['items']['behavior']['encoders'][0]['vsig'] = [ 1.397514e+02, -2.327280e-01,  4.668198e-02,  8.853951e-01,  7.473094e-01,  7.473094e-01]
+    D['items']['behavior']['encoders'][0]['vin'] = [4.98354226257652, 4.987414049450308, 4.988704645074904, 4.982251666951925, 4.977089284453541, 4.977089284453541]
     
     pickle.dump(D, bytes_io)
 
