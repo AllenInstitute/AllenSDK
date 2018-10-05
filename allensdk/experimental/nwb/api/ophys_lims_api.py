@@ -2,9 +2,9 @@ import numpy as np
 from .lims_api import LimsApi, clean_multiline_query
 
 
-class OphysApi(LimsApi):
+class OphysLimsApi(LimsApi):
     def __init__(self):
-        super(OphysApi, self).__init__()
+        super(OphysLimsApi, self).__init__()
         self._dff_table = None
 
     def get_dff_file_table(self):
@@ -18,6 +18,25 @@ class OphysApi(LimsApi):
     def get_dff_file(self, experiment_id):
         table = self.get_dff_file_table()
         return table[table.attachable_id == experiment_id].iloc[0].path
+
+    def session_id(self, experiment_id):
+        session_query = clean_multiline_query('''
+            select ophys_session_id
+            from ophys_experiments
+            where id = {}
+        '''.format(experiment_id))
+        df = self.query_fn(session_query)
+        return df.loc[0, 'ophys_session_id']
+
+    def get_sync_file(self, experiment_id):
+        session_id = self.session_id(experiment_id)
+        return self._get_well_known_file_path(session_id, 'OphysRigSync',
+                                              'OphysSession')
+
+    def get_pickle_file(self, experiment_id):
+        session_id = self.session_id(experiment_id)
+        return self._get_well_known_file_path(session_id, 'OphysRigPickle',
+                                              'OphysSession')
 
     def get_roi_table(self, experiment_id):
         query = clean_multiline_query('''
@@ -48,3 +67,27 @@ class OphysApi(LimsApi):
             roi_dict[str(row[key])] = mask
 
         return roi_dict
+
+    def get_session_metadata(self, experiment_id):
+        query = clean_multiline_query('''
+            select oe.id as experiment_id, os.id as session_id, e.name as device_name,
+            idepth.depth as imaging_depth_um, s.acronym as targeted_structure,
+            os.date_of_acquisition as session_start_time, os.stimulus_name as session_description
+            from ophys_experiments oe
+            join ophys_sessions os on os.id = oe.ophys_session_id
+            join equipment e on e.id = os.equipment_id
+            join imaging_depths idepth on idepth.id = oe.imaging_depth_id
+            join structures s on s.id = oe.targeted_structure_id
+            where oe.id = {}
+        '''.format(experiment_id))
+
+        df = self.query_fn(query)
+        metadata = df.loc[0].to_dict()
+        # hardcode some stuff until I can figure out where to get it
+        metadata['excitation_lambda'] = 910.
+        metadata['emission_lambda'] = 520.
+        metadata['indicator'] = 'GCAMP6f'
+        metadata['imaging_rate'] = '31.'
+        metadata['fov'] = '400x400 microns (512 x 512 pixels)'
+
+        return metadata
