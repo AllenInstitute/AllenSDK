@@ -2,6 +2,7 @@ import pytest
 import os
 import datetime
 import numpy as np
+import pandas as pd
 
 from pynwb import NWBHDF5IO
 from allensdk.experimental.nwb.stimulus import VisualBehaviorStimulusAdapter
@@ -29,10 +30,7 @@ def test_visbeh_epoch(nwbfile, tmpfilename, visbeh_pkl):
     epoch_table = visbeh_data.get_epoch_table()
     nwbfile.epochs = epoch_table
 
-    # print nwbfile.epochs.to_dataframe()
-
-
-
+    src_df = nwbfile.epochs.to_dataframe()
     nwbfile.add_acquisition(visbeh_data.running_speed)
 
     with NWBHDF5IO(tmpfilename, mode='w') as io:
@@ -40,12 +38,17 @@ def test_visbeh_epoch(nwbfile, tmpfilename, visbeh_pkl):
 
     nwbfile_in = NWBHDF5IO(tmpfilename, mode='r').read()
 
-    print nwbfile_in.epochs.to_dataframe()
+    tgt_df = nwbfile_in.epochs.to_dataframe()
 
-    raise
+    # Assert the round-trip worked
+    ts_src = src_df['timeseries']
+    ts_tgt = tgt_df['timeseries']
+    src_df.drop('timeseries', axis=1, inplace=True)
+    tgt_df.drop('timeseries', axis=1, inplace=True)
 
+    for tgt_row, src_row in zip(ts_tgt.values, ts_src.values):
+        for tgt_ts, src_ts in zip(tgt_row, src_row):
+            assert np.allclose(tgt_ts.data, src_ts.data)
+            assert np.allclose(tgt_ts.timestamps, src_ts.timestamps)
 
-
-    
-
-
+    pd.testing.assert_frame_equal(src_df, tgt_df)
