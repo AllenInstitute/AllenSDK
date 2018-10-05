@@ -11,6 +11,43 @@ from .lims_api import LimsApi, clean_multiline_query, produce_in_clause_target
 
 class EcephysLimsApi(LimsApi, EcephysApi):
 
+
+    def get_spike_times(self, session_id, probe_ids=None):
+
+        wkf = self.get_probe_and_session_well_known_files()
+        wkf = wkf[(wkf['session_id'] == session_id) & ~wkf['probe_id'].isnull()]
+        if probe_ids is not None:
+            wkf = wkf[wkf['probe_id'].isin(probe_ids)]
+        probe_ids = np.sort(wkf['probe_id'].unique())
+
+        unit_table = self.get_unit_table(session_id, probe_ids=probe_ids)
+
+        spike_times_files = wkf[wkf['file_type'] == 'EcephysSortedSpikeTimes']  # TODO example case has no aligned times
+        spike_units_files = wkf[wkf['file_type'] == 'EcephysSortedSpikeClusters']
+
+        output_times = {}
+        for ii, probe_id in enumerate(probe_ids):
+
+            probe_unit_table = unit_table[unit_table['probe_id'] == probe_id]
+
+            spike_times = np.squeeze(np.load(spike_times_files[spike_times_files['probe_id'] == probe_id]['path'].values[0], allow_pickle=False)).astype(float) / 30000.0  # TODO since we don't have aligned event times in s ...
+            spike_units = np.squeeze(np.load(spike_units_files[spike_units_files['probe_id'] == probe_id]['path'].values[0], allow_pickle=False))
+
+            sort_order = np.argsort(spike_units)
+            spike_units = spike_units[sort_order]
+            spike_times = spike_times[sort_order]
+            changes = np.concatenate([np.array([0]), np.where(np.diff(spike_units))[0] - 1, np.array([-1])])
+
+            for jj, (low, high) in enumerate(zip(changes[:-1], changes[1:])):
+                local_unit = spike_units[high]
+                unit_times = spike_times[low:high+1]
+
+                global_unit = probe_unit_table['id'].values[local_unit]  
+                output_times[global_unit] = unit_times
+
+        return output_times
+
+
     def get_session_table(self, session_ids=None):
         '''
         '''
@@ -127,7 +164,6 @@ class EcephysLimsApi(LimsApi, EcephysApi):
         for ii, probe in enumerate(response):
             max_vertical_pos = np.amax(probe['probe_info']['vertical_pos'])
             num_channels = len(probe['probe_info']['channel'])
-
             probe_df = pd.DataFrame({
                 'id': np.array(probe['probe_info']['channel']) + ii * last_num_channels, #  TODO: we don't really have ids for these ...
                 'local_index': probe['probe_info']['channel'],

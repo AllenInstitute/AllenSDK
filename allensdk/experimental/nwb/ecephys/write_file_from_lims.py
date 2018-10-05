@@ -8,11 +8,13 @@ import pandas as pd
 import numpy as np
 
 import pynwb
-from pynwb.core import DynamicTable
+from pynwb.core import DynamicTable, VectorData, VectorIndex
 from pynwb.file import ElectrodeTable
 from pynwb import NWBHDF5IO
 from pynwb.device import Device
 from pynwb.ecephys import ElectrodeGroup
+from pynwb.misc import UnitTimes
+from pynwb.base import ProcessingModule
 
 from allensdk.experimental.nwb.api.ecephys_lims_api import EcephysLimsApi
 
@@ -27,9 +29,13 @@ CT_PLACEHOLDERS = {
     'location': 'null',  # TODO: again, waits on CCF registration for accurate information. Will be acronym of CCF structure
     'filtering': 'here is a description of our filtering'  # TODO do we have a standard filtering string?
 }
+STIM_TABLE_RENAMES_MAP = {
+    'Start': 'start_time',
+    'End': 'stop_time',
+}
 
 
-def process_channel_table(channel_table, placeholders=None):
+def process_channel_table_for_nwb(channel_table, placeholders=None):
     if placeholders is None:
         placeholders = CT_PLACEHOLDERS
 
@@ -41,6 +47,15 @@ def process_channel_table(channel_table, placeholders=None):
         channel_table[key] = value
 
     return channel_table
+
+
+def process_stimulus_table_for_nwb(stimulus_table, renames_map=None):
+    stimulus_table  = stimulus_table.rename(columns=renames_map, index={})
+    stimulus_table['description'] = ''  # TODO: I guess it makes sense for epochs to have descriptions?
+    stimulus_table['timeseries'] = [tuple()] * stimulus_table.shape[0]
+    stimulus_table['tags'] = [tuple()] * stimulus_table.shape[0]
+    
+    return stimulus_table
 
 
 def add_units_to_file(nwbfile, probe_table, channel_table, unit_table):
@@ -71,13 +86,34 @@ def add_units_to_file(nwbfile, probe_table, channel_table, unit_table):
     return nwbfile
 
 
+def add_spike_times_to_file(nwbfile, spike_times):  # TODO how to add waveforms?
+    unit_times = UnitTimes(
+        source=SOURCE_PLACEHOLDER
+    )
+    for key, value in spike_times.items():
+        unit_times.add_spike_times(
+            unit_id=key,
+            spike_times=np.array(value)
+        )
+
+    unit_times_module = ProcessingModule(
+        name='spike_detection',
+        source=SOURCE_PLACEHOLDER,
+        description='spike_times',
+        data_interfaces=[unit_times]
+    )
+    nwbfile.add_processing_module(unit_times_module)
+    return nwbfile
+
+
 def main(ecephys_session_id, nwb_path, remove_file=False):
 
     api = EcephysLimsApi()
 
     session_info = api.get_session_table(session_ids=[ecephys_session_id]).to_dict('record')[0]
+    # stimulus_table = process_stimulus_table_for_nwb(api.get_stimulus_table(ecephys_session_id))
     probe_table = api.get_probe_table(session_ids=[ecephys_session_id])
-    channel_table = process_channel_table(api.get_channel_table(ecephys_session_id))
+    channel_table = process_channel_table_for_nwb(api.get_channel_table(ecephys_session_id))  # TODO: 706875901 breaks here
     unit_table = api.get_unit_table(session_id=ecephys_session_id)
     unit_table.set_index('id', drop=True, inplace=True)
 
@@ -90,6 +126,8 @@ def main(ecephys_session_id, nwb_path, remove_file=False):
     )
 
     nwbfile = add_units_to_file(nwbfile, probe_table, channel_table, unit_table)
+    # nwbfile.epochs = Epochs.from_dataframe(stimulus_table)  # TODO: I can't actually find an experiment that both as a stim table and has the current format for its other data
+    nwbfile = add_spike_times_to_file(nwbfile, api.get_spike_times(ecephys_session_id))
 
     if remove_file:
         os.remove(nwb_path)
@@ -101,10 +139,9 @@ def main(ecephys_session_id, nwb_path, remove_file=False):
     return nwbfile, nwb_path
 
 
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('ecephys_session_id', type=int) # 754312389, for instance
+    parser.add_argument('ecephys_session_id', type=int) # 754312389, for instance ... TODO: 754312389 ONLY
     parser.add_argument('--nwb_path', type=str, default=None)
     parser.add_argument('--remove_file', action='store_true', default=False)
 
