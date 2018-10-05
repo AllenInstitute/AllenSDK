@@ -3,13 +3,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import ic_ephys
 
-DEFAULT_NWB1_FILE_NAME ="/local1/ephys/patchseq/nwb2/Npr3-IRES2-CreSst-IRES-FlpOAi65-401243.04.01.01_ver2.nwb"
+DEFAULT_NWB2_FILE_NAME ="/allen/aibs/technology/sergeyg/ephys_pipeline/nwb_conversion/nwb2/Npr3-IRES2-CreSst-IRES-FlpOAi65-401243.04.01.01_ver2.nwb"
 
 
 def plot_sweeps(nwbfile, sweep_table,
                 xlim=[0,5],
-                response_offset=-100,
-                stimulus_offset=-500):
+                acquisition_trace_offset = None,
+                stimulus_trace_offset = None):
 
     fig, ax = plt.subplots(1, 2, figsize=(10, 7))
 
@@ -25,15 +25,22 @@ def plot_sweeps(nwbfile, sweep_table,
         t_acq = np.arange(0,len(acquisition_data))/acquisition.rate
         t_stm = np.arange(0,len(stimulus_data))/stimulus.rate
 
-        stimulus_offset = -np.max(np.abs(stimulus_data))
-        acquisition_offset = -np.max(np.abs(acquisition_data))
+        if stimulus_trace_offset is None:
+            stimulus_trace_offset = -np.max(np.abs(stimulus_data))
 
-        acquisition_data += trace_ix * acquisition_offset
-        stimulus_data += trace_ix * stimulus_offset
+        if acquisition_trace_offset is None:
+            acquisition_trace_offset = -np.max(np.abs(acquisition_data))
+
+
+        acquisition_offset = trace_ix * acquisition_trace_offset
+        acquisition_data += acquisition_offset
+
+        stimulus_offset = trace_ix * stimulus_trace_offset
+        stimulus_data += stimulus_offset
 
         ax[0].plot(t_stm, stimulus_data)
         ax[0].set_xlabel('time (s)')
-        ax[0].text(0, trace_ix * stimulus_offset, " %s: " % sweep_name, fontsize=10)
+        ax[0].text(t_stm[-1]*0.5, stimulus_offset, " %s " % sweep_name, fontsize=10)
         ax[0].set_title("Stimulus (%4.0e*%s)" % (stimulus.conversion, stimulus.unit))
         ax[0].set_xlim(t_stm[0],t_stm[-1])
 
@@ -41,11 +48,11 @@ def plot_sweeps(nwbfile, sweep_table,
         ax[1].set_xlabel('time (s)')
         ax[1].set_title("Acquisition (%4.0e*%s)" % (acquisition.conversion,acquisition.unit))
         ax[1].set_xlim(t_acq[0],t_acq[-1])
-        ax[1].text(0, trace_ix * acquisition_offset, " %s: " % sweep_name, fontsize=10)
+        ax[1].text(t_stm[-1]*0.5, acquisition_offset, " %s" % sweep_name, fontsize=10)
 
         trace_ix+=1
 
-    fig.suptitle(sweep_info["stimulus_description"], fontsize=18)
+    fig.suptitle("stimulus description: "+sweep_info["stimulus_description"], fontsize=18)
     fig.tight_layout(rect=[0, 0.03, 1, 0.95])
 
 
@@ -57,7 +64,6 @@ def main():
     """
     # Usage:
     $ python plot_icephys_nwb2.py NWB2_FILE_NAME
-    example files:"/local1/ephys/patchseq/nwb2/Pvalb-IRES-Cre;Ai14-406663.04.01.01_ver2.nwb"
 
     """
     if len(sys.argv) == 1:
