@@ -1,0 +1,1 @@
+from .legacy_adapter import VisualCodingLegacyNwbAdapter

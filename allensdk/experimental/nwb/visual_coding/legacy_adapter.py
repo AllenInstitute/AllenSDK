@@ -1,4 +1,5 @@
 from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
+from pynwb import TimeSeries
 from pynwb.form.backends.hdf5.h5_utils import H5DataIO
 
 
