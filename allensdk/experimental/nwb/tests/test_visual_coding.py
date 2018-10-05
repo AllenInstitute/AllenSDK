@@ -1,5 +1,6 @@
 import datetime
-from allensdk.experimental.nwb import visual_coding as vc
+import os
+from allensdk.experimental.nwb.visual_coding import VisualCodingLegacyNwbAdapter
 from pynwb import NWBFile, NWBHDF5IO
 import numpy as np
 import pytest
@@ -16,9 +17,10 @@ def nwb_filename(tmpdir_factory):
     return str(nwb)
 
 
+@pytest.mark.skipif(not os.environ.get('ALLENSDK_EXPERIMENTAL',''), reason='Experimental')
 @pytest.mark.parametrize("compress", (True, False))
 def test_legacy_cv_running_speed(nwb_filename, vc_nwb, compress):
-    adapter = vc.VisualCodingLegacyNwbAdapter(vc_nwb, compress=compress)
+    adapter = VisualCodingLegacyNwbAdapter(vc_nwb, compress=compress)
 
     nwbfile = NWBFile(
         source='Data source',
