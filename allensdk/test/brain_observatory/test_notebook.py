@@ -80,8 +80,8 @@ def test_brain_observatory_trace_analysis_notebook(boc):
     assert pref_tf == 2
 
     pref_trials = dg.stim_table[(dg.stim_table.orientation==pref_ori)&(dg.stim_table.temporal_frequency==pref_tf)]
-    assert pref_trials['start'][1] == 836 
-    assert pref_trials['end'][1] == 896 
+    assert pref_trials['start'][1] == 837 
+    assert pref_trials['end'][1] == 897 
 
     # mean sweep response
     subset = dg.sweep_response[(dg.stim_table.orientation==pref_ori)&(dg.stim_table.temporal_frequency==pref_tf)]
@@ -100,7 +100,7 @@ def test_brain_observatory_static_gratings_notebook(boc):
 
     peak_head = sg.peak.head()
     assert peak_head['cell_specimen_id'][0] == 517399188
-    assert np.isclose(peak_head['reliability_sg'][0], 0.011318858489782238)
+    assert np.isclose(peak_head['reliability_sg'][0], -0.010099250163301616)
 
 
 @pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
@@ -110,7 +110,7 @@ def test_brain_observatory_natural_scenes_notebook(boc):
     ns = NaturalScenes(data_set)
     ns_head = ns.peak.head()
     
-    assert np.isclose(ns_head['peak_dff_ns'][0], 4.9169226656)
+    assert np.isclose(ns_head['peak_dff_ns'][0], 4.9614532738)
     assert ns_head['cell_specimen_id'][0] == 517399188
 
 @pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
@@ -147,7 +147,10 @@ def test_brain_observatory_experiment_containers_notebook(boc):
                                     stimuli=[stim_info.STATIC_GRATINGS])[0]
     exp = boc.get_ophys_experiment_data(exp['id'])
 
-    assert set(depths) == set([175, 265, 275, 300, 320, 325, 335, 350, 365, 375])
+    assert set(depths) == set([175, 185, 195, 200, 205, 225, 250, 265, 275, 276, 285,
+                               300, 320, 325, 335, 350, 365, 375, 390, 400, 550, 570,
+                               625])
+
     expected_stimuli = ['drifting_gratings',
                         'locally_sparse_noise',
                         'locally_sparse_noise_4deg',
@@ -158,14 +161,25 @@ def test_brain_observatory_experiment_containers_notebook(boc):
                         'natural_scenes',
                         'spontaneous',
                         'static_gratings']
+
     assert set(stims) == set(expected_stimuli)
-    expected_cre_lines = [u'Cux2-CreERT2',
-                          u'Emx1-IRES-Cre',
-                          u'Nr5a1-Cre',
-                          u'Rbp4-Cre_KL100',
-                          u'Rorb-IRES2-Cre',
-                          u'Scnn1a-Tg3-Cre']
+
+    expected_cre_lines = [ u'Cux2-CreERT2',
+                           u'Emx1-IRES-Cre',
+                           u'Fezf2-CreER',
+                           u'Nr5a1-Cre',
+                           u'Ntsr1-Cre_GN220',
+                           u'Pvalb-IRES-Cre',
+                           u'Rbp4-Cre_KL100',
+                           u'Rorb-IRES2-Cre',
+                           u'Scnn1a-Tg3-Cre',
+                           u'Slc17a7-IRES2-Cre',
+                           u'Sst-IRES-Cre',
+                           u'Tlx3-Cre_PL56',
+                           u'Vip-IRES-Cre' ]
+
     assert set(cre_lines) == set(expected_cre_lines)
+
     cells = boc.get_cell_specimens()
 
     cells = pd.DataFrame.from_records(cells)
