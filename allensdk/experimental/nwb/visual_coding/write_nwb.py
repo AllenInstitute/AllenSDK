@@ -8,7 +8,7 @@ from pynwb.ophys import OpticalChannel
 from pynwb.form.backends.hdf5.h5_utils import H5DataIO
 
 
-def write_nwb(output_file, stimulus_adapter, ophys_adapter):
+def write_nwb(output_file, stimulus_adapter, ophys_adapter, **compression_opts):
     """Write Visual Coding NWB 2.0 file
 
     Parameters
@@ -58,7 +58,8 @@ def write_nwb(output_file, stimulus_adapter, ophys_adapter):
 
     dff, t = ophys_adapter.dff_traces
     ophys.get_dff_series(dff_interface, rt_region, dff, t,
-                          source=ophys_adapter.dff_source)
+                         source=ophys_adapter.dff_source,
+                         **compression_opts)
 
     with NWBHDF5IO(output_file, mode='w') as io:
         io.write(nwbfile)
@@ -68,15 +69,21 @@ def main():
     parser = ArgumentParser()
     parser.add_argument("experiment_id", type=int)
     parser.add_argument("nwb_file", type=str)
+    parser.add_argument("--compress", action="store_true")
 
     args = parser.parse_args()
+
+    opts = {}
+    if args.compress:
+        opts = {"compression": True, "compression_opts": 9}
+
     api = OphysLimsApi()
     ophys_adapter = ophys.OphysAdapter(args.experiment_id, api)
     pkl = api.get_pickle_file(args.experiment_id)
     sync = api.get_sync_file(args.experiment_id)
     stimulus_adapter = VisualCodingStimulusAdapter(pkl, sync)
 
-    write_nwb(args.nwb_file, stimulus_adapter, ophys_adapter)
+    write_nwb(args.nwb_file, stimulus_adapter, ophys_adapter, **opts)
 
 if __name__ == "__main__":
     main()
