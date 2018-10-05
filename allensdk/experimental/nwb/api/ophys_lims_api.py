@@ -35,7 +35,7 @@ class OphysLimsApi(LimsApi):
 
     def get_pickle_file(self, experiment_id):
         session_id = self.session_id(experiment_id)
-        return self._get_well_known_file_path(session_id, 'OphysRigPickle',
+        return self._get_well_known_file_path(session_id, 'StimulusPickle',
                                               'OphysSession')
 
     def get_roi_table(self, experiment_id):

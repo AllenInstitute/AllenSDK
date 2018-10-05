@@ -2,7 +2,7 @@ import datetime
 import h5py
 from .timestamps import get_timestamps_from_sync
 from pynwb import NWBFile
-from pynwb.ophys import DfOverF, ImageSegmentation
+from pynwb.ophys import DfOverF, ImageSegmentation, OpticalChannel
 from pynwb.form.backends.hdf5.h5_utils import H5DataIO
 
 
@@ -10,15 +10,15 @@ def create_base_nwb(session_metadata):
     nwbfile = NWBFile(
         source='Allen Brain Observatory',
         session_description=session_metadata["session_description"],
-        institute='The Allen Institute for Brain Science',
-        identifier=session_metadata["experiment_id"],
-        session_id=session_metadata["session_id"],
-        experiment_id=session_metadata["experiment_id"],
+        institution='The Allen Institute for Brain Science',
+        identifier=str(session_metadata["experiment_id"]),
+        session_id=str(session_metadata["session_id"]),
         session_start_time=session_metadata["session_start_time"],
         file_create_date=datetime.datetime.now()
     )
 
-    nwbfile.create_device(session_metadata["device_name"])
+    nwbfile.create_device(session_metadata["device_name"],
+                          "Allen Brain Observatory")
 
     return nwbfile
 
@@ -118,7 +118,7 @@ class OphysAdapter(object):
     def __init__(self, experiment_id, api, ophys_key="2p_vsync",
                  use_falling_edges=True):
         self.experiment_id = experiment_id
-        self.sync_file = api.get_sync_file()
+        self.sync_file = api.get_sync_file(experiment_id)
         self.ophys_key = ophys_key
         self.use_falling_edges = use_falling_edges
         self._api = api
@@ -153,17 +153,17 @@ class OphysAdapter(object):
 
     @property
     def roi_mask_dict(self):
-        return self._api.roi_mask_dict(self.experiment_id)
+        return self._api.get_roi_dict(self.experiment_id)
 
     @property
     def session_metadata(self):
         if self._metadata is None:
-            self._metadata = self._api.session_metadata(self.experiment_id)
+            self._metadata = self._api.get_session_metadata(self.experiment_id)
 
         return self._metadata
 
     def get_optical_channel(self, channel='channel_1'):
-        metadata = self.session_metadata()
+        metadata = self.session_metadata
 
         optical_channel = self._channels.get(channel, None)
         if optical_channel is None:

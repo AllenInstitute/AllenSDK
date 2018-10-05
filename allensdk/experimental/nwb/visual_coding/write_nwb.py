@@ -1,8 +1,8 @@
 import datetime
 from argparse import ArgumentParser
-from ..stimulus import VisualCodingStimulusAdapter
-from .. import ophys
-from ..api.ophys_lims_api import OphysLimsApi
+from allensdk.experimental.nwb.stimulus import VisualCodingStimulusAdapter
+from allensdk.experimental.nwb import ophys
+from allensdk.experimental.nwb.api.ophys_lims_api import OphysLimsApi
 from pynwb import NWBFile, NWBHDF5IO, TimeSeries
 from pynwb.ophys import OpticalChannel
 from pynwb.form.backends.hdf5.h5_utils import H5DataIO
@@ -22,7 +22,7 @@ def write_nwb(output_file, stimulus_adapter, ophys_adapter):
         Adapter providing session metadata, roi data, and dff from data
         sources.
     """
-    session_metadata = ophys_adapter.session_metadata()
+    session_metadata = ophys_adapter.session_metadata
 
     nwbfile = ophys.create_base_nwb(session_metadata)
 
@@ -31,10 +31,10 @@ def write_nwb(output_file, stimulus_adapter, ophys_adapter):
     processing = ophys.add_ophys_module(
         nwbfile, 'visual_coding_pipeline',
         ("Processing module for Allen Brain Observatory: "
-         "Visual Coding 2-Photon Experiments"))
+         "Visual Coding 2-Photon Experiments"),
+        ophys_adapter.dff_source)
 
-    processing = nwbfile.get_processing_module("visual_coding_pipeline")
-    dff_interface = processing.get_interface('dff_interface')
+    dff_interface = processing.get_data_interface('dff_interface')
 
     optical_channel = ophys_adapter.get_optical_channel()
 
@@ -54,7 +54,7 @@ def write_nwb(output_file, stimulus_adapter, ophys_adapter):
 
     rt_region = plane_seg.create_roi_table_region(
         description="segmented cells labeled by cell_specimen_id",
-        names=[roi for roi in ophys_adapter.roi_dict.keys()])
+        names=[roi for roi in ophys_adapter.roi_mask_dict.keys()])
 
     dff, t = ophys_adapter.dff_traces
     ophys.get_dff_series(dff_interface, rt_region, dff, t,
@@ -76,7 +76,7 @@ def main():
     sync = api.get_sync_file(args.experiment_id)
     stimulus_adapter = VisualCodingStimulusAdapter(pkl, sync)
 
-    write_nwb(args.output_file, stimulus_adapter, ophys_adapter)
+    write_nwb(args.nwb_file, stimulus_adapter, ophys_adapter)
 
 if __name__ == "__main__":
     main()
