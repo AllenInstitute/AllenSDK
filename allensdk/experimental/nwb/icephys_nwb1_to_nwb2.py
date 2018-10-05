@@ -5,8 +5,7 @@ import ipfx.lab_notebook_reader as lab_notebook_reader
 import ic_ephys
 import os
 
-DEFAULT_NWB1_FILE_NAME ="/local1/ephys/patchseq/nwb2/Npr3-IRES2-CreSst-IRES-FlpOAi65-401243.04.01.01.nwb"
-#   "/local1/ephys/patchseq/nwb2/Pvalb-IRES-Cre;Ai14-406663.04.01.01.nwb"
+DEFAULT_NWB1_FILE_NAME ="/allen/aibs/technology/sergeyg/ephys_pipeline/nwb_conversion/nwb1/Npr3-IRES2-CreSst-IRES-FlpOAi65-401243.04.01.01.nwb"
 
 
 def main():
