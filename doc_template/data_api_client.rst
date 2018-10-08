@@ -166,7 +166,7 @@ Pandas Dataframes can be written to a CSV file using to_csv and read using load_
                         'parent_structure_id',
                         'acronym']].to_csv('summary_structures.csv',
                                            index_label='structure_id')
-    reread = pd.DataFrame.from_csv('summary_structures.csv')
+    reread = pd.read_csv('summary_structures.csv')
 
 
 Iteration over a Dataframe of API data can be done in several ways.

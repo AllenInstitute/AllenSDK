@@ -36,13 +36,12 @@
 import allensdk.core.cell_types_cache as CTC
 from allensdk.core.cell_types_cache import ReporterStatus as RS
 import pytest
-from pandas.core.frame import DataFrame
+import pandas as pd
 from allensdk.config import enable_console_log
 from mock import MagicMock, patch, call, mock_open
 from six.moves import builtins
 import itertools as it
 import allensdk.core.json_utilities as ju
-import pandas.io.json as pj
 import os
 
 _MOCK_PATH = '/path/to/xyz.txt'
@@ -249,9 +248,9 @@ def test_get_reconstruction(cache_fixture,
 
 @pytest.mark.parametrize('path_exists',
                          (False, True))
-@patch.object(DataFrame, "to_csv")
-@patch.object(DataFrame, "from_csv")
-def test_get_reconstruction_with_api(from_csv,
+@patch.object(pd.DataFrame, "to_csv")
+@patch.object(pd, "read_csv")
+def test_get_reconstruction_with_api(read_csv,
                                      to_csv,
                                      cache_fixture,
                                      cell_id,
@@ -278,9 +277,9 @@ def test_get_reconstruction_with_api(from_csv,
         assert query_mock.called
 
 
-@patch.object(DataFrame, "to_csv")
-@patch.object(DataFrame, "from_csv")
-def test_get_reconstruction_exception(from_csv,
+@patch.object(pd.DataFrame, "to_csv")
+@patch.object(pd, "read_csv")
+def test_get_reconstruction_exception(read_csv,
                                       to_csv,
                                       cache_fixture,
                                       cell_id):
@@ -409,9 +408,9 @@ def test_get_ephys_features(cache_fixture,
 @pytest.mark.parametrize('df,path_exists',
                          it.product((False,True),
                                     (False,True)))
-@patch.object(DataFrame, "to_csv")
-@patch.object(DataFrame, "from_csv")
-def test_get_ephys_features_with_api(from_csv,
+@patch.object(pd.DataFrame, "to_csv")
+@patch.object(pd, "read_csv")
+def test_get_ephys_features_with_api(read_csv,
                                      to_csv,
                                      cache_fixture,
                                      df,
@@ -435,7 +434,7 @@ def test_get_ephys_features_with_api(from_csv,
                         _ = ctc.get_ephys_features(dataframe=df)
 
     if path_exists:
-        from_csv.assert_called_once_with(_MOCK_PATH)
+        read_csv.assert_called_once_with(_MOCK_PATH)
     else:
         mkd.assert_called_once_with(_MOCK_PATH)
         assert query_mock.called
@@ -444,11 +443,11 @@ def test_get_ephys_features_with_api(from_csv,
 @pytest.mark.parametrize('path_exists,df',
                          it.product((False, True),
                                     (False, True)))
-@patch.object(DataFrame, "to_csv")
-@patch.object(DataFrame, "from_csv",
-              return_value=DataFrame([{ 'stuff': 'whatever'},
-                                      { 'stuff': 'nonsense'}]))
-def test_get_morphology_features(from_csv,
+@patch.object(pd.DataFrame, "to_csv")
+@patch.object(pd, "read_csv",
+              return_value=pd.DataFrame([{ 'stuff': 'whatever'},
+                                         { 'stuff': 'nonsense'}]))
+def test_get_morphology_features(read_csv,
                                  to_csv,
                                  cache_fixture,
                                  path_exists,
@@ -478,7 +477,7 @@ def test_get_morphology_features(from_csv,
     
     if path_exists:
         if df:
-            from_csv.assert_called_once_with(_MOCK_PATH)
+            read_csv.assert_called_once_with(_MOCK_PATH)
         else:
             assert True
         assert not mkd.called
@@ -545,11 +544,11 @@ def test_get_ephys_sweeps_with_api(cache_fixture,
                          it.product((False, True),
                                     (False, True)))
 @patch('pandas.DataFrame.merge')
-@patch.object(DataFrame, "to_csv")
-@patch.object(DataFrame, "from_csv",
-              return_value=DataFrame([{ 'stuff': 'whatever'},
-                                      { 'stuff': 'nonsense'}]))
-def test_get_all_features(from_csv,
+@patch.object(pd.DataFrame, "to_csv")
+@patch.object(pd, "read_csv",
+              return_value=pd.DataFrame([{ 'stuff': 'whatever'},
+                                         { 'stuff': 'nonsense'}]))
+def test_get_all_features(read_csv,
                           to_csv,
                           mock_merge,
                           cache_fixture,
@@ -577,7 +576,7 @@ def test_get_all_features(from_csv,
                                         require_reconstruction=require_reconstruction)
 
     if path_exists:
-        assert from_csv.called
+        assert read_csv.called
     else:
         assert query_mock.called
     

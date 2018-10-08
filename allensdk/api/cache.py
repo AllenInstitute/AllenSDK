@@ -244,7 +244,7 @@ class Cache(object):
         index : string, optional
             post-rename column to use as the row label.
         '''
-        data = pd.DataFrame.from_csv(path)
+        data = pd.read_csv(path)
 
         Cache.rename_columns(data, rename)
 
@@ -383,14 +383,14 @@ class Cache(object):
     def cache_csv_json():
         return {
              'writer': Cache.csv_writer,
-             'reader': lambda f: pd.DataFrame.from_csv(f).to_dict('records')
+             'reader': lambda f: pd.read_csv(f).to_dict('records')
         }
 
     @staticmethod
     def cache_csv_dataframe():
         return {
              'writer': Cache.csv_writer,
-             'reader' : pd.DataFrame.from_csv
+             'reader' : pd.read_csv
         }
 
     @staticmethod
@@ -422,7 +422,7 @@ class Cache(object):
     def cache_csv():
         return {
             'writer': Cache.csv_writer,
-            'reader': pd.DataFrame.from_csv
+            'reader': pd.read_csv
         }
 
     @staticmethod
@@ -525,7 +525,7 @@ class Cache(object):
             else:
                 data = ju.read(path)
         elif return_dataframe is True:
-            data = pd.DataFrame.from_csv(path)
+            data = pd.read_csv(path)
         else:
             raise ValueError(
                 'save_as_json=False cannot be used with return_dataframe=False')
