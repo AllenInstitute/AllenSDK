@@ -1,9 +1,10 @@
 import pytest
 import datetime
-from pynwb import NWBFile#, NWBHDF5IO, TimeSeries
+from pynwb import NWBFile
 import os
 import io
 import pickle
+import numpy as np
 
 @pytest.fixture(scope='function')
 def nwbfile(tmpdir):
@@ -24,7 +25,21 @@ def tmpfilename(tmpdir):
     return os.path.join(str(tmpdir), 'test.nwb')
 
 @pytest.fixture(scope='function')
-def visbeh_pkl():
+def behaviorimagesfilename(tmpdir):
+
+    image_dict = {}
+    image_dict['im065'] = {}
+    image_dict['im077'] = {}
+    image_dict['im065']['im065'] = np.zeros((3,6))
+    image_dict['im077']['im077'] = np.ones((3,6))
+    
+    fname = os.path.join(str(tmpdir), 'images.pkl')
+    pickle.dump(image_dict, open(fname, 'w'))
+
+    return fname
+
+@pytest.fixture(scope='function')
+def visbeh_pkl(behaviorimagesfilename):
 
     bytes_io = io.BytesIO()
     D = {}
@@ -43,7 +58,7 @@ def visbeh_pkl():
     D['items']['behavior']['stimuli']['images']['set_log'] = [('Image', 'im065', .05, 0),('Image', 'im077', 26.01941239779431, 2)]
     D['items']['behavior']['stimuli']['images']['change_log'] = [(('im065', 'im065'), ('im077', 'im077'), 26.019579445142398, 2)]
     D['items']['behavior']['stimuli']['images']['draw_log'] = [0,1,0,1,0,0]
-    D['items']['behavior']['stimuli']['images']['image_path'] = ''
+    D['items']['behavior']['stimuli']['images']['image_path'] = behaviorimagesfilename
     D["items"]["behavior"]["config"] = {}
     D["items"]["behavior"]["config"]["reward"] = {}
     D["items"]["behavior"]["config"]["reward"]["reward_volume"] = 0

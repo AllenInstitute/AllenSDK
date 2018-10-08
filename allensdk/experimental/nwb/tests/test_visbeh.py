@@ -24,10 +24,10 @@ def test_visbeh_running_speed(nwbfile, tmpfilename, visbeh_pkl):
 
 @pytest.mark.skipif(not os.environ.get('ALLENSDK_EXPERIMENTAL',''), reason='Experimental')
 def test_visbeh_epoch(nwbfile, tmpfilename, visbeh_pkl):
-    tmpfilename = '/home/nicholasc/foo.nwb'
+
     visbeh_data = VisualBehaviorStimulusAdapter(visbeh_pkl)
 
-    epoch_table = visbeh_data.get_epoch_table()
+    epoch_table = visbeh_data.stimulus_epoch_table
     nwbfile.epochs = epoch_table
 
     src_df = nwbfile.epochs.to_dataframe()
@@ -52,3 +52,45 @@ def test_visbeh_epoch(nwbfile, tmpfilename, visbeh_pkl):
             assert np.allclose(tgt_ts.timestamps, src_ts.timestamps)
 
     pd.testing.assert_frame_equal(src_df, tgt_df)
+
+@pytest.mark.skipif(not os.environ.get('ALLENSDK_EXPERIMENTAL',''), reason='Experimental')
+def test_visbeh_image_stimulus(nwbfile, tmpfilename, visbeh_pkl):
+
+    visbeh_data = VisualBehaviorStimulusAdapter(visbeh_pkl)
+
+    for x in visbeh_data.image_series_list:
+        nwbfile.add_stimulus_template(x)
+    
+    for y in visbeh_data.index_series_list:
+        nwbfile.add_stimulus(y)
+
+    with NWBHDF5IO(tmpfilename, mode='w') as io:
+        io.write(nwbfile)
+
+    nwbfile_in = NWBHDF5IO(tmpfilename, mode='r').read()
+
+    assert np.allclose(nwbfile.stimulus['image_index'].data, nwbfile_in.stimulus['image_index'].data)
+    assert np.allclose(nwbfile.stimulus['image_index'].timestamps, nwbfile_in.stimulus['image_index'].timestamps)
+
+    assert np.allclose(nwbfile.stimulus['image_index'].indexed_timeseries.data, nwbfile_in.stimulus['image_index'].indexed_timeseries.data)
+    assert np.allclose(nwbfile.stimulus['image_index'].indexed_timeseries.timestamps, nwbfile_in.stimulus['image_index'].indexed_timeseries.timestamps)
+
+@pytest.mark.skipif(not os.environ.get('ALLENSDK_EXPERIMENTAL',''), reason='Experimental')
+@pytest.mark.parametrize('pklfile', ['/allen/programs/braintv/production/neuralcoding/prod0/specimen_738720433/behavior_session_760658830/181004091143_409296_2e5b5a55-af4b-4f94-829d-0048df1eb550.pkl',
+                                     '/allen/programs/braintv/production/visualbehavior/prod0/specimen_738786518/behavior_session_759866491/181002090744_403468_7add2e7c-96fd-4aa0-b864-3dc4d4c38efa.pkl'])
+def test_visbeh_pickle_integration(pklfile, nwbfile, tmpfilename):
+
+    visbeh_data = VisualBehaviorStimulusAdapter(pklfile)
+
+    nwbfile.add_acquisition(visbeh_data.running_speed)
+    
+    for x in visbeh_data.image_series_list:
+        nwbfile.add_stimulus_template(x)
+    
+    for y in visbeh_data.index_series_list:
+        nwbfile.add_stimulus(y)
+
+    with NWBHDF5IO(tmpfilename, mode='w') as io:
+        io.write(nwbfile)
+
+    nwbfile_in = NWBHDF5IO(tmpfilename, mode='r').read()
