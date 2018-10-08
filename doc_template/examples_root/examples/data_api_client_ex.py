@@ -38,8 +38,8 @@ atlas_data = rma.model_query('Atlas',
 schema = rma.get_schema()
 for entry in schema:
     data_description = entry['DataDescription']
-    clz = data_description.keys()[0]
-    info = data_description.values()[0]
+    clz = list(data_description.keys())[0]
+    info = list(data_description.values())[0]
     fields = info['fields']
     associations = info['associations']
     table = info['table']
