@@ -11,7 +11,7 @@ class OphysLimsApi(LimsApi):
         # Dff files are apparently missing attachable type
         if self._dff_table is None:
             self._dff_table = self.get_well_known_file_table(
-                well_known_file_type_names=['OphysDffTraceFile'])
+                file_type_names=['OphysDffTraceFile'])
 
         return self._dff_table
 
