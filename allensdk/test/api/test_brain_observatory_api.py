@@ -527,3 +527,16 @@ def test_find_experiment_acquisition_age():
     age = find_experiment_acquisition_age(exp)
 
     assert age == 1
+
+def test_dataframe_query(bo_api, mock_specimens):
+    res = bo_api.dataframe_query(mock_specimens, [], 'cell_specimen_id')
+    assert len(res) == len(mock_specimens)
+
+    res = bo_api.dataframe_query(mock_specimens, 
+                                 [ { 'field': 'experiment_container_id',
+                                     'op': '=',
+                                     'value': 511498500 } ],
+                                 'cell_specimen_id')
+
+    assert len(res) == 1
+
