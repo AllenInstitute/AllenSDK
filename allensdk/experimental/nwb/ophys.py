@@ -109,7 +109,7 @@ def get_dff_series(dff_interface, roi_table_region, dff, timestamps,
             data=H5DataIO(dff, **compression_opts),
             unit='NA',
             rois=roi_table_region,
-            timestamps=timestamps)
+            timestamps=H5DataIO(timestamps, **compression_opts))
 
     return dff_series
 

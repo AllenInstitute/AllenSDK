@@ -91,7 +91,7 @@ class BaseStimulusAdapter(object):
             self._running_speed = TimeSeries(name='running_speed',
                             source=self._source,
                             data=H5DataIO(speed.values, **self.compression_opts),
-                            timestamps=times,
+                            timestamps=H5DataIO(times, ** self.compression_opts),
                             unit='cm/s')
 
         return self._running_speed

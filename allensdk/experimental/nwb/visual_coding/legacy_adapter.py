@@ -19,7 +19,7 @@ class VisualCodingLegacyNwbAdapter(object):
         ts = TimeSeries(name='running_speed',
                         source='Allen Brain Observatory: Visual Coding',
                         data=H5DataIO(dxcm, **self.compression_opts),
-                        timestamps=dxtime,
+                        timestamps=H5DataIO(dxtime, **self.compression_opts),
                         unit='cm/s')
 
         return ts
