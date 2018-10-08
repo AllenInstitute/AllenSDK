@@ -622,6 +622,9 @@ class BrainObservatoryApi(RmaTemplate):
            of operators.
         """
 
+        if len(filters) == 0:
+            return data
+
         queries = self.dataframe_query_string(filters)
         result_dataframe = pd.DataFrame(data)
         result_dataframe = result_dataframe.query(queries)
