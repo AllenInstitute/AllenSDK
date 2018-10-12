@@ -572,7 +572,7 @@ class MouseConnectivityCache(ReferenceSpaceCache):
                                                              hemisphere_ids=hemisphere_ids)
                      for eid in experiment_ids]
 
-        return pd.concat(unionizes, ignore_index=True)
+        return pd.concat(unionizes, ignore_index=True, sort=True)
 
     def get_projection_matrix(self, experiment_ids,
                               projection_structure_ids=None,
