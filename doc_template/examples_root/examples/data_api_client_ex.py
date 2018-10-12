@@ -105,7 +105,7 @@ summary_structures[['id',
                     'parent_structure_id',
                     'acronym']].to_csv('summary_structures.csv',
                                         index_label='structure_id')
-reread = pd.DataFrame.read_csv('summary_structures.csv')
+reread = pd.read_csv('summary_structures.csv')
 
 #===============================================================================
 # example 10
