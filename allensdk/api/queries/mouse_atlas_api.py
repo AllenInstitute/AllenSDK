@@ -81,9 +81,12 @@ class MouseAtlasApi(ReferenceSpaceApi, GridDataApi):
         if gene_ids is not None:
             criteria += ',genes[id$in{}]'.format(','.join(map(str, gene_ids)))
 
+        order = kwargs.pop('order', ['\'id\''])
+
         return self.model_query(model='SectionDataSet', 
                                 criteria=criteria,
                                 include='genes',
+                                order=order,
                                 **kwargs)
 
     @cacheable()
@@ -112,9 +115,12 @@ class MouseAtlasApi(ReferenceSpaceApi, GridDataApi):
         if chromosome_ids is not None:
             criteria += ',[chromosome_id$in{}]'.format(','.join(map(str, chromosome_ids)))
         
+        order = kwargs.pop('order', ['\'id\''])
+
         return self.model_query(model='Gene', 
                                 criteria=criteria,
                                 include='chromosome',
+                                order=order,
                                 **kwargs)
 
     @cacheable(strategy='create', 

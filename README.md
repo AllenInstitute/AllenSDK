@@ -32,9 +32,9 @@ Nathan Gouwens @gouwens
 
 Nile Graddis @nilegraddis
 
-Gabe Ocker
+Gabe Ocker @gocker
 
-Corinne Teeter
+Corinne Teeter @corinneteeter
 
 Shreejoy Tripathy @stripathy
 
@@ -43,5 +43,7 @@ Saskia de Vries @saskiad
 Derric Williams @derricw
 
 Jed Perkins @jfperkins
- 
+
 Joe Knox @jknox13
+
+Justin Kiggins @neuromusic

@@ -171,6 +171,8 @@ def float_label(n):
         return "%.2f" % n
 
 def plot_representational_similarity(rs, dims=None, dim_labels=None, colors=None, dim_order=None, labels=True):
+    if np.all(np.isnan(rs)):
+        return # if rs is all NaN (happens with only 1 cell), there is nothing to plot
     if dim_order is not None:
         rsr = np.arange(len(rs)).reshape(*map(len,dims))
         rsrt = rsr.transpose(dim_order)
