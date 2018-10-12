@@ -10,7 +10,7 @@ future >= 0.14.3
 requests
 requests-toolbelt
 simplejson>=3.10.0
-scikit-image>=0.13.0
+scikit-image>=0.14.0
 statsmodels>=0.8.0
 simpleitk
 tables

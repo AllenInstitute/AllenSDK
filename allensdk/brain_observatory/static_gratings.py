@@ -419,7 +419,7 @@ class StaticGratings(StimulusAnalysis):
         data = df.values
 
         cmin = self.response[0,0,0,cell_index,0]
-        cmax = data.mean() + data.std()*3
+        cmax = max(cmin, data.mean() + data.std()*3)
 
         fp = cplots.FanPlotter.for_static_gratings()
         fp.plot(r_data=st.spatial_frequency.ix[mask].values,

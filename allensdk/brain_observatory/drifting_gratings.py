@@ -256,7 +256,7 @@ class DriftingGratings(StimulusAnalysis):
         data = df.values
     
         cmin = self.response[0,0,cell_index,0]
-        cmax = data.mean() + data.std()*3
+        cmax = max(cmin, data.mean() + data.std()*3)
 
         fp = cplots.FanPlotter.for_drifting_gratings()
         fp.plot(r_data=st.temporal_frequency.ix[mask].values,

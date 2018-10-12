@@ -24,5 +24,5 @@ pd = mcc.get_projection_density(experiments[0]['id'])
 
 import nrrd
 
-file_name = 'experiment_644250774/projection_density_25.nrrd'
+file_name = 'mouse_connectivity/experiment_644250774/projection_density_25.nrrd'
 data_array, metadata = nrrd.read(file_name)

@@ -34,7 +34,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 from allensdk.config.manifest_builder import ManifestBuilder
-from allensdk.api.cache import Cache
+from allensdk.api.cache import Cache, get_default_manifest_file
 from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
 from allensdk.deprecated import deprecated
 
@@ -79,9 +79,9 @@ class MouseConnectivityCache(ReferenceSpaceCache):
         50, 100).  Default is 25.
 
     ccf_version: string
-        Desired version of the Common Coordinate Framework.  This affects the annotation 
-        volume (get_annotation_volume) and structure masks (get_structure_mask). 
-        Must be one of (MouseConnectivityApi.CCF_2015, MouseConnectivityApi.CCF_2016). 
+        Desired version of the Common Coordinate Framework.  This affects the annotation
+        volume (get_annotation_volume) and structure masks (get_structure_mask).
+        Must be one of (MouseConnectivityApi.CCF_2015, MouseConnectivityApi.CCF_2016).
         Default: MouseConnectivityApi.CCF_2016
 
     cache: boolean
@@ -120,10 +120,13 @@ class MouseConnectivityCache(ReferenceSpaceCache):
     def __init__(self,
                  resolution=None,
                  cache=True,
-                 manifest_file='mouse_connectivity_manifest.json',
+                 manifest_file=None,
                  ccf_version=None,
-                 base_uri=None, 
+                 base_uri=None,
                  version=None):
+
+        if manifest_file is None:
+            manifest_file = get_default_manifest_file('mouse_connectivity')
 
         if version is None:
             version = self.MANIFEST_VERSION
@@ -133,9 +136,9 @@ class MouseConnectivityCache(ReferenceSpaceCache):
 
         if ccf_version is None:
             ccf_version = MouseConnectivityApi.CCF_VERSION_DEFAULT
-        
+
         super(MouseConnectivityCache, self).__init__(
-            resolution, reference_space_key=ccf_version, cache=cache, 
+            resolution, reference_space_key=ccf_version, cache=cache,
             manifest=manifest_file, version=version)
 
         self.api = MouseConnectivityApi(base_uri=base_uri)
@@ -160,12 +163,12 @@ class MouseConnectivityCache(ReferenceSpaceCache):
             file_name will be pulled out of the manifest.  Default is None.
 
         """
-        
+
         file_name = self.get_cache_path(file_name,
                                         self.PROJECTION_DENSITY_KEY,
                                         experiment_id,
                                         self.resolution)
-                                        
+
         self.api.download_projection_density(
             file_name, experiment_id, self.resolution, strategy='lazy')
 
@@ -191,7 +194,7 @@ class MouseConnectivityCache(ReferenceSpaceCache):
             file_name will be pulled out of the manifest.  Default is None.
 
         """
-        
+
         file_name = self.get_cache_path(file_name,
                                         self.INJECTION_DENSITY_KEY,
                                         experiment_id,
@@ -298,7 +301,7 @@ class MouseConnectivityCache(ReferenceSpaceCache):
             # renaming id
             e['id'] = e['data_set_id']
             del e['data_set_id']
-            
+
             # simplify trangsenic line
             tl = e.get('transgenic_line', None)
             if tl:
@@ -353,15 +356,15 @@ class MouseConnectivityCache(ReferenceSpaceCache):
 
             descendant_ids = reduce(op.add, self.get_structure_tree()\
                                     .descendant_ids(injection_structure_ids))
-            experiments = [e for e in experiments 
+            experiments = [e for e in experiments
                            if e['structure_id'] in descendant_ids]
 
         return experiments
 
-    def get_experiment_structure_unionizes(self, experiment_id, 
-                                           file_name=None, 
+    def get_experiment_structure_unionizes(self, experiment_id,
+                                           file_name=None,
                                            is_injection=None,
-                                           structure_ids=None, 
+                                           structure_ids=None,
                                            include_descendants=False,
                                            hemisphere_ids=None):
         """
@@ -398,20 +401,20 @@ class MouseConnectivityCache(ReferenceSpaceCache):
 
         """
 
-        file_name = self.get_cache_path(file_name, 
-                                        self.STRUCTURE_UNIONIZES_KEY, 
+        file_name = self.get_cache_path(file_name,
+                                        self.STRUCTURE_UNIONIZES_KEY,
                                         experiment_id)
-                   
-        filter_fn = functools.partial(self.filter_structure_unionizes, 
-                                      is_injection=is_injection, 
-                                      structure_ids=structure_ids, 
-                                      include_descendants=include_descendants, 
+
+        filter_fn = functools.partial(self.filter_structure_unionizes,
+                                      is_injection=is_injection,
+                                      structure_ids=structure_ids,
+                                      include_descendants=include_descendants,
                                       hemisphere_ids=hemisphere_ids)
-                                      
+
         col_rn = lambda x: pd.DataFrame(x).rename(columns={
             'section_data_set_id': 'experiment_id'})
-                                      
-        return self.api.get_structure_unionizes([experiment_id], 
+
+        return self.api.get_structure_unionizes([experiment_id],
                                                 path=file_name,
                                                 strategy='lazy',
                                                 pre=col_rn,
@@ -419,7 +422,7 @@ class MouseConnectivityCache(ReferenceSpaceCache):
                                                 writer=lambda p, x : pd.DataFrame(x).to_csv(p),
                                                 reader=pd.DataFrame.from_csv)
 
-    def rank_structures(self, experiment_ids, is_injection, structure_ids=None, hemisphere_ids=None, 
+    def rank_structures(self, experiment_ids, is_injection, structure_ids=None, hemisphere_ids=None,
                         rank_on='normalized_projection_volume', n=5, threshold=10**-2):
         '''Produces one or more (per experiment) ranked lists of brain structures, using a specified data field.
 
@@ -430,11 +433,11 @@ class MouseConnectivityCache(ReferenceSpaceCache):
         is_injection : boolean
             Use data from only injection (or non-injection) unionizes.
         structure_ids : list of int, optional
-            Consider only these structures. It is a good idea to make sure that these structures are not spatially 
-            overlapping; otherwise your results will contain redundant information. Defaults to the summary 
+            Consider only these structures. It is a good idea to make sure that these structures are not spatially
+            overlapping; otherwise your results will contain redundant information. Defaults to the summary
             structures - a brain-wide list of nonoverlapping mid-level structures.
         hemisphere_ids : list of int, optional
-            Consider only these hemispheres (1: left, 2: right, 3: both). Like with structures, 
+            Consider only these hemispheres (1: left, 2: right, 3: both). Like with structures,
             you might get redundant results if you select overlapping options. Defaults to [1, 2].
         rank_on : str, optional
             Rank unionize data using this field (descending). Defaults to normalized_projection_volume.
@@ -445,9 +448,9 @@ class MouseConnectivityCache(ReferenceSpaceCache):
 
         Returns
         -------
-        list : 
+        list :
             Each element (1 for each input experiment) is a list of dictionaries. The dictionaries describe the top
-            injection structures in descending order. They are specified by their structure and hemisphere id fields and 
+            injection structures in descending order. They are specified by their structure and hemisphere id fields and
             additionally report the value specified by the rank_on parameter.
 
         '''
@@ -460,12 +463,12 @@ class MouseConnectivityCache(ReferenceSpaceCache):
         if structure_ids is None:
             structure_ids = self.default_structure_ids
 
-        unionizes = self.get_structure_unionizes(experiment_ids, 
-                                                 is_injection=is_injection, 
-                                                 structure_ids=structure_ids, 
-                                                 hemisphere_ids=hemisphere_ids, 
+        unionizes = self.get_structure_unionizes(experiment_ids,
+                                                 is_injection=is_injection,
+                                                 structure_ids=structure_ids,
+                                                 hemisphere_ids=hemisphere_ids,
                                                  include_descendants=False)
-        unionizes = unionizes[unionizes[rank_on] > threshold] 
+        unionizes = unionizes[unionizes[rank_on] > threshold]
 
         results = []
         for eid in experiment_ids:
@@ -473,7 +476,7 @@ class MouseConnectivityCache(ReferenceSpaceCache):
             this_experiment_unionizes = unionizes[unionizes['experiment_id'] == eid]
             this_experiment_unionizes = this_experiment_unionizes.sort_values(by=rank_on, ascending=False)
             this_experiment_unionizes = this_experiment_unionizes.select(filter_fields, axis=1)
-            
+
             records = this_experiment_unionizes.to_dict('record')
             if len(records) > n:
                 records = records[:n]
@@ -481,9 +484,9 @@ class MouseConnectivityCache(ReferenceSpaceCache):
 
         return results
 
-    def filter_structure_unionizes(self, unionizes, 
-                                   is_injection=None, 
-                                   structure_ids=None, 
+    def filter_structure_unionizes(self, unionizes,
+                                   is_injection=None,
+                                   structure_ids=None,
                                    include_descendants=False,
                                    hemisphere_ids=None):
         """
@@ -530,9 +533,9 @@ class MouseConnectivityCache(ReferenceSpaceCache):
 
         return unionizes
 
-    def get_structure_unionizes(self, experiment_ids, 
-                                is_injection=None, 
-                                structure_ids=None, 
+    def get_structure_unionizes(self, experiment_ids,
+                                is_injection=None,
+                                structure_ids=None,
                                 include_descendants=False,
                                 hemisphere_ids=None):
         """
@@ -571,10 +574,10 @@ class MouseConnectivityCache(ReferenceSpaceCache):
 
         return pd.concat(unionizes, ignore_index=True, sort=True)
 
-    def get_projection_matrix(self, experiment_ids, 
+    def get_projection_matrix(self, experiment_ids,
                               projection_structure_ids=None,
-                              hemisphere_ids=None, 
-                              parameter='projection_volume', 
+                              hemisphere_ids=None,
+                              parameter='projection_volume',
                               dataframe=False):
 
         if projection_structure_ids is None:
@@ -604,7 +607,7 @@ class MouseConnectivityCache(ReferenceSpaceCache):
         cidx = 0
         hlabel = {1: '-L', 2: '-R', 3: ''}
 
-        acronym_map = self.get_structure_tree().value_map(lambda x: x['id'], 
+        acronym_map = self.get_structure_tree().value_map(lambda x: x['id'],
                                                           lambda x: x['acronym'])
 
         for hid in hemisphere_ids:
@@ -632,7 +635,7 @@ class MouseConnectivityCache(ReferenceSpaceCache):
             return {'matrix': matrix, 'rows': rows_df, 'columns': cols_df}
         else:
             return {'matrix': matrix, 'rows': experiment_ids, 'columns': columns}
-    
+
 
     def add_manifest_paths(self, manifest_builder):
         """

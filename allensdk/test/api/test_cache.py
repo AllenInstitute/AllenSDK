@@ -42,7 +42,7 @@ import numpy as np
 import pytest
 from mock import MagicMock, mock_open, patch
 
-from allensdk.api.cache import Cache, memoize
+from allensdk.api.cache import Cache, memoize, get_default_manifest_file
 from allensdk.api.queries.rma_api import RmaApi
 import allensdk.core.json_utilities as ju
 from allensdk.config.manifest import ManifestVersionError
@@ -84,10 +84,10 @@ vn 0.0753706 0.16324 -0.983703
 
 I should be a comment, but am not
 
-f 1//1 2//2 3//3 
-f 4//4 1//1 3//3 
-f 3//3 2//2 5//5 
-f 6//6 3//3 5//5 
+f 1//1 2//2 3//3
+f 4//4 1//1 3//3
+f 3//3 2//2 5//5
+f 6//6 3//3 5//5
 
     '''
 
@@ -95,9 +95,9 @@ f 6//6 3//3 5//5
 @pytest.fixture
 def dummy_cache():
     class DummyCache(Cache):
-        
+
         VERSION = None
-    
+
         def build_manifest(self, file_name):
             manifest_builder = ManifestBuilder()
             manifest_builder.set_version(DummyCache.VERSION)
@@ -110,9 +110,9 @@ def test_version_update(fn_temp_dir, dummy_cache):
 
     mpath = os.path.join(fn_temp_dir, 'manifest.json')
     dc = dummy_cache(manifest=mpath)
-    
+
     same_dc = dummy_cache(manifest=mpath)
-    
+
     with pytest.raises(ManifestVersionError):
         new_dc = dummy_cache(manifest=mpath, version=1.0)
 
@@ -187,3 +187,9 @@ def test_memoize():
         for ii in range(2):
             t0 = time.time()
             fb.f(0), time.time() - t0
+
+
+def test_get_default_manifest_file():
+    assert get_default_manifest_file('brain_observatory') == 'brain_observatory/manifest.json'
+    assert get_default_manifest_file('cell_types') == 'cell_types/manifest.json'
+    assert get_default_manifest_file('mouse_connectivity') == 'mouse_connectivity/manifest.json'

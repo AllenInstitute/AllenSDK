@@ -6,6 +6,9 @@ htmlcov
 .settings
 cell_types
 dist
+.eggs/
+eggs/
+*.egg-info/
 test-reports/*
 doc_template/examples/nb/connectivity/experiment_*
 doc_template/examples/nb/Website_Inquiry_RT_45792 /experiment_*
@@ -17,3 +20,6 @@ allensdk.egg-info/
 debug.log
 *~
 *#*#
+
+# editor configs
+.vscode/
