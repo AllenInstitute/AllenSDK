@@ -420,7 +420,7 @@ class MouseConnectivityCache(ReferenceSpaceCache):
                                                 pre=col_rn,
                                                 post=filter_fn,
                                                 writer=lambda p, x : pd.DataFrame(x).to_csv(p),
-                                                reader=pd.DataFrame.from_csv)
+                                                reader=lambda x: pd.read_csv(x, index_col=0, parse_dates=True))
 
     def rank_structures(self, experiment_ids, is_injection, structure_ids=None, hemisphere_ids=None,
                         rank_on='normalized_projection_volume', n=5, threshold=10**-2):

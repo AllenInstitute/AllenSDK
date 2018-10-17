@@ -43,6 +43,7 @@ from six.moves import builtins
 import itertools as it
 import allensdk.core.json_utilities as ju
 import pandas.io.json as pj
+import pandas as pd
 import os
 
 _MOCK_PATH = '/path/to/xyz.txt'
@@ -61,10 +62,16 @@ def cell_id():
 
 
 @pytest.fixture
+def cached_csv(tmpdir_factory):
+    csv = str(tmpdir_factory.mktemp("cache_test").join("data.csv"))
+    return csv
+
+
+@pytest.fixture
 def cache_fixture(tmpdir_factory):
     # Instantiate the CellTypesCache instance.  The manifest_file argument
     # tells it where to store the manifest, which is a JSON file that tracks
-    # file paths.  If you supply a relative path (like this), it will go
+    # file paths.  If you supply a relative path, it will go
     # into your current working directory
     manifest_file = str(tmpdir_factory.mktemp("ctc").join("manifest.json"))
     ctc = CTC.CellTypesCache(manifest_file=manifest_file)
@@ -250,9 +257,7 @@ def test_get_reconstruction(cache_fixture,
 @pytest.mark.parametrize('path_exists',
                          (False, True))
 @patch.object(DataFrame, "to_csv")
-@patch.object(DataFrame, "from_csv")
-def test_get_reconstruction_with_api(from_csv,
-                                     to_csv,
+def test_get_reconstruction_with_api(to_csv,
                                      cache_fixture,
                                      cell_id,
                                      path_exists):
@@ -279,9 +284,7 @@ def test_get_reconstruction_with_api(from_csv,
 
 
 @patch.object(DataFrame, "to_csv")
-@patch.object(DataFrame, "from_csv")
-def test_get_reconstruction_exception(from_csv,
-                                      to_csv,
+def test_get_reconstruction_exception(to_csv,
                                       cache_fixture,
                                       cell_id):
     ctc = cache_fixture
@@ -410,8 +413,8 @@ def test_get_ephys_features(cache_fixture,
                          it.product((False,True),
                                     (False,True)))
 @patch.object(DataFrame, "to_csv")
-@patch.object(DataFrame, "from_csv")
-def test_get_ephys_features_with_api(from_csv,
+@patch("pandas.read_csv")
+def test_get_ephys_features_with_api(read_csv,
                                      to_csv,
                                      cache_fixture,
                                      df,
@@ -435,20 +438,42 @@ def test_get_ephys_features_with_api(from_csv,
                         _ = ctc.get_ephys_features(dataframe=df)
 
     if path_exists:
-        from_csv.assert_called_once_with(_MOCK_PATH)
+        read_csv.assert_called_once_with(_MOCK_PATH, parse_dates=True)
     else:
         mkd.assert_called_once_with(_MOCK_PATH)
         assert query_mock.called
+
+
+@pytest.mark.parametrize('df', (False, True))
+def test_get_ephys_features_cache_roundtrip(cached_csv,
+                                            cache_fixture,
+                                            df):
+    ctc = cache_fixture
+
+    mock_data = [{'lorem': 1,
+                  'ipsum': 2 },
+                 {'lorem': 3,
+                  'ipsum': 4 }]
+
+    with patch.object(ctc, "get_cache_path", return_value=cached_csv):
+        with patch('allensdk.api.queries.cell_types_api.CellTypesApi.model_query',
+                MagicMock(name='model query',
+                            return_value=mock_data)) as query_mock:
+            data = ctc.get_ephys_features()
+    pandas_data = pd.read_csv(cached_csv, parse_dates=True)
+
+    assert len(data) == 2
+    assert sorted(data[0].keys()) == sorted(pandas_data.columns)
 
 
 @pytest.mark.parametrize('path_exists,df',
                          it.product((False, True),
                                     (False, True)))
 @patch.object(DataFrame, "to_csv")
-@patch.object(DataFrame, "from_csv",
+@patch("pandas.read_csv",
               return_value=DataFrame([{ 'stuff': 'whatever'},
                                       { 'stuff': 'nonsense'}]))
-def test_get_morphology_features(from_csv,
+def test_get_morphology_features(read_csv,
                                  to_csv,
                                  cache_fixture,
                                  path_exists,
@@ -467,8 +492,7 @@ def test_get_morphology_features(from_csv,
                     with patch('allensdk.api.queries.cell_types_api.CellTypesApi.model_query',
                             MagicMock(name='model query',
                                         return_value=json_data)) as query_mock:
-                        data = ctc.get_morphology_features(df,
-                                                        _MOCK_PATH)
+                        data = ctc.get_morphology_features(df, _MOCK_PATH)
 
     if df:
         assert ('stuff' in data) == True
@@ -478,7 +502,7 @@ def test_get_morphology_features(from_csv,
     
     if path_exists:
         if df:
-            from_csv.assert_called_once_with(_MOCK_PATH)
+            read_csv.assert_called_once_with(_MOCK_PATH, parse_dates=True)
         else:
             assert True
         assert not mkd.called
@@ -546,10 +570,10 @@ def test_get_ephys_sweeps_with_api(cache_fixture,
                                     (False, True)))
 @patch('pandas.DataFrame.merge')
 @patch.object(DataFrame, "to_csv")
-@patch.object(DataFrame, "from_csv",
+@patch("pandas.read_csv",
               return_value=DataFrame([{ 'stuff': 'whatever'},
                                       { 'stuff': 'nonsense'}]))
-def test_get_all_features(from_csv,
+def test_get_all_features(read_csv,
                           to_csv,
                           mock_merge,
                           cache_fixture,
@@ -577,7 +601,7 @@ def test_get_all_features(from_csv,
                                         require_reconstruction=require_reconstruction)
 
     if path_exists:
-        assert from_csv.called
+        assert read_csv.called
     else:
         assert query_mock.called
     

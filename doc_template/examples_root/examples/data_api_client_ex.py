@@ -105,7 +105,7 @@ summary_structures[['id',
                     'parent_structure_id',
                     'acronym']].to_csv('summary_structures.csv',
                                         index_label='structure_id')
-reread = pd.DataFrame.from_csv('summary_structures.csv')
+reread = pd.read_csv('summary_structures.csv')
 
 #===============================================================================
 # example 10
@@ -113,7 +113,7 @@ reread = pd.DataFrame.from_csv('summary_structures.csv')
 
 for id, name, parent_structure_id in summary_structures[['name',
                                                             'parent_structure_id']].itertuples():
-    print("%d %s %d" % (id, name, parent_structure_id))	
+    print("%d %s %d" % (id, name, parent_structure_id))
 
 #===============================================================================
 # example 11
