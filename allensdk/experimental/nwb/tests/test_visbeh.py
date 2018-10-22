@@ -8,7 +8,7 @@ from pynwb import NWBHDF5IO
 from allensdk.experimental.nwb.stimulus import VisualBehaviorStimulusAdapter
 
 @pytest.mark.skipif(not os.environ.get('ALLENSDK_EXPERIMENTAL',''), reason='Experimental')
-def test_visbeh_running_speed(nwbfile, tmpfilename, visbeh_pkl):
+def test_visbeh_running_speed(nwbfile, nwb_filename, visbeh_pkl):
 
     test_speed = [0.26978933, 2.29435859, 4.31892785, 4.31892785, 4.31892785, 4.31892785]
 
@@ -16,14 +16,14 @@ def test_visbeh_running_speed(nwbfile, tmpfilename, visbeh_pkl):
     assert np.allclose(visbeh_data.running_speed.data, test_speed)
 
     nwbfile.add_acquisition(visbeh_data.running_speed)
-    with NWBHDF5IO(tmpfilename, mode='w') as io:
+    with NWBHDF5IO(nwb_filename, mode='w') as io:
         io.write(nwbfile)
-    nwbfile_in = NWBHDF5IO(tmpfilename, mode='r').read()
+    nwbfile_in = NWBHDF5IO(nwb_filename, mode='r').read()
     assert np.allclose(nwbfile_in.acquisition['running_speed'].data.value, test_speed)
 
 
 @pytest.mark.skipif(not os.environ.get('ALLENSDK_EXPERIMENTAL',''), reason='Experimental')
-def test_visbeh_epoch(nwbfile, tmpfilename, visbeh_pkl):
+def test_visbeh_epoch(nwbfile, nwb_filename, visbeh_pkl):
 
     visbeh_data = VisualBehaviorStimulusAdapter(visbeh_pkl)
 
@@ -33,10 +33,10 @@ def test_visbeh_epoch(nwbfile, tmpfilename, visbeh_pkl):
     src_df = nwbfile.epochs.to_dataframe()
     nwbfile.add_acquisition(visbeh_data.running_speed)
 
-    with NWBHDF5IO(tmpfilename, mode='w') as io:
+    with NWBHDF5IO(nwb_filename, mode='w') as io:
         io.write(nwbfile)
 
-    nwbfile_in = NWBHDF5IO(tmpfilename, mode='r').read()
+    nwbfile_in = NWBHDF5IO(nwb_filename, mode='r').read()
 
     tgt_df = nwbfile_in.epochs.to_dataframe()
 
@@ -54,7 +54,7 @@ def test_visbeh_epoch(nwbfile, tmpfilename, visbeh_pkl):
     pd.testing.assert_frame_equal(src_df, tgt_df)
 
 @pytest.mark.skipif(not os.environ.get('ALLENSDK_EXPERIMENTAL',''), reason='Experimental')
-def test_visbeh_image_stimulus(nwbfile, tmpfilename, visbeh_pkl):
+def test_visbeh_image_stimulus(nwbfile, nwb_filename, visbeh_pkl):
 
     visbeh_data = VisualBehaviorStimulusAdapter(visbeh_pkl)
 
@@ -64,10 +64,10 @@ def test_visbeh_image_stimulus(nwbfile, tmpfilename, visbeh_pkl):
     for y in visbeh_data.index_series_list:
         nwbfile.add_stimulus(y)
 
-    with NWBHDF5IO(tmpfilename, mode='w') as io:
+    with NWBHDF5IO(nwb_filename, mode='w') as io:
         io.write(nwbfile)
 
-    nwbfile_in = NWBHDF5IO(tmpfilename, mode='r').read()
+    nwbfile_in = NWBHDF5IO(nwb_filename, mode='r').read()
 
     assert np.allclose(nwbfile.stimulus['image_index'].data, nwbfile_in.stimulus['image_index'].data)
     assert np.allclose(nwbfile.stimulus['image_index'].timestamps, nwbfile_in.stimulus['image_index'].timestamps)
@@ -78,7 +78,7 @@ def test_visbeh_image_stimulus(nwbfile, tmpfilename, visbeh_pkl):
 @pytest.mark.skipif(not os.environ.get('ALLENSDK_EXPERIMENTAL',''), reason='Experimental')
 @pytest.mark.parametrize('pklfile', ['/allen/programs/braintv/production/neuralcoding/prod0/specimen_738720433/behavior_session_760658830/181004091143_409296_2e5b5a55-af4b-4f94-829d-0048df1eb550.pkl',
                                      '/allen/programs/braintv/production/visualbehavior/prod0/specimen_738786518/behavior_session_759866491/181002090744_403468_7add2e7c-96fd-4aa0-b864-3dc4d4c38efa.pkl'])
-def test_visbeh_pickle_integration(pklfile, nwbfile, tmpfilename):
+def test_visbeh_pickle_integration(pklfile, nwbfile, nwb_filename):
 
     visbeh_data = VisualBehaviorStimulusAdapter(pklfile)
 
@@ -90,7 +90,7 @@ def test_visbeh_pickle_integration(pklfile, nwbfile, tmpfilename):
     for y in visbeh_data.index_series_list:
         nwbfile.add_stimulus(y)
 
-    with NWBHDF5IO(tmpfilename, mode='w') as io:
+    with NWBHDF5IO(nwb_filename, mode='w') as io:
         io.write(nwbfile)
 
-    nwbfile_in = NWBHDF5IO(tmpfilename, mode='r').read()
+    nwbfile_in = NWBHDF5IO(nwb_filename, mode='r').read()
