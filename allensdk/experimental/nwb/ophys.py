@@ -93,7 +93,7 @@ def get_plane_segmentation(image_segmentation, imaging_plane, roi_mask_dict,
             imaging_plane=imaging_plane)
 
         for roi_id, roi_mask in roi_mask_dict.items():
-            plane_segmentation.add_roi(str(roi_id), [], roi_mask)
+            plane_segmentation.add_roi(id=roi_id, image_mask=roi_mask)
 
     return plane_segmentation
 

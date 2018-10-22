@@ -54,7 +54,7 @@ def write_nwb(output_file, stimulus_adapter, ophys_adapter, **compression_opts):
 
     rt_region = plane_seg.create_roi_table_region(
         description="segmented cells labeled by cell_specimen_id",
-        names=[roi for roi in ophys_adapter.roi_mask_dict.keys()])
+        region=slice(len(ophys_adapter.roi_mask_dict.keys())))
 
     dff, t = ophys_adapter.dff_traces
     ophys.get_dff_series(dff_interface, rt_region, dff, t,
