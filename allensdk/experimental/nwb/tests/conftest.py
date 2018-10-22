@@ -6,6 +6,31 @@ import io
 import pickle
 import numpy as np
 
+@pytest.fixture
+def vb_pkl():
+    return '/allen/programs/braintv/production/visualbehavior/prod0/specimen_710269829/ophys_session_759332825/759332825_stim.pkl'
+
+
+@pytest.fixture
+def vb_sync():
+    return '/allen/programs/braintv/production/visualbehavior/prod0/specimen_710269829/ophys_session_759332825/759332825_sync.h5'
+
+
+@pytest.fixture
+def vc_pkl():
+    return '/allen/programs/braintv/production/neuralcoding/prod53/specimen_691654617/ophys_session_714254764/714254764_388801_20180626_stim.pkl'
+
+
+@pytest.fixture
+def vc_sync():
+    return '/allen/programs/braintv/production/neuralcoding/prod53/specimen_691654617/ophys_session_714254764/714254764_388801_20180626_sync.h5'
+
+
+@pytest.fixture
+def nwb_filename(tmpdir_factory):
+    nwb = tmpdir_factory.mktemp("test").join("test.nwb")
+    return str(nwb)
+
 @pytest.fixture(scope='function')
 def nwbfile(tmpdir):
 
@@ -18,11 +43,6 @@ def nwbfile(tmpdir):
     )
 
     return nwbfile
-
-@pytest.fixture(scope='function')
-def tmpfilename(tmpdir):
-
-    return os.path.join(str(tmpdir), 'test.nwb')
 
 @pytest.fixture(scope='function')
 def behaviorimagesfilename(tmpdir):

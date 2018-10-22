@@ -7,32 +7,6 @@ import numpy as np
 import pytest
 
 
-@pytest.fixture
-def vb_pkl():
-    return '/allen/programs/braintv/production/visualbehavior/prod0/specimen_710269829/ophys_session_759332825/759332825_stim.pkl'
-
-
-@pytest.fixture
-def vb_sync():
-    return '/allen/programs/braintv/production/visualbehavior/prod0/specimen_710269829/ophys_session_759332825/759332825_sync.h5'
-
-
-@pytest.fixture
-def vc_pkl():
-    return '/allen/programs/braintv/production/neuralcoding/prod53/specimen_691654617/ophys_session_714254764/714254764_388801_20180626_stim.pkl'
-
-
-@pytest.fixture
-def vc_sync():
-    return '/allen/programs/braintv/production/neuralcoding/prod53/specimen_691654617/ophys_session_714254764/714254764_388801_20180626_sync.h5'
-
-
-@pytest.fixture
-def nwb_filename(tmpdir_factory):
-    nwb = tmpdir_factory.mktemp("test").join("test.nwb")
-    return str(nwb)
-
-
 @pytest.mark.skipif(not os.environ.get('ALLENSDK_EXPERIMENTAL',''), reason='Experimental')
 @pytest.mark.parametrize("compress", (True, False))
 def test_visual_behavior_running_speed(nwb_filename, vb_pkl, vb_sync,
