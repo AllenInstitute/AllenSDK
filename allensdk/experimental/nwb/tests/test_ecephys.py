@@ -1,0 +1,11 @@
+
+import pytest
+
+from allensdk.experimental.nwb.ecephys.write_file_from_lims import build_file as build_ecephys_nwbfile
+
+
+# @pytest.mark.skipif() # TODO: connection stuff
+@pytest.mark.parametrize('session_data_set_id', [754312389])
+def test_ecephys_roundtrip(roundtripper, session_data_set_id):
+    nwbfile = build_ecephys_nwbfile(session_data_set_id)
+    roundtripper(nwbfile, 'roundtrip_test_{}.nwb'.format(session_data_set_id))
