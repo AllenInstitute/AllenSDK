@@ -66,7 +66,7 @@ class OphysLimsApi(LimsApi):
             roi_mask = np.array(row.mask_matrix)
             h, w = roi_mask.shape
             mask[row.y:row.y + h, row.x:row.x + w] = roi_mask
-            roi_dict[str(row[key])] = mask
+            roi_dict[row[key]]= mask
 
         return roi_dict
 
