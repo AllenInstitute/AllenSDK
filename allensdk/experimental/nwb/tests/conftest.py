@@ -1,10 +1,13 @@
 import pytest
 import datetime
-from pynwb import NWBFile
+from pynwb import NWBFile, NWBHDF5IO
 import os
 import io
 import pickle
 import numpy as np
+
+from allensdk.experimental.nwb.tests.utilities.comparators import generic_assert_equal
+
 
 @pytest.fixture
 def vb_pkl():
@@ -113,3 +116,18 @@ def visbeh_pkl(behaviorimagesfilename):
     pickle.dump(D, bytes_io)
 
     return bytes_io
+
+
+@pytest.fixture
+def roundtripper(tmpdir_factory):
+    def roundtripper(nwbfile, file_name='test.nwb'):
+        temp_dir = str(tmpdir_factory.mktemp('roundtrip'))
+        file_path = os.path.join(temp_dir, file_name)
+
+        with NWBHDF5IO(file_path, 'w') as nwb_file_writer:
+            nwb_file_writer.write(nwbfile)
+
+        with NWBHDF5IO(file_path, 'r') as nwb_file_reader:
+            obtained = nwb_file_reader.read()
+            generic_assert_equal(nwbfile, obtained)
+    return roundtripper
