@@ -19,3 +19,4 @@ debug.log
 *#*#
 *.ipynb_checkpoints
 *__pycache__/
+.mypy_cache/
