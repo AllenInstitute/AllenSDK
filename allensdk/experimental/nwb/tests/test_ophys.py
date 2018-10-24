@@ -145,3 +145,5 @@ def test_get_dff_series(image_segmentation_nwb, roi_mask_dict, dff, timestamps):
                                    "source")
     series3 = ophys.get_dff_series(dff_interface, rt, dff, timestamps,
                                    "source")
+    assert(series1 != series2 and series1 != series3)
+    assert(series2 == series3)

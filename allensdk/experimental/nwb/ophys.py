@@ -1,7 +1,7 @@
 import datetime
 import h5py
 from .timestamps import get_timestamps_from_sync
-from pynwb import NWBFile
+from pynwb import NWBFile, TimeSeries
 from pynwb.ophys import DfOverF, ImageSegmentation, OpticalChannel
 from pynwb.form.backends.hdf5.h5_utils import H5DataIO
 
@@ -104,12 +104,12 @@ def get_dff_series(dff_interface, roi_table_region, dff, timestamps,
 
     if dff_series is None:
         dff_series = dff_interface.create_roi_response_series(
-            name='df_over_f',
+            name=name,
             source=source,
             data=H5DataIO(dff, **compression_opts),
             unit='NA',
             rois=roi_table_region,
-            timestamps=H5DataIO(timestamps, **compression_opts))
+            timestamps=timestamps)
 
     return dff_series
 
@@ -122,9 +122,9 @@ class OphysAdapter(object):
         self.ophys_key = ophys_key
         self.use_falling_edges = use_falling_edges
         self._api = api
-        self._dff_table = None
         self._metadata = None
         self._channels = {}
+        self._data_length = None
         self._timestamps = None
 
     @property
@@ -136,18 +136,38 @@ class OphysAdapter(object):
         with h5py.File(self.dff_source, "r") as f:
             traces = f["data"].value
 
-        timestamps = self.timestamps
+        return traces
 
-        if len(timestamps) > traces.shape[1]:
-            timestamps = timestamps[:traces.shape[1]]
+    @property
+    def data_length(self):
+        """Number of samples in the actual ophys data file"""
+        if self._data_length is None:
+            with h5py.File(self.dff_source, "r") as f:
+                self._data_length = f["data"].shape[1]
 
-        return traces, timestamps
+        return self._data_length
 
     @property
     def timestamps(self):
         if self._timestamps is None:
-            self._timestamps = get_timestamps_from_sync(
+            times = get_timestamps_from_sync(
                 self.sync_file, self.ophys_key, self.use_falling_edges)
+            
+            if len(times) < self.data_length:
+                raise ValueError(
+                    "Invalid timestamps length {} for data length {}".format(
+                        len(times), self.data_length
+                    )
+                )
+            elif len(times) > self.data_length:
+                times = times[:self.data_length]
+            
+            self._timestamps = TimeSeries(
+                name="ophys timestamps",
+                source=self.sync_file,
+                data=times,
+                unit="seconds"
+            )
 
         return self._timestamps
 

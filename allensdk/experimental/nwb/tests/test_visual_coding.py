@@ -38,5 +38,5 @@ def test_legacy_cv_running_speed(nwb_filename, vc_nwb, compress):
 
     nwbfile_in = NWBHDF5IO(nwb_filename, mode='r').read()
     running_speed_in = nwbfile_in.get_acquisition('running_speed')
-    assert(np.allclose(running_speed_in.data, running_speed.data.data, equal_nan=True))
+    assert(np.allclose(running_speed_in.data, running_speed.data, equal_nan=True))
     assert(np.allclose(running_speed_in.timestamps, running_speed.timestamps))
