@@ -6,7 +6,8 @@ from pynwb.epoch import Epochs
 from scipy.signal import medfilt
 from visual_behavior.translator.foraging2 import data_to_change_detection_core
 from visual_behavior.analyze import compute_running_speed
-from .timestamps import get_timestamps_from_sync
+from allensdk.experimental.nwb.timestamps import (get_timestamps_from_sync,
+                                                  correct_timestamps_length)
 from pynwb.image import ImageSeries, IndexSeries
 import numpy as np
 
@@ -45,6 +46,7 @@ class BaseStimulusAdapter(object):
         self.stim_key = stim_key
         self._data = None
         self._running_speed = None
+        self._timestamps = None
 
         self.EPOCHS = 'epochs' # Dont change this without looking at https://github.com/NeurodataWithoutBorders/pynwb/issues/646
 
@@ -65,6 +67,23 @@ class BaseStimulusAdapter(object):
     def index_series_list(self):
         raise NotImplementedError()
 
+    @property
+    def timestamps(self):
+        if self._timestamps is None:
+            data_length = len(self.core_data['running'].speed)
+            times = correct_timestamps_length(self.get_times(), data_length)
+
+            source = self.sync_file if self.sync_file else self.pkl_file
+
+            self._timestamps = TimeSeries(
+                name="stimulus timestamps",
+                source=source,
+                unit="Seconds",
+                timestamps=times
+            )
+
+        return self._timestamps
+
     def get_times(self):
         return get_timestamps_from_sync(self.sync_file, self.stim_key)
 
@@ -75,17 +94,13 @@ class BaseStimulusAdapter(object):
 
             running_df = self.core_data['running']
             speed = running_df.speed
-            times = self.get_times()
-            if len(times) > len(speed):
-                logger.warning("Got times of length %s but speed of length %s, truncating times from the end",
-                            len(times), len(speed))
-                times = times[:len(speed)]
 
-            self._running_speed = TimeSeries(name='running_speed',
-                            source=self._source,
-                            data=speed.values,
-                            timestamps=times,
-                            unit='cm/s')
+            self._running_speed = TimeSeries(
+                name='running_speed',
+                source=self.pkl_file,
+                data=speed.values,
+                timestamps=self.timestamps,
+                unit='cm/s')
 
         return self._running_speed
 

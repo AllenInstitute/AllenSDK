@@ -1,6 +1,8 @@
 import datetime
+import numpy as np
 import h5py
-from .timestamps import get_timestamps_from_sync
+from allensdk.experimental.nwb.timestamps import (get_timestamps_from_sync,
+                                                  correct_timestamps_length)
 from pynwb import NWBFile, TimeSeries
 from pynwb.ophys import DfOverF, ImageSegmentation, OpticalChannel
 
@@ -152,21 +154,13 @@ class OphysAdapter(object):
             times = get_timestamps_from_sync(
                 self.sync_file, self.ophys_key, self.use_falling_edges)
             
-            if len(times) < self.data_length:
-                raise ValueError(
-                    "Invalid timestamps length {} for data length {}".format(
-                        len(times), self.data_length
-                    )
-                )
-            elif len(times) > self.data_length:
-                times = times[:self.data_length]
+            times = correct_timestamps_length(times, self.data_length)
             
             self._timestamps = TimeSeries(
                 name="ophys timestamps",
                 source=self.sync_file,
-                data=times,
-                unit="seconds",
-                rate=np.nanmean(np.diff(times))
+                unit="Seconds",
+                timestamps=times
             )
 
         return self._timestamps

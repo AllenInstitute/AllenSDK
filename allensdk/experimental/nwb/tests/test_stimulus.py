@@ -27,7 +27,7 @@ def test_visual_behavior_running_speed(nwb_filename, vb_pkl, vb_sync):
 
     nwbfile_in = NWBHDF5IO(nwb_filename, mode='r').read()
     running_speed_in = nwbfile_in.get_acquisition('running_speed')
-    assert(np.allclose(running_speed_in.data, running_speed.data.data))
+    assert(np.allclose(running_speed_in.data, running_speed.data))
     assert(np.allclose(running_speed_in.timestamps, running_speed.timestamps))
 
 
@@ -51,5 +51,5 @@ def test_visual_coding_running_speed(nwb_filename, vc_pkl, vc_sync):
 
     nwbfile_in = NWBHDF5IO(nwb_filename, mode='r').read()
     running_speed_in = nwbfile_in.get_acquisition('running_speed')
-    assert(np.allclose(running_speed_in.data, running_speed.data.data))
+    assert(np.allclose(running_speed_in.data, running_speed.data))
     assert(np.allclose(running_speed_in.timestamps, running_speed.timestamps))
