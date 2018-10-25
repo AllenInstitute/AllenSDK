@@ -1,6 +1,6 @@
 from allensdk.experimental.nwb import ophys
 from collections import Iterable
-from pynwb import NWBFile, NWBHDF5IO
+from pynwb import NWBFile, NWBHDF5IO, TimeSeries
 from pynwb.device import Device
 from pynwb.ophys import OpticalChannel, ImageSegmentation, DfOverF
 import numpy as np
@@ -29,7 +29,13 @@ def dff():
 
 @pytest.fixture
 def timestamps():
-    return np.arange(100)
+    return TimeSeries(
+        name="timestamps",
+        source="the big bang",
+        data=np.arange(100),
+        unit="seconds",
+        rate=1.0
+    )
 
 
 @pytest.fixture(scope='function')

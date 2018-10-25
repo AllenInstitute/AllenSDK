@@ -3,7 +3,6 @@ import h5py
 from .timestamps import get_timestamps_from_sync
 from pynwb import NWBFile, TimeSeries
 from pynwb.ophys import DfOverF, ImageSegmentation, OpticalChannel
-from pynwb.form.backends.hdf5.h5_utils import H5DataIO
 
 
 def create_base_nwb(session_metadata):
@@ -99,14 +98,14 @@ def get_plane_segmentation(image_segmentation, imaging_plane, roi_mask_dict,
 
 
 def get_dff_series(dff_interface, roi_table_region, dff, timestamps,
-                   source, name='df_over_f', **compression_opts):
+                   source, name='df_over_f'):
     dff_series = dff_interface.roi_response_series.get(name, None)
 
     if dff_series is None:
         dff_series = dff_interface.create_roi_response_series(
             name=name,
             source=source,
-            data=H5DataIO(dff, **compression_opts),
+            data=dff,
             unit='NA',
             rois=roi_table_region,
             timestamps=timestamps)
@@ -166,7 +165,8 @@ class OphysAdapter(object):
                 name="ophys timestamps",
                 source=self.sync_file,
                 data=times,
-                unit="seconds"
+                unit="seconds",
+                rate=np.nanmean(np.diff(times))
             )
 
         return self._timestamps

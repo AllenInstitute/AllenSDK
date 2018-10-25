@@ -18,9 +18,8 @@ def nwb_filename(tmpdir_factory):
 
 
 @pytest.mark.skipif(not os.environ.get('ALLENSDK_EXPERIMENTAL',''), reason='Experimental')
-@pytest.mark.parametrize("compress", (True, False))
-def test_legacy_cv_running_speed(nwb_filename, vc_nwb, compress):
-    adapter = VisualCodingLegacyNwbAdapter(vc_nwb, compress=compress)
+def test_legacy_cv_running_speed(nwb_filename, vc_nwb):
+    adapter = VisualCodingLegacyNwbAdapter(vc_nwb)
 
     nwbfile = NWBFile(
         source='Data source',

@@ -8,11 +8,8 @@ import pytest
 
 
 @pytest.mark.skipif(not os.environ.get('ALLENSDK_EXPERIMENTAL',''), reason='Experimental')
-@pytest.mark.parametrize("compress", (True, False))
-def test_visual_behavior_running_speed(nwb_filename, vb_pkl, vb_sync,
-                                       compress):
-    adapter = VisualBehaviorStimulusAdapter(vb_pkl, vb_sync, stim_key=2,
-                                            compress=compress)
+def test_visual_behavior_running_speed(nwb_filename, vb_pkl, vb_sync):
+    adapter = VisualBehaviorStimulusAdapter(vb_pkl, vb_sync, stim_key=2)
 
     nwbfile = NWBFile(
         source='Data source',
@@ -35,10 +32,8 @@ def test_visual_behavior_running_speed(nwb_filename, vb_pkl, vb_sync,
 
 
 @pytest.mark.skipif(not os.environ.get('ALLENSDK_EXPERIMENTAL',''), reason='Experimental')
-@pytest.mark.parametrize("compress", (True, False))
-def test_visual_coding_running_speed(nwb_filename, vc_pkl, vc_sync,
-                                     compress):
-    adapter = VisualCodingStimulusAdapter(vc_pkl, vc_sync, compress=compress)
+def test_visual_coding_running_speed(nwb_filename, vc_pkl, vc_sync):
+    adapter = VisualCodingStimulusAdapter(vc_pkl, vc_sync)
 
     nwbfile = NWBFile(
         source='Data source',

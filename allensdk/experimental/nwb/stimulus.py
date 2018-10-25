@@ -2,7 +2,6 @@ import logging
 import pandas as pd
 import numpy as np
 from pynwb import TimeSeries
-from pynwb.form.backends.hdf5.h5_utils import H5DataIO
 from pynwb.epoch import Epochs
 from scipy.signal import medfilt
 from visual_behavior.translator.foraging2 import data_to_change_detection_core
@@ -40,18 +39,12 @@ def visual_coding_running_speed(exp_data):
 class BaseStimulusAdapter(object):
     _source = ''
 
-    def __init__(self, pkl_file, sync_file, stim_key='stim_vsync',
-                 compress=True):
+    def __init__(self, pkl_file, sync_file, stim_key='stim_vsync'):
         self.pkl_file = pkl_file
         self.sync_file = sync_file
         self.stim_key = stim_key
         self._data = None
         self._running_speed = None
-        if compress:
-            self.compression_opts = {"compression": True,
-                                     "compression_opts": 9}
-        else:
-            self.compression_opts = {}
 
         self.EPOCHS = 'epochs' # Dont change this without looking at https://github.com/NeurodataWithoutBorders/pynwb/issues/646
 
@@ -90,8 +83,8 @@ class BaseStimulusAdapter(object):
 
             self._running_speed = TimeSeries(name='running_speed',
                             source=self._source,
-                            data=H5DataIO(speed.values, **self.compression_opts),
-                            timestamps=H5DataIO(times, ** self.compression_opts),
+                            data=speed.values,
+                            timestamps=times,
                             unit='cm/s')
 
         return self._running_speed
@@ -100,10 +93,10 @@ class BaseStimulusAdapter(object):
 class VisualBehaviorStimulusAdapter(BaseStimulusAdapter):
     _source = 'Allen Brain Observatory: Visual Behavior'
 
-    def __init__(self, pkl_file, sync_file=None, stim_key='stim_vsync', compress=True):
+    def __init__(self, pkl_file, sync_file=None, stim_key='stim_vsync'):
         '''Cleaning up init signature for optional kwarg sync'''
 
-        super(VisualBehaviorStimulusAdapter, self).__init__(pkl_file, sync_file, stim_key='stim_vsync', compress=True)
+        super(VisualBehaviorStimulusAdapter, self).__init__(pkl_file, sync_file, stim_key=stim_key)
 
         self._stimulus_epoch_df = None
         self._stimulus_epoch_table = None
