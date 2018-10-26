@@ -106,8 +106,7 @@ def add_spike_times_to_file(nwbfile, spike_times):  # TODO how to add waveforms?
     return nwbfile
 
 
-def main(ecephys_session_id, nwb_path, remove_file=False):
-
+def build_file(ecephys_session_id):
     api = EcephysLimsApi()
 
     session_info = api.get_session_table(session_ids=[ecephys_session_id]).to_dict('record')[0]
@@ -128,6 +127,12 @@ def main(ecephys_session_id, nwb_path, remove_file=False):
     nwbfile = add_units_to_file(nwbfile, probe_table, channel_table, unit_table)
     # nwbfile.epochs = Epochs.from_dataframe(stimulus_table)  # TODO: I can't actually find an experiment that both as a stim table and has the current format for its other data
     nwbfile = add_spike_times_to_file(nwbfile, api.get_spike_times(ecephys_session_id))
+    return nwbfile
+
+
+def main(ecephys_session_id, nwb_path, remove_file=False):
+
+    nwbfile = build_file(ecephys_session_id)
 
     if remove_file:
         os.remove(nwb_path)

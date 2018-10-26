@@ -1,0 +1,7 @@
+# pynwb
+git+https://github.com/neurodatawithoutborders/pynwb
+git+https://github.com/alleninstitute/visual_behavior_analysis
+psycopg2
+statsmodels
+scikit-image
+zipfile36
