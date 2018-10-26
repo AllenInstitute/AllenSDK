@@ -5,8 +5,9 @@ import os
 import io
 import pickle
 import numpy as np
+import pandas as pd
 
-from allensdk.experimental.nwb.tests.utilities.comparators import generic_assert_equal
+from allensdk.experimental.nwb.tests.utilities.compare import nested_compare, comparisons_as_df
 
 
 @pytest.fixture
@@ -120,7 +121,7 @@ def visbeh_pkl(behaviorimagesfilename):
 
 @pytest.fixture
 def roundtripper(tmpdir_factory):
-    def roundtripper(nwbfile, file_name='test.nwb'):
+    def roundtripper(nwbfile, file_name='test.nwb', comparisons_dir=None):
         temp_dir = str(tmpdir_factory.mktemp('roundtrip'))
         file_path = os.path.join(temp_dir, file_name)
 
@@ -129,5 +130,17 @@ def roundtripper(tmpdir_factory):
 
         with NWBHDF5IO(file_path, 'r') as nwb_file_reader:
             obtained = nwb_file_reader.read()
-            generic_assert_equal(nwbfile, obtained)
+            comparisons = nested_compare(nwbfile, obtained)
+            comparisons_df = comparisons_as_df(comparisons)
+
+            if comparisons_dir is not None:
+                if not os.path.exists(comparisons_dir):
+                    os.makedirs(comparisons_dir)  # not using exist_ok for py27 compatibility
+                full_comparisons_path = os.path.join(comparisons_dir, 'full.csv')
+                comparisons_df.to_csv(full_comparisons_path)
+
+            with pd.option_context('display.max_rows', None, 'display.max_columns', None, 'display.max_colwidth', -1):
+                print(comparisons_df[~(comparisons_df['direct_equal'])])
+            assert comparisons_df['direct_equal'].all()
+
     return roundtripper

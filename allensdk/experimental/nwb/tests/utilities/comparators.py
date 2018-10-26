@@ -1,69 +1,111 @@
+from typing import Tuple, Union, Any, Dict, Set
+import sys
 
-import numpy as np
-from pynwb import NWBContainer, NWBData
+import pynwb
 
-
-DICT_LIKE_TYPES = (dict,)
-LIST_LIKE_TYPES = (list, tuple)
-NDARRAY_LIKE_TYPES = (np.ndarray,)
+from .comparison_types import ComparatorType, integer_types, scalar_numeric_types, list_like_types, catchall_types
 
 
-def nwb_container_assert_equal(left, right):
+def basic_compare_types(
+    left_type,  # type: type
+    right_type,  # type: type
+    subclasses_pass=False  # type: bool
+):
+    # type: (...) -> Tuple[bool, str]
 
-    left_keys = list(left.__nwbfields__)
-    right_keys = list(right.__nwbfields__)
-
-    assert set(left_keys) == set(right_keys)
-    for key in left_keys:
-        generic_assert_equal(getattr(left, key), getattr(right, key))
-
-
-def nwb_data_assert_equal(left, right):
-    list_like_assert_equal(left, right)
-
-
-def dict_like_assert_equal(left, right):
-    ''' Compares dict-like objects. Each must expose:
-
-        keys()
-        __getitem__
-    '''
-    
-    left_keys = list(left.keys())
-    right_keys = list(right.keys())
-
-    assert set(left_keys) == set(right_keys)
-    for key in left_keys:
-        generic_equal(left[key], right[key])
-
-
-def list_like_assert_equal(left, right):
-    for left_item, right_item in zip(left, right):
-        generic_assert_equal(left_item, right_item)
-
-
-def array_like_assert_equal(left, right):
-    assert np.array_equal(left, right)
-
-
-def direct_assert_equal(left, right):
-    assert left == right
-
-
-def generic_assert_equal(left, right):
-
-    if isinstance(left, NWBContainer) and isinstance(right, NWBContainer):
-        nwb_container_assert_equal(left, right)
-    elif isinstance(left, NWBData) and isinstance(right, NWBData):
-        nwb_data_assert_equal(left, right)
-    elif isinstance(left, DICT_LIKE_TYPES) and isinstance(right, DICT_LIKE_TYPES):
-        dict_assert_equal(left, right)
-    elif isinstance(left, LIST_LIKE_TYPES) and isinstance(right, LIST_LIKE_TYPES):
-        list_like_assert_equal(left, right)
-    elif isinstance(left, NDARRAY_LIKE_TYPES) and isinstance(right, NDARRAY_LIKE_TYPES):
-        array_like_assert_equal(left, right)
-    elif hasattr(left, '__eq__') and hasattr(right, '__eq__'):
-        direct_assert_equal(left, right)
+    if not subclasses_pass:
+        result = left_type == right_type
     else:
-        raise TypeError('unable to compare types: {}, {}'.format(type(left), type(right)))
+        result = issubclass(left_type, right_type) or issubclass(right_type, left_type)
 
+    diff = 'left type: {}, right type: {}'.format(left_type, right_type)
+    return result, diff
+
+
+def dict_like_comparator(
+    left,  # type: Dict[Any, Any]
+    right  # type: Dict[Any, Any]
+):
+    # type: (...) -> Tuple[bool, str]
+
+    left_keys = set(left.keys())  # type: Set[Any]
+    right_keys = set(right.keys())  # type: Set[Any]
+
+    left_extra = left_keys - right_keys
+    right_extra = right_keys - left_keys
+
+    if left_keys == right_keys:
+        return True, ''
+    return False, 'found {} extra keys in the left item: {}\nand {} extra keys in the right item'.format(
+        len(left_extra), left_extra, len(right_extra), right_extra
+    )
+
+
+def list_like_comparator(
+    left,
+    right
+):
+    # type: (...) -> Tuple[bool, str]
+    return len(left) == len(right), '{} elements in left, {} in right'.format(len(left), len(right))
+
+
+def nwb_container_comparator(
+    left,  # type: pynwb.NWBContainer
+    right  # type: pynwb.NWBContainer
+):
+    # type: (...) -> Tuple[bool, str]
+    return left.name == right.name, 'left name: {}, right name: {}'.format(left.name, right.name)
+
+
+
+def int_like_scalar_comparator(
+    left,
+    right
+):
+    # type: (...) -> Tuple[bool, str]
+    return left == right, '{} vs {}'.format(left, right)
+
+
+def float_like_scalar_comparator(
+    left,
+    right
+):
+    # type: (...) -> Tuple[bool, str]
+    return abs(left - right) <= sys.float_info.epsilon, '{} vs {}'.format(left, right)
+
+
+def catchall_direct_comparator(
+    left,
+    right
+):
+    return left == right, '{} vs {}'.format(left, right)
+
+
+def no_matching_comparator(
+    left,  # type: Any
+    right  # type: Any
+):
+    # type: (...) -> Tuple[bool, str]
+    return False, 'no comparator defined for {} and {}'.format(type(left), type(right))
+
+
+def default_comparator_lookup(
+    left_type,  # type: type
+    right_type  # type: type
+):
+    # type: (...) -> ComparatorType
+
+    if issubclass(left_type, dict) and issubclass(right_type, dict):
+        return dict_like_comparator
+    elif issubclass(left_type, integer_types) and issubclass(right_type, integer_types):
+        return int_like_scalar_comparator
+    elif issubclass(left_type, scalar_numeric_types) and issubclass(right_type, scalar_numeric_types):
+        return float_like_scalar_comparator
+    elif issubclass(left_type, list_like_types) and issubclass(right_type, list_like_types):
+        return list_like_comparator
+    elif issubclass(left_type, pynwb.NWBContainer) and issubclass(right_type, pynwb.NWBContainer):
+        return nwb_container_comparator
+    elif issubclass(left_type, catchall_types) and issubclass(right_type, catchall_types) and left_type == right_type: # insert new cases above
+        return catchall_direct_comparator
+
+    return no_matching_comparator
