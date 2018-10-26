@@ -1,8 +1,8 @@
 import sys
 import matplotlib.pyplot as plt
 import numpy as np
-import icephys_api
 import pandas as pd
+from pynwb import NWBHDF5IO
 
 DEFAULT_NWB2_FILE_NAME ="/allen/aibs/technology/sergeyg/ephys_pipeline/nwb_conversion/nwb2/Npr3-IRES2-CreSst-IRES-FlpOAi65-401243.04.01.01_ver2.nwb"
 
@@ -100,7 +100,7 @@ def main():
 
     nwb2_file_name = sys.argv[1]
 
-    nwbfile = icephys_api.load_nwb2_file(nwb2_file_name)
+    nwbfile = NWBHDF5IO(nwb2_file_name,mode ="r").read()
 
     sweep_table = build_sweep_table(nwbfile)
 
