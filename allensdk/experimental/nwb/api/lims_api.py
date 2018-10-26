@@ -11,10 +11,13 @@ DEFAULT_PORT = 5432
 DEFAULT_USERNAME = 'limsreader'
 
 
-def psycopg2_select(query, database=DEFAULT_DATABASE, host=DEFAULT_HOST, port=DEFAULT_PORT, username=DEFAULT_USERNAME):
+def psycopg2_select(query, database=DEFAULT_DATABASE, host=DEFAULT_HOST, port=DEFAULT_PORT, username=DEFAULT_USERNAME, password=None):
+
+    if password is None:
+        password = os.environ.get('LIMS2_PASSWORD', None)
 
     connection = psycopg2.connect(
-        'host={} port={} dbname={} user={}'.format(host, port, database, username), 
+        host=host, port=port, dbname=database, user=username, password=password,
         cursor_factory=psycopg2.extras.RealDictCursor
     )
     cursor = connection.cursor()
