@@ -63,7 +63,7 @@ def test_get_neuronal_models(mock_json_msg_query, biophys_api):
 
     mock_json_msg_query.assert_called_once_with(
         "http://twarehouse-backup/api/v2/data/query.json?"
-        "q=model::NeuronalModel,rma::criteria,[neuronal_model_template_id$in491455321,32923071],"
+        "q=model::NeuronalModel,rma::criteria,[neuronal_model_template_id$in491455321,329230710],"
         "[specimen_id$in386049446,469753383],rma::options[num_rows$eq'all'][count$eqfalse]")
 
 
