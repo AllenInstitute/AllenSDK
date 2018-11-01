@@ -47,7 +47,7 @@ class BiophysicalApi(RmaTemplate):
     _MOD_file_type = 'BiophysicalModelDescription'
     _FIT_file_type = 'NeuronalModelParameters'
     _MARKER_file_type = '3DNeuronMarker'
-    BIOPHYSICAL_MODEL_TYPE_IDS = (491455321, 32923071,)
+    BIOPHYSICAL_MODEL_TYPE_IDS = (491455321, 329230710,)
 
     rma_templates = \
         {"model_queries": [
