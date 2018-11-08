@@ -1,0 +1,72 @@
+from marshmallow import RAISE
+from argschema import ArgSchema, ArgSchemaParser 
+from argschema.schemas import DefaultSchema
+from argschema.fields import Nested, InputDir, String, Float, Dict, Int, List, Bool
+import numpy as np
+
+
+class RaisingSchema(DefaultSchema):
+    class META:
+        unknown=RAISE
+
+
+class ImageSpacing(RaisingSchema):
+    row = Float(required=True)
+    column = Float(required=True)
+
+
+class ImageDimensions(RaisingSchema):
+    row = Int(required=True)
+    column = Int(required=True)
+
+
+class ReferenceSpacing(RaisingSchema):
+    row = Float(required=True)
+    column = Float(required=True)
+    slice = Float(required=True)
+
+
+class ReferenceDimensions(RaisingSchema):
+    row = Int(required=True)
+    column = Int(required=True)
+    slice = Int(required=True)
+
+
+class SubImage(RaisingSchema):
+    specimen_tissue_index = Int()
+    dimensions = Nested(ImageDimensions)
+    spacing = Nested(ImageSpacing)
+    segmentation_paths = Dict()
+    intensity_paths = Dict()
+    polygons = Dict()
+
+
+class InputParameters(ArgSchema):
+    class Meta:
+        unknown=RAISE
+    
+    sub_images = Nested(SubImage, required=True, many=True, help='Sub images composing this image series')
+    affine_params = List(Float, help='Parameters of affine image stack to reference space transform.')
+    deformation_field_path = String(required=True, 
+        help='Path to parameters of the deformable local transform from affine-transformed image stack to reference space transform.'
+    )
+    image_series_slice_spacing = Float(required=True, help='Distance (microns) between successive images in this series.')
+    target_spacings = List(Float, required=True, help='For each volume produced, downsample to this isometric resolution')
+    reference_spacing = Nested(ReferenceSpacing, required=True, help='Native spacing of reference space (microns).')
+    reference_dimensions = Nested(ReferenceDimensions, required=True, help='Native dimensions of reference space.')
+    sub_image_count = Int(required=True, help='Expected number of sub images')
+    grid_prefix = String(required=True, help='Write output grid files here')
+    accumulator_prefix = String(required=True, help='If this run produces accumulators, write them here.')
+    storage_directory = String(required=False, help='Storage directory for this image series. Not used')
+
+
+
+class OutputSchema(RaisingSchema): 
+    input_parameters = Nested(InputParameters, 
+                              description=("Input parameters the module " 
+                                           "was run with"), 
+                              required=True) 
+
+
+class OutputParameters(OutputSchema): 
+    pass
