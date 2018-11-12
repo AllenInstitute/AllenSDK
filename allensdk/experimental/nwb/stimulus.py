@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 from pynwb import TimeSeries
 from pynwb.form.backends.hdf5.h5_utils import H5DataIO
-from pynwb.epoch import Epochs
 from scipy.signal import medfilt
 from visual_behavior.translator.foraging2 import data_to_change_detection_core
 from visual_behavior.analyze import compute_running_speed

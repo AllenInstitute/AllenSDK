@@ -13,7 +13,6 @@ from pynwb.file import ElectrodeTable
 from pynwb import NWBHDF5IO
 from pynwb.device import Device
 from pynwb.ecephys import ElectrodeGroup
-from pynwb.misc import UnitTimes
 from pynwb.base import ProcessingModule
 
 from allensdk.experimental.nwb.api.ecephys_lims_api import EcephysLimsApi
