@@ -8,6 +8,7 @@ from visual_behavior.translator.foraging2 import data_to_change_detection_core
 from visual_behavior.analyze import compute_running_speed
 from .timestamps import get_timestamps_from_sync
 from pynwb.image import ImageSeries, IndexSeries
+from pynwb.epoch import TimeIntervals
 import numpy as np
 
 logger = logging.getLogger(__name__)
@@ -37,7 +38,6 @@ def visual_coding_running_speed(exp_data):
 
 
 class BaseStimulusAdapter(object):
-    _source = ''
 
     def __init__(self, pkl_file, sync_file, stim_key='stim_vsync',
                  compress=True):
@@ -88,7 +88,6 @@ class BaseStimulusAdapter(object):
                 times = times[:len(speed)]
 
             self._running_speed = TimeSeries(name='running_speed',
-                            source=self._source,
                             data=H5DataIO(speed.values, **self.compression_opts),
                             timestamps=H5DataIO(times, ** self.compression_opts),
                             unit='cm/s')
@@ -97,7 +96,6 @@ class BaseStimulusAdapter(object):
 
 
 class VisualBehaviorStimulusAdapter(BaseStimulusAdapter):
-    _source = 'Allen Brain Observatory: Visual Behavior'
 
     def __init__(self, pkl_file, sync_file=None, stim_key='stim_vsync', compress=True):
         '''Cleaning up init signature for optional kwarg sync'''
@@ -155,7 +153,7 @@ class VisualBehaviorStimulusAdapter(BaseStimulusAdapter):
     def stimulus_epoch_table(self):
 
         if self._stimulus_epoch_table is None:
-            self._stimulus_epoch_table = Epochs.from_dataframe(self.stimulus_epoch_df, 'nosource', self.EPOCHS)
+            self._stimulus_epoch_table = TimeIntervals.from_dataframe(self.stimulus_epoch_df, self.EPOCHS)
 
         return self._stimulus_epoch_table
 
@@ -167,8 +165,6 @@ class VisualBehaviorStimulusAdapter(BaseStimulusAdapter):
             image_set = self.core_data['image_set']
             name = image_set.get('name', 'TODO_visual_behavior_analysis_issues_389')
             image_data =  np.array(image_set['images'])
-            source = image_set['metadata']['image_set']
-
             
             image_index = []
             for x in image_set['image_attributes']:
@@ -176,7 +172,6 @@ class VisualBehaviorStimulusAdapter(BaseStimulusAdapter):
 
             self._visual_stimulus_image_series = ImageSeries(
                                                 name=name,
-                                                source=source,
                                                 data=image_data,
                                                 unit='NA',
                                                 format='raw',
@@ -211,7 +206,6 @@ class VisualBehaviorStimulusAdapter(BaseStimulusAdapter):
 
             image_index_series = IndexSeries(
                             name='image_index',
-                            source='NA',
                             data=index_timeseries,
                             unit='NA',
                             indexed_timeseries=self.visual_stimulus_image_series,
@@ -224,7 +218,6 @@ class VisualBehaviorStimulusAdapter(BaseStimulusAdapter):
 
 
 class VisualCodingStimulusAdapter(BaseStimulusAdapter):
-    _source = 'Allen Brain Observatory: Visual Coding'
 
     @property
     def core_data(self):
