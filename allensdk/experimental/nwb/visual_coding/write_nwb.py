@@ -31,8 +31,7 @@ def write_nwb(output_file, stimulus_adapter, ophys_adapter, **compression_opts):
     processing = ophys.add_ophys_module(
         nwbfile, 'visual_coding_pipeline',
         ("Processing module for Allen Brain Observatory: "
-         "Visual Coding 2-Photon Experiments"),
-        ophys_adapter.dff_source)
+         "Visual Coding 2-Photon Experiments"))
 
     dff_interface = processing.get_data_interface('dff_interface')
 

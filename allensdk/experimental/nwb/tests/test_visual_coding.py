@@ -23,7 +23,6 @@ def test_legacy_cv_running_speed(nwb_filename, vc_nwb, compress):
     adapter = VisualCodingLegacyNwbAdapter(vc_nwb, compress=compress)
 
     nwbfile = NWBFile(
-        source='Data source',
         session_description='test vc',
         identifier='vc_session_uuid',
         session_start_time=datetime.datetime.now(),

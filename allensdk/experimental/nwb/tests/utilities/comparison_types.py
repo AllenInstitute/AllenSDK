@@ -1,3 +1,4 @@
+import datetime
 from collections import namedtuple
 from typing import Callable, Dict, Tuple, Any, List, Union
 
@@ -20,6 +21,6 @@ integer_types = (int, np.integer, bool, np.bool_)
 float_types = (float, np.floating)
 scalar_numeric_types = integer_types + float_types
 list_like_types = (list, np.ndarray, tuple, pynwb.NWBData)
-catchall_types = (type(None), str, set)
+catchall_types = (type(None), str, set, datetime.datetime)
 
 ComparisonResult = namedtuple('ComparisonResult', ['types_equal', 'direct_equal', 'types_diff', 'direct_diff'])
