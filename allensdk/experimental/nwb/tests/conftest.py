@@ -39,7 +39,6 @@ def nwb_filename(tmpdir_factory):
 def nwbfile(tmpdir):
 
     nwbfile = NWBFile(
-        source='Data source',
         session_description='test foraging2',
         identifier='behavior_session_uuid',
         session_start_time=datetime.datetime.now(),
@@ -56,9 +55,9 @@ def behaviorimagesfilename(tmpdir):
     image_dict['im077'] = {}
     image_dict['im065']['im065'] = np.zeros((3,6))
     image_dict['im077']['im077'] = np.ones((3,6))
-    
+
     fname = os.path.join(str(tmpdir), 'images.pkl')
-    pickle.dump(image_dict, open(fname, 'w'))
+    pickle.dump(image_dict, open(fname, 'wb'))
 
     return fname
 

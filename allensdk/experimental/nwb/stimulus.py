@@ -37,6 +37,12 @@ def visual_coding_running_speed(exp_data):
     return running_speed
 
 
+def ensure_not_bytes(arg, encoding='utf-8'):
+    if isinstance(arg, bytes):
+        return arg.decode(encoding)
+    return arg
+
+
 class BaseStimulusAdapter(object):
 
     def __init__(self, pkl_file, sync_file, stim_key='stim_vsync',
@@ -141,7 +147,6 @@ class VisualBehaviorStimulusAdapter(BaseStimulusAdapter):
             df = self.core_data['visual_stimuli'].copy()
             df['stop_time'] = timestamps[df['end_frame']]
             df['start_time'] = timestamps[df['frame']]
-            df['description'] = ['stimulus presentation']*len(df) 
             df['timeseries'] = [[self.running_speed]]*len(df) 
             df['tags'] = [[self.timestamp_source]]*len(df) 
             df.drop('time', inplace=True, axis=1)
@@ -198,7 +203,10 @@ class VisualBehaviorStimulusAdapter(BaseStimulusAdapter):
 
             mapper_dict = {}
             for x in image_set['image_attributes']:
-                mapper_dict[x['image_name'], x['image_category']] = x['image_index']
+                mapper_dict[
+                    ensure_not_bytes(x['image_name']), 
+                    ensure_not_bytes(x['image_category'])
+                ] = x['image_index']
 
             index_timeseries = []
             for cn, cc in zip(stimulus_epoch_df['image_name'].values, stimulus_epoch_df['image_category'].values):
