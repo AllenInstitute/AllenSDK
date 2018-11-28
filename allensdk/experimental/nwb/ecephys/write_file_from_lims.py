@@ -14,7 +14,7 @@ from pynwb import NWBHDF5IO
 from pynwb.device import Device
 from pynwb.ecephys import ElectrodeGroup
 from pynwb.base import ProcessingModule
-from pynwb.misc import Units
+# from pynwb.misc import Units
 
 from allensdk.experimental.nwb.api.ecephys_lims_api import EcephysLimsApi
 
@@ -79,19 +79,19 @@ def add_units_to_file(nwbfile, probe_table, channel_table, unit_table, spike_tim
 
     nwbfile.electrodes = ElectrodeTable().from_dataframe(channel_table, name='electrodes')
 
-    nwbfile.add_unit_column('firing_rate', description='')
-    nwbfile.add_unit_column('isi_violations', description='')
-    nwbfile.add_unit_column('peak_channel_id', description='')
-    nwbfile.add_unit_column('probe_id', description='')
-    nwbfile.add_unit_column('quality', description='')
-    nwbfile.add_unit_column('snr', description='')
+    stimes = []
+    sindex = []
+    counter = 0
+    for ii, (unit_id, _) in enumerate(unit_table.iterrows()):
+        sindex.append(counter)
+        stimes.append(spike_times[unit_id])
+        counter += len(spike_times[unit_id])
+    del spike_times
+    stimes = np.concatenate(stimes)
 
-    for unit_id, unit_row in unit_table.iterrows():
-        nwbfile.add_unit(
-            id=unit_id,
-            spike_times=spike_times[unit_id],
-            **unit_row
-        )
+    nwbfile.units = pynwb.misc.Units.from_dataframe(unit_table, name='units')
+    nwbfile.units.add_column(name='spike_times', description='times (s) of detected spiking events', data=stimes, index=sindex)
+
     return nwbfile
 
 
