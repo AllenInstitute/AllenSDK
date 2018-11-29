@@ -1,7 +1,13 @@
-from .write_classic_grid_files import write_classic_grid_files
 
-def get_writer(case):
-    if case == 'classic':
-        return write_classic_grid_files
-    else:
-        raise ValueError('unrecognized case: {}'.format(case))
+
+
+def classic_writer():
+    pass
+
+
+def cav_writer():
+    pass
+
+
+def count_writer():
+    pass

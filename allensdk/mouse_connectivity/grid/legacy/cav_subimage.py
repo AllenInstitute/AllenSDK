@@ -7,10 +7,13 @@ import numpy as np
 from scipy.ndimage.interpolation import zoom
 from six import iteritems
 
-sys.path.append('/shared/bioapps/itk/itk_shared/jp2/build')
-import jpeg_twok
+try:
+    sys.path.append('/shared/bioapps/itk/itk_shared/jp2/build')
+    import jpeg_twok
+except (ImportError, ModuleNotFoundError):
+    import glymur
 
-from . import image_utilities as iu
+from allensdk.mouse_connectivity.grid import image_utilities as iu
 from .base_subimage import PolygonSubImage, SegmentationSubImage, IntensitySubImage
 
 

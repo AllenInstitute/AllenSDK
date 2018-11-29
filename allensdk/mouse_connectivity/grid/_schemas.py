@@ -5,6 +5,13 @@ from argschema.fields import Nested, InputDir, String, Float, Dict, Int, List, B
 import numpy as np
 
 
+VALID_CASES = (
+    'classic',
+    'cav',
+    'count'
+)
+
+
 class RaisingSchema(DefaultSchema):
     class META:
         unknown=RAISE
@@ -45,6 +52,7 @@ class InputParameters(ArgSchema):
     class Meta:
         unknown=RAISE
     
+    case = String(required=True, validate=lambda s: s in VALID_CASES, help='select a use case to run')
     sub_images = Nested(SubImage, required=True, many=True, help='Sub images composing this image series')
     affine_params = List(Float, help='Parameters of affine image stack to reference space transform.')
     deformation_field_path = String(required=True, 
@@ -58,6 +66,7 @@ class InputParameters(ArgSchema):
     grid_prefix = String(required=True, help='Write output grid files here')
     accumulator_prefix = String(required=True, help='If this run produces accumulators, write them here.')
     storage_directory = String(required=False, help='Storage directory for this image series. Not used')
+    filter_bit = Int(default=None, help='if provided, signals that pixels with this bit high have passed the optional post-filter stage')
 
 
 

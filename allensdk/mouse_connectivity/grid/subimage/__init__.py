@@ -1,14 +1,25 @@
-from .classic_count_subimage import ClassicCountSubImage
-from .cav_subimage import CavSubImage
-from .classic_subimage import ClassicSubImage
+from .count_subimage import CountSubimage
+from .cav_subimage import CavSubimage
+from .classic_subimage import ClassicSubimage
 
 
-def get_subimage_class(case):
-    if case == 'classic':
-        return ClassicSubImage
-    elif case == 'classic_count':
-        return ClassicCountSubImage
-    elif case == 'cav':
-        return CavSubImage
-    else:
-        raise ValueError('unrecognized case: {}'.format(case))
+def run_subimage(input_data):
+    
+    # TODO: remove or fix
+    logging.basicConfig(format='%(asctime)s - %(process)s - %(levelname)s - %(message)s')
+    logging.getLogger('').setLevel(logging.INFO)
+        
+    index = input_data.pop('specimen_tissue_index')
+    cls = input_data.pop('cls')
+    logging.info('handling {0} at index {1}'.format(cls.__name__, index))
+
+    si = cls(**input_data)
+    
+    try:
+        si.setup_images()
+        si.compute_coarse_planes()
+    except Exception as err:
+        logging.exception(err)
+        raise err
+    
+    return index, si.accumulators

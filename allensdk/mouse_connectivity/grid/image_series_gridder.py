@@ -5,10 +5,9 @@ from six import iteritems
 import SimpleITK as sitk
 import numpy as np
 
-from .base_subimage import run_subimage
-from .classic_subimage import ClassicSubImage
-from . import image_utilities as iu
-from .downsampling_utilities import block_average, window_average
+from .subimage import run_subimage
+from .utilities import image_utilities as iu
+from .utilities.downsampling_utilities import block_average, window_average
 
 
 #==============================================================================

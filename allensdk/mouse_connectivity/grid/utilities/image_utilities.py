@@ -1,6 +1,7 @@
 from __future__ import division
 import logging
 import os
+import sys
 
 from six import iteritems
 import numpy as np
@@ -232,3 +233,28 @@ def write_volume(volume, name, prefix=None, specify_resolution=None, extension='
 
     if paths is not None:
         paths.append(path)
+
+
+def __read_segmentation_image_with_kakadu(path):
+    return jpeg_twok.read(path).T
+
+def __read_intensity_image_with_kakadu(path, reduce_level, channel):
+    return jpeg_twok.read(path, reduce_level, channel).T
+
+def __read_segmentation_image_with_glymur(path):
+    return glymur.Jp2k(path)[:]
+
+def __read_intensity_image_with_glymur():
+    image = glymur.Jp2k(path)[:]
+    
+
+
+try:
+    sys.path.append('/shared/bioapps/itk/itk_shared/jp2/build')
+    import jpeg_twok
+    read_segmentation_image = __read_segmentation_image_with_kakadu
+    read_intensity_image = __read_intensity_image_with_kakadu
+except (ImportError, ModuleNotFoundError):
+    import glymur
+    read_segmentation_image = __read_segmentation_image_with_glymur
+    read_intensity_image = __read_intensity_image_with_glymur
