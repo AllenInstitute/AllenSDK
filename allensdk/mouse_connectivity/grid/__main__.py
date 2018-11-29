@@ -1,9 +1,11 @@
 import logging
 import pprint
+import sys
+import argparse
 
+import argschema
 import requests
 
-from allensdk.core.multi_source_argschema_parser import MultiSourceArgschemaParser
 from ._schemas import InputParameters, OutputParameters
 from . import cases
 from .image_series_gridder import ImageSeriesGridder
@@ -25,7 +27,13 @@ def get_inputs_from_lims(host, image_series_id, output_root, job_queue, strategy
         raise ValueError('bad request uri: {} ({})'.format(uri, data['error']))
 
     return data
-    
+
+def write_or_print_outputs(data, parser):
+    data.update({'input_parameters': parser.args})
+    if 'output_json' in parser.args:
+        parser.output(data, indent=2)
+    else:
+        print(parser.get_output_json(data))    
 
 def run_grid(args):
 
@@ -65,26 +73,23 @@ def run_grid(args):
         subimage_kwargs['filter_bit'] = args['filter_bit']
 
     gridder = ImageSeriesGridder(
-        grid_prefix=input_data['grid_prefix'], 
-        accumulator_prefix=input_data['accumulator_prefix'], 
-        target_spacings=input_data['target_spacings'], 
         in_dims=input_dimensions, 
         in_spacing=input_spacing, 
         out_dims=output_dimensions, 
         out_spacing=output_spacing, 
-        reduce_level=args.reduce_level, 
+        reduce_level=args['reduce_level'], 
         subimages=sub_images, 
         subimage_kwargs=subimage_kwargs, 
-        nprocesses=args.nprocesses, 
-        affine_params=input_data['affine_params'], 
-        dfmfld_path=input_data['deformation_field_path']
+        nprocesses=args['nprocesses'], 
+        affine_params=args['affine_params'], 
+        dfmfld_path=args['deformation_field_path']
     )
 
     gridder.setup_subimages()
     gridder.build_coarse_grids()
 
     writer = case['writer']
-    paths = writer(gridder)
+    paths = writer(gridder, args['grid_prefix'], args['accumulator_prefix'], target_spacings=args['target_spacings'])
 
     return {'output_file_paths': paths}
 
@@ -92,25 +97,31 @@ def run_grid(args):
 def main():
 
     logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s')
-    parser = MultiSourceArgschemaParser(
-        sources={
-            'lims': {
-                'get_input_data': get_inputs_from_lims,
-                'params': {
-                    'host': 'http://lims2',
-                    'job_queue': None,
-                    'strategy': None,
-                    'image_series_id': None,
-                    'output_root': None
-                }
-            }
-        },
+
+    # TODO replace with argschema implementation of multisource parser
+    remaining_args = sys.argv[1:]
+    input_data = {}
+    if '--get_inputs_from_lims' in sys.argv:
+        lims_parser = argparse.ArgumentParser(add_help=False)
+        lims_parser.add_argument('--host', type=str, default='http://lims2')
+        lims_parser.add_argument('--job_queue', type=str, default=None)
+        lims_parser.add_argument('--strategy', type=str,default= None)
+        lims_parser.add_argument('--image_series_id', type=int, default=None)
+        lims_parser.add_argument('--output_root', type=str, default= None)
+
+        lims_args, remaining_args = lims_parser.parse_known_args(remaining_args)
+        remaining_args = [item for item in remaining_args if item != '--get_inputs_from_lims']
+        input_data = get_inputs_from_lims(**lims_args.__dict__)
+
+    parser = argschema.ArgSchemaParser(
+        args=remaining_args,
+        input_data=input_data,
         schema_type=InputParameters,
         output_schema_type=OutputParameters,
     )
 
     output = run_grid(parser.args)
-    MultiSourceArgschemaParser.write_or_print_outputs(output, parser)
+    write_or_print_outputs(output, parser)
 
 
 if __name__ == '__main__':

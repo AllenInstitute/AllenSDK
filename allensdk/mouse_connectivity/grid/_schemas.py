@@ -66,8 +66,9 @@ class InputParameters(ArgSchema):
     grid_prefix = String(required=True, help='Write output grid files here')
     accumulator_prefix = String(required=True, help='If this run produces accumulators, write them here.')
     storage_directory = String(required=False, help='Storage directory for this image series. Not used')
-    filter_bit = Int(default=None, help='if provided, signals that pixels with this bit high have passed the optional post-filter stage')
-
+    filter_bit = Int(default=None, allow_none=True, help='if provided, signals that pixels with this bit high have passed the optional post-filter stage')
+    nprocesses = Int(default=8, help='spawn this many worker subprocesses')
+    reduce_level = Int(default=0, help='power of two by which to downsample each input axis')
 
 
 class OutputSchema(RaisingSchema): 

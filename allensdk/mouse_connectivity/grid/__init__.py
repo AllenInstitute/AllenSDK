@@ -1,19 +1,19 @@
 
 from .writers import classic_writer, count_writer, cav_writer
-from .subimage import CavSubimage, CountSubimage, ClassicSubimage
+from .subimage import CavSubImage, CountSubImage, ClassicSubImage
 
 
 cases = {
     'classic': {
         'writer': classic_writer,
-        'subimage': ClassicSubimage
+        'subimage': ClassicSubImage
     },
     'count': {
         'writer': count_writer,
-        'subimage': CountSubimage
+        'subimage': CountSubImage
     },
     'cav': {
         'writer': cav_writer,
-        'subimage': CavSubimage
+        'subimage': CavSubImage
     }
 }

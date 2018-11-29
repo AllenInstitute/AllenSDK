@@ -12,6 +12,12 @@ from skimage.draw import polygon
 from allensdk.config.manifest import Manifest
 
 
+if sys.version_info[0] > 2:
+    failed_import = (ImportError, ModuleNotFoundError)
+else:
+    failed_import = (ImportError,)
+
+
 # use np_sitk_convert or sitk_np_convert to access
 # TODO: check if this already exists. If not: add more dtypes
 # it does not
@@ -254,7 +260,7 @@ try:
     import jpeg_twok
     read_segmentation_image = __read_segmentation_image_with_kakadu
     read_intensity_image = __read_intensity_image_with_kakadu
-except (ImportError, ModuleNotFoundError):
+except failed_import:
     import glymur
     read_segmentation_image = __read_segmentation_image_with_glymur
     read_intensity_image = __read_intensity_image_with_glymur
