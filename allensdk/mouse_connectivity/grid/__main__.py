@@ -51,6 +51,7 @@ def run_grid(args):
         raise
 
     sub_images = args['sub_images']
+    
 
     input_dimensions = [sub_images[0]['dimensions']['column'], 
                         sub_images[0]['dimensions']['row'], 
@@ -127,10 +128,8 @@ def main():
         output_schema_type=OutputParameters,
     )
 
-    print(parser.args)
-
-    # output = run_grid(parser.args)
-    # write_or_print_outputs(output, parser)
+    output = run_grid(parser.args)
+    write_or_print_outputs(output, parser)
 
 
 if __name__ == '__main__':

@@ -87,6 +87,7 @@ class SegmentationSubImage(SubImage):
             reduce_level, in_dims, in_spacing, coarse_spacing, *args, **kwargs)
 
         self.segmentation_paths = segmentation_paths
+        
         if 'filter_bit' in kwargs and kwargs['filter_bit'] is not None:
             self.filter = 2 ** kwargs['filter_bit']
 
@@ -169,7 +170,7 @@ class SegmentationSubImage(SubImage):
         '''
         
         logging.info('loading {0}'.format(segmentation_name))
-        segmentation = jpeg_twok.read(self.segmentation_paths[segmentation_name]).T
+        segmentation = iu.read_segmentation_image(self.segmentation_paths[segmentation_name])
         
         if self.reduce_level > 0:
             logging.info('downsampling {0}'.format(segmentation_name))
@@ -201,7 +202,7 @@ class IntensitySubImage(SubImage):
             logging.info('loading {0}'.format(name))
 
             info = self.intensity_paths[name]
-            self.images[name] = jpeg_twok.read(info['path'], self.reduce_level, info['channel']).T
+            self.images[name] = iu.read_intensity_image(info['path'], self.reduce_level, info['channel'])
 
 
     def setup_images(self):
@@ -230,9 +231,14 @@ class PolygonSubImage(SubImage):
         self.get_polygons()
 
 
-    def get_polygons(self):
+    def get_polygons(self, optional_polygons=None):
 
-        for key in self.__class__.required_polys:
+        polygon_keys = []
+        if optional_polygons is not None:
+            polygon_keys.extend(optional_polygons)
+        polygon_keys.extend(self.__class__.required_polys)
+
+        for key in polygon_keys:
             logging.info('rasterizing {0} polygon'.format(key))
           
             points = self.polygon_info[key]

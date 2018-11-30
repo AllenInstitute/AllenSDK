@@ -23,7 +23,8 @@ class ClassicSubImage(IntensitySubImage, SegmentationSubImage, PolygonSubImage):
     
     
     def __init__(self, reduce_level, in_dims, in_spacing, coarse_spacing, 
-                 polygon_info, segmentation_paths, intensity_paths, 
+                 polygon_info, segmentation_paths, intensity_paths,
+                 injection_polygon_key='aav_tracer', 
                  *args, **kwargs):
                  
         super(ClassicSubImage, self).__init__(
@@ -32,6 +33,7 @@ class ClassicSubImage(IntensitySubImage, SegmentationSubImage, PolygonSubImage):
             segmentation_paths=segmentation_paths, 
             intensity_paths=intensity_paths, 
             *args, **kwargs)
+        self.injection_polygon_key = injection_polygon_key
 
 
     def process_segmentation(self):
@@ -43,7 +45,11 @@ class ClassicSubImage(IntensitySubImage, SegmentationSubImage, PolygonSubImage):
         self.apply_mask('projection', 'no_signal', False)
         del self.images['no_signal']
             
-        self.extract_injection_from_segmentation()
+        if self.injection_polygon_key in self.images:
+            self.images['injection'] = self.images[self.injection_polygon_key]
+            del self.images[injection_polygon_key]
+        else:
+            self.extract_injection_from_segmentation()
         del self.images['segmentation']
         
         self.binarize('projection')
