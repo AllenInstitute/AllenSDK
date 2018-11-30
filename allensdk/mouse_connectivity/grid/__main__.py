@@ -2,6 +2,7 @@ import logging
 import pprint
 import sys
 import argparse
+import os
 
 import argschema
 import requests
@@ -26,7 +27,12 @@ def get_inputs_from_lims(host, image_series_id, output_root, job_queue, strategy
     if len(data) == 1 and 'error' in data:
         raise ValueError('bad request uri: {} ({})'.format(uri, data['error']))
 
+    data['storage_directory'] = os.path.join(output_root, os.path.split(data['storage_directory'])[-1])
+    data['grid_prefix'] = os.path.join(output_root, os.path.split(data['grid_prefix'])[-1])
+    data['accumulator_prefix'] = os.path.join(output_root, os.path.split(data['accumulator_prefix'])[-1])
+
     return data
+
 
 def write_or_print_outputs(data, parser):
     data.update({'input_parameters': parser.args})
@@ -34,6 +40,7 @@ def write_or_print_outputs(data, parser):
         parser.output(data, indent=2)
     else:
         print(parser.get_output_json(data))    
+
 
 def run_grid(args):
 
@@ -120,8 +127,10 @@ def main():
         output_schema_type=OutputParameters,
     )
 
-    output = run_grid(parser.args)
-    write_or_print_outputs(output, parser)
+    print(parser.args)
+
+    # output = run_grid(parser.args)
+    # write_or_print_outputs(output, parser)
 
 
 if __name__ == '__main__':
