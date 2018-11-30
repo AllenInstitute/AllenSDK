@@ -18,6 +18,7 @@ from .base_subimage import PolygonSubImage, SegmentationSubImage, IntensitySubIm
 class ClassicSubImage(IntensitySubImage, SegmentationSubImage, PolygonSubImage):
     
     required_polys = ['missing_tile', 'no_signal', 'aav_exclusion']
+    optional_polys = ['aav_tracer']
     required_segmentations = ['segmentation']
     required_intensities = ['green']
     
@@ -37,7 +38,7 @@ class ClassicSubImage(IntensitySubImage, SegmentationSubImage, PolygonSubImage):
 
 
     def process_segmentation(self):
-        
+
         self.apply_mask('segmentation', 'missing_tile', False)
         
         self.extract_signal_from_segmentation(signal_name='projection')
@@ -47,7 +48,7 @@ class ClassicSubImage(IntensitySubImage, SegmentationSubImage, PolygonSubImage):
             
         if self.injection_polygon_key in self.images:
             self.images['injection'] = self.images[self.injection_polygon_key]
-            del self.images[injection_polygon_key]
+            del self.images[self.injection_polygon_key]
         else:
             self.extract_injection_from_segmentation()
         del self.images['segmentation']

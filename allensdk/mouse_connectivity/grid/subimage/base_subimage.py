@@ -216,6 +216,7 @@ class IntensitySubImage(SubImage):
 class PolygonSubImage(SubImage):
 
     required_polys = []
+    optional_polys = []
 
     def __init__(self, reduce_level, in_dims, in_spacing, coarse_spacing, 
                  polygon_info, *args, **kwargs):
@@ -231,11 +232,10 @@ class PolygonSubImage(SubImage):
         self.get_polygons()
 
 
-    def get_polygons(self, optional_polygons=None):
+    def get_polygons(self):
 
         polygon_keys = []
-        if optional_polygons is not None:
-            polygon_keys.extend(optional_polygons)
+        polygon_keys.extend(self.__class__.optional_polys)
         polygon_keys.extend(self.__class__.required_polys)
 
         for key in polygon_keys:
