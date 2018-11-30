@@ -20,7 +20,7 @@ TypeComparatorType = Callable[[type, type], Tuple[bool, str]]
 integer_types = (int, np.integer, bool, np.bool_)
 float_types = (float, np.floating)
 scalar_numeric_types = integer_types + float_types
-list_like_types = (list, np.ndarray, tuple, pynwb.NWBData)
+list_like_types = (list, tuple)#, pynwb.NWBData, np.ndarray)
 catchall_types = (type(None), str, set, datetime.datetime)
 
 ComparisonResult = namedtuple('ComparisonResult', ['types_equal', 'direct_equal', 'types_diff', 'direct_diff'])
