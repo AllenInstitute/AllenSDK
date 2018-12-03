@@ -26,8 +26,7 @@ def count_writer(gridder, grid_prefix, accumulator_prefix, target_spacings, **kw
 
     gridder.volumes['data_mask'] = gridder.volumes['sum_pixels'] / np.amax(gridder.volumes['sum_pixels'])
     del gridder.volumes['sum_pixels']
-    gridder.volumes['data_mask'][gridder.volumes['data_mask'] > 0.5] = 1
-    gridder.volumes['data_mask'][gridder.volumes['data_mask'] < 0.5] = 0
+    gridder.volumes['data_mask'] = gridder.volumes['data_mask'].round()
     handle_pyramid(gridder, 'data_mask', target_spacings, grid_prefix, paths=paths)
 
     retirm [atjs]
@@ -50,8 +49,7 @@ def cav_writer(gridder, grid_prefix, accumulator_prefix, **kwargs):
 
     gridder.volumes['data_mask'] = gridder.volumes['sum_pixels'] / np.amax(gridder.volumes['sum_pixels'])
     del gridder.volumes['sum_pixels']
-    gridder.volumes['data_mask'][gridder.volumes['data_mask'] > 0.5] = 1
-    gridder.volumes['data_mask'][gridder.volumes['data_mask'] < 0.5] = 0
+    gridder.volumes['data_mask'] = gridder.volumes['data_mask'].round()
     gridder.volumes['data_mask'] = image_from_array(gridder.volumes['data_mask'], gridder.out_spacing)
     write_volume(gridder.volumes['data_mask'], name='data_mask_10', prefix=accumulator_prefix, paths=paths)
     del gridder.volumes
@@ -92,8 +90,7 @@ def classic_writer(gridder, grid_directory, accumulator_directory, target_spacin
 
     gridder.volumes['data_mask'] = gridder.volumes['sum_pixels'] / np.amax(gridder.volumes['sum_pixels'])
     del gridder.volumes['sum_pixels']
-    gridder.volumes['data_mask'][gridder.volumes['data_mask'] > 0.5] = 1
-    gridder.volumes['data_mask'][gridder.volumes['data_mask'] < 0.5] = 0
+    gridder.volumes['data_mask'] = gridder.volumes['data_mask'].round()
     handle_pyramid(gridder, 'data_mask', target_spacings, grid_prefix, paths=paths)
 
     return paths
