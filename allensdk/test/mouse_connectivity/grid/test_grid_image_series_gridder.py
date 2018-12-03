@@ -1,5 +1,6 @@
 import pytest
 import mock
+from six.moves import range
 
 import numpy as np
 import SimpleITK as sitk
@@ -144,7 +145,7 @@ def test_build_coarse_grids():
             pass
     
         def imap_unordered(*a, **k):
-            for ii in xrange(20):
+            for ii in range(20):
                 yield ii, ii
 
     with mock.patch('multiprocessing.Pool', new=Dummy) as p:
@@ -154,7 +155,7 @@ def test_build_coarse_grids():
         
         gridder.build_coarse_grids()
         
-        for ii in xrange(20):
+        for ii in range(20):
             assert( mock.call(ii, ii) in gridder.paste_subimage.mock_calls )
         
     
