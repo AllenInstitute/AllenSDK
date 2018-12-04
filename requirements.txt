@@ -14,3 +14,6 @@ scikit-image>=0.14.0
 statsmodels>=0.8.0
 simpleitk
 tables
+argschema
+marshmallow>=3.0.0b20
+glymur

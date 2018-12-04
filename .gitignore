@@ -20,6 +20,6 @@ allensdk.egg-info/
 debug.log
 *~
 *#*#
-
-# editor configs
+**.ipynb_checkpoints**
 .vscode/
+.mypy_cache
