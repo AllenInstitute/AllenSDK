@@ -47,11 +47,13 @@ class ClassicSubImage(IntensitySubImage, SegmentationSubImage, PolygonSubImage):
         del self.images['no_signal']
             
         if self.injection_polygon_key in self.images:
+            logging.info('reading injection from rasterized {} polygon'.format(self.injection_polygon_key))
             self.images['injection'] = self.images[self.injection_polygon_key]
             del self.images[self.injection_polygon_key]
         else:
             self.extract_injection_from_segmentation()
         del self.images['segmentation']
+        logging.info('injection pixel count: {}'.format(np.count_nonzero(self.images['injection'])))
         
         self.binarize('projection')
         self.binarize('injection')

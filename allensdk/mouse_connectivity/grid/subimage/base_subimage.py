@@ -100,8 +100,6 @@ class SegmentationSubImage(SubImage):
     def get_segmentation(self):
         
         for name in self.__class__.required_segmentations:
-            logging.info('loading {0} segmentation'.format(name))
-
             self.read_segmentation_image(name)
 
         self.process_segmentation()
@@ -169,9 +167,11 @@ class SegmentationSubImage(SubImage):
 
         '''
         
-        logging.info('loading {0}'.format(segmentation_name))
-        segmentation = iu.read_segmentation_image(self.segmentation_paths[segmentation_name])
-        
+        path = self.segmentation_paths[segmentation_name]
+        logging.info('loading {} from {}'.format(segmentation_name, path))
+        segmentation = iu.read_segmentation_image(path)
+        logging.info('{} shape: {}'.format(segmentation_name, segmentation.shape))
+
         if self.reduce_level > 0:
             logging.info('downsampling {0}'.format(segmentation_name))
             segmentation = zoom(segmentation, 1.0 / 2**self.reduce_level, order=0)
@@ -199,10 +199,12 @@ class IntensitySubImage(SubImage):
     def get_intensity(self):
   
         for name in self.__class__.required_intensities:
-            logging.info('loading {0}'.format(name))
-
             info = self.intensity_paths[name]
+            logging.info('loading {} intensities from {}'.format(name, info['path']))
+
             self.images[name] = iu.read_intensity_image(info['path'], self.reduce_level, info['channel'])
+            logging.info('loaded {} intensities to image of shape: {}'.format(name, self.images[name].shape))
+
 
 
     def setup_images(self):
@@ -253,8 +255,7 @@ class PolygonSubImage(SubImage):
     
 def run_subimage(input_data):
     
-    # TODO: remove or fix
-    logging.basicConfig(format='%(asctime)s - %(process)s - %(levelname)s - %(message)s')
+    # TODO: not propagating the log level from the calling thread
     logging.getLogger('').setLevel(logging.INFO)
         
     index = input_data.pop('specimen_tissue_index')
@@ -263,11 +264,7 @@ def run_subimage(input_data):
 
     si = cls(**input_data)
     
-    try:
-        si.setup_images()
-        si.compute_coarse_planes()
-    except Exception as err:
-        logging.exception(err)
-        raise err
-    
+    si.setup_images()
+    si.compute_coarse_planes()
+
     return index, si.accumulators

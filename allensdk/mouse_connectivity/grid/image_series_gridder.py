@@ -120,7 +120,7 @@ class ImageSeriesGridder(object):
         pool = mp.Pool(processes=self.nprocesses)
         mapper = pool.imap_unordered(run_subimage, self.subimages)
         
-        logging.info('building coarse grids')
+        logging.info('building coarse grids ({} processes)'.format(self.nprocesses))
         for index, output in mapper:
             
             logging.info('received coarse planar data from subimage at index {0}'.format(index))
