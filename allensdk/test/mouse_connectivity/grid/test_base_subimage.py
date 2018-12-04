@@ -157,9 +157,9 @@ def test_read_segmentation_image(segmentation_params):
     arr = np.zeros((32, 32))
     arr[:16, :] = 1
 
-    exp = np.array([[1, 0], [1, 0]])
+    exp = np.array([[1, 1], [0, 0]])
 
-    with mock.patch('jpeg_twok.read', return_value=arr) as p:
+    with mock.patch('allensdk.mouse_connectivity.grid.utilities.image_utilities.read_segmentation_image', return_value=arr) as p:
         si.read_segmentation_image('name_one')
         p.assert_called_once_with('path_one')
 
@@ -190,11 +190,11 @@ def test_get_intensity(intensity_params):
     ) as a:
         a.return_value = ['name_one']
 
-        with mock.patch('jpeg_twok.read', return_value=arr) as p:
+        with mock.patch('allensdk.mouse_connectivity.grid.utilities.image_utilities.read_intensity_image', return_value=arr) as p:
             si.get_intensity()
 
             p.assert_called_once_with('path_one', 4, 2)
-            assert(np.allclose( si.images['name_one'], arr.T ))
+            assert(np.allclose( si.images['name_one'], arr ))
 
 
 #==============================================================================
