@@ -242,9 +242,13 @@ def write_volume(volume, name, prefix=None, specify_resolution=None, extension='
 
 
 def __read_segmentation_image_with_kakadu(path):
+    if not os.path.exists(path):
+        raise OSError('file not found at {}'.format(path))
     return jpeg_twok.read(path).T
 
 def __read_intensity_image_with_kakadu(path, reduce_level, channel):
+    if not os.path.exists(path):
+        raise OSError('file not found at {}'.format(path))
     return jpeg_twok.read(path, reduce_level, channel).T
 
 def __read_segmentation_image_with_glymur(path):
@@ -256,6 +260,10 @@ def __read_intensity_image_with_glymur():
 
 
 try:
+    # we use a proprietary library called kakadu internally (jpeg_twok is a python interface around that library)
+    # kakadu offers really good performance as well as support for advanced jp2 features
+    # however, since it is proprietary, we can't share it alongside the allensdk, 
+    # so we default to glymur (a python openjpeg) for external users.
     sys.path.append('/shared/bioapps/itk/itk_shared/jp2/build')
     import jpeg_twok
     read_segmentation_image = __read_segmentation_image_with_kakadu
