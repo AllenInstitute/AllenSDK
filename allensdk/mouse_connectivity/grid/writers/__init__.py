@@ -57,7 +57,7 @@ def cav_writer(gridder, grid_prefix, accumulator_prefix, **kwargs):
     return paths
 
 
-def classic_writer(gridder, grid_directory, accumulator_directory, target_spacings, **kwargs):
+def classic_writer(gridder, grid_prefix, accumulator_prefix, target_spacings, **kwargs):
 
     paths = []
 
