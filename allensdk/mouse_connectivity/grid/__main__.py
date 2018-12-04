@@ -104,7 +104,7 @@ def run_grid(args):
 
 def main():
 
-    logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s')
+    logging.basicConfig(format='%(asctime)s - %(process)s - %(levelname)s - %(message)s')
 
     # TODO replace with argschema implementation of multisource parser
     remaining_args = sys.argv[1:]
