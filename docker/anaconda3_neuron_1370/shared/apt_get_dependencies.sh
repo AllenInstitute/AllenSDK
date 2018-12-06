@@ -17,7 +17,9 @@ apt-get -yq install \
  alien \
  unzip \
  vim \
- libffi-dev
+ libffi-dev \
+ libopenjp2-7
+
 wget http://www.cmake.org/files/v3.4/cmake-3.4.1.tar.gz 
 tar -xvzf cmake-3.4.1.tar.gz 
 cd cmake-3.4.1/ 
