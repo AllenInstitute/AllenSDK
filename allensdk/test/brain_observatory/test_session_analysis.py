@@ -81,8 +81,7 @@ def session_c():
     return sa
 
 
-@pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
-                    reason="partial testing")
+@pytest.mark.nightly
 @pytest.mark.parametrize('plot_flag',[False])
 def test_session_a(session_a, plot_flag):
     with patch('allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_stimulus_table',
@@ -92,8 +91,7 @@ def test_session_a(session_a, plot_flag):
         assert True
 
 
-@pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
-                    reason="partial testing")
+@pytest.mark.nightly
 @pytest.mark.parametrize('plot_flag',[False])
 def test_session_b(session_b, plot_flag):
     with patch('allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_stimulus_table',
@@ -103,8 +101,7 @@ def test_session_b(session_b, plot_flag):
         assert True
 
 
-@pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
-                    reason="partial_testing")
+@pytest.mark.nightly
 @pytest.mark.parametrize('plot_flag',[False])
 def test_session_c(session_c, plot_flag):
     with patch('allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_stimulus_table',
@@ -114,24 +111,21 @@ def test_session_c(session_c, plot_flag):
         assert True
 
 
-@pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
-                    reason="partial testing")
+@pytest.mark.nightly
 def test_session_get_session_type(session_a):
     session_type = session_a.nwb.get_session_type()
 
     assert session_type == 'three_session_A'
 
 
-@pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
-                    reason="partial testing")
+@pytest.mark.nightly
 def test_session_get_session_type_b(session_b):
     session_type = session_b.nwb.get_session_type()
 
     assert session_type == 'three_session_B'
 
 
-@pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
-                    reason="partial testing")
+@pytest.mark.nightly
 def test_session_get_session_type_c(session_c):
     session_type = session_c.nwb.get_session_type()
 

@@ -38,8 +38,7 @@ import pytest
 import os
 
 
-@pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
-                    reason="partial testing")
+@pytest.mark.nightly
 def test_notebook(tmpdir_factory):
 
     # coding: utf-8

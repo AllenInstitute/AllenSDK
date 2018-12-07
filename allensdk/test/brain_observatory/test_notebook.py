@@ -52,8 +52,8 @@ def boc(tmpdir_factory):
     endpoint = os.environ['TEST_API_ENDPOINT'] if 'TEST_API_ENDPOINT' in os.environ else 'http://twarehouse-backup'
     return BrainObservatoryCache(manifest_file=str(manifest_file), base_uri=endpoint)
 
-@pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
-                    reason="partial testing")
+
+@pytest.mark.nightly
 def test_brain_observatory_trace_analysis_notebook(boc):
     # Drifting Gratings
     data_set = boc.get_ophys_experiment_data(502376461)
@@ -92,8 +92,7 @@ def test_brain_observatory_trace_analysis_notebook(boc):
     trial_timestamps = np.arange(-1*dg.interlength, dg.interlength+dg.sweeplength, 1.)/dg.acquisition_rate
 
 
-@pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
-                    reason="partial testing")
+@pytest.mark.nightly
 def test_brain_observatory_static_gratings_notebook(boc):
     data_set = boc.get_ophys_experiment_data(510938357)
     sg = StaticGratings(data_set)
@@ -103,8 +102,7 @@ def test_brain_observatory_static_gratings_notebook(boc):
     assert np.isclose(peak_head['reliability_sg'][0], -0.010099250163301616)
 
 
-@pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
-                    reason="partial testing")
+@pytest.mark.nightly
 def test_brain_observatory_natural_scenes_notebook(boc):
     data_set = boc.get_ophys_experiment_data(510938357)
     ns = NaturalScenes(data_set)
@@ -113,8 +111,8 @@ def test_brain_observatory_natural_scenes_notebook(boc):
     assert np.isclose(ns_head['peak_dff_ns'][0], 4.9614532738)
     assert ns_head['cell_specimen_id'][0] == 517399188
 
-@pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
-                    reason="partial testing")
+
+@pytest.mark.nightly
 def test_brain_observatory_locally_sparse_noise_notebook(boc):
     specimen_id = 517410165
     cell = boc.get_cell_specimens(ids=[specimen_id])[0]
@@ -132,8 +130,7 @@ def test_brain_observatory_locally_sparse_noise_notebook(boc):
     #assert cell_loc
     #assert receptive_field
 
-@pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
-                    reason="partial testing")
+@pytest.mark.nightly
 def test_brain_observatory_experiment_containers_notebook(boc):
     targeted_structures = boc.get_all_targeted_structures()
     visp_ecs = boc.get_experiment_containers(targeted_structures=['VISp'])
