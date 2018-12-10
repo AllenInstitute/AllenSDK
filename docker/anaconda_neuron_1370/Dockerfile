@@ -19,6 +19,8 @@ COPY requirements.txt test_requirements.txt ./
 RUN  pip install -r requirements.txt; \
      pip install -r test_requirements.txt
 
+RUN apt-get -yq install libopenjp2-7
+
 ENV PYTHONPATH /usr/local/nrn/lib/python
 ENV PATH /usr/local/nrn/x86_64/bin:$PATH
 ENV TEST_API_ENDPOINT http://api.brain-map.org
