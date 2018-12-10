@@ -12,7 +12,6 @@ def test_visual_behavior_running_speed(nwb_filename, vb_pkl, vb_sync):
     adapter = VisualBehaviorStimulusAdapter(vb_pkl, vb_sync, stim_key=2)
 
     nwbfile = NWBFile(
-        source='Data source',
         session_description='test foraging2',
         identifier='behavior_session_uuid',
         session_start_time=datetime.datetime.now(),
@@ -36,7 +35,6 @@ def test_visual_coding_running_speed(nwb_filename, vc_pkl, vc_sync):
     adapter = VisualCodingStimulusAdapter(vc_pkl, vc_sync)
 
     nwbfile = NWBFile(
-        source='Data source',
         session_description='test vc',
         identifier='vc_session_uuid',
         session_start_time=datetime.datetime.now(),

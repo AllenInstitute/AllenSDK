@@ -22,6 +22,7 @@ def test_visbeh_running_speed(nwbfile, nwb_filename, visbeh_pkl):
     assert np.allclose(nwbfile_in.acquisition['running_speed'].data.value, test_speed)
 
 
+@pytest.mark.skipif(True, reason='depends on resolution of https://github.com/NeurodataWithoutBorders/pynwb/issues/734')
 @pytest.mark.skipif(not os.environ.get('ALLENSDK_EXPERIMENTAL',''), reason='Experimental')
 def test_visbeh_epoch(nwbfile, nwb_filename, visbeh_pkl):
 
@@ -37,6 +38,9 @@ def test_visbeh_epoch(nwbfile, nwb_filename, visbeh_pkl):
         io.write(nwbfile)
 
     nwbfile_in = NWBHDF5IO(nwb_filename, mode='r').read()
+
+    print(src_df.head())
+    print(nwbfile_in)
 
     tgt_df = nwbfile_in.epochs.to_dataframe()
 

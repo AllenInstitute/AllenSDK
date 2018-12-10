@@ -9,6 +9,7 @@ from visual_behavior.analyze import compute_running_speed
 from allensdk.experimental.nwb.timestamps import (get_timestamps_from_sync,
                                                   correct_timestamps_length)
 from pynwb.image import ImageSeries, IndexSeries
+from pynwb.epoch import TimeIntervals
 import numpy as np
 
 logger = logging.getLogger(__name__)
@@ -37,8 +38,13 @@ def visual_coding_running_speed(exp_data):
     return running_speed
 
 
+def ensure_not_bytes(arg, encoding='utf-8'):
+    if isinstance(arg, bytes):
+        return arg.decode(encoding)
+    return arg
+
+
 class BaseStimulusAdapter(object):
-    _source = ''
 
     def __init__(self, pkl_file, sync_file, stim_key='stim_vsync'):
         self.pkl_file = pkl_file
@@ -106,7 +112,6 @@ class BaseStimulusAdapter(object):
 
 
 class VisualBehaviorStimulusAdapter(BaseStimulusAdapter):
-    _source = 'Allen Brain Observatory: Visual Behavior'
 
     def __init__(self, pkl_file, sync_file=None, stim_key='stim_vsync'):
         '''Cleaning up init signature for optional kwarg sync'''
@@ -152,7 +157,6 @@ class VisualBehaviorStimulusAdapter(BaseStimulusAdapter):
             df = self.core_data['visual_stimuli'].copy()
             df['stop_time'] = timestamps[df['end_frame']]
             df['start_time'] = timestamps[df['frame']]
-            df['description'] = ['stimulus presentation']*len(df) 
             df['timeseries'] = [[self.running_speed]]*len(df) 
             df['tags'] = [[self.timestamp_source]]*len(df) 
             df.drop('time', inplace=True, axis=1)
@@ -164,7 +168,7 @@ class VisualBehaviorStimulusAdapter(BaseStimulusAdapter):
     def stimulus_epoch_table(self):
 
         if self._stimulus_epoch_table is None:
-            self._stimulus_epoch_table = Epochs.from_dataframe(self.stimulus_epoch_df, 'nosource', self.EPOCHS)
+            self._stimulus_epoch_table = TimeIntervals.from_dataframe(self.stimulus_epoch_df, self.EPOCHS)
 
         return self._stimulus_epoch_table
 
@@ -176,8 +180,6 @@ class VisualBehaviorStimulusAdapter(BaseStimulusAdapter):
             image_set = self.core_data['image_set']
             name = image_set.get('name', 'TODO_visual_behavior_analysis_issues_389')
             image_data =  np.array(image_set['images'])
-            source = image_set['metadata']['image_set']
-
             
             image_index = []
             for x in image_set['image_attributes']:
@@ -185,7 +187,6 @@ class VisualBehaviorStimulusAdapter(BaseStimulusAdapter):
 
             self._visual_stimulus_image_series = ImageSeries(
                                                 name=name,
-                                                source=source,
                                                 data=image_data,
                                                 unit='NA',
                                                 format='raw',
@@ -212,7 +213,10 @@ class VisualBehaviorStimulusAdapter(BaseStimulusAdapter):
 
             mapper_dict = {}
             for x in image_set['image_attributes']:
-                mapper_dict[x['image_name'], x['image_category']] = x['image_index']
+                mapper_dict[
+                    ensure_not_bytes(x['image_name']), 
+                    ensure_not_bytes(x['image_category'])
+                ] = x['image_index']
 
             index_timeseries = []
             for cn, cc in zip(stimulus_epoch_df['image_name'].values, stimulus_epoch_df['image_category'].values):
@@ -220,7 +224,6 @@ class VisualBehaviorStimulusAdapter(BaseStimulusAdapter):
 
             image_index_series = IndexSeries(
                             name='image_index',
-                            source='NA',
                             data=index_timeseries,
                             unit='NA',
                             indexed_timeseries=self.visual_stimulus_image_series,
@@ -233,7 +236,6 @@ class VisualBehaviorStimulusAdapter(BaseStimulusAdapter):
 
 
 class VisualCodingStimulusAdapter(BaseStimulusAdapter):
-    _source = 'Allen Brain Observatory: Visual Coding'
 
     @property
     def core_data(self):

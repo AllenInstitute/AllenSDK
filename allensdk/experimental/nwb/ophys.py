@@ -9,7 +9,6 @@ from pynwb.ophys import DfOverF, ImageSegmentation, OpticalChannel
 
 def create_base_nwb(session_metadata):
     nwbfile = NWBFile(
-        source='Allen Brain Observatory',
         session_description=session_metadata["session_description"],
         institution='The Allen Institute for Brain Science',
         identifier=str(session_metadata["experiment_id"]),
@@ -24,15 +23,12 @@ def create_base_nwb(session_metadata):
     return nwbfile
 
 
-def add_ophys_module(nwbfile, name, description, dff_source):
+def add_ophys_module(nwbfile, name, description):
     module = nwbfile.create_processing_module(
         name=name,
-        source='Allen Brain Observatory',
         description=description)
 
-    dff_interface = DfOverF(
-        name='dff_interface',
-        source=dff_source)
+    dff_interface = DfOverF(name='dff_interface')
 
     module.add_data_interface(dff_interface)
 
@@ -50,7 +46,6 @@ def add_imaging_plane(nwbfile, optical_channel, session_metadata,
 
     imaging_plane = nwbfile.create_imaging_plane(
         name=name,
-        source='a source',
         optical_channel=optical_channel,
         description=description,
         device=device,
@@ -67,22 +62,19 @@ def add_imaging_plane(nwbfile, optical_channel, session_metadata,
 
 
 def get_image_segmentation(ophys_module,
-                           source,
                            name="image_segmentation"):
     """Get an image segmentation by name, create it if it doesn't exist"""
     image_segmentation = ophys_module.data_interfaces.get(name, None)
 
     if image_segmentation is None:
-        image_segmentation = ImageSegmentation(
-            name=name,
-            source=source)
+        image_segmentation = ImageSegmentation(name=name)
         ophys_module.add_data_interface(image_segmentation)
     
     return image_segmentation
 
 
 def get_plane_segmentation(image_segmentation, imaging_plane, roi_mask_dict,
-                           source, description, name="plane_segmentation"):
+                           description, name="plane_segmentation"):
     """Get a plane segmentation by name, create it if it doesn't exist"""
     plane_segmentation = image_segmentation.plane_segmentations.get(name, None)
 
@@ -90,7 +82,6 @@ def get_plane_segmentation(image_segmentation, imaging_plane, roi_mask_dict,
         plane_segmentation = image_segmentation.create_plane_segmentation(
             name=name,
             description=description,
-            source=source,
             imaging_plane=imaging_plane)
 
         for roi_id, roi_mask in roi_mask_dict.items():
@@ -183,7 +174,6 @@ class OphysAdapter(object):
         if optical_channel is None:
             optical_channel = OpticalChannel(
                 name=channel,
-                source=metadata['device_name'],
                 description='2P Optical Channel',
                 emission_lambda=metadata['emission_lambda'])
 

@@ -1,7 +1,5 @@
-# until we get a public reader...
-# pip install --trusted-host aibs-artifactory --index-url http://aibs-artifactory/artifactory/api/pypi/pypi-local/simple aibs-sync-extractor
 import logging
-from aibs_sync_extractor.dataset import Dataset
+from allensdk.experimental.aibs_sync.dataset import Dataset
 
 logger = logging.getLogger(__name__)
 

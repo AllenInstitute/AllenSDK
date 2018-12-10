@@ -13,13 +13,12 @@ from pynwb.file import ElectrodeTable
 from pynwb import NWBHDF5IO
 from pynwb.device import Device
 from pynwb.ecephys import ElectrodeGroup
-from pynwb.misc import UnitTimes
 from pynwb.base import ProcessingModule
+# from pynwb.misc import Units
 
 from allensdk.experimental.nwb.api.ecephys_lims_api import EcephysLimsApi
 
 
-SOURCE_PLACEHOLDER = 'Allen Institute for Brain Science'
 SESSION_START_TIME_PLACEHOLDER = datetime.now()  # TODO: this is not present in the date_of_acquisition column in lims 
 CT_PLACEHOLDERS = {
     'x': -1.0,  # TODO when we get CCF positions from alignment we can write those here, till then there is no option to not supply these fields, so ...
@@ -58,18 +57,16 @@ def process_stimulus_table_for_nwb(stimulus_table, renames_map=None):
     return stimulus_table
 
 
-def add_units_to_file(nwbfile, probe_table, channel_table, unit_table):
+def add_units_to_file(nwbfile, probe_table, channel_table, unit_table, spike_times):
 
     for _, probe in probe_table.iterrows():
 
         probe_nwb_device = Device(
             name=str(probe['id']), # why not name? probe names are actually codes for targeted structure. ids are the appropriate primary key
-            source=SOURCE_PLACEHOLDER
         )
 
         probe_nwb_electrode_group = ElectrodeGroup(
             name=str(probe['id']),
-            source=SOURCE_PLACEHOLDER, 
             description=probe['name'], # TODO probe name currently describes the targeting of the probe - the closest we have to a meaningful "kind"
             location='', # TODO not actailly sure where to get this
             device=probe_nwb_device
@@ -80,29 +77,21 @@ def add_units_to_file(nwbfile, probe_table, channel_table, unit_table):
 
         channel_table.loc[channel_table['probe_id'] == probe['id'], 'group'] = probe_nwb_electrode_group
 
-    nwbfile.electrodes = ElectrodeTable().from_dataframe(channel_table, source=SOURCE_PLACEHOLDER, name='electrodes')
-    nwbfile.units = DynamicTable.from_dataframe(unit_table, source=SOURCE_PLACEHOLDER, name='units')
+    nwbfile.electrodes = ElectrodeTable().from_dataframe(channel_table, name='electrodes')
 
-    return nwbfile
+    stimes = []
+    sindex = []
+    counter = 0
+    for ii, (unit_id, _) in enumerate(unit_table.iterrows()):
+        sindex.append(counter)
+        stimes.append(spike_times[unit_id])
+        counter += len(spike_times[unit_id])
+    del spike_times
+    stimes = np.concatenate(stimes)
 
+    nwbfile.units = pynwb.misc.Units.from_dataframe(unit_table, name='units')
+    nwbfile.units.add_column(name='spike_times', description='times (s) of detected spiking events', data=stimes, index=sindex)
 
-def add_spike_times_to_file(nwbfile, spike_times):  # TODO how to add waveforms?
-    unit_times = UnitTimes(
-        source=SOURCE_PLACEHOLDER
-    )
-    for key, value in spike_times.items():
-        unit_times.add_spike_times(
-            unit_id=key,
-            spike_times=np.array(value)
-        )
-
-    unit_times_module = ProcessingModule(
-        name='spike_detection',
-        source=SOURCE_PLACEHOLDER,
-        description='spike_times',
-        data_interfaces=[unit_times]
-    )
-    nwbfile.add_processing_module(unit_times_module)
     return nwbfile
 
 
@@ -115,18 +104,18 @@ def build_file(ecephys_session_id):
     channel_table = process_channel_table_for_nwb(api.get_channel_table(ecephys_session_id))  # TODO: 706875901 breaks here
     unit_table = api.get_unit_table(session_id=ecephys_session_id)
     unit_table.set_index('id', drop=True, inplace=True)
+    spike_times = api.get_spike_times(ecephys_session_id)
 
     nwbfile = pynwb.NWBFile(
-        source=SOURCE_PLACEHOLDER,
         session_description='EcephysSession',
         identifier='{}'.format(ecephys_session_id),
         session_start_time=SESSION_START_TIME_PLACEHOLDER,
         file_create_date=datetime.now()
     )
 
-    nwbfile = add_units_to_file(nwbfile, probe_table, channel_table, unit_table)
+    nwbfile = add_units_to_file(nwbfile, probe_table, channel_table, unit_table, spike_times)
     # nwbfile.epochs = Epochs.from_dataframe(stimulus_table)  # TODO: I can't actually find an experiment that both as a stim table and has the current format for its other data
-    nwbfile = add_spike_times_to_file(nwbfile, api.get_spike_times(ecephys_session_id))
+    # nwbfile = add_spike_times_to_file(nwbfile, )
     return nwbfile
 
 

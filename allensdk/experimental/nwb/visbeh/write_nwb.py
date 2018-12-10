@@ -11,7 +11,6 @@ def main(save_file_name, foraging_file_name):
     visbeh_data = VisualBehaviorStimulusAdapter(foraging_file_name)
 
     nwbfile = NWBFile(
-        source='Data source',
         session_description='test foraging2',
         identifier='behavior_session_uuid',
         session_start_time=visbeh_data.session_start_time,

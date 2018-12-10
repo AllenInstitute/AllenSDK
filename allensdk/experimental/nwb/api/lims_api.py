@@ -90,7 +90,7 @@ class LimsApi(object):
 
         '''
 
-        query: str = clean_multiline_query('''
+        query = clean_multiline_query('''
             select wkf.storage_directory, wkf.filename from well_known_files wkf
             join well_known_file_types wkft on wkf.well_known_file_type_id = wkft.id
             where wkf.attachable_type = '{}'
