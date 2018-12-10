@@ -420,7 +420,7 @@ class MouseConnectivityCache(ReferenceSpaceCache):
                                                 pre=col_rn,
                                                 post=filter_fn,
                                                 writer=lambda p, x : pd.DataFrame(x).to_csv(p),
-                                                reader=pd.DataFrame.from_csv)
+                                                reader=lambda x: pd.read_csv(x, index_col=0, parse_dates=True))
 
     def rank_structures(self, experiment_ids, is_injection, structure_ids=None, hemisphere_ids=None,
                         rank_on='normalized_projection_volume', n=5, threshold=10**-2):
@@ -572,7 +572,7 @@ class MouseConnectivityCache(ReferenceSpaceCache):
                                                              hemisphere_ids=hemisphere_ids)
                      for eid in experiment_ids]
 
-        return pd.concat(unionizes, ignore_index=True)
+        return pd.concat(unionizes, ignore_index=True, sort=True)
 
     def get_projection_matrix(self, experiment_ids,
                               projection_structure_ids=None,
