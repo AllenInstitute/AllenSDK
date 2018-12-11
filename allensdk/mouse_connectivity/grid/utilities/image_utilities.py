@@ -228,6 +228,8 @@ def write_volume(volume, name, prefix=None, specify_resolution=None, extension='
         path = os.path.join(prefix, name)
 
     if specify_resolution is not None:
+        if isinstance(specify_resolution, (float, np.floating)) and specify_resolution % 1.0 == 0:
+            specify_resolution = int(specify_resolution)
         path = path + '_{0}'.format(specify_resolution)
 
     path = path + extension
