@@ -36,9 +36,12 @@ def apply_divisions(image, window_size):
 
     for axis in xrange(image.ndim):
 
-        slc = [slice(window_size-1, None, window_size) 
-               if ii == axis else slice(0, None) 
-               for ii in xrange(image.ndim)]
+        slc = tuple([
+            slice(window_size-1, None, window_size) 
+            if ii == axis 
+            else slice(0, None) 
+            for ii in xrange(image.ndim)
+        ])
 
         image[slc] = image[slc] / 2
 
@@ -68,9 +71,9 @@ def extract(image, factor, window_size, window_step, output_shape):
 
     for case in it.product(*([[0, 1]] * image.ndim)):     
 
-        inp = [slice(window_size - 2, None, window_step) 
-               if not ii else slice(window_size, None, window_step) for ii in case]
-        out = [slice(0, None, 2) if not ii else slice(1, None, 2) for ii in case]
+        inp = tuple([slice(window_size - 2, None, window_step) 
+               if not ii else slice(window_size, None, window_step) for ii in case])
+        out = tuple([slice(0, None, 2) if not ii else slice(1, None, 2) for ii in case])
 
         output[out] = image[inp]
 
