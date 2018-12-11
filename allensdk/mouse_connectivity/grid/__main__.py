@@ -67,6 +67,9 @@ def run_grid(args):
         si['polygon_info'] = si['polygons']
         del si['polygons']
     sub_images = sorted(sub_images, key=lambda si: si['specimen_tissue_index'])
+    logging.info('{} sub images with indices: {}'.format(
+        len(sub_images), [si['specimen_tissue_index'] for si in sub_images])
+    )
 
     output_dimensions = [args['reference_dimensions']['slice'], 
                          args['reference_dimensions']['row'], 
