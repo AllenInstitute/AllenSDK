@@ -65,6 +65,7 @@ NATURAL_SCENES = 'natural_scenes'
 NATURAL_SCENES_SHORT = 'ns'
 NATURAL_SCENES_COLOR = '#e31a1c'
 
+# note that this stimulus is equivalent to LOCALLY_SPARSE_NOISE_4DEG in session C2 files
 LOCALLY_SPARSE_NOISE = 'locally_sparse_noise'
 LOCALLY_SPARSE_NOISE_SHORT = 'lsn'
 LOCALLY_SPARSE_NOISE_COLOR = '#fdbf6f'

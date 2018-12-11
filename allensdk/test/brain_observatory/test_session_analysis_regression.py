@@ -87,7 +87,7 @@ def ns(nwb_b, analysis_b):
 # session c
 @pytest.fixture(scope="module")
 def lsn(nwb_c, analysis_c):
-    return LocallySparseNoise.from_analysis_file(BODS(nwb_c), analysis_c, si.LOCALLY_SPARSE_NOISE_8DEG)
+    return LocallySparseNoise.from_analysis_file(BODS(nwb_c), analysis_c, si.LOCALLY_SPARSE_NOISE)
 
 @pytest.fixture(scope="module")
 def nm1c(nwb_c, analysis_c):
