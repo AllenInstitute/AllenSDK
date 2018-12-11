@@ -2,7 +2,7 @@ import functools
 
 import numpy as np
 
-from ..utilities.image_utilities import write_volume
+from ..utilities.image_utilities import write_volume, image_from_array
 from ..utilities.downsampling_utilities import downsample_average
 
 
