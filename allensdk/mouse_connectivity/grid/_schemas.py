@@ -1,7 +1,7 @@
 from marshmallow import RAISE
 from argschema import ArgSchema, ArgSchemaParser 
 from argschema.schemas import DefaultSchema
-from argschema.fields import Nested, InputDir, String, Float, Dict, Int, List, Bool
+from argschema.fields import Nested, InputDir, String, Float, Dict, Int, List, Bool, LogLevel
 import numpy as np
 
 
@@ -52,6 +52,7 @@ class InputParameters(ArgSchema):
     class Meta:
         unknown=RAISE
     
+    log_level = LogLevel(default='INFO',description="set the logging level of the module")
     case = String(required=True, validate=lambda s: s in VALID_CASES, help='select a use case to run')
     sub_images = Nested(SubImage, required=True, many=True, help='Sub images composing this image series')
     affine_params = List(Float, help='Parameters of affine image stack to reference space transform.')
