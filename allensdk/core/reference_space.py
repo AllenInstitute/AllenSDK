@@ -347,6 +347,7 @@ class ReferenceSpace(object):
 
         if np.any(labeldescription['IDX'].values > np.iinfo(id_type).max):
             labeldescription = labeldescription.sort_values(by='LABEL')
+            labeldescription = labeldescription.reset_index(drop=True)
             new_annotation = np.zeros(self.annotation.shape, dtype=id_type)
             id_map = {}
 
