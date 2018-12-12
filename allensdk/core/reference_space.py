@@ -336,14 +336,29 @@ class ReferenceSpace(object):
                       list(image.shape) + [3]).astype(np.uint8)
             
             
-    def export_itksnap_labels(self, id_type=np.uint16, labeldescription_args=None):
+    def export_itksnap_labels(self, id_type=np.uint16, labeldescription_kwargs=None):
         '''Produces itksnap labels, remapping large ids if needed.
+
+        Parameters
+        ----------
+        id_type : np.integer, optional
+            Used to determine the type of the output annotation and whether ids need to be remapped to smaller values.
+        labeldescription_kwargs : dict, optional
+            Keyword arguments passed to StructureTree.export_labeldescription
+
+        Returns
+        -------
+        np.ndarray : 
+            Annotation volume, remapped if needed
+        pd.DataFrame
+            labeldescription dataframe
+
         '''
 
-        if labeldescription_args is None:
-            labeldescription_args = {}
+        if labeldescription_kwargs is None:
+            labeldescription_kwargs = {}
 
-        labeldescription = self.structure_tree.export_labeldescription(**labeldescription_args)
+        labeldescription = self.structure_tree.export_labeldescription(**labeldescription_kwargs)
 
         if np.any(labeldescription['IDX'].values > np.iinfo(id_type).max):
             labeldescription = labeldescription.sort_values(by='LABEL')
@@ -362,6 +377,19 @@ class ReferenceSpace(object):
 
     
     def write_itksnap_labels(self, annotation_path, label_path, **kwargs):
+        '''Generate a label file (nrrd) and a labeldescription file (csv) for use with ITKSnap
+
+        Parameters
+        ----------
+        annotation_path : str
+            write generated label file here
+        label_path : str
+            write generated labeldescription file here
+        **kwargs : 
+            will be passed to self.export_itksnap_labels
+
+        '''
+
         annotation, labels = self.export_itksnap_labels(**kwargs)
         nrrd.write(annotation_path, annotation, header={'spacings': self.resolution})
         labels.to_csv(label_path, sep=' ', index=False, header=False, quoting=csv.QUOTE_NONNUMERIC)
