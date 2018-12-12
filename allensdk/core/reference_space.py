@@ -38,11 +38,13 @@ from collections import defaultdict
 import operator as op
 import functools
 import os
+import csv
 
 from scipy.misc import imresize
 from scipy.ndimage.interpolation import zoom
 import numpy as np
 import nrrd
+import pandas as pd
 
 from allensdk.core.structure_tree import StructureTree
 
@@ -334,6 +336,36 @@ class ReferenceSpace(object):
                       list(image.shape) + [3]).astype(np.uint8)
             
             
+    def export_itksnap_labels(self, id_type=np.uint16, labeldescription_args=None):
+        '''Produces itksnap labels, remapping large ids if needed.
+        '''
+
+        if labeldescription_args is None:
+            labeldescription_args = {}
+
+        labeldescription = self.structure_tree.export_labeldescription(**labeldescription_args)
+
+        if np.any(labeldescription['IDX'].values > np.iinfo(id_type).max):
+            labeldescription = labeldescription.sort_values(by='LABEL')
+            new_annotation = np.zeros(self.annotation.shape, dtype=id_type)
+            id_map = {}
+
+            for ii, idx in enumerate(labeldescription['IDX'].values):
+                id_map[idx] = ii + 1
+                new_annotation[self.annotation == idx] = ii + 1
+
+            labeldescription['IDX'] = labeldescription.apply(lambda row: id_map[row['IDX']], axis=1)
+            return new_annotation, labeldescription
+
+        return self.annotation, labeldescription
+
+    
+    def write_itksnap_labels(self, annotation_path, label_path, **kwargs):
+        annotation, labels = self.export_itksnap_labels(**kwargs)
+        nrrd.write(annotation_path, annotation, header={'spacings': self.resolution})
+        labels.to_csv(label_path, sep=' ', index=False, header=False, quoting=csv.QUOTE_NONNUMERIC)
+
+
     @staticmethod
     def return_mask_cb(structure_id, fn):
         '''A basic callback for many_structure_masks
