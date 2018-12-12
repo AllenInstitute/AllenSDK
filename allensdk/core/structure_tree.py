@@ -279,6 +279,23 @@ class StructureTree( SimpleTree ):
 
     def export_labeldescription(self, alphas=None, exclude_label_vis=None, exclude_mesh_vis=None, label_key='acronym'):
         '''Produces an itksnap labeldescription table from this structure tree
+
+        Parameters
+        ----------
+        alphas : dict, optional
+            Maps structure ids to alpha levels. Optional - will only use provided ids.
+        exclude_label_vis : list, optional
+            The structures denoted by these ids will not be visible in ITKSnap.
+        exclude_mesh_vis : list, optional
+            The structures denoted by these ids will not have visible meshes in ITKSnap.
+        label_key: str, optional
+            Use this column for display labels.
+
+        Returns
+        -------
+        pd.DataFrame : 
+            Contains data needed for loading as an ITKSnap label description file.
+
         '''
 
         if alphas is None:
