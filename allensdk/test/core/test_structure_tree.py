@@ -234,7 +234,7 @@ def test_path_to_list(inp, out):
     assert(allclose(obt, out))
 
 
-def test_export_labeldescription(tree):
+def test_export_label_description(tree):
     exp = pd.DataFrame({
         'IDX': [0, 1, 2],
         '-R-': [0, 0, 255],
@@ -246,5 +246,5 @@ def test_export_labeldescription(tree):
         'LABEL': ['rt', 'a', 'b']
     }).loc[:, ('IDX', '-R-', '-G-', '-B-', '-A-', 'VIS', 'MSH', 'LABEL')]
 
-    obt = tree.export_labeldescription()
+    obt = tree.export_label_description()
     pd.testing.assert_frame_equal(obt, exp)
