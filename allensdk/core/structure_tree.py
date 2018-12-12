@@ -277,8 +277,8 @@ class StructureTree( SimpleTree ):
         return (set(ancestor_ids) & set(structure_ids))
         
 
-    def export_labeldescription(self, alphas=None, exclude_label_vis=None, exclude_mesh_vis=None, label_key='acronym'):
-        '''Produces an itksnap labeldescription table from this structure tree
+    def export_label_description(self, alphas=None, exclude_label_vis=None, exclude_mesh_vis=None, label_key='acronym'):
+        '''Produces an itksnap label_description table from this structure tree
 
         Parameters
         ----------

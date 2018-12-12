@@ -336,55 +336,55 @@ class ReferenceSpace(object):
                       list(image.shape) + [3]).astype(np.uint8)
             
             
-    def export_itksnap_labels(self, id_type=np.uint16, labeldescription_kwargs=None):
+    def export_itksnap_labels(self, id_type=np.uint16, label_description_kwargs=None):
         '''Produces itksnap labels, remapping large ids if needed.
 
         Parameters
         ----------
         id_type : np.integer, optional
             Used to determine the type of the output annotation and whether ids need to be remapped to smaller values.
-        labeldescription_kwargs : dict, optional
-            Keyword arguments passed to StructureTree.export_labeldescription
+        label_description_kwargs : dict, optional
+            Keyword arguments passed to StructureTree.export_label_description
 
         Returns
         -------
         np.ndarray : 
             Annotation volume, remapped if needed
         pd.DataFrame
-            labeldescription dataframe
+            label_description dataframe
 
         '''
 
-        if labeldescription_kwargs is None:
-            labeldescription_kwargs = {}
+        if label_description_kwargs is None:
+            label_description_kwargs = {}
 
-        labeldescription = self.structure_tree.export_labeldescription(**labeldescription_kwargs)
+        label_description = self.structure_tree.export_label_description(**label_description_kwargs)
 
-        if np.any(labeldescription['IDX'].values > np.iinfo(id_type).max):
-            labeldescription = labeldescription.sort_values(by='LABEL')
-            labeldescription = labeldescription.reset_index(drop=True)
+        if np.any(label_description['IDX'].values > np.iinfo(id_type).max):
+            label_description = label_description.sort_values(by='LABEL')
+            label_description = label_description.reset_index(drop=True)
             new_annotation = np.zeros(self.annotation.shape, dtype=id_type)
             id_map = {}
 
-            for ii, idx in enumerate(labeldescription['IDX'].values):
+            for ii, idx in enumerate(label_description['IDX'].values):
                 id_map[idx] = ii + 1
                 new_annotation[self.annotation == idx] = ii + 1
 
-            labeldescription['IDX'] = labeldescription.apply(lambda row: id_map[row['IDX']], axis=1)
-            return new_annotation, labeldescription
+            label_description['IDX'] = label_description.apply(lambda row: id_map[row['IDX']], axis=1)
+            return new_annotation, label_description
 
-        return self.annotation, labeldescription
+        return self.annotation, label_description
 
     
     def write_itksnap_labels(self, annotation_path, label_path, **kwargs):
-        '''Generate a label file (nrrd) and a labeldescription file (csv) for use with ITKSnap
+        '''Generate a label file (nrrd) and a label_description file (csv) for use with ITKSnap
 
         Parameters
         ----------
         annotation_path : str
             write generated label file here
         label_path : str
-            write generated labeldescription file here
+            write generated label_description file here
         **kwargs : 
             will be passed to self.export_itksnap_labels
 
