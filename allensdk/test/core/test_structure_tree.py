@@ -244,7 +244,7 @@ def test_export_labeldescription(tree):
         'VIS': [1, 1, 1],
         'MSH': [1, 1, 1],
         'LABEL': ['rt', 'a', 'b']
-    })
+    }).loc[:, ('IDX', '-R-', '-G-', '-B-', '-A-', 'VIS', 'MSH', 'LABEL')]
 
     obt = tree.export_labeldescription()
     pd.testing.assert_frame_equal(obt, exp)
