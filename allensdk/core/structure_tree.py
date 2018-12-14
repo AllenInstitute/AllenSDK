@@ -40,6 +40,7 @@ from six import iteritems, string_types
 import functools
 
 import numpy as np
+import pandas as pd
 
 from .simple_tree import SimpleTree
 
@@ -275,6 +276,51 @@ class StructureTree( SimpleTree ):
                                   self.ancestor_ids(structure_ids)))
         return (set(ancestor_ids) & set(structure_ids))
         
+
+    def export_label_description(self, alphas=None, exclude_label_vis=None, exclude_mesh_vis=None, label_key='acronym'):
+        '''Produces an itksnap label_description table from this structure tree
+
+        Parameters
+        ----------
+        alphas : dict, optional
+            Maps structure ids to alpha levels. Optional - will only use provided ids.
+        exclude_label_vis : list, optional
+            The structures denoted by these ids will not be visible in ITKSnap.
+        exclude_mesh_vis : list, optional
+            The structures denoted by these ids will not have visible meshes in ITKSnap.
+        label_key: str, optional
+            Use this column for display labels.
+
+        Returns
+        -------
+        pd.DataFrame : 
+            Contains data needed for loading as an ITKSnap label description file.
+
+        '''
+
+        if alphas is None:
+            alphas = {}
+        if exclude_label_vis is None:
+            exclude_label_vis = set([])
+        if exclude_mesh_vis is None:
+            exclude_mesh_vis = set([])
+
+        df = pd.DataFrame([
+            {
+                'IDX': node['id'],
+                '-R-': node['rgb_triplet'][0],
+                '-G-': node['rgb_triplet'][1],
+                '-B-': node['rgb_triplet'][2],
+                '-A-': alphas.get(node['id'], 1.0), 
+                'VIS': 1 if node['id'] not in exclude_label_vis else 0,
+                'MSH': 1 if node['id'] not in exclude_mesh_vis else 0,
+                'LABEL': node[label_key]
+            }
+            for node in self.nodes()
+        ]).loc[:, ('IDX', '-R-', '-G-', '-B-', '-A-', 'VIS', 'MSH', 'LABEL')]
+
+        return df
+
 
     @staticmethod
     def clean_structures(structures, whitelist=None, data_transforms=None, renames=None):

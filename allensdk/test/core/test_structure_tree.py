@@ -37,6 +37,7 @@ import pytest
 import mock
 from numpy import allclose
 import sys
+import pandas as pd
 
 from allensdk.api.queries.ontologies_api import OntologiesApi
 from allensdk.core.structure_tree import StructureTree
@@ -231,3 +232,19 @@ def test_hex_to_rgb(inp, out):
 def test_path_to_list(inp, out):
     obt = StructureTree.path_to_list(inp)
     assert(allclose(obt, out))
+
+
+def test_export_label_description(tree):
+    exp = pd.DataFrame({
+        'IDX': [0, 1, 2],
+        '-R-': [0, 0, 255],
+        '-G-': [0, 15, 255],
+        '-B-': [0, 255, 255],
+        '-A-': [1.0, 1.0, 1.0],
+        'VIS': [1, 1, 1],
+        'MSH': [1, 1, 1],
+        'LABEL': ['rt', 'a', 'b']
+    }).loc[:, ('IDX', '-R-', '-G-', '-B-', '-A-', 'VIS', 'MSH', 'LABEL')]
+
+    obt = tree.export_label_description()
+    pd.testing.assert_frame_equal(obt, exp)
