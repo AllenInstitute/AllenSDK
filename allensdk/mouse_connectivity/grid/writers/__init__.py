@@ -29,7 +29,7 @@ def count_writer(gridder, grid_prefix, accumulator_prefix, target_spacings, **kw
     gridder.volumes['data_mask'] = gridder.volumes['data_mask'].round()
     handle_pyramid(gridder, 'data_mask', target_spacings, grid_prefix, paths=paths)
 
-    retirm [atjs]
+    return paths
 
     
 def cav_writer(gridder, grid_prefix, accumulator_prefix, **kwargs):
