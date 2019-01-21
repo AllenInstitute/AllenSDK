@@ -23,6 +23,7 @@ install:
   - conda create -q -n test-environment python=%PYTHON% pip
   - activate test-environment
   - conda install statsmodels
+  - pip install pillow
   - conda install -c https://conda.anaconda.org/simpleitk SimpleITK
   - if %PYTHON% == 2.7 conda install scikit-image
   - pip install codecov

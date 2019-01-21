@@ -15,3 +15,4 @@ scikit-build
 statsmodels>=0.8.0
 simpleitk
 tables
+pillow
