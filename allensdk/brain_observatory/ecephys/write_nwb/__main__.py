@@ -129,7 +129,8 @@ def read_spike_times_to_dictionary(spike_times_path, spike_units_path, local_to_
         unit_times = spike_times[low:high+1]
 
         if local_to_global_unit_map is not None:
-            output_times[local_to_global_unit_map[local_unit]] = unit_times
+            global_id = local_to_global_unit_map[local_unit]
+            output_times[global_id] = unit_times
         else:
             output_times[local_unit] = unit_times
 
@@ -170,8 +171,9 @@ def write_ecephys_nwb(output_path, session_id, session_start_time, stimulus_tabl
         probewise_channel_table['group'] = probe_nwb_electrode_group
         channel_tables.append(probewise_channel_table)
 
-        probewise_units_table = pd.DataFrame(probe['units'])
         local_to_global_unit_id_map = {unit['local_index']: unit['id'] for unit in probe['units']}
+        probewise_units_table = pd.DataFrame(probe['units'])
+        logging.info(f'mapping local unit indices to global unit indices using: {local_to_global_unit_id_map}')
         probewise_spike_times = read_spike_times_to_dictionary(
             probe['spike_times_path'], probe['spike_clusters_file'], local_to_global_unit_id_map
         )
