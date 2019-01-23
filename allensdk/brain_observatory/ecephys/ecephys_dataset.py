@@ -40,6 +40,7 @@ def eager_read_nwb_probes(nwbfile: pynwb.file.NWBFile) -> pd.DataFrame:
     probes = []
     for k, v in nwbfile.electrode_groups.items():
         probes.append({'id': int(k), 'name': v.description})
+    print(probes)
     return pd.DataFrame(probes)
 
 
@@ -61,7 +62,7 @@ def eager_read_dataset_from_nwbfile(nwbfile: Union[str, pynwb.file.NWBFile]) -> 
     dataset: EcephysDataset = EcephysDataset(
         session_id=int(nwbfile.identifier),
         stimulus_epochs=eager_read_nwb_stimulus_epochs(nwbfile),
-        probes=pd.DataFrame(),
+        probes=eager_read_nwb_probes(nwbfile),
         channels=eager_read_nwbfile_channels(nwbfile),
         units=units,
         spike_times=spike_times
