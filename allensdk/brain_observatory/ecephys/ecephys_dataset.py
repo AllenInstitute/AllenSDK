@@ -11,7 +11,7 @@ T = TypeVar('T')
 MaybeCallable = Union[T, Callable[[], T]]
 
 
-@dataclass
+@dataclass(frozen=True)
 class EcephysDataset:
     session_id: int
     stimulus_epochs: MaybeCallable[pd.DataFrame]
@@ -19,15 +19,17 @@ class EcephysDataset:
     channels: MaybeCallable[pd.DataFrame]
     units: MaybeCallable[pd.DataFrame]
     spike_times: MaybeCallable[Mapping[int, np.ndarray]]
+    mean_waveforms: MaybeCallable[Mapping[int, np.ndarray]]
 
 
-def eager_read_nwbfile_units(nwbfile: pynwb.file.NWBFile) -> Tuple[pd.DataFrame, Mapping[int, np.ndarray]]:
+def eager_read_nwbfile_units(nwbfile: pynwb.file.NWBFile) -> Tuple[pd.DataFrame, Mapping[int, np.ndarray], Mapping[int, np.ndarray]]:
     units_table = nwbfile.units.to_dataframe()
     
     spike_times = units_table['spike_times'].to_dict()
-    units_table.drop(columns='spike_times', inplace=True)
+    mean_waveforms = units_table['waveform_mean'].to_dict()
 
-    return units_table, spike_times 
+    units_table.drop(columns=['spike_times', 'waveform_mean'], inplace=True)
+    return units_table, spike_times, mean_waveforms
 
 
 def eager_read_nwbfile_channels(nwbfile: pynwb.file.NWBFile) -> pd.DataFrame:
@@ -40,7 +42,6 @@ def eager_read_nwb_probes(nwbfile: pynwb.file.NWBFile) -> pd.DataFrame:
     probes = []
     for k, v in nwbfile.electrode_groups.items():
         probes.append({'id': int(k), 'name': v.description})
-    print(probes)
     return pd.DataFrame(probes)
 
 
@@ -58,14 +59,15 @@ def eager_read_dataset_from_nwbfile(nwbfile: Union[str, pynwb.file.NWBFile]) -> 
         nwbfile = io.read()
         owns_file = True
 
-    units, spike_times = eager_read_nwbfile_units(nwbfile)
+    units, spike_times, mean_waveforms = eager_read_nwbfile_units(nwbfile)
     dataset: EcephysDataset = EcephysDataset(
         session_id=int(nwbfile.identifier),
         stimulus_epochs=eager_read_nwb_stimulus_epochs(nwbfile),
         probes=eager_read_nwb_probes(nwbfile),
         channels=eager_read_nwbfile_channels(nwbfile),
         units=units,
-        spike_times=spike_times
+        spike_times=spike_times,
+        mean_waveforms=mean_waveforms
     )
 
     if owns_file:

@@ -121,12 +121,12 @@ def read_spike_times_to_dictionary(spike_times_path, spike_units_path, local_to_
     sort_order = np.argsort(spike_units)
     spike_units = spike_units[sort_order]
     spike_times = spike_times[sort_order]
-    changes = np.concatenate([np.array([0]), np.where(np.diff(spike_units))[0] - 1, np.array([-1])])
+    changes = np.concatenate([np.array([0]), np.where(np.diff(spike_units))[0] + 1, np.array([spike_times.size])])
 
     output_times = {}
     for jj, (low, high) in enumerate(zip(changes[:-1], changes[1:])):
-        local_unit = spike_units[high]
-        unit_times = spike_times[low:high+1]
+        local_unit = spike_units[low]
+        unit_times = spike_times[low:high]
 
         if local_to_global_unit_map is not None:
             global_id = local_to_global_unit_map[local_unit]
@@ -135,6 +135,41 @@ def read_spike_times_to_dictionary(spike_times_path, spike_units_path, local_to_
             output_times[local_unit] = unit_times
 
     return output_times
+
+
+def read_waveforms_to_dictionary(waveforms_path, local_to_global_unit_map=None, peak_channel_map=None):
+
+    waveforms = np.squeeze(np.load(waveforms_path, allow_pickle=False))
+    output_waveforms = {}
+    for unit_id, waveform in enumerate(np.split(waveforms, waveforms.shape[0], axis=0)):
+        if local_to_global_unit_map is not None:
+            unit_id = local_to_global_unit_map[unit_id]
+
+        if peak_channel_map is not None:
+            waveform = waveform[:, peak_channel_map[unit_id]]
+        
+        output_waveforms[unit_id] = np.squeeze(waveform)
+
+    return output_waveforms
+
+
+def dict_to_indexed_array(dc, order=None):
+
+    if order is None:
+        order = dc.keys()
+
+    data = []
+    index = []
+    counter = 0
+
+    for ii, key in enumerate(order):
+        data.append(dc[key])
+        counter += len(dc[key])
+        index.append(counter)
+
+    data = np.concatenate(data)
+
+    return index, data
 
 
 def write_ecephys_nwb(output_path, session_id, session_start_time, stimulus_table_path, probes, **kwargs):
@@ -151,8 +186,10 @@ def write_ecephys_nwb(output_path, session_id, session_start_time, stimulus_tabl
     channel_tables = []
     unit_tables = []
     spike_times = {}
+    mean_waveforms = {}
 
     for probe in probes:
+        logging.info(f'found probe {probe["id"]} with name {probe["name"]}')
 
         probe_nwb_device = pynwb.device.Device(
             name=str(probe['id']), # why not name? probe names are actually codes for targeted structure. ids are the appropriate primary key
@@ -167,18 +204,24 @@ def write_ecephys_nwb(output_path, session_id, session_start_time, stimulus_tabl
         nwbfile.add_device(probe_nwb_device)
         nwbfile.add_electrode_group(probe_nwb_electrode_group)
 
+        global_to_local_channel_map = {ch['id']: ch['local_index'] for ch in probe['channels']}
         probewise_channel_table = pd.DataFrame(probe['channels'])
         probewise_channel_table['group'] = probe_nwb_electrode_group
         channel_tables.append(probewise_channel_table)
 
         local_to_global_unit_id_map = {unit['local_index']: unit['id'] for unit in probe['units']}
+
         probewise_units_table = pd.DataFrame(probe['units'])
-        logging.info(f'mapping local unit indices to global unit indices using: {local_to_global_unit_id_map}')
         probewise_spike_times = read_spike_times_to_dictionary(
             probe['spike_times_path'], probe['spike_clusters_file'], local_to_global_unit_id_map
         )
+        probewise_mean_waveforms = read_waveforms_to_dictionary(
+            probe['mean_waveforms_path'], local_to_global_unit_id_map
+        )
+
         unit_tables.append(probewise_units_table)
         spike_times.update(probewise_spike_times)
+        mean_waveforms.update(probewise_mean_waveforms)
 
     channel_table = pd.concat(channel_tables)
     channel_table = channel_table.set_index(keys='id', drop=True)
@@ -187,19 +230,20 @@ def write_ecephys_nwb(output_path, session_id, session_start_time, stimulus_tabl
     unit_table = unit_table.set_index(keys='id', drop=True)
 
     nwbfile.electrodes = pynwb.file.ElectrodeTable().from_dataframe(channel_table, name='electrodes')
-
-    stimes = []
-    sindex = []
-    counter = 0
-    for ii, (unit_id, _) in enumerate(unit_table.iterrows()):
-        sindex.append(counter)
-        stimes.append(spike_times[unit_id])
-        counter += len(spike_times[unit_id])
-    del spike_times
-    stimes = np.concatenate(stimes)
-
     nwbfile.units = pynwb.misc.Units.from_dataframe(unit_table, name='units')
+
+    unit_id_order = unit_table.index.values.copy()
+    sindex, stimes = dict_to_indexed_array(spike_times, unit_id_order)
+    del spike_times
     nwbfile.units.add_column(name='spike_times', description='times (s) of detected spiking events', data=stimes, index=sindex)
+    del stimes
+    del sindex
+
+    mwindex, mwdata = dict_to_indexed_array(mean_waveforms, unit_id_order)
+    del mean_waveforms
+    nwbfile.units.add_column(name='waveform_mean', description='mean waveforms on peak channels (and over samples) for each unit', data=mwdata, index=mwindex)
+    del mwdata
+    del mwindex
 
     Manifest.safe_make_parent_dirs(output_path)
     io = pynwb.NWBHDF5IO(output_path, mode='w')
