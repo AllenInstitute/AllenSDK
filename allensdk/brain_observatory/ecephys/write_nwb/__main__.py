@@ -129,6 +129,9 @@ def read_spike_times_to_dictionary(spike_times_path, spike_units_path, local_to_
         unit_times = spike_times[low:high]
 
         if local_to_global_unit_map is not None:
+            if local_unit not in local_to_global_unit_map:
+                logging.warning(f'unable to find unit at local position {local_unit} while reading spike times')
+                continue
             global_id = local_to_global_unit_map[local_unit]
             output_times[global_id] = unit_times
         else:
@@ -143,6 +146,9 @@ def read_waveforms_to_dictionary(waveforms_path, local_to_global_unit_map=None, 
     output_waveforms = {}
     for unit_id, waveform in enumerate(np.split(waveforms, waveforms.shape[0], axis=0)):
         if local_to_global_unit_map is not None:
+            if unit_id not in local_to_global_unit_map:
+                logging.warning(f'unable to find unit at local position {unit_id} while reading waveforms')
+                continue
             unit_id = local_to_global_unit_map[unit_id]
 
         if peak_channel_map is not None:
@@ -172,7 +178,14 @@ def dict_to_indexed_array(dc, order=None):
     return index, data
 
 
-def write_ecephys_nwb(output_path, session_id, session_start_time, stimulus_table_path, probes, **kwargs):
+def write_ecephys_nwb(
+    output_path, 
+    session_id, session_start_time, 
+    stimulus_table_path, 
+    probes, 
+    running_speed, 
+    **kwargs
+):
 
     nwbfile = pynwb.NWBFile(
         session_description='EcephysSession',
@@ -244,6 +257,13 @@ def write_ecephys_nwb(output_path, session_id, session_start_time, stimulus_tabl
     nwbfile.units.add_column(name='waveform_mean', description='mean waveforms on peak channels (and over samples) for each unit', data=mwdata, index=mwindex)
     del mwdata
     del mwindex
+
+    running_speeds = np.squeeze(np.load(running_speed['running_speed_path'], allow_pickle=False))
+    running_speed_timestamps = np.squeeze(np.load(running_speed['running_speed_timestamps_path'], allow_pickle=False))
+    running_speed_series = pynwb.base.TimeSeries(name='running_speed', data=running_speeds, timestamps=running_speed_timestamps, unit='cm/s')
+    del running_speeds
+    del running_speed_timestamps
+    nwbfile.add_acquisition(running_speed_series)
 
     Manifest.safe_make_parent_dirs(output_path)
     io = pynwb.NWBHDF5IO(output_path, mode='w')

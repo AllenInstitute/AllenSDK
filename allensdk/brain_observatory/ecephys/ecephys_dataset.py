@@ -20,6 +20,8 @@ class EcephysDataset:
     units: MaybeCallable[pd.DataFrame]
     spike_times: MaybeCallable[Mapping[int, np.ndarray]]
     mean_waveforms: MaybeCallable[Mapping[int, np.ndarray]]
+    running_speed: MaybeCallable[np.ndarray]
+    running_speed_timestamps: MaybeCallable[np.ndarray]
 
 
 def eager_read_nwbfile_units(nwbfile: pynwb.file.NWBFile) -> Tuple[pd.DataFrame, Mapping[int, np.ndarray], Mapping[int, np.ndarray]]:
@@ -51,6 +53,11 @@ def eager_read_nwb_stimulus_epochs(nwbfile: pynwb.file.NWBFile) -> pd.DataFrame:
     return stimulus_table
 
 
+def eager_read_nwbfile_running_speeds(nwbfile: pynwb.file.NWBFile) -> Tuple[np.ndarray, np.ndarray]:
+    ts = nwbfile.get_acquisition('running_speed')
+    return ts.timestamps[:], ts.data[:]
+
+
 def eager_read_dataset_from_nwbfile(nwbfile: Union[str, pynwb.file.NWBFile]) -> EcephysDataset:
 
     owns_file = False
@@ -60,6 +67,8 @@ def eager_read_dataset_from_nwbfile(nwbfile: Union[str, pynwb.file.NWBFile]) -> 
         owns_file = True
 
     units, spike_times, mean_waveforms = eager_read_nwbfile_units(nwbfile)
+    running_speed_timestamps, running_speed = eager_read_nwbfile_running_speeds(nwbfile)
+
     dataset: EcephysDataset = EcephysDataset(
         session_id=int(nwbfile.identifier),
         stimulus_epochs=eager_read_nwb_stimulus_epochs(nwbfile),
@@ -67,7 +76,9 @@ def eager_read_dataset_from_nwbfile(nwbfile: Union[str, pynwb.file.NWBFile]) -> 
         channels=eager_read_nwbfile_channels(nwbfile),
         units=units,
         spike_times=spike_times,
-        mean_waveforms=mean_waveforms
+        mean_waveforms=mean_waveforms,
+        running_speed=running_speed,
+        running_speed_timestamps=running_speed_timestamps
     )
 
     if owns_file:

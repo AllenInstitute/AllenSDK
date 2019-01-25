@@ -50,7 +50,6 @@ class Unit(RaisingSchema):
     id = Int(required=True)
     peak_channel_id = Int(required=True)
     local_index = Int(required=True, description='within-probe index of this unit. Used for indexing into the spike times file.')
-    # probe_id = Int(required=True, description='')
     quality = String(required=True)
     firing_rate = Float(required=True)
     snr = Float(required=True)
