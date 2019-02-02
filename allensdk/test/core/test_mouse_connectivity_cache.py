@@ -46,6 +46,12 @@ from allensdk.core.mouse_connectivity_cache import MouseConnectivityCache
 from allensdk.core.structure_tree import StructureTree
 
 
+@pytest.fixture
+def cached_csv(tmpdir_factory):
+    csv = str(tmpdir_factory.mktemp("cache_test").join("data.csv"))
+    return csv
+
+
 @pytest.fixture(scope='function')
 def mcc(tmpdir_factory):
     manifest_file = tmpdir_factory.mktemp("mcc").join('manifest.json')
@@ -341,6 +347,21 @@ def test_get_experiment_structure_unionizes(mcc, unionizes):
     mock_query.assert_not_called()
     assert obtained.loc[0, 'projection_intensity'] == 263.231
     assert os.path.exists(path)
+
+
+def test_get_experiment_structure_unionizes_cache_roundtrip(mcc, unionizes,
+                                                            cached_csv):
+
+    eid = 166218353
+
+    with mock.patch.object(mcc.api, "model_query",
+                           new=lambda *args, **kwargs: unionizes):
+        obtained = mcc.get_experiment_structure_unionizes(
+            eid, file_name=cached_csv)
+    pandas_data = pd.read_csv(cached_csv, index_col=0, parse_dates=True)
+
+    assert obtained.loc[0, 'projection_intensity'] == 263.231
+    assert(sorted(obtained.keys()) == sorted(pandas_data.columns))
 
 
 def test_filter_structure_unionizes(mcc, unionizes):

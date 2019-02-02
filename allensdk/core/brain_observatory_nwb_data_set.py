@@ -55,13 +55,8 @@ from allensdk.brain_observatory.brain_observatory_exceptions import (MissingStim
 from allensdk.api.cache import memoize
 from allensdk.core import h5_utilities 
 
-# Deprecation rerouting:
-from allensdk.deprecated import deprecated
-from allensdk.brain_observatory.stimulus_info import warp_stimulus_coords as si_warp_stimulus_coords
-from allensdk.brain_observatory.stimulus_info import make_display_mask as si_make_display_mask
 from allensdk.brain_observatory.stimulus_info import mask_stimulus_template as si_mask_stimulus_template
 from allensdk.brain_observatory.brain_observatory_exceptions import EpochSeparationException
-
 
 _STIMULUS_PRESENTATION_PATH = 'stimulus/presentation'
 _STIMULUS_PRESENTATION_PATTERNS = ('{}', '{}_stimulus',)
@@ -109,7 +104,7 @@ def get_epoch_mask_list(st, threshold, max_cuts=2):
 
 class BrainObservatoryNwbDataSet(object):
     PIPELINE_DATASET = 'brain_observatory_pipeline'
-    SUPPORTED_PIPELINE_VERSION = "2.0"
+    SUPPORTED_PIPELINE_VERSION = "3.0"
 
     FILE_METADATA_MAPPING = {
         'age': 'general/subject/age',
@@ -542,7 +537,7 @@ class BrainObservatoryNwbDataSet(object):
                 curr_subtable['stimulus'] = stimulus
                 table_list.append(curr_subtable)
 
-        new_table = pd.concat(table_list)
+        new_table = pd.concat(table_list, sort=True)
         new_table.reset_index(drop=True, inplace=True)
 
         return new_table
@@ -585,19 +580,6 @@ class BrainObservatoryNwbDataSet(object):
 
         raise IOError("Could not find a stimulus table named '%s'" % stimulus_name)
                 
-
-    @deprecated('Use BrainObservatoryNWBDataset.get_stimulus_table instead')
-    def get_spontaneous_activity_stimulus_table(self):
-        ''' Return the spontaneous activity stimulus table, if it exists.
-
-        Returns
-        -------
-        stimulus table: pd.DataFrame
-        '''
-
-        with h5py.File(self.nwb_file, 'r') as nwb_file:
-            return make_spontaneous_activity_stimulus_table(nwb_file)
-
 
     @memoize
     def get_stimulus_template(self, stimulus_name):
@@ -667,7 +649,7 @@ class BrainObservatoryNwbDataSet(object):
         template_display_coords = np.rint(template_display_coords).astype(int)
 
         # build mask
-        template_mask, template_frac = mask_stimulus_template(
+        template_mask, template_frac = si_mask_stimulus_template(
             template_display_coords, template_shape)
 
         if mask_off_screen:
@@ -1137,33 +1119,3 @@ def _make_spontaneous_activity_stimulus_table(events, frame_durations):
     return stimulus_table
 
 
-@deprecated('Use allensdk.brain_observatory.stimulus_info.warp_stimulus_coords instead')
-def warp_stimulus_coords(*args, **kwargs):
-    return si_warp_stimulus_coords(*args, **kwargs)
-
-
-@deprecated('Use allensdk.brain_observatory.stimulus_info.make_display_mask instead')
-def make_display_mask(*args, **kwargs):
-    return si_make_display_mask(*args, **kwargs)
-
-
-@deprecated('Use allensdk.brain_observatory.stimulus_info.mask_stimulus_template instead')
-def mask_stimulus_template(*args, **kwargs):
-    return si_mask_stimulus_template(*args, **kwargs)
-
-
-@deprecated('Use BrainObservatoryNWBDataset.get_stimulus_table instead')
-def _get_abstract_feature_series_stimulus_table(nwb_file, stimulus_name):
-    with open(nwb_file, 'r') as nwb_file:
-        return make_abstract_feature_series_stimulus_table(nwb_file, stimulus_name)
-
-
-@deprecated('Use BrainObservatoryNWBDataset.get_stimulus_table instead')
-def _get_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
-    with open(nwb_file, 'r') as nwb_file:
-        return make_indexed_time_series_stimulus_table(nwb_file, stimulus_name)
-
-@deprecated('Use BrainObservatoryNWBDataset.get_stimulus_table instead')
-def _get_repeated_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
-    with open(nwb_file, 'r') as nwb_file:
-        return make_repeated_indexed_time_series_stimulus_table(nwb_file, stimulus_name)

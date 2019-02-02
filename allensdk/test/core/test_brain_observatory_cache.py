@@ -35,12 +35,9 @@
 #
 import pytest
 import os
+import numpy as np
 from mock import patch, mock_open, MagicMock
-from allensdk.core.brain_observatory_cache import (BrainObservatoryCache, 
-                                                   _find_container_tags,
-                                                   _merge_transgenic_lines,
-                                                   _find_specimen_cre_line,
-                                                   _find_specimen_reporter_line)
+from allensdk.core.brain_observatory_cache import BrainObservatoryCache
 from allensdk.api.queries.brain_observatory_api import BrainObservatoryApi
 import json
 import allensdk.brain_observatory.stimulus_info as si
@@ -57,7 +54,7 @@ CACHE_MANIFEST = """
   "manifest": [
     {
       "type": "manifest_version",
-      "value": "1.1"
+      "value": "1.2"
     },
     {
       "type": "dir",
@@ -99,10 +96,22 @@ CACHE_MANIFEST = """
       "type": "file",
       "spec": "ophys_analysis_data/%d_%s_analysis.h5",
       "key": "ANALYSIS_DATA"
+    },
+    {
+      "parent_key": "BASEDIR",
+      "type": "file",
+      "spec": "ophys_experiment_events/%d_events.npz",
+      "key": "EVENTS_DATA"
     }
   ]
 }
 """
+
+
+@pytest.fixture()
+def events_test_data():
+    return {"pattern": "/allen/aibs/informatics/module_test_data/observatory/events/%d_events.npz",
+            "experiment_id": 715923832}
 
 
 @pytest.fixture(scope="function")
@@ -281,7 +290,6 @@ def test_build_manifest(tmpdir_factory):
             read_manifest_data = f.read()
 
         assert manifest_data == read_manifest_data
-        
 
 
 def test_string_argument_errors(brain_observatory_cache):
@@ -305,82 +313,6 @@ def test_string_argument_errors(brain_observatory_cache):
     with pytest.raises(TypeError):
         boc.get_ophys_experiments(session_types='str')
 
-def test_find_container_tags():
-    # no conditions no tags
-    c = { "specimen": { "donor": { "conditions": [] } } }
-    tags = _find_container_tags(c)
-    assert len(tags) == 0
-
-    # tissue tags are ignored
-    c = { "specimen": { "donor": { "conditions": [ { "name": "tissuecyte" } ] } } }
-    tags = _find_container_tags(c)
-    assert len(tags) == 0
-
-    # no conditions is okay
-    c = { "specimen": { "donor": { } } }
-    tags = _find_container_tags(c)
-    assert len(tags) == 0
-
-    # everything else goes through
-    c = { "specimen": { "donor": { "conditions": [ { "name": "fish" } ] } } }
-    tags = _find_container_tags(c)
-    assert len(tags) == 1
-
-def test_merge_transgenic_lines():
-    # None is allowed and should be ignored
-    t1 = [ "a", "b", "c" ]
-    t2 = None
-    tm = _merge_transgenic_lines(t1,t2)
-    assert sorted(tm) == [ "a", "b", "c"]
-
-    # otherwise it's just a merge
-    t1 = [ "a", "b", "c" ]
-    t2 = [ "c", "d" ]
-    tm = _merge_transgenic_lines(t1,t2)
-    assert sorted(tm) == [ "a", "b", "c", "d"]
-
-    # one list is fine
-    t1 = [ "a", "b", "c" ]
-    tm = _merge_transgenic_lines(t1)
-    assert sorted(tm) == [ "a", "b", "c" ]
-
-def test_find_specimen_cre_line():
-    # None if no TLs
-    s = { "donor": { "transgenic_lines": [ ] } }
-    cre = _find_specimen_cre_line(s)
-    assert cre is None
-
-    # None if no 'Cre'
-    s = { "donor": { "transgenic_lines": [ { "transgenic_line_type_name": "driver", "name": "banana" } ] } }
-    cre = _find_specimen_cre_line(s)
-    assert cre is None
-
-    # None if no 'Cre'
-    s = { "donor": { "transgenic_lines": [ { "transgenic_line_type_name": "driver", "name": "bananaCre" } ] } }
-    cre = _find_specimen_cre_line(s)
-    assert cre == "bananaCre"
-
-    # None if no 'driver'
-    s = { "donor": { "transgenic_lines": [ { "transgenic_line_type_name": "reporter", "name": "bananaCre" } ] } }
-    cre = _find_specimen_cre_line(s)
-    assert cre == None
-
-def test_find_specimen_reporter_line():
-    # None if no TLs
-    s = { "donor": { "transgenic_lines": [ ] } }
-    cre = _find_specimen_reporter_line(s)
-    assert cre is None
-
-    s = { "donor": { "transgenic_lines": [ { "transgenic_line_type_name": "reporter", "name": "banana" } ] } }
-    cre = _find_specimen_reporter_line(s)
-    assert cre == "banana"
-
-    # None if no "reporter"
-    s = { "donor": { "transgenic_lines": [ { "transgenic_line_type_name": "driver", "name": "bananaCre" } ] } }
-    cre = _find_specimen_reporter_line(s)
-    assert cre is None
-
-
 @pytest.mark.skipif(not os.path.exists('/allen/aibs/informatics/module_test_data'), reason='AIBS path not available')
 @pytest.mark.parametrize("path_dict", get_list_of_path_dict())
 def test_brain_observatory_cache_get_analysis_file(brain_observatory_cache, path_dict): 
@@ -396,3 +328,15 @@ def test_brain_observatory_cache_get_analysis_file(brain_observatory_cache, path
     for stimulus in data_set.list_stimuli():
         if stimulus != si.SPONTANEOUS_ACTIVITY:
             brain_observatory_cache.get_ophys_experiment_analysis(oeid, stimulus)
+
+
+@pytest.mark.skipif(not os.path.exists('/allen/aibs/informatics/module_test_data'), reason='AIBS path not available')
+def test_brain_observatory_cache_get_events_data(brain_observatory_cache, events_test_data):
+    eid = events_test_data["experiment_id"]
+    data_file = events_test_data["pattern"] % eid
+
+    brain_observatory_cache.manifest.add_path(brain_observatory_cache.EVENTS_DATA_KEY, events_test_data["pattern"])
+
+    events = brain_observatory_cache.get_ophys_experiment_events(eid)
+    true_events = np.load(data_file, allow_pickle=False)["ev"]
+    assert(np.all(events == true_events))

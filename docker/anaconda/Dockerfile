@@ -16,6 +16,8 @@ RUN /bin/bash -c "\
   cd allensdk && \
   pip install . && \
   pip install -r test_requirements.txt"
+
+RUN apt-get -yq install libopenjp2-7
   
 ENV TEST_API_ENDPOINT http://api.brain-map.org
 ENV TEST_OBSERVATORY_EXPERIMENT_PLOTS_DATA=skip

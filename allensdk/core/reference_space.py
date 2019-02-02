@@ -38,11 +38,13 @@ from collections import defaultdict
 import operator as op
 import functools
 import os
+import csv
 
 from scipy.misc import imresize
 from scipy.ndimage.interpolation import zoom
 import numpy as np
 import nrrd
+import pandas as pd
 
 from allensdk.core.structure_tree import StructureTree
 
@@ -334,6 +336,65 @@ class ReferenceSpace(object):
                       list(image.shape) + [3]).astype(np.uint8)
             
             
+    def export_itksnap_labels(self, id_type=np.uint16, label_description_kwargs=None):
+        '''Produces itksnap labels, remapping large ids if needed.
+
+        Parameters
+        ----------
+        id_type : np.integer, optional
+            Used to determine the type of the output annotation and whether ids need to be remapped to smaller values.
+        label_description_kwargs : dict, optional
+            Keyword arguments passed to StructureTree.export_label_description
+
+        Returns
+        -------
+        np.ndarray : 
+            Annotation volume, remapped if needed
+        pd.DataFrame
+            label_description dataframe
+
+        '''
+
+        if label_description_kwargs is None:
+            label_description_kwargs = {}
+
+        label_description = self.structure_tree.export_label_description(**label_description_kwargs)
+
+        if np.any(label_description['IDX'].values > np.iinfo(id_type).max):
+            label_description = label_description.sort_values(by='LABEL')
+            label_description = label_description.reset_index(drop=True)
+            new_annotation = np.zeros(self.annotation.shape, dtype=id_type)
+            id_map = {}
+
+            for ii, idx in enumerate(label_description['IDX'].values):
+                id_map[idx] = ii + 1
+                new_annotation[self.annotation == idx] = ii + 1
+
+            label_description['IDX'] = label_description.apply(lambda row: id_map[row['IDX']], axis=1)
+            return new_annotation, label_description
+
+        return self.annotation, label_description
+
+    
+    def write_itksnap_labels(self, annotation_path, label_path, **kwargs):
+        '''Generate a label file (nrrd) and a label_description file (csv) for use with ITKSnap
+
+        Parameters
+        ----------
+        annotation_path : str
+            write generated label file here
+        label_path : str
+            write generated label_description file here
+        **kwargs : 
+            will be passed to self.export_itksnap_labels
+
+        '''
+
+        annotation, labels = self.export_itksnap_labels(**kwargs)
+        nrrd.write(annotation_path, annotation, header={'spacings': self.resolution})
+        labels.to_csv(label_path, sep=' ', index=False, header=False, quoting=csv.QUOTE_NONNUMERIC)
+
+
     @staticmethod
     def return_mask_cb(structure_id, fn):
         '''A basic callback for many_structure_masks

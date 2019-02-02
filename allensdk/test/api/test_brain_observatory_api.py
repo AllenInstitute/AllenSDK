@@ -37,7 +37,12 @@ import os
 import pytest
 from mock import patch, MagicMock, call
 from collections import Counter
-from allensdk.api.queries.brain_observatory_api import BrainObservatoryApi
+import datetime
+from allensdk.api.queries.brain_observatory_api import (BrainObservatoryApi,
+                                                        find_container_tags,
+                                                        find_specimen_cre_line,
+                                                        find_specimen_reporter_line,
+                                                        find_experiment_acquisition_age)
 
 _rows_per_message = 2000
 _msg = [{'whatever': True}] * _rows_per_message
@@ -54,16 +59,27 @@ def bo_api():
 @pytest.fixture
 def mock_containers():
     containers = [
-        {'targeted_structure': {'acronym': 'CBS'},
-         'imaging_depth': 100,
-         'specimen': {
-            'donor': {'transgenic_lines': [{'name': 'Shiny'}]}}
-         },
-        {'targeted_structure': {'acronym': 'NBC'},
-         'imaging_depth': 200,
-         'specimen': {
-            'donor': {'transgenic_lines': [{'name': 'Don'}]}}
-         }
+        {
+            'targeted_structure': {'acronym': 'CBS'},
+            'imaging_depth': 100,
+            'specimen': {
+            'donor': {'transgenic_lines': [{ 'name': 'Shiny', 
+                                             'transgenic_line_type_name': 'driver' }]}}
+        },
+        {
+            'targeted_structure': {'acronym': 'ABC'},
+            'imaging_depth': 150,
+            'specimen': {
+            'donor': {'transgenic_lines': [{ 'name': 'ShinyCre', 
+                                             'transgenic_line_type_name': 'driver' }]}}
+        },
+        {
+            'targeted_structure': {'acronym': 'NBC'},
+            'imaging_depth': 200,
+            'specimen': {
+                'donor': {'transgenic_lines': [{ 'name': 'Don', 
+                                                 'transgenic_line_type_name': 'reporter' }]}}
+        }
     ]
 
     return containers
@@ -234,7 +250,7 @@ def test_get_cell_metrics_no_ids(mock_json_msg_query, bo_api):
     mock_json_msg_query.assert_called_once_with(
         bo_api.api_url + "/api/v2/data/query.json?q="
         "model::ApiCamCellMetric,"
-        "rma::options[num_rows$eq2000][start_row$eq0][count$eqfalse]")
+        "rma::options[num_rows$eq2000][start_row$eq0][order$eq\'cell_specimen_id\'][count$eqfalse]")
 
 
 @patch.object(BrainObservatoryApi, "json_msg_query")
@@ -245,7 +261,7 @@ def test_get_cell_metrics_one_ids(mock_json_msg_query, bo_api):
         bo_api.api_url + "/api/v2/data/query.json?q="
         "model::ApiCamCellMetric,"
         "rma::criteria,[cell_specimen_id$in517394843],"
-        "rma::options[num_rows$eq2000][start_row$eq0][count$eqfalse]")
+        "rma::options[num_rows$eq2000][start_row$eq0][order$eq\'cell_specimen_id\'][count$eqfalse]")
 
 
 @patch.object(BrainObservatoryApi, "json_msg_query")
@@ -256,7 +272,7 @@ def test_get_cell_metrics_two_ids(mock_json_msg_query, bo_api):
         bo_api.api_url + "/api/v2/data/query.json?q="
         "model::ApiCamCellMetric,"
         "rma::criteria,[cell_specimen_id$in517394843,517394850],"
-        "rma::options[num_rows$eq2000][start_row$eq0][count$eqfalse]")
+        "rma::options[num_rows$eq2000][start_row$eq0][order$eq\'cell_specimen_id\'][count$eqfalse]")
 
 
 @patch("allensdk.core.json_utilities.read_url_get", side_effect=_msg5)
@@ -268,7 +284,7 @@ def test_get_cell_metrics_five_messages(ju_read_url_get, bo_api):
        (bo_api.api_url + '/api/v2/data/query.json?q='
         'model::ApiCamCellMetric,'
         'rma::criteria,%5Bcell_specimen_id$in517394843,517394850%5D,'
-        'rma::options%5Bnum_rows$eq2000%5D%5Bstart_row$eq{}%5D%5Bcount$eqfalse%5D')
+        'rma::options%5Bnum_rows$eq2000%5D%5Bstart_row$eq{}%5D%5Border$eq%27cell_specimen_id%27%5D%5Bcount$eqfalse%5D')
     expected_calls = map(lambda c: call(base_query.format(c)),
                          [0, 2000, 4000, 6000, 8000, 10000])
 
@@ -277,7 +293,7 @@ def test_get_cell_metrics_five_messages(ju_read_url_get, bo_api):
 
 def test_filter_experiment_containers_no_filters(bo_api, mock_containers):
     containers = bo_api.filter_experiment_containers(mock_containers)
-    assert len(containers) == 2
+    assert len(containers) == 3
 
 
 def test_filter_experiment_containers_depth_filter(bo_api, mock_containers):
@@ -303,9 +319,30 @@ def test_filter_experiment_containers_lines_all_filters(bo_api, mock_containers)
 
     assert len(containers) == 1
 
-def test_filter_experiment_containers_caseless(bo_api, mock_containers):
+    containers = \
+        bo_api.filter_experiment_containers(mock_containers,
+                                            imaging_depths=[200],
+                                            targeted_structures=['NBC'],
+                                            reporter_lines=['don'])
+
+    assert len(containers) == 1
+
+def test_filter_experiment_containers_transgenic_lines(bo_api, mock_containers):
+    containers = \
+        bo_api.filter_experiment_containers(mock_containers,
+                                            cre_lines=['Shiny'])
+
+    assert len(containers) == 0
+
+    containers = \
+        bo_api.filter_experiment_containers(mock_containers,
+                                            cre_lines=['ShinyCre'])
+
+    assert len(containers) == 1
+
     containers = \
         bo_api.filter_experiment_containers(mock_containers, transgenic_lines=['DON'])
+
     assert len(containers) == 1
 
 
@@ -378,6 +415,27 @@ def test_save_ophys_experiment_data(mock_json_msg_query,
 
 @patch.object(BrainObservatoryApi, "retrieve_file_over_http")
 @patch.object(BrainObservatoryApi, "json_msg_query", return_value=[{'download_link': '/url/path/to/file'}])
+def test_save_ophys_experiment_event_data(mock_json_msg_query,
+                                          mock_retrieve_file_over_http,
+                                          bo_api):
+    with patch('allensdk.config.manifest.Manifest.safe_mkdir') as mkdir:
+        bo_api.save_ophys_experiment_event_data(1, '/path/to/filename')
+
+        mkdir.assert_called_once_with('/path/to')
+
+    mock_json_msg_query.assert_called_once_with(
+        bo_api.api_url + "/api/v2/data/query.json?q="
+        "model::WellKnownFile,"
+        "rma::criteria,"
+        "[attachable_id$eq1],well_known_file_type[name$eqObservatoryEventsFile],"
+        "rma::options[num_rows$eq'all'][count$eqfalse]")
+    mock_retrieve_file_over_http.assert_called_with(
+        bo_api.api_url +  '/url/path/to/file',
+        '/path/to/filename')
+
+
+@patch.object(BrainObservatoryApi, "retrieve_file_over_http")
+@patch.object(BrainObservatoryApi, "json_msg_query", return_value=[{'download_link': '/url/path/to/file'}])
 def test_get_cell_specimen_id_mapping(mock_json_msg_query,
                                       mock_retrieve_file_over_http,
                                       bo_api):
@@ -395,3 +453,90 @@ def test_get_cell_specimen_id_mapping(mock_json_msg_query,
     mock_retrieve_file_over_http.assert_called_with(
         bo_api.api_url + '/url/path/to/file',
         '/path/to/filename')
+
+
+def test_find_container_tags():
+    # no conditions no tags
+    c = { "specimen": { "donor": { "conditions": [] } } }
+    tags = find_container_tags(c)
+    assert len(tags) == 0
+
+    # tissue tags are ignored
+    c = { "specimen": { "donor": { "conditions": [ { "name": "tissuecyte" } ] } } }
+    tags = find_container_tags(c)
+    assert len(tags) == 0
+
+    # no conditions is okay
+    c = { "specimen": { "donor": { } } }
+    tags = find_container_tags(c)
+    assert len(tags) == 0
+
+    # everything else goes through
+    c = { "specimen": { "donor": { "conditions": [ { "name": "fish" } ] } } }
+    tags = find_container_tags(c)
+    assert len(tags) == 1
+
+
+def test_find_specimen_cre_line():
+    # None if no TLs
+    s = { "donor": { "transgenic_lines": [ ] } }
+    cre = find_specimen_cre_line(s)
+    assert cre is None
+
+    # None if no 'Cre'
+    s = { "donor": { "transgenic_lines": [ { "transgenic_line_type_name": "driver", "name": "banana" } ] } }
+    cre = find_specimen_cre_line(s)
+    assert cre is None
+
+    # None if no 'Cre'
+    s = { "donor": { "transgenic_lines": [ { "transgenic_line_type_name": "driver", "name": "bananaCre" } ] } }
+    cre = find_specimen_cre_line(s)
+    assert cre == "bananaCre"
+
+    # None if no 'driver'
+    s = { "donor": { "transgenic_lines": [ { "transgenic_line_type_name": "reporter", "name": "bananaCre" } ] } }
+    cre = find_specimen_cre_line(s)
+    assert cre == None
+
+def test_find_specimen_reporter_line():
+    # None if no TLs
+    s = { "donor": { "transgenic_lines": [ ] } }
+    cre = find_specimen_reporter_line(s)
+    assert cre is None
+
+    s = { "donor": { "transgenic_lines": [ { "transgenic_line_type_name": "reporter", "name": "banana" } ] } }
+    cre = find_specimen_reporter_line(s)
+    assert cre == "banana"
+
+    # None if no "reporter"
+    s = { "donor": { "transgenic_lines": [ { "transgenic_line_type_name": "driver", "name": "bananaCre" } ] } }
+    cre = find_specimen_reporter_line(s)
+    assert cre is None
+
+def test_find_experiment_acquisition_age():
+    exp = {}
+    age = find_experiment_acquisition_age(exp)
+    assert age is None
+
+    d2 = datetime.datetime.now()
+    d1 = d2 - datetime.timedelta(days=1)
+
+    exp = { 'date_of_acquisition': str(d2),
+            'specimen': { 'donor': { 'date_of_birth': str(d1) } } }
+
+    age = find_experiment_acquisition_age(exp)
+
+    assert age == 1
+
+def test_dataframe_query(bo_api, mock_specimens):
+    res = bo_api.dataframe_query(mock_specimens, [], 'cell_specimen_id')
+    assert len(res) == len(mock_specimens)
+
+    res = bo_api.dataframe_query(mock_specimens, 
+                                 [ { 'field': 'experiment_container_id',
+                                     'op': '=',
+                                     'value': 511498500 } ],
+                                 'cell_specimen_id')
+
+    assert len(res) == 1
+

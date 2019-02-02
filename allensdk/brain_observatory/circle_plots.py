@@ -379,7 +379,10 @@ class TrackPlotter( PolarPlotter ):
 
         clim = self._clim(clim, data)
         if self.ring_length:
-            data = skimage.transform.resize(data.astype(np.float64), (data.shape[0], self.ring_length))
+            data = skimage.transform.resize(data.astype(np.float64),
+                                            (data.shape[0], self.ring_length),
+                                            mode='constant',
+                                            anti_aliasing=False)
    
         data_mean = data.mean(axis=0)
         data = np.vstack((data, data_mean))
@@ -438,6 +441,16 @@ class CoronaPlotter( PolarPlotter ):
         start, end = self.angle_transform([0.0, 40.0])
         add_arrow(plt.gca(), self.inner_radius * .85, start, end, color)
 
+    def show_circle(self, color=None):
+        if color is None:
+            color = DEFAULT_LABEL_COLOR
+        ax = plt.gca()
+        collection = radial_circles([0.96 * self.inner_radius])
+        collection.set_facecolor((0,0,0,0))
+        collection.set_edgecolor(color)
+        collection.set_zorder(1)
+        ax.add_collection(collection)
+
     def plot(self, category_data, 
              data=None,
              clim=None, 
@@ -471,13 +484,14 @@ class CoronaPlotter( PolarPlotter ):
 
             circles = polar_line_circles(radii[trial_order],
                                          degs[idx], 
-                                         self.inner_radius)                                         
+                                         self.inner_radius)
 
             circles.set_transform(circles.get_transform() + ax.transData)
             circles.set_array(data[trial_order])
             circles.set_cmap(cmap)
             circles.set_clim(clim)
             circles.set_edgecolors((0,0,0,0))
+            circles.set_zorder(2)
 
             ax.add_collection(circles)
 

@@ -60,7 +60,7 @@ def glif_api():
         return None
 
 
-@pytest.mark.skipif(glif_api() is None, reason='No TEST_API_ENDPOINT set.')
+@pytest.mark.requires_api_endpoint
 def test_get_neuronal_model_templates(glif_api):
 
     assert len(glif_api.get_neuronal_model_templates()) == 7
@@ -85,7 +85,7 @@ def test_get_neuronal_model_templates(glif_api):
             raise Exception('Unrecognized template: %s (%s)' % (template['id'], template['name']))
 
 
-@pytest.mark.skipif(glif_api() is None, reason='No TEST_API_ENDPOINT set.')
+@pytest.mark.requires_api_endpoint
 def test_get_neuronal_models(glif_api, specimen_id):
 
     cells = glif_api.get_neuronal_models([specimen_id])
@@ -93,13 +93,13 @@ def test_get_neuronal_models(glif_api, specimen_id):
     assert len(cells) == 1
     assert len(cells[0]['neuronal_models']) == 2
 
-@pytest.mark.skipif(glif_api() is None, reason='No TEST_API_ENDPOINT set.')
+@pytest.mark.requires_api_endpoint
 def test_get_neuronal_models_no_ids(glif_api):
     cells = glif_api.get_neuronal_models()
     assert len(cells) > 0
 
 
-@pytest.mark.skipif(glif_api() is None, reason='No TEST_API_ENDPOINT set.')
+@pytest.mark.requires_api_endpoint
 def test_get_neuron_configs(glif_api, specimen_id):
     model = glif_api.get_neuronal_models([specimen_id])
 
@@ -110,7 +110,7 @@ def test_get_neuron_configs(glif_api, specimen_id):
 
     np.testing.assert_almost_equal(glif_api.get_neuron_configs([test_id])[test_id]['th_inf'], 0.024561992461740227)
 
-@pytest.mark.skipif(glif_api() is None, reason='No TEST_API_ENDPOINT set.')
+@pytest.mark.requires_api_endpoint
 def test_deprecated(fn_temp_dir, glif_api, neuronal_model_id):
 
     # Exercising deprecated functionality

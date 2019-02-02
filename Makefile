@@ -62,8 +62,8 @@ doc: FORCE
 	cd $(DOCDIR); sphinx-build -b html . _build/html;
 
 notebooks:
-	cd doc_template/examples/nb && find . -maxdepth 1 -name '*.ipynb' -exec jupyter-nbconvert --to notebook --execute --ExecutePreprocessor.timeout=1800 {} \;
-	cd doc_template/examples/nb/summer_workshop_2015 && find . -maxdepth 1 -name '*.ipynb' -exec jupyter-nbconvert --to notebook --execute --ExecutePreprocessor.timeout=1800 {} \;
+	cd doc_template/examples_root/examples/nb && find . -maxdepth 1 -name '*.ipynb' -exec jupyter-nbconvert --to notebook --execute --ExecutePreprocessor.timeout=1800 {} \;
+	cd doc_template/examples_root/examples/nb/summer_workshop_2015 && find . -maxdepth 1 -name '*.ipynb' -exec jupyter-nbconvert --to notebook --execute --ExecutePreprocessor.timeout=1800 {} \;
 
 FORCE:
 

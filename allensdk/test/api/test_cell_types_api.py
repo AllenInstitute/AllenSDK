@@ -93,7 +93,8 @@ def cell_types_api():
     else:
         return None
 
-@pytest.mark.skipif(cell_types_api() is None, reason='No TEST_API_ENDPOINT set.')
+
+@pytest.mark.requires_api_endpoint
 def test_list_cells_unmocked(cell_types_api):
     from allensdk.config import enable_console_log
     enable_console_log()

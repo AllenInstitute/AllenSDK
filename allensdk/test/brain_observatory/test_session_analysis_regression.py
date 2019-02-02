@@ -87,7 +87,7 @@ def ns(nwb_b, analysis_b):
 # session c
 @pytest.fixture(scope="module")
 def lsn(nwb_c, analysis_c):
-    return LocallySparseNoise.from_analysis_file(BODS(nwb_c), analysis_c, si.LOCALLY_SPARSE_NOISE_8DEG)
+    return LocallySparseNoise.from_analysis_file(BODS(nwb_c), analysis_c, si.LOCALLY_SPARSE_NOISE)
 
 @pytest.fixture(scope="module")
 def nm1c(nwb_c, analysis_c):
@@ -180,16 +180,14 @@ def compare_peak(p1, p2):
         logging.debug("checking " + col)
         assert all(p1[col] == p2[col])
 
-@pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
-                    reason="partial testing")
+@pytest.mark.nightly
 def test_session_a(analysis_a, analysis_a_new):
     peak = pd.read_hdf(analysis_a, "analysis/peak")
     new_peak = pd.read_hdf(analysis_a_new, "analysis/peak")
     compare_peak(peak, new_peak)
 
 
-@pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
-                    reason="partial testing")
+@pytest.mark.nightly
 def test_drifting_gratings(dg, nwb_a, analysis_a_new):
     logging.debug("reading outputs")
     dg_new = DriftingGratings.from_analysis_file(BODS(nwb_a), analysis_a_new)
@@ -201,8 +199,7 @@ def test_drifting_gratings(dg, nwb_a, analysis_a_new):
     assert np.allclose(dg.signal_correlation, dg_new.signal_correlation, equal_nan=True)
     assert np.allclose(dg.representational_similarity, dg_new.representational_similarity, equal_nan=True)
 
-@pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
-                    reason="partial testing")
+@pytest.mark.nightly
 def test_natural_movie_one_a(nm1a, nwb_a, analysis_a_new):
     nm1a_new = NaturalMovie.from_analysis_file(BODS(nwb_a), analysis_a_new, si.NATURAL_MOVIE_ONE)
     #assert np.allclose(nm1a.sweep_response, nm1a_new.sweep_response)
@@ -211,23 +208,20 @@ def test_natural_movie_one_a(nm1a, nwb_a, analysis_a_new):
     assert np.allclose(nm1a.binned_dx_sp, nm1a_new.binned_dx_sp, equal_nan=True)
     assert np.allclose(nm1a.binned_dx_vis, nm1a_new.binned_dx_vis, equal_nan=True)
 
-@pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
-                    reason="partial testing")    
+@pytest.mark.nightly    
 def test_natural_movie_three(nm3, nwb_a, analysis_a_new):
     #nm3_new = NaturalMovie.from_analysis_file(BODS(nwb_a), analysis_a_new, si.NATURAL_MOVIE_THREE)
     #assert np.allclose(nm3.sweep_response, nm3_new.sweep_response)
     pass
 
 
-@pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
-                    reason="partial testing")
+@pytest.mark.nightly
 def test_session_b(analysis_b, analysis_b_new):
     peak = pd.read_hdf(analysis_b, "analysis/peak")
     new_peak = pd.read_hdf(analysis_b_new, "analysis/peak")
     compare_peak(peak, new_peak)
 
-@pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
-                    reason="partial testing")
+@pytest.mark.nightly
 def test_static_gratings(sg, nwb_b, analysis_b_new):
     sg_new = StaticGratings.from_analysis_file(BODS(nwb_b), analysis_b_new)
     #assert np.allclose(sg.sweep_response, sg_new.sweep_response)
@@ -238,8 +232,7 @@ def test_static_gratings(sg, nwb_b, analysis_b_new):
     assert np.allclose(sg.signal_correlation, sg_new.signal_correlation, equal_nan=True)
     assert np.allclose(sg.representational_similarity, sg_new.representational_similarity, equal_nan=True)
 
-@pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
-                    reason="partial testing")
+@pytest.mark.nightly
 def test_natural_movie_one_b(nm1b, nwb_b, analysis_b_new):    
     nm1b_new = NaturalMovie.from_analysis_file(BODS(nwb_b), analysis_b_new, si.NATURAL_MOVIE_ONE)
     #assert np.allclose(nm1b.sweep_response, nm1b_new.sweep_response)
@@ -249,8 +242,7 @@ def test_natural_movie_one_b(nm1b, nwb_b, analysis_b_new):
     assert np.allclose(nm1b.binned_dx_sp, nm1b_new.binned_dx_sp, equal_nan=True)
     assert np.allclose(nm1b.binned_dx_vis, nm1b_new.binned_dx_vis, equal_nan=True)
 
-@pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
-                    reason="partial testing")
+@pytest.mark.nightly
 def test_natural_scenes(ns, nwb_b, analysis_b_new):    
     ns_new = NaturalScenes.from_analysis_file(BODS(nwb_b), analysis_b_new)
     #assert np.allclose(ns.sweep_response, ns_new.sweep_response)
@@ -260,15 +252,13 @@ def test_natural_scenes(ns, nwb_b, analysis_b_new):
     assert np.allclose(ns.signal_correlation, ns_new.signal_correlation, equal_nan=True)
     assert np.allclose(ns.representational_similarity, ns_new.representational_similarity, equal_nan=True)
 
-@pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
-                    reason="partial testing")
+@pytest.mark.nightly
 def test_session_c(analysis_c, analysis_c_new):
     peak = pd.read_hdf(analysis_c, "analysis/peak")
     new_peak = pd.read_hdf(analysis_c_new, "analysis/peak")
     compare_peak(peak, new_peak)
 
-@pytest.mark.skipif(os.getenv('TEST_COMPETE') != 'true',
-                    reason="partial testing")
+@pytest.mark.nightly
 def test_locally_sparse_noise(lsn, nwb_c, analysis_c_new):
     ds = BODS(nwb_c)
     session_type = ds.get_metadata()['session_type']
@@ -282,8 +272,7 @@ def test_locally_sparse_noise(lsn, nwb_c, analysis_c_new):
     #assert np.allclose(lsn.sweep_response, lsn_new.sweep_response)
     assert np.allclose(lsn.mean_sweep_response, lsn_new.mean_sweep_response, equal_nan=True)
 
-@pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
-                    reason="partial testing")
+@pytest.mark.nightly
 def test_natural_movie_one_c(nm1c, nwb_c, analysis_c_new):    
     nm1c_new = NaturalMovie.from_analysis_file(BODS(nwb_c), analysis_c_new, si.NATURAL_MOVIE_ONE)
     #assert np.allclose(nm1c.sweep_response, nm1c_new.sweep_response)

@@ -72,7 +72,7 @@ def test_deprecated(deprecated_method):
         assert expected == str(c[-1].message)
         
         
-def test_deprecated_class(deprecated_class):
+def test_deprecated_class(deprecated_class, deprecated_method):
     expected = 'Class dep_cls is deprecated. msg'
     
     with warnings.catch_warnings(record=True) as c:

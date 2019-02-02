@@ -65,6 +65,7 @@ NATURAL_SCENES = 'natural_scenes'
 NATURAL_SCENES_SHORT = 'ns'
 NATURAL_SCENES_COLOR = '#e31a1c'
 
+# note that this stimulus is equivalent to LOCALLY_SPARSE_NOISE_4DEG in session C2 files
 LOCALLY_SPARSE_NOISE = 'locally_sparse_noise'
 LOCALLY_SPARSE_NOISE_SHORT = 'lsn'
 LOCALLY_SPARSE_NOISE_COLOR = '#fdbf6f'
@@ -141,7 +142,7 @@ def sessions_with_stimulus(stimulus):
     return sorted(list(sessions))
 
 
-def stimuli_in_session(session):
+def stimuli_in_session(session, allow_unknown=True):
     """ Return a list what stimuli are available in a given session.
 
     Parameters
@@ -149,7 +150,13 @@ def stimuli_in_session(session):
     session: string
         Must be one of: [stimulus_info.THREE_SESSION_A, stimulus_info.THREE_SESSION_B, stimulus_info.THREE_SESSION_C, stimulus_info.THREE_SESSION_C2]
     """
-    return SESSION_STIMULUS_MAP[session]
+    try:
+        return SESSION_STIMULUS_MAP[session]
+    except KeyError as e:
+        if allow_unknown:
+            return []
+        else:
+            raise
 
 
 def all_stimuli():

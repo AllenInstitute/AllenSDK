@@ -52,7 +52,7 @@ def test_get_genes(mock_query, atlas):
 
     expected = 'http://api.brain-map.org/api/v2/data/query.json?'\
                'q=model::Gene,rma::criteria,[organism_id$in2],rma::include,chromosome,'\
-               'rma::options[num_rows$eq2000][start_row$eq0][count$eqfalse]'
+               'rma::options[num_rows$eq2000][start_row$eq0][order$eq\'id\'][count$eqfalse]'
 
     for result in atlas.get_genes():
         pass
@@ -65,7 +65,7 @@ def test_get_section_data_sets(mock_query, atlas):
 
     expected = 'http://api.brain-map.org/api/v2/data/query.json?'\
                'q=model::SectionDataSet,rma::criteria,products[id$in1],rma::include,genes,'\
-               'rma::options[num_rows$eq2000][start_row$eq0][count$eqfalse]'
+               'rma::options[num_rows$eq2000][start_row$eq0][order$eq\'id\'][count$eqfalse]'
 
     for result in atlas.get_section_data_sets():
         pass

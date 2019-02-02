@@ -15,7 +15,7 @@ EXAMPLE_DIR = os.path.join(
 EXAMPLES = [filename for filename in os.listdir(EXAMPLE_DIR) if filename.split('.')[-1] == 'py']
 
 
-@pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true', reason="partial testing")
+@pytest.mark.nightly
 @pytest.mark.parametrize('script_name', EXAMPLES)
 def test_inline_examples(script_name, tmpdir_factory):
 

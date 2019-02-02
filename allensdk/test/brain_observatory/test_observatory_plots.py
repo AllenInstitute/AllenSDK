@@ -48,9 +48,9 @@ import allensdk.brain_observatory.stimulus_info as stiminfo
 import allensdk.core.json_utilities as ju
 from pkg_resources import resource_filename  # @UnresolvedImport
 
-if 'TEST_OBSERVATORY_EXPERIMENT_PLOTS_DATA' in os.environ:
-    data_file = os.environ['TEST_OBSERVATORY_EXPERIMENT_PLOTS_DATA']
-else:
+
+data_file = os.environ.get('TEST_OBSERVATORY_EXPERIMENT_PLOTS_DATA', 'skip')
+if data_file == 'default':
     data_file = resource_filename(__name__, 'test_observatory_plots_data.json')
 
 if data_file == 'skip':
