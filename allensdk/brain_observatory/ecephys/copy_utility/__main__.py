@@ -47,9 +47,9 @@ def raise_or_warn(message, do_raise, typ=None):
 
 def compare(source, dest, hasher_cls, raise_if_comparison_fails):
     if os.path.isdir(source) and os.path.isdir(dest):
-        compare_directories(source, dest, hasher_cls, raise_if_comparison_fails)
+        return compare_directories(source, dest, hasher_cls, raise_if_comparison_fails)
     elif (not os.path.isdir(source)) and (not os.path.isdir(dest)):
-        compare_files(source, dest, hasher_cls, raise_if_comparison_fails)
+        return compare_files(source, dest, hasher_cls, raise_if_comparison_fails)
     else:
         raise_or_warn(f"unable to compare files with directories: {source}, {dest}", raise_if_comparison_fails)
 
@@ -83,7 +83,7 @@ def compare_directories(source, dest, hasher_cls, raise_if_comparison_fails):
             compare(spath, dpath, hasher_cls, raise_if_comparison_fails)
     
 
-def main(files, use_rsync=True, hasher_key=None, raise_if_comparison_fails=True, make_parent_dirs=True):
+def main(files, use_rsync=True, hasher_key=None, raise_if_comparison_fails=True, make_parent_dirs=True, **kwargs):
     hasher_cls = available_hashers[hasher_key]
     output = []
 
@@ -93,14 +93,15 @@ def main(files, use_rsync=True, hasher_key=None, raise_if_comparison_fails=True,
         copy_file_entry(file_entry['source'], file_entry['destination'], use_rsync, make_parent_dirs)
 
         if hasher_cls is not None:
-            hashes = compare(file_entry['source'], file_entry['dest'], hasher_cls, raise_if_comparison_fails)
+            hashes = compare(file_entry['source'], file_entry['destination'], hasher_cls, raise_if_comparison_fails)
+            print(hashes)
             if hashes is not None:
-                record['source_hash'] = hashes[0].decode()
-                record['destination_hash'] = hashes[1].decode()
+                record['source_hash'] = [int(ii) for ii in hashes[0]]
+                record['destination_hash'] = [int(ii) for ii in hashes[1]]
 
         output.append(record)
 
-    return output
+    return {'files': output}
     
 
 if __name__ == '__main__':
