@@ -43,5 +43,5 @@ class InputSchema(ArgSchema):
     
 
 class OutputSchema(RaisingSchema):
-    nwb_path = String(required=True, description='path to output file')
+    files = Nested(CopiedFile, required=True, description='copied files')
     
