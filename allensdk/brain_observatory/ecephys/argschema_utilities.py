@@ -34,7 +34,7 @@ def check_read_access(path):
         f.close()
         return True
     except Exception as err:
-        raise ValidationError(f'file at #{path} not readable (#{type(err)}: {err.message}')
+        raise ValidationError(f'file at #{path} not readable (#{type(err)}: {err}')
 
 
 class RaisingSchema(DefaultSchema):
