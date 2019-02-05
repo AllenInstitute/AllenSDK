@@ -29,8 +29,8 @@ def test_hash_file(tmpdir_factory):
 @pytest.mark.parametrize('make_parent_dirs', [True, False])
 def test_copy_file_entry(tmpdir_factory, use_rsync, make_parent_dirs):
 
-    not_mac_or_linux = not (sys.platform.startswith('darwin') or sys.platform.startswith('linux'))
-    if use_rsync and not_mac_or_linux:
+    mac_or_linux = sys.platform.startswith('darwin') or sys.platform.startswith('linux')
+    if use_rsync and not mac_or_linux:
         pytest.skip()
 
     tempdir = str(tmpdir_factory.mktemp('ecephys_copy_utility_test_copy_file_entry'))
