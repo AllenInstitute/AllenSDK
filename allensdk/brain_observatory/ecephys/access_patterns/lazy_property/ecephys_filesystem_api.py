@@ -1,10 +1,11 @@
 from collections import namedtuple
 import random
+import warnings
 
 import pandas as pd
 import pynwb
 
-from .ecephys_api import EcephysApi
+from ..ecephys_api import EcephysApi
 
 
 RunningSpeed = namedtuple(typename='RunningSpeed', field_names=('timestamps', 'values'))

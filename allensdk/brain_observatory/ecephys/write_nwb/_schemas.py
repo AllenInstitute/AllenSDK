@@ -1,40 +1,10 @@
-import os
-
 from marshmallow import RAISE, ValidationError
 
 from argschema import ArgSchema, ArgSchemaParser
 from argschema.schemas import DefaultSchema
 from argschema.fields import LogLevel, String, Int, DateTime, Nested, Boolean, Float
 
-
-def check_write_access(path):
-    try:
-        fd = os.open(path, os.O_CREAT | os.O_EXCL)
-        os.close(fd)
-        os.remove(path)
-        return True
-    except FileNotFoundError:
-        check_write_access(os.path.dirname(path))
-    except PermissionError:
-        raise ValidationError(f'don\'t have permissions to write {path}')
-    except FileExistsError:
-        if not os.path.isdir(path):
-            raise ValidationError(f'file at {path} already exists')
-        return True
-
-
-def check_read_access(path):
-    try:
-        f = open(path, mode='r')
-        f.close()
-        return True
-    except Exception as err:
-        raise ValidationError(f'file at #{path} not readable (#{type(err)}: {err.message}')
-
-
-class RaisingSchema(DefaultSchema):
-    class Meta:
-        unknown=RAISE
+from ..argschema_utilities import check_read_access, check_write_access, RaisingSchema
 
 
 class Channel(RaisingSchema):

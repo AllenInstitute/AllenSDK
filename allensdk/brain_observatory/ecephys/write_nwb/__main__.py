@@ -14,6 +14,7 @@ import numpy as np
 from allensdk.config.manifest import Manifest
 
 from ._schemas import InputSchema, OutputSchema
+from ..argschema_utilities import write_or_print_outputs
 
 
 def get_inputs_from_lims(host, ecephys_session_id, output_root, job_queue, strategy):
@@ -25,15 +26,7 @@ def get_inputs_from_lims(host, ecephys_session_id, output_root, job_queue, strat
     if len(data) == 1 and 'error' in data:
         raise ValueError('bad request uri: {} ({})'.format(uri, data['error']))
 
-    return data
-
-
-def write_or_print_outputs(data, parser):
-    data.update({'input_parameters': parser.args})
-    if 'output_json' in parser.args:
-        parser.output(data, indent=2)
-    else:
-        print(parser.get_output_json(data))   
+    return data 
 
 
 STIM_TABLE_RENAMES_MAP = {
