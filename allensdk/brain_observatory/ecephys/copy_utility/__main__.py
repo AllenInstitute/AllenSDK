@@ -3,6 +3,7 @@ import subprocess as sp
 import shutil
 import warnings
 import copy as cp
+import os
 
 import argschema
 
@@ -13,25 +14,25 @@ from ..argschema_utilities import write_or_print_outputs
 
 def hash_file(path, hasher_cls):
     with open(path, 'rb') as file_obj:
-        hasher = hasher_cls(file_obj)
-        hasher.update()
+        hasher = hasher_cls()
+        hasher.update(file_obj.read())
         return hasher.digest()
 
 
-def copy_file_entry(src, dest, use_rsync, make_parent_dirs):
+def copy_file_entry(source, dest, use_rsync, make_parent_dirs):
 
     if make_parent_dirs:
         Manifest.safe_make_parent_dirs(dest)
 
-        if use_rsync:
-            sp.check_call(['rsync', '-a', source, dest])
+    if use_rsync:
+        sp.check_call(['rsync', '-a', source, dest])
+    else:
+        if os.path.isdir(source):
+            shutil.copytree(source, dest)
         else:
-            if os.path.isdir(source):
-                shutil.copytree(source, dest)
-            else:
-                shutil.copy(source, dest)
-        
-        logging.info(f"copied from {source} to {dest}")
+            shutil.copy(source, dest)
+    
+    logging.info(f"copied from {source} to {dest}")
 
 
 def raise_or_warn(message, do_raise, typ=None):
@@ -58,7 +59,7 @@ def compare_files(source, dest, hasher_cls, raise_if_comparison_fails):
     dest_hash = hash_file(dest, hasher_cls)
 
     if source_hash != dest_hash:
-        raise_or_warn(f"comparison of {source} and {dest} using {hasher_cls.name} failed", raise_if_comparison_fails)
+        raise_or_warn(f"comparison of {source} and {dest} using {hasher_cls.__name__} failed", raise_if_comparison_fails)
 
     return source_hash, dest_hash
 
@@ -67,7 +68,7 @@ def compare_directories(source, dest, hasher_cls, raise_if_comparison_fails):
     source_contents = sorted(os.listdir(source))
     dest_contents = sorted(os.listdir(dest))
 
-    if len(source_contents != len(dest_contents)):
+    if len(source_contents) != len(dest_contents):
         raise_or_warn(
             f"{source} contains {len(source_contents)} items while {dest} contains {len(dest_contents)} items", 
             raise_if_comparison_fails
