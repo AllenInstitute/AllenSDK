@@ -5,7 +5,13 @@ import sys
 
 import pytest
 
-import allensdk.brain_observatory.ecephys.copy_utility.__main__ as cu
+if sys.version_info < (3, 6):
+    if pytest.__version__ < "3.0.0":
+        pytest.skip()
+    else:
+        pytestmark = pytest.mark.skip
+else:
+    import allensdk.brain_observatory.ecephys.copy_utility.__main__ as cu
 
 
 def test_hash_file(tmpdir_factory):
