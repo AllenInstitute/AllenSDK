@@ -8,6 +8,9 @@ class LazyProperty(object):
         if obj is None:
             return self
 
+        if not hasattr(obj.api, self.getter_name):
+            return None
+
         if not hasattr(obj, self.hidden_attr):
             setattr(obj, self.hidden_attr, self.calculate(obj))
         return getattr(obj, self.hidden_attr)
