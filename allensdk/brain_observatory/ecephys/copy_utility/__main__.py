@@ -94,7 +94,6 @@ def main(files, use_rsync=True, hasher_key=None, raise_if_comparison_fails=True,
 
         if hasher_cls is not None:
             hashes = compare(file_entry['source'], file_entry['destination'], hasher_cls, raise_if_comparison_fails)
-            print(hashes)
             if hashes is not None:
                 record['source_hash'] = [int(ii) for ii in hashes[0]]
                 record['destination_hash'] = [int(ii) for ii in hashes[1]]
