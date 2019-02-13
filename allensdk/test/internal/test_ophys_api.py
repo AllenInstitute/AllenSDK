@@ -1,5 +1,6 @@
 import pytest
 
+from allensdk.internal.api import OneResultExpectedError
 from allensdk.internal.api.lims_ophys_api import LimsOphysAPI
 
 
@@ -10,5 +11,16 @@ from allensdk.internal.api.lims_ophys_api import LimsOphysAPI
 def test_get_ophys_experiment_dir(ophys_experiment_id, compare_val):
 
     api = LimsOphysAPI()
-    assert api.get_ophys_experiment_dir(ophys_experiment_id=ophys_experiment_id) == compare_val
-    assert api.get_ophys_experiment_dir(ophys_experiment_id) == compare_val
+
+    if compare_val is None:
+        expected_fail = False
+        try:
+            api.get_ophys_experiment_dir(ophys_experiment_id)
+        except OneResultExpectedError:
+            expected_fail = True
+        assert expected_fail == True
+    
+    else:
+        api.get_ophys_experiment_dir(ophys_experiment_id=ophys_experiment_id)
+        assert api.get_ophys_experiment_dir(ophys_experiment_id=ophys_experiment_id) == compare_val
+
