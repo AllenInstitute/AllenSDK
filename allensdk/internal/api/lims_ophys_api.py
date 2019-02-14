@@ -1,8 +1,11 @@
 from . import PostgresQueryMixin
 
+from allensdk.api.cache import memoize
+
 class LimsOphysAPI(PostgresQueryMixin):
 
-    def get_ophys_experiment_dir(self, ophys_experiment_id=None, **kwargs):
+    @memoize
+    def get_ophys_experiment_dir(self, ophys_experiment_id=None):
         query = '''
                 SELECT oe.storage_directory
                 FROM ophys_experiments oe
