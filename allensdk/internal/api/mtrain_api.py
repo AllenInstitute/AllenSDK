@@ -1,8 +1,7 @@
 import psycopg2
 import pandas as pd
 
-from allensdk.internal.api import PostgresQueryMixin, one
-# from . import PostgresQueryMixin, one
+from . import PostgresQueryMixin, one
 
 class MtrainApi(PostgresQueryMixin):
 
