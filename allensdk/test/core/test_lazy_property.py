@@ -18,11 +18,12 @@ class DataClass(LazyPropertyMixin):
         self.data = self.LazyProperty(self.api.get_data, original_data=self.original_data)
 
 
-@pytest.mark.parametrize('original_data', [1, '1', [None]])
+@pytest.mark.parametrize('original_data', [{'a': 'b'}, [None]])
 def test_first_compute(original_data):
     data_obj = DataClass(original_data)
     assert data_obj.data == original_data
-
+    assert data_obj.data is not original_data
+    
 
 @pytest.mark.parametrize('original_data', [1, '1', [None]])
 def test_is_lazy(original_data):
