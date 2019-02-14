@@ -20,8 +20,26 @@ def test_get_ophys_experiment_dir(ophys_experiment_id, compare_val):
         except OneResultExpectedError:
             expected_fail = True
         assert expected_fail == True
-    
     else:
-        api.get_ophys_experiment_dir(ophys_experiment_id=ophys_experiment_id)
         assert api.get_ophys_experiment_dir(ophys_experiment_id=ophys_experiment_id) == compare_val
+
+
+@pytest.mark.nightly
+@pytest.mark.parametrize('ophys_experiment_id, compare_val', [
+    pytest.param(511458874, '/allen/programs/braintv/production/neuralcoding/prod6/specimen_503292442/ophys_experiment_511458874/511458874.nwb'),
+    pytest.param(0, None)
+])
+def test_get_nwb_filepath(ophys_experiment_id, compare_val):
+
+    api = LimsOphysAPI()
+
+    if compare_val is None:
+        expected_fail = False
+        try:
+            api.get_nwb_filepath(ophys_experiment_id)
+        except OneResultExpectedError:
+            expected_fail = True
+        assert expected_fail == True
+    else:
+        assert api.get_nwb_filepath(ophys_experiment_id=ophys_experiment_id) == compare_val
 
