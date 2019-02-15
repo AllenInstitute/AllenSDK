@@ -1,6 +1,7 @@
-h5py>=2.3.1
+psycopg2>=2.7
+h5py>=2.8
 matplotlib>=1.4.3
-numpy>=1.12.1
+numpy>=1.15.1
 pandas>=0.23.0
 jinja2>=2.7.3
 scipy>=0.15.1
@@ -11,6 +12,7 @@ requests
 requests-toolbelt
 simplejson>=3.10.0
 scikit-image>=0.14.0
+scikit-build
 statsmodels>=0.8.0
 simpleitk
 tables
