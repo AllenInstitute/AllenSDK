@@ -421,6 +421,7 @@ class BrainObservatoryCache(Cache):
 
         return cell_specimens
 
+      
     def get_nwb_filepath(self, ophys_experiment_id=None):
         cache_nwb_filepath = self.get_cache_path(None, self.EXPERIMENT_DATA_KEY, ophys_experiment_id)
         if os.path.exists(cache_nwb_filepath):
@@ -428,7 +429,7 @@ class BrainObservatoryCache(Cache):
         else:
             return None
 
-
+          
     def get_ophys_experiment_data(self, ophys_experiment_id, file_name=None):
         """ Download the NWB file for an ophys_experiment (if it hasn't already been
         downloaded) and return a data accessor object.
@@ -447,8 +448,7 @@ class BrainObservatoryCache(Cache):
         -------
         BrainObservatoryNwbDataSet
         """
-        file_name = self.get_cache_path(
-            file_name, self.EXPERIMENT_DATA_KEY, ophys_experiment_id)
+        file_name = self.get_nwb_filepath(ophys_experiment_id=ophys_experiment_id, file_name=file_name, none_if_not_exists=False)
 
         self.api.save_ophys_experiment_data(ophys_experiment_id, file_name, strategy='lazy')
 
