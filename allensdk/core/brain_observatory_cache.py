@@ -448,7 +448,8 @@ class BrainObservatoryCache(Cache):
         -------
         BrainObservatoryNwbDataSet
         """
-        file_name = self.get_nwb_filepath(ophys_experiment_id=ophys_experiment_id, file_name=file_name, none_if_not_exists=False)
+        file_name = self.get_cache_path(
+            file_name, self.EXPERIMENT_DATA_KEY, ophys_experiment_id)
 
         self.api.save_ophys_experiment_data(ophys_experiment_id, file_name, strategy='lazy')
 
