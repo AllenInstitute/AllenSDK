@@ -39,7 +39,7 @@ For more details on how to use these methods, see :doc:`glif_models`.
 import functools
 import numpy as np
 import numba
-
+from numba import jit
 
 class GlifNeuronMethod( object ):
     """ A simple class to keep track of the name and parameters associated with a neuron method.
