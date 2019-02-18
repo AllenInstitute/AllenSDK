@@ -21,6 +21,17 @@ def test_get_behavior_training_df(LabTracks_ID):
     assert list(df.columns) == [u'stage_name', u'regimen_name', u'date', u'behavior_session_id']
     assert len(df) == 24
 
+@pytest.mark.nightly
+@pytest.mark.parametrize('LabTracks_ID', [
+    pytest.param(423986),
+])
+def test_get_current_stage(LabTracks_ID):
+    
+    api = MtrainApi()
+    stage = api.get_current_stage(LabTracks_ID)
+    assert stage == 'OPHYS_6_images_B'
+
+
 
 # def test_get_ophys_experiment_dir(ophys_experiment_id, compare_val):
 

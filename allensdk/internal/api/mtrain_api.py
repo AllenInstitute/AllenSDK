@@ -1,12 +1,17 @@
 import psycopg2
 import pandas as pd
+import requests
+import os
+import json
 
 from . import PostgresQueryMixin, one
 
 class MtrainApi(PostgresQueryMixin):
 
-    def __init__(self, dbname="mtrain", user="mtrainreader", host="prodmtrain1", password="mtrainro", port=5432):
+    def __init__(self, dbname="mtrain", user="mtrainreader", host="prodmtrain1", password="mtrainro", port=5432, api_base='http://mtrain:5000'):
         super(MtrainApi, self).__init__(dbname=dbname, user=user, host=host, password=password, port=port)
+        self.api_base = api_base
+
 
     def get_subjects(self):
         query = 'SELECT "LabTracks_ID" FROM subjects'
@@ -24,3 +29,10 @@ class MtrainApi(PostgresQueryMixin):
                WHERE "LabTracks_ID"={}
             '''.format(LabTracks_ID), connection)
         return dataframe.sort_values(by='date')
+
+
+    def get_current_stage(self, LabTracks_ID):
+        sess = requests.Session()
+
+        state_response = sess.get(os.path.join(self.api_base, 'get_script/'), data=json.dumps({'LabTracks_ID':LabTracks_ID}))#.json()#['objects']).keys()
+        return state_response.json()['data']['parameters']['stage']
