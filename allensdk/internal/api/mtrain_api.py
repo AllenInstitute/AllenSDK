@@ -10,7 +10,7 @@ class MtrainApi(PostgresQueryMixin):
 
     def get_subjects(self):
         query = 'SELECT "LabTracks_ID" FROM subjects'
-        return [one(x) for x in self.fetchall(query)]
+        return self.fetchall(query)
 
 
     def get_behavior_training_df(self, LabTracks_ID):

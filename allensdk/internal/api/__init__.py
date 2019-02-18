@@ -3,6 +3,9 @@ import psycopg2
 class OneResultExpectedError(RuntimeError):
     pass
 
+class OneOrMoreResultExpectedError(RuntimeError):
+    pass
+
 def one(x):
     if len(x) != 1:
         raise OneResultExpectedError('Expected length one result, received: {} results form query'.format(x))
@@ -40,4 +43,4 @@ class PostgresQueryMixin(object):
     def fetchall(self, query, strict=True):
         cur = self.get_cursor()
         cur.execute(query)
-        return cur.fetchall()
+        return [one(x) for x in cur.fetchall()]
