@@ -24,6 +24,26 @@ STIM_TABLE_RENAMES_MAP = {
 
 
 def get_inputs_from_lims(host, ecephys_session_id, output_root, job_queue, strategy):
+    ''' This is a development / testing utility for running this module from the Allen Institute for Brain Science's 
+    Laboratory Information Management System (LIMS). It will only work if you are on our internal network.
+
+    Parameters
+    ----------
+    ecephys_session_id : int
+        Unique identifier for session of interest.
+    output_root : str
+        Output file will be written into this directory.
+    job_queue : str
+        Identifies the job queue from which to obtain configuration data
+    strategy : str
+        Identifies the LIMS strategy which will be used to write module inputs.
+
+    Returns
+    -------
+    data : dict
+        Response from LIMS. Should meet the schema defined in _schemas.py
+
+    '''
     
     uri = f'{host}/input_jsons?object_id={ecephys_session_id}&object_class=EcephysSession&strategy_class={strategy}&job_queue_name={job_queue}&output_directory={output_root}'
     response = requests.get(uri)
@@ -36,6 +56,24 @@ def get_inputs_from_lims(host, ecephys_session_id, output_root, job_queue, strat
 
 
 def read_stimulus_table(path,  column_renames_map=None):
+    ''' Loads from a CSV on disk the stimulus table for this session. Optionally renames columns to match NWB 
+    epoch specifications.
+
+    Parameters
+    ----------
+    path : str
+        path to stimulus table csv
+    column_renames_map : dict, optional
+        if provided will be used to rename columns from keys -> values. Default renames 'Start' -> 'start_time' and 
+        'End' -> 'stop_time'
+    
+    Returns
+    -------
+    pd.DataFrame : 
+        stimulus table with applied renames
+
+    '''
+
     if column_renames_map  is None:
         column_renames_map = STIM_TABLE_RENAMES_MAP
 
@@ -60,6 +98,12 @@ def add_stimulus_table_to_file(nwbfile, stimulus_table, tag='stimulus_epoch'):
         Nans will be replaced with the empty string. Required columns are:
             start_time :: the time at which this epoch started
             stop_time :: the time  at which this epoch ended
+    tag : str, optional
+        Each epoch in an nwb file has one or more tags. This string will be applied as a tag to all epochs created here
+
+    Returns
+    -------
+    nwbfile : pynwb.NWBFile
 
     '''
     stimulus_table = stimulus_table.copy()
@@ -89,6 +133,24 @@ def add_stimulus_table_to_file(nwbfile, stimulus_table, tag='stimulus_epoch'):
 
 
 def read_spike_times_to_dictionary(spike_times_path, spike_units_path, local_to_global_unit_map=None):
+    ''' Reads spike times and assigned units from npy files into a lookup table.
+
+    Parameters
+    ----------
+    spike_times_path : str
+        npy file identifying, per spike, the time at which that spike occurred.
+    spike_units_path : str
+        npy file identifying, per spike, the unit associated with that spike. These are probe-local, so a 
+        local_to_global_unit_map is used to associate spikes with global unit identifiers.
+    local_to_global_unit_map : dict, optional
+        Maps probewise local unit indices to global unit ids
+
+    Returns
+    -------
+    output_times : dict
+        keys are unit identifiers, values are spike time arrays
+
+    '''
 
     spike_times = np.squeeze(np.load(spike_times_path, allow_pickle=False))
     spike_units = np.squeeze(np.load(spike_units_path, allow_pickle=False))
@@ -116,6 +178,24 @@ def read_spike_times_to_dictionary(spike_times_path, spike_units_path, local_to_
 
 
 def read_waveforms_to_dictionary(waveforms_path, local_to_global_unit_map=None, peak_channel_map=None):
+    ''' Builds a lookup table for unitwise waveform data
+
+    Parameters
+    ----------
+    waveforms_path : str
+        npy file containing waveform data for each unit. Dimensions ought to be units X samples X channels
+    local_to_global_unit_map : dict, optional
+        Maps probewise local unit indices to global unit ids
+    peak_channel_map : dict, optional
+        Maps unit identifiers to indices of peak channels. If provided, the output will contain only samples on the peak 
+        channel for each unit.
+
+    Returns
+    -------
+    output_waveforms : dict
+        Keys are unit identifiers, values are samples X channels data arrays.
+
+    '''
 
     waveforms = np.squeeze(np.load(waveforms_path, allow_pickle=False))
     output_waveforms = {}
@@ -135,6 +215,23 @@ def read_waveforms_to_dictionary(waveforms_path, local_to_global_unit_map=None, 
 
 
 def read_running_speed(values_path, timestamps_path):
+    ''' Reads running speed data and timestamps into a RunningSpeed named tuple
+
+    Parameters
+    ----------
+    values_path : str
+        path to npy file containing running speed values (cm / s) per sample
+    timestamps_path : str
+        path to npy file identifying the time at which each running speed sample was collected
+
+
+    Returns
+    -------
+    RunningSpeed : 
+        contains values and timestamps
+
+    '''
+
     return RunningSpeed(
         timestamps=np.squeeze(np.load(timestamps_path, allow_pickle=False)),
         values=np.squeeze(np.load(values_path, allow_pickle=False))
@@ -163,7 +260,9 @@ def add_probe_to_nwbfile(nwbfile, probe_id, description='', location=''):
         nwbfile : pynwb.NWBFile
             the updated file object
         probe_nwb_device : pynwb.device.Device
+            device object corresponding to this probe
         probe_nwb_electrode_group : pynwb.ecephys.ElectrodeGroup
+            electrode group object corresponding to this probe
 
     '''
 
@@ -217,6 +316,9 @@ def prepare_probewise_channel_table(channels, electrode_group):
 
 
 def dict_to_indexed_array(dc, order=None):
+    ''' Given a dictionary and an ordered arr, build a concatenation of the dictionary's values and an index describing 
+    how that concatenation can be unpacked
+    '''
 
     if order is None:
         order = dc.keys()
@@ -244,6 +346,14 @@ def add_ragged_data_to_dynamic_table(table, data, column_name, column_descriptio
         table to which data will be added (as VectorData / VectorIndex)
     data : dict
         each key-value pair describes some grouping of data
+    column_name : str
+        used to set the name of this column
+    column_description : str, optional
+        used to set the description of this column
+
+    Returns
+    -------
+    nwbfile : pynwb.NWBFile
 
     '''
 
@@ -254,6 +364,25 @@ def add_ragged_data_to_dynamic_table(table, data, column_name, column_descriptio
 
 
 def add_running_speed_to_nwbfile(nwbfile, running_speed, name='running_speed', unit='cm/s'):
+    ''' Adds running speed data to an NWBFile as a timeseries in acquisition
+
+    Parameters
+    ----------
+    nwbfile : pynwb.NWBFile
+        File to which runnign speeds will be written
+    running_speed : RunningSpeed
+        Contains attributes 'values' and 'timestamps'
+    name : str, optional
+        used as name of timeseries object
+    unit : str, optional
+        SI units of running speed values
+
+    Returns
+    -------
+    nwbfile : pynwb.NWBFile
+
+    '''
+
     running_speed_series = pynwb.base.TimeSeries(
         name=name, 
         data=running_speed.values, 
