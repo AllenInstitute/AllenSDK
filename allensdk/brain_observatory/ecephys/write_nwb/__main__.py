@@ -101,7 +101,7 @@ def read_spike_times_to_dictionary(spike_times_path, spike_units_path, local_to_
     output_times = {}
     for jj, (low, high) in enumerate(zip(changes[:-1], changes[1:])):
         local_unit = spike_units[low]
-        unit_times = spike_times[low:high]
+        unit_times = np.sort(spike_times[low:high])
 
         if local_to_global_unit_map is not None:
             if local_unit not in local_to_global_unit_map:
