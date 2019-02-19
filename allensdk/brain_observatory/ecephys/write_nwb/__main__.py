@@ -17,6 +17,12 @@ from ._schemas import InputSchema, OutputSchema
 from ..argschema_utilities import write_or_print_outputs
 
 
+STIM_TABLE_RENAMES_MAP = {
+    'Start': 'start_time',
+    'End': 'stop_time',
+}
+
+
 def get_inputs_from_lims(host, ecephys_session_id, output_root, job_queue, strategy):
     
     uri = f'{host}/input_jsons?object_id={ecephys_session_id}&object_class=EcephysSession&strategy_class={strategy}&job_queue_name={job_queue}&output_directory={output_root}'
@@ -27,43 +33,6 @@ def get_inputs_from_lims(host, ecephys_session_id, output_root, job_queue, strat
         raise ValueError('bad request uri: {} ({})'.format(uri, data['error']))
 
     return data 
-
-
-STIM_TABLE_RENAMES_MAP = {
-    'Start': 'start_time',
-    'End': 'stop_time',
-}
-
-
-def add_probes_to_file(nwbfile, probes):
-
-    probe_object_map = {}
-
-    for probe in probes:
-        probe_nwb_device = pynwb.device.Device(
-            name=str(probe['id']), # why not name? probe names are actually codes for targeted structure. ids are the appropriate primary key
-        )
-        probe_nwb_electrode_group = pynwb.ecephys.ElectrodeGroup(
-            name=str(probe['id']),
-            description=probe['name'], # TODO probe name currently describes the targeting of the probe - the closest we have to a meaningful "kind"
-            location='', # TODO not actailly sure where to get this
-            device=probe_nwb_device
-        )
-
-        nwbfile.add_device(probe_nwb_device)
-        nwbfile.add_electrode_group(probe_nwb_electrode_group)
-        probe_object_map[probe['id']] = probe_nwb_electrode_group
-
-    return nwbfile, probe_object_map
-
-
-def add_electrodes_to_file(nwbfile, channel_table, probe_object_map):
-
-    for probe_id, probe_group in probe_object_map.items():
-        channel_table.loc[channel_table['probe_id'] == probe['id'], 'group'] = probe_group
-
-    nwbfile.electrodes = pynwb.ElectrodeTable().from_dataframe(channel_table, name='electrodes')
-    return nwbfile
 
 
 def read_stimulus_table(path,  column_renames_map=None):
@@ -80,7 +49,20 @@ def read_stimulus_table(path,  column_renames_map=None):
     return stimulus_table.rename(columns=column_renames_map, index={})
 
 
-def add_stimulus_table_to_file(nwbfile, stimulus_table):
+def add_stimulus_table_to_file(nwbfile, stimulus_table, tag='stimulus_epoch'):
+    ''' Adds a stimulus table (defining stimulus characteristics for each time point in a session) to an nwbfile as epochs.
+
+    Parameters
+    ----------
+    nwbfile : pynwb.NWBFile
+    stimulus_table: pd.DataFrame
+        Each row corresponds to an epoch of time. Columns define the epoch (start and stop time) and its characteristics. 
+        Nans will be replaced with the empty string. Required columns are:
+            start_time :: the time at which this epoch started
+            stop_time :: the time  at which this epoch ended
+
+    '''
+    stimulus_table = stimulus_table.copy()
 
     ts = pynwb.base.TimeSeries(
         name='stimulus_times', 
@@ -97,7 +79,7 @@ def add_stimulus_table_to_file(nwbfile, stimulus_table):
             series.fillna('', inplace=True)
             stimulus_table[colname] = series.transform(str)
 
-    stimulus_table['tags'] = [('stimulus_epoch',)] * stimulus_table.shape[0]
+    stimulus_table['tags'] = [(tag,)] * stimulus_table.shape[0]
     stimulus_table['timeseries'] = [(ts,)] * stimulus_table.shape[0]
 
     container = pynwb.epoch.TimeIntervals.from_dataframe(stimulus_table, 'epochs')
@@ -152,6 +134,88 @@ def read_waveforms_to_dictionary(waveforms_path, local_to_global_unit_map=None, 
     return output_waveforms
 
 
+def read_running_speed(values_path, timestamps_path):
+    return RunningSpeed(
+        timestamps=np.squeeze(np.load(timestamps_path, allow_pickle=False)),
+        values=np.squeeze(np.load(values_path, allow_pickle=False))
+    )
+
+
+def add_probe_to_nwbfile(nwbfile, probe_id, description='', location=''):
+    ''' Creates objects required for representation of a single extracellular ephys probe within an NWB file. These objects amount 
+    to a Device (this will be removed at some point from pynwb) and an ElectrodeGroup.
+
+    Parameters
+    ----------
+    nwbfile : pynwb.NWBFile
+        file to which probe information will be assigned.
+    probe_id : int
+        unique identifier for this probe - will be used to fill the "name" field on this probe's device and group
+    description : str, optional
+        human-readable description of this probe. Practically (and temporarily), we use tags like "probeA" or "probeB"
+    location : str, optional
+        unspecified information about the location of this probe. Currently left blank, but in the future will probably contain
+        an expanded form of the information currently implicit in 'probeA' (ie targeting and insertion plan) while channels will 
+        carry the results of ccf registration.
+
+    Returns
+    ------
+        nwbfile : pynwb.NWBFile
+            the updated file object
+        probe_nwb_device : pynwb.device.Device
+        probe_nwb_electrode_group : pynwb.ecephys.ElectrodeGroup
+
+    '''
+
+    probe_nwb_device = pynwb.device.Device(name=str(probe_id))
+    probe_nwb_electrode_group = pynwb.ecephys.ElectrodeGroup(
+        name=str(probe_id),
+        description=description,
+        location=location,
+        device=probe_nwb_device
+    )
+    
+    nwbfile.add_device(probe_nwb_device)
+    nwbfile.add_electrode_group(probe_nwb_electrode_group)
+
+    return nwbfile, probe_nwb_device, probe_nwb_electrode_group
+
+
+def prepare_probewise_channel_table(channels, electrode_group):
+    ''' Builds an NWB-ready dataframe of probewise channels
+
+    Parameters
+    ----------
+    channels : pd.DataFrame
+        each row is a channel. ids may be listed as a column or index named "id". Other expected columns:
+            probe_id: int, uniquely identifies probe
+            valid_data: bool, whether data from this channel is usable
+            local_index: uint, the probe-local index of this channel
+            probe_vertical_position: the lengthwise position along the probe of this channel (microns)
+            probe_horizontal_position: the widthwise position on the probe of this channel (microns)
+    electrode_group : pynwb.ecephys.ElectrodeGroup
+        the electrode group representing this probe's electrodes
+
+    Returns
+    -------
+    channel_table : pd.DataFrame
+        probewise channel table, ready to be concatenated and passed to ElectrodeTable.from_dataframe
+
+    '''
+
+    channel_table = pd.DataFrame(channels).copy()
+
+    if 'id' in channel_table.columns and channel_table.index.name != 'id':
+        channel_table = channel_table.set_index(keys='id', drop=True)
+    elif 'id' in channel_table.columns and channel_table.index.name == 'id':
+        raise ValueError('found both column and index named \"id\"')
+    elif channel_table.index.name != 'id':
+        raise ValueError(f'unable to recognize ids in this channel table. index: {channel_table.index}, columns: {channel_table.columns}')
+
+    channel_table['group'] = electrode_group
+    return channel_table
+
+
 def dict_to_indexed_array(dc, order=None):
 
     if order is None:
@@ -169,6 +233,35 @@ def dict_to_indexed_array(dc, order=None):
     data = np.concatenate(data)
 
     return index, data
+
+
+def add_ragged_data_to_dynamic_table(table, data, column_name, column_description=''):
+    ''' Builds the index and data vectors required for writing ragged array data to a pynwb dynamic table
+
+    Parameters
+    ----------
+    table : pynwb.core.DynamicTable
+        table to which data will be added (as VectorData / VectorIndex)
+    data : dict
+        each key-value pair describes some grouping of data
+
+    '''
+
+    idx, values = dict_to_indexed_array(data, table.id)
+    del data
+
+    table.add_column(name=column_name, description=column_description, data=values, index=idx)
+
+
+def add_running_speed_to_nwbfile(nwbfile, running_speed, name='running_speed', unit='cm/s'):
+    running_speed_series = pynwb.base.TimeSeries(
+        name=name, 
+        data=running_speed.values, 
+        timestamps=running_speed.timestamps, 
+        unit=unit
+    )
+    nwbfile.add_acquisition(running_speed_series)
+    return nwbfile
 
 
 def write_ecephys_nwb(
@@ -197,66 +290,39 @@ def write_ecephys_nwb(
     for probe in probes:
         logging.info(f'found probe {probe["id"]} with name {probe["name"]}')
 
-        probe_nwb_device = pynwb.device.Device(
-            name=str(probe['id']), # why not name? probe names are actually codes for targeted structure. ids are the appropriate primary key
-        )
-        probe_nwb_electrode_group = pynwb.ecephys.ElectrodeGroup(
-            name=str(probe['id']),
-            description=probe['name'], # TODO probe name currently describes the targeting of the probe - the closest we have to a meaningful "kind"
-            location='', # TODO not actailly sure where to get this
-            device=probe_nwb_device
-        )
-        
-        nwbfile.add_device(probe_nwb_device)
-        nwbfile.add_electrode_group(probe_nwb_electrode_group)
+        nwbfile, probe_nwb_device, probe_nwb_electrode_group = add_probe_to_nwbfile(nwbfile, probe['id'], location=probe['name'])
+        channel_tables.append(prepare_probewise_channel_table(probe['channels'], probe_nwb_electrode_group))
+        unit_tables.append(pd.DataFrame(probe['units']))
 
-        global_to_local_channel_map = {ch['id']: ch['local_index'] for ch in probe['channels']}
-        probewise_channel_table = pd.DataFrame(probe['channels'])
-        probewise_channel_table['group'] = probe_nwb_electrode_group
-        channel_tables.append(probewise_channel_table)
+        local_to_global_unit_map = {unit['local_index']: unit['id'] for unit in probe['units']}
 
-        local_to_global_unit_id_map = {unit['local_index']: unit['id'] for unit in probe['units']}
+        spike_times.update(read_spike_times_to_dictionary(
+            probe['spike_times_path'], probe['spike_clusters_file'], local_to_global_unit_map
+        ))
+        mean_waveforms.update(read_waveforms_to_dictionary(
+            probe['mean_waveforms_path'], local_to_global_unit_map
+        ))
 
-        probewise_units_table = pd.DataFrame(probe['units'])
-        probewise_spike_times = read_spike_times_to_dictionary(
-            probe['spike_times_path'], probe['spike_clusters_file'], local_to_global_unit_id_map
-        )
-        probewise_mean_waveforms = read_waveforms_to_dictionary(
-            probe['mean_waveforms_path'], local_to_global_unit_id_map
-        )
+    nwbfile.electrodes = pynwb.file.ElectrodeTable().from_dataframe(pd.concat(channel_tables), name='electrodes')
+    nwbfile.units = pynwb.misc.Units.from_dataframe(pd.concat(unit_tables), name='units')
 
-        unit_tables.append(probewise_units_table)
-        spike_times.update(probewise_spike_times)
-        mean_waveforms.update(probewise_mean_waveforms)
+    add_ragged_data_to_dynamic_table(
+        table=nwbfile.units, 
+        data=spike_times, 
+        column_name='spike_times', 
+        column_description='times (s) of detected spiking events'
+    )
 
-    channel_table = pd.concat(channel_tables)
-    channel_table = channel_table.set_index(keys='id', drop=True)
+    add_ragged_data_to_dynamic_table(
+        table=nwbfile.units, 
+        data=mean_waveforms, 
+        column_name='waveform_mean', 
+        column_description='mean waveforms on peak channels (and over samples)'
+    )
 
-    unit_table = pd.concat(unit_tables)
-    unit_table = unit_table.set_index(keys='id', drop=True)
-
-    nwbfile.electrodes = pynwb.file.ElectrodeTable().from_dataframe(channel_table, name='electrodes')
-    nwbfile.units = pynwb.misc.Units.from_dataframe(unit_table, name='units')
-
-    unit_id_order = unit_table.index.values.copy()
-    sindex, stimes = dict_to_indexed_array(spike_times, unit_id_order)
-    del spike_times
-    nwbfile.units.add_column(name='spike_times', description='times (s) of detected spiking events', data=stimes, index=sindex)
-    del stimes
-    del sindex
-
-    mwindex, mwdata = dict_to_indexed_array(mean_waveforms, unit_id_order)
-    del mean_waveforms
-    nwbfile.units.add_column(name='waveform_mean', description='mean waveforms on peak channels (and over samples) for each unit', data=mwdata, index=mwindex)
-    del mwdata
-    del mwindex
-
-    running_speeds = np.squeeze(np.load(running_speed['running_speed_path'], allow_pickle=False))
-    running_speed_timestamps = np.squeeze(np.load(running_speed['running_speed_timestamps_path'], allow_pickle=False))
-    running_speed_series = pynwb.base.TimeSeries(name='running_speed', data=running_speeds, timestamps=running_speed_timestamps, unit='cm/s')
-    del running_speeds
-    del running_speed_timestamps
-    nwbfile.add_acquisition(running_speed_series)
+    running_speed = read_running_speed(running_speed['running_speed_values_path'], running_speed['running_speed_timestamps_path'])
+    add_running_speed_to_nwbfile(nwbfile, running_speed)
+    del running_speed
 
     Manifest.safe_make_parent_dirs(output_path)
     io = pynwb.NWBHDF5IO(output_path, mode='w')

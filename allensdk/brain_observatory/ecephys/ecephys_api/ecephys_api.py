@@ -2,9 +2,9 @@
 
 class EcephysApi:
 
-    __slots__ = tuple()
+    __slots__: tuple = tuple([])
 
-    def __init__(self, randomly_hide_units=False, *args, **kwargs): # for instance
+    def __init__(self, *args, **kwargs):
         pass
 
     def get_running_speed(self):

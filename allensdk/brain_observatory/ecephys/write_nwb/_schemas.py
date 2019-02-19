@@ -35,6 +35,7 @@ class Probe(RaisingSchema):
     channels = Nested(Channel, many=True, required=True)
     units = Nested(Unit, many=True, required=True)
 
+
 class RunningSpeed(RaisingSchema):
     running_speed_path = String(required=True, validate=check_read_access)
     running_speed_timestamps_path = String(required=True, validate=check_read_access)
