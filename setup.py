@@ -19,17 +19,8 @@ def prepend_find_packages(*roots):
         
     return packages
 
-dependency_link_regex = re.compile(r'(git|svn|hg|bzr)\+.+#egg=(?P<egg_name>.+)')
-dependency_links = []
-required = []
 with open('requirements.txt', 'r') as f:
-    for line in f.read().splitlines():
-        match = dependency_link_regex.match(line)
-        if match:
-            dependency_links.append(line)
-            required.append(match.group('egg_name'))
-        else:
-            required.append(line)
+    required = f.read().splitlines()
 
 with open('test_requirements.txt', 'r') as f:
     test_required = f.read().splitlines()
@@ -43,7 +34,6 @@ setup(
     package_data={'': ['*.conf', '*.cfg', '*.md', '*.json', '*.dat', '*.env', '*.sh', '*.txt', 'bps', 'Makefile', 'LICENSE'] },
     description = 'core libraries for the allensdk.',
     install_requires = required,
-    dependency_links=dependency_links,
     tests_require=test_required,
     setup_requires=['setuptools', 'sphinx', 'numpydoc', 'pytest-runner'],
     url='https://github.com/AllenInstitute/AllenSDK/tree/v%s' % (allensdk.__version__),
