@@ -180,5 +180,38 @@ def test_read_stimulus_table(tmpdir_factory, stimulus_table_data):
     assert np.allclose(stimulus_table_data['alpha'].values, obt['beta'].values)
 
 
-read_spike_times_to_dictionary(spike_times_path, spike_units_path, local_to_global_unit_map=None)
-def test_read_spike_times_to_dictionary
+# read_spike_times_to_dictionary(spike_times_path, spike_units_path, local_to_global_unit_map=None)
+def test_read_spike_times_to_dictionary(tmpdir_factory):
+    dirname = str(tmpdir_factory.mktemp('ecephys_nwb_spike_times'))
+    spike_times_path = os.path.join(dirname, 'spike_times.npy')
+    spike_units_path = os.path.join(dirname, 'spike_units.npy')
+
+    spike_times = np.random.rand(30)
+    np.save(spike_times_path, spike_times, allow_pickle=False)
+
+    spike_units = np.concatenate([np.arange(15), np.arange(15)])
+    np.save(spike_units_path, spike_units, allow_pickle=False)
+
+    local_to_global_unit_map = {ii: -ii for ii in spike_units}
+
+    obtained = write_nwb.read_spike_times_to_dictionary(spike_times_path, spike_units_path, local_to_global_unit_map)
+    for ii in range(15):
+        assert np.allclose(obtained[-ii], sorted([spike_times[ii], spike_times[15+ii]]))
+
+
+def test_read_waveforms_to_dictionary(tmpdir_factory):
+    dirname = str(tmpdir_factory.mktemp('ecephys_nwb_mean_waveforms'))
+    waveforms_path = os.path.join(dirname, 'mean_waveforms.npy')
+
+    nunits = 10
+    nchannels = 30
+    nsamples = 20
+
+    local_to_global_unit_map = {ii: -ii for ii in range(nunits)}
+
+    mean_waveforms = np.random.rand(nunits, nsamples, nchannels)
+    np.save(waveforms_path, mean_waveforms, allow_pickle=False)
+
+    obtained = write_nwb.read_waveforms_to_dictionary(waveforms_path, local_to_global_unit_map)
+    for ii in range(nunits):
+        assert np.allclose(mean_waveforms[ii, :, :], obtained[-ii])
