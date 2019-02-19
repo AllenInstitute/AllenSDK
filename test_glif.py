@@ -1,3 +1,5 @@
+import time
+import numpy as np
 from allensdk.api.queries.glif_api import GlifApi
 from allensdk.core.cell_types_cache import CellTypesCache
 import allensdk.core.json_utilities as json_utilities
@@ -31,11 +33,13 @@ stimulus = [ 0.0 ] * 100 + [ 10e-9 ] * 100 + [ 0.0 ] * 100
 neuron.dt = 5e-6
 
 # simulate the neuron
-import time
-b4 = time.time()
-output = neuron.run(stimulus)
-after = time.time()
-print(after-b4)
-#voltage = output['voltage']
-#threshold = output['threshold']
-#spike_times = output['interpolated_spike_times']
+
+deltas = []
+for i in range(0,100):
+    b4 = time.time()
+    output = neuron.run(stimulus)
+    after = time.time()
+
+    deltas.append(after-b4)
+    print(deltas[-1])
+print(np.mean(deltas))
