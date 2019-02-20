@@ -1,7 +1,7 @@
 import pytest
 
 from allensdk.internal.api import OneResultExpectedError
-from allensdk.internal.api.lims_ophys_api import LimsOphysAPI
+from allensdk.internal.api.ophys_lims_api import OphysLimsApi
 
 
 @pytest.mark.nightly
@@ -11,7 +11,7 @@ from allensdk.internal.api.lims_ophys_api import LimsOphysAPI
 ])
 def test_get_ophys_experiment_dir(ophys_experiment_id, compare_val):
 
-    api = LimsOphysAPI()
+    api = OphysLimsApi()
 
     if compare_val is None:
         expected_fail = False
@@ -31,7 +31,7 @@ def test_get_ophys_experiment_dir(ophys_experiment_id, compare_val):
 ])
 def test_get_nwb_filepath(ophys_experiment_id, compare_val):
 
-    api = LimsOphysAPI()
+    api = OphysLimsApi()
 
     if compare_val is None:
         expected_fail = False
