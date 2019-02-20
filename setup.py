@@ -1,8 +1,6 @@
 from setuptools import setup, find_packages
 import os
-import re
 import allensdk
-
 
 # http://bugs.python.org/issue8876#msg208792
 if hasattr(os, 'link'):
