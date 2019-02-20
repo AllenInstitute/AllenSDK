@@ -1,6 +1,6 @@
 from allensdk.api.cache import memoize
 
-from . import PostgresQueryMixin
+from allensdk.internal.api import PostgresQueryMixin
 
 class BehaviorLimsApi(PostgresQueryMixin):
 
