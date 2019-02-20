@@ -1,12 +1,97 @@
 import psycopg2
 import pandas as pd
+import requests
+import os
+import json
+import sys
+import itertools
 
 from . import PostgresQueryMixin, one
 
+
 class MtrainApi(PostgresQueryMixin):
 
+    def __init__(self, api_base='http://mtrain:5000'):
+        self.api_base = api_base
+
+    def get_page(self, table_name, get_obj=None, filters=[],**kwargs):
+        
+        if get_obj is None:
+            get_obj = requests
+
+        data = {'total_pages':'--'}
+        for ii in itertools.count(1):
+            sys.stdout.flush()
+
+            uri = os.path.join(self.api_base, "api/v1/%s?page=%i&q={\"filters\":%s}" % (table_name, ii, json.dumps(filters)))
+            tmp = get_obj.get(uri, **kwargs)
+            try:
+                data = tmp.json()
+            except TypeError:
+                data = tmp.json
+            if 'message' not in data:
+                df = pd.DataFrame(data["objects"])
+                sys.stdout.flush()
+                yield df
+
+            if 'total_pages' not in data or data['total_pages'] == ii:
+                return
+
+    def get_df(self, table_name, get_obj=None, **kwargs):
+        return pd.concat([df for df in self.get_page(table_name, get_obj=get_obj, **kwargs)], axis=0)
+
+
+    def get_subjects(self):
+        return self.get_df('subjects').LabTracks_ID.values
+
+    def get_session(self, behavior_session_uuid):
+        filters = [{"name":"id","op":"eq","val":behavior_session_uuid}]
+        behavior_df = self.get_df('behavior_sessions', filters=filters).rename(columns={'id':'behavior_session_uuid'})
+        state_df = self.get_df('states').rename(columns={'id':'state_id'})
+        regimen_df = self.get_df('regimens').rename(columns={'id':'regimen_id', 'name':'regimen_name'}).drop(['states', 'active'], axis=1)
+        stage_df = self.get_df('stages').rename(columns={'id':'stage_id'}).drop(['states'], axis=1)
+        
+        behavior_df = pd.merge(behavior_df, state_df, how='left', on='state_id')
+        behavior_df = pd.merge(behavior_df, stage_df, how='left', on='stage_id')
+        behavior_df = pd.merge(behavior_df, regimen_df, how='left', on='regimen_id')
+        behavior_df.drop(['state_id', 'stage_id', 'regimen_id'], inplace=True, axis=1)
+        if len(behavior_df) == 0:
+            raise RuntimeError("Session not found %s:" % behavior_session_uuid)
+        assert len(behavior_df) == 1
+        return behavior_df.iloc[0].to_dict()
+
+
+    def get_behavior_training_df(self, LabTracks_ID=None):
+        if LabTracks_ID is not None:
+            filters = [{"name":"LabTracks_ID","op":"eq","val":LabTracks_ID}]
+        else:
+            filters = []
+        behavior_df = self.get_df('behavior_sessions', filters=filters).rename(columns={'id':'behavior_session_uuid'})
+        
+        state_df = self.get_df('states').rename(columns={'id':'state_id'})
+        regimen_df = self.get_df('regimens').rename(columns={'id':'regimen_id', 'name':'regimen_name'}).drop(['states', 'active'], axis=1)
+        stage_df = self.get_df('stages').rename(columns={'id':'stage_id'}).drop(['states'], axis=1)
+        
+
+        behavior_df = pd.merge(behavior_df, state_df, how='left', on='state_id')
+        behavior_df = pd.merge(behavior_df, stage_df, how='left', on='stage_id')
+        behavior_df = pd.merge(behavior_df, regimen_df, how='left', on='regimen_id')
+        return behavior_df
+        
+
+
+    def get_current_stage(self, LabTracks_ID):
+        sess = requests.Session()
+
+        state_response = sess.get(os.path.join(self.api_base, 'get_script/'), data=json.dumps({'LabTracks_ID':LabTracks_ID}))#.json()#['objects']).keys()
+        return state_response.json()['data']['parameters']['stage']
+
+
+class MtrainSqlApi(PostgresQueryMixin):
+    
     def __init__(self, dbname="mtrain", user="mtrainreader", host="prodmtrain1", password="mtrainro", port=5432):
-        super(MtrainApi, self).__init__(dbname=dbname, user=user, host=host, password=password, port=port)
+        super(MtrainSqlApi, self).__init__(dbname=dbname, user=user, host=host, password=password, port=port)
+
 
     def get_subjects(self):
         query = 'SELECT "LabTracks_ID" FROM subjects'
