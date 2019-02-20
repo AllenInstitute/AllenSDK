@@ -19,9 +19,9 @@ class VisualBehaviorOphysSession(LazyPropertyMixin):
         self.use_acq_trigger = use_acq_trigger
 
         self.max_projection = LazyProperty(self.api.get_max_projection, ophys_experiment_id=self.ophys_experiment_id)
-    #     self.stimulus_timestamps = LazyProperty(self.api.get_stimulus_timestamps, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
-    #     self.ophys_timestamps = LazyProperty(self.api.get_ophys_timestamps, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
-    #     self.metadata = LazyProperty(self.api.get_metadata, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
+        self.stimulus_timestamps = LazyProperty(self.api.get_stimulus_timestamps, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
+        self.ophys_timestamps = LazyProperty(self.api.get_ophys_timestamps, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
+        self.metadata = LazyProperty(self.api.get_metadata, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
     #     self.dff_traces = LazyProperty(self.api.get_dff_traces, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
     #     self.roi_metrics = LazyProperty(self.api.get_roi_metrics, ophys_experiment_id=self.ophys_experiment_id)
     #     self.roi_masks = LazyProperty(self.api.get_roi_masks, ophys_experiment_id=self.ophys_experiment_id)
@@ -102,5 +102,8 @@ class VisualBehaviorOphysSession(LazyPropertyMixin):
 if __name__ == "__main__":
 
     session = VisualBehaviorOphysSession(789359614)
-    print session.max_projection    
+    print session.max_projection
+    print session.stimulus_timestamps
+    print session.ophys_timestamps
+    print session.metadata
 
