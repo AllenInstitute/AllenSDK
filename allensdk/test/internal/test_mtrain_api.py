@@ -17,10 +17,9 @@ def test_get_subjects():
 def test_get_behavior_training_df(LabTracks_ID):
     
     api = MtrainApi()
-    df = api.get_behavior_training_df(423986)
+    df = api.get_behavior_training_df(LabTracks_ID)
     assert list(df.columns) == [u'stage_name', u'regimen_name', u'date', u'behavior_session_id']
     assert len(df) == 24
-    # raise
 
 
 # def test_get_ophys_experiment_dir(ophys_experiment_id, compare_val):
