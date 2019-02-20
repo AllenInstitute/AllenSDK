@@ -19,3 +19,4 @@ tables
 argschema
 marshmallow>=3.0.0b20
 glymur
+pynwb @ git+https://github.com/NeurodataWithoutBorders/pynwb.git@dev#egg=pynwb
