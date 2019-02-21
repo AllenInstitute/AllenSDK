@@ -12,3 +12,4 @@ requests_toolbelt
 pynrrd
 SimpleITK
 scikit-image
+statsmodels
