@@ -1,10 +1,5 @@
-import os
-import h5py
-import platform
 import numpy as np
 import pandas as pd
-import tempfile
-import inspect
 from pandas.util.testing import assert_frame_equal
 
 from allensdk.core.lazy_property import LazyProperty, LazyPropertyMixin
