@@ -1,4 +1,6 @@
 import matplotlib.image as mpimg  # NOQA: D102
+import json
+import numpy as np
 
 from . import PostgresQueryMixin
 from allensdk.api.cache import memoize
@@ -173,6 +175,47 @@ class OphysLimsApi(PostgresQueryMixin):
                 JOIN ophys_sessions os ON oe.ophys_session_id = os.id
                 JOIN specimens sp ON sp.id=os.specimen_id
                 JOIN donors d ON d.id=sp.donor_id
+                WHERE oe.id= {};
+                '''.format(ophys_experiment_id)        
+        return self.fetchone(query, strict=True)
+
+
+    @memoize
+    def get_dff_file(self, ophys_experiment_id=None):
+        query = '''
+                SELECT dff.storage_directory || dff.filename AS dff_file
+                FROM ophys_experiments oe
+                LEFT JOIN well_known_files dff ON dff.attachable_id=oe.id AND dff.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'OphysDffTraceFile')
+                WHERE oe.id= {};
+                '''.format(ophys_experiment_id)        
+        return self.fetchone(query, strict=True)
+
+
+    @memoize
+    def get_input_extract_traces_file(self, ophys_experiment_id=None):
+        query = '''
+                SELECT oe.storage_directory || 'processed/' || oe.id || '_input_extract_traces.json'
+                FROM ophys_experiments oe
+                WHERE oe.id= {};
+                '''.format(ophys_experiment_id)        
+        return self.fetchone(query, strict=True)
+
+
+    @memoize
+    def get_cell_roi_ids(self, ophys_experiment_id=None):
+        input_extract_traces_file = self.get_input_extract_traces_file(ophys_experiment_id=ophys_experiment_id)
+        with open(input_extract_traces_file, 'r') as w:
+            jin = json.load(w)
+        return np.array([roi['id'] for roi in jin['rois']])
+
+
+    @memoize
+    def get_objectlist_file(self, ophys_experiment_id=None):
+        query = '''
+                SELECT obj.storage_directory || obj.filename AS obj_file
+                FROM ophys_experiments oe
+                LEFT JOIN ophys_cell_segmentation_runs ocsr ON ocsr.ophys_experiment_id = oe.id AND ocsr.current = 't'
+                LEFT JOIN well_known_files obj ON obj.attachable_id=ocsr.id AND obj.attachable_type = 'OphysCellSegmentationRun' AND obj.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'OphysSegmentationObjects')
                 WHERE oe.id= {};
                 '''.format(ophys_experiment_id)        
         return self.fetchone(query, strict=True)
