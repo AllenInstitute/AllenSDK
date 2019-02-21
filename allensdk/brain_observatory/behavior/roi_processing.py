@@ -42,6 +42,8 @@ def add_cell_roi_ids_to_roi_metrics(roi_metrics, roi_locations):
 
 def get_roi_locations(input_extract_traces_file):
     jin = get_input_extract_traces_json(input_extract_traces_file)
+    h = jin["image"]["height"]
+    w = jin["image"]["width"]
     rois = jin["rois"]
     # get data out of json and into dataframe
     roi_locations_list = []
@@ -51,7 +53,10 @@ def get_roi_locations(input_extract_traces_file):
             mask = parse_mask_string(roi['mask'])
         else:
             mask = roi["mask"]
-        roi_locations_list.append([roi["id"], roi["x"], roi["y"], roi["width"], roi["height"], roi["valid"], mask])
+        binary_mask = np.zeros((h, w), dtype=np.uint8)
+        binary_mask[int(roi["y"]):int(roi["y"]) + int(roi["height"]), int(roi["x"]):int(roi["x"]) + int(roi["width"])] = mask
+
+        roi_locations_list.append([roi["id"], roi["x"], roi["y"], roi["width"], roi["height"], roi["valid"], binary_mask])
     roi_locations = pd.DataFrame(data=roi_locations_list, columns=['id', 'x', 'y', 'width', 'height', 'valid', 'mask'])
     return roi_locations
 
@@ -85,20 +90,3 @@ def get_roi_metrics(input_extract_traces_file, ophys_experiment_id, objectlist_f
                   roi_metrics.cell_roi_id.values]
     roi_metrics['cell_index'] = cell_index
     return {'filtered':roi_metrics, 'unfiltered':unfiltered_roi_metrics}
-
-def get_roi_masks(roi_metrics, input_extract_traces_file):
-    # make roi_dict with ids as keys and roi_mask_array
-    jin = get_input_extract_traces_json(input_extract_traces_file)
-    h = jin["image"]["height"]
-    w = jin["image"]["width"]
-    cell_roi_ids = np.unique(np.sort(roi_metrics.cell_roi_id.values))
-
-    roi_masks = {}
-    for i, id in enumerate(cell_roi_ids):
-        m = roi_metrics[roi_metrics.id == id].iloc[0]
-        mask = np.asarray(m['mask'])
-        binary_mask = np.zeros((h, w), dtype=np.uint8)
-        binary_mask[int(m.y):int(m.y) + int(m.height), int(m.x):int(m.x) + int(m.width)] = mask
-        roi_masks[int(id)] = binary_mask
-    csid_list, mask_list = zip(*roi_masks.items())
-    return pd.DataFrame({'cell_roi_id':csid_list, 'mask':mask_list})
