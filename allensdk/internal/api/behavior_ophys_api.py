@@ -7,7 +7,7 @@ import uuid
 from allensdk.api.cache import memoize
 from allensdk.internal.api.ophys_lims_api import OphysLimsApi
 from allensdk.brain_observatory.behavior.sync import get_sync_data
-from allensdk.brain_observatory.behavior.roi_processing import get_roi_metrics, get_roi_masks
+from allensdk.brain_observatory.behavior.roi_processing import get_roi_metrics
 from allensdk.brain_observatory.behavior.stimulus_processing import get_stimtable, get_stimulus_template, get_stimulus_metadata
 from allensdk.brain_observatory.behavior.metadata_processing import get_task_parameters
 
@@ -111,13 +111,6 @@ class BehaviorOphysLimsApi(OphysLimsApi):
         input_extract_traces_file = self.get_input_extract_traces_file(ophys_experiment_id=ophys_experiment_id)
         objectlist_file = self.get_objectlist_file(ophys_experiment_id=ophys_experiment_id)
         return get_roi_metrics(input_extract_traces_file, ophys_experiment_id, objectlist_file)['unfiltered']
-
-
-    @memoize
-    def get_roi_masks(self, ophys_experiment_id=None):
-        roi_metrics = self.get_roi_metrics( ophys_experiment_id=ophys_experiment_id)
-        input_extract_traces_file = self.get_input_extract_traces_file(ophys_experiment_id=ophys_experiment_id)
-        return get_roi_masks(roi_metrics, input_extract_traces_file)
 
 
     @memoize
