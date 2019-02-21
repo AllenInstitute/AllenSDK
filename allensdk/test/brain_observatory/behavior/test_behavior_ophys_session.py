@@ -7,14 +7,14 @@ import pandas as pd
 import numpy as np
 import h5py
 
-from allensdk.core.visual_behavior_ophys_session import VisualBehaviorOphysSession
+from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorOphysSession
 
 def test_equal():
     
     oeid1, oeid2 = 789359614, 736590872
-    d1 = VisualBehaviorOphysSession(oeid1)
-    d2 = VisualBehaviorOphysSession(oeid1)
-    d3 = VisualBehaviorOphysSession(oeid2)
+    d1 = BehaviorOphysSession(oeid1)
+    d2 = BehaviorOphysSession(oeid1)
+    d3 = BehaviorOphysSession(oeid2)
 
     assert d1 == d2
     assert not d1 == d3
@@ -23,7 +23,7 @@ def test_equal():
 def test_visbeh_ophys_data_set():
     
     ophys_experiment_id = 789359614
-    data_set = VisualBehaviorOphysSession(ophys_experiment_id)
+    data_set = BehaviorOphysSession(ophys_experiment_id)
 
     # TODO: need to improve testing here:
     # for _, row in data_set.roi_metrics.iterrows():
@@ -39,14 +39,12 @@ def test_visbeh_ophys_data_set():
     assert len(data_set.extended_dataframe) == 602
     assert len(data_set.licks) == 2421 and list(data_set.licks.columns) == ['frame', 'time']
     assert len(data_set.rewards) == 85 and list(data_set.rewards.columns) == ['frame', 'lickspout', 'time', 'volume']
-    assert len(data_set.corrected_fluorescence_traces) == 269 and list(data_set.corrected_fluorescence_traces.columns) == ['corrected_fluorescence', 'roi_id',  'timestamps']
+    assert len(data_set.corrected_fluorescence_traces) == 269 and list(data_set.corrected_fluorescence_traces.columns) == ['corrected_fluorescence', 'roi_id']
     assert sorted(data_set.stimulus_metadata['image_category'].unique()) == sorted(data_set.stimulus_table['image_category'].unique())
     assert sorted(data_set.stimulus_metadata['image_name'].unique()) == sorted(data_set.stimulus_table['image_name'].unique())
     np.testing.assert_array_almost_equal(data_set.running_speed['time'], data_set.stimulus_timestamps)
     assert len(data_set.cell_roi_ids) == len(data_set.dff_traces)
-    assert data_set.ophys_timestamps.shape == data_set.dff_traces.timestamps.values[0].shape
     assert data_set.average_image.shape == data_set.max_projection.shape
-    assert data_set.motion_correction['framenumber'].shape == data_set.ophys_timestamps.shape
     assert list(data_set.motion_correction.columns) == ['framenumber', 'x', 'y', 'correlation', 'input_x', 'input_y', 'kalman_x', 'kalman_y', 'algorithm', 'type']
     
     assert data_set.metadata == {'stimulus_frame_rate': 60.0, 
@@ -77,7 +75,7 @@ def test_visbeh_ophys_data_set():
 def test_get_trials():
 
     ophys_experiment_id = 789359614 
-    dataset = VisualBehaviorOphysSession(ophys_experiment_id)
+    dataset = BehaviorOphysSession(ophys_experiment_id)
     trial_df = dataset.get_trials()
     assert len(trial_df) == 304
     assert list(trial_df.columns) == [u'trial', u'change_time', u'initial_image_name', u'change_image_name',

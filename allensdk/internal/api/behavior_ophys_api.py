@@ -2,12 +2,18 @@ import matplotlib.image as mpimg  # NOQA: E402
 import numpy as np
 import h5py
 import pandas as pd
+import uuid
 
 from allensdk.api.cache import memoize
 from allensdk.internal.api.ophys_lims_api import OphysLimsApi
 from allensdk.brain_observatory.behavior.sync import get_sync_data
 from allensdk.brain_observatory.behavior.roi_processing import get_roi_metrics, get_roi_masks
+from allensdk.brain_observatory.behavior.stimulus_processing import get_stimtable, get_stimulus_template, get_stimulus_metadata
+from allensdk.brain_observatory.behavior.metadata_processing import get_task_parameters
+
 from visual_behavior.translator import foraging2
+from visual_behavior.translator.core import create_extended_dataframe  # NOQA: E402
+
 
 class BehaviorOphysLimsApi(OphysLimsApi):
 
@@ -83,7 +89,7 @@ class BehaviorOphysLimsApi(OphysLimsApi):
         metadata['driver_line'] = self.get_driver_line(ophys_experiment_id)
         metadata['LabTracks_ID'] = self.get_LabTracks_ID(ophys_experiment_id)
         metadata['full_genotype'] = self.get_full_genotype(ophys_experiment_id)
-        metadata['behavior_session_uuid'] = self.get_behavior_session_uuid(ophys_experiment_id)
+        metadata['behavior_session_uuid'] = uuid.UUID(self.get_behavior_session_uuid(ophys_experiment_id))
 
         return metadata
 
@@ -126,3 +132,80 @@ class BehaviorOphysLimsApi(OphysLimsApi):
     @memoize
     def get_running_speed(self, ophys_experiment_id=None, use_acq_trigger=False):
         return self.get_core_data(ophys_experiment_id=ophys_experiment_id, use_acq_trigger=use_acq_trigger)['running']
+
+
+    @memoize    
+    def get_stimulus_table(self, ophys_experiment_id=None, use_acq_trigger=False):
+        core_data = self.get_core_data(ophys_experiment_id=ophys_experiment_id)
+        timestamps_stimulus = self.get_stimulus_timestamps(ophys_experiment_id=ophys_experiment_id, use_acq_trigger=use_acq_trigger)
+        return get_stimtable(core_data, timestamps_stimulus)
+
+
+    @memoize
+    def get_stimulus_template(self, ophys_experiment_id=None):
+        behavior_stimulus_file = self.get_behavior_stimulus_file(ophys_experiment_id=ophys_experiment_id)
+        data = pd.read_pickle(behavior_stimulus_file)
+        return get_stimulus_template(data)
+
+
+    @memoize
+    def get_stimulus_metadata(self, ophys_experiment_id=None):
+        behavior_stimulus_file = self.get_behavior_stimulus_file(ophys_experiment_id=ophys_experiment_id)
+        data = pd.read_pickle(behavior_stimulus_file)
+        return get_stimulus_metadata(data)
+
+
+    @memoize
+    def get_licks(self, ophys_experiment_id=None):
+        core_data = self.get_core_data(ophys_experiment_id=ophys_experiment_id)
+        return core_data['licks']
+
+
+    @memoize
+    def get_rewards(self, ophys_experiment_id=None):
+        core_data = self.get_core_data(ophys_experiment_id=ophys_experiment_id)
+        return core_data['rewards']
+
+
+    @memoize
+    def get_task_parameters(self, ophys_experiment_id=None):
+        core_data = self.get_core_data(ophys_experiment_id=ophys_experiment_id)
+        return get_task_parameters(core_data)
+
+
+    @memoize
+    def get_extended_dataframe(self, ophys_experiment_id=None):
+        core_data = self.get_core_data(ophys_experiment_id=ophys_experiment_id)
+        return create_extended_dataframe(trials=core_data['trials'], 
+                                         metadata=core_data['metadata'],
+                                         licks=core_data['licks'],
+                                         time=core_data['time'])
+
+
+    @memoize
+    def get_corrected_fluorescence_traces(self, ophys_experiment_id=None, use_acq_trigger=False):
+        demix_file = self.get_demix_file(ophys_experiment_id=ophys_experiment_id)
+        
+        g = h5py.File(demix_file)
+        corrected_fluorescence_trace_array = np.asarray(g['data'])
+        g.close()
+
+        cell_roi_id_list = self.get_cell_roi_ids(ophys_experiment_id=ophys_experiment_id)
+        ophys_timestamps = self.get_ophys_timestamps(ophys_experiment_id=ophys_experiment_id, use_acq_trigger=use_acq_trigger)
+        assert corrected_fluorescence_trace_array.shape[1], ophys_timestamps.shape[0]
+        df = pd.DataFrame({'roi_id':cell_roi_id_list, 'corrected_fluorescence':list(corrected_fluorescence_trace_array)})
+        return df
+
+
+    @memoize
+    def get_average_image(self, ophys_experiment_id=None):
+        avgint_a1X_file = self.get_avgint_a1X_file(ophys_experiment_id=ophys_experiment_id)
+        average_image = mpimg.imread(avgint_a1X_file)
+        return average_image
+
+
+    @memoize
+    def get_motion_correction(self, ophys_experiment_id=None):
+        motion_correction_filepath = self.get_rigid_motion_transform_file(ophys_experiment_id=ophys_experiment_id)
+        motion_correction = pd.read_csv(motion_correction_filepath)
+        return motion_correction
