@@ -40,6 +40,7 @@ import io
 import logging
 import logging.config as lc
 from pkg_resources import resource_filename  # @UnresolvedImport
+
 try:
     from configparser import ConfigParser  # @UnresolvedImport
 except:
@@ -55,19 +56,20 @@ class ApplicationConfig(object):
     _log = logging.getLogger(__name__)
     _DEFAULT_LOG_CONFIG = os.getenv(
         'LOG_CFG', resource_filename(__name__, 'logging.conf'))
-    lc.fileConfig(_DEFAULT_LOG_CONFIG)
 
     def __init__(self,
                  defaults,
                  name="app",
                  halp="Run application.",
                  default_log_config=None):
+
         self.application_name = name
         self.help = halp
         self.debug_enabled = False
 
         if default_log_config is None:
             default_log_config = ApplicationConfig._DEFAULT_LOG_CONFIG
+            lc.fileConfig(_DEFAULT_LOG_CONFIG)
 
         ApplicationConfig._log.info(
             "default log config: %s" % (default_log_config))
