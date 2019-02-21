@@ -7,6 +7,7 @@ from allensdk.api.cache import memoize
 from allensdk.internal.api.ophys_lims_api import OphysLimsApi
 from allensdk.brain_observatory.behavior.sync import get_sync_data
 from allensdk.brain_observatory.behavior.roi_processing import get_roi_metrics, get_roi_masks
+from visual_behavior.translator import foraging2
 
 class BehaviorOphysLimsApi(OphysLimsApi):
 
@@ -111,3 +112,17 @@ class BehaviorOphysLimsApi(OphysLimsApi):
         roi_metrics = self.get_roi_metrics( ophys_experiment_id=ophys_experiment_id)
         input_extract_traces_file = self.get_input_extract_traces_file(ophys_experiment_id=ophys_experiment_id)
         return get_roi_masks(roi_metrics, input_extract_traces_file)
+
+
+    @memoize
+    def get_core_data(self, ophys_experiment_id=None, use_acq_trigger=False):
+        stim_filepath = self.get_behavior_stimulus_file(ophys_experiment_id=ophys_experiment_id)
+        pkl = pd.read_pickle(stim_filepath)
+        stimulus_timestamps = self.get_stimulus_timestamps(ophys_experiment_id=ophys_experiment_id, use_acq_trigger=use_acq_trigger)
+        core_data = foraging2.data_to_change_detection_core(pkl, time=stimulus_timestamps)
+        return core_data
+
+
+    @memoize
+    def get_running_speed(self, ophys_experiment_id=None, use_acq_trigger=False):
+        return self.get_core_data(ophys_experiment_id=ophys_experiment_id, use_acq_trigger=use_acq_trigger)['running']

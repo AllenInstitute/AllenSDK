@@ -25,8 +25,8 @@ class BehaviorOphysSession(LazyPropertyMixin):
         self.dff_traces = LazyProperty(self.api.get_dff_traces, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
         self.roi_metrics = LazyProperty(self.api.get_roi_metrics, ophys_experiment_id=self.ophys_experiment_id)
         self.roi_masks = LazyProperty(self.api.get_roi_masks, ophys_experiment_id=self.ophys_experiment_id)
-    #     self.cell_roi_ids = LazyProperty(self.api.get_cell_roi_ids, ophys_experiment_id=self.ophys_experiment_id)
-    #     self.running_speed = LazyProperty(self.api.get_running_speed, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
+        self.cell_roi_ids = LazyProperty(self.api.get_cell_roi_ids, ophys_experiment_id=self.ophys_experiment_id)
+        self.running_speed = LazyProperty(self.api.get_running_speed, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
     #     self.stimulus_table = LazyProperty(self.api.get_stimulus_table, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
     #     self.stimulus_template = LazyProperty(self.api.get_stimulus_template, ophys_experiment_id=self.ophys_experiment_id)
     #     self.stimulus_metadata = LazyProperty(self.api.get_stimulus_metadata, ophys_experiment_id=self.ophys_experiment_id)
@@ -102,10 +102,12 @@ class BehaviorOphysSession(LazyPropertyMixin):
 if __name__ == "__main__":
 
     session = BehaviorOphysSession(789359614)
-    print session.max_projection
-    print session.stimulus_timestamps
-    print session.ophys_timestamps
-    print session.metadata
-    print session.dff_traces
-    print session.roi_metrics
-    print session.roi_masks
+    # print session.max_projection
+    # print session.stimulus_timestamps
+    # print session.ophys_timestamps
+    # print session.metadata
+    # print session.dff_traces
+    # print session.roi_metrics
+    # print session.roi_masks
+    # print session.cell_roi_ids
+    print session.running_speed
