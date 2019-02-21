@@ -9,6 +9,6 @@ h5py
 pandas
 scipy
 requests_toolbelt
-nrrd
+pynrrd
 SimpleITK
 scikit-image
