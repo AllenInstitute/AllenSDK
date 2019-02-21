@@ -8,3 +8,7 @@ simplejson
 h5py
 pandas
 scipy
+requests_toolbelt
+nrrd
+SimpleITK
+scikit-image
