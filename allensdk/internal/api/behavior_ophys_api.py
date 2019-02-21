@@ -1,12 +1,14 @@
 import matplotlib.image as mpimg  # NOQA: E402
 import numpy as np
+import h5py
 import pandas as pd
 
 from allensdk.api.cache import memoize
 from allensdk.internal.api.ophys_lims_api import OphysLimsApi
-from allensdk.brain_observatory.visual_behavior.sync import get_sync_data
+from allensdk.brain_observatory.behavior.sync import get_sync_data
+from allensdk.brain_observatory.behavior.roi_processing import get_roi_metrics, get_roi_masks
 
-class VisualBehaviorOphysLimsApi(OphysLimsApi):
+class BehaviorOphysLimsApi(OphysLimsApi):
 
     @memoize
     def get_sync_data(self, ophys_experiment_id=None, use_acq_trigger=False):
@@ -52,18 +54,26 @@ class VisualBehaviorOphysLimsApi(OphysLimsApi):
         data = pd.read_pickle(behavior_stimulus_file)
         return data['session_uuid']
 
+    @memoize
+    def get_stimulus_frame_rate(self, ophys_experiment_id=None, use_acq_trigger=False):
+        stimulus_timestamps = self.get_stimulus_timestamps(ophys_experiment_id=ophys_experiment_id, use_acq_trigger=use_acq_trigger)
+        return np.round(1 / np.mean(np.diff(stimulus_timestamps)), 0)
+
+
+    @memoize
+    def get_ophys_frame_rate(self, ophys_experiment_id=None, use_acq_trigger=False):
+        ophys_timestamps = self.get_ophys_timestamps(ophys_experiment_id=ophys_experiment_id, use_acq_trigger=use_acq_trigger)
+        return np.round(1 / np.mean(np.diff(ophys_timestamps)), 0)
+
 
     @memoize
     def get_metadata(self, ophys_experiment_id=None, use_acq_trigger=False):
         
-        ophys_timestamps = self.get_ophys_timestamps(ophys_experiment_id=ophys_experiment_id, use_acq_trigger=use_acq_trigger)
-        stimulus_timestamps = self.get_stimulus_timestamps(ophys_experiment_id=ophys_experiment_id, use_acq_trigger=use_acq_trigger)
-
         metadata = {}
         metadata['ophys_experiment_id'] = ophys_experiment_id
         metadata['experiment_container_id'] = self.get_experiment_container_id(ophys_experiment_id=ophys_experiment_id)
-        metadata['ophys_frame_rate'] = np.round(1 / np.mean(np.diff(ophys_timestamps)), 0)
-        metadata['stimulus_frame_rate'] = np.round(1 / np.mean(np.diff(stimulus_timestamps)), 0)
+        metadata['ophys_frame_rate'] = self.get_ophys_frame_rate(ophys_experiment_id=ophys_experiment_id, use_acq_trigger=use_acq_trigger)
+        metadata['stimulus_frame_rate'] = self.get_stimulus_frame_rate(ophys_experiment_id=ophys_experiment_id, use_acq_trigger=use_acq_trigger)
         metadata['targeted_structure'] = self.get_targeted_structure(ophys_experiment_id)
         metadata['imaging_depth'] = self.get_imaging_depth(ophys_experiment_id)
         metadata['session_type'] = self.get_stimulus_name(ophys_experiment_id)
@@ -75,3 +85,29 @@ class VisualBehaviorOphysLimsApi(OphysLimsApi):
         metadata['behavior_session_uuid'] = self.get_behavior_session_uuid(ophys_experiment_id)
 
         return metadata
+
+
+    @memoize
+    def get_dff_traces(self, ophys_experiment_id=None, use_acq_trigger=False):
+        dff_path = self.get_dff_file(ophys_experiment_id=ophys_experiment_id)
+        g = h5py.File(dff_path)
+        dff_traces = np.asarray(g['data'])
+        g.close()
+
+        cell_roi_id_list = self.get_cell_roi_ids(ophys_experiment_id=ophys_experiment_id)
+        df = pd.DataFrame({'cell_roi_id':cell_roi_id_list, 'dff':list(dff_traces)})
+        return df
+
+
+    @memoize
+    def get_roi_metrics(self, ophys_experiment_id=None):
+        input_extract_traces_file = self.get_input_extract_traces_file(ophys_experiment_id=ophys_experiment_id)
+        objectlist_file = self.get_objectlist_file(ophys_experiment_id=ophys_experiment_id)
+        return get_roi_metrics(input_extract_traces_file, ophys_experiment_id, objectlist_file)['unfiltered']
+
+
+    @memoize
+    def get_roi_masks(self, ophys_experiment_id=None):
+        roi_metrics = self.get_roi_metrics( ophys_experiment_id=ophys_experiment_id)
+        input_extract_traces_file = self.get_input_extract_traces_file(ophys_experiment_id=ophys_experiment_id)
+        return get_roi_masks(roi_metrics, input_extract_traces_file)
