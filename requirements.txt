@@ -19,5 +19,5 @@ tables
 argschema
 marshmallow>=3.0.0b20
 glymur
-pynwb @ git+https://github.com/NeurodataWithoutBorders/pynwb.git@dev#egg=pynwb
-visual_behavior @ git+https://github.com/AllenInstitute/visual_behavior_analysis.git@master#egg=visual_behavior_analysis
+pynwb git+https://github.com/NeurodataWithoutBorders/pynwb.git@dev#egg=pynwb
+visual_behavior git+https://github.com/AllenInstitute/visual_behavior_analysis.git@master#egg=visual_behavior_analysis
