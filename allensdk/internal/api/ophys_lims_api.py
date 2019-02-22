@@ -1,6 +1,8 @@
 import matplotlib.image as mpimg  # NOQA: D102
 import json
 import numpy as np
+import os
+import h5py
 
 from . import PostgresQueryMixin, OneOrMoreResultExpectedError
 from allensdk.api.cache import memoize
@@ -263,3 +265,9 @@ class OphysLimsApi(PostgresQueryMixin):
                 WHERE oe.id= {};
                 '''.format(ophys_experiment_id)        
         return self.fetchone(query, strict=True)
+
+    def get_raw_dff_data(self, ophys_experiment_id=None, use_acq_trigger=False):
+        dff_path = self.get_dff_file(ophys_experiment_id=ophys_experiment_id)
+        with h5py.File(dff_path, 'r') as raw_file:
+            dff_traces = np.asarray(raw_file['data'])
+        return dff_traces

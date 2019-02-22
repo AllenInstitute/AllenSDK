@@ -96,11 +96,7 @@ class BehaviorOphysLimsApi(OphysLimsApi):
 
     @memoize
     def get_dff_traces(self, ophys_experiment_id=None, use_acq_trigger=False):
-        dff_path = self.get_dff_file(ophys_experiment_id=ophys_experiment_id)
-        g = h5py.File(dff_path)
-        dff_traces = np.asarray(g['data'])
-        g.close()
-
+        dff_traces = self.get_raw_dff_data(ophys_experiment_id)
         cell_roi_id_list = self.get_cell_roi_ids(ophys_experiment_id=ophys_experiment_id)
         df = pd.DataFrame({'cell_roi_id':cell_roi_id_list, 'dff':list(dff_traces)})
         return df
