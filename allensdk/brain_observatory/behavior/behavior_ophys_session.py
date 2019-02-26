@@ -27,7 +27,7 @@ class BehaviorOphysSession(LazyPropertyMixin):
         self.licks = LazyProperty(self.api.get_licks, ophys_experiment_id=self.ophys_experiment_id)
         self.rewards = LazyProperty(self.api.get_rewards, ophys_experiment_id=self.ophys_experiment_id)
         self.task_parameters = LazyProperty(self.api.get_task_parameters, ophys_experiment_id=self.ophys_experiment_id)
-        self.extended_dataframe = LazyProperty(self.api.get_extended_dataframe, ophys_experiment_id=self.ophys_experiment_id)
+        self.extended_dataframe = LazyProperty(self.api.get_extended_dataframe, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
         self.corrected_fluorescence_traces = LazyProperty(self.api.get_corrected_fluorescence_traces, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
         self.average_image = LazyProperty(self.api.get_average_image, ophys_experiment_id=self.ophys_experiment_id)
         self.motion_correction = LazyProperty(self.api.get_motion_correction, ophys_experiment_id=self.ophys_experiment_id)
@@ -38,10 +38,10 @@ class BehaviorOphysSession(LazyPropertyMixin):
         if 'trial' not in trials.columns:
             trials.insert(loc=0, column='trial', value=trials.index.values)
 
-        if auto_rewarded == False:
-            trials = trials[(trials.auto_rewarded != True)].reset_index()
+        if auto_rewarded is False:
+            trials = trials[(trials.auto_rewarded is not True)].reset_index()
             trials = trials.rename(columns={'level_0': 'original_trial_index'})
-        if aborted == False:
+        if aborted is False:
             trials = trials[(trials.trial_type != 'aborted')].reset_index()
             trials = trials.rename(columns={'level_0': 'original_trial_index'})
         trials.rename(
@@ -50,8 +50,8 @@ class BehaviorOphysSession(LazyPropertyMixin):
 
         if columns is None:
             columns = ['trial', 'change_time', 'initial_image_name', 'change_image_name', 'trial_type', 'trial_type_color',
-             'response', 'response_type', 'response_window', 'lick_times', 'response_latency', 'rewarded',
-             'reward_times', 'reward_volume', 'reward_rate', 'start_time', 'end_time', 'trial_length', 'mouse_id', 'start_date_time']
+                       'response', 'response_type', 'response_window', 'lick_times', 'response_latency', 'rewarded',
+                       'reward_times', 'reward_volume', 'reward_rate', 'start_time', 'end_time', 'trial_length', 'mouse_id', 'start_date_time']
 
         trials = trials[columns]
 
@@ -95,21 +95,21 @@ class BehaviorOphysSession(LazyPropertyMixin):
 if __name__ == "__main__":
 
     session = BehaviorOphysSession(789359614)
-    print session.max_projection
-    print session.stimulus_timestamps
-    print session.ophys_timestamps
-    print session.metadata
-    print session.dff_traces
-    print session.roi_metrics
-    print session.cell_roi_ids
-    print session.running_speed
-    print session.stimulus_table
-    print session.stimulus_template
-    print session.stimulus_metadata
-    print session.licks
-    print session.rewards
-    print session.task_parameters
-    print session.extended_dataframe
-    print session.corrected_fluorescence_traces
-    print session.average_image
-    print session.motion_correction
+    # print session.max_projection
+    # print session.stimulus_timestamps
+    # print session.ophys_timestamps
+    # print session.metadata
+    # print session.dff_traces
+    # print session.roi_metrics
+    # print session.cell_roi_ids
+    # print session.running_speed
+    # print session.stimulus_table
+    # print session.stimulus_template
+    # print session.stimulus_metadata
+    # print session.licks
+    # print session.rewards
+    # print session.task_parameters
+    session.extended_dataframe
+    # print session.corrected_fluorescence_traces
+    # print session.average_image
+    # print session.motion_correction

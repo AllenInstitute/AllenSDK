@@ -1,19 +1,18 @@
-import pandas as pd
+def get_task_parameters(data):
 
-def get_task_parameters(core_data):
     task_parameters = {}
-    task_parameters['blank_duration'] = core_data['metadata']['blank_duration_range'][0]
-    task_parameters['stimulus_duration'] = core_data['metadata']['stim_duration']
-    if 'omitted_flash_fraction' in core_data['metadata']['params'].keys():
-        task_parameters['omitted_flash_fraction'] = core_data['metadata']['params']['omitted_flash_fraction']
-    else:
-        task_parameters['omitted_flash_fraction'] = None
-    task_parameters['response_window'] = core_data['metadata']['response_window']
-    task_parameters['reward_volume'] = core_data['metadata']['rewardvol']
-    task_parameters['stage'] = core_data['metadata']['stage']
-    task_parameters['stimulus'] = core_data['metadata']['stimulus']
-    task_parameters['stimulus_distribution'] = core_data['metadata']['stimulus_distribution']
-    task_parameters['task'] = core_data['metadata']['task']
-    task_parameters['n_stimulus_frames'] = core_data['metadata']['n_stimulus_frames']
+    task_parameters['blank_duration'] = data["items"]["behavior"]['config']['DoC']['blank_duration_range']
+    task_parameters['stimulus_duration'] = data["items"]["behavior"]['config']['DoC']['stimulus_window'] * 1000
+    task_parameters['omitted_flash_fraction'] = data["items"]["behavior"]['params'].get('omitted_flash_fraction', None)
+    task_parameters['response_window'] = data["items"]["behavior"]["config"]["DoC"]["response_window"]
+    task_parameters['reward_volume'] = data["items"]["behavior"]["config"]["reward"]["reward_volume"]
+    task_parameters['stage'] = data["items"]["behavior"]["params"]["stage"]
+    task_parameters['stimulus'] = next(iter(data["items"]["behavior"]["stimuli"]))
+    task_parameters['stimulus_distribution'] = data["items"]["behavior"]["config"]["DoC"]["change_time_dist"]
+    task_parameters['task'] = data["items"]["behavior"]["config"]["behavior"]["task_id"]
+    n_stimulus_frames = 0
+    for stim_type, stim_table in data["items"]["behavior"]["stimuli"].items():
+        n_stimulus_frames += sum(stim_table.get("draw_log", []))
+    task_parameters['n_stimulus_frames'] = n_stimulus_frames
 
     return task_parameters

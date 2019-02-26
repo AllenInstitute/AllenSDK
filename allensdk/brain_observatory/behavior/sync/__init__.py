@@ -41,7 +41,7 @@ def get_sync_data(sync_path, use_acq_trigger=False):
     # vsyncs = vs_f_sec
     # add display lag
     monitor_delay = calculate_delay(sync_dataset, vs_f_sec, sample_freq)
-    vsyncs = vs_f_sec + monitor_delay  # this should be added, right!?
+    stimulus_frames = vs_f_sec - monitor_delay # this should be subtracted; makes master timeline pre-delay.
     # line labels are different on 2P6 and production rigs - need options for both
     if 'lick_times' in meta_data['line_labels']:
         lick_times = sync_dataset.get_rising_edges('lick_1') / sample_freq
@@ -69,8 +69,10 @@ def get_sync_data(sync_path, use_acq_trigger=False):
     if use_acq_trigger:
         frames_2p = frames_2p[frames_2p > trigger[0]]
 
+    print 'sync_licks:', len(lick_times)
+
     sync_data = {'ophys_frames': frames_2p,
-                 'stimulus_frames': vsyncs,
+                 'stimulus_frames': stimulus_frames,
                  'lick_times': lick_times,
                  'ophys_trigger': trigger,
                  'eye_tracking': eye_tracking,
