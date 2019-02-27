@@ -1,8 +1,9 @@
 class LazyProperty(object):
     
-    def __init__(self, api_method, *args, **kwargs):
+    def __init__(self, api_method, wrappers=tuple(), *args, **kwargs):
 
         self.api_method = api_method
+        self.wrappers = wrappers
         self.args = args
         self.kwargs = kwargs
         self.value = None
@@ -19,4 +20,7 @@ class LazyProperty(object):
         raise AttributeError("Can't set LazyLoadable attribute")
 
     def calculate(self):
-        return self.api_method(*self.args, **self.kwargs)
+        result = self.api_method(*self.args, **self.kwargs)
+        for wrapper in self.wrappers:
+            result = wrapper(result)
+        return result

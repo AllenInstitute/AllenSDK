@@ -35,10 +35,13 @@ class EcephysNwbApi(EcephysApi):
         )
     
     def get_stimulus_table(self) -> pd.DataFrame:
-        stimulus_table = self.nwbfile.epochs.to_dataframe()
-        stimulus_table = stimulus_table.reset_index()
-        stimulus_table.drop(columns=['tags', 'timeseries', 'id'], inplace=True)
-        return stimulus_table
+        table = pd.DataFrame({
+            col.name: col.data for col in self.nwbfile.epochs.columns 
+            if col.name not in set(['tags', 'timeseries', 'tags_index', 'timeseries_index'])
+        }, index=pd.Index(name=self.nwbfile.epochs.id.name, data=self.nwbfile.epochs.id.data))
+        table.index = table.index.astype(int)
+        return table
+    
     
     def get_probes(self) -> pd.DataFrame:
         probes: Union[List, pd.DataFrame] = []
@@ -68,7 +71,9 @@ class EcephysNwbApi(EcephysApi):
         return units_table
 
     def __get_full_units_table(self) -> pd.DataFrame:
-        return self.nwbfile.units.to_dataframe()
+        table = self.nwbfile.units.to_dataframe()
+        table.index = table.index.astype(int)
+        return table
 
     @classmethod
     def from_nwbfile(cls, nwbfile, **kwargs):
