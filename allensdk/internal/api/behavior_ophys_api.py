@@ -6,7 +6,7 @@ import uuid
 
 from allensdk.api.cache import memoize
 from allensdk.internal.api.ophys_lims_api import OphysLimsApi
-from allensdk.brain_observatory.behavior.sync import get_sync_data
+from allensdk.brain_observatory.behavior.sync import get_sync_data, get_stimulus_rebase_function
 from allensdk.brain_observatory.behavior.roi_processing import get_roi_metrics
 from allensdk.brain_observatory.behavior.stimulus_processing import get_stimtable, get_stimulus_template, get_stimulus_metadata
 from allensdk.brain_observatory.behavior.metadata_processing import get_task_parameters
@@ -94,6 +94,7 @@ class BehaviorOphysLimsApi(OphysLimsApi):
         metadata['LabTracks_ID'] = self.get_LabTracks_ID(ophys_experiment_id)
         metadata['full_genotype'] = self.get_full_genotype(ophys_experiment_id)
         metadata['behavior_session_uuid'] = uuid.UUID(self.get_behavior_session_uuid(ophys_experiment_id))
+        metadata['rig'] = self.get_equipment_id(ophys_experiment_id)
 
         return metadata
 
@@ -145,10 +146,8 @@ class BehaviorOphysLimsApi(OphysLimsApi):
 
     @memoize
     def get_licks(self, ophys_experiment_id=None, use_acq_trigger=False):
-        behavior_stimulus_file = self.get_behavior_stimulus_file(ophys_experiment_id=ophys_experiment_id)
-        stimulus_timestamps = self.get_stimulus_timestamps(ophys_experiment_id=ophys_experiment_id, use_acq_trigger=use_acq_trigger)
-        data = pd.read_pickle(behavior_stimulus_file)
-        return get_licks(data, stimulus_timestamps)
+        lick_times = self.get_sync_data(ophys_experiment_id=ophys_experiment_id, use_acq_trigger=use_acq_trigger)['lick_times']
+        return pd.DataFrame(data={"time": lick_times, })
 
 
     @memoize
@@ -156,7 +155,8 @@ class BehaviorOphysLimsApi(OphysLimsApi):
         behavior_stimulus_file = self.get_behavior_stimulus_file(ophys_experiment_id=ophys_experiment_id)
         stimulus_timestamps = self.get_stimulus_timestamps(ophys_experiment_id=ophys_experiment_id, use_acq_trigger=use_acq_trigger)
         data = pd.read_pickle(behavior_stimulus_file)
-        return get_rewards(data, stimulus_timestamps)
+        rebase_function = self.get_stimulus_rebase_function(ophys_experiment_id=ophys_experiment_id, use_acq_trigger=use_acq_trigger)
+        return get_rewards(data, stimulus_timestamps, rebase_function)
 
 
     @memoize
@@ -167,42 +167,18 @@ class BehaviorOphysLimsApi(OphysLimsApi):
 
 
     @memoize
-    def get_extended_dataframe(self, ophys_experiment_id=None, use_acq_trigger=False):
+    def get_trials(self, ophys_experiment_id=None, use_acq_trigger=False):
 
-        stimulus_timestamps = self.get_stimulus_timestamps(ophys_experiment_id=ophys_experiment_id, use_acq_trigger=use_acq_trigger)
+        stimulus_timestamps_no_monitor_delay = self.get_sync_data(ophys_experiment_id=ophys_experiment_id, use_acq_trigger=use_acq_trigger)['stimulus_frames_no_delay']
         licks = self.get_licks(ophys_experiment_id=ophys_experiment_id, use_acq_trigger=use_acq_trigger)
-        rewards = self.get_rewards(ophys_experiment_id=ophys_experiment_id, use_acq_trigger=use_acq_trigger)
-
-        sync_lick_times = self.get_sync_data(ophys_experiment_id=ophys_experiment_id, use_acq_trigger=use_acq_trigger)['lick_times']
-
-        from visual_behavior.translator import foraging2
-        from visual_behavior.translator.core import create_extended_dataframe  # NOQA: E402
-
         behavior_stimulus_file = self.get_behavior_stimulus_file(ophys_experiment_id=ophys_experiment_id)
         data = pd.read_pickle(behavior_stimulus_file)
-        core_data = foraging2.data_to_change_detection_core(data, time=stimulus_timestamps)
-        edf = create_extended_dataframe(trials=core_data['trials'],
-                                         metadata=core_data['metadata'],
-                                         licks=core_data['licks'],
-                                         time=stimulus_timestamps)
+        rewards = self.get_rewards(ophys_experiment_id=ophys_experiment_id, use_acq_trigger=use_acq_trigger)
+        rebase_function = self.get_stimulus_rebase_function(ophys_experiment_id=ophys_experiment_id, use_acq_trigger=use_acq_trigger)
 
-        
-        trial_df = get_trials(data, stimulus_timestamps, licks, rewards, sync_lick_times)
-        # print trial_df
-        # for c in sorted(trial_df.columns):
-        #     print c
+        trial_df = get_trials(data, stimulus_timestamps_no_monitor_delay, licks, rewards, rebase_function)
 
-        # print trial_df#[['index', '']]
-
-        # return edf
-
-        # stimulus_timestamps = self.get_stimulus_timestamps(ophys_experiment_id=ophys_experiment_id, use_acq_trigger=use_acq_trigger)
-        
-
-        # return create_extended_dataframe(trials=core_data['trials'],
-        #                                  metadata=core_data['metadata'],
-        #                                  licks=licks,
-        #                                  time=stimulus_timestamps)
+        return trial_df
 
 
     @memoize
@@ -232,3 +208,13 @@ class BehaviorOphysLimsApi(OphysLimsApi):
         motion_correction_filepath = self.get_rigid_motion_transform_file(ophys_experiment_id=ophys_experiment_id)
         motion_correction = pd.read_csv(motion_correction_filepath)
         return motion_correction
+
+
+    def get_stimulus_rebase_function(self, ophys_experiment_id=None, use_acq_trigger=False):
+
+        stimulus_timestamps_no_monitor_delay = self.get_sync_data(ophys_experiment_id=ophys_experiment_id, use_acq_trigger=use_acq_trigger)['stimulus_frames_no_delay']
+        behavior_stimulus_file = self.get_behavior_stimulus_file(ophys_experiment_id=ophys_experiment_id)
+        data = pd.read_pickle(behavior_stimulus_file)
+        stimulus_rebase_function = get_stimulus_rebase_function(data, stimulus_timestamps_no_monitor_delay)
+
+        return stimulus_rebase_function

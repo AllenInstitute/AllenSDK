@@ -181,6 +181,17 @@ class OphysLimsApi(PostgresQueryMixin):
                 '''.format(ophys_experiment_id)        
         return self.fetchone(query, strict=True)
 
+    @memoize
+    def get_equipment_id(self, ophys_experiment_id=None):
+        query = '''
+                SELECT e.name
+                FROM ophys_experiments oe
+                JOIN ophys_sessions os ON oe.ophys_session_id = os.id
+                JOIN equipment e ON e.id=os.equipment_id
+                WHERE oe.id= {};
+                '''.format(ophys_experiment_id)        
+        return self.fetchone(query, strict=True)
+
 
     @memoize
     def get_dff_file(self, ophys_experiment_id=None):

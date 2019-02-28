@@ -6,6 +6,8 @@ Created on Sunday July 15 2018
 
 from .process_sync import filter_digital, calculate_delay  # NOQA: E402
 from .sync_dataset import Dataset as SyncDataset  # NOQA: E402
+import numpy as np
+import scipy.stats as sps
 
 def get_sync_data(sync_path, use_acq_trigger=False):
     
@@ -38,11 +40,11 @@ def get_sync_data(sync_path, use_acq_trigger=False):
     # convert to seconds
     # vs_r_sec = vs_r / sample_freq
     vs_f_sec = vs_f / sample_freq
-    # vsyncs = vs_f_sec
+    # monitor_delay = calculate_delay(sync_dataset, vs_f_sec, sample_freq)
+    
     # add display lag
-    monitor_delay = calculate_delay(sync_dataset, vs_f_sec, sample_freq)
-    stimulus_frames = vs_f_sec - monitor_delay # this should be subtracted; makes master timeline pre-delay.
-    # line labels are different on 2P6 and production rigs - need options for both
+    stimulus_frames_no_monitor_delay = sync_dataset.get_rising_edges('stim_vsync') / sample_freq
+    stimulus_frames = stimulus_frames_no_monitor_delay + .0351# monitor_delay
     if 'lick_times' in meta_data['line_labels']:
         lick_times = sync_dataset.get_rising_edges('lick_1') / sample_freq
     elif 'lick_sensor' in meta_data['line_labels']:
@@ -54,9 +56,13 @@ def get_sync_data(sync_path, use_acq_trigger=False):
     elif 'acq_trigger' in meta_data['line_labels']:
         trigger = sync_dataset.get_rising_edges('acq_trigger') / sample_freq
     if 'stim_photodiode' in meta_data['line_labels']:
-        stim_photodiode = sync_dataset.get_rising_edges('stim_photodiode') / sample_freq
+        a = sync_dataset.get_rising_edges('stim_photodiode') / sample_freq
+        b = sync_dataset.get_falling_edges('stim_photodiode') / sample_freq
+        stim_photodiode = sorted(list(a)+list(b))
     elif 'photodiode' in meta_data['line_labels']:
-        stim_photodiode = sync_dataset.get_rising_edges('photodiode') / sample_freq
+        a = sync_dataset.get_rising_edges('photodiode') / sample_freq
+        b = sync_dataset.get_falling_edges('photodiode') / sample_freq
+        stim_photodiode = sorted(list(a)+list(b))
     if 'cam1_exposure' in meta_data['line_labels']:
         eye_tracking = sync_dataset.get_rising_edges('cam1_exposure') / sample_freq
     elif 'eye_tracking' in meta_data['line_labels']:
@@ -69,7 +75,6 @@ def get_sync_data(sync_path, use_acq_trigger=False):
     if use_acq_trigger:
         frames_2p = frames_2p[frames_2p > trigger[0]]
 
-    print 'sync_licks:', len(lick_times)
 
     sync_data = {'ophys_frames': frames_2p,
                  'stimulus_frames': stimulus_frames,
@@ -78,6 +83,26 @@ def get_sync_data(sync_path, use_acq_trigger=False):
                  'eye_tracking': eye_tracking,
                  'behavior_monitoring': behavior_monitoring,
                  'stim_photodiode': stim_photodiode,
+                 'stimulus_frames_no_delay': stimulus_frames_no_monitor_delay,
                  }
 
     return sync_data
+
+def get_stimulus_rebase_function(data, stimulus_timestamps_no_monitor_delay):
+    
+    # Time rebasing: times in stimulus_timestamps_pickle and lick log will agree with times in event log
+    vsyncs = data["items"]["behavior"]['intervalsms']
+    stimulus_timestamps_pickle_pre = np.hstack((0, vsyncs)).cumsum() / 1000.0
+
+    assert len(stimulus_timestamps_pickle_pre) == len(stimulus_timestamps_no_monitor_delay)
+    first_trial = data["items"]["behavior"]["trial_log"][0]
+    first_trial_start_time, first_trial_start_frame = {(e[0], e[1]):(e[2], e[3]) for e in first_trial['events']}['trial_start','']
+    offset_time = first_trial_start_time-stimulus_timestamps_pickle_pre[first_trial_start_frame]
+    stimulus_timestamps_pickle = np.array([t+offset_time for t in stimulus_timestamps_pickle_pre])
+
+    # Rebase used to transform trial log times to sync times:
+    time_slope, time_intercept, _, _, _ = sps.linregress(stimulus_timestamps_pickle, stimulus_timestamps_no_monitor_delay)
+    def rebase(t):
+        return time_intercept+time_slope*t
+
+    return rebase
