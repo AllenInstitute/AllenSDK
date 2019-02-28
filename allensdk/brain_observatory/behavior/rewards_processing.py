@@ -10,4 +10,4 @@ def get_rewards(data, time, stimulus_rebase_function):
             rewards_dict["volume"][idx] = rewards[0][0]
             rewards_dict["time"][idx] = stimulus_rebase_function(time[rewards[0][2]])
             rewards_dict["lickspout"][idx] = None  # not yet implemented in the foraging2 output
-    return pd.DataFrame(data=rewards_dict)
+    return pd.DataFrame(data=rewards_dict)[['volume', 'time', 'lickspout']]

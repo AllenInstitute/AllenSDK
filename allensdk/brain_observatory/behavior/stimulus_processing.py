@@ -1,8 +1,19 @@
 import numpy as np
 import pandas as pd
-from six import iteritems
+from six import iteritems, PY3
+import pickle
 
-from visual_behavior.translator import foraging2, foraging
+if PY3:
+
+    def load_pickle(pstream):
+
+        return pickle.load(pstream, encoding="bytes")
+else:
+    FileNotFoundError = IOError
+
+    def load_pickle(pstream):
+
+        return pickle.load(pstream)
 
 
 def get_stimtable(data, stimulus_timestamps):
@@ -21,12 +32,34 @@ def get_stimtable(data, stimulus_timestamps):
 
 def get_images_dict(pkl):
 
-    try:
-        images = foraging2.data_to_images(pkl)
-    except KeyError:
-        images = foraging.load_images(pkl)
+    # Sometimes the source is a zipped pickle:
+    metadata = {'image_set':pkl["items"]["behavior"]["stimuli"]["images"]["image_path"]}
+    
+    image_set = load_pickle(open(metadata['image_set'], 'rb'))
+    images = []
+    images_meta = []
 
-    return images
+    ii = 0
+    for cat, cat_images in image_set.items():
+        for img_name, img in cat_images.items():
+            meta = dict(
+                image_category=cat,
+                image_name=img_name,
+                image_index=ii,
+            )
+
+            images.append(img)
+            images_meta.append(meta)
+
+            ii += 1
+
+    images_dict = dict(
+        metadata=metadata,
+        images=images,
+        image_attributes=images_meta,
+    )
+
+    return images_dict
 
 
 def get_stimulus_template(pkl):

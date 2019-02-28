@@ -9,6 +9,7 @@ import h5py
 
 from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorOphysSession
 
+@pytest.mark.nightly
 def test_equal():
     
     oeid1, oeid2 = 789359614, 736590872
@@ -19,7 +20,7 @@ def test_equal():
     assert d1 == d2
     assert not d1 == d3
 
-
+@pytest.mark.nightly
 def test_visbeh_ophys_data_set():
     
     ophys_experiment_id = 789359614
@@ -36,9 +37,8 @@ def test_visbeh_ophys_data_set():
     # All sorts of assert relationships:
     assert data_set.api.get_foraging_id(ophys_experiment_id) == str(data_set.api.get_behavior_session_uuid(ophys_experiment_id))
     assert data_set.stimulus_template.shape == (8, 918, 1174)
-    assert len(data_set.extended_dataframe) == 602
-    assert len(data_set.licks) == 2421 and list(data_set.licks.columns) == ['frame', 'time']
-    assert len(data_set.rewards) == 85 and list(data_set.rewards.columns) == ['frame', 'lickspout', 'time', 'volume']
+    assert len(data_set.licks) == 2432 and list(data_set.licks.columns) == ['time']
+    assert len(data_set.rewards) == 85 and list(data_set.rewards.columns) == ['volume', 'time', 'lickspout']
     assert len(data_set.corrected_fluorescence_traces) == 269 and list(data_set.corrected_fluorescence_traces.columns) == ['corrected_fluorescence', 'roi_id']
     assert sorted(data_set.stimulus_metadata['image_category'].unique()) == sorted(data_set.stimulus_table['image_category'].unique())
     assert sorted(data_set.stimulus_metadata['image_name'].unique()) == sorted(data_set.stimulus_table['image_name'].unique())
@@ -46,6 +46,7 @@ def test_visbeh_ophys_data_set():
     assert len(data_set.cell_roi_ids) == len(data_set.dff_traces)
     assert data_set.average_image.shape == data_set.max_projection.shape
     assert list(data_set.motion_correction.columns) == ['framenumber', 'x', 'y', 'correlation', 'input_x', 'input_y', 'kalman_x', 'kalman_y', 'algorithm', 'type']
+    assert len(data_set.trials) == 602
     
     assert data_set.metadata == {'stimulus_frame_rate': 60.0, 
                                  'full_genotype': 'Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;Ai93(TITL-GCaMP6f)/wt', 
@@ -59,34 +60,21 @@ def test_visbeh_ophys_data_set():
                                  'LabTracks_ID': '416369', 
                                  'experiment_container_id': 814796558, 
                                  'targeted_structure': 'VISp', 
-                                 'reporter_line': 'Ai93(TITL-GCaMP6f)'}
+                                 'reporter_line': 'Ai93(TITL-GCaMP6f)',
+                                 'rig': 'CAM2P.5'}
     
     assert data_set.task_parameters == {'reward_volume': 0.007, 
                                         'stimulus_distribution': u'geometric', 
                                         'stimulus_duration': 6000.0, 
                                         'stimulus': 'images', 
-                                        'blank_duration': 0.5, 
+                                        'blank_duration': (0.5, 0.5), 
                                         'n_stimulus_frames': 69882, 
                                         'task': 'DoC_untranslated', 
                                         'omitted_flash_fraction': None, 
                                         'response_window': [0.15, 0.75], 
                                         'stage': u'OPHYS_6_images_B'}
 
-def test_get_trials():
 
-    ophys_experiment_id = 789359614 
-    dataset = BehaviorOphysSession(ophys_experiment_id)
-    trial_df = dataset.get_trials()
-    assert len(trial_df) == 304
-    assert list(trial_df.columns) == [u'trial', u'change_time', u'initial_image_name', u'change_image_name',
-                                      u'trial_type', u'trial_type_color', u'response', u'response_type',
-                                      u'response_window', u'lick_times', u'response_latency', u'rewarded',
-                                      u'reward_times', u'reward_volume', u'reward_rate', u'start_time',
-                                      u'end_time', u'trial_length', u'mouse_id', u'start_date_time']
-
-    all_trial_df = dataset.get_trials(auto_rewarded=True, aborted=True)
-    assert len(all_trial_df) == 602
-    assert len(all_trial_df) > len(trial_df)
 
 # def test_visbeh_ophys_data_set_events():
     

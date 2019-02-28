@@ -12,11 +12,7 @@ from allensdk.brain_observatory.behavior.stimulus_processing import get_stimtabl
 from allensdk.brain_observatory.behavior.metadata_processing import get_task_parameters
 from allensdk.brain_observatory.behavior.running_processing import get_running_df
 from allensdk.brain_observatory.behavior.rewards_processing import get_rewards
-from allensdk.brain_observatory.behavior.licks_processing import get_licks
 from allensdk.brain_observatory.behavior.trials_processing import get_trials
-
-from visual_behavior.translator import foraging2
-from visual_behavior.translator.core import create_extended_dataframe  # NOQA: E402
 
 
 class BehaviorOphysLimsApi(OphysLimsApi):
