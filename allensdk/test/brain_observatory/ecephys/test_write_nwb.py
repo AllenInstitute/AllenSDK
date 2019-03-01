@@ -40,7 +40,7 @@ def stimulus_table_data():
         'start_time': [1, 2, 4, 5, 6],
         'stop_time': [2, 4, 5, 6, 8],
         'alpha': [0.5, 0.4, 0.3, 0.2, 0.1]
-    })
+    }, index=pd.Index(name='id', data=[0, 1, 2, 3, 4]))
 
 
 @pytest.fixture
@@ -77,9 +77,6 @@ def test_add_stimulus_table_to_file(nwbfile, stimulus_table_data, roundtripper):
     api = roundtripper(nwbfile)
     obtained_stimulus_table = api.get_stimulus_table()
     
-    print(obtained_stimulus_table)
-    print(stimulus_table_data)
-
     pd.testing.assert_frame_equal(stimulus_table_data, obtained_stimulus_table, check_dtype=False)
     
 
