@@ -14,29 +14,74 @@ class EcephysSession(LazyPropertyMixin):
     Attributes
     ----------
     units : pd.Dataframe
-        A table whose rows are sorted units (putative neurons) and whose columns are characteristics of those units. The 
-        values of this table's index are unique integer identifiers for each unit.
+        A table whose rows are sorted units (putative neurons) and whose columns are characteristics of those units.
+        Index is:
+            unit_id : int
+                Unique integer identifier for this unit.
         Columns are:
-            firing_rate	
-            isi_violations	
-            local_index_unit	
-            peak_channel_id	
-            quality	
-            snr	
-            local_index_channel	
-            probe_horizontal_position	
-            probe_id	
-            probe_vertical_position	
-            valid_data	
-            description	
-            location
+            firing_rate : float
+                This unit's firing rate (spikes / s) calculated over the window of that unit's activity (the time from 
+                its first detected spike to its last).
+            isi_violations : float
+                Estamate of this unit's contamination rate (larger means that more of the spikes assigned to this unit 
+                probably originated from other neurons). Calculated as a ratio of the firing rate of the unit over 
+                periods where spikes would be isi-violating vs the total firing rate of the unit.
+            peak_channel_id : int
+                Unique integer identifier for this unit's peak channel (the channel on which this unit's responses 
+                were greatest)
+            snr : float
+                Signal to noise ratio for this unit.
+            probe_horizontal_position :  numeric
+                The horizontal (short-axis) position of this unit's peak channel in microns.
+            probe_vertical_position : numeric
+                The vertical (long-axis, lower values are closer to the probe base) position of this unit's peak 
+                channel in microns.
+            probe_id : int
+                Unique integer identifier for this unit's probe.
+            probe_description : str
+                Human-readable description carrying miscellaneous information about this unit's probe.
+            location : str
+                Gross-scale location of this unit's probe.
     spike_times : dict
-        A di
-    running_speed
-    mean_waveforms
-    
-    stimulus_sweeps
-    units
+        Maps integer unit ids to arrays of spike times (float) for those units.
+    running_speed : RunningSpeed
+        NamedTuple with two fields
+            timestamps : numpy.ndarray
+                Timestamps of running speed data samples
+            values : np.ndarray
+                Running speed of the experimental subject (in cm / s).
+    mean_waveforms : dict
+        Maps integer unit ids to xarray.DataArrays containing mean spike waveforms for that unit.
+    stimulus_sweeps : pd.DataFrame
+        Table whose rows are stimulus sweeps and whose columns are sweep characteristics. A stimulus sweep is the 
+        smallest unit of distinct stimulus presentation and lasts for (usually) 1 60hz frame.
+        Index is
+            stimulus_sweep_id : int
+                Unique identifier for this stimulus sweep
+        Columns are
+            start_time :  float
+                Time (s) at which this sweep began
+            stop_time : float
+                Time (s) at which this sweep ended
+            stimulus_name : str
+                Identifies the stimulus family (e.g. "drifting_gratings" or "natural_movie_3") used for this sweep. The 
+                stimulus family, along with relevant parameter values, provides the information required to reconstruct 
+                the stimulus presented during this sweep. The empty string indicates a blank period.
+            stimulus_block : numeric
+                A stimulus block is made by sequentially presenting sweeps from the same stimulus family. This value is 
+                the index of the block which contains this sweep. During a blank period, this is NaN.
+            TF : float
+                Temporal frequency, or NaN when not appropriate.
+            SF : float
+                Spatial frequency, or NaN when not appropriate
+            Ori : float
+                Orientation (in degress) or NaN when not appropriate
+            Contrast : float
+            Pos_x : float
+            Pos_y : float
+            Color : numeric
+            Image : numeric
+            Phase : float
 
     '''
 
@@ -44,13 +89,13 @@ class EcephysSession(LazyPropertyMixin):
         self.api: EcephysApi  = api
 
         self.running_speed= self.LazyProperty(self.api.get_running_speed)
-        self.mean_waveforms = self.LazyProperty(self.api.get_mean_waveforms)
+        self.mean_waveforms = self.LazyProperty(self.api.get_mean_waveforms, wrappers=[self._build_mean_waveforms])
         self.spike_times = self.LazyProperty(self.api.get_spike_times)
 
         self.probes = self.LazyProperty(self.api.get_probes)
         self.channels = self.LazyProperty(self.api.get_channels)
 
-        self.stimulus_sweeps = self.LazyProperty(self.api.get_stimulus_table)
+        self.stimulus_sweeps = self.LazyProperty(self.api.get_stimulus_table, wrappers=[self._build_stimulus_sweeps])
         self.units = self.LazyProperty(self.api.get_units, wrappers=[self._build_units_table])
 
 
@@ -167,33 +212,29 @@ class EcephysSession(LazyPropertyMixin):
         mean_counts = mean_counts.set_index(keys='unit_id')
         return mean_counts
 
+    def list_stimulus_conditions(self, stimulus_sweeps=None):
+        if stimulus_sweeps is None:
+            stimulus_sweeps = self.stimulus_sweeps.copy()
+
+        stimulus_sweeps = stimulus_sweeps.drop(columns=['start_time', 'stop_time', 'stimulus_block'])
+        stimulus_sweeps = stimulus_sweeps.drop_duplicates()
+        stimulus_sweeps = stimulus_sweeps.reset_index(inplace=False).drop(columns=['stimulus_sweep_id'])
+
+        stimulus_sweeps = removed_unused_stimulus_sweep_columns(stimulus_sweeps)
+        return stimulus_sweeps
 
 
-    # def stimulus_conditionwise_spike_summary(self, stimulus_sweeps, units, fn=np.mean):
-    #     mean_counts = _spike_counts_by_stimulus_sweep_and_condition
+    def list_stimulus_parameter_values(self, stimulus_sweeps=None):
+        if stimulus_sweeps is None:
+            stimulus_sweeps = self.stimulus_sweeps.copy()
 
-    #     mean_counts.rename(columns={'count': 'mean_spike_count'}, inplace=True)
-    #     mean_counts = mean_counts.groupby(['stimulus_index', 'stimulus_name', 'TF', 'SF', 'Ori', 'Contrast', 'unit_id'], as_index=False).mean()
-    #     mean_counts = mean_counts.drop(columns='stimulus_sweep_id')
-    #     mean_counts = mean_counts.set_index(keys='unit_id')
-
+        stimulus_sweeps = stimulus_sweeps.drop(columns=['start_time', 'stop_time', 'stimulus_block'])
+        return {col: stimulus_sweeps[col].unique() for col in stimulus_sweeps.columns}
 
 
-    # def enumerate_stimulus_conditions(self, query=None):
-    #     stimulus_table = optionally_query_dataframe(self.stimulus_table, query)
-    #     stimulus_table = stimulus_table.drop(columns=['start_time', 'stop_time', 'stimulus_block'])
-    #     stimulus_table = stimulus_table.drop_duplicates()
-    #     stimulus_table = stimulus_table.reset_index(inplace=False).drop(columns=['id'])
-
-    #     stimulus_table = clean_stimulus_table_columns(stimulus_table)
-    #     return stimulus_table
-
-
-    # def distinct_stimulus_parameter_values(self, query=None):
-    #     stimulus_table = optionally_query_dataframe(self.stimulus_table, query)
-    #     stimulus_table = stimulus_table.drop(columns=['start_time', 'stop_time', 'stimulus_block'])
-    #     return {col: stimulus_table[col].unique() for col in stimulus_table.columns}
-
+    def _build_stimulus_sweeps(self, stimulus_sweeps):
+        stimulus_sweeps.index.name = 'stimulus_sweep_id'
+        return stimulus_sweeps
 
     def _build_units_table(self, units_table):
         channels = self.channels.copy()
@@ -202,8 +243,29 @@ class EcephysSession(LazyPropertyMixin):
         self._unmerged_units = units_table.copy()
         table = pd.merge(units_table, channels, left_on='peak_channel_id', right_index=True, suffixes=['_unit', '_channel'])
         table = pd.merge(table, probes, left_on='probe_id', right_index=True, suffixes=['_unit', '_probe'])
+
         table.index.name = 'unit_id'
-        return table.sort_values(by=['description', 'probe_vertical_position', 'probe_vertical_position'])
+        table = table.rename(columns={'description': 'probe_description'})
+
+        table = table.loc[
+            (table['valid_data'])
+            & (table['quality'] == 'good')
+        ]
+        table = table.drop(columns=['local_index_unit', 'local_index_channel', 'quality', 'valid_data'])
+        return table.sort_values(by=['probe_description', 'probe_vertical_position', 'probe_vertical_position'])
+
+
+    def _build_mean_waveforms(self, mean_waveforms):
+        channels = self.channels.copy().sort_values(by='local_index').index.values
+        for unit_id in list(mean_waveforms.keys()):
+            mean_waveforms[unit_id] = xr.DataArray(
+                data=mean_waveforms[unit_id],
+                dims=['samples', 'channels'], # TODO: this ought to be in a time base
+                coords={
+                    'channels': channels,
+                    'samples': np.arange(mean_waveforms[unit_id].shape[0])
+                }
+            )
 
 
     @classmethod
@@ -250,19 +312,3 @@ def clean_stimulus_dataset_arrays(dataset):
         elif np.all(dataset[da] == ''):
             to_drop.append(da)
     return dataset.drop(to_drop)
-
-
-# def merge_spike_times_and_stimulus_sweeps(
-#     spike_times, stimulus_sweeps, 
-#     stimulus_sweep_id_colname='stimulus_sweep_id', spike_time_colname='spike_time',
-#     drop_from_merged=('start_time', 'stop_time', 'stimulus_block')
-# ):
-#     drop_from_merged = [drop_from_merged] if isinstance(drop_from_merged, str) else drop_from_merged
-
-#     spike_times = spike_times.reset_index().set_index(keys=stimulus_sweep_id_colname)
-#     stimulus_sweeps.index.name = stimulus_sweep_id_colname
-#     stimulus_sweeps = stimulus_sweeps.reindex(index=spike_times.index)
-
-#     merged = pd.concat([spike_times, stimulus_sweeps], axis=1)
-#     merged = merged.drop(columns=list(drop_from_merged))
-#     return merged.reset_index().set_index(keys=spike_time_colname)
