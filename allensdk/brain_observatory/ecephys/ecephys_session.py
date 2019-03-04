@@ -1,4 +1,5 @@
 import warnings
+import re
 
 import xarray as xr
 import numpy as np
@@ -70,6 +71,10 @@ class EcephysSession(LazyPropertyMixin):
             stimulus_block : numeric
                 A stimulus block is made by sequentially presenting sweeps from the same stimulus family. This value is 
                 the index of the block which contains this sweep. During a blank period, this is NaN.
+            is_movie : bool
+                If True, this sweep corresponds to a frame of a longer movie stimulus (consisting of this sweep and 
+                the rest of its block). These differ from non-movie stimuli in that frames are presented in a 
+                consistent order with meaningful features present across multiple sweeps.
             TF : float
                 Temporal frequency, or NaN when not appropriate.
             SF : float
@@ -84,6 +89,27 @@ class EcephysSession(LazyPropertyMixin):
             Phase : float
 
     '''
+
+
+    @property
+    def num_units(self):
+        return self.units.shape[0]
+
+
+    @property
+    def num_probes(self):
+        return self.probes.shape[0]
+
+
+    @property
+    def num_channels(self):
+        return self.channels.shape[0]
+
+
+    @property
+    def num_stimulus_sweeps(self):
+        return self.stimulus_sweeps.shape[0]
+
 
     def __init__(self, api, **kwargs):
         self.api: EcephysApi  = api
@@ -234,6 +260,12 @@ class EcephysSession(LazyPropertyMixin):
 
     def _build_stimulus_sweeps(self, stimulus_sweeps):
         stimulus_sweeps.index.name = 'stimulus_sweep_id'
+        stimulus_sweeps = stimulus_sweeps.drop(columns=['stimulus_index'])
+
+        # TODO: set this explicitly upstream 
+        movie_re = re.compile('.*movie.*', re.IGNORECASE)
+        stimulus_sweeps['is_movie'] = stimulus_sweeps['stimulus_name'].str.match(movie_re)
+
         return stimulus_sweeps
 
     def _build_units_table(self, units_table):
@@ -256,16 +288,23 @@ class EcephysSession(LazyPropertyMixin):
 
 
     def _build_mean_waveforms(self, mean_waveforms):
-        channels = self.channels.copy().sort_values(by='local_index').index.values
-        for unit_id in list(mean_waveforms.keys()):
-            mean_waveforms[unit_id] = xr.DataArray(
-                data=mean_waveforms[unit_id],
-                dims=['samples', 'channels'], # TODO: this ought to be in a time base
-                coords={
-                    'channels': channels,
-                    'samples': np.arange(mean_waveforms[unit_id].shape[0])
-                }
-            )
+        channel_ids = self.channels.copy().sort_values(by='local_index').index.values
+        num_samples = next(iter(mean_waveforms.values())).shape[0] 
+
+        da = xr.DataArray(
+            data=np.zeros((self.num_units, num_samples, self.num_channels)),
+            dims=['unit_id', 'sample', 'channel_id'],
+            coords={
+                'channel_id': channel_ids,
+                'unit_id': self.units.index.values,
+                'sample': np.arange(num_samples) # TODO: this ought to be in a time base
+            }
+        )
+
+        for unit_id in self.units.index.values:
+            da.loc[unit_id, :, :] = mean_waveforms[unit_id]
+
+        return xr.Dataset(data_vars={'mean_waveforms': da})
 
 
     @classmethod
