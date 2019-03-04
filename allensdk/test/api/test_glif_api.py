@@ -61,6 +61,7 @@ def glif_api():
 
 
 @pytest.mark.requires_api_endpoint
+@pytest.mark.skip_flaky_test
 def test_get_neuronal_model_templates(glif_api):
 
     assert len(glif_api.get_neuronal_model_templates()) == 7
@@ -111,6 +112,7 @@ def test_get_neuron_configs(glif_api, specimen_id):
     np.testing.assert_almost_equal(glif_api.get_neuron_configs([test_id])[test_id]['th_inf'], 0.024561992461740227)
 
 @pytest.mark.requires_api_endpoint
+@pytest.mark.todo_flaky
 def test_deprecated(fn_temp_dir, glif_api, neuronal_model_id):
 
     # Exercising deprecated functionality

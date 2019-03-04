@@ -251,6 +251,7 @@ def test_dataframe_query(mock_json_msg_query,
             assert len(cells) > 0
 
 
+@pytest.mark.todo_flaky
 def test_dataframe_query_unmocked(unmocked_boc,
                                   example_filters,
                                   cells,
@@ -266,6 +267,7 @@ def test_dataframe_query_unmocked(unmocked_boc,
     assert len(cells) > 0 and len(cells) < 1000
 
 
+@pytest.mark.todo_flaky
 def test_dataframe_query_between_unmocked(unmocked_boc,
                                           between_filter,
                                           cells,
@@ -281,6 +283,7 @@ def test_dataframe_query_between_unmocked(unmocked_boc,
     assert len(cells) > 0 and len (cells) < 1000
 
 
+@pytest.mark.todo_flaky
 def test_dataframe_query_is_unmocked(unmocked_boc,
                                      cells,
                                      cell_specimen_table):
