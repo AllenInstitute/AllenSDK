@@ -361,7 +361,7 @@ class EcephysSession(LazyPropertyMixin):
                 dims=['channel_id', 'time'],
                 coords={
                     'channel_id': [ channel_id_lut[(ii, probe_id_lut[uid])] for ii in range(data.shape[0])],
-                    'time': np.arange(data.shape[1]) / 30000 # TODO: get these timestamps from NWB file
+                    'time': np.arange(data.shape[1]) / 30000 # TODO: ugh, get these timestamps from NWB file
                 }
             )
 
