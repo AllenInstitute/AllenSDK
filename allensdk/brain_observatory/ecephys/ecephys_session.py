@@ -91,18 +91,18 @@ class EcephysSession(LazyPropertyMixin):
             stimulus_block : numeric
                 A stimulus block is made by sequentially presenting sweeps from the same stimulus family. 
                 This value is the index of the block which contains this sweep. During a blank period, 
-                this is NaN.
+                this is 'null'.
             is_movie : bool
                 If True, this sweep corresponds to a frame of a longer movie stimulus (consisting of 
                 this sweep and the rest of its block). These differ from non-movie stimuli in that 
                 frames are presented in a consistent order with meaningful features present across 
                 multiple sweeps.
             TF : float
-                Temporal frequency, or NaN when not appropriate.
+                Temporal frequency, or 'null' when not appropriate.
             SF : float
-                Spatial frequency, or NaN when not appropriate
+                Spatial frequency, or 'null' when not appropriate
             Ori : float
-                Orientation (in degress) or NaN when not appropriate
+                Orientation (in degrees) or 'null' when not appropriate
             Contrast : float
             Pos_x : float
             Pos_y : float
@@ -157,6 +157,32 @@ class EcephysSession(LazyPropertyMixin):
         time_domain_callback=None
     ):
         ''' Build a dataset of spike counts surrounding stimulus onset per unit and stimulus frame.
+
+        Parameters
+        ---------
+        bin_edges : numpy.ndarray
+            Spikes will be counted into the bins defined by these edges. Values are in seconds, relative 
+            to stimulus onset.
+        stimulus_sweep_ids : array-like
+            Filter to these stimulus sweeps
+        unit_ids : array-like
+            Filter to these units
+        binarize : bool, optional
+            If true, all counts greater than 0 will be treated as 1. This results in lower storage overhead, 
+            but is only reasonable if bin sizes are fine (<= 1 millisecond).
+        large_bin_size_threshold : float, optional
+            If binarize is True and the largest bin width is greater than this value, a warning will be emitted.
+        time_domain_callback : callable, optional
+            The time domain is a numpy array whose values are trial-aligned bin 
+            edges (each row is aligned to a different trial). This optional function will be 
+            applied to the time domain before counting spikes.
+
+        Returns
+        -------
+        xarray.Dataset :
+            Contains a data array named spike_counts whose dimensions are stimulus sweep, unit, 
+            and time bin and whose values are spike counts.
+
         '''
 
         stimulus_sweeps = self.stimulus_sweeps.loc[stimulus_sweep_ids] if stimulus_sweep_ids is not None else self.stimulus_sweeps
@@ -207,7 +233,26 @@ class EcephysSession(LazyPropertyMixin):
 
 
     def sweepwise_spike_times(self, stimulus_sweep_ids=None, unit_ids=None):
-        '''
+        ''' Produce a table associating spike times with units and stimulus sweeos
+
+        Parameters
+        ----------
+        stimulus_sweep_ids : array-like
+            Filter to these stimulus sweeps
+        unit_ids : array-like
+            Filter to these units
+
+        Returns
+        -------
+        pandas.DataFrame : 
+        Index is
+            spike_time : float
+                On the session's master clock.
+        Columns are
+            stimulus_sweep_id : int
+                The stimulus sweep on which this spike occurred.
+            unit_id : int
+                The unit that emitted this spike.
         '''
 
         stimulus_sweeps = self.stimulus_sweeps.loc[stimulus_sweep_ids] if stimulus_sweep_ids is not None else self.stimulus_sweeps
@@ -251,18 +296,78 @@ class EcephysSession(LazyPropertyMixin):
 
 
     def conditionwise_spike_counts(self, stimulus_sweep_ids=None, unit_ids=None):
+        ''' Count spikes by unit and stimulus condition
+
+        Parameters
+        ----------
+        stimulus_sweep_ids : array-like
+            Filter to these stimulus sweeps
+        unit_ids : array-like
+            Filter to these units
+
+        Returns
+        -------
+        pd.DataFrame :
+            Each row describes a condition and unit. The 'count' column states the number 
+            of spikes emitted by the unit under the condition.
+
+        Notes
+        -----
+        A stimulus condition is a setting of the parameters for a particular stimulus.
+
+        '''
+
         spike_times = self.sweepwise_spike_times(stimulus_sweep_ids=stimulus_sweep_ids, unit_ids=unit_ids)
         stimulus_sweeps = self.stimulus_sweeps.loc[stimulus_sweep_ids] if stimulus_sweep_ids is not None else self.stimulus_sweeps
         return count_spikes_by_condition(spike_times, stimulus_sweeps)
 
 
     def conditionwise_mean_spike_counts(self, stimulus_sweep_ids=None, unit_ids=None):
+        ''' Report average spike counts by unit and stimulus condition
+
+        Parameters
+        ----------
+        stimulus_sweep_ids : array-like
+            Filter to these stimulus sweeps
+        unit_ids : array-like
+            Filter to these units
+
+        Returns
+        -------
+        pd.DataFrame :
+            Each row describes a condition and unit. The 'mean_spike_count' column states the average
+            number of spikes emitted by the unit under the condition.
+
+        Notes
+        -----
+        A stimulus condition is a setting of the parameters for a particular stimulus.
+
+        '''
+
         stimulus_sweeps = self.stimulus_sweeps.loc[stimulus_sweep_ids] if stimulus_sweep_ids is not None else self.stimulus_sweeps
         spike_times = self.sweepwise_spike_times(stimulus_sweep_ids=stimulus_sweep_ids, unit_ids=unit_ids)
         return mean_spikes_by_condition(spike_times, stimulus_sweeps)
 
 
     def get_stimulus_conditions(self, stimulus_sweep_ids=None):
+        ''' Report stimulus conditions applied during this session
+
+        Parameters
+        ----------
+        stimulus_sweep_ids : array-like
+            Filter to these stimulus sweeps
+
+        Returns
+        -------
+        pd.DataFrame :
+            Each row describes a condition
+
+        Notes
+        -----
+        A stimulus condition is a setting of the parameters for a particular stimulus.
+
+        '''
+
         stimulus_sweeps = self.stimulus_sweeps.loc[stimulus_sweep_ids] if stimulus_sweep_ids is not None else self.stimulus_sweeps
 
         stimulus_sweeps = stimulus_sweeps.drop(columns=['start_time', 'stop_time', 'stimulus_block', 'is_movie'])
@@ -271,6 +376,7 @@ class EcephysSession(LazyPropertyMixin):
 
         stimulus_sweeps = removed_unused_stimulus_sweep_columns(stimulus_sweeps)
         return stimulus_sweeps
+
 
     def get_stimulus_parameter_values(self, stimulus_sweep_ids=None):
         ''' For each stimulus parameter, report the unique values taken on by that 
