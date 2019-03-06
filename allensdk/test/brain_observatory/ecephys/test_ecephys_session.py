@@ -180,7 +180,7 @@ def test_sweepwise_spike_times(spike_times_api):
         'stimulus_sweep_id': [2, 2, 2, ]
     }, index=pd.Index(name='spike_time', data=[1.01, 1.02, 1.03]))
 
-    pd.testing.assert_frame_equal(expected, obtained, check_like=True)
+    pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)
 
 
 def test_conditionwise_spike_counts(spike_times_api):
