@@ -137,8 +137,8 @@ class EcephysSession(LazyPropertyMixin):
         self.api: EcephysApi  = api
 
         self.running_speed= self.LazyProperty(self.api.get_running_speed)
-        self.mean_waveforms = self.LazyProperty(self.api.get_mean_waveforms)
-        self.spike_times = self.LazyProperty(self.api.get_spike_times)
+        self.mean_waveforms = self.LazyProperty(self.api.get_mean_waveforms, wrappers=[self._build_mean_waveforms])
+        self.spike_times = self.LazyProperty(self.api.get_spike_times, wrappers=[self._build_spike_times])
 
         self.probes = self.LazyProperty(self.api.get_probes)
         self.channels = self.LazyProperty(self.api.get_channels)
@@ -294,6 +294,19 @@ class EcephysSession(LazyPropertyMixin):
         return {col: stimulus_sweeps[col].unique() for col in stimulus_sweeps.columns}
 
 
+    def _build_spike_times(self, spike_times):
+        retained_units = set(self.units.index.values)
+        output_spike_times = {}
+
+        for unit_id in list(spike_times.keys()):
+            data = spike_times.pop(unit_id)
+            if unit_id not in retained_units:
+                continue
+            output_spike_times[unit_id] = data
+
+        return output_spike_times
+
+
     def _build_stimulus_sweeps(self, stimulus_sweeps):
         stimulus_sweeps.index.name = 'stimulus_sweep_id'
         stimulus_sweeps = stimulus_sweeps.drop(columns=['stimulus_index'])
@@ -324,8 +337,35 @@ class EcephysSession(LazyPropertyMixin):
             (table['valid_data'])
             & (table['quality'] == 'good')
         ]
+
         table = table.drop(columns=['local_index_unit', 'local_index_channel', 'quality', 'valid_data'])
         return table.sort_values(by=['probe_description', 'probe_vertical_position', 'probe_horizontal_position'])
+
+
+    def _build_mean_waveforms(self, mean_waveforms):
+        #TODO: there is a bug either here or (more likely) in LIMS unit data ingest which causes the peak channel 
+        # to be off by a few (exactly 1?) indices
+        # we could easily recompute here, but better to fix it at the source
+        channel_id_lut = {(row['local_index'], row['probe_id']): cid for cid, row in self.channels.iterrows()}
+        probe_id_lut = {uid: row['probe_id'] for uid, row in self.units.iterrows()}
+        
+        output_waveforms = {}
+        for uid in list(mean_waveforms.keys()):
+            data = mean_waveforms.pop(uid)
+
+            if uid not in probe_id_lut: # It's been filtered out during unit table generation!
+                continue
+
+            output_waveforms[uid] = xr.DataArray(
+                data=data,
+                dims=['channel_id', 'time'],
+                coords={
+                    'channel_id': [ channel_id_lut[(ii, probe_id_lut[uid])] for ii in range(data.shape[0])],
+                    'time': np.arange(data.shape[1]) / 30000 # TODO: get these timestamps from NWB file
+                }
+            )
+
+        return output_waveforms
 
 
     @classmethod
