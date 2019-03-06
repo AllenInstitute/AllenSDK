@@ -27,6 +27,16 @@ def raw_stimulus_table():
 
 
 @pytest.fixture
+def raw_spike_times():
+    return {
+        0: np.array([5, 6, 7, 8]),
+        1: np.array([2.5]),
+        2: np.array([1.01, 1.02, 1.03])
+    }
+
+
+
+@pytest.fixture
 def raw_mean_waveforms():
     return {
         0: np.zeros((20, 3)),
@@ -41,8 +51,8 @@ def raw_channels():
         'local_index': [0, 1, 2],
         'probe_horizontal_position': [5, 10, 15],
         'probe_id': [0, 0, 0],
-        'probe_vertical_position': [10, 22, 10],
-        'valid_data': [True, True, False]
+        'probe_vertical_position': [10, 22, 33],
+        'valid_data': [False, True, True]
     }, index=pd.Index(name='channel_id', data=[0, 1, 2]))
 
 
@@ -52,7 +62,7 @@ def raw_units():
         'firing_rate': np.linspace(1, 3, 3),
         'isi_violations': [40, 0.5, 0.1],
         'local_index': [0, 0, 1],
-        'peak_channel_id': [0, 1, 2],
+        'peak_channel_id': [2, 1, 0],
         'quality': ['good', 'good', 'noise'],
         'snr': [0.1, 1.4, 10.0]
     }, index=pd.Index(name='unit_id', data=np.arange(3)[::-1]))
@@ -75,6 +85,18 @@ def just_stimulus_table_api(raw_stimulus_table):
 
 
 @pytest.fixture
+def units_table_api(raw_channels, raw_units, raw_probes):
+    class EcephysUnitsTableApi(EcephysApi):
+        def get_channels(self):
+            return raw_channels
+        def get_units(self):
+            return raw_units
+        def get_probes(self):
+            return raw_probes  
+    return EcephysUnitsTableApi()
+
+
+@pytest.fixture
 def mean_waveforms_api(raw_mean_waveforms, raw_channels, raw_units, raw_probes):
     class EcephysMeanWaveformsApi(EcephysApi):
         def get_mean_waveforms(self):
@@ -86,6 +108,22 @@ def mean_waveforms_api(raw_mean_waveforms, raw_channels, raw_units, raw_probes):
         def get_probes(self):
             return raw_probes
     return EcephysMeanWaveformsApi()
+
+
+@pytest.fixture
+def spike_times_api(raw_units, raw_channels, raw_probes, raw_stimulus_table, raw_spike_times):
+    class EcephysSpikeTimesApi(EcephysApi):
+        def get_spike_times(self):
+            return raw_spike_times
+        def get_channels(self):
+            return raw_channels
+        def get_units(self):
+            return raw_units
+        def get_probes(self):
+            return raw_probes
+        def get_stimulus_table(self):
+            return raw_stimulus_table
+    return EcephysSpikeTimesApi()
 
 
 def test_build_stimulus_sweeps(just_stimulus_table_api):
@@ -107,5 +145,58 @@ def test_build_mean_waveforms(mean_waveforms_api):
     session = EcephysSession(api=mean_waveforms_api)
     obtained = session.mean_waveforms
 
-    assert np.allclose(np.zeros((20, 3)) + 2, obtained['mean_waveforms'].loc[2, :, :])
-    assert np.allclose(np.zeros((20, 3)) + 1, obtained['mean_waveforms'].loc[1, :, :])
+    assert np.allclose(np.zeros((20, 3)) + 2, obtained['mean_waveforms'].loc[{'unit_id': 2}])
+    assert np.allclose(np.zeros((20, 3)) + 1, obtained['mean_waveforms'].loc[{'unit_id': 1}])
+
+
+def test_build_units_table(units_table_api):
+    session = EcephysSession(api=units_table_api)
+    obtained = session.units
+
+    assert 2 == session.num_units
+    assert np.allclose([22, 33], obtained['probe_vertical_position'])
+    assert np.allclose([1, 2], obtained.index.values)
+
+
+def test_framewise_spike_counts(spike_times_api):
+    session = EcephysSession(api=spike_times_api)
+    obtained = session.sweepwise_spike_counts(np.linspace(-.1, .1, 3),session.stimulus_sweeps, session.units)
+
+    first = obtained['spike_counts'].loc[{'unit_id': 2, 'stimulus_sweep_id': 2}]
+    assert np.allclose([0, 3], first)
+
+    second = obtained['spike_counts'].loc[{'unit_id': 1, 'stimulus_sweep_id': 3}]
+    assert np.allclose([0, 0], second)
+
+    assert np.allclose([4, 2, 2], obtained['spike_counts'].shape)
+
+
+def test_sweepwise_spike_times(spike_times_api):
+    session = EcephysSession(api=spike_times_api)
+    obtained = session.sweepwise_spike_times(session.stimulus_sweeps, session.units)
+
+    expected = pd.DataFrame({
+        'unit_id': [2, 2, 2],
+        'stimulus_sweep_id': [2, 2, 2, ]
+    }, index=pd.Index(name='spike_time', data=[1.01, 1.02, 1.03]))
+
+    pd.testing.assert_frame_equal(expected, obtained, check_like=True)
+
+
+def test_spike_counts_by_unit_and_stimulus_sweep(spike_times_api):
+    session = EcephysSession(api=spike_times_api)
+    obtained = session.spike_counts_by_unit_and_stimulus_sweep(session.stimulus_sweeps, session.units)
+
+    expected = pd.DataFrame({
+        'unit_id': [2],
+        'stimulus_sweep_id': [2],
+        'count': [3]
+    })
+
+    pd.testing.assert_frame_equal(expected, obtained, check_like=True)
+
+
+def test_mean_spike_counts_by_unit_and_stimulus_condition(spike_times_api):
+    session = EcephysSession(api=spike_times_api)
+    obtained = session.mean_spike_counts_by_unit_and_stimulus_condition(session.stimulus_sweeps, session.units)
+    
