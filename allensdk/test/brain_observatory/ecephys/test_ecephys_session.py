@@ -225,3 +225,30 @@ def test_conditionwise_mean_spike_counts(spike_times_api):
     })
 
     pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)
+
+
+def test_get_stimulus_conditions(just_stimulus_table_api):
+    session = EcephysSession(api=just_stimulus_table_api)
+    obtained = session.get_stimulus_conditions(stimulus_sweep_ids=[3])
+
+    expected = pd.DataFrame({
+        'Color': [16.5],
+        'stimulus_name': ['a_movie'],
+        'Phase': [180]
+    })
+
+    pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)
+
+
+def test_get_stimulus_parameter_values(just_stimulus_table_api):
+    session = EcephysSession(api=just_stimulus_table_api)
+    obtained = session.get_stimulus_parameter_values()
+
+    expected = {
+        'Color': [0, 5.5, 11, 16.5],
+        'Phase': [0, 60, 120, 180]
+    }
+
+    for k, v in expected.items():
+        assert np.allclose(v, obtained[k])
+    assert len(expected) == len(obtained)
