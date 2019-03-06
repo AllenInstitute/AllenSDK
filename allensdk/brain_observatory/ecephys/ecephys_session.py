@@ -316,7 +316,7 @@ class EcephysSession(LazyPropertyMixin):
         stimulus_sweeps['is_movie'] = stimulus_sweeps['stimulus_name'].str.match(movie_re)
 
         # pandas groupby ops ignore nans, so we need a new null value that pandas does not recognize as null ...
-        stimulus_sweeps['stimulus_name'].loc[stimulus_sweeps['stimulus_name'] == ''] = 'gray_period' # TODO replace this with a 'constant' stimulus and set its actual level / hue.
+        stimulus_sweeps.loc[stimulus_sweeps['stimulus_name'] == '', 'stimulus_name'] = 'gray_period' # TODO replace this with a 'constant' stimulus and set its actual level / hue.
         stimulus_sweeps[stimulus_sweeps == ''] = np.nan
         stimulus_sweeps = stimulus_sweeps.fillna('null') # 123 / 2**8
 
