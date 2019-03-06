@@ -1,7 +1,7 @@
 import pytest
 
 from allensdk.internal.api import OneResultExpectedError
-from allensdk.internal.api.behavior_lims_api import BehaviorLimsApi
+from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
 
 
 @pytest.mark.nightly
@@ -11,7 +11,7 @@ from allensdk.internal.api.behavior_lims_api import BehaviorLimsApi
 ])
 def test_get_behavior_stimulus_file(ophys_experiment_id, compare_val):
 
-    api = BehaviorLimsApi()
+    api = BehaviorOphysLimsApi()
 
     if compare_val is None:
         expected_fail = False
