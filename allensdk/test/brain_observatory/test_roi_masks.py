@@ -77,3 +77,48 @@ def test_init_by_pixels_large():
     npx = len(np.where(a)[0])
     assert npx == len(np.where(m.get_mask_plane())[0])
 
+
+def test_create_neuropil_mask():
+
+    image_width = 100
+    image_height = 80
+
+    # border = [image_width-1, 0, image_height-1, 0]
+    border = [5, 5, 5, 5]
+
+    roi_mask = np.zeros((image_height, image_width), dtype=np.uint8)
+    roi_mask[40:45, 30:35] = 1
+
+    combined_binary_mask = np.zeros((image_height, image_width), dtype=np.uint8)
+    combined_binary_mask[:, 45:] = 1
+
+    roi = roi_masks.create_roi_mask(image_w=image_width, image_h=image_height, border=border, roi_mask=roi_mask)
+    obtained = roi_masks.create_neuropil_mask(roi, border, combined_binary_mask)
+
+    expected_mask = np.zeros((58-27, 45-17), dtype=np.uint8)
+    expected_mask[:, :] = 1
+
+    assert np.allclose(expected_mask, obtained.mask)
+    assert obtained.x == 17
+    assert obtained.y == 27
+    assert obtained.width == 28
+    assert obtained.height == 31
+
+
+def test_create_empty_neuropil_mask():
+    image_width = 100
+    image_height = 80
+
+    # border = [image_width-1, 0, image_height-1, 0]
+    border = [5, 5, 5, 5]
+
+    roi_mask = np.zeros((image_height, image_width), dtype=np.uint8)
+    roi_mask[40:45, 30:35] = 1
+
+    combined_binary_mask = np.zeros((image_height, image_width), dtype=np.uint8)
+    combined_binary_mask[:, :] = 1
+
+    roi = roi_masks.create_roi_mask(image_w=image_width, image_h=image_height, border=border, roi_mask=roi_mask)
+    obtained = roi_masks.create_neuropil_mask(roi, border, combined_binary_mask)
+
+    assert obtained.mask is None

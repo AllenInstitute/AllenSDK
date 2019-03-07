@@ -262,7 +262,8 @@ def create_neuropil_mask(roi, border, combined_binary_mask, label=None):
         The ROI that the neuropil masks will be based on
 
     border: float[4]
-        Coordinates defining useable area of image. See create_roi_mask().
+        Border widths on the [right, left, down, up] sides. The resulting 
+        neuropil mask will not include pixels falling into a border.
 
     combined_binary_mask
         List of pixel coordinates (x,y) that define the mask
@@ -321,14 +322,23 @@ class NeuropilMask(Mask):
         Parameters
         ----------
         border: float[4]
-            Coordinates defining useable area of image. See create_roi_mask().
-
+            Border widths on the [right, left, down, up] sides. The resulting 
+            neuropil mask will not include pixels falling into a border.
         array: integer[image height][image width]
             Image-sized array that describes the mask. Active parts of the
             mask should have values >0. Background pixels must be zero
         '''
         # find lowest and highest non-zero indices on each axis
         px = np.argwhere(array)
+
+        if len(px) == 0:
+            self.x = None
+            self.width = None
+            self.y = None
+            self.height = None
+            self.mask = None
+            return
+
         (top, left), (bottom, right) = px.min(0), px.max(0)
 
         # left and right border insets
@@ -394,10 +404,13 @@ def calculate_traces(stack, mask_list, block_size=100):
             mask.mask = np.array(mask.mask)
 
         # compute mask areas
-        mask_areas[i] = mask.mask.sum()
+        if mask.mask is not None:
+            mask_areas[i] = mask.mask.sum()
+        else:
+            mask_areas[i] = None
 
         # if the mask is empty, the trace is nan
-        if mask_areas[i] == 0:
+        if mask_areas[i] is None or mask_areas[i] == 0:
             logging.warning("mask '%d/%s' is empty", i, mask.label)
             traces[i,:] = np.nan
             valid_masks[i] = False
