@@ -72,6 +72,11 @@ class Mask(object):
        User-defined number to help put masks into different categories
     '''
 
+    @property
+    def overlaps_motion_border(self):
+        # flags like this are now in self.flags, patch for backwards compatibility
+        return 'overlaps_motion_border' in self.flags
+
     def __init__(self, image_w, image_h, label, mask_group):
         '''
         Mask class constructor. The Mask class is designed to be abstract
@@ -87,13 +92,13 @@ class Mask(object):
         self.y = 0
         self.height = 0
         self.mask = None
-        self.overlaps_motion_border = False
         # label is for distinguishing neuropil from ROI, in case
         #   these masks are mixed together
         self.label = label
         # auxiliary metadata. if a particula mask is part of an group,
         #   that data can be stored here
         self.mask_group = mask_group
+        self.flags = set([])
 
     def __str__(self):
         return "%s: TL=%d,%d w,h=%d,%d\n%s" % (self.label, self.x, self.y, self.width, self.height, str(self.mask))
@@ -147,7 +152,7 @@ def create_roi_mask(image_w, image_h, border, pix_list=None, roi_mask=None, labe
     border: float[4]
         Coordinates defining useable area of image. If the entire image
         is usable, and masks are valid anywhere in the image, this should
-        be [(image_w-1), 0, (image_h-1), 0]. The following constants
+        be [0, 0, 0, 0]. The following constants
         help describe the array order:
 
             RIGHT_SHIFT = 0
@@ -224,8 +229,12 @@ class RoiMask(Mask):
             Image-sized array that describes the mask. Active parts of the
             mask should have values >0. Background pixels must be zero
         '''
-        # find lowest and highest non-zero indices on each axis
         px = np.argwhere(array)
+
+        if len(px) == 0:
+            self.flags.add('zero_pixels')
+            return
+
         (top, left), (bottom, right) = px.min(0), px.max(0)
 
         # left and right border insets
@@ -237,9 +246,9 @@ class RoiMask(Mask):
 
         # if ROI crosses border, it's considered invalid
         if left < l_inset or right > r_inset:
-            self.overlaps_motion_border = True
+            self.flags.add('overlaps_motion_border')
         if top < t_inset or bottom > b_inset:
-            self.overlaps_motion_border = True
+            self.flags.add('overlaps_motion_border')
         #
         self.x = left
         self.width = right - left + 1
@@ -328,15 +337,10 @@ class NeuropilMask(Mask):
             Image-sized array that describes the mask. Active parts of the
             mask should have values >0. Background pixels must be zero
         '''
-        # find lowest and highest non-zero indices on each axis
         px = np.argwhere(array)
 
         if len(px) == 0:
-            self.x = None
-            self.width = None
-            self.y = None
-            self.height = None
-            self.mask = None
+            self.flags.add('zero_pixels')
             return
 
         (top, left), (bottom, right) = px.min(0), px.max(0)
@@ -395,31 +399,25 @@ def calculate_traces(stack, mask_list, block_size=100):
     traces = np.zeros((len(mask_list), stack.shape[0]), dtype=float)
     num_frames = stack.shape[0]
 
-    # make sure masks are numpy objects
     mask_areas = np.zeros(len(mask_list), dtype=float)
     valid_masks = np.ones(len(mask_list), dtype=bool)
 
-    for i,mask in enumerate(mask_list):
-        if not isinstance(mask.mask, np.ndarray):
-            mask.mask = np.array(mask.mask)
-
-        # compute mask areas
-        if mask.mask is not None:
-            mask_areas[i] = mask.mask.sum()
-        else:
-            mask_areas[i] = None
-
-        # if the mask is empty, the trace is nan
-        if mask_areas[i] is None or mask_areas[i] == 0:
+    for i, mask in enumerate(mask_list):
+        if 'zero_pixels' in mask.flags:
             logging.warning("mask '%d/%s' is empty", i, mask.label)
             traces[i,:] = np.nan
             valid_masks[i] = False
+            continue
 
-        # if the mask overlaps the motion border, the trace is nan
-        if mask.overlaps_motion_border:
+        if 'overlaps_motion_border' in mask.flags:
             logging.warning("mask '%d/%s' overlaps with motion border", i, mask.label)
             traces[i,:] = np.nan
             valid_masks[i] = False
+            continue
+
+        if not isinstance(mask.mask, np.ndarray):
+            mask.mask = np.array(mask.mask)
+        mask_areas[i] = mask.mask.sum()
 
     # calculate traces
     for frame_num in range(0, num_frames, block_size):

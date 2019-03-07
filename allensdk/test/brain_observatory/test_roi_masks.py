@@ -122,3 +122,4 @@ def test_create_empty_neuropil_mask():
     obtained = roi_masks.create_neuropil_mask(roi, border, combined_binary_mask)
 
     assert obtained.mask is None
+    assert 'zero_pixels' in obtained.flags
