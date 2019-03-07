@@ -57,20 +57,20 @@ class EcephysNwbApi(EcephysApi):
         return channels
     
     def get_mean_waveforms(self) -> Dict[int, np.ndarray]:
-        units_table = self.__get_full_units_table()
+        units_table = self._get_full_units_table()
         return units_table['waveform_mean'].to_dict()
 
     def get_spike_times(self) -> Dict[int, np.ndarray]:
-        units_table = self.__get_full_units_table()
+        units_table = self._get_full_units_table()
         return units_table['spike_times'].to_dict()
     
     def get_units(self) -> pd.DataFrame:
-        units_table = self.__get_full_units_table()
+        units_table = self._get_full_units_table()
         units_table.drop(columns=['spike_times', 'waveform_mean'], inplace=True)
 
         return units_table
 
-    def __get_full_units_table(self) -> pd.DataFrame:
+    def _get_full_units_table(self) -> pd.DataFrame:
         table = self.nwbfile.units.to_dataframe()
         table.index = table.index.astype(int)
         return table
