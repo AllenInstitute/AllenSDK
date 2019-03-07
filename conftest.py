@@ -33,7 +33,7 @@ def pytest_collection_modifyitems(config, items):
     )
 
     skip_flaky_test = pytest.mark.skipif(
-        (os.getenv('TEST_COMPLETE') != 'true') or (os.getenv('TEST_FLAKY') == 'true'),
+        (os.getenv('TEST_COMPLETE') != 'true') and (os.getenv('TEST_FLAKY') != 'true'),
         reason='this test does not consistently pass (for instance, because it makes requests that sometimes time out).'\
             'All such tests should be fixed, but in the mean time we\'ve restricted it to run in our nightly build only '\
             'in order to reduce the prevalence of bogus test results.'
@@ -46,5 +46,5 @@ def pytest_collection_modifyitems(config, items):
         if 'nightly' in item.keywords:
             item.add_marker(skip_nightly_test)
 
-        if 'flaky' in item.keywords:
+        if 'todo_flaky' in item.keywords:
             item.add_marker(skip_flaky_test)
