@@ -15,10 +15,7 @@ def plot_running_speed(
         Times at which running speed samples were collected
     values : numpy.ndarray
         Running speed values (by default: linear cm / s with negative values indicating backwards movement)
-
-
-
-
+        
     '''
 
     stop_index = len(timestamps) if stop_index is None else stop_index
