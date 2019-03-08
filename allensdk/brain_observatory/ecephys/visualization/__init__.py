@@ -1,10 +1,8 @@
-
-import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import numpy as np
 
 
-def plot_mean_waveforms(mean_waveforms, unit_ids):
+def plot_mean_waveforms(mean_waveforms, unit_ids): # pragma: no cover
     ''' Utility for plotting mean waveforms on each unit's peak channel
 
     Parameters
@@ -42,7 +40,7 @@ def plot_spike_counts(
     xlabel='time relative to stimulus onset (s)', 
     ylabel='unit', 
     xtick_step=20
-):
+): # pragma: no cover
     '''Utility for making a simple spike counts plot.
 
     Parameters
@@ -73,26 +71,5 @@ def plot_spike_counts(
     ax.set_xlabel(xlabel, fontsize=16)
 
     ax.set_title(title, fontsize=20)
-
-    return fig
-    
-
-def plot_running_speed(timestamps, values, start_index, stop_index, step=1):
-    ''' Plot a running speed trace
-    '''
-
-    fig, ax = plt.subplots(figsize=(8, 8))
-    plt.plot(
-        timestamps[start_index:stop_index:step], 
-        values[start_index:stop_index:step],
-    )
-
-    ax.set_ylabel('running speed (cm/s)', fontsize=16)
-    ax.set_xlabel('time (s)', fontsize=16)
-    ax.set_title(
-        f'running speed from {timestamps[start_index]:2.2f} to {timestamps[stop_index-1]:2.2f} seconds',
-        fontsize=20
-    )
-    plt.axis('tight')
 
     return fig
