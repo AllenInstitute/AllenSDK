@@ -32,9 +32,19 @@ def pytest_collection_modifyitems(config, items):
             'Either way, it does\'nt run by default and must be opted into (it does run in our nightly builds).'
     )
 
+    skip_flaky_test = pytest.mark.skipif(
+        (os.getenv('TEST_COMPLETE') != 'true') and (os.getenv('TEST_FLAKY') != 'true'),
+        reason='this test does not consistently pass (for instance, because it makes requests that sometimes time out).'\
+            'All such tests should be fixed, but in the mean time we\'ve restricted it to run in our nightly build only '\
+            'in order to reduce the prevalence of bogus test results.'
+    )
+
     for item in items:
         if 'requires_api_endpoint' in item.keywords:
             item.add_marker(skip_api_endpoint_test)
 
         if 'nightly' in item.keywords:
             item.add_marker(skip_nightly_test)
+
+        if 'todo_flaky' in item.keywords:
+            item.add_marker(skip_flaky_test)

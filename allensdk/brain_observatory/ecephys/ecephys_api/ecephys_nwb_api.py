@@ -35,10 +35,13 @@ class EcephysNwbApi(EcephysApi):
         )
     
     def get_stimulus_table(self) -> pd.DataFrame:
-        stimulus_table = self.nwbfile.epochs.to_dataframe()
-        stimulus_table = stimulus_table.reset_index()
-        stimulus_table.drop(columns=['tags', 'timeseries', 'id'], inplace=True)
-        return stimulus_table
+        table = pd.DataFrame({
+            col.name: col.data for col in self.nwbfile.epochs.columns 
+            if col.name not in set(['tags', 'timeseries', 'tags_index', 'timeseries_index'])
+        }, index=pd.Index(name=self.nwbfile.epochs.id.name, data=self.nwbfile.epochs.id.data))
+        table.index = table.index.astype(int)
+        return table
+    
     
     def get_probes(self) -> pd.DataFrame:
         probes: Union[List, pd.DataFrame] = []
@@ -54,21 +57,23 @@ class EcephysNwbApi(EcephysApi):
         return channels
     
     def get_mean_waveforms(self) -> Dict[int, np.ndarray]:
-        units_table = self.__get_full_units_table()
+        units_table = self._get_full_units_table()
         return units_table['waveform_mean'].to_dict()
 
     def get_spike_times(self) -> Dict[int, np.ndarray]:
-        units_table = self.__get_full_units_table()
+        units_table = self._get_full_units_table()
         return units_table['spike_times'].to_dict()
     
     def get_units(self) -> pd.DataFrame:
-        units_table = self.__get_full_units_table()
+        units_table = self._get_full_units_table()
         units_table.drop(columns=['spike_times', 'waveform_mean'], inplace=True)
 
         return units_table
 
-    def __get_full_units_table(self) -> pd.DataFrame:
-        return self.nwbfile.units.to_dataframe()
+    def _get_full_units_table(self) -> pd.DataFrame:
+        table = self.nwbfile.units.to_dataframe()
+        table.index = table.index.astype(int)
+        return table
 
     @classmethod
     def from_nwbfile(cls, nwbfile, **kwargs):
