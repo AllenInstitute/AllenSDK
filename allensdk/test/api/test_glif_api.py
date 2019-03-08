@@ -61,7 +61,7 @@ def glif_api():
 
 
 @pytest.mark.requires_api_endpoint
-@pytest.mark.skip_flaky_test
+@pytest.mark.todo_flaky
 def test_get_neuronal_model_templates(glif_api):
 
     assert len(glif_api.get_neuronal_model_templates()) == 7
