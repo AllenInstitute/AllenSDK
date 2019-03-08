@@ -23,7 +23,7 @@ class MtrainApi(PostgresQueryMixin):
         for ii in itertools.count(1):
             sys.stdout.flush()
 
-            uri = os.path.join(self.api_base, "api/v1/%s?page=%i&q={\"filters\":%s}" % (table_name, ii, json.dumps(filters)))
+            uri = '/'.join([self.api_base, "api/v1/%s?page=%i&q={\"filters\":%s}" % (table_name, ii, json.dumps(filters))])
             tmp = get_obj.get(uri, **kwargs)
             try:
                 data = tmp.json()
