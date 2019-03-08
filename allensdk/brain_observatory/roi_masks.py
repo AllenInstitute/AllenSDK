@@ -474,7 +474,6 @@ def calculate_roi_and_neuropil_traces(movie_h5, roi_mask_list, motion_border):
     return roi_traces, neuropil_traces
 
 
-
 def create_roi_mask_array(rois):
     '''Create full image mask array from list of RoiMasks.
 
