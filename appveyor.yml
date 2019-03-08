@@ -25,7 +25,7 @@ install:
   - conda install statsmodels
   - pip install Pillow
   - conda install -c https://conda.anaconda.org/simpleitk SimpleITK
-  - if %PYTHON% == 2.7 conda install scikit-image
+  - if %PYTHON% == 2.7 conda install -c conda-forge scikit-image
   - pip install codecov
   - pip install -r test_requirements.txt
   - pip install .
