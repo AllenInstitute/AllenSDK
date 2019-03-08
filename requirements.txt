@@ -1,7 +1,7 @@
 psycopg2>=2.7
 h5py>=2.8
 matplotlib>=1.4.3
-numpy>=1.15.1
+numpy>=1.16
 pandas>=0.23.0
 jinja2>=2.7.3
 scipy>=0.15.1
