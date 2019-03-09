@@ -378,7 +378,7 @@ class NeuropilMask(Mask):
         self.mask = array[top:bottom + 1, left:right + 1]
 
 
-def calculate_traces(stack, mask_list, block_size=100):
+def calculate_traces(stack, mask_list, block_size=1000):
     '''
     Calculates the average response of the specified masks in the
     image stack
@@ -403,8 +403,9 @@ def calculate_traces(stack, mask_list, block_size=100):
     valid_masks = np.ones(len(mask_list), dtype=bool)
 
     for i, mask in enumerate(mask_list):
-        if 'zero_pixels' in mask.flags:
+        if 'zero_pixels' in mask.flags or mask.mask.sum() == 0:
             logging.warning("mask '%d/%s' is empty", i, mask.label)
+            mask.flags.add('zero_pixels')
             traces[i,:] = np.nan
             valid_masks[i] = False
             continue
@@ -421,12 +422,12 @@ def calculate_traces(stack, mask_list, block_size=100):
 
     # calculate traces
     for frame_num in range(0, num_frames, block_size):
-        if frame_num % 1000 == 0:
+        if frame_num % block_size == 0:
             logging.debug("frame " + str(frame_num) + " of " + str(num_frames))
         frames = stack[frame_num:frame_num+block_size]
 
         for i in range(len(mask_list)):
-            if valid_masks[i] is False:
+            if not valid_masks[i]:
                 continue
 
             mask = mask_list[i]
@@ -453,14 +454,8 @@ def calculate_roi_and_neuropil_traces(movie_h5, roi_mask_list, motion_border):
         nmask = create_neuropil_mask(m, motion_border, combined_mask, "neuropil for " + m.label)
         neuropil_masks.append(nmask)
 
-    # calculate fluorescence traces for valid ROI and neuropil masks
-    # create a combined list and calculate these together (this lets us
-    #   read the large image stack only once)
-    combined_list = []
-    for m in roi_mask_list:
-        combined_list.append(m)
-    for n in neuropil_masks:
-        combined_list.append(n)
+    num_rois = len(roi_mask_list)
+    combined_list = roi_mask_list + neuropil_masks #  read the large image stack only once
 
     with h5py.File(movie_h5, "r") as movie_f:
         stack_frames = movie_f["data"]
@@ -468,8 +463,8 @@ def calculate_roi_and_neuropil_traces(movie_h5, roi_mask_list, motion_border):
         logging.info("Calculating %d traces (neuropil + ROI) over %d frames" % (len(combined_list), len(stack_frames)))
         traces = calculate_traces(stack_frames, combined_list)
 
-        roi_traces = traces[:len(roi_mask_list)]
-        neuropil_traces = traces[len(roi_mask_list):]
+        roi_traces = traces[:num_rois]
+        neuropil_traces = traces[num_rois:]
 
     return roi_traces, neuropil_traces
 
