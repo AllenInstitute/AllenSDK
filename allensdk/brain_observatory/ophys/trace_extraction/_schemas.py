@@ -35,14 +35,16 @@ class InputSchema(ArgSchema):
     class Meta:
         unknown=RAISE
     log_level = LogLevel(default='INFO', description='set the logging level of the module')
-    motion_border = MotionBorder(required=True, description='border widths - pixels outside the border are considered invalid')
+    motion_border = Nested(MotionBorder, required=True, description='border widths - pixels outside the border are considered invalid')
     storage_directory = String(required=True, description='used to set output directory')
     motion_corrected_stack = String(required=True, description='path to h5 file containing motion corrected image stack')
     rois = Nested(Roi, many=True, description='specifications of individual regions of interest')
-    image = Image(required=True, description='parameters describing the field of view')
+    image = Nested(Image, required=True, description='parameters describing the field of view')
     log_0 = String(required=True, description='path to motion correction output csv') # TODO: is this redundant with motion border?
 
 
-# class OutputSchema(RaisingSchema):
+class OutputSchema(RaisingSchema):
+    neuropil_trace_file = String(required=True, description='path to output h5 file containing neuropil traces') # TODO rename these to _path
+    roi_trace_file = String(required=True, description='path to output h5 file containing roi traces')
     
     
