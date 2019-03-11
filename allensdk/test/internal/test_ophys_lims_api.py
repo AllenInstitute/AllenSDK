@@ -13,6 +13,7 @@ def api_data():
      return {702134928:
                       {'ophys_dir':'/allen/programs/braintv/production/neuralcoding/prod0/specimen_652073919/ophys_session_702013508/ophys_experiment_702134928/',
                        'demix_file':'/allen/programs/braintv/production/neuralcoding/prod0/specimen_652073919/ophys_session_702013508/ophys_experiment_702134928/demix/702134928_demixed_traces.h5',
+                       'maxint_file':'/allen/programs/braintv/production/neuralcoding/prod0/specimen_652073919/ophys_session_702013508/ophys_experiment_702134928/processed/ophys_cell_segmentation_run_814561221/maxInt_a13a.png',
                        'avgint_a1X_file':'/allen/programs/braintv/production/neuralcoding/prod0/specimen_652073919/ophys_session_702013508/ophys_experiment_702134928/processed/ophys_cell_segmentation_run_814561221/avgInt_a1X.png',
                        'rigid_motion_transform_file':'/allen/programs/braintv/production/neuralcoding/prod0/specimen_652073919/ophys_session_702013508/ophys_experiment_702134928/processed/702134928_rigid_motion_transform.csv',
                        'targeted_structure':'VISal',
@@ -53,6 +54,17 @@ def test_get_ophys_experiment_dir(ophys_experiment_id, api_data, ophys_lims_api)
 def test_get_demix_file(ophys_experiment_id, api_data, ophys_lims_api):
     f = ophys_lims_api.get_demix_file
     key = 'demix_file'
+    if ophys_experiment_id in api_data:
+        assert f(ophys_experiment_id=ophys_experiment_id) == api_data[ophys_experiment_id][key]
+    else:
+        expected_fail(f, ophys_experiment_id=ophys_experiment_id)
+
+
+@pytest.mark.nightly
+@pytest.mark.parametrize('ophys_experiment_id', [702134928, 0])
+def test_get_maxint_file(ophys_experiment_id, api_data, ophys_lims_api):
+    f = ophys_lims_api.get_maxint_file
+    key = 'maxint_file'
     if ophys_experiment_id in api_data:
         assert f(ophys_experiment_id=ophys_experiment_id) == api_data[ophys_experiment_id][key]
     else:
