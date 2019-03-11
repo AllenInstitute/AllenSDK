@@ -47,16 +47,18 @@ class OphysLimsApi(PostgresQueryMixin):
                 '''.format(ophys_experiment_id)        
         return self.fetchone(query, strict=True)
 
+
     @memoize
     def get_maxint_file(self, ophys_experiment_id=None):
         query = '''
-                SELECT obj.storage_directory || 'maxInt_a13a.png' AS maxint_file
+                SELECT wkf.storage_directory || wkf.filename AS maxint_file
                 FROM ophys_experiments oe
                 LEFT JOIN ophys_cell_segmentation_runs ocsr ON ocsr.ophys_experiment_id = oe.id AND ocsr.current = 't'
-                LEFT JOIN well_known_files obj ON obj.attachable_id=ocsr.id AND obj.attachable_type = 'OphysCellSegmentationRun' AND obj.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'OphysSegmentationObjects')
+                LEFT JOIN well_known_files wkf ON wkf.attachable_id=ocsr.id AND wkf.attachable_type = 'OphysCellSegmentationRun' AND wkf.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'OphysMaxIntImage')
                 WHERE oe.id= {};
-                '''.format(ophys_experiment_id)        
+                '''.format(ophys_experiment_id)
         return self.fetchone(query, strict=True)
+
 
     @memoize
     def get_max_projection(self, ophys_experiment_id=None):
@@ -207,8 +209,9 @@ class OphysLimsApi(PostgresQueryMixin):
     @memoize
     def get_input_extract_traces_file(self, ophys_experiment_id=None):
         query = '''
-                SELECT oe.storage_directory || 'processed/' || oe.id || '_input_extract_traces.json'
+                SELECT wkf.storage_directory || wkf.filename AS input_extract_traces_file
                 FROM ophys_experiments oe
+                LEFT JOIN well_known_files wkf ON wkf.attachable_id=oe.id AND wkf.attachable_type = 'OphysExperiment' AND wkf.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'OphysExtractedTracesInputJson')
                 WHERE oe.id= {};
                 '''.format(ophys_experiment_id)        
         return self.fetchone(query, strict=True)
@@ -237,8 +240,9 @@ class OphysLimsApi(PostgresQueryMixin):
     @memoize
     def get_demix_file(self, ophys_experiment_id=None):
         query = '''
-                SELECT oe.storage_directory || 'demix/' || oe.id || '_demixed_traces.h5' AS demix_file
+                SELECT wkf.storage_directory || wkf.filename AS demix_file
                 FROM ophys_experiments oe
+                LEFT JOIN well_known_files wkf ON wkf.attachable_id=oe.id AND wkf.attachable_type = 'OphysExperiment' AND wkf.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'DemixedTracesFile')
                 WHERE oe.id= {};
                 '''.format(ophys_experiment_id)        
         return self.fetchone(query, strict=True)
