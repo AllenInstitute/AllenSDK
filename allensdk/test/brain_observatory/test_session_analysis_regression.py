@@ -9,6 +9,7 @@ import json
 from pkg_resources import resource_filename  # @UnresolvedImport
 import numpy as np
 import pandas as pd
+import tables # TODO only for a (hopefully) temporary test skip
 
 from allensdk.brain_observatory.drifting_gratings import DriftingGratings
 from allensdk.brain_observatory.static_gratings import StaticGratings
@@ -87,7 +88,17 @@ def ns(nwb_b, analysis_b):
 # session c
 @pytest.fixture(scope="module")
 def lsn(nwb_c, analysis_c):
-    return LocallySparseNoise.from_analysis_file(BODS(nwb_c), analysis_c, si.LOCALLY_SPARSE_NOISE)
+
+    # see pytables issue 717, which is resolved in master but not yet part of a release (at time of writing)
+    # until then, text data breaks on read under numpy 1.16 series
+    if tables.__version__ <= '3.4.4' and np.__version__ >= '1.16':
+        pytest.skip()
+
+    # in order to work around 2/3 unicode compatibility, separate files are specified for python 2 and 3
+    # we need to look up a different key depending on python version
+    key =  si.LOCALLY_SPARSE_NOISE_4DEG if sys.version_info < (3,) else si.LOCALLY_SPARSE_NOISE
+
+    return LocallySparseNoise.from_analysis_file(BODS(nwb_c), analysis_c, key)
 
 @pytest.fixture(scope="module")
 def nm1c(nwb_c, analysis_c):
