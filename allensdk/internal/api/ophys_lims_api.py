@@ -237,8 +237,9 @@ class OphysLimsApi(PostgresQueryMixin):
     @memoize
     def get_demix_file(self, ophys_experiment_id=None):
         query = '''
-                SELECT oe.storage_directory || 'demix/' || oe.id || '_demixed_traces.h5' AS demix_file
+                SELECT wkf.storage_directory || wkf.filename AS demix_file
                 FROM ophys_experiments oe
+                LEFT JOIN well_known_files wkf ON wkf.attachable_id=oe.id AND wkf.attachable_type = 'OphysExperiment' AND wkf.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'DemixedTracesFile')
                 WHERE oe.id= {};
                 '''.format(ophys_experiment_id)        
         return self.fetchone(query, strict=True)
