@@ -209,8 +209,9 @@ class OphysLimsApi(PostgresQueryMixin):
     @memoize
     def get_input_extract_traces_file(self, ophys_experiment_id=None):
         query = '''
-                SELECT oe.storage_directory || 'processed/' || oe.id || '_input_extract_traces.json'
+                SELECT wkf.storage_directory || wkf.filename AS input_extract_traces_file
                 FROM ophys_experiments oe
+                LEFT JOIN well_known_files wkf ON wkf.attachable_id=oe.id AND wkf.attachable_type = 'OphysExperiment' AND wkf.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'OphysExtractedTracesInputJson')
                 WHERE oe.id= {};
                 '''.format(ophys_experiment_id)        
         return self.fetchone(query, strict=True)
