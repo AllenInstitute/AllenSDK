@@ -68,6 +68,15 @@ class BehaviorOphysSession(LazyPropertyMixin):
 if __name__ == "__main__":
 
     session = BehaviorOphysSession(789359614)
+
+    from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi
+    nwb_filepath = './tmp.nwb'
+    nwb_api = BehaviorOphysNwbApi(nwb_filepath)
+    nwb_api.save(session)
+
+
+
+
     # print session.max_projection
     # print session.stimulus_timestamps
     # print session.ophys_timestamps
