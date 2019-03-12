@@ -20,7 +20,9 @@ STIMULUS_PARAMETERS = tuple([
     'Pos_y',
     'Color',
     'Image',
-    'Phase'
+    'Phase',
+    'Speed',
+    'Dir'
 ])
 
 
@@ -521,7 +523,12 @@ def count_spikes_by_condition(spike_times, stimulus_sweeps):
 def mean_spikes_by_condition(spike_times, stimulus_sweeps, stimulus_parameters=STIMULUS_PARAMETERS):
     sweep_counts_by_condition = count_by_condition(stimulus_sweeps)
     spike_counts_by_condition = count_spikes_by_condition(spike_times, stimulus_sweeps)
-    
+
+    stimulus_parameters = [
+        sp for sp in stimulus_parameters 
+        if sp in sweep_counts_by_condition.columns.values 
+        and sp in spike_counts_by_condition.columns.values
+    ]
     mean_spikes = spike_counts_by_condition.merge(
         sweep_counts_by_condition, 
         left_on=stimulus_parameters,
