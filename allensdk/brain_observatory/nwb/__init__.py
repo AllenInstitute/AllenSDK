@@ -1,5 +1,6 @@
 from pynwb.base import TimeSeries
 from pynwb.behavior import BehavioralTimeSeries
+from pynwb import ProcessingModule
 
 def add_running_data_df_to_nwbfile(nwbfile, running_data_df, unit_dict):
     ''' Adds running speed data to an NWBFile as timeseries in acquisition and processing
@@ -30,14 +31,14 @@ def add_running_data_df_to_nwbfile(nwbfile, running_data_df, unit_dict):
     running_dx_series = TimeSeries(
         name='dx',
         data=running_data_df['dx'].values,
-        timestamps=timestamps_ts, 
+        timestamps=timestamps_ts,
         unit=unit_dict['dx']
     )
 
     running_speed_series = TimeSeries(
         name='speed',
         data=running_data_df['speed'].values,
-        timestamps=timestamps_ts, 
+        timestamps=timestamps_ts,
         unit=unit_dict['speed']
     )
 
@@ -51,16 +52,16 @@ def add_running_data_df_to_nwbfile(nwbfile, running_data_df, unit_dict):
     v_in = TimeSeries(
         name='v_in',
         data=running_data_df['v_in'].values,
-        timestamps=timestamps_ts, 
+        timestamps=timestamps_ts,
         unit=unit_dict['v_in']
     )
 
-    running_bts = BehavioralTimeSeries(name='running')
-    nwbfile.add_analysis(running_bts)
+    running_mod = ProcessingModule('running', 'Running speed processing module')
+    nwbfile.add_processing_module(running_mod)
 
-    running_bts.add_timeseries(timestamps_ts)
-    running_bts.add_timeseries(running_speed_series)
-    running_bts.add_timeseries(running_dx_series)
+    running_mod.add_data_interface(timestamps_ts)
+    running_mod.add_data_interface(running_speed_series)
+    running_mod.add_data_interface(running_dx_series)
 
     nwbfile.add_acquisition(v_sig)
     nwbfile.add_acquisition(v_in)
