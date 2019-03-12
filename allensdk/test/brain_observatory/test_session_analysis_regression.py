@@ -88,12 +88,6 @@ def ns(nwb_b, analysis_b):
 # session c
 @pytest.fixture(scope="module")
 def lsn(nwb_c, analysis_c):
-
-    # see pytables issue 717, which is resolved in master but not yet part of a release (at time of writing)
-    # until then, text data breaks on read under numpy 1.16 series
-    if tables.__version__ <= '3.4.4' and np.__version__ >= '1.16':
-        pytest.skip()
-
     # in order to work around 2/3 unicode compatibility, separate files are specified for python 2 and 3
     # we need to look up a different key depending on python version
     key =  si.LOCALLY_SPARSE_NOISE_4DEG if sys.version_info < (3,) else si.LOCALLY_SPARSE_NOISE
