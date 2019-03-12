@@ -6,7 +6,7 @@ import numpy as np
 import pynwb
 
 from .ecephys_api import EcephysApi
-from .. import RunningSpeed
+from ... import RunningSpeed
 
 
 

@@ -3,7 +3,7 @@ from typing import Dict
 import numpy as np
 import pandas as pd
 
-from .. import RunningSpeed
+from ... import RunningSpeed
 
 class EcephysApi:
 
