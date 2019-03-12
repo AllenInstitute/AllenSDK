@@ -30,12 +30,11 @@ class BehaviorOphysNwbApi(object):
         with NWBHDF5IO(self.nwb_filepath, 'r') as nwb_file_reader:
             obtained = nwb_file_reader.read()
 
-            print (obtained.acquisition)
-            print (obtained.analysis)
-            raise
-
             return pd.DataFrame({'v_sig': obtained.get_acquisition('v_sig').data.value,
-                                 'v_in': obtained.get_acquisition('v_in').data.value})
+                                 'v_in': obtained.get_acquisition('v_in').data.value,
+                                 'speed': obtained.modules['running'].get_data_interface('speed').data.value,
+                                 'dx': obtained.modules['running'].get_data_interface('dx').data.value},
+                                index=pd.Index(obtained.modules['running'].get_data_interface('timestamps').timestamps.value, name='timestamps'))
 
     def get_metadata(self, ophys_experiment_id=None, **kwargs):
         pass
