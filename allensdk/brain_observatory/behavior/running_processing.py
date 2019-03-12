@@ -33,9 +33,8 @@ def get_running_df(data, time):
     speed = calc_deriv(dx, time)  # speed in degrees/s
     speed = deg_to_dist(speed)
     return pd.DataFrame({
-        'time': time,
         'speed': speed,
         'dx': dx_raw,
         'v_sig': v_sig,
         'v_in': v_in,
-    })
+    }, index=pd.Index(time, name='timestamps'))

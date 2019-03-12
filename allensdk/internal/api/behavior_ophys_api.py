@@ -13,6 +13,7 @@ from allensdk.brain_observatory.behavior.metadata_processing import get_task_par
 from allensdk.brain_observatory.behavior.running_processing import get_running_df
 from allensdk.brain_observatory.behavior.rewards_processing import get_rewards
 from allensdk.brain_observatory.behavior.trials_processing import get_trials
+from allensdk.brain_observatory import RunningSpeed
 
 
 class BehaviorOphysLimsApi(OphysLimsApi):
@@ -75,7 +76,7 @@ class BehaviorOphysLimsApi(OphysLimsApi):
 
     @memoize
     def get_metadata(self, ophys_experiment_id=None, use_acq_trigger=False):
-        
+
         metadata = {}
         metadata['ophys_experiment_id'] = ophys_experiment_id
         metadata['experiment_container_id'] = self.get_experiment_container_id(ophys_experiment_id=ophys_experiment_id)
@@ -94,7 +95,6 @@ class BehaviorOphysLimsApi(OphysLimsApi):
 
         return metadata
 
-
     @memoize
     def get_dff_traces(self, ophys_experiment_id=None, use_acq_trigger=False):
         dff_traces = self.get_raw_dff_data(ophys_experiment_id)
@@ -102,13 +102,11 @@ class BehaviorOphysLimsApi(OphysLimsApi):
         df = pd.DataFrame({'cell_roi_id':cell_roi_id_list, 'dff':list(dff_traces)})
         return df
 
-
     @memoize
     def get_roi_metrics(self, ophys_experiment_id=None):
         input_extract_traces_file = self.get_input_extract_traces_file(ophys_experiment_id=ophys_experiment_id)
         objectlist_file = self.get_objectlist_file(ophys_experiment_id=ophys_experiment_id)
         return get_roi_metrics(input_extract_traces_file, ophys_experiment_id, objectlist_file)['unfiltered']
-
 
     @memoize
     def get_running_data_df(self, ophys_experiment_id=None, use_acq_trigger=False):
@@ -120,7 +118,9 @@ class BehaviorOphysLimsApi(OphysLimsApi):
     @memoize
     def get_running_speed(self, ophys_experiment_id=None, use_acq_trigger=False):
         running_data_df = self.get_running_data_df(ophys_experiment_id=ophys_experiment_id, use_acq_trigger=use_acq_trigger)
-        return running_data_df.time.values, running_data_df.speed.values
+        assert running_data_df.index.name == 'timestamps'
+        return RunningSpeed(timestamps=running_data_df.index.values,
+                            values=running_data_df.speed.values)
 
 
     @memoize    
