@@ -111,11 +111,16 @@ class BehaviorOphysLimsApi(OphysLimsApi):
 
 
     @memoize
-    def get_running_speed(self, ophys_experiment_id=None, use_acq_trigger=False):
+    def get_running_data_df(self, ophys_experiment_id=None, use_acq_trigger=False):
         stimulus_timestamps = self.get_stimulus_timestamps(ophys_experiment_id=ophys_experiment_id, use_acq_trigger=use_acq_trigger)
         behavior_stimulus_file = self.get_behavior_stimulus_file(ophys_experiment_id=ophys_experiment_id)
         data = pd.read_pickle(behavior_stimulus_file)
         return get_running_df(data, stimulus_timestamps)
+
+    @memoize
+    def get_running_speed(self, ophys_experiment_id=None, use_acq_trigger=False):
+        running_data_df = self.get_running_data_df(ophys_experiment_id=ophys_experiment_id, use_acq_trigger=use_acq_trigger)
+        return running_data_df.time.values, running_data_df.speed.values
 
 
     @memoize    

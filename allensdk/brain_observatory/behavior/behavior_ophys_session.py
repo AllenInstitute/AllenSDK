@@ -20,6 +20,7 @@ class BehaviorOphysSession(LazyPropertyMixin):
         self.dff_traces = LazyProperty(self.api.get_dff_traces, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
         self.roi_metrics = LazyProperty(self.api.get_roi_metrics, ophys_experiment_id=self.ophys_experiment_id)
         self.cell_roi_ids = LazyProperty(self.api.get_cell_roi_ids, ophys_experiment_id=self.ophys_experiment_id)
+        self.running_data_df = LazyProperty(self.api.get_running_data_df, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
         self.running_speed = LazyProperty(self.api.get_running_speed, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
         self.stimulus_table = LazyProperty(self.api.get_stimulus_table, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
         self.stimulus_template = LazyProperty(self.api.get_stimulus_template, ophys_experiment_id=self.ophys_experiment_id)
@@ -51,6 +52,8 @@ class BehaviorOphysSession(LazyPropertyMixin):
                     np.testing.assert_array_almost_equal(x1, x2)
                 elif isinstance(x1, (dict, list)):
                     assert x1 == x2
+                elif isinstance(x1, (tuple,)):
+                    [np.testing.assert_array_almost_equal(x1i, x2i) for x1i, x2i in zip(x1, x2)]
                 else:
                     raise Exception('Comparator not implemented')
 
@@ -85,6 +88,7 @@ if __name__ == "__main__":
     # print session.roi_metrics
     # print session.cell_roi_ids
     # print session.running_speed
+    # print session.running_data_df
     # print session.stimulus_table
     # print session.stimulus_template
     # print session.stimulus_metadata

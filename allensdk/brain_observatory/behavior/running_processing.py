@@ -34,7 +34,6 @@ def get_running_df(data, time):
     speed = deg_to_dist(speed)
     return pd.DataFrame({
         'time': time,
-        'frame': range(len(time)),
         'speed': speed,
         'dx': dx_raw,
         'v_sig': v_sig,

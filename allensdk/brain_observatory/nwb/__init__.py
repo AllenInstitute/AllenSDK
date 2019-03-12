@@ -1,7 +1,7 @@
 from pynwb.base import TimeSeries
 from pynwb.behavior import BehavioralTimeSeries
 
-def add_running_speed_to_nwbfile(nwbfile, running_df, unit='cm/s'):
+def add_running_speed_to_nwbfile(nwbfile, running_df, unit_dict):
     ''' Adds running speed data to an NWBFile as timeseries in acquisition and processing
 
     Parameters
@@ -19,40 +19,38 @@ def add_running_speed_to_nwbfile(nwbfile, running_df, unit='cm/s'):
 
     '''
 
-    # print running_df.columns
-
     timestamps_ts = TimeSeries(
         name='running_speed_timestamps',
         timestamps=running_df['time'].values, 
-        unit=unit
+        unit=unit_dict['time']
     )
 
     running_dx_series = TimeSeries(
         name='running_dx',
         data=running_df['dx'].values, 
         timestamps=timestamps_ts, 
-        unit=unit
+        unit=unit_dict['dx']
     )
 
     running_speed_series = TimeSeries(
         name='running_speed',
         data=running_df['speed'].values, 
         timestamps=timestamps_ts, 
-        unit=unit
+        unit=unit_dict['speed']
     )
 
     v_sig = TimeSeries(
         name='v_sig',
         data=running_df['v_sig'].values, 
         timestamps=timestamps_ts, 
-        unit=unit
+        unit=unit_dict['v_sig']
     )
 
     v_in = TimeSeries(
         name='v_in',
         data=running_df['v_in'].values, 
         timestamps=timestamps_ts, 
-        unit=unit
+        unit=unit_dict['v_in']
     )
 
     running_bts = BehavioralTimeSeries()

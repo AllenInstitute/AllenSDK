@@ -42,7 +42,7 @@ def test_visbeh_ophys_data_set():
     assert len(data_set.corrected_fluorescence_traces) == 269 and list(data_set.corrected_fluorescence_traces.columns) == ['corrected_fluorescence', 'roi_id']
     assert sorted(data_set.stimulus_metadata['image_category'].unique()) == sorted(data_set.stimulus_table['image_category'].unique())
     assert sorted(data_set.stimulus_metadata['image_name'].unique()) == sorted(data_set.stimulus_table['image_name'].unique())
-    np.testing.assert_array_almost_equal(data_set.running_speed['time'], data_set.stimulus_timestamps)
+    np.testing.assert_array_almost_equal(data_set.running_speed[0], data_set.stimulus_timestamps)
     assert len(data_set.cell_roi_ids) == len(data_set.dff_traces)
     assert data_set.average_image.shape == data_set.max_projection.shape
     assert list(data_set.motion_correction.columns) == ['framenumber', 'x', 'y', 'correlation', 'input_x', 'input_y', 'kalman_x', 'kalman_y', 'algorithm', 'type']

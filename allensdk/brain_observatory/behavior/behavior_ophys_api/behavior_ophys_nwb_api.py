@@ -17,7 +17,8 @@ class BehaviorOphysNwbApi(object):
             file_create_date=datetime.datetime.now()
         )
 
-        add_running_speed_to_nwbfile(nwbfile, session_object.running_speed)
+        unit_dict = {'v_sig':'V', 'v_in':'V', 'speed':'cm/S', 'time':'S', 'dx':'cm'}
+        add_running_speed_to_nwbfile(nwbfile, session_object.running_data_df, unit_dict)
 
 
         with NWBHDF5IO(self.nwb_filepath, 'w') as nwb_file_writer:
