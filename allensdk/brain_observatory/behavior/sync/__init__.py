@@ -5,7 +5,7 @@ Created on Sunday July 15 2018
 """
 
 from .process_sync import filter_digital, calculate_delay  # NOQA: E402
-from .sync_dataset import Dataset as SyncDataset  # NOQA: E402
+from allensdk.brain_observatory.sync_dataset import Dataset as SyncDataset  # NOQA: E402
 import numpy as np
 import scipy.stats as sps
 
