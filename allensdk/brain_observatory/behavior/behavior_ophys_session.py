@@ -78,6 +78,9 @@ if __name__ == "__main__":
     nwb_api.save(session)
 
 
+    session = BehaviorOphysSession(789359614, api=nwb_api)
+    print session.running_data_df
+
 
 
     # print session.max_projection
