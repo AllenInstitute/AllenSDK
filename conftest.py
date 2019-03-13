@@ -40,8 +40,14 @@ def pytest_collection_modifyitems(config, items):
     )
 
     skip_prerelease_test = pytest.mark.skipif(
-        not ( os.environ.get('ALLENSDK_RUN_PRERELEASE_TESTS', None) in ('true', 'True', '1') ),
+        os.environ.get('ALLENSDK_RUN_PRERELEASE_TESTS') != 'true',
         reason='prerelease tests are only valid if external and internal data expected to align'
+    )
+
+    skip_neuron_test = pytest.mark.skipif(
+        (os.getenv('TEST_COMPLETE') != 'true') and (os.getenv('TEST_NEURON') != 'true'),
+        reason='this test depends on the NEURON simulation library. This dependency is not straghtforward to build '\
+            'and install, so you must opt in to running this test'
     )
 
     for item in items:
@@ -56,3 +62,6 @@ def pytest_collection_modifyitems(config, items):
 
         if 'prerelease' in item.keywords:
             item.add_marker(skip_prerelease_test)
+
+        if 'requires_neuron' in item.keywords:
+            item.add_marker(skip_neuron_test)
