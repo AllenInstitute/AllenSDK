@@ -122,7 +122,7 @@ def main():
     try:
         neuron, best_param, begin_param = optimize_neuron(model_config, sweep_index, dt, cut, bessel)
         ju.write(args.output_file, neuron.to_dict())
-    except Exception, e:
+    except Exception as e:
         logging.error(e.message)
 
 if __name__ == "__main__": main()

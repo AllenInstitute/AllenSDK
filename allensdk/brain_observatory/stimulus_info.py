@@ -190,7 +190,7 @@ class BinaryIntervalSearchTree(object):
 
         Example:
         bist = BinaryIntervalSearchTree([(0,.5,'A'), (1,2,'B')])
-        print bist.search(1.5)
+        print(bist.search(1.5))
         """
 
         # Double-check that the list is sorted
@@ -226,7 +226,6 @@ class BinaryIntervalSearchTree(object):
         else:
             return_val = self.search(fi, tmp=tmp + [1])
 
-        # print 'CHECKING:', return_val[0], fi, return_val[1], tmp
         assert (return_val[0] <= fi) and (fi <= return_val[1])
         return return_val
 

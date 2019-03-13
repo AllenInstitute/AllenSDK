@@ -19,7 +19,7 @@ WITH exa AS (
   JOIN ophys_sessions os ON os.id=o.ophys_session_id
   WHERE os.stimulus_name IN ('three_session_C','three_session_C2') AND (crar.archived IS NULL OR crar.archived = 'f') AND ocsr.current = 't' 
  )
-SELECT sp.parent_id AS specimen_id, sp.id AS cell_specimen_id, exa.cell_roi_id, exb.cell_roi_id, exc.cell_roi_id, ec.id AS experiment_container_id
+SELECT distinct sp.parent_id AS specimen_id, sp.id AS cell_specimen_id, exa.cell_roi_id, exb.cell_roi_id, exc.cell_roi_id, ec.id AS experiment_container_id
 ,exa.valid_roi AS a_valid,exb.valid_roi AS b_valid,exc.valid_roi AS c_valid
 ,exa.archived AS crara_archived, exa.data AS crara_data, exa.data->'roi_cell_metrics'->'p_dg' AS p_dg, exa.data->'roi_cell_metrics'->'reliability_nm1' AS reliability_nm1_a
 ,exb.archived AS crarb_archived, exb.data AS crarb_data, exb.data->'roi_cell_metrics'->'p_ns' AS p_ns, exb.data->'roi_cell_metrics'->'reliability_nm1' AS reliability_nm1_b

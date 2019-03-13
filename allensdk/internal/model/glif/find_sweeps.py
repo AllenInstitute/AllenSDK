@@ -177,7 +177,7 @@ def parse_arguments():
         if not os.path.exists(args.sweep_list_file):
             raise Exception("sweep list file (%s) does not exist" % args.sweep_file)
 
-    except Exception, e:
+    except Exception as e:
         parser.print_help()
         sys.exit(1)
 

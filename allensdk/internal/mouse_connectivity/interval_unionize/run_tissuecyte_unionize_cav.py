@@ -49,14 +49,18 @@ def run(input_data):
     logging.info('propagating data to bilateral unionizes')
     bilateral = CavUnionizer.propagate_to_bilateral(raw_unionizes)
 
-    cooked_unionizes = unionizer.postprocess_unionizes(raw_unionizes, 
-                                                       image_series_id=input_data['image_series_id'], 
-                                                       volume_scale=volume_scale, 
-                                                       max_pixels)
-    cooked_bilateral = unionizer.postprocess_unionizes(bilateral, 
-                                                       image_series_id=input_data['image_series_id'], 
-                                                       volume_scale=volume_scale,
-                                                       max_pixels)
+    cooked_unionizes = list(unionizer.postprocess_unionizes(
+        raw_unionizes, 
+        image_series_id=input_data['image_series_id'], 
+        volume_scale=volume_scale,
+        max_pixels=max_pixels
+    ))
+    cooked_bilateral = list(unionizer.postprocess_unionizes(
+        bilateral, 
+        image_series_id=input_data['image_series_id'], 
+        volume_scale=volume_scale,
+        max_pixels=max_pixels
+    ))
 
     for item in cooked_bilateral:
         item['hemisphere'] = '(none)'

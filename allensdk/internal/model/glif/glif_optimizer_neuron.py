@@ -297,7 +297,7 @@ class GlifOptimizerNeuron( glif_neuron.GlifNeuron ):
                  len(grid_bio_spike_model_threshold) != num_spikes):
                 raise Exception('The number of spikes in your output does not match your target')
 
-        except GlifNeuronException, e:
+        except GlifNeuronException as e:
             
             # if an exception was raised during run_until_spike, record any simulated data before exiting
             voltage[start_index:end_index] = e.data['voltage']

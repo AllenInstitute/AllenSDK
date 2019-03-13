@@ -40,7 +40,7 @@ def pytest_collection_modifyitems(config, items):
     )
 
     skip_prerelease_test = pytest.mark.skipif(
-        os.environ.get('ALLENSDK_RUN_PRERELEASE_TESTS') != 'true',
+        os.environ.get('TEST_PRERELEASE') != 'true',
         reason='prerelease tests are only valid if external and internal data expected to align'
     )
 

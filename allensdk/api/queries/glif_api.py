@@ -98,7 +98,6 @@ class GlifApi(RmaTemplate):
 
         return_dict = {}
         for curr_config in data:
-            # print curr_config
             neuron_config_url = curr_config['well_known_files'][0]['download_link']
             return_dict[curr_config['id']] = self.retrieve_parsed_json_over_http(self.api_url +
                                                                                  neuron_config_url)
