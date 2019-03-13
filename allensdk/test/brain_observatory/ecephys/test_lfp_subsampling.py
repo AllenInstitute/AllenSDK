@@ -24,6 +24,43 @@ def test_select_channels(total_channels, surface_offset, surface_padding, start_
     assert len(selected) == len(input_channels[::channel_stride])
 
 
+@pytest.mark.parametrize('remove_references', [True, False])
+@pytest.mark.parametrize('reference_channels', [np.array([0, 1, 2]), np.array([9, 10, 11]), np.array([10, 11, 12])])
+@pytest.mark.parametrize('remove_noisy_channels', [True, False])
+@pytest.mark.parametrize('noisy_channels', [np.array([10, 11, 12])])
+def test_select_channels_filtered(remove_references, reference_channels, remove_noisy_channels, noisy_channels):
+    """Similar to test above but focused on ability to remove reference """
+    total_channels = 100
+    surface_offset = -20
+    start_channel_offset = 0
+    channel_stride = 1
+    surface_padding = 10
+
+    selected, actual = subsampling.select_channels(total_channels=total_channels,
+                                                   surface_channel=total_channels + surface_offset,
+                                                   surface_padding=surface_padding,
+                                                   start_channel_offset=start_channel_offset,
+                                                   channel_stride=channel_stride,
+                                                   channel_order=np.arange(total_channels),
+                                                   noisy_channels=noisy_channels,
+                                                   remove_noisy_channels=remove_noisy_channels,
+                                                   reference_channels=reference_channels,
+                                                   remove_references=remove_references)
+
+    assert np.allclose(selected, actual)
+    removed_channels = set()
+    if remove_noisy_channels:
+        assert(not np.any(np.isin(noisy_channels, selected)))
+        removed_channels |= set(noisy_channels)
+
+    if remove_references:
+        assert(not np.any(np.isin(reference_channels, selected)))
+        removed_channels |= set(reference_channels)
+
+    input_channels = np.arange(start_channel_offset, total_channels + surface_offset + surface_padding)
+    assert(len(selected) == len(input_channels) - len(removed_channels))
+
+
 @pytest.mark.parametrize('array_length', [50])  # , 150, 2001])
 @pytest.mark.parametrize('subsampling_factor', [1])  # , 2, 4, 10])
 def test_subsample_timestamps(subsampling_factor, array_length):

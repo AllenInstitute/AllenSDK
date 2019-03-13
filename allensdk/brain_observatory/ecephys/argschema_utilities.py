@@ -1,8 +1,9 @@
 import os
 
+import argparse
 from marshmallow import RAISE, ValidationError
+from argschema import ArgSchemaParser
 from argschema.schemas import DefaultSchema
-
 
 def write_or_print_outputs(data, parser):
     data.update({'input_parameters': parser.args})
@@ -40,3 +41,13 @@ def check_read_access(path):
 class RaisingSchema(DefaultSchema):
     class Meta:
         unknown=RAISE
+
+
+class ArgSchemaParserPlus(ArgSchemaParser):  # pragma: no cover
+
+    def __init__(self, *args, **kwargs):
+        parser = argparse.ArgumentParser()
+        [known_args, extra_args] = parser.parse_known_args()
+        self.args = known_args
+
+        super(ArgSchemaParserPlus, self).__init__(args=extra_args, **kwargs)
