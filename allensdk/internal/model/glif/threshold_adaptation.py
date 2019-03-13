@@ -185,7 +185,7 @@ def calc_spike_component_of_threshold_from_multiblip(multi_SS, dt, dv_cutoff, th
         decay_const=-decay_const
     
 
-    except Exception, e:
+    except Exception as e:
         logging.error(e.message)
         const_to_add_to_thresh_for_reset=None 
         decay_const=None
@@ -577,13 +577,13 @@ def fit_avoltage_bvoltage_th(x, v_trace_list, El_list, spike_cut_length, all_spi
 #  
 #            # if the "spike" is less than 2 mV from threshold to peak, don't count it
 #            if v[peak_idx] - v[threshold_idx] < 0.002:  
-#                print "\tnot counting spike is closer to peak than 2 mV"
+#                print("\tnot counting spike is closer to peak than 2 mV")
 #                continue
 #    
 #            #NOTE: because threshold doesnt decay to zero in the multiblip this doesnt get rid of the situation that usually is only in the first spike of a stimulus
 #            # if the spike is less the -30mV, don't count it
 #            if v[peak_idx] < -0.04:
-#                print "\tnot counting spike: peak is too small"
+#                print("\tnot counting spike: peak is too small")
 #                continue
 #    
 #            spikes.append(spk)
@@ -640,7 +640,8 @@ def get_peaks(voltage, aboveValue=0):
     peakInd=np.intersect1d(np.intersect1d(IndShiftL[0], IndShiftR[0]), greatThanThresh[0]) #find the indicies of the peak
     return peakInd
 
-def exp_force_c((t, const), a1, k1):
+def exp_force_c(t_const, a1, k1):
+    (t, const) = t_const
     return a1*(np.exp(k1*t))+const
 
 def exp_fit_c(t, a1, k1, const):

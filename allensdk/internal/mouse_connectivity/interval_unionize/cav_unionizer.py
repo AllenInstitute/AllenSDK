@@ -33,7 +33,7 @@ class CavUnionizer(IntervalUnionizer):
         return unionize 
 
 
-    def postprocess_unionizes(self, raw_unionizes, image_series_id, volume_scale):
+    def postprocess_unionizes(self, raw_unionizes, image_series_id, volume_scale, max_pixels):
 
         unionizes = []
         
@@ -46,7 +46,7 @@ class CavUnionizer(IntervalUnionizer):
                 hemisphere = 'right'
             sid = abs(sid)
                 
-            out = un.output(volume_scale)
+            out = un.output(volume_scale, max_pixels)
             out['structure_id'] = sid
             out['hemisphere'] = hemisphere
             out['image_series_id'] = image_series_id

@@ -28,7 +28,7 @@ proc region_areas() { local _sum
 		_sum += area(x)
 	}
 
-	print "A1 ", _sum
+	print("A1 ", _sum)
 
 	_sum = 0
 
@@ -40,5 +40,5 @@ proc region_areas() { local _sum
 		_sum += area(x)
 	}
 
-	print "A2 ", _sum
+	print("A2 ", _sum)
 }

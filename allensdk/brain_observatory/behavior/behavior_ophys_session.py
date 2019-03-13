@@ -68,21 +68,3 @@ class BehaviorOphysSession(LazyPropertyMixin):
 if __name__ == "__main__":
 
     session = BehaviorOphysSession(789359614)
-    # print session.max_projection
-    # print session.stimulus_timestamps
-    # print session.ophys_timestamps
-    # print session.metadata
-    # print session.dff_traces
-    # print session.roi_metrics
-    # print session.cell_roi_ids
-    # print session.running_speed
-    # print session.stimulus_table
-    # print session.stimulus_template
-    # print session.stimulus_metadata
-    # print session.licks
-    # print session.rewards
-    # print session.task_parameters
-    # print session.trials
-    # print session.corrected_fluorescence_traces
-    # print session.average_image
-    # print session.motion_correction

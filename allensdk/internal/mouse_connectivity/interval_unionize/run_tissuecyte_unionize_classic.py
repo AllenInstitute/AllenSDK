@@ -68,19 +68,23 @@ def run(input_data):
     logging.info('propagating data to bilateral unionizes')
     bilateral = TissuecyteUnionizer.propagate_to_bilateral(raw_unionizes)
 
-    cooked_unionizes = unionizer.postprocess_unionizes(raw_unionizes, 
-                                                       image_series_id=input_data['image_series_id'], 
-                                                       output_spacing_iso=input_data['reference_spacing'], 
-                                                       volume_scale=volume_scale, 
-                                                       target_shape=input_data['reference_shape'],
-                                                       sort=unionizer.sort)
+    cooked_unionizes = list(unionizer.postprocess_unionizes(
+        raw_unionizes, 
+        image_series_id=input_data['image_series_id'], 
+        output_spacing_iso=input_data['reference_spacing'], 
+        volume_scale=volume_scale, 
+        target_shape=input_data['reference_shape'],
+        sort=unionizer.sort
+    ))
 
-    cooked_bilateral = unionizer.postprocess_unionizes(bilateral, 
-                                                       image_series_id=input_data['image_series_id'], 
-                                                       output_spacing_iso=input_data['reference_spacing'], 
-                                                       volume_scale=volume_scale, 
-                                                       target_shape=input_data['reference_shape'], 
-                                                       sort=unionizer.sort)
+    cooked_bilateral = list(unionizer.postprocess_unionizes(
+        bilateral, 
+        image_series_id=input_data['image_series_id'], 
+        output_spacing_iso=input_data['reference_spacing'], 
+        volume_scale=volume_scale, 
+        target_shape=input_data['reference_shape'], 
+        sort=unionizer.sort
+    ))
     for item in cooked_bilateral:
         item['hemisphere_id'] = 3
         cooked_unionizes.append(item)

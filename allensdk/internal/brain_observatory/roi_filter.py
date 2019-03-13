@@ -6,9 +6,9 @@ import allensdk.internal.brain_observatory.mask_set as mask_set
 from allensdk.brain_observatory.roi_masks import create_roi_mask_array
 
 try:
-    from sklearn.cross_validation import cross_val_score
-except:
     from sklearn.model_selection import cross_val_score
+except ImportError:
+    from sklearn.cross_validation import cross_val_score
 from sklearn import __version__ as sklearn_version
 import numpy as np
 import pandas as pd

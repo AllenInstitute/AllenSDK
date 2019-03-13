@@ -59,4 +59,4 @@ if __name__ == "__main__":
             try:
                 validation_function(ophys_experiment_id, api=api)
             except ValidationError as e:
-                print ophys_experiment_id, e
+                print(ophys_experiment_id, e)

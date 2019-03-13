@@ -167,7 +167,7 @@ def ASGLM_pairwise(ks_int, I_stim, voltage, spike_ind, cinit, tauinit, SCL, dt, 
                 fit_asc_amp=fitprs[:ncos]
                 #Compute and plot post-spike current (essentially multiply basis functions with correct amplitudes from GLM fit)
                 ipsc = np.sum(b_ipsp_spikes_deleted[:,0:ncos]*fit_asc_amp,1)  #THIS IS TOTAL POSTSPIKE CURRENT
-            except Exception, e:
+            except Exception as e:
                 logging.warning("fit didn't work: " + str(e))
                 llh=np.nan
                 fit_R=np.NAN

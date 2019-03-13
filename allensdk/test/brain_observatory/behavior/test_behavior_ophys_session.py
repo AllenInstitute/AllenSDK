@@ -28,10 +28,10 @@ def test_visbeh_ophys_data_set():
 
     # TODO: need to improve testing here:
     # for _, row in data_set.roi_metrics.iterrows():
-    #     print np.array(row.to_dict()['mask']).sum()
+    #     print(np.array(row.to_dict()['mask']).sum())
     # print
     # for _, row in data_set.roi_masks.iterrows():
-    #     print np.array(row.to_dict()['mask']).sum()
+    #     print(np.array(row.to_dict()['mask']).sum())
 
 
     # All sorts of assert relationships:
