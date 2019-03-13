@@ -1,5 +1,4 @@
 import os
-from datetime import datetime
 import warnings
 
 import pytest
@@ -9,29 +8,6 @@ import numpy as np
 
 import allensdk.brain_observatory.ecephys.write_nwb.__main__ as write_nwb
 from allensdk.brain_observatory.ecephys.ecephys_api.ecephys_nwb_api import EcephysNwbApi
-from allensdk.brain_observatory.ecephys import RunningSpeed
-
-
-@pytest.fixture
-def nwbfile():
-    return pynwb.NWBFile(
-        session_description='asession',
-        identifier='afile',
-        session_start_time=datetime.now()
-    )
-
-
-@pytest.fixture
-def roundtripper(tmpdir_factory):
-    def f(nwbfile):
-        tmpdir = str(tmpdir_factory.mktemp('ecephys_nwb_roundtrip_tests'))
-        nwb_path = os.path.join(tmpdir, 'nwbfile.nwb')
-
-        with pynwb.NWBHDF5IO(nwb_path, 'w') as write_io:
-            write_io.write(nwbfile)
-
-        return EcephysNwbApi(nwb_path)
-    return f
 
 
 @pytest.fixture
@@ -63,18 +39,10 @@ def spike_times():
     }
 
 
-@pytest.fixture
-def running_speed():
-    return RunningSpeed(
-        timestamps=[1, 2, 3],
-        values=[4, 5, 6]
-    )
-
-
 def test_add_stimulus_table_to_file(nwbfile, stimulus_table_data, roundtripper):
     write_nwb.add_stimulus_table_to_file(nwbfile, stimulus_table_data)
 
-    api = roundtripper(nwbfile)
+    api = roundtripper(nwbfile, EcephysNwbApi)
     obtained_stimulus_table = api.get_stimulus_table()
     
     pd.testing.assert_frame_equal(stimulus_table_data, obtained_stimulus_table, check_dtype=False)
@@ -88,7 +56,7 @@ def test_add_probe_to_nwbfile(nwbfile, roundtripper, roundtrip, pid, desc, loc, 
 
     nwbfile, _, _ = write_nwb.add_probe_to_nwbfile(nwbfile, pid, description=desc, location=loc)
     if roundtrip:
-        obt = roundtripper(nwbfile)
+        obt = roundtripper(nwbfile, EcephysNwbApi)
     else:
         obt = EcephysNwbApi.from_nwbfile(nwbfile)
 
@@ -158,7 +126,7 @@ def test_add_running_speed_to_nwbfile(nwbfile, running_speed, roundtripper, roun
 
     nwbfile = write_nwb.add_running_speed_to_nwbfile(nwbfile, running_speed)
     if roundtrip:
-        api_obt = roundtripper(nwbfile)
+        api_obt = roundtripper(nwbfile, EcephysNwbApi)
     else:
         api_obt = EcephysNwbApi.from_nwbfile(nwbfile)
 
