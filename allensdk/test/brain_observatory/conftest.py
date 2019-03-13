@@ -3,10 +3,10 @@ import os
 from datetime import datetime
 import pynwb
 
-from allensdk.brain_observatory import RunningSpeed
 
 @pytest.fixture
 def running_speed():
+    from allensdk.brain_observatory.running_speed import RunningSpeed
     return RunningSpeed(
         timestamps=[1, 2, 3],
         values=[4, 5, 6]

@@ -7,7 +7,7 @@ import pandas as pd
 
 from allensdk.core.lazy_property import LazyPropertyMixin
 from allensdk.brain_observatory.ecephys.ecephys_api import EcephysApi, EcephysNwbApi
-from .. import RunningSpeed
+from ..running_speed import RunningSpeed
 
 
 STIMULUS_PARAMETERS = tuple([
