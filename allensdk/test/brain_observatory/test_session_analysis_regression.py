@@ -9,7 +9,6 @@ import json
 from pkg_resources import resource_filename  # @UnresolvedImport
 import numpy as np
 import pandas as pd
-import tables # TODO only for a (hopefully) temporary test skip
 
 from allensdk.brain_observatory.drifting_gratings import DriftingGratings
 from allensdk.brain_observatory.static_gratings import StaticGratings
