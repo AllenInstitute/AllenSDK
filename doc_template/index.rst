@@ -26,7 +26,7 @@ The Allen Software Development Kit houses source code for reading and processing
 The Allen SDK focuses on the Allen Brain Observatory, Cell Types Database, and Mouse Brain Connectivity Atlas.
 
 .. ATTENTION::
-    We will be dropping for py2 support in October 2019
+    We will be dropping for py2 support in October 2019, and any files with a py2 dependency (for example analysis files) will also be updated.
 
 .. image:: /_static/sdk_cam.png
    :align: right
@@ -106,7 +106,7 @@ Additionally, serveral dependencies were upgraded to contiune to resolve install
     * numpy>=1.15.1
     * pytest>=4.1.1
     * pip install Pillow (Needed in CI infrastrucutre)
-    * For python 2.7 conda install -c conda-forge scikit-image (Needed in CI infrastrucutre)
+    * For python 2.7 conda install -c conda-forge scikit-image (Needed in CI infrastructure)
 
 We also removed deprecated functionality in BrainObservatoryNwbDataSet, `and wrote some additional tools for working with itksnap label descriptions <https://github.com/AllenInstitute/AllenSDK/issues/312>`_.
 

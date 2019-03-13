@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [0.16.1] = 2019-3-012
+## [0.16.1] = 2019-3-12
 
 ### Added
  - Added tools for working with itksnap label descriptions (https://github.com/AllenInstitute/AllenSDK/issues/312)
