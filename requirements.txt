@@ -14,4 +14,4 @@ scikit-image>=0.14.0
 scikit-build
 statsmodels>=0.8.0
 simpleitk
-tables
+tables==3.4.4
