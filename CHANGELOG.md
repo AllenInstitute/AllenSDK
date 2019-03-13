@@ -25,6 +25,8 @@ All notable changes to this project will be documented in this file.
  - https://github.com/AllenInstitute/AllenSDK/issues/311 Fix locally sparse noise test
  - https://github.com/AllenInstitute/AllenSDK/issues/330 Fix numpy warning message
  - https://github.com/AllenInstitute/AllenSDK/issues/330 Fix Pillow dependency install
+ - https://github.com/AllenInstitute/AllenSDK/issues/405 Fix session analysis regression test (passing CI in python2 and python3)
+ - https://github.com/AllenInstitute/AllenSDK/issues/420 Fix installation bug resulting from pytables 3.5
  - https://github.com/AllenInstitute/AllenSDK/commit/1ef88046a58a36d870d3f1048a778806d1db2954 Fix scikit-image dependency install
 
 ## [0.16.0] = 2018-10-04

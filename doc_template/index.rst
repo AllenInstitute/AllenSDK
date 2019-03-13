@@ -99,11 +99,12 @@ The 0.16.1 release fixes several user-discovered bugs, and updates the versons o
     * `#256 <https://github.com/AllenInstitute/AllenSDK/issues/256>`_ Making sure our examples are python3 compatible
     * `#267 <https://github.com/AllenInstitute/AllenSDK/issues/267>`_ Fix a bug in get_cell_specimens filter argument
     * `#295 <https://github.com/AllenInstitute/AllenSDK/issues/295>`_ BiophysicalApi.get_neuronal_models doesn't find perisomatic models
+    * `#426 <https://github.com/AllenInstitute/AllenSDK/issues/426>`_ numpy and pytables versions pinned until pytables 3.5 can be pip installed
 
+Additionally, serveral dependencies were upgraded to resolve installation issues:
 
-Additionally, serveral dependencies were upgraded to contiune to resolve installation:
-
-    * numpy>=1.15.1
+    * numpy==1.15.4
+    * numpy==3.4.4
     * pytest>=4.1.1
     * pip install Pillow (Needed in CI infrastrucutre)
     * For python 2.7 conda install -c conda-forge scikit-image (Needed in CI infrastructure)
