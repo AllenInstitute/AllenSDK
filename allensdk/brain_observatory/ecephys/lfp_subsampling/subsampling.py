@@ -96,27 +96,22 @@ def select_channels(total_channels,
     actual_channel_numbers = np.arange(total_channels)
     actual_channel_numbers = actual_channel_numbers[start_channel_offset:max_channel:channel_stride]
 
-    if remove_references:
-        mask = np.isin(actual_channel_numbers, reference_channels, assume_unique=True, invert=True)
+    if remove_references or remove_noisy_channels:
+        # TODO: Is there a case that reference/noisy channels won't be removed? If not then we should remove flags and
+        #   just check if the arrays are empty
+        logger.info("Before:")
+        logger.info(actual_channel_numbers)
+        # create mask to filter out reference channels
+        mask = (not remove_references) or np.isin(actual_channel_numbers, reference_channels, assume_unique=True,
+                                                  invert=True)
+
+        # mask to remove noisy channels
+        mask &= (not remove_noisy_channels) or np.isin(actual_channel_numbers, noisy_channels, assume_unique=True,
+                                                       invert=True)
         actual_channel_numbers = actual_channel_numbers[mask]
         selected_channels = selected_channels[mask]
-
-    logger.info("Before:")
-    logger.info(actual_channel_numbers)
-
-    logger.info("To remove:")
-    logger.info(noisy_channels)
-
-    if remove_noisy_channels:
-        mask = np.isin(actual_channel_numbers, noisy_channels, assume_unique=True, invert=True)
-        logger.info(np.where(mask)[0])
-        actual_channel_numbers = actual_channel_numbers[mask]
-        selected_channels = selected_channels[mask]
-
-    logger.info("After:")
-    logger.info(actual_channel_numbers)
-
-    # stop
+        logger.info("After:")
+        logger.info(actual_channel_numbers)
 
     return selected_channels, actual_channel_numbers
 
@@ -208,7 +203,7 @@ def remove_lfp_offset(lfp, sampling_frequency, cutoff_frequency, filter_order):
     return lfp_filtered
 
 
-def remove_lfp_noise(lfp, surface_channel, channel_numbers):
+def remove_lfp_noise(lfp, surface_channel, channel_numbers, channel_max=384, channel_limit=380):
     """
     Subtract mean of channels out of brain to remove noise
 
@@ -231,8 +226,7 @@ def remove_lfp_noise(lfp, surface_channel, channel_numbers):
 
     lfp_noise_removed = np.zeros(lfp.shape, dtype='int16')
 
-    if surface_channel >= 384:
-        surface_channel = 380
+    surface_channel = channel_limit if surface_channel >= channel_max else surface_channel
 
     channel_selection = np.where(channel_numbers > surface_channel)[0]
 
