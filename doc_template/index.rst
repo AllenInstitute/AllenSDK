@@ -25,6 +25,9 @@ Welcome to the Allen SDK
 The Allen Software Development Kit houses source code for reading and processing Allen Brain Atlas data.  
 The Allen SDK focuses on the Allen Brain Observatory, Cell Types Database, and Mouse Brain Connectivity Atlas.
 
+.. ATTENTION::
+    We will be dropping for py2 support in October 2019, and any files with a py2 dependency (for example analysis files) will also be updated.
+
 .. image:: /_static/sdk_cam.png
    :align: right
 
@@ -87,33 +90,31 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
-What's New - Release 0.16.0 (October 4th, 2018)
+What's New - Release 0.16.1 (March 12th, 2019)
 -----------------------------------------------
 
-The 0.16.0 release coincides with the release of significantly more data in the Allen Brain Observatory.  To access the new data, remove the following files from your :py:class:`~allensdk.core.brain_observatory_cache.BrainObservatoryCache` manifest directory: 
+The 0.16.1 release fixes several user-discovered bugs, and updates the versons of several dependencies:
 
-    * ``cell_specimens.json``
-    * ``experiment_containers.json``
-    * ``ophys_experiments.json``
+    * `#207 <https://github.com/AllenInstitute/AllenSDK/issues/207>`_ Fix two missing ephys features (tau and max_euclidean_distance)
+    * `#256 <https://github.com/AllenInstitute/AllenSDK/issues/256>`_ Making sure our examples are python3 compatible
+    * `#267 <https://github.com/AllenInstitute/AllenSDK/issues/267>`_ Fix a bug in get_cell_specimens filter argument
+    * `#295 <https://github.com/AllenInstitute/AllenSDK/issues/295>`_ BiophysicalApi.get_neuronal_models doesn't find perisomatic models
+    * `#426 <https://github.com/AllenInstitute/AllenSDK/issues/426>`_ numpy and pytables versions pinned until pytables 3.5 can be pip installed
 
-Users now have access to methods for accessing new data derived from fluorescence traces:
+Additionally, serveral dependencies were upgraded to resolve installation issues:
 
-    * :py:meth:`~allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiment_analysis`: traces and metrics organized by stimulus condition
-    * :py:meth:`~allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiment_events`: calcium events determined with `FastLZeroSpikeInference <https://github.com/jewellsean/FastLZeroSpikeInference>`_
+    * numpy==1.15.4
+    * numpy==3.4.4
+    * pytest>=4.1.1
+    * pip install Pillow (Needed in CI infrastrucutre)
+    * For python 2.7 conda install -c conda-forge scikit-image (Needed in CI infrastructure)
 
-Note: we addressed `GitHub issue #69 <https://github.com/AllenInstitute/AllenSDK/issues/69>`_ and a more general time alignment error in our processing pipeline.  Handling of additional frame pulses has been corrected, resulting in 2-photon movie frames being assigned times 30ms earlier than before.  We have updated all previously published NWB files accordingly.  Delete these files and re-download them to access updated time stamps.
-
-This release also contains more mouse and human data in the Allen Cell Types Database.  To access the new data, remove the following files from your :py:class:`~allensdk.core.cell_types_cache.CellTypesCache` manifest directory:
-
-    * ``manifest.json``
-    * ``cells.json`` 
-    * ``ephys_features.csv`` 
-    * ``morphology_features.csv`` 
-
+We also removed deprecated functionality in BrainObservatoryNwbDataSet, `and wrote some additional tools for working with itksnap label descriptions <https://github.com/AllenInstitute/AllenSDK/issues/312>`_.
 
 Previous Release Notes
 ----------------------
 
+    * `0.16.0 <https://github.com/AllenInstitute/AllenSDK/wiki/Release-Notes-(0.16.0)>`_
     * `0.14.5 <https://github.com/AllenInstitute/AllenSDK/wiki/Release-Notes-(0.14.5)>`_
     * `0.14.4 <https://github.com/AllenInstitute/AllenSDK/wiki/Release-Notes-(0.14.4)>`_
     * `0.14.3 <https://github.com/AllenInstitute/AllenSDK/wiki/Release-Notes-(0.14.3)>`_
