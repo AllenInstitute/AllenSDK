@@ -106,7 +106,7 @@ Additionally, serveral dependencies were upgraded to resolve installation issues
     * numpy==1.15.4
     * numpy==3.4.4
     * pytest>=4.1.1
-    * pip install Pillow (Needed in CI infrastrucutre)
+    * pip install Pillow (Needed in CI infrastructure)
     * For python 2.7 conda install -c conda-forge scikit-image (Needed in CI infrastructure)
 
 We also removed deprecated functionality in BrainObservatoryNwbDataSet, `and wrote some additional tools for working with itksnap label descriptions <https://github.com/AllenInstitute/AllenSDK/issues/312>`_.
