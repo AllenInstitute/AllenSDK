@@ -87,7 +87,11 @@ def ns(nwb_b, analysis_b):
 # session c
 @pytest.fixture(scope="module")
 def lsn(nwb_c, analysis_c):
-    return LocallySparseNoise.from_analysis_file(BODS(nwb_c), analysis_c, si.LOCALLY_SPARSE_NOISE)
+    # in order to work around 2/3 unicode compatibility, separate files are specified for python 2 and 3
+    # we need to look up a different key depending on python version
+    key =  si.LOCALLY_SPARSE_NOISE_4DEG if sys.version_info < (3,) else si.LOCALLY_SPARSE_NOISE
+
+    return LocallySparseNoise.from_analysis_file(BODS(nwb_c), analysis_c, key)
 
 @pytest.fixture(scope="module")
 def nm1c(nwb_c, analysis_c):
