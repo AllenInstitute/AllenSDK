@@ -39,7 +39,10 @@ def test_get_session():
     behavior_session_uuid = '394a910e-94c7-4472-9838-5345aff59ed8'
 
     api = MtrainApi()
-    assert api.get_session(behavior_session_uuid) == {u'name': u'TRAINING_1_gratings', 
+    session_dict = api.get_session(behavior_session_uuid)
+    trials_df = session_dict.pop('trials')
+    assert len(trials_df) == 576
+    assert session_dict == {u'name': u'TRAINING_1_gratings',
                                                       u'parameters': {u'auto_reward_delay': 0.15, 
                                                                       u'change_time_scale': 2.0, 
                                                                       u'end_after_response': True, 

@@ -1,12 +1,11 @@
-import psycopg2
 import pandas as pd
 import requests
 import os
-import json
 import sys
 import itertools
+import json
 
-from . import PostgresQueryMixin, one
+from . import PostgresQueryMixin
 
 
 class MtrainApi(PostgresQueryMixin):
@@ -14,8 +13,8 @@ class MtrainApi(PostgresQueryMixin):
     def __init__(self, api_base='http://mtrain:5000'):
         self.api_base = api_base
 
-    def get_page(self, table_name, get_obj=None, filters=[],**kwargs):
-        
+    def get_page(self, table_name, get_obj=None, filters=[], **kwargs):
+      
         if get_obj is None:
             get_obj = requests
 
@@ -40,17 +39,16 @@ class MtrainApi(PostgresQueryMixin):
     def get_df(self, table_name, get_obj=None, **kwargs):
         return pd.concat([df for df in self.get_page(table_name, get_obj=get_obj, **kwargs)], axis=0)
 
-
     def get_subjects(self):
         return self.get_df('subjects').LabTracks_ID.values
 
     def get_session(self, behavior_session_uuid):
-        filters = [{"name":"id","op":"eq","val":behavior_session_uuid}]
-        behavior_df = self.get_df('behavior_sessions', filters=filters).rename(columns={'id':'behavior_session_uuid'})
-        state_df = self.get_df('states').rename(columns={'id':'state_id'})
-        regimen_df = self.get_df('regimens').rename(columns={'id':'regimen_id', 'name':'regimen_name'}).drop(['states', 'active'], axis=1)
-        stage_df = self.get_df('stages').rename(columns={'id':'stage_id'}).drop(['states'], axis=1)
-        
+        filters = [{"name": "id", "op": "eq", "val": behavior_session_uuid}]
+        behavior_df = self.get_df('behavior_sessions', filters=filters).rename(columns={'id': 'behavior_session_uuid'})
+        state_df = self.get_df('states').rename(columns={'id': 'state_id'})
+        regimen_df = self.get_df('regimens').rename(columns={'id': 'regimen_id', 'name': 'regimen_name'}).drop(['states', 'active'], axis=1)
+        stage_df = self.get_df('stages').rename(columns={'id': 'stage_id'}).drop(['states'], axis=1)
+
         behavior_df = pd.merge(behavior_df, state_df, how='left', on='state_id')
         behavior_df = pd.merge(behavior_df, stage_df, how='left', on='stage_id')
         behavior_df = pd.merge(behavior_df, regimen_df, how='left', on='regimen_id')
@@ -58,8 +56,13 @@ class MtrainApi(PostgresQueryMixin):
         if len(behavior_df) == 0:
             raise RuntimeError("Session not found %s:" % behavior_session_uuid)
         assert len(behavior_df) == 1
-        return behavior_df.iloc[0].to_dict()
+        session_dict = behavior_df.iloc[0].to_dict()
 
+        filters = [{"name": "behavior_session_uuid", "op": "eq", "val": behavior_session_uuid}]
+        trials_df = self.get_df('trials', filters=filters).sort_values('index')
+        session_dict['trials'] = trials_df
+
+        return session_dict
 
     def get_behavior_training_df(self, LabTracks_ID=None):
         if LabTracks_ID is not None:
@@ -70,8 +73,7 @@ class MtrainApi(PostgresQueryMixin):
         
         state_df = self.get_df('states').rename(columns={'id':'state_id'})
         regimen_df = self.get_df('regimens').rename(columns={'id':'regimen_id', 'name':'regimen_name'}).drop(['states', 'active'], axis=1)
-        stage_df = self.get_df('stages').rename(columns={'id':'stage_id'}).drop(['states'], axis=1)
-        
+        stage_df = self.get_df('stages').rename(columns={'id':'stage_id', 'name':'stage_name'}).drop(['states'], axis=1)
 
         behavior_df = pd.merge(behavior_df, state_df, how='left', on='state_id')
         behavior_df = pd.merge(behavior_df, stage_df, how='left', on='stage_id')
