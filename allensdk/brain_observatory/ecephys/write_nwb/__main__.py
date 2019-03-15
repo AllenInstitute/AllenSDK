@@ -12,6 +12,7 @@ import pandas as pd
 import numpy as np
 
 from allensdk.config.manifest import Manifest
+from allensdk.brain_observatory.running_speed import RunningSpeed
 
 from ._schemas import InputSchema, OutputSchema
 from ..argschema_utilities import write_or_print_outputs
@@ -433,7 +434,8 @@ def write_ecephys_nwb(
         ))
 
     nwbfile.electrodes = pynwb.file.ElectrodeTable().from_dataframe(pd.concat(channel_tables), name='electrodes')
-    nwbfile.units = pynwb.misc.Units.from_dataframe(pd.concat(unit_tables), name='units')
+    units_table = pd.concat(unit_tables).set_index(keys='id', drop=True)
+    nwbfile.units = pynwb.misc.Units.from_dataframe(units_table, name='units')
 
     add_ragged_data_to_dynamic_table(
         table=nwbfile.units, 
@@ -449,7 +451,7 @@ def write_ecephys_nwb(
         column_description='mean waveforms on peak channels (and over samples)'
     )
 
-    running_speed = read_running_speed(running_speed['running_speed_values_path'], running_speed['running_speed_timestamps_path'])
+    running_speed = read_running_speed(running_speed['running_speed_path'], running_speed['running_speed_timestamps_path'])
     add_running_speed_to_nwbfile(nwbfile, running_speed)
     del running_speed
 
