@@ -6,7 +6,7 @@ from argschema import ArgSchema, ArgSchemaParser
 from argschema.schemas import DefaultSchema
 from argschema.fields import LogLevel, String, Int, DateTime, Nested, Boolean, Float, List
 
-from ..argschema_utilities import check_read_access, check_write_access, RaisingSchema
+from allensdk.brain_observatory.nwb.argschema_utilities import check_read_access, check_write_access, RaisingSchema
 
 available_hashers = {
     'sha3_256': hashlib.sha3_256,
