@@ -9,7 +9,7 @@ import argschema
 
 from allensdk.config.manifest import Manifest
 from ._schemas import InputSchema, OutputSchema, available_hashers
-from allensdk.brain_observatory.nwb.argschema_utilities import write_or_print_outputs
+from allensdk.brain_observatory.argschema_utilities import write_or_print_outputs
 
 
 def hash_file(path, hasher_cls):

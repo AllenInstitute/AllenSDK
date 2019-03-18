@@ -50,7 +50,3 @@ class BehaviorOphysNwbApi(object):
         # behavior_stimulus_file = self.get_behavior_stimulus_file(ophys_experiment_id=ophys_experiment_id)
         # data = pd.read_pickle(behavior_stimulus_file)
         # return get_running_df(data, stimulus_timestamps)
-
-    # def get_running_speed(self, ophys_experiment_id=None):
-    #     running_data_df = self.get_running_data_df(ophys_experiment_id=ophys_experiment_id)
-    #     return running_data_df.time.values, running_data_df.speed.values

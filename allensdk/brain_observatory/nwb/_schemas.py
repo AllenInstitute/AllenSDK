@@ -4,7 +4,7 @@ from argschema import ArgSchema, ArgSchemaParser
 from argschema.schemas import DefaultSchema
 from argschema.fields import LogLevel, String, Int, DateTime, Nested, Boolean, Float
 
-from allensdk.brain_observatory.nwb.argschema_utilities import check_read_access, check_write_access, RaisingSchema
+from allensdk.brain_observatory.argschema_utilities import check_read_access, check_write_access, RaisingSchema
 
 
 class Channel(RaisingSchema):
