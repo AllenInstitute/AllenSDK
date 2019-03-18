@@ -7,26 +7,10 @@ import pynwb
 
 from .ecephys_api import EcephysApi
 from ...running_speed import RunningSpeed
+from allensdk.brain_observatory.nwb.nwb_api import NwbApi
 
 
-
-class EcephysNwbApi(EcephysApi):
-
-    __slots__ = ('path', '_nwbfile')
-
-    @property
-    def nwbfile(self):
-        if hasattr(self, '_nwbfile'):
-            return self._nwbfile
-
-        io = pynwb.NWBHDF5IO(self.path, 'r')
-        return io.read()
-
-    def __init__(self, path, **kwargs):
-        ''' Reads data for a single Extracellular Electrophysiology session from an NWB 2.0 file
-        '''
-
-        self.path = path
+class EcephysNwbApi(NwbApi, EcephysApi):
 
     def get_running_speed(self) -> RunningSpeed:
         return RunningSpeed(
@@ -74,9 +58,3 @@ class EcephysNwbApi(EcephysApi):
         table = self.nwbfile.units.to_dataframe()
         table.index = table.index.astype(int)
         return table
-
-    @classmethod
-    def from_nwbfile(cls, nwbfile, **kwargs):
-        obj = cls(path=None, **kwargs)
-        obj._nwbfile = nwbfile
-        return obj
