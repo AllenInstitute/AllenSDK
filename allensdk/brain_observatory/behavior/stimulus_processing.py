@@ -43,8 +43,8 @@ def get_images_dict(pkl):
     for cat, cat_images in image_set.items():
         for img_name, img in cat_images.items():
             meta = dict(
-                image_category=cat,
-                image_name=img_name,
+                image_category=cat.decode("utf-8"),
+                image_name=img_name.decode("utf-8"),
                 image_index=ii,
             )
 

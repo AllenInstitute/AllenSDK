@@ -9,6 +9,7 @@ import h5py
 
 from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorOphysSession
 
+
 @pytest.mark.nightly
 def test_equal():
     
@@ -18,7 +19,8 @@ def test_equal():
     d3 = BehaviorOphysSession(oeid2)
 
     assert d1 == d2
-    assert not d1 == d3
+    assert not (d1 == d3)
+
 
 @pytest.mark.nightly
 def test_visbeh_ophys_data_set():
@@ -39,7 +41,7 @@ def test_visbeh_ophys_data_set():
     assert data_set.stimulus_template.shape == (8, 918, 1174)
     assert len(data_set.licks) == 2432 and list(data_set.licks.columns) == ['time']
     assert len(data_set.rewards) == 85 and list(data_set.rewards.columns) == ['volume', 'time', 'lickspout']
-    assert len(data_set.corrected_fluorescence_traces) == 269 and list(data_set.corrected_fluorescence_traces.columns) == ['corrected_fluorescence', 'roi_id']
+    assert len(data_set.corrected_fluorescence_traces) == 269 and sorted(data_set.corrected_fluorescence_traces.columns) == ['corrected_fluorescence', 'roi_id']
     assert sorted(data_set.stimulus_metadata['image_category'].unique()) == sorted(data_set.stimulus_table['image_category'].unique())
     assert sorted(data_set.stimulus_metadata['image_name'].unique()) == sorted(data_set.stimulus_table['image_name'].unique())
     np.testing.assert_array_almost_equal(data_set.running_speed['time'], data_set.stimulus_timestamps)

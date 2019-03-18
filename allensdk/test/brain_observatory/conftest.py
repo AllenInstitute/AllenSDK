@@ -24,7 +24,7 @@ def nwbfile():
 @pytest.fixture
 def roundtripper(tmpdir_factory):
     def f(nwbfile, api):
-        tmpdir = str(tmpdir_factory.mktemp('ecephys_nwb_roundtrip_tests'))
+        tmpdir = str(tmpdir_factory.mktemp('nwb_roundtrip_tests'))
         nwb_path = os.path.join(tmpdir, 'nwbfile.nwb')
 
         with pynwb.NWBHDF5IO(nwb_path, 'w') as write_io:

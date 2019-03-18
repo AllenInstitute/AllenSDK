@@ -14,8 +14,8 @@ import numpy as np
 from allensdk.config.manifest import Manifest
 from allensdk.brain_observatory.running_speed import RunningSpeed
 
-from ._schemas import InputSchema, OutputSchema
-from ..argschema_utilities import write_or_print_outputs
+from allensdk.brain_observatory.nwb._schemas import InputSchema, OutputSchema
+from allensdk.brain_observatory.argschema_utilities import write_or_print_outputs
 
 
 STIM_TABLE_RENAMES_MAP = {
