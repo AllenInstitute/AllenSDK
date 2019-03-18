@@ -5,6 +5,7 @@ from pandas.util.testing import assert_frame_equal
 from allensdk.core.lazy_property import LazyProperty, LazyPropertyMixin
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
 
+
 class BehaviorOphysSession(LazyPropertyMixin):
 
     def __init__(self, ophys_experiment_id, api=None, use_acq_trigger=False):
