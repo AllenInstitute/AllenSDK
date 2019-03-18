@@ -9,6 +9,7 @@ import h5py
 
 from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorOphysSession
 
+
 @pytest.mark.nightly
 def test_equal():
     
@@ -18,7 +19,8 @@ def test_equal():
     d3 = BehaviorOphysSession(oeid2)
 
     assert d1 == d2
-    assert not d1 == d3
+    assert not (d1 == d3)
+
 
 @pytest.mark.nightly
 def test_visbeh_ophys_data_set():

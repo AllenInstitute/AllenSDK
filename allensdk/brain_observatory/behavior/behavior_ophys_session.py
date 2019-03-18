@@ -37,13 +37,13 @@ class BehaviorOphysSession(LazyPropertyMixin):
         field_set = set()
         for key, val in self.__dict__.items():
             if isinstance(val, LazyProperty):
-                field_set.add(key) 
+                field_set.add(key)
         for key, val in other.__dict__.items():
             if isinstance(val, LazyProperty):
                 field_set.add(key)
 
         try:
-            for field in field_set: 
+            for field in field_set:
                 x1, x2 = getattr(self, field), getattr(other, field)
                 if isinstance(x1, pd.DataFrame):
                     assert_frame_equal(x1, x2)
