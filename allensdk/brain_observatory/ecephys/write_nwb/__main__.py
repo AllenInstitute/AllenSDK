@@ -404,7 +404,7 @@ def write_ecephys_nwb(
             probe['mean_waveforms_path'], local_to_global_unit_map
         ))
 
-    nwbfile.electrodes = pynwb.file.ElectrodeTable().from_dataframe(pd.concat(channel_tables), name='electrodes')
+    nwbfile.electrodes = pynwb.file.ElectrodeTable().from_dataframe(pd.concat(channel_tables).fillna(np.nan), name='electrodes')
     units_table = pd.concat(unit_tables).set_index(keys='id', drop=True)
     nwbfile.units = pynwb.misc.Units.from_dataframe(units_table, name='units')
 
