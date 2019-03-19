@@ -3,6 +3,9 @@ from pynwb.base import TimeSeries
 from pynwb.behavior import BehavioralTimeSeries
 from pynwb import ProcessingModule
 
+from allensdk.brain_observatory.running_speed import RunningSpeed
+
+
 def add_running_speed_to_nwbfile(nwbfile, running_speed, name='speed', unit='cm/s'):
     ''' Adds running speed data to an NWBFile as a timeseries in acquisition
 
@@ -46,7 +49,7 @@ def add_running_speed_to_nwbfile(nwbfile, running_speed, name='speed', unit='cm/
     return nwbfile
 
 
-def add_running_data_df_to_nwbfile(nwbfile, running_data_df, unit_dict):
+def add_running_data_df_to_nwbfile(nwbfile, running_data_df, unit_dict, index_key='timestamps'):
     ''' Adds running speed data to an NWBFile as timeseries in acquisition and processing
 
     Parameters
@@ -63,26 +66,22 @@ def add_running_data_df_to_nwbfile(nwbfile, running_data_df, unit_dict):
     nwbfile : pynwb.NWBFile
 
     '''
-    assert running_data_df.index.name == 'timestamps'
+    assert running_data_df.index.name == index_key
 
-    timestamps_ts = TimeSeries(
-        name='timestamps',
-        timestamps=running_data_df.index.values,
-        unit=unit_dict['timestamps']
-    )
+    running_speed = RunningSpeed(timestamps=running_data_df.index.values,
+                                 values=running_data_df['speed'].values)
+
+    add_running_speed_to_nwbfile(nwbfile, running_speed, name='speed', unit=unit_dict['speed'])
+
+    running_mod = nwbfile.modules['running']
+    timestamps_ts = running_mod.get_data_interface('timestamps')
+    running_speed_series = running_mod.get_data_interface('speed')
 
     running_dx_series = TimeSeries(
         name='dx',
         data=running_data_df['dx'].values,
         timestamps=timestamps_ts,
         unit=unit_dict['dx']
-    )
-
-    running_speed_series = TimeSeries(
-        name='speed',
-        data=running_data_df['speed'].values,
-        timestamps=timestamps_ts,
-        unit=unit_dict['speed']
     )
 
     v_sig = TimeSeries(
@@ -99,13 +98,7 @@ def add_running_data_df_to_nwbfile(nwbfile, running_data_df, unit_dict):
         unit=unit_dict['v_in']
     )
 
-    running_mod = ProcessingModule('running', 'Running speed processing module')
-    nwbfile.add_processing_module(running_mod)
-
-    running_mod.add_data_interface(timestamps_ts)
-    running_mod.add_data_interface(running_speed_series)
     running_mod.add_data_interface(running_dx_series)
-
     nwbfile.add_acquisition(v_sig)
     nwbfile.add_acquisition(v_in)
 
