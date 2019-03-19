@@ -8,7 +8,7 @@ import pynwb
 def running_speed():
     from allensdk.brain_observatory.running_speed import RunningSpeed
     return RunningSpeed(
-        timestamps=[1, 2, 3],
+        timestamps=[1., 2., 3.],
         values=[4, 5, 6]
     )
 
