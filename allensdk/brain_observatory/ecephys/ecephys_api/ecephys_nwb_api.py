@@ -11,7 +11,7 @@ from allensdk.brain_observatory.nwb.nwb_api import NwbApi
 
 class EcephysNwbApi(NwbApi, EcephysApi):
 
-    def get_stimulus_table(self) -> pd.DataFrame:
+    def get_stimulus_presentations(self) -> pd.DataFrame:
         table = pd.DataFrame({
             col.name: col.data for col in self.nwbfile.epochs.columns 
             if col.name not in set(['tags', 'timeseries', 'tags_index', 'timeseries_index'])
