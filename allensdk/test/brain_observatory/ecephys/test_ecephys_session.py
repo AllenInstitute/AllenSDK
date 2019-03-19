@@ -79,7 +79,7 @@ def raw_probes():
 @pytest.fixture
 def just_stimulus_table_api(raw_stimulus_table):
     class EcephysJustStimulusTableApi(EcephysApi):
-        def get_stimulus_table(self):
+        def get_stimulus_presentations(self):
             return raw_stimulus_table
     return EcephysJustStimulusTableApi()
 
@@ -121,22 +121,22 @@ def spike_times_api(raw_units, raw_channels, raw_probes, raw_stimulus_table, raw
             return raw_units
         def get_probes(self):
             return raw_probes
-        def get_stimulus_table(self):
+        def get_stimulus_presentations(self):
             return raw_stimulus_table
     return EcephysSpikeTimesApi()
 
 
-def test_build_stimulus_sweeps(just_stimulus_table_api):
+def test_build_stimulus_presentations(just_stimulus_table_api):
     expected_columns = [
         'start_time', 'stop_time', 'stimulus_name', 'stimulus_block', 'TF', 'SF', 'Ori', 'Contrast', 
         'Pos_x', 'Pos_y', 'Color', 'Image', 'Phase', 'is_movie'
     ]
 
     session = EcephysSession(api=just_stimulus_table_api)
-    obtained = session.stimulus_sweeps
+    obtained = session.stimulus_presentations
 
     assert set(expected_columns) == set(obtained.columns)
-    assert 'stimulus_sweep_id' == obtained.index.name
+    assert 'stimulus_presentation_id' == obtained.index.name
     assert 4 == obtained.shape[0]
     assert np.allclose([False, False, False, True], obtained['is_movie'])
 
@@ -160,24 +160,24 @@ def test_build_units_table(units_table_api):
 
 def test_framewise_spike_counts(spike_times_api):
     session = EcephysSession(api=spike_times_api)
-    obtained = session.sweepwise_spike_counts(np.linspace(-.1, .1, 3), session.stimulus_sweeps.index.values, session.units.index.values)
+    obtained = session.presentationwise_spike_counts(np.linspace(-.1, .1, 3), session.stimulus_presentations.index.values, session.units.index.values)
 
-    first = obtained['spike_counts'].loc[{'unit_id': 2, 'stimulus_sweep_id': 2}]
+    first = obtained['spike_counts'].loc[{'unit_id': 2, 'stimulus_presentation_id': 2}]
     assert np.allclose([0, 3], first)
 
-    second = obtained['spike_counts'].loc[{'unit_id': 1, 'stimulus_sweep_id': 3}]
+    second = obtained['spike_counts'].loc[{'unit_id': 1, 'stimulus_presentation_id': 3}]
     assert np.allclose([0, 0], second)
 
     assert np.allclose([4, 2, 2], obtained['spike_counts'].shape)
 
 
-def test_sweepwise_spike_times(spike_times_api):
+def test_presentationwise_spike_times(spike_times_api):
     session = EcephysSession(api=spike_times_api)
-    obtained = session.sweepwise_spike_times(session.stimulus_sweeps.index.values, session.units.index.values)
+    obtained = session.presentationwise_spike_times(session.stimulus_presentations.index.values, session.units.index.values)
 
     expected = pd.DataFrame({
         'unit_id': [2, 2, 2],
-        'stimulus_sweep_id': [2, 2, 2, ]
+        'stimulus_presentation_id': [2, 2, 2, ]
     }, index=pd.Index(name='spike_time', data=[1.01, 1.02, 1.03]))
 
     pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)
@@ -185,7 +185,7 @@ def test_sweepwise_spike_times(spike_times_api):
 
 def test_conditionwise_spike_counts(spike_times_api):
     session = EcephysSession(api=spike_times_api)
-    obtained = session.conditionwise_spike_counts(session.stimulus_sweeps.index.values, session.units.index.values)
+    obtained = session.conditionwise_spike_counts(session.stimulus_presentations.index.values, session.units.index.values)
 
     expected = pd.DataFrame({
         'unit_id': [2],
@@ -207,7 +207,7 @@ def test_conditionwise_spike_counts(spike_times_api):
 
 def test_conditionwise_mean_spike_counts(spike_times_api):
     session = EcephysSession(api=spike_times_api)
-    obtained = session.conditionwise_mean_spike_counts(session.stimulus_sweeps.index.values, session.units.index.values)
+    obtained = session.conditionwise_mean_spike_counts(session.stimulus_presentations.index.values, session.units.index.values)
 
     expected = pd.DataFrame({
         'unit_id': [2],
@@ -229,7 +229,7 @@ def test_conditionwise_mean_spike_counts(spike_times_api):
 
 def test_get_stimulus_conditions(just_stimulus_table_api):
     session = EcephysSession(api=just_stimulus_table_api)
-    obtained = session.get_stimulus_conditions(stimulus_sweep_ids=[3])
+    obtained = session.get_stimulus_conditions(stimulus_presentation_ids=[3])
 
     expected = pd.DataFrame({
         'Color': [16.5],
