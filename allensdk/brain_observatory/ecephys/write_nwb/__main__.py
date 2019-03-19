@@ -15,6 +15,7 @@ from allensdk.config.manifest import Manifest
 from allensdk.brain_observatory.running_speed import RunningSpeed
 
 from allensdk.brain_observatory.nwb._schemas import InputSchema, OutputSchema
+from allensdk.brain_observatory.nwb import add_running_speed_to_nwbfile
 from allensdk.brain_observatory.argschema_utilities import write_or_print_outputs
 
 
@@ -362,36 +363,6 @@ def add_ragged_data_to_dynamic_table(table, data, column_name, column_descriptio
     del data
 
     table.add_column(name=column_name, description=column_description, data=values, index=idx)
-
-
-def add_running_speed_to_nwbfile(nwbfile, running_speed, name='running_speed', unit='cm/s'):
-    ''' Adds running speed data to an NWBFile as a timeseries in acquisition
-
-    Parameters
-    ----------
-    nwbfile : pynwb.NWBFile
-        File to which runnign speeds will be written
-    running_speed : RunningSpeed
-        Contains attributes 'values' and 'timestamps'
-    name : str, optional
-        used as name of timeseries object
-    unit : str, optional
-        SI units of running speed values
-
-    Returns
-    -------
-    nwbfile : pynwb.NWBFile
-
-    '''
-
-    running_speed_series = pynwb.base.TimeSeries(
-        name=name, 
-        data=running_speed.values, 
-        timestamps=running_speed.timestamps, 
-        unit=unit
-    )
-    nwbfile.add_acquisition(running_speed_series)
-    return nwbfile
 
 
 def write_ecephys_nwb(
