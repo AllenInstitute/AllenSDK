@@ -20,7 +20,7 @@ def running_data_df(running_speed):
     v_in = np.ones_like(running_speed.values)
     dx = np.ones_like(running_speed.values)
 
-    return pd.DataFrame({'v_sig': v_sig,
+    return pd.DataFrame({'speed': running_speed.values,
                          'v_in': v_in,
-                         'speed': running_speed.values,
+                         'v_sig': v_sig,
                          'dx': dx}, index=pd.Index(running_speed.timestamps, name='timestamps'))

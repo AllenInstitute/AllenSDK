@@ -2,21 +2,11 @@ import datetime
 from pynwb import NWBFile, NWBHDF5IO
 import pandas as pd
 import allensdk.brain_observatory.nwb as nwb
-from allensdk.brain_observatory.running_speed import RunningSpeed
+
+from allensdk.brain_observatory.nwb.nwb_api import NwbApi
 
 
-class BehaviorOphysNwbApi(object):
-
-    @property
-    def nwbfile(self):
-        if hasattr(self, '_nwbfile'):
-            return self._nwbfile
-
-        io = NWBHDF5IO(self.path, 'r')
-        return io.read()
-
-    def __init__(self, path):
-        self.path = path
+class BehaviorOphysNwbApi(NwbApi):
 
     def save(self, session_object):
 
@@ -37,30 +27,22 @@ class BehaviorOphysNwbApi(object):
 
     def get_running_data_df(self, **kwargs):
 
-        return pd.DataFrame({'v_sig': self.nwbfile.get_acquisition('v_sig').data,
-                             'v_in': self.nwbfile.get_acquisition('v_in').data,
-                             'speed': self.nwbfile.modules['running'].get_data_interface('speed').data,
-                             'dx': self.nwbfile.modules['running'].get_data_interface('dx').data},
-                                 index=pd.Index(self.nwbfile.modules['running'].get_data_interface('timestamps').timestamps, name='timestamps'))
+        print(self.nwbfile.modules)
+
+        running_speed = self.get_running_speed()
+
+        running_data_df = pd.DataFrame({'speed': running_speed.values},
+                                       index=pd.Index(running_speed.timestamps, name='timestamps'))
+
+        for key in ['v_in', 'v_sig']:
+            if key in self.nwbfile.acquisition:
+                running_data_df[key] = self.nwbfile.get_acquisition(key).data
+
+        for key in ['dx']:
+            if ('running' in self.nwbfile.modules) and (key in self.nwbfile.modules['running'].fields['data_interfaces']):
+                running_data_df[key] = self.nwbfile.modules['running'].get_data_interface(key).data
+
+        return running_data_df
 
     def get_metadata(self, **kwargs):
         pass
-
-    def get_running_speed(self, **kwargs):
-        
-        running_data_df = self.get_running_data_df()
-        return RunningSpeed(timestamps=running_data_df.index.values,
-                            values=running_data_df.speed.values)
-
-
-        # stimulus_timestamps = self.get_stimulus_timestamps(ophys_experiment_id=ophys_experiment_id, use_acq_trigger=use_acq_trigger)
-        # behavior_stimulus_file = self.get_behavior_stimulus_file(ophys_experiment_id=ophys_experiment_id)
-        # data = pd.read_pickle(behavior_stimulus_file)
-        # return get_running_df(data, stimulus_timestamps)
-
-
-    @classmethod
-    def from_nwbfile(cls, nwbfile, **kwargs):
-        obj = cls(path=None, **kwargs)
-        obj._nwbfile = nwbfile
-        return obj
