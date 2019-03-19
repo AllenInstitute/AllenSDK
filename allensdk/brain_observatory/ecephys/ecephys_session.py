@@ -446,7 +446,7 @@ class EcephysSession(LazyPropertyMixin):
             & (table['quality'] == 'good')
         ]
 
-        table = table.drop(columns=['local_index_unit', 'local_index_channel', 'quality', 'valid_data'])
+        table = table.drop(columns=['local_index_unit', 'quality', 'valid_data', 'manual_structure_id'])
         return table.sort_values(by=['probe_description', 'probe_vertical_position', 'probe_horizontal_position'])
 
 
