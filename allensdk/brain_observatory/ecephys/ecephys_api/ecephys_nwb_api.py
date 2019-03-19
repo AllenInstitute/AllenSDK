@@ -6,17 +6,10 @@ import numpy as np
 import pynwb
 
 from .ecephys_api import EcephysApi
-from ...running_speed import RunningSpeed
 from allensdk.brain_observatory.nwb.nwb_api import NwbApi
 
 
 class EcephysNwbApi(NwbApi, EcephysApi):
-
-    def get_running_speed(self) -> RunningSpeed:
-        return RunningSpeed(
-            timestamps=self.nwbfile.get_acquisition('running_speed').timestamps[:],
-            values=self.nwbfile.get_acquisition('running_speed').data[:]
-        )
 
     def get_stimulus_table(self) -> pd.DataFrame:
         table = pd.DataFrame({

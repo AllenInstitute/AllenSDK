@@ -1,4 +1,5 @@
 import pynwb
+from allensdk.brain_observatory.running_speed import RunningSpeed
 
 
 class NwbApi:
@@ -24,3 +25,13 @@ class NwbApi:
         obj = cls(path=None, **kwargs)
         obj._nwbfile = nwbfile
         return obj
+
+    def get_running_speed(self) -> RunningSpeed:
+
+        values = self.nwbfile.modules['running'].get_data_interface('speed').data[:]
+        timestamps = self.nwbfile.modules['running'].get_data_interface('timestamps').timestamps[:]
+
+        return RunningSpeed(
+            timestamps=timestamps,
+            values=values,
+        )
