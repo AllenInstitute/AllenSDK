@@ -16,7 +16,7 @@ class EcephysApi:
     def get_running_speed(self) -> RunningSpeed:
         raise NotImplementedError
 
-    def get_stimulus_table(self) -> pd.DataFrame:
+    def get_stimulus_presentations(self) -> pd.DataFrame:
         raise NotImplementedError
 
     def get_probes(self) -> pd.DataFrame:

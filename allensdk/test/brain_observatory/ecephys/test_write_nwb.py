@@ -43,7 +43,7 @@ def test_add_stimulus_table_to_file(nwbfile, stimulus_table_data, roundtripper):
     write_nwb.add_stimulus_table_to_file(nwbfile, stimulus_table_data)
 
     api = roundtripper(nwbfile, EcephysNwbApi)
-    obtained_stimulus_table = api.get_stimulus_table()
+    obtained_stimulus_table = api.get_stimulus_presentations()
     
     pd.testing.assert_frame_equal(stimulus_table_data, obtained_stimulus_table, check_dtype=False)
     
