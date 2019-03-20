@@ -93,7 +93,6 @@ if __name__ == "__main__":
     # print(session.running_speed)
     # print(session.running_data_df)
     # print(session.stimulus_presentations)
-    # print(session.stimulus_table)
     # print(session.stimulus_templates)
     # print(session.stimulus_metadata)
     # print(session.licks)
