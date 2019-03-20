@@ -6,6 +6,7 @@ from typing import NamedTuple
 from allensdk.core.lazy_property import LazyProperty, LazyPropertyMixin
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
 
+
 class BehaviorOphysSession(LazyPropertyMixin):
 
     def __init__(self, ophys_experiment_id, api=None, use_acq_trigger=False):
@@ -22,8 +23,9 @@ class BehaviorOphysSession(LazyPropertyMixin):
         self.roi_metrics = LazyProperty(self.api.get_roi_metrics, ophys_experiment_id=self.ophys_experiment_id)
         self.cell_roi_ids = LazyProperty(self.api.get_cell_roi_ids, ophys_experiment_id=self.ophys_experiment_id)
         self.running_speed = LazyProperty(self.api.get_running_speed, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
-        self.stimulus_table = LazyProperty(self.api.get_stimulus_table, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
-        self.stimulus_template = LazyProperty(self.api.get_stimulus_template, ophys_experiment_id=self.ophys_experiment_id)
+        self.running_data_df = LazyProperty(self.api.get_running_data_df, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
+        self.stimulus_presentations = LazyProperty(self.api.get_stimulus_presentations, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
+        self.stimulus_templates = LazyProperty(self.api.get_stimulus_templates, ophys_experiment_id=self.ophys_experiment_id)
         self.stimulus_metadata = LazyProperty(self.api.get_stimulus_metadata, ophys_experiment_id=self.ophys_experiment_id)
         self.licks = LazyProperty(self.api.get_licks, ophys_experiment_id=self.ophys_experiment_id)
         self.rewards = LazyProperty(self.api.get_rewards, ophys_experiment_id=self.ophys_experiment_id)
@@ -68,22 +70,29 @@ class BehaviorOphysSession(LazyPropertyMixin):
 
 if __name__ == "__main__":
 
+    from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi
+    nwb_filepath = './tmp.nwb'
+    nwb_api = BehaviorOphysNwbApi(nwb_filepath)
     session = BehaviorOphysSession(789359614)
-    print(session.max_projection)
-    print(session.stimulus_timestamps)
-    print(session.ophys_timestamps)
-    print(session.metadata)
-    print(session.dff_traces)
-    print(session.roi_metrics)
-    print(session.cell_roi_ids)
-    print(session.running_speed)
-    print(session.stimulus_table)
-    print(session.stimulus_template)
-    print(session.stimulus_metadata)
-    print(session.licks)
-    print(session.rewards)
-    print(session.task_parameters)
-    print(session.trials)
-    print(session.corrected_fluorescence_traces)
-    print(session.average_image)
-    print(session.motion_correction)
+    nwb_api.save(session)
+
+    # session = BehaviorOphysSession(789359614)
+
+    # print(session.max_projection)
+    # print(session.stimulus_timestamps)
+    # print(session.ophys_timestamps)
+    # print(session.metadata)
+    # print(session.dff_traces)
+    # print(session.roi_metrics)
+    # print(session.cell_roi_ids)
+    # print(session.running_speed)
+    # print(session.stimulus_presentations)
+    # print(session.stimulus_templates)
+    # print(session.stimulus_metadata)
+    # print(session.licks)
+    # print(session.rewards)
+    # print(session.task_parameters)
+    # print(session.trials)
+    # print(session.corrected_fluorescence_traces)
+    # print(session.average_image)
+    # print(session.motion_correction)
