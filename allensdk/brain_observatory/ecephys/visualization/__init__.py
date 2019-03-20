@@ -75,8 +75,9 @@ def plot_spike_counts(
 
 
 class _VlPlotter:
-    def __init__(self, num_objects, cmap=plt.cm.tab20, cycle_colors=False):
+    def __init__(self, ax, num_objects, cmap=plt.cm.tab20, cycle_colors=False):
         self.ii = 0
+        self.ax = ax
         self.num_objects = num_objects
         self.cmap = cmap
         self.cycle_colors = cycle_colors
@@ -88,14 +89,14 @@ class _VlPlotter:
         cindex = self.ii % self.cmap.N if self.cycle_colors else np.random.randint(self.cmap.N)
         color = self.cmap(cindex)
 
-        plt.vlines(gb.index.values, low, high, colors=color)
+        self.ax.vlines(gb.index.values, low, high, colors=color)
         self.ii += 1
 
 
 def raster_plot(spike_times, figsize=(8,8), cmap=plt.cm.tab20, title='spike raster', cycle_colors=False):
 
     fig, ax = plt.subplots(figsize=figsize)
-    plotter = _VlPlotter(num_objects=len(spike_times['unit_id'].unique()), cmap=cmap, cycle_colors=cycle_colors)
+    plotter = _VlPlotter(ax, num_objects=len(spike_times['unit_id'].unique()), cmap=cmap, cycle_colors=cycle_colors)
     spike_times.groupby('unit_id').agg(plotter)
     
     ax.set_xlabel('time (s)', fontsize=16)
