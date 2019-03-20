@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def plot_mean_waveforms(mean_waveforms, unit_ids): # pragma: no cover
+def plot_mean_waveforms(mean_waveforms, unit_ids, peak_channels): # pragma: no cover
     ''' Utility for plotting mean waveforms on each unit's peak channel
 
     Parameters
@@ -19,9 +19,7 @@ def plot_mean_waveforms(mean_waveforms, unit_ids): # pragma: no cover
 
     for uid in unit_ids:
         wf = mean_waveforms[uid]
-        delta = wf.max(dim='time') - wf.min(dim='time') # TODO: there is something wrong with the peak channels in the nwb file, so we are computing them here as a stopgap
-        ch_max = delta.where(delta == delta.max(), drop=True)['channel_id'][0]
-        ax.plot(wf.loc[{'channel_id': ch_max}])
+        ax.plot(wf.loc[{'channel_id': peak_channels[uid]}])
 
     ax.legend(unit_ids)
     ax.set_ylabel('membrane potential (mV)', fontsize=16)
