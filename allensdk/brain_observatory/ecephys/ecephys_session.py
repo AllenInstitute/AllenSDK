@@ -439,14 +439,19 @@ class EcephysSession(LazyPropertyMixin):
         table = pd.merge(table, probes, left_on='probe_id', right_index=True, suffixes=['_unit', '_probe'])
 
         table.index.name = 'unit_id'
-        table = table.rename(columns={'description': 'probe_description'})
+        table = table.rename(columns={
+            'description': 'probe_description',
+            'manual_structure_id': 'structure_id',
+            'manual_structure_acronym': 'structure_acronym',
+            'local_index_channel': 'channel_local_index'
+            })
 
         table = table.loc[
             (table['valid_data'])
             & (table['quality'] == 'good')
         ]
 
-        table = table.drop(columns=['local_index_unit', 'quality', 'valid_data', 'manual_structure_id'])
+        table = table.drop(columns=['local_index_unit', 'quality', 'valid_data'])
         return table.sort_values(by=['probe_description', 'probe_vertical_position', 'probe_horizontal_position'])
 
 
