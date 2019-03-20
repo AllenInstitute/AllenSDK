@@ -13,4 +13,4 @@ conda create -y -v -c defaults --clone ${BASE_ENVIRONMENT} --prefix ${bamboo_NEX
 source activate ${bamboo_NEXT_PRODUCTION_ENVIRONMENT}
 pip install --upgrade pip
 pip install -i ${bamboo_repository_url}/simple --extra-index-url https://pypi.org/simple  *.whl
-chmod -R 777 ${bamboo_NEXT_PRODUCTION_ENVIRONMENT}
+chmod -R 777 ${bamboo_NEXT_PRODUCTION_ENVIRONMENT} 
