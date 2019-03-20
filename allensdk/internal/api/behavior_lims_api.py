@@ -4,7 +4,7 @@ from . import PostgresQueryMixin
 import pandas as pd
 
 
-class BehaviorApi(PostgresQueryMixin):
+class BehaviorLimsApi(PostgresQueryMixin):
 
     def foraging_id_to_behavior_session_id(self, foraging_id):
         '''maps foraging_id to behavior_session_id'''

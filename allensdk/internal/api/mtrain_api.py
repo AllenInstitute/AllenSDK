@@ -13,7 +13,7 @@ class MtrainApi(PostgresQueryMixin):
 
     def __init__(self, api_base='http://mtrain:5000'):
         self.api_base = api_base
-        self.behavior_api = BehaviorApi()
+        self.behavior_lims_api = BehaviorLimsApi()
 
     def get_page(self, table_name, get_obj=None, filters=[], **kwargs):
       
@@ -50,12 +50,12 @@ class MtrainApi(PostgresQueryMixin):
 
         if behavior_session_uuid is None and behavior_session_id is not None:
             # get a behavior session uuid if a lims ID was entered
-            behavior_session_uuid = self.behavior_api.behavior_session_id_to_foraging_id(
+            behavior_session_uuid = self.behavior_lims_api.behavior_session_id_to_foraging_id(
                 behavior_session_id)
 
         if behavior_session_uuid is not None and behavior_session_id is not None:
             # if both a behavior session uuid and a lims id are entered, ensure that they match
-            assert behavior_session_uuid == self.behavior_api.behavior_session_id_to_foraging_id(
+            assert behavior_session_uuid == self.behavior_lims_api.behavior_session_id_to_foraging_id(
                 behavior_session_id), 'behavior_session {} does not match behavior_session_id {}'.format(behavior_session_uuid, behavior_session_id)
         filters = [{"name": "id", "op": "eq", "val": behavior_session_uuid}]
         behavior_df = self.get_df('behavior_sessions', filters=filters).rename(columns={'id': 'behavior_session_uuid'})
