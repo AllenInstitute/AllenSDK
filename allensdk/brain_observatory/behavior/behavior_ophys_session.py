@@ -5,6 +5,7 @@ from pandas.util.testing import assert_frame_equal
 from allensdk.core.lazy_property import LazyProperty, LazyPropertyMixin
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
 
+
 class BehaviorOphysSession(LazyPropertyMixin):
 
     def __init__(self, ophys_experiment_id, api=None, use_acq_trigger=False):
@@ -66,6 +67,11 @@ class BehaviorOphysSession(LazyPropertyMixin):
 
 
 if __name__ == "__main__":
+
+    # from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi
+    # nwb_filepath = './tmp.nwb'
+    # nwb_api = BehaviorOphysNwbApi(nwb_filepath)
+    # nwb_api.save(session)
 
     session = BehaviorOphysSession(789359614)
     print(session.max_projection)

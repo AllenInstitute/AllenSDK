@@ -122,6 +122,7 @@ def test_add_running_speed_to_nwbfile(nwbfile, running_speed, roundtripper, roun
         api_obt = EcephysNwbApi.from_nwbfile(nwbfile)
 
     running_speed_obt = api_obt.get_running_speed()
+
     assert np.allclose(running_speed.timestamps, running_speed_obt.timestamps)
     assert np.allclose(running_speed.values, running_speed_obt.values)
 
