@@ -6,7 +6,7 @@ import itertools
 import json
 
 from . import PostgresQueryMixin
-from .behavior_api import BehaviorApi
+from .behavior_lims_api import BehaviorLimsApi
 
 
 class MtrainApi(PostgresQueryMixin):
