@@ -11,14 +11,6 @@ from allensdk.brain_observatory.nwb.nwb_api import NwbApi
 
 class EcephysNwbApi(NwbApi, EcephysApi):
 
-    def get_stimulus_presentations(self) -> pd.DataFrame:
-        table = pd.DataFrame({
-            col.name: col.data for col in self.nwbfile.epochs.columns 
-            if col.name not in set(['tags', 'timeseries', 'tags_index', 'timeseries_index'])
-        }, index=pd.Index(name='stimulus_presentations_id', data=self.nwbfile.epochs.id.data))
-        table.index = table.index.astype(int)
-        return table
-
     def get_probes(self) -> pd.DataFrame:
         probes: Union[List, pd.DataFrame] = []
         for k, v in self.nwbfile.electrode_groups.items():

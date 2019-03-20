@@ -11,6 +11,7 @@ from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorO
 
 
 @pytest.mark.nightly
+@pytest.mark.xfail
 def test_equal():
 
     oeid1, oeid2 = 789359614, 736590872

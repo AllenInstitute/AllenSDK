@@ -48,3 +48,15 @@ def test_add_stimulus_templates(nwbfile, stimulus_templates, roundtrip, roundtri
     stimulus_templates_obt = obt.get_stimulus_templates()
     for key in set(stimulus_templates.keys()).union(set(stimulus_templates_obt.keys())):
         np.testing.assert_array_almost_equal(stimulus_templates[key], stimulus_templates_obt[key])
+
+
+@pytest.mark.parametrize('roundtrip', [True, False])
+def test_add_stimulus_presentations_to_file(nwbfile, stimulus_presentations, roundtrip, roundtripper):
+    nwb.add_stimulus_presentations_to_file(nwbfile, stimulus_presentations)
+
+    if roundtrip:
+        obt = roundtripper(nwbfile, BehaviorOphysNwbApi)
+    else:
+        obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
+
+    pd.testing.assert_frame_equal(stimulus_presentations, obt.get_stimulus_presentations(), check_dtype=False)

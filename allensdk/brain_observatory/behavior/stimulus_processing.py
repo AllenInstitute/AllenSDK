@@ -10,16 +10,16 @@ def load_pickle(pstream):
     return pickle.load(pstream, encoding="bytes")
 
 
-def get_stimtable(data, stimulus_timestamps):
+def get_stimulus_presentations(data, stimulus_timestamps):
 
     visual_stimuli = get_visual_stimuli_df(data, stimulus_timestamps)
     stimulus_table = visual_stimuli[:-10]  # ignore last 10 flashes
     # workaround to rename columns to harmonize with visual coding and rebase timestamps to sync time
     stimulus_table.insert(loc=0, column='flash_number', value=np.arange(0, len(stimulus_table)))
-    stimulus_table = stimulus_table.rename(columns={'frame': 'start_frame', 'time': 'start_time'})
+    stimulus_table = stimulus_table.rename(columns={'frame': 'start_frame', 'time': 'start_time', 'flash_number':'stimulus_presentations_id'})
     stimulus_table.start_time = [stimulus_timestamps[start_frame] for start_frame in stimulus_table.start_frame.values]
     end_time = [stimulus_timestamps[end_frame] for end_frame in stimulus_table.end_frame.values]
-    stimulus_table.insert(loc=4, column='end_time', value=end_time)
+    stimulus_table.insert(loc=4, column='stop_time', value=end_time)
 
     return stimulus_table
 
