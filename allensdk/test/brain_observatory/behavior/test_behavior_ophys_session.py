@@ -12,7 +12,7 @@ from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorO
 
 @pytest.mark.nightly
 def test_equal():
-    
+
     oeid1, oeid2 = 789359614, 736590872
     d1 = BehaviorOphysSession(oeid1)
     d2 = BehaviorOphysSession(oeid1)
