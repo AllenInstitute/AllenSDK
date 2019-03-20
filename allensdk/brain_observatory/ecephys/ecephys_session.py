@@ -187,8 +187,8 @@ class EcephysSession(LazyPropertyMixin):
 
         '''
 
-        stimulus_presentations = self.stimulus_presentations.loc[stimulus_presentation_ids] if stimulus_presentation_ids is not None else self.stimulus_presentations
-        units = self.units.loc[unit_ids] if unit_ids is not None else self.units
+        stimulus_presentations = self._filter_owned_df('stimulus_presentations', ids=stimulus_presentation_ids)
+        units = self._filter_owned_df('units', ids=unit_ids)
 
         largest_bin_size = np.amax(np.diff(bin_edges))
         if binarize and largest_bin_size  > large_bin_size_threshold:
@@ -257,8 +257,8 @@ class EcephysSession(LazyPropertyMixin):
                 The unit that emitted this spike.
         '''
 
-        stimulus_presentations = self.stimulus_presentations.loc[stimulus_presentation_ids] if stimulus_presentation_ids is not None else self.stimulus_presentations
-        units = self.units.loc[unit_ids] if unit_ids is not None else self.units
+        stimulus_presentations = self._filter_owned_df('stimulus_presentations', ids=stimulus_presentation_ids)
+        units = self._filter_owned_df('units', ids=unit_ids)
 
         presentation_times = np.zeros([stimulus_presentations.shape[0] * 2])
         presentation_times[::2] = np.array(stimulus_presentations['start_time'])
@@ -320,7 +320,7 @@ class EcephysSession(LazyPropertyMixin):
         '''
 
         spike_times = self.presentationwise_spike_times(stimulus_presentation_ids=stimulus_presentation_ids, unit_ids=unit_ids)
-        stimulus_presentations = self.stimulus_presentations.loc[stimulus_presentation_ids] if stimulus_presentation_ids is not None else self.stimulus_presentations
+        stimulus_presentations = self._filter_owned_df('stimulus_presentations', ids=stimulus_presentation_ids)
         return count_spikes_by_condition(spike_times, stimulus_presentations)
 
 
@@ -346,7 +346,7 @@ class EcephysSession(LazyPropertyMixin):
 
         '''
 
-        stimulus_presentations = self.stimulus_presentations.loc[stimulus_presentation_ids] if stimulus_presentation_ids is not None else self.stimulus_presentations
+        stimulus_presentations = self._filter_owned_df('stimulus_presentations', ids=stimulus_presentation_ids)
         spike_times = self.presentationwise_spike_times(stimulus_presentation_ids=stimulus_presentation_ids, unit_ids=unit_ids)
         return mean_spikes_by_condition(spike_times, stimulus_presentations)
 
@@ -370,7 +370,7 @@ class EcephysSession(LazyPropertyMixin):
 
         '''
 
-        stimulus_presentations = self.stimulus_presentations.loc[stimulus_presentation_ids] if stimulus_presentation_ids is not None else self.stimulus_presentations
+        stimulus_presentations = self._filter_owned_df('stimulus_presentations', ids=stimulus_presentation_ids)
 
         stimulus_presentations = stimulus_presentations.drop(columns=['start_time', 'stop_time', 'stimulus_block', 'is_movie'])
         stimulus_presentations = stimulus_presentations.drop_duplicates()
@@ -396,7 +396,7 @@ class EcephysSession(LazyPropertyMixin):
 
         '''
 
-        stimulus_presentations = self.stimulus_presentations.loc[stimulus_presentation_ids] if stimulus_presentation_ids is not None else self.stimulus_presentations
+        stimulus_presentations = self._filter_owned_df('stimulus_presentations', ids=stimulus_presentation_ids)
         stimulus_presentations = stimulus_presentations.drop(columns=['start_time', 'stop_time', 'stimulus_block', 'is_movie', 'stimulus_name'])
         stimulus_presentations = removed_unused_stimulus_presentation_columns(stimulus_presentations)
         return {col: stimulus_presentations[col].unique() for col in stimulus_presentations.columns}
@@ -474,6 +474,21 @@ class EcephysSession(LazyPropertyMixin):
             )
 
         return output_waveforms
+
+    def _filter_owned_df(self, key, ids=None, copy=True):
+
+        df = getattr(self, key)
+
+        if copy:
+            df = df.copy()
+
+        if ids is not None:
+            df = df.loc[ids]
+
+        if df.shape[0] == 0:
+            warnings.warn(f'filtering to an empty set of {key}!')
+
+        return df
 
 
     @classmethod
