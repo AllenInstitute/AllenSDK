@@ -1,6 +1,7 @@
 import os
-
+import pandas as pd
 import pynwb
+
 from allensdk.brain_observatory.running_speed import RunningSpeed
 
 
@@ -50,3 +51,11 @@ class NwbApi:
             timestamps=timestamps,
             values=values,
         )
+
+    def get_stimulus_presentations(self) -> pd.DataFrame:
+        table = pd.DataFrame({
+            col.name: col.data for col in self.nwbfile.epochs.columns 
+            if col.name not in set(['tags', 'timeseries', 'tags_index', 'timeseries_index'])
+        }, index=pd.Index(name='stimulus_presentations_id', data=self.nwbfile.epochs.id.data))
+        table.index = table.index.astype(int)
+        return table

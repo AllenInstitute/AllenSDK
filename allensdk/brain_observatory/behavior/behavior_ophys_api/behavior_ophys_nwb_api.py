@@ -47,3 +47,11 @@ class BehaviorOphysNwbApi(NwbApi):
 
     def get_stimulus_templates(self, **kwargs):
         return {key: val.data[:] for key, val in self.nwbfile.stimulus_template.items()}
+
+    def get_stimulus_presentations(self) -> pd.DataFrame:
+        table = pd.DataFrame({
+            col.name: col.data for col in self.nwbfile.epochs.columns
+            if col.name not in set(['tags', 'timeseries', 'tags_index', 'timeseries_index'])
+        }, index=pd.Index(name='stimulus_presentations_id', data=self.nwbfile.epochs.id.data))
+        table.index = table.index.astype(int)
+        return table
