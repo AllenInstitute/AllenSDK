@@ -6,12 +6,14 @@ import itertools
 import json
 
 from . import PostgresQueryMixin
+from .behavior_api import BehaviorApi
 
 
 class MtrainApi(PostgresQueryMixin):
 
     def __init__(self, api_base='http://mtrain:5000'):
         self.api_base = api_base
+        self.behavior_lims_api = BehaviorLimsApi()
 
     def get_page(self, table_name, get_obj=None, filters=[], **kwargs):
       
@@ -42,7 +44,19 @@ class MtrainApi(PostgresQueryMixin):
     def get_subjects(self):
         return self.get_df('subjects').LabTracks_ID.values
 
-    def get_session(self, behavior_session_uuid):
+    def get_session(self, behavior_session_uuid=None, behavior_session_id=None):
+        assert not all(v is None for v in [
+                       behavior_session_uuid, behavior_session_id]), 'must enter either a behavior_session_uuid or a behavior_session_id'
+
+        if behavior_session_uuid is None and behavior_session_id is not None:
+            # get a behavior session uuid if a lims ID was entered
+            behavior_session_uuid = self.behavior_lims_api.behavior_session_id_to_foraging_id(
+                behavior_session_id)
+
+        if behavior_session_uuid is not None and behavior_session_id is not None:
+            # if both a behavior session uuid and a lims id are entered, ensure that they match
+            assert behavior_session_uuid == self.behavior_lims_api.behavior_session_id_to_foraging_id(
+                behavior_session_id), 'behavior_session {} does not match behavior_session_id {}'.format(behavior_session_uuid, behavior_session_id)
         filters = [{"name": "id", "op": "eq", "val": behavior_session_uuid}]
         behavior_df = self.get_df('behavior_sessions', filters=filters).rename(columns={'id': 'behavior_session_uuid'})
         state_df = self.get_df('states').rename(columns={'id': 'state_id'})
