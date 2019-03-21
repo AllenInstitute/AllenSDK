@@ -2,6 +2,7 @@ import pytest
 import os
 from datetime import datetime
 import pynwb
+import pandas as pd
 
 
 @pytest.fixture
@@ -12,6 +13,7 @@ def running_speed():
         values=[4, 5, 6]
     )
 
+
 @pytest.fixture
 def nwbfile():
     return pynwb.NWBFile(
@@ -19,6 +21,15 @@ def nwbfile():
         identifier='afile',
         session_start_time=datetime.now()
     )
+
+
+@pytest.fixture
+def stimulus_presentations():
+    return pd.DataFrame({
+        'start_time': [1, 2, 4, 5, 6],
+        'stop_time': [2, 4, 5, 6, 8],
+        'alpha': [0.5, 0.4, 0.3, 0.2, 0.1]
+    }, index=pd.Index(name='stimulus_presentations_id', data=[0, 1, 2, 3, 4]))
 
 
 @pytest.fixture
