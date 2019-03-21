@@ -495,10 +495,10 @@ class EcephysSession(LazyPropertyMixin):
 
         table.index.name = 'unit_id'
         table = table.rename(columns={
-            'description': 'probe_description',
+            'description': 'probe_name',
             'manual_structure_id': 'structure_id',
             'manual_structure_acronym': 'structure_acronym',
-            'local_index_channel': 'channel_local_index'
+            'local_index_channel': 'channel_local_index',
             })
 
         table = table.loc[
@@ -507,7 +507,7 @@ class EcephysSession(LazyPropertyMixin):
         ]
 
         table = table.drop(columns=['local_index_unit', 'quality', 'valid_data'])
-        return table.sort_values(by=['probe_description', 'probe_vertical_position', 'probe_horizontal_position'])
+        return table.sort_values(by=['probe_name', 'probe_vertical_position', 'probe_horizontal_position'])
 
 
     def _build_mean_waveforms(self, mean_waveforms):
