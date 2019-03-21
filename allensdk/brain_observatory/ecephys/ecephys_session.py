@@ -499,7 +499,7 @@ class EcephysSession(LazyPropertyMixin):
     @classmethod
     def from_nwb_path(cls, path, api_kwargs=None, **kwargs):
         api_kwargs = {} if api_kwargs is None else api_kwargs
-        return cls(api=EcephysNwbApi(path=path, **api_kwargs), **kwargs)
+        return cls(api=EcephysNwbApi.from_path(path=path, **api_kwargs), **kwargs)
 
 
 def build_time_window_domain(bin_edges, offsets, callback=None):
