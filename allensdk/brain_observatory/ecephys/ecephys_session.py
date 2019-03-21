@@ -294,7 +294,7 @@ class EcephysSession(LazyPropertyMixin):
         return pd.DataFrame({
             'stimulus_presentation_id': np.concatenate(presentation_ids).astype(int),
             'unit_id': np.concatenate(unit_ids).astype(int)
-        }, index=pd.Index(np.concatenate(spike_times), name='spike_time'))
+        }, index=pd.Index(np.concatenate(spike_times), name='spike_time')).sort_values('spike_time', axis=0)
 
 
     def conditionwise_spike_counts(self, stimulus_presentation_ids=None, unit_ids=None):

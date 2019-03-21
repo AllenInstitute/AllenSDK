@@ -31,7 +31,7 @@ def raw_spike_times():
     return {
         0: np.array([5, 6, 7, 8]),
         1: np.array([2.5]),
-        2: np.array([1.01, 1.02, 1.03])
+        2: np.array([1.01, 1.03, 1.02])
     }
 
 
