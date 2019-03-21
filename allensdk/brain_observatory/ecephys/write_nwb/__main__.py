@@ -15,7 +15,7 @@ from allensdk.config.manifest import Manifest
 from allensdk.brain_observatory.running_speed import RunningSpeed
 
 from ._schemas import InputSchema, OutputSchema
-from allensdk.brain_observatory.nwb import add_running_speed_to_nwbfile, add_stimulus_presentations_to_file
+from allensdk.brain_observatory.nwb import add_running_speed_to_nwbfile, add_stimulus_presentations
 from allensdk.brain_observatory.argschema_utilities import write_or_print_outputs
 
 
@@ -336,7 +336,7 @@ def write_ecephys_nwb(
     )
 
     stimulus_table = read_stimulus_table(stimulus_table_path)
-    nwbfile = add_stimulus_presentations_to_file(nwbfile, stimulus_table)
+    nwbfile = add_stimulus_presentations(nwbfile, stimulus_table)
 
     channel_tables = []
     unit_tables = []
