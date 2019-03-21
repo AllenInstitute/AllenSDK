@@ -125,7 +125,7 @@ def add_stimulus_template(nwbfile, image_data, name):
     return nwbfile
 
 
-def add_stimulus_presentations_to_file(nwbfile, stimulus_table, tag='stimulus_epoch'):
+def add_stimulus_presentations(nwbfile, stimulus_table, tag='stimulus_epoch'):
     ''' Adds a stimulus table (defining stimulus characteristics for each time point in a session) to an nwbfile as epochs.
 
     Parameters
