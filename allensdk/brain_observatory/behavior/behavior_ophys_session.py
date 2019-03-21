@@ -23,7 +23,7 @@ class BehaviorOphysSession(LazyPropertyMixin):
         self.cell_roi_ids = LazyProperty(self.api.get_cell_roi_ids, ophys_experiment_id=self.ophys_experiment_id)
         self.running_speed = LazyProperty(self.api.get_running_speed, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
         self.stimulus_table = LazyProperty(self.api.get_stimulus_table, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
-        self.stimulus_template = LazyProperty(self.api.get_stimulus_template, ophys_experiment_id=self.ophys_experiment_id)
+        self.stimulus_templates = LazyProperty(self.api.get_stimulus_templates, ophys_experiment_id=self.ophys_experiment_id)
         self.stimulus_metadata = LazyProperty(self.api.get_stimulus_metadata, ophys_experiment_id=self.ophys_experiment_id)
         self.licks = LazyProperty(self.api.get_licks, ophys_experiment_id=self.ophys_experiment_id)
         self.rewards = LazyProperty(self.api.get_rewards, ophys_experiment_id=self.ophys_experiment_id)
@@ -50,8 +50,14 @@ class BehaviorOphysSession(LazyPropertyMixin):
                     assert_frame_equal(x1, x2)
                 elif isinstance(x1, np.ndarray):
                     np.testing.assert_array_almost_equal(x1, x2)
-                elif isinstance(x1, (dict, list)):
+                elif isinstance(x1, (list,)):
                     assert x1 == x2
+                elif isinstance(x1, (dict,)):
+                    for key in set(x1.keys()).union(set(x2.keys())):
+                        if isinstance(x1[key], (np.ndarray,)):
+                            np.testing.assert_array_almost_equal(x1[key], x2[key])
+                        else:
+                            assert x1[key] == x2[key]
                 else:
                     raise Exception('Comparator not implemented')
 
@@ -74,21 +80,21 @@ if __name__ == "__main__":
     # nwb_api.save(session)
 
     session = BehaviorOphysSession(789359614)
-    print(session.max_projection)
-    print(session.stimulus_timestamps)
-    print(session.ophys_timestamps)
-    print(session.metadata)
-    print(session.dff_traces)
-    print(session.roi_metrics)
-    print(session.cell_roi_ids)
-    print(session.running_speed)
-    print(session.stimulus_table)
-    print(session.stimulus_template)
+    # print(session.max_projection)
+    # print(session.stimulus_timestamps)
+    # print(session.ophys_timestamps)
+    # print(session.metadata)
+    # print(session.dff_traces)
+    # print(session.roi_metrics)
+    # print(session.cell_roi_ids)
+    # print(session.running_speed)
+    # print(session.stimulus_table)
+    # print(session.stimulus_template.shape)
     print(session.stimulus_metadata)
-    print(session.licks)
-    print(session.rewards)
-    print(session.task_parameters)
-    print(session.trials)
-    print(session.corrected_fluorescence_traces)
-    print(session.average_image)
-    print(session.motion_correction)
+    # print(session.licks)
+    # print(session.rewards)
+    # print(session.task_parameters)
+    # print(session.trials)
+    # print(session.corrected_fluorescence_traces)
+    # print(session.average_image)
+    # print(session.motion_correction)

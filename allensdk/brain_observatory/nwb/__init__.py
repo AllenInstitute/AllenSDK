@@ -2,6 +2,7 @@ import pynwb
 from pynwb.base import TimeSeries
 from pynwb.behavior import BehavioralTimeSeries
 from pynwb import ProcessingModule
+from pynwb.image import ImageSeries
 
 from allensdk.brain_observatory.running_speed import RunningSpeed
 
@@ -75,7 +76,6 @@ def add_running_data_df_to_nwbfile(nwbfile, running_data_df, unit_dict, index_ke
 
     running_mod = nwbfile.modules['running']
     timestamps_ts = running_mod.get_data_interface('timestamps')
-    running_speed_series = running_mod.get_data_interface('speed')
 
     running_dx_series = TimeSeries(
         name='dx',
@@ -102,4 +102,17 @@ def add_running_data_df_to_nwbfile(nwbfile, running_data_df, unit_dict, index_ke
     nwbfile.add_acquisition(v_sig)
     nwbfile.add_acquisition(v_in)
 
+    return nwbfile
+
+
+def add_image_template(nwbfile, image_data, name):
+
+    image_index = list(range(image_data.shape[0]))
+    visual_stimulus_image_series = ImageSeries(name=name,
+                                               data=image_data,
+                                               unit='NA',
+                                               format='raw',
+                                               timestamps=image_index)
+
+    nwbfile.add_stimulus_template(visual_stimulus_image_series)
     return nwbfile

@@ -2,6 +2,9 @@ import numpy as np
 import pandas as pd
 from six import iteritems, PY3
 import pickle
+from allensdk.brain_observatory.behavior import IMAGE_SETS
+
+IMAGE_SETS_REV = {val:key for key, val in IMAGE_SETS.items()}
 
 if PY3:
 
@@ -62,10 +65,11 @@ def get_images_dict(pkl):
     return images_dict
 
 
-def get_stimulus_template(pkl):
+def get_stimulus_templates(pkl):
 
     images = get_images_dict(pkl)
-    return np.array(images['images'])
+    image_set_filename = images['metadata']['image_set']
+    return {IMAGE_SETS_REV[image_set_filename]: np.array(images['images'])}
 
 
 def get_stimulus_metadata(pkl):
