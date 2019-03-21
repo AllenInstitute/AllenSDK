@@ -1,3 +1,5 @@
+import os
+
 import pynwb
 from allensdk.brain_observatory.running_speed import RunningSpeed
 
@@ -22,9 +24,22 @@ class NwbApi:
 
     @classmethod
     def from_nwbfile(cls, nwbfile, **kwargs):
+
         obj = cls(path=None, **kwargs)
         obj._nwbfile = nwbfile
+
         return obj
+
+    @classmethod
+    def from_path(cls, path, **kwargs):
+        
+        try:
+            with open(path, 'r'):
+                pass
+        except Exception as err:
+            raise
+
+        return cls(path=path)
 
     def get_running_speed(self) -> RunningSpeed:
 
