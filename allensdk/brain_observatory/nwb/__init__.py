@@ -110,3 +110,61 @@ def add_running_data_df_to_nwbfile(nwbfile, running_data_df, unit_dict):
     nwbfile.add_acquisition(v_in)
 
     return nwbfile
+
+
+def add_stimulus_template(nwbfile, image_data, name):
+
+    image_index = list(range(image_data.shape[0]))
+    visual_stimulus_image_series = ImageSeries(name=name,
+                                               data=image_data,
+                                               unit='NA',
+                                               format='raw',
+                                               timestamps=image_index)
+
+    nwbfile.add_stimulus_template(visual_stimulus_image_series)
+    return nwbfile
+
+
+def add_stimulus_table_to_file(nwbfile, stimulus_table, tag='stimulus_epoch'):
+    ''' Adds a stimulus table (defining stimulus characteristics for each time point in a session) to an nwbfile as epochs.
+
+    Parameters
+    ----------
+    nwbfile : pynwb.NWBFile
+    stimulus_table: pd.DataFrame
+        Each row corresponds to an epoch of time. Columns define the epoch (start and stop time) and its characteristics. 
+        Nans will be replaced with the empty string. Required columns are:
+            start_time :: the time at which this epoch started
+            stop_time :: the time  at which this epoch ended
+    tag : str, optional
+        Each epoch in an nwb file has one or more tags. This string will be applied as a tag to all epochs created here
+
+    Returns
+    -------
+    nwbfile : pynwb.NWBFile
+
+    '''
+    stimulus_table = stimulus_table.copy()
+
+    ts = pynwb.base.TimeSeries(
+        name='stimulus_times',
+        timestamps=stimulus_table['start_time'].values,
+        data=stimulus_table['stop_time'].values - stimulus_table['start_time'].values,
+        unit='s',
+        description='start times (timestamps) and durations (data) of stimulus presentation epochs'
+    )
+    nwbfile.add_acquisition(ts)
+
+    for colname, series in stimulus_table.items():
+        types = set(series.map(type))
+        if len(types) > 1 and str in types:
+            series.fillna('', inplace=True)
+            stimulus_table[colname] = series.transform(str)
+
+    stimulus_table['tags'] = [(tag,)] * stimulus_table.shape[0]
+    stimulus_table['timeseries'] = [(ts,)] * stimulus_table.shape[0]
+
+    container = pynwb.epoch.TimeIntervals.from_dataframe(stimulus_table, 'epochs')
+    nwbfile.epochs = container
+
+    return nwbfile

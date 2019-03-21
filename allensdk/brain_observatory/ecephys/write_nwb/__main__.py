@@ -15,7 +15,7 @@ from allensdk.config.manifest import Manifest
 from allensdk.brain_observatory.running_speed import RunningSpeed
 
 from ._schemas import InputSchema, OutputSchema
-from allensdk.brain_observatory.nwb import add_running_speed_to_nwbfile
+from allensdk.brain_observatory.nwb import add_running_speed_to_nwbfile, add_stimulus_table_to_file
 from allensdk.brain_observatory.argschema_utilities import write_or_print_outputs
 
 
@@ -87,51 +87,6 @@ def read_stimulus_table(path,  column_renames_map=None):
         raise IOError(f'unrecognized stimulus table extension: {ext}')
 
     return stimulus_table.rename(columns=column_renames_map, index={})
-
-
-def add_stimulus_table_to_file(nwbfile, stimulus_table, tag='stimulus_epoch'):
-    ''' Adds a stimulus table (defining stimulus characteristics for each time point in a session) to an nwbfile as epochs.
-
-    Parameters
-    ----------
-    nwbfile : pynwb.NWBFile
-    stimulus_table: pd.DataFrame
-        Each row corresponds to an epoch of time. Columns define the epoch (start and stop time) and its characteristics. 
-        Nans will be replaced with the empty string. Required columns are:
-            start_time :: the time at which this epoch started
-            stop_time :: the time  at which this epoch ended
-    tag : str, optional
-        Each epoch in an nwb file has one or more tags. This string will be applied as a tag to all epochs created here
-
-    Returns
-    -------
-    nwbfile : pynwb.NWBFile
-
-    '''
-    stimulus_table = stimulus_table.copy()
-
-    ts = pynwb.base.TimeSeries(
-        name='stimulus_times', 
-        timestamps=stimulus_table['start_time'].values, 
-        data=stimulus_table['stop_time'].values - stimulus_table['start_time'].values,
-        unit='s',
-        description='start times (timestamps) and durations (data) of stimulus presentation epochs'
-    )
-    nwbfile.add_acquisition(ts)
-
-    for colname, series in stimulus_table.items():
-        types = set(series.map(type))
-        if len(types) > 1 and str in types:
-            series.fillna('', inplace=True)
-            stimulus_table[colname] = series.transform(str)
-
-    stimulus_table['tags'] = [(tag,)] * stimulus_table.shape[0]
-    stimulus_table['timeseries'] = [(ts,)] * stimulus_table.shape[0]
-
-    container = pynwb.epoch.TimeIntervals.from_dataframe(stimulus_table, 'epochs')
-    nwbfile.epochs = container
-
-    return nwbfile
 
 
 def read_spike_times_to_dictionary(spike_times_path, spike_units_path, local_to_global_unit_map=None):

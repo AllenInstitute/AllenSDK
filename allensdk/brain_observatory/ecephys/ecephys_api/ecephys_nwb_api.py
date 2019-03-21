@@ -15,7 +15,7 @@ class EcephysNwbApi(NwbApi, EcephysApi):
         table = pd.DataFrame({
             col.name: col.data for col in self.nwbfile.epochs.columns 
             if col.name not in set(['tags', 'timeseries', 'tags_index', 'timeseries_index'])
-        }, index=pd.Index(name=self.nwbfile.epochs.id.name, data=self.nwbfile.epochs.id.data))
+        }, index=pd.Index(name='stimulus_presentations_id', data=self.nwbfile.epochs.id.data))
         table.index = table.index.astype(int)
         return table
 
