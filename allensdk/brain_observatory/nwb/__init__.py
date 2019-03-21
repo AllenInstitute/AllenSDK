@@ -105,7 +105,7 @@ def add_running_data_df_to_nwbfile(nwbfile, running_data_df, unit_dict, index_ke
     return nwbfile
 
 
-def add_image_template(nwbfile, image_data, name):
+def add_stimulus_template(nwbfile, image_data, name):
 
     image_index = list(range(image_data.shape[0]))
     visual_stimulus_image_series = ImageSeries(name=name,

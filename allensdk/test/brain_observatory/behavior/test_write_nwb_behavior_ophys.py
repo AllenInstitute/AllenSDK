@@ -36,9 +36,9 @@ def test_add_running_data_df_to_nwbfile(nwbfile, running_data_df, roundtrip, rou
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
-def test_add_image_template(nwbfile, stimulus_templates, roundtrip, roundtripper):
+def test_add_stimulus_templates(nwbfile, stimulus_templates, roundtrip, roundtripper):
     for key, val in stimulus_templates.items():
-        nwb.add_image_template(nwbfile, val, key)
+        nwb.add_stimulus_template(nwbfile, val, key)
 
     if roundtrip:
         obt = roundtripper(nwbfile, BehaviorOphysNwbApi)
