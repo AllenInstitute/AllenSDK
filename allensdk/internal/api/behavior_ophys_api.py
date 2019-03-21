@@ -8,7 +8,7 @@ from allensdk.api.cache import memoize
 from allensdk.internal.api.ophys_lims_api import OphysLimsApi
 from allensdk.brain_observatory.behavior.sync import get_sync_data, get_stimulus_rebase_function
 from allensdk.brain_observatory.behavior.roi_processing import get_roi_metrics
-from allensdk.brain_observatory.behavior.stimulus_processing import get_stimtable, get_stimulus_template, get_stimulus_metadata
+from allensdk.brain_observatory.behavior.stimulus_processing import get_stimtable, get_stimulus_templates, get_stimulus_metadata
 from allensdk.brain_observatory.behavior.metadata_processing import get_task_parameters
 from allensdk.brain_observatory.behavior.running_processing import get_running_df
 from allensdk.brain_observatory.behavior.rewards_processing import get_rewards
@@ -131,10 +131,10 @@ class BehaviorOphysLimsApi(OphysLimsApi):
 
 
     @memoize
-    def get_stimulus_template(self, ophys_experiment_id=None):
+    def get_stimulus_templates(self, ophys_experiment_id=None):
         behavior_stimulus_file = self.get_behavior_stimulus_file(ophys_experiment_id=ophys_experiment_id)
         data = pd.read_pickle(behavior_stimulus_file)
-        return get_stimulus_template(data)
+        return get_stimulus_templates(data)
 
 
     @memoize

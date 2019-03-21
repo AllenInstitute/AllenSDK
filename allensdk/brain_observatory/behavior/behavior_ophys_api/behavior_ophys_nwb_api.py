@@ -27,8 +27,6 @@ class BehaviorOphysNwbApi(NwbApi):
 
     def get_running_data_df(self, **kwargs):
 
-        print(self.nwbfile.modules)
-
         running_speed = self.get_running_speed()
 
         running_data_df = pd.DataFrame({'speed': running_speed.values},
@@ -46,3 +44,6 @@ class BehaviorOphysNwbApi(NwbApi):
 
     def get_metadata(self, **kwargs):
         pass
+
+    def get_stimulus_templates(self, **kwargs):
+        return {key: val.data[:] for key, val in self.nwbfile.stimulus_template.items()}

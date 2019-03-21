@@ -24,3 +24,13 @@ def running_data_df(running_speed):
                          'v_in': v_in,
                          'v_sig': v_sig,
                          'dx': dx}, index=pd.Index(running_speed.timestamps, name='timestamps'))
+
+
+@pytest.fixture
+def stimulus_templates():
+
+    image_template = np.zeros((3, 4, 5))
+    image_template[1, :, :] = image_template[1, :, :] + 1
+    image_template[2, :, :] = image_template[2, :, :] + 2
+
+    return {'test': image_template}

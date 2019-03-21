@@ -52,8 +52,14 @@ class BehaviorOphysSession(LazyPropertyMixin):
                     assert_frame_equal(x1, x2)
                 elif isinstance(x1, np.ndarray):
                     np.testing.assert_array_almost_equal(x1, x2)
-                elif isinstance(x1, (dict, list)):
+                elif isinstance(x1, (list,)):
                     assert x1 == x2
+                elif isinstance(x1, (dict,)):
+                    for key in set(x1.keys()).union(set(x2.keys())):
+                        if isinstance(x1[key], (np.ndarray,)):
+                            np.testing.assert_array_almost_equal(x1[key], x2[key])
+                        else:
+                            assert x1[key] == x2[key]
                 else:
                     assert x1 == x2
 
@@ -77,7 +83,6 @@ if __name__ == "__main__":
     nwb_api.save(session)
 
     # session = BehaviorOphysSession(789359614)
-
     # print(session.max_projection)
     # print(session.stimulus_timestamps)
     # print(session.ophys_timestamps)
@@ -86,7 +91,9 @@ if __name__ == "__main__":
     # print(session.roi_metrics)
     # print(session.cell_roi_ids)
     # print(session.running_speed)
+    # print(session.running_data_df)
     # print(session.stimulus_presentations)
+    # print(session.stimulus_table)
     # print(session.stimulus_templates)
     # print(session.stimulus_metadata)
     # print(session.licks)

@@ -1,19 +1,13 @@
 import numpy as np
 import pandas as pd
-from six import iteritems, PY3
 import pickle
+from allensdk.brain_observatory.behavior import IMAGE_SETS
 
-if PY3:
+IMAGE_SETS_REV = {val:key for key, val in IMAGE_SETS.items()}
 
-    def load_pickle(pstream):
 
-        return pickle.load(pstream, encoding="bytes")
-else:
-    FileNotFoundError = IOError
-
-    def load_pickle(pstream):
-
-        return pickle.load(pstream)
+def load_pickle(pstream):
+    return pickle.load(pstream, encoding="bytes")
 
 
 def get_stimtable(data, stimulus_timestamps):
@@ -28,13 +22,13 @@ def get_stimtable(data, stimulus_timestamps):
     stimulus_table.insert(loc=4, column='end_time', value=end_time)
 
     return stimulus_table
-    
+
 
 def get_images_dict(pkl):
 
     # Sometimes the source is a zipped pickle:
-    metadata = {'image_set':pkl["items"]["behavior"]["stimuli"]["images"]["image_path"]}
-    
+    metadata = {'image_set': pkl["items"]["behavior"]["stimuli"]["images"]["image_path"]}
+
     image_set = load_pickle(open(metadata['image_set'], 'rb'))
     images = []
     images_meta = []
@@ -62,10 +56,11 @@ def get_images_dict(pkl):
     return images_dict
 
 
-def get_stimulus_template(pkl):
+def get_stimulus_templates(pkl):
 
     images = get_images_dict(pkl)
-    return np.array(images['images'])
+    image_set_filename = images['metadata']['image_set']
+    return {IMAGE_SETS_REV[image_set_filename]: np.array(images['images'])}
 
 
 def get_stimulus_metadata(pkl):
@@ -128,7 +123,7 @@ def get_visual_stimuli_df(data, time):
     stimuli = data['items']['behavior']['stimuli']
     n_frames = len(time)
     visual_stimuli_data = []
-    for stimuli_group_name, stim_dict in iteritems(stimuli):
+    for stimuli_group_name, stim_dict in stimuli.items():
         for idx, (attr_name, attr_value, _time, frame, ) in \
                 enumerate(stim_dict["set_log"]):
             orientation = attr_value if attr_name.lower() == "ori" else np.nan
