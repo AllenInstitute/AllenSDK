@@ -30,8 +30,8 @@ def spike_times():
     }
 
 
-def test_add_stimulus_table_to_file(nwbfile, stimulus_presentations, roundtripper):
-    write_nwb.add_stimulus_table_to_file(nwbfile, stimulus_presentations)
+def test_add_stimulus_presentations_to_file(nwbfile, stimulus_presentations, roundtripper):
+    write_nwb.add_stimulus_presentations_to_file(nwbfile, stimulus_presentations)
 
     api = roundtripper(nwbfile, EcephysNwbApi)
     obtained_stimulus_table = api.get_stimulus_presentations()
