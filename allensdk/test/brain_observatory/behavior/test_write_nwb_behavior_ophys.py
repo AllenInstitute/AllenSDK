@@ -36,14 +36,15 @@ def test_add_running_data_df_to_nwbfile(nwbfile, running_data_df, roundtrip, rou
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
-def test_add_image_template(nwbfile, image_template, roundtrip, roundtripper):
-    nwbfile = nwb.add_image_template(nwbfile, image_template, 'test')
+def test_add_image_template(nwbfile, stimulus_templates, roundtrip, roundtripper):
+    for key, val in stimulus_templates.items():
+        nwb.add_image_template(nwbfile, val, key)
 
     if roundtrip:
         obt = roundtripper(nwbfile, BehaviorOphysNwbApi)
     else:
         obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
 
-    print(nwbfile.stimulus['image_index'])
-
-    # pd.testing.assert_frame_equal(running_data_df, obt.get_running_data_df())
+    stimulus_templates_obt = obt.get_stimulus_templates()
+    for key in set(stimulus_templates.keys()).union(set(stimulus_templates_obt.keys())):
+        np.testing.assert_array_almost_equal(stimulus_templates[key], stimulus_templates_obt[key])

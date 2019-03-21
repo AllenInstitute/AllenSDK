@@ -42,10 +42,8 @@ class BehaviorOphysNwbApi(NwbApi):
 
         return running_data_df
 
-
     def get_metadata(self, **kwargs):
         pass
-        
 
-    def get_stimulus_template(**kwargs):
-        pass
+    def get_stimulus_templates(self, **kwargs):
+        return {key: val.data[:] for key, val in self.nwbfile.stimulus_template.items()}

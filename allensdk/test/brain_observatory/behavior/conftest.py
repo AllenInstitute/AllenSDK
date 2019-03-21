@@ -27,10 +27,10 @@ def running_data_df(running_speed):
 
 
 @pytest.fixture
-def image_template():
+def stimulus_templates():
 
     image_template = np.zeros((3, 4, 5))
     image_template[1, :, :] = image_template[1, :, :] + 1
     image_template[2, :, :] = image_template[2, :, :] + 2
 
-    return image_template
+    return {'test': image_template}
