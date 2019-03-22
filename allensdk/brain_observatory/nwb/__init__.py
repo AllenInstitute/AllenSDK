@@ -160,3 +160,18 @@ def add_stimulus_presentations(nwbfile, stimulus_table, tag='stimulus_epoch'):
     nwbfile.epochs = container
 
     return nwbfile
+
+
+def add_ophys_timestamps(nwbfile, ophys_timestamps, module_name='two_photon_imaging'):
+
+    stimulus_ts = TimeSeries(
+        name='timestamps',
+        timestamps=ophys_timestamps,
+        unit='s'
+    )
+
+    stim_mod = ProcessingModule(module_name, 'Ophys timestamps processing module')
+    nwbfile.add_processing_module(stim_mod)
+    stim_mod.add_data_interface(stimulus_ts)
+
+    return nwbfile
