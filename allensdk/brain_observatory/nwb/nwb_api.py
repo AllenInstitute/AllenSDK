@@ -33,7 +33,7 @@ class NwbApi:
 
     @classmethod
     def from_path(cls, path, **kwargs):
-        
+
         try:
             with open(path, 'r'):
                 pass

@@ -1,6 +1,6 @@
 import pynwb
 from pynwb.base import TimeSeries
-from pynwb.behavior import BehavioralTimeSeries
+from pynwb.behavior import BehavioralEvents
 from pynwb import ProcessingModule
 from pynwb.image import ImageSeries
 
