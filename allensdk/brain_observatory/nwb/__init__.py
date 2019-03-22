@@ -5,6 +5,7 @@ from pynwb import ProcessingModule
 from pynwb.image import ImageSeries
 
 from allensdk.brain_observatory.running_speed import RunningSpeed
+from allensdk.brain_observatory import dict_to_indexed_array
 
 
 def add_running_speed_to_nwbfile(nwbfile, running_speed, name='speed', unit='cm/s'):
@@ -184,3 +185,20 @@ def add_stimulus_timestamps(nwbfile, stimulus_timestamps, module_name='stimulus'
     stim_mod.add_data_interface(stimulus_ts)
 
     return nwbfile
+
+
+def add_trials(nwbfile, trials, description_dict={}):
+
+    order = list(trials.index)
+    for _, row in trials[['start_time', 'stop_time']].iterrows():
+        row_dict = row.to_dict()
+        nwbfile.add_trial(**row_dict)
+
+    for c in [c for c in trials.columns if c not in ['start_time', 'stop_time']]:
+        index, data = dict_to_indexed_array(trials[c].to_dict(), order)
+        if data.dtype == '<U1':
+            data = trials[c].values
+        if not len(data) == len(order):
+            nwbfile.add_trial_column(name=c, description=description_dict.get(c, 'NOT IMPLEMENTED: %s' % c), data=data, index=index)
+        else:
+            nwbfile.add_trial_column(name=c, description=description_dict.get(c, 'NOT IMPLEMENTED: %s' % c), data=data)

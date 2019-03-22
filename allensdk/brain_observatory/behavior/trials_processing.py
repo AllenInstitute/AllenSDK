@@ -7,7 +7,7 @@ from dateutil import parser
 from six import iteritems
 from collections import defaultdict
 
-
+TRIAL_COLUMN_DESCRIPTION_DICT = {}
 
 def resolve_initial_image(stimuli, start_frame):
     """Attempts to resolve the initial image for a given start_frame for a trial
@@ -54,17 +54,17 @@ def get_trials(data, stimulus_timestamps_no_monitor_delay, licks_df, rewards_df,
     sync_lick_times = licks_df.time.values
     rebased_reward_times = rewards_df.time.values
     for trial in data["items"]["behavior"]["trial_log"]:
-        event_dict = {(e[0], e[1]):rebase(e[2]) for e in trial['events']}
-        
+        event_dict = {(e[0], e[1]): rebase(e[2]) for e in trial['events']}
+
         trial_data['trial'].append(trial["index"])
 
         start_time = event_dict['trial_start', '']
         trial_data['start_time'].append(start_time)
 
-        end_time = event_dict['trial_end', '']
-        trial_data['end_time'].append(end_time)
+        stop_time = event_dict['trial_end', '']
+        trial_data['stop_time'].append(stop_time)
 
-        trial_length = end_time - start_time
+        trial_length = stop_time - start_time
         trial_data['trial_length'].append(trial_length)
 
         catch = trial["trial_params"]["catch"] == True
@@ -76,10 +76,10 @@ def get_trials(data, stimulus_timestamps_no_monitor_delay, licks_df, rewards_df,
         go = not catch and not auto_rewarded
         trial_data['go'].append(go)
 
-        lick_events = [rebase(lick_tuple[0])  for lick_tuple in trial["licks"]]
+        lick_events = [rebase(lick_tuple[0]) for lick_tuple in trial["licks"]]
         trial_data['lick_events'].append(lick_events)
 
-        lick_times = sync_lick_times[np.where(np.logical_and(sync_lick_times >= start_time, sync_lick_times <= end_time))]
+        lick_times = sync_lick_times[np.where(np.logical_and(sync_lick_times >= start_time, sync_lick_times <= stop_time))]
         trial_data['lick_times'].append(lick_times)
 
         aborted = ("abort", "") in event_dict
@@ -100,7 +100,7 @@ def get_trials(data, stimulus_timestamps_no_monitor_delay, licks_df, rewards_df,
         miss = ('miss', "") in event_dict
         trial_data['miss'].append(miss)
 
-        reward_times = rebased_reward_times[np.where(np.logical_and(rebased_reward_times >= start_time, rebased_reward_times <= end_time))]
+        reward_times = rebased_reward_times[np.where(np.logical_and(rebased_reward_times >= start_time, rebased_reward_times <= stop_time))]
         trial_data['reward_times'].append(reward_times)
 
         sham_change = True if ('sham_change', '') in event_dict else False
@@ -121,7 +121,6 @@ def get_trials(data, stimulus_timestamps_no_monitor_delay, licks_df, rewards_df,
                 response_latency = float("inf")
         trial_data['response_latency'].append(response_latency)
 
-
         trial_start_frame = trial["events"][0][3]
         _, _, initial_image_name = resolve_initial_image(stimuli, trial_start_frame)
         if len(trial["stimulus_changes"]) == 0:
@@ -133,6 +132,7 @@ def get_trials(data, stimulus_timestamps_no_monitor_delay, licks_df, rewards_df,
         trial_data['initial_image_name'].append(initial_image_name)
         trial_data['change_image_name'].append(change_image_name)
 
-    trials = pd.DataFrame(trial_data)
+    trials = pd.DataFrame(trial_data).set_index('trial')
+    trials.index = trials.index.rename('trials_id')
 
     return trials

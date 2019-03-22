@@ -5,6 +5,7 @@ import allensdk.brain_observatory.nwb as nwb
 import numpy as np
 
 from allensdk.brain_observatory.nwb.nwb_api import NwbApi
+from allensdk.brain_observatory.behavior.trials_processing import TRIAL_COLUMN_DESCRIPTION_DICT
 
 
 class BehaviorOphysNwbApi(NwbApi):
@@ -33,7 +34,10 @@ class BehaviorOphysNwbApi(NwbApi):
             nwb.add_stimulus_template(nwbfile, val, key)
 
         # Add stimulus presentations data to NWB in-memory object:
-        nwb.add_stimulus_presentations_to_file(nwbfile, session_object.stimulus_presentations)
+        nwb.add_stimulus_presentations(nwbfile, session_object.stimulus_presentations)
+
+        # Add trials data to NWB in-memory object:
+        nwb.add_trials(nwbfile, session_object.trials, TRIAL_COLUMN_DESCRIPTION_DICT)
 
         # Write the file:
         with NWBHDF5IO(self.path, 'w') as nwb_file_writer:
@@ -64,16 +68,13 @@ class BehaviorOphysNwbApi(NwbApi):
     def get_stimulus_templates(self, **kwargs):
         return {key: val.data[:] for key, val in self.nwbfile.stimulus_template.items()}
 
-    def get_stimulus_presentations(self) -> pd.DataFrame:
-        table = pd.DataFrame({
-            col.name: col.data for col in self.nwbfile.epochs.columns
-            if col.name not in set(['tags', 'timeseries', 'tags_index', 'timeseries_index'])
-        }, index=pd.Index(name='stimulus_presentations_id', data=self.nwbfile.epochs.id.data))
-        table.index = table.index.astype(int)
-        return table
-
     def get_ophys_timestamps(self) -> np.ndarray:
         return self.nwbfile.modules['two_photon_imaging'].get_data_interface('timestamps').timestamps
 
     def get_stimulus_timestamps(self) -> np.ndarray:
         return self.nwbfile.modules['stimulus'].get_data_interface('timestamps').timestamps
+
+    def get_trials(self) -> pd.DataFrame:
+        trials = self.nwbfile.trials.to_dataframe()
+        trials.index = trials.index.rename('trials_id')
+        return trials

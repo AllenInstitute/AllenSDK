@@ -17,6 +17,7 @@ from allensdk.brain_observatory.running_speed import RunningSpeed
 from ._schemas import InputSchema, OutputSchema
 from allensdk.brain_observatory.nwb import add_running_speed_to_nwbfile, add_stimulus_presentations
 from allensdk.brain_observatory.argschema_utilities import write_or_print_outputs
+from allensdk.brain_observatory import dict_to_indexed_array
 
 
 STIM_TABLE_RENAMES_MAP = {
@@ -270,28 +271,6 @@ def prepare_probewise_channel_table(channels, electrode_group):
 
     channel_table['group'] = electrode_group
     return channel_table
-
-
-def dict_to_indexed_array(dc, order=None):
-    ''' Given a dictionary and an ordered arr, build a concatenation of the dictionary's values and an index describing 
-    how that concatenation can be unpacked
-    '''
-
-    if order is None:
-        order = dc.keys()
-
-    data = []
-    index = []
-    counter = 0
-
-    for ii, key in enumerate(order):
-        data.append(dc[key])
-        counter += len(dc[key])
-        index.append(counter)
-
-    data = np.concatenate(data)
-
-    return index, data
 
 
 def add_ragged_data_to_dynamic_table(table, data, column_name, column_description=''):
