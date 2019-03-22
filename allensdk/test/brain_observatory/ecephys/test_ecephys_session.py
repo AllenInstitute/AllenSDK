@@ -252,3 +252,15 @@ def test_get_stimulus_parameter_values(just_stimulus_table_api):
     for k, v in expected.items():
         assert np.allclose(v, obtained[k])
     assert len(expected) == len(obtained)
+
+
+def test_get_presentations_for_stimulus(just_stimulus_table_api, raw_stimulus_table):
+    session = EcephysSession(api=just_stimulus_table_api)
+    obtained = session.get_presentations_for_stimulus(['a'])
+
+    expected = raw_stimulus_table.loc[:2, [
+        'start_time', 'stop_time', 'stimulus_name', 'stimulus_block', 'Color', 'Phase'
+    ]]
+    expected['is_movie'] = False
+
+    pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)

@@ -149,6 +149,25 @@ class EcephysSession(LazyPropertyMixin):
         self.units = self.LazyProperty(self.api.get_units, wrappers=[self._build_units_table])
 
 
+    def get_presentations_for_stimulus(self, stimulus_names):
+        '''Get a subset of stimulus presentations by name, with irrelevant parameters filtered off
+
+        Parameters
+        ----------
+        stimulus_names : array-like of str
+            The names of stimuli to include in the output.
+
+        Returns
+        -------
+        pd.DataFrame :
+            Rows are filtered presentations, columns are the relevant subset of stimulus parameters
+
+        '''
+
+        filtered_presentations = self.stimulus_presentations[self.stimulus_presentations['stimulus_name'].isin(stimulus_names)]
+        return removed_unused_stimulus_presentation_columns(filtered_presentations)
+
+
     def presentationwise_spike_counts(self, 
         bin_edges, 
         stimulus_presentation_ids, 
