@@ -1,6 +1,6 @@
 import pynwb
 from pynwb.base import TimeSeries
-from pynwb.behavior import BehavioralTimeSeries
+from pynwb.behavior import BehavioralEvents
 from pynwb import ProcessingModule
 from pynwb.image import ImageSeries
 
@@ -202,3 +202,23 @@ def add_trials(nwbfile, trials, description_dict={}):
             nwbfile.add_trial_column(name=c, description=description_dict.get(c, 'NOT IMPLEMENTED: %s' % c), data=data, index=index)
         else:
             nwbfile.add_trial_column(name=c, description=description_dict.get(c, 'NOT IMPLEMENTED: %s' % c), data=data)
+
+
+def add_licks(nwbfile, licks):
+
+    licks_event_series = TimeSeries(
+        name='timestamps',
+        timestamps=licks,
+        unit='s'
+    )
+
+    # Add lick event timeseries to lick interface:
+    licks_interface = BehavioralEvents([licks_event_series], 'licks')
+
+    # Add lick interface to nwb file, by way of a processing module:
+    licks_mod = ProcessingModule('licking', 'Licking behavior processing module')
+    licks_mod.add_data_interface(licks_interface)
+    nwbfile.add_processing_module(licks_mod)
+
+    return nwbfile
+
