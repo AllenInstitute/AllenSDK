@@ -39,6 +39,9 @@ class BehaviorOphysNwbApi(NwbApi):
         # Add trials data to NWB in-memory object:
         nwb.add_trials(nwbfile, session_object.trials, TRIAL_COLUMN_DESCRIPTION_DICT)
 
+        # Add licks data to NWB in-memory object:
+        nwb.add_licks(nwbfile, session_object.licks)
+
         # Write the file:
         with NWBHDF5IO(self.path, 'w') as nwb_file_writer:
             nwb_file_writer.write(nwbfile)
@@ -78,3 +81,7 @@ class BehaviorOphysNwbApi(NwbApi):
         trials = self.nwbfile.trials.to_dataframe()
         trials.index = trials.index.rename('trials_id')
         return trials
+
+    def get_licks(self) -> np.ndarray:
+        return self.nwbfile.modules['licking'].get_data_interface('licks')['timestamps'].timestamps[:]
+

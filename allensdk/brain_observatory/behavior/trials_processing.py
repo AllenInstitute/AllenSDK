@@ -44,14 +44,11 @@ def resolve_initial_image(stimuli, start_frame):
     return initial_image_category_name, initial_image_group, initial_image_name
 
 
-
-def get_trials(data, stimulus_timestamps_no_monitor_delay, licks_df, rewards_df, rebase):
+def get_trials(data, stimulus_timestamps_no_monitor_delay, sync_lick_times, rewards_df, rebase):
 
     stimuli = data["items"]["behavior"]["stimuli"]
 
-    event_set = set()
     trial_data = defaultdict(list)
-    sync_lick_times = licks_df.time.values
     rebased_reward_times = rewards_df.time.values
     for trial in data["items"]["behavior"]["trial_log"]:
         event_dict = {(e[0], e[1]): rebase(e[2]) for e in trial['events']}
@@ -90,7 +87,7 @@ def get_trials(data, stimulus_timestamps_no_monitor_delay, licks_df, rewards_df,
 
         hit = ('hit', "") in event_dict
         trial_data['hit'].append(hit)
-        
+
         false_alarm = ('false_alarm', "") in event_dict
         trial_data['false_alarm'].append(false_alarm)
 
