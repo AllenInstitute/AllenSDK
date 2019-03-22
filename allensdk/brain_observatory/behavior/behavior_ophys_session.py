@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from pandas.util.testing import assert_frame_equal
+from typing import NamedTuple
 
 from allensdk.core.lazy_property import LazyProperty, LazyPropertyMixin
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
@@ -52,7 +53,7 @@ class BehaviorOphysSession(LazyPropertyMixin):
                 elif isinstance(x1, (dict, list)):
                     assert x1 == x2
                 else:
-                    raise Exception('Comparator not implemented')
+                    assert x1 == x2
 
         except NotImplementedError as e:
             self_implements_get_field = hasattr(self.api, getattr(type(self), field).getter_name)
