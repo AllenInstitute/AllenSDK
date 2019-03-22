@@ -2,6 +2,7 @@ import datetime
 from pynwb import NWBFile, NWBHDF5IO
 import pandas as pd
 import allensdk.brain_observatory.nwb as nwb
+import numpy as np
 
 from allensdk.brain_observatory.nwb.nwb_api import NwbApi
 
@@ -19,6 +20,8 @@ class BehaviorOphysNwbApi(NwbApi):
 
         unit_dict = {'v_sig': 'V', 'v_in': 'V', 'speed': 'cm/s', 'timestamps': 's', 'dx': 'cm'}
         nwb.add_running_data_df_to_nwbfile(nwbfile, session_object.running_data_df, unit_dict)
+
+        nwb.add_ophys_timestamps(nwbfile, session_object.ophys_timestamps)
 
         with NWBHDF5IO(self.path, 'w') as nwb_file_writer:
             nwb_file_writer.write(nwbfile)
@@ -55,3 +58,6 @@ class BehaviorOphysNwbApi(NwbApi):
         }, index=pd.Index(name='stimulus_presentations_id', data=self.nwbfile.epochs.id.data))
         table.index = table.index.astype(int)
         return table
+
+    def get_ophys_timestamps(self) -> np.ndarray:
+        return self.nwbfile.modules['2p_acquisition'].get_data_interface('timestamps').timestamps
