@@ -34,3 +34,8 @@ def stimulus_templates():
     image_template[2, :, :] = image_template[2, :, :] + 2
 
     return {'test': image_template}
+
+
+@pytest.fixture
+def ophys_timestamps():
+    return np.array([1., 2., 3.])
