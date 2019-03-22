@@ -18,11 +18,24 @@ class BehaviorOphysNwbApi(NwbApi):
             file_create_date=datetime.datetime.now()
         )
 
+        # Add stimulus_timestamps to NWB in-memory object:
+        nwb.add_stimulus_timestamps(nwbfile, session_object.stimulus_timestamps)
+
+        # Add running data to NWB in-memory object:
         unit_dict = {'v_sig': 'V', 'v_in': 'V', 'speed': 'cm/s', 'timestamps': 's', 'dx': 'cm'}
         nwb.add_running_data_df_to_nwbfile(nwbfile, session_object.running_data_df, unit_dict)
 
+        # Add ophys to NWB in-memory object:
         nwb.add_ophys_timestamps(nwbfile, session_object.ophys_timestamps)
 
+        # Add stimulus template data to NWB in-memory object:
+        for key, val in session_object.stimulus_templates.items():
+            nwb.add_stimulus_template(nwbfile, val, key)
+
+        # Add stimulus presentations data to NWB in-memory object:
+        nwb.add_stimulus_presentations_to_file(nwbfile, session_object.stimulus_presentations)
+
+        # Write the file:
         with NWBHDF5IO(self.path, 'w') as nwb_file_writer:
             nwb_file_writer.write(nwbfile)
 
@@ -61,3 +74,6 @@ class BehaviorOphysNwbApi(NwbApi):
 
     def get_ophys_timestamps(self) -> np.ndarray:
         return self.nwbfile.modules['two_photon_imaging'].get_data_interface('timestamps').timestamps
+
+    def get_stimulus_timestamps(self) -> np.ndarray:
+        return self.nwbfile.modules['stimulus'].get_data_interface('timestamps').timestamps
