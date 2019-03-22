@@ -146,14 +146,7 @@ def add_stimulus_presentations(nwbfile, stimulus_table, tag='stimulus_epoch'):
     '''
     stimulus_table = stimulus_table.copy()
 
-    ts = pynwb.base.TimeSeries(
-        name='stimulus_times',
-        timestamps=stimulus_table['start_time'].values,
-        data=stimulus_table['stop_time'].values - stimulus_table['start_time'].values,
-        unit='s',
-        description='start times (timestamps) and durations (data) of stimulus presentation epochs'
-    )
-    nwbfile.add_acquisition(ts)
+    ts = nwbfile.modules['stimulus'].get_data_interface('timestamps')
 
     for colname, series in stimulus_table.items():
         types = set(series.map(type))
@@ -166,5 +159,20 @@ def add_stimulus_presentations(nwbfile, stimulus_table, tag='stimulus_epoch'):
 
     container = pynwb.epoch.TimeIntervals.from_dataframe(stimulus_table, 'epochs')
     nwbfile.epochs = container
+
+    return nwbfile
+
+
+def add_stimulus_timestamps(nwbfile, stimulus_timestamps, module_name='stimulus'):
+
+    stimulus_ts = TimeSeries(
+        name='timestamps',
+        timestamps=stimulus_timestamps,
+        unit='s'
+    )
+
+    stim_mod = ProcessingModule(module_name, 'Stimulus Times processing')
+    nwbfile.add_processing_module(stim_mod)
+    stim_mod.add_data_interface(stimulus_ts)
 
     return nwbfile
