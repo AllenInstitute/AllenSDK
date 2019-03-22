@@ -135,6 +135,11 @@ class EcephysSession(LazyPropertyMixin):
         return self.stimulus_presentations.shape[0]
 
 
+    @property
+    def stimulus_names(self):
+        return self.stimulus_presentations['stimulus_name'].unique().tolist()
+
+
     def __init__(self, api, **kwargs):
         self.api: EcephysApi  = api
 
