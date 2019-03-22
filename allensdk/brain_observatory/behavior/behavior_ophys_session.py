@@ -99,6 +99,8 @@ if __name__ == "__main__":
     # print(session.rewards)
     # print(session.task_parameters)
     # print(session.trials)
+    # for key, val in list(session.trials.iterrows())[0][1].to_dict().items():
+    #     print(key, val)
     # print(session.corrected_fluorescence_traces)
     # print(session.average_image)
     # print(session.motion_correction)

@@ -88,3 +88,16 @@ def test_add_stimulus_timestamps(nwbfile, stimulus_timestamps, roundtrip, roundt
 
     np.testing.assert_array_almost_equal(stimulus_timestamps, obt.get_stimulus_timestamps())
 
+
+@pytest.mark.parametrize('roundtrip', [True, False])
+def test_add_trials(nwbfile, roundtrip, roundtripper, trials):
+
+    nwb.add_trials(nwbfile, trials, {})
+
+    if roundtrip:
+        obt = roundtripper(nwbfile, BehaviorOphysNwbApi)
+    else:
+        obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
+
+    pd.testing.assert_frame_equal(trials, obt.get_trials(), check_dtype=False)
+
