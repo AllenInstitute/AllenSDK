@@ -3,6 +3,7 @@ import os
 from datetime import datetime
 import pynwb
 import pandas as pd
+import numpy as np
 
 
 @pytest.fixture
@@ -43,3 +44,8 @@ def roundtripper(tmpdir_factory):
 
         return api(nwb_path)
     return f
+
+
+@pytest.fixture
+def stimulus_timestamps():
+    return np.array([1., 2., 3.])
