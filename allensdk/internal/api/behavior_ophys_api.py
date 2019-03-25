@@ -147,7 +147,7 @@ class BehaviorOphysLimsApi(OphysLimsApi):
     @memoize
     def get_licks(self, ophys_experiment_id=None, use_acq_trigger=False):
         lick_times = self.get_sync_data(ophys_experiment_id=ophys_experiment_id, use_acq_trigger=use_acq_trigger)['lick_times']
-        return lick_times
+        return pd.DataFrame(data={"time": lick_times, })
 
 
     @memoize

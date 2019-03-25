@@ -112,4 +112,17 @@ def test_add_licks(nwbfile, roundtrip, roundtripper, licks):
     else:
         obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
 
-    np.testing.assert_array_almost_equal(licks, obt.get_licks())
+    pd.testing.assert_frame_equal(licks, obt.get_licks(), check_dtype=False)
+
+
+@pytest.mark.parametrize('roundtrip', [True, False])
+def test_add_rewards(nwbfile, roundtrip, roundtripper, rewards):
+
+    nwb.add_rewards(nwbfile, rewards)
+
+    if roundtrip:
+        obt = roundtripper(nwbfile, BehaviorOphysNwbApi)
+    else:
+        obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
+
+    pd.testing.assert_frame_equal(rewards, obt.get_rewards(), check_dtype=False)

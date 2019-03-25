@@ -1,6 +1,7 @@
 import pandas as pd
 from collections import defaultdict
 
+
 def get_rewards(data, time, stimulus_rebase_function):
     trial_df = pd.DataFrame(data["items"]["behavior"]['trial_log'])
     rewards_dict = defaultdict(dict)
@@ -9,5 +10,6 @@ def get_rewards(data, time, stimulus_rebase_function):
         if rewards:
             rewards_dict["volume"][idx] = rewards[0][0]
             rewards_dict["time"][idx] = stimulus_rebase_function(time[rewards[0][2]])
-            rewards_dict["lickspout"][idx] = None  # not yet implemented in the foraging2 output
-    return pd.DataFrame(data=rewards_dict)[['volume', 'time', 'lickspout']]
+            rewards_dict["autorewarded"][idx] = 'auto_rewarded' in trial['trial_params']
+
+    return pd.DataFrame(data=rewards_dict)[['volume', 'time', 'autorewarded']]

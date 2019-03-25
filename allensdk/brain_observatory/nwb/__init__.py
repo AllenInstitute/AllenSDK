@@ -208,7 +208,7 @@ def add_licks(nwbfile, licks):
 
     licks_event_series = TimeSeries(
         name='timestamps',
-        timestamps=licks,
+        timestamps=licks.time.values,
         unit='s'
     )
 
@@ -222,3 +222,33 @@ def add_licks(nwbfile, licks):
 
     return nwbfile
 
+
+def add_rewards(nwbfile, rewards_df):
+
+    reward_timestamps_ts = TimeSeries(
+        name='timestamps',
+        timestamps=rewards_df.time.values,
+        unit='s'
+    )
+
+    reward_volume_ts = TimeSeries(
+        name='volume',
+        data=rewards_df.volume.values,
+        timestamps=reward_timestamps_ts,
+        unit='ml'
+    )
+
+    autorewarded_ts = TimeSeries(
+        name='autorewarded',
+        data=rewards_df.autorewarded.values,
+        timestamps=reward_timestamps_ts,
+        unit=None
+    )
+
+    rewards_mod = ProcessingModule('rewards', 'Licking behavior processing module')
+    rewards_mod.add_data_interface(reward_timestamps_ts)
+    rewards_mod.add_data_interface(reward_volume_ts)
+    rewards_mod.add_data_interface(autorewarded_ts)
+    nwbfile.add_processing_module(rewards_mod)
+
+    return nwbfile

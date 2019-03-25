@@ -42,6 +42,9 @@ class BehaviorOphysNwbApi(NwbApi):
         # Add licks data to NWB in-memory object:
         nwb.add_licks(nwbfile, session_object.licks)
 
+        # Add rewards data to NWB in-memory object:
+        nwb.add_rewards(nwbfile, session_object.rewards)
+
         # Write the file:
         with NWBHDF5IO(self.path, 'w') as nwb_file_writer:
             nwb_file_writer.write(nwbfile)
@@ -83,5 +86,11 @@ class BehaviorOphysNwbApi(NwbApi):
         return trials
 
     def get_licks(self) -> np.ndarray:
-        return self.nwbfile.modules['licking'].get_data_interface('licks')['timestamps'].timestamps[:]
+        return pd.DataFrame({'time': self.nwbfile.modules['licking'].get_data_interface('licks')['timestamps'].timestamps[:]})
 
+    def get_rewards(self) -> np.ndarray:
+        time = self.nwbfile.modules['rewards'].get_data_interface('timestamps').timestamps[:]
+        autorewarded = self.nwbfile.modules['rewards'].get_data_interface('autorewarded').data[:]
+        volume = self.nwbfile.modules['rewards'].get_data_interface('volume').data[:]
+
+        return pd.DataFrame({'time': time, 'volume': volume, 'autorewarded': autorewarded})
