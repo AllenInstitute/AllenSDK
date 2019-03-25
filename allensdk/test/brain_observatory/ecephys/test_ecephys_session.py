@@ -283,3 +283,4 @@ def test_filter_owned_df_scalar(just_stimulus_table_api):
 
     assert w[-1].message.args[0] == 'a scalar (3) was provided as ids, filtering to a single row of stimulus_presentations.'
     assert obtained['Phase'].values[0] == 180
+
