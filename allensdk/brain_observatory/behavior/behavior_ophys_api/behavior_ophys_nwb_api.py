@@ -3,9 +3,11 @@ from pynwb import NWBFile, NWBHDF5IO
 import pandas as pd
 import allensdk.brain_observatory.nwb as nwb
 import numpy as np
+import SimpleITK as sitk
 
 from allensdk.brain_observatory.nwb.nwb_api import NwbApi
 from allensdk.brain_observatory.behavior.trials_processing import TRIAL_COLUMN_DESCRIPTION_DICT
+from allensdk.brain_observatory.image_api import ImageApi
 
 
 class BehaviorOphysNwbApi(NwbApi):
@@ -44,6 +46,9 @@ class BehaviorOphysNwbApi(NwbApi):
 
         # Add rewards data to NWB in-memory object:
         nwb.add_rewards(nwbfile, session_object.rewards)
+
+        # Add rewards data to NWB in-memory object:
+        nwb.add_max_projection(nwbfile, session_object.max_projection)
 
         # Write the file:
         with NWBHDF5IO(self.path, 'w') as nwb_file_writer:
@@ -94,3 +99,15 @@ class BehaviorOphysNwbApi(NwbApi):
         volume = self.nwbfile.modules['rewards'].get_data_interface('volume').data[:]
 
         return pd.DataFrame({'time': time, 'volume': volume, 'autorewarded': autorewarded})
+
+    def get_max_projection(self, image_api=None) -> sitk.Image:
+
+        if image_api is None:
+            image_api = ImageApi
+
+        nwb_img = self.nwbfile.modules['two_photon_imaging'].get_data_interface('images')['max_projection']
+        data = nwb_img.data
+        resolution = nwb_img.resolution  # px/cm
+        spacing = [resolution * 10, resolution * 10]
+
+        return ImageApi.serialize(data, spacing, 'mm')

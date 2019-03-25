@@ -1,11 +1,12 @@
 import pynwb
-from pynwb.base import TimeSeries
+from pynwb.base import TimeSeries, Images
 from pynwb.behavior import BehavioralEvents
 from pynwb import ProcessingModule
-from pynwb.image import ImageSeries
+from pynwb.image import ImageSeries, GrayscaleImage
 
 from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory import dict_to_indexed_array
+from allensdk.brain_observatory.image_api import ImageApi
 
 
 def add_running_speed_to_nwbfile(nwbfile, running_speed, name='speed', unit='cm/s'):
@@ -251,4 +252,29 @@ def add_rewards(nwbfile, rewards_df):
     rewards_mod.add_data_interface(autorewarded_ts)
     nwbfile.add_processing_module(rewards_mod)
 
+    return nwbfile
+
+
+def add_max_projection(nwbfile, max_projection, image_api=None):
+
+    description = 'Maximum projection, at pixels/cm resolution'
+
+    if image_api is None:
+        image_api = ImageApi
+
+    data, spacing, unit = ImageApi.deserialize(max_projection)
+    assert spacing[0] == spacing[1] and len(spacing) == 2
+
+    max_projection_image = GrayscaleImage('max_projection', data, resolution=spacing[0] / 10, description=description)
+
+    images = Images(name='images')
+    images.add_image(max_projection_image)
+
+    if 'two_photon_imaging' not in nwbfile.modules:
+        ophys_mod = ProcessingModule('two_photon_imaging', 'Ophys timestamps processing module')
+        nwbfile.add_processing_module(ophys_mod)
+    else:
+        ophys_mod = nwbfile.modules['two_photon_imaging']
+    ophys_mod.add_data_interface(images)
+    
     return nwbfile
