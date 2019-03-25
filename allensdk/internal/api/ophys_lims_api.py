@@ -6,6 +6,7 @@ import h5py
 
 from . import PostgresQueryMixin, OneOrMoreResultExpectedError
 from allensdk.api.cache import memoize
+from allensdk.brain_observatory.image_api import ImageApi
 
 class OphysLimsApi(PostgresQueryMixin):
     ''' hello
@@ -61,10 +62,17 @@ class OphysLimsApi(PostgresQueryMixin):
 
 
     @memoize
-    def get_max_projection(self, ophys_experiment_id=None):
+    def get_max_projection(self, ophys_experiment_id=None, image_api=None):
+
+        if image_api is None:
+            image_api = ImageApi
+
         maxInt_a13_file = self.get_maxint_file(ophys_experiment_id=ophys_experiment_id)
+        platform_json_file = self.get_ophys_platform_json(ophys_experiment_id=ophys_experiment_id)
+        platform_data = json.load(open(platform_json_file, 'r'))
+        pixel_size = float(platform_data['registration']['surface_2p']['pixel_size_um'])
         max_projection = mpimg.imread(maxInt_a13_file)
-        return max_projection
+        return ImageApi.serialize(max_projection, [pixel_size / 1000., pixel_size / 1000.], 'mm')
 
 
     @memoize
@@ -286,3 +294,14 @@ class OphysLimsApi(PostgresQueryMixin):
         with h5py.File(dff_path, 'r') as raw_file:
             dff_traces = np.asarray(raw_file['data'])
         return dff_traces
+
+    @memoize
+    def get_ophys_platform_json(self, ophys_experiment_id=None):
+        query = '''
+                SELECT wkf.storage_directory || wkf.filename AS transform_file
+                FROM ophys_experiments oe
+                JOIN ophys_sessions os ON oe.ophys_session_id = os.id
+                LEFT JOIN well_known_files wkf ON wkf.attachable_id=os.id AND wkf.attachable_type = 'OphysSession' AND wkf.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'OphysPlatformJson')
+                WHERE oe.id= {};
+                '''.format(ophys_experiment_id)
+        return self.fetchone(query, strict=True)
