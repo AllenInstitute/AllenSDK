@@ -1,5 +1,6 @@
 import warnings
 import re
+from collections.abc import Collection
 
 import xarray as xr
 import numpy as np
@@ -504,15 +505,22 @@ class EcephysSession(LazyPropertyMixin):
 
         return output_waveforms
 
-    def _filter_owned_df(self, key, ids=None, copy=True):
+    def _filter_owned_df(self, key, ids=None, copy=True, warn_on_scalar=True):
 
         df = getattr(self, key)
 
         if copy:
             df = df.copy()
 
-        if ids is not None:
-            df = df.loc[ids]
+        if ids is None:
+            return df
+        
+        if not isinstance(ids, Collection):
+            if warn_on_scalar:
+                warnings.warn(f'a scalar ({ids}) was provided as ids, filtering to a single row of {key}.')
+            ids = [ids]
+                
+        df = df.loc[ids]
 
         if df.shape[0] == 0:
             warnings.warn(f'filtering to an empty set of {key}!')
