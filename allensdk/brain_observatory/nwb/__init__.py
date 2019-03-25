@@ -202,3 +202,53 @@ def add_trials(nwbfile, trials, description_dict={}):
             nwbfile.add_trial_column(name=c, description=description_dict.get(c, 'NOT IMPLEMENTED: %s' % c), data=data, index=index)
         else:
             nwbfile.add_trial_column(name=c, description=description_dict.get(c, 'NOT IMPLEMENTED: %s' % c), data=data)
+
+
+def add_licks(nwbfile, licks):
+
+    licks_event_series = TimeSeries(
+        name='timestamps',
+        timestamps=licks.time.values,
+        unit='s'
+    )
+
+    # Add lick event timeseries to lick interface:
+    licks_interface = BehavioralEvents([licks_event_series], 'licks')
+
+    # Add lick interface to nwb file, by way of a processing module:
+    licks_mod = ProcessingModule('licking', 'Licking behavior processing module')
+    licks_mod.add_data_interface(licks_interface)
+    nwbfile.add_processing_module(licks_mod)
+
+    return nwbfile
+
+
+def add_rewards(nwbfile, rewards_df):
+
+    reward_timestamps_ts = TimeSeries(
+        name='timestamps',
+        timestamps=rewards_df.time.values,
+        unit='s'
+    )
+
+    reward_volume_ts = TimeSeries(
+        name='volume',
+        data=rewards_df.volume.values,
+        timestamps=reward_timestamps_ts,
+        unit='ml'
+    )
+
+    autorewarded_ts = TimeSeries(
+        name='autorewarded',
+        data=rewards_df.autorewarded.values,
+        timestamps=reward_timestamps_ts,
+        unit=None
+    )
+
+    rewards_mod = ProcessingModule('rewards', 'Licking behavior processing module')
+    rewards_mod.add_data_interface(reward_timestamps_ts)
+    rewards_mod.add_data_interface(reward_volume_ts)
+    rewards_mod.add_data_interface(autorewarded_ts)
+    nwbfile.add_processing_module(rewards_mod)
+
+    return nwbfile
