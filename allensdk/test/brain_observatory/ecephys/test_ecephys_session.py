@@ -264,3 +264,22 @@ def test_get_presentations_for_stimulus(just_stimulus_table_api, raw_stimulus_ta
     expected['is_movie'] = False
 
     pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)
+
+
+def test_filter_owned_df(just_stimulus_table_api):
+    session = EcephysSession(api=just_stimulus_table_api)
+    ids = [0, 2]
+    obtained = session._filter_owned_df('stimulus_presentations', ids)
+
+    assert np.allclose([0, 120], obtained['Phase'].values)
+
+
+def test_filter_owned_df_scalar(just_stimulus_table_api):
+    session = EcephysSession(api=just_stimulus_table_api)
+    ids = 3
+
+    with pytest.warns(UserWarning) as w:
+        obtained = session._filter_owned_df('stimulus_presentations', ids)
+
+    assert w[-1].message.args[0] == 'a scalar (3) was provided as ids, filtering to a single row of stimulus_presentations.'
+    assert obtained['Phase'].values[0] == 180
