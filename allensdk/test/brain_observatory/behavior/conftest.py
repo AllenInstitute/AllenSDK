@@ -53,7 +53,11 @@ def trials():
     }, index=pd.Index(name='trials_id', data=[0, 1, 2, 3, 4]))
 
 
-
 @pytest.fixture
 def licks():
-    return np.array([1., 2., 3.])
+    return pd.DataFrame({'time': [1., 2., 3.]})
+
+
+@pytest.fixture
+def rewards():
+    return pd.DataFrame({'time': [1., 2., 3.], 'volume': [.01, .01, .01], 'autorewarded': [True, False, False]})
