@@ -39,3 +39,15 @@ def stimulus_templates():
 @pytest.fixture
 def ophys_timestamps():
     return np.array([1., 2., 3.])
+
+
+@pytest.fixture
+def trials():
+    return pd.DataFrame({
+        'start_time': [1., 2., 4., 5., 6.],
+        'stop_time': [2., 4., 5., 6., 8.],
+        'a': [0.5, 0.4, 0.3, 0.2, 0.1],
+        'b': [[], [1], [2, 2], [3], []],
+        'c': ['a', 'bb', 'ccc', 'dddd', 'eeeee'],
+        'd': [np.array([1]), np.array([1, 2]), np.array([1, 2, 3]), np.array([1, 2, 3, 4]), np.array([1, 2, 3, 4, 5])],
+    }, index=pd.Index(name='trials_id', data=[0, 1, 2, 3, 4]))
