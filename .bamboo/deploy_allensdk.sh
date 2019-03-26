@@ -1,7 +1,7 @@
 set -eu
 
 export HOME=${bamboo_PRODUCTION_HOME}
-export TMPDIR=${bamboo_PRODUCTION_HOME}/tmp
+export TMPDIR=${bamboo_build_working_directory}/tmp
 export PATH=/allen/aibs/technology/conda/shared/miniconda/bin:$PATH
 
 export CONDA_PATH_BACKUP=${CONDA_PATH_BACKUP:-$PATH}
@@ -22,11 +22,10 @@ source activate ${bamboo_NEXT_PRODUCTION_ENVIRONMENT}
 conda install -y mpi4py 
 conda install -y -c conda-forge opencv
 
-pip install -e .
-pip install -r internal_requirements.txt
-
 files=( artifacts/*.whl )
 pip install ${files[0]}
+
+pip install -r internal_requirements.txt
 
 source deactivate
 
