@@ -3,6 +3,8 @@ import pandas as pd
 import pytest
 import numpy as np
 
+from allensdk.brain_observatory.image_api import ImageApi
+
 
 def pytest_ignore_collect(path, config):
     ''' The brain_observatory.ecephys submodule uses python 3.6 features that may not be backwards compatible!
@@ -61,3 +63,13 @@ def licks():
 @pytest.fixture
 def rewards():
     return pd.DataFrame({'time': [1., 2., 3.], 'volume': [.01, .01, .01], 'autorewarded': [True, False, False]})
+
+
+@pytest.fixture
+def image_api():
+    return ImageApi
+
+
+@pytest.fixture
+def max_projection(image_api):
+    return image_api.serialize(np.array([[1, 2], [3, 4]]), [.1, .1], 'mm')

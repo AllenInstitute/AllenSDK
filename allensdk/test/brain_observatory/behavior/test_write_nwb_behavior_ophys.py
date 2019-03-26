@@ -126,3 +126,16 @@ def test_add_rewards(nwbfile, roundtrip, roundtripper, rewards):
         obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
 
     pd.testing.assert_frame_equal(rewards, obt.get_rewards(), check_dtype=False)
+
+
+@pytest.mark.parametrize('roundtrip', [True, False])
+def test_add_max_projection(nwbfile, roundtrip, roundtripper, max_projection, image_api):
+
+    nwb.add_max_projection(nwbfile, max_projection)
+
+    if roundtrip:
+        obt = roundtripper(nwbfile, BehaviorOphysNwbApi)
+    else:
+        obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
+
+    assert image_api.deserialize(max_projection) == image_api.deserialize(obt.get_max_projection())
