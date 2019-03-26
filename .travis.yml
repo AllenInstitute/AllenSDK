@@ -20,12 +20,19 @@ matrix:
       sudo: required
       python: 3.6
       env: TEST_PYTHON_VERSION=3.6
+    - os: linux
+      sudo: required
+      python: 3.7
+      env: TEST_PYTHON_VERSION=3.7
     - os: osx
       language: generic
       env: TEST_PYTHON_VERSION=2.7
     - os: osx
       language: generic
       env: TEST_PYTHON_VERSION=3.6
+    - os: osx
+      language: generic
+      env: TEST_PYTHON_VERSION=3.7
 
 install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
