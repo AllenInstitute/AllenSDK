@@ -25,8 +25,6 @@ conda install -y -c conda-forge opencv
 files=( artifacts/*.whl )
 pip install ${files[0]}
 
-pip install -r internal_requirements.txt
-
 source deactivate
 
 chmod -R 777 ${bamboo_NEXT_PRODUCTION_ENVIRONMENT}
