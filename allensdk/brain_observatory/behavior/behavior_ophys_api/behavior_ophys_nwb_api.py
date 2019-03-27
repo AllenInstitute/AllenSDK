@@ -31,8 +31,13 @@ class BehaviorOphysNwbApi(NwbApi):
         nwb.add_ophys_timestamps(nwbfile, session_object.ophys_timestamps)
 
         # Add stimulus template data to NWB in-memory object:
-        for key, val in session_object.stimulus_templates.items():
-            nwb.add_stimulus_template(nwbfile, val, key)
+        for name, image_data in session_object.stimulus_templates.items():
+            nwb.add_stimulus_template(nwbfile, image_data, name)
+
+            # Add index for this template to NWB in-memory object:
+            nwb_template = nwbfile.stimulus_template[name]
+            stimulus_index = session_object.stimulus_index[session_object.stimulus_index['image_set'] == nwb_template.name]
+            nwb.add_stimulus_index(nwbfile, stimulus_index, nwb_template)
 
         # Add stimulus presentations data to NWB in-memory object:
         nwb.add_stimulus_presentations(nwbfile, session_object.stimulus_presentations)
@@ -46,10 +51,10 @@ class BehaviorOphysNwbApi(NwbApi):
         # Add rewards data to NWB in-memory object:
         nwb.add_rewards(nwbfile, session_object.rewards)
 
-        # Add rewards data to NWB in-memory object:
+        # Add max_projection image data to NWB in-memory object:
         nwb.add_max_projection(nwbfile, session_object.max_projection)
 
-        # Add rewards data to NWB in-memory object:
+        # Add average_image image data to NWB in-memory object:
         nwb.add_average_image(nwbfile, session_object.average_image)
 
         # Write the file:
@@ -107,3 +112,17 @@ class BehaviorOphysNwbApi(NwbApi):
 
     def get_average_image(self, image_api=None) -> sitk.Image:
         return self.get_image('average_image', 'two_photon_imaging', image_api=image_api)
+
+    def get_stimulus_index(self) -> pd.DataFrame:
+
+        data_dict = {'timestamps': [], 'image_set': [], 'image_index': []}
+        for stimulus_name in self.nwbfile.stimulus:
+            curr_image_index_series = self.nwbfile.stimulus[stimulus_name]
+            data_dict['image_set'] += [stimulus_name] * len(curr_image_index_series.data[:])
+            data_dict['image_index'] += list(curr_image_index_series.data[:])
+            data_dict['timestamps'] += list(curr_image_index_series.timestamps[:])
+
+        stimulus_index_df = pd.DataFrame(data_dict)
+        stimulus_index_df.set_index('timestamps', inplace=True)
+        stimulus_index_df.sort_index(inplace=True)
+        return stimulus_index_df

@@ -20,6 +20,7 @@ def get_stimulus_presentations(data, stimulus_timestamps):
     stimulus_table.start_time = [stimulus_timestamps[start_frame] for start_frame in stimulus_table.start_frame.values]
     end_time = [stimulus_timestamps[end_frame] for end_frame in stimulus_table.end_frame.values]
     stimulus_table.insert(loc=4, column='stop_time', value=end_time)
+    stimulus_table.set_index('stimulus_presentations_id', inplace=True)
 
     return stimulus_table
 
@@ -66,10 +67,14 @@ def get_stimulus_templates(pkl):
 def get_stimulus_metadata(pkl):
 
     images = get_images_dict(pkl)
-    return pd.DataFrame(images['image_attributes'])
+    stimulus_index_df = pd.DataFrame(images['image_attributes'])
+    stimulus_index_df['image_set'] = IMAGE_SETS_REV[images['metadata']['image_set']]
+    stimulus_index_df.set_index(['image_index'], inplace=True, drop=True)
+    return stimulus_index_df
+
 
 def _resolve_image_category(change_log, frame):
-    
+
     for change in (unpack_change_log(c) for c in change_log):
         if frame < change['frame']:
             return change['from_category']

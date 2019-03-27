@@ -140,10 +140,17 @@ class BehaviorOphysLimsApi(OphysLimsApi):
 
 
     @memoize
-    def get_stimulus_metadata(self, ophys_experiment_id=None):
+    def get_stimulus_index(self, ophys_experiment_id=None, use_acq_trigger=False):
         behavior_stimulus_file = self.get_behavior_stimulus_file(ophys_experiment_id=ophys_experiment_id)
         data = pd.read_pickle(behavior_stimulus_file)
-        return get_stimulus_metadata(data)
+        stimulus_metadata_df = get_stimulus_metadata(data)
+        stimulus_presentations_df = self.get_stimulus_presentations(ophys_experiment_id=ophys_experiment_id, use_acq_trigger=use_acq_trigger)
+        idx_name = stimulus_presentations_df.index.name
+        stimulus_index_df = stimulus_presentations_df.reset_index().merge(stimulus_metadata_df.reset_index(), on=['image_name', 'image_category']).set_index(idx_name)
+        stimulus_index_df.sort_index(inplace=True)
+        stimulus_index_df = stimulus_index_df[['image_set', 'image_index', 'start_time']].rename(columns={'start_time': 'timestamps'})
+        stimulus_index_df.set_index('timestamps', inplace=True, drop=True)
+        return stimulus_index_df
 
 
     @memoize

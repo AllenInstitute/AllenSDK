@@ -2,7 +2,7 @@ import pynwb
 from pynwb.base import TimeSeries, Images
 from pynwb.behavior import BehavioralEvents
 from pynwb import ProcessingModule
-from pynwb.image import ImageSeries, GrayscaleImage
+from pynwb.image import ImageSeries, GrayscaleImage, IndexSeries
 
 from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory import dict_to_indexed_array
@@ -291,3 +291,16 @@ def add_max_projection(nwbfile, max_projection, image_api=None):
 def add_average_image(nwbfile, average_image, image_api=None):
 
     add_image(nwbfile, average_image, 'average_image', 'two_photon_imaging', 'Ophys timestamps processing module', image_api=image_api)
+
+
+def add_stimulus_index(nwbfile, stimulus_index, nwb_template):
+
+    assert stimulus_index.index.name == 'timestamps'
+
+    image_index = IndexSeries(
+        name=nwb_template.name,
+        data=stimulus_index['image_index'].values,
+        unit='None',
+        indexed_timeseries=nwb_template,
+        timestamps=stimulus_index.index.values)
+    nwbfile.add_stimulus(image_index)

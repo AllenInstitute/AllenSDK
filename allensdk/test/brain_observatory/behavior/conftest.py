@@ -35,7 +35,7 @@ def stimulus_templates():
     image_template[1, :, :] = image_template[1, :, :] + 1
     image_template[2, :, :] = image_template[2, :, :] + 2
 
-    return {'test': image_template}
+    return {'test1': image_template, 'test2': np.zeros((5, 2, 2))}
 
 
 @pytest.fixture
@@ -78,3 +78,12 @@ def max_projection(image_api):
 @pytest.fixture
 def average_image(max_projection):
     return max_projection
+
+
+@pytest.fixture
+def stimulus_index(stimulus_templates):
+    image_sets_list = list(stimulus_templates.keys())
+    image_sets = image_sets_list + image_sets_list
+    return pd.DataFrame({'image_set': image_sets,
+                         'image_index': [0] * len(image_sets)},
+                        index=pd.Index(np.arange(len(image_sets), dtype=np.float64), name='timestamps'))
