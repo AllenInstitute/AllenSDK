@@ -43,12 +43,17 @@ from allensdk.api.queries.brain_observatory_api import (BrainObservatoryApi,
                                                         find_specimen_cre_line,
                                                         find_specimen_reporter_line,
                                                         find_experiment_acquisition_age)
+from . import SafeJsonMsg
+
 
 _rows_per_message = 2000
 _msg = [{'whatever': True}] * _rows_per_message
 _num_messages = 5
 _msg5 = [{'msg': _msg}] * _num_messages
 
+@pytest.fixture
+def safe_msg5():
+    return SafeJsonMsg(_msg5)
 
 @pytest.fixture()
 def bo_api():
@@ -275,20 +280,20 @@ def test_get_cell_metrics_two_ids(mock_json_msg_query, bo_api):
         "rma::options[num_rows$eq2000][start_row$eq0][order$eq\'cell_specimen_id\'][count$eqfalse]")
 
 
-@patch("allensdk.core.json_utilities.read_url_get", side_effect=_msg5)
-def test_get_cell_metrics_five_messages(ju_read_url_get, bo_api):
-    ids = [517394843, 517394850]
-    list(bo_api.get_cell_metrics(cell_specimen_ids=ids))
+def test_get_cell_metrics_five_messages(bo_api, safe_msg5):
+    with patch("allensdk.core.json_utilities.read_url_get", side_effect=safe_msg5) as ju_read_url_get:
+        ids = [517394843, 517394850]
+        list(bo_api.get_cell_metrics(cell_specimen_ids=ids))
 
-    base_query = \
-       (bo_api.api_url + '/api/v2/data/query.json?q='
-        'model::ApiCamCellMetric,'
-        'rma::criteria,%5Bcell_specimen_id$in517394843,517394850%5D,'
-        'rma::options%5Bnum_rows$eq2000%5D%5Bstart_row$eq{}%5D%5Border$eq%27cell_specimen_id%27%5D%5Bcount$eqfalse%5D')
-    expected_calls = map(lambda c: call(base_query.format(c)),
-                         [0, 2000, 4000, 6000, 8000, 10000])
+        base_query = \
+        (bo_api.api_url + '/api/v2/data/query.json?q='
+            'model::ApiCamCellMetric,'
+            'rma::criteria,%5Bcell_specimen_id$in517394843,517394850%5D,'
+            'rma::options%5Bnum_rows$eq2000%5D%5Bstart_row$eq{}%5D%5Border$eq%27cell_specimen_id%27%5D%5Bcount$eqfalse%5D')
+        expected_calls = map(lambda c: call(base_query.format(c)),
+                            [0, 2000, 4000, 6000, 8000, 10000])
 
-    assert ju_read_url_get.call_args_list == list(expected_calls)
+        assert ju_read_url_get.call_args_list == list(expected_calls)
 
 
 def test_filter_experiment_containers_no_filters(bo_api, mock_containers):
