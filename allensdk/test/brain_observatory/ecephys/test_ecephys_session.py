@@ -129,7 +129,7 @@ def spike_times_api(raw_units, raw_channels, raw_probes, raw_stimulus_table, raw
 @pytest.fixture
 def session_metadata_api():
     class EcephysSessionMetadataApi(EcephysApi):
-        def get_session_id(self):
+        def get_ecephys_session_id(self):
             return 12345
     return EcephysSessionMetadataApi()
 
@@ -137,7 +137,7 @@ def session_metadata_api():
 def test_session_metadata(session_metadata_api):
     session = EcephysSession(api=session_metadata_api)
 
-    assert 12345 == session.session_id
+    assert 12345 == session.ecephys_session_id
 
 
 def test_build_stimulus_presentations(just_stimulus_table_api):

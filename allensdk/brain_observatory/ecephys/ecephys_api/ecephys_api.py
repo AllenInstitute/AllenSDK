@@ -34,5 +34,5 @@ class EcephysApi:
     def get_units(self) -> pd.DataFrame:
         raise NotImplementedError
 
-    def get_session_id(self) -> int:
+    def get_ecephys_session_id(self) -> int:
         raise NotImplementedError

@@ -40,7 +40,7 @@ def test_roundtrip_metadata(roundtripper):
     )
 
     api = roundtripper(nwbfile, EcephysNwbApi)
-    assert 12345 == api.get_session_id()
+    assert 12345 == api.get_ecephys_session_id()
 
 
 def test_add_stimulus_presentations(nwbfile, stimulus_presentations, roundtripper):
