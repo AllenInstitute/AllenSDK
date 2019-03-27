@@ -7,7 +7,6 @@ import SimpleITK as sitk
 
 from allensdk.brain_observatory.nwb.nwb_api import NwbApi
 from allensdk.brain_observatory.behavior.trials_processing import TRIAL_COLUMN_DESCRIPTION_DICT
-from allensdk.brain_observatory.image_api import ImageApi
 
 
 class BehaviorOphysNwbApi(NwbApi):
@@ -49,6 +48,9 @@ class BehaviorOphysNwbApi(NwbApi):
 
         # Add rewards data to NWB in-memory object:
         nwb.add_max_projection(nwbfile, session_object.max_projection)
+
+        # Add rewards data to NWB in-memory object:
+        nwb.add_average_image(nwbfile, session_object.average_image)
 
         # Write the file:
         with NWBHDF5IO(self.path, 'w') as nwb_file_writer:
@@ -101,13 +103,7 @@ class BehaviorOphysNwbApi(NwbApi):
         return pd.DataFrame({'time': time, 'volume': volume, 'autorewarded': autorewarded})
 
     def get_max_projection(self, image_api=None) -> sitk.Image:
+        return self.get_image('max_projection', 'two_photon_imaging', image_api=image_api)
 
-        if image_api is None:
-            image_api = ImageApi
-
-        nwb_img = self.nwbfile.modules['two_photon_imaging'].get_data_interface('images')['max_projection']
-        data = nwb_img.data
-        resolution = nwb_img.resolution  # px/cm
-        spacing = [resolution * 10, resolution * 10]
-
-        return ImageApi.serialize(data, spacing, 'mm')
+    def get_average_image(self, image_api=None) -> sitk.Image:
+        return self.get_image('average_image', 'two_photon_imaging', image_api=image_api)

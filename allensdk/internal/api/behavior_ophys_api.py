@@ -3,6 +3,7 @@ import numpy as np
 import h5py
 import pandas as pd
 import uuid
+import json
 
 from allensdk.api.cache import memoize
 from allensdk.internal.api.ophys_lims_api import OphysLimsApi
@@ -14,6 +15,7 @@ from allensdk.brain_observatory.behavior.running_processing import get_running_d
 from allensdk.brain_observatory.behavior.rewards_processing import get_rewards
 from allensdk.brain_observatory.behavior.trials_processing import get_trials
 from allensdk.brain_observatory.running_speed import RunningSpeed
+from allensdk.brain_observatory.image_api import ImageApi
 
 
 class BehaviorOphysLimsApi(OphysLimsApi):
@@ -192,15 +194,22 @@ class BehaviorOphysLimsApi(OphysLimsApi):
         cell_roi_id_list = self.get_cell_roi_ids(ophys_experiment_id=ophys_experiment_id)
         ophys_timestamps = self.get_ophys_timestamps(ophys_experiment_id=ophys_experiment_id, use_acq_trigger=use_acq_trigger)
         assert corrected_fluorescence_trace_array.shape[1], ophys_timestamps.shape[0]
-        df = pd.DataFrame({'roi_id':cell_roi_id_list, 'corrected_fluorescence':list(corrected_fluorescence_trace_array)})
+        df = pd.DataFrame({'roi_id': cell_roi_id_list, 'corrected_fluorescence': list(corrected_fluorescence_trace_array)})
         return df
 
 
     @memoize
-    def get_average_image(self, ophys_experiment_id=None):
+    def get_average_image(self, ophys_experiment_id=None, image_api=None):
+
+        if image_api is None:
+            image_api = ImageApi
+
         avgint_a1X_file = self.get_avgint_a1X_file(ophys_experiment_id=ophys_experiment_id)
+        platform_json_file = self.get_ophys_platform_json(ophys_experiment_id=ophys_experiment_id)
+        platform_data = json.load(open(platform_json_file, 'r'))
+        pixel_size = float(platform_data['registration']['surface_2p']['pixel_size_um'])
         average_image = mpimg.imread(avgint_a1X_file)
-        return average_image
+        return ImageApi.serialize(average_image, [pixel_size / 1000., pixel_size / 1000.], 'mm')
 
 
     @memoize

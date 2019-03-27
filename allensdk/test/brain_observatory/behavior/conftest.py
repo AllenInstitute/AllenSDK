@@ -73,3 +73,8 @@ def image_api():
 @pytest.fixture
 def max_projection(image_api):
     return image_api.serialize(np.array([[1, 2], [3, 4]]), [.1, .1], 'mm')
+
+
+@pytest.fixture
+def average_image(max_projection):
+    return max_projection

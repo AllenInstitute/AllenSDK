@@ -255,26 +255,39 @@ def add_rewards(nwbfile, rewards_df):
     return nwbfile
 
 
-def add_max_projection(nwbfile, max_projection, image_api=None):
+def add_image(nwbfile, image_data, image_name, module_name, module_description, image_api=None):
 
-    description = 'Maximum projection, at pixels/cm resolution'
+    description = '{} image at pixels/cm resolution'.format(image_name)
 
     if image_api is None:
         image_api = ImageApi
 
-    data, spacing, unit = ImageApi.deserialize(max_projection)
-    assert spacing[0] == spacing[1] and len(spacing) == 2
+    data, spacing, unit = ImageApi.deserialize(image_data)
+    assert spacing[0] == spacing[1] and len(spacing) == 2 and unit == 'mm'
 
-    max_projection_image = GrayscaleImage('max_projection', data, resolution=spacing[0] / 10, description=description)
-
-    images = Images(name='images')
-    images.add_image(max_projection_image)
-
-    if 'two_photon_imaging' not in nwbfile.modules:
-        ophys_mod = ProcessingModule('two_photon_imaging', 'Ophys timestamps processing module')
+    if module_name not in nwbfile.modules:
+        ophys_mod = ProcessingModule(module_name, module_description)
         nwbfile.add_processing_module(ophys_mod)
     else:
-        ophys_mod = nwbfile.modules['two_photon_imaging']
-    ophys_mod.add_data_interface(images)
-    
+        ophys_mod = nwbfile.modules[module_name]
+
+    image = GrayscaleImage(image_name, data, resolution=spacing[0] / 10, description=description)
+
+    if 'images' not in ophys_mod.containers:
+        images = Images(name='images')
+        ophys_mod.add_data_interface(images)
+    else:
+        images = ophys_mod['images']
+    images.add_image(image)
+
     return nwbfile
+
+
+def add_max_projection(nwbfile, max_projection, image_api=None):
+
+    add_image(nwbfile, max_projection, 'max_projection', 'two_photon_imaging', 'Ophys timestamps processing module', image_api=image_api)
+
+
+def add_average_image(nwbfile, average_image, image_api=None):
+
+    add_image(nwbfile, average_image, 'average_image', 'two_photon_imaging', 'Ophys timestamps processing module', image_api=image_api)
