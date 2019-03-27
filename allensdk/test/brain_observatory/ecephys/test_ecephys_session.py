@@ -126,6 +126,20 @@ def spike_times_api(raw_units, raw_channels, raw_probes, raw_stimulus_table, raw
     return EcephysSpikeTimesApi()
 
 
+@pytest.fixture
+def session_metadata_api():
+    class EcephysSessionMetadataApi(EcephysApi):
+        def get_ecephys_session_id(self):
+            return 12345
+    return EcephysSessionMetadataApi()
+
+
+def test_session_metadata(session_metadata_api):
+    session = EcephysSession(api=session_metadata_api)
+
+    assert 12345 == session.ecephys_session_id
+
+
 def test_build_stimulus_presentations(just_stimulus_table_api):
     expected_columns = [
         'start_time', 'stop_time', 'stimulus_name', 'stimulus_block', 'TF', 'SF', 'Ori', 'Contrast', 

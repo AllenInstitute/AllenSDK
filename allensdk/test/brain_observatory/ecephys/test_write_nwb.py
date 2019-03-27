@@ -1,5 +1,6 @@
 import os
 import warnings
+from datetime import datetime
 
 import pytest
 import pynwb
@@ -28,6 +29,18 @@ def spike_times():
         22: [],
         33: [13, 4, 12]
     }
+
+
+
+def test_roundtrip_metadata(roundtripper):
+    nwbfile = pynwb.NWBFile(
+        session_description='EcephysSession',
+        identifier='{}'.format(12345),
+        session_start_time=datetime.now()
+    )
+
+    api = roundtripper(nwbfile, EcephysNwbApi)
+    assert 12345 == api.get_ecephys_session_id()
 
 
 def test_add_stimulus_presentations(nwbfile, stimulus_presentations, roundtripper):

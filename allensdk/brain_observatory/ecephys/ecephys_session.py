@@ -144,6 +144,7 @@ class EcephysSession(LazyPropertyMixin):
     def __init__(self, api, **kwargs):
         self.api: EcephysApi  = api
 
+        self.ecephys_session_id = self.LazyProperty(self.api.get_ecephys_session_id)
         self.running_speed= self.LazyProperty(self.api.get_running_speed)
         self.mean_waveforms = self.LazyProperty(self.api.get_mean_waveforms, wrappers=[self._build_mean_waveforms])
         self.spike_times = self.LazyProperty(self.api.get_spike_times, wrappers=[self._build_spike_times])
