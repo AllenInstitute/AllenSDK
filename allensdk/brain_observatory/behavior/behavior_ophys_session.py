@@ -76,6 +76,9 @@ class BehaviorOphysSession(LazyPropertyMixin):
 
 if __name__ == "__main__":
 
+    # from allensdk.brain_observatory import JSONEncoder
+    # import json
+
     from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi
     nwb_filepath = './tmp.nwb'
     nwb_api = BehaviorOphysNwbApi(nwb_filepath)
@@ -86,7 +89,7 @@ if __name__ == "__main__":
     # print(session.max_projection)
     # print(session.stimulus_timestamps)
     # print(session.ophys_timestamps)
-    # print(session.metadata)
+    # print(json.dumps(session.metadata, indent=2, cls=JSONEncoder))
     # print(session.dff_traces)
     # print(session.roi_metrics)
     # print(session.cell_roi_ids)
@@ -97,10 +100,18 @@ if __name__ == "__main__":
     # print(session.stimulus_index)
     # print(session.licks)
     # print(session.rewards)
-    # print(session.task_parameters)
+    # print(json.dumps(session.task_parameters, indent=2, cls=JSONEncoder))
     # print(session.trials)
     # for key, val in list(session.trials.iterrows())[0][1].to_dict().items():
     #     print(key, val)
     # print(session.corrected_fluorescence_traces)
     # print(session.average_image)
     # print(session.motion_correction)
+
+
+
+    # def get_task_parameters(self, *args, **kwargs):
+    #     return read_data_json(self.task_parameters_file_info, object_hook=date_hook)
+
+    # def save_task_parameters(self, obj):
+    #     save_data_json(obj.task_parameters, self.task_parameters_file_info, cls=DateTimeEncoder)

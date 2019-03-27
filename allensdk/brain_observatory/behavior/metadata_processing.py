@@ -3,7 +3,7 @@ def get_task_parameters(data):
     task_parameters = {}
     task_parameters['blank_duration'] = data["items"]["behavior"]['config']['DoC']['blank_duration_range']
     task_parameters['stimulus_duration'] = data["items"]["behavior"]['config']['DoC']['stimulus_window'] * 1000
-    task_parameters['omitted_flash_fraction'] = data["items"]["behavior"]['params'].get('omitted_flash_fraction', None)
+    task_parameters['omitted_flash_fraction'] = data["items"]["behavior"]['params'].get('omitted_flash_fraction', float('nan'))
     task_parameters['response_window'] = data["items"]["behavior"]["config"]["DoC"]["response_window"]
     task_parameters['reward_volume'] = data["items"]["behavior"]["config"]["reward"]["reward_volume"]
     task_parameters['stage'] = data["items"]["behavior"]["params"]["stage"]

@@ -3,10 +3,12 @@ import json
 import numpy as np
 import os
 import h5py
+import pytz
 
 from . import PostgresQueryMixin, OneOrMoreResultExpectedError
 from allensdk.api.cache import memoize
 from allensdk.brain_observatory.image_api import ImageApi
+
 
 class OphysLimsApi(PostgresQueryMixin):
     ''' hello
@@ -117,8 +119,10 @@ class OphysLimsApi(PostgresQueryMixin):
                 FROM ophys_experiments oe
                 JOIN ophys_sessions os ON oe.ophys_session_id = os.id
                 WHERE oe.id= {};
-                '''.format(ophys_experiment_id)        
-        return self.fetchone(query, strict=True)
+                '''.format(ophys_experiment_id)
+        stimulus_name = self.fetchone(query, strict=True)
+        stimulus_name = 'Unknown' if stimulus_name is None else stimulus_name
+        return stimulus_name
 
 
     @memoize
@@ -128,9 +132,10 @@ class OphysLimsApi(PostgresQueryMixin):
                 FROM ophys_experiments oe
                 JOIN ophys_sessions os ON oe.ophys_session_id = os.id
                 WHERE oe.id= {};
-                '''.format(ophys_experiment_id)        
-        return self.fetchone(query, strict=True)
+                '''.format(ophys_experiment_id)
 
+        experiment_date = self.fetchone(query, strict=True)
+        return pytz.utc.localize(experiment_date)
 
     @memoize
     def get_reporter_line(self, ophys_experiment_id=None):
@@ -176,7 +181,7 @@ class OphysLimsApi(PostgresQueryMixin):
                 JOIN specimens sp ON sp.id=os.specimen_id
                 WHERE oe.id= {};
                 '''.format(ophys_experiment_id)        
-        return self.fetchone(query, strict=True)
+        return int(self.fetchone(query, strict=True))
 
 
     @memoize
