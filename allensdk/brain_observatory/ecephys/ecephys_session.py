@@ -112,6 +112,11 @@ class EcephysSession(LazyPropertyMixin):
             Color : numeric
             Image : numeric
             Phase : float
+    inter_presentation_intervals : pd.DataFrame
+        The elapsed time between each immediately sequential pair of stimulus presentations. This is a dataframe with a 
+        two-level multiindex (levels are 'from_presentation_id' and 'to_presentation_id'). It has a single column, 
+        'interval', which reports the elapsed time between the two presentations in seconds on the experiment's master 
+        clock.
 
     '''
 
@@ -154,6 +159,32 @@ class EcephysSession(LazyPropertyMixin):
 
         self.stimulus_presentations = self.LazyProperty(self.api.get_stimulus_presentations, wrappers=[self._build_stimulus_presentations])
         self.units = self.LazyProperty(self.api.get_units, wrappers=[self._build_units_table])
+        self.inter_presentation_intervals = self.LazyProperty(self._build_inter_presentation_intervals)
+
+
+    def get_inter_presentation_intervals_for_stimulus(self, stimulus_names):
+        ''' Get a subset of this session's inter-presentation intervals, filtered by stimulus name.
+
+        Parameters
+        ----------
+        stimulus_names : array-like of str
+            The names of stimuli to include in the output.
+
+        Returns
+        -------
+        pd.DataFrame : 
+            inter-presentation intervals, filtered to the requested stimulus names.
+
+        '''
+
+        stimulus_names = warn_on_scalar(stimulus_names, f'expected stimulus_names to be a collection (list-like), but found {type(stimulus_names)}: {stimulus_names}')
+        filtered_presentations = self.stimulus_presentations[self.stimulus_presentations['stimulus_name'].isin(stimulus_names)]
+        filtered_ids = set(filtered_presentations.index.values)
+
+        return self.inter_presentation_intervals[
+            (self.inter_presentation_intervals.index.isin(filtered_ids, level='from_presentation_id'))
+            & (self.inter_presentation_intervals.index.isin(filtered_ids, level='to_presentation_id'))
+        ]
 
 
     def get_presentations_for_stimulus(self, stimulus_names):
@@ -171,6 +202,7 @@ class EcephysSession(LazyPropertyMixin):
 
         '''
 
+        stimulus_names = warn_on_scalar(stimulus_names, f'expected stimulus_names to be a collection (list-like), but found {type(stimulus_names)}: {stimulus_names}')
         filtered_presentations = self.stimulus_presentations[self.stimulus_presentations['stimulus_name'].isin(stimulus_names)]
         return removed_unused_stimulus_presentation_columns(filtered_presentations)
 
@@ -456,6 +488,7 @@ class EcephysSession(LazyPropertyMixin):
 
         return stimulus_presentations
 
+
     def _build_units_table(self, units_table):
         channels = self.channels.copy()
         probes = self.probes.copy()
@@ -506,8 +539,17 @@ class EcephysSession(LazyPropertyMixin):
 
         return output_waveforms
 
-    def _filter_owned_df(self, key, ids=None, copy=True, warn_on_scalar=True):
 
+    def _build_inter_presentation_intervals(self):
+        intervals = pd.DataFrame({
+            'from_presentation_id': self.stimulus_presentations.index.values[:-1],
+            'to_presentation_id': self.stimulus_presentations.index.values[1:],
+            'interval': self.stimulus_presentations['start_time'].values[1:] - self.stimulus_presentations['stop_time'].values[:-1]
+        })
+        return intervals.set_index(['from_presentation_id', 'to_presentation_id'], inplace=False)
+
+
+    def _filter_owned_df(self, key, ids=None, copy=True):
         df = getattr(self, key)
 
         if copy:
@@ -516,11 +558,8 @@ class EcephysSession(LazyPropertyMixin):
         if ids is None:
             return df
         
-        if not isinstance(ids, Collection):
-            if warn_on_scalar:
-                warnings.warn(f'a scalar ({ids}) was provided as ids, filtering to a single row of {key}.')
-            ids = [ids]
-                
+        ids = warn_on_scalar(ids, f'a scalar ({ids}) was provided as ids, filtering to a single row of {key}.')
+
         df = df.loc[ids]
 
         if df.shape[0] == 0:
@@ -592,3 +631,10 @@ def mean_spikes_by_condition(spike_times, stimulus_presentations, stimulus_param
     
     mean_spikes['mean_spike_count'] = mean_spikes['count_spikes'] / mean_spikes['count_presentations']
     return mean_spikes.drop(columns=['count_spikes', 'count_presentations'])
+
+
+def warn_on_scalar(value, message):
+    if not isinstance(value, Collection) or isinstance(value, str):
+        warnings.warn(message)
+        return [value]
+    return value
