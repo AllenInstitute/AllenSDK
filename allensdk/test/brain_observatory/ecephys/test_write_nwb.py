@@ -44,6 +44,7 @@ def test_roundtrip_metadata(roundtripper):
 
 
 def test_add_stimulus_presentations(nwbfile, stimulus_presentations, roundtripper):
+    write_nwb.add_stimulus_timestamps(nwbfile, [0, 1])
     write_nwb.add_stimulus_presentations(nwbfile, stimulus_presentations)
 
     api = roundtripper(nwbfile, EcephysNwbApi)
