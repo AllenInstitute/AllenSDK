@@ -143,7 +143,7 @@ def test_session_metadata(session_metadata_api):
 def test_build_stimulus_presentations(just_stimulus_table_api):
     expected_columns = [
         'start_time', 'stop_time', 'stimulus_name', 'stimulus_block', 'TF', 'SF', 'Ori', 'Contrast', 
-        'Pos_x', 'Pos_y', 'Color', 'Image', 'Phase', 'is_movie'
+        'Pos_x', 'Pos_y', 'Color', 'Image', 'Phase', 'duration'
     ]
 
     session = EcephysSession(api=just_stimulus_table_api)
@@ -152,7 +152,6 @@ def test_build_stimulus_presentations(just_stimulus_table_api):
     assert set(expected_columns) == set(obtained.columns)
     assert 'stimulus_presentation_id' == obtained.index.name
     assert 4 == obtained.shape[0]
-    assert np.allclose([False, False, False, True], obtained['is_movie'])
 
 
 def test_build_mean_waveforms(mean_waveforms_api):
@@ -262,7 +261,7 @@ def test_get_stimulus_parameter_values(just_stimulus_table_api):
         'Color': [0, 5.5, 11, 16.5],
         'Phase': [0, 60, 120, 180]
     }
-
+    
     for k, v in expected.items():
         assert np.allclose(v, obtained[k])
     assert len(expected) == len(obtained)
@@ -275,7 +274,7 @@ def test_get_presentations_for_stimulus(just_stimulus_table_api, raw_stimulus_ta
     expected = raw_stimulus_table.loc[:2, [
         'start_time', 'stop_time', 'stimulus_name', 'stimulus_block', 'Color', 'Phase'
     ]]
-    expected['is_movie'] = False
+    expected['duration'] = expected['stop_time'] - expected['start_time']
 
     pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)
 
@@ -298,3 +297,34 @@ def test_filter_owned_df_scalar(just_stimulus_table_api):
     assert w[-1].message.args[0] == 'a scalar (3) was provided as ids, filtering to a single row of stimulus_presentations.'
     assert obtained['Phase'].values[0] == 180
 
+
+def test_build_inter_presentation_intervals(just_stimulus_table_api):
+    session = EcephysSession(api=just_stimulus_table_api)
+    obtained = session.inter_presentation_intervals
+
+    expected = pd.DataFrame({
+            'interval': [0, 0, 0]
+        }, index=pd.MultiIndex(
+            levels=[[0, 1, 2], [1, 2, 3]],
+            codes=[[0, 1, 2], [0, 1, 2]],
+            names=['from_presentation_id', 'to_presentation_id']
+        )
+    )
+
+    pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)
+
+
+def test_get_inter_presentation_intervals_for_stimulus(just_stimulus_table_api):
+    session = EcephysSession(api=just_stimulus_table_api)
+    obtained = session.get_inter_presentation_intervals_for_stimulus('a')
+
+    expected = pd.DataFrame({
+            'interval': [0, 0]
+        }, index=pd.MultiIndex(
+            levels=[[0, 1], [1, 2]],
+            codes=[[0, 1], [0, 1]],
+            names=['from_presentation_id', 'to_presentation_id']
+        )
+    )
+
+    pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)
