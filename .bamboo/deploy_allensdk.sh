@@ -18,10 +18,6 @@ conda create -y -${bamboo_VERBOSITY} --prefix ${bamboo_NEXT_PRODUCTION_ENVIRONME
 
 source activate ${bamboo_NEXT_PRODUCTION_ENVIRONMENT}
 
-# needs mpicc to compile with pip
-conda install -y mpi4py 
-conda install -y -c conda-forge opencv
-
 files=( artifacts/*.whl )
 pip install ${files[0]}
 
