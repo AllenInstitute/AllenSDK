@@ -2,6 +2,9 @@ import sys
 import pandas as pd
 import pytest
 import numpy as np
+import pytz
+import datetime
+import uuid
 
 from allensdk.brain_observatory.image_api import ImageApi
 
@@ -87,3 +90,39 @@ def stimulus_index(stimulus_templates):
     return pd.DataFrame({'image_set': image_sets,
                          'image_index': [0] * len(image_sets)},
                         index=pd.Index(np.arange(len(image_sets), dtype=np.float64), name='timestamps'))
+
+
+@pytest.fixture
+def metadata():
+
+    return {"ophys_experiment_id": 1234,
+            "experiment_container_id": 5678,
+            "ophys_frame_rate": 31.0,
+            "stimulus_frame_rate": 60.0,
+            "targeted_structure": "VISp",
+            "imaging_depth": 375,
+            "session_type": 'Unknown',
+            "experiment_datetime": pytz.utc.localize(datetime.datetime.now()),
+            "reporter_line": "Ai93(TITL-GCaMP6f)",
+            "driver_line": ["Camk2a-tTA", "Slc17a7-IRES2-Cre"],
+            "LabTracks_ID": 416369,
+            "full_genotype": "Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;Ai93(TITL-GCaMP6f)/wt",
+            "behavior_session_uuid": uuid.uuid4(),
+            "rig": "CAM2P.5"
+            }
+
+
+@pytest.fixture
+def task_parameters():
+
+    return {"blank_duration": [0.5, 0.5],
+            "stimulus_duration": 6000.0,
+            "omitted_flash_fraction": float('nan'),
+            "response_window": [0.15, 0.75],
+            "reward_volume": 0.007,
+            "stage": "OPHYS_6_images_B",
+            "stimulus": "images",
+            "stimulus_distribution": "geometric",
+            "task": "DoC_untranslated",
+            "n_stimulus_frames": 69882
+            }

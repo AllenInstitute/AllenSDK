@@ -1,3 +1,6 @@
+import numpy as np
+import datetime
+import uuid
 import pynwb
 from pynwb.base import TimeSeries, Images
 from pynwb.behavior import BehavioralEvents
@@ -7,6 +10,8 @@ from pynwb.image import ImageSeries, GrayscaleImage, IndexSeries
 from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory import dict_to_indexed_array
 from allensdk.brain_observatory.image_api import ImageApi
+from allensdk.brain_observatory.behavior.schemas import OphysBehaviorMetaDataSchema, OphysBehaviorTaskParametersSchema
+from allensdk.brain_observatory.nwb.metadata import load_LabMetaData_extension
 
 
 def add_running_speed_to_nwbfile(nwbfile, running_speed, name='speed', unit='cm/s'):
@@ -304,3 +309,35 @@ def add_stimulus_index(nwbfile, stimulus_index, nwb_template):
         indexed_timeseries=nwb_template,
         timestamps=stimulus_index.index.values)
     nwbfile.add_stimulus(image_index)
+
+
+def add_metadata(nwbfile, metadata):
+
+    OphysBehaviorMetaData = load_LabMetaData_extension(OphysBehaviorMetaDataSchema, 'AIBS_ophys_behavior')
+    metadata_clean = OphysBehaviorMetaDataSchema().dump(metadata)
+
+    new_metadata_dict = {}
+    for key, val in metadata_clean.items():
+        if isinstance(val, list):
+            new_metadata_dict[key] = np.array(val)
+        elif isinstance(val, (datetime.datetime, uuid.UUID)):
+            new_metadata_dict[key] = str(val)
+        else:
+            new_metadata_dict[key] = val
+    nwb_metadata = OphysBehaviorMetaData(name='metadata', **new_metadata_dict)
+    nwbfile.add_lab_meta_data(nwb_metadata)
+
+
+def add_task_parameters(nwbfile, task_parameters):
+
+    OphysBehaviorTaskParameters = load_LabMetaData_extension(OphysBehaviorTaskParametersSchema, 'AIBS_ophys_behavior')
+    task_parameters_clean = OphysBehaviorTaskParametersSchema().dump(task_parameters)
+
+    new_task_parameters_dict = {}
+    for key, val in task_parameters_clean.items():
+        if isinstance(val, list):
+            new_task_parameters_dict[key] = np.array(val)
+        else:
+            new_task_parameters_dict[key] = val
+    nwb_task_parameters = OphysBehaviorTaskParameters(name='task_parameters', **new_task_parameters_dict)
+    nwbfile.add_lab_meta_data(nwb_task_parameters)

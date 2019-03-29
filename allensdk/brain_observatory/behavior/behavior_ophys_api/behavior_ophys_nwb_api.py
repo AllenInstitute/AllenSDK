@@ -4,9 +4,14 @@ import pandas as pd
 import allensdk.brain_observatory.nwb as nwb
 import numpy as np
 import SimpleITK as sitk
+import pytz
+import uuid
+import h5py
 
 from allensdk.brain_observatory.nwb.nwb_api import NwbApi
 from allensdk.brain_observatory.behavior.trials_processing import TRIAL_COLUMN_DESCRIPTION_DICT
+from allensdk.brain_observatory.behavior.schemas import OphysBehaviorMetaDataSchema, OphysBehaviorTaskParametersSchema
+from allensdk.brain_observatory.nwb.metadata import load_LabMetaData_extension
 
 
 class BehaviorOphysNwbApi(NwbApi):
@@ -16,8 +21,8 @@ class BehaviorOphysNwbApi(NwbApi):
         nwbfile = NWBFile(
             session_description=str(session_object.metadata['session_type']),
             identifier=str(session_object.ophys_experiment_id),
-            session_start_time=session_object.metadata['experiment_date'],
-            file_create_date=datetime.datetime.now()
+            session_start_time=session_object.metadata['experiment_datetime'],
+            file_create_date=pytz.utc.localize(datetime.datetime.now())
         )
 
         # Add stimulus_timestamps to NWB in-memory object:
@@ -57,6 +62,12 @@ class BehaviorOphysNwbApi(NwbApi):
         # Add average_image image data to NWB in-memory object:
         nwb.add_average_image(nwbfile, session_object.average_image)
 
+        # Add metadata to NWB in-memory object:
+        nwb.add_metadata(nwbfile, session_object.metadata)
+
+        # Add task parameters to NWB in-memory object:
+        nwb.add_task_parameters(nwbfile, session_object.task_parameters)
+
         # Write the file:
         with NWBHDF5IO(self.path, 'w') as nwb_file_writer:
             nwb_file_writer.write(nwbfile)
@@ -79,9 +90,6 @@ class BehaviorOphysNwbApi(NwbApi):
                 running_data_df[key] = self.nwbfile.modules['running'].get_data_interface(key).data
 
         return running_data_df
-
-    def get_metadata(self, **kwargs):
-        pass
 
     def get_stimulus_templates(self, **kwargs):
         return {key: val.data[:] for key, val in self.nwbfile.stimulus_template.items()}
@@ -126,3 +134,36 @@ class BehaviorOphysNwbApi(NwbApi):
         stimulus_index_df.set_index('timestamps', inplace=True)
         stimulus_index_df.sort_index(inplace=True)
         return stimulus_index_df
+
+    def get_metadata(self) -> dict:
+
+        if self.path is None:
+            metadata_nwb_obj = self.nwbfile.lab_meta_data['metadata']
+            data = OphysBehaviorMetaDataSchema(exclude=['experiment_datetime']).dump(metadata_nwb_obj)
+            experiment_datetime = metadata_nwb_obj.experiment_datetime
+        else:
+            f = h5py.File(self.path, 'r')
+            data = dict(f['general/metadata'].attrs)
+            data.pop('namespace')
+            data.pop('neurodata_type')
+            f.close()
+            experiment_datetime = data['experiment_datetime']
+            data['driver_line'] = OphysBehaviorMetaDataSchema().load({'driver_line': data['driver_line']}, partial=True)['driver_line']
+        data['experiment_datetime'] = OphysBehaviorMetaDataSchema().load({'experiment_datetime': experiment_datetime}, partial=True)['experiment_datetime']            
+        data['behavior_session_uuid'] = uuid.UUID(data['behavior_session_uuid'])
+        return data
+
+    def get_task_parameters(self) -> dict:
+
+        if self.path is None:
+            metadata_nwb_obj = self.nwbfile.lab_meta_data['task_parameters']
+            data = OphysBehaviorTaskParametersSchema().dump(metadata_nwb_obj)
+        else:
+            f = h5py.File(self.path, 'r')
+            data = dict(f['general/task_parameters'].attrs)
+            data.pop('namespace')
+            data.pop('neurodata_type')
+            f.close()
+            data['response_window'] = OphysBehaviorTaskParametersSchema().load({'response_window': data['response_window']}, partial=True)['response_window']
+            data['blank_duration'] = OphysBehaviorTaskParametersSchema().load({'blank_duration': data['blank_duration']}, partial=True)['blank_duration']
+        return data

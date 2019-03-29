@@ -87,7 +87,7 @@ class BehaviorOphysLimsApi(OphysLimsApi):
         metadata['targeted_structure'] = self.get_targeted_structure(ophys_experiment_id)
         metadata['imaging_depth'] = self.get_imaging_depth(ophys_experiment_id)
         metadata['session_type'] = self.get_stimulus_name(ophys_experiment_id)
-        metadata['experiment_date'] = self.get_experiment_date(ophys_experiment_id)
+        metadata['experiment_datetime'] = self.get_experiment_date(ophys_experiment_id)
         metadata['reporter_line'] = self.get_reporter_line(ophys_experiment_id)
         metadata['driver_line'] = self.get_driver_line(ophys_experiment_id)
         metadata['LabTracks_ID'] = self.get_LabTracks_ID(ophys_experiment_id)
@@ -156,7 +156,7 @@ class BehaviorOphysLimsApi(OphysLimsApi):
     @memoize
     def get_licks(self, ophys_experiment_id=None, use_acq_trigger=False):
         lick_times = self.get_sync_data(ophys_experiment_id=ophys_experiment_id, use_acq_trigger=use_acq_trigger)['lick_times']
-        return lick_times
+        return pd.DataFrame({'time': lick_times})
 
 
     @memoize

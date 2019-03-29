@@ -1,9 +1,12 @@
 import pytest
 import pandas as pd
 import numpy as np
+import math
 
 import allensdk.brain_observatory.nwb as nwb
 from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi
+from allensdk.brain_observatory.behavior.schemas import OphysBehaviorMetaDataSchema, OphysBehaviorTaskParametersSchema
+from allensdk.brain_observatory.nwb.metadata import load_LabMetaData_extension
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
@@ -171,3 +174,43 @@ def test_add_stimulus_index(nwbfile, roundtrip, roundtripper, stimulus_index, st
         obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
 
     pd.testing.assert_frame_equal(stimulus_index, obt.get_stimulus_index(), check_dtype=False)
+
+
+@pytest.mark.parametrize('roundtrip', [True, False])
+def test_add_metadata(nwbfile, roundtrip, roundtripper, metadata):
+
+    nwb.add_metadata(nwbfile, metadata)
+
+    if roundtrip:
+        obt = roundtripper(nwbfile, BehaviorOphysNwbApi)
+    else:
+        obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
+
+    metadata_obt = obt.get_metadata()
+
+    assert len(metadata_obt) == len(metadata)
+    for key, val in metadata.items():
+        assert val == metadata_obt[key]
+
+
+@pytest.mark.parametrize('roundtrip', [True, False])
+def test_add_task_parameters(nwbfile, roundtrip, roundtripper, task_parameters):
+
+    nwb.add_task_parameters(nwbfile, task_parameters)
+
+    if roundtrip:
+        obt = roundtripper(nwbfile, BehaviorOphysNwbApi)
+    else:
+        obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
+
+    task_parameters_obt = obt.get_task_parameters()
+
+    assert len(task_parameters_obt) == len(task_parameters)
+    for key, val in task_parameters.items():
+        if key == 'omitted_flash_fraction':
+            if math.isnan(val):
+                assert math.isnan(task_parameters_obt[key])
+            if math.isnan(task_parameters_obt[key]):
+                assert math.isnan(val)
+        else:
+            assert val == task_parameters_obt[key]

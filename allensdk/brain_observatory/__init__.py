@@ -36,6 +36,10 @@
 
 import numpy as np
 from collections.abc import Iterable
+import json
+import uuid
+import datetime
+import dateutil
 
 
 def dict_to_indexed_array(dc, order=None):
@@ -65,3 +69,23 @@ def dict_to_indexed_array(dc, order=None):
 
     data = np.concatenate(data)
     return index, data
+
+
+class JSONEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, datetime.datetime):
+            return o.isoformat()
+        elif isinstance(o, uuid.UUID):
+            return str(o)
+        return json.JSONEncoder.default(self, o)
+
+
+def hook(json_dict):
+    for key, value in json_dict.items():
+        if key == 'experiment_date':
+            json_dict[key] = dateutil.parser.parse(value)
+        elif key == 'behavior_session_uuid':
+            json_dict[key] = uuid.UUID(value)
+        else:
+            pass
+    return json_dict
