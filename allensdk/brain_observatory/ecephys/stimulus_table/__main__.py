@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 
 from . import ephys_pre_spikes
-from allensdk.brain_observatory.sync_dataset import SyncDataset 
+from allensdk.brain_observatory.ecephys.file_io.ecephys_sync_dataset import EcephysSyncDataset 
 from allensdk.brain_observatory.argschema_utilities import ArgSchemaParserPlus
 from allensdk.brain_observatory.ecephys.file_io.stim_file import CamStimOnePickleStimFile
 from ._schemas import InputParameters, OutputParameters
@@ -45,7 +45,7 @@ def build_stimulus_table(args):
 
     stim_file = CamStimOnePickleStimFile.factory(args['stimulus_pkl_path'])
 
-    sync_dataset = SyncDataset.factory(args['sync_h5_path'])
+    sync_dataset = EcephysSyncDataset.factory(args['sync_h5_path'])
     frame_times = sync_dataset.extract_frame_times(strategy=args['frame_time_strategy'])
 
     seconds_to_frames = lambda seconds: (np.array(seconds) + stim_file.pre_blank_sec) * stim_file.frames_per_second
