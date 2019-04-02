@@ -12,6 +12,8 @@ class InputParameters(ArgSchema):
     frame_time_strategy = String(default='use_photodiode', 
         help='technique used to align frame times. Options are \'use_photodiode\', which interpolates frame times between photodiode edge times (preferred when vsync times are unreliable) and \'use_vsyncs\', which is preferred when reliable vsync times are available.'
     )
+    stimulus_name_map = Dict(keys=String(), values=String(), allow_none=True, default=None, help='optionally rename stimuli')
+    column_name_map = Dict(keys=String(), values=String(), allow_none=True, default=None, help='optionally rename parameters')
 
 
 class OutputSchema(DefaultSchema): 
