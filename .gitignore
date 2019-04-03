@@ -3,7 +3,6 @@
 .coverage*
 htmlcov
 .settings
-cell_types
 dist
 .eggs/
 eggs/
