@@ -46,13 +46,14 @@ class EcephysNwb1Adaptor(EcephysApi):
     * There were no 'channels' table/group in NWB1. Instead we had to iterate through all the units and pull out the
       distinct channel info.
     * In NWB2 each unit has a mean-waveform for every channel on the probe. In NWB1 A unit only has a single waveform
+    * The NWB1 identifier is a string
     """
 
     def __init__(self, path, *args, **kwargs):
         self._path = path
         self._h5_root = h5py.File(self._path, 'r')
-        # check file is a valid NWB 1 file
         try:
+            # check file is a valid NWB 1 file
             version_str = self._h5_root['nwb_version'][()]
             if not (version_str.startswith('NWB-1.') or version_str.startswith('1.')):
                 raise Exception('{} is not a valid NWB 1 file path'.format(self._path))
@@ -83,7 +84,7 @@ class EcephysNwb1Adaptor(EcephysApi):
         running_speed_grp = self.running_speed_grp
         return RunningSpeed(
             timestamps=running_speed_grp['timestamps'][()],
-            values=running_speed_grp['data'][()],
+            values=running_speed_grp['data'][()]
         )
 
     __stim_col_map = {
@@ -216,6 +217,7 @@ class EcephysNwb1Adaptor(EcephysApi):
     def get_mean_waveforms(self) -> Dict[int, np.ndarray]:
         waveforms = {}
         for prb_name, prb_grp in self._probe_groups():
+            # There is one waveform for any given spike, but still calling it "mean" wavefor
             for indx, uid in enumerate(prb_grp['unit_list']):
                 unit_grp = prb_grp['UnitTimes'][str(uid)]
                 unit_id = self._unit_ids[(prb_name, uid)]
@@ -225,11 +227,7 @@ class EcephysNwb1Adaptor(EcephysApi):
 
     def get_spike_times(self) -> Dict[int, np.ndarray]:
         spike_times = {}
-        processing_grp = self.processing_grp
-        for prb_name, prb_grp in processing_grp.items():
-            if not (isinstance(prb_grp, h5py.Group) and prb_name.lower().startswith('probe')):
-                continue
-
+        for prb_name, prb_grp in self._probe_groups():
             for indx, uid in enumerate(prb_grp['unit_list']):
                 unit_grp = prb_grp['UnitTimes'][str(uid)]
                 unit_id = self._unit_ids[(prb_name, uid)]
@@ -239,16 +237,14 @@ class EcephysNwb1Adaptor(EcephysApi):
 
     def get_units(self) -> pd.DataFrame:
         # TODO: Missing properties: firing_rate, isi_violations
-        processing_grp = self.processing_grp
         unit_ids = np.zeros(0, dtype=np.uint64)
         local_indices = np.zeros(0, dtype=np.int64)
         peak_channel_ids = np.zeros(0, dtype=np.int64)
         snrs = np.zeros(0, dtype=np.float64)
 
-        for prb_name, prb_grp in processing_grp.items():
-            if not (isinstance(prb_grp, h5py.Group) and prb_name.lower().startswith('probe')):
-                continue
-
+        for prb_name, prb_grp in self._probe_groups():
+            # visit every /processing/probeN/UnitList/N/ group to build
+            # TODO: Since just visting the tree is so expensive, maybe build the channels and probes at the same time.
             unit_list = prb_grp['unit_list'][()]
             prb_uids = np.zeros(len(unit_list), dtype=np.uint64)
             prb_channels = np.zeros(len(unit_list), dtype=np.int64)
@@ -275,26 +271,17 @@ class EcephysNwb1Adaptor(EcephysApi):
         units_df.set_index('unit_id', inplace=True)
         return units_df
 
+    def get_ecephys_session_id(self) -> int:
+        # In NWB the identifiers are strings, and in the case for AIBS data usually "mouse(\n+)_session", this is not
+        # a good solution and the API should probably be changed to allow any scalar id
+        import re
+        try:
+            identifier_str = self._h5_root['identifier'][()]
+            return int(re.search(r'\d+', identifier_str).group())
+        except:
+            return -1
+
     @classmethod
     def from_path(cls, path, **kwargs):
-        import pynwb
-        try:
-            io = pynwb.NWBHDF5IO(path, 'r')
-            return io.read()
-        except:
-            pass
-
-        try:
-            return cls(path=path, **kwargs)
-        except:
-            pass
-
-        raise Exception('Could not open {} as an NWB file.'.format(path))
-
-'''
-class EcephysSessionNwb1(EcephysSession):
-    @classmethod
-    def from_nwb_path(cls, path, api_kwargs=None, **kwargs):
-        api_kwargs = {} if api_kwargs is None else api_kwargs
-        return cls(api=EcephysNwb1Adaptor.from_path(path=path, **api_kwargs), **kwargs)
-'''
+        # TODO: Validate that file is proper NWB1
+        return cls(path=path, **kwargs)
