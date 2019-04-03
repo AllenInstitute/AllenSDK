@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 
 from allensdk.core.lazy_property import LazyPropertyMixin
-from allensdk.brain_observatory.ecephys.ecephys_api import EcephysApi, EcephysNwbApi
+from allensdk.brain_observatory.ecephys.ecephys_api import EcephysApi, EcephysNwbApi, EcephysNwb1Adaptor
 from ..running_speed import RunningSpeed
 
 
@@ -479,7 +479,29 @@ class EcephysSession(LazyPropertyMixin):
         return table.sort_values(by=['probe_description', 'probe_vertical_position', 'probe_horizontal_position'])
 
 
+    def _build_nwb1_waveforms(self, mean_waveforms):
+        # _build_mean_waveforms() assumes every unit has the same number of waveforms and that a unit-waveform exists
+        # for all channels. This is not true for NWB 1 files where each unit has ONE waveform on ONE channel
+        units_df = self.units
+        output_waveforms = {}
+        for uid in list(mean_waveforms.keys()):
+            data = mean_waveforms.pop(uid)
+            output_waveforms[uid] = xr.DataArray(
+                data=data,
+                dims=['channel_id', 'time'],
+                coords={
+                    'channel_id': [units_df.loc[uid]['peak_channel_id']],
+                    'time': np.arange(data.shape[1]) / 30000  # Don't know where this came from
+                }
+            )
+
+        return output_waveforms
+
     def _build_mean_waveforms(self, mean_waveforms):
+        # from ecephys_analysis_modules.modules.modality_comparison.ecephys_nwb1_adaptor import EcephysNwb1Adaptor
+        if isinstance(self.api, EcephysNwb1Adaptor):
+            return self._build_nwb1_waveforms(mean_waveforms)
+
         #TODO: there is a bug either here or (more likely) in LIMS unit data ingest which causes the peak channel 
         # to be off by a few (exactly 1?) indices
         # we could easily recompute here, but better to fix it at the source
@@ -523,7 +545,24 @@ class EcephysSession(LazyPropertyMixin):
     @classmethod
     def from_nwb_path(cls, path, api_kwargs=None, **kwargs):
         api_kwargs = {} if api_kwargs is None else api_kwargs
-        return cls(api=EcephysNwbApi.from_path(path=path, **api_kwargs), **kwargs)
+        try:
+            # See if NWB2 file
+            # TODO: I couldn't find anything in pynwb to check if file is valid NWB. instead call NWBHDF5IO.read() which
+            #  is problematic since it tries to parse the entire file.
+            nwb_adaptor = EcephysNwbApi.from_path(path=path, **api_kwargs)
+            nwb_adaptor.nwbfile  # calls HDFMIO.read()
+            return cls(api=nwb_adaptor, **kwargs)
+        except:
+            pass
+
+        try:
+            # See if NWB1 file
+            nwb_adaptor = EcephysNwb1Adaptor.from_path(path=path, **api_kwargs) # Should validate as part of constructor
+            return cls(api=nwb_adaptor, **kwargs)
+        except:
+            pass
+
+        raise Exception('Could not open {} as an NWB file'.format(path))
 
 
 def build_time_window_domain(bin_edges, offsets, callback=None):
