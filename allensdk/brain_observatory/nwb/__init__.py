@@ -6,7 +6,7 @@ from pynwb.base import TimeSeries, Images
 from pynwb.behavior import BehavioralEvents
 from pynwb import ProcessingModule
 from pynwb.image import ImageSeries, GrayscaleImage, IndexSeries
-from pynwb.ophys import DfOverF, ImageSegmentation, OpticalChannel
+from pynwb.ophys import DfOverF, ImageSegmentation, OpticalChannel, Fluorescence
 
 import allensdk.brain_observatory.roi_masks as roi
 from allensdk.brain_observatory.running_speed import RunningSpeed
@@ -413,22 +413,41 @@ def add_cell_specimen_table(nwbfile, cell_roi_table):
     return nwbfile
 
 
-def add_dff_traces(nwbfile, dff_df):
+def add_dff_traces(nwbfile, dff_traces):
 
     cell_specimen_table = nwbfile.modules['two_photon_imaging'].data_interfaces['image_segmentation'].plane_segmentations['cell_specimen_table']
     roi_table_region = cell_specimen_table.create_roi_table_region(
         description="segmented cells labeled by cell_specimen_id",
-        region=slice(len(dff_df)))
+        region=slice(len(dff_traces)))
 
     # Create/Add dff modules and interfaces:
-    assert dff_df.index.name == 'cell_roi_id'
-    dff_module = nwbfile.modules['two_photon_imaging']
-    ophys_timestamps = dff_module.get_data_interface('timestamps')
-    dff_interface = DfOverF(name='traces')
-    dff_module.add_data_interface(dff_interface)
+    assert dff_traces.index.name == 'cell_roi_id'
+    twop_module = nwbfile.modules['two_photon_imaging']
+    ophys_timestamps = twop_module.get_data_interface('timestamps')
+    dff_interface = DfOverF(name='dff')
+    twop_module.add_data_interface(dff_interface)
     dff_interface.create_roi_response_series(
-        name='dff',
-        data=np.array([dff_df.loc[cell_roi_id].dff for cell_roi_id in dff_df.index.values]),
+        name='traces',
+        data=np.array([dff_traces.loc[cell_roi_id].dff for cell_roi_id in dff_traces.index.values]),
+        unit='NA',
+        rois=roi_table_region,
+        timestamps=ophys_timestamps)
+
+    return nwbfile
+
+
+def add_corrected_fluorescence_traces(nwbfile, corrected_fluorescence_traces):
+
+    # Create/Add corrected_fluorescence_traces modules and interfaces:
+    assert corrected_fluorescence_traces.index.name == 'cell_roi_id'
+    twop_module = nwbfile.modules['two_photon_imaging']
+    roi_table_region = nwbfile.modules['two_photon_imaging'].data_interfaces['dff'].roi_response_series['traces'].rois
+    ophys_timestamps = twop_module.get_data_interface('timestamps')
+    f_interface = Fluorescence(name='corrected_fluorescence')
+    twop_module.add_data_interface(f_interface)
+    f_interface.create_roi_response_series(
+        name='traces',
+        data=np.array([corrected_fluorescence_traces.loc[cell_roi_id].corrected_fluorescence for cell_roi_id in corrected_fluorescence_traces.index.values]),
         unit='NA',
         rois=roi_table_region,
         timestamps=ophys_timestamps)

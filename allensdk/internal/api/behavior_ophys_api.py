@@ -193,7 +193,7 @@ class BehaviorOphysLimsApi(OphysLimsApi):
         cell_roi_id_list = self.get_cell_roi_ids(ophys_experiment_id=ophys_experiment_id)
         ophys_timestamps = self.get_ophys_timestamps(ophys_experiment_id=ophys_experiment_id, use_acq_trigger=use_acq_trigger)
         assert corrected_fluorescence_trace_array.shape[1], ophys_timestamps.shape[0]
-        df = pd.DataFrame({'roi_id': cell_roi_id_list, 'corrected_fluorescence': list(corrected_fluorescence_trace_array)})
+        df = pd.DataFrame({'corrected_fluorescence': list(corrected_fluorescence_trace_array)}, index=pd.Index(cell_roi_id_list, name='cell_roi_id'))
         return df
 
 

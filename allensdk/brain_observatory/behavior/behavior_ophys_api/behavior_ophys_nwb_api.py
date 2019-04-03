@@ -176,7 +176,11 @@ class BehaviorOphysNwbApi(NwbApi):
         return df
 
     def get_dff_traces(self) -> pd.DataFrame:
-        dff_nwb = self.nwbfile.modules['two_photon_imaging'].data_interfaces['traces'].roi_response_series['dff']
-        print(dff_nwb.data[:].shape)
-        return pd.DataFrame({'dff':  [x for x in dff_nwb.data[:]]},
+        dff_nwb = self.nwbfile.modules['two_photon_imaging'].data_interfaces['dff'].roi_response_series['traces']
+        return pd.DataFrame({'dff': [x for x in dff_nwb.data[:]]},
                              index=pd.Index(data=dff_nwb.rois.table.id[:], name='cell_roi_id'))
+
+    def get_corrected_fluorescence_traces(self) -> pd.DataFrame:
+        corrected_fluorescence_nwb = self.nwbfile.modules['two_photon_imaging'].data_interfaces['corrected_fluorescence'].roi_response_series['traces']
+        return pd.DataFrame({'corrected_fluorescence': [x for x in corrected_fluorescence_nwb.data[:]]},
+                             index=pd.Index(data=corrected_fluorescence_nwb.rois.table.id[:], name='cell_roi_id'))

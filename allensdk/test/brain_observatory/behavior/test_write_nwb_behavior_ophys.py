@@ -245,3 +245,20 @@ def test_get_dff_traces(nwbfile, roundtrip, roundtripper, dff_traces, cell_speci
         obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
 
     pd.testing.assert_frame_equal(dff_traces, obt.get_dff_traces(), check_dtype=False)
+
+
+@pytest.mark.parametrize('roundtrip', [True, False])
+def test_get_corrected_fluorescence_traces(nwbfile, roundtrip, roundtripper, dff_traces, corrected_fluorescence_traces, cell_specimen_table, metadata, ophys_timestamps):
+
+    nwb.add_ophys_timestamps(nwbfile, ophys_timestamps)
+    nwb.add_metadata(nwbfile, metadata)
+    nwb.add_cell_specimen_table(nwbfile, cell_specimen_table)
+    nwb.add_dff_traces(nwbfile, dff_traces)
+    nwb.add_corrected_fluorescence_traces(nwbfile, corrected_fluorescence_traces)
+
+    if roundtrip:
+        obt = roundtripper(nwbfile, BehaviorOphysNwbApi)
+    else:
+        obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
+
+    pd.testing.assert_frame_equal(corrected_fluorescence_traces, obt.get_corrected_fluorescence_traces(), check_dtype=False)
