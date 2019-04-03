@@ -32,7 +32,7 @@ class BehaviorOphysNwbApi(NwbApi):
         unit_dict = {'v_sig': 'V', 'v_in': 'V', 'speed': 'cm/s', 'timestamps': 's', 'dx': 'cm'}
         nwb.add_running_data_df_to_nwbfile(nwbfile, session_object.running_data_df, unit_dict)
 
-        # Add ophys to NWB in-memory object:
+        # # Add ophys to NWB in-memory object:
         nwb.add_ophys_timestamps(nwbfile, session_object.ophys_timestamps)
 
         # Add stimulus template data to NWB in-memory object:
@@ -67,6 +67,18 @@ class BehaviorOphysNwbApi(NwbApi):
 
         # Add task parameters to NWB in-memory object:
         nwb.add_task_parameters(nwbfile, session_object.task_parameters)
+
+        # Add roi metrics to NWB in-memory object:
+        nwb.add_cell_specimen_table(nwbfile, session_object.cell_specimen_table)
+
+        # Add dff to NWB in-memory object:
+        nwb.add_dff_traces(nwbfile, session_object.dff_traces)
+
+        # Add corrected_fluorescence to NWB in-memory object:
+        nwb.add_corrected_fluorescence_traces(nwbfile, session_object.corrected_fluorescence_traces)
+
+        # Add motion correction to NWB in-memory object:
+        nwb.add_motion_correction(nwbfile, session_object.motion_correction)
 
         # Write the file:
         with NWBHDF5IO(self.path, 'w') as nwb_file_writer:
@@ -184,3 +196,11 @@ class BehaviorOphysNwbApi(NwbApi):
         corrected_fluorescence_nwb = self.nwbfile.modules['two_photon_imaging'].data_interfaces['corrected_fluorescence'].roi_response_series['traces']
         return pd.DataFrame({'corrected_fluorescence': [x for x in corrected_fluorescence_nwb.data[:]]},
                              index=pd.Index(data=corrected_fluorescence_nwb.rois.table.id[:], name='cell_roi_id'))
+
+    def get_motion_correction(self) -> pd.DataFrame:
+
+        motion_correction_data = {}
+        motion_correction_data['x'] = self.nwbfile.modules['motion_correction'].get_data_interface('x').data[:]
+        motion_correction_data['y'] = self.nwbfile.modules['motion_correction'].get_data_interface('y').data[:]
+
+        return pd.DataFrame(motion_correction_data)

@@ -415,6 +415,11 @@ def add_cell_specimen_table(nwbfile, cell_roi_table):
 
 def add_dff_traces(nwbfile, dff_traces):
 
+    twop_module = nwbfile.modules['two_photon_imaging']
+    ophys_timestamps = twop_module.get_data_interface('timestamps')
+    data = np.array([dff_traces.loc[cell_roi_id].dff for cell_roi_id in dff_traces.index.values])
+    # assert len(ophys_timestamps.timestamps) == len(data)
+
     cell_specimen_table = nwbfile.modules['two_photon_imaging'].data_interfaces['image_segmentation'].plane_segmentations['cell_specimen_table']
     roi_table_region = cell_specimen_table.create_roi_table_region(
         description="segmented cells labeled by cell_specimen_id",
@@ -422,13 +427,12 @@ def add_dff_traces(nwbfile, dff_traces):
 
     # Create/Add dff modules and interfaces:
     assert dff_traces.index.name == 'cell_roi_id'
-    twop_module = nwbfile.modules['two_photon_imaging']
-    ophys_timestamps = twop_module.get_data_interface('timestamps')
     dff_interface = DfOverF(name='dff')
     twop_module.add_data_interface(dff_interface)
+
     dff_interface.create_roi_response_series(
         name='traces',
-        data=np.array([dff_traces.loc[cell_roi_id].dff for cell_roi_id in dff_traces.index.values]),
+        data=data,
         unit='NA',
         rois=roi_table_region,
         timestamps=ophys_timestamps)
@@ -453,3 +457,28 @@ def add_corrected_fluorescence_traces(nwbfile, corrected_fluorescence_traces):
         timestamps=ophys_timestamps)
 
     return nwbfile
+
+
+def add_motion_correction(nwbfile, motion_correction):
+
+    twop_module = nwbfile.modules['two_photon_imaging']
+    ophys_timestamps = twop_module.get_data_interface('timestamps')
+
+    t1 = TimeSeries(
+        name='x',
+        data=motion_correction['x'].values,
+        timestamps=ophys_timestamps,
+        unit='pixels'
+    )
+
+    t2 = TimeSeries(
+        name='y',
+        data=motion_correction['y'].values,
+        timestamps=ophys_timestamps,
+        unit='pixels'
+    )
+
+    motion_module = ProcessingModule('motion_correction', 'Motion Correction processing module')
+    motion_module.add_data_interface(t1)
+    motion_module.add_data_interface(t2)
+    nwbfile.add_processing_module(motion_module)

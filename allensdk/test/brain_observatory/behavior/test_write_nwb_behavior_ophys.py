@@ -262,3 +262,17 @@ def test_get_corrected_fluorescence_traces(nwbfile, roundtrip, roundtripper, dff
         obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
 
     pd.testing.assert_frame_equal(corrected_fluorescence_traces, obt.get_corrected_fluorescence_traces(), check_dtype=False)
+
+
+@pytest.mark.parametrize('roundtrip', [True, False])
+def test_get_motion_correction(nwbfile, roundtrip, roundtripper, motion_correction, ophys_timestamps):
+
+    nwb.add_ophys_timestamps(nwbfile, ophys_timestamps)
+    nwb.add_motion_correction(nwbfile, motion_correction)
+
+    if roundtrip:
+        obt = roundtripper(nwbfile, BehaviorOphysNwbApi)
+    else:
+        obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
+
+    pd.testing.assert_frame_equal(motion_correction, obt.get_motion_correction(), check_dtype=False)

@@ -161,3 +161,8 @@ def dff_traces(ophys_timestamps, cell_specimen_table):
 def corrected_fluorescence_traces(ophys_timestamps, cell_specimen_table):
     return pd.DataFrame({'corrected_fluorescence': [np.ones_like(ophys_timestamps)]},
                          index=cell_specimen_table.index)
+
+@pytest.fixture
+def motion_correction(ophys_timestamps):
+    return pd.DataFrame({'x': np.ones_like(ophys_timestamps),
+                         'y': np.ones_like(ophys_timestamps)})

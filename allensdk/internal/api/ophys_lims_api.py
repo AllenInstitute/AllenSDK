@@ -4,6 +4,7 @@ import numpy as np
 import os
 import h5py
 import pytz
+import pandas as pd
 
 from . import PostgresQueryMixin, OneOrMoreResultExpectedError
 from allensdk.api.cache import memoize
@@ -75,19 +76,6 @@ class OphysLimsApi(PostgresQueryMixin):
         pixel_size = float(platform_data['registration']['surface_2p']['pixel_size_um'])
         max_projection = mpimg.imread(maxInt_a13_file)
         return ImageApi.serialize(max_projection, [pixel_size / 1000., pixel_size / 1000.], 'mm')
-
-
-    @memoize
-    def get_sync_file(self, ophys_experiment_id=None):
-        query = '''
-                SELECT sync.storage_directory || sync.filename AS sync_file
-                FROM ophys_experiments oe
-                JOIN ophys_sessions os ON oe.ophys_session_id = os.id
-                LEFT JOIN well_known_files sync ON sync.attachable_id=os.id AND sync.attachable_type = 'OphysSession' AND sync.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'OphysRigSync')
-                WHERE oe.id= {};
-                '''.format(ophys_experiment_id)        
-        return self.fetchone(query, strict=True)
-
 
     @memoize
     def get_targeted_structure(self, ophys_experiment_id=None):

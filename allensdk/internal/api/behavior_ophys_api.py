@@ -215,7 +215,7 @@ class BehaviorOphysLimsApi(OphysLimsApi):
     def get_motion_correction(self, ophys_experiment_id=None):
         motion_correction_filepath = self.get_rigid_motion_transform_file(ophys_experiment_id=ophys_experiment_id)
         motion_correction = pd.read_csv(motion_correction_filepath)
-        return motion_correction
+        return motion_correction[['x', 'y']]
 
 
     def get_stimulus_rebase_function(self, ophys_experiment_id=None, use_acq_trigger=False):
