@@ -9,30 +9,29 @@ from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
 
 class BehaviorOphysSession(LazyPropertyMixin):
 
-    def __init__(self, ophys_experiment_id, api=None, use_acq_trigger=False):
+    def __init__(self, ophys_experiment_id, api=None):
 
         self.ophys_experiment_id = ophys_experiment_id
-        self.api = BehaviorOphysLimsApi() if api is None else api
-        self.use_acq_trigger = use_acq_trigger
+        self.api = BehaviorOphysLimsApi(ophys_experiment_id) if api is None else api
 
-        self.max_projection = LazyProperty(self.api.get_max_projection, ophys_experiment_id=self.ophys_experiment_id)
-        self.stimulus_timestamps = LazyProperty(self.api.get_stimulus_timestamps, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
-        self.ophys_timestamps = LazyProperty(self.api.get_ophys_timestamps, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
-        self.metadata = LazyProperty(self.api.get_metadata, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
-        self.dff_traces = LazyProperty(self.api.get_dff_traces, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
-        self.cell_specimen_table = LazyProperty(self.api.get_cell_specimen_table, ophys_experiment_id=self.ophys_experiment_id)
-        self.running_speed = LazyProperty(self.api.get_running_speed, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
-        self.running_data_df = LazyProperty(self.api.get_running_data_df, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
-        self.stimulus_presentations = LazyProperty(self.api.get_stimulus_presentations, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
-        self.stimulus_templates = LazyProperty(self.api.get_stimulus_templates, ophys_experiment_id=self.ophys_experiment_id)
-        self.stimulus_index = LazyProperty(self.api.get_stimulus_index, ophys_experiment_id=self.ophys_experiment_id)
-        self.licks = LazyProperty(self.api.get_licks, ophys_experiment_id=self.ophys_experiment_id)
-        self.rewards = LazyProperty(self.api.get_rewards, ophys_experiment_id=self.ophys_experiment_id)
-        self.task_parameters = LazyProperty(self.api.get_task_parameters, ophys_experiment_id=self.ophys_experiment_id)
-        self.trials = LazyProperty(self.api.get_trials, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
-        self.corrected_fluorescence_traces = LazyProperty(self.api.get_corrected_fluorescence_traces, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
-        self.average_image = LazyProperty(self.api.get_average_image, ophys_experiment_id=self.ophys_experiment_id)
-        self.motion_correction = LazyProperty(self.api.get_motion_correction, ophys_experiment_id=self.ophys_experiment_id)
+        self.max_projection = LazyProperty(self.api.get_max_projection)
+        self.stimulus_timestamps = LazyProperty(self.api.get_stimulus_timestamps)
+        self.ophys_timestamps = LazyProperty(self.api.get_ophys_timestamps)
+        self.metadata = LazyProperty(self.api.get_metadata)
+        self.dff_traces = LazyProperty(self.api.get_dff_traces)
+        self.cell_specimen_table = LazyProperty(self.api.get_cell_specimen_table)
+        self.running_speed = LazyProperty(self.api.get_running_speed)
+        self.running_data_df = LazyProperty(self.api.get_running_data_df)
+        self.stimulus_presentations = LazyProperty(self.api.get_stimulus_presentations)
+        self.stimulus_templates = LazyProperty(self.api.get_stimulus_templates)
+        self.stimulus_index = LazyProperty(self.api.get_stimulus_index)
+        self.licks = LazyProperty(self.api.get_licks)
+        self.rewards = LazyProperty(self.api.get_rewards)
+        self.task_parameters = LazyProperty(self.api.get_task_parameters)
+        self.trials = LazyProperty(self.api.get_trials)
+        self.corrected_fluorescence_traces = LazyProperty(self.api.get_corrected_fluorescence_traces)
+        self.average_image = LazyProperty(self.api.get_average_image)
+        self.motion_correction = LazyProperty(self.api.get_motion_correction)
 
     def __eq__(self, other):
 
@@ -46,6 +45,7 @@ class BehaviorOphysSession(LazyPropertyMixin):
 
         try:
             for field in field_set:
+                print(field)
                 x1, x2 = getattr(self, field), getattr(other, field)
                 if isinstance(x1, pd.DataFrame):
                     assert_frame_equal(x1, x2)
@@ -75,16 +75,18 @@ class BehaviorOphysSession(LazyPropertyMixin):
 
 if __name__ == "__main__":
 
-    # from allensdk.brain_observatory import JSONEncoder
-    # import json
-
-    # from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi
-    # nwb_filepath = './tmp.nwb'
+    from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi
+    nwb_filepath = './tmp.nwb'
     # nwb_api = BehaviorOphysNwbApi(nwb_filepath)
     # session = BehaviorOphysSession(789359614)
     # nwb_api.save(session)
 
-    session = BehaviorOphysSession(789359614)
+    api_2 = BehaviorOphysNwbApi(nwb_filepath)
+    session = BehaviorOphysSession(789359614, api=api_2)
+    
+    # assert session == session2
+
+    # session = BehaviorOphysSession(789359614)
     print(session.max_projection)
     print(session.stimulus_timestamps)
     print(session.ophys_timestamps)
