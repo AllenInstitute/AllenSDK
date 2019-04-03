@@ -167,3 +167,13 @@ class BehaviorOphysNwbApi(NwbApi):
             data['response_window'] = OphysBehaviorTaskParametersSchema().load({'response_window': data['response_window']}, partial=True)['response_window']
             data['blank_duration'] = OphysBehaviorTaskParametersSchema().load({'blank_duration': data['blank_duration']}, partial=True)['blank_duration']
         return data
+
+    def get_cell_specimen_table(self) -> pd.DataFrame:
+        df = self.nwbfile.modules['two_photon_imaging'].data_interfaces['image_segmentation'].plane_segmentations['cell_specimen_table'].to_dataframe()
+        df.index.rename('cell_roi_id', inplace=True)
+        df['cell_specimen_id'] = [None if csid == -1 else csid for csid in df['cell_specimen_id'].values]
+        df['image_mask'] = [mask.astype(bool) for mask in df['image_mask'].values]
+        return df
+
+    def get_dff_traces(self) -> pd.DataFrame:
+        raise NotImplementedError

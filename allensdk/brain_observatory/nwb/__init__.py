@@ -6,7 +6,9 @@ from pynwb.base import TimeSeries, Images
 from pynwb.behavior import BehavioralEvents
 from pynwb import ProcessingModule
 from pynwb.image import ImageSeries, GrayscaleImage, IndexSeries
+from pynwb.ophys import DfOverF, ImageSegmentation, OpticalChannel
 
+import allensdk.brain_observatory.roi_masks as roi
 from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory import dict_to_indexed_array
 from allensdk.brain_observatory.image_api import ImageApi
@@ -341,3 +343,94 @@ def add_task_parameters(nwbfile, task_parameters):
             new_task_parameters_dict[key] = val
     nwb_task_parameters = OphysBehaviorTaskParameters(name='task_parameters', **new_task_parameters_dict)
     nwbfile.add_lab_meta_data(nwb_task_parameters)
+
+
+def add_cell_specimen_table(nwbfile, cell_roi_table):
+
+    # Device:
+    device_name = nwbfile.lab_meta_data['metadata'].device_name
+    nwbfile.create_device(device_name,
+                          "Allen Brain Observatory")
+    device = nwbfile.get_device(device_name)
+
+    # Location:
+    location_description = "Area: {}, Depth: {} um".format(
+        nwbfile.lab_meta_data['metadata'].targeted_structure,
+        nwbfile.lab_meta_data['metadata'].imaging_depth)
+
+    # FOV:
+    fov_width = nwbfile.lab_meta_data['metadata'].field_of_view_width
+    fov_height = nwbfile.lab_meta_data['metadata'].field_of_view_height
+    imaging_plane_description = "{} field of view in {} at depth {} um".format(
+        (fov_width, fov_height),
+        nwbfile.lab_meta_data['metadata'].targeted_structure,
+        nwbfile.lab_meta_data['metadata'].imaging_depth)
+
+    # Optical Channel:
+    optical_channel = OpticalChannel(
+        name='channel_1',
+        description='2P Optical Channel',
+        emission_lambda=nwbfile.lab_meta_data['metadata'].emission_lambda)
+
+    # Imaging Plane:
+    imaging_plane = nwbfile.create_imaging_plane(
+        name='imaging_plane_1',
+        optical_channel=optical_channel,
+        description=imaging_plane_description,
+        device=device,
+        excitation_lambda=nwbfile.lab_meta_data['metadata'].excitation_lambda,
+        imaging_rate=nwbfile.lab_meta_data['metadata'].ophys_frame_rate,
+        indicator=nwbfile.lab_meta_data['metadata'].indicator,
+        location=location_description,
+        manifold=[],  # Should this be passed in for future support?
+        conversion=1.0,
+        unit='unknown',  # Should this be passed in for future support?
+        reference_frame='unknown')  # Should this be passed in for future support?
+
+
+    # Image Segmentation:
+    image_segmentation = ImageSegmentation(name="image_segmentation")
+    nwbfile.modules['two_photon_imaging'].add_data_interface(image_segmentation)
+
+    # Plane Segmentation:
+    plane_segmentation = image_segmentation.create_plane_segmentation(
+        name='cell_specimen_table',
+        description="Segmented rois",
+        imaging_plane=imaging_plane)
+
+    for c in [c for c in cell_roi_table.columns if c not in ['id', 'mask_matrix']]:
+        plane_segmentation.add_column(c, c)
+
+    for cell_roi_id, row in cell_roi_table.iterrows():
+        sub_mask = np.array(row.pop('image_mask'))
+        curr_roi = roi.create_roi_mask(fov_width, fov_height, [(fov_width - 1), 0, (fov_height - 1), 0], roi_mask=sub_mask)
+        mask = curr_roi.get_mask_plane()
+        csid = row.pop('cell_specimen_id')
+        row['cell_specimen_id'] = -1 if csid is None else csid
+        row['id'] = cell_roi_id
+        plane_segmentation.add_roi(image_mask=mask, **row.to_dict())
+
+    return nwbfile
+
+
+def add_dff_traces(nwbfile, dff_df):
+
+    cell_specimen_table = nwbfile.modules['two_photon_imaging'].data_interfaces['image_segmentation'].plane_segmentations['cell_specimen_table']
+    roi_table_region = cell_specimen_table.create_roi_table_region(
+        description="segmented cells labeled by cell_specimen_id",
+        region=slice(len(dff_df)))
+
+    # Create/Add dff modules and interfaces:
+    assert dff_df.index.name == 'cell_roi_id'
+    dff_module = nwbfile.modules['two_photon_imaging']
+    ophys_timestamps = dff_module.get_data_interface('timestamps')
+    dff_interface = DfOverF(name='traces')
+    dff_module.add_data_interface(dff_interface)
+    dff_interface.create_roi_response_series(
+        name='dff',
+        data=np.array([dff_df.loc[cell_roi_id].dff for cell_roi_id in dff_df.index.values]),
+        unit='NA',
+        rois=roi_table_region,
+        timestamps=ophys_timestamps)
+
+    return nwbfile

@@ -8,7 +8,6 @@ import json
 from allensdk.api.cache import memoize
 from allensdk.internal.api.ophys_lims_api import OphysLimsApi
 from allensdk.brain_observatory.behavior.sync import get_sync_data, get_stimulus_rebase_function
-from allensdk.brain_observatory.behavior.roi_processing import get_roi_metrics
 from allensdk.brain_observatory.behavior.stimulus_processing import get_stimulus_presentations, get_stimulus_templates, get_stimulus_metadata
 from allensdk.brain_observatory.behavior.metadata_processing import get_task_parameters
 from allensdk.brain_observatory.behavior.running_processing import get_running_df
@@ -79,7 +78,7 @@ class BehaviorOphysLimsApi(OphysLimsApi):
     @memoize
     def get_metadata(self, ophys_experiment_id=None, use_acq_trigger=False):
 
-        metadata = {}
+        metadata = super().get_metadata(ophys_experiment_id=ophys_experiment_id)
         metadata['ophys_experiment_id'] = ophys_experiment_id
         metadata['experiment_container_id'] = self.get_experiment_container_id(ophys_experiment_id=ophys_experiment_id)
         metadata['ophys_frame_rate'] = self.get_ophys_frame_rate(ophys_experiment_id=ophys_experiment_id, use_acq_trigger=use_acq_trigger)
@@ -93,7 +92,6 @@ class BehaviorOphysLimsApi(OphysLimsApi):
         metadata['LabTracks_ID'] = self.get_LabTracks_ID(ophys_experiment_id)
         metadata['full_genotype'] = self.get_full_genotype(ophys_experiment_id)
         metadata['behavior_session_uuid'] = uuid.UUID(self.get_behavior_session_uuid(ophys_experiment_id))
-        metadata['rig'] = self.get_equipment_id(ophys_experiment_id)
 
         return metadata
 
@@ -101,14 +99,8 @@ class BehaviorOphysLimsApi(OphysLimsApi):
     def get_dff_traces(self, ophys_experiment_id=None, use_acq_trigger=False):
         dff_traces = self.get_raw_dff_data(ophys_experiment_id)
         cell_roi_id_list = self.get_cell_roi_ids(ophys_experiment_id=ophys_experiment_id)
-        df = pd.DataFrame({'cell_roi_id':cell_roi_id_list, 'dff':list(dff_traces)})
+        df = pd.DataFrame({'dff': list(dff_traces)}, index=pd.Index(cell_roi_id_list, name='cell_roi_id'))
         return df
-
-    @memoize
-    def get_roi_metrics(self, ophys_experiment_id=None):
-        input_extract_traces_file = self.get_input_extract_traces_file(ophys_experiment_id=ophys_experiment_id)
-        objectlist_file = self.get_objectlist_file(ophys_experiment_id=ophys_experiment_id)
-        return get_roi_metrics(input_extract_traces_file, ophys_experiment_id, objectlist_file)['unfiltered']
 
     @memoize
     def get_running_data_df(self, ophys_experiment_id=None, use_acq_trigger=False):

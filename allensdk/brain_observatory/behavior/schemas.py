@@ -1,13 +1,15 @@
-from marshmallow import Schema, fields, pre_dump, RAISE
+from marshmallow import Schema, fields, RAISE
 import numpy as np
 
 
 STYPE_DICT = {fields.Float: 'float', fields.Int: 'int', fields.String: 'text', fields.List: 'text', fields.DateTime: 'text', fields.UUID: 'text'}
 TYPE_DICT = {fields.Float: float, fields.Int: int, fields.String: str, fields.List: np.ndarray, fields.DateTime: str, fields.UUID: str}
 
+
 class RaisingSchema(Schema):
     class Meta:
-        unknown=RAISE
+        unknown = RAISE
+
 
 class OphysBehaviorMetaDataSchema(RaisingSchema):
     """ base schema for all timeseries
@@ -83,8 +85,33 @@ class OphysBehaviorMetaDataSchema(RaisingSchema):
         required=True,
     )
 
-    rig = fields.String(
+    device_name = fields.String(
         doc='name of two-photon rig',
+        required=True,
+    )
+
+    excitation_lambda = fields.Float(
+        doc='excitation_lambda',
+        required=True,
+    )
+
+    emission_lambda = fields.Float(
+        doc='emission_lambda',
+        required=True,
+    )
+
+    indicator = fields.String(
+        doc='indicator',
+        required=True,
+    )
+
+    field_of_view_width = fields.Int(
+        doc='field_of_view_width',
+        required=True,
+    )
+
+    field_of_view_height = fields.Int(
+        doc='field_of_view_height',
         required=True,
     )
 
@@ -99,7 +126,7 @@ class OphysBehaviorTaskParametersSchema(RaisingSchema):
         fields.Float,
         doc='blank duration',
         required=True,
-        shape=(None,),
+        shape=(2,),
     )
 
     stimulus_duration = fields.Float(
@@ -117,7 +144,7 @@ class OphysBehaviorTaskParametersSchema(RaisingSchema):
         fields.Float,
         doc='response_window',
         required=True,
-        shape=(None,),
+        shape=(2,),
     )
 
     reward_volume = fields.Float(

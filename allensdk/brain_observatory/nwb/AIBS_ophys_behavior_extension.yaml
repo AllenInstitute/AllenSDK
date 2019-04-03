@@ -4,86 +4,101 @@ groups:
   doc: "LabMetaData extensions: ['OphysBehaviorMetaData', 'OphysBehaviorTaskParameters']\
     \ (AIBS_ophys_behavior)"
   attributes:
-  - name: ophys_frame_rate
-    dtype: float
-    doc: Frame rate (frames/second) of the two-photon microscope
-  - name: rig
-    dtype: text
-    doc: name of two-photon rig
-  - name: stimulus_frame_rate
-    dtype: float
-    doc: Frame rate (frames/second) of the visual_stimulus from the monitor
-  - name: reporter_line
-    dtype: text
-    doc: Reporter line
-  - name: behavior_session_uuid
-    dtype: text
-    doc: MTrain record for session, also called foraging_id
-  - name: LabTracks_ID
-    dtype: int
-    doc: LabTracks ID of subject
-  - name: targeted_structure
-    dtype: text
-    doc: Anatomical structure targeted for two-photon acquisition
   - name: imaging_depth
     dtype: int
     doc: Depth (microns) below the cortical surface targeted for two-photon acquisition
-  - name: full_genotype
-    dtype: text
-    doc: full genotype of subject
+  - name: LabTracks_ID
+    dtype: int
+    doc: LabTracks ID of subject
   - name: ophys_experiment_id
     dtype: int
     doc: Id for this ophys session
-  - name: session_type
-    dtype: text
-    doc: Experimental session description
-  - name: experiment_container_id
-    dtype: int
-    doc: Container ID for the container that contains this ophys session
   - name: driver_line
     dtype: text
     doc: Driver line
     shape:
     - null
+  - name: excitation_lambda
+    dtype: float
+    doc: excitation_lambda
+  - name: behavior_session_uuid
+    dtype: text
+    doc: MTrain record for session, also called foraging_id
+  - name: experiment_container_id
+    dtype: int
+    doc: Container ID for the container that contains this ophys session
+  - name: ophys_frame_rate
+    dtype: float
+    doc: Frame rate (frames/second) of the two-photon microscope
+  - name: field_of_view_height
+    dtype: int
+    doc: field_of_view_height
+  - name: indicator
+    dtype: text
+    doc: indicator
+  - name: device_name
+    dtype: text
+    doc: name of two-photon rig
+  - name: session_type
+    dtype: text
+    doc: Experimental session description
+  - name: emission_lambda
+    dtype: float
+    doc: emission_lambda
+  - name: reporter_line
+    dtype: text
+    doc: Reporter line
+  - name: field_of_view_width
+    dtype: int
+    doc: field_of_view_width
   - name: experiment_datetime
     dtype: text
     doc: Date of the experiment (UTC, as string)
+  - name: full_genotype
+    dtype: text
+    doc: full genotype of subject
+  - name: stimulus_frame_rate
+    dtype: float
+    doc: Frame rate (frames/second) of the visual_stimulus from the monitor
+  - name: targeted_structure
+    dtype: text
+    doc: Anatomical structure targeted for two-photon acquisition
 - neurodata_type_def: OphysBehaviorTaskParameters
   neurodata_type_inc: LabMetaData
   doc: "LabMetaData extensions: ['OphysBehaviorMetaData', 'OphysBehaviorTaskParameters']\
     \ (AIBS_ophys_behavior)"
   attributes:
-  - name: response_window
-    dtype: text
-    doc: response_window
-    shape:
-    - null
-  - name: stimulus_duration
+  - name: reward_volume
     dtype: float
-    doc: duration of each stimulus presentation
+    doc: reward_volume
   - name: stimulus
     dtype: text
     doc: stage
-  - name: task
+  - name: blank_duration
     dtype: text
-    doc: task
-  - name: n_stimulus_frames
-    dtype: int
-    doc: n_stimulus_frames
+    doc: blank duration
+    shape:
+    - 2
   - name: stage
     dtype: text
     doc: stage
   - name: stimulus_distribution
     dtype: text
     doc: stimulus_distribution
+  - name: response_window
+    dtype: text
+    doc: response_window
+    shape:
+    - 2
+  - name: n_stimulus_frames
+    dtype: int
+    doc: n_stimulus_frames
+  - name: task
+    dtype: text
+    doc: task
+  - name: stimulus_duration
+    dtype: float
+    doc: duration of each stimulus presentation
   - name: omitted_flash_fraction
     dtype: float
     doc: omitted_flash_fraction
-  - name: reward_volume
-    dtype: float
-    doc: reward_volume
-  - name: blank_duration
-    dtype: text
-    doc: blank duration
-    shape:
-    - null

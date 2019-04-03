@@ -182,14 +182,6 @@ def test_get_full_genotype(ophys_experiment_id, api_data, ophys_lims_api):
         expected_fail(f, ophys_experiment_id=ophys_experiment_id)
 
 
-
-
-
-
-
-
-
-
 @pytest.mark.nightly
 @pytest.mark.parametrize('ophys_experiment_id, compare_val', [
     pytest.param(511458874, '/allen/programs/braintv/production/neuralcoding/prod6/specimen_503292442/ophys_experiment_511458874/511458874.nwb'),
@@ -206,6 +198,51 @@ def test_get_nwb_filepath(ophys_experiment_id, compare_val, ophys_lims_api):
         assert expected_fail == True
     else:
         assert ophys_lims_api.get_nwb_filepath(ophys_experiment_id=ophys_experiment_id) == compare_val
+
+
+@pytest.mark.nightly
+@pytest.mark.parametrize('ophys_experiment_id', [
+    pytest.param(511458874),
+])
+def test_get_ophys_segmentation_run_id(ophys_experiment_id, ophys_lims_api):
+    print(ophys_lims_api.get_ophys_segmentation_run_id(ophys_experiment_id=ophys_experiment_id))
+
+
+@pytest.mark.nightly
+@pytest.mark.parametrize('ophys_experiment_id', [
+    pytest.param(511458874),
+])
+def test_get_cell_roi_table(ophys_experiment_id, ophys_lims_api):
+    df = ophys_lims_api.get_cell_roi_table(ophys_experiment_id)
+    assert len(df) == 128
+
+
+
+
+
+
+
+
+
+
+
+# @pytest.mark.nightly
+# @pytest.mark.parametrize('ophys_experiment_id, compare_val', [
+#     pytest.param(511458874, 572290131),
+#     pytest.param(0, None)
+# ])
+# def test_get_curr_segmentation_run(ophys_experiment_id, compare_val, ophys_lims_api):
+
+#     if compare_val is None:
+#         expected_fail = False
+#         try:
+#             ophys_lims_api.get_curr_segmentation_run(ophys_experiment_id)
+#         except OneResultExpectedError:
+#             expected_fail = True
+#         assert expected_fail is True
+#     else:
+#         assert ophys_lims_api.get_curr_segmentation_run(ophys_experiment_id=ophys_experiment_id) == compare_val
+
 
 
         # 'demix_file':'/allen/programs/braintv/production/neuralcoding/prod0/specimen_652073919/ophys_session_702013508/ophys_experiment_702134928/demix/702134928_demixed_traces.h5',

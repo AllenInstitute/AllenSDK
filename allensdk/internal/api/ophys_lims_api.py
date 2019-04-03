@@ -310,3 +310,62 @@ class OphysLimsApi(PostgresQueryMixin):
                 WHERE oe.id= {};
                 '''.format(ophys_experiment_id)
         return self.fetchone(query, strict=True)
+
+    @memoize
+    def get_device_name(self, ophys_experiment_id=None):
+        query = '''
+                select e.name as device_name
+                from ophys_experiments oe
+                join ophys_sessions os on os.id = oe.ophys_session_id
+                join equipment e on e.id = os.equipment_id
+                where oe.id = {}
+                '''.format(ophys_experiment_id)
+        return self.fetchone(query, strict=True)
+
+    @memoize
+    def get_field_of_view_shape(self, ophys_experiment_id=None):
+        query = '''
+                select {}
+                from ophys_experiments oe
+                where oe.id = {}
+                '''
+        X = {c: self.fetchone(query.format('oe.movie_{}'.format(c), ophys_experiment_id), strict=True) for c in ['width', 'height']}
+        return X
+
+    @memoize
+    def get_metadata(self, ophys_experiment_id):
+
+        metadata = {}
+        metadata['device_name'] = self.get_device_name(ophys_experiment_id=ophys_experiment_id)
+        metadata['excitation_lambda'] = 910.
+        metadata['emission_lambda'] = 520.
+        metadata['indicator'] = 'GCAMP6f'
+        metadata['field_of_view_width'] = self.get_field_of_view_shape(ophys_experiment_id=ophys_experiment_id)['width']
+        metadata['field_of_view_height'] = self.get_field_of_view_shape(ophys_experiment_id=ophys_experiment_id)['height']
+
+        return metadata
+
+    @memoize
+    def get_ophys_cell_segmentation_run_id(self, ophys_experiment_id):
+        query = '''
+                select oseg.id
+                from ophys_experiments oe
+                join ophys_cell_segmentation_runs oseg on oe.id = oseg.ophys_experiment_id
+                where oe.id = {} and oseg.current = 't'
+                '''.format(ophys_experiment_id)
+        return self.fetchone(query, strict=True)
+
+
+
+    @memoize
+    def get_cell_specimen_table(self, ophys_experiment_id):
+        ophys_cell_segmentation_run_id = self.get_ophys_cell_segmentation_run_id(ophys_experiment_id)
+        query = '''
+                select *
+                from cell_rois cr
+                where cr.ophys_cell_segmentation_run_id = {}
+                '''.format(ophys_cell_segmentation_run_id)
+
+        cell_specimen_table = pd.read_sql(query, self.get_connection()).rename(columns={'id': 'cell_roi_id', 'mask_matrix': 'image_mask'}).set_index('cell_roi_id')
+
+        return cell_specimen_table

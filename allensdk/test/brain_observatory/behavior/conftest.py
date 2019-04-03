@@ -108,7 +108,13 @@ def metadata():
             "LabTracks_ID": 416369,
             "full_genotype": "Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;Ai93(TITL-GCaMP6f)/wt",
             "behavior_session_uuid": uuid.uuid4(),
-            "rig": "CAM2P.5"
+            "rig": "CAM2P.5",
+            "emission_lambda": 1.0,
+            "excitation_lambda": 1.0,
+            "indicator": 'HW',
+            "field_of_view_width": 2,
+            "field_of_view_height": 2,
+            "device_name": 'my_device',
             }
 
 
@@ -126,3 +132,27 @@ def task_parameters():
             "task": "DoC_untranslated",
             "n_stimulus_frames": 69882
             }
+
+
+@pytest.fixture
+def cell_specimen_table():
+    return pd.DataFrame({'cell_specimen_id': [None, None],
+                         'x': [1, 1],
+                         'y': [1, 1],
+                         'width': [1, 1],
+                         'height': [1, 1],
+                         'valid_roi':[True, False],
+                         'max_correction_up':[1., 1.],
+                         'max_correction_down':[1., 1.],
+                         'max_correction_left':[1., 1.],
+                         'max_correction_right':[1., 1.],
+                         'mask_image_plane':[1, 1],
+                         'ophys_cell_segmentation_run_id':[1, 1],
+                         'image_mask': [np.array([[True, True], [False, False]]), np.array([[True, True], [False, False]])]},
+                          index=pd.Index([123, 321], dtype=int, name='cell_roi_id'))
+
+
+@pytest.fixture
+def dff_traces(ophys_timestamps):
+    return pd.DataFrame({'dff': ophys_timestamps},
+                         index=pd.Index([1], dtype=int, name='cell_roi_id'))

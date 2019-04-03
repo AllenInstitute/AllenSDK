@@ -214,3 +214,31 @@ def test_add_task_parameters(nwbfile, roundtrip, roundtripper, task_parameters):
                 assert math.isnan(val)
         else:
             assert val == task_parameters_obt[key]
+
+
+@pytest.mark.parametrize('roundtrip', [True, False])
+def test_get_cell_specimen_table(nwbfile, roundtrip, roundtripper, cell_specimen_table, metadata, ophys_timestamps):
+
+    nwb.add_ophys_timestamps(nwbfile, ophys_timestamps)
+    nwb.add_metadata(nwbfile, metadata)
+    nwb.add_cell_specimen_table(nwbfile, cell_specimen_table)
+
+    if roundtrip:
+        obt = roundtripper(nwbfile, BehaviorOphysNwbApi)
+    else:
+        obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
+
+    pd.testing.assert_frame_equal(cell_specimen_table, obt.get_cell_specimen_table(), check_dtype=False)
+
+
+@pytest.mark.parametrize('roundtrip', [True, False])
+def test_get_dff_traces(nwbfile, roundtrip, roundtripper, dff_traces):
+
+    nwb.add_dff_traces(nwbfile, dff_traces)
+
+    if roundtrip:
+        obt = roundtripper(nwbfile, BehaviorOphysNwbApi)
+    else:
+        obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
+
+    pd.testing.assert_frame_equal(dff_traces, obt.get_dff_traces(), check_dtype=False)
