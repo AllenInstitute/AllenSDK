@@ -153,6 +153,6 @@ def cell_specimen_table():
 
 
 @pytest.fixture
-def dff_traces(ophys_timestamps):
-    return pd.DataFrame({'dff': ophys_timestamps},
-                         index=pd.Index([1], dtype=int, name='cell_roi_id'))
+def dff_traces(ophys_timestamps, cell_specimen_table):
+    return pd.DataFrame({'dff': [np.ones_like(ophys_timestamps)]},
+                         index=cell_specimen_table.index)

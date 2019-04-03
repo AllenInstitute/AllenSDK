@@ -232,8 +232,11 @@ def test_get_cell_specimen_table(nwbfile, roundtrip, roundtripper, cell_specimen
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
-def test_get_dff_traces(nwbfile, roundtrip, roundtripper, dff_traces):
+def test_get_dff_traces(nwbfile, roundtrip, roundtripper, dff_traces, cell_specimen_table, metadata, ophys_timestamps):
 
+    nwb.add_ophys_timestamps(nwbfile, ophys_timestamps)
+    nwb.add_metadata(nwbfile, metadata)
+    nwb.add_cell_specimen_table(nwbfile, cell_specimen_table)
     nwb.add_dff_traces(nwbfile, dff_traces)
 
     if roundtrip:

@@ -176,4 +176,7 @@ class BehaviorOphysNwbApi(NwbApi):
         return df
 
     def get_dff_traces(self) -> pd.DataFrame:
-        raise NotImplementedError
+        dff_nwb = self.nwbfile.modules['two_photon_imaging'].data_interfaces['traces'].roi_response_series['dff']
+        print(dff_nwb.data[:].shape)
+        return pd.DataFrame({'dff':  [x for x in dff_nwb.data[:]]},
+                             index=pd.Index(data=dff_nwb.rois.table.id[:], name='cell_roi_id'))
