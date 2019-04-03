@@ -21,3 +21,4 @@ debug.log
 **.ipynb_checkpoints**
 .vscode/
 .mypy_cache/
+/cell_types/
