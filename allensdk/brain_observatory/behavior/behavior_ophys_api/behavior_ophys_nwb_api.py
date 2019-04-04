@@ -6,7 +6,6 @@ import numpy as np
 import SimpleITK as sitk
 import pytz
 import uuid
-import h5py
 
 from allensdk.brain_observatory.nwb.nwb_api import NwbApi
 from allensdk.brain_observatory.behavior.trials_processing import TRIAL_COLUMN_DESCRIPTION_DICT
@@ -149,35 +148,17 @@ class BehaviorOphysNwbApi(NwbApi):
 
     def get_metadata(self) -> dict:
 
-        if self.path is None:
-            metadata_nwb_obj = self.nwbfile.lab_meta_data['metadata']
-            data = OphysBehaviorMetaDataSchema(exclude=['experiment_datetime']).dump(metadata_nwb_obj)
-            experiment_datetime = metadata_nwb_obj.experiment_datetime
-        else:
-            f = h5py.File(self.path, 'r')
-            data = dict(f['general/metadata'].attrs)
-            data.pop('namespace')
-            data.pop('neurodata_type')
-            f.close()
-            experiment_datetime = data['experiment_datetime']
-            data['driver_line'] = OphysBehaviorMetaDataSchema().load({'driver_line': data['driver_line']}, partial=True)['driver_line']
+        metadata_nwb_obj = self.nwbfile.lab_meta_data['metadata']
+        data = OphysBehaviorMetaDataSchema(exclude=['experiment_datetime']).dump(metadata_nwb_obj)
+        experiment_datetime = metadata_nwb_obj.experiment_datetime
         data['experiment_datetime'] = OphysBehaviorMetaDataSchema().load({'experiment_datetime': experiment_datetime}, partial=True)['experiment_datetime']            
         data['behavior_session_uuid'] = uuid.UUID(data['behavior_session_uuid'])
         return data
 
     def get_task_parameters(self) -> dict:
 
-        if self.path is None:
-            metadata_nwb_obj = self.nwbfile.lab_meta_data['task_parameters']
-            data = OphysBehaviorTaskParametersSchema().dump(metadata_nwb_obj)
-        else:
-            f = h5py.File(self.path, 'r')
-            data = dict(f['general/task_parameters'].attrs)
-            data.pop('namespace')
-            data.pop('neurodata_type')
-            f.close()
-            data['response_window_sec'] = OphysBehaviorTaskParametersSchema().load({'response_window_sec': data['response_window_sec']}, partial=True)['response_window_sec']
-            data['blank_duration_sec'] = OphysBehaviorTaskParametersSchema().load({'blank_duration_sec': data['blank_duration_sec']}, partial=True)['blank_duration_sec']
+        metadata_nwb_obj = self.nwbfile.lab_meta_data['task_parameters']
+        data = OphysBehaviorTaskParametersSchema().dump(metadata_nwb_obj)
         return data
 
     def get_cell_specimen_table(self) -> pd.DataFrame:
