@@ -73,7 +73,7 @@ def subsample(args):
                                                             params['start_channel_offset'],
                                                             params['channel_stride'],
                                                             lfp_channel_order,
-                                                            probe['noisy_channels'],
+                                                            probe.get('noisy_channels', []),
                                                             params['remove_noisy_channels'],
                                                             probe['reference_channels'],
                                                             params['remove_reference_channels'])

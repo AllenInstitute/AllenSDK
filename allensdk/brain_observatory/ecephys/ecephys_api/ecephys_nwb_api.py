@@ -38,6 +38,9 @@ class EcephysNwbApi(NwbApi, EcephysApi):
 
         return units_table
 
+    def get_ecephys_session_id(self) -> int:
+        return int(self.nwbfile.identifier)
+
     def _get_full_units_table(self) -> pd.DataFrame:
         table = self.nwbfile.units.to_dataframe()
         table.index = table.index.astype(int)

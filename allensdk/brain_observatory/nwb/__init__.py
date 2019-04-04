@@ -178,7 +178,7 @@ def add_ophys_timestamps(nwbfile, ophys_timestamps, module_name='two_photon_imag
 
     return nwbfile
 
-
+  
 def add_stimulus_timestamps(nwbfile, stimulus_timestamps, module_name='stimulus'):
 
     stimulus_ts = TimeSeries(

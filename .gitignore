@@ -3,7 +3,6 @@
 .coverage*
 htmlcov
 .settings
-cell_types
 dist
 .eggs/
 eggs/
@@ -22,3 +21,4 @@ debug.log
 **.ipynb_checkpoints**
 .vscode/
 .mypy_cache/
+/cell_types/
