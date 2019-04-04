@@ -26,9 +26,10 @@ def running_data_df(running_speed):
     dx = np.ones_like(running_speed.values)
 
     return pd.DataFrame({'speed': running_speed.values,
-                         'v_in': v_in,
+                         'dx': dx,
                          'v_sig': v_sig,
-                         'dx': dx}, index=pd.Index(running_speed.timestamps, name='timestamps'))
+                         'v_in': v_in,
+                         }, index=pd.Index(running_speed.timestamps, name='timestamps'))
 
 
 @pytest.fixture
@@ -65,7 +66,8 @@ def licks():
 
 @pytest.fixture
 def rewards():
-    return pd.DataFrame({'time': [1., 2., 3.], 'volume': [.01, .01, .01], 'autorewarded': [True, False, False]})
+    return pd.DataFrame({'volume': [.01, .01, .01], 'autorewarded': [True, False, False]},
+                        index=pd.Index(data=[1., 2., 3.], name='timestamps'))
 
 
 @pytest.fixture
@@ -108,7 +110,6 @@ def metadata():
             "LabTracks_ID": 416369,
             "full_genotype": "Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;Ai93(TITL-GCaMP6f)/wt",
             "behavior_session_uuid": uuid.uuid4(),
-            "rig": "CAM2P.5",
             "emission_lambda": 1.0,
             "excitation_lambda": 1.0,
             "indicator": 'HW',
@@ -121,10 +122,10 @@ def metadata():
 @pytest.fixture
 def task_parameters():
 
-    return {"blank_duration": [0.5, 0.5],
-            "stimulus_duration": 6000.0,
+    return {"blank_duration_sec": [0.5, 0.5],
+            "stimulus_duration_sec": 6000.0,
             "omitted_flash_fraction": float('nan'),
-            "response_window": [0.15, 0.75],
+            "response_window_sec": [0.15, 0.75],
             "reward_volume": 0.007,
             "stage": "OPHYS_6_images_B",
             "stimulus": "images",
