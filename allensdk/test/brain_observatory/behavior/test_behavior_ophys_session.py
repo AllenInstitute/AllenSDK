@@ -8,9 +8,60 @@ import pandas as pd
 import pytz
 import numpy as np
 import h5py
+import SimpleITK as sitk
+from pandas.util.testing import assert_frame_equal
 
 from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorOphysSession
 from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi
+from allensdk.core.lazy_property import LazyProperty
+
+
+def equals(A, B):
+
+    field_set = set()
+    for key, val in A.__dict__.items():
+        if isinstance(val, LazyProperty):
+            field_set.add(key)
+    for key, val in B.__dict__.items():
+        if isinstance(val, LazyProperty):
+            field_set.add(key)
+
+    try:
+        for field in sorted(field_set):
+            x1, x2 = getattr(A, field), getattr(B, field)
+            if isinstance(x1, pd.DataFrame):
+                assert_frame_equal(x1, x2)
+            elif isinstance(x1, np.ndarray):
+                np.testing.assert_array_almost_equal(x1, x2)
+            elif isinstance(x1, (list,)):
+                assert x1 == x2
+            elif isinstance(x1, (sitk.Image,)):
+                assert x1.GetSize() == x2.GetSize()
+                assert x1 == x2
+            elif isinstance(x1, (dict,)):
+                for key in set(x1.keys()).union(set(x2.keys())):
+                    if isinstance(x1[key], (np.ndarray,)):
+                        np.testing.assert_array_almost_equal(x1[key], x2[key])
+                    elif isinstance(x1[key], (float,)):
+                        if math.isnan(x1[key]) or math.isnan(x2[key]):
+                            assert math.isnan(x1[key]) and math.isnan(x2[key])
+                        else:
+                            assert x1[key] == x2[key]
+                    else:
+                        assert x1[key] == x2[key]
+
+            else:
+                assert x1 == x2
+
+    except NotImplementedError as e:
+        A_implements_get_field = hasattr(A.api, getattr(type(A), field).getter_name)
+        B_implements_get_field = hasattr(B.api, getattr(type(B), field).getter_name)
+        assert A_implements_get_field == B_implements_get_field == False
+
+    except (AssertionError, AttributeError) as e:
+        return False
+
+    return True
 
 @pytest.mark.nightly
 @pytest.mark.parametrize('oeid1, oeid2, expected', [
@@ -21,7 +72,7 @@ def test_equal(oeid1, oeid2, expected):
     d1 = BehaviorOphysSession(oeid1)
     d2 = BehaviorOphysSession(oeid2)
 
-    assert (d1 == d2) == expected
+    assert equals(d1, d2) == expected
 
 
 @pytest.mark.nightly
@@ -33,7 +84,7 @@ def test_nwb_end_to_end(tmpdir_factory):
     BehaviorOphysNwbApi(nwb_filepath).save(d1)
 
     d2 = BehaviorOphysSession(789359614, api=BehaviorOphysNwbApi(nwb_filepath))
-    assert d1 == d2
+    assert equals(d1, d2)
 
 
 @pytest.mark.nightly
