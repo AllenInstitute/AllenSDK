@@ -8,7 +8,7 @@ import numpy as np
 import h5py
 
 from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorOphysSession
-
+from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi
 
 @pytest.mark.nightly
 def test_equal():
@@ -19,6 +19,18 @@ def test_equal():
 
     assert d1 == d2
     assert not (d1 == d3)
+
+
+@pytest.mark.nightly
+def test_nwb_end_to_end(tmpdir_factory):
+    oeid = 789359614
+    nwb_filepath = os.path.join(str(tmpdir_factory.mktemp('test_nwb_end_to_end')), 'nwbfile.nwb')
+    
+    d1 = BehaviorOphysSession(oeid)
+    BehaviorOphysNwbApi(nwb_filepath).save(d1)
+
+    d2 = BehaviorOphysSession(789359614, api=BehaviorOphysNwbApi(nwb_filepath))
+    assert d1 == d2
 
 
 @pytest.mark.nightly

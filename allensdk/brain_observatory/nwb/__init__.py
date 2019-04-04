@@ -232,10 +232,11 @@ def add_licks(nwbfile, licks):
 
 
 def add_rewards(nwbfile, rewards_df):
+    assert rewards_df.index.name == 'timestamps'
 
     reward_timestamps_ts = TimeSeries(
         name='timestamps',
-        timestamps=rewards_df.time.values,
+        timestamps=rewards_df.index.values,
         unit='s'
     )
 

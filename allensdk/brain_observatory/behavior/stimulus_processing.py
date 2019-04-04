@@ -21,6 +21,7 @@ def get_stimulus_presentations(data, stimulus_timestamps):
     end_time = [stimulus_timestamps[end_frame] for end_frame in stimulus_table.end_frame.values]
     stimulus_table.insert(loc=4, column='stop_time', value=end_time)
     stimulus_table.set_index('stimulus_presentations_id', inplace=True)
+    stimulus_table = stimulus_table[sorted(stimulus_table.columns)]
 
     return stimulus_table
 

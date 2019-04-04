@@ -1,9 +1,14 @@
 import pandas as pd
 import pynwb
 import SimpleITK as sitk
+import os
 
 from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory.image_api import ImageApi
+
+from pynwb import load_namespaces
+namespace_path = os.path.join(os.path.dirname(__file__), 'AIBS_ophys_behavior_namespace.yaml')
+load_namespaces(namespace_path)
 
 
 class NwbApi:
@@ -59,7 +64,7 @@ class NwbApi:
             if col.name not in set(['tags', 'timeseries', 'tags_index', 'timeseries_index'])
         }, index=pd.Index(name='stimulus_presentations_id', data=self.nwbfile.epochs.id.data))
         table.index = table.index.astype(int)
-        return table
+        return table[sorted(table.columns)]
 
     def get_image(self, name, module, image_api=None) -> sitk.Image:
 

@@ -101,7 +101,7 @@ class BehaviorOphysNwbApi(NwbApi):
             if ('running' in self.nwbfile.modules) and (key in self.nwbfile.modules['running'].fields['data_interfaces']):
                 running_data_df[key] = self.nwbfile.modules['running'].get_data_interface(key).data
 
-        return running_data_df
+        return running_data_df[['speed', 'dx', 'v_sig', 'v_in']]
 
     def get_stimulus_templates(self, **kwargs):
         return {key: val.data[:] for key, val in self.nwbfile.stimulus_template.items()}
@@ -125,7 +125,7 @@ class BehaviorOphysNwbApi(NwbApi):
         autorewarded = self.nwbfile.modules['rewards'].get_data_interface('autorewarded').data[:]
         volume = self.nwbfile.modules['rewards'].get_data_interface('volume').data[:]
 
-        return pd.DataFrame({'time': time, 'volume': volume, 'autorewarded': autorewarded})
+        return pd.DataFrame({'volume': volume, 'timestamps': time, 'autorewarded': autorewarded}).set_index('timestamps')
 
     def get_max_projection(self, image_api=None) -> sitk.Image:
         return self.get_image('max_projection', 'two_photon_imaging', image_api=image_api)

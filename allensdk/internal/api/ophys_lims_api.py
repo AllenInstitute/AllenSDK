@@ -9,6 +9,7 @@ import pandas as pd
 from . import PostgresQueryMixin, OneOrMoreResultExpectedError
 from allensdk.api.cache import memoize
 from allensdk.brain_observatory.image_api import ImageApi
+import allensdk.brain_observatory.roi_masks as roi
 
 
 class OphysLimsApi(PostgresQueryMixin):
@@ -332,7 +333,13 @@ class OphysLimsApi(PostgresQueryMixin):
                 from cell_rois cr
                 where cr.ophys_cell_segmentation_run_id = {}
                 '''.format(ophys_cell_segmentation_run_id)
-
         cell_specimen_table = pd.read_sql(query, self.get_connection()).rename(columns={'id': 'cell_roi_id', 'mask_matrix': 'image_mask'}).set_index('cell_roi_id')
+
+        fov_width, fov_height = self.get_field_of_view_shape()['width'], self.get_field_of_view_shape()['height']
+        image_mask_list = []
+        for sub_mask in cell_specimen_table['image_mask'].values:
+            curr_roi = roi.create_roi_mask(fov_width, fov_height, [(fov_width - 1), 0, (fov_height - 1), 0], roi_mask=np.array(sub_mask, dtype=np.bool))
+            image_mask_list.append(curr_roi.get_mask_plane().astype(np.bool))
+        cell_specimen_table['image_mask'] = image_mask_list
 
         return cell_specimen_table

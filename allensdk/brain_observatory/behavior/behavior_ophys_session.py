@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import math
 from pandas.util.testing import assert_frame_equal
 from typing import NamedTuple
 
@@ -44,8 +45,7 @@ class BehaviorOphysSession(LazyPropertyMixin):
                 field_set.add(key)
 
         try:
-            for field in field_set:
-                print(field)
+            for field in sorted(field_set):
                 x1, x2 = getattr(self, field), getattr(other, field)
                 if isinstance(x1, pd.DataFrame):
                     assert_frame_equal(x1, x2)
@@ -57,8 +57,14 @@ class BehaviorOphysSession(LazyPropertyMixin):
                     for key in set(x1.keys()).union(set(x2.keys())):
                         if isinstance(x1[key], (np.ndarray,)):
                             np.testing.assert_array_almost_equal(x1[key], x2[key])
+                        elif isinstance(x1[key], (float,)):
+                            if math.isnan(x1[key]) or math.isnan(x2[key]):
+                                assert math.isnan(x1[key]) and math.isnan(x2[key])
+                            else:
+                                assert x1[key] == x2[key]
                         else:
                             assert x1[key] == x2[key]
+
                 else:
                     assert x1 == x2
 
@@ -76,32 +82,35 @@ class BehaviorOphysSession(LazyPropertyMixin):
 if __name__ == "__main__":
 
     from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi
-    nwb_filepath = './tmp.nwb'
+    nwb_filepath = '/home/nicholasc/projects/allensdk/tmp.nwb'
+    session = BehaviorOphysSession(789359614)
     # nwb_api = BehaviorOphysNwbApi(nwb_filepath)
-    # session = BehaviorOphysSession(789359614)
     # nwb_api.save(session)
 
+    # print(session.cell_specimen_table)
+
+
     api_2 = BehaviorOphysNwbApi(nwb_filepath)
-    session = BehaviorOphysSession(789359614, api=api_2)
+    session2 = BehaviorOphysSession(789359614, api=api_2)
     
-    # assert session == session2
+    assert session == session2
 
     # session = BehaviorOphysSession(789359614)
-    print(session.max_projection)
-    print(session.stimulus_timestamps)
-    print(session.ophys_timestamps)
-    print(session.metadata)
-    print(session.dff_traces)
-    print(session.cell_specimen_table)
-    print(session.running_speed)
-    print(session.running_data_df)
-    print(session.stimulus_presentations)
-    print(session.stimulus_templates)
-    print(session.stimulus_index)
-    print(session.licks)
-    print(session.rewards)
-    print(session.task_parameters)
-    print(session.trials)
-    print(session.corrected_fluorescence_traces)
-    print(session.average_image)
-    print(session.motion_correction)
+    # print(session.max_projection)
+    # print(session.stimulus_timestamps)
+    # print(session.ophys_timestamps)
+    # print(session.metadata)
+    # print(session.dff_traces)
+    # print(session.cell_specimen_table)
+    # print(session.running_speed)
+    # print(session.running_data_df)
+    # print(session.stimulus_presentations)
+    # print(session.stimulus_templates)
+    # print(session.stimulus_index)
+    # print(session.licks)
+    # print(session.rewards)
+    # print(session.task_parameters)
+    # print(session.trials)
+    # print(session.corrected_fluorescence_traces)
+    # print(session.average_image)
+    # print(session.motion_correction)

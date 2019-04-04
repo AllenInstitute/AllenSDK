@@ -45,12 +45,12 @@ def resolve_initial_image(stimuli, start_frame):
 
 
 def get_trials(data, stimulus_timestamps_no_monitor_delay, licks_df, rewards_df, rebase):
-
+    assert rewards_df.index.name == 'timestamps'
     stimuli = data["items"]["behavior"]["stimuli"]
 
     trial_data = defaultdict(list)
     sync_lick_times = licks_df.time.values 
-    rebased_reward_times = rewards_df.time.values
+    rebased_reward_times = rewards_df.index.values
     for trial in data["items"]["behavior"]["trial_log"]:
         event_dict = {(e[0], e[1]): rebase(e[2]) for e in trial['events']}
 
