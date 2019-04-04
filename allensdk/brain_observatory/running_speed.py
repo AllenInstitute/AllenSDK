@@ -15,3 +15,8 @@ class RunningSpeed(NamedTuple):
 
     timestamps: np.ndarray
     values: np.ndarray
+
+    def __eq__(self, other):
+        a = np.array_equal(self.timestamps, other.timestamps)
+        b = np.array_equal(self.values, other.values)
+        return a and b

@@ -1,5 +1,6 @@
 import warnings
 import re
+from collections.abc import Collection
 
 import xarray as xr
 import numpy as np
@@ -10,20 +11,12 @@ from allensdk.brain_observatory.ecephys.ecephys_api import EcephysApi, EcephysNw
 from ..running_speed import RunningSpeed
 
 
-STIMULUS_PARAMETERS = tuple([
-    'stimulus_name',
-    'TF',
-    'SF',
-    'Ori',
-    'Contrast',
-    'Pos_x',
-    'Pos_y',
-    'Color',
-    'Image',
-    'Phase',
-    'Speed',
-    'Dir'
-])
+NON_STIMULUS_PARAMETERS = tuple([
+    'start_time',
+    'stop_time',
+    'duration',
+    'stimulus_block'
+]) # stimulus_presentation column names not describing a parameter of a stimulus
 
 
 class EcephysSession(LazyPropertyMixin):
@@ -72,33 +65,30 @@ class EcephysSession(LazyPropertyMixin):
                 Running speed of the experimental subject (in cm / s).
     mean_waveforms : dict
         Maps integer unit ids to xarray.DataArrays containing mean spike waveforms for that unit.
-    stimulus_sweeps : pd.DataFrame
-        Table whose rows are stimulus sweeps and whose columns are sweep characteristics. 
-        A stimulus sweep is the smallest unit of distinct stimulus presentation and lasts for 
+    stimulus_presentations : pd.DataFrame
+        Table whose rows are stimulus presentations and whose columns are presentation characteristics. 
+        A stimulus presentation is the smallest unit of distinct stimulus presentation and lasts for 
         (usually) 1 60hz frame. Since not all parameters are relevant to all stimuli, this table 
         contains many 'null' values.
         Index is
-            stimulus_sweep_id : int
-                Unique identifier for this stimulus sweep
+            stimulus_presentation_id : int
+                Unique identifier for this stimulus presentation
         Columns are
             start_time :  float
-                Time (s) at which this sweep began
+                Time (s) at which this presentation began
             stop_time : float
-                Time (s) at which this sweep ended
+                Time (s) at which this presentation ended
+            duration : float
+                stop_time - start_time (s). Included for convenience.
             stimulus_name : str
                 Identifies the stimulus family (e.g. "drifting_gratings" or "natural_movie_3") used 
-                for this sweep. The stimulus family, along with relevant parameter values, provides the 
-                information required to reconstruct the stimulus presented during this sweep. The empty 
+                for this presentation. The stimulus family, along with relevant parameter values, provides the 
+                information required to reconstruct the stimulus presented during this presentation. The empty 
                 string indicates a blank period.
             stimulus_block : numeric
-                A stimulus block is made by sequentially presenting sweeps from the same stimulus family. 
-                This value is the index of the block which contains this sweep. During a blank period, 
+                A stimulus block is made by sequentially presenting presentations from the same stimulus family. 
+                This value is the index of the block which contains this presentation. During a blank period, 
                 this is 'null'.
-            is_movie : bool
-                If True, this sweep corresponds to a frame of a longer movie stimulus (consisting of 
-                this sweep and the rest of its block). These differ from non-movie stimuli in that 
-                frames are presented in a consistent order with meaningful features present across 
-                multiple sweeps.
             TF : float
                 Temporal frequency, or 'null' when not appropriate.
             SF : float
@@ -111,6 +101,11 @@ class EcephysSession(LazyPropertyMixin):
             Color : numeric
             Image : numeric
             Phase : float
+    inter_presentation_intervals : pd.DataFrame
+        The elapsed time between each immediately sequential pair of stimulus presentations. This is a dataframe with a 
+        two-level multiindex (levels are 'from_presentation_id' and 'to_presentation_id'). It has a single column, 
+        'interval', which reports the elapsed time between the two presentations in seconds on the experiment's master 
+        clock.
 
     '''
 
@@ -131,13 +126,19 @@ class EcephysSession(LazyPropertyMixin):
 
 
     @property
-    def num_stimulus_sweeps(self):
-        return self.stimulus_sweeps.shape[0]
+    def num_stimulus_presentations(self):
+        return self.stimulus_presentations.shape[0]
+
+
+    @property
+    def stimulus_names(self):
+        return self.stimulus_presentations['stimulus_name'].unique().tolist()
 
 
     def __init__(self, api, **kwargs):
         self.api: EcephysApi  = api
 
+        self.ecephys_session_id = self.LazyProperty(self.api.get_ecephys_session_id)
         self.running_speed= self.LazyProperty(self.api.get_running_speed)
         self.mean_waveforms = self.LazyProperty(self.api.get_mean_waveforms, wrappers=[self._build_mean_waveforms])
         self.spike_times = self.LazyProperty(self.api.get_spike_times, wrappers=[self._build_spike_times])
@@ -145,13 +146,59 @@ class EcephysSession(LazyPropertyMixin):
         self.probes = self.LazyProperty(self.api.get_probes)
         self.channels = self.LazyProperty(self.api.get_channels)
 
-        self.stimulus_sweeps = self.LazyProperty(self.api.get_stimulus_table, wrappers=[self._build_stimulus_sweeps])
+        self.stimulus_presentations = self.LazyProperty(self.api.get_stimulus_presentations, wrappers=[self._build_stimulus_presentations])
         self.units = self.LazyProperty(self.api.get_units, wrappers=[self._build_units_table])
+        self.inter_presentation_intervals = self.LazyProperty(self._build_inter_presentation_intervals)
 
 
-    def sweepwise_spike_counts(self, 
+    def get_inter_presentation_intervals_for_stimulus(self, stimulus_names):
+        ''' Get a subset of this session's inter-presentation intervals, filtered by stimulus name.
+
+        Parameters
+        ----------
+        stimulus_names : array-like of str
+            The names of stimuli to include in the output.
+
+        Returns
+        -------
+        pd.DataFrame : 
+            inter-presentation intervals, filtered to the requested stimulus names.
+
+        '''
+
+        stimulus_names = warn_on_scalar(stimulus_names, f'expected stimulus_names to be a collection (list-like), but found {type(stimulus_names)}: {stimulus_names}')
+        filtered_presentations = self.stimulus_presentations[self.stimulus_presentations['stimulus_name'].isin(stimulus_names)]
+        filtered_ids = set(filtered_presentations.index.values)
+
+        return self.inter_presentation_intervals[
+            (self.inter_presentation_intervals.index.isin(filtered_ids, level='from_presentation_id'))
+            & (self.inter_presentation_intervals.index.isin(filtered_ids, level='to_presentation_id'))
+        ]
+
+
+    def get_presentations_for_stimulus(self, stimulus_names):
+        '''Get a subset of stimulus presentations by name, with irrelevant parameters filtered off
+
+        Parameters
+        ----------
+        stimulus_names : array-like of str
+            The names of stimuli to include in the output.
+
+        Returns
+        -------
+        pd.DataFrame :
+            Rows are filtered presentations, columns are the relevant subset of stimulus parameters
+
+        '''
+
+        stimulus_names = warn_on_scalar(stimulus_names, f'expected stimulus_names to be a collection (list-like), but found {type(stimulus_names)}: {stimulus_names}')
+        filtered_presentations = self.stimulus_presentations[self.stimulus_presentations['stimulus_name'].isin(stimulus_names)]
+        return removed_unused_stimulus_presentation_columns(filtered_presentations)
+
+
+    def presentationwise_spike_counts(self, 
         bin_edges, 
-        stimulus_sweep_ids, 
+        stimulus_presentation_ids, 
         unit_ids, 
         binarize=False, 
         dtype=None, 
@@ -165,8 +212,8 @@ class EcephysSession(LazyPropertyMixin):
         bin_edges : numpy.ndarray
             Spikes will be counted into the bins defined by these edges. Values are in seconds, relative 
             to stimulus onset.
-        stimulus_sweep_ids : array-like
-            Filter to these stimulus sweeps
+        stimulus_presentation_ids : array-like
+            Filter to these stimulus presentations
         unit_ids : array-like
             Filter to these units
         binarize : bool, optional
@@ -182,13 +229,13 @@ class EcephysSession(LazyPropertyMixin):
         Returns
         -------
         xarray.Dataset :
-            Contains a data array named spike_counts whose dimensions are stimulus sweep, unit, 
+            Contains a data array named spike_counts whose dimensions are stimulus presentation, unit, 
             and time bin and whose values are spike counts.
 
         '''
 
-        stimulus_sweeps = self.stimulus_sweeps.loc[stimulus_sweep_ids] if stimulus_sweep_ids is not None else self.stimulus_sweeps
-        units = self.units.loc[unit_ids] if unit_ids is not None else self.units
+        stimulus_presentations = self._filter_owned_df('stimulus_presentations', ids=stimulus_presentation_ids)
+        units = self._filter_owned_df('units', ids=unit_ids)
 
         largest_bin_size = np.amax(np.diff(bin_edges))
         if binarize and largest_bin_size  > large_bin_size_threshold:
@@ -199,7 +246,7 @@ class EcephysSession(LazyPropertyMixin):
             )
 
         bin_edges = np.array(bin_edges)
-        domain = build_time_window_domain(bin_edges, stimulus_sweeps['start_time'].values, callback=time_domain_callback)
+        domain = build_time_window_domain(bin_edges, stimulus_presentations['start_time'].values, callback=time_domain_callback)
         tiled_data = np.zeros(
             (domain.shape[0], domain.shape[1], units.shape[0]), 
             dtype=(np.uint8 if binarize else np.uint16) if dtype is None else dtype
@@ -224,23 +271,23 @@ class EcephysSession(LazyPropertyMixin):
         tiled_data = xr.DataArray(
             data=tiled_data[:, 1:, :], 
             coords={
-                'stimulus_sweep_id': stimulus_sweeps.index.values,
+                'stimulus_presentation_id': stimulus_presentations.index.values,
                 'time_relative_to_stimulus_onset': bin_edges[:-1] + np.diff(bin_edges) / 2,
                 'unit_id': units.index.values
             },
-            dims=['stimulus_sweep_id', 'time_relative_to_stimulus_onset', 'unit_id']
+            dims=['stimulus_presentation_id', 'time_relative_to_stimulus_onset', 'unit_id']
         )
 
         return xr.Dataset(data_vars={'spike_counts': tiled_data})
 
 
-    def sweepwise_spike_times(self, stimulus_sweep_ids=None, unit_ids=None):
+    def presentationwise_spike_times(self, stimulus_presentation_ids=None, unit_ids=None):
         ''' Produce a table associating spike times with units and stimulus sweeos
 
         Parameters
         ----------
-        stimulus_sweep_ids : array-like
-            Filter to these stimulus sweeps
+        stimulus_presentation_ids : array-like
+            Filter to these stimulus presentations
         unit_ids : array-like
             Filter to these units
 
@@ -251,59 +298,59 @@ class EcephysSession(LazyPropertyMixin):
             spike_time : float
                 On the session's master clock.
         Columns are
-            stimulus_sweep_id : int
-                The stimulus sweep on which this spike occurred.
+            stimulus_presentation_id : int
+                The stimulus presentation on which this spike occurred.
             unit_id : int
                 The unit that emitted this spike.
         '''
 
-        stimulus_sweeps = self.stimulus_sweeps.loc[stimulus_sweep_ids] if stimulus_sweep_ids is not None else self.stimulus_sweeps
-        units = self.units.loc[unit_ids] if unit_ids is not None else self.units
+        stimulus_presentations = self._filter_owned_df('stimulus_presentations', ids=stimulus_presentation_ids)
+        units = self._filter_owned_df('units', ids=unit_ids)
 
-        sweep_times = np.zeros([stimulus_sweeps.shape[0] * 2])
-        sweep_times[::2] = np.array(stimulus_sweeps['start_time'])
-        sweep_times[1::2] = np.array(stimulus_sweeps['stop_time'])
-        all_sweep_ids = np.array(stimulus_sweeps.index.values)
+        presentation_times = np.zeros([stimulus_presentations.shape[0] * 2])
+        presentation_times[::2] = np.array(stimulus_presentations['start_time'])
+        presentation_times[1::2] = np.array(stimulus_presentations['stop_time'])
+        all_presentation_ids = np.array(stimulus_presentations.index.values)
 
-        sweep_ids = []
+        presentation_ids = []
         unit_ids = []
         spike_times = []
 
         for ii, unit_id in enumerate(units.index.values):
             data = self.spike_times[unit_id]
-            indices = np.searchsorted(sweep_times, data) - 1
+            indices = np.searchsorted(presentation_times, data) - 1
 
             index_valid = indices % 2 == 0
-            sweeps = all_sweep_ids[np.floor(indices / 2).astype(int)]
+            presentations = all_presentation_ids[np.floor(indices / 2).astype(int)]
 
-            sorder = np.argsort(sweeps)
-            sweeps = sweeps[sorder]
+            sorder = np.argsort(presentations)
+            presentations = presentations[sorder]
             index_valid = index_valid[sorder]
             data = data[sorder]
 
-            changes = np.where(np.ediff1d(sweeps, to_begin=1, to_end=1))[0]
+            changes = np.where(np.ediff1d(presentations, to_begin=1, to_end=1))[0]
             for ii, jj in zip(changes[:-1], changes[1:]):
                 values = data[ii:jj][index_valid[ii:jj]]
                 if values.size == 0:
                     continue
 
                 unit_ids.append(np.zeros([values.size]) + unit_id)
-                sweep_ids.append(np.zeros([values.size]) + sweeps[ii])
+                presentation_ids.append(np.zeros([values.size]) + presentations[ii])
                 spike_times.append(values)
 
         return pd.DataFrame({
-            'stimulus_sweep_id': np.concatenate(sweep_ids).astype(int),
+            'stimulus_presentation_id': np.concatenate(presentation_ids).astype(int),
             'unit_id': np.concatenate(unit_ids).astype(int)
-        }, index=pd.Index(np.concatenate(spike_times), name='spike_time'))
+        }, index=pd.Index(np.concatenate(spike_times), name='spike_time')).sort_values('spike_time', axis=0)
 
 
-    def conditionwise_spike_counts(self, stimulus_sweep_ids=None, unit_ids=None):
+    def conditionwise_spike_counts(self, stimulus_presentation_ids=None, unit_ids=None):
         ''' Count spikes by unit and stimulus condition
 
         Parameters
         ----------
-        stimulus_sweep_ids : array-like
-            Filter to these stimulus sweeps
+        stimulus_presentation_ids : array-like
+            Filter to these stimulus presentations
         unit_ids : array-like
             Filter to these units
 
@@ -319,18 +366,18 @@ class EcephysSession(LazyPropertyMixin):
 
         '''
 
-        spike_times = self.sweepwise_spike_times(stimulus_sweep_ids=stimulus_sweep_ids, unit_ids=unit_ids)
-        stimulus_sweeps = self.stimulus_sweeps.loc[stimulus_sweep_ids] if stimulus_sweep_ids is not None else self.stimulus_sweeps
-        return count_spikes_by_condition(spike_times, stimulus_sweeps)
+        spike_times = self.presentationwise_spike_times(stimulus_presentation_ids=stimulus_presentation_ids, unit_ids=unit_ids)
+        stimulus_presentations = self._filter_owned_df('stimulus_presentations', ids=stimulus_presentation_ids)
+        return count_spikes_by_condition(spike_times, stimulus_presentations)
 
 
-    def conditionwise_mean_spike_counts(self, stimulus_sweep_ids=None, unit_ids=None):
+    def conditionwise_mean_spike_counts(self, stimulus_presentation_ids=None, unit_ids=None):
         ''' Report average spike counts by unit and stimulus condition
 
         Parameters
         ----------
-        stimulus_sweep_ids : array-like
-            Filter to these stimulus sweeps
+        stimulus_presentation_ids : array-like
+            Filter to these stimulus presentations
         unit_ids : array-like
             Filter to these units
 
@@ -346,18 +393,18 @@ class EcephysSession(LazyPropertyMixin):
 
         '''
 
-        stimulus_sweeps = self.stimulus_sweeps.loc[stimulus_sweep_ids] if stimulus_sweep_ids is not None else self.stimulus_sweeps
-        spike_times = self.sweepwise_spike_times(stimulus_sweep_ids=stimulus_sweep_ids, unit_ids=unit_ids)
-        return mean_spikes_by_condition(spike_times, stimulus_sweeps)
+        stimulus_presentations = self._filter_owned_df('stimulus_presentations', ids=stimulus_presentation_ids)
+        spike_times = self.presentationwise_spike_times(stimulus_presentation_ids=stimulus_presentation_ids, unit_ids=unit_ids)
+        return mean_spikes_by_condition(spike_times, stimulus_presentations)
 
 
-    def get_stimulus_conditions(self, stimulus_sweep_ids=None):
+    def get_stimulus_conditions(self, stimulus_presentation_ids=None):
         ''' Report stimulus conditions applied during this session
 
         Parameters
         ----------
-        stimulus_sweep_ids : array-like
-            Filter to these stimulus sweeps
+        stimulus_presentation_ids : array-like
+            Filter to these stimulus presentations
 
         Returns
         -------
@@ -370,24 +417,25 @@ class EcephysSession(LazyPropertyMixin):
 
         '''
 
-        stimulus_sweeps = self.stimulus_sweeps.loc[stimulus_sweep_ids] if stimulus_sweep_ids is not None else self.stimulus_sweeps
+        stimulus_presentations = self._filter_owned_df('stimulus_presentations', ids=stimulus_presentation_ids)
 
-        stimulus_sweeps = stimulus_sweeps.drop(columns=['start_time', 'stop_time', 'stimulus_block', 'is_movie'])
-        stimulus_sweeps = stimulus_sweeps.drop_duplicates()
-        stimulus_sweeps = stimulus_sweeps.reset_index(inplace=False).drop(columns=['stimulus_sweep_id'])
+        stimulus_presentations = stimulus_presentations.drop(columns=list(NON_STIMULUS_PARAMETERS))
+        stimulus_conditions = stimulus_presentations.drop_duplicates()
+        stimulus_conditions = stimulus_conditions.reset_index(inplace=False).drop(columns=['stimulus_presentation_id'])
+        stimulus_conditions.index.name = 'stimulus_condition_index'
 
-        stimulus_sweeps = removed_unused_stimulus_sweep_columns(stimulus_sweeps)
-        return stimulus_sweeps
+        stimulus_conditions = removed_unused_stimulus_presentation_columns(stimulus_conditions)
+        return stimulus_conditions
 
 
-    def get_stimulus_parameter_values(self, stimulus_sweep_ids=None):
+    def get_stimulus_parameter_values(self, stimulus_presentation_ids=None, drop_nulls=True):
         ''' For each stimulus parameter, report the unique values taken on by that 
         parameter throughout the course of the  session.
 
         Parameters
         ----------
-        stimulus_sweep_ids : array-like, optional
-            If provided, only parameter values from these stimulus sweeps will be considered.
+        stimulus_presentation_ids : array-like, optional
+            If provided, only parameter values from these stimulus presentations will be considered.
 
         Returns
         -------
@@ -396,10 +444,18 @@ class EcephysSession(LazyPropertyMixin):
 
         '''
 
-        stimulus_sweeps = self.stimulus_sweeps.loc[stimulus_sweep_ids] if stimulus_sweep_ids is not None else self.stimulus_sweeps
-        stimulus_sweeps = stimulus_sweeps.drop(columns=['start_time', 'stop_time', 'stimulus_block', 'is_movie', 'stimulus_name'])
-        stimulus_sweeps = removed_unused_stimulus_sweep_columns(stimulus_sweeps)
-        return {col: stimulus_sweeps[col].unique() for col in stimulus_sweeps.columns}
+        stimulus_presentations = self._filter_owned_df('stimulus_presentations', ids=stimulus_presentation_ids)
+        stimulus_presentations = stimulus_presentations.drop(columns=list(NON_STIMULUS_PARAMETERS) + ['stimulus_name'])
+        stimulus_presentations = removed_unused_stimulus_presentation_columns(stimulus_presentations)
+
+        parameters = {}
+        for colname in stimulus_presentations.columns:
+            uniques = stimulus_presentations[colname].unique()
+            if drop_nulls:
+                uniques = uniques[uniques != 'null']
+            parameters[colname] = uniques
+
+        return parameters
 
 
     def _build_spike_times(self, spike_times):
@@ -415,20 +471,19 @@ class EcephysSession(LazyPropertyMixin):
         return output_spike_times
 
 
-    def _build_stimulus_sweeps(self, stimulus_sweeps):
-        stimulus_sweeps.index.name = 'stimulus_sweep_id'
-        stimulus_sweeps = stimulus_sweeps.drop(columns=['stimulus_index'])
-
-        # TODO: set this explicitly upstream 
-        movie_re = re.compile('.*movie.*', re.IGNORECASE)
-        stimulus_sweeps['is_movie'] = stimulus_sweeps['stimulus_name'].str.match(movie_re)
+    def _build_stimulus_presentations(self, stimulus_presentations):
+        stimulus_presentations.index.name = 'stimulus_presentation_id'
+        stimulus_presentations = stimulus_presentations.drop(columns=['stimulus_index'])
 
         # pandas groupby ops ignore nans, so we need a new null value that pandas does not recognize as null ...
-        stimulus_sweeps.loc[stimulus_sweeps['stimulus_name'] == '', 'stimulus_name'] = 'gray_period' # TODO replace this with a 'constant' stimulus and set its actual level / hue.
-        stimulus_sweeps[stimulus_sweeps == ''] = np.nan
-        stimulus_sweeps = stimulus_sweeps.fillna('null') # 123 / 2**8
+        stimulus_presentations.loc[stimulus_presentations['stimulus_name'] == '', 'stimulus_name'] = 'spontaneous_activity'
+        stimulus_presentations[stimulus_presentations == ''] = np.nan
+        stimulus_presentations = stimulus_presentations.fillna('null') # 123 / 2**8
 
-        return stimulus_sweeps
+        stimulus_presentations['duration'] = stimulus_presentations['stop_time'] - stimulus_presentations['start_time']
+
+        return stimulus_presentations
+
 
     def _build_units_table(self, units_table):
         channels = self.channels.copy()
@@ -439,14 +494,19 @@ class EcephysSession(LazyPropertyMixin):
         table = pd.merge(table, probes, left_on='probe_id', right_index=True, suffixes=['_unit', '_probe'])
 
         table.index.name = 'unit_id'
-        table = table.rename(columns={'description': 'probe_description'})
+        table = table.rename(columns={
+            'description': 'probe_description',
+            'manual_structure_id': 'structure_id',
+            'manual_structure_acronym': 'structure_acronym',
+            'local_index_channel': 'channel_local_index'
+            })
 
         table = table.loc[
             (table['valid_data'])
             & (table['quality'] == 'good')
         ]
 
-        table = table.drop(columns=['local_index_unit', 'local_index_channel', 'quality', 'valid_data'])
+        table = table.drop(columns=['local_index_unit', 'quality', 'valid_data'])
         return table.sort_values(by=['probe_description', 'probe_vertical_position', 'probe_horizontal_position'])
 
 
@@ -476,10 +536,38 @@ class EcephysSession(LazyPropertyMixin):
         return output_waveforms
 
 
+    def _build_inter_presentation_intervals(self):
+        intervals = pd.DataFrame({
+            'from_presentation_id': self.stimulus_presentations.index.values[:-1],
+            'to_presentation_id': self.stimulus_presentations.index.values[1:],
+            'interval': self.stimulus_presentations['start_time'].values[1:] - self.stimulus_presentations['stop_time'].values[:-1]
+        })
+        return intervals.set_index(['from_presentation_id', 'to_presentation_id'], inplace=False)
+
+
+    def _filter_owned_df(self, key, ids=None, copy=True):
+        df = getattr(self, key)
+
+        if copy:
+            df = df.copy()
+
+        if ids is None:
+            return df
+        
+        ids = warn_on_scalar(ids, f'a scalar ({ids}) was provided as ids, filtering to a single row of {key}.')
+
+        df = df.loc[ids]
+
+        if df.shape[0] == 0:
+            warnings.warn(f'filtering to an empty set of {key}!')
+
+        return df
+
+
     @classmethod
     def from_nwb_path(cls, path, api_kwargs=None, **kwargs):
         api_kwargs = {} if api_kwargs is None else api_kwargs
-        return cls(api=EcephysNwbApi(path=path, **api_kwargs), **kwargs)
+        return cls(api=EcephysNwbApi.from_path(path=path, **api_kwargs), **kwargs)
 
 
 def build_time_window_domain(bin_edges, offsets, callback=None):
@@ -489,53 +577,60 @@ def build_time_window_domain(bin_edges, offsets, callback=None):
     return callback(domain)
 
 
-def removed_unused_stimulus_sweep_columns(stimulus_sweeps):
+def removed_unused_stimulus_presentation_columns(stimulus_presentations):
     to_drop = []
-    for cn in stimulus_sweeps.columns:
-        if np.all(stimulus_sweeps[cn].isna()):
+    for cn in stimulus_presentations.columns:
+        if np.all(stimulus_presentations[cn].isna()):
             to_drop.append(cn)
-        elif np.all(stimulus_sweeps[cn].astype(str).values == ''):
+        elif np.all(stimulus_presentations[cn].astype(str).values == ''):
             to_drop.append(cn)
-        elif np.all(stimulus_sweeps[cn].astype(str).values == 'null'):
+        elif np.all(stimulus_presentations[cn].astype(str).values == 'null'):
             to_drop.append(cn)
-    return stimulus_sweeps.drop(columns=to_drop)
+    return stimulus_presentations.drop(columns=to_drop)
 
 
-def count_by_condition(stimulus_sweeps, exclude_parameters=None):
-    exclude_parameters = [] if exclude_parameters is None else exclude_parameters
-    exclude_parameters += ['start_time', 'stop_time', 'stimulus_block', 'is_movie']
+def count_by_condition(stimulus_presentations, exclude_parameters=NON_STIMULUS_PARAMETERS):
     
-    stimulus_sweeps =  stimulus_sweeps.copy()
-    stimulus_sweeps = stimulus_sweeps.drop(columns=exclude_parameters)
+    stimulus_presentations =  stimulus_presentations.copy()
+    stimulus_presentations = stimulus_presentations.drop(columns=list(exclude_parameters))
     
-    cols = stimulus_sweeps.columns.tolist()
-    stimulus_sweeps['count'] = 0
-    return stimulus_sweeps.groupby(cols, as_index=False).count()
+    cols = stimulus_presentations.columns.tolist()
+    stimulus_presentations['count'] = 0
+    return stimulus_presentations.groupby(cols, as_index=False).count()
 
 
-def count_spikes_by_condition(spike_times, stimulus_sweeps):
+def count_spikes_by_condition(spike_times, stimulus_presentations):
     spike_times = spike_times.copy()
-    spike_times = spike_times.merge(stimulus_sweeps, left_on='stimulus_sweep_id', right_index=True)
-    spike_times = spike_times.drop(columns=['stimulus_sweep_id'])
+    spike_times = spike_times.merge(stimulus_presentations, left_on='stimulus_presentation_id', right_index=True)
+    spike_times = spike_times.drop(columns=['stimulus_presentation_id'])
     return count_by_condition(spike_times)
 
 
-def mean_spikes_by_condition(spike_times, stimulus_sweeps, stimulus_parameters=STIMULUS_PARAMETERS):
-    sweep_counts_by_condition = count_by_condition(stimulus_sweeps)
-    spike_counts_by_condition = count_spikes_by_condition(spike_times, stimulus_sweeps)
+def mean_spikes_by_condition(spike_times, stimulus_presentations, non_stimulus_parameters=NON_STIMULUS_PARAMETERS):
+    presentation_counts_by_condition = count_by_condition(stimulus_presentations)
+    spike_counts_by_condition = count_spikes_by_condition(spike_times, stimulus_presentations)
 
+    colnames = set(spike_counts_by_condition.columns.values) & set(presentation_counts_by_condition.columns.values)
     stimulus_parameters = [
-        sp for sp in stimulus_parameters 
-        if sp in sweep_counts_by_condition.columns.values 
-        and sp in spike_counts_by_condition.columns.values
+        sp for sp in colnames
+        if sp not in non_stimulus_parameters
+        and sp != 'count'
     ]
+
     mean_spikes = spike_counts_by_condition.merge(
-        sweep_counts_by_condition, 
+        presentation_counts_by_condition, 
         left_on=stimulus_parameters,
         right_on=stimulus_parameters,
-        suffixes=['_spikes', '_sweeps'],
+        suffixes=['_spikes', '_presentations'],
         how='left'
     )
     
-    mean_spikes['mean_spike_count'] = mean_spikes['count_spikes'] / mean_spikes['count_sweeps']
-    return mean_spikes.drop(columns=['count_spikes', 'count_sweeps'])
+    mean_spikes['mean_spike_count'] = mean_spikes['count_spikes'] / mean_spikes['count_presentations']
+    return mean_spikes.drop(columns=['count_spikes', 'count_presentations'])
+
+
+def warn_on_scalar(value, message):
+    if not isinstance(value, Collection) or isinstance(value, str):
+        warnings.warn(message)
+        return [value]
+    return value

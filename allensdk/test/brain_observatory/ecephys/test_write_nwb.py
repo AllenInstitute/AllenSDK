@@ -1,5 +1,6 @@
 import os
 import warnings
+from datetime import datetime
 
 import pytest
 import pynwb
@@ -8,15 +9,6 @@ import numpy as np
 
 import allensdk.brain_observatory.ecephys.write_nwb.__main__ as write_nwb
 from allensdk.brain_observatory.ecephys.ecephys_api.ecephys_nwb_api import EcephysNwbApi
-
-
-@pytest.fixture
-def stimulus_table_data():
-    return pd.DataFrame({
-        'start_time': [1, 2, 4, 5, 6],
-        'stop_time': [2, 4, 5, 6, 8],
-        'alpha': [0.5, 0.4, 0.3, 0.2, 0.1]
-    }, index=pd.Index(name='id', data=[0, 1, 2, 3, 4]))
 
 
 @pytest.fixture
@@ -39,13 +31,26 @@ def spike_times():
     }
 
 
-def test_add_stimulus_table_to_file(nwbfile, stimulus_table_data, roundtripper):
-    write_nwb.add_stimulus_table_to_file(nwbfile, stimulus_table_data)
+
+def test_roundtrip_metadata(roundtripper):
+    nwbfile = pynwb.NWBFile(
+        session_description='EcephysSession',
+        identifier='{}'.format(12345),
+        session_start_time=datetime.now()
+    )
 
     api = roundtripper(nwbfile, EcephysNwbApi)
-    obtained_stimulus_table = api.get_stimulus_table()
+    assert 12345 == api.get_ecephys_session_id()
+
+
+def test_add_stimulus_presentations(nwbfile, stimulus_presentations, roundtripper):
+    write_nwb.add_stimulus_timestamps(nwbfile, [0, 1])
+    write_nwb.add_stimulus_presentations(nwbfile, stimulus_presentations)
+
+    api = roundtripper(nwbfile, EcephysNwbApi)
+    obtained_stimulus_table = api.get_stimulus_presentations()
     
-    pd.testing.assert_frame_equal(stimulus_table_data, obtained_stimulus_table, check_dtype=False)
+    pd.testing.assert_frame_equal(stimulus_presentations, obtained_stimulus_table, check_dtype=False)
     
 
 @pytest.mark.parametrize('roundtrip', [True, False])
@@ -135,14 +140,14 @@ def test_add_running_speed_to_nwbfile(nwbfile, running_speed, roundtripper, roun
     assert np.allclose(running_speed.values, running_speed_obt.values)
 
 
-def test_read_stimulus_table(tmpdir_factory, stimulus_table_data):
+def test_read_stimulus_table(tmpdir_factory, stimulus_presentations):
     dirname = str(tmpdir_factory.mktemp('ecephys_nwb_test'))
     stim_table_path = os.path.join(dirname, 'stim_table.csv')
 
-    stimulus_table_data.to_csv(stim_table_path)
+    stimulus_presentations.to_csv(stim_table_path)
     obt = write_nwb.read_stimulus_table(stim_table_path, column_renames_map={'alpha': 'beta'})
 
-    assert np.allclose(stimulus_table_data['alpha'].values, obt['beta'].values)
+    assert np.allclose(stimulus_presentations['alpha'].values, obt['beta'].values)
 
 
 # read_spike_times_to_dictionary(spike_times_path, spike_units_path, local_to_global_unit_map=None)

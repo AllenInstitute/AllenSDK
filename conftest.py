@@ -39,6 +39,17 @@ def pytest_collection_modifyitems(config, items):
             'in order to reduce the prevalence of bogus test results.'
     )
 
+    skip_prerelease_test = pytest.mark.skipif(
+        os.environ.get('TEST_PRERELEASE') != 'true',
+        reason='prerelease tests are only valid if external and internal data expected to align'
+    )
+
+    skip_neuron_test = pytest.mark.skipif(
+        (os.getenv('TEST_COMPLETE') != 'true') and (os.getenv('TEST_NEURON') != 'true'),
+        reason='this test depends on the NEURON simulation library. This dependency is not straghtforward to build '\
+            'and install, so you must opt in to running this test'
+    )
+
     for item in items:
         if 'requires_api_endpoint' in item.keywords:
             item.add_marker(skip_api_endpoint_test)
@@ -48,3 +59,9 @@ def pytest_collection_modifyitems(config, items):
 
         if 'todo_flaky' in item.keywords:
             item.add_marker(skip_flaky_test)
+
+        if 'prerelease' in item.keywords:
+            item.add_marker(skip_prerelease_test)
+
+        if 'requires_neuron' in item.keywords:
+            item.add_marker(skip_neuron_test)

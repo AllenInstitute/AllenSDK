@@ -12,9 +12,11 @@ import pandas as pd
 import numpy as np
 
 from allensdk.config.manifest import Manifest
+from allensdk.brain_observatory.running_speed import RunningSpeed
 
 from ._schemas import InputSchema, OutputSchema
-from ..argschema_utilities import write_or_print_outputs
+from allensdk.brain_observatory.nwb import add_running_speed_to_nwbfile, add_stimulus_presentations, add_stimulus_timestamps
+from allensdk.brain_observatory.argschema_utilities import write_or_print_outputs
 
 
 STIM_TABLE_RENAMES_MAP = {
@@ -85,51 +87,6 @@ def read_stimulus_table(path,  column_renames_map=None):
         raise IOError(f'unrecognized stimulus table extension: {ext}')
 
     return stimulus_table.rename(columns=column_renames_map, index={})
-
-
-def add_stimulus_table_to_file(nwbfile, stimulus_table, tag='stimulus_epoch'):
-    ''' Adds a stimulus table (defining stimulus characteristics for each time point in a session) to an nwbfile as epochs.
-
-    Parameters
-    ----------
-    nwbfile : pynwb.NWBFile
-    stimulus_table: pd.DataFrame
-        Each row corresponds to an epoch of time. Columns define the epoch (start and stop time) and its characteristics. 
-        Nans will be replaced with the empty string. Required columns are:
-            start_time :: the time at which this epoch started
-            stop_time :: the time  at which this epoch ended
-    tag : str, optional
-        Each epoch in an nwb file has one or more tags. This string will be applied as a tag to all epochs created here
-
-    Returns
-    -------
-    nwbfile : pynwb.NWBFile
-
-    '''
-    stimulus_table = stimulus_table.copy()
-
-    ts = pynwb.base.TimeSeries(
-        name='stimulus_times', 
-        timestamps=stimulus_table['start_time'].values, 
-        data=stimulus_table['stop_time'].values - stimulus_table['start_time'].values,
-        unit='s',
-        description='start times (timestamps) and durations (data) of stimulus presentation epochs'
-    )
-    nwbfile.add_acquisition(ts)
-
-    for colname, series in stimulus_table.items():
-        types = set(series.map(type))
-        if len(types) > 1 and str in types:
-            series.fillna('', inplace=True)
-            stimulus_table[colname] = series.transform(str)
-
-    stimulus_table['tags'] = [(tag,)] * stimulus_table.shape[0]
-    stimulus_table['timeseries'] = [(ts,)] * stimulus_table.shape[0]
-
-    container = pynwb.epoch.TimeIntervals.from_dataframe(stimulus_table, 'epochs')
-    nwbfile.epochs = container
-
-    return nwbfile
 
 
 def read_spike_times_to_dictionary(spike_times_path, spike_units_path, local_to_global_unit_map=None):
@@ -363,36 +320,6 @@ def add_ragged_data_to_dynamic_table(table, data, column_name, column_descriptio
     table.add_column(name=column_name, description=column_description, data=values, index=idx)
 
 
-def add_running_speed_to_nwbfile(nwbfile, running_speed, name='running_speed', unit='cm/s'):
-    ''' Adds running speed data to an NWBFile as a timeseries in acquisition
-
-    Parameters
-    ----------
-    nwbfile : pynwb.NWBFile
-        File to which runnign speeds will be written
-    running_speed : RunningSpeed
-        Contains attributes 'values' and 'timestamps'
-    name : str, optional
-        used as name of timeseries object
-    unit : str, optional
-        SI units of running speed values
-
-    Returns
-    -------
-    nwbfile : pynwb.NWBFile
-
-    '''
-
-    running_speed_series = pynwb.base.TimeSeries(
-        name=name, 
-        data=running_speed.values, 
-        timestamps=running_speed.timestamps, 
-        unit=unit
-    )
-    nwbfile.add_acquisition(running_speed_series)
-    return nwbfile
-
-
 def write_ecephys_nwb(
     output_path, 
     session_id, session_start_time, 
@@ -409,7 +336,8 @@ def write_ecephys_nwb(
     )
 
     stimulus_table = read_stimulus_table(stimulus_table_path)
-    nwbfile = add_stimulus_table_to_file(nwbfile, stimulus_table)
+    nwbfile = add_stimulus_timestamps(nwbfile, stimulus_table['start_time'].values) # TODO: patch until full timestamps are output by stim table module
+    nwbfile = add_stimulus_presentations(nwbfile, stimulus_table)
 
     channel_tables = []
     unit_tables = []
@@ -432,8 +360,9 @@ def write_ecephys_nwb(
             probe['mean_waveforms_path'], local_to_global_unit_map
         ))
 
-    nwbfile.electrodes = pynwb.file.ElectrodeTable().from_dataframe(pd.concat(channel_tables), name='electrodes')
-    nwbfile.units = pynwb.misc.Units.from_dataframe(pd.concat(unit_tables), name='units')
+    nwbfile.electrodes = pynwb.file.ElectrodeTable().from_dataframe(pd.concat(channel_tables).fillna(''), name='electrodes')
+    units_table = pd.concat(unit_tables).set_index(keys='id', drop=True)
+    nwbfile.units = pynwb.misc.Units.from_dataframe(units_table.fillna(''), name='units')
 
     add_ragged_data_to_dynamic_table(
         table=nwbfile.units, 
@@ -449,7 +378,7 @@ def write_ecephys_nwb(
         column_description='mean waveforms on peak channels (and over samples)'
     )
 
-    running_speed = read_running_speed(running_speed['running_speed_values_path'], running_speed['running_speed_timestamps_path'])
+    running_speed = read_running_speed(running_speed['running_speed_path'], running_speed['running_speed_timestamps_path'])
     add_running_speed_to_nwbfile(nwbfile, running_speed)
     del running_speed
 

@@ -1,6 +1,34 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [0.16.1] = 2019-3-12
+
+### Added
+ - Added tools for working with itksnap label descriptions (https://github.com/AllenInstitute/AllenSDK/issues/312)
+
+### Changed
+ - Update pytest version number (now requires pytest>=4.1.1)
+ - Update numpy version number (now requires numpy>=1.15.1)
+ - Removed deprecated functions from BrainObservatoryNwbDataSet
+ - Updated documentation
+
+### Bug Fixes
+ - https://github.com/AllenInstitute/AllenSDK/issues/256 Examples python3 compatible
+ - https://github.com/AllenInstitute/AllenSDK/issues/267 Fix get_cell_specimens filter argument
+ - https://github.com/AllenInstitute/AllenSDK/pull/226 Fix pandas sorting behavior warning
+ - https://github.com/AllenInstitute/AllenSDK/issues/207 Fix "two celltypes features"
+ - https://github.com/AllenInstitute/AllenSDK/issues/273 Fix "make notebook"
+ - https://github.com/AllenInstitute/AllenSDK/issues/275 Fix inconsistent numpy requirement
+ - https://github.com/AllenInstitute/AllenSDK/issues/295 Fix BiophysicalApi.get_neuronal_models
+ - https://github.com/AllenInstitute/AllenSDK/issues/309 Fix tests to use updated pytest
+ - https://github.com/AllenInstitute/AllenSDK/issues/307 Fix openjpeg dependency in python3 in the CI build
+ - https://github.com/AllenInstitute/AllenSDK/issues/311 Fix locally sparse noise test
+ - https://github.com/AllenInstitute/AllenSDK/issues/330 Fix numpy warning message
+ - https://github.com/AllenInstitute/AllenSDK/issues/330 Fix Pillow dependency install
+ - https://github.com/AllenInstitute/AllenSDK/issues/405 Fix session analysis regression test (passing CI in python2 and python3)
+ - https://github.com/AllenInstitute/AllenSDK/issues/420 Fix installation bug resulting from pytables 3.5
+ - https://github.com/AllenInstitute/AllenSDK/commit/1ef88046a58a36d870d3f1048a778806d1db2954 Fix scikit-image dependency install
+
 ## [0.16.0] = 2018-10-04
 
 ### Added

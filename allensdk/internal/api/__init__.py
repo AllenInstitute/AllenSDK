@@ -1,22 +1,25 @@
 import psycopg2
 
+
 class OneResultExpectedError(RuntimeError):
     pass
+
 
 class OneOrMoreResultExpectedError(RuntimeError):
     pass
 
+
 def one(x):
     if len(x) != 1:
         raise OneResultExpectedError('Expected length one result, received: {} results form query'.format(x))
-    if isinstance(x,set):
+    if isinstance(x, set):
         return list(x)[0]
     else:
         return x[0]
 
 
 class PostgresQueryMixin(object):
-    
+
     def __init__(self, dbname="lims2", user="limsreader", host="limsdb2", password="limsro", port=5432):
 
         self.dbname = dbname
@@ -34,10 +37,10 @@ class PostgresQueryMixin(object):
     def fetchone(self, query, strict=True):
         cur = self.get_cursor()
         cur.execute(query)
-        if strict == True:
+        if strict is True:
             return one(one(cur.fetchall()))
         else:
-            result =  cur.fetchone()
+            result = cur.fetchone()
             return one(result) if result is not None else None
 
     def fetchall(self, query, strict=True):

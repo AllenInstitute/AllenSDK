@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from pandas.util.testing import assert_frame_equal
+from typing import NamedTuple
 
 from allensdk.core.lazy_property import LazyProperty, LazyPropertyMixin
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
@@ -37,13 +38,13 @@ class BehaviorOphysSession(LazyPropertyMixin):
         field_set = set()
         for key, val in self.__dict__.items():
             if isinstance(val, LazyProperty):
-                field_set.add(key) 
+                field_set.add(key)
         for key, val in other.__dict__.items():
             if isinstance(val, LazyProperty):
                 field_set.add(key)
 
         try:
-            for field in field_set: 
+            for field in field_set:
                 x1, x2 = getattr(self, field), getattr(other, field)
                 if isinstance(x1, pd.DataFrame):
                     assert_frame_equal(x1, x2)
@@ -52,7 +53,7 @@ class BehaviorOphysSession(LazyPropertyMixin):
                 elif isinstance(x1, (dict, list)):
                     assert x1 == x2
                 else:
-                    raise Exception('Comparator not implemented')
+                    assert x1 == x2
 
         except NotImplementedError as e:
             self_implements_get_field = hasattr(self.api, getattr(type(self), field).getter_name)
@@ -68,21 +69,21 @@ class BehaviorOphysSession(LazyPropertyMixin):
 if __name__ == "__main__":
 
     session = BehaviorOphysSession(789359614)
-    # print session.max_projection
-    # print session.stimulus_timestamps
-    # print session.ophys_timestamps
-    # print session.metadata
-    # print session.dff_traces
-    # print session.roi_metrics
-    # print session.cell_roi_ids
-    # print session.running_speed
-    # print session.stimulus_table
-    # print session.stimulus_template
-    # print session.stimulus_metadata
-    # print session.licks
-    # print session.rewards
-    # print session.task_parameters
-    # print session.trials
-    # print session.corrected_fluorescence_traces
-    # print session.average_image
-    # print session.motion_correction
+    print(session.max_projection)
+    print(session.stimulus_timestamps)
+    print(session.ophys_timestamps)
+    print(session.metadata)
+    print(session.dff_traces)
+    print(session.roi_metrics)
+    print(session.cell_roi_ids)
+    print(session.running_speed)
+    print(session.stimulus_table)
+    print(session.stimulus_template)
+    print(session.stimulus_metadata)
+    print(session.licks)
+    print(session.rewards)
+    print(session.task_parameters)
+    print(session.trials)
+    print(session.corrected_fluorescence_traces)
+    print(session.average_image)
+    print(session.motion_correction)

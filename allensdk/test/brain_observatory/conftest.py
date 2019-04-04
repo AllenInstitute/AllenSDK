@@ -2,15 +2,18 @@ import pytest
 import os
 from datetime import datetime
 import pynwb
+import pandas as pd
+import numpy as np
 
 
 @pytest.fixture
 def running_speed():
     from allensdk.brain_observatory.running_speed import RunningSpeed
     return RunningSpeed(
-        timestamps=[1, 2, 3],
+        timestamps=[1., 2., 3.],
         values=[4, 5, 6]
     )
+
 
 @pytest.fixture
 def nwbfile():
@@ -22,9 +25,18 @@ def nwbfile():
 
 
 @pytest.fixture
+def stimulus_presentations():
+    return pd.DataFrame({
+        'start_time': [1, 2, 4, 5, 6],
+        'stop_time': [2, 4, 5, 6, 8],
+        'alpha': [0.5, 0.4, 0.3, 0.2, 0.1]
+    }, index=pd.Index(name='stimulus_presentations_id', data=[0, 1, 2, 3, 4]))
+
+
+@pytest.fixture
 def roundtripper(tmpdir_factory):
     def f(nwbfile, api):
-        tmpdir = str(tmpdir_factory.mktemp('ecephys_nwb_roundtrip_tests'))
+        tmpdir = str(tmpdir_factory.mktemp('nwb_roundtrip_tests'))
         nwb_path = os.path.join(tmpdir, 'nwbfile.nwb')
 
         with pynwb.NWBHDF5IO(nwb_path, 'w') as write_io:
@@ -32,3 +44,8 @@ def roundtripper(tmpdir_factory):
 
         return api(nwb_path)
     return f
+
+
+@pytest.fixture
+def stimulus_timestamps():
+    return np.array([1., 2., 3.])

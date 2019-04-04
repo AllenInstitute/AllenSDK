@@ -20,6 +20,10 @@ def prepend_find_packages(*roots):
 with open('requirements.txt', 'r') as f:
     required = f.read().splitlines()
 
+if os.environ.get('ALLENSDK_INTERNAL_REQUIREMENTS', 'false') == 'true':
+    with open('internal_requirements.txt', 'r') as f:
+        required.extend(f.read().splitlines())
+
 with open('test_requirements.txt', 'r') as f:
     test_required = f.read().splitlines()
 
@@ -29,7 +33,7 @@ setup(
     author = 'David Feng',
     author_email = 'davidf@alleninstitute.org',
     packages = prepend_find_packages('allensdk'),
-    package_data={'': ['*.conf', '*.cfg', '*.md', '*.json', '*.dat', '*.env', '*.sh', '*.txt', 'bps', 'Makefile', 'LICENSE'] },
+    package_data={'': ['*.conf', '*.cfg', '*.md', '*.json', '*.dat', '*.env', '*.sh', '*.txt', 'bps', 'Makefile', 'LICENSE', '*.hoc'] },
     description = 'core libraries for the allensdk.',
     install_requires = required,
     tests_require=test_required,

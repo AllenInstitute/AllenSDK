@@ -4,7 +4,8 @@ from argschema import ArgSchema, ArgSchemaParser
 from argschema.schemas import DefaultSchema
 from argschema.fields import LogLevel, String, Int, DateTime, Nested, Boolean, Float
 
-from ..argschema_utilities import check_read_access, check_write_access, RaisingSchema
+from allensdk.brain_observatory.argschema_utilities import check_read_access, check_write_access, RaisingSchema
+from allensdk.brain_observatory.nwb.schemas import RunningSpeedPathsSchema
 
 
 class Channel(RaisingSchema):
@@ -14,6 +15,8 @@ class Channel(RaisingSchema):
     local_index = Int(required=True)
     probe_vertical_position = Int(required=True)
     probe_horizontal_position = Int(required=True)
+    manual_structure_id = Int(required=True, allow_none=True)
+    manual_structure_acronym = String(required=True, allow_none=True)
 
 
 class Unit(RaisingSchema):
@@ -36,11 +39,6 @@ class Probe(RaisingSchema):
     units = Nested(Unit, many=True, required=True)
 
 
-class RunningSpeed(RaisingSchema):
-    running_speed_path = String(required=True, validate=check_read_access)
-    running_speed_timestamps_path = String(required=True, validate=check_read_access)
-
-
 class InputSchema(ArgSchema):
     class Meta:
         unknown=RAISE
@@ -50,7 +48,7 @@ class InputSchema(ArgSchema):
     session_start_time = DateTime(required=True, description='the date and time (iso8601) at which the session started')
     stimulus_table_path = String(required=True, validate=check_read_access, description='path to stimulus table file')
     probes = Nested(Probe, many=True, required=True, description='records of the individual probes used for this experiment')
-    running_speed = Nested(RunningSpeed, required=True, description='data collected about the running behavior of the experiment\'s subject')
+    running_speed = Nested(RunningSpeedPathsSchema, required=True, description='data collected about the running behavior of the experiment\'s subject')
 
 
 class OutputSchema(RaisingSchema):
