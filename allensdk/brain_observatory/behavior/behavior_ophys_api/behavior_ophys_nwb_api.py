@@ -176,8 +176,8 @@ class BehaviorOphysNwbApi(NwbApi):
             data.pop('namespace')
             data.pop('neurodata_type')
             f.close()
-            data['response_window'] = OphysBehaviorTaskParametersSchema().load({'response_window': data['response_window']}, partial=True)['response_window']
-            data['blank_duration'] = OphysBehaviorTaskParametersSchema().load({'blank_duration': data['blank_duration']}, partial=True)['blank_duration']
+            data['response_window_sec'] = OphysBehaviorTaskParametersSchema().load({'response_window_sec': data['response_window_sec']}, partial=True)['response_window_sec']
+            data['blank_duration_sec'] = OphysBehaviorTaskParametersSchema().load({'blank_duration_sec': data['blank_duration_sec']}, partial=True)['blank_duration_sec']
         return data
 
     def get_cell_specimen_table(self) -> pd.DataFrame:

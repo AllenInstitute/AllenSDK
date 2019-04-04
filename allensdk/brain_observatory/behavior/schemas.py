@@ -122,15 +122,15 @@ class OphysBehaviorTaskParametersSchema(RaisingSchema):
 
     neurodata_type = 'OphysBehaviorTaskParameters'
 
-    blank_duration = fields.List(
+    blank_duration_sec = fields.List(
         fields.Float,
-        doc='blank duration',
+        doc='blank duration in seconds',
         required=True,
         shape=(2,),
     )
 
-    stimulus_duration = fields.Float(
-        doc='duration of each stimulus presentation',
+    stimulus_duration_sec = fields.Float(
+        doc='duration of each stimulus presentation in seconds',
         required=True,
     )
 
@@ -140,9 +140,9 @@ class OphysBehaviorTaskParametersSchema(RaisingSchema):
         allow_nan=True,
     )
 
-    response_window = fields.List(
+    response_window_sec = fields.List(
         fields.Float,
-        doc='response_window',
+        doc='response_window in seconds',
         required=True,
         shape=(2,),
     )
