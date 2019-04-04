@@ -3,6 +3,7 @@ import pandas as pd
 import math
 from pandas.util.testing import assert_frame_equal
 from typing import NamedTuple
+import SimpleITK as sitk
 
 from allensdk.core.lazy_property import LazyProperty, LazyPropertyMixin
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
@@ -34,6 +35,8 @@ class BehaviorOphysSession(LazyPropertyMixin):
         self.average_image = LazyProperty(self.api.get_average_image)
         self.motion_correction = LazyProperty(self.api.get_motion_correction)
 
+    
+
     def __eq__(self, other):
 
         field_set = set()
@@ -52,6 +55,9 @@ class BehaviorOphysSession(LazyPropertyMixin):
                 elif isinstance(x1, np.ndarray):
                     np.testing.assert_array_almost_equal(x1, x2)
                 elif isinstance(x1, (list,)):
+                    assert x1 == x2
+                elif isinstance(x1, (sitk.Image,)):
+                    assert x1.GetSize() == x2.GetSize()
                     assert x1 == x2
                 elif isinstance(x1, (dict,)):
                     for key in set(x1.keys()).union(set(x2.keys())):
@@ -81,28 +87,28 @@ class BehaviorOphysSession(LazyPropertyMixin):
 
 if __name__ == "__main__":
 
-    from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi
-    nwb_filepath = '/home/nicholasc/projects/allensdk/tmp.nwb'
-    session = BehaviorOphysSession(789359614)
+    # from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi
+    # nwb_filepath = '/home/nicholasc/projects/allensdk/tmp.nwb'
+    # session = BehaviorOphysSession(789359614)
     # nwb_api = BehaviorOphysNwbApi(nwb_filepath)
     # nwb_api.save(session)
 
     # print(session.cell_specimen_table)
 
 
-    api_2 = BehaviorOphysNwbApi(nwb_filepath)
-    session2 = BehaviorOphysSession(789359614, api=api_2)
+    # api_2 = BehaviorOphysNwbApi(nwb_filepath)
+    # session2 = BehaviorOphysSession(789359614, api=api_2)
     
-    assert session == session2
+    # assert session == session2
 
-    # session = BehaviorOphysSession(789359614)
+    session = BehaviorOphysSession(789359614)
     # print(session.max_projection)
     # print(session.stimulus_timestamps)
     # print(session.ophys_timestamps)
     # print(session.metadata)
     # print(session.dff_traces)
     # print(session.cell_specimen_table)
-    # print(session.running_speed)
+    print(session.running_speed)
     # print(session.running_data_df)
     # print(session.stimulus_presentations)
     # print(session.stimulus_templates)
