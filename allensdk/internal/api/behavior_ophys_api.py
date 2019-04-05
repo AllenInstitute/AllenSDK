@@ -193,9 +193,7 @@ class BehaviorOphysLimsApi(OphysLimsApi):
             image_api = ImageApi
 
         avgint_a1X_file = self.get_avgint_a1X_file()
-        platform_json_file = self.get_ophys_platform_json()
-        platform_data = json.load(open(platform_json_file, 'r'))
-        pixel_size = float(platform_data['registration']['surface_2p']['pixel_size_um'])
+        pixel_size = self.get_surface_2p_pixel_size_um()
         average_image = mpimg.imread(avgint_a1X_file)
         return ImageApi.serialize(average_image, [pixel_size / 1000., pixel_size / 1000.], 'mm')
 

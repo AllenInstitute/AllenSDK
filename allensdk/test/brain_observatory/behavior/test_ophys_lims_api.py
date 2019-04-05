@@ -5,7 +5,7 @@ from allensdk.internal.api.ophys_lims_api import OphysLimsApi
 
 @pytest.fixture(scope="function")
 def ophys_lims_api():
-    return OphysLimsApi()
+    raise
 
 
 @pytest.fixture(scope="function")
@@ -217,42 +217,19 @@ def test_get_cell_roi_table(ophys_experiment_id, ophys_lims_api):
     assert len(df) == 128
 
 
+@pytest.mark.nightly
+@pytest.mark.parametrize('ophys_lims_api, compare_val', [
+    pytest.param(OphysLimsApi(511458874), 0.785203),
+    pytest.param(OphysLimsApi(0), None)
+])
+def test_get_surface_2p_pixel_size_um(ophys_lims_api, compare_val):
 
-
-
-
-
-
-
-
-
-# @pytest.mark.nightly
-# @pytest.mark.parametrize('ophys_experiment_id, compare_val', [
-#     pytest.param(511458874, 572290131),
-#     pytest.param(0, None)
-# ])
-# def test_get_curr_segmentation_run(ophys_experiment_id, compare_val, ophys_lims_api):
-
-#     if compare_val is None:
-#         expected_fail = False
-#         try:
-#             ophys_lims_api.get_curr_segmentation_run(ophys_experiment_id)
-#         except OneResultExpectedError:
-#             expected_fail = True
-#         assert expected_fail is True
-#     else:
-#         assert ophys_lims_api.get_curr_segmentation_run(ophys_experiment_id=ophys_experiment_id) == compare_val
-
-
-
-        # 'demix_file':'/allen/programs/braintv/production/neuralcoding/prod0/specimen_652073919/ophys_session_702013508/ophys_experiment_702134928/demix/702134928_demixed_traces.h5',
-        # 'avgint_a1X_file':'/allen/programs/braintv/production/neuralcoding/prod0/specimen_652073919/ophys_session_702013508/ophys_experiment_702134928/processed/ophys_cell_segmentation_run_814561221/avgInt_a1X.png',
-        # 'rigid_motion_transform_file':'/allen/programs/braintv/production/neuralcoding/prod0/specimen_652073919/ophys_session_702013508/ophys_experiment_702134928/processed/702134928_rigid_motion_transform.csv',
-        # 'targeted_structure':'VISal',
-        # 'imaging_depth':175,
-        # 'stimulus_name':None,
-        # 'reporter_line':'Ai148(TIT2L-GC6f-ICL-tTA2)',
-        # 'driver_line':['Vip-IRES-Cre'],
-        # 'LabTracks_ID':'363887',
-        # 'full_genotype':'Vip-IRES-Cre/wt;Ai148(TIT2L-GC6f-ICL-tTA2)/wt'
-        # }
+    if compare_val is None:
+        expected_fail = False
+        try:
+            ophys_lims_api.get_surface_2p_pixel_size_um()
+        except OneResultExpectedError:
+            expected_fail = True
+        assert expected_fail is True
+    else:
+        assert ophys_lims_api.get_surface_2p_pixel_size_um() == compare_val
