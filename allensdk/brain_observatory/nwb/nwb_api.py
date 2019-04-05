@@ -1,7 +1,14 @@
+import pandas as pd
+import pynwb
+import SimpleITK as sitk
 import os
 
-import pynwb
 from allensdk.brain_observatory.running_speed import RunningSpeed
+from allensdk.brain_observatory.image_api import ImageApi
+
+from pynwb import load_namespaces
+namespace_path = os.path.join(os.path.dirname(__file__), 'AIBS_ophys_behavior_namespace.yaml')
+load_namespaces(namespace_path)
 
 
 class NwbApi:
@@ -32,7 +39,7 @@ class NwbApi:
 
     @classmethod
     def from_path(cls, path, **kwargs):
-        
+
         try:
             with open(path, 'r'):
                 pass
@@ -50,3 +57,23 @@ class NwbApi:
             timestamps=timestamps,
             values=values,
         )
+
+    def get_stimulus_presentations(self) -> pd.DataFrame:
+        table = pd.DataFrame({
+            col.name: col.data for col in self.nwbfile.epochs.columns 
+            if col.name not in set(['tags', 'timeseries', 'tags_index', 'timeseries_index'])
+        }, index=pd.Index(name='stimulus_presentations_id', data=self.nwbfile.epochs.id.data))
+        table.index = table.index.astype(int)
+        return table[sorted(table.columns)]
+
+    def get_image(self, name, module, image_api=None) -> sitk.Image:
+
+        if image_api is None:
+            image_api = ImageApi
+
+        nwb_img = self.nwbfile.modules[module].get_data_interface('images')[name]
+        data = nwb_img.data
+        resolution = nwb_img.resolution  # px/cm
+        spacing = [resolution * 10, resolution * 10]
+
+        return ImageApi.serialize(data, spacing, 'mm')
