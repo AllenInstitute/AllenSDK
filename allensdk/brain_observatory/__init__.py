@@ -35,7 +35,11 @@
 #
 
 import numpy as np
-from collections.abc import Iterable
+import sys
+if sys.version_info < (3, 3):
+    from collections import Iterable
+else:
+    from collections.abc import Iterable
 import json
 import uuid
 import datetime

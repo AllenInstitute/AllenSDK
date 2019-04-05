@@ -6,8 +6,6 @@ import pytz
 import datetime
 import uuid
 
-from allensdk.brain_observatory.image_api import ImageApi
-
 
 def pytest_ignore_collect(path, config):
     ''' The brain_observatory.ecephys submodule uses python 3.6 features that may not be backwards compatible!
@@ -72,6 +70,7 @@ def rewards():
 
 @pytest.fixture
 def image_api():
+    from allensdk.brain_observatory.image_api import ImageApi
     return ImageApi
 
 
