@@ -1,3 +1,50 @@
+import re
+
+import pandas as pd
+import numpy as np
+
+
+GENERIC_MOVIE_RE = re.compile(r'natural_movie_(?P<number>\d+|one|two|three|four|five|six|seven|eight|nine)(_more_repeats){0,1}')
+SHUFFLED_MOVIE_RE = re.compile(r'natural_movie_shuffled')
+
+
+def add_number_to_shuffled_movie(
+    table, 
+    natural_movie_re=GENERIC_MOVIE_RE, 
+    template_re=SHUFFLED_MOVIE_RE,
+    stim_colname='stimulus_name', 
+    template='natural_movie_{}_shuffled',
+    tmp_colname='__movie_number__'
+):
+    '''
+    '''
+
+    if not table[stim_colname].str.contains(SHUFFLED_MOVIE_RE).any():
+        return table
+    table = table.copy()
+
+    table[tmp_colname] = table[stim_colname].str.extract(natural_movie_re, expand=True)['number']
+
+    unique_numbers = [item for item in table[tmp_colname].dropna(inplace=False).unique()]
+    if len(unique_numbers) != 1:
+        raise ValueError(f'unable to uniquely determine a movie number for this session. Candidates: {unique_numbers}')
+    movie_number = unique_numbers[0]
+
+    def renamer(row):
+        if not isinstance(row[stim_colname], str):
+            return row[stim_colname]
+        if not template_re.match(row[stim_colname]):
+            return row[stim_colname]
+        else:
+            return template.format(movie_number)
+
+    table[stim_colname] = table.apply(renamer, axis=1)
+    table.drop(columns=tmp_colname, inplace=True)
+    return table
+
+
+
+
 # import re
 
 
