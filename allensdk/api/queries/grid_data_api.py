@@ -172,3 +172,31 @@ class GridDataApi(RmaApi):
             save_file_path = str(section_data_set_id) + '.nrrd'
 
         self.retrieve_file_over_http(url, save_file_path)
+
+
+    def download_deformation_field(self, 
+        section_data_set_id, 
+        header_path=None,
+        voxel_path=None,
+        voxel_type='DeformationFieldVoxels', 
+        header_type='DeformationFieldHeader'
+    ):
+        '''
+        '''
+
+        header_path = '{}_dfmfld.mhd'.format(section_data_set_id) if header_path is None else header_path
+        voxel_path = '{}_dfmfld.raw'.format(section_data_set_id) if voxel_path is None else voxel_path
+
+        well_known_files = self.model_query(
+            model='WellKnownFile',
+            filters={'attachable_id': section_data_set_id},
+            criteria='well_known_file_type[name$in\'DeformationFieldHeader\',\'DeformationFieldVoxels\']',
+            include='well_known_file_type'
+        )
+        well_known_file_urls = {
+            wkf['well_known_file_type']['name']: 
+            self.construct_well_known_file_download_url(wkf['id']) for wkf in well_known_files
+        }
+        
+        self.retrieve_file_over_http(well_known_file_urls[header_type], header_path)
+        self.retrieve_file_over_http(well_known_file_urls[voxel_type], voxel_path)

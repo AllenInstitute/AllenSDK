@@ -43,6 +43,7 @@ from .reference_space_cache import ReferenceSpaceCache
 
 import nrrd
 import os
+import SimpleITK as sitk
 import pandas as pd
 import numpy as np
 from allensdk.config.manifest import Manifest
@@ -101,6 +102,8 @@ class MouseConnectivityCache(ReferenceSpaceCache):
     DATA_MASK_KEY = 'DATA_MASK'
     STRUCTURE_UNIONIZES_KEY = 'STRUCTURE_UNIONIZES'
     EXPERIMENTS_KEY = 'EXPERIMENTS'
+    DEFORMATION_FIELD_HEADER_KEY = 'DEFORMATION_FIELD_HEADER'
+    DEFORMATION_FIELD_VOXEL_KEY = 'DEFORMATION_FIELD_VOXELS'
 
     MANIFEST_VERSION = 1.3
 
@@ -637,6 +640,25 @@ class MouseConnectivityCache(ReferenceSpaceCache):
             return {'matrix': matrix, 'rows': experiment_ids, 'columns': columns}
 
 
+    def get_deformation_field(self, section_data_set_id, header_path=None, voxel_path=None):
+        '''
+        '''
+
+        header_path = self.get_cache_path(header_path, self.DEFORMATION_FIELD_HEADER_KEY, section_data_set_id)
+        voxel_path = self.get_cache_path(voxel_path, self.DEFORMATION_FIELD_VOXEL_KEY, section_data_set_id)
+
+        if not (os.path.exists(header_path) and os.path.exists(voxel_path)):
+            Manifest.safe_make_parent_dirs(header_path)
+            Manifest.safe_make_parent_dirs(voxel_path)
+            self.api.download_deformation_field(
+                section_data_set_id,
+                header_path=header_path,
+                voxel_path=voxel_path
+                )
+
+        return sitk.ReadImage(header_path)    
+    
+
     def add_manifest_paths(self, manifest_builder):
         """
         Construct a manifest for this Cache class and save it in a file.
@@ -680,5 +702,15 @@ class MouseConnectivityCache(ReferenceSpaceCache):
                                   'experiment_%d/projection_density_%d.nrrd',
                                   parent_key='BASEDIR',
                                   typename='file')
+
+        manifest_builder.add_path(self.DEFORMATION_FIELD_HEADER_KEY,
+                                 'experiment_%d/dfmfld.mhd',
+                                 parent_key='BASEDIR',
+                                 typename='file')
+
+        manifest_builder.add_path(self.DEFORMATION_FIELD_VOXEL_KEY,
+                                 'experiment_%d/dfmfld.raw',
+                                 parent_key='BASEDIR',
+                                 typename='file')
 
         return manifest_builder
