@@ -8,7 +8,7 @@ import pandas as pd
 
 from . import PostgresQueryMixin, OneOrMoreResultExpectedError
 from allensdk.api.cache import memoize
-from allensdk.brain_observatory.image_api import ImageApi
+from allensdk.brain_observatory.behavior.image_api import ImageApi
 import allensdk.brain_observatory.roi_masks as roi
 
 

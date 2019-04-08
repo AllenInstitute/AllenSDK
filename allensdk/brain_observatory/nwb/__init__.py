@@ -11,7 +11,7 @@ from pynwb.ophys import DfOverF, ImageSegmentation, OpticalChannel, Fluorescence
 import allensdk.brain_observatory.roi_masks as roi
 from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory import dict_to_indexed_array
-from allensdk.brain_observatory.image_api import ImageApi
+from allensdk.brain_observatory.behavior.image_api import ImageApi
 from allensdk.brain_observatory.behavior.schemas import OphysBehaviorMetaDataSchema, OphysBehaviorTaskParametersSchema
 from allensdk.brain_observatory.nwb.metadata import load_LabMetaData_extension
 
