@@ -14,7 +14,7 @@ from allensdk.brain_observatory.behavior.running_processing import get_running_d
 from allensdk.brain_observatory.behavior.rewards_processing import get_rewards
 from allensdk.brain_observatory.behavior.trials_processing import get_trials
 from allensdk.brain_observatory.running_speed import RunningSpeed
-from allensdk.brain_observatory.image_api import ImageApi
+from allensdk.brain_observatory.behavior.image_api import ImageApi
 
 
 class BehaviorOphysLimsApi(OphysLimsApi):

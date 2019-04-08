@@ -4,7 +4,7 @@ import SimpleITK as sitk
 import os
 
 from allensdk.brain_observatory.running_speed import RunningSpeed
-from allensdk.brain_observatory.image_api import ImageApi
+from allensdk.brain_observatory.behavior.image_api import ImageApi
 
 from pynwb import load_namespaces
 namespace_path = os.path.join(os.path.dirname(__file__), 'AIBS_ophys_behavior_namespace.yaml')

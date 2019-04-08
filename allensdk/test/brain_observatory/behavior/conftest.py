@@ -70,7 +70,7 @@ def rewards():
 
 @pytest.fixture
 def image_api():
-    from allensdk.brain_observatory.image_api import ImageApi
+    from allensdk.brain_observatory.behavior.image_api import ImageApi
     return ImageApi
 
 
