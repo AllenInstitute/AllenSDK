@@ -391,40 +391,6 @@ def calculate_dff(traces, dff_computation_cb=None, save_plot_dir=None):
     return dff
 
 
-def compute_dff(traces,
-                save_plot_dir=None,
-                mode_kernelsize=5400,
-                mean_kernelsize=3000):
-    """Compute dF/F of a set of traces using a low-pass windowed-mode operator.
-
-    This method is deprecated. Use :func:`calculate_dff` with
-    dff_computation_cb = :func:`compute_dff_windowed_mode` .
-
-    The operation is basically:
-
-        T_mm = windowed_mean(windowed_mode(T))
-
-        T_dff = (T - T_mm) / T_mm
-
-    Parameters
-    ----------
-    traces: np.ndarray
-       2D array of traces to be analyzed
-
-    Returns
-    -------
-    np.ndarray with the same shape as the input array.
-    """
-    warnings.warn(
-        FutureWarning("The default computation for dff has been changed. Use"
-                      " `calculate_dff` to compute dff now."))
-    computation_cb = partial(compute_dff_windowed_mode,
-                             mode_kernelsize=mode_kernelsize,
-                             mean_kernelsize=mean_kernelsize)
-    return calculate_dff(traces, dff_computation_cb=computation_cb,
-                         save_plot_dir=save_plot_dir)
-
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("input_h5")
