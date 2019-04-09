@@ -56,7 +56,7 @@ class BehaviorOphysNwbApi(NwbApi):
         nwb.add_rewards(nwbfile, session_object.rewards)
 
         # Add max_projection image data to NWB in-memory object:
-        nwb.add_max_projection(nwbfile, session_object.max_projection)
+        nwb.add_max_projection(nwbfile, session_object.segmentation_mask_image)
 
         # Add average_image image data to NWB in-memory object:
         nwb.add_average_image(nwbfile, session_object.average_image)
@@ -126,7 +126,7 @@ class BehaviorOphysNwbApi(NwbApi):
 
         return pd.DataFrame({'volume': volume, 'timestamps': time, 'autorewarded': autorewarded}).set_index('timestamps')
 
-    def get_max_projection(self, image_api=None) -> sitk.Image:
+    def get_segmentation_mask_image(self, image_api=None) -> sitk.Image:
         return self.get_image('max_projection', 'two_photon_imaging', image_api=image_api)
 
     def get_average_image(self, image_api=None) -> sitk.Image:
@@ -185,3 +185,6 @@ class BehaviorOphysNwbApi(NwbApi):
         motion_correction_data['y'] = self.nwbfile.modules['motion_correction'].get_data_interface('y').data[:]
 
         return pd.DataFrame(motion_correction_data)
+
+    def get_ophys_experiment_id(self) -> int:
+        return self.get_metadata()['ophys_experiment_id']

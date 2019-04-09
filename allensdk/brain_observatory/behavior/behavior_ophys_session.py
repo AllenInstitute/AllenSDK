@@ -9,12 +9,16 @@ from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
 
 class BehaviorOphysSession(LazyPropertyMixin):
 
-    def __init__(self, ophys_experiment_id, api=None):
+    @classmethod
+    def from_LIMS(cls, ophys_experiment_id):
+        return cls(api=BehaviorOphysLimsApi(ophys_experiment_id))
 
-        self.ophys_experiment_id = ophys_experiment_id
-        self.api = BehaviorOphysLimsApi(ophys_experiment_id) if api is None else api
+    def __init__(self, api=None):
 
-        self.max_projection = LazyProperty(self.api.get_max_projection)
+        self.api = api
+
+        self.ophys_experiment_id = LazyProperty(self.api.get_ophys_experiment_id)
+        self.segmentation_mask_image = LazyProperty(self.api.get_segmentation_mask_image)
         self.stimulus_timestamps = LazyProperty(self.api.get_stimulus_timestamps)
         self.ophys_timestamps = LazyProperty(self.api.get_ophys_timestamps)
         self.metadata = LazyProperty(self.api.get_metadata)
@@ -36,7 +40,10 @@ class BehaviorOphysSession(LazyPropertyMixin):
 
 if __name__ == "__main__":
 
-    # from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi
+    from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi
+
+
+
     # nwb_filepath = '/home/nicholasc/projects/allensdk/tmp.nwb'
     # session = BehaviorOphysSession(789359614)
     # nwb_api = BehaviorOphysNwbApi(nwb_filepath)
@@ -50,22 +57,28 @@ if __name__ == "__main__":
     
     # assert session == session2
 
-    session = BehaviorOphysSession(789359614)
-    # print(session.max_projection)
-    # print(session.stimulus_timestamps)
-    # print(session.ophys_timestamps)
-    # print(session.metadata)
-    # print(session.dff_traces)
-    # print(session.cell_specimen_table)
-    print(session.running_speed)
-    # print(session.running_data_df)
-    # print(session.stimulus_presentations)
-    # print(session.stimulus_templates)
-    # print(session.stimulus_index)
-    # print(session.licks)
-    # print(session.rewards)
-    # print(session.task_parameters)
-    # print(session.trials)
-    # print(session.corrected_fluorescence_traces)
-    # print(session.average_image)
-    # print(session.motion_correction)
+    # session = BehaviorOphysSession.from_LIMS(789359614)
+    # session.segmentation_mask_image
+    # session.stimulus_timestamps
+    # session.ophys_timestamps
+    # session.metadata
+    # session.dff_traces
+    # s = session.cell_specimen_table.to_json()
+
+    api = BehaviorOphysLimsApi(789359614)
+    
+    # print(api.get_cell_specimen_table().head())
+    # with open('tmp.json', 'w') as f:
+    #     f.write(api.get_raw_cell_specimen_table_json())
+    # session.running_speed
+    # session.running_data_df
+    # session.stimulus_presentations
+    # session.stimulus_templates
+    # session.stimulus_index
+    # session.licks
+    # session.rewards
+    # session.task_parameters
+    # session.trials
+    # session.corrected_fluorescence_traces
+    # session.average_image
+    # session.motion_correction

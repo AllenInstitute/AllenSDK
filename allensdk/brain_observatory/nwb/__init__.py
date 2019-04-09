@@ -291,7 +291,7 @@ def add_image(nwbfile, image_data, image_name, module_name, module_description, 
     return nwbfile
 
 
-def add_max_projection(nwbfile, max_projection, image_api=None):
+def add_segmentation_mask_image(nwbfile, max_projection, image_api=None):
 
     add_image(nwbfile, max_projection, 'max_projection', 'two_photon_imaging', 'Ophys timestamps processing module', image_api=image_api)
 
@@ -349,7 +349,7 @@ def add_task_parameters(nwbfile, task_parameters):
 def add_cell_specimen_table(nwbfile, cell_roi_table):
 
     # Device:
-    device_name = nwbfile.lab_meta_data['metadata'].device_name
+    device_name = nwbfile.lab_meta_data['metadata'].rig_name
     nwbfile.create_device(device_name,
                           "Allen Brain Observatory")
     device = nwbfile.get_device(device_name)

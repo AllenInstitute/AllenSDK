@@ -42,7 +42,7 @@ class BehaviorOphysLimsApi(OphysLimsApi):
                 SELECT visual_behavior_experiment_container_id 
                 FROM ophys_experiments_visual_behavior_experiment_containers 
                 WHERE ophys_experiment_id= {};
-                '''.format(self.ophys_experiment_id)        
+                '''.format(self.get_ophys_experiment_id())        
         return self.fetchone(query, strict=False)
 
     @memoize
@@ -54,7 +54,7 @@ class BehaviorOphysLimsApi(OphysLimsApi):
                 JOIN behavior_sessions bs ON bs.ophys_session_id=os.id
                 LEFT JOIN well_known_files stim ON stim.attachable_id=bs.id AND stim.attachable_type = 'BehaviorSession' AND stim.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'StimulusPickle')
                 WHERE oe.id= {};
-                '''.format(self.ophys_experiment_id)
+                '''.format(self.get_ophys_experiment_id())
         return self.fetchone(query, strict=True)
 
     def get_behavior_session_uuid(self):
@@ -76,7 +76,7 @@ class BehaviorOphysLimsApi(OphysLimsApi):
     def get_metadata(self):
 
         metadata = super().get_metadata()
-        metadata['ophys_experiment_id'] = self.ophys_experiment_id
+        metadata['ophys_experiment_id'] = self.get_ophys_experiment_id()
         metadata['experiment_container_id'] = self.get_experiment_container_id()
         metadata['ophys_frame_rate'] = self.get_ophys_frame_rate()
         metadata['stimulus_frame_rate'] = self.get_stimulus_frame_rate()
@@ -86,7 +86,7 @@ class BehaviorOphysLimsApi(OphysLimsApi):
         metadata['experiment_datetime'] = self.get_experiment_date()
         metadata['reporter_line'] = self.get_reporter_line()
         metadata['driver_line'] = self.get_driver_line()
-        metadata['LabTracks_ID'] = self.get_LabTracks_ID()
+        metadata['LabTracks_ID'] = self.get_external_specimen_name()
         metadata['full_genotype'] = self.get_full_genotype()
         metadata['behavior_session_uuid'] = uuid.UUID(self.get_behavior_session_uuid())
 
@@ -192,10 +192,8 @@ class BehaviorOphysLimsApi(OphysLimsApi):
         if image_api is None:
             image_api = ImageApi
 
-        avgint_a1X_file = self.get_avgint_a1X_file()
-        platform_json_file = self.get_ophys_platform_json()
-        platform_data = json.load(open(platform_json_file, 'r'))
-        pixel_size = float(platform_data['registration']['surface_2p']['pixel_size_um'])
+        avgint_a1X_file = self.get_average_intensity_projection_image()
+        pixel_size = self.get_surface_2p_pixel_size_um()
         average_image = mpimg.imread(avgint_a1X_file)
         return ImageApi.serialize(average_image, [pixel_size / 1000., pixel_size / 1000.], 'mm')
 

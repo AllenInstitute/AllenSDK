@@ -4,71 +4,90 @@ groups:
   doc: "LabMetaData extensions: ['OphysBehaviorMetaData', 'OphysBehaviorTaskParameters']\
     \ (AIBS_ophys_behavior)"
   attributes:
-  - name: imaging_depth
-    dtype: int
-    doc: Depth (microns) below the cortical surface targeted for two-photon acquisition
-  - name: indicator
-    dtype: text
-    doc: indicator
-  - name: device_name
-    dtype: text
-    doc: name of two-photon rig
-  - name: ophys_experiment_id
-    dtype: int
-    doc: Id for this ophys session
-  - name: full_genotype
-    dtype: text
-    doc: full genotype of subject
-  - name: reporter_line
-    dtype: text
-    doc: Reporter line
-  - name: stimulus_frame_rate
-    dtype: float
-    doc: Frame rate (frames/second) of the visual_stimulus from the monitor
   - name: LabTracks_ID
     dtype: int
     doc: LabTracks ID of subject
+  - name: emission_lambda
+    dtype: float
+    doc: emission_lambda
   - name: session_type
     dtype: text
     doc: Experimental session description
-  - name: field_of_view_width
-    dtype: int
-    doc: field_of_view_width
-  - name: experiment_datetime
+  - name: full_genotype
     dtype: text
-    doc: Date of the experiment (UTC, as string)
+    doc: full genotype of subject
+  - name: ophys_frame_rate
+    dtype: float
+    doc: Frame rate (frames/second) of the two-photon microscope
+  - name: driver_line
+    dtype: text
+    doc: Driver line
+    shape:
+    - null
+  - name: experiment_container_id
+    dtype: int
+    doc: Container ID for the container that contains this ophys session
   - name: behavior_session_uuid
     dtype: text
     doc: MTrain record for session, also called foraging_id
   - name: field_of_view_height
     dtype: int
     doc: field_of_view_height
-  - name: experiment_container_id
-    dtype: int
-    doc: Container ID for the container that contains this ophys session
-  - name: driver_line
+  - name: indicator
     dtype: text
-    doc: Driver line
-    shape:
-    - null
+    doc: indicator
   - name: excitation_lambda
     dtype: float
     doc: excitation_lambda
+  - name: experiment_datetime
+    dtype: text
+    doc: Date of the experiment (UTC, as string)
+  - name: ophys_experiment_id
+    dtype: int
+    doc: Id for this ophys session
+  - name: stimulus_frame_rate
+    dtype: float
+    doc: Frame rate (frames/second) of the visual_stimulus from the monitor
+  - name: imaging_depth
+    dtype: int
+    doc: Depth (microns) below the cortical surface targeted for two-photon acquisition
+  - name: reporter_line
+    dtype: text
+    doc: Reporter line
+  - name: field_of_view_width
+    dtype: int
+    doc: field_of_view_width
+  - name: rig_name
+    dtype: text
+    doc: name of two-photon rig
   - name: targeted_structure
     dtype: text
     doc: Anatomical structure targeted for two-photon acquisition
-  - name: emission_lambda
-    dtype: float
-    doc: emission_lambda
-  - name: ophys_frame_rate
-    dtype: float
-    doc: Frame rate (frames/second) of the two-photon microscope
 - neurodata_type_def: OphysBehaviorTaskParameters
   neurodata_type_inc: LabMetaData
   doc: "LabMetaData extensions: ['OphysBehaviorMetaData', 'OphysBehaviorTaskParameters']\
     \ (AIBS_ophys_behavior)"
   attributes:
-  - name: stimulus
+  - name: response_window_sec
+    dtype: text
+    doc: response_window in seconds
+    shape:
+    - 2
+  - name: blank_duration_sec
+    dtype: text
+    doc: blank duration in seconds
+    shape:
+    - 2
+  - name: stimulus_distribution
+    dtype: text
+    doc: stimulus_distribution
+  - name: omitted_flash_fraction
+    dtype: float
+    doc: omitted_flash_fraction
+  - name: task
+    dtype: text
+    doc: task
+  - name: stage
     dtype: text
     doc: stage
   - name: stimulus_duration_sec
@@ -77,28 +96,9 @@ groups:
   - name: reward_volume
     dtype: float
     doc: reward_volume
-  - name: stage
-    dtype: text
-    doc: stage
-  - name: task
-    dtype: text
-    doc: task
-  - name: response_window_sec
-    dtype: text
-    doc: response_window in seconds
-    shape:
-    - 2
   - name: n_stimulus_frames
     dtype: int
     doc: n_stimulus_frames
-  - name: omitted_flash_fraction
-    dtype: float
-    doc: omitted_flash_fraction
-  - name: stimulus_distribution
+  - name: stimulus
     dtype: text
-    doc: stimulus_distribution
-  - name: blank_duration_sec
-    dtype: text
-    doc: blank duration in seconds
-    shape:
-    - 2
+    doc: stage

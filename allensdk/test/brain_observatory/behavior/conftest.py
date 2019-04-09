@@ -114,7 +114,7 @@ def metadata():
             "indicator": 'HW',
             "field_of_view_width": 2,
             "field_of_view_height": 2,
-            "device_name": 'my_device',
+            "rig_name": 'my_device',
             }
 
 

@@ -85,7 +85,7 @@ class OphysBehaviorMetaDataSchema(RaisingSchema):
         required=True,
     )
 
-    device_name = fields.String(
+    rig_name = fields.String(
         doc='name of two-photon rig',
         required=True,
     )
