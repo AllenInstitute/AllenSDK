@@ -208,6 +208,7 @@ class GridDataApi(RmaApi):
             criteria='well_known_file_type[name$in\'DeformationFieldHeader\',\'DeformationFieldVoxels\']',
             include='well_known_file_type'
         )
+
         well_known_file_urls = {
             wkf['well_known_file_type']['name']: 
             self.construct_well_known_file_download_url(wkf['id']) for wkf in well_known_files

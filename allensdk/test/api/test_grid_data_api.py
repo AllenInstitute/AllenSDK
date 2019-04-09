@@ -130,3 +130,18 @@ def test_api_doc_url_projection_grid_injection_fraction_resolution(grid_data):
         "http://api.brain-map.org/grid_data/download_file/181777177"
         "?image=injection_fraction&resolution=25",
         path)
+
+
+def test_download_deformation_field(grid_data):
+    grid_data.model_query = MagicMock(
+        name='model_query', 
+        return_value=[
+            {'well_known_file_type': {'name': 'DeformationFieldHeader'}, 'id': 123}, 
+            {'well_known_file_type': {'name': 'DeformationFieldVoxels'}, 'id': 456}
+        ]
+    )
+
+    grid_data.download_deformation_field(789)
+
+    grid_data.retrieve_file_over_http.assert_any_call('http://api.brain-map.org/api/v2/well_known_file_download/123', '789_dfmfld.mhd')
+    grid_data.retrieve_file_over_http.assert_any_call('http://api.brain-map.org/api/v2/well_known_file_download/456', '789_dfmfld.raw')
