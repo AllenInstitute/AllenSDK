@@ -716,7 +716,7 @@ class MouseConnectivityCache(ReferenceSpaceCache):
         if not direction in ('trv', 'tvr'):
             raise ArgumentError('invalid direction: {}. direction must be one of tvr, trv'.format(direction))
 
-        file_name = self.get_cache_path(file_name, self.STRUCTURE_TREE_KEY)
+        file_name = self.get_cache_path(file_name, self.ALIGNMENT3D_KEY)
 
         raw_alignment = self.api.download_alignment3d(
             strategy='lazy',
