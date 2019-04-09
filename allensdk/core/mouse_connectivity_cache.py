@@ -728,7 +728,7 @@ class MouseConnectivityCache(ReferenceSpaceCache):
         for entry, value in raw_alignment.items():
             match = alignment_re.match(entry)
             if match is not None:
-                alignment.flat[int(match['index'])] = value
+                alignment.flat[int(match.group('index'))] = value
         
         return alignment
 
