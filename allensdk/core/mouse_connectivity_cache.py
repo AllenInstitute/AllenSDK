@@ -360,11 +360,9 @@ class MouseConnectivityCache(ReferenceSpaceCache):
 
         if injection_structure_ids is not None:
             structure_ids = MouseConnectivityCache.validate_structure_ids(injection_structure_ids)
-
-            descendant_ids = reduce(op.add, self.get_structure_tree()\
-                                    .descendant_ids(injection_structure_ids))
-            experiments = [e for e in experiments
-                           if e['structure_id'] in descendant_ids]
+            descendant_ids = set(reduce(op.add, self.get_structure_tree().descendant_ids(injection_structure_ids)))
+            
+            experiments = [e for e in experiments if e['structure_id'] in descendant_ids]
 
         return experiments
 

@@ -294,8 +294,14 @@ def test_filter_experiments(mcc, experiments):
     assert len(pass_line) == 1
     assert len(fail_line) == 1
 
-    sid_line = mcc.filter_experiments(experiments, cre=True,
-                                      injection_structure_ids=[97,98])
+    def fake_tree(*a, **k):
+        class FakeTree(object):
+            def descendant_ids(*a, **k):
+                return [[97, 98], []]
+        return FakeTree()
+
+    with mock.patch.object(mcc, 'get_structure_tree', new=fake_tree) as p:
+        sid_line = mcc.filter_experiments(experiments, cre=True, injection_structure_ids=[97, 98])
 
     assert len(sid_line) == 1
 
