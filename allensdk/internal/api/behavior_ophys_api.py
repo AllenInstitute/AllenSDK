@@ -15,6 +15,7 @@ from allensdk.brain_observatory.behavior.rewards_processing import get_rewards
 from allensdk.brain_observatory.behavior.trials_processing import get_trials
 from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory.behavior.image_api import ImageApi
+from allensdk.internal.api import PostgresQueryMixin
 
 
 class BehaviorOphysLimsApi(OphysLimsApi):
@@ -211,3 +212,26 @@ class BehaviorOphysLimsApi(OphysLimsApi):
         stimulus_rebase_function = get_stimulus_rebase_function(data, stimulus_timestamps_no_monitor_delay)
 
         return stimulus_rebase_function
+
+    @staticmethod
+    def get_ophys_experiment_df():
+
+        api = PostgresQueryMixin()
+        query = '''
+                SELECT *
+                FROM ophys_experiments_visual_behavior_experiment_containers oec
+                LEFT JOIN ophys_experiments oe ON oe.id = oec.ophys_experiment_id 
+                '''
+
+        return pd.read_sql(query, api.get_connection()).rename(columns={'visual_behavior_experiment_container_id':'container_id'}).drop('id', axis=1)
+
+if __name__ == "__main__":
+
+
+
+
+
+    L = BehaviorOphysLimsApi.get_ophys_experiment_df()
+    print(L)
+    # for x in [791352433, 814796698, 814796612, 814796558, 814797528]:
+    #     print(x in L)
