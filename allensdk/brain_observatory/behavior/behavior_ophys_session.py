@@ -42,16 +42,16 @@ if __name__ == "__main__":
 
     from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi
 
-    api_list = []
-    df = BehaviorOphysLimsApi.get_ophys_experiment_df()
-    for cid in [791352433, 814796698, 814796612, 814796558, 814797528]:
-        df2 = df[(df['container_id'] == cid) & (df['workflow_state'] == 'passed')]
-        api_list += [BehaviorOphysLimsApi(oeid) for oeid in df2['ophys_experiment_id'].values]
+    # api_list = []
+    # df = BehaviorOphysLimsApi.get_ophys_experiment_df()
+    # for cid in [791352433, 814796698, 814796612, 814796558, 814797528]:
+    #     df2 = df[(df['container_id'] == cid) & (df['workflow_state'] == 'passed')]
+    #     api_list += [BehaviorOphysLimsApi(oeid) for oeid in df2['ophys_experiment_id'].values]
 
-    for api in api_list:
-        session = BehaviorOphysSession(api=api)
-        print(session.task_parameters)
-        print(session.running_speed)
+    # for api in api_list:
+    #     session = BehaviorOphysSession(api=api)
+    #     print(session.task_parameters)
+    #     print(session.running_speed)
 
 
     # nwb_filepath = '/home/nicholasc/projects/allensdk/tmp.nwb'

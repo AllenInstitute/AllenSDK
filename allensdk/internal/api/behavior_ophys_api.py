@@ -193,7 +193,7 @@ class BehaviorOphysLimsApi(OphysLimsApi):
         if image_api is None:
             image_api = ImageApi
 
-        avgint_a1X_file = self.get_average_intensity_projection_image()
+        avgint_a1X_file = self.get_average_intensity_projection_image_file()
         pixel_size = self.get_surface_2p_pixel_size_um()
         average_image = mpimg.imread(avgint_a1X_file)
         return ImageApi.serialize(average_image, [pixel_size / 1000., pixel_size / 1000.], 'mm')

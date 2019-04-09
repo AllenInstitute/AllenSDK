@@ -224,7 +224,7 @@ class OphysLimsApi(PostgresQueryMixin):
         return self.fetchone(query, strict=True)
 
     @memoize
-    def get_average_intensity_projection_image(self):
+    def get_average_intensity_projection_image_file(self):
         query = '''
                 SELECT avg.storage_directory || avg.filename AS avgint_file
                 FROM ophys_experiments oe
@@ -305,7 +305,7 @@ class OphysLimsApi(PostgresQueryMixin):
         return self.fetchone(query, strict=True)
 
     @memoize
-    def get_raw_cell_specimen_table_json(self):
+    def get_raw_cell_specimen_table_dict(self):
         ophys_cell_segmentation_run_id = self.get_ophys_cell_segmentation_run_id()
         query = '''
                 select *
@@ -313,11 +313,11 @@ class OphysLimsApi(PostgresQueryMixin):
                 where cr.ophys_cell_segmentation_run_id = {}
                 '''.format(ophys_cell_segmentation_run_id)
         cell_specimen_table = pd.read_sql(query, self.get_connection()).rename(columns={'id': 'cell_roi_id', 'mask_matrix': 'image_mask'})
-        return cell_specimen_table.to_json()
+        return cell_specimen_table.to_dict()
 
     @memoize
     def get_cell_specimen_table(self):
-        cell_specimen_table = pd.read_json(self.get_raw_cell_specimen_table_json()).set_index('cell_roi_id')
+        cell_specimen_table = pd.DataFrame.from_dict(self.get_raw_cell_specimen_table_dict()).set_index('cell_roi_id')
         fov_width, fov_height = self.get_field_of_view_shape()['width'], self.get_field_of_view_shape()['height']
         image_mask_list = []
         for sub_mask in cell_specimen_table['image_mask'].values:

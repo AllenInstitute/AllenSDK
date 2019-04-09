@@ -5,6 +5,7 @@ import numpy as np
 import pytz
 import datetime
 import uuid
+import os
 
 
 def pytest_ignore_collect(path, config):
@@ -166,3 +167,32 @@ def corrected_fluorescence_traces(ophys_timestamps, cell_specimen_table):
 def motion_correction(ophys_timestamps):
     return pd.DataFrame({'x': np.ones_like(ophys_timestamps),
                          'y': np.ones_like(ophys_timestamps)})
+
+
+@pytest.fixture
+def session_data():
+
+    data = {'ophys_experiment_id': 789359614,
+            'surface_2p_pixel_size_um': 0.78125,
+            "segmentation_mask_image_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/processed/ophys_cell_segmentation_run_789410052/maxInt_a13a.png",
+            "sync_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/789220000_sync.h5",
+            "rig_name": "CAM2P.5",
+            "movie_width": 447,
+            "movie_height": 512,
+            "container_id": 814796558,
+            "targeted_structure": "VISp",
+            "targeted_depth": 375,
+            "stimulus_name": "Unknown",
+            "date_of_acquisition": '2018-11-30 23:28:37',
+            "reporter_line": "Ai93(TITL-GCaMP6f)",
+            "driver_line": ['Camk2a-tTA', 'Slc17a7-IRES2-Cre'],
+            "external_specimen_name": 416369,
+            "full_genotype": "Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;Ai93(TITL-GCaMP6f)/wt",
+            "behavior_stimulus_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/behavior_session_789295700/789220000.pkl",
+            "dff_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/789359614_dff.h5",
+            "ophys_cell_segmentation_run_id": 789410052,
+            "cell_specimen_table": open(os.path.join(os.path.dirname(__file__), 'cell_specimen_table_789359614.json'), 'r').read(),
+            "demix_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/demix/789359614_demixed_traces.h5",
+            "average_intensity_projection_image": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/processed/ophys_cell_segmentation_run_789410052/avgInt_a1X.png",
+            "rigid_motion_transform_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/processed/789359614_rigid_motion_transform.csv",
+            }

@@ -6,7 +6,14 @@ import numpy as np
 import SimpleITK as sitk
 import pytz
 import uuid
+from pandas.util.testing import assert_frame_equal
+import os
+import math
+import numpy as np
+import pandas as pd
 
+
+from allensdk.core.lazy_property import LazyProperty
 from allensdk.brain_observatory.nwb.nwb_api import NwbApi
 from allensdk.brain_observatory.behavior.trials_processing import TRIAL_COLUMN_DESCRIPTION_DICT
 from allensdk.brain_observatory.behavior.schemas import OphysBehaviorMetaDataSchema, OphysBehaviorTaskParametersSchema
@@ -56,7 +63,7 @@ class BehaviorOphysNwbApi(NwbApi):
         nwb.add_rewards(nwbfile, session_object.rewards)
 
         # Add max_projection image data to NWB in-memory object:
-        nwb.add_max_projection(nwbfile, session_object.segmentation_mask_image)
+        nwb.add_segmentation_mask_image(nwbfile, session_object.segmentation_mask_image)
 
         # Add average_image image data to NWB in-memory object:
         nwb.add_average_image(nwbfile, session_object.average_image)
@@ -188,3 +195,51 @@ class BehaviorOphysNwbApi(NwbApi):
 
     def get_ophys_experiment_id(self) -> int:
         return self.get_metadata()['ophys_experiment_id']
+
+
+def equals(A, B):
+
+    field_set = set()
+    for key, val in A.__dict__.items():
+        if isinstance(val, LazyProperty):
+            field_set.add(key)
+    for key, val in B.__dict__.items():
+        if isinstance(val, LazyProperty):
+            field_set.add(key)
+
+    try:
+        for field in sorted(field_set):
+            x1, x2 = getattr(A, field), getattr(B, field)
+            if isinstance(x1, pd.DataFrame):
+                assert_frame_equal(x1, x2)
+            elif isinstance(x1, np.ndarray):
+                np.testing.assert_array_almost_equal(x1, x2)
+            elif isinstance(x1, (list,)):
+                assert x1 == x2
+            elif isinstance(x1, (sitk.Image,)):
+                assert x1.GetSize() == x2.GetSize()
+                assert x1 == x2
+            elif isinstance(x1, (dict,)):
+                for key in set(x1.keys()).union(set(x2.keys())):
+                    if isinstance(x1[key], (np.ndarray,)):
+                        np.testing.assert_array_almost_equal(x1[key], x2[key])
+                    elif isinstance(x1[key], (float,)):
+                        if math.isnan(x1[key]) or math.isnan(x2[key]):
+                            assert math.isnan(x1[key]) and math.isnan(x2[key])
+                        else:
+                            assert x1[key] == x2[key]
+                    else:
+                        assert x1[key] == x2[key]
+
+            else:
+                assert x1 == x2
+
+    except NotImplementedError as e:
+        A_implements_get_field = hasattr(A.api, getattr(type(A), field).getter_name)
+        B_implements_get_field = hasattr(B.api, getattr(type(B), field).getter_name)
+        assert A_implements_get_field == B_implements_get_field == False
+
+    except (AssertionError, AttributeError) as e:
+        return False
+
+    return True
