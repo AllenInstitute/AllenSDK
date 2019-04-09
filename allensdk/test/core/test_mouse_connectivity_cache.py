@@ -486,7 +486,7 @@ def test_get_deformation_field(mcc):
 
     def write_dfmfld(*a, **k):
         img = sitk.GetImageFromArray(arr)
-        sitk.WriteImage(img, k['header_path'])
+        sitk.WriteImage(img, str(k['header_path']), True) # TODO the str call here is only necessary in 2.7
 
     with mock.patch.object(mcc.api, 'download_deformation_field', new=write_dfmfld) as p:
         obtained = mcc.get_deformation_field(123)

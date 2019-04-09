@@ -681,7 +681,7 @@ class MouseConnectivityCache(ReferenceSpaceCache):
                 voxel_path=voxel_path
                 )
 
-        return sitk.GetArrayFromImage(sitk.ReadImage(header_path))
+        return sitk.GetArrayFromImage(sitk.ReadImage(str(header_path))) # TODO the str call here is only necessary in 2.7
 
 
     def get_affine_parameters(self, section_data_set_id, direction='trv', file_name=None):
