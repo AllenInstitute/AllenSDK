@@ -42,6 +42,7 @@ from . import json_utilities
 from .reference_space_cache import ReferenceSpaceCache
 
 import nrrd
+import re
 import os
 import SimpleITK as sitk
 import pandas as pd
@@ -104,11 +105,14 @@ class MouseConnectivityCache(ReferenceSpaceCache):
     EXPERIMENTS_KEY = 'EXPERIMENTS'
     DEFORMATION_FIELD_HEADER_KEY = 'DEFORMATION_FIELD_HEADER'
     DEFORMATION_FIELD_VOXEL_KEY = 'DEFORMATION_FIELD_VOXELS'
+    ALIGNMENT3D_KEY = 'ALIGNMENT3D'
 
     MANIFEST_VERSION = 1.3
 
     SUMMARY_STRUCTURE_SET_ID = 167587189
     DEFAULT_STRUCTURE_SET_IDS = tuple([SUMMARY_STRUCTURE_SET_ID])
+
+    DFMFLD_RESOLUTIONS = (25,)
 
     @property
     def default_structure_ids(self):
@@ -641,8 +645,30 @@ class MouseConnectivityCache(ReferenceSpaceCache):
 
 
     def get_deformation_field(self, section_data_set_id, header_path=None, voxel_path=None):
+        ''' Extract the local alignment parameters for this dataset. This a 3D vector image (3 components) describing 
+        a deformable local mapping from CCF voxels to this section data set's affine-aligned image stack.
+
+        Parameters
+        ----------
+            section_data_set_id : int
+                Download the deformation field for this data set
+            header_path : str, optional
+                If supplied, the deformation field header will be downloaded to this path.
+            voxel_path : str, optiona
+                If supplied, the deformation field voxels will be downloaded to this path.
+
+        Returns
+        -------
+            SimpleITK.Image :
+                3D, 3-component image
+
         '''
-        '''
+
+        if self.resolution not in self.DFMFLD_RESOLUTIONS:
+            warnings.warn(
+                'deformation fields are only available at {} isometric resolutions, but this is a '\
+                '{}-micron cache'.format(self.DFMFLD_RESOLUTIONS, self.resolution)
+            )
 
         header_path = self.get_cache_path(header_path, self.DEFORMATION_FIELD_HEADER_KEY, section_data_set_id)
         voxel_path = self.get_cache_path(voxel_path, self.DEFORMATION_FIELD_VOXEL_KEY, section_data_set_id)
@@ -656,8 +682,57 @@ class MouseConnectivityCache(ReferenceSpaceCache):
                 voxel_path=voxel_path
                 )
 
-        return sitk.ReadImage(header_path)    
+        return sitk.ReadImage(header_path)
+
+
+    def get_affine_parameters(self, section_data_set_id, direction='trv', file_name=None):
+        ''' Extract the parameters of the 3D affine tranformation mapping this section data set's image-space stack to 
+        CCF-space (or vice-versa).
+
+        Parameters
+        ----------
+        section_data_set_id : int
+            download the parameters for this data set.
+        direction : str, optional
+            Valid options are:
+                trv : "transform from reference to volume". Maps CCF points to image space points. If you are 
+                    resampling data into CCF, this is the direction you want.
+                tvr : "transform from volume to reference". Maps image space points to CCF points.
+        file_name : str
+            If provided, store the downloaded file here.
+ 
+        Returns
+        -------
+        alignment : numpy.ndarray
+            4 X 3 matrix. In order to transform a point [X_1, X_2, X_3] run 
+                np.dot([X_1, X_2, X_3, 1], alignment). In 
+            to build a SimpleITK affine transform run:
+                transform = sitk.AffineTransform(3)
+                transform.SetParameters(alignment.flatten())
+
+        '''
+
+        if not direction in ('trv', 'tvr'):
+            raise ArgumentError('invalid direction: {}. direction must be one of tvr, trv'.format(direction))
+
+        file_name = self.get_cache_path(file_name, self.STRUCTURE_TREE_KEY)
+
+        raw_alignment = self.api.download_alignment3d(
+            strategy='lazy',
+            path=file_name,
+            section_data_set_id=section_data_set_id,
+            **Cache.cache_json())
     
+        alignment_re = re.compile('{}_(?P<index>\d+)'.format(direction))
+        alignment = np.zeros((4, 3), dtype=float)
+
+        for entry, value in raw_alignment.items():
+            match = alignment_re.match(entry)
+            if match is not None:
+                alignment.flat[int(match['index'])] = value
+        
+        return alignment
+
 
     def add_manifest_paths(self, manifest_builder):
         """
@@ -712,5 +787,10 @@ class MouseConnectivityCache(ReferenceSpaceCache):
                                  'experiment_%d/dfmfld.raw',
                                  parent_key='BASEDIR',
                                  typename='file')
+
+        manifest_builder.add_path(self.ALIGNMENT3D_KEY,
+                                  'experiment_%d/alignment3d.json',
+                                  parent_key='BASEDIR',
+                                  typename='file')
 
         return manifest_builder
