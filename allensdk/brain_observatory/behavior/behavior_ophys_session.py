@@ -51,21 +51,21 @@ if __name__ == "__main__":
     # assert session == session2
 
     session = BehaviorOphysSession(789359614)
-    # print(session.max_projection)
-    # print(session.stimulus_timestamps)
-    # print(session.ophys_timestamps)
-    # print(session.metadata)
-    # print(session.dff_traces)
-    # print(session.cell_specimen_table)
-    print(session.running_speed)
-    # print(session.running_data_df)
-    # print(session.stimulus_presentations)
-    # print(session.stimulus_templates)
-    # print(session.stimulus_index)
-    # print(session.licks)
-    # print(session.rewards)
-    # print(session.task_parameters)
-    # print(session.trials)
-    # print(session.corrected_fluorescence_traces)
-    # print(session.average_image)
-    # print(session.motion_correction)
+    session.max_projection
+    session.stimulus_timestamps
+    session.ophys_timestamps
+    session.metadata
+    session.dff_traces
+    session.cell_specimen_table
+    session.running_speed
+    session.running_data_df
+    session.stimulus_presentations
+    session.stimulus_templates
+    session.stimulus_index
+    session.licks
+    session.rewards
+    session.task_parameters
+    session.trials
+    session.corrected_fluorescence_traces
+    session.average_image
+    session.motion_correction

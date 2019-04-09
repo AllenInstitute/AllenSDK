@@ -66,9 +66,7 @@ class OphysLimsApi(PostgresQueryMixin):
             image_api = ImageApi
 
         maxInt_a13_file = self.get_maxint_file()
-        platform_json_file = self.get_ophys_platform_json()
-        platform_data = json.load(open(platform_json_file, 'r'))
-        pixel_size = float(platform_data['registration']['surface_2p']['pixel_size_um'])
+        pixel_size = self.get_surface_2p_pixel_size_um()
         max_projection = mpimg.imread(maxInt_a13_file)
         return ImageApi.serialize(max_projection, [pixel_size / 1000., pixel_size / 1000.], 'mm')
 
@@ -196,21 +194,10 @@ class OphysLimsApi(PostgresQueryMixin):
         return self.fetchone(query, strict=True)
 
     @memoize
-    def get_input_extract_traces_file(self):
-        query = '''
-                SELECT wkf.storage_directory || wkf.filename AS input_extract_traces_file
-                FROM ophys_experiments oe
-                LEFT JOIN well_known_files wkf ON wkf.attachable_id=oe.id AND wkf.attachable_type = 'OphysExperiment' AND wkf.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'OphysExtractedTracesInputJson')
-                WHERE oe.id= {};
-                '''.format(self.ophys_experiment_id)
-        return self.fetchone(query, strict=True)
-
-    @memoize
     def get_cell_roi_ids(self):
-        input_extract_traces_file = self.get_input_extract_traces_file()
-        with open(input_extract_traces_file, 'r') as w:
-            jin = json.load(w)
-        return np.array([roi['id'] for roi in jin['rois']])
+        cell_specimen_table = self.get_cell_specimen_table()
+        assert cell_specimen_table.index.name == 'cell_roi_id'
+        return cell_specimen_table.index.values
 
     @memoize
     def get_objectlist_file(self):
@@ -269,17 +256,6 @@ class OphysLimsApi(PostgresQueryMixin):
         with h5py.File(dff_path, 'r') as raw_file:
             dff_traces = np.asarray(raw_file['data'])
         return dff_traces
-
-    @memoize
-    def get_ophys_platform_json(self):
-        query = '''
-                SELECT wkf.storage_directory || wkf.filename AS transform_file
-                FROM ophys_experiments oe
-                JOIN ophys_sessions os ON oe.ophys_session_id = os.id
-                LEFT JOIN well_known_files wkf ON wkf.attachable_id=os.id AND wkf.attachable_type = 'OphysSession' AND wkf.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'OphysPlatformJson')
-                WHERE oe.id= {};
-                '''.format(self.ophys_experiment_id)
-        return self.fetchone(query, strict=True)
 
     @memoize
     def get_device_name(self):
@@ -343,3 +319,13 @@ class OphysLimsApi(PostgresQueryMixin):
         cell_specimen_table['image_mask'] = image_mask_list
 
         return cell_specimen_table
+
+    @memoize
+    def get_surface_2p_pixel_size_um(self):
+        query = '''
+                SELECT sc.resolution
+                FROM ophys_experiments oe
+                JOIN scans sc ON sc.image_id=oe.ophys_primary_image_id
+                WHERE oe.id = {};
+                '''.format(self.ophys_experiment_id)
+        return self.fetchone(query, strict=True)
