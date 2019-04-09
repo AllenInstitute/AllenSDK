@@ -659,8 +659,9 @@ class MouseConnectivityCache(ReferenceSpaceCache):
 
         Returns
         -------
-            SimpleITK.Image :
-                3D, 3-component image
+            numpy.ndarray : 
+                3D X 3 component vector array (origin 0, 0, 0; 25-micron isometric resolution) defining a 
+                deformable transformation from CCF-space to affine-transformed image space.
 
         '''
 
@@ -682,7 +683,7 @@ class MouseConnectivityCache(ReferenceSpaceCache):
                 voxel_path=voxel_path
                 )
 
-        return sitk.ReadImage(header_path)
+        return sitk.GetArrayFromImage(sitk.ReadImage(header_path))
 
 
     def get_affine_parameters(self, section_data_set_id, direction='trv', file_name=None):
