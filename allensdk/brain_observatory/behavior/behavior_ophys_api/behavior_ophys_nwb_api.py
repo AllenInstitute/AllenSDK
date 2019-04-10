@@ -18,6 +18,7 @@ from allensdk.brain_observatory.nwb.nwb_api import NwbApi
 from allensdk.brain_observatory.behavior.trials_processing import TRIAL_COLUMN_DESCRIPTION_DICT
 from allensdk.brain_observatory.behavior.schemas import OphysBehaviorMetaDataSchema, OphysBehaviorTaskParametersSchema
 from allensdk.brain_observatory.nwb.metadata import load_LabMetaData_extension
+from allensdk.brain_observatory.behavior.behavior_ophys_api import BehaviorOphysApiBase
 
 
 class BehaviorOphysNwbApi(NwbApi):
