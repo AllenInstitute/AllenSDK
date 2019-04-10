@@ -40,6 +40,7 @@ import pytest
 import numpy as np
 import nrrd
 import pandas as pd
+import SimpleITK as sitk
 
 
 from allensdk.core.mouse_connectivity_cache import MouseConnectivityCache
@@ -293,8 +294,14 @@ def test_filter_experiments(mcc, experiments):
     assert len(pass_line) == 1
     assert len(fail_line) == 1
 
-    sid_line = mcc.filter_experiments(experiments, cre=True,
-                                      injection_structure_ids=[97,98])
+    def fake_tree(*a, **k):
+        class FakeTree(object):
+            def descendant_ids(*a, **k):
+                return [[97, 98], []]
+        return FakeTree()
+
+    with mock.patch.object(mcc, 'get_structure_tree', new=fake_tree) as p:
+        sid_line = mcc.filter_experiments(experiments, cre=True, injection_structure_ids=[97, 98])
 
     assert len(sid_line) == 1
 
@@ -471,3 +478,48 @@ def test_validate_structure_ids(inp, fails):
     else:
         out = MouseConnectivityCache.validate_structure_ids(inp)
         assert( out == [ int(i) for i in inp ] )
+
+
+def test_get_deformation_field(mcc):
+
+    arr = np.random.rand(2, 4, 5, 3)
+
+    def write_dfmfld(*a, **k):
+        img = sitk.GetImageFromArray(arr)
+        sitk.WriteImage(img, str(k['header_path']), True) # TODO the str call here is only necessary in 2.7
+
+    with mock.patch.object(mcc.api, 'download_deformation_field', new=write_dfmfld) as p:
+        obtained = mcc.get_deformation_field(123)
+
+    assert np.allclose(arr, obtained)
+
+
+def test_get_affine_parameters(mcc):
+
+    def new_fn(*args, **kwargs):
+        return [{'alignment3d': {
+            'trv_00': 1,
+            'trv_01': 2,
+            'trv_02': 3,
+            'trv_03': 4,
+            'trv_04': 5,
+            'trv_05': 6,
+            'trv_06': 7,
+            'trv_07': 8,
+            'trv_08': 9,
+            'trv_09': 10,
+            'trv_10': 11,
+            'trv_11': 12,
+        }}]
+    
+    expected = np.array([
+        [1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 9],
+        [10, 11, 12]
+    ])
+
+    with mock.patch.object(mcc.api, "model_query", new=new_fn):
+        obtained = mcc.get_affine_parameters(1245)
+
+    assert np.allclose(expected, obtained)

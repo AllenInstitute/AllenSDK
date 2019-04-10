@@ -130,3 +130,34 @@ def test_api_doc_url_projection_grid_injection_fraction_resolution(grid_data):
         "http://api.brain-map.org/grid_data/download_file/181777177"
         "?image=injection_fraction&resolution=25",
         path)
+
+
+def test_download_deformation_field(grid_data):
+    grid_data.model_query = MagicMock(
+        name='model_query', 
+        return_value=[
+            {'well_known_file_type': {'name': 'DeformationFieldHeader'}, 'id': 123}, 
+            {'well_known_file_type': {'name': 'DeformationFieldVoxels'}, 'id': 456}
+        ]
+    )
+
+    grid_data.download_deformation_field(789)
+
+    grid_data.retrieve_file_over_http.assert_any_call('http://api.brain-map.org/api/v2/well_known_file_download/123', '789_dfmfld.mhd')
+    grid_data.retrieve_file_over_http.assert_any_call('http://api.brain-map.org/api/v2/well_known_file_download/456', '789_dfmfld.raw')
+
+
+def test_download_alignment3d(grid_data):
+    grid_data.json_msg_query = MagicMock(
+        name='json_msg_query',
+        return_value=[{'alignment3d': 'foo'}]
+    )
+
+    obtained = grid_data.download_alignment3d(123)
+    assert 'foo' == obtained
+    grid_data.json_msg_query.assert_called_once_with((
+        'http://api.brain-map.org/api/v2/data/query.json?q='
+        'model::SectionDataSet[id$eq123],'
+        'rma::include,alignment3d,'
+        'rma::options[num_rows$eq\'all\'][count$eqfalse]'
+    ))
