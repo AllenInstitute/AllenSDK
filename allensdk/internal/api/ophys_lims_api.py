@@ -317,7 +317,7 @@ class OphysLimsApi(PostgresQueryMixin):
 
     @memoize
     def get_cell_specimen_table(self):
-        cell_specimen_table = pd.DataFrame.from_dict(self.get_raw_cell_specimen_table_dict()).set_index('cell_roi_id')
+        cell_specimen_table = pd.DataFrame.from_dict(self.get_raw_cell_specimen_table_dict()).set_index('cell_roi_id').sort_index()
         fov_width, fov_height = self.get_field_of_view_shape()['width'], self.get_field_of_view_shape()['height']
         image_mask_list = []
         for sub_mask in cell_specimen_table['image_mask'].values:

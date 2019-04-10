@@ -6,6 +6,7 @@ import pytz
 import datetime
 import uuid
 import os
+import json
 
 
 def pytest_ignore_collect(path, config):
@@ -191,8 +192,10 @@ def session_data():
             "behavior_stimulus_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/behavior_session_789295700/789220000.pkl",
             "dff_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/789359614_dff.h5",
             "ophys_cell_segmentation_run_id": 789410052,
-            "cell_specimen_table": open(os.path.join(os.path.dirname(__file__), 'cell_specimen_table_789359614.json'), 'r').read(),
+            "cell_specimen_table_dict": json.load(open(os.path.join(os.path.dirname(__file__), 'cell_specimen_table_789359614.json'), 'r')),
             "demix_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/demix/789359614_demixed_traces.h5",
-            "average_intensity_projection_image": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/processed/ophys_cell_segmentation_run_789410052/avgInt_a1X.png",
+            "average_intensity_projection_image_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/processed/ophys_cell_segmentation_run_789410052/avgInt_a1X.png",
             "rigid_motion_transform_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/processed/789359614_rigid_motion_transform.csv",
             }
+
+    return data
