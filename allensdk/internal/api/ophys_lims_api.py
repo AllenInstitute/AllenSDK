@@ -132,7 +132,10 @@ class OphysLimsApi(PostgresQueryMixin):
                 JOIN genotype_types gt ON gt.id=g.genotype_type_id AND gt.name = 'reporter'
                 WHERE oe.id= {};
                 '''.format(self.get_ophys_experiment_id())
-        return self.fetchone(query, strict=True)
+        result = self.fetchall(query)
+        if result is None or len(result) < 1:
+            raise OneOrMoreResultExpectedError('Expected one or more, but received: {} from query'.format(result))
+        return result
 
     @memoize
     def get_driver_line(self):
@@ -313,6 +316,7 @@ class OphysLimsApi(PostgresQueryMixin):
                 where cr.ophys_cell_segmentation_run_id = {}
                 '''.format(ophys_cell_segmentation_run_id)
         cell_specimen_table = pd.read_sql(query, self.get_connection()).rename(columns={'id': 'cell_roi_id', 'mask_matrix': 'image_mask'})
+        cell_specimen_table.drop(['ophys_experiment_id', 'ophys_cell_segmentation_run_id'], inplace=True, axis=1)
         return cell_specimen_table.to_dict()
 
     @memoize

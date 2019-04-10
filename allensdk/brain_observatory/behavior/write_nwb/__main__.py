@@ -151,7 +151,7 @@ if __name__ == "__main__":
     #                                 "targeted_depth": 375,
     #                                 "stimulus_name": "Unknown",
     #                                 "date_of_acquisition": '2018-11-30 23:28:37',
-    #                                 "reporter_line": "Ai93(TITL-GCaMP6f)",
+    #                                 "reporter_line": ["Ai93(TITL-GCaMP6f)"],
     #                                 "driver_line": ['Camk2a-tTA', 'Slc17a7-IRES2-Cre'],
     #                                 "external_specimen_name": 416369,
     #                                 "full_genotype": "Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;Ai93(TITL-GCaMP6f)/wt",

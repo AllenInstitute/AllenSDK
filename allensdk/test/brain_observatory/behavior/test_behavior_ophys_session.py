@@ -86,7 +86,7 @@ def test_visbeh_ophys_data_set():
                                  'LabTracks_ID': 416369,
                                  'experiment_container_id': 814796558,
                                  'targeted_structure': 'VISp',
-                                 'reporter_line': 'Ai93(TITL-GCaMP6f)',
+                                 'reporter_line': ['Ai93(TITL-GCaMP6f)'],
                                  'emission_lambda': 520.0,
                                  'excitation_lambda': 910.0,
                                  'field_of_view_height': 512,

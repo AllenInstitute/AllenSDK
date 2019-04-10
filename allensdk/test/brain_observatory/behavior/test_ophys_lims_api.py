@@ -16,7 +16,7 @@ def api_data():
                        'targeted_structure': 'VISal',
                        'imaging_depth': 175,
                        'stimulus_name': 'Unknown',
-                       'reporter_line': 'Ai148(TIT2L-GC6f-ICL-tTA2)',
+                       'reporter_line': ['Ai148(TIT2L-GC6f-ICL-tTA2)'],
                        'driver_line': ['Vip-IRES-Cre'],
                        'LabTracks_ID': 363887,
                        'full_genotype': 'Vip-IRES-Cre/wt;Ai148(TIT2L-GC6f-ICL-tTA2)/wt'

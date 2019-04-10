@@ -58,10 +58,12 @@ class OphysBehaviorMetaDataSchema(RaisingSchema):
         required=True,
     )
 
-    reporter_line = fields.String(
+    reporter_line = fields.List(
+        fields.String,
         doc='Reporter line',
         required=True,
-    )
+        shape=(None,),
+    )    
 
     driver_line = fields.List(
         fields.String,

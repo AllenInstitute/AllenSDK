@@ -8,7 +8,6 @@ from allensdk.brain_observatory.argschema_utilities import check_read_access, ch
 class CellSpecimenTable(RaisingSchema):
     cell_roi_id = Dict(String, Int, required=True)
     cell_specimen_id = Dict(String, Int(allow_none=True), required=True)
-    ophys_experiment_id = Dict(String, Int, required=True)
     x = Dict(String, Float, required=True)
     y = Dict(String, Float, required=True)
     max_correction_up = Dict(String, Float, required=True)
@@ -18,7 +17,6 @@ class CellSpecimenTable(RaisingSchema):
     valid_roi = Dict(String, Boolean, required=True)
     height = Dict(String, Int, required=True)
     width = Dict(String, Int, required=True)
-    ophys_cell_segmentation_run_id = Dict(String, Int, required=True)
     mask_image_plane = Dict(String, Int, required=True)
     image_mask = Dict(String, List(List(Boolean)), required=True)
 
@@ -41,8 +39,8 @@ class SessionData(RaisingSchema):
     targeted_depth = Int(required=True, description='Cortical depth that the experiment targeted')
     stimulus_name = String(required=True, description='Stimulus Name')
     date_of_acquisition = String(required=True, description='date of acquisition of experiment, as string (no timezone info but relative ot UTC)')
-    reporter_line = String(required=True, description='reporter line')
-    driver_line = List(String, required=True, description='reporter line')
+    reporter_line = List(String, required=True, description='reporter line')
+    driver_line = List(String, required=True, description='driver line')
     external_specimen_name = Int(required=True, description='LabTracks ID of the animal')
     full_genotype = String(required=True, description='full genotype')
     surface_2p_pixel_size_um = Float(required=True, description='the spatial extent (in um) of the 2p field-of-view')
