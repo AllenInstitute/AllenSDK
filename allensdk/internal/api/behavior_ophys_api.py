@@ -225,13 +225,29 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
 
         return pd.read_sql(query, api.get_connection()).rename(columns={'visual_behavior_experiment_container_id':'container_id'}).drop('id', axis=1)
 
+    @classmethod
+    def get_api_list_by_container_id(cls, container_id):
+
+        df = cls.get_ophys_experiment_df()
+        oeid_list = df[df['container_id'] == container_id]['ophys_experiment_id'].values
+        return [cls(oeid) for oeid in oeid_list]
+
+
+
+
 if __name__ == "__main__":
 
 
 
 
+    pass
+    # print(BehaviorOphysLimsApi.get_api_by_container(838105949))
 
-    L = BehaviorOphysLimsApi.get_ophys_experiment_df()
-    print(L)
+    # ophys_experiment_id = df['ophys_experiment_id'].iloc[0]
+    # print(ophys_experiment_id)
+    # BehaviorOphysLimsApi
+    # print(L)
+    # for c in sorted(L.columns):
+    #     print(c)
     # for x in [791352433, 814796698, 814796612, 814796558, 814797528]:
     #     print(x in L)
