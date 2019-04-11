@@ -21,7 +21,7 @@ from allensdk.brain_observatory.nwb.metadata import load_LabMetaData_extension
 from allensdk.brain_observatory.behavior.behavior_ophys_api import BehaviorOphysApiBase
 
 
-class BehaviorOphysNwbApi(NwbApi):
+class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
 
     def save(self, session_object):
 
@@ -193,9 +193,6 @@ class BehaviorOphysNwbApi(NwbApi):
         motion_correction_data['y'] = self.nwbfile.modules['motion_correction'].get_data_interface('y').data[:]
 
         return pd.DataFrame(motion_correction_data)
-
-    def get_ophys_experiment_id(self) -> int:
-        return self.get_metadata()['ophys_experiment_id']
 
 
 def equals(A, B):

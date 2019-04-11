@@ -16,9 +16,9 @@ from allensdk.brain_observatory.behavior.trials_processing import get_trials
 from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory.behavior.image_api import ImageApi
 from allensdk.internal.api import PostgresQueryMixin
+from allensdk.brain_observatory.behavior.behavior_ophys_api import BehaviorOphysApiBase
 
-
-class BehaviorOphysLimsApi(OphysLimsApi):
+class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
 
     def __init__(self, ophys_experiment_id):
         super().__init__(ophys_experiment_id)
