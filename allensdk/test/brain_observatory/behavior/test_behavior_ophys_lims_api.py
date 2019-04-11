@@ -11,15 +11,14 @@ from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
 ])
 def test_get_behavior_stimulus_file(ophys_experiment_id, compare_val):
 
-    api = BehaviorOphysLimsApi()
+    api = BehaviorOphysLimsApi(ophys_experiment_id)
 
     if compare_val is None:
         expected_fail = False
         try:
-            api.get_behavior_stimulus_file(ophys_experiment_id)
+            api.get_behavior_stimulus_file()
         except OneResultExpectedError:
             expected_fail = True
         assert expected_fail is True
     else:
-        assert api.get_behavior_stimulus_file(
-            ophys_experiment_id=ophys_experiment_id) == compare_val
+        assert api.get_behavior_stimulus_file() == compare_val
