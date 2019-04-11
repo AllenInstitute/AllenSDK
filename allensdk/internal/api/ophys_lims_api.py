@@ -328,6 +328,7 @@ class OphysLimsApi(PostgresQueryMixin):
             curr_roi = roi.create_roi_mask(fov_width, fov_height, [(fov_width - 1), 0, (fov_height - 1), 0], roi_mask=np.array(sub_mask, dtype=np.bool))
             image_mask_list.append(curr_roi.get_mask_plane().astype(np.bool))
         cell_specimen_table['image_mask'] = image_mask_list
+        cell_specimen_table = cell_specimen_table[sorted(cell_specimen_table.columns)]
         return cell_specimen_table
 
     @memoize
