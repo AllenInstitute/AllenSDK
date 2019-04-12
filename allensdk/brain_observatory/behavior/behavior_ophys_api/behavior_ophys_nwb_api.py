@@ -39,7 +39,7 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
         unit_dict = {'v_sig': 'V', 'v_in': 'V', 'speed': 'cm/s', 'timestamps': 's', 'dx': 'cm'}
         nwb.add_running_data_df_to_nwbfile(nwbfile, session_object.running_data_df, unit_dict)
 
-        # # Add ophys to NWB in-memory object:
+        # Add ophys to NWB in-memory object:
         nwb.add_ophys_timestamps(nwbfile, session_object.ophys_timestamps)
 
         # Add stimulus template data to NWB in-memory object:
