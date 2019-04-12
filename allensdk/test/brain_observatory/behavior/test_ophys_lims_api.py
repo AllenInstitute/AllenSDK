@@ -19,7 +19,8 @@ def api_data():
                        'reporter_line': ['Ai148(TIT2L-GC6f-ICL-tTA2)'],
                        'driver_line': ['Vip-IRES-Cre'],
                        'LabTracks_ID': 363887,
-                       'full_genotype': 'Vip-IRES-Cre/wt;Ai148(TIT2L-GC6f-ICL-tTA2)/wt'
+                       'full_genotype': 'Vip-IRES-Cre/wt;Ai148(TIT2L-GC6f-ICL-tTA2)/wt',
+                       'workflow_state': 'passed',
                        }
             }
 
@@ -172,6 +173,17 @@ def test_get_full_genotype(ophys_experiment_id, api_data):
     ophys_lims_api = OphysLimsApi(ophys_experiment_id)
     f = ophys_lims_api.get_full_genotype
     key = 'full_genotype'
+    if ophys_experiment_id in api_data:
+        assert f() == api_data[ophys_experiment_id][key]
+    else:
+        expected_fail(f)
+
+@pytest.mark.nightly
+@pytest.mark.parametrize('ophys_experiment_id', [702134928, 0])
+def test_get_workflow_state(ophys_experiment_id, api_data):
+    ophys_lims_api = OphysLimsApi(ophys_experiment_id)
+    f = ophys_lims_api.get_workflow_state
+    key = 'workflow_state'
     if ophys_experiment_id in api_data:
         assert f() == api_data[ophys_experiment_id][key]
     else:
