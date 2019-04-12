@@ -207,6 +207,8 @@ def add_trials(nwbfile, trials, description_dict={}):
         if data.dtype == '<U1':
             data = trials[c].values
         if not len(data) == len(order):
+            if len(data) == 0:
+                data = ['']
             nwbfile.add_trial_column(name=c, description=description_dict.get(c, 'NOT IMPLEMENTED: %s' % c), data=data, index=index)
         else:
             nwbfile.add_trial_column(name=c, description=description_dict.get(c, 'NOT IMPLEMENTED: %s' % c), data=data)
