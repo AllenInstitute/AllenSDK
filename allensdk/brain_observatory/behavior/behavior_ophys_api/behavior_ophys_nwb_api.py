@@ -58,10 +58,12 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
         nwb.add_trials(nwbfile, session_object.trials, TRIAL_COLUMN_DESCRIPTION_DICT)
 
         # Add licks data to NWB in-memory object:
-        nwb.add_licks(nwbfile, session_object.licks)
+        if len(session_object.licks) > 0:
+            nwb.add_licks(nwbfile, session_object.licks)
 
         # Add rewards data to NWB in-memory object:
-        nwb.add_rewards(nwbfile, session_object.rewards)
+        if len(session_object.rewards) > 0:
+            nwb.add_rewards(nwbfile, session_object.rewards)
 
         # Add max_projection image data to NWB in-memory object:
         nwb.add_segmentation_mask_image(nwbfile, session_object.segmentation_mask_image)
@@ -125,14 +127,19 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
         return trials
 
     def get_licks(self) -> np.ndarray:
-        return pd.DataFrame({'time': self.nwbfile.modules['licking'].get_data_interface('licks')['timestamps'].timestamps[:]})
+        if 'licking' in self.nwbfile.modules:
+            return pd.DataFrame({'time': self.nwbfile.modules['licking'].get_data_interface('licks')['timestamps'].timestamps[:]})
+        else:
+            return pd.DataFrame({'time': []})
 
     def get_rewards(self) -> np.ndarray:
-        time = self.nwbfile.modules['rewards'].get_data_interface('timestamps').timestamps[:]
-        autorewarded = self.nwbfile.modules['rewards'].get_data_interface('autorewarded').data[:]
-        volume = self.nwbfile.modules['rewards'].get_data_interface('volume').data[:]
-
-        return pd.DataFrame({'volume': volume, 'timestamps': time, 'autorewarded': autorewarded}).set_index('timestamps')
+        if 'rewards' in self.nwbfile.modules:
+            time = self.nwbfile.modules['rewards'].get_data_interface('timestamps').timestamps[:]
+            autorewarded = self.nwbfile.modules['rewards'].get_data_interface('autorewarded').data[:]
+            volume = self.nwbfile.modules['rewards'].get_data_interface('volume').data[:]
+            return pd.DataFrame({'volume': volume, 'timestamps': time, 'autorewarded': autorewarded}).set_index('timestamps')
+        else:
+            return pd.DataFrame({'volume': [], 'timestamps': [], 'autorewarded': []}).set_index('timestamps')
 
     def get_segmentation_mask_image(self, image_api=None) -> sitk.Image:
         return self.get_image('max_projection', 'two_photon_imaging', image_api=image_api)
