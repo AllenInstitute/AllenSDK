@@ -34,7 +34,9 @@ def build_stimulus_table(args):
     output_validation.validate_epoch_durations(stim_table_full)
     output_validation.validate_max_spontaneous_epoch_duration(stim_table_full, args['maximum_expected_spontanous_activity_duration'])
 
-    # munge_names(stim_table_full, args['stimulus_name_map'], args['column_name_map'])
+    stim_table_full = naming_utilities.standardize_movie_numbers(stim_table_full)
+    stim_table_full = naming_utilities.add_number_to_shuffled_movie(stim_table_full)
+    stim_table_full = naming_utilities.extract_gabor_parameters(stim_table_full)
 
     stim_table_full.to_csv(args['output_stimulus_table_path'], index=False)
     return {'output_path': args['output_stimulus_table_path']}
