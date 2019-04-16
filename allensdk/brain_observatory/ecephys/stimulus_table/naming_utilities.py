@@ -1,4 +1,5 @@
 import re
+import warnings
 
 import pandas as pd
 import numpy as np
@@ -31,8 +32,9 @@ def collapse_columns(table):
             if transformed in colnames and col != transformed:
                 matches.append(transformed)
 
-                mask = (table[col].isna()) & ~(table[transformed].isna()) # TODO validate this more carefully
-                table[col][mask] = table[transformed][mask]
+                 # this works because overlapping columns from the same stimulus are caught during build_stimuluswise_table
+                mask = (table[col].isna()) & ~(table[transformed].isna())
+                table.loc[mask, col] = table[transformed][mask]
                 break
 
     table.drop(columns=matches, inplace=True)
@@ -86,27 +88,11 @@ def standardize_movie_numbers(
 
     replace = lambda match_obj: digit_names[match_obj['number']]
 
+    # for some reason pandas really wants us to use the captures
+    warnings.filterwarnings("ignore", 'This pattern has match groups')
+
     movie_rows = table[stim_colname].str.contains(movie_re, na=False)
     table.loc[movie_rows,stim_colname] = table.loc[movie_rows,stim_colname].str.replace(numeral_re, replace)
-
-    return table
-
-
-def extract_gabor_parameters(
-    table, 
-    gabor_name='gabor', 
-    gabor_diameter_regex=GABOR_DIAMETER_RE, 
-    stim_colname='stimulus_name', 
-    diameter_colname='diameter'
-):
-    ''' the gabor_20_deg_250ms stimulus has diameter (a parameter we want) and duration (a parameter encoded already by start and stop times)
-    baked into the name. This function splits them out.
-    '''
-
-    table[diameter_colname] = table[stim_colname].str.extract(gabor_diameter_regex)
-    table[diameter_colname] = table[diameter_colname].astype(float)
-
-    table[stim_colname][~table[diameter_colname].isna()] = gabor_name
 
     return table
 

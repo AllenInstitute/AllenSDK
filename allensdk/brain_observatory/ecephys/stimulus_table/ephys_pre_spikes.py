@@ -7,6 +7,7 @@ Created on Fri Dec 16 15:11:23 2016
 
 import ast
 import re
+import logging
 
 import numpy as np
 import pandas as pd
@@ -353,7 +354,7 @@ def build_stimuluswise_table(
         if not (existing_cap or existing_upper or existing):
             stim_table[const_param_key] = [const_param_value] * stim_table.shape[0]
         else:
-            warnings.warn(f'found sweep_param named: {const_param_key}, ignoring const param of the same name (value: {const_param_value})')
+            logging.info(f'found sweep_param named: {const_param_key}, ignoring const param of the same name (value: {const_param_value})')
 
     unique_indices = np.unique(stim_table[block_key].values)
     output = [ stim_table.loc[stim_table[block_key] == ii, :] for ii in unique_indices ]

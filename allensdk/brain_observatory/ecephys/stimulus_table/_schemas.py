@@ -21,11 +21,9 @@ class InputParameters(ArgSchema):
     stimulus_name_map = Dict(keys=String(), values=String(), help='optionally rename stimuli', default={
         "": "spontaneous",
         "Natural Images": "natural_scenes",
-        "natural_movie_1": "natural_movie_one",
-        "natural_movie_2": "natural_movie_two",
-        "natural_movie_3": "natural_movie_three",
         "flash_250ms": "flash",
-        "contrast_response": "drifting_gratings_contrast"
+        "contrast_response": "drifting_gratings_contrast",
+        'gabor_20_deg_250ms': 'gabor'
     })
     column_name_map = Dict(keys=String(), values=String(), help='optionally rename parameters', default={})
 
