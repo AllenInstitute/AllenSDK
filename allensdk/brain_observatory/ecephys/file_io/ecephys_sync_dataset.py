@@ -1,6 +1,7 @@
 from itertools import product
 import functools
 from collections import defaultdict
+import logging
 
 import numpy as np
 
@@ -56,7 +57,7 @@ class EcephysSyncDataset(Dataset):
         vsync_times = self.get_edges('falling', frame_keys)
         vsync_times = stimulus_sync.trim_discontiguous_vsyncs(vsync_times, photodiode_cycle)
         
-        print("Total vsyncs: " + str(len(vsync_times)))
+        logging.info(f"Total vsyncs: {len(vsync_times)}")
 
         photodiode_times = stimulus_sync.trim_border_pulses(photodiode_times, vsync_times)
         photodiode_times = stimulus_sync.correct_on_off_effects(photodiode_times)
