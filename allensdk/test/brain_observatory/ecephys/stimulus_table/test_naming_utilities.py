@@ -35,17 +35,6 @@ def test_standardize_movie_numbers(table, expected):
     pd.testing.assert_frame_equal(expected, obtained, check_like=True)
 
 
-@pytest.mark.parametrize('table,expected', [
-    [
-        pd.DataFrame({'stimulus_name': ['gabor_20_deg_250ms', 'gabor_53.1deg', 'gabor_.2_deg_241ms']}),
-        pd.DataFrame({'stimulus_name': ['gabor', 'gabor', 'gabor'], 'diameter': [20.0, 53.1, 0.2]})
-    ]
-])
-def test_extract_gabor_parameters(table, expected):
-    obtained = nu.extract_gabor_parameters(table)
-    pd.testing.assert_frame_equal(expected, obtained, check_like=True)
-
-
 @pytest.mark.parametrize('table,name_map,expected', [
     [
         pd.DataFrame({'stimulus_name': ['Natural Images', 'contrast_response']}),

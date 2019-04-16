@@ -37,9 +37,8 @@ def build_stimulus_table(args):
     stim_table_full = naming_utilities.collapse_columns(stim_table_full)
     stim_table_full = naming_utilities.standardize_movie_numbers(stim_table_full)
     stim_table_full = naming_utilities.add_number_to_shuffled_movie(stim_table_full)
-    stim_table_full = naming_utilities.extract_gabor_parameters(stim_table_full)
-
-    stim_table_full['duration'] = stim_table_full['End'] - stim_table_full['Start']
+    stim_table_full = naming_utilities.map_stimulus_names(stim_table_full, args['stimulus_name_map'])
+    stim_table_full.rename(columns=args['column_name_map'], inplace=True)
 
     stim_table_full.to_csv(args['output_stimulus_table_path'], index=False)
     np.save(args['output_frame_times_path'], frame_times, allow_pickle=False)
