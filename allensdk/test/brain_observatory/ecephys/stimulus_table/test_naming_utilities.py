@@ -46,7 +46,6 @@ def test_extract_gabor_parameters(table, expected):
     pd.testing.assert_frame_equal(expected, obtained, check_like=True)
 
 
-
 @pytest.mark.parametrize('table,name_map,expected', [
     [
         pd.DataFrame({'stimulus_name': ['Natural Images', 'contrast_response']}),
