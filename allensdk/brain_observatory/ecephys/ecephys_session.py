@@ -506,7 +506,7 @@ class EcephysSession(LazyPropertyMixin):
             & (table['quality'] == 'good')
         ]
 
-        table = table.drop(columns=['local_index_unit', 'quality', 'valid_data'])
+        # table = table.drop(columns=['local_index_unit', 'quality', 'valid_data'])
         return table.sort_values(by=['probe_description', 'probe_vertical_position', 'probe_horizontal_position'])
 
 
@@ -607,6 +607,12 @@ class EcephysSession(LazyPropertyMixin):
             pass
 
         raise Exception('Could not open {} as an NWB file'.format(path))
+
+    @classmethod
+    def from_nwb1_path(cls, path, api_kwargs=None, **kwargs):
+        api_kwargs = {} if api_kwargs is None else api_kwargs
+        nwb_adaptor = EcephysNwb1Adaptor.from_path(path=path, **api_kwargs)  # Should validate as part of constructor
+        return cls(api=nwb_adaptor, **kwargs)
 
 
 def build_time_window_domain(bin_edges, offsets, callback=None):

@@ -108,8 +108,15 @@ class EcephysNwb1Adaptor(EcephysApi):
         # a single table.
         for block_i, (stim_name, stim_grp) in enumerate(stim_pres_grp.items()):
             timestamps = stim_grp['timestamps'][()]
-            n_stims = stim_grp['num_samples'][()]
+            start_times = timestamps[:, 0]
+            if timestamps.shape[1] == 2:
+                stop_times = timestamps[:, 1]
+            else:
+                # Some of the datasets have an optotagging stimulus with no stop time.
+                continue
+                stop_times = np.nan
 
+            n_stims = stim_grp['num_samples'][()]
             try:
                 # parse the features/data datasets, map old column names (temporal freq->TF, phase-> phase, etc).
                 stim_props = {self.__stim_col_map.get(ftr_name, ftr_name): stim_grp['data'][:, i]
@@ -119,8 +126,8 @@ class EcephysNwb1Adaptor(EcephysApi):
 
             stim_df = pd.DataFrame({
                 'stimulus_presentation_id': np.arange(presentation_ids, presentation_ids + n_stims),
-                'start_time': timestamps[:, 0],
-                'stop_time': timestamps[:, 1],
+                'start_time': start_times,
+                'stop_time': stop_times,
                 'stimulus_name': stim_name,
                 'TF': stim_props.get('TF', np.nan),
                 'SF': stim_props.get('SF', np.nan),
