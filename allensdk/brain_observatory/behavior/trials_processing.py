@@ -92,7 +92,7 @@ def get_trials(data, stimulus_timestamps_no_monitor_delay, licks_df, rewards_df,
         false_alarm = ('false_alarm', "") in event_dict
         trial_data['false_alarm'].append(false_alarm)
 
-        response_time = event_dict.get(('hit', '')) or event_dict.get(('false_alarm', '')) if hit or false_alarm else None
+        response_time = event_dict.get(('hit', '')) or event_dict.get(('false_alarm', '')) if hit or false_alarm else float('nan')
         trial_data['response_time'].append(response_time)
 
         miss = ('miss', "") in event_dict
@@ -107,7 +107,7 @@ def get_trials(data, stimulus_timestamps_no_monitor_delay, licks_df, rewards_df,
         stimulus_change = True if ('stimulus_changed', '') in event_dict else False
         trial_data['stimulus_change'].append(stimulus_change)
 
-        change_time = event_dict.get(('stimulus_changed', '')) or event_dict.get(('sham_change', '')) if stimulus_change or sham_change else None
+        change_time = event_dict.get(('stimulus_changed', '')) or event_dict.get(('sham_change', '')) if stimulus_change or sham_change else float('nan')
         trial_data['change_time'].append(change_time)
 
         if not (sham_change or stimulus_change):

@@ -6,7 +6,7 @@ import h5py
 import pytz
 import pandas as pd
 
-from . import PostgresQueryMixin, OneOrMoreResultExpectedError
+from allensdk.internal.api import PostgresQueryMixin, OneOrMoreResultExpectedError
 from allensdk.api.cache import memoize
 from allensdk.brain_observatory.behavior.image_api import ImageApi
 import allensdk.brain_observatory.roi_masks as roi
@@ -340,3 +340,18 @@ class OphysLimsApi(PostgresQueryMixin):
                 WHERE oe.id = {};
                 '''.format(self.get_ophys_experiment_id())
         return self.fetchone(query, strict=True)
+
+
+    @memoize
+    def get_workflow_state(self):
+        query = '''
+                SELECT oe.workflow_state
+                FROM ophys_experiments oe
+                WHERE oe.id = {};
+                '''.format(self.get_ophys_experiment_id())
+        return self.fetchone(query, strict=True)
+
+if __name__ == "__main__":
+
+    api = OphysLimsApi(842510825)
+    print(api.get_workflow_state())

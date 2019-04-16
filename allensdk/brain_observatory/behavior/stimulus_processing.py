@@ -2,8 +2,24 @@ import numpy as np
 import pandas as pd
 import pickle
 from allensdk.brain_observatory.behavior import IMAGE_SETS
+import os
 
-IMAGE_SETS_REV = {val:key for key, val in IMAGE_SETS.items()}
+IMAGE_SETS_REV = {val: key for key, val in IMAGE_SETS.items()}
+
+def convert_filepath_caseinsensitive(filename_in):
+
+    if filename_in == '//allen/programs/braintv/workgroups/nc-ophys/Doug/Stimulus_Code/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_6_2017.07.14.pkl':
+        return '//allen/programs/braintv/workgroups/nc-ophys/Doug/Stimulus_Code/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_6_2017.07.14.pkl'
+    elif filename_in == '//allen/programs/braintv/workgroups/nc-ophys/Doug/Stimulus_Code/image_dictionaries/Natural_Images_Lum_Matched_set_training_2017.07.14.pkl':
+        return '//allen/programs/braintv/workgroups/nc-ophys/Doug/Stimulus_Code/image_dictionaries/Natural_Images_Lum_Matched_set_training_2017.07.14.pkl'
+    elif filename_in == '//allen/programs/braintv/workgroups/nc-ophys/Doug/Stimulus_Code/image_dictionaries/Natural_Images_Lum_Matched_set_TRAINING_2017.07.14.pkl':
+        return '//allen/programs/braintv/workgroups/nc-ophys/Doug/Stimulus_Code/image_dictionaries/Natural_Images_Lum_Matched_set_training_2017.07.14.pkl'
+    elif filename_in == '//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_training_2017.07.14.pkl':
+        return '//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_training_2017.07.14.pkl'
+    elif filename_in == '//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_6_2017.07.14.pkl':
+        return '//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_6_2017.07.14.pkl'
+    else:
+        raise NotImplementedError(filename_in)
 
 
 def load_pickle(pstream):
@@ -31,7 +47,10 @@ def get_images_dict(pkl):
     # Sometimes the source is a zipped pickle:
     metadata = {'image_set': pkl["items"]["behavior"]["stimuli"]["images"]["image_path"]}
 
-    image_set = load_pickle(open(metadata['image_set'], 'rb'))
+    # Get image file name; these are encoded case-insensitive in the pickle file :/
+    filename = convert_filepath_caseinsensitive(metadata['image_set'])
+
+    image_set = load_pickle(open(filename, 'rb'))
     images = []
     images_meta = []
 
@@ -61,7 +80,7 @@ def get_images_dict(pkl):
 def get_stimulus_templates(pkl):
 
     images = get_images_dict(pkl)
-    image_set_filename = images['metadata']['image_set']
+    image_set_filename = convert_filepath_caseinsensitive(images['metadata']['image_set'])
     return {IMAGE_SETS_REV[image_set_filename]: np.array(images['images'])}
 
 
@@ -69,7 +88,8 @@ def get_stimulus_metadata(pkl):
 
     images = get_images_dict(pkl)
     stimulus_index_df = pd.DataFrame(images['image_attributes'])
-    stimulus_index_df['image_set'] = IMAGE_SETS_REV[images['metadata']['image_set']]
+    image_set_filename = convert_filepath_caseinsensitive(images['metadata']['image_set'])
+    stimulus_index_df['image_set'] = IMAGE_SETS_REV[image_set_filename]
     stimulus_index_df.set_index(['image_index'], inplace=True, drop=True)
     return stimulus_index_df
 
