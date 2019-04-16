@@ -26,6 +26,15 @@ class InputParameters(ArgSchema):
         'gabor_20_deg_250ms': 'gabor'
     })
     column_name_map = Dict(keys=String(), values=String(), help='optionally rename parameters', default={})
+    drop_columns = List(String(), help='columns to be dropped from the stimulus table', default=[
+        'name', 
+        'maskParams',
+        'win',
+        'autoLog',
+        'autoDraw',
+        'tex',
+        'texRes'
+    ])
 
 
 class OutputSchema(DefaultSchema): 
