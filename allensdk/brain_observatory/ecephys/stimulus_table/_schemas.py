@@ -2,14 +2,17 @@ import sys
 
 from argschema import ArgSchema, ArgSchemaParser 
 from argschema.schemas import DefaultSchema
-from argschema.fields import Nested, InputDir, String, Float, Dict, Int
+from argschema.fields import Nested, InputDir, String, Float, Dict, Int, List
+
+from . import naming_utilities as nu
+
 
 
 class InputParameters(ArgSchema): 
     stimulus_pkl_path = String(required=True, help="path to pkl file containing raw stimulus information")
     sync_h5_path = String(required=True, help="path to h5 file containing syncronization information")
     output_stimulus_table_path = String(required=True, help="the output stimulus table csv will be written here")
-    output_frame_times_path = String(required=True, help='output all frame times here') # TODO: implement
+    output_frame_times_path = String(required=True, help='output all frame times here')
     minimum_spontaneous_activity_duration = Float(default=sys.float_info.epsilon, help="detected spontaneous activity sweeps will be rejected if they last fewer that this many seconds")
     maximum_expected_spontanous_activity_duration = Float(default=1225.02541, help='validation will fail if a spontanous activity epoch longer than this one is computed.')
     frame_time_strategy = String(default='use_photodiode', 
@@ -36,3 +39,4 @@ class OutputSchema(DefaultSchema):
 
 class OutputParameters(OutputSchema): 
     output_path = String(help="Path to output csv file")
+    output_frame_times_path = String(help='output all frame times here')

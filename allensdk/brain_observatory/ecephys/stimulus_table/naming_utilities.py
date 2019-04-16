@@ -11,6 +11,34 @@ SHUFFLED_MOVIE_RE = re.compile(r'natural_movie_shuffled')
 NUMERAL_RE = re.compile(r'(?P<number>\d+)')
 
 
+def drop_empty_columns(table):
+    to_drop = []
+
+    for colname in table.colums:
+        if table[colname].isna().all():
+            to_drop.append(colname)
+
+    table.drop(columns=to_drop, inplace=True)
+    return table
+
+
+def collapse_columns(table):
+    colnames = set(table.columns)
+
+    matches = []
+    for col in table.columns:
+        for transformed in (col.upper(), col.capitalize()):
+            if transformed in colnames and col != transformed:
+                matches.append(transformed)
+
+                mask = (table[col].isna()) & ~(table[transformed].isna()) # TODO validate this more carefully
+                table[col][mask] = table[transformed][mask]
+                break
+
+    table.drop(columns=matches, inplace=True)
+    return table
+
+
 def add_number_to_shuffled_movie(
     table, 
     natural_movie_re=GENERIC_MOVIE_RE, 

@@ -342,10 +342,15 @@ def build_stimuluswise_table(
         stim_table = assign_sweep_values(stim_table, sweep_table)
         stim_table = split_column(stim_table, 'Pos', {'Pos_x': lambda field: field[0], 'Pos_y': lambda field: field[1]})
    
-    const_params = parse_stim_repr(stimulus['stim'])
+    const_params = extract_const_params_from_stim_repr(stimulus['stim'])
     existing_columns = set(stim_table.columns)
     for const_param_key, const_param_value in const_params.items():
-        if const_param_key not in existing_columns:
+
+        existing_cap = const_param_key.capitalize() in existing_columns
+        existing_upper = const_param_key.upper() in existing_columns
+        existing = const_param_key in existing_columns
+
+        if not (existing_cap or existing_upper or existing):
             stim_table[const_param_key] = [const_param_value] * stim_table.shape[0]
         else:
             warnings.warn(f'found sweep_param named: {const_param_key}, ignoring const param of the same name (value: {const_param_value})')
