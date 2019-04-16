@@ -33,3 +33,63 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
+
+import numpy as np
+import sys
+if sys.version_info < (3, 3):
+    from collections import Iterable
+else:
+    from collections.abc import Iterable
+import json
+import uuid
+import datetime
+import dateutil
+
+
+def dict_to_indexed_array(dc, order=None):
+    ''' Given a dictionary and an ordered arr, build a concatenation of the dictionary's values and an index describing
+    how that concatenation can be unpacked
+    '''
+
+    if order is None:
+        order = dc.keys()
+
+    data = []
+    index = []
+    counter = 0
+
+    for key in order:
+
+        if isinstance(dc[key], (np.ndarray, list)):
+            extended = dc[key]
+        if isinstance(dc[key], Iterable):
+            extended = [x for x in dc[key]]
+        else:
+            extended = [dc[key]]
+
+        counter += len(extended)
+        index.append(counter)
+        data.append(extended)
+
+    data = np.concatenate(data)
+    return index, data
+
+
+class JSONEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, datetime.datetime):
+            return o.isoformat()
+        elif isinstance(o, uuid.UUID):
+            return str(o)
+        return json.JSONEncoder.default(self, o)
+
+
+def hook(json_dict):
+    for key, value in json_dict.items():
+        if key == 'experiment_date':
+            json_dict[key] = dateutil.parser.parse(value)
+        elif key == 'behavior_session_uuid':
+            json_dict[key] = uuid.UUID(value)
+        else:
+            pass
+    return json_dict

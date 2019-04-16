@@ -28,6 +28,7 @@ def main():
     parser.add_argument("output_json")
     parser.add_argument("--log_level", default=logging.DEBUG)
     parser.add_argument("--input_dataset", default="FC")
+    parser.add_argument("--roi_field", default="roi_names")
     parser.add_argument("--output_dataset", default="data")
     args = parser.parse_args()
 
@@ -39,6 +40,7 @@ def main():
     # read from "data"
     input_h5 = h5py.File(input_file, "r")
     traces = input_h5[args.input_dataset].value
+    roi_names = input_h5[args.roi_field][:]
     input_h5.close()
 
     dff = calculate_dff(traces)
@@ -46,6 +48,7 @@ def main():
     # write to "data"
     output_h5 = h5py.File(output_file, "w")
     output_h5[args.output_dataset] = dff
+    output_h5[args.roi_field] = roi_names
     output_h5.close()
 
     output_data = {}
