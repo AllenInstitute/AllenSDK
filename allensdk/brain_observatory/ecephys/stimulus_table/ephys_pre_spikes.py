@@ -14,9 +14,7 @@ import pandas as pd
 
 import warnings
 
-
-REPR_PARAMS_RE = re.compile(r'([a-z0-9]+=[^=]+)[,\)]', re.IGNORECASE)
-ARRAY_RE = re.compile(r'array\((?P<contents>\[.*\])\)')
+import .stimulus_parameter_extraction as spe
 
 
 def create_stim_table(
@@ -219,56 +217,12 @@ def read_stimulus_name_from_path(stimulus):
     return stimulus['stim_path'].split('\\')[-1].split('.')[0]
 
 
-def extract_const_params_from_stim_repr(stim_repr, repr_params_re=REPR_PARAMS_RE, array_re=ARRAY_RE):
-    '''Parameters which are not set as sweep_params in the stimulus script (usually because they are not 
-    varied during the course of the session) are not output in an easily machine-readable format. This function 
-    attempts to recover them by parsing the string repr of the stimulus.
-
-    Parameters
-    ----------
-        stim_repr : str
-            The repr of the camstim stimulus object. Served up per-stimulus in the stim pickle.
-        repr_params_re : re.Pattern
-            Extracts attributes as "="-seperated strings
-        array_re : re.Pattern
-            Extracts list reprs from numpy array reprs.
-
-    Returns
-    -------
-    repr_params : dict
-        dictionary of paramater keys and values extracted from the stim repr. Where possible, the values are converted 
-        to native Python types.
-
-    '''
-
-    repr_params = {}
-
-    for match in repr_params_re.findall(stim_repr):
-        k, v = match.split('=')
-        
-        if k not in repr_params:
-
-            m = array_re.match(v)
-            if m is not None:
-                v = m['contents']
-
-            try:
-                v = ast.literal_eval(v)
-            except ValueError as err:
-                pass
-
-            repr_params[k] = v
-
-        else:
-            raise KeyError(f'duplicate key: {k}')
-
-    return repr_params
-
-
 def build_stimuluswise_table(
     stimulus, seconds_to_frames, 
     start_key='Start', end_key='End', name_key='stimulus_name', block_key='stimulus_block',
-    get_stimulus_name=None
+    get_stimulus_name=None,
+    extract_const_params_from_repr=False,
+    drop_const_params=spe.DROP_PARAMS
 ):
     ''' Construct a table of sweeps, including their times on the experiment-global clock 
     and the values of each relevant parameter.
@@ -343,18 +297,19 @@ def build_stimuluswise_table(
         stim_table = assign_sweep_values(stim_table, sweep_table)
         stim_table = split_column(stim_table, 'Pos', {'Pos_x': lambda field: field[0], 'Pos_y': lambda field: field[1]})
    
-    const_params = extract_const_params_from_stim_repr(stimulus['stim'])
-    existing_columns = set(stim_table.columns)
-    for const_param_key, const_param_value in const_params.items():
+   if extract_const_params_from_repr:
+        const_params = spe.extract_stim_repr(stimulus['stim'], drop_params=drop_const_params)
+        existing_columns = set(stim_table.columns)
+        for const_param_key, const_param_value in const_params.items():
 
-        existing_cap = const_param_key.capitalize() in existing_columns
-        existing_upper = const_param_key.upper() in existing_columns
-        existing = const_param_key in existing_columns
+            existing_cap = const_param_key.capitalize() in existing_columns
+            existing_upper = const_param_key.upper() in existing_columns
+            existing = const_param_key in existing_columns
 
-        if not (existing_cap or existing_upper or existing):
-            stim_table[const_param_key] = [const_param_value] * stim_table.shape[0]
-        else:
-            logging.info(f'found sweep_param named: {const_param_key}, ignoring const param of the same name (value: {const_param_value})')
+            if not (existing_cap or existing_upper or existing):
+                stim_table[const_param_key] = [const_param_value] * stim_table.shape[0]
+            else:
+                logging.info(f'found sweep_param named: {const_param_key}, ignoring const param of the same name (value: {const_param_value})')
 
     unique_indices = np.unique(stim_table[block_key].values)
     output = [ stim_table.loc[stim_table[block_key] == ii, :] for ii in unique_indices ]

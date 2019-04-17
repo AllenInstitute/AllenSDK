@@ -2,7 +2,7 @@ import sys
 
 from argschema import ArgSchema, ArgSchemaParser 
 from argschema.schemas import DefaultSchema
-from argschema.fields import Nested, InputDir, String, Float, Dict, Int, List
+from argschema.fields import Nested, InputDir, String, Float, Dict, Int, List, Bool
 
 from . import naming_utilities as nu
 
@@ -26,14 +26,13 @@ class InputParameters(ArgSchema):
         'gabor_20_deg_250ms': 'gabor'
     })
     column_name_map = Dict(keys=String(), values=String(), help='optionally rename parameters', default={})
-    drop_columns = List(String(), help='columns to be dropped from the stimulus table', default=[
+    extract_const_params_from_repr = Bool(default=True)
+    drop_const_params = List(String(), help='columns to be dropped from the stimulus table', default=[
         'name', 
         'maskParams',
         'win',
         'autoLog',
         'autoDraw',
-        'tex',
-        'texRes'
     ])
 
 
