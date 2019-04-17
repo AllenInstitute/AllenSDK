@@ -25,7 +25,12 @@ def build_stimulus_table(args):
     seconds_to_frames = lambda seconds: (np.array(seconds) + stim_file.pre_blank_sec) * stim_file.frames_per_second
     minimum_spontaneous_activity_duration = args['minimum_spontaneous_activity_duration'] / stim_file.frames_per_second
 
-    stimulus_tabler = functools.partial(ephys_pre_spikes.build_stimuluswise_table, seconds_to_frames=seconds_to_frames)
+    stimulus_tabler = functools.partial(
+        ephys_pre_spikes.build_stimuluswise_table, 
+        seconds_to_frames=seconds_to_frames, 
+        extract_const_params_from_repr=args['extract_const_params_from_repr'],
+        drop_const_params=args['drop_const_params']
+    )
     spon_tabler = functools.partial(ephys_pre_spikes.make_spontaneous_activity_tables, duration_threshold=minimum_spontaneous_activity_duration)
     
     stim_table_full = ephys_pre_spikes.create_stim_table(stim_file.stimuli, stimulus_tabler, spon_tabler)
@@ -39,7 +44,6 @@ def build_stimulus_table(args):
     stim_table_full = naming_utilities.add_number_to_shuffled_movie(stim_table_full)
     stim_table_full = naming_utilities.map_stimulus_names(stim_table_full, args['stimulus_name_map'])
     stim_table_full.rename(columns=args['column_name_map'], inplace=True)
-    stim_table_full.drop(columns=set(stim_table_full.columns) & set(args['drop_columns']), inplace=True)
 
     stim_table_full.to_csv(args['output_stimulus_table_path'], index=False)
     np.save(args['output_frame_times_path'], frame_times, allow_pickle=False)
