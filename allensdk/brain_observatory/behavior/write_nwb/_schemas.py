@@ -57,4 +57,4 @@ class InputSchema(ArgSchema):
 
 
 class OutputSchema(RaisingSchema):
-    output_path = String(required=True, validate=check_write_access, description='write outputs to here')
+    output_path = String(required=True, description='write outputs to here')
