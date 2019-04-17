@@ -13,6 +13,11 @@ DROP_PARAMS = ( # psychopy boilerplate, more or less
     'win'
 )
 
+# these are placeholders for stim category-specific processing
+extract_grating_stim_const_params = lambda x: x
+extract_dot_stim_const_params = lambda x: x
+
+
 def extract_stim_repr(
     stim_repr, drop_params=DROP_PARAMS,
     repr_class_re=REPR_CLASS_RE, repr_params_re=REPR_PARAMS_RE, array_re=ARRAY_RE
