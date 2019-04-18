@@ -5,14 +5,29 @@ import pandas as pd
 import numpy as np
 
 
-GABOR_DIAMETER_RE = re.compile(r'gabor_(\d*\.{0,1}\d*)_{0,1}deg(?:_\d+ms){0,1}')
-GENERIC_MOVIE_RE = re.compile(r'natural_movie_(?P<number>\d+|one|two|three|four|five|six|seven|eight|nine)(_shuffled){0,1}(_more_repeats){0,1}')
-DIGIT_NAMES = {'1': 'one', '2': 'two', '3': 'three', '4': 'four', '5': 'five', '6': 'six', '7': 'seven', '8': 'eight', '9': 'nine'}
-SHUFFLED_MOVIE_RE = re.compile(r'natural_movie_shuffled')
-NUMERAL_RE = re.compile(r'(?P<number>\d+)')
+GABOR_DIAMETER_RE = re.compile(r"gabor_(\d*\.{0,1}\d*)_{0,1}deg(?:_\d+ms){0,1}")
+GENERIC_MOVIE_RE = re.compile(
+    r"natural_movie_(?P<number>\d+|one|two|three|four|five|six|seven|eight|nine)(_shuffled){0,1}(_more_repeats){0,1}"
+)
+DIGIT_NAMES = {
+    "1": "one",
+    "2": "two",
+    "3": "three",
+    "4": "four",
+    "5": "five",
+    "6": "six",
+    "7": "seven",
+    "8": "eight",
+    "9": "nine",
+}
+SHUFFLED_MOVIE_RE = re.compile(r"natural_movie_shuffled")
+NUMERAL_RE = re.compile(r"(?P<number>\d+)")
 
 
 def drop_empty_columns(table):
+    """ Remove from the stimulus table columns whose values are all nan
+    """
+
     to_drop = []
 
     for colname in table.colums:
@@ -24,16 +39,25 @@ def drop_empty_columns(table):
 
 
 def collapse_columns(table):
+    """ merge, where possible, columns that describe the same parameter. This is pretty conservative - it 
+    only matches columns by capitalization and it only overrides nans.
+    """
+
     colnames = set(table.columns)
 
     matches = []
     for col in table.columns:
         for transformed in (col.upper(), col.capitalize()):
             if transformed in colnames and col != transformed:
-                matches.append(transformed)
 
-                 # this works because overlapping columns from the same stimulus are caught during build_stimuluswise_table
-                mask = (table[col].isna()) & ~(table[transformed].isna())
+                col_notna = ~(table[col].isna())
+                trans_notna = ~(table[transformed].isna())
+                if (col_notna & trans_notna).sum() != 0:
+                    continue
+
+                mask = ~(col_notna) & (trans_notna)
+
+                matches.append(transformed)
                 table.loc[mask, col] = table[transformed][mask]
                 break
 
@@ -42,25 +66,31 @@ def collapse_columns(table):
 
 
 def add_number_to_shuffled_movie(
-    table, 
-    natural_movie_re=GENERIC_MOVIE_RE, 
+    table,
+    natural_movie_re=GENERIC_MOVIE_RE,
     template_re=SHUFFLED_MOVIE_RE,
-    stim_colname='stimulus_name', 
-    template='natural_movie_{}_shuffled',
-    tmp_colname='__movie_number__'
+    stim_colname="stimulus_name",
+    template="natural_movie_{}_shuffled",
+    tmp_colname="__movie_number__",
 ):
-    '''
-    '''
+    """ 
+    """
 
     if not table[stim_colname].str.contains(SHUFFLED_MOVIE_RE).any():
         return table
     table = table.copy()
 
-    table[tmp_colname] = table[stim_colname].str.extract(natural_movie_re, expand=True)['number']
+    table[tmp_colname] = table[stim_colname].str.extract(natural_movie_re, expand=True)[
+        "number"
+    ]
 
-    unique_numbers = [item for item in table[tmp_colname].dropna(inplace=False).unique()]
+    unique_numbers = [
+        item for item in table[tmp_colname].dropna(inplace=False).unique()
+    ]
     if len(unique_numbers) != 1:
-        raise ValueError(f'unable to uniquely determine a movie number for this session. Candidates: {unique_numbers}')
+        raise ValueError(
+            f"unable to uniquely determine a movie number for this session. Candidates: {unique_numbers}"
+        )
     movie_number = unique_numbers[0]
 
     def renamer(row):
@@ -77,36 +107,70 @@ def add_number_to_shuffled_movie(
 
 
 def standardize_movie_numbers(
-    table, 
-    movie_re=GENERIC_MOVIE_RE, 
+    table,
+    movie_re=GENERIC_MOVIE_RE,
     numeral_re=NUMERAL_RE,
-    digit_names=DIGIT_NAMES, 
-    stim_colname='stimulus_name'
+    digit_names=DIGIT_NAMES,
+    stim_colname="stimulus_name",
 ):
-    '''
-    '''
+    """ Natural movie stimuli in visual coding are numbered using words, like "natural_movie_two" rather than 
+    "natural_movie_2". This function ensures that all of the natural movie stimuli in an experiment are named by 
+    that convention.
 
-    replace = lambda match_obj: digit_names[match_obj['number']]
+    Parameters
+    ----------
+    table : pd.DataFrame
+        the incoming stimulus table
+    movie_re : re.Pattern, optional
+        regex that matches movie stimulus names
+    numeral_re : re.Pattern, optional
+        regex that extracts movie numbers from stimulus names
+    digit_names : dict, optional
+        map from numerals to english words
+    stim_colname : str, optional
+        the name of the dataframe column that contains stimulus names
+
+    Returns
+    -------
+    table : pd.DataFrame
+        the stimulus table with movie numerals having been mapped to english words
+
+    """
+
+    replace = lambda match_obj: digit_names[match_obj["number"]]
 
     # for some reason pandas really wants us to use the captures
-    warnings.filterwarnings("ignore", 'This pattern has match groups')
+    warnings.filterwarnings("ignore", "This pattern has match groups")
 
     movie_rows = table[stim_colname].str.contains(movie_re, na=False)
-    table.loc[movie_rows,stim_colname] = table.loc[movie_rows,stim_colname].str.replace(numeral_re, replace)
+    table.loc[movie_rows, stim_colname] = table.loc[
+        movie_rows, stim_colname
+    ].str.replace(numeral_re, replace)
 
     return table
 
 
-def map_stimulus_names(table, name_map=None, stim_colname='stimulus_name'):
-    '''
-    '''
+def map_stimulus_names(table, name_map=None, stim_colname="stimulus_name"):
+    """ Applies a mappting to the stimulus names in a stimulus table
+
+    Parameters
+    ----------
+    table : pd.DataFrame
+        the input stimulus table
+    name_map : dict, optional
+        rename the stimuli according to this mapping
+    stim_colname: str, optional
+        look in this column for stimulus names
+        
+    """
 
     if name_map is None:
         return table
 
-    if None in name_map:
-        name_map[np.nan] = name_map[None]
+    if "" in name_map:
+        name_map[np.nan] = name_map[""]
 
-    table[stim_colname] = table[stim_colname].replace(to_replace=name_map, inplace=False)
+    table[stim_colname] = table[stim_colname].replace(
+        to_replace=name_map, inplace=False
+    )
     return table
-
