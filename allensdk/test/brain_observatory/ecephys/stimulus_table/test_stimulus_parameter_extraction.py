@@ -34,3 +34,18 @@ def test_extract_stim_class_from_repr(stim_repr):
     obtained = spe.extract_stim_class_from_repr(stim_repr)
 
     assert expected == obtained
+
+
+def test_parse_stim_repr(stim_repr):
+    expected = {
+        "color": [1.0, 1.0, 1.0],
+        "colorSpace": "rgb",
+        "contrast": 0.8,
+        "depth": 0,
+    }
+
+    obtained = spe.parse_stim_repr(stim_repr)
+
+    assert len(expected) == len(obtained)
+    for key in obtained:
+        assert expected[key] == obtained[key]

@@ -17,7 +17,6 @@ DROP_PARAMS = (  # psychopy boilerplate, more or less
 def parse_stim_repr(
     stim_repr,
     drop_params=DROP_PARAMS,
-    repr_class_re=REPR_CLASS_RE,
     repr_params_re=REPR_PARAMS_RE,
     array_re=ARRAY_RE,
     raise_on_unrecognized=False,
@@ -28,7 +27,6 @@ def parse_stim_repr(
     ----------
     stim_repr : str
     drop_params : tuple
-    repr_class_re : re.Pattern
     repr_params_re : re.Pattern
     array_re : re.Pattern
 
@@ -40,7 +38,6 @@ def parse_stim_repr(
 
     """
 
-    stim_class = extract_stim_class_from_repr(stim_repr, repr_class_re=repr_class_re)
     stim_params = extract_const_params_from_stim_repr(
         stim_repr, repr_params_re=repr_params_re, array_re=array_re
     )
@@ -49,20 +46,7 @@ def parse_stim_repr(
         if drop_param in stim_params:
             del stim_params[drop_param]
 
-    if stim_class is not None and len(stim_params) > 0:
-
-        if stim_class == "DotStim":
-            return stim_params
-        elif stim_class == "GratingStim":
-            return stim_params
-        elif stim_class == "ImageStimNumpyuByte":
-            return stim_params
-        elif raise_on_unrecognized:
-            raise ValueError(f"unrecognized stimulus class: {stim_class}")
-        else:
-            return stim_params
-
-    return {}
+    return stim_params
 
 
 def extract_stim_class_from_repr(stim_repr, repr_class_re=REPR_CLASS_RE):
