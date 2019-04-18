@@ -12,7 +12,7 @@ def stim_repr():
 
 @pytest.fixture
 def dup_stim_repr():
-    return 'GratingStim(autoDraw=False, autoDraw=True)'
+    return "GratingStim(autoDraw=False, autoDraw=True)"
 
 
 def test_extract_const_params_from_stim_repr_duplicates(dup_stim_repr):
@@ -23,13 +23,13 @@ def test_extract_const_params_from_stim_repr_duplicates(dup_stim_repr):
 def test_extract_const_params_from_stim_repr(stim_repr):
 
     expected = {
-        'autoDraw': False,
-        'autoLog': True,
-        'color': [1.0, 1.0, 1.0],
-        'colorSpace': "rgb",
-        'contrast': 0.8,
-        'depth': 0,
-        'name': 'foo'
+        "autoDraw": False,
+        "autoLog": True,
+        "color": [1.0, 1.0, 1.0],
+        "colorSpace": "rgb",
+        "contrast": 0.8,
+        "depth": 0,
+        "name": "foo",
     }
 
     obtained = spe.extract_const_params_from_stim_repr(stim_repr)
