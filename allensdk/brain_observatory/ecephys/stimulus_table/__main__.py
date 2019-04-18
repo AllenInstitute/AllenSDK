@@ -58,6 +58,7 @@ def build_stimulus_table(args):
     )
 
     stim_table_full = naming_utilities.collapse_columns(stim_table_full)
+    stim_table_full = naming_utilities.drop_empty_columns(stim_table_full)
     stim_table_full = naming_utilities.standardize_movie_numbers(stim_table_full)
     stim_table_full = naming_utilities.add_number_to_shuffled_movie(stim_table_full)
     stim_table_full = naming_utilities.map_stimulus_names(

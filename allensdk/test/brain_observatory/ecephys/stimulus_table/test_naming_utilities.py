@@ -133,3 +133,25 @@ def test_standardize_movie_numbers(table, expected):
 def test_map_stimulus_names(table, name_map, expected):
     obtained = nu.map_stimulus_names(table, name_map)
     pd.testing.assert_frame_equal(expected, obtained, check_like=True)
+
+
+@pytest.mark.parametrize(
+    "table,expected",
+    [
+        [
+            pd.DataFrame({"a": [1, 2, 3], "b": [np.nan, np.nan, np.nan]}),
+            pd.DataFrame({"a": [1, 2, 3]}),
+        ],
+        [
+            pd.DataFrame({"a": [1, 2, 3], "b": [None, None, None]}),
+            pd.DataFrame({"a": [1, 2, 3]}),
+        ],
+        [
+            pd.DataFrame({"a": [1, 2, 3], "b": [None, None, 4]}),
+            pd.DataFrame({"a": [1, 2, 3], "b": [None, None, 4]}),
+        ],
+    ],
+)
+def test_drop_empty_columns(table, expected):
+    obtained = nu.drop_empty_columns(table)
+    pd.testing.assert_frame_equal(expected, obtained, check_like=True)

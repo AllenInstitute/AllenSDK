@@ -30,7 +30,7 @@ def drop_empty_columns(table):
 
     to_drop = []
 
-    for colname in table.colums:
+    for colname in table.columns:
         if table[colname].isna().all():
             to_drop.append(colname)
 
