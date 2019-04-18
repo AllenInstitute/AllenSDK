@@ -49,6 +49,7 @@ def parse_stim_repr(
     return stim_params
 
 
+# This is not currently in use by the stimulus_table module, but is a potentially handy utility
 def extract_stim_class_from_repr(stim_repr, repr_class_re=REPR_CLASS_RE):
     match = repr_class_re.match(stim_repr)
     if match is not None and "class_name" in match.groupdict():
