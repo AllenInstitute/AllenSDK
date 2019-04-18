@@ -7,18 +7,29 @@ from allensdk.brain_observatory.ecephys.stimulus_table import (
 
 @pytest.fixture
 def stim_repr():
-    return "GratingStim(autoDraw=False, autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=0.8, depth=0)"
+    return "GratingStim(autoDraw=False, autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=0.8, depth=0, name=foo)"
+
+
+@pytest.fixture
+def dup_stim_repr():
+    return 'GratingStim(autoDraw=False, autoDraw=True)'
+
+
+def test_extract_const_params_from_stim_repr_duplicates(dup_stim_repr):
+    with pytest.raises(KeyError):
+        obtained = spe.extract_const_params_from_stim_repr(dup_stim_repr)
 
 
 def test_extract_const_params_from_stim_repr(stim_repr):
 
     expected = {
-        "autoDraw": False,
-        "autoLog": True,
-        "color": [1.0, 1.0, 1.0],
-        "colorSpace": "rgb",
-        "contrast": 0.8,
-        "depth": 0,
+        'autoDraw': False,
+        'autoLog': True,
+        'color': [1.0, 1.0, 1.0],
+        'colorSpace': "rgb",
+        'contrast': 0.8,
+        'depth': 0,
+        'name': 'foo'
     }
 
     obtained = spe.extract_const_params_from_stim_repr(stim_repr)
