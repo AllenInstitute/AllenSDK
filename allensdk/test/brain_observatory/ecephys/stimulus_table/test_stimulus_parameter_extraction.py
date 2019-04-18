@@ -5,9 +5,13 @@ from allensdk.brain_observatory.ecephys.stimulus_table import (
 )
 
 
-def test_extract_const_params_from_stim_repr():
+@pytest.fixture
+def stim_repr():
+    return "GratingStim(autoDraw=False, autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=0.8, depth=0)"
 
-    stim_repr = "GratingStim(autoDraw=False, autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=0.8, depth=0)"
+
+def test_extract_const_params_from_stim_repr(stim_repr):
+
     expected = {
         "autoDraw": False,
         "autoLog": True,
@@ -22,3 +26,11 @@ def test_extract_const_params_from_stim_repr():
     assert len(expected) == len(obtained)
     for key in obtained:
         assert expected[key] == obtained[key]
+
+
+def test_extract_stim_class_from_repr(stim_repr):
+
+    expected = "GratingStim"
+    obtained = spe.extract_stim_class_from_repr(stim_repr)
+
+    assert expected == obtained
