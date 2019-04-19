@@ -155,3 +155,29 @@ def test_map_stimulus_names(table, name_map, expected):
 def test_drop_empty_columns(table, expected):
     obtained = nu.drop_empty_columns(table)
     pd.testing.assert_frame_equal(expected, obtained, check_like=True)
+
+
+@pytest.mark.parametrize(
+    "table,expected",
+    [
+        [
+            pd.DataFrame({'a': [1, 2, np.nan], 'A': [np.nan, None, 3]}),
+            pd.DataFrame({'a': [1, 2, 3]})
+        ],
+        [
+            pd.DataFrame({'bar': [1, 2, np.nan], 'Bar': [np.nan, None, 3]}),
+            pd.DataFrame({'bar': [1, 2, 3]})
+        ],
+        [
+            pd.DataFrame({'bar': [1, 2, np.nan], 'Bar': [np.nan, 4, 3]}),
+            pd.DataFrame({'bar': [1, 2, np.nan], 'Bar': [np.nan, 4, 3]})
+        ],
+        [
+            pd.DataFrame({'bar': [1, 2, np.nan], 'Bar': [np.nan, 4, 3], 'BAR': [np.nan, np.nan, 3]}),
+            pd.DataFrame({'bar': [1, 2, 3], 'Bar': [np.nan, 4, 3]})
+        ],
+    ]
+)
+def test_collapse_colimns(table, expected):
+    obtained = nu.collapse_columns(table)
+    pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)
