@@ -176,7 +176,6 @@ def test_add_stimulus_index(nwbfile, roundtrip, roundtripper, stimulus_index, st
     pd.testing.assert_frame_equal(stimulus_index, obt.get_stimulus_index(), check_dtype=False)
 
 
-@pytest.mark.xfail
 @pytest.mark.parametrize('roundtrip', [True, False])
 def test_add_metadata(nwbfile, roundtrip, roundtripper, metadata):
 
@@ -194,7 +193,6 @@ def test_add_metadata(nwbfile, roundtrip, roundtripper, metadata):
         assert val == metadata_obt[key]
 
 
-@pytest.mark.xfail
 @pytest.mark.parametrize('roundtrip', [True, False])
 def test_add_task_parameters(nwbfile, roundtrip, roundtripper, task_parameters):
 
@@ -218,7 +216,6 @@ def test_add_task_parameters(nwbfile, roundtrip, roundtripper, task_parameters):
             assert val == task_parameters_obt[key]
 
 
-@pytest.mark.xfail
 @pytest.mark.parametrize('roundtrip', [True, False])
 def test_get_cell_specimen_table(nwbfile, roundtrip, roundtripper, cell_specimen_table, metadata, ophys_timestamps):
 
