@@ -34,9 +34,6 @@ class BehaviorOphysApiBase:
     def get_stimulus_templates(self):
         raise NotImplementedError
 
-    def get_stimulus_index(self):
-        raise NotImplementedError
-
     def get_licks(self):
         raise NotImplementedError
 

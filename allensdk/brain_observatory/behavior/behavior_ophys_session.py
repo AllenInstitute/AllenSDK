@@ -30,7 +30,6 @@ class BehaviorOphysSession(LazyPropertyMixin):
         self.running_data_df = LazyProperty(self.api.get_running_data_df)
         self.stimulus_presentations = LazyProperty(self.api.get_stimulus_presentations)
         self.stimulus_templates = LazyProperty(self.api.get_stimulus_templates)
-        self.stimulus_index = LazyProperty(self.api.get_stimulus_index)
         self.licks = LazyProperty(self.api.get_licks)
         self.rewards = LazyProperty(self.api.get_rewards)
         self.task_parameters = LazyProperty(self.api.get_task_parameters)
@@ -42,21 +41,21 @@ class BehaviorOphysSession(LazyPropertyMixin):
 
 if __name__ == "__main__":
 
-    from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi
+    # from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi
 
-    blacklist = [797257159, 796306435, 791453299, 809191721, 796308505, 798404219] #
-    api_list = []
-    df = BehaviorOphysLimsApi.get_ophys_experiment_df()
-    for cid in [791352433, 814796698, 814796612, 814796558, 814797528]:
-        df2 = df[(df['container_id'] == cid) & (df['workflow_state'] == 'passed')]
-        api_list += [BehaviorOphysLimsApi(oeid) for oeid in df2['ophys_experiment_id'].values if oeid not in blacklist]
+    # blacklist = [797257159, 796306435, 791453299, 809191721, 796308505, 798404219] #
+    # api_list = []
+    # df = BehaviorOphysLimsApi.get_ophys_experiment_df()
+    # for cid in [791352433, 814796698, 814796612, 814796558, 814797528]:
+    #     df2 = df[(df['container_id'] == cid) & (df['workflow_state'] == 'passed')]
+    #     api_list += [BehaviorOphysLimsApi(oeid) for oeid in df2['ophys_experiment_id'].values if oeid not in blacklist]
 
-    for api in api_list:
+    # for api in api_list:
 
-        session = BehaviorOphysSession(api=api)
-        if len(session.licks) > 100:
+    #     session = BehaviorOphysSession(api=api)
+    #     if len(session.licks) > 100:
 
-            print(api.get_ophys_experiment_id())
+    #         print(api.get_ophys_experiment_id())
 
         # session.segmentation_mask_image
         # session.stimulus_timestamps
@@ -66,9 +65,7 @@ if __name__ == "__main__":
         # session.cell_specimen_table
         # session.running_speed
         # session.running_data_df
-        # session.stimulus_presentations
-        # session.stimulus_templates
-        # session.stimulus_index
+
         # print(api.get_ophys_experiment_id(), len(session.licks), session.metadata['experiment_datetime'])
         # session.rewards
         # session.task_parameters
@@ -77,9 +74,9 @@ if __name__ == "__main__":
         # session.average_image
         # session.motion_correction
 
-            nwb_filepath = '/allen/aibs/technology/nicholasc/tmp/behavior_ophys_session_{get_ophys_experiment_id}.nwb'.format(get_ophys_experiment_id=api.get_ophys_experiment_id())
-            BehaviorOphysNwbApi(nwb_filepath).save(session)
-            assert equals(session, BehaviorOphysSession(api=BehaviorOphysNwbApi(nwb_filepath)))
+            # nwb_filepath = '/allen/aibs/technology/nicholasc/tmp/behavior_ophys_session_{get_ophys_experiment_id}.nwb'.format(get_ophys_experiment_id=api.get_ophys_experiment_id())
+            # BehaviorOphysNwbApi(nwb_filepath).save(session)
+            # assert equals(session, BehaviorOphysSession(api=BehaviorOphysNwbApi(nwb_filepath)))
 
 
 
@@ -100,7 +97,16 @@ if __name__ == "__main__":
     
     # assert session == session2
 
-    # session = BehaviorOphysSession.from_LIMS(789359614)
+    session = BehaviorOphysSession.from_LIMS(789359614)
+    df = session.stimulus_presentations
+    # df2 = session.stimulus_index
+
+    print(df.head())
+    # print(df2.index.values)
+
+    # print(df.merge(df2, left_on='start_time', right_index=True))
+
+
     # session.segmentation_mask_image
     # session.stimulus_timestamps
     # session.ophys_timestamps

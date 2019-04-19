@@ -119,26 +119,26 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
         stimulus_timestamps = self.get_stimulus_timestamps()
         behavior_stimulus_file = self.get_behavior_stimulus_file()
         data = pd.read_pickle(behavior_stimulus_file)
-        return get_stimulus_presentations(data, stimulus_timestamps)
+        stimulus_presentations_df_pre = get_stimulus_presentations(data, stimulus_timestamps)
+
+        stimulus_metadata_df = get_stimulus_metadata(data)
+        idx_name = stimulus_presentations_df_pre.index.name
+        stimulus_index_df = stimulus_presentations_df_pre.reset_index().merge(stimulus_metadata_df.reset_index(), on=['image_name', 'image_category']).set_index(idx_name)
+        stimulus_index_df.sort_index(inplace=True)
+        stimulus_index_df = stimulus_index_df[['image_set', 'image_index', 'start_time']].rename(columns={'start_time': 'timestamps'})
+        stimulus_index_df.set_index('timestamps', inplace=True, drop=True)
+        assert len(stimulus_index_df) == len(stimulus_presentations_df_pre)
+
+        stimulus_presentations_df = stimulus_presentations_df_pre.merge(stimulus_index_df, left_on='start_time', right_index=True)
+        assert len(stimulus_index_df) == len(stimulus_presentations_df)
+
+        return stimulus_presentations_df[sorted(stimulus_presentations_df.columns)]
 
     @memoize
     def get_stimulus_templates(self):
         behavior_stimulus_file = self.get_behavior_stimulus_file()
         data = pd.read_pickle(behavior_stimulus_file)
         return get_stimulus_templates(data)
-
-    @memoize
-    def get_stimulus_index(self):
-        behavior_stimulus_file = self.get_behavior_stimulus_file()
-        data = pd.read_pickle(behavior_stimulus_file)
-        stimulus_metadata_df = get_stimulus_metadata(data)
-        stimulus_presentations_df = self.get_stimulus_presentations()
-        idx_name = stimulus_presentations_df.index.name
-        stimulus_index_df = stimulus_presentations_df.reset_index().merge(stimulus_metadata_df.reset_index(), on=['image_name', 'image_category']).set_index(idx_name)
-        stimulus_index_df.sort_index(inplace=True)
-        stimulus_index_df = stimulus_index_df[['image_set', 'image_index', 'start_time']].rename(columns={'start_time': 'timestamps'})
-        stimulus_index_df.set_index('timestamps', inplace=True, drop=True)
-        return stimulus_index_df
 
     @memoize
     def get_licks(self):

@@ -36,6 +36,7 @@ def test_session_from_json(tmpdir_factory, session_data):
 
     assert equals(d1, d2)
 
+
 @pytest.mark.nightly
 def test_nwb_end_to_end(tmpdir_factory):
     oeid = 789359614

@@ -87,12 +87,15 @@ def average_image(max_projection):
 
 
 @pytest.fixture
-def stimulus_index(stimulus_templates):
-    image_sets_list = list(stimulus_templates.keys())
-    image_sets = image_sets_list + image_sets_list
-    return pd.DataFrame({'image_set': image_sets,
-                         'image_index': [0] * len(image_sets)},
-                        index=pd.Index(np.arange(len(image_sets), dtype=np.float64), name='timestamps'))
+def stimulus_presentations_behavior(stimulus_templates, stimulus_presentations):
+
+    image_sets = ['test1','test1', 'test1', 'test2', 'test2' ]
+    stimulus_index_df = pd.DataFrame({'image_set': image_sets,
+                                      'image_index': [0] * len(image_sets)},
+                                       index=pd.Index(stimulus_presentations['start_time'], dtype=np.float64, name='timestamps'))
+
+    df = stimulus_presentations.merge(stimulus_index_df, left_on='start_time', right_index=True)
+    return df[sorted(df.columns)]
 
 
 @pytest.fixture
