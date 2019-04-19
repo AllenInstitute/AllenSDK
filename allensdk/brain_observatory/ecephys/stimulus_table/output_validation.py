@@ -6,11 +6,15 @@ def validate_epoch_durations(table, start_key="Start", end_key="End"):
     min_duration_index = durations.idxmin()
     min_duration = durations[min_duration_index]
 
-    assert min_duration >= 0
     if min_duration == 0:
         warnings.warn(
             f"there is an epoch in this stimulus table (index: {min_duration_index}) with duration = {min_duration}",
             UserWarning,
+        )
+    if min_duration < 0:
+        print(table.loc[min_duration_index - 5 : min_duration_index + 5, :])
+        raise ValueError(
+            f"there is an epoch with negative duration (index: {min_duration_index}"
         )
 
 
