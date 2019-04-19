@@ -90,22 +90,21 @@ class BehaviorOphysJsonApi(BehaviorOphysLimsApi):
         return self.data['external_specimen_name']
 
 
-def write_behavior_ophys_nwb(session_data, output_path):
+def write_behavior_ophys_nwb(session_data, nwb_filepath):
 
-    session = BehaviorOphysSession(api=BehaviorOphysJsonApi(session_data))
-    nwb_api = BehaviorOphysNwbApi(output_path)
-    nwb_api.save(session)
+    nwb_filepath_inprogress = nwb_filepath+'.inprogress'
+    nwb_filepath_error = nwb_filepath+'.error'
 
-    session_roundtrip = BehaviorOphysSession(api=BehaviorOphysNwbApi(output_path))
     try:
-        assert equals(session, session_roundtrip)
+        session = BehaviorOphysSession(api=BehaviorOphysJsonApi(session_data))
+        BehaviorOphysNwbApi(nwb_filepath_inprogress).save(session)
+        assert equals(session, BehaviorOphysSession(api=BehaviorOphysNwbApi(nwb_filepath_inprogress)))
+        os.rename(nwb_filepath_inprogress, nwb_filepath)
+        return {'output_path': nwb_filepath}
     except Exception as e:
-        if os.path.exists(output_path):
-            logging.error('Renaming output artifact: {}'.format(output_path + '.failure'))
-            os.rename(output_path, output_path + '.failure')
+        os.rename(nwb_filepath_inprogress, nwb_filepath_error)
         raise e
 
-    return {'output_path': output_path}
 
 
 def main():
