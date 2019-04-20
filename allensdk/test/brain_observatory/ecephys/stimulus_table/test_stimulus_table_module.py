@@ -10,9 +10,13 @@ import numpy as np
 from allensdk.brain_observatory.ecephys.stimulus_table.__main__ import build_stimulus_table
 
 
-# psuedofixture for a stimulus pickle
+def build_psuedofixture(name, data):
+    new_class = collections.namedtuple(name, data.keys())
+    return new_class(**data)
+
+
 def stim_file(*a, **k):
-    stim_data = {
+    return build_psuedofixture('StimFileClass', {
         "pre_blank_sec": 20.0,
         "frames_per_second": 60.0,
         "stimuli": [
@@ -22,14 +26,30 @@ def stim_file(*a, **k):
                 'dimnames': ['Pos', 'TF', 'SF', 'Ori', 'Contrast']
             }
         ]
-    }
-    StimFileClass = collections.namedtuple("StimFileClass", stim_data.keys())
-    return StimFileClass(**stim_data)
+    })
+
+
+def sync_file(*a, **k):
+    class SyncFileClass:
+
+        def extract_frame_times(*a, **k):
+            return np.arange(1000, dtype=float)
+
+        @classmethod
+        def factory(cls, *a, **k):
+            return cls()
+    
+    return SyncFileClass.factory
+
 
 
 @mock.patch(
     "allensdk.brain_observatory.ecephys.file_io.stim_file.CamStimOnePickleStimFile.factory", 
     new=stim_file
+)
+@mock.patch(
+    "allensdk.brain_observatory.ecephys.file_io.ecephys_sync_dataset.EcephysSyncDataset.factory",
+    new=sync_file()
 )
 def test_build_stimulus_table(tmpdir_factory):
 
