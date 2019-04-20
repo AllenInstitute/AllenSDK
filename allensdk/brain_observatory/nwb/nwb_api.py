@@ -59,11 +59,15 @@ class NwbApi:
         )
 
     def get_stimulus_presentations(self) -> pd.DataFrame:
+        
+
+
         table = pd.DataFrame({
             col.name: col.data for col in self.nwbfile.epochs.columns 
             if col.name not in set(['tags', 'timeseries', 'tags_index', 'timeseries_index'])
         }, index=pd.Index(name='stimulus_presentations_id', data=self.nwbfile.epochs.id.data))
         table.index = table.index.astype(int)
+
         return table[sorted(table.columns)]
 
     def get_image(self, name, module, image_api=None) -> sitk.Image:

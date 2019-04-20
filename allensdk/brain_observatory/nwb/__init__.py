@@ -305,14 +305,13 @@ def add_average_image(nwbfile, average_image, image_api=None):
 
 def add_stimulus_index(nwbfile, stimulus_index, nwb_template):
 
-    assert stimulus_index.index.name == 'timestamps'
-
     image_index = IndexSeries(
         name=nwb_template.name,
         data=stimulus_index['image_index'].values,
         unit='None',
         indexed_timeseries=nwb_template,
-        timestamps=stimulus_index.index.values)
+        timestamps=stimulus_index['start_time'].values)
+
     nwbfile.add_stimulus(image_index)
 
 

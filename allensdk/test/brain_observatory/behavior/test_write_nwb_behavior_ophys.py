@@ -54,16 +54,23 @@ def test_add_stimulus_templates(nwbfile, stimulus_templates, roundtrip, roundtri
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
-def test_add_stimulus_presentations(nwbfile, stimulus_presentations, stimulus_timestamps, roundtrip, roundtripper):
+def test_add_stimulus_presentations(nwbfile, stimulus_presentations_behavior, stimulus_timestamps, roundtrip, roundtripper, stimulus_templates):
     nwb.add_stimulus_timestamps(nwbfile, stimulus_timestamps)
-    nwb.add_stimulus_presentations(nwbfile, stimulus_presentations)
+    nwb.add_stimulus_presentations(nwbfile, stimulus_presentations_behavior)
+    for key, val in stimulus_templates.items():
+        nwb.add_stimulus_template(nwbfile, val, key)
+
+        # Add index for this template to NWB in-memory object:
+        nwb_template = nwbfile.stimulus_template[key]
+        curr_stimulus_index = stimulus_presentations_behavior[stimulus_presentations_behavior['image_set'] == nwb_template.name]
+        nwb.add_stimulus_index(nwbfile, curr_stimulus_index, nwb_template)
 
     if roundtrip:
         obt = roundtripper(nwbfile, BehaviorOphysNwbApi)
     else:
         obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
 
-    pd.testing.assert_frame_equal(stimulus_presentations, obt.get_stimulus_presentations(), check_dtype=False)
+    pd.testing.assert_frame_equal(stimulus_presentations_behavior, obt.get_stimulus_presentations(), check_dtype=False)
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
@@ -158,26 +165,6 @@ def test_add_average_image(nwbfile, roundtrip, roundtripper, average_image, imag
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
-def test_add_stimulus_index(nwbfile, roundtrip, roundtripper, stimulus_index, stimulus_templates):
-
-    for name, image_data in stimulus_templates.items():
-        nwb.add_stimulus_template(nwbfile, image_data, name)
-
-        # Add index for this template to NWB in-memory object:
-        nwb_template = nwbfile.stimulus_template[name]
-        curr_stimulus_index = stimulus_index[stimulus_index['image_set'] == nwb_template.name]
-        nwb.add_stimulus_index(nwbfile, curr_stimulus_index, nwb_template)
-
-    if roundtrip:
-        obt = roundtripper(nwbfile, BehaviorOphysNwbApi)
-    else:
-        obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
-
-    pd.testing.assert_frame_equal(stimulus_index, obt.get_stimulus_index(), check_dtype=False)
-
-
-@pytest.mark.xfail
-@pytest.mark.parametrize('roundtrip', [True, False])
 def test_add_metadata(nwbfile, roundtrip, roundtripper, metadata):
 
     nwb.add_metadata(nwbfile, metadata)
@@ -194,7 +181,6 @@ def test_add_metadata(nwbfile, roundtrip, roundtripper, metadata):
         assert val == metadata_obt[key]
 
 
-@pytest.mark.xfail
 @pytest.mark.parametrize('roundtrip', [True, False])
 def test_add_task_parameters(nwbfile, roundtrip, roundtripper, task_parameters):
 
@@ -218,7 +204,6 @@ def test_add_task_parameters(nwbfile, roundtrip, roundtripper, task_parameters):
             assert val == task_parameters_obt[key]
 
 
-@pytest.mark.xfail
 @pytest.mark.parametrize('roundtrip', [True, False])
 def test_get_cell_specimen_table(nwbfile, roundtrip, roundtripper, cell_specimen_table, metadata, ophys_timestamps):
 

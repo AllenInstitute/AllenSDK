@@ -48,7 +48,7 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
 
             # Add index for this template to NWB in-memory object:
             nwb_template = nwbfile.stimulus_template[name]
-            stimulus_index = session_object.stimulus_index[session_object.stimulus_index['image_set'] == nwb_template.name]
+            stimulus_index = session_object.stimulus_presentations[session_object.stimulus_presentations['image_set'] == nwb_template.name]
             nwb.add_stimulus_index(nwbfile, stimulus_index, nwb_template)
 
         # Add stimulus presentations data to NWB in-memory object:
@@ -146,20 +146,6 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
 
     def get_average_image(self, image_api=None) -> sitk.Image:
         return self.get_image('average_image', 'two_photon_imaging', image_api=image_api)
-
-    def get_stimulus_index(self) -> pd.DataFrame:
-
-        data_dict = {'timestamps': [], 'image_set': [], 'image_index': []}
-        for stimulus_name in self.nwbfile.stimulus:
-            curr_image_index_series = self.nwbfile.stimulus[stimulus_name]
-            data_dict['image_set'] += [stimulus_name] * len(curr_image_index_series.data[:])
-            data_dict['image_index'] += list(curr_image_index_series.data[:])
-            data_dict['timestamps'] += list(curr_image_index_series.timestamps[:])
-
-        stimulus_index_df = pd.DataFrame(data_dict)
-        stimulus_index_df.set_index('timestamps', inplace=True)
-        stimulus_index_df.sort_index(inplace=True)
-        return stimulus_index_df
 
     def get_metadata(self) -> dict:
 
