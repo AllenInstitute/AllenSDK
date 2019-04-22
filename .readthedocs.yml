@@ -8,7 +8,7 @@ sphinx:
   builder: html
 
 python:
-   version: 2.7
+   version: 3.7
    install:
       - requirements: doc_requirements.txt
 

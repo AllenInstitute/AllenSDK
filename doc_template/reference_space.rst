@@ -5,7 +5,7 @@ Allen Institute atlases and data are registered, when possible, to one of severa
 easily compare data across subjects and experimental modalities.
 
 This page documents how to use the Allen SDK to interact with a reference space. For more information and a list of reference spaces, see the 
-`atlas drawings and ontologies API documentation <http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies>`_ and the `3D reference models API documentation <http://help.brain-map.org/display/mouseconnectivity/API#API-DownloadAtlas3-DReferenceModels>`. 
+atlas drawings and ontologies `API documentation <http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies>`_ and the 3D reference models `API documentation <http://help.brain-map.org/display/mouseconnectivity/API#API-DownloadAtlas3-DReferenceModels>`_. 
 For details about the construction of the Common Coordinate Framework space, see the `CCFv3 whitepaper <http://help.brain-map.org/download/attachments/2818171/Mouse_Common_Coordinate_Framework.pdf?version=4&modificationDate=1508448259091&api=v2>`_.
 
 
