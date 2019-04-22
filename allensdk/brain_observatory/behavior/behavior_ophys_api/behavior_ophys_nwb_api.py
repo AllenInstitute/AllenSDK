@@ -21,6 +21,10 @@ from allensdk.brain_observatory.nwb.metadata import load_LabMetaData_extension
 from allensdk.brain_observatory.behavior.behavior_ophys_api import BehaviorOphysApiBase
 
 
+load_LabMetaData_extension(OphysBehaviorMetaDataSchema, 'AIBS_ophys_behavior')
+load_LabMetaData_extension(OphysBehaviorTaskParametersSchema, 'AIBS_ophys_behavior')
+
+
 class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
 
     def save(self, session_object):
