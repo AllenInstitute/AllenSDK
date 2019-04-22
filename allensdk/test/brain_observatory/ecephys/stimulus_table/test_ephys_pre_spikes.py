@@ -80,7 +80,7 @@ def test_assign_sweep_values():
     )
 
     obtained = ephys_pre_spikes.assign_sweep_values(stim_table, sweep_table)
-    pd.testing.assert_frame_equal(expected, obtained, check_like=True)
+    pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_column_type=False)
 
 
 @pytest.mark.parametrize(
@@ -105,7 +105,7 @@ def test_assign_sweep_values():
 def test_split_column(table, column, new_columns, drop, expected):
 
     obtained = ephys_pre_spikes.split_column(table, column, new_columns, drop)
-    pd.testing.assert_frame_equal(expected, obtained, check_like=True)
+    pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_column_type=False)
 
 
 @pytest.mark.parametrize(
@@ -157,7 +157,7 @@ def test_make_spontaneous_activity_tables(stimulus_tables, expected):
     obtained = ephys_pre_spikes.make_spontaneous_activity_tables(stimulus_tables)
 
     if len(obtained) == 1:
-        pd.testing.assert_frame_equal(obtained[0], expected[0], check_like=True)
+        pd.testing.assert_frame_equal(obtained[0], expected[0], check_like=True, check_column_type=False)
     else:
         assert len(obtained) == len(expected)
 
@@ -187,7 +187,7 @@ def test_create_stim_table(stimuli, stim_tabler, spon_tabler, sort_key, expected
         stimuli, stim_tabler, spon_tabler, sort_key
     )
     pd.testing.assert_frame_equal(
-        obtained, expected, check_like=True, check_dtype=False
+        obtained, expected, check_like=True, check_dtype=False, check_column_type=False
     )
 
 
@@ -217,7 +217,7 @@ def test_apply_frame_times(stim_table, frame_times, fps, eft, map_cols, expected
     obtained = ephys_pre_spikes.apply_frame_times(
         stim_table, frame_times, fps, eft, map_cols
     )
-    pd.testing.assert_frame_equal(obtained, expected, check_like=True)
+    pd.testing.assert_frame_equal(obtained, expected, check_like=True, check_column_type=False)
 
 
 @pytest.mark.parametrize(
@@ -267,4 +267,4 @@ def test_build_stimuluswise_table(stimulus, stf, start_key, end_key, expected):
         stimulus, stf, start_key, end_key
     )
     for obtained_table, expected_table in zip(obtained, expected):
-        pd.testing.assert_frame_equal(obtained_table, expected_table, check_like=True)
+        pd.testing.assert_frame_equal(obtained_table, expected_table, check_like=True, check_column_type=False)
