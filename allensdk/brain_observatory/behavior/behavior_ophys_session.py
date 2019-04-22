@@ -10,6 +10,50 @@ from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_a
 
 
 class BehaviorOphysSession(LazyPropertyMixin):
+    """Represents data from a single Visual Behavior Ophys imaging session.  LazyProperty attributes access the data only on the first demand, and then memoize the result for reuse.
+    
+    Attributes:
+        ophys_experiment_id : int (LazyProperty)
+            Unique identifier for this experimental session
+        segmentation_mask_image : SimpleITK.Image (LazyProperty)
+            2D image of the segmented regions-of-interest in the field of view
+        stimulus_timestamps : numpy.ndarray (LazyProperty)
+            Timestamps associated the stimulus presentations on the monitor 
+        ophys_timestamps : numpy.ndarray (LazyProperty)
+            Timestamps associated with frames captured by the microscope
+        metadata : dict (LazyProperty)
+            A dictionary of session-specific metadata
+        dff_traces : pandas.DataFrame (LazyProperty)
+            The traces of dff organized into a dataframe; index is the cell roi ids
+        cell_specimen_table : pandas.DataFrame (LazyProperty)
+            Cell roi information organized into a dataframe; index is the cell roi ids
+        running_speed : allensdk.brain_observatory.running_speed.RunningSpeed (LazyProperty)
+            NamedTuple with two fields
+                timestamps : numpy.ndarray
+                    Timestamps of running speed data samples
+                values : np.ndarray
+                    Running speed of the experimental subject (in cm / s).
+        running_data_df : pandas.DataFrame (LazyProperty)
+            Dataframe containing various signals used to compute running speed
+        stimulus_presentations : pandas.DataFrame (LazyProperty)
+            Table whose rows are stimulus presentations (i.e. a given image, for a given duration, typically 250 ms) and whose columns are presentation characteristics.
+        stimulus_templates : dict (LazyProperty)
+            A dictionary containing the stimulus images presented during the session keys are data set names, and values are 3D numpy arrays.
+        licks : pandas.DataFrame (LazyProperty)
+            A dataframe containing lick timestamps
+        rewards : pandas.DataFrame (LazyProperty)
+            A dataframe containing timestamps of delivered rewards
+        task_parameters : dict (LazyProperty)
+            A dictionary containing parameters used to define the task runtime behavior
+        trials : pandas.DataFrame (LazyProperty)
+            A dataframe containing behavioral trial start/stop times, and trial data
+        corrected_fluorescence_traces : pandas.DataFrame (LazyProperty)
+            The motion-corrected fluorescence traces organized into a dataframe; index is the cell roi ids
+        average_image : SimpleITK.Image (LazyProperty)
+            2D image of the microscope field of view, averaged across the experiment
+        motion_correction : pandas.DataFrame LazyProperty
+            A dataframe containing trace data used during motion correction computation
+    """
 
     @classmethod
     def from_LIMS(cls, ophys_experiment_id):
@@ -98,24 +142,16 @@ if __name__ == "__main__":
     # assert session == session2
 
     session = BehaviorOphysSession.from_LIMS(789359614)
-    df = session.stimulus_presentations
-    # df2 = session.stimulus_index
-
-    print(df.head())
-    # print(df2.index.values)
-
-    # print(df.merge(df2, left_on='start_time', right_index=True))
-
-
     # session.segmentation_mask_image
     # session.stimulus_timestamps
     # session.ophys_timestamps
     # session.metadata
     # session.dff_traces
     # session.cell_specimen_table
-    # session.running_speed
+    # running_speed
+    # print(session.stimulus_index)
     # session.running_data_df
-    # session.stimulus_presentations
+    print(session.stimulus_presentations)
     # session.stimulus_templates
     # session.stimulus_index
     # session.licks
