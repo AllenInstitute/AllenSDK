@@ -161,23 +161,31 @@ def test_drop_empty_columns(table, expected):
     "table,expected",
     [
         [
-            pd.DataFrame({'a': [1, 2, np.nan], 'A': [np.nan, None, 3]}),
-            pd.DataFrame({'a': [1, 2, 3]})
+            pd.DataFrame({"a": [1, 2, np.nan], "A": [np.nan, None, 3]}),
+            pd.DataFrame({"a": [1, 2, 3]}),
         ],
         [
-            pd.DataFrame({'bar': [1, 2, np.nan], 'Bar': [np.nan, None, 3]}),
-            pd.DataFrame({'bar': [1, 2, 3]})
+            pd.DataFrame({"bar": [1, 2, np.nan], "Bar": [np.nan, None, 3]}),
+            pd.DataFrame({"bar": [1, 2, 3]}),
         ],
         [
-            pd.DataFrame({'bar': [1, 2, np.nan], 'Bar': [np.nan, 4, 3]}),
-            pd.DataFrame({'bar': [1, 2, np.nan], 'Bar': [np.nan, 4, 3]})
+            pd.DataFrame({"bar": [1, 2, np.nan], "Bar": [np.nan, 4, 3]}),
+            pd.DataFrame({"bar": [1, 2, np.nan], "Bar": [np.nan, 4, 3]}),
         ],
         [
-            pd.DataFrame({'bar': [1, 2, np.nan], 'Bar': [np.nan, 4, 3], 'BAR': [np.nan, np.nan, 3]}),
-            pd.DataFrame({'bar': [1, 2, 3], 'Bar': [np.nan, 4, 3]})
+            pd.DataFrame(
+                {
+                    "bar": [1, 2, np.nan],
+                    "Bar": [np.nan, 4, 3],
+                    "BAR": [np.nan, np.nan, 3],
+                }
+            ),
+            pd.DataFrame({"bar": [1, 2, 3], "Bar": [np.nan, 4, 3]}),
         ],
-    ]
+    ],
 )
 def test_collapse_colimns(table, expected):
     obtained = nu.collapse_columns(table)
-    pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)
+    pd.testing.assert_frame_equal(
+        expected, obtained, check_like=True, check_dtype=False
+    )
