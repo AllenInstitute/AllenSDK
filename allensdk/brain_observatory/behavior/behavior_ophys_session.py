@@ -36,17 +36,15 @@ class BehaviorOphysSession(LazyPropertyMixin):
         running_data_df : pandas.DataFrame (LazyProperty)
             Dataframe containing various signals used to compute running speed
         stimulus_presentations : pandas.DataFrame (LazyProperty)
-            Table whose rows are stimulus presentations and whose columns are presentation characteristics. 
-                    A stimulus presentation is the smallest unit of distinct stimulus presentation and lasts for 
-                    (usually) 1 60hz frame.
+            Table whose rows are stimulus presentations (i.e. a given image, for a given duration, typically 250 ms) and whose columns are presentation characteristics.
         stimulus_templates : dict (LazyProperty)
             A dictionary containing the stimulus images presented during the session keys are data set names, and values are 3D numpy arrays.
         licks : pandas.DataFrame (LazyProperty)
             A dataframe containing lick timestamps
         rewards : pandas.DataFrame (LazyProperty)
-            A dataframe containing lick timestamps
+            A dataframe containing timestamps of delivered rewards
         task_parameters : dict (LazyProperty)
-            A dictionary containing task metadata
+            A dictionary containing parameters used to define the task runtime behavior
         trials : pandas.DataFrame (LazyProperty)
             A dataframe containing behavioral trial start/stop times, and trial data
         corrected_fluorescence_traces : pandas.DataFrame (LazyProperty)
