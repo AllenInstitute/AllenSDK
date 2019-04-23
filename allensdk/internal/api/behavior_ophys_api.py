@@ -17,6 +17,7 @@ from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory.behavior.image_api import ImageApi
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.brain_observatory.behavior.behavior_ophys_api import BehaviorOphysApiBase
+from allensdk.brain_observatory.behavior.trials_processing import get_extended_trials
 
 class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
 
@@ -205,13 +206,16 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
         return motion_correction[['x', 'y']]
 
     def get_stimulus_rebase_function(self):
-
         stimulus_timestamps_no_monitor_delay = self.get_sync_data()['stimulus_frames_no_delay']
         behavior_stimulus_file = self.get_behavior_stimulus_file()
         data = pd.read_pickle(behavior_stimulus_file)
         stimulus_rebase_function = get_stimulus_rebase_function(data, stimulus_timestamps_no_monitor_delay)
-
         return stimulus_rebase_function
+
+    def get_extended_trials(self):
+        filename = self.get_behavior_stimulus_file()
+        data = pd.read_pickle(filename)
+        return get_extended_trials(data)
 
     @staticmethod
     def get_ophys_experiment_df():
