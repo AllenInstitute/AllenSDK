@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [0.16.2] = xxxx-x-xx
+## [0.16.2] = 2019-4-23
 
 ### Added
  - https://github.com/AllenInstitute/AllenSDK/issues/549 Transforms for tissuecyte registration accessible from allensdk
