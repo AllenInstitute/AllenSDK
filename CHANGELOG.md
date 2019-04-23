@@ -7,6 +7,9 @@ All notable changes to this project will be documented in this file.
  - https://github.com/AllenInstitute/AllenSDK/issues/549 Transforms for tissuecyte registration accessible from allensdk
  - https://github.com/AllenInstitute/AllenSDK/pull/568 Release instructions for future maintainers.
 
+### Changed
+ - https://github.com/AllenInstitute/AllenSDK/issues/582 Documentation builds from a yml config in python 3.7
+
 ### Bug Fixes
  - https://github.com/AllenInstitute/AllenSDK/issues/523 pip no longer fails on new conda environment because of tables
 
