@@ -90,30 +90,21 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
-What's New - Release 0.16.1 (March 12th, 2019)
+What's New - Release 0.16.2 (April 23, 2019)
 -----------------------------------------------
 
-The 0.16.1 release fixes several user-discovered bugs, and updates the versons of several dependencies:
+The 0.16.2 release stabilizes the dependency issues introduced by tables 
 
-    * `#207 <https://github.com/AllenInstitute/AllenSDK/issues/207>`_ Fix two missing ephys features (tau and max_euclidean_distance)
-    * `#256 <https://github.com/AllenInstitute/AllenSDK/issues/256>`_ Making sure our examples are python3 compatible
-    * `#267 <https://github.com/AllenInstitute/AllenSDK/issues/267>`_ Fix a bug in get_cell_specimens filter argument
-    * `#295 <https://github.com/AllenInstitute/AllenSDK/issues/295>`_ BiophysicalApi.get_neuronal_models doesn't find perisomatic models
-    * `#426 <https://github.com/AllenInstitute/AllenSDK/issues/426>`_ numpy and pytables versions pinned until pytables 3.5 can be pip installed
+    * `#523 <https://github.com/AllenInstitute/AllenSDK/issues/523>`_ pip no longer fails on new conda environment because of tables
 
-Additionally, serveral dependencies were upgraded to resolve installation issues:
+We also now provide access support for the deformable and affine transformations computed by the TissueCyte registration code:
 
-    * numpy==1.15.4
-    * numpy==3.4.4
-    * pytest>=4.1.1
-    * pip install Pillow (Needed in CI infrastructure)
-    * For python 2.7 conda install -c conda-forge scikit-image (Needed in CI infrastructure)
-
-We also removed deprecated functionality in BrainObservatoryNwbDataSet, `and wrote some additional tools for working with itksnap label descriptions <https://github.com/AllenInstitute/AllenSDK/issues/312>`_.
+    * `#549 <https://github.com/AllenInstitute/AllenSDK/issues/549>`_ Transforms for tissuecyte registration accessible from allensdk
 
 Previous Release Notes
 ----------------------
 
+    * `0.16.1 <https://github.com/AllenInstitute/AllenSDK/wiki/Release-Notes-(0.16.1)>`_
     * `0.16.0 <https://github.com/AllenInstitute/AllenSDK/wiki/Release-Notes-(0.16.0)>`_
     * `0.14.5 <https://github.com/AllenInstitute/AllenSDK/wiki/Release-Notes-(0.14.5)>`_
     * `0.14.4 <https://github.com/AllenInstitute/AllenSDK/wiki/Release-Notes-(0.14.4)>`_

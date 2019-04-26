@@ -34,6 +34,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 
+from allensdk.api.cache import cacheable
 from allensdk.deprecated import deprecated
 from .rma_api import RmaApi
 
@@ -172,3 +173,80 @@ class GridDataApi(RmaApi):
             save_file_path = str(section_data_set_id) + '.nrrd'
 
         self.retrieve_file_over_http(url, save_file_path)
+
+
+    def download_deformation_field(self, 
+        section_data_set_id, 
+        header_path=None,
+        voxel_path=None,
+        voxel_type='DeformationFieldVoxels', 
+        header_type='DeformationFieldHeader'
+    ):
+        ''' Download the local alignment parameters for this dataset. This a 3D vector image (3 components) describing 
+        a deformable local mapping from CCF voxels to this section data set's affine-aligned image stack.
+
+        Parameters
+        ----------
+            section_data_set_id : int
+                Download the deformation field for this data set
+            header_path : str, optional
+                If supplied, the deformation field header will be downloaded to this path.
+            voxel_path : str, optiona
+                If supplied, the deformation field voxels will be downloaded to this path.
+            voxel_type : str
+                WellKnownFileType of this dataset's data file
+            header_type : str
+                WellKnownFileType of this dataset's header file
+        '''
+
+        header_path = '{}_dfmfld.mhd'.format(section_data_set_id) if header_path is None else header_path
+        voxel_path = '{}_dfmfld.raw'.format(section_data_set_id) if voxel_path is None else voxel_path
+
+        well_known_files = self.model_query(
+            model='WellKnownFile',
+            filters={'attachable_id': section_data_set_id},
+            criteria='well_known_file_type[name$in\'DeformationFieldHeader\',\'DeformationFieldVoxels\']',
+            include='well_known_file_type'
+        )
+
+        well_known_file_urls = {
+            wkf['well_known_file_type']['name']: 
+            self.construct_well_known_file_download_url(wkf['id']) for wkf in well_known_files
+        }
+        
+        self.retrieve_file_over_http(well_known_file_urls[header_type], header_path)
+        self.retrieve_file_over_http(well_known_file_urls[voxel_type], voxel_path)
+
+
+    @cacheable()
+    def download_alignment3d(self, section_data_set_id, num_rows='all', count=False, **kwargs):
+        ''' Download the parameters of the 3D affine tranformation mapping this section data set's image-space stack to 
+        CCF-space (or vice-versa).
+
+        Parameters
+        ----------
+        section_data_set_id : int
+            download the parameters for this data set.
+ 
+        Returns
+        -------
+        dict :
+            parameters of this section data set's alignment3d
+        '''
+
+        results = self.model_query(
+            model='SectionDataSet',
+            filters={'id': section_data_set_id},
+            include='alignment3d',
+            num_rows=num_rows,
+            count=count,
+            **kwargs
+        )
+
+        results = [result for result in results if 'alignment3d' in result]
+        if len(results) == 0:
+            raise ValueError('no SectionDataSet with attached alignment3d found for id {}'.format(section_data_set_id))
+        elif len(results) > 1:
+            raise ValueError('found multiple SectionDataSets with attached alignment3ds for id {}: {}'.format(section_data_set_id, results))
+
+        return results[0]['alignment3d']
