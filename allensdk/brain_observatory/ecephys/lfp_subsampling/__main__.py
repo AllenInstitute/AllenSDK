@@ -38,7 +38,7 @@ import logging
 
 from ._schemas import InputParameters, OutputParameters
 from allensdk.brain_observatory.ecephys.file_io.continuous_file import ContinuousFile
-from allensdk.brain_observatory.ecephys.argschema_parser_plus import ArgSchemaParserPlus
+from allensdk.brain_observatory.argschema_utilities import ArgSchemaParserPlus
 from .subsampling import select_channels, subsample_timestamps, subsample_lfp, remove_lfp_offset, remove_lfp_noise
 
 
@@ -73,7 +73,7 @@ def subsample(args):
                                                             params['start_channel_offset'],
                                                             params['channel_stride'],
                                                             lfp_channel_order,
-                                                            probe['noisy_channels'],
+                                                            probe.get('noisy_channels', []),
                                                             params['remove_noisy_channels'],
                                                             probe['reference_channels'],
                                                             params['remove_reference_channels'])

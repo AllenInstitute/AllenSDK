@@ -1,89 +1,163 @@
 import numpy as np
 import pandas as pd
-from pandas.util.testing import assert_frame_equal
+import math
 from typing import NamedTuple
+import os
 
 from allensdk.core.lazy_property import LazyProperty, LazyPropertyMixin
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
+from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import equals
+
 
 class BehaviorOphysSession(LazyPropertyMixin):
+    """Represents data from a single Visual Behavior Ophys imaging session.  LazyProperty attributes access the data only on the first demand, and then memoize the result for reuse.
+    
+    Attributes:
+        ophys_experiment_id : int (LazyProperty)
+            Unique identifier for this experimental session
+        segmentation_mask_image : SimpleITK.Image (LazyProperty)
+            2D image of the segmented regions-of-interest in the field of view
+        stimulus_timestamps : numpy.ndarray (LazyProperty)
+            Timestamps associated the stimulus presentations on the monitor 
+        ophys_timestamps : numpy.ndarray (LazyProperty)
+            Timestamps associated with frames captured by the microscope
+        metadata : dict (LazyProperty)
+            A dictionary of session-specific metadata
+        dff_traces : pandas.DataFrame (LazyProperty)
+            The traces of dff organized into a dataframe; index is the cell roi ids
+        cell_specimen_table : pandas.DataFrame (LazyProperty)
+            Cell roi information organized into a dataframe; index is the cell roi ids
+        running_speed : allensdk.brain_observatory.running_speed.RunningSpeed (LazyProperty)
+            NamedTuple with two fields
+                timestamps : numpy.ndarray
+                    Timestamps of running speed data samples
+                values : np.ndarray
+                    Running speed of the experimental subject (in cm / s).
+        running_data_df : pandas.DataFrame (LazyProperty)
+            Dataframe containing various signals used to compute running speed
+        stimulus_presentations : pandas.DataFrame (LazyProperty)
+            Table whose rows are stimulus presentations (i.e. a given image, for a given duration, typically 250 ms) and whose columns are presentation characteristics.
+        stimulus_templates : dict (LazyProperty)
+            A dictionary containing the stimulus images presented during the session keys are data set names, and values are 3D numpy arrays.
+        licks : pandas.DataFrame (LazyProperty)
+            A dataframe containing lick timestamps
+        rewards : pandas.DataFrame (LazyProperty)
+            A dataframe containing timestamps of delivered rewards
+        task_parameters : dict (LazyProperty)
+            A dictionary containing parameters used to define the task runtime behavior
+        trials : pandas.DataFrame (LazyProperty)
+            A dataframe containing behavioral trial start/stop times, and trial data
+        corrected_fluorescence_traces : pandas.DataFrame (LazyProperty)
+            The motion-corrected fluorescence traces organized into a dataframe; index is the cell roi ids
+        average_image : SimpleITK.Image (LazyProperty)
+            2D image of the microscope field of view, averaged across the experiment
+        motion_correction : pandas.DataFrame LazyProperty
+            A dataframe containing trace data used during motion correction computation
+    """
 
-    def __init__(self, ophys_experiment_id, api=None, use_acq_trigger=False):
+    @classmethod
+    def from_LIMS(cls, ophys_experiment_id):
+        return cls(api=BehaviorOphysLimsApi(ophys_experiment_id))
 
-        self.ophys_experiment_id = ophys_experiment_id
-        self.api = BehaviorOphysLimsApi() if api is None else api
-        self.use_acq_trigger = use_acq_trigger
+    def __init__(self, api=None):
 
-        self.max_projection = LazyProperty(self.api.get_max_projection, ophys_experiment_id=self.ophys_experiment_id)
-        self.stimulus_timestamps = LazyProperty(self.api.get_stimulus_timestamps, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
-        self.ophys_timestamps = LazyProperty(self.api.get_ophys_timestamps, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
-        self.metadata = LazyProperty(self.api.get_metadata, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
-        self.dff_traces = LazyProperty(self.api.get_dff_traces, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
-        self.roi_metrics = LazyProperty(self.api.get_roi_metrics, ophys_experiment_id=self.ophys_experiment_id)
-        self.cell_roi_ids = LazyProperty(self.api.get_cell_roi_ids, ophys_experiment_id=self.ophys_experiment_id)
-        self.running_speed = LazyProperty(self.api.get_running_speed, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
-        self.stimulus_table = LazyProperty(self.api.get_stimulus_table, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
-        self.stimulus_template = LazyProperty(self.api.get_stimulus_template, ophys_experiment_id=self.ophys_experiment_id)
-        self.stimulus_metadata = LazyProperty(self.api.get_stimulus_metadata, ophys_experiment_id=self.ophys_experiment_id)
-        self.licks = LazyProperty(self.api.get_licks, ophys_experiment_id=self.ophys_experiment_id)
-        self.rewards = LazyProperty(self.api.get_rewards, ophys_experiment_id=self.ophys_experiment_id)
-        self.task_parameters = LazyProperty(self.api.get_task_parameters, ophys_experiment_id=self.ophys_experiment_id)
-        self.trials = LazyProperty(self.api.get_trials, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
-        self.corrected_fluorescence_traces = LazyProperty(self.api.get_corrected_fluorescence_traces, ophys_experiment_id=self.ophys_experiment_id, use_acq_trigger=self.use_acq_trigger)
-        self.average_image = LazyProperty(self.api.get_average_image, ophys_experiment_id=self.ophys_experiment_id)
-        self.motion_correction = LazyProperty(self.api.get_motion_correction, ophys_experiment_id=self.ophys_experiment_id)
+        self.api = api
 
-    def __eq__(self, other):
-
-        field_set = set()
-        for key, val in self.__dict__.items():
-            if isinstance(val, LazyProperty):
-                field_set.add(key)
-        for key, val in other.__dict__.items():
-            if isinstance(val, LazyProperty):
-                field_set.add(key)
-
-        try:
-            for field in field_set:
-                x1, x2 = getattr(self, field), getattr(other, field)
-                if isinstance(x1, pd.DataFrame):
-                    assert_frame_equal(x1, x2)
-                elif isinstance(x1, np.ndarray):
-                    np.testing.assert_array_almost_equal(x1, x2)
-                elif isinstance(x1, (dict, list)):
-                    assert x1 == x2
-                else:
-                    assert x1 == x2
-
-        except NotImplementedError as e:
-            self_implements_get_field = hasattr(self.api, getattr(type(self), field).getter_name)
-            other_implements_get_field = hasattr(other.api, getattr(type(other), field).getter_name)
-            assert self_implements_get_field == other_implements_get_field == False
-
-        except (AssertionError, AttributeError) as e:
-            return False
-
-        return True
+        self.ophys_experiment_id = LazyProperty(self.api.get_ophys_experiment_id)
+        self.segmentation_mask_image = LazyProperty(self.api.get_segmentation_mask_image)
+        self.stimulus_timestamps = LazyProperty(self.api.get_stimulus_timestamps)
+        self.ophys_timestamps = LazyProperty(self.api.get_ophys_timestamps)
+        self.metadata = LazyProperty(self.api.get_metadata)
+        self.dff_traces = LazyProperty(self.api.get_dff_traces)
+        self.cell_specimen_table = LazyProperty(self.api.get_cell_specimen_table)
+        self.running_speed = LazyProperty(self.api.get_running_speed)
+        self.running_data_df = LazyProperty(self.api.get_running_data_df)
+        self.stimulus_presentations = LazyProperty(self.api.get_stimulus_presentations)
+        self.stimulus_templates = LazyProperty(self.api.get_stimulus_templates)
+        self.licks = LazyProperty(self.api.get_licks)
+        self.rewards = LazyProperty(self.api.get_rewards)
+        self.task_parameters = LazyProperty(self.api.get_task_parameters)
+        self.trials = LazyProperty(self.api.get_trials)
+        self.corrected_fluorescence_traces = LazyProperty(self.api.get_corrected_fluorescence_traces)
+        self.average_image = LazyProperty(self.api.get_average_image)
+        self.motion_correction = LazyProperty(self.api.get_motion_correction)
 
 
 if __name__ == "__main__":
 
-    session = BehaviorOphysSession(789359614)
-    print(session.max_projection)
-    print(session.stimulus_timestamps)
-    print(session.ophys_timestamps)
-    print(session.metadata)
-    print(session.dff_traces)
-    print(session.roi_metrics)
-    print(session.cell_roi_ids)
-    print(session.running_speed)
-    print(session.stimulus_table)
-    print(session.stimulus_template)
-    print(session.stimulus_metadata)
-    print(session.licks)
-    print(session.rewards)
-    print(session.task_parameters)
-    print(session.trials)
-    print(session.corrected_fluorescence_traces)
-    print(session.average_image)
-    print(session.motion_correction)
+    # from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi
+
+    # blacklist = [797257159, 796306435, 791453299, 809191721, 796308505, 798404219] #
+    # api_list = []
+    # df = BehaviorOphysLimsApi.get_ophys_experiment_df()
+    # for cid in [791352433, 814796698, 814796612, 814796558, 814797528]:
+    #     df2 = df[(df['container_id'] == cid) & (df['workflow_state'] == 'passed')]
+    #     api_list += [BehaviorOphysLimsApi(oeid) for oeid in df2['ophys_experiment_id'].values if oeid not in blacklist]
+
+    # for api in api_list:
+
+    #     session = BehaviorOphysSession(api=api)
+    #     if len(session.licks) > 100:
+
+    #         print(api.get_ophys_experiment_id())
+
+        # session.segmentation_mask_image
+        # session.stimulus_timestamps
+        # session.ophys_timestamps
+        # session.metadata
+        # session.dff_traces
+        # session.cell_specimen_table
+        # session.running_speed
+        # session.running_data_df
+
+        # print(api.get_ophys_experiment_id(), len(session.licks), session.metadata['experiment_datetime'])
+        # session.rewards
+        # session.task_parameters
+        # session.trials
+        # session.corrected_fluorescence_traces
+        # session.average_image
+        # session.motion_correction
+
+            # nwb_filepath = '/allen/aibs/technology/nicholasc/tmp/behavior_ophys_session_{get_ophys_experiment_id}.nwb'.format(get_ophys_experiment_id=api.get_ophys_experiment_id())
+            # BehaviorOphysNwbApi(nwb_filepath).save(session)
+            # assert equals(session, BehaviorOphysSession(api=BehaviorOphysNwbApi(nwb_filepath)))
+
+
+
+
+        # print(session.running_speed)
+
+
+    # nwb_filepath = '/home/nicholasc/projects/allensdk/tmp.nwb'
+    # session = BehaviorOphysSession(789359614)
+    # nwb_api = BehaviorOphysNwbApi(nwb_filepath)
+    # nwb_api.save(session)
+
+    # print(session.cell_specimen_table)
+
+
+    # api_2 = BehaviorOphysNwbApi(nwb_filepath)
+    # session2 = BehaviorOphysSession(789359614, api=api_2)
+    
+    # assert session == session2
+
+    session = BehaviorOphysSession.from_LIMS(789359614)
+    # session.segmentation_mask_image
+    # session.stimulus_timestamps
+    # session.ophys_timestamps
+    # session.metadata
+    # session.dff_traces
+    # session.cell_specimen_table
+    # running_speed
+    # print(session.stimulus_index)
+    # session.running_data_df
+    print(session.stimulus_presentations)
+    # session.stimulus_templates
+    # session.stimulus_index
+    # session.licks
+    # session.rewards
+    # session.task_parameters
+    # session.trials
+    # session.corrected_fluorescence_traces
+    # session.average_image
+    # session.motion_correction

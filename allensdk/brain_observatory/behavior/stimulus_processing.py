@@ -1,41 +1,56 @@
 import numpy as np
 import pandas as pd
-from six import iteritems, PY3
 import pickle
+from allensdk.brain_observatory.behavior import IMAGE_SETS
+import os
 
-if PY3:
+IMAGE_SETS_REV = {val: key for key, val in IMAGE_SETS.items()}
 
-    def load_pickle(pstream):
+def convert_filepath_caseinsensitive(filename_in):
 
-        return pickle.load(pstream, encoding="bytes")
-else:
-    FileNotFoundError = IOError
+    if filename_in == '//allen/programs/braintv/workgroups/nc-ophys/Doug/Stimulus_Code/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_6_2017.07.14.pkl':
+        return '//allen/programs/braintv/workgroups/nc-ophys/Doug/Stimulus_Code/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_6_2017.07.14.pkl'
+    elif filename_in == '//allen/programs/braintv/workgroups/nc-ophys/Doug/Stimulus_Code/image_dictionaries/Natural_Images_Lum_Matched_set_training_2017.07.14.pkl':
+        return '//allen/programs/braintv/workgroups/nc-ophys/Doug/Stimulus_Code/image_dictionaries/Natural_Images_Lum_Matched_set_training_2017.07.14.pkl'
+    elif filename_in == '//allen/programs/braintv/workgroups/nc-ophys/Doug/Stimulus_Code/image_dictionaries/Natural_Images_Lum_Matched_set_TRAINING_2017.07.14.pkl':
+        return '//allen/programs/braintv/workgroups/nc-ophys/Doug/Stimulus_Code/image_dictionaries/Natural_Images_Lum_Matched_set_training_2017.07.14.pkl'
+    elif filename_in == '//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_training_2017.07.14.pkl':
+        return '//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_training_2017.07.14.pkl'
+    elif filename_in == '//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_6_2017.07.14.pkl':
+        return '//allen/programs/braintv/workgroups/nc-ophys/visual_behavior/image_dictionaries/Natural_Images_Lum_Matched_set_ophys_6_2017.07.14.pkl'
+    else:
+        raise NotImplementedError(filename_in)
 
-    def load_pickle(pstream):
 
-        return pickle.load(pstream)
+def load_pickle(pstream):
+    return pickle.load(pstream, encoding="bytes")
 
 
-def get_stimtable(data, stimulus_timestamps):
+def get_stimulus_presentations(data, stimulus_timestamps):
 
     visual_stimuli = get_visual_stimuli_df(data, stimulus_timestamps)
     stimulus_table = visual_stimuli[:-10]  # ignore last 10 flashes
     # workaround to rename columns to harmonize with visual coding and rebase timestamps to sync time
     stimulus_table.insert(loc=0, column='flash_number', value=np.arange(0, len(stimulus_table)))
-    stimulus_table = stimulus_table.rename(columns={'frame': 'start_frame', 'time': 'start_time'})
+    stimulus_table = stimulus_table.rename(columns={'frame': 'start_frame', 'time': 'start_time', 'flash_number':'stimulus_presentations_id'})
     stimulus_table.start_time = [stimulus_timestamps[start_frame] for start_frame in stimulus_table.start_frame.values]
     end_time = [stimulus_timestamps[end_frame] for end_frame in stimulus_table.end_frame.values]
-    stimulus_table.insert(loc=4, column='end_time', value=end_time)
+    stimulus_table.insert(loc=4, column='stop_time', value=end_time)
+    stimulus_table.set_index('stimulus_presentations_id', inplace=True)
+    stimulus_table = stimulus_table[sorted(stimulus_table.columns)]
 
     return stimulus_table
-    
+
 
 def get_images_dict(pkl):
 
     # Sometimes the source is a zipped pickle:
-    metadata = {'image_set':pkl["items"]["behavior"]["stimuli"]["images"]["image_path"]}
-    
-    image_set = load_pickle(open(metadata['image_set'], 'rb'))
+    metadata = {'image_set': pkl["items"]["behavior"]["stimuli"]["images"]["image_path"]}
+
+    # Get image file name; these are encoded case-insensitive in the pickle file :/
+    filename = convert_filepath_caseinsensitive(metadata['image_set'])
+
+    image_set = load_pickle(open(filename, 'rb'))
     images = []
     images_meta = []
 
@@ -62,19 +77,25 @@ def get_images_dict(pkl):
     return images_dict
 
 
-def get_stimulus_template(pkl):
+def get_stimulus_templates(pkl):
 
     images = get_images_dict(pkl)
-    return np.array(images['images'])
+    image_set_filename = convert_filepath_caseinsensitive(images['metadata']['image_set'])
+    return {IMAGE_SETS_REV[image_set_filename]: np.array(images['images'])}
 
 
 def get_stimulus_metadata(pkl):
 
     images = get_images_dict(pkl)
-    return pd.DataFrame(images['image_attributes'])
+    stimulus_index_df = pd.DataFrame(images['image_attributes'])
+    image_set_filename = convert_filepath_caseinsensitive(images['metadata']['image_set'])
+    stimulus_index_df['image_set'] = IMAGE_SETS_REV[image_set_filename]
+    stimulus_index_df.set_index(['image_index'], inplace=True, drop=True)
+    return stimulus_index_df
+
 
 def _resolve_image_category(change_log, frame):
-    
+
     for change in (unpack_change_log(c) for c in change_log):
         if frame < change['frame']:
             return change['from_category']
@@ -128,7 +149,7 @@ def get_visual_stimuli_df(data, time):
     stimuli = data['items']['behavior']['stimuli']
     n_frames = len(time)
     visual_stimuli_data = []
-    for stimuli_group_name, stim_dict in iteritems(stimuli):
+    for stimuli_group_name, stim_dict in stimuli.items():
         for idx, (attr_name, attr_value, _time, frame, ) in \
                 enumerate(stim_dict["set_log"]):
             orientation = attr_value if attr_name.lower() == "ori" else np.nan

@@ -359,7 +359,7 @@ class LocallySparseNoise(StimulusAnalysis):
                                                                             mask_off_screen=False)
 
         baseline_trials = np.unique(np.where(lsn_movie[:,-5:,-1] != LocallySparseNoise.LSN_GREY)[0])
-        baseline_df = self.mean_sweep_response.ix[baseline_trials]
+        baseline_df = self.mean_sweep_response.loc[baseline_trials]
         cell_baselines = np.nanmean(baseline_df.values, axis=0)
 
         lsn_movie[:,~lsn_mask] = LocallySparseNoise.LSN_OFF_SCREEN
