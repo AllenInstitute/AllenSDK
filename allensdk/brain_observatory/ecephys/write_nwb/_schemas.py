@@ -29,6 +29,13 @@ class Unit(RaisingSchema):
     isi_violations = Float(required=True)
 
 
+class Lfp(RaisingSchema):
+    input_data_path = String(required=True, validate=check_read_access)
+    input_timestamps_path = String(required=True, validate=check_read_access)
+    input_channels_path = String(required=True, validate=check_read_access)
+    output_path = String(required=True)
+
+
 class Probe(RaisingSchema):
     id = Int(required=True)
     name = String(required=True)
@@ -37,6 +44,7 @@ class Probe(RaisingSchema):
     mean_waveforms_path = String(required=True, validate=check_read_access)
     channels = Nested(Channel, many=True, required=True)
     units = Nested(Unit, many=True, required=True)
+    lfp = Nested(Lfp, many=False, required=True)
 
 
 class InputSchema(ArgSchema):

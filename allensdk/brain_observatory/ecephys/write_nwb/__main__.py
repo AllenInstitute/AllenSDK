@@ -10,6 +10,7 @@ import pynwb
 import requests
 import pandas as pd
 import numpy as np
+from hdmf.backends.hdf5.h5_utils import H5DataIO
 
 from allensdk.config.manifest import Manifest
 from allensdk.brain_observatory.running_speed import RunningSpeed
@@ -18,6 +19,7 @@ from ._schemas import InputSchema, OutputSchema
 from allensdk.brain_observatory.nwb import add_running_speed_to_nwbfile, add_stimulus_presentations, add_stimulus_timestamps
 from allensdk.brain_observatory.argschema_utilities import write_or_print_outputs
 from allensdk.brain_observatory import dict_to_indexed_array
+from allensdk.brain_observatory.ecephys.file_io.continuous_file import ContinuousFile
 
 
 STIM_TABLE_RENAMES_MAP = {
@@ -299,6 +301,77 @@ def add_ragged_data_to_dynamic_table(table, data, column_name, column_descriptio
     table.add_column(name=column_name, description=column_description, data=values, index=idx)
 
 
+def write_probe_lfp_data_file(
+    probe_id: int,
+    session_start_time: datetime,
+    lfp_data_path: str,
+    lfp_timestamps_path: str,
+    lfp_channels_path: str,
+    output_path: str
+) -> str:
+    '''Write an NWB file containging only a single probe's LFP data, intended for linking from another file.
+    '''
+
+    nwbfile = pynwb.NWBFile(
+        session_description='EcephysProbe',
+        identifier=f'{probe_id}',
+        session_start_time=session_start_time
+    )    
+
+    lfp_channels = np.load(lfp_channels_path, allow_pickle=False)
+    lfp_data, lfp_timestamps = ContinuousFile(
+        data_path=lfp_data_path,
+        timestamps_path=lfp_timestamps_path,
+        total_num_channels=lfp_channels.size
+    ).load(memmap=False)
+    
+
+    nwbfile.add_acquisition(pynwb.base.TimeSeries(
+        name='subsampled_lfp_data',
+        data=H5DataIO(data=lfp_data, compression='gzip', compression_opts=9),
+        timestamps=H5DataIO(data=lfp_timestamps, compression='gzip', compression_opts=9)
+    ))
+
+    with pynwb.NWBHDF5IO(output_path, 'w') as lfp_nwbfile:
+        lfp_nwbfile.write(nwbfile)
+
+    return output_path
+
+
+def add_link_lfp_to_nwbfile(
+    nwbfile: pynwb.NWBFile, data_file_io: pynwb.NWBHDF5IO, probe_id: int, electrode_table_indices
+) -> pynwb.NWBFile:
+    ''' Add lfp data to an nwbfile, linking the data and timestamps to the contents of another file.
+
+    Parameters
+    ----------
+    nwbfile : 
+    data_file_io : 
+    probe_id : 
+
+    Returns
+    -------
+    pynwb.NWBFile : 
+
+
+    '''
+
+    electrode_table_region = nwbfile.create_electrode_table_region(
+        region=electrode_table_indices,
+        name='electrodes',
+        description=f'channels on probe {probe_id}'
+    )
+
+    data_nwbfile = data_file_io.read()
+    nwbfile.add_acquisition(pynwb.ecephys.ElectricalSeries(
+        name=f'probe_{probe_id}_lfp',
+        data=H5DataIO(data=data_nwbfile.get_acquisition('subsampled_lfp_data').data, link_data=True),
+        timestamps=H5DataIO(data=data_nwbfile.get_acquisition('subsampled_lfp_data').timestamps, link_data=True),
+        electrodes=electrode_table_region
+    ))
+    return nwbfile
+
+
 def write_ecephys_nwb(
     output_path, 
     session_id, session_start_time, 
@@ -323,6 +396,8 @@ def write_ecephys_nwb(
     spike_times = {}
     mean_waveforms = {}
 
+    probe_lfp_file_map = {}
+
     for probe in probes:
         logging.info(f'found probe {probe["id"]} with name {probe["name"]}')
 
@@ -339,7 +414,18 @@ def write_ecephys_nwb(
             probe['mean_waveforms_path'], local_to_global_unit_map
         ))
 
-    nwbfile.electrodes = pynwb.file.ElectrodeTable().from_dataframe(pd.concat(channel_tables).fillna(''), name='electrodes')
+        probe_lfp_file_map[probe['id']] = probe['lfp']['output_path']
+        # probe_lfp_file_map[probe['id']] = write_probe_lfp_data_file(
+        #     probe_id=probe['id'], 
+        #     session_start_time=session_start_time, 
+        #     lfp_data_path=probe['lfp']['input_data_path'],
+        #     lfp_timestamps_path=probe['lfp']['input_timestamps_path'],
+        #     lfp_channels_path=probe['lfp']['input_channels_path'],
+        #     output_path=probe['lfp']['output_path']
+        # )
+
+    electrodes_table = pd.concat(channel_tables).fillna('')
+    nwbfile.electrodes = pynwb.file.ElectrodeTable().from_dataframe(electrodes_table, name='electrodes')
     units_table = pd.concat(unit_tables).set_index(keys='id', drop=True)
     nwbfile.units = pynwb.misc.Units.from_dataframe(units_table.fillna(''), name='units')
 
@@ -361,10 +447,24 @@ def write_ecephys_nwb(
     add_running_speed_to_nwbfile(nwbfile, running_speed)
     del running_speed
 
+    channel_index_map = {
+        (row['probe_id'], row['local_index']): ii
+        for ii, (idx, row) in enumerate(electrodes_table.iterrows())
+    }
+    probe_lfp_ios = {pid: pynwb.NWBHDF5IO(pth, 'r') for pid, pth in probe_lfp_file_map.items()}
+    for probe in probes:
+        probe_lfp_io = probe_lfp_ios[probe['id']]
+        ch_local_indices = np.load(probe['lfp']['input_channels_path'], allow_pickle=False)
+        et_indices = tuple([channel_index_map[(probe['id'], ch_local_index)] for ch_local_index in ch_local_indices])
+        add_link_lfp_to_nwbfile(nwbfile, probe_lfp_io, probe['id'], et_indices)
+
     Manifest.safe_make_parent_dirs(output_path)
     io = pynwb.NWBHDF5IO(output_path, mode='w')
     io.write(nwbfile)
     io.close()
+
+    for probe_lfp_io in probe_lfp_ios.values():
+        probe_lfp_io.close()
 
     return {'nwb_path': output_path}
 
