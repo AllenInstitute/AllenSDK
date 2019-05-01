@@ -4,7 +4,7 @@ from typing import Dict, Union, List
 import pandas as pd
 import numpy as np
 import pynwb
-import xarray
+import xarray as xr
 
 from .ecephys_session_api import EcephysSessionApi
 from allensdk.brain_observatory.nwb.nwb_api import NwbApi
@@ -40,8 +40,27 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
 
         return units_table
 
-    # def get_lfp(self, probe_id: int) -> xr.DataArray:
-        
+    def get_lfp(self, probe_id: int, close: bool=True) -> xr.DataArray:
+        lfp = self.nwbfile.get_acquisition(f'probe_{probe_id}_lfp')
+        series = lfp.get_electrical_series(f'probe_{probe_id}_lfp_data')
+
+        electrodes = pd.DataFrame(
+            data=[ecr for ecr in series.electrodes], 
+            columns=['id'] + list(series.electrodes.table.colnames)
+        )
+
+        data = series.data[:]
+        timestamps = series.timestamps[:]
+
+        if close:
+            series.data.file.close()
+            series.timestamps.file.close()
+
+        return xr.DataArray(
+            data=data,
+            dims=['time', 'channel'],
+            coords=[timestamps, electrodes['id'].values]
+        )
 
     def get_ecephys_session_id(self) -> int:
         return int(self.nwbfile.identifier)
