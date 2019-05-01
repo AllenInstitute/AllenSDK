@@ -22,6 +22,7 @@ def units_table():
         'isi_violations': [34, 39, 22]
     }, index=pd.Index([11, 22, 33], name='id')), name='units')
 
+
 @pytest.fixture
 def spike_times():
     return {
@@ -29,7 +30,6 @@ def spike_times():
         22: [],
         33: [13, 4, 12]
     }
-
 
 
 def test_roundtrip_metadata(roundtripper):
@@ -186,3 +186,41 @@ def test_read_waveforms_to_dictionary(tmpdir_factory):
     obtained = write_nwb.read_waveforms_to_dictionary(waveforms_path, local_to_global_unit_map)
     for ii in range(nunits):
         assert np.allclose(mean_waveforms[ii, :, :], obtained[-ii])
+
+
+def test_write_probe_lfp_data_file(tmpdir_factory):
+
+    tmpdir = str(tmpdir_factory.mktemp('ecephys_test_write_probe_lfp_data_file'))
+
+    pid = 12345
+    session_start_time = datetime.now()
+    lfp_data_path = os.path.join(tmpdir, 'lfp_data.dat')
+    lfp_timestamps_path = os.path.join(tmpdir, 'lfp_timestamps.npy')
+    lfp_channels_path = os.path.join(tmpdir, 'lfp_channels.npy')
+    output_path = os.path.join(tmpdir, f'probe_{pid}_lfp.nwb')
+
+    total_timestamps = 12
+    subsample_channels = np.array([2, 3, 5, 8])
+
+    lfp_data = np.random.randint(-500, 500, size=(total_timestamps, len(subsample_channels)), dtype=np.int16)
+    lfp_timestamps = np.linspace(0, 1, total_timestamps)
+
+    with open(lfp_data_path, 'wb') as lfp_data_file:
+        lfp_data_file.write(lfp_data.flatten().tobytes())
+    np.save(lfp_channels_path, subsample_channels)
+    np.save(lfp_timestamps_path, lfp_timestamps)
+
+    write_nwb.write_probe_lfp_data_file(
+        probe_id=pid, 
+        session_start_time=session_start_time, 
+        lfp_data_path=lfp_data_path, 
+        lfp_timestamps_path=lfp_timestamps_path, 
+        lfp_channels_path=lfp_channels_path,
+        output_path=output_path
+    )
+
+    with pynwb.NWBHDF5IO(output_path, 'r') as obt_io:
+        obt_file = obt_io.read()
+        obt = obt_file.get_acquisition('subsampled_lfp_data')
+        assert np.allclose(lfp_data, obt.data[:])
+        assert np.allclose(lfp_timestamps, obt.timestamps[:])

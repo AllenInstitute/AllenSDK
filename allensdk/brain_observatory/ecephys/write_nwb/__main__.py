@@ -459,7 +459,6 @@ def write_ecephys_nwb(
     probe_lfp_ios = {pid: pynwb.NWBHDF5IO(pth, 'r') for pid, pth in probe_lfp_file_map.items()}
     probe_outputs = []
 
-
     for probe in probes:
         probe_lfp_io = probe_lfp_ios[probe['id']]
         ch_local_indices = np.load(probe['lfp']['input_channels_path'], allow_pickle=False)
