@@ -1,6 +1,7 @@
 import pytest
 import pandas as pd
 import numpy as np
+import xarray as xr
 
 from allensdk.brain_observatory.ecephys.ecephys_session_api import EcephysSessionApi
 from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
@@ -78,11 +79,33 @@ def raw_probes():
 
 
 @pytest.fixture
+def raw_lfp():
+    return {
+        0: xr.DataArray(
+            data=np.array([[1, 2, 3], [4, 5, 6]]),
+            dims=['channel', 'time'],
+            coords=[[2, 1], np.linspace(0, 1, 3)]
+        )
+    }
+
+@pytest.fixture
 def just_stimulus_table_api(raw_stimulus_table):
     class EcephysJustStimulusTableApi(EcephysSessionApi):
         def get_stimulus_presentations(self):
             return raw_stimulus_table
     return EcephysJustStimulusTableApi()
+
+
+@pytest.fixture
+def channels_table_api(raw_channels, raw_probes, raw_lfp):
+    class EcephysChannelsTableApi(EcephysApi):
+        def get_channels(self):
+            return raw_channels
+        def get_probes(self):
+            return raw_probes
+        def get_lfp(self, pid):
+            return raw_lfp[pid]
+    return EcephysChannelsTableApi()
 
 
 @pytest.fixture
@@ -329,3 +352,15 @@ def test_get_inter_presentation_intervals_for_stimulus(just_stimulus_table_api):
     )
 
     pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)
+
+def test_get_lfp(channels_table_api):
+    session = EcephysSession(api=channels_table_api)
+    obtained = session.get_lfp(0)
+
+    expected = xr.DataArray(
+        data=np.array([[1, 2, 3], [4, 5, 6]]),
+        dims=['channel', 'time'],
+        coords=[[2, 1], np.linspace(0, 1, 3)]
+    )
+
+    xr.testing.assert_equal(expected, obtained)
