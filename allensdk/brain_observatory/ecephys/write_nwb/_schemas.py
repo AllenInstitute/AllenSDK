@@ -59,5 +59,11 @@ class InputSchema(ArgSchema):
     running_speed = Nested(RunningSpeedPathsSchema, required=True, description='data collected about the running behavior of the experiment\'s subject')
 
 
+class ProbeOutputs(RaisingSchema):
+    nwb_path = String(required=True)
+    id = Int(required=True)
+
+
 class OutputSchema(RaisingSchema):
     nwb_path = String(required=True, description='path to output file')
+    probe_nwb_paths = Nested(ProbeOutputs, required=True)
