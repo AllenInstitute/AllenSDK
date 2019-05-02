@@ -460,12 +460,16 @@ def write_ecephys_nwb(
     probe_outputs = []
 
     for probe in probes:
-        probe_lfp_io = probe_lfp_ios[probe['id']]
+        probe_id = probe['id']
+        logging.info(f'linking lfp file for probe {probe_id}')
+
+        probe_lfp_io = probe_lfp_ios[probe_id]
         ch_local_indices = np.load(probe['lfp']['input_channels_path'], allow_pickle=False)
         et_indices = tuple([channel_index_map[(probe['id'], ch_local_index)] for ch_local_index in ch_local_indices])
+
         add_link_lfp_to_nwbfile(nwbfile, probe_lfp_io, probe['id'], et_indices)
         probe_outputs.append({
-            'id':probe['id'],
+            'id': probe['id'],
             'nwb_path': probe['lfp']['output_path']
         })
 
