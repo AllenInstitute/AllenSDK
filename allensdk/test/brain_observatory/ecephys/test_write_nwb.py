@@ -6,6 +6,7 @@ import pytest
 import pynwb
 import pandas as pd
 import numpy as np
+import xarray as xr
 
 import allensdk.brain_observatory.ecephys.write_nwb.__main__ as write_nwb
 from allensdk.brain_observatory.ecephys.ecephys_session_api import EcephysNwbSessionApi
@@ -188,39 +189,96 @@ def test_read_waveforms_to_dictionary(tmpdir_factory):
         assert np.allclose(mean_waveforms[ii, :, :], obtained[-ii])
 
 
-def test_write_probe_lfp_data_file(tmpdir_factory):
-
-    tmpdir = str(tmpdir_factory.mktemp('ecephys_test_write_probe_lfp_data_file'))
-
-    pid = 12345
-    session_start_time = datetime.now()
-    lfp_data_path = os.path.join(tmpdir, 'lfp_data.dat')
-    lfp_timestamps_path = os.path.join(tmpdir, 'lfp_timestamps.npy')
-    lfp_channels_path = os.path.join(tmpdir, 'lfp_channels.npy')
-    output_path = os.path.join(tmpdir, f'probe_{pid}_lfp.nwb')
-
+@pytest.fixture
+def lfp_data():
     total_timestamps = 12
     subsample_channels = np.array([2, 3, 5, 8])
 
-    lfp_data = np.random.randint(-500, 500, size=(total_timestamps, len(subsample_channels)), dtype=np.int16)
-    lfp_timestamps = np.linspace(0, 1, total_timestamps)
+    return {
+        'data': np.arange(total_timestamps * len(subsample_channels), dtype=np.int16)
+                    .reshape((total_timestamps, len(subsample_channels))),
+        'timestamps': np.linspace(0, 1, total_timestamps),
+        'subsample_channels': subsample_channels
+    }
+
+
+@pytest.fixture
+def linkable_lfp(tmpdir_factory, lfp_data):
+
+    tmpdir = str(tmpdir_factory.mktemp('ecephys_lfp_test'))
+
+    probe_id = 12345
+    session_start_time = datetime.now()
+
+    lfp_data_path = os.path.join(tmpdir, 'lfp_data.dat')
+    lfp_timestamps_path = os.path.join(tmpdir, 'lfp_timestamps.npy')
+    lfp_channels_path = os.path.join(tmpdir, 'lfp_channels.npy')
+
+    output_path = os.path.join(tmpdir, f'probe_{probe_id}_lfp.nwb')
 
     with open(lfp_data_path, 'wb') as lfp_data_file:
-        lfp_data_file.write(lfp_data.flatten().tobytes())
-    np.save(lfp_channels_path, subsample_channels)
-    np.save(lfp_timestamps_path, lfp_timestamps)
+        lfp_data_file.write(lfp_data['data'].flatten().tobytes())
+    np.save(lfp_channels_path, lfp_data['subsample_channels'])
+    np.save(lfp_timestamps_path, lfp_data['timestamps'])
 
-    write_nwb.write_probe_lfp_data_file(
-        probe_id=pid, 
+    return write_nwb.write_probe_lfp_data_file(
+        probe_id=probe_id, 
         session_start_time=session_start_time, 
         lfp_data_path=lfp_data_path, 
         lfp_timestamps_path=lfp_timestamps_path, 
         lfp_channels_path=lfp_channels_path,
         output_path=output_path
-    )
+    ), probe_id
 
-    with pynwb.NWBHDF5IO(output_path, 'r') as obt_io:
+
+def test_write_probe_lfp_data_file(linkable_lfp, lfp_data):
+
+    with pynwb.NWBHDF5IO(linkable_lfp[0], 'r') as obt_io:
         obt_file = obt_io.read()
         obt = obt_file.get_acquisition('subsampled_lfp_data')
-        assert np.allclose(lfp_data, obt.data[:])
-        assert np.allclose(lfp_timestamps, obt.timestamps[:])
+        assert np.allclose(lfp_data['data'], obt.data[:])
+        assert np.allclose(lfp_data['timestamps'], obt.timestamps[:])
+
+
+def test_add_link_lfp_to_nwbfile(linkable_lfp, lfp_data):
+
+    lfp_data_path, probe_id = linkable_lfp
+
+    tmpdir = os.path.dirname(lfp_data_path)
+    nwb_path = os.path.join(tmpdir, 'main_file.nwb')
+
+    nwbfile = pynwb.NWBFile(
+        session_description='test',
+        identifier='test',
+        session_start_time=datetime.now()
+    )
+
+    dev  = pynwb.device.Device(name='foo')
+    eg = pynwb.ecephys.ElectrodeGroup(name='foo_group', description='', location='', device=dev)
+    channels = pd.DataFrame([{'id': ii, 'group': eg} for ii in range(20)]).set_index('id')
+
+    nwbfile.add_device(dev)
+    nwbfile.add_electrode_group(eg)
+    nwbfile.electrodes = pynwb.file.ElectrodeTable().from_dataframe(channels, name='electrodes')
+
+    with pynwb.NWBHDF5IO(lfp_data_path, 'r') as data_file_io:
+        nwbfile = write_nwb.add_link_lfp_to_nwbfile(
+            nwbfile=nwbfile,
+            data_file_io=data_file_io,
+            probe_id=probe_id,
+            electrode_table_indices=lfp_data['subsample_channels'].tolist()
+        )
+
+        with pynwb.NWBHDF5IO(nwb_path, 'w') as write_io:
+            write_io.write(nwbfile)
+
+    lfp_exp = xr.DataArray(
+        data=lfp_data['data'],
+        dims=['time', 'channel'],
+        coords={'time': lfp_data['timestamps'], 'channel': lfp_data['subsample_channels']}
+    )
+
+    api = EcephysNwbApi.from_path(nwb_path)
+    lfp_obt = api.get_lfp(probe_id)
+    
+    xr.testing.assert_equal(lfp_exp, lfp_obt)
