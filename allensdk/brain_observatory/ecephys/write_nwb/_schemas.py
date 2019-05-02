@@ -66,4 +66,4 @@ class ProbeOutputs(RaisingSchema):
 
 class OutputSchema(RaisingSchema):
     nwb_path = String(required=True, description='path to output file')
-    probe_outputs = Nested(ProbeOutputs, required=True)
+    probe_outputs = Nested(ProbeOutputs, required=True, many=True)
