@@ -47,3 +47,11 @@ def test_get_extended_trials(ophys_experiment_id):
         raise RuntimeError('This should have failed with marshmallow.schema.ValidationError')
     except ValidationError:
         pass
+
+
+@pytest.mark.nightly
+@pytest.mark.parametrize('ophys_experiment_id', [860030092])
+def test_get_extended_trials(ophys_experiment_id):
+
+    api = BehaviorOphysLimsApi(ophys_experiment_id)
+    assert api.get_nwb_filepath() == '/allen/programs/braintv/production/visualbehavior/prod0/specimen_823826986/ophys_session_859701393/ophys_experiment_860030092/behavior_ophys_session_860030092.nwb'

@@ -19,6 +19,7 @@ from allensdk.internal.api import PostgresQueryMixin
 from allensdk.brain_observatory.behavior.behavior_ophys_api import BehaviorOphysApiBase
 from allensdk.brain_observatory.behavior.trials_processing import get_extended_trials
 
+
 class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
 
     def __init__(self, ophys_experiment_id):
@@ -215,6 +216,17 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
         motion_correction_filepath = self.get_rigid_motion_transform_file()
         motion_correction = pd.read_csv(motion_correction_filepath)
         return motion_correction[['x', 'y']]
+
+    @memoize
+    def get_nwb_filepath(self):
+
+        query = '''
+                SELECT wkf.storage_directory || wkf.filename AS nwb_file
+                FROM ophys_experiments oe
+                LEFT JOIN well_known_files wkf ON wkf.attachable_id=oe.id AND wkf.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'BehaviorOphysNwb')
+                WHERE oe.id = {};
+                '''.format(self.get_ophys_experiment_id())
+        return self.fetchone(query, strict=True)
 
     def get_stimulus_rebase_function(self):
         stimulus_timestamps_no_monitor_delay = self.get_sync_data()['stimulus_frames_no_delay']
