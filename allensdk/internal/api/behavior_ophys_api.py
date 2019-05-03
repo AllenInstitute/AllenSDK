@@ -33,10 +33,21 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
     def get_stimulus_timestamps(self):
         return self.get_sync_data()['stimulus_frames']
 
-
     @memoize
     def get_ophys_timestamps(self):
-        return self.get_sync_data()['ophys_frames']
+
+        ophys_timestamps = self.get_sync_data()['ophys_frames']
+        dff_traces = self.get_raw_dff_data()
+        number_of_cells, number_of_dff_frames = dff_traces.shape
+        num_of_timestamps = len(ophys_timestamps)
+        if number_of_dff_frames < num_of_timestamps:
+            ophys_timestamps = ophys_timestamps[:number_of_dff_frames]
+        elif number_of_dff_frames == num_of_timestamps:
+            pass
+        else:
+            raise RuntimeError('dff_frames is shorter than timestamps')
+
+        return ophys_timestamps
 
     @memoize
     def get_experiment_container_id(self):
