@@ -18,6 +18,21 @@ from allensdk.brain_observatory.behavior.image_api import ImageApi
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.brain_observatory.behavior.behavior_ophys_api import BehaviorOphysApiBase
 
+import functools
+
+def decorator(func):
+
+    @functools.wraps(func)
+    def wrapper_decorator(self, get_key=None):
+        value = func(self)
+        if get_key is not None:
+            key = get_key(self)
+            return key, value
+        else:
+            return value
+    return wrapper_decorator
+
+
 class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
 
     def __init__(self, ophys_experiment_id):
@@ -32,8 +47,8 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
     def get_stimulus_timestamps(self):
         return self.get_sync_data()['stimulus_frames']
 
-
     @memoize
+    @decorator
     def get_ophys_timestamps(self):
         return self.get_sync_data()['ophys_frames']
 

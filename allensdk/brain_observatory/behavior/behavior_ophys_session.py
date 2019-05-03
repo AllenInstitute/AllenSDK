@@ -56,17 +56,18 @@ class BehaviorOphysSession(LazyPropertyMixin):
     """
 
     @classmethod
-    def from_LIMS(cls, ophys_experiment_id):
-        return cls(api=BehaviorOphysLimsApi(ophys_experiment_id))
+    def from_LIMS(cls, ophys_experiment_id, cache=None):
+        return cls(api=BehaviorOphysLimsApi(ophys_experiment_id), cache=cache)
 
-    def __init__(self, api=None):
+    def __init__(self, api=None, cache=None):
 
         self.api = api
+        self.cache = cache
 
         self.ophys_experiment_id = LazyProperty(self.api.get_ophys_experiment_id)
         self.segmentation_mask_image = LazyProperty(self.api.get_segmentation_mask_image)
         self.stimulus_timestamps = LazyProperty(self.api.get_stimulus_timestamps)
-        self.ophys_timestamps = LazyProperty(self.api.get_ophys_timestamps)
+        self.ophys_timestamps = LazyProperty(self.api.get_ophys_timestamps, cache=self.cache)
         self.metadata = LazyProperty(self.api.get_metadata)
         self.dff_traces = LazyProperty(self.api.get_dff_traces)
         self.cell_specimen_table = LazyProperty(self.api.get_cell_specimen_table)
