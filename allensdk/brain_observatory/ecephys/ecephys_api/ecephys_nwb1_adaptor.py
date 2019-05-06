@@ -187,7 +187,7 @@ class EcephysNwb1Adaptor(EcephysApi):
             unit_list = prb_grp['unit_list'][()]
             for indx, uid in enumerate(unit_list):
                 unit_grp = prb_grp['UnitTimes'][str(uid)]
-                local_channel_index = unit_grp['channel'].value
+                local_channel_index = unit_grp['channel'][()]
                 channel_id = self._channel_ids[(prb_name, local_channel_index)]
                 if channel_id in existing_channels:
                     # If a channel has already been processed (ie it's shared by another unit) skip it. I'm assuming
@@ -197,8 +197,8 @@ class EcephysNwb1Adaptor(EcephysApi):
                     channel_ids[channel_indx] = channel_id
                     local_channel_indices[channel_indx] = local_channel_index
                     prb_ids[channel_indx] = prb_id
-                    prb_hrz_pos[channel_indx] = unit_grp['xpos_probe'].value
-                    prb_vert_pos[channel_indx] = unit_grp['ypos_probe'].value
+                    prb_hrz_pos[channel_indx] = unit_grp['xpos_probe'][()]
+                    prb_vert_pos[channel_indx] = unit_grp['ypos_probe'][()]
                     try:
                         struct_acronyms[channel_indx] = str(unit_grp['ccf_structure'][()], encoding='ascii')
                     except TypeError:
@@ -259,7 +259,7 @@ class EcephysNwb1Adaptor(EcephysApi):
             for indx, uid in enumerate(unit_list):
                 unit_grp = prb_grp['UnitTimes'][str(uid)]
                 prb_uids[indx] = self._unit_ids[(prb_name, uid)]
-                prb_channels[indx] = self._channel_ids[(prb_name, unit_grp['channel'].value)]
+                prb_channels[indx] = self._channel_ids[(prb_name, unit_grp['channel'][()])]
                 prb_snr[indx] = unit_grp['snr'][()]
 
             unit_ids = np.append(unit_ids, prb_uids)

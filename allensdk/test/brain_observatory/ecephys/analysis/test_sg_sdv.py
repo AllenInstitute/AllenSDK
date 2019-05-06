@@ -9,13 +9,15 @@ import itertools
 # nwb_path = '/allen/aibs/mat/Kael/ecephys_data/mouse387858.spikes.nwb'
 mouseid = 'mouse412792'
 stimulus = 'static_grating'
-nwb_path = '/allen/aibs/mat/Kael/ecephys_data/{}.spikes.nwb'.format(mouseid)
+nwb_path = 'data/{}.spikes.nwb'.format(mouseid)
 
 
-def save_results(mouseid='mouse412792'):
+def save_results(mouseid='mouse412792', rnd_seed=0):
+    np.random.seed(rnd_seed)
     sg = StaticGratings(nwb_path=nwb_path)
     with h5py.File('expected/{}.{}.h5'.format(mouseid, stimulus), 'w') as h5:
         h5.attrs['numbercells'] = sg.numbercells
+        h5.attrs['rnd_seed'] = rnd_seed
 
         spikes_grp = h5.create_group('/spikes')
         for specimen_id, spikes in sg.spikes.items():
@@ -91,7 +93,6 @@ def save_peak_data(h5, peak_df):
 
     peak_grp = h5.create_group('peak')
     for col in peak_df.columns:
-        print(col)
         dtype = dtype_lu.get(col, np.float64)
         peak_grp.create_dataset(col, data=peak_df[col].astype(dtype))
 
