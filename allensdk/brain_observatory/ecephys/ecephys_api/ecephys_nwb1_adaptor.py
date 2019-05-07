@@ -145,8 +145,12 @@ class EcephysNwb1Adaptor(EcephysApi):
             else:
                 stimulus_presentations_df = stimulus_presentations_df.append(stim_df)
 
+        # stimulus_presentations_df['Ori'] = stimulus_presentations_df['Ori'].astype(np.float64)
+
         stimulus_presentations_df['stimulus_index'] = 0  # I'm not sure what column is, but is droped by EcephysSession
         stimulus_presentations_df.set_index('stimulus_presentation_id', inplace=True)
+
+        # print(stimulus_presentations_df['SF'])
         return stimulus_presentations_df
 
 

@@ -1,6 +1,6 @@
 from ecephys_analysis_modules.common.static_gratings_sdv import StaticGratings
-from ecephys_analysis_modules.common.drifting_gratings_sdv import DriftingGratings
-from ecephys_analysis_modules.common.natural_scenes_sdv import NaturalScenes
+#from ecephys_analysis_modules.common.drifting_gratings_sdv import DriftingGratings
+#from ecephys_analysis_modules.common.natural_scenes_sdv import NaturalScenes
 
 
 import os
@@ -12,8 +12,8 @@ import itertools
 
 stims_lu = {
     'static_grating': StaticGratings,
-    'drifting_grating': DriftingGratings,
-    'natural_scene': NaturalScenes
+    #'drifting_grating': DriftingGratings,
+    #'natural_scene': NaturalScenes
 }
 
 
@@ -56,7 +56,7 @@ def create_data(mouseid, stimulus_type, base_dir='data', rnd_seed=0):
         sweep_p_vals.create_dataset('presentation_ids', data=[int(i) for i in sg.sweep_p_values.index.values])
         sweep_p_vals.create_dataset('data', data=sg.sweep_p_values.values)
 
-        h5.create_dataset('running_speed', data=sg.running_speed['running_speed'])
+        h5.create_dataset('running_speed', data=sg.running_speed['running_speed'].astype(np.float64))
 
         # TODO: Adding response_events and response_trials
 

@@ -36,7 +36,10 @@ def cmp_peak_data(actual_df, expected_h5):
     return True
 
 
-def cmp_mean_sweeps(actual_df, expected_h5):
+def cmp_mean_sweeps(actual_df, expected_h5, id_map=None):
+    if id_map is not None:
+        actual_df = actual_df.rename(index=str, columns=id_map)
+
     failed = []
     mse_grp = expected_h5['mean_sweep_events']
     actual_ids = actual_df.columns.values.astype(np.uint64)
@@ -45,11 +48,11 @@ def cmp_mean_sweeps(actual_df, expected_h5):
         print('specimen_ids do not match.')
         return False
 
-    sid_lu = {sid: i for i, sid in enumerate(mse_grp['specimen_ids'])}
+    sid_lu = {id_map.get(sid, sid): i for i, sid in enumerate(mse_grp['specimen_ids'])}
     for sid in actual_ids:
         expected_indx = sid_lu[sid]
         expected_vals = mse_grp['data'][:, expected_indx]
-        actual_vals = actual_df[str(sid)].values
+        actual_vals = actual_df[sid].values  # actual_df[str(sid)].values
         if not np.all(expected_vals == actual_vals):
             failed.append(sid)
 
@@ -59,7 +62,10 @@ def cmp_mean_sweeps(actual_df, expected_h5):
     return True
 
 
-def cmp_p_sweeps(actual_df, expected_h5):
+def cmp_p_sweeps(actual_df, expected_h5, id_map=None):
+    if id_map is not None:
+        actual_df = actual_df.rename(index=str, columns=id_map)
+
     failed = []
     spv_grp = expected_h5['sweep_p_values']
     actual_ids = actual_df.columns.values.astype(np.uint64)
@@ -72,7 +78,7 @@ def cmp_p_sweeps(actual_df, expected_h5):
     for sid in actual_ids:
         expected_indx = sid_lu[sid]
         expected_vals = spv_grp['data'][:, expected_indx]
-        actual_vals = actual_df[str(sid)].values
+        actual_vals = actual_df[sid].values # actual_df[str(sid)].values
         if not np.allclose(expected_vals, actual_vals, atol=1.0e-3):
             for i in range(6000):
                 if np.abs(expected_vals[i] - actual_vals[i]) > 1.0e-3:
@@ -86,14 +92,21 @@ def cmp_p_sweeps(actual_df, expected_h5):
     return True
 
 
-def cmp_sweep_events(actual_df, expected_h5, id_map=None):
+def cmp_sweep_events(actual_df, expected_h5, id_map=None, sampled=None):
+    if id_map is not None:
+        actual_df = actual_df.rename(index=str, columns=id_map)
+
+    # print(id_map)
+    # print(actual_df.columns)
     sw_grp = expected_h5['/sweep_events']
     sid_lu = {sid: i for i, sid in enumerate(sw_grp['specimen_ids'])}
     failed = []
-    id_map = id_map or {}
+    # id_map = id_map or {}
+
+
     for sid in sw_grp['specimen_ids']: #actual_df.columns.values:
-        print(sid)
-        act_sid = id_map[sid]
+        # print(sid)
+        #act_sid = id_map[sid]
         exp_sid = str(sid)
         # print(sid, id_map[sid])
         #print(actual_df[731])
@@ -101,7 +114,7 @@ def cmp_sweep_events(actual_df, expected_h5, id_map=None):
         #for pid in actual_df.index.values:
         for pid in range(len(actual_df)):
             # actual_events = actual_df[id_map[sid]].iloc[pid]
-            actual_events = actual_df[act_sid].iloc[pid]
+            actual_events = actual_df[sid].iloc[pid]
 
             exp_indx = sid_lu[int(sid)]
             exp_rref = sw_grp['events_table'][pid, exp_indx]
@@ -172,8 +185,9 @@ def test_sg_data(spikes_file, expected_file):
     ecephys_session = EcephysSession.from_nwb1_path(spikes_file)
     units = ecephys_session.units
     units = units[(units['location'] == 'probeC') & (units['structure_acronym'] == 'VISp')]
-    id_map = {loc_id: unit_id for loc_id, unit_id in zip(units['local_index_unit'], units.index.values)}
-    print(id_map)
+    # id_map = {loc_id: unit_id for loc_id, unit_id in zip(units['local_index_unit'], units.index.values)}
+    id_map = {unit_id: loc_id for loc_id, unit_id in zip(units['local_index_unit'], units.index.values)}
+    #print(id_map)
 
     #print(ecephys_session.units.columns)
     #print(id_map)
@@ -186,21 +200,37 @@ def test_sg_data(spikes_file, expected_file):
     # print(np.allclose(expected_h5['dxcm_ts'][()], sg.dxtime))
     # print(cmp_spikes(sg.spikes, expected_h5, id_map))
     # print(expected_h5.attrs['numbercells'] == sg.numbercells)
-    # print(sg.stim_table.columns)
-    # print(sg.stim_table_spontaneous)
-    #sweep_events = sg.sweep_events
-    #print(sweep_events)
-    #print(cmp_sweep_events(sweep_events, expected_h5, id_map))
-    print(sg.running_speed)
+    # sweep_events = sg.sweep_events
+    # assert(cmp_sweep_events(sg.sweep_events.copy(), expected_h5, id_map))
+
+
+    # Check the running_speed
+    # running_speed = sg.running_speed['running_speed'].values
+    # rs_actual = running_speed[~np.isnan(running_speed)]
+    # running_speed = expected_h5['running_speed'][()]
+    # rs_expected = running_speed[~np.isnan(running_speed)]
+    # assert(np.allclose(rs_actual, rs_expected, atol=1.0e-5))
+
+
+    # print(sg.mean_sweep_events)
+    assert(cmp_mean_sweeps(sg.mean_sweep_events.copy(), expected_h5, id_map))
+
+    # print(sg.sweep_p_events)
+    assert(cmp_p_sweeps(sg.sweep_p_values.copy(), expected_h5, id_map))
+
+    # print(sg.response_events)
+
+    print(sg.peak)
     exit()
-    
+
+
 
     print(np.allclose(sg.dxcm, expected_h5['dxcm'][()]))
 
     assert(cmp_peak(sg.peak.copy(), expected_h5))
-    assert(cmp_p_sweeps(sg.sweep_p_values.copy(), expected_h5))
+    # assert(cmp_p_sweeps(sg.sweep_p_values.copy(), expected_h5))
     assert(cmp_peak_data(sg.peak.copy(), expected_h5))
-    assert(cmp_mean_sweeps(sg.mean_sweep_events.copy(), expected_h5))
+    ## assert(cmp_mean_sweeps(sg.mean_sweep_events.copy(), expected_h5))
     assert(cmp_sweep_events(sg.sweep_events.copy(), expected_h5))
 
 
