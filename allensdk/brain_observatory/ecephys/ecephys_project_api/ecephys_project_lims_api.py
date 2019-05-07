@@ -1,8 +1,11 @@
 import os
+import shutil
+import warnings
 
 import pandas as pd
 
 from allensdk.api.cache import Cache, cacheable
+from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
 
 from .ecephys_project_api import EcephysProjectApi
 from .lims_api_mixin import LimsApiMixin
@@ -16,8 +19,8 @@ class EcephysProjectLimsApi(EcephysProjectApi, LimsApiMixin):
     @cacheable(
         strategy='lazy', 
         pathfinder=Cache.pathfinder(file_name_position=1, path_keyword='path'),
-        reader=lambda path: pd.read_csv(path).set_index('id'),
-        writer=lambda path, df: df.to_csv(path, index=False)
+        reader=lambda path: pd.read_csv(path, index_col='id'),
+        writer=lambda path, df: df.to_csv(path)
     )
     def get_sessions(self, 
         path,
@@ -60,6 +63,26 @@ class EcephysProjectLimsApi(EcephysProjectApi, LimsApiMixin):
         response.set_index('id', inplace=True)
 
         return response
+
+    @cacheable(
+        strategy='lazy', 
+        pathfinder=Cache.pathfinder(file_name_position=1, path_keyword='path'),
+        reader=EcephysSession.from_nwb_path
+    )
+    def get_session_data(self, path, session_id):
+        nwb_paths = self._get_session_nwb_paths(session_id)
+        main_nwb_path = nwb_paths.loc[nwb_paths['name'] == 'EcephysNwb']['path'].values
+
+        if len(main_nwb_path) == 1 and not isinstance(main_nwb_path, str):
+            main_nwb_path = main_nwb_path[0]
+        else:
+            raise ValueError(f'did not find a unique nwb path for session {session_id}')
+
+        fsize = os.path.getsize(main_nwb_path) / 1024 ** 2
+        warnings.warn(f'copying a {fsize:.6}mb file from {main_nwb_path} to {path}')
+        shutil.copyfile(main_nwb_path, path)
+        return path
+
 
     def _get_session_nwb_paths(self, session_id):
 
