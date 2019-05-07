@@ -2,6 +2,8 @@ import os
 
 import pandas as pd
 
+from allensdk.api.cache import Cache, cacheable
+
 from .ecephys_project_api import EcephysProjectApi
 from .lims_api_mixin import LimsApiMixin
 
@@ -11,7 +13,14 @@ class EcephysProjectLimsApi(EcephysProjectApi, LimsApiMixin):
     def __init__(self, **kwargs):
         super(EcephysProjectApi, self).__init__(**kwargs)
 
+    @cacheable(
+        strategy='lazy', 
+        pathfinder=Cache.pathfinder(file_name_position=1, path_keyword='path'),
+        reader=lambda path: pd.read_csv(path).set_index('id'),
+        writer=lambda path, df: df.to_csv(path, index=False)
+    )
     def get_sessions(self, 
+        path,
         session_ids=None, 
         workflow_states=('uploaded',),
         published=None,
@@ -47,8 +56,10 @@ class EcephysProjectLimsApi(EcephysProjectApi, LimsApiMixin):
         joins = ' '.join(joins)
 
         query = f'select es.* from ecephys_sessions es {joins} {filters}'
+        response = self.select(query)
+        response.set_index('id', inplace=True)
 
-        return self.select(query)
+        return response
 
     def _get_session_nwb_paths(self, session_id):
 
