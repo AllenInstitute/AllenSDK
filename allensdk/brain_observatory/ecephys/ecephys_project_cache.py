@@ -6,6 +6,9 @@ from allensdk.brain_observatory.ecephys.ecephys_project_api import EcephysProjec
 class EcephysProjectCache(Cache):
 
     SESSIONS_KEY = 'sessions'
+    PROBES_KEY = 'probes'
+    CHANNELS_KEY = 'channels'
+    UNITS_KEY = 'units'
     SESSION_DIR_KEY = 'session_data'
     SESSION_NWB_KEY = 'session_nwb'
 
@@ -21,8 +24,19 @@ class EcephysProjectCache(Cache):
 
     def get_sessions(self):
         path = self.get_cache_path(None, self.SESSIONS_KEY)
-        sessions = self.fetch_api.get_sessions(path)
-        return filter_sessions(sessions)
+        return self.fetch_api.get_sessions(path)
+
+    def get_probes(self):
+        path = self.get_cache_path(None, self.PROBES_KEY)
+        return self.fetch_api.get_probes(path)
+
+    def get_channels(self):
+        path = self.get_cache_path(None, self.CHANNELS_KEY)
+        return self.fetch_api.get_channels(path)
+
+    def get_units(self):
+        path = self.get_cache_path(None, self.UNITS_KEY)
+        return self.fetch_api.get_units(path)
 
     def get_session_data(self, session_id):
         path = self.get_cache_path(None, self.SESSION_NWB_KEY, session_id, session_id)
@@ -33,6 +47,18 @@ class EcephysProjectCache(Cache):
                                   
         manifest_builder.add_path(
             self.SESSIONS_KEY, 'sessions.csv', parent_key='BASEDIR', typename='file'
+        )
+
+        manifest_builder.add_path(
+            self.PROBES_KEY, 'probes.csv', parent_key='BASEDIR', typename='file'
+        )
+
+        manifest_builder.add_path(
+            self.CHANNELS_KEY, 'channels.csv', parent_key='BASEDIR', typename='file'
+        )
+
+        manifest_builder.add_path(
+            self.UNITS_KEY, 'units.csv', parent_key='BASEDIR', typename='file'
         )
 
         manifest_builder.add_path(
