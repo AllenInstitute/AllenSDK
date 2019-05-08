@@ -1,20 +1,142 @@
 import os
+import collections
 
 import pytest
+import pandas as pd
+import mock
 
 import allensdk.brain_observatory.ecephys.ecephys_project_cache as epc
-from allensdk.brain_observatory.ecephys.ecephys_project_api import EcephysProjectLimsApi
+
 
 @pytest.fixture
-def mock_api(sessions):
+def sessions():
+    return pd.DataFrame({
+        'stimulus_name': ['stimulus_set_one', 'stimulus_set_two', 'stimulus_set_two']
+    }, index=pd.Series(name='id', data=[1, 2, 3]))
+
+
+@pytest.fixture
+def units():
+    return pd.DataFrame({
+        'ecephys_channel_id': [2, 1],
+        'snr': [1.5, 4.9]
+    }, index=pd.Series(name='id', data=[1, 2]))
+
+@pytest.fixture
+def channels():
+    return pd.DataFrame({
+        'ecephys_probe_id': [11, 11],
+        'ap': [1000, 2000]
+    }, index=pd.Series(name='id', data=[1, 2]))
+
+
+@pytest.fixture
+def probes():
+    return pd.DataFrame({
+        'ecephys_session_id': [3],
+    }, index=pd.Series(name='id', data=[11]))
+
+
+@pytest.fixture
+def shared_tmpdir(tmpdir_factory):
+    return str(tmpdir_factory.mktemp('test_ecephys_project_cache'))
+
+
+@pytest.fixture
+def mock_api(shared_tmpdir, sessions, units, channels, probes):
     class MockApi:
-        @cacheable()
+        
+        def __init__(self, **kwargs):
+            self.accesses = collections.defaultdict(lambda: 1)
+
+        def __getattr__(self, name):
+            self.accesses[name] += 1
+
         def get_sessions(self):
+            return sessions
+
+        def get_units(self):
+            return units
+
+        def get_channels(self):
+            return channels
+
+        def get_probes(self):
+            return probes
+
+        def get_session_data(self, session_id):
+            path = os.path.join(shared_tmpdir, 'tmp.txt')
+            with open(path, 'w') as f:
+                f.write(f'{session_id}')
+            return open(path, 'rb')
+
+    return MockApi
 
 
+@pytest.fixture
+def tmpdir_cache(shared_tmpdir, mock_api):
 
-def test_get_sessions(tmpdir_factory, mock_api, sessions):
+    man_path = os.path.join(shared_tmpdir, 'manifest.json')
 
-    tmpdir = str(tmpdir_factory.mktemp('test_ecephys_project_cache'))
-    man_path = os.path.join(tmpdir, 'manifest.json')
+    return epc.EcephysProjectCache(
+        fetch_api=mock_api(),
+        manifest=man_path
+    )
 
+
+def test_get_sessions(tmpdir_cache, sessions):
+    sessions_one = tmpdir_cache.get_sessions()
+    sessions_two = tmpdir_cache.get_sessions()
+
+    pd.testing.assert_frame_equal(sessions, sessions_one)
+    pd.testing.assert_frame_equal(sessions, sessions_two)
+
+    assert 1 == tmpdir_cache.fetch_api.accesses['get_sessions']
+
+
+def test_get_units(tmpdir_cache, units):
+    units_one = tmpdir_cache.get_units()
+    units_two = tmpdir_cache.get_units()
+
+    pd.testing.assert_frame_equal(units, units_one)
+    pd.testing.assert_frame_equal(units, units_two)
+
+    assert 1 == tmpdir_cache.fetch_api.accesses['get_units']
+
+
+def test_get_probes(tmpdir_cache, probes):
+    probes_one = tmpdir_cache.get_probes()
+    probes_two = tmpdir_cache.get_probes()
+
+    pd.testing.assert_frame_equal(probes, probes_one)
+    pd.testing.assert_frame_equal(probes, probes_two)
+
+    assert 1 == tmpdir_cache.fetch_api.accesses['get_probes']
+
+
+def test_get_channels(tmpdir_cache, channels):
+    channels_one = tmpdir_cache.get_channels()
+    channels_two = tmpdir_cache.get_channels()
+
+    pd.testing.assert_frame_equal(channels, channels_one)
+    pd.testing.assert_frame_equal(channels, channels_two)
+
+    assert 1 == tmpdir_cache.fetch_api.accesses['get_channels']
+
+
+def test_get_session_data(tmpdir_cache):
+
+    sid = 12345
+
+    def rd(path, *args, **kwargs):
+        with open(path, 'r') as f:
+            return f.read()
+
+    with mock.patch('allensdk.brain_observatory.ecephys.ecephys_session.EcephysSession.from_nwb_path', new=rd):
+        data_one = tmpdir_cache.get_session_data(sid)
+        data_two = tmpdir_cache.get_session_data(sid)
+
+        assert str(sid) == data_one
+        assert str(sid) == data_two
+
+        assert 1 == tmpdir_cache.fetch_api.accesses['get_session_data']
