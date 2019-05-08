@@ -4,17 +4,8 @@ import warnings
 
 import pandas as pd
 
-from allensdk.api.cache import Cache, cacheable
-from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
-
 from .ecephys_project_api import EcephysProjectApi
 from .lims_api_mixin import LimsApiMixin
-
-
-csv_io = {
-    'reader': lambda path: pd.read_csv(path, index_col='id'),
-    'writer': lambda path, df: df.to_csv(path)
-}
 
 
 class EcephysProjectLimsApi(EcephysProjectApi, LimsApiMixin):
@@ -22,12 +13,7 @@ class EcephysProjectLimsApi(EcephysProjectApi, LimsApiMixin):
     def __init__(self, **kwargs):
         super(EcephysProjectApi, self).__init__(**kwargs)
 
-    @cacheable(
-        strategy='lazy', 
-        pathfinder=Cache.pathfinder(file_name_position=1, path_keyword='path'),
-        reader=EcephysSession.from_nwb_path
-    )
-    def get_session_data(self, path, session_id):
+    def get_session_data(self, session_id):
         nwb_paths = self._get_session_nwb_paths(session_id)
         main_nwb_path = nwb_paths.loc[nwb_paths['name'] == 'EcephysNwb']['path'].values
 
@@ -37,40 +23,22 @@ class EcephysProjectLimsApi(EcephysProjectApi, LimsApiMixin):
             raise ValueError(f'did not find a unique nwb path for session {session_id}')
 
         fsize = os.path.getsize(main_nwb_path) / 1024 ** 2
-        warnings.warn(f'copying a {fsize:.6}mb file from {main_nwb_path} to {path}')
-        shutil.copyfile(main_nwb_path, path)
-        return path
+        warnings.warn(f'copying a {fsize:.6}mb file from {main_nwb_path}')
+        
+        reader = open(main_nwb_path, 'rb')
+        return reader
 
-    @cacheable(
-        strategy='lazy',
-        pathfinder=Cache.pathfinder(file_name_position=1, path_keyword='path'),
-        **csv_io
-    )
-    def get_units(self, path, **kwargs):
+
+    def get_units(self, **kwargs):
         return self._get_units(**kwargs)
 
-    @cacheable(
-        strategy='lazy',
-        pathfinder=Cache.pathfinder(file_name_position=1, path_keyword='path'),
-        **csv_io
-    )
-    def get_channels(self, path, **kwargs):
+    def get_channels(self, **kwargs):
         return self._get_channels(**kwargs)
 
-    @cacheable(
-        strategy='lazy',
-        pathfinder=Cache.pathfinder(file_name_position=1, path_keyword='path'),
-        **csv_io
-    )
-    def get_probes(self, path, **kwargs):
+    def get_probes(self, **kwargs):
         return self._get_probes(**kwargs)
 
-    @cacheable(
-        strategy='lazy', 
-        pathfinder=Cache.pathfinder(file_name_position=1, path_keyword='path'),
-        **csv_io
-    )
-    def get_sessions(self, path, **kwargs):
+    def get_sessions(self, **kwargs):
         return self._get_sessions(**kwargs)
 
     def _get_units(self, unit_ids=None, channel_ids=None, probe_ids=None, session_ids=None):
@@ -141,8 +109,8 @@ class EcephysProjectLimsApi(EcephysProjectApi, LimsApiMixin):
 
         filters = []
         filters.append(containment_filter_clause(session_ids, 'es.id'))
-        filters.append(containment_filter_clause(project_names, 'es.workflow_state', True))
-        filters.append(containment_filter_clause(project_names, 'pr.id', True))
+        filters.append(containment_filter_clause(workflow_states, 'es.workflow_state', True))
+        filters.append(containment_filter_clause(project_names, 'pr.name', True))
 
         if published is not None:
             filters.append(f'es.published_at is {"not" if published else ""} null')
@@ -153,7 +121,7 @@ class EcephysProjectLimsApi(EcephysProjectApi, LimsApiMixin):
 
         query = f'''
             select es.* from ecephys_sessions es 
-            join project_ids pr on pr.id = es.project_id {and_filters(filters)}
+            join projects pr on pr.id = es.project_id {and_filters(filters)}
         '''
         response = self.select(query)
         response.set_index('id', inplace=True)
@@ -177,7 +145,7 @@ class EcephysProjectLimsApi(EcephysProjectApi, LimsApiMixin):
         filters = []
         filters.append(containment_filter_clause(session_ids, 'es.id'))
         filters.append(containment_filter_clause(probe_ids, 'ep.id'))
-        filters.append(containment_filter_clause(wkf_types, 'wkft.name'), True)
+        filters.append(containment_filter_clause(wkf_types, 'wkft.name', True))
 
         # TODO: why does the probe analysis runs table not have a "current" field?
         query = f'''
@@ -198,8 +166,8 @@ class EcephysProjectLimsApi(EcephysProjectApi, LimsApiMixin):
     def _get_session_well_known_files(self, session_ids=None, wkf_types=None):
 
         filters = []
-        filters.append(containment_filter_clause(session_ids), 'es.id')
-        filters.append(containment_filter_clause(wkf_types, 'wkft.name'), True)
+        filters.append(containment_filter_clause(session_ids, 'es.id'))
+        filters.append(containment_filter_clause(wkf_types, 'wkft.name', True))
 
         query = f''' 
             select wkf.storage_directory, wkf.filename, es.id as ecephys_session_id, wkft.name from ecephys_sessions es
