@@ -84,14 +84,18 @@ def tmpdir_cache(shared_tmpdir, mock_api):
     )
 
 
+def lazy_cache_test(cache, name, expected):
+    obtained_one = getattr(cache, name)()
+    obtained_two = getattr(cache, name)()
+
+    pd.testing.assert_frame_equal(expected, obtained_one)
+    pd.testing.assert_frame_equal(expected, obtained_two)
+
+    assert 1 == cache.fetch_api.accesses[name]
+
+
 def test_get_sessions(tmpdir_cache, sessions):
-    sessions_one = tmpdir_cache.get_sessions()
-    sessions_two = tmpdir_cache.get_sessions()
-
-    pd.testing.assert_frame_equal(sessions, sessions_one)
-    pd.testing.assert_frame_equal(sessions, sessions_two)
-
-    assert 1 == tmpdir_cache.fetch_api.accesses['get_sessions']
+    lazy_cache_test(tmpdir_cache, 'get_sessions', sessions)
 
 
 def test_get_units(tmpdir_cache, units):
