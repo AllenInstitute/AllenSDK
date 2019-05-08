@@ -75,6 +75,3 @@ class EcephysProjectCache(Cache):
     def from_lims(cls, lims_kwargs=None, **kwargs):
         lims_kwargs = {} if lims_kwargs is None else lims_kwargs
         return cls(fetch_api=EcephysProjectLimsApi(**lims_kwargs), **kwargs)
-
-def filter_sessions(sessions):
-    return sessions
