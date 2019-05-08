@@ -4,10 +4,11 @@ import os
 import sys
 import itertools
 import json
+import uuid
 
 from . import PostgresQueryMixin
 from .behavior_lims_api import BehaviorLimsApi
-
+from allensdk.brain_observatory.behavior.trials_processing import EDF_COLUMNS
 
 class MtrainApi(PostgresQueryMixin):
 
@@ -73,8 +74,10 @@ class MtrainApi(PostgresQueryMixin):
         session_dict = behavior_df.iloc[0].to_dict()
 
         filters = [{"name": "behavior_session_uuid", "op": "eq", "val": behavior_session_uuid}]
-        trials_df = self.get_df('trials', filters=filters).sort_values('index')
-        session_dict['trials'] = trials_df
+        trials_df = self.get_df('trials', filters=filters).sort_values('index').drop(['id', 'behavior_session'], axis=1).set_index('index', drop=False)
+        trials_df['behavior_session_uuid'] = trials_df['behavior_session_uuid'].map(uuid.UUID)
+        del trials_df.index.name
+        session_dict['trials'] = trials_df[EDF_COLUMNS]
 
         return session_dict
 
@@ -93,7 +96,6 @@ class MtrainApi(PostgresQueryMixin):
         behavior_df = pd.merge(behavior_df, stage_df, how='left', on='stage_id')
         behavior_df = pd.merge(behavior_df, regimen_df, how='left', on='regimen_id')
         return behavior_df
-        
 
 
     def get_current_stage(self, LabTracks_ID):
