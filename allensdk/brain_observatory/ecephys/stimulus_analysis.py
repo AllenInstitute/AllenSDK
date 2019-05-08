@@ -12,11 +12,6 @@ class StimulusAnalysis(object):
         elif isinstance(ecephys_session, string_types):
             self._ecephys_session = EcephysSession.from_nwb1_path(ecephys_session)
 
-        #print(self.ecephys_session.spike_times)
-        #print(self.ecephys_session.units.columns)
-        #print(self.ecephys_session.units[['location', 'structure_acronym']])
-        #print(self.ecephys_session.units[])
-        #exit()
         self._cell_ids = None
         self._cells_filter = {'location': 'probeC', 'structure_acronym': 'VISp'}
         self._number_cells = None
@@ -40,8 +35,11 @@ class StimulusAnalysis(object):
 
     @property
     def cell_id(self):
+        """Returns a list of unit-ids for which to apply the analysis"""
         # BOb analog
         if self._cell_ids is None:
+            # Original analysis files was hardcoded that only cells from probeC/VISp, replaced with a filter dict.
+            # TODO: Remove filter if it's not nessecary, or else make cells_filter a class parameter.
             units_df = self.ecephys_session.units
             if self._cells_filter:
                 mask = True
@@ -54,6 +52,7 @@ class StimulusAnalysis(object):
 
     @property
     def numbercells(self):
+        """Get the number of units/cells."""
         # BOb analog
         if not self._number_cells:
             self._number_cells = len(self.cell_id)
@@ -61,12 +60,13 @@ class StimulusAnalysis(object):
 
     @property
     def spikes(self):
+        """Returns a diction unit_id -> spike-times."""
         if self._spikes:
             return self._spikes
         else:
             self._spikes = self.ecephys_session.spike_times
             if len(self._spikes) > self.numbercells:
-                # if a filter has been applied st not all the cells are being used in the analysis
+                # if a filter has been applied such that not all the cells are being used in the analysis
                 self._spikes = {k: v for k, v in self._spikes.items() if k in self.cell_id}
 
         return self._spikes
@@ -84,11 +84,12 @@ class StimulusAnalysis(object):
     @property
     def stim_table(self):
         # BOb analog
+        # Stimulus table is already in EcephysSession object, just need to subselect 'static_gratings' presentations.
         if self._stim_table is None:
             # TODO: Give warning if no static_gratings stimulus
-            # Older versions of NWB files the stimulus name is in the form stimulus_gratings_N, so if self._stimulus_names
-            # is not explicity specified try to figure out stimulus
             if self._stimulus_names is None:
+                # Older versions of NWB files the stimulus name is in the form stimulus_gratings_N, so if
+                # self._stimulus_names is not explicity specified try to figure out stimulus
                 stims_table = self.ecephys_session.stimulus_presentations
                 stim_names = [s for s in stims_table['stimulus_name'].unique()
                               if s.lower().startswith('static_gratings')]
@@ -96,7 +97,8 @@ class StimulusAnalysis(object):
                 self._stim_table = stims_table[stims_table['stimulus_name'].isin(stim_names)]
 
             else:
-                self._stimulus_names = [self._stimulus_names] if isinstance(self._stimulus_names, string_types) else self._stimulus_names
+                self._stimulus_names = [self._stimulus_names] if isinstance(self._stimulus_names, string_types) \
+                    else self._stimulus_names
                 self._stim_table = self.ecephys_session.get_presentations_for_stimulus(self._stimulus_names)
 
         return self._stim_table
@@ -104,8 +106,10 @@ class StimulusAnalysis(object):
     @property
     def stim_table_spontaneous(self):
         # BOb analog
+        # Returns the stimulus table with only 'spanteous' presentations. Used by sweep_p_events for creating null dist.
         if self._stim_table_spontaneous is None:
-            # TODO: The original version filtered out stims of len < 100, figure out why or if this value should be user-defined?
+            # TODO: The original version filtered out stims of len < 100, figure out why or if this value should
+            #   be user-defined?
             stim_table = self.ecephys_session.get_presentations_for_stimulus(['spontaneous'])
             self._stim_table_spontaneous = stim_table[stim_table['duration'] > 100.0]
 

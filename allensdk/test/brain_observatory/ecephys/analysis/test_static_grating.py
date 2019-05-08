@@ -1,34 +1,37 @@
 # from ecephys_analysis_modules.common.static_gratings_sdv import StaticGratings
 from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
+from allensdk.brain_observatory.ecephys.ecephys_api import EcephysNwb1Adaptor
+from allensdk.brain_observatory.ecephys.static_gratings import StaticGratings
+
 import numpy as np
 import h5py
 
 
-def cmp_peak_data(actual_df, expected_h5):
+def cmp_peak_data(actual_df, expected_h5, id_map=None):
     failed = []
     peak_grp = expected_h5['peak']
     sid_lu = {sid: i for i, sid in enumerate(peak_grp['cell_specimen_id'])}
 
     actual_df.set_index('cell_specimen_id', inplace=True)
+    if id_map is not None:
+        actual_df = actual_df.rename(index=id_map)
     actual_ids = set(actual_df.index.values.astype(np.uint))
     expected_ids = set(peak_grp['cell_specimen_id'][()])
+
     if actual_ids != expected_ids:
         print('specimen_ids do not match.')
         return False
-    for sid in actual_ids:
-        actual_pd = actual_df.loc[str(sid)]
-        expected_indx = sid_lu[sid]
-        for col in ['pref_ori_sg', 'pref_sf_sg', 'pref_phase_sg', 'num_pref_trials_sg', 'responsive_sg',
-                    'g_osi_sg', 'sfdi_sg', 'reliability_sg', 'lifetime_sparseness_sg', 'fit_sf_sg',
-                    'fit_sf_ind_sg', 'sf_low_cutoff_sg', 'sf_high_cutoff_sg', 'run_pval_sg', 'run_mod_sg',
-                    'run_resp_sg', 'stat_resp_sg', 'lifetime_sparseness_dg']:
 
-            if np.isnan(actual_pd[col]):
-                if not np.isnan(peak_grp[col][expected_indx]):
-                    failed.append('{}, {}> {} != {}'.format(sid, col, actual_pd[col], peak_grp[col][expected_indx]))
-            else:
-                if actual_pd[col] != peak_grp[col][expected_indx]:
-                    failed.append('{}, {}> {} != {}'.format(sid, col, actual_pd[col], peak_grp[col][expected_indx]))
+    # TODO: Get column names from stimulus_analysis
+    for col in ['pref_ori_sg', 'pref_sf_sg', 'pref_phase_sg', 'num_pref_trials_sg', 'responsive_sg',
+                'g_osi_sg', 'sfdi_sg', 'reliability_sg', 'lifetime_sparseness_sg', 'fit_sf_sg',
+                'fit_sf_ind_sg', 'sf_low_cutoff_sg', 'sf_high_cutoff_sg', 'run_pval_sg', 'run_mod_sg',
+                'run_resp_sg', 'stat_resp_sg']:
+
+        # TODO: Need reorder the actual column so the specimen_ids allways match up with expected
+        if not np.allclose(actual_df[col].values, peak_grp[col][()], equal_nan=True):
+            failed.append(col)
+
     if failed:
         print(failed)
         return False
@@ -38,7 +41,7 @@ def cmp_peak_data(actual_df, expected_h5):
 
 def cmp_mean_sweeps(actual_df, expected_h5, id_map=None):
     if id_map is not None:
-        actual_df = actual_df.rename(index=str, columns=id_map)
+        actual_df = actual_df.rename(columns=id_map)
 
     failed = []
     mse_grp = expected_h5['mean_sweep_events']
@@ -78,7 +81,7 @@ def cmp_p_sweeps(actual_df, expected_h5, id_map=None):
     for sid in actual_ids:
         expected_indx = sid_lu[sid]
         expected_vals = spv_grp['data'][:, expected_indx]
-        actual_vals = actual_df[sid].values # actual_df[str(sid)].values
+        actual_vals = actual_df[sid].values  # actual_df[str(sid)].values
         if not np.allclose(expected_vals, actual_vals, atol=1.0e-3):
             for i in range(6000):
                 if np.abs(expected_vals[i] - actual_vals[i]) > 1.0e-3:
@@ -93,27 +96,17 @@ def cmp_p_sweeps(actual_df, expected_h5, id_map=None):
 
 
 def cmp_sweep_events(actual_df, expected_h5, id_map=None, sampled=None):
+    # TODO: This can take a long time so add option to test against a random sample
     if id_map is not None:
         actual_df = actual_df.rename(index=str, columns=id_map)
 
-    # print(id_map)
-    # print(actual_df.columns)
     sw_grp = expected_h5['/sweep_events']
     sid_lu = {sid: i for i, sid in enumerate(sw_grp['specimen_ids'])}
     failed = []
-    # id_map = id_map or {}
 
-
-    for sid in sw_grp['specimen_ids']: #actual_df.columns.values:
-        # print(sid)
-        #act_sid = id_map[sid]
+    for sid in sw_grp['specimen_ids']:  # actual_df.columns.values:
         exp_sid = str(sid)
-        # print(sid, id_map[sid])
-        #print(actual_df[731])
-        #exit()
-        #for pid in actual_df.index.values:
         for pid in range(len(actual_df)):
-            # actual_events = actual_df[id_map[sid]].iloc[pid]
             actual_events = actual_df[sid].iloc[pid]
 
             exp_indx = sid_lu[int(sid)]
@@ -129,110 +122,64 @@ def cmp_sweep_events(actual_df, expected_h5, id_map=None, sampled=None):
     return True
 
 
-def cmp_peak(actual_df, expected_h5):
-    peak_grp = expected_h5['/peak']
-    actual_df = actual_df.set_index('cell_specimen_id')
-    sid_lu = {sid: i for i, sid in enumerate(peak_grp['cell_specimen_id'])}
-
-    failed = False
-    for sid in actual_df.index.values:
-        actual_features = actual_df.loc[sid]
-        expected_indx = sid_lu[int(sid)]
-        for col in actual_df.columns.values:
-            actual_val = actual_features[col]
-            expected_val = peak_grp[col][expected_indx]
-
-            if np.isnan(actual_val) != np.isnan(expected_val):
-                print(sid)
-                print(col, actual_val, expected_val)
-                failed = True
-            elif not np.isnan(actual_val) and actual_val != expected_val:
-                print(sid)
-                print(col, actual_val, expected_val)
-                failed = True
-
-    return not failed
-
-
 def cmp_spikes(spikes_dict, expected_h5, id_map=None):
+    if id_map is not None:
+        spikes_dict = {id_map[k]: v for k, v in spikes_dict.items()}
+
     failed = []
     spikes_grp = expected_h5['spikes']
-    id_map = id_map or {}
     for specimen_id in spikes_grp.keys():
         expected_ts = spikes_grp[specimen_id]['spikes'][()]
-        # print(specimen_id)
-        actual_ts = spikes_dict[id_map.get(int(specimen_id), specimen_id)]
+        actual_ts = spikes_dict[int(specimen_id)]
         if not np.allclose(actual_ts, expected_ts):
             failed.append(specimen_id)
-        #print(expected_ts)
-        #exit()
+
     if failed:
         print('failed specimen_ids: {}'.format(failed))
         return False
 
     return True
-    #print(list(spikes_grp.keys()))
-    #exit()
 
+
+def cmp_running_speed(stim_analysis, expected_h5):
+    running_speed = stim_analysis.running_speed['running_speed'].values
+    rs_actual = running_speed[~np.isnan(running_speed)]
+    running_speed = expected_h5['running_speed'][()]
+    rs_expected = running_speed[~np.isnan(running_speed)]
+    return np.allclose(rs_actual, rs_expected, atol=1.0e-5)
 
 
 def test_sg_data(spikes_file, expected_file):
-    from allensdk.brain_observatory.ecephys.static_gratings import StaticGratings
     expected_h5 = h5py.File(expected_file, 'r')
     if 'rnd_seed' in expected_h5.attrs:
         np.random.seed(expected_h5.attrs['rnd_seed'])
 
     ecephys_session = EcephysSession.from_nwb1_path(spikes_file)
-    units = ecephys_session.units
-    units = units[(units['location'] == 'probeC') & (units['structure_acronym'] == 'VISp')]
-    # id_map = {loc_id: unit_id for loc_id, unit_id in zip(units['local_index_unit'], units.index.values)}
-    id_map = {unit_id: loc_id for loc_id, unit_id in zip(units['local_index_unit'], units.index.values)}
-    #print(id_map)
-
-    #print(ecephys_session.units.columns)
-    #print(id_map)
-    # print(units['local_index_unit'])
-    #exit()
-
     sg = StaticGratings(spikes_file)
 
-    # print(np.allclose(expected_h5['dxcm'][()], sg.dxcm))
-    # print(np.allclose(expected_h5['dxcm_ts'][()], sg.dxtime))
-    # print(cmp_spikes(sg.spikes, expected_h5, id_map))
-    # print(expected_h5.attrs['numbercells'] == sg.numbercells)
-    # sweep_events = sg.sweep_events
-    # assert(cmp_sweep_events(sg.sweep_events.copy(), expected_h5, id_map))
+    if isinstance(sg.ecephys_session.api, EcephysNwb1Adaptor):
+        units = ecephys_session.units
+        units = units[(units['location'] == 'probeC') & (units['structure_acronym'] == 'VISp')]
+        id_map = {unit_id: loc_id for loc_id, unit_id in zip(units['local_index_unit'], units.index.values)}
+    else:
+        id_map = None
 
+    assert(np.allclose(expected_h5['dxcm'][()], sg.dxcm))
+    assert(np.allclose(expected_h5['dxcm_ts'][()], sg.dxtime))
+    assert(expected_h5.attrs['numbercells'] == sg.numbercells)
 
-    # Check the running_speed
-    # running_speed = sg.running_speed['running_speed'].values
-    # rs_actual = running_speed[~np.isnan(running_speed)]
-    # running_speed = expected_h5['running_speed'][()]
-    # rs_expected = running_speed[~np.isnan(running_speed)]
-    # assert(np.allclose(rs_actual, rs_expected, atol=1.0e-5))
+    if 'spikes' in expected_h5:
+        assert(cmp_spikes(sg.spikes, expected_h5, id_map))
 
+    if 'sweep_events' in expected_h5:
+        assert(cmp_sweep_events(sg.sweep_events.copy(), expected_h5, id_map))
 
-    # print(sg.mean_sweep_events)
+    assert(cmp_running_speed(sg, expected_h5))
     assert(cmp_mean_sweeps(sg.mean_sweep_events.copy(), expected_h5, id_map))
-
-    # print(sg.sweep_p_events)
     assert(cmp_p_sweeps(sg.sweep_p_values.copy(), expected_h5, id_map))
-
-    # print(sg.response_events)
-
-    print(sg.peak)
-    exit()
-
-
-
-    print(np.allclose(sg.dxcm, expected_h5['dxcm'][()]))
-
-    assert(cmp_peak(sg.peak.copy(), expected_h5))
-    # assert(cmp_p_sweeps(sg.sweep_p_values.copy(), expected_h5))
-    assert(cmp_peak_data(sg.peak.copy(), expected_h5))
-    ## assert(cmp_mean_sweeps(sg.mean_sweep_events.copy(), expected_h5))
-    assert(cmp_sweep_events(sg.sweep_events.copy(), expected_h5))
+    assert(cmp_peak_data(sg.peak.copy(), expected_h5, id_map))
 
 
 if __name__ == '__main__':
-    test_sg_data('data/mouse412792.spikes.nwb', expected_file='expected/mouse412792.static_grating.h5')
+    mouseid = 'mouse412792.filtered'
+    test_sg_data('data/{}.spikes.nwb'.format(mouseid), expected_file='expected/{}.static_grating.h5'.format(mouseid))
