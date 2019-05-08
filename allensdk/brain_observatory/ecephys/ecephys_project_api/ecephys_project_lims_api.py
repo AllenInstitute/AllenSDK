@@ -5,10 +5,10 @@ import warnings
 import pandas as pd
 
 from .ecephys_project_api import EcephysProjectApi
-from .lims_api_mixin import LimsApiMixin
+from allensdk.internal.api import PostgresQueryMixin
 
 
-class EcephysProjectLimsApi(EcephysProjectApi, LimsApiMixin):
+class EcephysProjectLimsApi(EcephysProjectApi, PostgresQueryMixin):
 
     def __init__(self, **kwargs):
         super(EcephysProjectApi, self).__init__(**kwargs)
