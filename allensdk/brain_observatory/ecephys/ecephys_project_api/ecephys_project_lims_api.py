@@ -28,7 +28,6 @@ class EcephysProjectLimsApi(EcephysProjectApi, LimsApiMixin):
         reader = open(main_nwb_path, 'rb')
         return reader
 
-
     def get_units(self, **kwargs):
         return self._get_units(**kwargs)
 
@@ -126,6 +125,9 @@ class EcephysProjectLimsApi(EcephysProjectApi, LimsApiMixin):
         response = self.select(query)
         response.set_index('id', inplace=True)
 
+        session_files = set(self._get_session_well_known_files(response.index.values, ['EcephysNwb'])['ecephys_session_id'].values)
+        response['has_nwb'] = response.index.isin(session_files)
+
         return response
 
     def _get_session_nwb_paths(self, session_id):
@@ -183,7 +185,6 @@ class EcephysProjectLimsApi(EcephysProjectApi, LimsApiMixin):
         response = self.select(query)
         return clean_wkf_response(response)
 
-
 def containment_filter_clause(pass_values, field, quote=False):
     if pass_values is None or len(pass_values) == 0:
         return ''
@@ -195,11 +196,9 @@ def containment_filter_clause(pass_values, field, quote=False):
     
     return f'{field} in ({",".join(pass_values)})'
 
-
 def and_filters(filters):
     filters = [ff for ff in filters if ff]
     return f'where {" and ".join(filters)}' if filters else ''
-
 
 def clean_wkf_response(response):
     if response.shape[0] == 0:
