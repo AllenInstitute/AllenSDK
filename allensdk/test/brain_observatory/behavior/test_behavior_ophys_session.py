@@ -14,6 +14,7 @@ from pandas.util.testing import assert_frame_equal
 from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorOphysSession
 from allensdk.brain_observatory.behavior.write_nwb.__main__ import BehaviorOphysJsonApi
 from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi, equals
+from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
 
 
 @pytest.mark.requires_bamboo
@@ -105,3 +106,20 @@ def test_visbeh_ophys_data_set():
                                         'task': 'DoC_untranslated',
                                         'response_window_sec': [0.15, 0.75],
                                         'stage': u'OPHYS_6_images_B'}
+
+@pytest.mark.nightly
+def test_legacy_dff_api():
+
+    ophys_experiment_id = 792813858
+    api = BehaviorOphysLimsApi(ophys_experiment_id)
+    session = BehaviorOphysSession(api)
+    cell_specimen_ids = [817111851, 817111897, 817115675, 817117206, 817111009]
+
+    _, dff_array = session.get_dff_traces()
+    csid_table = session.cell_specimen_table[['cell_specimen_id']].reset_index().set_index('cell_specimen_id')
+    for csid in cell_specimen_ids:
+        cell_roi_id = csid_table.loc[csid]['cell_roi_id']
+        dff_trace = session.dff_traces.loc[cell_roi_id]['dff']
+
+        ind = session.get_cell_specimen_indices([csid])[0]
+        np.testing.assert_array_almost_equal(dff_trace, dff_array[ind, :])

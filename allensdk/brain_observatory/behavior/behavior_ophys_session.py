@@ -7,6 +7,7 @@ import os
 from allensdk.core.lazy_property import LazyProperty, LazyPropertyMixin
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
 from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import equals
+from allensdk.deprecated import legacy
 
 
 class BehaviorOphysSession(LazyPropertyMixin):
@@ -81,6 +82,30 @@ class BehaviorOphysSession(LazyPropertyMixin):
         self.corrected_fluorescence_traces = LazyProperty(self.api.get_corrected_fluorescence_traces)
         self.average_image = LazyProperty(self.api.get_average_image)
         self.motion_correction = LazyProperty(self.api.get_motion_correction)
+
+    @legacy('Consider using "get_dff_timeseries" instead.')
+    def get_dff_traces(self, cell_specimen_ids=None):
+
+        if cell_specimen_ids is None:
+            cell_specimen_ids = self.get_cell_specimen_ids()
+
+        csid_table = self.cell_specimen_table[['cell_specimen_id']]
+        csid_subtable = csid_table[csid_table['cell_specimen_id'].isin(cell_specimen_ids)]
+        dff_table = csid_subtable.join(self.dff_traces, how='left')
+        dff_traces = np.vstack(dff_table['dff'].values)
+        timestamps = self.ophys_timestamps
+
+        assert (len(cell_specimen_ids), len(timestamps)) == dff_traces.shape
+        return timestamps, dff_traces
+
+    @legacy()
+    def get_cell_specimen_indices(self, cell_specimen_ids):
+        csid_table = self.cell_specimen_table[['cell_specimen_id']].set_index('cell_specimen_id')
+        return [csid_table.index.get_loc(csid) for csid in cell_specimen_ids]
+
+    @legacy('Consider using "cell_specimen_table[\'cell_specimen_id\']" instead.')
+    def get_cell_specimen_ids(self):
+        return self.cell_specimen_table['cell_specimen_id'].values
 
 
 if __name__ == "__main__":
