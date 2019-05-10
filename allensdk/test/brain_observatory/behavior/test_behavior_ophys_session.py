@@ -16,7 +16,7 @@ from allensdk.brain_observatory.behavior.write_nwb.__main__ import BehaviorOphys
 from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi, equals
 
 
-@pytest.mark.nightly
+@pytest.mark.requires_bamboo
 @pytest.mark.parametrize('oeid1, oeid2, expected', [
     pytest.param(789359614, 789359614, True),
     pytest.param(789359614, 739216204, False)
@@ -27,7 +27,7 @@ def test_equal(oeid1, oeid2, expected):
 
     assert equals(d1, d2) == expected
 
-@pytest.mark.nightly
+@pytest.mark.requires_bamboo
 def test_session_from_json(tmpdir_factory, session_data):
     oeid = 789359614
 
@@ -37,7 +37,7 @@ def test_session_from_json(tmpdir_factory, session_data):
     assert equals(d1, d2)
 
 
-@pytest.mark.nightly
+@pytest.mark.requires_bamboo
 def test_nwb_end_to_end(tmpdir_factory):
     oeid = 789359614
     nwb_filepath = os.path.join(str(tmpdir_factory.mktemp('test_nwb_end_to_end')), 'nwbfile.nwb')
@@ -49,7 +49,7 @@ def test_nwb_end_to_end(tmpdir_factory):
     assert equals(d1, d2)
 
 
-@pytest.mark.nightly
+@pytest.mark.requires_bamboo
 def test_visbeh_ophys_data_set():
 
     ophys_experiment_id = 789359614
