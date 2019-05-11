@@ -1,6 +1,6 @@
 from ecephys_analysis_modules.common.static_gratings_sdv import StaticGratings
-#from ecephys_analysis_modules.common.drifting_gratings_sdv import DriftingGratings
-#from ecephys_analysis_modules.common.natural_scenes_sdv import NaturalScenes
+from ecephys_analysis_modules.common.drifting_gratings_sdv import DriftingGratings
+from ecephys_analysis_modules.common.natural_scenes_sdv import NaturalScenes
 
 
 import os
@@ -17,8 +17,8 @@ save_sweep_events = False
 
 stims_lu = {
     'static_grating': StaticGratings,
-    #'drifting_grating': DriftingGratings,
-    #'natural_scene': NaturalScenes
+    'drifting_grating': DriftingGratings,
+    'natural_scene': NaturalScenes
 }
 
 
@@ -162,7 +162,7 @@ def filter_nwb(mouseid, base_dir='data', stim_presenations=None, unit_list=None)
         for probe_name, probe_grp in orig_h5['processing'].items():
             print(probe_name)
             selected_units = []
-            for unit_id, unit_grp  in probe_grp['UnitTimes'].items():
+            for unit_id, unit_grp in probe_grp['UnitTimes'].items():
                 if not isinstance(unit_grp, h5py.Group):
                     continue
                 try:
@@ -196,12 +196,16 @@ def filter_nwb(mouseid, base_dir='data', stim_presenations=None, unit_list=None)
 if __name__ == '__main__':
     mouseid = 'mouse412792'
 
+    '''
+    mouseid = 'mouse412792'
     unit_list = [161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 179, 180, 181,
                  182, 183, 184, 185, 186, 187, 188, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202,
+                 
                  203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 215, 216, 217, 218, 219, 220, 221, 222, 223]
     mouseid = filter_nwb(mouseid, unit_list=unit_list[:20])
+    
+    '''
 
     create_data(mouseid=mouseid, stimulus_type='static_grating')
-    # create_data(mouseid='mouse412792', stimulus_type='drifting_grating')
-    # create_data(mouseid='mouse412792', stimulus_type='natural_scene')
-    # create_sg_data(mouseid='mouse412792')
+    create_data(mouseid=mouseid, stimulus_type='drifting_grating')
+    create_data(mouseid=mouseid, stimulus_type='natural_scene')

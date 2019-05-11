@@ -19,12 +19,6 @@ class StimulusAnalysis(object):
         self._stim_table = None
         self._stim_table_spontaneous = None
         self._stimulus_names = None
-        self._orivals = None
-        self._number_ori = None
-        self._sfvals = None
-        self._number_sf = None
-        self._phasevals = None
-        self._number_phase = None
         self._running_speed = None
         self._sweep_events = None
         self._mean_sweep_events = None
@@ -81,12 +75,15 @@ class StimulusAnalysis(object):
         # BOb analog
         return self._ecephys_session.running_speed.timestamps
 
+    def _stim_presentation_prefix(self):
+        raise NotImplementedError()
+
     @property
     def stim_table(self):
         # BOb analog
         # Stimulus table is already in EcephysSession object, just need to subselect 'static_gratings' presentations.
         if self._stim_table is None:
-            # TODO: Give warning if no static_gratings stimulus
+            # TODO: Give warning if no static_gratings stimulus?
             if self._stimulus_names is None:
                 # Older versions of NWB files the stimulus name is in the form stimulus_gratings_N, so if
                 # self._stimulus_names is not explicity specified try to figure out stimulus
@@ -116,52 +113,8 @@ class StimulusAnalysis(object):
         return self._stim_table_spontaneous
 
     @property
-    def orivals(self):
-        if self._orivals is None:
-            self._get_stim_table_stats()
-
-        return self._orivals
-
-    @property
-    def number_ori(self):
-        if self._number_ori is None:
-            self._get_stim_table_stats()
-
-        return self._number_ori
-
-    @property
-    def sfvals(self):
-        if self._sfvals is None:
-            self._get_stim_table_stats()
-
-        return self._sfvals
-
-    @property
-    def number_sf(self):
-        if self._number_sf is None:
-            self._get_stim_table_stats()
-
-        return self._number_sf
-
-    @property
-    def phasevals(self):
-        if self._phasevals is None:
-            self._get_stim_table_stats()
-
-        return self._phasevals
-
-    @property
-    def number_phase(self):
-        if self._number_phase is None:
-            self._get_stim_table_stats()
-
-        return self._number_phase
-
-    @property
     def sweep_events(self):
         if self._sweep_events is None:
-            # stim_presentation_ids = self.stim_table.index.values
-            # unit_ids = self.cell_id
             start_times = self.stim_table['start_time'].values - 1.0
             stop_times = self.stim_table['stop_time'].values
             sweep_events = pd.DataFrame(index=self.stim_table.index.values, columns=self.spikes.keys())
@@ -177,11 +130,9 @@ class StimulusAnalysis(object):
 
         return self._sweep_events
 
-
     @property
     def running_speed(self):
         if self._running_speed is None:
-            # running_speed = pd.DataFrame(index=self.stim_table.index.values, columns=['running_speed'])
             stim_times = np.zeros(len(self.stim_table)*2, dtype=np.float64)
             stim_times[::2] = self.stim_table['start_time'].values
             stim_times[1::2] = self.stim_table['stop_time'].values
@@ -191,11 +142,19 @@ class StimulusAnalysis(object):
 
             indices = np.searchsorted(stim_times, relevant_dxtimes) - 1  # excludes dxtimes occuring at time_stop
             rs_tmp_df = pd.DataFrame({'running_speed': relevant_dxcms, 'stim_indicies': indices})
+
+            # odd indicies have running speeds between start and stop times and should be removed
+            rs_tmp_df = rs_tmp_df[rs_tmp_df['stim_indicies'].mod(2) == 0]
+
+            # get averaged running speed for each stimulus
             rs_tmp_df = rs_tmp_df.groupby('stim_indicies').agg('mean')
 
-            # Remove odd numbered indicies (which indicates that a running speed was measured between start and stop times).
-            rs_tmp_df = rs_tmp_df.loc[list(range(0, 12000, 2))]
-            rs_tmp_df = rs_tmp_df.set_index(self.stim_table.index.values)
+            # some stimulus might not have an assoicated running_speed, set missing rows to NaN
+            new_index = pd.Index(range(0, len(self.stim_table)*2, 2), name='stim_indicies')
+            rs_tmp_df = rs_tmp_df.reindex(new_index)
+
+            # reset index with presentation ids
+            rs_tmp_df = rs_tmp_df.set_index(self.stim_table.index)
             self._running_speed = rs_tmp_df
 
         return self._running_speed
@@ -203,15 +162,3 @@ class StimulusAnalysis(object):
     @property
     def mean_sweep_events(self):
         raise NotImplementedError()
-
-
-    def _get_stim_table_stats(self):
-        sg_stim_table = self.stim_table
-        self._orivals = np.sort(sg_stim_table['Ori'].dropna().unique())  # list(range(0, 180, 30))
-        self._number_ori = len(self._orivals)
-
-        self._sfvals = np.sort(sg_stim_table['SF'].dropna().unique())  # [0.02, 0.04, 0.08, 0.16, 0.32]
-        self._number_sf = len(self._sfvals)
-
-        self._phasevals = np.sort(sg_stim_table['Phase'].dropna().unique())  # [0.0, 0.25, 0.50, 0.75]
-        self._number_phase = len(self._phasevals)
