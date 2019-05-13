@@ -54,6 +54,9 @@ def check_write_access(filepath):
     raise RuntimeError('Unhandled case; this should not happen')
 
 
+def check_write_access_overwrite(path):
+    return check_write_access(path, allow_exists=True)
+        
 def check_read_access(path):
     try:
         f = open(path, mode='r')

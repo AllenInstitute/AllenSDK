@@ -36,23 +36,16 @@ def add_running_speed_to_nwbfile(nwbfile, running_speed, name='speed', unit='cm/
 
     '''
 
-    timestamps_ts = TimeSeries(
-        name='timestamps',
-        timestamps=running_speed.timestamps,
-        unit='s'
-    )
-
     running_speed_series = pynwb.base.TimeSeries(
         name=name,
         data=running_speed.values,
-        timestamps=timestamps_ts,
+        timestamps=running_speed.timestamps,
         unit=unit
     )
 
     running_mod = ProcessingModule('running', 'Running speed processing module')
     nwbfile.add_processing_module(running_mod)
 
-    running_mod.add_data_interface(timestamps_ts)
     running_mod.add_data_interface(running_speed_series)
 
     return nwbfile
@@ -83,7 +76,7 @@ def add_running_data_df_to_nwbfile(nwbfile, running_data_df, unit_dict, index_ke
     add_running_speed_to_nwbfile(nwbfile, running_speed, name='speed', unit=unit_dict['speed'])
 
     running_mod = nwbfile.modules['running']
-    timestamps_ts = running_mod.get_data_interface('timestamps')
+    timestamps_ts = running_mod.get_data_interface('speed').timestamps
 
     running_dx_series = TimeSeries(
         name='dx',
@@ -167,24 +160,10 @@ def add_stimulus_presentations(nwbfile, stimulus_table, tag='stimulus_epoch'):
     return nwbfile
 
 
-def add_ophys_timestamps(nwbfile, ophys_timestamps, module_name='two_photon_imaging'):
-
-    stimulus_ts = TimeSeries(
-        name='timestamps',
-        timestamps=ophys_timestamps,
-        unit='s'
-    )
-
-    stim_mod = ProcessingModule(module_name, 'Ophys timestamps processing module')
-    nwbfile.add_processing_module(stim_mod)
-    stim_mod.add_data_interface(stimulus_ts)
-
-    return nwbfile
-
-  
 def add_stimulus_timestamps(nwbfile, stimulus_timestamps, module_name='stimulus'):
 
     stimulus_ts = TimeSeries(
+        data=stimulus_timestamps,
         name='timestamps',
         timestamps=stimulus_timestamps,
         unit='s'
@@ -220,6 +199,7 @@ def add_trials(nwbfile, trials, description_dict={}):
 def add_licks(nwbfile, licks):
 
     licks_event_series = TimeSeries(
+        data=licks.time.values,
         name='timestamps',
         timestamps=licks.time.values,
         unit='s'
@@ -239,28 +219,21 @@ def add_licks(nwbfile, licks):
 def add_rewards(nwbfile, rewards_df):
     assert rewards_df.index.name == 'timestamps'
 
-    reward_timestamps_ts = TimeSeries(
-        name='timestamps',
-        timestamps=rewards_df.index.values,
-        unit='s'
-    )
-
     reward_volume_ts = TimeSeries(
         name='volume',
         data=rewards_df.volume.values,
-        timestamps=reward_timestamps_ts,
+        timestamps=rewards_df.index.values,
         unit='ml'
     )
 
     autorewarded_ts = TimeSeries(
         name='autorewarded',
         data=rewards_df.autorewarded.values,
-        timestamps=reward_timestamps_ts,
+        timestamps=reward_volume_ts.timestamps,
         unit=None
     )
 
     rewards_mod = ProcessingModule('rewards', 'Licking behavior processing module')
-    rewards_mod.add_data_interface(reward_timestamps_ts)
     rewards_mod.add_data_interface(reward_volume_ts)
     rewards_mod.add_data_interface(autorewarded_ts)
     nwbfile.add_processing_module(rewards_mod)
@@ -396,7 +369,14 @@ def add_cell_specimen_table(nwbfile, cell_specimen_table):
 
     # Image Segmentation:
     image_segmentation = ImageSegmentation(name="image_segmentation")
-    nwbfile.modules['two_photon_imaging'].add_data_interface(image_segmentation)
+
+    if 'two_photon_imaging' not in nwbfile.modules:
+        two_photon_imaging_module = ProcessingModule('two_photon_imaging', '2P processing module')
+        nwbfile.add_processing_module(two_photon_imaging_module)
+    else:
+        two_photon_imaging_module = nwbfile.modules['two_photon_imaging']
+
+    two_photon_imaging_module.add_data_interface(image_segmentation)
 
     # Plane Segmentation:
     plane_segmentation = image_segmentation.create_plane_segmentation(
@@ -419,11 +399,10 @@ def add_cell_specimen_table(nwbfile, cell_specimen_table):
     return nwbfile
 
 
-def add_dff_traces(nwbfile, dff_traces):
+def add_dff_traces(nwbfile, dff_traces, ophys_timestamps):
     dff_traces = dff_traces.reset_index().set_index('cell_roi_id')[['dff']]
 
     twop_module = nwbfile.modules['two_photon_imaging']
-    ophys_timestamps = twop_module.get_data_interface('timestamps')
     data = np.array([dff_traces.loc[cell_roi_id].dff for cell_roi_id in dff_traces.index.values])
     # assert len(ophys_timestamps.timestamps) == len(data)
 
@@ -454,7 +433,7 @@ def add_corrected_fluorescence_traces(nwbfile, corrected_fluorescence_traces):
     assert corrected_fluorescence_traces.index.name == 'cell_roi_id'
     twop_module = nwbfile.modules['two_photon_imaging']
     roi_table_region = nwbfile.modules['two_photon_imaging'].data_interfaces['dff'].roi_response_series['traces'].rois
-    ophys_timestamps = twop_module.get_data_interface('timestamps')
+    ophys_timestamps = twop_module.get_data_interface('dff').roi_response_series['traces'].timestamps
     f_interface = Fluorescence(name='corrected_fluorescence')
     twop_module.add_data_interface(f_interface)
     f_interface.create_roi_response_series(
@@ -470,7 +449,7 @@ def add_corrected_fluorescence_traces(nwbfile, corrected_fluorescence_traces):
 def add_motion_correction(nwbfile, motion_correction):
 
     twop_module = nwbfile.modules['two_photon_imaging']
-    ophys_timestamps = twop_module.get_data_interface('timestamps')
+    ophys_timestamps = twop_module.get_data_interface('dff').roi_response_series['traces'].timestamps
 
     t1 = TimeSeries(
         name='x',

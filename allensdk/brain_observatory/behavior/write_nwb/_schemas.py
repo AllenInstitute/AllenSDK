@@ -3,7 +3,7 @@ from argschema.schemas import DefaultSchema
 from argschema.fields import LogLevel, String, Int, DateTime, Nested, Boolean, Float, List, Dict
 from marshmallow import RAISE, ValidationError
 
-from allensdk.brain_observatory.argschema_utilities import check_read_access, check_write_access, RaisingSchema
+from allensdk.brain_observatory.argschema_utilities import check_read_access, check_write_access_overwrite, RaisingSchema
 
 class CellSpecimenTable(RaisingSchema):
     cell_roi_id = Dict(String, Int, required=True)
@@ -53,7 +53,7 @@ class InputSchema(ArgSchema):
         unknown = RAISE
     log_level = LogLevel(default='INFO', description='set the logging level of the module')
     session_data = Nested(SessionData, required=True, description='records of the individual probes used for this experiment')
-    output_path = String(required=True, validate=check_write_access, description='write outputs to here')
+    output_path = String(required=True, validate=check_write_access_overwrite, description='write outputs to here')
 
 
 class OutputSchema(RaisingSchema):

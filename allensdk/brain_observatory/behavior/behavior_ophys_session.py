@@ -156,7 +156,7 @@ if __name__ == "__main__":
         # print(session.running_speed)
 
 
-    # nwb_filepath = '/home/nicholasc/projects/allensdk/tmp.nwb'
+    nwb_filepath = '/home/nicholasc/projects/allensdk/tmp.nwb'
     # session = BehaviorOphysSession(789359614)
     # nwb_api = BehaviorOphysNwbApi(nwb_filepath)
     # nwb_api.save(session)
@@ -177,6 +177,8 @@ if __name__ == "__main__":
     session = BehaviorOphysSession.from_LIMS(ophys_experiment_id)
 
 
+    session = BehaviorOphysSession.from_LIMS(789359614)
+    BehaviorOphysNwbApi(nwb_filepath).save(session)
     # session.segmentation_mask_image
     # session.stimulus_timestamps
     # session.ophys_timestamps
@@ -186,7 +188,7 @@ if __name__ == "__main__":
     # running_speed
     # print(session.stimulus_index)
     # session.running_data_df
-    # session.cell_specimen_table
+    # print(session.stimulus_presentations)
     # session.stimulus_templates
     # session.stimulus_index
     # session.licks
