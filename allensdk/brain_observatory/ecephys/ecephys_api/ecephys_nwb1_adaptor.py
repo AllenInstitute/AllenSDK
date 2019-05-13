@@ -95,7 +95,8 @@ class EcephysNwb1Adaptor(EcephysApi):
         b'pos_y': 'Pos_y',
         b'orientation': 'Ori',
         b'color': 'Color',
-        b'phase': 'Phase'
+        b'phase': 'Phase',
+        b'frame': 'Image'
     }
 
     def get_stimulus_presentations(self) -> pd.DataFrame:
@@ -136,6 +137,7 @@ class EcephysNwb1Adaptor(EcephysApi):
                 'Pos_y': stim_props.get('Pos_y', np.nan),
                 'Color': stim_props.get('Color', np.nan),
                 'Phase': stim_props.get('Phase', np.nan),
+                'Image': stim_props.get('Image', np.nan),
                 'stimulus_block': block_i  # Required by conditionwise_spike_counts(), add made-up number
             })
 

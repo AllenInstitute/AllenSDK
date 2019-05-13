@@ -1,7 +1,9 @@
+import pytest
 import numpy as np
 import h5py
 
 from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
+from allensdk.brain_observatory.ecephys.static_gratings import StaticGratings
 from allensdk.brain_observatory.ecephys.drifting_gratings import DriftingGratings
 from allensdk.brain_observatory.ecephys.natural_scenes import NaturalScenes
 from allensdk.brain_observatory.ecephys.ecephys_api import EcephysNwb1Adaptor
@@ -105,7 +107,7 @@ def cmp_p_sweeps(actual_df, expected_h5, id_map=None):
         expected_vals = spv_grp['data'][:, expected_indx]
         actual_vals = actual_df[sid].values  # actual_df[str(sid)].values
         if not np.allclose(expected_vals, actual_vals, atol=1.0e-3):
-            for i in range(6000):
+            for i in range(len(expected_vals)):
                 if np.abs(expected_vals[i] - actual_vals[i]) > 1.0e-3:
                     print(expected_vals[i], actual_vals[i])
 
@@ -117,9 +119,15 @@ def cmp_p_sweeps(actual_df, expected_h5, id_map=None):
     return True
 
 def cmp_peak_data(actual_df, expected_h5, id_map=None):
+    """Compare the peak table.
+
+    :param actual_df:
+    :param expected_h5:
+    :param id_map:
+    """
     failed = []
     peak_grp = expected_h5['peak']
-    sid_lu = {sid: i for i, sid in enumerate(peak_grp['cell_specimen_id'])}
+    # sid_lu = {sid: i for i, sid in enumerate(peak_grp['cell_specimen_id'])}
 
     actual_df.set_index('cell_specimen_id', inplace=True)
     if id_map is not None:
@@ -131,41 +139,13 @@ def cmp_peak_data(actual_df, expected_h5, id_map=None):
         print('specimen_ids do not match.')
         return False
 
-    # print(peak_grp['cell_specimen_id'])
-    # expected_specimen_ids = peak_grp['cell_specimen_id'].values
-    # expected_sort_order = np.argsort(peak_grp['cell_specimen_id'][()])
-    # print(expected_sort_order)
-    # print(peak_grp['cell_specimen_id'][()])
-    actual_df = actual_df.reindex(index=peak_grp['cell_specimen_id'][()])
-    #print(actual_df)
-    #exit()
-
+    # make sure not missing any peak columns
     assert(set(actual_df.columns) == set([k for k in peak_grp.keys() if k != 'cell_specimen_id']))
-    #print(set([k for k in peak_grp.keys() if k != 'cell_specimen_id']))
-    #exit()
 
-
-    # TODO: Get column names from stimulus_analysis
-    #for col in ['pref_ori_dg', 'pref_tf_dg', 'num_pref_trials_dg', 'responsive_dg', 'g_osi_dg', 'g_dsi_dg', 'tfdi_dg',
-    #            'reliability_dg', 'lifetime_sparseness_dg', 'fit_tf_dg', 'fit_tf_ind_dg', 'tf_low_cutoff_dg',
-    #            'tf_high_cutoff_dg', 'run_pval_dg', 'run_resp_dg', 'stat_resp_dg', 'run_mod_dg',
-    #            'peak_blank_dg', 'all_blank_dg']:
+    actual_df = actual_df.reindex(index=peak_grp['cell_specimen_id'][()]) # make sure cell_id order is the same
     for col in actual_df.columns:
-
-        # TODO: Need reorder the actual column so the specimen_ids allways match up with expected
-        #print(actual_df[col].values[expected_sort_order])
-        #exit()
-        #print(col)
-        #print(actual_df[col].dtype)
-        #print(actual_df[col].values)
-        #print(peak_grp[col][()])
-        #print(actual_df)
-        #print(actual_df[[col]])
         if not np.allclose(actual_df[col].values, peak_grp[col][()], equal_nan=True):
             failed.append(col)
-            #print(col)
-            #print(actual_df[col].values)
-            #exit()
 
     if failed:
         print(failed)
@@ -174,49 +154,44 @@ def cmp_peak_data(actual_df, expected_h5, id_map=None):
     return True
 
 
+@pytest.mark.parametrize('spikes_file,expected_file,stim_analysis_class',
+                         [('data/mouse412792.filtered.spikes.nwb', 'expected/mouse412792.filtered.static_grating.h5', StaticGratings),
+                          ('data/mouse412792.filtered.spikes.nwb', 'expected/mouse412792.filtered.drifting_grating.h5', DriftingGratings),
+                          ('data/mouse412792.filtered.spikes.nwb', 'expected/mouse412792.filtered.natural_scene.h5', NaturalScenes)])
 def test_stimulus_data(spikes_file, expected_file, stim_analysis_class):
     expected_h5 = h5py.File(expected_file, 'r')
     if 'rnd_seed' in expected_h5.attrs:
         np.random.seed(expected_h5.attrs['rnd_seed'])
 
     ecephys_session = EcephysSession.from_nwb1_path(spikes_file)
-    stim_table = stim_analysis_class(spikes_file)
+    sa = stim_analysis_class(spikes_file)
 
-    if isinstance(stim_table.ecephys_session.api, EcephysNwb1Adaptor):
+    if isinstance(sa.ecephys_session.api, EcephysNwb1Adaptor):
         units = ecephys_session.units
         units = units[(units['location'] == 'probeC') & (units['structure_acronym'] == 'VISp')]
         id_map = {unit_id: loc_id for loc_id, unit_id in zip(units['local_index_unit'], units.index.values)}
     else:
         id_map = None
 
-    assert(np.allclose(expected_h5['dxcm'][()], stim_table.dxcm))
-    assert(np.allclose(expected_h5['dxcm_ts'][()], stim_table.dxtime))
-    assert(expected_h5.attrs['numbercells'] == stim_table.numbercells)
-    print(stim_table.stim_table.columns)
-    exit()
-
-    #print(dg.stim_table.columns)
-    #print(dg.stim_table[['start_time', 'SF']])
-    #print(expected_h5['stimulus_table'])
+    assert(np.allclose(expected_h5['dxcm'][()], sa.dxcm))
+    assert(np.allclose(expected_h5['dxcm_ts'][()], sa.dxtime))
+    assert(expected_h5.attrs['numbercells'] == sa.numbercells)
 
     if 'spikes' in expected_h5:
-        assert(cmp_spikes(stim_table.spikes, expected_h5, id_map))
+        assert(cmp_spikes(sa.spikes, expected_h5, id_map))
 
-    #if 'sweep_events' in expected_h5:
-    #    assert(cmp_sweep_events(stim_table.sweep_events.copy(), expected_h5, id_map))
+    if 'sweep_events' in expected_h5:
+        assert(cmp_sweep_events(sa.sweep_events.copy(), expected_h5, id_map))
 
-    #print(dg.running_speed[:10])
-    #print(expected_h5['running_speed'][:10])
-    assert(cmp_running_speed(stim_table, expected_h5))
-    assert(cmp_mean_sweeps(stim_table.mean_sweep_events.copy(), expected_h5, id_map))
-    #print(dg.sweep_p_values[739])
-    #print(id_map)
-    assert(cmp_p_sweeps(stim_table.sweep_p_values.copy(), expected_h5, id_map))
-    assert(cmp_peak_data(stim_table.peak.copy(), expected_h5, id_map))
+    assert(cmp_running_speed(sa, expected_h5))
+    assert(cmp_mean_sweeps(sa.mean_sweep_events.copy(), expected_h5, id_map))
+    assert(cmp_p_sweeps(sa.sweep_p_values.copy(), expected_h5, id_map))
+    assert(cmp_peak_data(sa.peak.copy(), expected_h5, id_map))
 
 
 if __name__ == '__main__':
-    # mouseid = 'mouse412792.filtered'
-    mouseid = 'mouse412792'
-    # test_sg_data('data/{}.spikes.nwb'.format(mouseid), expected_file='expected/{}.drifting_grating.h5'.format(mouseid))
+    mouseid = 'mouse412792.filtered'
+    # mouseid = 'mouse412792'
+    test_stimulus_data('data/{}.spikes.nwb'.format(mouseid), expected_file='expected/{}.static_grating.h5'.format(mouseid), stim_analysis_class=StaticGratings)
+    test_stimulus_data('data/{}.spikes.nwb'.format(mouseid), expected_file='expected/{}.drifting_grating.h5'.format(mouseid), stim_analysis_class=DriftingGratings)
     test_stimulus_data('data/{}.spikes.nwb'.format(mouseid), expected_file='expected/{}.natural_scene.h5'.format(mouseid), stim_analysis_class=NaturalScenes)

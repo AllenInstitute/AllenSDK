@@ -16,7 +16,6 @@ class StaticGratings(StimulusAnalysis):
         self._number_sf = None
         self._phasevals = None
         self._number_phase = None
-        # self._sweep_p_values = None
         self._response_events = None
         self._response_trials = None
         # self._peak = None
@@ -93,32 +92,6 @@ class StaticGratings(StimulusAnalysis):
         return self._mean_sweep_events
 
     @property
-    def sweep_p_values(self):
-        if self._sweep_p_values is None:
-            # TODO: Code is currently a speed bottle-neck and could probably be improved.
-            # Recreate the mean-sweep-table but using randomly selected 'spontaneuous' stimuli.
-            shuffled_mean = np.empty((self.numbercells, 10000))
-            idx = np.random.choice(np.arange(self.stim_table_spontaneous['start_time'].iloc[0],
-                                             self.stim_table_spontaneous['stop_time'].iloc[0],
-                                             0.0001), 10000)  # TODO: what step size for np.arange?
-            for shuf in range(10000):
-                for i, v in enumerate(self.spikes.keys()):
-                    spikes = self.spikes[v]
-                    shuffled_mean[i, shuf] = len(spikes[(spikes > idx[shuf]) & (spikes < (idx[shuf] + 0.33))])
-
-            sweep_p_values = pd.DataFrame(index=self.stim_table.index.values, columns=self.sweep_events.columns)
-            for i, v in enumerate(self.spikes.keys()):
-                subset = self.mean_sweep_events[v].values
-                null_dist_mat = np.tile(shuffled_mean[i, :], reps=(len(subset), 1))
-                actual_is_less = subset.reshape(len(subset), 1) <= null_dist_mat
-                p_values = np.mean(actual_is_less, axis=1)
-                sweep_p_values[v] = p_values
-
-            self._sweep_p_values = sweep_p_values
-
-        return self._sweep_p_values
-
-    @property
     def response_events(self):
         if self._response_events is None:
             self._get_response_events()
@@ -161,6 +134,7 @@ class StaticGratings(StimulusAnalysis):
             peak_df['sf_low_cutoff_sg'] = np.nan
             peak_df['sf_high_cutoff_sg'] = np.nan
 
+            # TODO: Make cell_id the df index?
             peak_df['cell_specimen_id'] = list(self.spikes.keys())
             peak_df['lifetime_sparseness_sg'] = self._get_lifetime_sparseness()
 
@@ -175,7 +149,7 @@ class StaticGratings(StimulusAnalysis):
                 peak_df.loc[nc, 'pref_phase_sg'] = self.phasevals[pref_phase]
 
                 peak_df.loc[nc, 'num_pref_trials_sg'] = int(self.response_events[pref_ori, pref_sf+1, pref_phase, nc, 2])
-                peak_df.loc[nc, 'responsive_sg'] = self.response_events[pref_ori, pref_sf + 1, pref_phase, nc, 2] > 11
+                peak_df.loc[nc, 'responsive_sg'] = self.response_events[pref_ori, pref_sf+1, pref_phase, nc, 2] > 11
 
                 stim_table_mask = (self.stim_table['SF'] == self.sfvals[pref_sf]) & \
                                   (self.stim_table['Ori'] == self.orivals[pref_ori]) & \
@@ -276,34 +250,6 @@ class StaticGratings(StimulusAnalysis):
 
         return np.abs(cv_top_os.sum()) / tuning.sum()
 
-    def _get_reliability(self, specimen_id, st_mask):
-        """computes trial-to-trial reliability of cell at its preferred condition
-
-        :param specimen_id:
-        :param st_mask:
-        :return:
-        """
-        subset = self.sweep_events[st_mask][specimen_id].values
-        # print(subset)
-        #subset = self.sweep_events[(self.stim_table['SF']==self.sfvals[pref_sf]) &
-        #                           (self.stim_table['Ori']==self.orivals[pref_ori]) &
-        #                           (self.stim_table['Phase']==self.phasevals[pref_phase])]
-
-        subset += 1.0
-        corr_matrix = np.empty((len(subset), len(subset)))
-        for i in range(len(subset)):
-            fri = get_fr(subset[i])
-            # fri = get_fr(subset[v].iloc[i])
-            for j in range(len(subset)):
-                # frj = get_fr(subset[v].iloc[j])
-                frj = get_fr(subset[j])
-                r, p = st.pearsonr(fri[30:40], frj[30:40])
-                corr_matrix[i, j] = r
-
-        inds = np.triu_indices(len(subset), k=1)
-        upper = corr_matrix[inds[0], inds[1]]
-        return np.nanmean(upper)
-
     def _get_sfdi(self, pref_ori, pref_phase, nc):
         """computes spatial frequency discrimination index for cell
 
@@ -348,44 +294,6 @@ class StaticGratings(StimulusAnalysis):
         else:
             return np.NaN, np.NaN, np.NaN, np.NaN
 
-    '''
-    def _get_running_modulation(self, pref_ori, pref_sf, pref_phase, v):
-        """computes running modulation of cell at its preferred condition provided there are at least 2 trials for both
-        stationary and running conditions
-
-        :param pref_ori:
-        :param pref_sf:
-        :param pref_phase:
-        :param v:
-        :return: p_value of running modulation, running modulation metric, mean response to preferred condition when
-        running mean response to preferred condition when stationary
-        """
-        subset = self.mean_sweep_events[(self.stim_table['SF'] == self.sfvals[pref_sf])
-                                        & (self.stim_table['Ori'] == self.orivals[pref_ori])
-                                        & (self.stim_table['Phase'] == self.phasevals[pref_phase])]
-        speed_subset = self.running_speed[(self.stim_table['SF'] == self.sfvals[pref_sf])
-                                          & (self.stim_table['Ori'] == self.orivals[pref_ori])
-                                          & (self.stim_table['Phase'] == self.phasevals[pref_phase])]
-
-        subset_run = subset[speed_subset.running_speed >= 1]
-        subset_stat = subset[speed_subset.running_speed < 1]
-        # print(len(subset_run), len(subset_stat))
-        if np.logical_and(len(subset_run) > 1, len(subset_stat) > 1):
-            # print('HERE')
-            run = subset_run[v].mean()
-            stat = subset_stat[v].mean()
-            if run > stat:
-                run_mod = (run - stat) / run
-            elif stat > run:
-                run_mod = -1 * (stat - run) / stat
-            else:
-                run_mod = 0
-            (_, p) = st.ttest_ind(subset_run[v], subset_stat[v], equal_var=False)
-            return p, run_mod, run, stat
-        else:
-            return np.NaN, np.NaN, np.NaN, np.NaN
-    '''
-
     def _fit_sf_tuning(self, pref_ori, pref_sf, pref_phase, nc):
         """performs gaussian or exponential fit on the spatial frequency tuning curve at preferred orientation/phase.
 
@@ -401,10 +309,10 @@ class StaticGratings(StimulusAnalysis):
         fit_sf = np.NaN
         sf_low_cutoff = np.NaN
         sf_high_cutoff = np.NaN
-        print(pref_sf)
         if pref_sf in range(1, 4):  # TODO: Is this correct?
             try:
-                popt, pcov = curve_fit(gauss_function, range(5), sf_tuning, p0=[np.amax(sf_tuning), pref_sf, 1.], maxfev=2000)
+                popt, pcov = curve_fit(gauss_function, range(5), sf_tuning, p0=[np.amax(sf_tuning), pref_sf, 1.],
+                                       maxfev=2000)
                 sf_prediction = gauss_function(np.arange(0., 4.1, 0.1), *popt)
                 fit_sf_ind = popt[1]
                 fit_sf = 0.02*np.power(2, popt[1])
@@ -441,15 +349,6 @@ class StaticGratings(StimulusAnalysis):
 
 def do_sweep_mean_shifted(x):
     return len(x[(x > 0.066) & (x < 0.316)])/0.25
-
-
-def get_fr(spikes, num_timestep_second=30, filter_width=0.1):
-    spikes = spikes.astype(float)
-    spike_train = np.zeros((int(3.1*num_timestep_second)))  # hardcoded 3 second sweep length
-    spike_train[(spikes*num_timestep_second).astype(int)] = 1
-    filter_width = int(filter_width*num_timestep_second)
-    fr = ndi.gaussian_filter(spike_train, filter_width)
-    return fr
 
 
 def gauss_function(x, a, x0, sigma):
