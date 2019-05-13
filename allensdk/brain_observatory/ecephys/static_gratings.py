@@ -16,10 +16,10 @@ class StaticGratings(StimulusAnalysis):
         self._number_sf = None
         self._phasevals = None
         self._number_phase = None
-        self._sweep_p_values = None
+        # self._sweep_p_values = None
         self._response_events = None
         self._response_trials = None
-        self._peak = None
+        # self._peak = None
 
     @property
     def stim_table(self):
@@ -270,9 +270,6 @@ class StaticGratings(StimulusAnalysis):
         """
         orivals_rad = np.deg2rad(self.orivals)
         tuning = self.response_events[:, pref_sf+1, pref_phase, nc, 0]
-        print(pref_sf)
-        print(tuning)
-        # exit()
         cv_top_os = np.empty(self.number_ori, dtype=np.complex128)
         for i in range(self.number_ori):
             cv_top_os[i] = (tuning[i] * np.exp(1j*2*orivals_rad[i]))

@@ -22,6 +22,8 @@ class StimulusAnalysis(object):
         self._running_speed = None
         self._sweep_events = None
         self._mean_sweep_events = None
+        self._sweep_p_values = None
+        self._peak = None
 
     @property
     def ecephys_session(self):
@@ -80,25 +82,7 @@ class StimulusAnalysis(object):
 
     @property
     def stim_table(self):
-        # BOb analog
-        # Stimulus table is already in EcephysSession object, just need to subselect 'static_gratings' presentations.
-        if self._stim_table is None:
-            # TODO: Give warning if no static_gratings stimulus?
-            if self._stimulus_names is None:
-                # Older versions of NWB files the stimulus name is in the form stimulus_gratings_N, so if
-                # self._stimulus_names is not explicity specified try to figure out stimulus
-                stims_table = self.ecephys_session.stimulus_presentations
-                stim_names = [s for s in stims_table['stimulus_name'].unique()
-                              if s.lower().startswith('static_gratings')]
-
-                self._stim_table = stims_table[stims_table['stimulus_name'].isin(stim_names)]
-
-            else:
-                self._stimulus_names = [self._stimulus_names] if isinstance(self._stimulus_names, string_types) \
-                    else self._stimulus_names
-                self._stim_table = self.ecephys_session.get_presentations_for_stimulus(self._stimulus_names)
-
-        return self._stim_table
+        raise NotImplementedError()
 
     @property
     def stim_table_spontaneous(self):
@@ -161,4 +145,12 @@ class StimulusAnalysis(object):
 
     @property
     def mean_sweep_events(self):
+        raise NotImplementedError()
+
+    @property
+    def sweep_p_values(self):
+        raise NotImplementedError()
+
+    @property
+    def peak(self):
         raise NotImplementedError()

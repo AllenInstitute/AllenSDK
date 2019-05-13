@@ -10,9 +10,9 @@ import pandas as pd
 import itertools
 
 
-save_spikes = False
-save_stimulus_table = False
-save_sweep_events = False
+save_spikes = True
+save_stimulus_table = True
+save_sweep_events = True
 
 
 stims_lu = {
@@ -206,6 +206,6 @@ if __name__ == '__main__':
     
     '''
 
-    create_data(mouseid=mouseid, stimulus_type='static_grating')
-    create_data(mouseid=mouseid, stimulus_type='drifting_grating')
+    #create_data(mouseid=mouseid, stimulus_type='static_grating')
+    # create_data(mouseid=mouseid, stimulus_type='drifting_grating')
     create_data(mouseid=mouseid, stimulus_type='natural_scene')
