@@ -13,6 +13,10 @@ DOC_URL=http://alleninstitute.github.io/AllenSDK
 #ZIP_URL=https:\/\/github.com\/AllenInstitute\/AllenSDK\/archive\/master.zip
 #TGZ_URL=https:\/\/github.com\/AllenInstitute\/AllenSDK\/archive\/master.tar.gz
 
+NOTEBOOKS = $(shell find ./doc_template/examples_root/examples/nb ./doc_template/examples_root/examples/nb/summer_workshop_2015 -maxdepth 1 -name '*.ipynb')
+
+.PHONY: clean $(NOTEBOOKS) notebooks
+
 build:
 	mkdir -p $(DISTDIR)/$(PROJECTNAME) 
 	cp -r allensdk setup.py README.md $(DISTDIR)/$(PROJECTNAME)/
@@ -61,9 +65,10 @@ doc: FORCE
 	cp -r doc_template/* $(DOCDIR)
 	cd $(DOCDIR); sphinx-build -b html . _build/html;
 
-notebooks:
-	cd doc_template/examples_root/examples/nb && find . -maxdepth 1 -name '*.ipynb' -exec jupyter-nbconvert --to notebook --execute --ExecutePreprocessor.timeout=1800 {} \;
-	cd doc_template/examples_root/examples/nb/summer_workshop_2015 && find . -maxdepth 1 -name '*.ipynb' -exec jupyter-nbconvert --to notebook --execute --ExecutePreprocessor.timeout=1800 {} \;
+$(NOTEBOOKS):
+	jupyter-nbconvert --to notebook --execute --ExecutePreprocessor.timeout=$(timeout) --ExecutePreprocessor.kernel_name=$(python_kernel) $@
+
+notebooks: $(NOTEBOOKS)
 
 FORCE:
 
