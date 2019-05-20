@@ -36,7 +36,7 @@
 import six
 import numpy as np
 import scipy.ndimage.interpolation as spndi
-from scipy.misc import imresize
+from PIL import Image
 from allensdk.api.cache import memoize
 import itertools
 
@@ -495,10 +495,13 @@ class Monitor(object):
 
         # assert img.dtype == np.uint8
 
-        pixels_per_patch = LOCALLY_SPARSE_NOISE_PIXELS[stimulus_type]
 
         full_image = np.full((self.n_pixels_r, self.n_pixels_c), background_color, dtype=np.uint8)
-        img_full_res = imresize(img, float(pixels_per_patch), interp='nearest')
+
+        pixels_per_patch = float(LOCALLY_SPARSE_NOISE_PIXELS[stimulus_type])
+        target_size = tuple( int(pixels_per_patch * dimsize) for dimsize in img.shape[::-1] )
+        img_full_res = np.array(Image.fromarray(img).resize(target_size, 0))  # 0 -> nearest neighbor interpolator
+
         mr, mc = lsn_coordinate_to_monitor_coordinate((0, 0), (self.n_pixels_r, self.n_pixels_c), stimulus_type)
         Mr, Mc = lsn_coordinate_to_monitor_coordinate(img.shape, (self.n_pixels_r, self.n_pixels_c), stimulus_type)
         full_image[int(mr):int(Mr), int(mc):int(Mc)] = img_full_res
@@ -536,7 +539,7 @@ class Monitor(object):
 
     def natural_movie_image_to_screen(self, img, origin='lower', translation=(0,0)):
 
-        img = imresize(img, NATURAL_MOVIE_PIXELS)
+        img = np.array(Image.fromarray(img).resize(NATURAL_MOVIE_PIXELS[::-1], 2)).astype(np.uint8)  # 2 -> bilinear interpolator 
 
         assert img.dtype == np.uint8
 
