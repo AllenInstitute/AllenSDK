@@ -2,6 +2,7 @@ import logging
 import sys
 import marshmallow
 import argparse
+import os
 
 import numpy as np
 import requests
@@ -72,8 +73,8 @@ def get_inputs_from_lims(
 
 
 def write_trace_file(data, names, path):
-    logging.debug("Writing {}".format())
-    with h5py.File(roi_file, 'w') as fil:
+    logging.debug("Writing {}".format(path))
+    with h5py.File(path, 'w') as fil:
         fil["data"] = data
         fil.create_dataset("roi_names", data=names)
 
