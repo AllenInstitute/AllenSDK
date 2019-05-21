@@ -89,8 +89,8 @@ class BehaviorOphysSession(LazyPropertyMixin):
         if cell_specimen_ids is None:
             cell_specimen_ids = self.get_cell_specimen_ids()
 
-        csid_table = self.cell_specimen_table[['cell_specimen_id']]
-        csid_subtable = csid_table[csid_table['cell_specimen_id'].isin(cell_specimen_ids)]
+        csid_table = self.cell_specimen_table.reset_index()[['cell_specimen_id']]
+        csid_subtable = csid_table[csid_table['cell_specimen_id'].isin(cell_specimen_ids)].set_index('cell_specimen_id')
         dff_table = csid_subtable.join(self.dff_traces, how='left')
         dff_traces = np.vstack(dff_table['dff'].values)
         timestamps = self.ophys_timestamps
@@ -100,17 +100,16 @@ class BehaviorOphysSession(LazyPropertyMixin):
 
     @legacy()
     def get_cell_specimen_indices(self, cell_specimen_ids):
-        csid_table = self.cell_specimen_table[['cell_specimen_id']].set_index('cell_specimen_id')
-        return [csid_table.index.get_loc(csid) for csid in cell_specimen_ids]
+        return [self.cell_specimen_table.index.get_loc(csid) for csid in cell_specimen_ids]
 
     @legacy('Consider using "cell_specimen_table[\'cell_specimen_id\']" instead.')
     def get_cell_specimen_ids(self):
-        return self.cell_specimen_table['cell_specimen_id'].values
+        return self.cell_specimen_table.index.values
 
 
 if __name__ == "__main__":
 
-    # from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi
+    from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi
 
     # blacklist = [797257159, 796306435, 791453299, 809191721, 796308505, 798404219] #
     # api_list = []
@@ -160,13 +159,20 @@ if __name__ == "__main__":
 
     # print(session.cell_specimen_table)
 
-
-    # api_2 = BehaviorOphysNwbApi(nwb_filepath)
     # session2 = BehaviorOphysSession(789359614, api=api_2)
     
     # assert session == session2
+    
+    ophys_experiment_id = 792813858
+    # ophys_experiment_id = 789359614
 
-    session = BehaviorOphysSession.from_LIMS(789359614)
+    # nwb_filepath = BehaviorOphysSession.from_LIMS(ophys_experiment_id).api.get_nwb_filepath()
+    # api = BehaviorOphysNwbApi(nwb_filepath)
+    # session = BehaviorOphysSession(api=api)
+
+    session = BehaviorOphysSession.from_LIMS(ophys_experiment_id)
+
+
     # session.segmentation_mask_image
     # session.stimulus_timestamps
     # session.ophys_timestamps
@@ -176,13 +182,13 @@ if __name__ == "__main__":
     # running_speed
     # print(session.stimulus_index)
     # session.running_data_df
-    print(session.stimulus_presentations)
+    # session.cell_specimen_table
     # session.stimulus_templates
     # session.stimulus_index
     # session.licks
     # session.rewards
     # session.task_parameters
     # session.trials
-    # session.corrected_fluorescence_traces
+    session.corrected_fluorescence_traces
     # session.average_image
     # session.motion_correction

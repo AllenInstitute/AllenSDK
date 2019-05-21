@@ -69,7 +69,7 @@ def test_visbeh_ophys_data_set():
     assert list(data_set.stimulus_templates.values())[0].shape == (8, 918, 1174)
     assert len(data_set.licks) == 2432 and list(data_set.licks.columns) == ['time']
     assert len(data_set.rewards) == 85 and list(data_set.rewards.columns) == ['volume', 'autorewarded']
-    assert len(data_set.corrected_fluorescence_traces) == 269 and sorted(data_set.corrected_fluorescence_traces.columns) == ['corrected_fluorescence']
+    assert len(data_set.corrected_fluorescence_traces) == 269 and sorted(data_set.corrected_fluorescence_traces.columns) == ['cell_roi_id', 'corrected_fluorescence']
     np.testing.assert_array_almost_equal(data_set.running_speed.timestamps, data_set.stimulus_timestamps)
     assert len(data_set.cell_specimen_table) == len(data_set.dff_traces)
     assert data_set.average_image.GetSize() == data_set.segmentation_mask_image.GetSize()
@@ -116,10 +116,7 @@ def test_legacy_dff_api():
     cell_specimen_ids = [817111851, 817111897, 817115675, 817117206, 817111009]
 
     _, dff_array = session.get_dff_traces()
-    csid_table = session.cell_specimen_table[['cell_specimen_id']].reset_index().set_index('cell_specimen_id')
     for csid in cell_specimen_ids:
-        cell_roi_id = csid_table.loc[csid]['cell_roi_id']
-        dff_trace = session.dff_traces.loc[cell_roi_id]['dff']
-
+        dff_trace = session.dff_traces.loc[csid]['dff']
         ind = session.get_cell_specimen_indices([csid])[0]
         np.testing.assert_array_almost_equal(dff_trace, dff_array[ind, :])
