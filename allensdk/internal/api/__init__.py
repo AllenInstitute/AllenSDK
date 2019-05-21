@@ -12,8 +12,10 @@ class OneOrMoreResultExpectedError(RuntimeError):
 
 
 def one(x):
+    if isinstance(x, str):
+        return x
     if len(x) != 1:
-        raise OneResultExpectedError('Expected length one result, received: {} results form query'.format(x))
+        raise OneResultExpectedError('Expected length one result, received: {} results from query'.format(x))
     if isinstance(x, set):
         return list(x)[0]
     else:
@@ -62,8 +64,8 @@ class PostgresQueryMixin(object):
         return one(response)
 
     def fetchall(self, query, strict=True):
-        response = list(self.select(query).to_dict().values())
-        return [one(x) for x in response]
+        response = self.select(query)
+        return [one(x) for x in response.values.flat]
 
     def select(self, query):
         return psycopg2_select(query, 
