@@ -34,6 +34,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import numpy as np
+import pytest
 import allensdk.brain_observatory.roi_masks as roi_masks
 
 
@@ -123,3 +124,65 @@ def test_create_empty_neuropil_mask():
 
     assert obtained.mask is None
     assert 'zero_pixels' in obtained.flags
+
+
+@pytest.fixture
+def image_dims():
+    return {
+        'width': 100,
+        'height': 100
+    }
+
+
+@pytest.fixture
+def motion_border():
+    return [5.0, 5.0, 5.0, 5.0]
+
+@pytest.fixture
+def roi_mask_list(image_dims, motion_border):
+
+    base_pixels = np.argwhere(np.ones((10, 10)))
+
+    masks = []
+    for ii in range(10):
+        pixels = base_pixels + ii * 10
+        masks.append(roi_masks.create_roi_mask(
+            image_dims['width'], 
+            image_dims['height'],
+            motion_border,
+            pix_list=pixels,
+            label=str(ii),
+            mask_group=-1
+        ))
+
+    return masks
+
+@pytest.fixture
+def neuropil_masks(roi_mask_list):
+    neuropil_masks = []
+
+    mask_array = create_roi_mask_array(roi_mask_list)
+    combined_mask = mask_array.max(axis=0)
+
+    for roi_mask in roi_mask_list:
+        neuropil_masks.append(create_neuropil_mask(
+            roi_mask, 
+            motion_border, 
+            combined_mask, 
+            "neuropil for " + roi_mask.label
+        ))
+
+@pytest.fixture
+def video(image_dims):
+    num_frames = 20
+    # mval = image_dims['width'] * image_dims['height'] * num_frames
+    # return np.arange(mval).reshape((num_frames, image_dims['height'], image_dims['width']))
+    return np.ones((num_frames, image_dims['height'], image_dims['width']))
+
+
+def test_calculate_traces(video, roi_mask_list):
+    roi_traces = roi_masks.calculate_traces(video, roi_mask_list)
+
+    assert np.all(np.isnan(roi_traces[0, :]))
+    assert np.all(roi_traces[5, :] == 1)
+    assert np.all(np.isnan(roi_traces[9, :]))
