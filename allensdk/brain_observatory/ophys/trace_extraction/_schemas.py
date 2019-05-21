@@ -31,6 +31,11 @@ class Image(RaisingSchema):
     height = Integer(required=True, description='height (pixels) of the whole field of view')
 
 
+class ExclusionLabel(RaisingSchema):
+    roi_id = String(required=True)
+    exclusion_label_name = String(required=True)
+
+
 class InputSchema(ArgSchema):
     class Meta:
         unknown=RAISE
@@ -46,5 +51,5 @@ class InputSchema(ArgSchema):
 class OutputSchema(RaisingSchema):
     neuropil_trace_file = String(required=True, description='path to output h5 file containing neuropil traces') # TODO rename these to _path
     roi_trace_file = String(required=True, description='path to output h5 file containing roi traces')
-    
+    exclusion_labels = Nested(ExclusionLabel, many=True, description='a report of roi-wise problems detected during extraction')
     

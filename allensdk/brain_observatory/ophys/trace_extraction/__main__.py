@@ -3,6 +3,7 @@ import sys
 import marshmallow
 import argparse
 import os
+import sys
 
 import numpy as np
 import requests
@@ -74,9 +75,17 @@ def get_inputs_from_lims(
 
 def write_trace_file(data, names, path):
     logging.debug("Writing {}".format(path))
+
+    if sys.version_info.major == 2:
+        utf_dtype = h5py.special_dtype(vlen=unicode)
+    elif sys.version_info.major == 3:
+        utf_dtype = h5py.special_dtype(vlen=str)
+    else:
+        raise TypeError("unable to create a variable length h5 string dtype in python version: {}", sys.version_info)
+
     with h5py.File(path, 'w') as fil:
         fil["data"] = data
-        fil.create_dataset("roi_names", data=names)
+        fil.create_dataset("roi_names", data=np.array(names).astype(np.string_), dtype=utf_dtype)
 
 
 def extract_traces(motion_corrected_stack, motion_border, storage_directory, rois, image, log_0, **kwargs):
@@ -100,19 +109,20 @@ def extract_traces(motion_corrected_stack, motion_border, storage_directory, roi
     roi_names = [ roi.label for roi in roi_mask_list ]
 
     # extract traces
-    roi_traces, neuropil_traces = roi_masks.calculate_roi_and_neuropil_traces(
+    roi_traces, neuropil_traces, exclusions = roi_masks.calculate_roi_and_neuropil_traces(
         motion_corrected_stack, roi_mask_list, border
     )
 
-    roi_file = os.path.join(storage_directory, "roi_traces.h5")
+    roi_file = os.path.abspath(os.path.join(storage_directory, "roi_traces.h5"))
     write_trace_file(roi_traces, roi_names, roi_file)
 
-    np_file = os.path.join(storage_directory, "neuropil_traces.h5")
+    np_file = os.path.abspath(os.path.join(storage_directory, "neuropil_traces.h5"))
     write_trace_file(neuropil_traces, roi_names, np_file)
     
     return {
         'neuropil_trace_file': np_file,
-        'roi_trace_file': roi_file
+        'roi_trace_file': roi_file,
+        'exclusion_labels': exclusions
     }
 
 

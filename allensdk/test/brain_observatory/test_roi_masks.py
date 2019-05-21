@@ -34,6 +34,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import numpy as np
+import pandas as pd
 import pytest
 import allensdk.brain_observatory.roi_masks as roi_masks
 
@@ -169,7 +170,7 @@ def neuropil_masks(roi_mask_list):
             roi_mask, 
             motion_border, 
             combined_mask, 
-            "neuropil for " + roi_mask.label
+            roi_mask.label
         ))
 
 @pytest.fixture
@@ -181,8 +182,15 @@ def video(image_dims):
 
 
 def test_calculate_traces(video, roi_mask_list):
-    roi_traces = roi_masks.calculate_traces(video, roi_mask_list)
+    roi_traces, exclusions = roi_masks.calculate_traces(video, roi_mask_list)
+
+    expected_exclusions = pd.DataFrame({
+        'roi_id': ['0', '9'],
+        'exclusion_label_name': ['motion_border', 'motion_border']
+    })
 
     assert np.all(np.isnan(roi_traces[0, :]))
     assert np.all(roi_traces[5, :] == 1)
     assert np.all(np.isnan(roi_traces[9, :]))
+    
+    pd.testing.assert_frame_equal(expected_exclusions, pd.DataFrame(exclusions), check_like=True)
