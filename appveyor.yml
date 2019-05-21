@@ -12,8 +12,6 @@ environment:
   TEST_COMPLETE: "false"
   TEST_BAMBOO: "false"
   matrix:
-    - MINICONDA: "C:\\Miniconda-x64"
-      PYTHON: 2.7
     - MINICONDA: "C:\\Miniconda36-x64"
       PYTHON: 3.6
     - MINICONDA: "C:\\Miniconda37-x64"
@@ -27,8 +25,6 @@ install:
   - activate test-environment
   - conda install statsmodels
   - pip install Pillow
-  - if %PYTHON% == 2.7 conda install -c conda-forge scikit-image
-  - if %PYTHON% == 2.7 pip install SimpleITK==1.1.0
   - pip install codecov
   - pip install -r test_requirements.txt
   - pip install .
