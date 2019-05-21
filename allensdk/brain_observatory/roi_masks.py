@@ -377,6 +377,35 @@ class NeuropilMask(Mask):
         # make copy of mask
         self.mask = array[top:bottom + 1, left:right + 1]
 
+def validate_mask(mask):
+    '''Check a given roi or neuropil mask for (a subset of) disqualifying problems.
+    '''
+
+    exclusions = []
+
+    if 'zero_pixels' in mask.flags or mask.mask.sum() == 0:
+
+        if isinstance(mask, NeuropilMask):
+            label = 'empty_neuropil_mask'
+        elif isinstance(mask, RoiMask):
+            label = 'empty_roi_mask'
+        else:
+            label = 'zero_pixels'
+
+        exclusions.append({
+            'roi_id': mask.label,
+            'exclusion_label_name': label
+        })
+
+    if 'overlaps_motion_border' in mask.flags:
+        exclusions.append({
+            'roi_id': mask.label,
+            'exclusion_label_name': 'motion_border'
+        })
+
+    return exclusions
+    
+
 def calculate_traces(stack, mask_list, block_size=1000):
     '''
     Calculates the average response of the specified masks in the
@@ -405,34 +434,12 @@ def calculate_traces(stack, mask_list, block_size=1000):
     exclusions = []
 
     for i, mask in enumerate(mask_list):
-        if 'zero_pixels' in mask.flags or mask.mask.sum() == 0:
-            logging.warning("mask '%d/%s' is empty", i, mask.label)
-            mask.flags.add('zero_pixels')
+        
+        current_exclusions = validate_mask(mask)
+        if len(current_exclusions) > 0:
             traces[i,:] = np.nan
             valid_masks[i] = False
-
-            if isinstance(mask, NeuropilMask):
-                label = 'empty_neuropil_mask'
-            elif isinstance(mask, RoiMask):
-                label = 'empty_roi_mask'
-            else:
-                label = 'zero_pixels'
-
-            exclusions.append({
-                'roi_id': mask.label,
-                'exclusion_label_name': label
-            })
-            continue
-
-        if 'overlaps_motion_border' in mask.flags:
-            logging.warning("mask '%d/%s' overlaps with motion border", i, mask.label)
-            traces[i,:] = np.nan
-            valid_masks[i] = False
-
-            exclusions.append({
-                'roi_id': mask.label,
-                'exclusion_label_name': 'motion_border'
-            })
+            exclusions.extend(current_exclusions)
             continue
 
         if not isinstance(mask.mask, np.ndarray):

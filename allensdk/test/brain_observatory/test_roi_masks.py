@@ -159,26 +159,27 @@ def roi_mask_list(image_dims, motion_border):
     return masks
 
 @pytest.fixture
-def neuropil_masks(roi_mask_list):
+def neuropil_masks(roi_mask_list, motion_border):
     neuropil_masks = []
 
-    mask_array = create_roi_mask_array(roi_mask_list)
+    mask_array = roi_masks.create_roi_mask_array(roi_mask_list)
     combined_mask = mask_array.max(axis=0)
 
     for roi_mask in roi_mask_list:
-        neuropil_masks.append(create_neuropil_mask(
+        neuropil_masks.append(roi_masks.create_neuropil_mask(
             roi_mask, 
             motion_border, 
             combined_mask, 
             roi_mask.label
         ))
+    return neuropil_masks
 
 @pytest.fixture
 def video(image_dims):
     num_frames = 20
-    # mval = image_dims['width'] * image_dims['height'] * num_frames
-    # return np.arange(mval).reshape((num_frames, image_dims['height'], image_dims['width']))
-    return np.ones((num_frames, image_dims['height'], image_dims['width']))
+    data = np.ones((num_frames, image_dims['height'], image_dims['width']))
+    data[:, 50:, 50:] = 2
+    return data
 
 
 def test_calculate_traces(video, roi_mask_list):
@@ -190,7 +191,25 @@ def test_calculate_traces(video, roi_mask_list):
     })
 
     assert np.all(np.isnan(roi_traces[0, :]))
-    assert np.all(roi_traces[5, :] == 1)
+    assert np.all(roi_traces[4, :] == 1)
+    assert np.all(roi_traces[6, :] == 2)
     assert np.all(np.isnan(roi_traces[9, :]))
     
     pd.testing.assert_frame_equal(expected_exclusions, pd.DataFrame(exclusions), check_like=True)
+
+
+def test_validate_masks(roi_mask_list, neuropil_masks):
+    roi_mask_list.extend(neuropil_masks)
+    roi_mask_list[3].mask = np.zeros_like(roi_mask_list[3].mask)
+    roi_mask_list[17].mask = np.zeros_like(roi_mask_list[17].mask)
+
+    obtained = []
+    for mask in roi_mask_list:
+        obtained.extend(roi_masks.validate_mask(mask))
+
+    expected_exclusions = pd.DataFrame({
+        'roi_id': ['0', '3', '9', '7'],
+        'exclusion_label_name': ['motion_border', 'empty_roi_mask', 'motion_border', 'empty_neuropil_mask']
+    })
+    pd.testing.assert_frame_equal(expected_exclusions, pd.DataFrame(obtained), check_like=True)
+
