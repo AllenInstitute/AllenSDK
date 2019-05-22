@@ -7,7 +7,7 @@ from allensdk.brain_observatory.behavior.mtrain import ExtendedTrialSchema
 from marshmallow.schema import ValidationError
 
 
-@pytest.mark.nightly
+@pytest.mark.requires_bamboo
 @pytest.mark.parametrize('ophys_experiment_id, compare_val', [
     pytest.param(789359614, '/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/behavior_session_789295700/789220000.pkl'),
     pytest.param(0, None)
@@ -27,7 +27,7 @@ def test_get_behavior_stimulus_file(ophys_experiment_id, compare_val):
         assert api.get_behavior_stimulus_file() == compare_val
 
 
-@pytest.mark.nightly
+@pytest.mark.requires_bamboo
 @pytest.mark.parametrize('ophys_experiment_id', [789359614])
 def test_get_extended_trials(ophys_experiment_id):
 
@@ -49,7 +49,7 @@ def test_get_extended_trials(ophys_experiment_id):
         pass
 
 
-@pytest.mark.nightly
+@pytest.mark.requires_bamboo
 @pytest.mark.parametrize('ophys_experiment_id', [860030092])
 def test_get_extended_trials(ophys_experiment_id):
 

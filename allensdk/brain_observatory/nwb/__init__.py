@@ -350,7 +350,8 @@ def add_task_parameters(nwbfile, task_parameters):
     nwbfile.add_lab_meta_data(nwb_task_parameters)
 
 
-def add_cell_specimen_table(nwbfile, cell_roi_table):
+def add_cell_specimen_table(nwbfile, cell_specimen_table):
+    cell_roi_table = cell_specimen_table.reset_index().set_index('cell_roi_id')
 
     # Device:
     device_name = nwbfile.lab_meta_data['metadata'].rig_name
@@ -419,6 +420,7 @@ def add_cell_specimen_table(nwbfile, cell_roi_table):
 
 
 def add_dff_traces(nwbfile, dff_traces):
+    dff_traces = dff_traces.reset_index().set_index('cell_roi_id')[['dff']]
 
     twop_module = nwbfile.modules['two_photon_imaging']
     ophys_timestamps = twop_module.get_data_interface('timestamps')
@@ -446,6 +448,7 @@ def add_dff_traces(nwbfile, dff_traces):
 
 
 def add_corrected_fluorescence_traces(nwbfile, corrected_fluorescence_traces):
+    corrected_fluorescence_traces = corrected_fluorescence_traces.reset_index().set_index('cell_roi_id')[['corrected_fluorescence']]
 
     # Create/Add corrected_fluorescence_traces modules and interfaces:
     assert corrected_fluorescence_traces.index.name == 'cell_roi_id'

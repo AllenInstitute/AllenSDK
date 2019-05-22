@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 
 import allensdk.brain_observatory.ecephys.write_nwb.__main__ as write_nwb
-from allensdk.brain_observatory.ecephys.ecephys_api.ecephys_nwb_api import EcephysNwbApi
+from allensdk.brain_observatory.ecephys.ecephys_session_api import EcephysNwbSessionApi
 
 
 @pytest.fixture
@@ -39,7 +39,7 @@ def test_roundtrip_metadata(roundtripper):
         session_start_time=datetime.now()
     )
 
-    api = roundtripper(nwbfile, EcephysNwbApi)
+    api = roundtripper(nwbfile, EcephysNwbSessionApi)
     assert 12345 == api.get_ecephys_session_id()
 
 
@@ -47,7 +47,7 @@ def test_add_stimulus_presentations(nwbfile, stimulus_presentations, roundtrippe
     write_nwb.add_stimulus_timestamps(nwbfile, [0, 1])
     write_nwb.add_stimulus_presentations(nwbfile, stimulus_presentations)
 
-    api = roundtripper(nwbfile, EcephysNwbApi)
+    api = roundtripper(nwbfile, EcephysNwbSessionApi)
     obtained_stimulus_table = api.get_stimulus_presentations()
     
     pd.testing.assert_frame_equal(stimulus_presentations, obtained_stimulus_table, check_dtype=False)
@@ -61,9 +61,9 @@ def test_add_probe_to_nwbfile(nwbfile, roundtripper, roundtrip, pid, desc, loc, 
 
     nwbfile, _, _ = write_nwb.add_probe_to_nwbfile(nwbfile, pid, description=desc, location=loc)
     if roundtrip:
-        obt = roundtripper(nwbfile, EcephysNwbApi)
+        obt = roundtripper(nwbfile, EcephysNwbSessionApi)
     else:
-        obt = EcephysNwbApi.from_nwbfile(nwbfile)
+        obt = EcephysNwbSessionApi.from_nwbfile(nwbfile)
 
     pd.testing.assert_frame_equal(expected, obt.get_probes())
 
@@ -131,9 +131,9 @@ def test_add_running_speed_to_nwbfile(nwbfile, running_speed, roundtripper, roun
 
     nwbfile = write_nwb.add_running_speed_to_nwbfile(nwbfile, running_speed)
     if roundtrip:
-        api_obt = roundtripper(nwbfile, EcephysNwbApi)
+        api_obt = roundtripper(nwbfile, EcephysNwbSessionApi)
     else:
-        api_obt = EcephysNwbApi.from_nwbfile(nwbfile)
+        api_obt = EcephysNwbSessionApi.from_nwbfile(nwbfile)
 
     running_speed_obt = api_obt.get_running_speed()
 

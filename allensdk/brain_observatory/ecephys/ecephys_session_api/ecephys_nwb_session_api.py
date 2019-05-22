@@ -5,11 +5,11 @@ import pandas as pd
 import numpy as np
 import pynwb
 
-from .ecephys_api import EcephysApi
+from .ecephys_session_api import EcephysSessionApi
 from allensdk.brain_observatory.nwb.nwb_api import NwbApi
 
 
-class EcephysNwbApi(NwbApi, EcephysApi):
+class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
 
     def get_probes(self) -> pd.DataFrame:
         probes: Union[List, pd.DataFrame] = []
