@@ -70,6 +70,10 @@ $(NOTEBOOKS):
 
 notebooks: $(NOTEBOOKS)
 
+notebooks-neuron:
+	jupyter-nbconvert --to notebook --execute --ExecutePreprocessor.timeout=$(timeout) --ExecutePreprocessor.kernel_name=$(python_kernel) ./doc_template/examples_root/examples/nb/neuron/pulse_stimulus.ipynb
+
+
 FORCE:
 
 clean:
