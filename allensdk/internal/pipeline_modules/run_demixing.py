@@ -45,11 +45,19 @@ where cr.ophys_experiment_id = %d
 
     for exc_label in exc_labels:
         nrois[exc_label['id']]['exclusion_labels'].append(exc_label['exclusion_label'])
+
+    movie_path_response = lu.query('''
+        select wkf.filename, wkf.storage_directory from well_known_files wkf
+        join well_known_file_types wkft on wkft.id = wkf.well_known_file_type_id 
+        where wkf.attachable_id = {} and wkf.attachable_type = 'OphysExperiment'
+        and wkft.name = 'MotionCorrectedImageStack'
+    '''.format(experiment_id))
+    movie_h5_path = os.path.join(movie_path_response[0]['storage_directory'], movie_path_response[0]['filename'])
         
     exp_dir = os.path.join(OUTPUT_DIRECTORY, str(experiment_id))
 
     input_data = {
-        "movie_h5": os.path.join(sd, "processed", "concat_31Hz_0.h5"),
+        "movie_h5": movie_h5_path,
         "traces_h5": os.path.join(sd, "processed", "roi_traces.h5"),
         "roi_masks": nrois.values(),
         "output_file": os.path.join(exp_dir, "demixed_traces.h5")
