@@ -155,8 +155,11 @@ def add_stimulus_presentations(nwbfile, stimulus_table, tag='stimulus_epoch'):
             series.fillna('', inplace=True)
             stimulus_table[colname] = series.transform(str)
 
+    indices = np.searchsorted(ts.timestamps[:], stimulus_table['start_time'].values)
+    diffs = np.concatenate([np.diff(indices), [stimulus_table.shape[0] - indices[-1]]])
+
     stimulus_table['tags'] = [(tag,)] * stimulus_table.shape[0]
-    stimulus_table['timeseries'] = [(ts,)] * stimulus_table.shape[0]
+    stimulus_table['timeseries'] = [[[indices[ii], diffs[ii], ts]] for ii in range(stimulus_table.shape[0])]
 
     container = pynwb.epoch.TimeIntervals.from_dataframe(stimulus_table, 'epochs')
     nwbfile.epochs = container
