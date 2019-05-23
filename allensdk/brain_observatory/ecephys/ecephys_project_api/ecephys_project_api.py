@@ -4,10 +4,9 @@ from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
 
 
 class EcephysProjectApi:
-
     def get_sessions(self) -> pd.DataFrame:
         raise NotImplementedError()
-    
+
     def get_session_data(self) -> EcephysSession:
         raise NotImplementedError()
 
