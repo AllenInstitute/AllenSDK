@@ -440,6 +440,8 @@ def calculate_traces(stack, mask_list, block_size=1000):
             traces[i,:] = np.nan
             valid_masks[i] = False
             exclusions.extend(current_exclusions)
+            reasons = ", ".join([item["exclusion_label_name"] for item in current_exclusions])
+            logging.warning("unable to extract traces for mask \"{}\": {} ".format(mask.label, reasons))
             continue
 
         if not isinstance(mask.mask, np.ndarray):
