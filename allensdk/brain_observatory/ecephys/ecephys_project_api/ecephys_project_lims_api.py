@@ -6,6 +6,7 @@ import pandas as pd
 
 from .ecephys_project_api import EcephysProjectApi
 from allensdk.internal.api import PostgresQueryMixin
+from allensdk.internal.core.lims_utilities import safe_system_path
 
 
 class EcephysProjectLimsApi(EcephysProjectApi, PostgresQueryMixin):
@@ -203,6 +204,13 @@ def and_filters(filters):
 def clean_wkf_response(response):
     if response.shape[0] == 0:
         return response
-    response['path'] = response.apply(lambda row: os.path.join(row['storage_directory'], row['filename']), axis=1)
+
+    def build_path(row):
+        return os.path.join(
+            safe_system_path(row['storage_directory']),
+            row['filename']
+        )
+
+    response['path'] = response.apply(build_path, axis=1)
     response.drop(columns=['storage_directory', 'filename'], inplace=True)
     return response
