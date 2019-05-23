@@ -25,12 +25,6 @@ class Roi(RaisingSchema):
     mask_page = Integer(default=-1, description='') # TODO: this isn't in the examples I'm looking at. What is it?
 
 
-# TODO this is in the example input json's I'm looking at, but does not seem to be used
-class Image(RaisingSchema):
-    width = Integer(required=True, description='width (pixels) of the whole field of view')
-    height = Integer(required=True, description='height (pixels) of the whole field of view')
-
-
 class ExclusionLabel(RaisingSchema):
     roi_id = String(required=True)
     exclusion_label_name = String(required=True)
@@ -44,7 +38,6 @@ class InputSchema(ArgSchema):
     storage_directory = String(required=True, description='used to set output directory')
     motion_corrected_stack = String(required=True, description='path to h5 file containing motion corrected image stack')
     rois = Nested(Roi, many=True, description='specifications of individual regions of interest')
-    image = Nested(Image, required=True, description='parameters describing the field of view')
     log_0 = String(required=True, description='path to motion correction output csv') # TODO: is this redundant with motion border?
 
 

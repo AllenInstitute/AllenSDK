@@ -88,7 +88,7 @@ def write_trace_file(data, names, path):
         fil.create_dataset("roi_names", data=np.array(names).astype(np.string_), dtype=utf_dtype)
 
 
-def extract_traces(motion_corrected_stack, motion_border, storage_directory, rois, image, log_0, **kwargs):
+def extract_traces(motion_corrected_stack, motion_border, storage_directory, rois, log_0, **kwargs):
 
     # find width and height of movie
     with h5py.File(motion_corrected_stack, "r") as f:
