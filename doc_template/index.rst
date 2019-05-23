@@ -90,20 +90,21 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
-What's New - Release 0.16.2 (April 23, 2019)
+What's New - Release 0.16.3 (May 22, 2019)
 -----------------------------------------------
 
-The 0.16.2 release stabilizes the dependency issues introduced by tables 
+The 0.16.3 release resolves changes to the api of a dependency that resizes an image:
 
-    * `#523 <https://github.com/AllenInstitute/AllenSDK/issues/523>`_ pip no longer fails on new conda environment because of tables
+    * `#659 <https://github.com/AllenInstitute/AllenSDK/issues/659>`_ Use pillow/Image.resize instead of scipy.misc.imresize
+    
+We also went back and made sure that the example Jupyter notebooks still run:
 
-We also now provide access support for the deformable and affine transformations computed by the TissueCyte registration code:
-
-    * `#549 <https://github.com/AllenInstitute/AllenSDK/issues/549>`_ Transforms for tissuecyte registration accessible from allensdk
+    * `#661 <https://github.com/AllenInstitute/AllenSDK/issues/661>`_ Update example notebooks
 
 Previous Release Notes
 ----------------------
 
+    * `0.16.2 <https://github.com/AllenInstitute/AllenSDK/wiki/Release-Notes-(0.16.2)>`_
     * `0.16.1 <https://github.com/AllenInstitute/AllenSDK/wiki/Release-Notes-(0.16.1)>`_
     * `0.16.0 <https://github.com/AllenInstitute/AllenSDK/wiki/Release-Notes-(0.16.0)>`_
     * `0.14.5 <https://github.com/AllenInstitute/AllenSDK/wiki/Release-Notes-(0.14.5)>`_

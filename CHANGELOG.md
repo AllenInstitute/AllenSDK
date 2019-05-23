@@ -1,6 +1,13 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [0.16.3] = 2019-5-22
+
+### Bug Fixes
+ - https://github.com/AllenInstitute/AllenSDK/issues/660 Use pillow/Image.resize instead of scipy.misc.imresize
+ - https://github.com/AllenInstitute/AllenSDK/issues/659 Same
+ - https://github.com/AllenInstitute/AllenSDK/issues/661 Update example notebooks
+
 ## [0.16.2] = 2019-4-23
 
 ### Added
