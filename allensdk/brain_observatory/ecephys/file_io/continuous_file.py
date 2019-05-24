@@ -34,7 +34,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import numpy as np
-import os
+from pathlib import Path
 import logging
 
 
@@ -95,7 +95,7 @@ class ContinuousFile():
         expected_num_bytes = num_samples * bytes_per_sample
         logging.info('calculated LFP filesize: {} bytes'.format(expected_num_bytes))
 
-        num_bytes = os.path.getsize(self.data_path)
+        num_bytes = Path(self.data_path).stat().st_size()
         if not expected_num_bytes == num_bytes:
             raise IOError('expected LFP data filesize to be {} bytes, but its size was {} bytes'.format(expected_num_bytes, num_bytes))
 

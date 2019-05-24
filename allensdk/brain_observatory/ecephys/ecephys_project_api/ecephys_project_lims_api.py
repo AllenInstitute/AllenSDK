@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 import shutil
 import warnings
 
@@ -18,11 +18,11 @@ class EcephysProjectLimsApi(EcephysProjectApi, PostgresQueryMixin):
         main_nwb_path = nwb_paths.loc[nwb_paths["name"] == "EcephysNwb"]["path"].values
 
         if len(main_nwb_path) == 1 and not isinstance(main_nwb_path, str):
-            main_nwb_path = main_nwb_path[0]
+            main_nwb_path = Path(main_nwb_path[0])
         else:
             raise ValueError(f"did not find a unique nwb path for session {session_id}")
 
-        fsize = os.path.getsize(main_nwb_path) / 1024 ** 2
+        fsize = main_nwb_path.stat().st_size() / 1024 ** 2
         warnings.warn(f"copying a {fsize:.6}mb file from {main_nwb_path}")
 
         reader = open(main_nwb_path, "rb")
@@ -230,7 +230,7 @@ def clean_wkf_response(response):
         return response
 
     def build_path(row):
-        return os.path.join(safe_system_path(row["storage_directory"]), row["filename"])
+        return str(Path(safe_system_path(row["storage_directory"]), row["filename"]))
 
     response["path"] = response.apply(build_path, axis=1)
     response.drop(columns=["storage_directory", "filename"], inplace=True)

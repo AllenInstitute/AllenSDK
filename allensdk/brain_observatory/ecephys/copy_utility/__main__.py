@@ -3,7 +3,7 @@ import subprocess as sp
 import shutil
 import warnings
 import copy as cp
-import os
+from pathlib import Path
 
 import argschema
 
@@ -27,7 +27,7 @@ def copy_file_entry(source, dest, use_rsync, make_parent_dirs):
     if use_rsync:
         sp.check_call(['rsync', '-a', source, dest])
     else:
-        if os.path.isdir(source):
+        if Path(source).is_dir():
             shutil.copytree(source, dest)
         else:
             shutil.copy(source, dest)
@@ -46,9 +46,12 @@ def raise_or_warn(message, do_raise, typ=None):
     
 
 def compare(source, dest, hasher_cls, raise_if_comparison_fails):
-    if os.path.isdir(source) and os.path.isdir(dest):
+    source_path = Path(source)
+    dest_path = Path(dest)
+
+    if source_path.is_dir() and dest_path.is_dir():
         return compare_directories(source, dest, hasher_cls, raise_if_comparison_fails)
-    elif (not os.path.isdir(source)) and (not os.path.isdir(dest)):
+    elif (not source_path.is_dir()) and (not dest_path.is_dir()):
         return compare_files(source, dest, hasher_cls, raise_if_comparison_fails)
     else:
         raise_or_warn(f"unable to compare files with directories: {source}, {dest}", raise_if_comparison_fails)
@@ -65,8 +68,8 @@ def compare_files(source, dest, hasher_cls, raise_if_comparison_fails):
 
 
 def compare_directories(source, dest, hasher_cls, raise_if_comparison_fails):
-    source_contents = sorted(os.listdir(source))
-    dest_contents = sorted(os.listdir(dest))
+    source_contents = sorted([node for node in Path(source).iterdir()])
+    dest_contents = sorted([node for node in Path(dest).iterdir()])
 
     if len(source_contents) != len(dest_contents):
         raise_or_warn(
@@ -75,8 +78,8 @@ def compare_directories(source, dest, hasher_cls, raise_if_comparison_fails):
         )
 
     for sitem, ditem in zip(source_contents, dest_contents):
-        spath = os.path.join(source, sitem)
-        dpath = os.path.join(dest, ditem)
+        spath = str(Path(source, sitem))
+        dpath = str(Path(dest, ditem))
 
         if sitem != ditem:
             raise_or_warn(f"mismatch between {spath} and {dpath}", raise_if_comparison_fails)
