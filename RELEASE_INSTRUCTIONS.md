@@ -1,7 +1,9 @@
 ### While preparing a release:
 
+- [ ] Create a Release Epic on ZenHub that will track the release issues and pull requests
 - [ ] Create a "release candidate" branch (i.e. rc/0.16.2), and push to main fork (https://github.com/AllenInstitute/AllenSDK)
 - [ ] Create a draft pull request for the release (i.e. Release Candidate 0.16.2)
+  - [ ] Assign this draft PR to the Release Epic
   - [ ] Assign a developer to be responsible for the release deployment
   - [ ] Add the Project Owner as a reviewer
   - [ ] Copy this checklist into the draft pull request description
