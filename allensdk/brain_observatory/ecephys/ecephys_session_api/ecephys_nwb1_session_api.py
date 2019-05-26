@@ -5,7 +5,7 @@ import h5py
 import collections
 
 # from allensdk.brain_observatory.nwb.nwb_api import NwbApi
-from allensdk.brain_observatory.ecephys.ecephys_api import EcephysApi
+from .ecephys_session_api import EcephysSessionApi
 from allensdk.brain_observatory.running_speed import RunningSpeed
 
 
@@ -30,7 +30,7 @@ class IDCreator(object):
         return isinstance(key, collections.Hashable)
 
 
-class EcephysNwb1Adaptor(EcephysApi):
+class EcephysNwb1Api(EcephysSessionApi):
     """An EcephySession adaptor for reading NWB1.0 files.
 
     Was created by sight using an assortment of existing NWB1 files. It is possible that parts of the NWB1 standard (?!)
@@ -95,7 +95,8 @@ class EcephysNwb1Adaptor(EcephysApi):
         b'pos_y': 'Pos_y',
         b'orientation': 'Ori',
         b'color': 'Color',
-        b'phase': 'Phase'
+        b'phase': 'Phase',
+        b'frame': 'Image'
     }
 
     def get_stimulus_presentations(self) -> pd.DataFrame:
@@ -136,6 +137,7 @@ class EcephysNwb1Adaptor(EcephysApi):
                 'Pos_y': stim_props.get('Pos_y', np.nan),
                 'Color': stim_props.get('Color', np.nan),
                 'Phase': stim_props.get('Phase', np.nan),
+                'Image': stim_props.get('Image', np.nan),
                 'stimulus_block': block_i  # Required by conditionwise_spike_counts(), add made-up number
             })
 
@@ -187,7 +189,7 @@ class EcephysNwb1Adaptor(EcephysApi):
             unit_list = prb_grp['unit_list'][()]
             for indx, uid in enumerate(unit_list):
                 unit_grp = prb_grp['UnitTimes'][str(uid)]
-                local_channel_index = unit_grp['channel'].value
+                local_channel_index = unit_grp['channel'][()]
                 channel_id = self._channel_ids[(prb_name, local_channel_index)]
                 if channel_id in existing_channels:
                     # If a channel has already been processed (ie it's shared by another unit) skip it. I'm assuming
@@ -197,8 +199,8 @@ class EcephysNwb1Adaptor(EcephysApi):
                     channel_ids[channel_indx] = channel_id
                     local_channel_indices[channel_indx] = local_channel_index
                     prb_ids[channel_indx] = prb_id
-                    prb_hrz_pos[channel_indx] = unit_grp['xpos_probe'].value
-                    prb_vert_pos[channel_indx] = unit_grp['ypos_probe'].value
+                    prb_hrz_pos[channel_indx] = unit_grp['xpos_probe'][()]
+                    prb_vert_pos[channel_indx] = unit_grp['ypos_probe'][()]
                     try:
                         struct_acronyms[channel_indx] = str(unit_grp['ccf_structure'][()], encoding='ascii')
                     except TypeError:
@@ -259,7 +261,7 @@ class EcephysNwb1Adaptor(EcephysApi):
             for indx, uid in enumerate(unit_list):
                 unit_grp = prb_grp['UnitTimes'][str(uid)]
                 prb_uids[indx] = self._unit_ids[(prb_name, uid)]
-                prb_channels[indx] = self._channel_ids[(prb_name, unit_grp['channel'].value)]
+                prb_channels[indx] = self._channel_ids[(prb_name, unit_grp['channel'][()])]
                 prb_snr[indx] = unit_grp['snr'][()]
 
             unit_ids = np.append(unit_ids, prb_uids)
@@ -279,14 +281,8 @@ class EcephysNwb1Adaptor(EcephysApi):
         return units_df
 
     def get_ecephys_session_id(self) -> int:
-        # In NWB the identifiers are strings, and in the case for AIBS data usually "mouse(\n+)_session", this is not
-        # a good solution and the API should probably be changed to allow any scalar id
-        import re
-        try:
-            identifier_str = self._h5_root['identifier'][()]
-            return int(re.search(r'\d+', identifier_str).group())
-        except:
-            return -1
+        # Doesn't look like the session_id is stored
+        return EcephysSessionApi.session_na
 
     @classmethod
     def from_path(cls, path, **kwargs):

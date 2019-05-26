@@ -7,11 +7,7 @@ import numpy as np
 import pandas as pd
 
 from allensdk.core.lazy_property import LazyPropertyMixin
-<<<<<<< HEAD
-from allensdk.brain_observatory.ecephys.ecephys_api import EcephysApi, EcephysNwbApi, EcephysNwb1Adaptor
-=======
-from allensdk.brain_observatory.ecephys.ecephys_session_api import EcephysSessionApi, EcephysNwbSessionApi
->>>>>>> b3ff0cea18b00595cffac62fef926682ce102a66
+from allensdk.brain_observatory.ecephys.ecephys_session_api import EcephysSessionApi, EcephysNwbSessionApi, EcephysNwb1Api
 from ..running_speed import RunningSpeed
 
 
@@ -534,7 +530,7 @@ class EcephysSession(LazyPropertyMixin):
 
     def _build_mean_waveforms(self, mean_waveforms):
         # from ecephys_analysis_modules.modules.modality_comparison.ecephys_nwb1_adaptor import EcephysNwb1Adaptor
-        if isinstance(self.api, EcephysNwb1Adaptor):
+        if isinstance(self.api, EcephysNwb1Api):
             return self._build_nwb1_waveforms(mean_waveforms)
 
         #TODO: there is a bug either here or (more likely) in LIMS unit data ingest which causes the peak channel 
@@ -591,9 +587,22 @@ class EcephysSession(LazyPropertyMixin):
 
 
     @classmethod
-    def from_nwb_path(cls, path, api_kwargs=None, **kwargs):
+    def from_nwb_path(cls, path, nwb_version=2, api_kwargs=None, **kwargs):
         api_kwargs = {} if api_kwargs is None else api_kwargs
-        return cls(api=EcephysNwbSessionApi.from_path(path=path, **api_kwargs), **kwargs)
+        # TODO: Is there a way for pynwb to check the file before actually loading it with io read? If so we could
+        #       automatically check what NWB version is being inputed
+
+        if nwb_version >= 2:
+            NWBAdaptorCls = EcephysNwbSessionApi
+
+        elif nwb_version == 1:
+            NWBAdaptorCls = EcephysNwb1Api
+
+        else:
+            raise Exception('Unknown nwb version type specified.')
+
+        return cls(api=NWBAdaptorCls.from_path(path=path, **api_kwargs), ** kwargs)
+
 
 
 def build_time_window_domain(bin_edges, offsets, callback=None):
