@@ -7,7 +7,11 @@ import numpy as np
 import pandas as pd
 
 from allensdk.core.lazy_property import LazyPropertyMixin
+<<<<<<< HEAD
 from allensdk.brain_observatory.ecephys.ecephys_api import EcephysApi, EcephysNwbApi, EcephysNwb1Adaptor
+=======
+from allensdk.brain_observatory.ecephys.ecephys_session_api import EcephysSessionApi, EcephysNwbSessionApi
+>>>>>>> b3ff0cea18b00595cffac62fef926682ce102a66
 from ..running_speed import RunningSpeed
 
 
@@ -136,7 +140,7 @@ class EcephysSession(LazyPropertyMixin):
 
 
     def __init__(self, api, **kwargs):
-        self.api: EcephysApi  = api
+        self.api: EcephysSessionApi  = api
 
         self.ecephys_session_id = self.LazyProperty(self.api.get_ecephys_session_id)
         self.running_speed= self.LazyProperty(self.api.get_running_speed)
@@ -589,30 +593,7 @@ class EcephysSession(LazyPropertyMixin):
     @classmethod
     def from_nwb_path(cls, path, api_kwargs=None, **kwargs):
         api_kwargs = {} if api_kwargs is None else api_kwargs
-        try:
-            # See if NWB2 file
-            # TODO: I couldn't find anything in pynwb to check if file is valid NWB. instead call NWBHDF5IO.read() which
-            #  is problematic since it tries to parse the entire file.
-            nwb_adaptor = EcephysNwbApi.from_path(path=path, **api_kwargs)
-            nwb_adaptor.nwbfile  # calls HDFMIO.read()
-            return cls(api=nwb_adaptor, **kwargs)
-        except:
-            pass
-
-        try:
-            # See if NWB1 file
-            nwb_adaptor = EcephysNwb1Adaptor.from_path(path=path, **api_kwargs) # Should validate as part of constructor
-            return cls(api=nwb_adaptor, **kwargs)
-        except:
-            pass
-
-        raise Exception('Could not open {} as an NWB file'.format(path))
-
-    @classmethod
-    def from_nwb1_path(cls, path, api_kwargs=None, **kwargs):
-        api_kwargs = {} if api_kwargs is None else api_kwargs
-        nwb_adaptor = EcephysNwb1Adaptor.from_path(path=path, **api_kwargs)  # Should validate as part of constructor
-        return cls(api=nwb_adaptor, **kwargs)
+        return cls(api=EcephysNwbSessionApi.from_path(path=path, **api_kwargs), **kwargs)
 
 
 def build_time_window_domain(bin_edges, offsets, callback=None):

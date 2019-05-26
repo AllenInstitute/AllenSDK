@@ -2,7 +2,7 @@ import pytest
 import pandas as pd
 import numpy as np
 
-from allensdk.brain_observatory.ecephys.ecephys_api import EcephysApi
+from allensdk.brain_observatory.ecephys.ecephys_session_api import EcephysSessionApi
 from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
 
 
@@ -78,7 +78,7 @@ def raw_probes():
 
 @pytest.fixture
 def just_stimulus_table_api(raw_stimulus_table):
-    class EcephysJustStimulusTableApi(EcephysApi):
+    class EcephysJustStimulusTableApi(EcephysSessionApi):
         def get_stimulus_presentations(self):
             return raw_stimulus_table
     return EcephysJustStimulusTableApi()
@@ -86,7 +86,7 @@ def just_stimulus_table_api(raw_stimulus_table):
 
 @pytest.fixture
 def units_table_api(raw_channels, raw_units, raw_probes):
-    class EcephysUnitsTableApi(EcephysApi):
+    class EcephysUnitsTableApi(EcephysSessionApi):
         def get_channels(self):
             return raw_channels
         def get_units(self):
@@ -98,7 +98,7 @@ def units_table_api(raw_channels, raw_units, raw_probes):
 
 @pytest.fixture
 def mean_waveforms_api(raw_mean_waveforms, raw_channels, raw_units, raw_probes):
-    class EcephysMeanWaveformsApi(EcephysApi):
+    class EcephysMeanWaveformsApi(EcephysSessionApi):
         def get_mean_waveforms(self):
             return raw_mean_waveforms
         def get_channels(self):
@@ -112,7 +112,7 @@ def mean_waveforms_api(raw_mean_waveforms, raw_channels, raw_units, raw_probes):
 
 @pytest.fixture
 def spike_times_api(raw_units, raw_channels, raw_probes, raw_stimulus_table, raw_spike_times):
-    class EcephysSpikeTimesApi(EcephysApi):
+    class EcephysSpikeTimesApi(EcephysSessionApi):
         def get_spike_times(self):
             return raw_spike_times
         def get_channels(self):
@@ -128,7 +128,7 @@ def spike_times_api(raw_units, raw_channels, raw_probes, raw_stimulus_table, raw
 
 @pytest.fixture
 def session_metadata_api():
-    class EcephysSessionMetadataApi(EcephysApi):
+    class EcephysSessionMetadataApi(EcephysSessionApi):
         def get_ecephys_session_id(self):
             return 12345
     return EcephysSessionMetadataApi()

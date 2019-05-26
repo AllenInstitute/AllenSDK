@@ -202,8 +202,8 @@ class OphysLimsApi(PostgresQueryMixin):
     @memoize
     def get_cell_roi_ids(self):
         cell_specimen_table = self.get_cell_specimen_table()
-        assert cell_specimen_table.index.name == 'cell_roi_id'
-        return cell_specimen_table.index.values
+        assert cell_specimen_table.index.name == 'cell_specimen_id'
+        return cell_specimen_table['cell_roi_id'].values
 
     @memoize
     def get_objectlist_file(self):
@@ -329,6 +329,10 @@ class OphysLimsApi(PostgresQueryMixin):
             image_mask_list.append(curr_roi.get_mask_plane().astype(np.bool))
         cell_specimen_table['image_mask'] = image_mask_list
         cell_specimen_table = cell_specimen_table[sorted(cell_specimen_table.columns)]
+
+        cell_specimen_table.index.rename('cell_roi_id', inplace=True)
+        cell_specimen_table.reset_index(inplace=True)
+        cell_specimen_table.set_index('cell_specimen_id', inplace=True)
         return cell_specimen_table
 
     @memoize

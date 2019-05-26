@@ -6,7 +6,7 @@ import pandas as pd
 from ...running_speed import RunningSpeed
 
 
-class EcephysApi:
+class EcephysSessionApi:
 
     __slots__: tuple = tuple([])
 

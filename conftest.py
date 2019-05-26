@@ -50,6 +50,11 @@ def pytest_collection_modifyitems(config, items):
             'and install, so you must opt in to running this test'
     )
 
+    skip_outside_bamboo_test = pytest.mark.skipif(
+        os.environ.get('TEST_BAMBOO') != 'true',
+        reason='this test depends on the resources only available to Bamboo agents, but are still fast.  If they are slow, mark with nightly'
+    )
+
     for item in items:
         if 'requires_api_endpoint' in item.keywords:
             item.add_marker(skip_api_endpoint_test)
@@ -65,3 +70,6 @@ def pytest_collection_modifyitems(config, items):
 
         if 'requires_neuron' in item.keywords:
             item.add_marker(skip_neuron_test)
+
+        if 'requires_bamboo' in item.keywords:
+            item.add_marker(skip_outside_bamboo_test)

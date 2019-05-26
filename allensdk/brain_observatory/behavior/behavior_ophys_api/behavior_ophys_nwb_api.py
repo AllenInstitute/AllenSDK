@@ -21,6 +21,10 @@ from allensdk.brain_observatory.nwb.metadata import load_LabMetaData_extension
 from allensdk.brain_observatory.behavior.behavior_ophys_api import BehaviorOphysApiBase
 
 
+load_LabMetaData_extension(OphysBehaviorMetaDataSchema, 'AIBS_ophys_behavior')
+load_LabMetaData_extension(OphysBehaviorTaskParametersSchema, 'AIBS_ophys_behavior')
+
+
 class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
 
     def save(self, session_object):
@@ -167,17 +171,30 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
         df.index.rename('cell_roi_id', inplace=True)
         df['cell_specimen_id'] = [None if csid == -1 else csid for csid in df['cell_specimen_id'].values]
         df['image_mask'] = [mask.astype(bool) for mask in df['image_mask'].values]
+        df.reset_index(inplace=True)
+        df.set_index('cell_specimen_id', inplace=True)
         return df
 
     def get_dff_traces(self) -> pd.DataFrame:
         dff_nwb = self.nwbfile.modules['two_photon_imaging'].data_interfaces['dff'].roi_response_series['traces']
-        return pd.DataFrame({'dff': [x for x in dff_nwb.data[:]]},
-                             index=pd.Index(data=dff_nwb.rois.table.id[:], name='cell_roi_id'))
+        dff_traces = dff_nwb.data[:]
+        number_of_cells, number_of_dff_frames = dff_traces.shape
+        num_of_timestamps = len(self.get_ophys_timestamps())
+        assert num_of_timestamps == number_of_dff_frames
+        
+        df = pd.DataFrame({'dff': [x for x in dff_traces]}, index=pd.Index(data=dff_nwb.rois.table.id[:], name='cell_roi_id'))
+        cell_specimen_table = self.get_cell_specimen_table()
+        df = cell_specimen_table[['cell_roi_id']].join(df, on='cell_roi_id')
+        return df
 
     def get_corrected_fluorescence_traces(self) -> pd.DataFrame:
         corrected_fluorescence_nwb = self.nwbfile.modules['two_photon_imaging'].data_interfaces['corrected_fluorescence'].roi_response_series['traces']
-        return pd.DataFrame({'corrected_fluorescence': [x for x in corrected_fluorescence_nwb.data[:]]},
+        df = pd.DataFrame({'corrected_fluorescence': [x for x in corrected_fluorescence_nwb.data[:]]},
                              index=pd.Index(data=corrected_fluorescence_nwb.rois.table.id[:], name='cell_roi_id'))
+
+        cell_specimen_table = self.get_cell_specimen_table()
+        df = cell_specimen_table[['cell_roi_id']].join(df, on='cell_roi_id')
+        return df
 
     def get_motion_correction(self) -> pd.DataFrame:
 

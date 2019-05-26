@@ -17,6 +17,8 @@ from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory.behavior.image_api import ImageApi
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.brain_observatory.behavior.behavior_ophys_api import BehaviorOphysApiBase
+from allensdk.brain_observatory.behavior.trials_processing import get_extended_trials
+
 
 class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
 
@@ -32,10 +34,21 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
     def get_stimulus_timestamps(self):
         return self.get_sync_data()['stimulus_frames']
 
-
     @memoize
     def get_ophys_timestamps(self):
-        return self.get_sync_data()['ophys_frames']
+
+        ophys_timestamps = self.get_sync_data()['ophys_frames']
+        dff_traces = self.get_raw_dff_data()
+        number_of_cells, number_of_dff_frames = dff_traces.shape
+        num_of_timestamps = len(ophys_timestamps)
+        if number_of_dff_frames < num_of_timestamps:
+            ophys_timestamps = ophys_timestamps[:number_of_dff_frames]
+        elif number_of_dff_frames == num_of_timestamps:
+            pass
+        else:
+            raise RuntimeError('dff_frames is shorter than timestamps')
+
+        return ophys_timestamps
 
     @memoize
     def get_experiment_container_id(self):
@@ -97,7 +110,10 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
     def get_dff_traces(self):
         dff_traces = self.get_raw_dff_data()
         cell_roi_id_list = self.get_cell_roi_ids()
-        df = pd.DataFrame({'dff': list(dff_traces)}, index=pd.Index(cell_roi_id_list, name='cell_roi_id'))
+        df = pd.DataFrame({'dff': [x for x in dff_traces]}, index=pd.Index(cell_roi_id_list, name='cell_roi_id'))
+
+        cell_specimen_table = self.get_cell_specimen_table()
+        df = cell_specimen_table[['cell_roi_id']].join(df, on='cell_roi_id')
         return df
 
     @memoize
@@ -185,6 +201,9 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
         ophys_timestamps = self.get_ophys_timestamps()
         assert corrected_fluorescence_trace_array.shape[1], ophys_timestamps.shape[0]
         df = pd.DataFrame({'corrected_fluorescence': list(corrected_fluorescence_trace_array)}, index=pd.Index(cell_roi_id_list, name='cell_roi_id'))
+
+        cell_specimen_table = self.get_cell_specimen_table()
+        df = cell_specimen_table[['cell_roi_id']].join(df, on='cell_roi_id')
         return df
 
     @memoize
@@ -204,14 +223,28 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
         motion_correction = pd.read_csv(motion_correction_filepath)
         return motion_correction[['x', 'y']]
 
-    def get_stimulus_rebase_function(self):
+    @memoize
+    def get_nwb_filepath(self):
 
+        query = '''
+                SELECT wkf.storage_directory || wkf.filename AS nwb_file
+                FROM ophys_experiments oe
+                LEFT JOIN well_known_files wkf ON wkf.attachable_id=oe.id AND wkf.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'BehaviorOphysNwb')
+                WHERE oe.id = {};
+                '''.format(self.get_ophys_experiment_id())
+        return self.fetchone(query, strict=True)
+
+    def get_stimulus_rebase_function(self):
         stimulus_timestamps_no_monitor_delay = self.get_sync_data()['stimulus_frames_no_delay']
         behavior_stimulus_file = self.get_behavior_stimulus_file()
         data = pd.read_pickle(behavior_stimulus_file)
         stimulus_rebase_function = get_stimulus_rebase_function(data, stimulus_timestamps_no_monitor_delay)
-
         return stimulus_rebase_function
+
+    def get_extended_trials(self):
+        filename = self.get_behavior_stimulus_file()
+        data = pd.read_pickle(filename)
+        return get_extended_trials(data)
 
     @staticmethod
     def get_ophys_experiment_df():

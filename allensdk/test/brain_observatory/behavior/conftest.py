@@ -141,7 +141,7 @@ def task_parameters():
 
 @pytest.fixture
 def cell_specimen_table():
-    return pd.DataFrame({'cell_specimen_id': [None, None],
+    return pd.DataFrame({'cell_roi_id': [123, 321],
                          'x': [1, 1],
                          'y': [1, 1],
                          'width': [1, 1],
@@ -154,17 +154,19 @@ def cell_specimen_table():
                          'mask_image_plane':[1, 1],
                          'ophys_cell_segmentation_run_id':[1, 1],
                          'image_mask': [np.array([[True, True], [False, False]]), np.array([[True, True], [False, False]])]},
-                          index=pd.Index([123, 321], dtype=int, name='cell_roi_id'))
+                          index=pd.Index([None, None], dtype=int, name='cell_specimen_id'))
 
 
 @pytest.fixture
 def dff_traces(ophys_timestamps, cell_specimen_table):
-    return pd.DataFrame({'dff': [np.ones_like(ophys_timestamps)]},
+    return pd.DataFrame({'cell_roi_id': cell_specimen_table['cell_roi_id'],
+                         'dff': [np.ones_like(ophys_timestamps)]},
                          index=cell_specimen_table.index)
 
 @pytest.fixture
 def corrected_fluorescence_traces(ophys_timestamps, cell_specimen_table):
-    return pd.DataFrame({'corrected_fluorescence': [np.ones_like(ophys_timestamps)]},
+    return pd.DataFrame({'cell_roi_id': cell_specimen_table['cell_roi_id'],
+                         'corrected_fluorescence': [np.ones_like(ophys_timestamps)]},
                          index=cell_specimen_table.index)
 
 @pytest.fixture

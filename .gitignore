@@ -10,6 +10,14 @@ eggs/
 test-reports/*
 doc_template/examples/nb/connectivity/experiment_*
 doc_template/examples/nb/Website_Inquiry_RT_45792 /experiment_*
+doc_template/examples_root/examples/nb/*.zip
+doc_template/examples_root/examples/nb/*.json
+doc_template/examples_root/examples/nb/*.swc
+doc_template/examples_root/examples/nb/*.nrrd
+doc_template/examples_root/examples/nb/*.csv
+doc_template/examples_root/examples/nb/brain_observatory
+doc_template/examples_root/examples/nb/modfiles
+doc_template/examples_root/examples/nb/*.nbconvert.ipynb
 *pyc
 .eggs/
 .pytest_cache/
@@ -22,3 +30,4 @@ debug.log
 .vscode/
 .mypy_cache/
 /cell_types/
+example_ecephys_project_cache/

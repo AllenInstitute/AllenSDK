@@ -2,7 +2,7 @@ import logging
 import sys
 import argparse
 from datetime import datetime
-import os
+from pathlib import PurePath
 
 import marshmallow
 import argschema
@@ -80,7 +80,7 @@ def read_stimulus_table(path,  column_renames_map=None):
     if column_renames_map  is None:
         column_renames_map = STIM_TABLE_RENAMES_MAP
 
-    _, ext = os.path.splitext(path)
+    ext = PurePath(path).suffix
 
     if ext == '.csv':
         stimulus_table = pd.read_csv(path)

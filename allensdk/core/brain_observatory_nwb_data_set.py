@@ -900,6 +900,13 @@ class BrainObservatoryNwbDataSet(object):
         if motion_correction is None:
             raise KeyError("Could not find motion correction data.")
 
+        # Python3 compatibility:
+        rename_dict = {}
+        for c in motion_correction.columns:
+            if not isinstance(c, str):
+                rename_dict[c] = c.decode("utf-8")
+        motion_correction.rename(columns=rename_dict, inplace=True)
+
         return motion_correction
 
     def save_analysis_dataframes(self, *tables):

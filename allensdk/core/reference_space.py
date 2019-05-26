@@ -40,7 +40,6 @@ import functools
 import os
 import csv
 
-from scipy.misc import imresize
 from scipy.ndimage.interpolation import zoom
 import numpy as np
 import nrrd
