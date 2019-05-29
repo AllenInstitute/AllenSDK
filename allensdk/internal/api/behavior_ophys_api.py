@@ -18,6 +18,7 @@ from allensdk.brain_observatory.behavior.image_api import ImageApi
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.brain_observatory.behavior.behavior_ophys_api import BehaviorOphysApiBase
 from allensdk.brain_observatory.behavior.trials_processing import get_extended_trials
+from allensdk.internal.core.lims_utilities import safe_system_path
 
 
 class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
@@ -69,7 +70,7 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
                 LEFT JOIN well_known_files stim ON stim.attachable_id=bs.id AND stim.attachable_type = 'BehaviorSession' AND stim.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'StimulusPickle')
                 WHERE oe.id= {};
                 '''.format(self.get_ophys_experiment_id())
-        return self.fetchone(query, strict=True)
+        return safe_system_path(self.fetchone(query, strict=True))
 
     def get_behavior_session_uuid(self):
         behavior_stimulus_file = self.get_behavior_stimulus_file()
@@ -232,7 +233,7 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
                 LEFT JOIN well_known_files wkf ON wkf.attachable_id=oe.id AND wkf.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'BehaviorOphysNwb')
                 WHERE oe.id = {};
                 '''.format(self.get_ophys_experiment_id())
-        return self.fetchone(query, strict=True)
+        return safe_system_path(self.fetchone(query, strict=True))
 
     def get_stimulus_rebase_function(self):
         stimulus_timestamps_no_monitor_delay = self.get_sync_data()['stimulus_frames_no_delay']

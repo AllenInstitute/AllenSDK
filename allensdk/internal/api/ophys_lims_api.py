@@ -10,6 +10,7 @@ from allensdk.internal.api import PostgresQueryMixin, OneOrMoreResultExpectedErr
 from allensdk.api.cache import memoize
 from allensdk.brain_observatory.behavior.image_api import ImageApi
 import allensdk.brain_observatory.roi_masks as roi
+from allensdk.internal.core.lims_utilities import safe_system_path
 
 
 class OphysLimsApi(PostgresQueryMixin):
@@ -28,7 +29,7 @@ class OphysLimsApi(PostgresQueryMixin):
                 FROM ophys_experiments oe
                 WHERE oe.id = {};
                 '''.format(self.get_ophys_experiment_id())
-        return self.fetchone(query, strict=True)
+        return safe_system_path(self.fetchone(query, strict=True))
 
     @memoize
     def get_nwb_filepath(self):
@@ -38,7 +39,7 @@ class OphysLimsApi(PostgresQueryMixin):
                 LEFT JOIN well_known_files wkf ON wkf.attachable_id=oe.id AND wkf.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'NWBOphys')
                 WHERE oe.id = {};
                 '''.format(self.get_ophys_experiment_id())
-        return self.fetchone(query, strict=True)
+        return safe_system_path(self.fetchone(query, strict=True))
 
     @memoize
     def get_sync_file(self, ophys_experiment_id=None):
@@ -49,7 +50,7 @@ class OphysLimsApi(PostgresQueryMixin):
                 LEFT JOIN well_known_files sync ON sync.attachable_id=os.id AND sync.attachable_type = 'OphysSession' AND sync.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'OphysRigSync')
                 WHERE oe.id= {};
                 '''.format(self.get_ophys_experiment_id())
-        return self.fetchone(query, strict=True)
+        return safe_system_path(self.fetchone(query, strict=True))
 
     @memoize
     def get_segmentation_mask_image_file(self):
@@ -60,7 +61,7 @@ class OphysLimsApi(PostgresQueryMixin):
                 LEFT JOIN well_known_files wkf ON wkf.attachable_id=ocsr.id AND wkf.attachable_type = 'OphysCellSegmentationRun' AND wkf.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'OphysMaxIntImage')
                 WHERE oe.id= {};
                 '''.format(self.get_ophys_experiment_id())
-        return self.fetchone(query, strict=True)
+        return safe_system_path(self.fetchone(query, strict=True))
 
     @memoize
     def get_segmentation_mask_image(self, image_api=None):
@@ -197,7 +198,7 @@ class OphysLimsApi(PostgresQueryMixin):
                 LEFT JOIN well_known_files dff ON dff.attachable_id=oe.id AND dff.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'OphysDffTraceFile')
                 WHERE oe.id= {};
                 '''.format(self.get_ophys_experiment_id())
-        return self.fetchone(query, strict=True)
+        return safe_system_path(self.fetchone(query, strict=True))
 
     @memoize
     def get_cell_roi_ids(self):
@@ -214,7 +215,7 @@ class OphysLimsApi(PostgresQueryMixin):
                 LEFT JOIN well_known_files obj ON obj.attachable_id=ocsr.id AND obj.attachable_type = 'OphysCellSegmentationRun' AND obj.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'OphysSegmentationObjects')
                 WHERE oe.id= {};
                 '''.format(self.get_ophys_experiment_id())
-        return self.fetchone(query, strict=True)
+        return safe_system_path(self.fetchone(query, strict=True))
 
     @memoize
     def get_demix_file(self):
@@ -224,7 +225,7 @@ class OphysLimsApi(PostgresQueryMixin):
                 LEFT JOIN well_known_files wkf ON wkf.attachable_id=oe.id AND wkf.attachable_type = 'OphysExperiment' AND wkf.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'DemixedTracesFile')
                 WHERE oe.id= {};
                 '''.format(self.get_ophys_experiment_id())
-        return self.fetchone(query, strict=True)
+        return safe_system_path(self.fetchone(query, strict=True))
 
     @memoize
     def get_average_intensity_projection_image_file(self):
@@ -235,7 +236,7 @@ class OphysLimsApi(PostgresQueryMixin):
                 LEFT JOIN well_known_files avg ON avg.attachable_id=ocsr.id AND avg.attachable_type = 'OphysCellSegmentationRun' AND avg.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'OphysAverageIntensityProjectionImage')
                 WHERE oe.id = {};
                 '''.format(self.get_ophys_experiment_id())
-        return self.fetchone(query, strict=True)
+        return safe_system_path(self.fetchone(query, strict=True))
 
     @memoize
     def get_rigid_motion_transform_file(self):
@@ -245,7 +246,7 @@ class OphysLimsApi(PostgresQueryMixin):
                 LEFT JOIN well_known_files tra ON tra.attachable_id=oe.id AND tra.attachable_type = 'OphysExperiment' AND tra.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'OphysMotionXyOffsetData')
                 WHERE oe.id= {};
                 '''.format(self.get_ophys_experiment_id())
-        return self.fetchone(query, strict=True)
+        return safe_system_path(self.fetchone(query, strict=True))
 
     @memoize
     def get_foraging_id(self):
