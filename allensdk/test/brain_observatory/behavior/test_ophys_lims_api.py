@@ -1,3 +1,5 @@
+import os
+
 import pytest
 
 from allensdk.internal.api import OneResultExpectedError, OneOrMoreResultExpectedError
@@ -42,7 +44,7 @@ def test_get_ophys_experiment_dir(ophys_experiment_id, api_data):
     f = ophys_lims_api.get_ophys_experiment_dir
     key = 'ophys_dir'
     if ophys_experiment_id in api_data:
-        assert f() == api_data[ophys_experiment_id][key]
+        assert f() == os.path.normpath(api_data[ophys_experiment_id][key])
     else:
         expected_fail(f)
 
