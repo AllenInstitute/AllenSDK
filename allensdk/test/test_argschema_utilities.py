@@ -2,6 +2,7 @@ import pytest
 from marshmallow import ValidationError
 import os
 import stat
+import platform
 
 from allensdk.brain_observatory.argschema_utilities import check_write_access #, check_write_access_overwrite
 
@@ -36,13 +37,16 @@ def nonexistent_file(tmpdir_factory):
     return os.path.join(base_dir, 'parent', 'nonexistent_file.txt')
 
 
-@pytest.mark.parametrize('setup,raises', [
-    [existing_file, True],
-    [nonexistent_file, False],
-    [file_in_bad_permissions_dir, True],
-    [file_in_bad_permissions_middle_dir, True]
+@pytest.mark.parametrize('setup,raises,exclude_windows', [
+    [existing_file, True, False],
+    [nonexistent_file, False, False],
+    [file_in_bad_permissions_dir, True, True],
+    [file_in_bad_permissions_middle_dir, True, True]
 ])
-def test_check_write_access(tmpdir_factory, setup, raises):
+def test_check_write_access(tmpdir_factory, setup, raises, exclude_windows):
+
+    if exclude_windows and platform.system() == 'Windows':
+        pytest.skip()
 
     testpath = setup(tmpdir_factory)
     if raises:
