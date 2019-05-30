@@ -47,7 +47,7 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
         elif number_of_dff_frames == num_of_timestamps:
             pass
         else:
-            raise RuntimeError('dff_frames is shorter than timestamps')
+            raise RuntimeError('dff_frames is longer than timestamps')
 
         return ophys_timestamps
 
