@@ -16,14 +16,3 @@ def test_annotate_change_detect(trials):
     annotate_change_detect(trials)
     pd.testing.assert_series_equal(trials['change'], pd.Series([True, False, True, False], name='change'))
     pd.testing.assert_series_equal(trials['detect'], pd.Series([True, True, False, False], name='detect'))
-
-    print(trials)
-
-
-def test_annotate_change_detect2(trials):
-
-    # annotate_change_detect(trials)
-    # pd.testing.assert_series_equal(trials['change'], pd.Series([True, False, True, False], name='change'))
-    # pd.testing.assert_series_equal(trials['detect'], pd.Series([True, True, False, False], name='detect'))
-
-    print(trials)

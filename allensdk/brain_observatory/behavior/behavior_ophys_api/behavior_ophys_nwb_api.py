@@ -67,10 +67,13 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
             nwb.add_rewards(nwbfile, session_object.rewards)
 
         # Add max_projection image data to NWB in-memory object:
-        nwb.add_segmentation_mask_image(nwbfile, session_object.segmentation_mask_image)
+        nwb.add_max_projection(nwbfile, session_object.max_projection)
 
         # Add average_image image data to NWB in-memory object:
-        nwb.add_average_image(nwbfile, session_object.average_image)
+        nwb.add_average_image(nwbfile, session_object.average_projection)
+
+        # Add segmentation_mask_image image data to NWB in-memory object:
+        nwb.add_segmentation_mask_image(nwbfile, session_object.segmentation_mask_image)
 
         # Add metadata to NWB in-memory object:
         nwb.add_metadata(nwbfile, session_object.metadata)
@@ -142,11 +145,14 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
         else:
             return pd.DataFrame({'volume': [], 'timestamps': [], 'autorewarded': []}).set_index('timestamps')
 
-    def get_segmentation_mask_image(self, image_api=None) -> sitk.Image:
+    def get_max_projection(self, image_api=None) -> sitk.Image:
         return self.get_image('max_projection', 'two_photon_imaging', image_api=image_api)
 
-    def get_average_image(self, image_api=None) -> sitk.Image:
+    def get_average_projection(self, image_api=None) -> sitk.Image:
         return self.get_image('average_image', 'two_photon_imaging', image_api=image_api)
+
+    def get_segmentation_mask_image(self, image_api=None) -> sitk.Image:
+        return self.get_image('segmentation_mask_image', 'two_photon_imaging', image_api=image_api)
 
     def get_metadata(self) -> dict:
 

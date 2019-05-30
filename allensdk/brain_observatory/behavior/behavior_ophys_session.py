@@ -16,8 +16,8 @@ class BehaviorOphysSession(LazyPropertyMixin):
     Attributes:
         ophys_experiment_id : int (LazyProperty)
             Unique identifier for this experimental session
-        segmentation_mask_image : SimpleITK.Image (LazyProperty)
-            2D image of the segmented regions-of-interest in the field of view
+        max_projection : SimpleITK.Image (LazyProperty)
+            2D max projection image
         stimulus_timestamps : numpy.ndarray (LazyProperty)
             Timestamps associated the stimulus presentations on the monitor 
         ophys_timestamps : numpy.ndarray (LazyProperty)
@@ -50,7 +50,7 @@ class BehaviorOphysSession(LazyPropertyMixin):
             A dataframe containing behavioral trial start/stop times, and trial data
         corrected_fluorescence_traces : pandas.DataFrame (LazyProperty)
             The motion-corrected fluorescence traces organized into a dataframe; index is the cell roi ids
-        average_image : SimpleITK.Image (LazyProperty)
+        average_projection : SimpleITK.Image (LazyProperty)
             2D image of the microscope field of view, averaged across the experiment
         motion_correction : pandas.DataFrame LazyProperty
             A dataframe containing trace data used during motion correction computation
@@ -65,7 +65,7 @@ class BehaviorOphysSession(LazyPropertyMixin):
         self.api = api
 
         self.ophys_experiment_id = LazyProperty(self.api.get_ophys_experiment_id)
-        self.segmentation_mask_image = LazyProperty(self.api.get_segmentation_mask_image)
+        self.max_projection = LazyProperty(self.api.get_max_projection)
         self.stimulus_timestamps = LazyProperty(self.api.get_stimulus_timestamps)
         self.ophys_timestamps = LazyProperty(self.api.get_ophys_timestamps)
         self.metadata = LazyProperty(self.api.get_metadata)
@@ -80,8 +80,9 @@ class BehaviorOphysSession(LazyPropertyMixin):
         self.task_parameters = LazyProperty(self.api.get_task_parameters)
         self.trials = LazyProperty(self.api.get_trials)
         self.corrected_fluorescence_traces = LazyProperty(self.api.get_corrected_fluorescence_traces)
-        self.average_image = LazyProperty(self.api.get_average_image)
+        self.average_projection = LazyProperty(self.api.get_average_projection)
         self.motion_correction = LazyProperty(self.api.get_motion_correction)
+        self.segmentation_mask_image = LazyProperty(self.api.get_segmentation_mask_image)
 
     @legacy('Consider using "get_dff_timeseries" instead.')
     def get_dff_traces(self, cell_specimen_ids=None):
@@ -129,7 +130,7 @@ if __name__ == "__main__":
 
     #         print(api.get_ophys_experiment_id())
 
-        # session.segmentation_mask_image
+        # session.max_projection
         # session.stimulus_timestamps
         # session.ophys_timestamps
         # session.metadata
@@ -143,7 +144,6 @@ if __name__ == "__main__":
         # session.task_parameters
         # session.trials
         # session.corrected_fluorescence_traces
-        # session.average_image
         # session.motion_correction
 
             # nwb_filepath = '/allen/aibs/technology/nicholasc/tmp/behavior_ophys_session_{get_ophys_experiment_id}.nwb'.format(get_ophys_experiment_id=api.get_ophys_experiment_id())
@@ -177,9 +177,9 @@ if __name__ == "__main__":
     session = BehaviorOphysSession.from_LIMS(ophys_experiment_id)
 
 
-    session = BehaviorOphysSession.from_LIMS(789359614)
-    BehaviorOphysNwbApi(nwb_filepath).save(session)
-    # session.segmentation_mask_image
+    # session = BehaviorOphysSession.from_LIMS(789359614)
+    # BehaviorOphysNwbApi(nwb_filepath).save(session)
+    print(session.segmentation_mask_image)
     # session.stimulus_timestamps
     # session.ophys_timestamps
     # session.metadata
@@ -196,5 +196,5 @@ if __name__ == "__main__":
     # session.task_parameters
     # session.trials
     session.corrected_fluorescence_traces
-    # session.average_image
+    # session.average_projection
     # session.motion_correction
