@@ -4,39 +4,31 @@ import os
 
 from allensdk.brain_observatory.argschema_utilities import check_write_access #, check_write_access_overwrite
 
+def write_some_text(path):
+    with open(path, 'w') as fil:
+        fil.write('some_text')
 
-def test_check_write_access(tempdir_factory):
+def existing_file(tmpdir):
+    path = os.path.join(tmpdir, 'parent', 'foo.txt')
+    os.makedirs(os.path.dirname(path))
+    write_some_text(path)
+    return path
+
+def nonexistent_file(tmpdir):
+    return os.path.join(tmpdir, 'parent', 'foo.txt')
+
+
+@pytest.mark.parametrize('setup,raises', [
+    [existing_file, True],
+    [nonexistent_file, False]
+])
+def test_check_write_access(tmpdir_factory, setup, raises):
 
     # Definitely exists: base_dir
-    base_dir = str(tempdir_factory.mktemp('HW'))
-    filename_that_exists = os.path.join(base_dir, 'this_file_exists.txt')
-    filename_that_exists_but_wrong_permissions = os.path.join(base_dir, 'this_file_exists.txt')
-    for fname in [filename_that_exists, filename_that_exists_but_wrong_permissions]:
-        with open(fname, 'w') as f:
-            f.write('This string is now in the test file')
+    base_dir = str(tmpdir_factory.mktemp('HW'))
 
-    # Now change permissions on filename_that_exists_but_wrong_permissions:
-
-
-
-
-    # Definitely doesn't exist:
-    dir_or_file_that_doesnt_exist = os.path.join(base_dir, 'impossible')
-
-    # assert not check_write_access(dir_or_file_that_doesnt_exist)
-    assert check_write_access(filename_that_exists)
-
-    with pytest.raises(ValidationError) as e:
-        check_write_access(dir_or_file_that_doesnt_exist)
-
-    with pytest.raises(ValidationError) as e:
-        check_write_access(filename_that_exists_but_wrong_permissions)
-
-    
-    
-
-# def test_check_write_access_overwrite():
-
-
-
-#     pass
+    if raises:
+        with pytest.raises(ValidationError):
+            check_write_access(setup(base_dir))
+    else:
+        setup(base_dir)
