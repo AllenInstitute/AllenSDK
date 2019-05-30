@@ -1,6 +1,15 @@
 from setuptools import setup, find_packages
 import os
 import allensdk
+import re
+
+def parse_requirements_line(line):
+    split = line.split("#")
+    return split[0].strip()
+
+def parse_requirements_file(path):
+    with open(path, 'r') as fil:
+        return [parse_requirements_line(line) for line in fil.read().splitlines()]
 
 # http://bugs.python.org/issue8876#msg208792
 if hasattr(os, 'link'):
@@ -17,15 +26,12 @@ def prepend_find_packages(*roots):
         
     return packages
 
-with open('requirements.txt', 'r') as f:
-    required = f.read().splitlines()
+required = parse_requirements_file('requirements.txt')
 
 if os.environ.get('ALLENSDK_INTERNAL_REQUIREMENTS', 'false') == 'true':
-    with open('internal_requirements.txt', 'r') as f:
-        required.extend(f.read().splitlines())
+    required.extend(parse_requirements_file('internal_requirements.txt'))
 
-with open('test_requirements.txt', 'r') as f:
-    test_required = f.read().splitlines()
+test_required = parse_requirements_file('test_requirements.txt')
 
 setup(
     version = allensdk.__version__,
