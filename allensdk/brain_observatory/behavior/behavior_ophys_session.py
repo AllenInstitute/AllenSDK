@@ -104,7 +104,11 @@ class BehaviorOphysSession(LazyPropertyMixin):
 
     @legacy('Consider using "cell_specimen_table[\'cell_specimen_id\']" instead.')
     def get_cell_specimen_ids(self):
-        return self.cell_specimen_table.index.values
+        cell_specimen_ids = self.cell_specimen_table.index.values
+
+        if np.isnan(cell_specimen_ids.astype(float)).sum() == len(self.cell_specimen_table):
+            raise ValueError(f'cell_specimen_id values not assigned for {self.ophys_experiment_id}')
+        return cell_specimen_ids
 
 
 if __name__ == "__main__":
