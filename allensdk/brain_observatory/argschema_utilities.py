@@ -37,14 +37,19 @@ def check_write_access_dir(dirpath):
     raise RuntimeError('Unhandled case; this should not happen')
 
 
-def check_write_access(filepath):
+def check_write_access(filepath, allow_exists=False):
     try:
         fd = os.open(filepath, os.O_CREAT | os.O_EXCL)
         os.close(fd)
         os.remove(filepath)
         return True
     except FileExistsError:
-        raise ValidationError(f'file at {filepath} already exists')
+
+        if not allow_exists:
+            raise ValidationError(f'file at {filepath} already exists')
+        else:
+            return True
+
     except (FileNotFoundError, PermissionError):
         base_dir = os.path.dirname(filepath)
         return check_write_access_dir(base_dir)
@@ -52,6 +57,10 @@ def check_write_access(filepath):
         raise e
 
     raise RuntimeError('Unhandled case; this should not happen')
+
+
+def check_write_access_overwrite(path):
+    return check_write_access(path, allow_exists=True)
 
 
 def check_read_access(path):

@@ -43,9 +43,6 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
         unit_dict = {'v_sig': 'V', 'v_in': 'V', 'speed': 'cm/s', 'timestamps': 's', 'dx': 'cm'}
         nwb.add_running_data_df_to_nwbfile(nwbfile, session_object.running_data_df, unit_dict)
 
-        # Add ophys to NWB in-memory object:
-        nwb.add_ophys_timestamps(nwbfile, session_object.ophys_timestamps)
-
         # Add stimulus template data to NWB in-memory object:
         for name, image_data in session_object.stimulus_templates.items():
             nwb.add_stimulus_template(nwbfile, image_data, name)
@@ -85,7 +82,7 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
         nwb.add_cell_specimen_table(nwbfile, session_object.cell_specimen_table)
 
         # Add dff to NWB in-memory object:
-        nwb.add_dff_traces(nwbfile, session_object.dff_traces)
+        nwb.add_dff_traces(nwbfile, session_object.dff_traces, session_object.ophys_timestamps)
 
         # Add corrected_fluorescence to NWB in-memory object:
         nwb.add_corrected_fluorescence_traces(nwbfile, session_object.corrected_fluorescence_traces)
@@ -120,7 +117,7 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
         return {key: val.data[:] for key, val in self.nwbfile.stimulus_template.items()}
 
     def get_ophys_timestamps(self) -> np.ndarray:
-        return self.nwbfile.modules['two_photon_imaging'].get_data_interface('timestamps').timestamps
+        return self.nwbfile.modules['two_photon_imaging'].get_data_interface('dff').roi_response_series['traces'].timestamps
 
     def get_stimulus_timestamps(self) -> np.ndarray:
         return self.nwbfile.modules['stimulus'].get_data_interface('timestamps').timestamps
@@ -138,7 +135,7 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
 
     def get_rewards(self) -> np.ndarray:
         if 'rewards' in self.nwbfile.modules:
-            time = self.nwbfile.modules['rewards'].get_data_interface('timestamps').timestamps[:]
+            time = self.nwbfile.modules['rewards'].get_data_interface('autorewarded').timestamps[:]
             autorewarded = self.nwbfile.modules['rewards'].get_data_interface('autorewarded').data[:]
             volume = self.nwbfile.modules['rewards'].get_data_interface('volume').data[:]
             return pd.DataFrame({'volume': volume, 'timestamps': time, 'autorewarded': autorewarded}).set_index('timestamps')

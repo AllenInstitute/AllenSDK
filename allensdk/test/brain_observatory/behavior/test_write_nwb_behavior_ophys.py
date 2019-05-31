@@ -73,19 +73,6 @@ def test_add_stimulus_presentations(nwbfile, stimulus_presentations_behavior, st
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
-def test_add_ophys_timestamps(nwbfile, ophys_timestamps, roundtrip, roundtripper):
-
-    nwb.add_ophys_timestamps(nwbfile, ophys_timestamps)
-
-    if roundtrip:
-        obt = roundtripper(nwbfile, BehaviorOphysNwbApi)
-    else:
-        obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
-
-    np.testing.assert_array_almost_equal(ophys_timestamps, obt.get_ophys_timestamps())
-
-
-@pytest.mark.parametrize('roundtrip', [True, False])
 def test_add_stimulus_timestamps(nwbfile, stimulus_timestamps, roundtrip, roundtripper):
 
     nwb.add_stimulus_timestamps(nwbfile, stimulus_timestamps)
@@ -206,7 +193,6 @@ def test_add_task_parameters(nwbfile, roundtrip, roundtripper, task_parameters):
 @pytest.mark.parametrize('roundtrip', [True, False])
 def test_get_cell_specimen_table(nwbfile, roundtrip, roundtripper, cell_specimen_table, metadata, ophys_timestamps):
 
-    nwb.add_ophys_timestamps(nwbfile, ophys_timestamps)
     nwb.add_metadata(nwbfile, metadata)
     nwb.add_cell_specimen_table(nwbfile, cell_specimen_table)
 
@@ -221,10 +207,9 @@ def test_get_cell_specimen_table(nwbfile, roundtrip, roundtripper, cell_specimen
 @pytest.mark.parametrize('roundtrip', [True, False])
 def test_get_dff_traces(nwbfile, roundtrip, roundtripper, dff_traces, cell_specimen_table, metadata, ophys_timestamps):
 
-    nwb.add_ophys_timestamps(nwbfile, ophys_timestamps)
     nwb.add_metadata(nwbfile, metadata)
     nwb.add_cell_specimen_table(nwbfile, cell_specimen_table)
-    nwb.add_dff_traces(nwbfile, dff_traces)
+    nwb.add_dff_traces(nwbfile, dff_traces, ophys_timestamps)
 
     if roundtrip:
         obt = roundtripper(nwbfile, BehaviorOphysNwbApi)
@@ -237,10 +222,9 @@ def test_get_dff_traces(nwbfile, roundtrip, roundtripper, dff_traces, cell_speci
 @pytest.mark.parametrize('roundtrip', [True, False])
 def test_get_corrected_fluorescence_traces(nwbfile, roundtrip, roundtripper, dff_traces, corrected_fluorescence_traces, cell_specimen_table, metadata, ophys_timestamps):
 
-    nwb.add_ophys_timestamps(nwbfile, ophys_timestamps)
     nwb.add_metadata(nwbfile, metadata)
     nwb.add_cell_specimen_table(nwbfile, cell_specimen_table)
-    nwb.add_dff_traces(nwbfile, dff_traces)
+    nwb.add_dff_traces(nwbfile, dff_traces, ophys_timestamps)
     nwb.add_corrected_fluorescence_traces(nwbfile, corrected_fluorescence_traces)
 
     if roundtrip:
@@ -252,9 +236,11 @@ def test_get_corrected_fluorescence_traces(nwbfile, roundtrip, roundtripper, dff
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
-def test_get_motion_correction(nwbfile, roundtrip, roundtripper, motion_correction, ophys_timestamps):
+def test_get_motion_correction(nwbfile, roundtrip, roundtripper, motion_correction, ophys_timestamps, metadata, cell_specimen_table, dff_traces):
 
-    nwb.add_ophys_timestamps(nwbfile, ophys_timestamps)
+    nwb.add_metadata(nwbfile, metadata)
+    nwb.add_cell_specimen_table(nwbfile, cell_specimen_table)
+    nwb.add_dff_traces(nwbfile, dff_traces, ophys_timestamps)
     nwb.add_motion_correction(nwbfile, motion_correction)
 
     if roundtrip:

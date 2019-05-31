@@ -95,6 +95,11 @@ def write_behavior_ophys_nwb(session_data, nwb_filepath):
     nwb_filepath_inprogress = nwb_filepath+'.inprogress'
     nwb_filepath_error = nwb_filepath+'.error'
 
+    # Clean out files from previous runs:
+    for filename in [nwb_filepath_inprogress, nwb_filepath_error, nwb_filepath]:
+        if os.path.exists(filename):
+            os.remove(filename)
+
     try:
         session = BehaviorOphysSession(api=BehaviorOphysJsonApi(session_data))
         BehaviorOphysNwbApi(nwb_filepath_inprogress).save(session)

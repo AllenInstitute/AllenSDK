@@ -4,7 +4,7 @@ import os
 import stat
 import platform
 
-from allensdk.brain_observatory.argschema_utilities import check_write_access #, check_write_access_overwrite
+from allensdk.brain_observatory.argschema_utilities import check_write_access, check_write_access_overwrite
 
 
 def write_some_text(path):
@@ -54,3 +54,22 @@ def test_check_write_access(tmpdir_factory, setup, raises, exclude_windows):
             check_write_access(testpath)
     else:
         assert check_write_access(testpath)
+
+
+@pytest.mark.parametrize('setup,raises,exclude_windows', [
+    [existing_file, False, False],
+    [nonexistent_file, False, False],
+    [file_in_bad_permissions_dir, True, True],
+    [file_in_bad_permissions_middle_dir, True, True]
+])
+def test_check_write_access_overwrite(tmpdir_factory, setup, raises, exclude_windows):
+
+    if exclude_windows and platform.system() == 'Windows':
+        pytest.skip()
+
+    testpath = setup(tmpdir_factory)
+    if raises:
+        with pytest.raises(ValidationError):
+            check_write_access_overwrite(testpath)
+    else:
+        assert check_write_access_overwrite(testpath)
