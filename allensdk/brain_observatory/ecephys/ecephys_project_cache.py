@@ -4,7 +4,7 @@ import pandas as pd
 
 from allensdk.api.cache import Cache
 
-from allensdk.brain_observatory.ecephys.ecephys_project_api import EcephysProjectLimsApi
+from allensdk.brain_observatory.ecephys.ecephys_project_api import EcephysProjectLimsApi, EcephysProjectWarehouseApi
 from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
 
 
@@ -59,7 +59,8 @@ class EcephysProjectCache(Cache):
 
         def writer(_path, reader):
             with open(_path, 'wb') as writer:
-                writer.write(reader.read())
+                for chunk in reader:
+                    writer.write(chunk)
             reader.close()
 
         return call_caching(
@@ -101,6 +102,14 @@ class EcephysProjectCache(Cache):
         return manifest_builder
 
     @classmethod
+    def _from_api_class(cls, api_cls, api_kwargs=None, **kwargs):
+        api_kwargs = {} if api_kwargs is None else api_kwargs
+        return cls(fetch_api=api_cls(**api_kwargs), **kwargs)
+
+    @classmethod
     def from_lims(cls, lims_kwargs=None, **kwargs):
-        lims_kwargs = {} if lims_kwargs is None else lims_kwargs
-        return cls(fetch_api=EcephysProjectLimsApi(**lims_kwargs), **kwargs)
+        return cls._from_api_class(EcephysProjectLimsApi, lims_kwargs, **kwargs)
+
+    @classmethod
+    def from_warehouse(cls, warehouse_kwargs=None, **kwargs):
+        return cls._from_api_class(EcephysProjectWarehouseApi, warehouse_kwargs, **kwargs)

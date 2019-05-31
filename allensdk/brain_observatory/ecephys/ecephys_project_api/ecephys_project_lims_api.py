@@ -8,25 +8,17 @@ from .ecephys_project_api import EcephysProjectApi
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.internal.core.lims_utilities import safe_system_path
 
+from allensdk.brain_observatory.ecephys.ecephys_project_api.utilities import stream_well_known_file_from_lims
+
 
 class EcephysProjectLimsApi(EcephysProjectApi, PostgresQueryMixin):
     def __init__(self, **kwargs):
-        super(EcephysProjectApi, self).__init__(**kwargs)
+        super(EcephysProjectLimsApi, self).__init__(**kwargs)
 
     def get_session_data(self, session_id):
-        nwb_paths = self._get_session_nwb_paths(session_id)
-        main_nwb_path = nwb_paths.loc[nwb_paths["name"] == "EcephysNwb"]["path"].values
-
-        if len(main_nwb_path) == 1 and not isinstance(main_nwb_path, str):
-            main_nwb_path = Path(main_nwb_path[0])
-        else:
-            raise ValueError(f"did not find a unique nwb path for session {session_id}")
-
-        fsize = main_nwb_path.stat().st_size() / 1024 ** 2
-        warnings.warn(f"copying a {fsize:.6}mb file from {main_nwb_path}")
-
-        reader = open(main_nwb_path, "rb")
-        return reader
+        nwbs = self._get_session_well_known_files(session_ids=[session_id], wkf_type=["EcephysNwb"])
+        nwb_id = nwbs["id"].values[0]
+        return download_well_known_file_form_lims(nwb_id)
 
     def get_units(self, **kwargs):
         return self._get_units(**kwargs)
