@@ -208,7 +208,7 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
         return df
 
     @memoize
-    def get_average_image(self, image_api=None):
+    def get_average_projection(self, image_api=None):
 
         if image_api is None:
             image_api = ImageApi

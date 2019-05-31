@@ -65,7 +65,7 @@ def test_get_demix_file(ophys_experiment_id, api_data):
 @pytest.mark.parametrize('ophys_experiment_id', [702134928, 0])
 def test_get_maxint_file(ophys_experiment_id, api_data):
     ophys_lims_api = OphysLimsApi(ophys_experiment_id)
-    f = ophys_lims_api.get_segmentation_mask_image_file
+    f = ophys_lims_api.get_max_projection_file
     key = 'maxint_file'
     if ophys_experiment_id in api_data:
         assert f() == api_data[ophys_experiment_id][key]
@@ -244,3 +244,21 @@ def test_get_surface_2p_pixel_size_um(ophys_lims_api, compare_val):
         assert expected_fail is True
     else:
         assert ophys_lims_api.get_surface_2p_pixel_size_um() == compare_val
+
+
+@pytest.mark.requires_bamboo
+@pytest.mark.parametrize('ophys_lims_api, compare_val', [
+    pytest.param(OphysLimsApi(511458874), '/allen/programs/braintv/production/neuralcoding/prod6/specimen_503292442/ophys_experiment_511458874/processed/ophys_cell_segmentation_run_572290131/maxInt_masks.tif'),
+    pytest.param(OphysLimsApi(0), None)
+])
+def test_get_segmentation_mask_image_file(ophys_lims_api, compare_val):
+
+    if compare_val is None:
+        expected_fail = False
+        try:
+            ophys_lims_api.get_segmentation_mask_image_file()
+        except OneResultExpectedError:
+            expected_fail = True
+        assert expected_fail is True
+    else:
+        assert ophys_lims_api.get_segmentation_mask_image_file() == compare_val

@@ -269,7 +269,7 @@ def add_image(nwbfile, image_data, image_name, module_name, module_description, 
     return nwbfile
 
 
-def add_segmentation_mask_image(nwbfile, max_projection, image_api=None):
+def add_max_projection(nwbfile, max_projection, image_api=None):
 
     add_image(nwbfile, max_projection, 'max_projection', 'two_photon_imaging', 'Ophys timestamps processing module', image_api=image_api)
 
@@ -278,6 +278,10 @@ def add_average_image(nwbfile, average_image, image_api=None):
 
     add_image(nwbfile, average_image, 'average_image', 'two_photon_imaging', 'Ophys timestamps processing module', image_api=image_api)
 
+
+def add_segmentation_mask_image(nwbfile, segmentation_mask_image, image_api=None):
+
+    add_image(nwbfile, segmentation_mask_image, 'segmentation_mask_image', 'two_photon_imaging', 'Ophys timestamps processing module', image_api=image_api)
 
 def add_stimulus_index(nwbfile, stimulus_index, nwb_template):
 

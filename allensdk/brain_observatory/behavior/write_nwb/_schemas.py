@@ -29,7 +29,7 @@ class SessionData(RaisingSchema):
     movie_width = Int(required=True, description='width of field-of-view for 2p movie')
     container_id = Int(required=True, description='container that this experiment is in')
     sync_file = String(required=True, description='path to sync file')
-    segmentation_mask_image_file = String(required=True, description='path to segmentation_mask_image file')
+    max_projection_file = String(required=True, description='path to max_projection file')
     behavior_stimulus_file = String(required=True, description='path to behavior_stimulus file')
     dff_file = String(required=True, description='path to dff file')
     demix_file = String(required=True, description='path to demix file')

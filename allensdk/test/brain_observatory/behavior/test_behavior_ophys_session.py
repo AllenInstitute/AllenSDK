@@ -17,7 +17,7 @@ from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_a
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
 
 
-@pytest.mark.requires_bamboo
+@pytest.mark.nightly
 @pytest.mark.parametrize('oeid1, oeid2, expected', [
     pytest.param(789359614, 789359614, True),
     pytest.param(789359614, 739216204, False)
@@ -28,7 +28,7 @@ def test_equal(oeid1, oeid2, expected):
 
     assert equals(d1, d2) == expected
 
-@pytest.mark.requires_bamboo
+@pytest.mark.nightly
 def test_session_from_json(tmpdir_factory, session_data):
     oeid = 789359614
 
@@ -50,7 +50,7 @@ def test_nwb_end_to_end(tmpdir_factory):
     assert equals(d1, d2)
 
 
-@pytest.mark.requires_bamboo
+@pytest.mark.nightly
 def test_visbeh_ophys_data_set():
 
     ophys_experiment_id = 789359614
@@ -72,7 +72,7 @@ def test_visbeh_ophys_data_set():
     assert len(data_set.corrected_fluorescence_traces) == 269 and sorted(data_set.corrected_fluorescence_traces.columns) == ['cell_roi_id', 'corrected_fluorescence']
     np.testing.assert_array_almost_equal(data_set.running_speed.timestamps, data_set.stimulus_timestamps)
     assert len(data_set.cell_specimen_table) == len(data_set.dff_traces)
-    assert data_set.average_image.GetSize() == data_set.segmentation_mask_image.GetSize()
+    assert data_set.average_projection.GetSize() == data_set.max_projection.GetSize()
     assert list(data_set.motion_correction.columns) == ['x', 'y']
     assert len(data_set.trials) == 602
 
@@ -107,13 +107,13 @@ def test_visbeh_ophys_data_set():
                                         'response_window_sec': [0.15, 0.75],
                                         'stage': u'OPHYS_6_images_B'}
 
-@pytest.mark.nightly
+@pytest.mark.requires_bamboo
 def test_legacy_dff_api():
 
     ophys_experiment_id = 792813858
     api = BehaviorOphysLimsApi(ophys_experiment_id)
     session = BehaviorOphysSession(api)
-    cell_specimen_ids = [817111851, 817111897, 817115675, 817117206, 817111009]
+    cell_specimen_ids = [878143453, 878143533, 878151801, 878143406, 878143302]
 
     _, dff_array = session.get_dff_traces()
     for csid in cell_specimen_ids:

@@ -4,7 +4,7 @@ from allensdk.internal.api import OneResultExpectedError
 from allensdk.internal.api.behavior_lims_api import BehaviorLimsApi
 
 
-@pytest.mark.nightly
+@pytest.mark.requires_bamboo
 @pytest.mark.parametrize('behavior_session_uuid', [
     pytest.param('394a910e-94c7-4472-9838-5345aff59ed8'),
 ])
@@ -15,7 +15,7 @@ def test_foraging_id_to_behavior_session_id(behavior_session_uuid):
     assert behavior_session_id == 823847007
 
 
-@pytest.mark.nightly
+@pytest.mark.requires_bamboo
 @pytest.mark.parametrize('behavior_session_uuid', [
     pytest.param(823847007),
 ])
