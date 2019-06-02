@@ -280,9 +280,16 @@ class EcephysNwb1Api(EcephysSessionApi):
         units_df.set_index('unit_id', inplace=True)
         return units_df
 
+
     def get_ecephys_session_id(self) -> int:
         # Doesn't look like the session_id is stored
         return EcephysSessionApi.session_na
+
+
+    def get_actual_sampling_rates(self) -> float:
+        # TODO: xiaojuan has code to calculate the code for each given probe.
+        probes_table = self.get_probes()
+        return {probe_id: self.get_baseline_sampling_rate() for probe_id in probes_table.index.values}
 
     @classmethod
     def from_path(cls, path, **kwargs):

@@ -41,6 +41,11 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
     def get_ecephys_session_id(self) -> int:
         return int(self.nwbfile.identifier)
 
+    def get_actual_sampling_rates(self) -> float:
+        # TODO: xiaojuan has code to calculate the code for each given probe.
+        probes_table = self.get_probes()
+        return {probe_id: self.get_baseline_sampling_rate() for probe_id in probes_table.index.values}
+
     def _get_full_units_table(self) -> pd.DataFrame:
         table = self.nwbfile.units.to_dataframe()
         table.index = table.index.astype(int)

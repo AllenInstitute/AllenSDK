@@ -522,7 +522,7 @@ class EcephysSession(LazyPropertyMixin):
                 dims=['channel_id', 'time'],
                 coords={
                     'channel_id': [units_df.loc[uid]['peak_channel_id']],
-                    'time': np.arange(data.shape[1]) / 30000  # Don't know where this came from
+                    'time': np.arange(data.shape[1]) / self.api.get_baseline_sampling_rate()
                 }
             )
 
@@ -551,7 +551,7 @@ class EcephysSession(LazyPropertyMixin):
                 dims=['channel_id', 'time'],
                 coords={
                     'channel_id': [ channel_id_lut[(ii, probe_id_lut[uid])] for ii in range(data.shape[0])],
-                    'time': np.arange(data.shape[1]) / 30000 # TODO: ugh, get these timestamps from NWB file
+                    'time': np.arange(data.shape[1]) / self.api.get_baseline_sampling_rate()
                 }
             )
 
@@ -592,6 +592,7 @@ class EcephysSession(LazyPropertyMixin):
         # TODO: Is there a way for pynwb to check the file before actually loading it with io read? If so we could
         #       automatically check what NWB version is being inputed
 
+        nwb_version = int(nwb_version)  # only use major version
         if nwb_version >= 2:
             NWBAdaptorCls = EcephysNwbSessionApi
 
@@ -599,10 +600,9 @@ class EcephysSession(LazyPropertyMixin):
             NWBAdaptorCls = EcephysNwb1Api
 
         else:
-            raise Exception('Unknown nwb version type specified.')
+            raise Exception(f'specified NWB version {nwb_version} not supported. Supported versions are: 2.X, 1.X')
 
         return cls(api=NWBAdaptorCls.from_path(path=path, **api_kwargs), ** kwargs)
-
 
 
 def build_time_window_domain(bin_edges, offsets, callback=None):
