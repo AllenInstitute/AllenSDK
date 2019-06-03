@@ -478,7 +478,8 @@ class EcephysSession(LazyPropertyMixin):
         # pandas groupby ops ignore nans, so we need a new null value that pandas does not recognize as null ...
         stimulus_presentations.loc[stimulus_presentations['stimulus_name'] == '', 'stimulus_name'] = 'spontaneous_activity'
         stimulus_presentations[stimulus_presentations == ''] = np.nan
-        stimulus_presentations = stimulus_presentations.fillna('null') # 123 / 2**8
+        # This will convert columns to object dtypes
+        ## stimulus_presentations = stimulus_presentations.fillna('null') # 123 / 2**8
 
         stimulus_presentations['duration'] = stimulus_presentations['stop_time'] - stimulus_presentations['start_time']
 
@@ -631,6 +632,7 @@ def count_by_condition(stimulus_presentations, exclude_parameters=NON_STIMULUS_P
     
     cols = stimulus_presentations.columns.tolist()
     stimulus_presentations['count'] = 0
+    stimulus_presentations = stimulus_presentations.fillna('null')
     return stimulus_presentations.groupby(cols, as_index=False).count()
 
 
