@@ -3,73 +3,101 @@ from marshmallow import ValidationError
 import os
 import stat
 import platform
+from pathlib import Path
 
 from allensdk.brain_observatory.argschema_utilities import check_write_access, check_write_access_overwrite
 
+READ_ONLY = stat.S_IREAD|stat.S_IRGRP|stat.S_IROTH
+READ_WRITE = READ_ONLY|stat.S_IWRITE|stat.S_IWGRP|stat.S_IWOTH
 
 def write_some_text(path):
     with open(path, 'w') as fil:
         fil.write('some_text')
 
 
-def existing_file(tmpdir_factory, filename='existing_file.txt'):
-    base_dir = str(tmpdir_factory.mktemp('HW'))
-    path = os.path.join(base_dir, 'parent', filename)
-    os.makedirs(os.path.dirname(path))
-    write_some_text(path)
-    return path
-
-
-def file_in_bad_permissions_dir(tmpdir_factory):
-    base_dir = str(tmpdir_factory.mktemp('HW'))
-    os.chmod(base_dir, stat.S_IREAD)
-    return os.path.join(base_dir, 'parent_doesnt_have_permission_file.txt')
-
-
-def file_in_bad_permissions_middle_dir(tmpdir_factory):
-    base_dir = str(tmpdir_factory.mktemp('HW'))
-    os.chmod(base_dir, stat.S_IREAD)
-    return os.path.join(base_dir, 'doesnt_exist', 'parent_doesnt_have_permission_file.txt')
-
-
-def nonexistent_file(tmpdir_factory):
-    base_dir = str(tmpdir_factory.mktemp('HW'))
-    return os.path.join(base_dir, 'parent', 'nonexistent_file.txt')
-
-
-@pytest.mark.parametrize('setup,raises,exclude_windows', [
-    [existing_file, True, False],
-    [nonexistent_file, False, False],
-    [file_in_bad_permissions_dir, True, True],
-    [file_in_bad_permissions_middle_dir, True, True]
-])
-def test_check_write_access(tmpdir_factory, setup, raises, exclude_windows):
-
-    if exclude_windows and platform.system() == 'Windows':
+def try_write_bad_permissions(path):
+    try:
+        p = os.path.join(path, 'check')
+        open(p, 'w')
         pytest.skip()
+    except PermissionError:
+        pass
 
-    testpath = setup(tmpdir_factory)
+class WriteAccessTestHarness(object):
+    def __init__(self, base_path):
+        self.base_path = base_path
+    
+    def setup(self):
+        raise NotImplementedError()
+    
+    def teardown(self):
+        pass
+
+class ExistingFile(WriteAccessTestHarness):
+    def setup(self):
+        self.path = os.path.join(self.base_path, 'parent', 'foo')
+        os.makedirs(os.path.dirname(self.path))
+        write_some_text(self.path)
+        return self.path
+
+class NonexistentFile(WriteAccessTestHarness):
+    def setup(self):
+        self.path = os.path.join(self.base_path, 'parent', 'nonexistent_file.txt')
+        return self.path
+
+class FileInBadPermissionsDir(WriteAccessTestHarness):
+    def setup(self):
+        self.first = os.path.join(self.base_path, 'no_write')
+
+        os.makedirs(self.first)
+        os.chmod(self.first, READ_ONLY)
+
+        try_write_bad_permissions(self.first)
+
+        self.path = os.path.join(self.first, 'foo.txt')
+        return self.path
+
+    def teardown(self):
+        os.chmod(self.first, READ_WRITE)
+
+class FileInBadPermissionsMiddleDir(WriteAccessTestHarness):
+    def setup(self):
+        self.first = os.path.join(self.base_path, 'first')
+        self.second = os.path.join(self.first, 'second')
+
+        os.makedirs(self.first)
+        os.chmod(self.first, READ_ONLY)
+
+        try_write_bad_permissions(self.first)
+
+        self.path = os.path.join(self.second, 'foo.txt')
+        return self.path
+
+    def teardown(self):
+        os.chmod(self.first, READ_WRITE)
+
+
+@pytest.mark.parametrize('harness_cls,fn,raises', [
+    [ExistingFile, check_write_access, True],
+    [ExistingFile, check_write_access_overwrite, False],
+    [NonexistentFile, check_write_access, False],
+    [NonexistentFile, check_write_access_overwrite, False],
+    [FileInBadPermissionsDir, check_write_access, True],
+    [FileInBadPermissionsDir, check_write_access_overwrite, True],
+    [FileInBadPermissionsMiddleDir, check_write_access, True],
+    [FileInBadPermissionsMiddleDir, check_write_access_overwrite, True]
+])
+def test_check_write_access(tmpdir_factory, harness_cls, fn, raises):
+
+    base_dir = str(tmpdir_factory.mktemp('HW'))
+
+    harness = harness_cls(base_dir)
+    testpath = harness.setup()
+
     if raises:
         with pytest.raises(ValidationError):
-            check_write_access(testpath)
+            fn(testpath)
     else:
-        assert check_write_access(testpath)
+        assert fn(testpath)
 
-
-@pytest.mark.parametrize('setup,raises,exclude_windows', [
-    [existing_file, False, False],
-    [nonexistent_file, False, False],
-    [file_in_bad_permissions_dir, True, True],
-    [file_in_bad_permissions_middle_dir, True, True]
-])
-def test_check_write_access_overwrite(tmpdir_factory, setup, raises, exclude_windows):
-
-    if exclude_windows and platform.system() == 'Windows':
-        pytest.skip()
-
-    testpath = setup(tmpdir_factory)
-    if raises:
-        with pytest.raises(ValidationError):
-            check_write_access_overwrite(testpath)
-    else:
-        assert check_write_access_overwrite(testpath)
+    harness.teardown()
