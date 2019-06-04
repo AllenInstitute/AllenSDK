@@ -72,7 +72,8 @@ def raw_units():
 def raw_probes():
     return pd.DataFrame({
         'description': ['probeA', 'probeB'],
-        'location': ['VISp', 'VISam']
+        'location': ['VISp', 'VISam'],
+        'sampling_rate': [30000.0, 30000.0]
     }, index=pd.Index(name='id', data=[0, 1]))
 
 
