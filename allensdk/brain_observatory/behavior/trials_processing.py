@@ -154,9 +154,6 @@ def get_trials(data, stimulus_timestamps_no_monitor_delay, licks_df, rewards_df,
         go = not catch and not auto_rewarded
         trial_data['go'].append(go)
 
-        lick_events = [rebase(lick_tuple[0]) for lick_tuple in trial["licks"]]
-        trial_data['lick_events'].append(lick_events)
-
         lick_times = sync_lick_times[np.where(np.logical_and(sync_lick_times >= start_time, sync_lick_times <= stop_time))]
         trial_data['lick_times'].append(lick_times)
 
