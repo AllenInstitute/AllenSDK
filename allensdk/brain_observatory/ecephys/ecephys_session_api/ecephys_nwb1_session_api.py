@@ -165,6 +165,7 @@ class EcephysNwb1Api(EcephysSessionApi):
             'description': ""  # TODO: Find description
         })
         probes_df.set_index('id', inplace=True)
+        probes_df['sampling_rate'] = 30000.0  # TODO: calculate real sampling rate for each probe.
         return probes_df
 
 
@@ -284,12 +285,6 @@ class EcephysNwb1Api(EcephysSessionApi):
     def get_ecephys_session_id(self) -> int:
         # Doesn't look like the session_id is stored
         return EcephysSessionApi.session_na
-
-
-    def get_actual_sampling_rates(self) -> float:
-        # TODO: xiaojuan has code to calculate the code for each given probe.
-        probes_table = self.get_probes()
-        return {probe_id: self.get_baseline_sampling_rate() for probe_id in probes_table.index.values}
 
     @classmethod
     def from_path(cls, path, **kwargs):

@@ -150,7 +150,6 @@ class EcephysSession(LazyPropertyMixin):
         self.units = self.LazyProperty(self.api.get_units, wrappers=[self._build_units_table])
         self.inter_presentation_intervals = self.LazyProperty(self._build_inter_presentation_intervals)
 
-
     def get_inter_presentation_intervals_for_stimulus(self, stimulus_names):
         ''' Get a subset of this session's inter-presentation intervals, filtered by stimulus name.
 
@@ -515,14 +514,17 @@ class EcephysSession(LazyPropertyMixin):
         # for all channels. This is not true for NWB 1 files where each unit has ONE waveform on ONE channel
         units_df = self.units
         output_waveforms = {}
+        sampling_rate_lu = {uid: self.probes.loc[r['probe_id']]['sampling_rate'] for uid, r in units_df.iterrows()}
+
         for uid in list(mean_waveforms.keys()):
+            # assert(sampling_rate_lu[uid] == 30000)
             data = mean_waveforms.pop(uid)
             output_waveforms[uid] = xr.DataArray(
                 data=data,
                 dims=['channel_id', 'time'],
                 coords={
                     'channel_id': [units_df.loc[uid]['peak_channel_id']],
-                    'time': np.arange(data.shape[1]) / self.api.get_baseline_sampling_rate()
+                    'time': np.arange(data.shape[1]) / sampling_rate_lu[uid]
                 }
             )
 
@@ -538,7 +540,7 @@ class EcephysSession(LazyPropertyMixin):
         # we could easily recompute here, but better to fix it at the source
         channel_id_lut = {(row['local_index'], row['probe_id']): cid for cid, row in self.channels.iterrows()}
         probe_id_lut = {uid: row['probe_id'] for uid, row in self.units.iterrows()}
-        
+
         output_waveforms = {}
         for uid in list(mean_waveforms.keys()):
             data = mean_waveforms.pop(uid)
@@ -546,12 +548,13 @@ class EcephysSession(LazyPropertyMixin):
             if uid not in probe_id_lut: # It's been filtered out during unit table generation!
                 continue
 
+            probe_id = probe_id_lut[uid]
             output_waveforms[uid] = xr.DataArray(
                 data=data,
                 dims=['channel_id', 'time'],
                 coords={
-                    'channel_id': [ channel_id_lut[(ii, probe_id_lut[uid])] for ii in range(data.shape[0])],
-                    'time': np.arange(data.shape[1]) / self.api.get_baseline_sampling_rate()
+                    'channel_id': [ channel_id_lut[(ii, probe_id)] for ii in range(data.shape[0])],
+                    'time': np.arange(data.shape[1]) / self.probes.loc[probe_id]['sampling_rate']
                 }
             )
 
