@@ -58,7 +58,6 @@ class PostgresQueryMixin(object):
 
     def fetchone(self, query, strict=True):
         response = one(list(self.select(query).to_dict().values()))
-        print(response)
         if strict is True and (len(response) != 1 or response[0] is None):
             raise OneResultExpectedError
         return response[0]
