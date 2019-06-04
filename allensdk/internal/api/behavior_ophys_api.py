@@ -271,11 +271,9 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
 
 if __name__ == "__main__":
 
-
-
-
-    pass
-    # print(BehaviorOphysLimsApi.get_api_by_container(838105949))
+    # print(BehaviorOphysLimsApi.get_api_list_by_container_id(838105949))
+    pd.set_option('display.max_rows', 5000)
+    print(BehaviorOphysLimsApi.get_ophys_experiment_df()[['container_id', 'ophys_experiment_id', 'workflow_state']])
 
     # ophys_experiment_id = df['ophys_experiment_id'].iloc[0]
     # print(ophys_experiment_id)
