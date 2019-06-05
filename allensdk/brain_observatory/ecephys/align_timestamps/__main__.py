@@ -33,8 +33,6 @@ def align_timestamps(args):
             channel_states, timestamps, probe["sampling_rate"]
         )
 
-        # print("First 5 barcodes:")
-        # print(probe_barcodes[:5])
         print("Split times:")
         print(probe_split_times)
 
