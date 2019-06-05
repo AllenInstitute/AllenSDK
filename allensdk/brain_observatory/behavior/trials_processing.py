@@ -365,16 +365,32 @@ def get_image_info_from_trial(trial_log, ti):
         return prev_group, prev_name, prev_group, prev_name
 
 
-def get_ori_info_from_trial(trial_log, ti):
-    raise NotImplementedError
+def get_ori_info_from_trial(trial_log, ti, ):
+    if ti == -1:
+        raise IndexError('No change on first trial.')
+    
+    if len(trial_log[ti]["stimulus_changes"]) == 1:
+        (initial_group, initial_orientation), (change_group, change_orientation, ), _, _ = trial_log[ti]["stimulus_changes"][0]
+        return change_orientation, change_orientation, None
+    else:
+        return get_ori_info_from_trial(trial_log, ti - 1)
 
 
 def get_trials_v0(data, time):
+    stimuli = data["items"]["behavior"]["stimuli"]
+    if len(list(stimuli.keys())) != 1:
+        raise ValueError('Only one stimuli supported.')
+    
+    stim_name, stim = next(iter(stimuli.items()))
+    if stim_name not in ['images', 'grating', ]:
+        raise ValueError('Unsupported stimuli name: {}.'.format(stim_name))
 
-    implied_type = data["items"]["behavior"]["stimuli"]['images']["obj_type"]
+    implied_type = stim["obj_type"]
     trial_log = data["items"]["behavior"]["trial_log"]
     pre_change_time = data["items"]["behavior"]["config"]['DoC']['pre_change_time']
     initial_blank_duration = data["items"]["behavior"]["config"]["DoC"]["initial_blank"]
+
+    initial_stim = stim['set_log'][0]  # we need this for the situations where a change doesn't occur on the first trial
 
     trials = collections.defaultdict(list)
     for ti, trial in enumerate(trial_log):
@@ -413,17 +429,25 @@ def get_trials_v0(data, time):
             trials['initial_ori'].append(None)
             trials['initial_contrast'].append(None)
             trials['delta_ori'].append(None)
-        else:
-            change_orientation, change_contrast, initial_orientation, initial_contrast, delta_orientation = get_ori_info_from_trial(trial_log, ti)
+        elif implied_type == 'DoCGratingStimulus':
+            try:
+                change_orientation, initial_orientation, delta_orientation = get_ori_info_from_trial(trial_log, ti)
+            except IndexError:
+                orientation = initial_stim[1]  # shape: group_name, orientation, stimulus time relative to start, frame
+                change_orientation = orientation
+                initial_orientation = orientation
+                delta_orientation = None
             trials['initial_image_category'].append('')
             trials['initial_image_name'].append('')
             trials['change_image_name'].append('')
             trials['change_image_category'].append('')
             trials['change_ori'].append(change_orientation)
-            trials['change_contrast'].append(change_contrast)
+            trials['change_contrast'].append(None)
             trials['initial_ori'].append(initial_orientation)
-            trials['initial_contrast'].append(initial_contrast)
+            trials['initial_contrast'].append(None)
             trials['delta_ori'].append(delta_orientation)
+        else:
+            raise NotImplementedError('Unsupported stimulus type: {}'.format(implied_type), )
 
     return pd.DataFrame(trials)
 
