@@ -259,6 +259,24 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
 
         return pd.read_sql(query, api.get_connection()).rename(columns={'visual_behavior_experiment_container_id':'container_id'}).drop('id', axis=1)
 
+    @staticmethod
+    def get_containers_df(only_passed=True):
+
+        api = PostgresQueryMixin()
+        if only_passed is True:
+            query = '''
+                    SELECT *
+                    FROM visual_behavior_experiment_containers vbc
+                    WHERE workflow_state IN ('container_qc','publish');
+                    '''
+        else:
+            query = '''
+                    SELECT *
+                    FROM visual_behavior_experiment_containers vbc
+                    '''
+
+        return pd.read_sql(query, api.get_connection()).rename(columns={'id':'container_id'})[['container_id', 'specimen_id', 'workflow_state']]
+
     @classmethod
     def get_api_list_by_container_id(cls, container_id):
 
@@ -272,9 +290,8 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
 if __name__ == "__main__":
 
 
+    print(BehaviorOphysLimsApi.get_containers_df(only_passed=False))
 
-
-    pass
     # print(BehaviorOphysLimsApi.get_api_by_container(838105949))
 
     # ophys_experiment_id = df['ophys_experiment_id'].iloc[0]
