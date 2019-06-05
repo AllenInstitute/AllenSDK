@@ -401,10 +401,10 @@ def get_trials_v0(data, time):
         # Stimulus:
         if implied_type == 'DoCImageStimulus':
             from_group, from_name, to_group, to_name = get_image_info_from_trial(trial_log, ti)
-            trials['initial_image_category'].append(from_group)
+            # trials['initial_image_category'].append(from_group)
             trials['initial_image_name'].append(from_name)
             trials['change_image_name'].append(to_name)
-            trials['change_image_category'].append(to_group)
+            # trials['change_image_category'].append(to_group)
             trials['change_ori'].append(None)
             trials['change_contrast'].append(None)
             trials['initial_ori'].append(None)
@@ -412,10 +412,10 @@ def get_trials_v0(data, time):
             trials['delta_ori'].append(None)
         else:
             change_orientation, change_contrast, initial_orientation, initial_contrast, delta_orientation = get_ori_info_from_trial(trial_log, ti)
-            trials['initial_image_category'].append('')
+            # trials['initial_image_category'].append('')
             trials['initial_image_name'].append('')
             trials['change_image_name'].append('')
-            trials['change_image_category'].append('')
+            # trials['change_image_category'].append('')
             trials['change_ori'].append(change_orientation)
             trials['change_contrast'].append(change_contrast)
             trials['initial_ori'].append(initial_orientation)

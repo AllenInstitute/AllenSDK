@@ -155,13 +155,13 @@ def get_visual_stimuli_df(data, time):
             orientation = attr_value if attr_name.lower() == "ori" else np.nan
             image_name = attr_value if attr_name.lower() == "image" else np.nan
 
-            if attr_name.lower() == "image" and stim_dict["change_log"]:
-                image_category = _resolve_image_category(
-                    stim_dict["change_log"],
-                    frame
-                )
-            else:
-                image_category = np.nan
+            # if attr_name.lower() == "image" and stim_dict["change_log"]:
+            #     image_category = _resolve_image_category(
+            #         stim_dict["change_log"],
+            #         frame
+            #     )
+            # else:
+            #     image_category = np.nan
 
             stimulus_epoch = _get_stimulus_epoch(
                 stim_dict["set_log"],
@@ -185,7 +185,7 @@ def get_visual_stimuli_df(data, time):
                 visual_stimuli_data.append({
                     "orientation": orientation,
                     "image_name": image_name,
-                    "image_category": image_category,
+                    # "image_category": image_category,
                     "frame": epoch_start,
                     "end_frame": epoch_end,
                     "time": time[epoch_start],
