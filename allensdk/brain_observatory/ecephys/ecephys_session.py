@@ -498,7 +498,7 @@ class EcephysSession(LazyPropertyMixin):
             'description': 'probe_description',
             'manual_structure_id': 'structure_id',
             'manual_structure_acronym': 'structure_acronym',
-            'local_index_channel': 'channel_local_index'
+            'local_index_channel': 'channel_local_index',
             })
 
         table = table.loc[
