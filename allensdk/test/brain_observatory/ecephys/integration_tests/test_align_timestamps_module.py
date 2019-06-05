@@ -88,7 +88,6 @@ def align_timestamps_706875901_expected_files():
     }
 
 
-@pytest.mark.requires_bamboo
 @pytest.fixture(scope="module")
 def run_align_timestamps_706875901(tmpdir_factory):
     base_path = tmpdir_factory.mktemp("align_timestamps_integration")
@@ -109,6 +108,7 @@ def run_align_timestamps_706875901(tmpdir_factory):
     return output_json_path
 
 
+@pytest.mark.requires_bamboo
 def test_align_timestamps_parameters_706875901(
     run_align_timestamps_706875901, align_timestamps_706875901_expected_params
 ):
@@ -130,6 +130,7 @@ def test_align_timestamps_parameters_706875901(
         )
 
 
+@pytest.mark.requires_bamboo
 def test_align_timestamps_files_706875901(
     run_align_timestamps_706875901, align_timestamps_706875901_expected_files
 ):
@@ -149,6 +150,7 @@ def test_align_timestamps_files_706875901(
             assert np.allclose(expected_data, obtained_data)
 
 
+@pytest.mark.requires_bamboo
 def test_align_timestamps_barcode_agreement_706875901(run_align_timestamps_706875901):
 
     with open(run_align_timestamps_706875901, "r") as output_json_file:
