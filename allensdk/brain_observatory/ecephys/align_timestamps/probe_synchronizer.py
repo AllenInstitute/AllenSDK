@@ -1,23 +1,26 @@
-
 from . import barcode
 
 import numpy as np
 
 
 class ProbeSynchronizer(object):
-
-
     @property
     def sampling_rate_scale(self):
-        ''' The ratio of the probe's sampling rate assessed on the global clock to the 
+        """ The ratio of the probe's sampling rate assessed on the global clock to the 
         probe's locally assessed sampling rate.
-        '''
+        """
 
         return self.global_probe_sampling_rate / self.local_probe_sampling_rate
 
-
-    def __init__(self, global_probe_sampling_rate, local_probe_sampling_rate, total_time_shift, min_time, max_time):
-        '''Converts probe sample indices to master clock times.
+    def __init__(
+        self,
+        global_probe_sampling_rate,
+        local_probe_sampling_rate,
+        total_time_shift,
+        min_time,
+        max_time,
+    ):
+        """Converts probe sample indices to master clock times.
 
         Parameters
         ----------
@@ -32,7 +35,7 @@ class ProbeSynchronizer(object):
         max_time : float
             maximum time for this synchronizer
 
-        '''
+        """
 
         self.global_probe_sampling_rate = global_probe_sampling_rate
         self.local_probe_sampling_rate = local_probe_sampling_rate
@@ -40,9 +43,8 @@ class ProbeSynchronizer(object):
         self.min_time = min_time
         self.max_time = max_time
 
-
-    def __call__(self, samples, sync_condition='master'):
-        '''Applies a computed transform to input probe sample indices.
+    def __call__(self, samples, sync_condition="master"):
+        """Applies a computed transform to input probe sample indices.
 
         Parameters
         ----------
@@ -58,35 +60,47 @@ class ProbeSynchronizer(object):
         numpy.ndarray : 
             Sample timestamps in seconds on the master (default) or probe clock.
 
-        '''
+        """
 
-        
-
-        in_range = np.where(((samples / self.local_probe_sampling_rate) >= self.min_time) * 
-                            ((samples / self.local_probe_sampling_rate) < self.max_time))[0]
+        in_range = np.where(
+            ((samples / self.local_probe_sampling_rate) >= self.min_time)
+            * ((samples / self.local_probe_sampling_rate) < self.max_time)
+        )[0]
 
         if self.global_probe_sampling_rate > 0:
 
-            if sync_condition == 'probe':
+            if sync_condition == "probe":
                 samples[in_range] = samples[in_range] / self.local_probe_sampling_rate
 
-            elif sync_condition == 'master':
-                samples[in_range] = samples[in_range] / self.global_probe_sampling_rate - self.total_time_shift
+            elif sync_condition == "master":
+                samples[in_range] = (
+                    samples[in_range] / self.global_probe_sampling_rate
+                    - self.total_time_shift
+                )
 
             else:
-                raise ValueError('unrecognized sync condition: {}'.format(sync_condition))
+                raise ValueError(
+                    "unrecognized sync condition: {}".format(sync_condition)
+                )
 
         else:
             samples[in_range] = -1
 
         return samples
 
-
     @classmethod
-    def compute(cls, master_barcode_times, master_barcodes, probe_barcode_times, probe_barcodes, min_time, max_time,
-        probe_start_index, local_probe_sampling_rate
+    def compute(
+        cls,
+        master_barcode_times,
+        master_barcodes,
+        probe_barcode_times,
+        probe_barcodes,
+        min_time,
+        max_time,
+        probe_start_index,
+        local_probe_sampling_rate,
     ):
-        '''Compute a transform from probe samples to master times by aligning barcodes.
+        """Compute a transform from probe samples to master times by aligning barcodes.
 
         Parameters
         ----------
@@ -114,7 +128,7 @@ class ProbeSynchronizer(object):
         ProbeSynchronizer : 
             When called, applies the transform computed here to samples on the probe clock.
 
-        '''
+        """
 
         times_array = np.array(probe_barcode_times)
         barcodes_array = np.array(probe_barcodes)
@@ -126,10 +140,14 @@ class ProbeSynchronizer(object):
         if len(barcodes_to_align) > 0:
 
             print("Num barcodes: " + str(len(barcodes_to_align)))
-        
+
             total_time_shift, global_probe_sampling_rate, _ = barcode.get_probe_time_offset(
-                master_barcode_times, master_barcodes, times_to_align, barcodes_to_align, 
-                probe_start_index, local_probe_sampling_rate
+                master_barcode_times,
+                master_barcodes,
+                times_to_align,
+                barcodes_to_align,
+                probe_start_index,
+                local_probe_sampling_rate,
             )
 
         else:
@@ -137,5 +155,10 @@ class ProbeSynchronizer(object):
             total_time_shift = 0
             global_probe_sampling_rate = 0
 
-        return cls(global_probe_sampling_rate, local_probe_sampling_rate, total_time_shift, min_time, max_time)
-
+        return cls(
+            global_probe_sampling_rate,
+            local_probe_sampling_rate,
+            total_time_shift,
+            min_time,
+            max_time,
+        )

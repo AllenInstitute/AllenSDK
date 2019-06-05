@@ -1,10 +1,15 @@
 import numpy as np
 
 
-def extract_barcodes_from_times(on_times, off_times, inter_barcode_interval=10, 
-                                bar_duration=0.03, barcode_duration_ceiling=2, 
-                                nbits=32):
-    '''Read barcodes from timestamped rising and falling edges.
+def extract_barcodes_from_times(
+    on_times,
+    off_times,
+    inter_barcode_interval=10,
+    bar_duration=0.03,
+    barcode_duration_ceiling=2,
+    nbits=32,
+):
+    """Read barcodes from timestamped rising and falling edges.
 
     Parameters
     ----------
@@ -33,57 +38,64 @@ def extract_barcodes_from_times(on_times, off_times, inter_barcode_interval=10,
     ignores first code in prod (ok, but not intended)
     ignores first on pulse (intended - this is needed to identify that a barcode is starting)
 
-    '''
-
+    """
 
     start_indices = np.diff(on_times)
     a = np.where(start_indices > inter_barcode_interval)[0]
-    barcode_start_times = on_times[a+1]
-    
+    barcode_start_times = on_times[a + 1]
+
     barcodes = []
-    
+
     for i, t in enumerate(barcode_start_times):
-        
-        oncode = on_times[np.where(np.logical_and( on_times > t, on_times < t + barcode_duration_ceiling ))[0]]
-        offcode = off_times[np.where(np.logical_and( off_times > t, off_times < t + barcode_duration_ceiling ))[0]]
-        
+
+        oncode = on_times[
+            np.where(
+                np.logical_and(on_times > t, on_times < t + barcode_duration_ceiling)
+            )[0]
+        ]
+        offcode = off_times[
+            np.where(
+                np.logical_and(off_times > t, off_times < t + barcode_duration_ceiling)
+            )[0]
+        ]
+
         currTime = offcode[0]
-        
+
         bits = np.zeros((nbits,))
-        
+
         for bit in range(0, nbits):
-            
+
             nextOn = np.where(oncode > currTime)[0]
             nextOff = np.where(offcode > currTime)[0]
-            
+
             if nextOn.size > 0:
                 nextOn = oncode[nextOn[0]]
             else:
                 nextOn = t + inter_barcode_interval
-            
+
             if nextOff.size > 0:
                 nextOff = offcode[nextOff[0]]
             else:
                 nextOff = t + inter_barcode_interval
-            
+
             if nextOn < nextOff:
                 bits[bit] = 1
-            
+
             currTime += bar_duration
-            
-        barcode = 0        
-        
+
+        barcode = 0
+
         # least sig left
         for bit in range(0, nbits):
-            barcode += bits[bit]*pow(2,bit)
-        
+            barcode += bits[bit] * pow(2, bit)
+
         barcodes.append(barcode)
-                    
+
     return barcode_start_times, barcodes
 
 
-def find_matching_index(master_barcodes, probe_barcodes, alignment_type='start'):
-    '''Given a set of barcodes for the master clock and the probe clock, find the
+def find_matching_index(master_barcodes, probe_barcodes, alignment_type="start"):
+    """Given a set of barcodes for the master clock and the probe clock, find the
     indices of a matching set, either starting from the beginning or the end
     of the list.
 
@@ -103,12 +115,12 @@ def find_matching_index(master_barcodes, probe_barcodes, alignment_type='start')
     probe_barcode_index : int
         matching index for probe barcodes (None if not found)
 
-    '''
+    """
 
     foundMatch = False
     master_barcode_index = None
 
-    if alignment_type == 'start':
+    if alignment_type == "start":
         probe_barcode_index = 0
         direction = 1
     else:
@@ -117,9 +129,11 @@ def find_matching_index(master_barcodes, probe_barcodes, alignment_type='start')
 
     while not foundMatch and abs(probe_barcode_index) < len(probe_barcodes):
 
-        master_barcode_index = np.where(master_barcodes == probe_barcodes[probe_barcode_index])[0]
-        
-        assert(len(master_barcode_index) < 2)
+        master_barcode_index = np.where(
+            master_barcodes == probe_barcodes[probe_barcode_index]
+        )[0]
+
+        assert len(master_barcode_index) < 2
 
         if len(master_barcode_index) == 1:
             foundMatch = True
@@ -133,7 +147,7 @@ def find_matching_index(master_barcodes, probe_barcodes, alignment_type='start')
 
 
 def match_barcodes(master_times, master_barcodes, probe_times, probe_barcodes):
-    '''Given sequences of barcode values and (local) times on a probe line and a master 
+    """Given sequences of barcode values and (local) times on a probe line and a master 
     line, find the time points on each clock corresponding to the first and last shared 
     barcode.
 
@@ -159,9 +173,11 @@ def match_barcodes(master_times, master_barcodes, probe_times, probe_barcodes):
     master_interval : np.ndarray
         Start and end times of the matched interval according to the master clock
 
-    '''
+    """
 
-    master_start_index, probe_start_index = find_matching_index(master_barcodes, probe_barcodes, alignment_type='start')
+    master_start_index, probe_start_index = find_matching_index(
+        master_barcodes, probe_barcodes, alignment_type="start"
+    )
 
     if master_start_index is not None:
         t_m_start = master_times[master_start_index]
@@ -169,13 +185,15 @@ def match_barcodes(master_times, master_barcodes, probe_times, probe_barcodes):
     else:
         t_m_start, t_p_start = None, None
 
-    #print(master_barcodes)
-    #print(probe_barcodes)
+    # print(master_barcodes)
+    # print(probe_barcodes)
 
-    #print("Master start index: " + str(master_start_index))
+    # print("Master start index: " + str(master_start_index))
     if len(probe_barcodes) > 2:
-        master_end_index, probe_end_index = find_matching_index(master_barcodes, probe_barcodes, alignment_type='end')
-        #print("Probe end index: " + str(probe_end_index))
+        master_end_index, probe_end_index = find_matching_index(
+            master_barcodes, probe_barcodes, alignment_type="end"
+        )
+        # print("Probe end index: " + str(probe_end_index))
         t_m_end = master_times[master_end_index]
         t_p_end = probe_times[probe_end_index]
     else:
@@ -184,9 +202,8 @@ def match_barcodes(master_times, master_barcodes, probe_times, probe_barcodes):
     return np.array([t_p_start, t_p_end]), np.array([t_m_start, t_m_end])
 
 
-
 def linear_transform_from_intervals(master, probe):
-    '''Find a scale and translation which aligns two 1d segments
+    """Find a scale and translation which aligns two 1d segments
 
     Parameters
     ----------
@@ -208,7 +225,7 @@ def linear_transform_from_intervals(master, probe):
     solves 
         (master + translation) * scale = probe
     for scale and translation
-    '''
+    """
 
     if probe[1] is not None:
         scale = (probe[1] - probe[0]) / (master[1] - master[0])
@@ -221,11 +238,16 @@ def linear_transform_from_intervals(master, probe):
         translation = None
 
     return scale, translation
-    
 
-def get_probe_time_offset(master_times, master_barcodes, 
-                          probe_times, probe_barcodes, 
-                          acq_start_index, local_probe_rate):
+
+def get_probe_time_offset(
+    master_times,
+    master_barcodes,
+    probe_times,
+    probe_barcodes,
+    acq_start_index,
+    local_probe_rate,
+):
     """Time offset between master clock and recording probes. For converting probe time to master clock.
     
     Parameters
@@ -258,8 +280,12 @@ def get_probe_time_offset(master_times, master_barcodes,
     
     """
 
-    probe_endpoints, master_endpoints = match_barcodes(master_times, master_barcodes, probe_times, probe_barcodes)
-    rate_scale, time_offset = linear_transform_from_intervals(master_endpoints, probe_endpoints)
+    probe_endpoints, master_endpoints = match_barcodes(
+        master_times, master_barcodes, probe_times, probe_barcodes
+    )
+    rate_scale, time_offset = linear_transform_from_intervals(
+        master_endpoints, probe_endpoints
+    )
 
     if time_offset is not None:
         probe_rate = local_probe_rate * rate_scale
