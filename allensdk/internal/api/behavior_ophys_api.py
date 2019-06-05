@@ -140,7 +140,7 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
 
         stimulus_metadata_df = get_stimulus_metadata(data)
         idx_name = stimulus_presentations_df_pre.index.name
-        stimulus_index_df = stimulus_presentations_df_pre.reset_index().merge(stimulus_metadata_df.reset_index(), on=['image_name', 'image_category']).set_index(idx_name)
+        stimulus_index_df = stimulus_presentations_df_pre.reset_index().merge(stimulus_metadata_df.reset_index(), on=['image_name']).set_index(idx_name)
         stimulus_index_df.sort_index(inplace=True)
         stimulus_index_df = stimulus_index_df[['image_set', 'image_index', 'start_time']].rename(columns={'start_time': 'timestamps'})
         stimulus_index_df.set_index('timestamps', inplace=True, drop=True)
