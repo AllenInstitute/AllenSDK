@@ -436,11 +436,9 @@ def get_trials_v0(data, time):
                 initial_orientation = orientation
                 delta_orientation = None
             trials['initial_image_category'].append('')
-        else:
-            change_orientation, change_contrast, initial_orientation, initial_contrast, delta_orientation = get_ori_info_from_trial(trial_log, ti)
-
             trials['initial_image_name'].append('')
             trials['change_image_name'].append('')
+            trials['change_image_category'].append('')
             trials['change_ori'].append(change_orientation)
             trials['change_contrast'].append(None)
             trials['initial_ori'].append(initial_orientation)
