@@ -154,9 +154,6 @@ def get_trials(data, stimulus_timestamps_no_monitor_delay, licks_df, rewards_df,
         go = not catch and not auto_rewarded
         trial_data['go'].append(go)
 
-        lick_events = [rebase(lick_tuple[0]) for lick_tuple in trial["licks"]]
-        trial_data['lick_events'].append(lick_events)
-
         lick_times = sync_lick_times[np.where(np.logical_and(sync_lick_times >= start_time, sync_lick_times <= stop_time))]
         trial_data['lick_times'].append(lick_times)
 
@@ -171,6 +168,9 @@ def get_trials(data, stimulus_timestamps_no_monitor_delay, licks_df, rewards_df,
 
         false_alarm = ('false_alarm', "") in event_dict
         trial_data['false_alarm'].append(false_alarm)
+
+        correct_reject = catch and not false_alarm
+        trial_data['correct_reject'].append(correct_reject)
 
         response_time = event_dict.get(('hit', '')) or event_dict.get(('false_alarm', '')) if hit or false_alarm else float('nan')
         trial_data['response_time'].append(response_time)
@@ -419,11 +419,9 @@ def get_trials_v0(data, time):
 
         # Stimulus:
         if implied_type == 'DoCImageStimulus':
-            from_group, from_name, to_group, to_name = get_image_info_from_trial(trial_log, ti)
-            trials['initial_image_category'].append(from_group)
+            _, from_name, _, to_name = get_image_info_from_trial(trial_log, ti)
             trials['initial_image_name'].append(from_name)
             trials['change_image_name'].append(to_name)
-            trials['change_image_category'].append(to_group)
             trials['change_ori'].append(None)
             trials['change_contrast'].append(None)
             trials['initial_ori'].append(None)
@@ -438,9 +436,11 @@ def get_trials_v0(data, time):
                 initial_orientation = orientation
                 delta_orientation = None
             trials['initial_image_category'].append('')
+        else:
+            change_orientation, change_contrast, initial_orientation, initial_contrast, delta_orientation = get_ori_info_from_trial(trial_log, ti)
+
             trials['initial_image_name'].append('')
             trials['change_image_name'].append('')
-            trials['change_image_category'].append('')
             trials['change_ori'].append(change_orientation)
             trials['change_contrast'].append(None)
             trials['initial_ori'].append(initial_orientation)

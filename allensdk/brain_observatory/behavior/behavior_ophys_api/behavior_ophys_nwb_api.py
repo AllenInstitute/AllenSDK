@@ -127,6 +127,8 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
 
     def get_trials(self) -> pd.DataFrame:
         trials = self.nwbfile.trials.to_dataframe()
+        if 'lick_events' in trials.columns:
+            trials.drop('lick_events', inplace=True, axis=1)
         trials.index = trials.index.rename('trials_id')
         return trials
 
