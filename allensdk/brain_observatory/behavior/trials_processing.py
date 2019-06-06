@@ -169,6 +169,9 @@ def get_trials(data, stimulus_timestamps_no_monitor_delay, licks_df, rewards_df,
         false_alarm = ('false_alarm', "") in event_dict
         trial_data['false_alarm'].append(false_alarm)
 
+        correct_reject = catch and not false_alarm
+        trial_data['correct_reject'].append(correct_reject)
+
         response_time = event_dict.get(('hit', '')) or event_dict.get(('false_alarm', '')) if hit or false_alarm else float('nan')
         trial_data['response_time'].append(response_time)
 
