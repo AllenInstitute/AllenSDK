@@ -46,6 +46,8 @@ class SessionData(RaisingSchema):
     surface_2p_pixel_size_um = Float(required=True, description='the spatial extent (in um) of the 2p field-of-view')
     ophys_cell_segmentation_run_id = Int(required=True, description='ID of the active segmentation run used to generate this file')
     cell_specimen_table_dict = Nested(CellSpecimenTable, required=True, description='Table of cell specimen info')
+    sex = String(required=True, description='sex')
+    age = String(required=True, description='age')
 
 
 class InputSchema(ArgSchema):
