@@ -10,18 +10,17 @@ from .utilities import postgres_macros, build_and_execute
 
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.internal.core.lims_utilities import safe_system_path
-        
 
 
 class EcephysProjectLimsApi(EcephysProjectApi):
-
     def __init__(self, postgres_engine, app_engine):
         self.postgres_engine = postgres_engine
         self.app_engine = app_engine
 
     def get_session_data(self, session_id):
 
-        nwb_response = build_and_execute("""
+        nwb_response = build_and_execute(
+            """
             select wkf.id from well_known_files wkf 
             join ecephys_analysis_runs ear on (
                 ear.id = wkf.attachable_id
@@ -29,7 +28,10 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             )
             where ear.current
             and ear.ecephys_session_id = {{session_id}}
-        """, engine=self.postgres_engine.select, session_id=session_id)
+        """,
+            engine=self.postgres_engine.select,
+            session_id=session_id,
+        )
 
         if nwb_response.shape[0] != 1:
             raise ValueError(
@@ -37,10 +39,15 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             )
 
         nwb_id = nwb_response.loc[0, "id"]
-        return self.app_engine.stream(f"well_known_files/download/{nwb_id}?wkf_id={nwb_id}")
+        return self.app_engine.stream(
+            f"well_known_files/download/{nwb_id}?wkf_id={nwb_id}"
+        )
 
-    def get_units(self, unit_ids=None, channel_ids=None, probe_ids=None, session_ids=None):
-        return build_and_execute("""
+    def get_units(
+        self, unit_ids=None, channel_ids=None, probe_ids=None, session_ids=None
+    ):
+        return build_and_execute(
+            """
                 {%- import 'postgres_macros' as pm -%}
                 select eu.* from ecephys_units eu
                 join ecephys_channels ec on ec.id = eu.ecephys_channel_id
@@ -52,12 +59,17 @@ class EcephysProjectLimsApi(EcephysProjectApi):
                 {{pm.optional_contains('ep.id', probe_ids) -}}
                 {{pm.optional_contains('es.id', session_ids) -}}
             """,
-            base=postgres_macros(), engine=self.postgres_engine.select, unit_ids=unit_ids, channel_ids=channel_ids, 
-            probe_ids=probe_ids, session_ids=session_ids
+            base=postgres_macros(),
+            engine=self.postgres_engine.select,
+            unit_ids=unit_ids,
+            channel_ids=channel_ids,
+            probe_ids=probe_ids,
+            session_ids=session_ids,
         )
 
     def get_channels(self, channel_ids=None, probe_ids=None, session_ids=None):
-        return build_and_execute("""
+        return build_and_execute(
+            """
                 {%- import 'postgres_macros' as pm -%}
                 select ec.* from ecephys_channels ec 
                 join ecephys_probes ep on ep.id = ec.ecephys_probe_id
@@ -67,12 +79,16 @@ class EcephysProjectLimsApi(EcephysProjectApi):
                 {{pm.optional_contains('ep.id', probe_ids) -}}
                 {{pm.optional_contains('es.id', session_ids) -}}
             """,
-            base=postgres_macros(), engine=self.postgres_engine.select, channel_ids=channel_ids, probe_ids=probe_ids, 
-            session_ids=session_ids
+            base=postgres_macros(),
+            engine=self.postgres_engine.select,
+            channel_ids=channel_ids,
+            probe_ids=probe_ids,
+            session_ids=session_ids,
         )
 
     def get_probes(self, probe_ids=None, session_ids=None):
-        return build_and_execute("""
+        return build_and_execute(
+            """
                 {%- import 'postgres_macros' as pm -%}
                 select ep.* from ecephys_probes ep 
                 join ecephys_sessions es on es.id = ep.ecephys_session_id 
@@ -80,13 +96,25 @@ class EcephysProjectLimsApi(EcephysProjectApi):
                 {{pm.optional_contains('ep.id', probe_ids) -}}
                 {{pm.optional_contains('es.id', session_ids) -}}
             """,
-            base=postgres_macros(), engine=self.postgres_engine.select, probe_ids=probe_ids, session_ids=session_ids
+            base=postgres_macros(),
+            engine=self.postgres_engine.select,
+            probe_ids=probe_ids,
+            session_ids=session_ids,
         )
 
-    def get_sessions(self, session_ids=None, workflow_states=("uploaded",), published=None, habituation=False,
-        project_names=("BrainTV Neuropixels Visual Behavior", "BrainTV Neuropixels Visual Coding",)
+    def get_sessions(
+        self,
+        session_ids=None,
+        workflow_states=("uploaded",),
+        published=None,
+        habituation=False,
+        project_names=(
+            "BrainTV Neuropixels Visual Behavior",
+            "BrainTV Neuropixels Visual Coding",
+        ),
     ):
-        return build_and_execute("""
+        return build_and_execute(
+            """
                 {%- import 'postgres_macros' as pm -%}
                 select es.* from ecephys_sessions es
                 join projects pr on pr.id = es.project_id
@@ -96,9 +124,14 @@ class EcephysProjectLimsApi(EcephysProjectApi):
                 {{pm.optional_equals('es.habituation', pm.str(habituation).lower()) -}}
                 {{pm.optional_not_null('es.published_at', published) -}}
                 {{pm.optional_contains('pr.name', project_names, True) -}}
-            """, 
-            base=postgres_macros(), engine=self.postgres_engine.select, session_ids=session_ids, 
-            workflow_states=workflow_states, published=published, habituation=habituation, project_names=project_names
+            """,
+            base=postgres_macros(),
+            engine=self.postgres_engine.select,
+            session_ids=session_ids,
+            workflow_states=workflow_states,
+            published=published,
+            habituation=habituation,
+            project_names=project_names,
         )
 
     @classmethod

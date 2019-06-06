@@ -2,6 +2,7 @@ import copy as cp
 
 from jinja2 import Environment, BaseLoader, DictLoader
 
+
 def postgres_macros():
     return {
         "postgres_macros": """"
@@ -34,18 +35,21 @@ def postgres_macros():
         """
     }
 
+
 def build_and_execute(query, base=None, engine=None, **kwargs):
     env = build_environment({"__tmp__": query}, base=base)
     return execute_templated(env, "__tmp__", engine=engine, **kwargs)
+
 
 def build_environment(template_strings, base=None):
     if base is None:
         base = {}
     else:
         base = cp.deepcopy(base)
-        
+
     base.update(template_strings)
     return Environment(loader=DictLoader(base), lstrip_blocks=True, trim_blocks=True)
+
 
 def execute_templated(environment, name, engine, **kwargs):
     template = environment.get_template(name)
