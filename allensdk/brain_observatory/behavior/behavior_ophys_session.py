@@ -8,6 +8,7 @@ from allensdk.core.lazy_property import LazyProperty, LazyPropertyMixin
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
 from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import equals
 from allensdk.deprecated import legacy
+from allensdk.brain_observatory.behavior.trials_processing import calculate_reward_rate, dprime
 
 
 class BehaviorOphysSession(LazyPropertyMixin):
@@ -111,10 +112,70 @@ class BehaviorOphysSession(LazyPropertyMixin):
             raise ValueError(f'cell_specimen_id values not assigned for {self.ophys_experiment_id}')
         return cell_specimen_ids
 
+    def get_reward_rate(self):
+        response_latency_list = []
+        for _, t in self.trials.iterrows():
+            valid_response_licks = [l for l in t.lick_times if l - t.change_time > self.task_parameters['response_window_sec'][0]]
+            response_latency = float('inf') if len(valid_response_licks) == 0 else valid_response_licks[0] - t.change_time
+            response_latency_list.append(response_latency)
+        reward_rate = calculate_reward_rate(response_latency=response_latency_list, starttime=self.trials.start_time.values)
+        reward_rate[np.isinf(reward_rate)] = float('nan')
+        return reward_rate
+
+    def get_rolling_performance_df(self):
+        performance_metrics = {}
+        performance_metrics['reward_rate'] = self.get_reward_rate()
+
+        hit = np.full(len(self.trials), np.nan)
+        hit[self.trials.hit] = True
+        hit[self.trials.miss] = False
+        performance_metrics['hit_rate'] = pd.Series(hit).rolling(window=100, min_periods=0).mean()
+
+        false_alarm = np.full(len(self.trials), np.nan)
+        false_alarm[self.trials.false_alarm] = True
+        false_alarm[self.trials.correct_reject] = False
+        performance_metrics['false_alarm_rate'] = pd.Series(false_alarm).rolling(window=100, min_periods=0).mean()
+
+        performance_metrics['dprime'] = dprime(performance_metrics['hit_rate'], performance_metrics['false_alarm_rate'])
+        return pd.DataFrame(performance_metrics)
+
+    def get_performance_metrics(self):
+        performance_metrics = {}
+        performance_metrics['trial_count'] = len(self.trials)
+        performance_metrics['go_trial_count'] = self.trials.go.sum()
+        performance_metrics['catch_trial_count'] = self.trials.catch.sum()
+        performance_metrics['hit_trial_count'] = self.trials.hit.sum()
+        performance_metrics['miss_trial_count'] = self.trials.miss.sum()
+        performance_metrics['false_alarm_trial_count'] = self.trials.false_alarm.sum()
+        performance_metrics['correct_reject_trial_count'] = self.trials.correct_reject.sum()
+        performance_metrics['auto_rewarded_trial_count'] = self.trials.auto_rewarded.sum()
+        performance_metrics['rewarded_trial_count'] = self.trials.reward_times.apply(lambda x: len(x) > 0).sum()
+        performance_metrics['total_reward_count'] = len(self.rewards)
+        performance_metrics['total_reward_volume'] = self.rewards.volume.sum()
+
+        rolling_performance_df = self.get_rolling_performance_df()
+        engaged_trial_mask = (rolling_performance_df['reward_rate'] > 2)
+        performance_metrics['maximum_reward_rate'] = np.nanmax(rolling_performance_df['reward_rate'].values)
+        performance_metrics['engaged_trial_count'] = (engaged_trial_mask).sum()
+        performance_metrics['mean_false_alarm_rate'] = rolling_performance_df['false_alarm_rate'].mean()
+        performance_metrics['mean_false_alarm_rate_engaged'] = rolling_performance_df['false_alarm_rate'][engaged_trial_mask].mean()
+        performance_metrics['mean_dprime'] = rolling_performance_df['dprime'].mean()
+        performance_metrics['mean_dprime_engaged'] = rolling_performance_df['dprime'][engaged_trial_mask].mean()
+
+
+        
+
+        for key, val in performance_metrics.items():
+            print(key, val)
+
 
 if __name__ == "__main__":
 
-    from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi
+    ophys_experiment_id = 789359614
+    session = BehaviorOphysSession.from_LIMS(ophys_experiment_id)
+    session.get_performance_metrics()
+
+    # from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi
 
     # blacklist = [797257159, 796306435, 791453299, 809191721, 796308505, 798404219] #
     # api_list = []
@@ -156,7 +217,7 @@ if __name__ == "__main__":
         # print(session.running_speed)
 
 
-    nwb_filepath = '/home/nicholasc/projects/allensdk/tmp.nwb'
+    # nwb_filepath = '/home/nicholasc/projects/allensdk/tmp.nwb'
     # session = BehaviorOphysSession(789359614)
     # nwb_api = BehaviorOphysNwbApi(nwb_filepath)
     # nwb_api.save(session)
@@ -167,19 +228,20 @@ if __name__ == "__main__":
     
     # assert session == session2
     
-    ophys_experiment_id = 792813858
+
+
     # ophys_experiment_id = 789359614
 
     # nwb_filepath = BehaviorOphysSession.from_LIMS(ophys_experiment_id).api.get_nwb_filepath()
     # api = BehaviorOphysNwbApi(nwb_filepath)
     # session = BehaviorOphysSession(api=api)
 
-    session = BehaviorOphysSession.from_LIMS(ophys_experiment_id)
+
 
 
     # session = BehaviorOphysSession.from_LIMS(789359614)
     # BehaviorOphysNwbApi(nwb_filepath).save(session)
-    print(session.segmentation_mask_image)
+    # print(session.segmentation_mask_image)
     # session.stimulus_timestamps
     # session.ophys_timestamps
     # session.metadata
@@ -195,6 +257,6 @@ if __name__ == "__main__":
     # session.rewards
     # session.task_parameters
     # session.trials
-    session.corrected_fluorescence_traces
+    # session.corrected_fluorescence_traces
     # session.average_projection
     # session.motion_correction

@@ -6,6 +6,7 @@ import uuid
 from copy import deepcopy
 import collections
 import dateutil
+from scipy.stats import norm
 
 
 # TODO: add trial column descriptions
@@ -607,3 +608,56 @@ def get_extended_trials(data, time=None):
                                   metadata=data_to_metadata(data, time),
                                   time=time,
                                   licks=data_to_licks(data, time))
+
+
+# -> metrics
+def dprime(hit_rate, fa_rate, limits=(0.01, 0.99)):
+    """ calculates the d-prime for a given hit rate and false alarm rate
+
+    https://en.wikipedia.org/wiki/Sensitivity_index
+
+    Parameters
+    ----------
+    hit_rate : float
+        rate of hits in the True class
+    fa_rate : float
+        rate of false alarms in the False class
+    limits : tuple, optional
+        limits on extreme values, which distort. default: (0.01,0.99)
+
+    Returns
+    -------
+    d_prime
+
+    """
+    assert limits[0] > 0.0, 'limits[0] must be greater than 0.0'
+    assert limits[1] < 1.0, 'limits[1] must be less than 1.0'
+    Z = norm.ppf
+
+    # Limit values in order to avoid d' infinity
+    hit_rate = np.clip(hit_rate, limits[0], limits[1])
+    fa_rate = np.clip(fa_rate, limits[0], limits[1])
+
+    try:
+        last_hit_nan = np.where(np.isnan(hit_rate))[0].max()
+    except ValueError:
+        last_hit_nan = 0
+
+    try:
+        last_fa_nan = np.where(np.isnan(fa_rate))[0].max()
+    except ValueError:
+        last_fa_nan = 0
+
+    last_nan = np.max((last_hit_nan, last_fa_nan))
+
+    # fill nans with 0.5 to avoid warning about nans
+    d_prime = Z(pd.Series(hit_rate).fillna(0.5)) - Z(pd.Series(fa_rate).fillna(0.5))
+
+    # fill all values up to the last nan with nan
+    d_prime[:last_nan] = np.nan
+
+    if len(d_prime) == 1:
+        # if the result is a 1-length vector, return as a scalar
+        return d_prime[0]
+    else:
+        return d_prime
