@@ -22,7 +22,7 @@ class EcephysProjectLimsApi(EcephysProjectApi, PostgresQueryMixin):
         else:
             raise ValueError(f"did not find a unique nwb path for session {session_id}")
 
-        fsize = main_nwb_path.stat().st_size() / 1024 ** 2
+        fsize = main_nwb_path.stat().st_size / 1024 ** 2
         warnings.warn(f"copying a {fsize:.6}mb file from {main_nwb_path}")
 
         reader = open(main_nwb_path, "rb")

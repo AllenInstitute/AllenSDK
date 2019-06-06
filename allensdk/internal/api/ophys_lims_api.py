@@ -103,7 +103,7 @@ class OphysLimsApi(PostgresQueryMixin):
                 JOIN ophys_sessions os ON oe.ophys_session_id = os.id
                 WHERE oe.id= {};
                 '''.format(self.get_ophys_experiment_id())
-        stimulus_name = self.fetchone(query, strict=True)
+        stimulus_name = self.fetchone(query, strict=False)
         stimulus_name = 'Unknown' if stimulus_name is None else stimulus_name
         return stimulus_name
 
