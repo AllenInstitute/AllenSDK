@@ -20,12 +20,14 @@ class EcephysProjectLimsApi(EcephysProjectApi):
     def get_session_data(self, session_id):
         nwb_response = build_and_execute(
             """
-            select wkf.id from well_known_files wkf 
+            select wkf.id, wkf.filename, wkf.storage_directory, wkf.attachable_id from well_known_files wkf 
             join ecephys_analysis_runs ear on (
                 ear.id = wkf.attachable_id
                 and wkf.attachable_type = 'EcephysAnalysisRun'
             )
+            join well_known_file_types wkft on wkft.id = wkf.well_known_file_type_id
             where ear.current
+            and wkft.name = 'EcephysNwb'
             and ear.ecephys_session_id = {{session_id}}
         """,
             engine=self.postgres_engine.select,
@@ -34,7 +36,8 @@ class EcephysProjectLimsApi(EcephysProjectApi):
 
         if nwb_response.shape[0] != 1:
             raise ValueError(
-                f"expected exactly 1 current NWB file for session {session_id}, found: {nwb_response.shape[0]}"
+                f"expected exactly 1 current NWB file for session {session_id}, "
+                f"found {nwb_response.shape[0]}: {pd.DataFrame(nwb_response)}"
             )
 
         nwb_id = nwb_response.loc[0, "id"]
@@ -146,5 +149,5 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             _app_kwargs.update(app_kwargs)
 
         pg_engine = PostgresQueryMixin(**_pg_kwargs)
-        app_engine = HttpEngine(_app_kwargs)
+        app_engine = HttpEngine(**_app_kwargs)
         return cls(pg_engine, app_engine)
