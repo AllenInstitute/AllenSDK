@@ -252,12 +252,20 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
 
         api = PostgresQueryMixin()
         query = '''
-                SELECT *
+                SELECT oec.visual_behavior_experiment_container_id as container_id, oec.ophys_experiment_id, oe.workflow_state, g.name as driver_line, id.depth, st.acronym
                 FROM ophys_experiments_visual_behavior_experiment_containers oec
-                LEFT JOIN ophys_experiments oe ON oe.id = oec.ophys_experiment_id 
+                LEFT JOIN ophys_experiments oe ON oe.id = oec.ophys_experiment_id
+                LEFT JOIN ophys_sessions os ON oe.ophys_session_id = os.id
+                LEFT JOIN specimens sp ON sp.id=os.specimen_id
+                LEFT JOIN donors d ON d.id=sp.donor_id
+                LEFT JOIN donors_genotypes dg ON dg.donor_id=d.id
+                LEFT JOIN genotypes g ON g.id=dg.genotype_id
+                LEFT JOIN genotype_types gt ON gt.id=g.genotype_type_id AND gt.name = 'driver'
+                LEFT JOIN imaging_depths id ON id.id=os.imaging_depth_id
+                LEFT JOIN structures st ON st.id=oe.targeted_structure_id
                 '''
 
-        return pd.read_sql(query, api.get_connection()).rename(columns={'visual_behavior_experiment_container_id':'container_id'}).drop('id', axis=1)
+        return pd.read_sql(query, api.get_connection())
 
     @staticmethod
     def get_containers_df(only_passed=True):
@@ -289,8 +297,8 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
 
 if __name__ == "__main__":
 
-
-    print(BehaviorOphysLimsApi.get_containers_df(only_passed=False))
+    print(BehaviorOphysLimsApi.get_ophys_experiment_df())
+    # print(BehaviorOphysLimsApi.get_containers_df(only_passed=False))
 
     # print(BehaviorOphysLimsApi.get_api_by_container(838105949))
 
