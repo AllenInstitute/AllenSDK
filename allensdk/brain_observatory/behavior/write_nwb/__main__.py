@@ -42,7 +42,7 @@ class BehaviorOphysJsonApi(BehaviorOphysLimsApi):
         return self.data['sex']
 
     def get_age(self):
-        return self.data['sex']
+        return self.data['age']
 
     def get_field_of_view_shape(self):
         return {'height': self.data['movie_height'], 'width': self.data['movie_width']}

@@ -58,7 +58,7 @@ class BehaviorOphysSession(LazyPropertyMixin):
     """
 
     @classmethod
-    def from_LIMS(cls, ophys_experiment_id):
+    def from_lims(cls, ophys_experiment_id):
         return cls(api=BehaviorOphysLimsApi(ophys_experiment_id))
 
     def __init__(self, api=None):
@@ -172,91 +172,5 @@ class BehaviorOphysSession(LazyPropertyMixin):
 if __name__ == "__main__":
 
     ophys_experiment_id = 789359614
-    session = BehaviorOphysSession.from_LIMS(ophys_experiment_id)
+    session = BehaviorOphysSession.from_lims(ophys_experiment_id)
     session.get_performance_metrics()
-
-    # from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi
-
-    # blacklist = [797257159, 796306435, 791453299, 809191721, 796308505, 798404219] #
-    # api_list = []
-    # df = BehaviorOphysLimsApi.get_ophys_experiment_df()
-    # for cid in [791352433, 814796698, 814796612, 814796558, 814797528]:
-    #     df2 = df[(df['container_id'] == cid) & (df['workflow_state'] == 'passed')]
-    #     api_list += [BehaviorOphysLimsApi(oeid) for oeid in df2['ophys_experiment_id'].values if oeid not in blacklist]
-
-    # for api in api_list:
-
-    #     session = BehaviorOphysSession(api=api)
-    #     if len(session.licks) > 100:
-
-    #         print(api.get_ophys_experiment_id())
-
-        # session.max_projection
-        # session.stimulus_timestamps
-        # session.ophys_timestamps
-        # session.metadata
-        # session.dff_traces
-        # session.cell_specimen_table
-        # session.running_speed
-        # session.running_data_df
-
-        # print(api.get_ophys_experiment_id(), len(session.licks), session.metadata['experiment_datetime'])
-        # session.rewards
-        # session.task_parameters
-        # session.trials
-        # session.corrected_fluorescence_traces
-        # session.motion_correction
-
-            # nwb_filepath = '/allen/aibs/technology/nicholasc/tmp/behavior_ophys_session_{get_ophys_experiment_id}.nwb'.format(get_ophys_experiment_id=api.get_ophys_experiment_id())
-            # BehaviorOphysNwbApi(nwb_filepath).save(session)
-            # assert equals(session, BehaviorOphysSession(api=BehaviorOphysNwbApi(nwb_filepath)))
-
-
-
-
-        # print(session.running_speed)
-
-
-    # nwb_filepath = '/home/nicholasc/projects/allensdk/tmp.nwb'
-    # session = BehaviorOphysSession(789359614)
-    # nwb_api = BehaviorOphysNwbApi(nwb_filepath)
-    # nwb_api.save(session)
-
-    # print(session.cell_specimen_table)
-
-    # session2 = BehaviorOphysSession(789359614, api=api_2)
-    
-    # assert session == session2
-    
-
-
-    # ophys_experiment_id = 789359614
-
-    # nwb_filepath = BehaviorOphysSession.from_LIMS(ophys_experiment_id).api.get_nwb_filepath()
-    # api = BehaviorOphysNwbApi(nwb_filepath)
-    # session = BehaviorOphysSession(api=api)
-
-
-
-
-    # session = BehaviorOphysSession.from_LIMS(789359614)
-    # BehaviorOphysNwbApi(nwb_filepath).save(session)
-    # print(session.segmentation_mask_image)
-    # session.stimulus_timestamps
-    # session.ophys_timestamps
-    # session.metadata
-    # session.dff_traces
-    # session.cell_specimen_table
-    # running_speed
-    # print(session.stimulus_index)
-    # session.running_data_df
-    # print(session.stimulus_presentations)
-    # session.stimulus_templates
-    # session.stimulus_index
-    # session.licks
-    # session.rewards
-    # session.task_parameters
-    # session.trials
-    # session.corrected_fluorescence_traces
-    # session.average_projection
-    # session.motion_correction
