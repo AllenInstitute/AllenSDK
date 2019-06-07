@@ -3,20 +3,31 @@ import copy as cp
 from jinja2 import Environment, BaseLoader, DictLoader
 
 
-def postgres_macros():
+def macros():
     return {
-        "postgres_macros": """"
-            {% macro comma_sep(data, quote=False) %}
-                ({% for datum in data%}
+        "macros": """
+            {%- macro comma_sep(data, quote=False) -%}
+                {%- for datum in data -%}
                     {% if quote%}\'{%endif -%}
                     {{datum}}
                     {%- if quote %}\'{% endif %}
                     {% if not loop.last %},{% endif %}
-                {% endfor %})
-            {% endmacro %}
+                {%- endfor -%}
+            {%- endmacro -%}
+            {%- macro str(x) -%}
+                {{- x ~ "" -}}
+            {%- endmacro -%}
+        """
+    }
+
+
+def postgres_macros():
+    return {
+        "postgres_macros": """
+            {% import 'macros' as m %}
             {% macro optional_contains(key, data, quote=False) %}
                 {% if data is not none -%}
-                    and {{key}} in {{comma_sep(data, quote)}}
+                    and {{key}} in ({{m.comma_sep(data, quote)}})
                 {% endif %}
             {% endmacro %}
             {% macro optional_equals(key, value) %}
@@ -29,11 +40,22 @@ def postgres_macros():
                     and {{key}} is {{- ' not ' if value -}} null
                 {% endif %}
             {% endmacro %}
-            {% macro str(x) %}
-                {{x ~ ""}}
-            {% endmacro %}
-        """
+        """,
+        "macros": macros()["macros"]
     }
+
+
+def rma_macros():
+    return {
+        "rma_macros": """
+            {% import 'macros' as m %}
+            {% macro optional_contains(key, data, quote=False) -%}
+                {%- if data is not none %}[{{key}}$in{{m.comma_sep(data,quote)}}]{% endif -%}
+            {%- endmacro -%}
+        """,
+        "macros": macros()["macros"]
+    }
+
 
 
 def build_and_execute(query, base=None, engine=None, **kwargs):

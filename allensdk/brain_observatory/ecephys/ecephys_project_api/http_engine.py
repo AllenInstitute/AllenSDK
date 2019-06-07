@@ -1,6 +1,5 @@
 import requests
 
-
 class HttpEngine:
     def __init__(self, scheme, host):
         self.scheme = scheme
