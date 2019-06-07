@@ -52,9 +52,10 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
                 "criteria=model::EcephysProbe"
                 r"{{',rma::criteria' if criteria}}"
                 r"{{rm.optional_contains('id',probe_ids)}}"
-                r"{{rm.optional_contains('session_id',session_ids)}}"
+                r"{{rm.optional_contains('ecephys_session_id',session_ids)}}"
             ),
-            base=rma_macros(), engine=self.rma_engine.get_rma_tabular, session_ids=session_ids, probe_ids=probe_ids
+            base=rma_macros(), engine=self.rma_engine.get_rma_tabular, session_ids=session_ids, probe_ids=probe_ids,
+            criteria=criteria
         )
 
     def get_channels(self, channel_ids=None, probe_ids=None, session_ids=None):
@@ -63,31 +64,29 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
             (
                 "{% import 'rma_macros' as rm %}"
                 "{% import 'macros' as m %}"           
-                "criteria=model::EcephysProbe"
+                "criteria=model::EcephysChannel"
                 r"{{',rma::criteria' if criteria}}"
                 r"{{rm.optional_contains('id',channel_ids)}}"
                 r"{{rm.optional_contains('ecephys_probe_id',probe_ids)}}"
-                r"{%if session_ids is not none%}ecephys_probe(ecephys_session[id$in{{m.comma_sep(session_ids)}}]){%endif%}"
+                r"{%if session_ids is not none%},rma::criteria,ecephys_probe[ecephys_session_id$in{{m.comma_sep(session_ids)}}]{%endif%}"
             ),
             base=rma_macros(), engine=self.rma_engine.get_rma_tabular, session_ids=session_ids, probe_ids=probe_ids,
-            channel_ids=channel_ids
+            channel_ids=channel_ids, criteria=criteria
         )
 
     def get_units(self, unit_ids=None, channel_ids=None, probe_ids=None, session_ids=None):
         criteria = probe_ids is not None and session_ids is not None
         return build_and_execute(
             (
-                "{% import 'rma_macros' as rm %}"
-                "{% import 'macros' as m %}"           
-                "criteria=model::EcephysProbe"
-                r"{{',rma::criteria' if criteria}}"
-                r"{{rm.optional_contains('id',unit_ids)}}"
-                r"{{rm.optional_contains('ecephys_channel_id',channel_ids)}}"
-                r"{%if probe_ids is not none%}ecephys_channel(ecephys_probe[id$in{{m.comma_sep(probe_ids)}}]){%endif%}"
-                r"{%if session_ids is not none%}ecephys_channel(ecephys_probe(ecephys_session[id$in{{m.comma_sep(session_ids)}}])){%endif%}"
+                "{% import 'macros' as m %}" 
+                "criteria=model::EcephysUnit"
+                r"{% if unit_ids is not none %},rma::criteria[id$in{{m.comma_sep(unit_ids)}}]{% endif %}"
+                r"{% if channel_ids is not none %},rma::criteria[ecephys_channel_id$in{{m.comma_sep(channel_ids)}}]{% endif %}"
+                r"{% if probe_ids is not none %},rma::criteria,ecephys_channel(ecephys_probe[id$in{{m.comma_sep(probe_ids)}}]){% endif %}"
+                r"{% if session_ids is not none %},rma::criteria,ecephys_channel(ecephys_probe(ecephys_session[id$in{{m.comma_sep(session_ids)}}])){% endif %}"
             ),
             base=rma_macros(), engine=self.rma_engine.get_rma_tabular, session_ids=session_ids, probe_ids=probe_ids,
-            channel_ids=channel_ids, unit_ids=unit_ids
+            channel_ids=channel_ids, unit_ids=unit_ids, criteria=criteria
         )
     @classmethod
     def default(cls, **rma_kwargs):
