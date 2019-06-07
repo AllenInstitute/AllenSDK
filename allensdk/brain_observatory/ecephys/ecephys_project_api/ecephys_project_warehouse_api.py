@@ -1,7 +1,7 @@
-from allensdk.api.queries.rma_api import RmaApi
+import pandas as pd
+
+from .rma_engine import RmaEngine
 from .ecephys_project_api import EcephysProjectApi
-
-
 from .utilities import rma_macros, build_and_execute
 
 class EcephysProjectWarehouseApi(EcephysProjectApi):
@@ -11,7 +11,7 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
 
     def get_sessions(self, session_ids=None, has_eye_tracking=None, stimulus_names=None):
         criteria = session_ids is not None or has_eye_tracking is not None or stimulus_names is not None
-        return build_and_execute(
+        stream = build_and_execute(
             (
                 "{% import 'rma_macros' as rm %}"
                 "{% import 'macros' as m %}"
@@ -25,3 +25,15 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
             has_eye_tracking=has_eye_tracking, stimulus_names=stimulus_names
         )
 
+        response = []
+        for chunk in stream:
+            response.extend(chunk)
+        return pd.DataFrame(response)
+
+
+
+    @classmethod
+    def default(cls, **rma_kwargs):
+        _rma_kwargs = {"scheme": "http", "host": "api.brain-map.org"}
+        _rma_kwargs.update(rma_kwargs)
+        return cls(RmaEngine(**_rma_kwargs))

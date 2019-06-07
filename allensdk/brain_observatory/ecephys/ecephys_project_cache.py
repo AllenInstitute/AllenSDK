@@ -1,4 +1,5 @@
 import functools
+from pathlib import Path
 
 import pandas as pd
 
@@ -16,7 +17,11 @@ csv_io = {
 
 def call_caching(fn, path, strategy=None, pre=lambda d: d, writer=None, reader=None, post=None, *args, **kwargs):
     fn = functools.partial(fn, *args, **kwargs)
-    return Cache.cacher(fn, path=path, strategy=strategy, pre=pre, writer=writer, reader=reader, post=post)
+    try:
+        return Cache.cacher(fn, path=path, strategy=strategy, pre=pre, writer=writer, reader=reader, post=post)
+    except:
+        Path(path).unlink
+        raise
 
 
 class EcephysProjectCache(Cache):
@@ -105,5 +110,13 @@ class EcephysProjectCache(Cache):
         lims_kwargs = {} if lims_kwargs is None else lims_kwargs
         return cls(
             fetch_api=EcephysProjectLimsApi.default(**lims_kwargs), 
+            **kwargs
+        )
+
+    @classmethod
+    def from_warehouse(cls, warehouse_kwargs=None, **kwargs):
+        warehouse_kwargs = {} if warehouse_kwargs is None else warehouse_kwargs
+        return cls(
+            fetch_api=EcephysProjectWarehouseApi.default(**warehouse_kwargs), 
             **kwargs
         )
