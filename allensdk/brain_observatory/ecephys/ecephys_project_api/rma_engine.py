@@ -1,6 +1,7 @@
 import sys
 
 import requests
+import pandas as pd
 
 from .http_engine import HttpEngine
 
@@ -26,7 +27,7 @@ class RmaEngine(HttpEngine):
             count = self.page_size
         return f"{url},rma::options[start_row$eq{start}][num_rows$eq{count}]"
 
-    def get(self, query):
+    def get_rma(self, query):
         url = f"{self.scheme}://{self.host}/{self.rma_prefix}/{self.format_query_string}?{query}"
 
         start_row = 0
@@ -43,3 +44,9 @@ class RmaEngine(HttpEngine):
                 total_rows = response_json["total_rows"]
 
             yield response_json["msg"]
+
+    def get_rma_tabular(self, query):
+        response = []
+        for chunk in self.get_rma(query):
+            response.extend(chunk)
+        return pd.DataFrame(response)

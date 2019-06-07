@@ -37,7 +37,7 @@ from allensdk.brain_observatory.ecephys.ecephys_project_api import ecephys_proje
 )
 def test_query(method, conditions, expected_query):
     class MockRmaEngine:
-        def get(self, rendered):
+        def get_rma_tabular(self, rendered):
             assert expected_query == rendered
             return []
 
