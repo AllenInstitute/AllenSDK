@@ -18,7 +18,6 @@ class EcephysProjectLimsApi(EcephysProjectApi):
         self.app_engine = app_engine
 
     def get_session_data(self, session_id):
-
         nwb_response = build_and_execute(
             """
             select wkf.id from well_known_files wkf 
@@ -116,12 +115,13 @@ class EcephysProjectLimsApi(EcephysProjectApi):
         return build_and_execute(
             """
                 {%- import 'postgres_macros' as pm -%}
+                {%- import 'macros' as m -%}
                 select es.* from ecephys_sessions es
                 join projects pr on pr.id = es.project_id
                 where true
                 {{pm.optional_contains('es.id', session_ids) -}}
                 {{pm.optional_contains('es.workflow_state', workflow_states, True) -}}
-                {{pm.optional_equals('es.habituation', pm.str(habituation).lower()) -}}
+                {{pm.optional_equals('es.habituation', m.str(habituation).lower()) -}}
                 {{pm.optional_not_null('es.published_at', published) -}}
                 {{pm.optional_contains('pr.name', project_names, True) -}}
             """,
