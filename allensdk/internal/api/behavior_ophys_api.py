@@ -57,7 +57,7 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
                 SELECT visual_behavior_experiment_container_id 
                 FROM ophys_experiments_visual_behavior_experiment_containers 
                 WHERE ophys_experiment_id= {};
-                '''.format(self.get_ophys_experiment_id())        
+                '''.format(self.get_ophys_experiment_id())
         return self.fetchone(query, strict=False)
 
     @memoize

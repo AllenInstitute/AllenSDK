@@ -117,6 +117,16 @@ class OphysBehaviorMetaDataSchema(RaisingSchema):
         required=True,
     )
 
+    sex = fields.String(
+        doc='Sex of the specimen doner/subject',
+        required=True,
+    )
+
+    age = fields.String(
+        doc='Age of the specimen doner/subject',
+        required=True,
+    )
+
 
 class OphysBehaviorTaskParametersSchema(RaisingSchema):
     """ base schema for all timeseries
