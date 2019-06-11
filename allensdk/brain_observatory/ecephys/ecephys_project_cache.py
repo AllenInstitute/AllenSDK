@@ -1,10 +1,11 @@
 import functools
+from pathlib import Path
 
 import pandas as pd
 
 from allensdk.api.cache import Cache
 
-from allensdk.brain_observatory.ecephys.ecephys_project_api import EcephysProjectLimsApi
+from allensdk.brain_observatory.ecephys.ecephys_project_api import EcephysProjectLimsApi, EcephysProjectWarehouseApi
 from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
 
 
@@ -16,7 +17,11 @@ csv_io = {
 
 def call_caching(fn, path, strategy=None, pre=lambda d: d, writer=None, reader=None, post=None, *args, **kwargs):
     fn = functools.partial(fn, *args, **kwargs)
-    return Cache.cacher(fn, path=path, strategy=strategy, pre=pre, writer=writer, reader=reader, post=post)
+    try:
+        return Cache.cacher(fn, path=path, strategy=strategy, pre=pre, writer=writer, reader=reader, post=post)
+    except:
+        Path(path).unlink
+        raise
 
 
 class EcephysProjectCache(Cache):
@@ -57,18 +62,18 @@ class EcephysProjectCache(Cache):
     def get_session_data(self, session_id):
         path = self.get_cache_path(None, self.SESSION_NWB_KEY, session_id, session_id)
 
-        def writer(_path, reader):
+        def writer(_path, data):
             with open(_path, 'wb') as writer:
-                writer.write(reader.read())
-            reader.close()
+                for chunk in data:
+                    writer.write(chunk)
 
         return call_caching(
             self.fetch_api.get_session_data, 
             path, 
             session_id=session_id, 
             strategy='lazy',
-            reader=EcephysSession.from_nwb_path,
-            writer=writer
+            writer=writer,
+            reader=EcephysSession.from_nwb_path
         )
 
     def add_manifest_paths(self, manifest_builder):
@@ -103,4 +108,15 @@ class EcephysProjectCache(Cache):
     @classmethod
     def from_lims(cls, lims_kwargs=None, **kwargs):
         lims_kwargs = {} if lims_kwargs is None else lims_kwargs
-        return cls(fetch_api=EcephysProjectLimsApi(**lims_kwargs), **kwargs)
+        return cls(
+            fetch_api=EcephysProjectLimsApi.default(**lims_kwargs), 
+            **kwargs
+        )
+
+    @classmethod
+    def from_warehouse(cls, warehouse_kwargs=None, **kwargs):
+        warehouse_kwargs = {} if warehouse_kwargs is None else warehouse_kwargs
+        return cls(
+            fetch_api=EcephysProjectWarehouseApi.default(**warehouse_kwargs), 
+            **kwargs
+        )
