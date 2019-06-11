@@ -8,6 +8,8 @@ from ...running_speed import RunningSpeed
 
 class EcephysSessionApi:
 
+    session_na = -1
+
     __slots__: tuple = tuple([])
 
     def __init__(self, *args, **kwargs):

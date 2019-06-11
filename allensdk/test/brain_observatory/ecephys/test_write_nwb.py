@@ -55,7 +55,7 @@ def test_add_stimulus_presentations(nwbfile, stimulus_presentations, roundtrippe
 
 @pytest.mark.parametrize('roundtrip', [True, False])
 @pytest.mark.parametrize('pid,desc,loc, expected', [
-    [12, 'a probe', 'probeA', pd.DataFrame({'description': ['a probe'], 'location': ['probeA']}, index=pd.Index([12], name='id'))]
+    [12, 'a probe', 'probeA', pd.DataFrame({'description': ['a probe'], 'location': ['probeA'], 'sampling_rate': [30000.0]}, index=pd.Index([12], name='id'))]
 ])
 def test_add_probe_to_nwbfile(nwbfile, roundtripper, roundtrip, pid, desc, loc, expected):
 

@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 
 from allensdk.core.lazy_property import LazyPropertyMixin
-from allensdk.brain_observatory.ecephys.ecephys_session_api import EcephysSessionApi, EcephysNwbSessionApi
+from allensdk.brain_observatory.ecephys.ecephys_session_api import EcephysSessionApi, EcephysNwbSessionApi, EcephysNwb1Api
 from ..running_speed import RunningSpeed
 
 
@@ -149,7 +149,6 @@ class EcephysSession(LazyPropertyMixin):
         self.stimulus_presentations = self.LazyProperty(self.api.get_stimulus_presentations, wrappers=[self._build_stimulus_presentations])
         self.units = self.LazyProperty(self.api.get_units, wrappers=[self._build_units_table])
         self.inter_presentation_intervals = self.LazyProperty(self._build_inter_presentation_intervals)
-
 
     def get_inter_presentation_intervals_for_stimulus(self, stimulus_names):
         ''' Get a subset of this session's inter-presentation intervals, filtered by stimulus name.
@@ -506,17 +505,42 @@ class EcephysSession(LazyPropertyMixin):
             & (table['quality'] == 'good')
         ]
 
-        table = table.drop(columns=['local_index_unit', 'quality', 'valid_data'])
+        # table = table.drop(columns=['local_index_unit', 'quality', 'valid_data'])
         return table.sort_values(by=['probe_description', 'probe_vertical_position', 'probe_horizontal_position'])
 
 
+    def _build_nwb1_waveforms(self, mean_waveforms):
+        # _build_mean_waveforms() assumes every unit has the same number of waveforms and that a unit-waveform exists
+        # for all channels. This is not true for NWB 1 files where each unit has ONE waveform on ONE channel
+        units_df = self.units
+        output_waveforms = {}
+        sampling_rate_lu = {uid: self.probes.loc[r['probe_id']]['sampling_rate'] for uid, r in units_df.iterrows()}
+
+        for uid in list(mean_waveforms.keys()):
+            # assert(sampling_rate_lu[uid] == 30000)
+            data = mean_waveforms.pop(uid)
+            output_waveforms[uid] = xr.DataArray(
+                data=data,
+                dims=['channel_id', 'time'],
+                coords={
+                    'channel_id': [units_df.loc[uid]['peak_channel_id']],
+                    'time': np.arange(data.shape[1]) / sampling_rate_lu[uid]
+                }
+            )
+
+        return output_waveforms
+
     def _build_mean_waveforms(self, mean_waveforms):
+        # from ecephys_analysis_modules.modules.modality_comparison.ecephys_nwb1_adaptor import EcephysNwb1Adaptor
+        if isinstance(self.api, EcephysNwb1Api):
+            return self._build_nwb1_waveforms(mean_waveforms)
+
         #TODO: there is a bug either here or (more likely) in LIMS unit data ingest which causes the peak channel 
         # to be off by a few (exactly 1?) indices
         # we could easily recompute here, but better to fix it at the source
         channel_id_lut = {(row['local_index'], row['probe_id']): cid for cid, row in self.channels.iterrows()}
         probe_id_lut = {uid: row['probe_id'] for uid, row in self.units.iterrows()}
-        
+
         output_waveforms = {}
         for uid in list(mean_waveforms.keys()):
             data = mean_waveforms.pop(uid)
@@ -524,12 +548,13 @@ class EcephysSession(LazyPropertyMixin):
             if uid not in probe_id_lut: # It's been filtered out during unit table generation!
                 continue
 
+            probe_id = probe_id_lut[uid]
             output_waveforms[uid] = xr.DataArray(
                 data=data,
                 dims=['channel_id', 'time'],
                 coords={
-                    'channel_id': [ channel_id_lut[(ii, probe_id_lut[uid])] for ii in range(data.shape[0])],
-                    'time': np.arange(data.shape[1]) / 30000 # TODO: ugh, get these timestamps from NWB file
+                    'channel_id': [ channel_id_lut[(ii, probe_id)] for ii in range(data.shape[0])],
+                    'time': np.arange(data.shape[1]) / self.probes.loc[probe_id]['sampling_rate']
                 }
             )
 
@@ -565,9 +590,22 @@ class EcephysSession(LazyPropertyMixin):
 
 
     @classmethod
-    def from_nwb_path(cls, path, api_kwargs=None, **kwargs):
+    def from_nwb_path(cls, path, nwb_version=2, api_kwargs=None, **kwargs):
         api_kwargs = {} if api_kwargs is None else api_kwargs
-        return cls(api=EcephysNwbSessionApi.from_path(path=path, **api_kwargs), **kwargs)
+        # TODO: Is there a way for pynwb to check the file before actually loading it with io read? If so we could
+        #       automatically check what NWB version is being inputed
+
+        nwb_version = int(nwb_version)  # only use major version
+        if nwb_version >= 2:
+            NWBAdaptorCls = EcephysNwbSessionApi
+
+        elif nwb_version == 1:
+            NWBAdaptorCls = EcephysNwb1Api
+
+        else:
+            raise Exception(f'specified NWB version {nwb_version} not supported. Supported versions are: 2.X, 1.X')
+
+        return cls(api=NWBAdaptorCls.from_path(path=path, **api_kwargs), ** kwargs)
 
 
 def build_time_window_domain(bin_edges, offsets, callback=None):
