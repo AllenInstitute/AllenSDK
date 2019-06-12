@@ -15,6 +15,7 @@ from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorO
 from allensdk.brain_observatory.behavior.write_nwb.__main__ import BehaviorOphysJsonApi
 from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi, equals
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
+from allensdk.brain_observatory.behavior.trials_processing import dprime
 
 
 @pytest.mark.nightly
@@ -122,3 +123,11 @@ def test_legacy_dff_api():
         dff_trace = session.dff_traces.loc[csid]['dff']
         ind = session.get_cell_specimen_indices([csid])[0]
         np.testing.assert_array_almost_equal(dff_trace, dff_array[ind, :])
+
+
+@pytest.mark.requires_bamboo
+def test_dprime(rylan_dprime_meta):
+    rylan_dprime, rylan_hit_rate, rylan_fa_rate, ophys_experiment_id = rylan_dprime_meta
+    our_dprime = dprime(rylan_hit_rate, rylan_fa_rate, )
+
+    assert np.allclose(rylan_dprime, our_dprime, equal_nan=True, ), "calculated dprime != rylan's dprime"
