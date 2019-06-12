@@ -213,3 +213,151 @@ def session_data():
             "age": "P139"}
 
     return data
+
+
+@pytest.fixture
+def rylan_dprime_meta():
+    # * we use the result of rylan's code as a value test against our refactored version
+    # * all code is embedded within to try to prevent some side effects cheaply
+
+    from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
+    from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorOphysSession
+
+    import pandas as pd
+    import numpy as np
+
+
+    def get_response_rates(session, sliding_window=100):
+        '''Calculates response rates for hits, catches, and d-prime across a rolling window.
+        Additionally checks that licks are present in the correct response window for the correct hits (go trials)
+        and catch false alarms.
+    
+        Parameters
+        ----------
+        session : AllenSDK session object 
+            session object for an individual experiment
+        sliding_window : int
+            sliding window (in data points) to calculate rolling d-prime, hit-rate, and false-alarm over
+        
+        Returns
+        ------
+        hit_rate (array),
+        catch_rate (array),
+        dprime (array)
+        '''
+
+        #go responses: for this we check if the trial is go and the mouse was rewarded
+        #---------------------------------------------
+        go_responses = pd.Series([np.nan] * len(session.trials))
+        go_trials=session.trials.loc[(session.trials['go']==True) & (session.trials['auto_rewarded']!=True) 
+            & (session.trials['reward_times'])]
+
+        #we want to have a check that ensures that the definition of go trials above are classified as hits and that
+        #there is a lick in the response window
+
+        response_win_start=session.task_parameters['response_window_sec'][0]
+        response_win_end=session.task_parameters['response_window_sec'][1]
+
+        licks_present_go=check_lick_in_resp_wind(trials=go_trials,
+                                    window_start=response_win_start,
+                                    window_end=response_win_end)
+
+        # ensure that all hit trials have a lick present in the window
+        assert(set(go_trials['hit'])==set(licks_present_go))
+
+        go_responses[session.trials.loc[(session.trials['go']==True) & (session.trials['auto_rewarded']!=True) 
+                        & (session.trials['reward_times'])].index]=1
+
+        go_responses[session.trials.loc[(session.trials['go']==True) & (session.trials['auto_rewarded']!=True) 
+                        & (session.trials['reward_times'].str.len() == 0)].index]=0
+
+        #note that after this, trials that are not GO are encoded as NaN in the go responses mask
+        hit_rate = go_responses.rolling(window=sliding_window,min_periods=0).mean()
+
+
+        #catch responses: for this we check if false alarm and catch are true
+        #----------------------------------------------------------------------
+        #ideally future versions would check the correct reject logic
+        catch_responses = pd.Series([np.nan] * len(session.trials))
+
+        catch_fa_trials=session.trials.loc[(session.trials['catch']==True) & (session.trials['false_alarm']==True)]
+
+        catch_responses[session.trials.loc[(session.trials['catch']==True) & (session.trials['false_alarm']==True)].index]=1
+
+        #we assert that for a catch false alarm, there must be a lick in the response window on a catch trial
+        licks_present_catch=check_lick_in_resp_wind(trials=catch_fa_trials,
+                                                window_start=response_win_start,
+                                                window_end=response_win_end)
+
+        assert(set(catch_fa_trials['false_alarm'])==set(licks_present_catch))
+
+        catch_responses[session.trials.loc[(session.trials['catch']==True) & (session.trials['false_alarm']==False)].index]=0
+
+        catch_rate = catch_responses.rolling(window=sliding_window,min_periods=0).mean()
+
+        #calculate d-prime using previously defined function
+        d_prime = dprime(hit_rate, catch_rate)
+
+        return hit_rate.values, catch_rate.values, d_prime
+
+
+    def dprime(hit_rate, fa_rate, limits=(0.01, 0.99)):
+
+        from scipy.stats import norm
+        """ calculates the d-prime for a given hit rate and false alarm rate
+        https://en.wikipedia.org/wiki/Sensitivity_index
+        Parameters
+        ----------
+        hit_rate : float
+            rate of hits in the True class
+        fa_rate : float
+            rate of false alarms in the False class
+        limits : tuple, optional
+            limits on extreme values, which distort. default: (0.01,0.99)
+        Returns
+        -------
+        d_prime
+        """
+        assert limits[0] > 0.0, 'limits[0] must be greater than 0.0'
+        assert limits[1] < 1.0, 'limits[1] must be less than 1.0'
+        Z = norm.ppf
+
+        # Limit values in order to avoid d' infinity
+        hit_rate = np.clip(hit_rate, limits[0], limits[1])
+        fa_rate = np.clip(fa_rate, limits[0], limits[1])
+
+        return Z(hit_rate) - Z(fa_rate)
+
+
+    def check_lick_in_resp_wind(trials,window_start,window_end):
+        '''Returns whether there is a lick time in the passed window (start to end)
+        
+        Parameters
+            ----------
+            trials : dataframe 
+                a trials Dataframe extracted from the AllenSDK session object, or a portion there of
+                
+        Returns
+            ------
+            Boolean array of whether there was a lick in the passed window (np.array)
+        '''
+
+        trials_cop=trials.copy()
+        #response time is relative to the image change
+        trials_cop['start_response_window']=trials_cop['change_time']+window_start
+
+        trials_cop['end_response_window']=trials_cop['change_time']+window_end
+
+        trials_cop['lick_in_window']=trials_cop.apply(lambda x: any(x['start_response_window']< i< x['end_response_window'] for i in x['lick_times']), 1)
+
+        return np.array(trials_cop['lick_in_window'])
+
+
+    ophys_experiment_id = 820307518
+
+    # Load data from LIMS direction:
+    api = BehaviorOphysLimsApi(ophys_experiment_id)
+    session = BehaviorOphysSession(api)
+
+    hit_rate,catch_rate,d_prime=get_response_rates(session, )
+    return d_prime, hit_rate, catch_rate, ophys_experiment_id, 
