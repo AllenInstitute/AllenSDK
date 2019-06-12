@@ -8,6 +8,24 @@ from scipy.optimize import curve_fit
 
 
 class StaticGratings(StimulusAnalysis):
+    """
+    A class for getting single-cell metrics from the static-gratings stimulus of an ecephys session nwb file.
+
+    To use either pass in a EcephysSession object::
+        session = EcephysSession.from_nwb_path('/path/to/my.nwb')
+        sg_analysis = StaticGratings(session)
+
+    or alternativly pass in the file path::
+        sg_analysis = StaticGratings('/path/to/my.nwb')
+
+    You can also pass in a cell filter dictionary which will only select cells with certain properties. For example
+    to get only those units which are on probe C and found in the VISp area::
+        sg_analysis = StaticGratings(session, filter={'location': 'probeC', 'structure_acronym': 'VISp'})
+
+    To get a table of the individual cell metrics ranked by unit-id::
+        metrics_table_df = sg_analysis.peak()
+
+    """
     def __init__(self, ecephys_session, **kwargs):
         super(StaticGratings, self).__init__(ecephys_session, **kwargs)
         self._orivals = None
@@ -104,6 +122,8 @@ class StaticGratings(StimulusAnalysis):
 
         return self._response_trials
 
+    # Ran into issues with pandas 'deciding' certain floating point metrics are either ints or objects and messing
+    # up the analysis. Explicity define the data-types.
     PEAK_COLS = [('cell_specimen_id', np.uint64), ('pref_ori_sg', np.float64), ('pref_sf_sg', np.float64),
                  ('pref_phase_sg', np.float64), ('num_pref_trials_sg', np.uint64), ('responsive_sg', np.bool),
                  ('g_osi_sg', np.float64), ('sfdi_sg', np.float64), ('reliability_sg', np.float64),

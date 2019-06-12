@@ -41,7 +41,7 @@ class StimulusAnalysis(object):
         # BOb analog
         if self._cell_ids is None:
             # Original analysis files was hardcoded that only cells from probeC/VISp, replaced with a filter dict.
-            # TODO: Remove filter if it's unnessecary, or else make cells_filter a class parameter.
+            # TODO: Remove filter if it's unnessecary
             units_df = self.ecephys_session.units
             if self._cells_filter:
                 mask = True
@@ -75,11 +75,13 @@ class StimulusAnalysis(object):
 
     @property
     def dxcm(self):
+        """Returns an array of session running-speed velocities"""
         # BOb analog
         return self.ecephys_session.running_speed.values
 
     @property
     def dxtime(self):
+        """Returns an array of session running speed timestamps"""
         # BOb analog
         return self._ecephys_session.running_speed.timestamps
 
@@ -89,8 +91,9 @@ class StimulusAnalysis(object):
 
     @property
     def stim_table_spontaneous(self):
+        """Returns a stimulus table with only 'spontaneous' stimulus selected."""
         # BOb analog
-        # Returns the stimulus table with only 'spanteous' presentations. Used by sweep_p_events for creating null dist.
+        # Used by sweep_p_events for creating null dist.
         if self._stim_table_spontaneous is None:
             # TODO: The original version filtered out stims of len < 100, figure out why or if this value should
             #   be user-defined?
@@ -101,12 +104,17 @@ class StimulusAnalysis(object):
 
     @property
     def sweep_events(self):
+        """Returns a pandas DataFrame ranked by stimuli and filed by unit, giving a list of spikes offset by stim
+        onset."""
         if self._sweep_events is None:
             start_times = self.stim_table['start_time'].values - 1.0
             stop_times = self.stim_table['stop_time'].values
             sweep_events = pd.DataFrame(index=self.stim_table.index.values, columns=self.spikes.keys())
 
             for specimen_id, spikes in self.spikes.items():
+                # In theory we should be able to use EcephysSession presentationwise_spike_times(). But ran into issues
+                # with the "sides" certain boundary spikes will fall on, and will significantly affect the metrics
+                # upstream.
                 start_indicies = np.searchsorted(spikes, start_times, side='left')
                 stop_indicies = np.searchsorted(spikes, stop_times, side='right')
 
@@ -124,7 +132,7 @@ class StimulusAnalysis(object):
             stim_times[::2] = self.stim_table['start_time'].values
             stim_times[1::2] = self.stim_table['stop_time'].values
             sampled_indicies = np.where((self.dxtime >= stim_times[0])&(self.dxtime <= stim_times[-1]))[0]
-            relevant_dxtimes = self.dxtime[sampled_indicies] # self.dxtime[(self.dxtime >= stim_times[0])&(self.dxtime <= stim_times[-1])]
+            relevant_dxtimes = self.dxtime[sampled_indicies]
             relevant_dxcms = self.dxcm[sampled_indicies]
 
             indices = np.searchsorted(stim_times, relevant_dxtimes) - 1  # excludes dxtimes occuring at time_stop
@@ -148,10 +156,12 @@ class StimulusAnalysis(object):
 
     @property
     def mean_sweep_events(self):
+        """The mean values for sweep-events"""
         raise NotImplementedError()
 
     @property
     def sweep_p_values(self):
+        """mean sweeps taken from randomized 'spontaneous' trial data."""
         if self._sweep_p_values is None:
             self._sweep_p_values = self.calc_sweep_p_values()
 
@@ -159,6 +169,7 @@ class StimulusAnalysis(object):
 
     @property
     def peak(self):
+        """Returns a pandas DataFrame of the single-cell stimulus response metrics ranked by the cells unit-ids."""
         raise NotImplementedError()
 
     def calc_sweep_p_values(self, n_samples=10000, step_size=0.0001, offset=0.33):
