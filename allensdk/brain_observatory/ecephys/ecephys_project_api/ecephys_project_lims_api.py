@@ -5,104 +5,106 @@ import warnings
 import pandas as pd
 
 from .ecephys_project_api import EcephysProjectApi
+from .http_engine import HttpEngine
+from .utilities import postgres_macros, build_and_execute
+
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.internal.core.lims_utilities import safe_system_path
 
 
-class EcephysProjectLimsApi(EcephysProjectApi, PostgresQueryMixin):
-    def __init__(self, **kwargs):
-        super(EcephysProjectApi, self).__init__(**kwargs)
+class EcephysProjectLimsApi(EcephysProjectApi):
+    def __init__(self, postgres_engine, app_engine):
+        self.postgres_engine = postgres_engine
+        self.app_engine = app_engine
 
     def get_session_data(self, session_id):
-        nwb_paths = self._get_session_nwb_paths(session_id)
-        main_nwb_path = nwb_paths.loc[nwb_paths["name"] == "EcephysNwb"]["path"].values
+        nwb_response = build_and_execute(
+            """
+            select wkf.id, wkf.filename, wkf.storage_directory, wkf.attachable_id from well_known_files wkf 
+            join ecephys_analysis_runs ear on (
+                ear.id = wkf.attachable_id
+                and wkf.attachable_type = 'EcephysAnalysisRun'
+            )
+            join well_known_file_types wkft on wkft.id = wkf.well_known_file_type_id
+            where ear.current
+            and wkft.name = 'EcephysNwb'
+            and ear.ecephys_session_id = {{session_id}}
+        """,
+            engine=self.postgres_engine.select,
+            session_id=session_id,
+        )
 
-        if len(main_nwb_path) == 1 and not isinstance(main_nwb_path, str):
-            main_nwb_path = Path(main_nwb_path[0])
-        else:
-            raise ValueError(f"did not find a unique nwb path for session {session_id}")
+        if nwb_response.shape[0] != 1:
+            raise ValueError(
+                f"expected exactly 1 current NWB file for session {session_id}, "
+                f"found {nwb_response.shape[0]}: {pd.DataFrame(nwb_response)}"
+            )
 
-        fsize = main_nwb_path.stat().st_size / 1024 ** 2
-        warnings.warn(f"copying a {fsize:.6}mb file from {main_nwb_path}")
+        nwb_id = nwb_response.loc[0, "id"]
+        return self.app_engine.stream(
+            f"well_known_files/download/{nwb_id}?wkf_id={nwb_id}"
+        )
 
-        reader = open(main_nwb_path, "rb")
-        return reader
-
-    def get_units(self, **kwargs):
-        return self._get_units(**kwargs)
-
-    def get_channels(self, **kwargs):
-        return self._get_channels(**kwargs)
-
-    def get_probes(self, **kwargs):
-        return self._get_probes(**kwargs)
-
-    def get_sessions(self, **kwargs):
-        return self._get_sessions(**kwargs)
-
-    def _get_units(
+    def get_units(
         self, unit_ids=None, channel_ids=None, probe_ids=None, session_ids=None
     ):
+        return build_and_execute(
+            """
+                {%- import 'postgres_macros' as pm -%}
+                select eu.* from ecephys_units eu
+                join ecephys_channels ec on ec.id = eu.ecephys_channel_id
+                join ecephys_probes ep on ep.id = ec.ecephys_probe_id
+                join ecephys_sessions es on es.id = ep.ecephys_session_id 
+                where true
+                {{pm.optional_contains('eu.id', unit_ids) -}}
+                {{pm.optional_contains('ec.id', channel_ids) -}}
+                {{pm.optional_contains('ep.id', probe_ids) -}}
+                {{pm.optional_contains('es.id', session_ids) -}}
+            """,
+            base=postgres_macros(),
+            engine=self.postgres_engine.select,
+            unit_ids=unit_ids,
+            channel_ids=channel_ids,
+            probe_ids=probe_ids,
+            session_ids=session_ids,
+        )
 
-        filters = []
-        filters.append(containment_filter_clause(channel_ids, "eu.id"))
-        filters.append(containment_filter_clause(channel_ids, "ec.id"))
-        filters.append(containment_filter_clause(probe_ids, "ep.id"))
-        filters.append(containment_filter_clause(session_ids, "es.id"))
+    def get_channels(self, channel_ids=None, probe_ids=None, session_ids=None):
+        return build_and_execute(
+            """
+                {%- import 'postgres_macros' as pm -%}
+                select ec.* from ecephys_channels ec 
+                join ecephys_probes ep on ep.id = ec.ecephys_probe_id
+                join ecephys_sessions es on es.id = ep.ecephys_session_id 
+                where true
+                {{pm.optional_contains('ec.id', channel_ids) -}}
+                {{pm.optional_contains('ep.id', probe_ids) -}}
+                {{pm.optional_contains('es.id', session_ids) -}}
+            """,
+            base=postgres_macros(),
+            engine=self.postgres_engine.select,
+            channel_ids=channel_ids,
+            probe_ids=probe_ids,
+            session_ids=session_ids,
+        )
 
-        query = f"""
-            select eu.* from ecephys_units eu
-            join ecephys_channels ec on ec.id = eu.ecephys_channel_id
-            join ecephys_probes ep on ep.id = ec.ecephys_probe_id
-            join ecephys_sessions es on es.id = ep.ecephys_session_id 
-            {and_filters(filters)}
-        """
+    def get_probes(self, probe_ids=None, session_ids=None):
+        return build_and_execute(
+            """
+                {%- import 'postgres_macros' as pm -%}
+                select ep.* from ecephys_probes ep 
+                join ecephys_sessions es on es.id = ep.ecephys_session_id 
+                where true
+                {{pm.optional_contains('ep.id', probe_ids) -}}
+                {{pm.optional_contains('es.id', session_ids) -}}
+            """,
+            base=postgres_macros(),
+            engine=self.postgres_engine.select,
+            probe_ids=probe_ids,
+            session_ids=session_ids,
+        )
 
-        results = self.select(query)
-        results.set_index("id", inplace=True)
-
-        return results
-
-    def _get_channels(self, channel_ids=None, probe_ids=None, session_ids=None):
-
-        filters = []
-        filters.append(containment_filter_clause(channel_ids, "ec.id"))
-        filters.append(containment_filter_clause(probe_ids, "ep.id"))
-        filters.append(containment_filter_clause(session_ids, "es.id"))
-
-        query = f"""
-            select ec.* from ecephys_channels ec
-            join ecephys_probes ep on ep.id = ec.ecephys_probe_id
-            join ecephys_sessions es on es.id = ep.ecephys_session_id 
-            {and_filters(filters)}
-        """
-
-        results = self.select(query)
-        results.set_index("id", inplace=True)
-
-        return results
-
-    def _get_probes(
-        self, probe_ids=None, session_ids=None, workflow_states=("uploaded",)
-    ):
-
-        filters = []
-        filters.append(containment_filter_clause(probe_ids, "ep.id"))
-        filters.append(containment_filter_clause(session_ids, "es.id"))
-
-        query = f"""
-            select ep.* from ecephys_probes ep 
-            join ecephys_sessions es on es.id = ep.ecephys_session_id 
-            {and_filters(filters)}
-        """
-
-        results = self.select(query)
-        results.set_index("id", inplace=True)
-        results.drop(columns="probe_info", inplace=True)
-
-        return results
-
-    def _get_sessions(
+    def get_sessions(
         self,
         session_ids=None,
         workflow_states=("uploaded",),
@@ -113,125 +115,39 @@ class EcephysProjectLimsApi(EcephysProjectApi, PostgresQueryMixin):
             "BrainTV Neuropixels Visual Coding",
         ),
     ):
-
-        filters = []
-        filters.append(containment_filter_clause(session_ids, "es.id"))
-        filters.append(
-            containment_filter_clause(workflow_states, "es.workflow_state", True)
-        )
-        filters.append(containment_filter_clause(project_names, "pr.name", True))
-
-        if published is not None:
-            filters.append(f'es.published_at is {"not" if published else ""} null')
-        if habituation is False:
-            filters.append("habituation = false")
-        elif habituation is True:
-            filters.append("habituation = true")
-
-        query = f"""
-            select es.* from ecephys_sessions es 
-            join projects pr on pr.id = es.project_id {and_filters(filters)}
-        """
-        response = self.select(query)
-        response.set_index("id", inplace=True)
-
-        session_files = set(
-            self._get_session_well_known_files(response.index.values, ["EcephysNwb"])[
-                "ecephys_session_id"
-            ].values
-        )
-        response["has_nwb"] = response.index.isin(session_files)
-
-        return response
-
-    def _get_session_nwb_paths(self, session_id):
-
-        probe_response = self._get_probe_well_known_files(
-            [session_id], wkf_types=["EcephysLfpNwb"]
-        )
-        session_response = self._get_session_well_known_files(
-            [session_id], ["EcephysNwb"]
+        return build_and_execute(
+            """
+                {%- import 'postgres_macros' as pm -%}
+                {%- import 'macros' as m -%}
+                select es.* from ecephys_sessions es
+                join projects pr on pr.id = es.project_id
+                where true
+                {{pm.optional_contains('es.id', session_ids) -}}
+                {{pm.optional_contains('es.workflow_state', workflow_states, True) -}}
+                {{pm.optional_equals('es.habituation', m.str(habituation).lower()) -}}
+                {{pm.optional_not_null('es.published_at', published) -}}
+                {{pm.optional_contains('pr.name', project_names, True) -}}
+            """,
+            base=postgres_macros(),
+            engine=self.postgres_engine.select,
+            session_ids=session_ids,
+            workflow_states=workflow_states,
+            published=published,
+            habituation=habituation,
+            project_names=project_names,
         )
 
-        session_response["ecephys_probe_id"] = None
-        response = (
-            pd.concat([session_response, probe_response], sort=False)
-            .reset_index()
-            .drop(columns="index")
-        )
+    @classmethod
+    def default(cls, pg_kwargs=None, app_kwargs=None):
 
-        return response
+        _pg_kwargs = {}
+        if pg_kwargs is not None:
+            _pg_kwargs.update(pg_kwargs)
 
-    def _get_probe_well_known_files(
-        self, session_ids=None, probe_ids=None, wkf_types=None
-    ):
+        _app_kwargs = {"scheme": "http", "host": "lims2"}
+        if app_kwargs is not None:
+            _app_kwargs.update(app_kwargs)
 
-        filters = []
-        filters.append(containment_filter_clause(session_ids, "es.id"))
-        filters.append(containment_filter_clause(probe_ids, "ep.id"))
-        filters.append(containment_filter_clause(wkf_types, "wkft.name", True))
-
-        # TODO: why does the probe analysis runs table not have a "current" field?
-        query = f"""
-            select wkf.storage_directory, wkf.filename, wkft.name, 
-            es.id as ecephys_session_id, ep.id as ecephys_probe_id from ecephys_sessions es
-            join ecephys_probes ep on ep.ecephys_session_id = es.id
-            join ecephys_analysis_run_probes earp on (
-                earp.ecephys_probe_id = ep.id
-            )
-            join well_known_files wkf on wkf.attachable_id = earp.id
-            join well_known_file_types wkft on wkft.id = wkf.well_known_file_type_id
-            {and_filters(filters)}
-        """
-
-        response = self.select(query)
-        return clean_wkf_response(response)
-
-    def _get_session_well_known_files(self, session_ids=None, wkf_types=None):
-
-        filters = []
-        filters.append(containment_filter_clause(session_ids, "es.id"))
-        filters.append(containment_filter_clause(wkf_types, "wkft.name", True))
-
-        query = f""" 
-            select wkf.storage_directory, wkf.filename, es.id as ecephys_session_id, wkft.name from ecephys_sessions es
-            join ecephys_analysis_runs ear on (
-                ear.ecephys_session_id = es.id
-                and ear.current
-            )
-            join well_known_files wkf on wkf.attachable_id = ear.id
-            join well_known_file_types wkft on wkft.id = wkf.well_known_file_type_id
-            {and_filters(filters)}
-        """
-
-        response = self.select(query)
-        return clean_wkf_response(response)
-
-
-def containment_filter_clause(pass_values, field, quote=False):
-    if pass_values is None or len(pass_values) == 0:
-        return ""
-
-    if quote:
-        pass_values = [f"'{p}'" for p in pass_values]
-    else:
-        pass_values = [f"{p}" for p in pass_values]
-
-    return f'{field} in ({",".join(pass_values)})'
-
-
-def and_filters(filters):
-    filters = [ff for ff in filters if ff]
-    return f'where {" and ".join(filters)}' if filters else ""
-
-
-def clean_wkf_response(response):
-    if response.shape[0] == 0:
-        return response
-
-    def build_path(row):
-        return str(Path(safe_system_path(row["storage_directory"]), row["filename"]))
-
-    response["path"] = response.apply(build_path, axis=1)
-    response.drop(columns=["storage_directory", "filename"], inplace=True)
-    return response
+        pg_engine = PostgresQueryMixin(**_pg_kwargs)
+        app_engine = HttpEngine(**_app_kwargs)
+        return cls(pg_engine, app_engine)

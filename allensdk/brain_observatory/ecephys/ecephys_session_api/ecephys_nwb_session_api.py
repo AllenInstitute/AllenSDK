@@ -17,6 +17,7 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
             probes.append({'id': int(k), 'description': v.description, 'location': v.location})
         probes = pd.DataFrame(probes)
         probes = probes.set_index(keys='id', drop=True)
+        probes['sampling_rate'] = 30000.0  # TODO: calculate real sampling rate for each probe.
         return probes
 
     def get_channels(self) -> pd.DataFrame:
