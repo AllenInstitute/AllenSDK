@@ -326,7 +326,7 @@ def write_ecephys_nwb(
     for probe in probes:
         logging.info(f'found probe {probe["id"]} with name {probe["name"]}')
 
-        nwbfile, probe_nwb_device, probe_nwb_electrode_group = add_probe_to_nwbfile(nwbfile, probe['id'], location=probe['name'])
+        nwbfile, probe_nwb_device, probe_nwb_electrode_group = add_probe_to_nwbfile(nwbfile, probe['id'], description=probe['name'])
         channel_tables.append(prepare_probewise_channel_table(probe['channels'], probe_nwb_electrode_group))
         unit_tables.append(pd.DataFrame(probe['units']))
 

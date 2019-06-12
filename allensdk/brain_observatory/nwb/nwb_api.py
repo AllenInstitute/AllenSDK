@@ -51,7 +51,7 @@ class NwbApi:
     def get_running_speed(self) -> RunningSpeed:
 
         values = self.nwbfile.modules['running'].get_data_interface('speed').data[:]
-        timestamps = self.nwbfile.modules['running'].get_data_interface('timestamps').timestamps[:]
+        timestamps = self.nwbfile.modules['running'].get_data_interface('speed').timestamps[:]
 
         return RunningSpeed(
             timestamps=timestamps,

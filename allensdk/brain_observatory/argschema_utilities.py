@@ -1,9 +1,11 @@
 import os
+import pathlib
 
 import argparse
 from marshmallow import RAISE, ValidationError
 from argschema import ArgSchemaParser
 from argschema.schemas import DefaultSchema
+
 
 def write_or_print_outputs(data, parser):
     data.update({'input_parameters': parser.args})
@@ -13,20 +15,52 @@ def write_or_print_outputs(data, parser):
         print(parser.get_output_json(data))  
 
 
-def check_write_access(path):
+def check_write_access_dir(dirpath):
+
+    if os.path.exists(dirpath):
+        test_filepath = pathlib.Path(dirpath, 'test_file.txt')
+        try:
+            with test_filepath.open() as _:
+                pass
+            os.remove(test_filepath)
+            return True
+        except PermissionError:
+            raise ValidationError(f'don\'t have permissions to write in directory {dirpath}')
+    else:
+        try:
+            pathlib.Path(dirpath).mkdir(parents=True)
+            pathlib.Path(dirpath).rmdir()
+            return True
+        except PermissionError:
+            raise ValidationError(f'Can\'t build path to requested location {dirpath}')
+
+    raise RuntimeError('Unhandled case; this should not happen')
+
+
+def check_write_access(filepath, allow_exists=False):
     try:
-        fd = os.open(path, os.O_CREAT | os.O_EXCL)
+        fd = os.open(filepath, os.O_CREAT | os.O_EXCL)
         os.close(fd)
-        os.remove(path)
+        os.remove(filepath)
         return True
-    except FileNotFoundError:
-        check_write_access(os.path.dirname(path))
-    except PermissionError:
-        raise ValidationError(f'don\'t have permissions to write {path}')
     except FileExistsError:
-        if not os.path.isdir(path):
-            raise ValidationError(f'file at {path} already exists')
-        return True
+
+        if not allow_exists:
+            raise ValidationError(f'file at {filepath} already exists')
+        else:
+            return True
+
+    except (FileNotFoundError, PermissionError):
+        base_dir = os.path.dirname(filepath)
+        return check_write_access_dir(base_dir)
+    except Exception as e:
+        raise e
+
+    raise RuntimeError('Unhandled case; this should not happen')
+
+
+def check_write_access_overwrite(path):
+    return check_write_access(path, allow_exists=True)
 
 
 def check_read_access(path):

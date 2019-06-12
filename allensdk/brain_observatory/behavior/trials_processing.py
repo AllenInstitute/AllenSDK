@@ -6,6 +6,7 @@ import uuid
 from copy import deepcopy
 import collections
 import dateutil
+from scipy.stats import norm
 
 
 # TODO: add trial column descriptions
@@ -154,9 +155,6 @@ def get_trials(data, stimulus_timestamps_no_monitor_delay, licks_df, rewards_df,
         go = not catch and not auto_rewarded
         trial_data['go'].append(go)
 
-        lick_events = [rebase(lick_tuple[0]) for lick_tuple in trial["licks"]]
-        trial_data['lick_events'].append(lick_events)
-
         lick_times = sync_lick_times[np.where(np.logical_and(sync_lick_times >= start_time, sync_lick_times <= stop_time))]
         trial_data['lick_times'].append(lick_times)
 
@@ -171,6 +169,9 @@ def get_trials(data, stimulus_timestamps_no_monitor_delay, licks_df, rewards_df,
 
         false_alarm = ('false_alarm', "") in event_dict
         trial_data['false_alarm'].append(false_alarm)
+
+        correct_reject = catch and not false_alarm
+        trial_data['correct_reject'].append(correct_reject)
 
         response_time = event_dict.get(('hit', '')) or event_dict.get(('false_alarm', '')) if hit or false_alarm else float('nan')
         trial_data['response_time'].append(response_time)
@@ -365,16 +366,32 @@ def get_image_info_from_trial(trial_log, ti):
         return prev_group, prev_name, prev_group, prev_name
 
 
-def get_ori_info_from_trial(trial_log, ti):
-    raise NotImplementedError
+def get_ori_info_from_trial(trial_log, ti, ):
+    if ti == -1:
+        raise IndexError('No change on first trial.')
+    
+    if len(trial_log[ti]["stimulus_changes"]) == 1:
+        (initial_group, initial_orientation), (change_group, change_orientation, ), _, _ = trial_log[ti]["stimulus_changes"][0]
+        return change_orientation, change_orientation, None
+    else:
+        return get_ori_info_from_trial(trial_log, ti - 1)
 
 
 def get_trials_v0(data, time):
+    stimuli = data["items"]["behavior"]["stimuli"]
+    if len(list(stimuli.keys())) != 1:
+        raise ValueError('Only one stimuli supported.')
+    
+    stim_name, stim = next(iter(stimuli.items()))
+    if stim_name not in ['images', 'grating', ]:
+        raise ValueError('Unsupported stimuli name: {}.'.format(stim_name))
 
-    implied_type = data["items"]["behavior"]["stimuli"]['images']["obj_type"]
+    implied_type = stim["obj_type"]
     trial_log = data["items"]["behavior"]["trial_log"]
     pre_change_time = data["items"]["behavior"]["config"]['DoC']['pre_change_time']
     initial_blank_duration = data["items"]["behavior"]["config"]["DoC"]["initial_blank"]
+
+    initial_stim = stim['set_log'][0]  # we need this for the situations where a change doesn't occur on the first trial
 
     trials = collections.defaultdict(list)
     for ti, trial in enumerate(trial_log):
@@ -404,26 +421,34 @@ def get_trials_v0(data, time):
         # Stimulus:
         if implied_type == 'DoCImageStimulus':
             from_group, from_name, to_group, to_name = get_image_info_from_trial(trial_log, ti)
-            trials['initial_image_category'].append(from_group)
             trials['initial_image_name'].append(from_name)
+            trials['initial_image_category'].append(from_group)
             trials['change_image_name'].append(to_name)
-            trials['change_image_category'].append(to_group)
+            trials['change_image_category'].append(to_group) 
             trials['change_ori'].append(None)
             trials['change_contrast'].append(None)
             trials['initial_ori'].append(None)
             trials['initial_contrast'].append(None)
             trials['delta_ori'].append(None)
-        else:
-            change_orientation, change_contrast, initial_orientation, initial_contrast, delta_orientation = get_ori_info_from_trial(trial_log, ti)
+        elif implied_type == 'DoCGratingStimulus':
+            try:
+                change_orientation, initial_orientation, delta_orientation = get_ori_info_from_trial(trial_log, ti)
+            except IndexError:
+                orientation = initial_stim[1]  # shape: group_name, orientation, stimulus time relative to start, frame
+                change_orientation = orientation
+                initial_orientation = orientation
+                delta_orientation = None
             trials['initial_image_category'].append('')
             trials['initial_image_name'].append('')
             trials['change_image_name'].append('')
             trials['change_image_category'].append('')
             trials['change_ori'].append(change_orientation)
-            trials['change_contrast'].append(change_contrast)
+            trials['change_contrast'].append(None)
             trials['initial_ori'].append(initial_orientation)
-            trials['initial_contrast'].append(initial_contrast)
+            trials['initial_contrast'].append(None)
             trials['delta_ori'].append(delta_orientation)
+        else:
+            raise NotImplementedError('Unsupported stimulus type: {}'.format(implied_type), )
 
     return pd.DataFrame(trials)
 
@@ -611,3 +636,56 @@ def get_extended_trials(data, time=None):
                                   metadata=data_to_metadata(data, time),
                                   time=time,
                                   licks=data_to_licks(data, time))
+
+
+# -> metrics
+def dprime(hit_rate, fa_rate, limits=(0.01, 0.99)):
+    """ calculates the d-prime for a given hit rate and false alarm rate
+
+    https://en.wikipedia.org/wiki/Sensitivity_index
+
+    Parameters
+    ----------
+    hit_rate : float
+        rate of hits in the True class
+    fa_rate : float
+        rate of false alarms in the False class
+    limits : tuple, optional
+        limits on extreme values, which distort. default: (0.01,0.99)
+
+    Returns
+    -------
+    d_prime
+
+    """
+    assert limits[0] > 0.0, 'limits[0] must be greater than 0.0'
+    assert limits[1] < 1.0, 'limits[1] must be less than 1.0'
+    Z = norm.ppf
+
+    # Limit values in order to avoid d' infinity
+    hit_rate = np.clip(hit_rate, limits[0], limits[1])
+    fa_rate = np.clip(fa_rate, limits[0], limits[1])
+
+    try:
+        last_hit_nan = np.where(np.isnan(hit_rate))[0].max()
+    except ValueError:
+        last_hit_nan = 0
+
+    try:
+        last_fa_nan = np.where(np.isnan(fa_rate))[0].max()
+    except ValueError:
+        last_fa_nan = 0
+
+    last_nan = np.max((last_hit_nan, last_fa_nan))
+
+    # fill nans with 0.5 to avoid warning about nans
+    d_prime = Z(pd.Series(hit_rate).fillna(0.5)) - Z(pd.Series(fa_rate).fillna(0.5))
+
+    # fill all values up to the last nan with nan
+    d_prime[:last_nan] = np.nan
+
+    if len(d_prime) == 1:
+        # if the result is a 1-length vector, return as a scalar
+        return d_prime[0]
+    else:
+        return d_prime

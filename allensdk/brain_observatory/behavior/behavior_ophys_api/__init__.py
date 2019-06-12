@@ -4,7 +4,7 @@ class BehaviorOphysApiBase:
     def get_ophys_experiment_id(self) -> int:
         return self.get_metadata()['ophys_experiment_id']
 
-    def get_segmentation_mask_image(self):
+    def get_max_projection(self):
         raise NotImplementedError
 
     def get_stimulus_timestamps(self):
@@ -52,5 +52,8 @@ class BehaviorOphysApiBase:
     def get_motion_correction(self):
         raise NotImplementedError
 
-    def get_average_image(self):
+    def get_average_projection(self):
+        raise NotImplementedError
+
+    def get_segmentation_mask_image(self):
         raise NotImplementedError

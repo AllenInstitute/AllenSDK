@@ -58,7 +58,7 @@ def main(jin):
         if blowout < low or blowout > high:
             exp_fail_tags.append("blowout outside of range")
             experiment_state["failed_blowout"] = True
-    except Exception, e:
+    except Exception as e:
         exp_fail_tags.append("Error analyzing blowout. " + e.message)
         experiment_state["failed_blowout"] = True
 
@@ -73,7 +73,7 @@ def main(jin):
         if abs(e0) > qc_criteria["electrode_0_pa_max"]:
             exp_fail_tags.append("e0 -- exceeds max")
             experiment_state["failed_electrode_0"] = True
-    except Exception, e:
+    except Exception as e:
         exp_fail_tags.append("Error analyzing blowout. " + e.message)
         experiment_state["failed_electrode_0"] = True
 
@@ -90,7 +90,7 @@ def main(jin):
             reason = "%f versus criteria=%f" % (seal, tgt)
             exp_fail_tags.append("Seal (%s)" % reason)
             experiment_state["failed_seal"] = True
-    except Exception, e:
+    except Exception as e:
         seal = None
         msg = "Seal 0 is not available. %s" % e.message
         logging.warning(msg)
@@ -132,7 +132,7 @@ def main(jin):
                 tgt = qc_criteria["input_vs_access_resistance_min"]
                 reason = "%f versus criteria=%f" % (sir_ratio, tgt)
                 sr_tags.append("input/access resistance (%s)" % reason)
-    except Exception, e:
+    except Exception as e:
         exp_fail_tags.append("Error analyzing access resistance. " + e.message)
 
     if len(sr_tags) > 0:

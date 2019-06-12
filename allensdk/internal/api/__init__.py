@@ -57,11 +57,10 @@ class PostgresQueryMixin(object):
         return psycopg2.connect(dbname=self.dbname, user=self.user, host=self.host, password=self.password, port=self.port)
 
     def fetchone(self, query, strict=True):
-        if strict is True:
-            response = list(self.select(query).to_dict().values())
-            return one(one(response))
-        response = list(self.select_one(query).values())
-        return one(response)
+        response = one(list(self.select(query).to_dict().values()))
+        if strict is True and (len(response) != 1 or response[0] is None):
+            raise OneResultExpectedError
+        return response[0]
 
     def fetchall(self, query, strict=True):
         response = self.select(query)

@@ -26,6 +26,9 @@ class BehaviorOphysJsonApi(BehaviorOphysLimsApi):
     def get_surface_2p_pixel_size_um(self):
         return self.data['surface_2p_pixel_size_um']
 
+    def get_max_projection_file(self):
+        return self.data['max_projection_file']
+
     def get_segmentation_mask_image_file(self):
         return self.data['segmentation_mask_image_file']
 
@@ -34,6 +37,12 @@ class BehaviorOphysJsonApi(BehaviorOphysLimsApi):
 
     def get_rig_name(self):
         return self.data['rig_name']
+
+    def get_sex(self):
+        return self.data['sex']
+
+    def get_age(self):
+        return self.data['age']
 
     def get_field_of_view_shape(self):
         return {'height': self.data['movie_height'], 'width': self.data['movie_width']}
@@ -95,6 +104,11 @@ def write_behavior_ophys_nwb(session_data, nwb_filepath):
     nwb_filepath_inprogress = nwb_filepath+'.inprogress'
     nwb_filepath_error = nwb_filepath+'.error'
 
+    # Clean out files from previous runs:
+    for filename in [nwb_filepath_inprogress, nwb_filepath_error, nwb_filepath]:
+        if os.path.exists(filename):
+            os.remove(filename)
+
     try:
         session = BehaviorOphysSession(api=BehaviorOphysJsonApi(session_data))
         BehaviorOphysNwbApi(nwb_filepath_inprogress).save(session)
@@ -140,7 +154,7 @@ if __name__ == "__main__":
     # input_dict = {'log_level':'DEBUG',
     #               'session_data': {'ophys_experiment_id': 789359614,
     #                                 'surface_2p_pixel_size_um': 0.78125,
-    #                                 "segmentation_mask_image_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/processed/ophys_cell_segmentation_run_789410052/maxInt_a13a.png",
+    #                                 "max_projection_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/processed/ophys_cell_segmentation_run_789410052/maxInt_a13a.png",
     #                                 "sync_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/789220000_sync.h5",
     #                                 "rig_name": "CAM2P.5",
     #                                 "movie_width": 447,

@@ -17,6 +17,7 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
             probes.append({'id': int(k), 'description': v.description, 'location': v.location})
         probes = pd.DataFrame(probes)
         probes = probes.set_index(keys='id', drop=True)
+        probes['sampling_rate'] = 30000.0  # TODO: calculate real sampling rate for each probe.
         return probes
 
     def get_channels(self) -> pd.DataFrame:
@@ -40,11 +41,6 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
 
     def get_ecephys_session_id(self) -> int:
         return int(self.nwbfile.identifier)
-
-    def get_actual_sampling_rates(self) -> float:
-        # TODO: xiaojuan has code to calculate the code for each given probe.
-        probes_table = self.get_probes()
-        return {probe_id: self.get_baseline_sampling_rate() for probe_id in probes_table.index.values}
 
     def _get_full_units_table(self) -> pd.DataFrame:
         table = self.nwbfile.units.to_dataframe()

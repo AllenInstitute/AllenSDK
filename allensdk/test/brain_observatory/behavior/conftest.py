@@ -87,6 +87,11 @@ def average_image(max_projection):
 
 
 @pytest.fixture
+def segmentation_mask_image(max_projection):
+    return max_projection
+
+
+@pytest.fixture
 def stimulus_presentations_behavior(stimulus_templates, stimulus_presentations):
 
     image_sets = ['test1','test1', 'test1', 'test2', 'test2' ]
@@ -120,6 +125,8 @@ def metadata():
             "field_of_view_width": 2,
             "field_of_view_height": 2,
             "rig_name": 'my_device',
+            "sex": 'M',
+            "age": 'P139',
             }
 
 
@@ -180,7 +187,7 @@ def session_data():
 
     data = {'ophys_experiment_id': 789359614,
             'surface_2p_pixel_size_um': 0.78125,
-            "segmentation_mask_image_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/processed/ophys_cell_segmentation_run_789410052/maxInt_a13a.png",
+            "max_projection_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/processed/ophys_cell_segmentation_run_789410052/maxInt_a13a.png",
             "sync_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/789220000_sync.h5",
             "rig_name": "CAM2P.5",
             "movie_width": 447,
@@ -201,6 +208,8 @@ def session_data():
             "demix_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/demix/789359614_demixed_traces.h5",
             "average_intensity_projection_image_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/processed/ophys_cell_segmentation_run_789410052/avgInt_a1X.png",
             "rigid_motion_transform_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/processed/789359614_rigid_motion_transform.csv",
-            }
+            "segmentation_mask_image_file": "/allen/programs/braintv/production/visualbehavior/prod0/specimen_756577249/ophys_session_789220000/ophys_experiment_789359614/processed/ophys_cell_segmentation_run_789410052/maxInt_masks.tif",
+            "sex": "F",
+            "age": "P139"}
 
     return data

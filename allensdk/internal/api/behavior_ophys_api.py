@@ -18,6 +18,7 @@ from allensdk.brain_observatory.behavior.image_api import ImageApi
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.brain_observatory.behavior.behavior_ophys_api import BehaviorOphysApiBase
 from allensdk.brain_observatory.behavior.trials_processing import get_extended_trials
+from allensdk.internal.core.lims_utilities import safe_system_path
 
 
 class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
@@ -46,7 +47,7 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
         elif number_of_dff_frames == num_of_timestamps:
             pass
         else:
-            raise RuntimeError('dff_frames is shorter than timestamps')
+            raise RuntimeError('dff_frames is longer than timestamps')
 
         return ophys_timestamps
 
@@ -56,7 +57,7 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
                 SELECT visual_behavior_experiment_container_id 
                 FROM ophys_experiments_visual_behavior_experiment_containers 
                 WHERE ophys_experiment_id= {};
-                '''.format(self.get_ophys_experiment_id())        
+                '''.format(self.get_ophys_experiment_id())
         return self.fetchone(query, strict=False)
 
     @memoize
@@ -69,7 +70,7 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
                 LEFT JOIN well_known_files stim ON stim.attachable_id=bs.id AND stim.attachable_type = 'BehaviorSession' AND stim.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'StimulusPickle')
                 WHERE oe.id= {};
                 '''.format(self.get_ophys_experiment_id())
-        return self.fetchone(query, strict=True)
+        return safe_system_path(self.fetchone(query, strict=True))
 
     def get_behavior_session_uuid(self):
         behavior_stimulus_file = self.get_behavior_stimulus_file()
@@ -139,7 +140,7 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
 
         stimulus_metadata_df = get_stimulus_metadata(data)
         idx_name = stimulus_presentations_df_pre.index.name
-        stimulus_index_df = stimulus_presentations_df_pre.reset_index().merge(stimulus_metadata_df.reset_index(), on=['image_name', 'image_category']).set_index(idx_name)
+        stimulus_index_df = stimulus_presentations_df_pre.reset_index().merge(stimulus_metadata_df.reset_index(), on=['image_name']).set_index(idx_name)
         stimulus_index_df.sort_index(inplace=True)
         stimulus_index_df = stimulus_index_df[['image_set', 'image_index', 'start_time']].rename(columns={'start_time': 'timestamps'})
         stimulus_index_df.set_index('timestamps', inplace=True, drop=True)
@@ -207,7 +208,7 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
         return df
 
     @memoize
-    def get_average_image(self, image_api=None):
+    def get_average_projection(self, image_api=None):
 
         if image_api is None:
             image_api = ImageApi
@@ -232,7 +233,7 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
                 LEFT JOIN well_known_files wkf ON wkf.attachable_id=oe.id AND wkf.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'BehaviorOphysNwb')
                 WHERE oe.id = {};
                 '''.format(self.get_ophys_experiment_id())
-        return self.fetchone(query, strict=True)
+        return safe_system_path(self.fetchone(query, strict=True))
 
     def get_stimulus_rebase_function(self):
         stimulus_timestamps_no_monitor_delay = self.get_sync_data()['stimulus_frames_no_delay']
@@ -251,12 +252,38 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
 
         api = PostgresQueryMixin()
         query = '''
-                SELECT *
+                SELECT oec.visual_behavior_experiment_container_id as container_id, oec.ophys_experiment_id, oe.workflow_state, g.name as driver_line, id.depth, st.acronym
                 FROM ophys_experiments_visual_behavior_experiment_containers oec
-                LEFT JOIN ophys_experiments oe ON oe.id = oec.ophys_experiment_id 
+                LEFT JOIN ophys_experiments oe ON oe.id = oec.ophys_experiment_id
+                LEFT JOIN ophys_sessions os ON oe.ophys_session_id = os.id
+                LEFT JOIN specimens sp ON sp.id=os.specimen_id
+                LEFT JOIN donors d ON d.id=sp.donor_id
+                LEFT JOIN donors_genotypes dg ON dg.donor_id=d.id
+                LEFT JOIN genotypes g ON g.id=dg.genotype_id
+                LEFT JOIN genotype_types gt ON gt.id=g.genotype_type_id AND gt.name = 'driver'
+                LEFT JOIN imaging_depths id ON id.id=os.imaging_depth_id
+                LEFT JOIN structures st ON st.id=oe.targeted_structure_id
                 '''
 
-        return pd.read_sql(query, api.get_connection()).rename(columns={'visual_behavior_experiment_container_id':'container_id'}).drop('id', axis=1)
+        return pd.read_sql(query, api.get_connection())
+
+    @staticmethod
+    def get_containers_df(only_passed=True):
+
+        api = PostgresQueryMixin()
+        if only_passed is True:
+            query = '''
+                    SELECT *
+                    FROM visual_behavior_experiment_containers vbc
+                    WHERE workflow_state IN ('container_qc','publish');
+                    '''
+        else:
+            query = '''
+                    SELECT *
+                    FROM visual_behavior_experiment_containers vbc
+                    '''
+
+        return pd.read_sql(query, api.get_connection()).rename(columns={'id':'container_id'})[['container_id', 'specimen_id', 'workflow_state']]
 
     @classmethod
     def get_api_list_by_container_id(cls, container_id):
@@ -270,10 +297,9 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
 
 if __name__ == "__main__":
 
+    print(BehaviorOphysLimsApi.get_ophys_experiment_df())
+    # print(BehaviorOphysLimsApi.get_containers_df(only_passed=False))
 
-
-
-    pass
     # print(BehaviorOphysLimsApi.get_api_by_container(838105949))
 
     # ophys_experiment_id = df['ophys_experiment_id'].iloc[0]

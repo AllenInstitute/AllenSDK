@@ -3,7 +3,7 @@ from argschema.schemas import DefaultSchema
 from argschema.fields import LogLevel, String, Int, DateTime, Nested, Boolean, Float, List, Dict
 from marshmallow import RAISE, ValidationError
 
-from allensdk.brain_observatory.argschema_utilities import check_read_access, check_write_access, RaisingSchema
+from allensdk.brain_observatory.argschema_utilities import check_read_access, check_write_access_overwrite, RaisingSchema
 
 class CellSpecimenTable(RaisingSchema):
     cell_roi_id = Dict(String, Int, required=True)
@@ -29,7 +29,7 @@ class SessionData(RaisingSchema):
     movie_width = Int(required=True, description='width of field-of-view for 2p movie')
     container_id = Int(required=True, description='container that this experiment is in')
     sync_file = String(required=True, description='path to sync file')
-    segmentation_mask_image_file = String(required=True, description='path to segmentation_mask_image file')
+    max_projection_file = String(required=True, description='path to max_projection file')
     behavior_stimulus_file = String(required=True, description='path to behavior_stimulus file')
     dff_file = String(required=True, description='path to dff file')
     demix_file = String(required=True, description='path to demix file')
@@ -46,6 +46,8 @@ class SessionData(RaisingSchema):
     surface_2p_pixel_size_um = Float(required=True, description='the spatial extent (in um) of the 2p field-of-view')
     ophys_cell_segmentation_run_id = Int(required=True, description='ID of the active segmentation run used to generate this file')
     cell_specimen_table_dict = Nested(CellSpecimenTable, required=True, description='Table of cell specimen info')
+    sex = String(required=True, description='sex')
+    age = String(required=True, description='age')
 
 
 class InputSchema(ArgSchema):
@@ -53,7 +55,7 @@ class InputSchema(ArgSchema):
         unknown = RAISE
     log_level = LogLevel(default='INFO', description='set the logging level of the module')
     session_data = Nested(SessionData, required=True, description='records of the individual probes used for this experiment')
-    output_path = String(required=True, validate=check_write_access, description='write outputs to here')
+    output_path = String(required=True, validate=check_write_access_overwrite, description='write outputs to here')
 
 
 class OutputSchema(RaisingSchema):

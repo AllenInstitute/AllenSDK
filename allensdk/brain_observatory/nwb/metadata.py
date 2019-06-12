@@ -1,5 +1,5 @@
 import os
-from pynwb import get_type_map, TimeSeries, NWBFile, register_class, docval, load_namespaces, popargs, get_class
+from pynwb import get_type_map, NWBFile, register_class, docval, load_namespaces, popargs, get_class
 from pynwb.spec import NWBNamespaceBuilder, NWBGroupSpec, NWBAttributeSpec, NWBDatasetSpec
 from pynwb.file import LabMetaData
 from marshmallow import fields

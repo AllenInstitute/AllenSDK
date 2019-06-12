@@ -331,7 +331,7 @@ def organize_metadata(ephys_roi_result):
         try:
             reporter_genotype = next( g for g in genotypes if g['genotype_type_id'] == 177835595 )
             metadata['cre_line'] = reporter_genotype['name']
-        except Exception, e:
+        except Exception as e:
             logging.error("Could not find reporter genotype for mouse cell")
             raise
 
@@ -620,7 +620,7 @@ def main(jin):
             spikes = sweep_features[sweep_num]['spikes']
             spike_times = [ s['threshold_t'] for s in spikes ]
             NwbDataSet(outfile).set_spike_times(sweep_num, spike_times)
-        except Exception, e:
+        except Exception as e:
             logging.info("sweep %d has no sweep features. %s" % (sweep_num, e.message) )
 #    try:
 #        # remove spike times for non-passing sweeps

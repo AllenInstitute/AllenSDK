@@ -72,6 +72,11 @@ class Mask(object):
        User-defined number to help put masks into different categories
     '''
 
+    @property
+    def overlaps_motion_border(self):
+        # flags like this are now in self.flags, patch for backwards compatibility
+        return 'overlaps_motion_border' in self.flags
+
     def __init__(self, image_w, image_h, label, mask_group):
         '''
         Mask class constructor. The Mask class is designed to be abstract
@@ -87,13 +92,13 @@ class Mask(object):
         self.y = 0
         self.height = 0
         self.mask = None
-        self.overlaps_motion_border = False
         # label is for distinguishing neuropil from ROI, in case
         #   these masks are mixed together
         self.label = label
         # auxiliary metadata. if a particula mask is part of an group,
         #   that data can be stored here
         self.mask_group = mask_group
+        self.flags = set([])
 
     def __str__(self):
         return "%s: TL=%d,%d w,h=%d,%d\n%s" % (self.label, self.x, self.y, self.width, self.height, str(self.mask))
@@ -147,7 +152,7 @@ def create_roi_mask(image_w, image_h, border, pix_list=None, roi_mask=None, labe
     border: float[4]
         Coordinates defining useable area of image. If the entire image
         is usable, and masks are valid anywhere in the image, this should
-        be [(image_w-1), 0, (image_h-1), 0]. The following constants
+        be [0, 0, 0, 0]. The following constants
         help describe the array order:
 
             RIGHT_SHIFT = 0
@@ -224,8 +229,12 @@ class RoiMask(Mask):
             Image-sized array that describes the mask. Active parts of the
             mask should have values >0. Background pixels must be zero
         '''
-        # find lowest and highest non-zero indices on each axis
         px = np.argwhere(array)
+
+        if len(px) == 0:
+            self.flags.add('zero_pixels')
+            return
+
         (top, left), (bottom, right) = px.min(0), px.max(0)
 
         # left and right border insets
@@ -237,9 +246,9 @@ class RoiMask(Mask):
 
         # if ROI crosses border, it's considered invalid
         if left < l_inset or right > r_inset:
-            self.overlaps_motion_border = True
+            self.flags.add('overlaps_motion_border')
         if top < t_inset or bottom > b_inset:
-            self.overlaps_motion_border = True
+            self.flags.add('overlaps_motion_border')
         #
         self.x = left
         self.width = right - left + 1
@@ -262,7 +271,8 @@ def create_neuropil_mask(roi, border, combined_binary_mask, label=None):
         The ROI that the neuropil masks will be based on
 
     border: float[4]
-        Coordinates defining useable area of image. See create_roi_mask().
+        Border widths on the [right, left, down, up] sides. The resulting 
+        neuropil mask will not include pixels falling into a border.
 
     combined_binary_mask
         List of pixel coordinates (x,y) that define the mask
@@ -321,14 +331,18 @@ class NeuropilMask(Mask):
         Parameters
         ----------
         border: float[4]
-            Coordinates defining useable area of image. See create_roi_mask().
-
+            Border widths on the [right, left, down, up] sides. The resulting 
+            neuropil mask will not include pixels falling into a border.
         array: integer[image height][image width]
             Image-sized array that describes the mask. Active parts of the
             mask should have values >0. Background pixels must be zero
         '''
-        # find lowest and highest non-zero indices on each axis
         px = np.argwhere(array)
+
+        if len(px) == 0:
+            self.flags.add('zero_pixels')
+            return
+
         (top, left), (bottom, right) = px.min(0), px.max(0)
 
         # left and right border insets
@@ -363,8 +377,36 @@ class NeuropilMask(Mask):
         # make copy of mask
         self.mask = array[top:bottom + 1, left:right + 1]
 
+def validate_mask(mask):
+    '''Check a given roi or neuropil mask for (a subset of) disqualifying problems.
+    '''
 
-def calculate_traces(stack, mask_list, block_size=100):
+    exclusions = []
+
+    if 'zero_pixels' in mask.flags or mask.mask.sum() == 0:
+
+        if isinstance(mask, NeuropilMask):
+            label = 'empty_neuropil_mask'
+        elif isinstance(mask, RoiMask):
+            label = 'empty_roi_mask'
+        else:
+            label = 'zero_pixels'
+
+        exclusions.append({
+            'roi_id': mask.label,
+            'exclusion_label_name': label
+        })
+
+    if 'overlaps_motion_border' in mask.flags:
+        exclusions.append({
+            'roi_id': mask.label,
+            'exclusion_label_name': 'motion_border'
+        })
+
+    return exclusions
+    
+
+def calculate_traces(stack, mask_list, block_size=1000):
     '''
     Calculates the average response of the specified masks in the
     image stack
@@ -382,40 +424,38 @@ def calculate_traces(stack, mask_list, block_size=100):
     float[number masks][number frames]
         This is the average response for each Mask in each image frame
     '''
+
     traces = np.zeros((len(mask_list), stack.shape[0]), dtype=float)
     num_frames = stack.shape[0]
 
-    # make sure masks are numpy objects
     mask_areas = np.zeros(len(mask_list), dtype=float)
     valid_masks = np.ones(len(mask_list), dtype=bool)
 
-    for i,mask in enumerate(mask_list):
+    exclusions = []
+
+    for i, mask in enumerate(mask_list):
+        
+        current_exclusions = validate_mask(mask)
+        if len(current_exclusions) > 0:
+            traces[i,:] = np.nan
+            valid_masks[i] = False
+            exclusions.extend(current_exclusions)
+            reasons = ", ".join([item["exclusion_label_name"] for item in current_exclusions])
+            logging.warning("unable to extract traces for mask \"{}\": {} ".format(mask.label, reasons))
+            continue
+
         if not isinstance(mask.mask, np.ndarray):
             mask.mask = np.array(mask.mask)
-
-        # compute mask areas
         mask_areas[i] = mask.mask.sum()
-
-        # if the mask is empty, the trace is nan
-        if mask_areas[i] == 0:
-            logging.warning("mask '%d/%s' is empty", i, mask.label)
-            traces[i,:] = np.nan
-            valid_masks[i] = False
-
-        # if the mask overlaps the motion border, the trace is nan
-        if mask.overlaps_motion_border:
-            logging.warning("mask '%d/%s' overlaps with motion border", i, mask.label)
-            traces[i,:] = np.nan
-            valid_masks[i] = False
 
     # calculate traces
     for frame_num in range(0, num_frames, block_size):
-        if frame_num % 1000 == 0:
+        if frame_num % block_size == 0:
             logging.debug("frame " + str(frame_num) + " of " + str(num_frames))
         frames = stack[frame_num:frame_num+block_size]
 
         for i in range(len(mask_list)):
-            if valid_masks[i] is False:
+            if not valid_masks[i]:
                 continue
 
             mask = mask_list[i]
@@ -424,7 +464,8 @@ def calculate_traces(stack, mask_list, block_size=100):
 
             total = subframe[:, mask.mask].sum(axis=1)
             traces[i, frame_num:frame_num+block_size] = total / mask_areas[i]
-    return traces
+
+    return traces, exclusions
 
 def calculate_roi_and_neuropil_traces(movie_h5, roi_mask_list, motion_border):
     """ get roi and neuropil masks """
@@ -442,26 +483,19 @@ def calculate_roi_and_neuropil_traces(movie_h5, roi_mask_list, motion_border):
         nmask = create_neuropil_mask(m, motion_border, combined_mask, "neuropil for " + m.label)
         neuropil_masks.append(nmask)
 
-    # calculate fluorescence traces for valid ROI and neuropil masks
-    # create a combined list and calculate these together (this lets us
-    #   read the large image stack only once)
-    combined_list = []
-    for m in roi_mask_list:
-        combined_list.append(m)
-    for n in neuropil_masks:
-        combined_list.append(n)
+    num_rois = len(roi_mask_list)
+    combined_list = roi_mask_list + neuropil_masks #  read the large image stack only once
 
     with h5py.File(movie_h5, "r") as movie_f:
         stack_frames = movie_f["data"]
 
         logging.info("Calculating %d traces (neuropil + ROI) over %d frames" % (len(combined_list), len(stack_frames)))
-        traces = calculate_traces(stack_frames, combined_list)
+        traces, exclusions = calculate_traces(stack_frames, combined_list)
 
-        roi_traces = traces[:len(roi_mask_list)]
-        neuropil_traces = traces[len(roi_mask_list):]
+        roi_traces = traces[:num_rois]
+        neuropil_traces = traces[num_rois:]
 
-    return roi_traces, neuropil_traces
-
+    return roi_traces, neuropil_traces, exclusions
 
 
 def create_roi_mask_array(rois):
