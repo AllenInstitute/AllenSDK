@@ -420,9 +420,11 @@ def get_trials_v0(data, time):
 
         # Stimulus:
         if implied_type == 'DoCImageStimulus':
-            _, from_name, _, to_name = get_image_info_from_trial(trial_log, ti)
+            from_group, from_name, to_group, to_name = get_image_info_from_trial(trial_log, ti)
             trials['initial_image_name'].append(from_name)
+            trials['initial_image_category'].append(from_group)
             trials['change_image_name'].append(to_name)
+            trials['change_image_category'].append(to_group) 
             trials['change_ori'].append(None)
             trials['change_contrast'].append(None)
             trials['initial_ori'].append(None)

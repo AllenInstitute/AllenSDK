@@ -24,8 +24,8 @@ from allensdk.brain_observatory.behavior.trials_processing import dprime
     pytest.param(789359614, 739216204, False)
 ])
 def test_equal(oeid1, oeid2, expected):
-    d1 = BehaviorOphysSession.from_LIMS(oeid1)
-    d2 = BehaviorOphysSession.from_LIMS(oeid2)
+    d1 = BehaviorOphysSession.from_lims(oeid1)
+    d2 = BehaviorOphysSession.from_lims(oeid2)
 
     assert equals(d1, d2) == expected
 
@@ -34,7 +34,7 @@ def test_session_from_json(tmpdir_factory, session_data):
     oeid = 789359614
 
     d1 = BehaviorOphysSession(api=BehaviorOphysJsonApi(session_data))
-    d2 = BehaviorOphysSession.from_LIMS(oeid)
+    d2 = BehaviorOphysSession.from_lims(oeid)
 
     assert equals(d1, d2)
 
@@ -44,7 +44,7 @@ def test_nwb_end_to_end(tmpdir_factory):
     oeid = 789359614
     nwb_filepath = os.path.join(str(tmpdir_factory.mktemp('test_nwb_end_to_end')), 'nwbfile.nwb')
 
-    d1 = BehaviorOphysSession.from_LIMS(oeid)
+    d1 = BehaviorOphysSession.from_lims(oeid)
     BehaviorOphysNwbApi(nwb_filepath).save(d1)
 
     d2 = BehaviorOphysSession(api=BehaviorOphysNwbApi(nwb_filepath))
@@ -55,7 +55,7 @@ def test_nwb_end_to_end(tmpdir_factory):
 def test_visbeh_ophys_data_set():
 
     ophys_experiment_id = 789359614
-    data_set = BehaviorOphysSession.from_LIMS(ophys_experiment_id)
+    data_set = BehaviorOphysSession.from_lims(ophys_experiment_id)
 
     # TODO: need to improve testing here:
     # for _, row in data_set.roi_metrics.iterrows():
@@ -95,7 +95,9 @@ def test_visbeh_ophys_data_set():
                                  'field_of_view_height': 512,
                                  'field_of_view_width': 447,
                                  'indicator': 'GCAMP6f',
-                                 'rig_name': 'CAM2P.5'}
+                                 'rig_name': 'CAM2P.5',
+                                 'age': 'P139',
+                                 'sex': 'F'}
 
     assert math.isnan(data_set.task_parameters.pop('omitted_flash_fraction'))
     assert data_set.task_parameters == {'reward_volume': 0.007,
