@@ -37,24 +37,37 @@ class CamStimOnePickleStimFile(object):
 
 
     @property
-    def wheel_rotation(self):
+    def angular_wheel_rotation(self):
         ''' Extract the total rotation of the running wheel on each frame.
         '''
+        return self._extract_running_array("dx")
 
-        try:
-            result = self.data['items']['foraging']['encoders'][0]['dx']
-        except (KeyError, IndexError):
-            try:
-                result = self.data['dx']
-            except KeyError:
-                raise KeyError('unable to extract angular running speed from this stimulus pickle')
-                
-        return np.array(result)            
+
+    @property
+    def vsig(self):
+        """Running speed signal voltage
+        """
+        return self._extract_running_array("vsig")
+
+    @property
+    def vin(self):
+        return self._extract_running_array("vin")
 
 
     def __init__(self, data, **kwargs):
         self.data = data
 
+
+    def _extract_running_array(self, key):
+        try:
+            result = self.data['items']['foraging']['encoders'][0][key]
+        except (KeyError, IndexError):
+            try:
+                result = self.data[key]
+            except KeyError:
+                raise KeyError(f'unable to extract {key} from this stimulus pickle')
+                
+        return np.array(result)
 
     @classmethod
     def factory(cls, path, **kwargs):

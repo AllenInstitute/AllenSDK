@@ -9,13 +9,8 @@ from allensdk.brain_observatory.sync_dataset import Dataset
 from allensdk.brain_observatory.ecephys import stimulus_sync
 
 
-FRAME_KEYS = ('frames', 'stim_vsync')
-PHOTODIODE_KEYS = ('photodiode', 'stim_photodiode')
-
-
 class EcephysSyncDataset(Dataset):
         
-
     @property
     def sample_frequency(self):
         return self.meta_data['ni_daq']['counter_output_freq']
@@ -52,7 +47,7 @@ class EcephysSyncDataset(Dataset):
         return led_indices / float(self.sample_frequency)
 
 
-    def extract_frame_times_from_photodiode(self, photodiode_cycle=60, frame_keys=FRAME_KEYS, photodiode_keys=PHOTODIODE_KEYS):
+    def extract_frame_times_from_photodiode(self, photodiode_cycle=60, frame_keys=Dataset.FRAME_KEYS, photodiode_keys=Dataset.PHOTODIODE_KEYS):
         photodiode_times = self.get_edges('all', photodiode_keys)
         vsync_times = self.get_edges('falling', frame_keys)
         vsync_times = stimulus_sync.trim_discontiguous_vsyncs(vsync_times, photodiode_cycle)
@@ -73,11 +68,15 @@ class EcephysSyncDataset(Dataset):
         return frame_start_times
 
 
-    def extract_frame_times_from_vsyncs(self, photodiode_cycle=60, frame_keys=FRAME_KEYS, photodiode_keys=PHOTODIODE_KEYS):
+    def extract_frame_times_from_vsyncs(self, photodiode_cycle=60, 
+        frame_keys=Dataset.FRAME_KEYS, photodiode_keys=Dataset.PHOTODIODE_KEYS
+    ):
         raise NotImplementedError()
 
 
-    def extract_frame_times(self, strategy, photodiode_cycle=60, frame_keys=FRAME_KEYS, photodiode_keys=PHOTODIODE_KEYS):
+    def extract_frame_times(self, strategy, photodiode_cycle=60, 
+        frame_keys=Dataset.FRAME_KEYS, photodiode_keys=Dataset.PHOTODIODE_KEYS
+    ):
 
         if strategy == 'use_photodiode':
             return self.extract_frame_times_from_photodiode(
@@ -89,26 +88,6 @@ class EcephysSyncDataset(Dataset):
                 )
         else:
             raise ValueError('unrecognized strategy: {}'.format(strategy))
-
-
-    def get_edges(self, kind, keys, units='seconds'):
-        if kind == 'falling':
-            fn = self.get_falling_edges
-        elif kind == 'rising':
-            fn = self.get_rising_edges
-        elif kind == 'all':
-            return np.sort(np.concatenate([
-                self.get_edges('rising', keys, units), 
-                self.get_edges('falling', keys, units)
-            ]))
-
-        for key in keys:
-            try:
-                return fn(key, units=units)
-            except ValueError:
-                continue
-
-        raise KeyError
 
 
     @classmethod

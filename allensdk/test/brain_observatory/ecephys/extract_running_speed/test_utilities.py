@@ -1,3 +1,5 @@
+from contextlib import nullcontext
+
 import pytest
 import numpy as np
 
@@ -28,3 +30,15 @@ def test_angular_to_linear_velocity(angular, radius):
     roundtrip = obtained / radius
 
     assert np.allclose(angular, roundtrip)
+
+
+@pytest.mark.parametrize("data,width,expected,fn,raises", [
+    []
+])
+def test_med_filter(data, width, expected, fn, raises):
+
+    raises = pytest.raises("ValueError") if raises else nullcontext
+
+    with raises as r:
+        obtained = fn(data, width)
+        assert np.allclose(expected, obtained)

@@ -45,7 +45,7 @@ class ContinuousFile():
 
     """
 
-    def __init__(self, data_path, timestamps_path, total_num_channels = 384, dtype=np.int16):
+    def __init__(self, data_path, timestamps_path, total_num_channels=384, dtype=np.int16):
 
         """
         data_path : str

@@ -1,0 +1,140 @@
+import warnings
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+
+from allensdk.brain_observatory.sync_dataset import Dataset
+from allensdk.brain_observatory.argschema_utilities import ArgSchemaParserPlus
+
+from ._schemas import InputParameters, OutputParameters
+
+
+DEGREES_TO_RADIANS = np.pi / 180.0
+
+
+def check_encoder(parent, key):
+    if len(parent["encoders"]) != 1:
+        return False
+    if not key in parent["encoders"][0]:
+        return False
+    if len(parent["encoders"][0][key]) == 0:
+        return False
+    return True
+
+
+def running_from_stim_file(stim_file, key, expected_length):
+    if "behavior" in stim_file["items"] and check_encoder(stim_file["items"]["behavior"], key):
+        return stim_file["items"]["behavior"]["encoders"][0][key][:]
+    if "foraging" in stim_file["items"] and check_encoder(stim_file["items"]["foraging"], key):
+        return stim_file["items"]["foraging"]["encoders"][0][key][:]
+    if key in stim_file:
+        return stim_file[key][:]
+
+    warnings.warn(f"unable to read {key} from this stimulus file")
+    return np.ones(expected_length) * np.nan
+
+
+def degrees_to_radians(degrees):
+    return np.array(degrees) * DEGREES_TO_RADIANS
+
+def angular_to_linear_velocity(angular_velocity, radius):
+    return np.multiply(angular_velocity, radius)
+
+
+def extract_running_speeds(
+    frame_times,
+    dx_deg,
+    vsig,
+    vin,
+    wheel_radius,
+    subject_position
+):
+
+    # due to an acquisition bug (the buffer of raw orientations may be updated
+    # more slowly than it is read, leading to a 0 value for the change in 
+    # orientation over an interval) there may be exact zeros in the velocity. 
+    nonzero_indices = np.flatnonzero(dx_deg)
+    dx_deg = dx_deg[nonzero_indices]
+    frame_times = frame_times[nonzero_indices]
+
+    # the first interval does not have a known start time, so we can't compute
+    # an average velocity from dx 
+    dx_rad = degrees_to_radians(dx_deg[1:])
+
+    start_times = frame_times[:-1]
+    end_times = frame_times[1:]
+
+    durations = end_times - start_times
+    angular_velocity = dx_rad / durations
+
+    radius = wheel_radius * subject_position
+    linear_velocity = angular_to_linear_velocity(angular_velocity, radius)
+
+    return pd.DataFrame({
+        "start_time": start_times,
+        "end_time": end_times,
+        "velocity": linear_velocity,
+        "net_rotation": dx_rad
+    })
+
+
+def main(
+    stimulus_pkl_path,
+    sync_h5_path,
+    output_path,
+    wheel_radius,
+    subject_position
+):
+
+    stim_file = pd.read_pickle(stimulus_pkl_path)
+    sync_dataset = Dataset(sync_h5_path)
+
+    # Why the rising edge? See Sweepstim.update in camstim. This method does:
+    # 1. updates the stimuli
+    # 2. updates the "items", causing a running speed sample to be acquired
+    # 3. sets the vsync line high
+    # 4. flips the buffer
+    frame_times = sync_dataset.get_edges("rising", Dataset.FRAME_KEYS, units="seconds")
+    num_raw_timestamps = len(frame_times)
+
+    vsig = running_from_stim_file(stim_file, "vsig", num_raw_timestamps)
+    vin = running_from_stim_file(stim_file, "vin", num_raw_timestamps)
+    dx_deg = running_from_stim_file(stim_file, "dx", num_raw_timestamps)
+
+    velocities = extract_running_speeds(
+        frame_times=frame_times,
+        dx_deg=dx_deg,
+        vsig=vsig,
+        vin=vin,
+        wheel_radius=wheel_radius,
+        subject_position=subject_position,
+    )
+
+    raw_data = pd.DataFrame({
+        "vsig": vsig,
+        "vin": vin,
+        "frame_times": frame_times,
+        "dx": dx_deg
+    })
+
+    store = pd.HDFStore(output_path)
+    store.put("running_speed", velocities)
+    store.put("raw_data", raw_data)
+    store.close()
+
+    return {"output_path": output_path}
+
+
+if __name__ == "__main__":
+
+    mod = ArgSchemaParserPlus(
+        schema_type=InputParameters, output_schema_type=OutputParameters
+    )
+    output = main(**mod.args)
+
+    output.update({"input_parameters": mod.args})
+    if "output_json" in mod.args:
+        mod.output(output, indent=2)
+    else:
+        print(mod.get_output_json(output))
