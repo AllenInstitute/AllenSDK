@@ -3,6 +3,10 @@ from argschema.schemas import DefaultSchema
 from argschema.fields import Nested, InputDir, String, Float, Dict, Int
 
 class InputParameters(ArgSchema):
+    output_path = String(
+        required=True,
+        help="write outputs to here"
+    )
     stimulus_pkl_path = String(
         required=True, help="path to pkl file containing raw stimulus information"
     )
@@ -10,16 +14,9 @@ class InputParameters(ArgSchema):
         required=True, help="path to h5 file containing synchronization information"
     )
     wheel_radius = Float(default=8.255, help="radius, in cm, of running wheel")
-    output_running_speeds_path = String(
-        required=True, help="the output running speeds file will be written here"
-    )
-    output_timestamps_path = String(
-        required=True,
-        help="the start times of the frames at which running speeds were sampled (global clock) will be written here",
-    )
-    frame_time_strategy = String(
-        default="use_photodiode",
-        help="technique used to align frame times. Options are 'use_photodiode', which interpolates frame times between photodiode edge times (preferred when vsync times are unreliable) and 'use_vsyncs', which is preferred when reliable vsync times are available.",
+    subject_position = Float(
+        default=2/3, 
+        help="normalized distance of the subject from the center of the running wheel (1 is rim, 0 is center)"
     )
 
 
@@ -32,4 +29,4 @@ class OutputSchema(DefaultSchema):
 
 
 class OutputParameters(OutputSchema):
-    output_path = String(required=True, help="path to output h5 file")
+    output_path = String(required=True, help="path to output file")
