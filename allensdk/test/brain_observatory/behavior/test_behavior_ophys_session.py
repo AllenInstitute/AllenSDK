@@ -122,3 +122,13 @@ def test_legacy_dff_api():
         dff_trace = session.dff_traces.loc[csid]['dff']
         ind = session.get_cell_specimen_indices([csid])[0]
         np.testing.assert_array_almost_equal(dff_trace, dff_array[ind, :])
+
+@pytest.mark.requires_bamboo
+@pytest.mark.parametrize('ophys_experiment_id, number_omitted', [
+    pytest.param(789359614, 153),
+    pytest.param(792813858, 129)
+])
+def test_stimulus_presentations_omitted(ophys_experiment_id, number_omitted):
+    session = BehaviorOphysSession.from_lims(ophys_experiment_id)
+    df = session.stimulus_presentations
+    assert df['omitted'].sum() == number_omitted

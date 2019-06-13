@@ -137,17 +137,14 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
         behavior_stimulus_file = self.get_behavior_stimulus_file()
         data = pd.read_pickle(behavior_stimulus_file)
         stimulus_presentations_df_pre = get_stimulus_presentations(data, stimulus_timestamps)
-
         stimulus_metadata_df = get_stimulus_metadata(data)
         idx_name = stimulus_presentations_df_pre.index.name
         stimulus_index_df = stimulus_presentations_df_pre.reset_index().merge(stimulus_metadata_df.reset_index(), on=['image_name']).set_index(idx_name)
         stimulus_index_df.sort_index(inplace=True)
         stimulus_index_df = stimulus_index_df[['image_set', 'image_index', 'start_time']].rename(columns={'start_time': 'timestamps'})
         stimulus_index_df.set_index('timestamps', inplace=True, drop=True)
-        assert len(stimulus_index_df) == len(stimulus_presentations_df_pre)
-
-        stimulus_presentations_df = stimulus_presentations_df_pre.merge(stimulus_index_df, left_on='start_time', right_index=True)
-        assert len(stimulus_index_df) == len(stimulus_presentations_df)
+        stimulus_presentations_df = stimulus_presentations_df_pre.merge(stimulus_index_df, left_on='start_time', right_index=True, how='left')
+        assert len(stimulus_presentations_df_pre) == len(stimulus_presentations_df)
 
         return stimulus_presentations_df[sorted(stimulus_presentations_df.columns)]
 
