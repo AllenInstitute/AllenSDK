@@ -95,6 +95,13 @@ def get_stimulus_metadata(pkl):
     stimulus_index_df = pd.DataFrame(images['image_attributes'])
     image_set_filename = convert_filepath_caseinsensitive(images['metadata']['image_set'])
     stimulus_index_df['image_set'] = IMAGE_SETS_REV[image_set_filename]
+
+    # Add an entry for omitted stimuli
+    omitted_df = pd.DataFrame({'image_category':['omitted'],
+                               'image_name':['omitted'],
+                               'image_set':['omitted'],
+                               'image_index':[stimulus_index_df['image_index'].max()+1]})
+    stimulus_index_df = stimulus_index_df.append(omitted_df, ignore_index=True, sort=False)
     stimulus_index_df.set_index(['image_index'], inplace=True, drop=True)
     return stimulus_index_df
 
@@ -213,7 +220,8 @@ def get_visual_stimuli_df(data, time):
 
     omitted = np.ones_like(omitted_flash_list).astype(bool)
     time = [time[fi] for fi in omitted_flash_list]
-    omitted_df = pd.DataFrame({'omitted': omitted, 'frame': omitted_flash_list, 'time': time})
+    omitted_df = pd.DataFrame({'omitted': omitted, 'frame': omitted_flash_list, 'time': time,
+                               'image_name':'omitted'})
 
     df = pd.concat((visual_stimuli_df, omitted_df), sort=False).sort_values('frame').reset_index()
     return df
