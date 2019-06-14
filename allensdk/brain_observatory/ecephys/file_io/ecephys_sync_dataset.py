@@ -7,6 +7,7 @@ import numpy as np
 
 from allensdk.brain_observatory.sync_dataset import Dataset
 from allensdk.brain_observatory.ecephys import stimulus_sync
+from allensdk.brain_observatory import sync_utilities
 
 
 class EcephysSyncDataset(Dataset):
@@ -50,7 +51,7 @@ class EcephysSyncDataset(Dataset):
     def extract_frame_times_from_photodiode(self, photodiode_cycle=60, frame_keys=Dataset.FRAME_KEYS, photodiode_keys=Dataset.PHOTODIODE_KEYS):
         photodiode_times = self.get_edges('all', photodiode_keys)
         vsync_times = self.get_edges('falling', frame_keys)
-        vsync_times = stimulus_sync.trim_discontiguous_vsyncs(vsync_times, photodiode_cycle)
+        vsync_times = sync_utilities.trim_discontiguous_times(vsync_times)
         
         logging.info(f"Total vsyncs: {len(vsync_times)}")
 
