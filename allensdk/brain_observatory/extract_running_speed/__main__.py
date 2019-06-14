@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 
 from allensdk.brain_observatory.sync_dataset import Dataset
+from allensdk.brain_observatory import sync_utilities
 from allensdk.brain_observatory.argschema_utilities import ArgSchemaParserPlus
 
 from ._schemas import InputParameters, OutputParameters
@@ -16,7 +17,7 @@ DEGREES_TO_RADIANS = np.pi / 180.0
 def check_encoder(parent, key):
     if len(parent["encoders"]) != 1:
         return False
-    if not key in parent["encoders"][0]:
+    if key not in parent["encoders"][0]:
         return False
     if len(parent["encoders"][0][key]) == 0:
         return False
@@ -24,9 +25,13 @@ def check_encoder(parent, key):
 
 
 def running_from_stim_file(stim_file, key, expected_length):
-    if "behavior" in stim_file["items"] and check_encoder(stim_file["items"]["behavior"], key):
+    if "behavior" in stim_file["items"] and check_encoder(
+        stim_file["items"]["behavior"], key
+    ):
         return stim_file["items"]["behavior"]["encoders"][0][key][:]
-    if "foraging" in stim_file["items"] and check_encoder(stim_file["items"]["foraging"], key):
+    if "foraging" in stim_file["items"] and check_encoder(
+        stim_file["items"]["foraging"], key
+    ):
         return stim_file["items"]["foraging"]["encoders"][0][key][:]
     if key in stim_file:
         return stim_file[key][:]
@@ -38,28 +43,24 @@ def running_from_stim_file(stim_file, key, expected_length):
 def degrees_to_radians(degrees):
     return np.array(degrees) * DEGREES_TO_RADIANS
 
+
 def angular_to_linear_velocity(angular_velocity, radius):
     return np.multiply(angular_velocity, radius)
 
 
 def extract_running_speeds(
-    frame_times,
-    dx_deg,
-    vsig,
-    vin,
-    wheel_radius,
-    subject_position
+    frame_times, dx_deg, vsig, vin, wheel_radius, subject_position
 ):
 
     # due to an acquisition bug (the buffer of raw orientations may be updated
-    # more slowly than it is read, leading to a 0 value for the change in 
-    # orientation over an interval) there may be exact zeros in the velocity. 
+    # more slowly than it is read, leading to a 0 value for the change in
+    # orientation over an interval) there may be exact zeros in the velocity.
     nonzero_indices = np.flatnonzero(dx_deg)
     dx_deg = dx_deg[nonzero_indices]
     frame_times = frame_times[nonzero_indices]
 
     # the first interval does not have a known start time, so we can't compute
-    # an average velocity from dx 
+    # an average velocity from dx
     dx_rad = degrees_to_radians(dx_deg[1:])
 
     start_times = frame_times[:-1]
@@ -71,20 +72,19 @@ def extract_running_speeds(
     radius = wheel_radius * subject_position
     linear_velocity = angular_to_linear_velocity(angular_velocity, radius)
 
-    return pd.DataFrame({
-        "start_time": start_times,
-        "end_time": end_times,
-        "velocity": linear_velocity,
-        "net_rotation": dx_rad
-    })
+    return pd.DataFrame(
+        {
+            "start_time": start_times,
+            "end_time": end_times,
+            "velocity": linear_velocity,
+            "net_rotation": dx_rad,
+        }
+    )
 
 
 def main(
-    stimulus_pkl_path,
-    sync_h5_path,
-    output_path,
-    wheel_radius,
-    subject_position
+    stimulus_pkl_path, sync_h5_path, output_path, wheel_radius, 
+    subject_position, **kwargs
 ):
 
     stim_file = pd.read_pickle(stimulus_pkl_path)
@@ -95,12 +95,25 @@ def main(
     # 2. updates the "items", causing a running speed sample to be acquired
     # 3. sets the vsync line high
     # 4. flips the buffer
-    frame_times = sync_dataset.get_edges("rising", Dataset.FRAME_KEYS, units="seconds")
+    frame_times = sync_dataset.get_edges(
+        "rising", Dataset.FRAME_KEYS, units="seconds"
+    )
+
+    # occasionally an extra set of frame times are acquired after the rest of 
+    # the signals. We detect and remove these
+    frame_times = sync_utilities.trim_discontiguous_times(frame_times)
     num_raw_timestamps = len(frame_times)
+
+    dx_deg = running_from_stim_file(stim_file, "dx", num_raw_timestamps)
+
+    if num_raw_timestamps != len(dx_deg):
+        raise ValueError(
+            f"found {num_raw_timestamps} rising edges on the vsync line, "
+            f"but only {len(dx_deg)} rotation samples"
+        )
 
     vsig = running_from_stim_file(stim_file, "vsig", num_raw_timestamps)
     vin = running_from_stim_file(stim_file, "vin", num_raw_timestamps)
-    dx_deg = running_from_stim_file(stim_file, "dx", num_raw_timestamps)
 
     velocities = extract_running_speeds(
         frame_times=frame_times,
@@ -111,12 +124,9 @@ def main(
         subject_position=subject_position,
     )
 
-    raw_data = pd.DataFrame({
-        "vsig": vsig,
-        "vin": vin,
-        "frame_times": frame_times,
-        "dx": dx_deg
-    })
+    raw_data = pd.DataFrame(
+        {"vsig": vsig, "vin": vin, "frame_times": frame_times, "dx": dx_deg}
+    )
 
     store = pd.HDFStore(output_path)
     store.put("running_speed", velocities)
@@ -131,9 +141,10 @@ if __name__ == "__main__":
     mod = ArgSchemaParserPlus(
         schema_type=InputParameters, output_schema_type=OutputParameters
     )
-    output = main(**mod.args)
 
+    output = main(**mod.args)
     output.update({"input_parameters": mod.args})
+
     if "output_json" in mod.args:
         mod.output(output, indent=2)
     else:
