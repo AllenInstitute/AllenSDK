@@ -1,7 +1,6 @@
-from marshmallow import RAISE, ValidationError
+from marshmallow import RAISE
 
-from argschema import ArgSchema, ArgSchemaParser
-from argschema.schemas import DefaultSchema
+from argschema import ArgSchema
 from argschema.fields import LogLevel, String, Int, DateTime, Nested, Boolean, Float
 
 from allensdk.brain_observatory.argschema_utilities import check_read_access, check_write_access, RaisingSchema

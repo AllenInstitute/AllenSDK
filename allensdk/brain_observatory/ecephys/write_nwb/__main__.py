@@ -303,13 +303,15 @@ def add_ragged_data_to_dynamic_table(table, data, column_name, column_descriptio
 
 def write_probe_lfp_data_file(
     probe_id: int,
+    probe_name: str,
+    channel_table: pd.DataFrame,
     session_start_time: datetime,
     lfp_data_path: str,
     lfp_timestamps_path: str,
     lfp_channels_path: str,
     output_path: str
 ) -> str:
-    '''Write an NWB file containging only a single probe's LFP data, intended for linking from another file.
+    '''Write an NWB file containing only a single probe's LFP data, intended for linking from another file.
     '''
 
     nwbfile = pynwb.NWBFile(
@@ -317,6 +319,10 @@ def write_probe_lfp_data_file(
         identifier=f'{probe_id}',
         session_start_time=session_start_time
     )    
+
+    nwbfile, probe_nwb_device, probe_nwb_electrode_group = add_probe_to_nwbfile(nwbfile, probe_id, description=probe_name)
+    channel_table[""]
+
 
     lfp_channels = np.load(lfp_channels_path, allow_pickle=False)
     lfp_data, lfp_timestamps = ContinuousFile(
@@ -338,41 +344,95 @@ def write_probe_lfp_data_file(
     return output_path
 
 
-def add_link_lfp_to_nwbfile(
-    nwbfile: pynwb.NWBFile, data_file_io: pynwb.NWBHDF5IO, probe_id: int, electrode_table_indices
-) -> pynwb.NWBFile:
-    ''' Add lfp data to an nwbfile, linking the data and timestamps to the contents of another file.
+def write_probewise_lfp_files(probes, session_start_time):
 
-    Parameters
-    ----------
-    nwbfile : 
-    data_file_io : 
-    probe_id : 
+    output_paths = []
 
-    Returns
-    -------
-    pynwb.NWBFile : 
+    for probe in probes:
 
+        nwbfile = pynwb.NWBFile(
+            session_description='EcephysProbe',
+            identifier=f"{probe['id']}",
+            session_start_time=session_start_time
+        )    
 
-    '''
+        nwbfile, probe_nwb_device, probe_nwb_electrode_group = add_probe_to_nwbfile(nwbfile, probe['id'], description=probe['name'])
 
-    electrode_table_region = nwbfile.create_electrode_table_region(
-        region=electrode_table_indices,
-        name='electrodes',
-        description=f'channels on probe {probe_id}'
+        channels = prepare_probewise_channel_table(probe['channels'], probe_nwb_electrode_group)
+        lfp_channels = set(list(np.load(probe['lfp']['input_channels_path'], allow_pickle=False)))
+        channels = channels[channels["local_index"].isin(lfp_channels)]
+        
+        nwbfile.electrodes = pynwb.file.ElectrodeTable().from_dataframe(channels, name='electrodes')
+        electrode_table_region = nwbfile.create_electrode_table_region(
+            region=np.arange(channels.shape[0]),
+            name='electrodes',
+            description=f"lfp channels on probe {probe['id']}"
+        )
+
+        lfp_data, lfp_timestamps = ContinuousFile(
+            data_path=probe['lfp']['input_data_path'],
+            timestamps_path=probe['lfp']['input_timestamps_path'],
+            total_num_channels=lfp_channels.size
+        ).load(memmap=False)
+
+        lfp = pynwb.ecephys.LFP(name=f"probe_{probe['id']}_lfp")
+
+        nwbfile.add_acquisition(lfp.create_electrical_series(
+            name=f"probe_{probe['id']}_lfp_data",
+            data=H5DataIO(data=lfp_data, compression='gzip', compression_opts=9),
+            timestamps=H5DataIO(data=lfp_timestamps, compression='gzip', compression_opts=9),
+            electrodes=electrode_table_region
+        ))
+
+        nwbfile.add_acquisition(lfp)
+
+        with pynwb.NWBHDF5IO(probe['lfp']['output_path'], 'w') as lfp_writer:
+            lfp_writer.write(nwbfile)
+        output_paths.append({"id": probe["id"], "nwb_path": probe["lfp"]["output_path"]})
+
+    return output_paths
+    
+
+def add_probewise_data_to_nwbfile(nwbfile, probes):
+    channel_tables = {}
+    unit_tables = []
+    spike_times = {}
+    mean_waveforms = {}
+
+    for probe in probes:
+        logging.info(f'found probe {probe["id"]} with name {probe["name"]}')
+
+        nwbfile, probe_nwb_device, probe_nwb_electrode_group = add_probe_to_nwbfile(nwbfile, probe['id'], description=probe['name'])
+        channel_tables[probe["id"]] = prepare_probewise_channel_table(probe['channels'], probe_nwb_electrode_group)
+        unit_tables.append(pd.DataFrame(probe['units']))
+
+        local_to_global_unit_map = {unit['local_index']: unit['id'] for unit in probe['units']}
+
+        spike_times.update(read_spike_times_to_dictionary(
+            probe['spike_times_path'], probe['spike_clusters_file'], local_to_global_unit_map
+        ))
+        mean_waveforms.update(read_waveforms_to_dictionary(
+            probe['mean_waveforms_path'], local_to_global_unit_map
+        ))
+    
+    electrodes_table = pd.concat(list(channel_tables.values())).fillna('')
+    nwbfile.electrodes = pynwb.file.ElectrodeTable().from_dataframe(electrodes_table, name='electrodes')
+    units_table = pd.concat(unit_tables).set_index(keys='id', drop=True)
+    nwbfile.units = pynwb.misc.Units.from_dataframe(units_table.fillna(''), name='units')
+
+    add_ragged_data_to_dynamic_table(
+        table=nwbfile.units, 
+        data=spike_times, 
+        column_name='spike_times', 
+        column_description='times (s) of detected spiking events'
     )
 
-    data_nwbfile = data_file_io.read()
-
-    lfp = pynwb.ecephys.LFP(name=f'probe_{probe_id}_lfp')
-    nwbfile.add_acquisition(lfp)
-
-    nwbfile.add_acquisition(lfp.create_electrical_series(
-        name=f'probe_{probe_id}_lfp_data',
-        data=H5DataIO(data=data_nwbfile.get_acquisition('subsampled_lfp_data').data, link_data=True),
-        timestamps=H5DataIO(data=data_nwbfile.get_acquisition('subsampled_lfp_data').timestamps, link_data=True),
-        electrodes=electrode_table_region
-    ))
+    add_ragged_data_to_dynamic_table(
+        table=nwbfile.units, 
+        data=mean_waveforms, 
+        column_name='waveform_mean', 
+        column_description='mean waveforms on peak channels (and over samples)'
+    )
 
     return nwbfile
 
@@ -396,94 +456,21 @@ def write_ecephys_nwb(
     nwbfile = add_stimulus_timestamps(nwbfile, stimulus_table['start_time'].values) # TODO: patch until full timestamps are output by stim table module
     nwbfile = add_stimulus_presentations(nwbfile, stimulus_table)
 
-    channel_tables = []
-    unit_tables = []
-    spike_times = {}
-    mean_waveforms = {}
-
-    probe_lfp_file_map = {}
-
-    for probe in probes:
-        logging.info(f'found probe {probe["id"]} with name {probe["name"]}')
-
-        nwbfile, probe_nwb_device, probe_nwb_electrode_group = add_probe_to_nwbfile(nwbfile, probe['id'], description=probe['name'])
-        channel_tables.append(prepare_probewise_channel_table(probe['channels'], probe_nwb_electrode_group))
-        unit_tables.append(pd.DataFrame(probe['units']))
-
-        local_to_global_unit_map = {unit['local_index']: unit['id'] for unit in probe['units']}
-
-        spike_times.update(read_spike_times_to_dictionary(
-            probe['spike_times_path'], probe['spike_clusters_file'], local_to_global_unit_map
-        ))
-        mean_waveforms.update(read_waveforms_to_dictionary(
-            probe['mean_waveforms_path'], local_to_global_unit_map
-        ))
-
-        probe_lfp_file_map[probe['id']] = probe['lfp']['output_path']
-        probe_lfp_file_map[probe['id']] = write_probe_lfp_data_file(
-            probe_id=probe['id'], 
-            session_start_time=session_start_time, 
-            lfp_data_path=probe['lfp']['input_data_path'],
-            lfp_timestamps_path=probe['lfp']['input_timestamps_path'],
-            lfp_channels_path=probe['lfp']['input_channels_path'],
-            output_path=probe['lfp']['output_path']
-        )
-
-    electrodes_table = pd.concat(channel_tables).fillna('')
-    nwbfile.electrodes = pynwb.file.ElectrodeTable().from_dataframe(electrodes_table, name='electrodes')
-    units_table = pd.concat(unit_tables).set_index(keys='id', drop=True)
-    nwbfile.units = pynwb.misc.Units.from_dataframe(units_table.fillna(''), name='units')
-
-    add_ragged_data_to_dynamic_table(
-        table=nwbfile.units, 
-        data=spike_times, 
-        column_name='spike_times', 
-        column_description='times (s) of detected spiking events'
-    )
-
-    add_ragged_data_to_dynamic_table(
-        table=nwbfile.units, 
-        data=mean_waveforms, 
-        column_name='waveform_mean', 
-        column_description='mean waveforms on peak channels (and over samples)'
-    )
+    nwbfile = add_probewise_data_to_nwbfile(nwbfile, probes)
 
     running_speed = read_running_speed(running_speed['running_speed_path'], running_speed['running_speed_timestamps_path'])
     add_running_speed_to_nwbfile(nwbfile, running_speed)
-    del running_speed
-
-    channel_index_map = {
-        (row['probe_id'], row['local_index']): ii
-        for ii, (idx, row) in enumerate(electrodes_table.iterrows())
-    }
-    probe_lfp_ios = {pid: pynwb.NWBHDF5IO(pth, 'r') for pid, pth in probe_lfp_file_map.items()}
-    probe_outputs = []
-
-    for probe in probes:
-        probe_id = probe['id']
-        logging.info(f'linking lfp file for probe {probe_id}')
-
-        probe_lfp_io = probe_lfp_ios[probe_id]
-        ch_local_indices = np.load(probe['lfp']['input_channels_path'], allow_pickle=False)
-        et_indices = tuple([channel_index_map[(probe['id'], ch_local_index)] for ch_local_index in ch_local_indices])
-
-        add_link_lfp_to_nwbfile(nwbfile, probe_lfp_io, probe['id'], et_indices)
-        probe_outputs.append({
-            'id': probe['id'],
-            'nwb_path': probe['lfp']['output_path']
-        })
 
     Manifest.safe_make_parent_dirs(output_path)
     io = pynwb.NWBHDF5IO(output_path, mode='w')
     io.write(nwbfile)
     io.close()
 
-    for probe_lfp_io in probe_lfp_ios.values():
-        probe_lfp_io.close()
+    probe_outputs = write_probewise_lfp_files(probes, session_start_time)
 
     return {
         'nwb_path': output_path,
-        'probe_outputs': probe_outputs
+        "probe_outputs": probe_outputs
     }
 
 
@@ -512,7 +499,7 @@ def main():
             schema_type=InputSchema,
             output_schema_type=OutputSchema,
         )
-    except marshmallow.exceptions.ValidationError as err:
+    except marshmallow.exceptions.ValidationError:
         print(input_data)
         raise
 
