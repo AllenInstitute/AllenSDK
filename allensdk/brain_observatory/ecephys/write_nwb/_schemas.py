@@ -56,6 +56,7 @@ class InputSchema(ArgSchema):
     stimulus_table_path = String(required=True, validate=check_read_access, description='path to stimulus table file')
     probes = Nested(Probe, many=True, required=True, description='records of the individual probes used for this experiment')
     running_speed = Nested(RunningSpeedPathsSchema, required=True, description='data collected about the running behavior of the experiment\'s subject')
+    pool_size = Int(default=3, help="number of child processes used to write probewise lfp files")
 
 
 class ProbeOutputs(RaisingSchema):
