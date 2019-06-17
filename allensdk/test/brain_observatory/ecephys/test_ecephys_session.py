@@ -98,7 +98,7 @@ def just_stimulus_table_api(raw_stimulus_table):
 
 @pytest.fixture
 def channels_table_api(raw_channels, raw_probes, raw_lfp):
-    class EcephysChannelsTableApi(EcephysApi):
+    class EcephysChannelsTableApi(EcephysSessionApi):
         def get_channels(self):
             return raw_channels
         def get_probes(self):
