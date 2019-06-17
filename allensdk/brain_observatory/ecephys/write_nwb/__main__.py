@@ -303,6 +303,9 @@ def add_ragged_data_to_dynamic_table(table, data, column_name, column_descriptio
 
 
 def write_probe_lfp_file(session_start_time, log_level, probe):
+    """ Writes LFP data (and associated channel information) for one probe to a standalone nwb file
+    """
+
     logging.getLogger('').setLevel(log_level)
     logging.info(f"writing lfp file for probe {probe['id']}")
 
@@ -315,8 +318,14 @@ def write_probe_lfp_file(session_start_time, log_level, probe):
     nwbfile, probe_nwb_device, probe_nwb_electrode_group = add_probe_to_nwbfile(nwbfile, probe['id'], description=probe['name'])
 
     channels = prepare_probewise_channel_table(probe['channels'], probe_nwb_electrode_group)
-    lfp_channels = set(list(np.load(probe['lfp']['input_channels_path'], allow_pickle=False)))
-    channels = channels[channels["local_index"].isin(lfp_channels)]
+    lfp_channels = np.load(probe['lfp']['input_channels_path'], allow_pickle=False)
+    
+    channels.reset_index(inplace=True)
+    channels.set_index("local_index", inplace=True)
+    channels = channels.loc[lfp_channels, :]
+    channels.reset_index(inplace=True)
+    channels.set_index("id", inplace=True)
+
     channels = channels.fillna("")
     
     nwbfile.electrodes = pynwb.file.ElectrodeTable().from_dataframe(channels, name='electrodes')
@@ -329,7 +338,7 @@ def write_probe_lfp_file(session_start_time, log_level, probe):
     lfp_data, lfp_timestamps = ContinuousFile(
         data_path=probe['lfp']['input_data_path'],
         timestamps_path=probe['lfp']['input_timestamps_path'],
-        total_num_channels=len(lfp_channels)
+        total_num_channels=channels.shape[0]
     ).load(memmap=False)
 
     lfp = pynwb.ecephys.LFP(name=f"probe_{probe['id']}_lfp")
@@ -363,6 +372,9 @@ def write_probewise_lfp_files(probes, session_start_time, pool_size=3):
     
 
 def add_probewise_data_to_nwbfile(nwbfile, probes):
+    """ Adds channel and spike data for a single probe to the session-level nwb file.
+    """
+
     channel_tables = {}
     unit_tables = []
     spike_times = {}
