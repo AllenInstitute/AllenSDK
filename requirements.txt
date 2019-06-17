@@ -16,7 +16,7 @@ scikit-build
 statsmodels>=0.8.0
 simpleitk
 argschema
-marshmallow>=3.0.0rc6
+marshmallow==3.0.0rc6
 glymur
 xarray
 hdmf==1.0.2
