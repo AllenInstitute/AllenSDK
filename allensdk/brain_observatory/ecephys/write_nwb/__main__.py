@@ -444,26 +444,26 @@ def write_ecephys_nwb(
     **kwargs
 ):
 
-    # nwbfile = pynwb.NWBFile(
-    #     session_description='EcephysSession',
-    #     identifier='{}'.format(session_id),
-    #     session_start_time=session_start_time
-    # )
+    nwbfile = pynwb.NWBFile(
+        session_description='EcephysSession',
+        identifier='{}'.format(session_id),
+        session_start_time=session_start_time
+    )
 
-    # stimulus_table = read_stimulus_table(stimulus_table_path)
-    # nwbfile = add_stimulus_timestamps(nwbfile, stimulus_table['start_time'].values) # TODO: patch until full timestamps are output by stim table module
-    # nwbfile = add_stimulus_presentations(nwbfile, stimulus_table)
+    stimulus_table = read_stimulus_table(stimulus_table_path)
+    nwbfile = add_stimulus_timestamps(nwbfile, stimulus_table['start_time'].values) # TODO: patch until full timestamps are output by stim table module
+    nwbfile = add_stimulus_presentations(nwbfile, stimulus_table)
 
-    # nwbfile = add_probewise_data_to_nwbfile(nwbfile, probes)
+    nwbfile = add_probewise_data_to_nwbfile(nwbfile, probes)
 
-    # running_speed = read_running_speed(running_speed['running_speed_path'], running_speed['running_speed_timestamps_path'])
-    # add_running_speed_to_nwbfile(nwbfile, running_speed)
+    running_speed = read_running_speed(running_speed['running_speed_path'], running_speed['running_speed_timestamps_path'])
+    add_running_speed_to_nwbfile(nwbfile, running_speed)
 
-    # Manifest.safe_make_parent_dirs(output_path)
-    # io = pynwb.NWBHDF5IO(output_path, mode='w')
-    # logging.info(f"writing session nwb file to {output_path}")
-    # io.write(nwbfile)
-    # io.close()
+    Manifest.safe_make_parent_dirs(output_path)
+    io = pynwb.NWBHDF5IO(output_path, mode='w')
+    logging.info(f"writing session nwb file to {output_path}")
+    io.write(nwbfile)
+    io.close()
 
     probe_outputs = write_probewise_lfp_files(probes, session_start_time, pool_size=pool_size)
 
