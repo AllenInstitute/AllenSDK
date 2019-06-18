@@ -60,8 +60,6 @@ class NwbApi:
 
     def get_stimulus_presentations(self) -> pd.DataFrame:
         
-
-
         table = pd.DataFrame({
             col.name: col.data for col in self.nwbfile.epochs.columns 
             if col.name not in set(['tags', 'timeseries', 'tags_index', 'timeseries_index'])

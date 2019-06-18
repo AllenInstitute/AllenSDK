@@ -136,7 +136,7 @@ class EcephysSession(LazyPropertyMixin):
 
 
     def __init__(self, api, **kwargs):
-        self.api: EcephysSessionApi  = api
+        self.api: EcephysSessionApi = api
 
         self.ecephys_session_id = self.LazyProperty(self.api.get_ecephys_session_id)
         self.running_speed= self.LazyProperty(self.api.get_running_speed)
