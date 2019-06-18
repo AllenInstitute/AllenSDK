@@ -326,11 +326,7 @@ def write_probe_lfp_file(session_start_time, log_level, probe):
     channels.reset_index(inplace=True)
     channels.set_index("id", inplace=True)
 
-    for colname in channels.columns:
-        if np.all(pd.isna(channels[colname]).values):
-            channels[colname] = ["" for ii in range(channels.shape[0])]
-
-    channels = channels.fillna("")
+    channels = channels.fillna("none")
     
     nwbfile.electrodes = pynwb.file.ElectrodeTable().from_dataframe(channels, name='electrodes')
     electrode_table_region = nwbfile.create_electrode_table_region(
@@ -400,10 +396,10 @@ def add_probewise_data_to_nwbfile(nwbfile, probes):
             probe['mean_waveforms_path'], local_to_global_unit_map
         ))
     
-    electrodes_table = pd.concat(list(channel_tables.values())).fillna('')
+    electrodes_table = pd.concat(list(channel_tables.values())).fillna("none")
     nwbfile.electrodes = pynwb.file.ElectrodeTable().from_dataframe(electrodes_table, name='electrodes')
     units_table = pd.concat(unit_tables).set_index(keys='id', drop=True)
-    nwbfile.units = pynwb.misc.Units.from_dataframe(units_table.fillna(''), name='units')
+    nwbfile.units = pynwb.misc.Units.from_dataframe(units_table.fillna("none"), name='units')
 
     add_ragged_data_to_dynamic_table(
         table=nwbfile.units, 
