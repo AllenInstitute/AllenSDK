@@ -1,8 +1,9 @@
 import logging
 import sys
 import argparse
-from datetime import datetime
 from pathlib import PurePath
+import multiprocessing as mp
+from functools import partial
 
 import marshmallow
 import argschema
@@ -10,6 +11,7 @@ import pynwb
 import requests
 import pandas as pd
 import numpy as np
+from hdmf.backends.hdf5.h5_utils import H5DataIO
 
 from allensdk.config.manifest import Manifest
 from allensdk.brain_observatory.running_speed import RunningSpeed
@@ -18,12 +20,29 @@ from ._schemas import InputSchema, OutputSchema
 from allensdk.brain_observatory.nwb import add_running_speed_to_nwbfile, add_stimulus_presentations, add_stimulus_timestamps
 from allensdk.brain_observatory.argschema_utilities import write_or_print_outputs
 from allensdk.brain_observatory import dict_to_indexed_array
+from allensdk.brain_observatory.ecephys.file_io.continuous_file import ContinuousFile
 
 
 STIM_TABLE_RENAMES_MAP = {
     'Start': 'start_time',
     'End': 'stop_time',
 }
+
+
+def fill_df(df, str_fill=""):
+    df = df.copy()
+
+    for colname in df.columns:
+        if not pd.api.types.is_numeric_dtype(df[colname]):
+            df[colname].fillna(str_fill)
+
+        if np.all(pd.isna(df[colname]).values):
+            df[colname] = [str_fill for ii in range(df.shape[0])]
+
+        if pd.api.types.is_string_dtype(df[colname]):
+            df[colname] = df[colname].astype(str)
+
+    return df
 
 
 def get_inputs_from_lims(host, ecephys_session_id, output_root, job_queue, strategy):
@@ -299,26 +318,80 @@ def add_ragged_data_to_dynamic_table(table, data, column_name, column_descriptio
     table.add_column(name=column_name, description=column_description, data=values, index=idx)
 
 
-def write_ecephys_nwb(
-    output_path, 
-    session_id, session_start_time, 
-    stimulus_table_path, 
-    probes, 
-    running_speed, 
-    **kwargs
-):
+def write_probe_lfp_file(session_start_time, log_level, probe):
+    """ Writes LFP data (and associated channel information) for one probe to a standalone nwb file
+    """
+
+    logging.getLogger('').setLevel(log_level)
+    logging.info(f"writing lfp file for probe {probe['id']}")
 
     nwbfile = pynwb.NWBFile(
-        session_description='EcephysSession',
-        identifier='{}'.format(session_id),
+        session_description='EcephysProbe',
+        identifier=f"{probe['id']}",
         session_start_time=session_start_time
+    )    
+
+    nwbfile, probe_nwb_device, probe_nwb_electrode_group = add_probe_to_nwbfile(nwbfile, probe['id'], description=probe['name'])
+
+    channels = prepare_probewise_channel_table(probe['channels'], probe_nwb_electrode_group)
+    lfp_channels = np.load(probe['lfp']['input_channels_path'], allow_pickle=False)
+    
+    channels.reset_index(inplace=True)
+    channels.set_index("local_index", inplace=True)
+    channels = channels.loc[lfp_channels, :]
+    channels.reset_index(inplace=True)
+    channels.set_index("id", inplace=True)
+
+    channels = fill_df(channels)
+    
+    nwbfile.electrodes = pynwb.file.ElectrodeTable().from_dataframe(channels, name='electrodes')
+    electrode_table_region = nwbfile.create_electrode_table_region(
+        region=np.arange(channels.shape[0]).tolist(),  # must use raw indices here
+        name='electrodes',
+        description=f"lfp channels on probe {probe['id']}"
     )
 
-    stimulus_table = read_stimulus_table(stimulus_table_path)
-    nwbfile = add_stimulus_timestamps(nwbfile, stimulus_table['start_time'].values) # TODO: patch until full timestamps are output by stim table module
-    nwbfile = add_stimulus_presentations(nwbfile, stimulus_table)
+    lfp_data, lfp_timestamps = ContinuousFile(
+        data_path=probe['lfp']['input_data_path'],
+        timestamps_path=probe['lfp']['input_timestamps_path'],
+        total_num_channels=channels.shape[0]
+    ).load(memmap=False)
 
-    channel_tables = []
+    lfp = pynwb.ecephys.LFP(name=f"probe_{probe['id']}_lfp")
+
+    nwbfile.add_acquisition(lfp.create_electrical_series(
+        name=f"probe_{probe['id']}_lfp_data",
+        data=H5DataIO(data=lfp_data, compression='gzip', compression_opts=9),
+        timestamps=H5DataIO(data=lfp_timestamps, compression='gzip', compression_opts=9),
+        electrodes=electrode_table_region
+    ))
+
+    nwbfile.add_acquisition(lfp)
+
+    with pynwb.NWBHDF5IO(probe['lfp']['output_path'], 'w') as lfp_writer:
+        logging.info(f"writing probe lfp file to {probe['lfp']['output_path']}")
+        lfp_writer.write(nwbfile)
+    return {"id": probe["id"], "nwb_path": probe["lfp"]["output_path"]}
+
+
+def write_probewise_lfp_files(probes, session_start_time, pool_size=3):
+
+    output_paths = []
+
+    pool = mp.Pool(processes=pool_size)
+    write = partial(write_probe_lfp_file, session_start_time, logging.getLogger("").getEffectiveLevel())
+
+    for pout in pool.imap_unordered(write, probes):
+        output_paths.append(pout)
+
+    return output_paths
+    
+
+def add_probewise_data_to_nwbfile(nwbfile, probes):
+    """ Adds channel and spike data for a single probe to the session-level nwb file.
+    """
+
+    channel_tables = {}
     unit_tables = []
     spike_times = {}
     mean_waveforms = {}
@@ -327,7 +400,7 @@ def write_ecephys_nwb(
         logging.info(f'found probe {probe["id"]} with name {probe["name"]}')
 
         nwbfile, probe_nwb_device, probe_nwb_electrode_group = add_probe_to_nwbfile(nwbfile, probe['id'], description=probe['name'])
-        channel_tables.append(prepare_probewise_channel_table(probe['channels'], probe_nwb_electrode_group))
+        channel_tables[probe["id"]] = prepare_probewise_channel_table(probe['channels'], probe_nwb_electrode_group)
         unit_tables.append(pd.DataFrame(probe['units']))
 
         local_to_global_unit_map = {unit['local_index']: unit['id'] for unit in probe['units']}
@@ -338,10 +411,11 @@ def write_ecephys_nwb(
         mean_waveforms.update(read_waveforms_to_dictionary(
             probe['mean_waveforms_path'], local_to_global_unit_map
         ))
-
-    nwbfile.electrodes = pynwb.file.ElectrodeTable().from_dataframe(pd.concat(channel_tables).fillna(''), name='electrodes')
+    
+    electrodes_table = fill_df(pd.concat(list(channel_tables.values())))
+    nwbfile.electrodes = pynwb.file.ElectrodeTable().from_dataframe(electrodes_table, name='electrodes')
     units_table = pd.concat(unit_tables).set_index(keys='id', drop=True)
-    nwbfile.units = pynwb.misc.Units.from_dataframe(units_table.fillna(''), name='units')
+    nwbfile.units = pynwb.misc.Units.from_dataframe(fill_df(units_table), name='units')
 
     add_ragged_data_to_dynamic_table(
         table=nwbfile.units, 
@@ -357,16 +431,46 @@ def write_ecephys_nwb(
         column_description='mean waveforms on peak channels (and over samples)'
     )
 
+    return nwbfile
+
+
+def write_ecephys_nwb(
+    output_path, 
+    session_id, session_start_time, 
+    stimulus_table_path, 
+    probes, 
+    running_speed,
+    pool_size,
+    **kwargs
+):
+
+    nwbfile = pynwb.NWBFile(
+        session_description='EcephysSession',
+        identifier='{}'.format(session_id),
+        session_start_time=session_start_time
+    )
+
+    stimulus_table = read_stimulus_table(stimulus_table_path)
+    nwbfile = add_stimulus_timestamps(nwbfile, stimulus_table['start_time'].values) # TODO: patch until full timestamps are output by stim table module
+    nwbfile = add_stimulus_presentations(nwbfile, stimulus_table)
+
+    nwbfile = add_probewise_data_to_nwbfile(nwbfile, probes)
+
     running_speed = read_running_speed(running_speed['running_speed_path'], running_speed['running_speed_timestamps_path'])
     add_running_speed_to_nwbfile(nwbfile, running_speed)
-    del running_speed
 
     Manifest.safe_make_parent_dirs(output_path)
     io = pynwb.NWBHDF5IO(output_path, mode='w')
+    logging.info(f"writing session nwb file to {output_path}")
     io.write(nwbfile)
     io.close()
 
-    return {'nwb_path': output_path}
+    probe_outputs = write_probewise_lfp_files(probes, session_start_time, pool_size=pool_size)
+
+    return {
+        'nwb_path': output_path,
+        "probe_outputs": probe_outputs
+    }
 
 
 def main():
@@ -394,7 +498,7 @@ def main():
             schema_type=InputSchema,
             output_schema_type=OutputSchema,
         )
-    except marshmallow.exceptions.ValidationError as err:
+    except marshmallow.exceptions.ValidationError:
         print(input_data)
         raise
 

@@ -1,6 +1,7 @@
 import os
-import warnings
 from datetime import datetime
+from pathlib import Path
+import logging
 
 import pytest
 import pynwb
@@ -22,6 +23,7 @@ def units_table():
         'isi_violations': [34, 39, 22]
     }, index=pd.Index([11, 22, 33], name='id')), name='units')
 
+
 @pytest.fixture
 def spike_times():
     return {
@@ -29,7 +31,6 @@ def spike_times():
         22: [],
         33: [13, 4, 12]
     }
-
 
 
 def test_roundtrip_metadata(roundtripper):
@@ -87,7 +88,7 @@ def test_prepare_probewise_channel_table():
         }
     ]
 
-    dev  = pynwb.device.Device(name='foo')
+    dev = pynwb.device.Device(name='foo')
     eg = pynwb.ecephys.ElectrodeGroup(name='foo_group', description='', location='', device=dev)
 
     expected = pd.DataFrame({
@@ -167,7 +168,7 @@ def test_read_spike_times_to_dictionary(tmpdir_factory):
 
     obtained = write_nwb.read_spike_times_to_dictionary(spike_times_path, spike_units_path, local_to_global_unit_map)
     for ii in range(15):
-        assert np.allclose(obtained[-ii], sorted([spike_times[ii], spike_times[15+ii]]))
+        assert np.allclose(obtained[-ii], sorted([spike_times[ii], spike_times[15 + ii]]))
 
 
 def test_read_waveforms_to_dictionary(tmpdir_factory):
@@ -186,3 +187,80 @@ def test_read_waveforms_to_dictionary(tmpdir_factory):
     obtained = write_nwb.read_waveforms_to_dictionary(waveforms_path, local_to_global_unit_map)
     for ii in range(nunits):
         assert np.allclose(mean_waveforms[ii, :, :], obtained[-ii])
+
+
+@pytest.fixture
+def lfp_data():
+    total_timestamps = 12
+    subsample_channels = np.array([3, 2])
+
+    return {
+        'data': np.arange(total_timestamps * len(subsample_channels), dtype=np.int16).reshape((total_timestamps, len(subsample_channels))),
+        'timestamps': np.linspace(0, 1, total_timestamps),
+        'subsample_channels': subsample_channels
+    }
+
+
+def test_write_probe_lfp_file(tmpdir_factory, lfp_data):
+
+    tmpdir = Path(tmpdir_factory.mktemp("probe_lfp_nwb"))
+    input_data_path = tmpdir / Path("lfp_data.dat")
+    input_timestamps_path = tmpdir / Path("lfp_timestamps.npy")
+    input_channels_path = tmpdir / Path("lfp_channels.npy")
+    output_path = str(tmpdir / Path("lfp.nwb"))  # pynwb.NWBHDF5IO chokes on Path
+
+    probe_data = {
+        "id": 12345,
+        "name": "probeA",
+        "channels":  [
+            {
+                'id': 0,
+                'probe_id': 12,
+                'local_index': 1,
+                'probe_vertical_position': 21,
+                'probe_horizontal_position': 33
+            },
+            {
+                'id': 1,
+                'probe_id': 12,
+                'local_index': 2,
+                'probe_vertical_position': 21,
+                'probe_horizontal_position': 32
+            },
+            {
+                'id': 2,
+                'probe_id': 12,
+                'local_index': 3,
+                'probe_vertical_position': 21,
+                'probe_horizontal_position': 31
+            }
+        ],
+        "lfp": {
+            "input_data_path": input_data_path,
+            "input_timestamps_path": input_timestamps_path,
+            "input_channels_path": input_channels_path,
+            "output_path": output_path
+        }
+    }
+
+    np.save(input_timestamps_path, lfp_data["timestamps"],  allow_pickle=False)
+    np.save(input_channels_path, lfp_data["subsample_channels"], allow_pickle=False)
+    with open(input_data_path, "wb") as input_data_file:
+        input_data_file.write(lfp_data["data"].tobytes())
+
+    write_nwb.write_probe_lfp_file(datetime.now(), logging.INFO, probe_data)
+
+    exp_electrodes = pd.DataFrame(probe_data["channels"]).set_index("id").loc[[2, 1], :]
+
+    with pynwb.NWBHDF5IO(output_path, "r") as obt_io:
+        obt_f = obt_io.read()
+        
+        obt_ser = obt_f.get_acquisition("probe_12345_lfp").electrical_series["probe_12345_lfp_data"]
+        assert np.allclose(lfp_data["data"], obt_ser.data[:])
+        assert np.allclose(lfp_data["timestamps"], obt_ser.timestamps[:])
+
+        obt_electrodes = obt_f.electrodes.to_dataframe().loc[
+            :, ['local_index', 'probe_horizontal_position', 'probe_id','probe_vertical_position']
+        ]
+
+        pd.testing.assert_frame_equal(exp_electrodes, obt_electrodes, check_like=True)

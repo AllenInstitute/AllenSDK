@@ -1,7 +1,6 @@
-from marshmallow import RAISE, ValidationError
+from marshmallow import RAISE
 
-from argschema import ArgSchema, ArgSchemaParser
-from argschema.schemas import DefaultSchema
+from argschema import ArgSchema
 from argschema.fields import LogLevel, String, Int, DateTime, Nested, Boolean, Float
 
 from allensdk.brain_observatory.argschema_utilities import check_read_access, check_write_access, RaisingSchema
@@ -29,6 +28,13 @@ class Unit(RaisingSchema):
     isi_violations = Float(required=True)
 
 
+class Lfp(RaisingSchema):
+    input_data_path = String(required=True, validate=check_read_access)
+    input_timestamps_path = String(required=True, validate=check_read_access)
+    input_channels_path = String(required=True, validate=check_read_access)
+    output_path = String(required=True)
+
+
 class Probe(RaisingSchema):
     id = Int(required=True)
     name = String(required=True)
@@ -37,6 +43,7 @@ class Probe(RaisingSchema):
     mean_waveforms_path = String(required=True, validate=check_read_access)
     channels = Nested(Channel, many=True, required=True)
     units = Nested(Unit, many=True, required=True)
+    lfp = Nested(Lfp, many=False, required=True)
 
 
 class InputSchema(ArgSchema):
@@ -49,7 +56,14 @@ class InputSchema(ArgSchema):
     stimulus_table_path = String(required=True, validate=check_read_access, description='path to stimulus table file')
     probes = Nested(Probe, many=True, required=True, description='records of the individual probes used for this experiment')
     running_speed = Nested(RunningSpeedPathsSchema, required=True, description='data collected about the running behavior of the experiment\'s subject')
+    pool_size = Int(default=3, help="number of child processes used to write probewise lfp files")
+
+
+class ProbeOutputs(RaisingSchema):
+    nwb_path = String(required=True)
+    id = Int(required=True)
 
 
 class OutputSchema(RaisingSchema):
     nwb_path = String(required=True, description='path to output file')
+    probe_outputs = Nested(ProbeOutputs, required=True, many=True)

@@ -136,7 +136,7 @@ class EcephysSession(LazyPropertyMixin):
 
 
     def __init__(self, api, **kwargs):
-        self.api: EcephysSessionApi  = api
+        self.api: EcephysSessionApi = api
 
         self.ecephys_session_id = self.LazyProperty(self.api.get_ecephys_session_id)
         self.running_speed= self.LazyProperty(self.api.get_running_speed)
@@ -149,6 +149,30 @@ class EcephysSession(LazyPropertyMixin):
         self.stimulus_presentations = self.LazyProperty(self.api.get_stimulus_presentations, wrappers=[self._build_stimulus_presentations])
         self.units = self.LazyProperty(self.api.get_units, wrappers=[self._build_units_table])
         self.inter_presentation_intervals = self.LazyProperty(self._build_inter_presentation_intervals)
+
+
+    def get_lfp(self, probe_id):
+        ''' Load an xarray DataArray with LFP data from channels on a single probe
+
+        Parameters
+        ----------
+        probe_id : int
+            identify the probe whose LFP data ought to be loaded
+
+        Returns
+        -------
+        xr.DataArray :
+            dimensions are channel (id) and time (seconds). Values are sampled LFP data.
+
+        Notes
+        -----
+        Unlike many other data access methods on this class. This one does not cache the loaded data in memory due to 
+        the large size of the LFP data.
+
+        '''
+
+        return self.api.get_lfp(probe_id)
+
 
     def get_inter_presentation_intervals_for_stimulus(self, stimulus_names):
         ''' Get a subset of this session's inter-presentation intervals, filtered by stimulus name.

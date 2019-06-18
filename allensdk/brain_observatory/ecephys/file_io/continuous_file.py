@@ -95,7 +95,7 @@ class ContinuousFile():
         expected_num_bytes = num_samples * bytes_per_sample
         logging.info('calculated LFP filesize: {} bytes'.format(expected_num_bytes))
 
-        num_bytes = Path(self.data_path).stat().st_size()
+        num_bytes = Path(self.data_path).stat().st_size
         if not expected_num_bytes == num_bytes:
             raise IOError('expected LFP data filesize to be {} bytes, but its size was {} bytes'.format(expected_num_bytes, num_bytes))
 

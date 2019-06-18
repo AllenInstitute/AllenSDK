@@ -1,8 +1,8 @@
-import warnings
-from typing import Dict, Union, List
+from typing import Dict, Union, List, Optional
 
 import pandas as pd
 import numpy as np
+import xarray as xr
 import pynwb
 
 from .ecephys_session_api import EcephysSessionApi
@@ -10,6 +10,22 @@ from allensdk.brain_observatory.nwb.nwb_api import NwbApi
 
 
 class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
+
+    def __init__(self, path, probe_lfp_paths: Optional[Dict[int, str]] = None, **kwargs):
+        super(EcephysNwbSessionApi, self).__init__(path, **kwargs)
+        self.probe_lfp_paths = probe_lfp_paths
+
+    def _probe_nwbfile(self, probe_id: int):
+        if self.probe_lfp_paths is None:
+            raise TypeError(
+                f"EcephysNwbSessionApi assumes a split NWB file, with probewise LFP stored in individual files. "
+                "this object was not configured with probe_lfp_paths"
+            )
+        elif probe_id not in self.probe_lfp_paths:
+            raise KeyError(f"no probe lfp file path is recorded for probe {probe_id}")
+
+        reader = pynwb.NWBHDF5IO(self.probe_lfp_paths[probe_id], 'r')
+        return reader.read()
 
     def get_probes(self) -> pd.DataFrame:
         probes: Union[List, pd.DataFrame] = []
@@ -38,6 +54,24 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         units_table.drop(columns=['spike_times', 'waveform_mean'], inplace=True)
 
         return units_table
+
+    def get_lfp(self, probe_id: int) -> xr.DataArray:
+        lfp = self._probe_nwbfile(probe_id).get_acquisition(f'probe_{probe_id}_lfp')
+        series = lfp.get_electrical_series(f'probe_{probe_id}_lfp_data')
+
+        electrodes = pd.DataFrame(
+            data=[ecr for ecr in series.electrodes], 
+            columns=['id'] + list(series.electrodes.table.colnames)
+        )
+
+        data = series.data[:]
+        timestamps = series.timestamps[:]
+
+        return xr.DataArray(
+            data=data,
+            dims=['time', 'channel'],
+            coords=[timestamps, electrodes['id'].values]
+        )
 
     def get_ecephys_session_id(self) -> int:
         return int(self.nwbfile.identifier)

@@ -2,6 +2,7 @@ from typing import Dict
 
 import numpy as np
 import pandas as pd
+import xarray as xr
 
 from ...running_speed import RunningSpeed
 
@@ -37,4 +38,7 @@ class EcephysSessionApi:
         raise NotImplementedError
 
     def get_ecephys_session_id(self) -> int:
+        raise NotImplementedError
+
+    def get_lfp(self, probe_id: int) -> xr.DataArray:
         raise NotImplementedError
