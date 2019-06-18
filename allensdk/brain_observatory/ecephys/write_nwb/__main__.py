@@ -326,6 +326,10 @@ def write_probe_lfp_file(session_start_time, log_level, probe):
     channels.reset_index(inplace=True)
     channels.set_index("id", inplace=True)
 
+    for colname in channels.columns:
+        if np.all(pd.isna(channels[colname]).values):
+            channels[colname] = ["" for ii in range(channels.shape[0])]
+
     channels = channels.fillna("")
     
     nwbfile.electrodes = pynwb.file.ElectrodeTable().from_dataframe(channels, name='electrodes')
