@@ -9,7 +9,6 @@ from .http_engine import HttpEngine
 from .utilities import postgres_macros, build_and_execute
 
 from allensdk.internal.api import PostgresQueryMixin
-from allensdk.internal.core.lims_utilities import safe_system_path
 
 
 class EcephysProjectLimsApi(EcephysProjectApi):
@@ -37,6 +36,35 @@ class EcephysProjectLimsApi(EcephysProjectApi):
         if nwb_response.shape[0] != 1:
             raise ValueError(
                 f"expected exactly 1 current NWB file for session {session_id}, "
+                f"found {nwb_response.shape[0]}: {pd.DataFrame(nwb_response)}"
+            )
+
+        nwb_id = nwb_response.loc[0, "id"]
+        return self.app_engine.stream(
+            f"well_known_files/download/{nwb_id}?wkf_id={nwb_id}"
+        )
+
+    def get_probe_lfp_data(self, probe_id):
+        nwb_response = build_and_execute(
+            """
+            select wkf.id from well_known_files wkf
+            join ecephys_analysis_run_probes earp on (
+                earp.id = wkf.attachable_id
+                and wkf.attachable_type = 'EcephysAnalysisRunProbe'
+            )
+            join ecephys_analysis_runs ear on ear.id = earp.ecephys_analysis_run_id
+            join well_known_file_types wkft on wkft.id = wkf.well_known_file_type_id
+            where wkft.name ~ 'EcephysLfpNwb'
+            and ear.current
+            and earp.probe_id = {{probe_id}}
+            """,
+            engine=self.postgres_engine.select,
+            probe_id=probe_id
+        )
+
+        if nwb_response.shape[0] != 1:
+            raise ValueError(
+                f"expected exactly 1 current LFP NWB file for probe {probe_id}, "
                 f"found {nwb_response.shape[0]}: {pd.DataFrame(nwb_response)}"
             )
 

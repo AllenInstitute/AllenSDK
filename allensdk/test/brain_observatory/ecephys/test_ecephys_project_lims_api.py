@@ -120,3 +120,28 @@ def test_get_session_data():
         postgres_engine=MockPgEngine(), app_engine=MockHttpEngine()
     )
     api.get_session_data(session_id)
+
+
+def test_get_probe_data():
+
+    probe_id = 12345
+    wkf_id = 987
+
+    class MockPgEngine:
+        def select(self, rendered):
+            pattern = re.compile(
+                r".*and earp.probe_id = (?P<probe_id>\d+).*", re.DOTALL
+            )
+            match = pattern.match(rendered)
+            pid_obt = int(match["probe_id"])
+            assert probe_id == pid_obt
+            return pd.DataFrame({"id": [wkf_id]})
+
+    class MockHttpEngine:
+        def stream(self, path):
+            assert path == f"well_known_files/download/{wkf_id}?wkf_id={wkf_id}"
+
+    api = epla.EcephysProjectLimsApi(
+        postgres_engine=MockPgEngine(), app_engine=MockHttpEngine()
+    )
+    api.get_probe_lfp_data(probe_id)
