@@ -3,6 +3,7 @@ from typing import Dict, Union, List, Optional
 import pandas as pd
 import numpy as np
 import xarray as xr
+import pynwb
 
 from .ecephys_session_api import EcephysSessionApi
 from allensdk.brain_observatory.nwb.nwb_api import NwbApi

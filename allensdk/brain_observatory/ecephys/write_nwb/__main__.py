@@ -29,6 +29,22 @@ STIM_TABLE_RENAMES_MAP = {
 }
 
 
+def fill_df(df, str_fill=""):
+    df = df.copy()
+
+    for colname in df.columns:
+        if not pd.api.types.is_numeric_dtype(df[colname]):
+            df[colname].fillna(str_fill)
+
+        if np.all(pd.isna(df[colname]).values):
+            df[colname] = [str_fill for ii in range(df.shape[0])]
+
+        if all([isinstance(val, str) for val in df[colname].values]):
+            df[colname] = df[colname].astype(str)
+
+    return df
+
+
 def get_inputs_from_lims(host, ecephys_session_id, output_root, job_queue, strategy):
     ''' This is a development / testing utility for running this module from the Allen Institute for Brain Science's 
     Laboratory Information Management System (LIMS). It will only work if you are on our internal network.
@@ -326,7 +342,7 @@ def write_probe_lfp_file(session_start_time, log_level, probe):
     channels.reset_index(inplace=True)
     channels.set_index("id", inplace=True)
 
-    channels = channels.fillna("none")
+    channels = fill_df(channels)
     
     nwbfile.electrodes = pynwb.file.ElectrodeTable().from_dataframe(channels, name='electrodes')
     electrode_table_region = nwbfile.create_electrode_table_region(
@@ -396,10 +412,10 @@ def add_probewise_data_to_nwbfile(nwbfile, probes):
             probe['mean_waveforms_path'], local_to_global_unit_map
         ))
     
-    electrodes_table = pd.concat(list(channel_tables.values())).fillna("none")
+    electrodes_table = fill_df(pd.concat(list(channel_tables.values())))
     nwbfile.electrodes = pynwb.file.ElectrodeTable().from_dataframe(electrodes_table, name='electrodes')
     units_table = pd.concat(unit_tables).set_index(keys='id', drop=True)
-    nwbfile.units = pynwb.misc.Units.from_dataframe(units_table.fillna("none"), name='units')
+    nwbfile.units = pynwb.misc.Units.from_dataframe(fill_df(units_table), name='units')
 
     add_ragged_data_to_dynamic_table(
         table=nwbfile.units, 
