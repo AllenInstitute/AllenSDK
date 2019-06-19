@@ -18,7 +18,7 @@ class StimulusAnalysis(object):
             nwb_version = kwargs.get('nwb_version', None)
             self._ecephys_session = EcephysSession.from_nwb_path(path=ecephys_session, nwb_version=nwb_version)
 
-        self._cell_ids = None
+        self._unit_ids = None
         self._cells_filter = kwargs.get('filter', None)  # {'location': 'probeC', 'structure_acronym': 'VISp'}
         self._number_cells = None
         self._spikes = None
@@ -36,10 +36,10 @@ class StimulusAnalysis(object):
         return self._ecephys_session
 
     @property
-    def cell_id(self):
+    def unit_ids(self):
         """Returns a list of unit-ids for which to apply the analysis"""
         # BOb analog
-        if self._cell_ids is None:
+        if self._unit_ids is None:
             # Original analysis files was hardcoded that only cells from probeC/VISp, replaced with a filter dict.
             # TODO: Remove filter if it's unnessecary
             units_df = self.ecephys_session.units
@@ -48,16 +48,16 @@ class StimulusAnalysis(object):
                 for col, val in self._cells_filter.items():
                     mask &= units_df[col] == val
                 units_df = units_df[mask]
-            self._cell_ids = units_df.index.values
+            self._unit_ids = units_df.index.values
 
-        return self._cell_ids
+        return self._unit_ids
 
     @property
     def numbercells(self):
         """Get the number of units/cells."""
         # BOb analog
         if not self._number_cells:
-            self._number_cells = len(self.cell_id)
+            self._number_cells = len(self.unit_ids)
         return self._number_cells
 
     @property
@@ -69,7 +69,7 @@ class StimulusAnalysis(object):
             self._spikes = self.ecephys_session.spike_times
             if len(self._spikes) > self.numbercells:
                 # if a filter has been applied such that not all the cells are being used in the analysis
-                self._spikes = {k: v for k, v in self._spikes.items() if k in self.cell_id}
+                self._spikes = {k: v for k, v in self._spikes.items() if k in self.unit_ids}
 
         return self._spikes
 
@@ -120,15 +120,14 @@ class StimulusAnalysis(object):
             stop_times = self.stim_table['stop_time'].values
             sweep_events = pd.DataFrame(index=self.stim_table.index.values, columns=self.spikes.keys())
 
-            for specimen_id, spikes in self.spikes.items(): # TODO: unit_id
+            for unit_id, spikes in self.spikes.items():
                 # In theory we should be able to use EcephysSession presentationwise_spike_times(). But ran into issues
                 # with the "sides" certain boundary spikes will fall on, and will significantly affect the metrics
                 # upstream.
-                # TODO: what is going on here? instability? bug in ecephys_session? Kael remembers this occurring as a rate edge case
                 start_indicies = np.searchsorted(spikes, start_times, side='left')
                 stop_indicies = np.searchsorted(spikes, stop_times, side='right')
 
-                sweep_events[specimen_id] = [spikes[start_indx:stop_indx] - start_times[indx] - 1.0 if stop_indx > start_indx else np.array([])
+                sweep_events[unit_id] = [spikes[start_indx:stop_indx] - start_times[indx] - 1.0 if stop_indx > start_indx else np.array([])
                                              for indx, (start_indx, stop_indx) in enumerate(zip(start_indicies, stop_indicies))]
 
             self._sweep_events = sweep_events
@@ -198,7 +197,6 @@ class StimulusAnalysis(object):
             (uncorrected for multiple comparisons).
 
         """
-
         # TODO: Code is currently a speed bottle-neck and could probably be improved.
         # Recreate the mean-sweep-table but using randomly selected 'spontaneuous' stimuli.
         shuffled_mean = np.empty((self.numbercells, n_samples))
@@ -211,12 +209,12 @@ class StimulusAnalysis(object):
                 shuffled_mean[i, shuf] = len(spikes[(spikes > idx[shuf]) & (spikes < (idx[shuf] + offset))])
 
         sweep_p_values = pd.DataFrame(index=self.stim_table.index.values, columns=self.sweep_events.columns)
-        for i, v in enumerate(self.spikes.keys()): # TODO: v -> unit_id
-            subset = self.mean_sweep_events[v].values
+        for i, unit_id in enumerate(self.spikes.keys()):
+            subset = self.mean_sweep_events[unit_id].values
             null_dist_mat = np.tile(shuffled_mean[i, :], reps=(len(subset), 1))
             actual_is_less = subset.reshape(len(subset), 1) <= null_dist_mat
             p_values = np.mean(actual_is_less, axis=1)
-            sweep_p_values[v] = p_values
+            sweep_p_values[unit_id] = p_values
 
         return sweep_p_values
 

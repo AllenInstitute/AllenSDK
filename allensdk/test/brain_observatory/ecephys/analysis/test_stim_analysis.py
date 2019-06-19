@@ -155,15 +155,18 @@ def cmp_peak_data(actual_df, expected_h5, id_map=None):
     return True
 
 
+test_dir = '/allen/aibs/informatics/module_test_data/ecephys/stimulus_analysis'
+
+@pytest.mark.skipif(not os.path.exists(test_dir),
+                    reason='Unable to access test files.')
 @pytest.mark.parametrize('spikes_file,expected_file,stim_analysis_class,nwb_version',
                          [('data/mouse412792.filtered.spikes.nwb', 'expected/mouse412792.filtered.static_grating.h5', StaticGratings, 1),
                           #('data/mouse412792.filtered.spikes.nwb', 'expected/mouse412792.filtered.drifting_grating.h5', DriftingGratings, 1),
                           #('data/mouse412792.filtered.spikes.nwb', 'expected/mouse412792.filtered.natural_scene.h5', NaturalScenes, 1)
                           ])
 def test_stimulus_data(spikes_file, expected_file, stim_analysis_class, nwb_version):
-    file_dir = os.path.dirname(os.path.abspath(__file__))
-    spikes_file = os.path.join(file_dir, spikes_file)
-    expected_file = os.path.join(file_dir, expected_file)
+    spikes_file = os.path.join(test_dir, spikes_file)
+    expected_file = os.path.join(test_dir, expected_file)
     expected_h5 = h5py.File(expected_file, 'r')
     if 'rnd_seed' in expected_h5.attrs:
         np.random.seed(expected_h5.attrs['rnd_seed'])

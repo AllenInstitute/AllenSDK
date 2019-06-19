@@ -37,6 +37,10 @@ class StaticGratings(StimulusAnalysis):
         self._response_events = None
         self._response_trials = None
 
+        self._col_ori = 'Ori'
+        self._col_sf = 'SF'
+        self._col_phase = 'Phase'
+
     @property
     def stim_table(self):
         # Stimulus table is already in EcephysSession object, just need to subselect 'static_gratings' presentations.
@@ -153,7 +157,7 @@ class StaticGratings(StimulusAnalysis):
             peak_df['sf_low_cutoff_sg'] = np.nan
             peak_df['sf_high_cutoff_sg'] = np.nan
 
-            # TODO: Make cell_id the df index?
+            # TODO: Make unit_id the df index?
             peak_df['cell_specimen_id'] = list(self.spikes.keys())
             peak_df['lifetime_sparseness_sg'] = self._get_lifetime_sparseness()
 
@@ -170,9 +174,9 @@ class StaticGratings(StimulusAnalysis):
                 peak_df.loc[nc, 'num_pref_trials_sg'] = int(self.response_events[pref_ori, pref_sf+1, pref_phase, nc, 2])
                 peak_df.loc[nc, 'responsive_sg'] = self.response_events[pref_ori, pref_sf+1, pref_phase, nc, 2] > 11
 
-                stim_table_mask = (self.stim_table['SF'] == self.sfvals[pref_sf]) & \
-                                  (self.stim_table['Ori'] == self.orivals[pref_ori]) & \
-                                  (self.stim_table['Phase'] == self.phasevals[pref_phase])
+                stim_table_mask = (self.stim_table[self._col_sf] == self.sfvals[pref_sf]) & \
+                                  (self.stim_table[self._col_ori] == self.orivals[pref_ori]) & \
+                                  (self.stim_table[self._col_phase] == self.phasevals[pref_phase])
                 peak_df.loc[nc, 'g_osi_sg'] = self._get_osi(pref_sf, pref_phase, nc)
 
                 peak_df.loc[nc, 'reliability_sg'] = self._get_reliability(unit_id, stim_table_mask)
@@ -190,31 +194,34 @@ class StaticGratings(StimulusAnalysis):
 
     def _get_stim_table_stats(self):
         sg_stim_table = self.stim_table
-        self._orivals = np.sort(sg_stim_table['Ori'].dropna().unique())
+        self._orivals = np.sort(sg_stim_table[self._col_ori].dropna().unique())
         self._number_ori = len(self._orivals)
 
-        self._sfvals = np.sort(sg_stim_table['SF'].dropna().unique())
+        self._sfvals = np.sort(sg_stim_table[self._col_sf].dropna().unique())
         # TODO: Check that SF=0.0 isn't in the data, it is a special condition coded into responses table
         self._number_sf = len(self._sfvals)
 
-        self._phasevals = np.sort(sg_stim_table['Phase'].dropna().unique())
+        self._phasevals = np.sort(sg_stim_table[self._col_phase].dropna().unique())
         self._number_phase = len(self._phasevals)
 
     def _get_lifetime_sparseness(self):
-        response = self.response_events[:, 1:, :, :, 0].reshape(120, self.numbercells)
-        return ((1 - (1 / 120.) * ((np.power(response.sum(axis=0), 2)) / (np.power(response, 2).sum(axis=0)))) / ( # TODO What is up here?
-                    1 - (1 / 120.)))
+        # Olsen & Wilson 2008
+        n_features = self.number_phase * self.number_ori * self.number_sf
+        recipr = 1.0/n_features
+        response = self.response_events[:, 1:, :, :, 0].reshape(n_features, self.numbercells)
+        return ((1.0 - recipr * ((np.power(response.sum(axis=0), 2)) / (np.power(response, 2).sum(axis=0)))) / (
+                    1.0 - recipr))
 
     def _get_response_events(self):
         # for each cell, find all trials with the same orientation/spatial_freq/phase/cell combo; get averaged num
         # of spikes, the standard err, and a count of all statistically significant trials.
         response_events = np.empty((self.number_ori, self.number_sf+1, self.number_phase, self.numbercells, 3))
         for oi, ori in enumerate(self.orivals):
-            ori_mask = self.stim_table['Ori'] == ori
+            ori_mask = self.stim_table[self._col_ori] == ori
             for si, sf in enumerate(self.sfvals):
-                sf_mask = self.stim_table['SF'] == sf
+                sf_mask = self.stim_table[self._col_sf] == sf
                 for phi, phase in enumerate(self.phasevals):
-                    mask = ori_mask & sf_mask & (self.stim_table['Phase'] == phase)
+                    mask = ori_mask & sf_mask & (self.stim_table[self._col_phase] == phase)
                     subset = self.mean_sweep_events[mask]
                     subset_p = self.sweep_p_values[mask]
 
@@ -223,11 +230,11 @@ class StaticGratings(StimulusAnalysis):
                     response_events[oi, si+1, phi, :, 2] = subset_p[subset_p < 0.05].count().values
 
         # A special case for a blank (or invalid?) stimulus
-        subset = self.mean_sweep_events[np.isnan(self.stim_table['Ori'])]
-        subset_p = self.sweep_p_values[np.isnan(self.stim_table['Ori'])]
+        subset = self.mean_sweep_events[np.isnan(self.stim_table[self._col_ori])]
+        subset_p = self.sweep_p_values[np.isnan(self.stim_table[self._col_ori])]
         response_events[0, 0, 0, :, 0] = subset.mean(axis=0)
         response_events[0, 0, 0, :, 1] = subset.std(axis=0) / np.sqrt(len(subset))
-        response_events[0, 0, 0, :, 2] = subset_p[subset_p < 0.05].count().values # TODO: parametrize alpha
+        response_events[0, 0, 0, :, 2] = subset_p[subset_p < 0.05].count().values  # TODO: parametrize alpha
 
         self._response_events = response_events
 
@@ -242,11 +249,11 @@ class StaticGratings(StimulusAnalysis):
                                     n_stims//n_features))
         response_trials[0, 0, 0, :, :] = np.nan
         for oi, ori in enumerate(self.orivals):
-            ori_mask = self.stim_table['Ori'] == ori
+            ori_mask = self.stim_table[self._col_ori] == ori
             for si, sf in enumerate(self.sfvals):
-                sf_mask = self.stim_table['SF'] == sf
+                sf_mask = self.stim_table[self._col_sf] == sf
                 for phi, phase in enumerate(self.phasevals):
-                    mask = ori_mask & sf_mask & (self.stim_table['Phase'] == phase)
+                    mask = ori_mask & sf_mask & (self.stim_table[self._col_phase] == phase)
                     subset = self.mean_sweep_events[mask]
                     response_trials[oi, si+1, phi, :, :subset.shape[0]] = subset.values.T
 
@@ -279,8 +286,8 @@ class StaticGratings(StimulusAnalysis):
         """
         v = list(self.spikes.keys())[nc]
         sf_tuning = self.response_events[pref_ori, 1:, pref_phase, nc, 0]
-        trials = self.mean_sweep_events[(self.stim_table['Ori'] == self.orivals[pref_ori]) &
-                                        (self.stim_table['Phase'] == self.phasevals[pref_phase])][v].values
+        trials = self.mean_sweep_events[(self.stim_table[self._col_ori] == self.orivals[pref_ori]) &
+                                        (self.stim_table[self._col_phase] == self.phasevals[pref_phase])][v].values
         sse_part = np.sqrt(np.sum((trials - trials.mean())**2) / (len(trials)-5))
 
         return (np.ptp(sf_tuning)) / (np.ptp(sf_tuning) + 2 * sse_part)
