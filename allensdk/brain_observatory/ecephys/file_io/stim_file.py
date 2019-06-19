@@ -1,5 +1,3 @@
-import copy as cp
-
 import pandas as pd
 import numpy as np
 
@@ -33,7 +31,7 @@ class CamStimOnePickleStimFile(object):
         ''' Extract the mean angular velocity of the running wheel (degrees / s) for each 
         frame.
         '''
-        return self.frames_per_second * self.wheel_rotation
+        return self.frames_per_second * self.angular_wheel_rotation
 
 
     @property
