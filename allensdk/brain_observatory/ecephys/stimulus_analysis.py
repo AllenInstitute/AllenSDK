@@ -104,17 +104,27 @@ class StimulusAnalysis(object):
 
     @property
     def sweep_events(self):
-        """Returns a pandas DataFrame ranked by stimuli and filed by unit, giving a list of spikes offset by stim
-        onset."""
+        """ Construct a dataframe describing events occuring within each stimulus presentation, by unit.
+
+        Returns
+        =======
+        pd.DataFrame : 
+            Each row is a stimulus presentation. Each column is a unit. Each cell contains a numpy array of 
+            spike times occurring during that presentation (and emitted by that unit) relative to the onset of the 
+            presentation (-1 second).
+
+        """
+
         if self._sweep_events is None:
-            start_times = self.stim_table['start_time'].values - 1.0
+            start_times = self.stim_table['start_time'].values - 1.0  # TODO: 1 second pre?
             stop_times = self.stim_table['stop_time'].values
             sweep_events = pd.DataFrame(index=self.stim_table.index.values, columns=self.spikes.keys())
 
-            for specimen_id, spikes in self.spikes.items():
+            for specimen_id, spikes in self.spikes.items(): # TODO: unit_id
                 # In theory we should be able to use EcephysSession presentationwise_spike_times(). But ran into issues
                 # with the "sides" certain boundary spikes will fall on, and will significantly affect the metrics
                 # upstream.
+                # TODO: what is going on here? instability? bug in ecephys_session? Kael remembers this occurring as a rate edge case
                 start_indicies = np.searchsorted(spikes, start_times, side='left')
                 stop_indicies = np.searchsorted(spikes, stop_times, side='right')
 
@@ -173,6 +183,22 @@ class StimulusAnalysis(object):
         raise NotImplementedError()
 
     def calc_sweep_p_values(self, n_samples=10000, step_size=0.0001, offset=0.33):
+        """ Calculates the probability, for each unit and stimulus presentation, that the number of spikes emitted by 
+        that unit during that presentation could have been produced by that unit's spontaneous activity. This is 
+        implemented as a permutation test using spontaneous activity (gray screen) periods as input data.
+
+        Parameters
+        ==========
+
+        Returns
+        =======
+        sweep_p_values : pd.DataFrame
+            Each row is a stimulus presentation. Each column is a unit. Cells contain the probability that the 
+            unit's spontaneous activity could account for its observed spiking activity during that presentation
+            (uncorrected for multiple comparisons).
+
+        """
+
         # TODO: Code is currently a speed bottle-neck and could probably be improved.
         # Recreate the mean-sweep-table but using randomly selected 'spontaneuous' stimuli.
         shuffled_mean = np.empty((self.numbercells, n_samples))
@@ -185,7 +211,7 @@ class StimulusAnalysis(object):
                 shuffled_mean[i, shuf] = len(spikes[(spikes > idx[shuf]) & (spikes < (idx[shuf] + offset))])
 
         sweep_p_values = pd.DataFrame(index=self.stim_table.index.values, columns=self.sweep_events.columns)
-        for i, v in enumerate(self.spikes.keys()):
+        for i, v in enumerate(self.spikes.keys()): # TODO: v -> unit_id
             subset = self.mean_sweep_events[v].values
             null_dist_mat = np.tile(shuffled_mean[i, :], reps=(len(subset), 1))
             actual_is_less = subset.reshape(len(subset), 1) <= null_dist_mat
@@ -200,7 +226,7 @@ class StimulusAnalysis(object):
         :param specimen_id:
         :param st_mask:
         :return:
-        """
+        """  # TODO: what are these?
         subset = self.sweep_events[st_mask][specimen_id].values
         subset += 1.0
         corr_matrix = np.empty((len(subset), len(subset)))
@@ -220,7 +246,7 @@ class StimulusAnalysis(object):
 
 def get_fr(spikes, num_timestep_second=30, filter_width=0.1):
     spikes = spikes.astype(float)
-    spike_train = np.zeros((int(3.1*num_timestep_second)))  # hardcoded 3 second sweep length
+    spike_train = np.zeros((int(3.1*num_timestep_second)))  # TODO: hardcoded 3 second sweep length
     spike_train[(spikes*num_timestep_second).astype(int)] = 1
     filter_width = int(filter_width*num_timestep_second)
     fr = ndi.gaussian_filter(spike_train, filter_width)

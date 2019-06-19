@@ -202,7 +202,7 @@ class StaticGratings(StimulusAnalysis):
 
     def _get_lifetime_sparseness(self):
         response = self.response_events[:, 1:, :, :, 0].reshape(120, self.numbercells)
-        return ((1 - (1 / 120.) * ((np.power(response.sum(axis=0), 2)) / (np.power(response, 2).sum(axis=0)))) / (
+        return ((1 - (1 / 120.) * ((np.power(response.sum(axis=0), 2)) / (np.power(response, 2).sum(axis=0)))) / ( # TODO What is up here?
                     1 - (1 / 120.)))
 
     def _get_response_events(self):
@@ -227,7 +227,7 @@ class StaticGratings(StimulusAnalysis):
         subset_p = self.sweep_p_values[np.isnan(self.stim_table['Ori'])]
         response_events[0, 0, 0, :, 0] = subset.mean(axis=0)
         response_events[0, 0, 0, :, 1] = subset.std(axis=0) / np.sqrt(len(subset))
-        response_events[0, 0, 0, :, 2] = subset_p[subset_p < 0.05].count().values
+        response_events[0, 0, 0, :, 2] = subset_p[subset_p < 0.05].count().values # TODO: parametrize alpha
 
         self._response_events = response_events
 
@@ -313,7 +313,7 @@ class StaticGratings(StimulusAnalysis):
         else:
             return np.NaN, np.NaN, np.NaN, np.NaN
 
-    def _fit_sf_tuning(self, pref_ori, pref_sf, pref_phase, nc):
+    def _fit_sf_tuning(self, pref_ori, pref_sf, pref_phase, nc):  # TODO: magic numbers?
         """performs gaussian or exponential fit on the spatial frequency tuning curve at preferred orientation/phase.
 
         :param pref_ori:
@@ -367,7 +367,7 @@ class StaticGratings(StimulusAnalysis):
 
 
 def do_sweep_mean_shifted(x):
-    return len(x[(x > 0.066) & (x < 0.316)])/0.25
+    return len(x[(x > 0.066) & (x < 0.316)])/0.25 # TODO: what? looks like spike count in a time range, but doesn't match logically to 1s offset
 
 
 def gauss_function(x, a, x0, sigma):
