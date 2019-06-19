@@ -369,7 +369,7 @@ def add_running_speed_to_nwbfile(nwbfile, running_speed, units=None):
     rotation_timeseries = pynwb.base.TimeSeries(
         name="running_wheel_rotation",
         timestamps=running_speed_timeseries,
-        data=running_speed["rotation"].values,
+        data=running_speed["net_rotation"].values,
         unit=units["rotation"]
     )
 
@@ -385,10 +385,7 @@ def add_raw_running_data_to_nwbfile(nwbfile, raw_running_data, units=None):
 
     raw_rotation_timeseries = pynwb.base.TimeSeries(
         name="raw_running_wheel_rotation",
-        timestamps=np.array([
-            raw_running_data["start_time"].values, 
-            raw_running_data["end_time"].values
-        ]),
+        timestamps=np.array(raw_running_data["frame_time"]),
         data=raw_running_data["dx"].values,
         unit=units["rotation"]
     )
@@ -410,6 +407,8 @@ def add_raw_running_data_to_nwbfile(nwbfile, raw_running_data, units=None):
     nwbfile.add_acquisition(raw_rotation_timeseries)
     nwbfile.add_acquisition(vsig_ts)
     nwbfile.add_acquisition(vin_ts)
+
+    return nwbfile
 
 
 def write_probe_lfp_file(session_start_time, log_level, probe):

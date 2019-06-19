@@ -39,7 +39,17 @@ def running_speed():
         "start_time": [1., 2., 3., 4., 5.],
         "end_time": [2., 3., 4., 5., 6.],
         "velocity": [-1., -2., -1., 0., 1.],
-        "rotation": [-np.pi, -2 *np.pi, -np.pi, 0, np.pi]
+        "net_rotation": [-np.pi, -2 *np.pi, -np.pi, 0, np.pi]
+    })
+
+
+@pytest.fixture
+def raw_running_data():
+    return pd.DataFrame({
+        "frame_time": np.random.rand(4),
+        "dx": np.random.rand(4),
+        "vsig": np.random.rand(4),
+        "vin": np.random.rand(4),
     })
 
 
@@ -153,9 +163,24 @@ def test_add_running_speed_to_nwbfile(nwbfile, running_speed, roundtripper, roun
     
     expected = running_speed
     if not include_rotation:
-        expected = expected.drop(columns="rotation")
+        expected = expected.drop(columns="net_rotation")
     pd.testing.assert_frame_equal(expected, obtained, check_like=True)
 
+
+@pytest.mark.parametrize('roundtrip', [[True]])
+def test_add_raw_running_Data_to_nwbfile(nwbfile, raw_running_data, roundtripper, roundtrip):
+
+    nwbfile = write_nwb.add_raw_running_data_to_nwbfile(nwbfile, raw_running_data)
+    if roundtrip:
+        api_obt = roundtripper(nwbfile, EcephysNwbSessionApi)
+    else:
+        api_obt = EcephysNwbSessionApi.from_nwbfile(nwbfile)
+
+    obtained = api_obt.get_raw_running_data()
+
+
+    expected = raw_running_data.rename(columns={"dx": "net_rotation", "vsig": "signal_voltage", "vin": "supply_voltage"})
+    pd.testing.assert_frame_equal(expected, obtained, check_like=True)
 
 
 def test_read_stimulus_table(tmpdir_factory, stimulus_presentations):

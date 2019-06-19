@@ -85,9 +85,22 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
 
         if include_rotation:
             rotation_series = running_module["running_wheel_rotation"]
-            running["rotation"] = rotation_series.data[:]
+            running["net_rotation"] = rotation_series.data[:]
 
         return running
+
+    def get_raw_running_data(self):
+        rotation_series = self.nwbfile.get_acquisition("raw_running_wheel_rotation")
+        signal_voltage_series = self.nwbfile.get_acquisition("running_wheel_signal_voltage")
+        supply_voltage_series = self.nwbfile.get_acquisition("running_wheel_supply_voltage")
+
+        return pd.DataFrame({
+            "frame_time": rotation_series.timestamps[:],
+            "net_rotation": rotation_series.data[:],
+            "signal_voltage": signal_voltage_series.data[:],
+            "supply_voltage": supply_voltage_series.data[:]
+        })
+
 
     def get_ecephys_session_id(self) -> int:
         return int(self.nwbfile.identifier)

@@ -124,7 +124,7 @@ def main(
     )
 
     raw_data = pd.DataFrame(
-        {"vsig": vsig, "vin": vin, "frame_times": frame_times, "dx": dx_deg}
+        {"vsig": vsig, "vin": vin, "frame_time": frame_times, "dx": dx_deg}
     )
 
     store = pd.HDFStore(output_path)

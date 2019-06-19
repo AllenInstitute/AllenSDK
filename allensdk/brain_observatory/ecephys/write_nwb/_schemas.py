@@ -36,7 +36,7 @@ class Unit(RaisingSchema):
     peak_channel_id = Int(required=True)
     local_index = Int(
         required=True,
-        description="within-probe index of this unit. Used for indexing into the spike times file.",
+        help="within-probe index of this unit. Used for indexing into the spike times file.",
     )
     quality = String(required=True)
     firing_rate = Float(required=True)
@@ -67,36 +67,40 @@ class InputSchema(ArgSchema):
         unknown = RAISE
 
     log_level = LogLevel(
-        default="INFO", description="set the logging level of the module"
+        default="INFO", help="set the logging level of the module"
     )
     output_path = String(
         required=True,
         validate=check_write_access,
-        description="write outputs to here",
+        help="write outputs to here",
     )
     session_id = Int(
-        required=True, description="unique identifier for this ecephys session"
+        required=True, help="unique identifier for this ecephys session"
     )
     session_start_time = DateTime(
         required=True,
-        description="the date and time (iso8601) at which the session started",
+        help="the date and time (iso8601) at which the session started",
     )
     stimulus_table_path = String(
         required=True,
         validate=check_read_access,
-        description="path to stimulus table file",
+        help="path to stimulus table file",
     )
     probes = Nested(
         Probe,
         many=True,
         required=True,
-        description="records of the individual probes used for this experiment",
+        help="records of the individual probes used for this experiment",
     )
     running_speed_path = String(
         required=True,
-        description="data collected about the running behavior of the experiment's subject",
+        help="data collected about the running behavior of the experiment's subject",
+    )
+    pool_size = Int(
+        default=3, 
+        help="number of child processes used to write probewise lfp files"
     )
 
 
 class OutputSchema(RaisingSchema):
-    nwb_path = String(required=True, description="path to output file")
+    nwb_path = String(required=True, help="path to output file")
