@@ -47,7 +47,8 @@ def fill_df(df, str_fill=""):
 
 
 def get_inputs_from_lims(host, ecephys_session_id, output_root, job_queue, strategy):
-    ''' This is a development / testing utility for running this module from the Allen Institute for Brain Science's 
+    """
+     This is a development / testing utility for running this module from the Allen Institute for Brain Science's 
     Laboratory Information Management System (LIMS). It will only work if you are on our internal network.
 
     Parameters
@@ -340,26 +341,6 @@ def add_ragged_data_to_dynamic_table(
     )
 
 
-# def add_running_speed_to_nwbfile(nwbfile, running_speed, name='speed', unit='cm/s'):
-#     ''' Adds running speed data to an NWBFile as timeseries in acquisition
-
-#     '''
-
-#     running_speed_series = pynwb.base.TimeSeries(
-#         name=name,
-#         data=running_speed[].values,
-#         timestamps=running_speed.timestamps,
-#         unit=unit
-#     )
-
-#     running_mod = ProcessingModule('running', 'Running speed processing module')
-#     nwbfile.add_processing_module(running_mod)
-
-#     running_mod.add_data_interface(running_speed_series)
-
-#     return nwbfile
-
-
 DEFAULT_RUNNING_SPEED_UNITS = {
     "velocity": "cm/s",
     "vin": "V",
@@ -552,7 +533,7 @@ def write_ecephys_nwb(
     session_id, session_start_time, 
     stimulus_table_path, 
     probes, 
-    running_speed,
+    running_speed_path,
     pool_size,
     **kwargs
 ):
@@ -569,8 +550,9 @@ def write_ecephys_nwb(
 
     nwbfile = add_probewise_data_to_nwbfile(nwbfile, probes)
 
-    running_speed = read_running_speed(running_speed['running_speed_path'], running_speed['running_speed_timestamps_path'])
+    running_speed, raw_running_data = read_running_speed(running_speed_path)
     add_running_speed_to_nwbfile(nwbfile, running_speed)
+    add_raw_running_data_to_nwbfile(nwbfile, raw_running_data)
 
     Manifest.safe_make_parent_dirs(output_path)
     io = pynwb.NWBHDF5IO(output_path, mode='w')

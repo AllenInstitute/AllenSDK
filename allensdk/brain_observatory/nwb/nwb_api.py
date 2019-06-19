@@ -43,7 +43,7 @@ class NwbApi:
         try:
             with open(path, 'r'):
                 pass
-        except Exception as err:
+        except Exception:
             raise
 
         return cls(path=path)
