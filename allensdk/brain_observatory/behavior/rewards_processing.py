@@ -9,7 +9,7 @@ def get_rewards(data, time, stimulus_rebase_function):
         rewards = trial["rewards"]  # as i write this there can only ever be one reward per trial
         if rewards:
             rewards_dict["volume"].append(rewards[0][0])
-            rewards_dict["timestamps"].append(stimulus_rebase_function(time[rewards[0][2]]))
+            rewards_dict["timestamps"].append(stimulus_rebase_function(rewards[0][1]))
             rewards_dict["autorewarded"].append('auto_rewarded' in trial['trial_params'])
 
     df = pd.DataFrame(rewards_dict).set_index('timestamps', drop=True)

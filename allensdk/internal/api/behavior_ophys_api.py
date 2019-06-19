@@ -162,7 +162,7 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
     @memoize
     def get_rewards(self):
         behavior_stimulus_file = self.get_behavior_stimulus_file()
-        stimulus_timestamps = self.get_stimulus_timestamps()
+        stimulus_timestamps = self.get_stimulus_timestamps() - .0351
         data = pd.read_pickle(behavior_stimulus_file)
         rebase_function = self.get_stimulus_rebase_function()
         return get_rewards(data, stimulus_timestamps, rebase_function)

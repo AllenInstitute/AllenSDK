@@ -43,7 +43,7 @@ def get_sync_data(sync_path, use_acq_trigger=False):
     # monitor_delay = calculate_delay(sync_dataset, vs_f_sec, sample_freq)
     
     # add display lag
-    stimulus_frames_no_monitor_delay = sync_dataset.get_rising_edges('stim_vsync') / sample_freq
+    stimulus_frames_no_monitor_delay = sync_dataset.get_falling_edges('stim_vsync') / sample_freq
     stimulus_frames = stimulus_frames_no_monitor_delay + .0351# monitor_delay
     if 'lick_times' in meta_data['line_labels']:
         lick_times = sync_dataset.get_rising_edges('lick_1') / sample_freq
