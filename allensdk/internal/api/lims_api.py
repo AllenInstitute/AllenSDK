@@ -14,14 +14,14 @@ class LimsApi(PostgresQueryMixin):
 
     def get_behavior_tracking_video_filepath_df(self):
         query = '''
-                SELECT wkf.storage_directory || wkf.filename AS raw_behavior_tracking_video_filepath, attachable_type 
+                SELECT wkf.storage_directory || wkf.filename AS raw_behavior_tracking_video_filepath, attachable_type, attachable_id
                 FROM well_known_files wkf WHERE wkf.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'RawBehaviorTrackingVideo')
                 '''
         return pd.read_sql(query, self.get_connection())
 
     def get_eye_tracking_video_filepath_df(self):
         query = '''
-                SELECT wkf.storage_directory || wkf.filename AS raw_eye_tracking_video_filepath, attachable_type 
+                SELECT wkf.storage_directory || wkf.filename AS raw_eye_tracking_video_filepath, attachable_type, attachable_id
                 FROM well_known_files wkf WHERE wkf.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'RawEyeTrackingVideo')
                 '''
         return pd.read_sql(query, self.get_connection())
@@ -29,5 +29,5 @@ class LimsApi(PostgresQueryMixin):
 if __name__ == "__main__":
 
     api = LimsApi()
-    #print(api.get_behavior_tracking_video_filepath_df())
-    print(api.get_eye_tracking_video_filepath_df())
+    print(api.get_behavior_tracking_video_filepath_df())
+    #  print(api.get_eye_tracking_video_filepath_df())
