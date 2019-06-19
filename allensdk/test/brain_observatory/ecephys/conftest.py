@@ -35,10 +35,10 @@ def use_temp_dir(tmpdir_factory):
             json.dump(input_json_data, new_input_json)
 
         sp.check_call([
-                'python', '-m', module, 
-                '--input_json', new_input_json_path, 
-                '--output_json', output_json_path
-            ])
+            'python', '-m', module, 
+            '--input_json', new_input_json_path, 
+            '--output_json', output_json_path
+        ])
 
         with open(output_json_path, 'r') as output_json:
             output_json_data = json.load(output_json)
