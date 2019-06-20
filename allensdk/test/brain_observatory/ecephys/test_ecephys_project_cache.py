@@ -128,19 +128,12 @@ def test_get_channels(tmpdir_cache, channels):
     assert 1 == tmpdir_cache.fetch_api.accesses['get_channels']
 
 
-def test_get_session_data(tmpdir_cache):
+def test_get_session_data(shared_tmpdir, tmpdir_cache):
 
     sid = 12345
 
-    def rd(path, *args, **kwargs):
-        with open(path, 'r') as f:
-            return f.read()
+    data_one = tmpdir_cache.get_session_data(sid)
+    data_two = tmpdir_cache.get_session_data(sid)
 
-    with mock.patch('allensdk.brain_observatory.ecephys.ecephys_session.EcephysSession.from_nwb_path', new=rd):
-        data_one = tmpdir_cache.get_session_data(sid)
-        data_two = tmpdir_cache.get_session_data(sid)
-
-        assert str(sid) == data_one
-        assert str(sid) == data_two
-
-        assert 1 == tmpdir_cache.fetch_api.accesses['get_session_data']
+    assert 1 == tmpdir_cache.fetch_api.accesses['get_session_data']
+    assert os.path.join(shared_tmpdir, f"session_{sid}", f"session_{sid}.nwb") == data_one.api.path
