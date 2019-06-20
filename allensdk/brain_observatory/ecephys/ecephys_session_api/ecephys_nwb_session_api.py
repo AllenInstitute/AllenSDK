@@ -1,4 +1,5 @@
-from typing import Dict, Union, List, Optional
+from typing import Dict, Union, List, Optional, Callable, Iterable, Any
+from pathlib import Path
 
 import pandas as pd
 import numpy as np
@@ -6,12 +7,14 @@ import xarray as xr
 import pynwb
 
 from .ecephys_session_api import EcephysSessionApi
+from allensdk.brain_observatory.ecephys.file_promise import FilePromise
 from allensdk.brain_observatory.nwb.nwb_api import NwbApi
+
 
 
 class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
 
-    def __init__(self, path, probe_lfp_paths: Optional[Dict[int, str]] = None, **kwargs):
+    def __init__(self, path, probe_lfp_paths: Optional[Dict[int, FilePromise]] = None, **kwargs):
         super(EcephysNwbSessionApi, self).__init__(path, **kwargs)
         self.probe_lfp_paths = probe_lfp_paths
 
@@ -24,8 +27,8 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         elif probe_id not in self.probe_lfp_paths:
             raise KeyError(f"no probe lfp file path is recorded for probe {probe_id}")
 
-        reader = pynwb.NWBHDF5IO(self.probe_lfp_paths[probe_id], 'r')
-        return reader.read()
+        return self.probe_lfp_paths[probe_id]()
+
 
     def get_probes(self) -> pd.DataFrame:
         probes: Union[List, pd.DataFrame] = []
@@ -56,13 +59,11 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         return units_table
 
     def get_lfp(self, probe_id: int) -> xr.DataArray:
-        lfp = self._probe_nwbfile(probe_id).get_acquisition(f'probe_{probe_id}_lfp')
+        lfp_file = self._probe_nwbfile(probe_id)
+        lfp = lfp_file.get_acquisition(f'probe_{probe_id}_lfp')
         series = lfp.get_electrical_series(f'probe_{probe_id}_lfp_data')
 
-        electrodes = pd.DataFrame(
-            data=[ecr for ecr in series.electrodes], 
-            columns=['id'] + list(series.electrodes.table.colnames)
-        )
+        electrodes = lfp_file.electrodes.to_dataframe()
 
         data = series.data[:]
         timestamps = series.timestamps[:]
@@ -70,7 +71,7 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         return xr.DataArray(
             data=data,
             dims=['time', 'channel'],
-            coords=[timestamps, electrodes['id'].values]
+            coords=[timestamps, electrodes.index.values]
         )
 
     def get_running_speed(self, include_rotation=False):
