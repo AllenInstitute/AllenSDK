@@ -59,7 +59,6 @@ class EcephysNwb1Api(EcephysSessionApi):
             if not (version_str.startswith('NWB-1.') or version_str.startswith('1.')):
                 raise Exception('{} is not a valid NWB 1 file path'.format(self._path))
         except Exception:
-            warnings.warn(f"{self._path} is not a valid NWB 1 file path")
             raise
 
         # EcephysSession requires session wide ids for units/channels/etc but NWB 1 doesn't have such a thing (ids
