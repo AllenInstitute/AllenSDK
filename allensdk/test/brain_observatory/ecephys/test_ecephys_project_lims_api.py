@@ -130,7 +130,7 @@ def test_get_probe_data():
     class MockPgEngine:
         def select(self, rendered):
             pattern = re.compile(
-                r".*and earp.probe_id = (?P<probe_id>\d+).*", re.DOTALL
+                r".*and earp.ecephys_probe_id = (?P<probe_id>\d+).*", re.DOTALL
             )
             match = pattern.match(rendered)
             pid_obt = int(match["probe_id"])

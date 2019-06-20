@@ -56,7 +56,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             join well_known_file_types wkft on wkft.id = wkf.well_known_file_type_id
             where wkft.name ~ 'EcephysLfpNwb'
             and ear.current
-            and earp.probe_id = {{probe_id}}
+            and earp.ecephys_probe_id = {{probe_id}}
             """,
             engine=self.postgres_engine.select,
             probe_id=probe_id
