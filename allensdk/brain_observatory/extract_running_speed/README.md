@@ -1,12 +1,12 @@
 Extract running speed
 =====================
-Calculates an average running speed for the mouse on each stimulus frame.
+Calculates an average running speed for the subject on each stimulus frame.
 
 
 Running
 -------
 ```
-python -m ecephys_pipeline.modules.extract_running_speed --input_json <path to input json> --output_json <path to output json>
+python -m allensdk.brain_observatory.extract_running_speed --input_json <path to input json> --output_json <path to output json>
 ```
 See the schema file for detailed information about input json contents.
 
@@ -20,5 +20,6 @@ presented in this experiment.
 
 Output data
 -----------
-- Running speeds npy : for each frame, the average running speed on that frame
-- Timestamps npy : for each frame, the onset time of that frame (s, master clock)
+- Running speeds h5 : Contains two tables. These are:
+  - running_speed : rows are intervals. Columns list start and stop times, mean velocities, and the net rotations from which those velocities are calculated. Known artifacts are removed, but the data are otherwise unfiltered.
+  - raw_data : rows are samples. Columns list acquisition times, signal and supply voltages, and net rotations since the last timestamp.
