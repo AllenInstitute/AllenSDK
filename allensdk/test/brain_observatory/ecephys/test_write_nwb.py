@@ -33,6 +33,26 @@ def spike_times():
     }
 
 
+@pytest.fixture
+def running_speed():
+    return pd.DataFrame({
+        "start_time": [1., 2., 3., 4., 5.],
+        "end_time": [2., 3., 4., 5., 6.],
+        "velocity": [-1., -2., -1., 0., 1.],
+        "net_rotation": [-np.pi, -2 *np.pi, -np.pi, 0, np.pi]
+    })
+
+
+@pytest.fixture
+def raw_running_data():
+    return pd.DataFrame({
+        "frame_time": np.random.rand(4),
+        "dx": np.random.rand(4),
+        "vsig": np.random.rand(4),
+        "vin": np.random.rand(4),
+    })
+
+
 def test_roundtrip_metadata(roundtripper):
     nwbfile = pynwb.NWBFile(
         session_description='EcephysSession',
@@ -127,8 +147,11 @@ def test_add_ragged_data_to_dynamic_table(units_table, spike_times):
     assert np.allclose([13, 4, 12], units_table['spike_times'][2])
 
 
-@pytest.mark.parametrize('roundtrip', [True, False])
-def test_add_running_speed_to_nwbfile(nwbfile, running_speed, roundtripper, roundtrip):
+@pytest.mark.parametrize('roundtrip,include_rotation', [
+    [True, True],
+    [True, False]
+])
+def test_add_running_speed_to_nwbfile(nwbfile, running_speed, roundtripper, roundtrip, include_rotation):
 
     nwbfile = write_nwb.add_running_speed_to_nwbfile(nwbfile, running_speed)
     if roundtrip:
@@ -136,10 +159,28 @@ def test_add_running_speed_to_nwbfile(nwbfile, running_speed, roundtripper, roun
     else:
         api_obt = EcephysNwbSessionApi.from_nwbfile(nwbfile)
 
-    running_speed_obt = api_obt.get_running_speed()
+    obtained = api_obt.get_running_speed(include_rotation=include_rotation)
+    
+    expected = running_speed
+    if not include_rotation:
+        expected = expected.drop(columns="net_rotation")
+    pd.testing.assert_frame_equal(expected, obtained, check_like=True)
 
-    assert np.allclose(running_speed.timestamps, running_speed_obt.timestamps)
-    assert np.allclose(running_speed.values, running_speed_obt.values)
+
+@pytest.mark.parametrize('roundtrip', [[True]])
+def test_add_raw_running_Data_to_nwbfile(nwbfile, raw_running_data, roundtripper, roundtrip):
+
+    nwbfile = write_nwb.add_raw_running_data_to_nwbfile(nwbfile, raw_running_data)
+    if roundtrip:
+        api_obt = roundtripper(nwbfile, EcephysNwbSessionApi)
+    else:
+        api_obt = EcephysNwbSessionApi.from_nwbfile(nwbfile)
+
+    obtained = api_obt.get_raw_running_data()
+
+
+    expected = raw_running_data.rename(columns={"dx": "net_rotation", "vsig": "signal_voltage", "vin": "supply_voltage"})
+    pd.testing.assert_frame_equal(expected, obtained, check_like=True)
 
 
 def test_read_stimulus_table(tmpdir_factory, stimulus_presentations):

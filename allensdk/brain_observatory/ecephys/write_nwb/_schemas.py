@@ -1,9 +1,22 @@
 from marshmallow import RAISE
 
-from argschema import ArgSchema
-from argschema.fields import LogLevel, String, Int, DateTime, Nested, Boolean, Float
+from argschema import ArgSchema, ArgSchemaParser
+from argschema.schemas import DefaultSchema
+from argschema.fields import (
+    LogLevel,
+    String,
+    Int,
+    DateTime,
+    Nested,
+    Boolean,
+    Float,
+)
 
-from allensdk.brain_observatory.argschema_utilities import check_read_access, check_write_access, RaisingSchema
+from allensdk.brain_observatory.argschema_utilities import (
+    check_read_access,
+    check_write_access,
+    RaisingSchema,
+)
 from allensdk.brain_observatory.nwb.schemas import RunningSpeedPathsSchema
 
 
@@ -21,7 +34,10 @@ class Channel(RaisingSchema):
 class Unit(RaisingSchema):
     id = Int(required=True)
     peak_channel_id = Int(required=True)
-    local_index = Int(required=True, description='within-probe index of this unit. Used for indexing into the spike times file.')
+    local_index = Int(
+        required=True,
+        help="within-probe index of this unit. Used for indexing into the spike times file.",
+    )
     quality = String(required=True)
     firing_rate = Float(required=True)
     snr = Float(required=True)
@@ -48,15 +64,42 @@ class Probe(RaisingSchema):
 
 class InputSchema(ArgSchema):
     class Meta:
-        unknown=RAISE
-    log_level = LogLevel(default='INFO', description='set the logging level of the module')
-    output_path = String(required=True, validate=check_write_access, description='write outputs to here')
-    session_id = Int(required=True, description='unique identifier for this ecephys session')
-    session_start_time = DateTime(required=True, description='the date and time (iso8601) at which the session started')
-    stimulus_table_path = String(required=True, validate=check_read_access, description='path to stimulus table file')
-    probes = Nested(Probe, many=True, required=True, description='records of the individual probes used for this experiment')
-    running_speed = Nested(RunningSpeedPathsSchema, required=True, description='data collected about the running behavior of the experiment\'s subject')
-    pool_size = Int(default=3, help="number of child processes used to write probewise lfp files")
+        unknown = RAISE
+
+    log_level = LogLevel(
+        default="INFO", help="set the logging level of the module"
+    )
+    output_path = String(
+        required=True,
+        validate=check_write_access,
+        help="write outputs to here",
+    )
+    session_id = Int(
+        required=True, help="unique identifier for this ecephys session"
+    )
+    session_start_time = DateTime(
+        required=True,
+        help="the date and time (iso8601) at which the session started",
+    )
+    stimulus_table_path = String(
+        required=True,
+        validate=check_read_access,
+        help="path to stimulus table file",
+    )
+    probes = Nested(
+        Probe,
+        many=True,
+        required=True,
+        help="records of the individual probes used for this experiment",
+    )
+    running_speed_path = String(
+        required=True,
+        help="data collected about the running behavior of the experiment's subject",
+    )
+    pool_size = Int(
+        default=3, 
+        help="number of child processes used to write probewise lfp files"
+    )
 
 
 class ProbeOutputs(RaisingSchema):

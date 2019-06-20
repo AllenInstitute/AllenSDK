@@ -14,19 +14,20 @@ import numpy as np
 from hdmf.backends.hdf5.h5_utils import H5DataIO
 
 from allensdk.config.manifest import Manifest
-from allensdk.brain_observatory.running_speed import RunningSpeed
 
 from ._schemas import InputSchema, OutputSchema
-from allensdk.brain_observatory.nwb import add_running_speed_to_nwbfile, add_stimulus_presentations, add_stimulus_timestamps
-from allensdk.brain_observatory.argschema_utilities import write_or_print_outputs
+from allensdk.brain_observatory.nwb import (
+    add_stimulus_presentations,
+    add_stimulus_timestamps,
+)
+from allensdk.brain_observatory.argschema_utilities import (
+    write_or_print_outputs,
+)
 from allensdk.brain_observatory import dict_to_indexed_array
 from allensdk.brain_observatory.ecephys.file_io.continuous_file import ContinuousFile
 
 
-STIM_TABLE_RENAMES_MAP = {
-    'Start': 'start_time',
-    'End': 'stop_time',
-}
+STIM_TABLE_RENAMES_MAP = {"Start": "start_time", "End": "stop_time"}
 
 
 def fill_df(df, str_fill=""):
@@ -46,7 +47,8 @@ def fill_df(df, str_fill=""):
 
 
 def get_inputs_from_lims(host, ecephys_session_id, output_root, job_queue, strategy):
-    ''' This is a development / testing utility for running this module from the Allen Institute for Brain Science's 
+    """
+     This is a development / testing utility for running this module from the Allen Institute for Brain Science's 
     Laboratory Information Management System (LIMS). It will only work if you are on our internal network.
 
     Parameters
@@ -65,20 +67,20 @@ def get_inputs_from_lims(host, ecephys_session_id, output_root, job_queue, strat
     data : dict
         Response from LIMS. Should meet the schema defined in _schemas.py
 
-    '''
-    
-    uri = f'{host}/input_jsons?object_id={ecephys_session_id}&object_class=EcephysSession&strategy_class={strategy}&job_queue_name={job_queue}&output_directory={output_root}'
+    """
+
+    uri = f"{host}/input_jsons?object_id={ecephys_session_id}&object_class=EcephysSession&strategy_class={strategy}&job_queue_name={job_queue}&output_directory={output_root}"
     response = requests.get(uri)
     data = response.json()
 
-    if len(data) == 1 and 'error' in data:
-        raise ValueError('bad request uri: {} ({})'.format(uri, data['error']))
+    if len(data) == 1 and "error" in data:
+        raise ValueError("bad request uri: {} ({})".format(uri, data["error"]))
 
-    return data 
+    return data
 
 
-def read_stimulus_table(path,  column_renames_map=None):
-    ''' Loads from a CSV on disk the stimulus table for this session. Optionally renames columns to match NWB 
+def read_stimulus_table(path, column_renames_map=None):
+    """ Loads from a CSV on disk the stimulus table for this session. Optionally renames columns to match NWB 
     epoch specifications.
 
     Parameters
@@ -94,23 +96,25 @@ def read_stimulus_table(path,  column_renames_map=None):
     pd.DataFrame : 
         stimulus table with applied renames
 
-    '''
+    """
 
-    if column_renames_map  is None:
+    if column_renames_map is None:
         column_renames_map = STIM_TABLE_RENAMES_MAP
 
     ext = PurePath(path).suffix
 
-    if ext == '.csv':
+    if ext == ".csv":
         stimulus_table = pd.read_csv(path)
     else:
-        raise IOError(f'unrecognized stimulus table extension: {ext}')
+        raise IOError(f"unrecognized stimulus table extension: {ext}")
 
     return stimulus_table.rename(columns=column_renames_map, index={})
 
 
-def read_spike_times_to_dictionary(spike_times_path, spike_units_path, local_to_global_unit_map=None):
-    ''' Reads spike times and assigned units from npy files into a lookup table.
+def read_spike_times_to_dictionary(
+    spike_times_path, spike_units_path, local_to_global_unit_map=None
+):
+    """ Reads spike times and assigned units from npy files into a lookup table.
 
     Parameters
     ----------
@@ -127,7 +131,7 @@ def read_spike_times_to_dictionary(spike_times_path, spike_units_path, local_to_
     output_times : dict
         keys are unit identifiers, values are spike time arrays
 
-    '''
+    """
 
     spike_times = np.squeeze(np.load(spike_times_path, allow_pickle=False))
     spike_units = np.squeeze(np.load(spike_units_path, allow_pickle=False))
@@ -135,7 +139,13 @@ def read_spike_times_to_dictionary(spike_times_path, spike_units_path, local_to_
     sort_order = np.argsort(spike_units)
     spike_units = spike_units[sort_order]
     spike_times = spike_times[sort_order]
-    changes = np.concatenate([np.array([0]), np.where(np.diff(spike_units))[0] + 1, np.array([spike_times.size])])
+    changes = np.concatenate(
+        [
+            np.array([0]),
+            np.where(np.diff(spike_units))[0] + 1,
+            np.array([spike_times.size]),
+        ]
+    )
 
     output_times = {}
     for jj, (low, high) in enumerate(zip(changes[:-1], changes[1:])):
@@ -144,7 +154,9 @@ def read_spike_times_to_dictionary(spike_times_path, spike_units_path, local_to_
 
         if local_to_global_unit_map is not None:
             if local_unit not in local_to_global_unit_map:
-                logging.warning(f'unable to find unit at local position {local_unit} while reading spike times')
+                logging.warning(
+                    f"unable to find unit at local position {local_unit} while reading spike times"
+                )
                 continue
             global_id = local_to_global_unit_map[local_unit]
             output_times[global_id] = unit_times
@@ -154,8 +166,10 @@ def read_spike_times_to_dictionary(spike_times_path, spike_units_path, local_to_
     return output_times
 
 
-def read_waveforms_to_dictionary(waveforms_path, local_to_global_unit_map=None, peak_channel_map=None):
-    ''' Builds a lookup table for unitwise waveform data
+def read_waveforms_to_dictionary(
+    waveforms_path, local_to_global_unit_map=None, peak_channel_map=None
+):
+    """ Builds a lookup table for unitwise waveform data
 
     Parameters
     ----------
@@ -172,51 +186,54 @@ def read_waveforms_to_dictionary(waveforms_path, local_to_global_unit_map=None, 
     output_waveforms : dict
         Keys are unit identifiers, values are samples X channels data arrays.
 
-    '''
+    """
 
     waveforms = np.squeeze(np.load(waveforms_path, allow_pickle=False))
     output_waveforms = {}
-    for unit_id, waveform in enumerate(np.split(waveforms, waveforms.shape[0], axis=0)):
+    for unit_id, waveform in enumerate(
+        np.split(waveforms, waveforms.shape[0], axis=0)
+    ):
         if local_to_global_unit_map is not None:
             if unit_id not in local_to_global_unit_map:
-                logging.warning(f'unable to find unit at local position {unit_id} while reading waveforms')
+                logging.warning(
+                    f"unable to find unit at local position {unit_id} while reading waveforms"
+                )
                 continue
             unit_id = local_to_global_unit_map[unit_id]
 
         if peak_channel_map is not None:
             waveform = waveform[:, peak_channel_map[unit_id]]
-        
+
         output_waveforms[unit_id] = np.squeeze(waveform)
 
     return output_waveforms
 
 
-def read_running_speed(values_path, timestamps_path):
-    ''' Reads running speed data and timestamps into a RunningSpeed named tuple
+def read_running_speed(path):
+    """ Reads running speed data and timestamps into a RunningSpeed named tuple
 
     Parameters
     ----------
-    values_path : str
-        path to npy file containing running speed values (cm / s) per sample
-    timestamps_path : str
-        path to npy file identifying the time at which each running speed sample was collected
+    path : str
+        path to running speed store
 
 
     Returns
     -------
-    RunningSpeed : 
-        contains values and timestamps
+    tuple : 
+        first item is dataframe of running speed data, second is dataframe of 
+        raw values (vsig, vin, encoder rotation)
 
-    '''
+    """
 
-    return RunningSpeed(
-        timestamps=np.squeeze(np.load(timestamps_path, allow_pickle=False)),
-        values=np.squeeze(np.load(values_path, allow_pickle=False))
+    return (
+        pd.read_hdf(path, key="running_speed"), 
+        pd.read_hdf(path, key="raw_data")
     )
 
 
-def add_probe_to_nwbfile(nwbfile, probe_id, description='', location=''):
-    ''' Creates objects required for representation of a single extracellular ephys probe within an NWB file. These objects amount 
+def add_probe_to_nwbfile(nwbfile, probe_id, description="", location=""):
+    """ Creates objects required for representation of a single extracellular ephys probe within an NWB file. These objects amount 
     to a Device (this will be removed at some point from pynwb) and an ElectrodeGroup.
 
     Parameters
@@ -241,16 +258,16 @@ def add_probe_to_nwbfile(nwbfile, probe_id, description='', location=''):
         probe_nwb_electrode_group : pynwb.ecephys.ElectrodeGroup
             electrode group object corresponding to this probe
 
-    '''
+    """
 
     probe_nwb_device = pynwb.device.Device(name=str(probe_id))
     probe_nwb_electrode_group = pynwb.ecephys.ElectrodeGroup(
         name=str(probe_id),
         description=description,
         location=location,
-        device=probe_nwb_device
+        device=probe_nwb_device,
     )
-    
+
     nwbfile.add_device(probe_nwb_device)
     nwbfile.add_electrode_group(probe_nwb_electrode_group)
 
@@ -258,7 +275,7 @@ def add_probe_to_nwbfile(nwbfile, probe_id, description='', location=''):
 
 
 def prepare_probewise_channel_table(channels, electrode_group):
-    ''' Builds an NWB-ready dataframe of probewise channels
+    """ Builds an NWB-ready dataframe of probewise channels
 
     Parameters
     ----------
@@ -277,23 +294,27 @@ def prepare_probewise_channel_table(channels, electrode_group):
     channel_table : pd.DataFrame
         probewise channel table, ready to be concatenated and passed to ElectrodeTable.from_dataframe
 
-    '''
+    """
 
     channel_table = pd.DataFrame(channels).copy()
 
-    if 'id' in channel_table.columns and channel_table.index.name != 'id':
-        channel_table = channel_table.set_index(keys='id', drop=True)
-    elif 'id' in channel_table.columns and channel_table.index.name == 'id':
-        raise ValueError('found both column and index named \"id\"')
-    elif channel_table.index.name != 'id':
-        raise ValueError(f'unable to recognize ids in this channel table. index: {channel_table.index}, columns: {channel_table.columns}')
+    if "id" in channel_table.columns and channel_table.index.name != "id":
+        channel_table = channel_table.set_index(keys="id", drop=True)
+    elif "id" in channel_table.columns and channel_table.index.name == "id":
+        raise ValueError('found both column and index named "id"')
+    elif channel_table.index.name != "id":
+        raise ValueError(
+            f"unable to recognize ids in this channel table. index: {channel_table.index}, columns: {channel_table.columns}"
+        )
 
-    channel_table['group'] = electrode_group
+    channel_table["group"] = electrode_group
     return channel_table
 
 
-def add_ragged_data_to_dynamic_table(table, data, column_name, column_description=''):
-    ''' Builds the index and data vectors required for writing ragged array data to a pynwb dynamic table
+def add_ragged_data_to_dynamic_table(
+    table, data, column_name, column_description=""
+):
+    """ Builds the index and data vectors required for writing ragged array data to a pynwb dynamic table
 
     Parameters
     ----------
@@ -310,12 +331,84 @@ def add_ragged_data_to_dynamic_table(table, data, column_name, column_descriptio
     -------
     nwbfile : pynwb.NWBFile
 
-    '''
+    """
 
     idx, values = dict_to_indexed_array(data, table.id)
     del data
 
-    table.add_column(name=column_name, description=column_description, data=values, index=idx)
+    table.add_column(
+        name=column_name, description=column_description, data=values, index=idx
+    )
+
+
+DEFAULT_RUNNING_SPEED_UNITS = {
+    "velocity": "cm/s",
+    "vin": "V",
+    "vsig": "V",
+    "rotation": "radians"
+}
+
+
+def add_running_speed_to_nwbfile(nwbfile, running_speed, units=None):
+    if units is None:
+        units = DEFAULT_RUNNING_SPEED_UNITS
+
+    running_mod = pynwb.ProcessingModule("running", "running speed data")
+    nwbfile.add_processing_module(running_mod)
+
+    running_speed_timeseries = pynwb.base.TimeSeries(
+        name="running_speed",
+        timestamps=np.array([
+            running_speed["start_time"].values, 
+            running_speed["end_time"].values
+        ]),
+        data=running_speed["velocity"].values,
+        unit=units["velocity"]
+    )
+
+    rotation_timeseries = pynwb.base.TimeSeries(
+        name="running_wheel_rotation",
+        timestamps=running_speed_timeseries,
+        data=running_speed["net_rotation"].values,
+        unit=units["rotation"]
+    )
+
+    running_mod.add_data_interface(running_speed_timeseries)
+    running_mod.add_data_interface(rotation_timeseries)
+
+    return nwbfile
+
+
+def add_raw_running_data_to_nwbfile(nwbfile, raw_running_data, units=None):
+    if units is None:
+        units = DEFAULT_RUNNING_SPEED_UNITS
+
+    raw_rotation_timeseries = pynwb.base.TimeSeries(
+        name="raw_running_wheel_rotation",
+        timestamps=np.array(raw_running_data["frame_time"]),
+        data=raw_running_data["dx"].values,
+        unit=units["rotation"]
+    )
+
+    vsig_ts = pynwb.base.TimeSeries(
+        name="running_wheel_signal_voltage",
+        timestamps=raw_rotation_timeseries,
+        data=raw_running_data["vsig"].values,
+        unit=units["vsig"]
+    )
+
+    vin_ts = pynwb.base.TimeSeries(
+        name="running_wheel_supply_voltage",
+        timestamps=raw_rotation_timeseries,
+        data=raw_running_data["vin"].values,
+        unit=units["vin"]
+    )
+
+    nwbfile.add_acquisition(raw_rotation_timeseries)
+    nwbfile.add_acquisition(vsig_ts)
+    nwbfile.add_acquisition(vin_ts)
+
+    return nwbfile
 
 
 def write_probe_lfp_file(session_start_time, log_level, probe):
@@ -418,17 +511,17 @@ def add_probewise_data_to_nwbfile(nwbfile, probes):
     nwbfile.units = pynwb.misc.Units.from_dataframe(fill_df(units_table), name='units')
 
     add_ragged_data_to_dynamic_table(
-        table=nwbfile.units, 
-        data=spike_times, 
-        column_name='spike_times', 
-        column_description='times (s) of detected spiking events'
+        table=nwbfile.units,
+        data=spike_times,
+        column_name="spike_times",
+        column_description="times (s) of detected spiking events",
     )
 
     add_ragged_data_to_dynamic_table(
-        table=nwbfile.units, 
-        data=mean_waveforms, 
-        column_name='waveform_mean', 
-        column_description='mean waveforms on peak channels (and over samples)'
+        table=nwbfile.units,
+        data=mean_waveforms,
+        column_name="waveform_mean",
+        column_description="mean waveforms on peak channels (and over samples)",
     )
 
     return nwbfile
@@ -439,7 +532,7 @@ def write_ecephys_nwb(
     session_id, session_start_time, 
     stimulus_table_path, 
     probes, 
-    running_speed,
+    running_speed_path,
     pool_size,
     **kwargs
 ):
@@ -456,8 +549,9 @@ def write_ecephys_nwb(
 
     nwbfile = add_probewise_data_to_nwbfile(nwbfile, probes)
 
-    running_speed = read_running_speed(running_speed['running_speed_path'], running_speed['running_speed_timestamps_path'])
+    running_speed, raw_running_data = read_running_speed(running_speed_path)
     add_running_speed_to_nwbfile(nwbfile, running_speed)
+    add_raw_running_data_to_nwbfile(nwbfile, raw_running_data)
 
     Manifest.safe_make_parent_dirs(output_path)
     io = pynwb.NWBHDF5IO(output_path, mode='w')
@@ -474,22 +568,25 @@ def write_ecephys_nwb(
 
 
 def main():
-    logging.basicConfig(format='%(asctime)s - %(process)s - %(levelname)s - %(message)s')
+    logging.basicConfig(
+        format="%(asctime)s - %(process)s - %(levelname)s - %(message)s"
+    )
 
     remaining_args = sys.argv[1:]
     input_data = {}
-    if '--get_inputs_from_lims' in sys.argv:
+    if "--get_inputs_from_lims" in sys.argv:
         lims_parser = argparse.ArgumentParser(add_help=False)
-        lims_parser.add_argument('--host', type=str, default='http://lims2')
-        lims_parser.add_argument('--job_queue', type=str, default=None)
-        lims_parser.add_argument('--strategy', type=str,default= None)
-        lims_parser.add_argument('--ecephys_session_id', type=int, default=None)
-        lims_parser.add_argument('--output_root', type=str, default= None)
+        lims_parser.add_argument("--host", type=str, default="http://lims2")
+        lims_parser.add_argument("--job_queue", type=str, default=None)
+        lims_parser.add_argument("--strategy", type=str, default=None)
+        lims_parser.add_argument("--ecephys_session_id", type=int, default=None)
+        lims_parser.add_argument("--output_root", type=str, default=None)
 
         lims_args, remaining_args = lims_parser.parse_known_args(remaining_args)
-        remaining_args = [item for item in remaining_args if item != '--get_inputs_from_lims']
+        remaining_args = [
+            item for item in remaining_args if item != "--get_inputs_from_lims"
+        ]
         input_data = get_inputs_from_lims(**lims_args.__dict__)
-
 
     try:
         parser = argschema.ArgSchemaParser(
@@ -506,5 +603,5 @@ def main():
     write_or_print_outputs(output, parser)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
