@@ -84,10 +84,11 @@ class EcephysNwb1Api(EcephysSessionApi):
 
     def get_running_speed(self) -> RunningSpeed:
         running_speed_grp = self.running_speed_grp
-        return RunningSpeed(
-            timestamps=running_speed_grp['timestamps'][()],
-            values=running_speed_grp['data'][()]
-        )
+
+        return pd.DataFrame({
+            "timestamps": running_speed_grp['timestamps'][:],
+            "values": running_speed_grp['data'][:] # TODO: what has been done to these? Are they just dx?
+        })
 
     __stim_col_map = {
         # Used for mapping column names from NWB 1.0 features ds to their appropiate NWB 2.0 name
