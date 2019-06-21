@@ -2,7 +2,7 @@ import pandas as pd
 from collections import defaultdict
 
 
-def get_rewards(data, time, stimulus_rebase_function):
+def get_rewards(data, stimulus_rebase_function):
     trial_df = pd.DataFrame(data["items"]["behavior"]['trial_log'])
     rewards_dict = {'volume': [], 'timestamps': [], 'autorewarded': []}
     for idx, trial in trial_df.iterrows():
