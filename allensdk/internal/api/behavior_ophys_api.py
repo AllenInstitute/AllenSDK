@@ -33,7 +33,8 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
 
     @memoize
     def get_stimulus_timestamps(self):
-        return self.get_sync_data()['stimulus_frames']
+        monitor_delay = .0351
+        return self.get_sync_data()['stimulus_times_no_delay'] + monitor_delay
 
     @memoize
     def get_ophys_timestamps(self):
@@ -162,10 +163,9 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
     @memoize
     def get_rewards(self):
         behavior_stimulus_file = self.get_behavior_stimulus_file()
-        stimulus_timestamps = self.get_stimulus_timestamps()
         data = pd.read_pickle(behavior_stimulus_file)
         rebase_function = self.get_stimulus_rebase_function()
-        return get_rewards(data, stimulus_timestamps, rebase_function)
+        return get_rewards(data, rebase_function)
 
     @memoize
     def get_task_parameters(self):
@@ -176,14 +176,12 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
     @memoize
     def get_trials(self):
 
-        stimulus_timestamps_no_monitor_delay = self.get_sync_data()['stimulus_frames_no_delay']
         licks = self.get_licks()
         behavior_stimulus_file = self.get_behavior_stimulus_file()
         data = pd.read_pickle(behavior_stimulus_file)
         rewards = self.get_rewards()
         rebase_function = self.get_stimulus_rebase_function()
-
-        trial_df = get_trials(data, stimulus_timestamps_no_monitor_delay, licks, rewards, rebase_function)
+        trial_df = get_trials(data, licks, rewards, rebase_function)
 
         return trial_df
 
@@ -233,7 +231,7 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
         return safe_system_path(self.fetchone(query, strict=True))
 
     def get_stimulus_rebase_function(self):
-        stimulus_timestamps_no_monitor_delay = self.get_sync_data()['stimulus_frames_no_delay']
+        stimulus_timestamps_no_monitor_delay = self.get_sync_data()['stimulus_times_no_delay']
         behavior_stimulus_file = self.get_behavior_stimulus_file()
         data = pd.read_pickle(behavior_stimulus_file)
         stimulus_rebase_function = get_stimulus_rebase_function(data, stimulus_timestamps_no_monitor_delay)
