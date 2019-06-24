@@ -12,6 +12,6 @@ requests-toolbelt
 simplejson>=3.10.0
 scikit-image>=0.14.0
 scikit-build
-statsmodels>=0.8.0
+statsmodels==0.9.0
 simpleitk
 tables>=3.5.1
