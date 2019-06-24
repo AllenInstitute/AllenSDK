@@ -182,16 +182,13 @@ def get_trials(data, licks_df, rewards_df, rebase):
         reward_times = rebased_reward_times[np.where(np.logical_and(rebased_reward_times >= start_time, rebased_reward_times <= stop_time))]
         trial_data['reward_times'].append(reward_times)
 
-        sham_change = True if ('sham_change', '') in event_dict else False
-        trial_data['sham_change'].append(sham_change)
-
         stimulus_change = True if ('stimulus_changed', '') in event_dict else False
         trial_data['stimulus_change'].append(stimulus_change)
 
-        change_time = event_dict.get(('stimulus_changed', '')) or event_dict.get(('sham_change', '')) if stimulus_change or sham_change else float('nan')
+        change_time = event_dict.get(('stimulus_changed', '')) or event_dict.get(('sham_change', '')) if stimulus_change or catch else float('nan')
         trial_data['change_time'].append(change_time)
 
-        if not (sham_change or stimulus_change):
+        if not (catch or stimulus_change):
             response_latency = None
         else:
             if hit or false_alarm:
