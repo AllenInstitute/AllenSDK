@@ -247,7 +247,17 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
 
         api = PostgresQueryMixin()
         query = '''
-                SELECT oec.visual_behavior_experiment_container_id as container_id, oec.ophys_experiment_id, oe.workflow_state, d.full_genotype as full_genotype, id.depth, st.acronym
+                SELECT
+
+                oec.visual_behavior_experiment_container_id as container_id,
+                oec.ophys_experiment_id,
+                oe.workflow_state,
+                d.full_genotype as full_genotype,
+                id.depth as imaging_depth,
+                st.acronym as targeted_structure,
+                os.name as session_name,
+                equipment.name as equipment_name
+
                 FROM ophys_experiments_visual_behavior_experiment_containers oec
                 LEFT JOIN ophys_experiments oe ON oe.id = oec.ophys_experiment_id
                 LEFT JOIN ophys_sessions os ON oe.ophys_session_id = os.id
@@ -255,6 +265,7 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
                 LEFT JOIN donors d ON d.id=sp.donor_id
                 LEFT JOIN imaging_depths id ON id.id=os.imaging_depth_id
                 LEFT JOIN structures st ON st.id=oe.targeted_structure_id
+                LEFT JOIN equipment ON equipment.id=os.equipment_id
                 '''
 
         return pd.read_sql(query, api.get_connection())
