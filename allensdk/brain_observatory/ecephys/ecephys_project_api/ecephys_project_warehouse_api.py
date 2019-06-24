@@ -26,6 +26,23 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
         download_link = well_known_files.loc[0, "download_link"]
         return self.rma_engine.stream(download_link)
         
+    def get_probe_lfp_data(self, probe_id):
+        well_known_files = build_and_execute(
+            (
+                "criteria=model::WellKnownFile"
+                ",rma::criteria,well_known_file_type[name$eq'EcephysNwb']"
+                "[attachable_type$eq'EcephysProbe']"
+                r"[attachable_id$eq{{probe_id}}]"
+            ),
+            engine=self.rma_engine.get_rma_tabular, probe_id=probe_id
+        )
+
+        if well_known_files.shape[0] != 1:
+            raise ValueError(f"expected exactly 1 LFP NWB file for probe {probe_id}, found: {well_known_files}")
+        
+        download_link = well_known_files.loc[0, "download_link"]
+        return self.rma_engine.stream(download_link)
+
 
     def get_sessions(self, session_ids=None, has_eye_tracking=None, stimulus_names=None):
         criteria = session_ids is not None or has_eye_tracking is not None or stimulus_names is not None

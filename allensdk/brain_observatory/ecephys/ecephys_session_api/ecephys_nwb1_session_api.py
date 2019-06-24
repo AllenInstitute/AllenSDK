@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import h5py
 import collections
+import warnings
 
 # from allensdk.brain_observatory.nwb.nwb_api import NwbApi
 from .ecephys_session_api import EcephysSessionApi
@@ -57,8 +58,8 @@ class EcephysNwb1Api(EcephysSessionApi):
             version_str = self._h5_root['nwb_version'][()]
             if not (version_str.startswith('NWB-1.') or version_str.startswith('1.')):
                 raise Exception('{} is not a valid NWB 1 file path'.format(self._path))
-        except:
-            raise Exception('{} is not a valid NWB 1 file path'.format(self._path))
+        except Exception:
+            raise
 
         # EcephysSession requires session wide ids for units/channels/etc but NWB 1 doesn't have such a thing (ids
         # are relative to the probe). The following data-stuctures are used build and fetch session ids without having
@@ -82,10 +83,11 @@ class EcephysNwb1Api(EcephysSessionApi):
 
     def get_running_speed(self) -> RunningSpeed:
         running_speed_grp = self.running_speed_grp
-        return RunningSpeed(
-            timestamps=running_speed_grp['timestamps'][()],
-            values=running_speed_grp['data'][()]
-        )
+
+        return pd.DataFrame({
+            "timestamps": running_speed_grp['timestamps'][:],
+            "values": running_speed_grp['data'][:] # TODO: what has been done to these? Are they just dx?
+        })
 
     __stim_col_map = {
         # Used for mapping column names from NWB 1.0 features ds to their appropiate NWB 2.0 name

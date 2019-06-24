@@ -1,5 +1,4 @@
 import warnings
-import re
 from collections.abc import Collection
 
 import xarray as xr
@@ -8,7 +7,6 @@ import pandas as pd
 
 from allensdk.core.lazy_property import LazyPropertyMixin
 from allensdk.brain_observatory.ecephys.ecephys_session_api import EcephysSessionApi, EcephysNwbSessionApi, EcephysNwb1Api
-from ..running_speed import RunningSpeed
 
 
 NON_STIMULUS_PARAMETERS = tuple([
@@ -136,7 +134,7 @@ class EcephysSession(LazyPropertyMixin):
 
 
     def __init__(self, api, **kwargs):
-        self.api: EcephysSessionApi  = api
+        self.api: EcephysSessionApi = api
 
         self.ecephys_session_id = self.LazyProperty(self.api.get_ecephys_session_id)
         self.running_speed= self.LazyProperty(self.api.get_running_speed)
@@ -149,6 +147,30 @@ class EcephysSession(LazyPropertyMixin):
         self.stimulus_presentations = self.LazyProperty(self.api.get_stimulus_presentations, wrappers=[self._build_stimulus_presentations])
         self.units = self.LazyProperty(self.api.get_units, wrappers=[self._build_units_table])
         self.inter_presentation_intervals = self.LazyProperty(self._build_inter_presentation_intervals)
+
+
+    def get_lfp(self, probe_id):
+        ''' Load an xarray DataArray with LFP data from channels on a single probe
+
+        Parameters
+        ----------
+        probe_id : int
+            identify the probe whose LFP data ought to be loaded
+
+        Returns
+        -------
+        xr.DataArray :
+            dimensions are channel (id) and time (seconds). Values are sampled LFP data.
+
+        Notes
+        -----
+        Unlike many other data access methods on this class. This one does not cache the loaded data in memory due to 
+        the large size of the LFP data.
+
+        '''
+
+        return self.api.get_lfp(probe_id)
+
 
     def get_inter_presentation_intervals_for_stimulus(self, stimulus_names):
         ''' Get a subset of this session's inter-presentation intervals, filtered by stimulus name.
@@ -195,7 +217,8 @@ class EcephysSession(LazyPropertyMixin):
         return removed_unused_stimulus_presentation_columns(filtered_presentations)
 
 
-    def presentationwise_spike_counts(self, 
+    def presentationwise_spike_counts(
+        self, 
         bin_edges, 
         stimulus_presentation_ids, 
         unit_ids, 
@@ -237,7 +260,7 @@ class EcephysSession(LazyPropertyMixin):
         units = self._filter_owned_df('units', ids=unit_ids)
 
         largest_bin_size = np.amax(np.diff(bin_edges))
-        if binarize and largest_bin_size  > large_bin_size_threshold:
+        if binarize and largest_bin_size > large_bin_size_threshold:
             warnings.warn(
                 f'You\'ve elected to binarize spike counts, but your maximum bin width is {largest_bin_size:2.5f} seconds. '
                 'Binarizing spike counts with such a large bin width can cause significant loss of accuracy! '
@@ -498,7 +521,7 @@ class EcephysSession(LazyPropertyMixin):
             'manual_structure_id': 'structure_id',
             'manual_structure_acronym': 'structure_acronym',
             'local_index_channel': 'channel_local_index',
-            })
+        })
 
         table = table.loc[
             (table['valid_data'])
@@ -535,7 +558,7 @@ class EcephysSession(LazyPropertyMixin):
         if isinstance(self.api, EcephysNwb1Api):
             return self._build_nwb1_waveforms(mean_waveforms)
 
-        #TODO: there is a bug either here or (more likely) in LIMS unit data ingest which causes the peak channel 
+        # TODO: there is a bug either here or (more likely) in LIMS unit data ingest which causes the peak channel 
         # to be off by a few (exactly 1?) indices
         # we could easily recompute here, but better to fix it at the source
         channel_id_lut = {(row['local_index'], row['probe_id']): cid for cid, row in self.channels.iterrows()}

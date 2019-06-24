@@ -130,3 +130,36 @@ def test_dprime(rylan_dprime_meta):
     our_dprime = dprime(rylan_hit_rate, rylan_fa_rate, )
 
     assert np.allclose(rylan_dprime, our_dprime, equal_nan=True, ), "calculated dprime != rylan's dprime"
+
+@pytest.mark.requires_bamboo
+@pytest.mark.parametrize('ophys_experiment_id, number_omitted', [
+    pytest.param(789359614, 153),
+    pytest.param(792813858, 129)
+])
+def test_stimulus_presentations_omitted(ophys_experiment_id, number_omitted):
+    session = BehaviorOphysSession.from_lims(ophys_experiment_id)
+    df = session.stimulus_presentations
+    assert df['omitted'].sum() == number_omitted
+
+
+@pytest.mark.requires_bamboo
+@pytest.mark.parametrize('ophys_experiment_id', [
+    pytest.param(789359614),
+    pytest.param(792813858)
+])
+def test_trial_response_window_bounds_reward(ophys_experiment_id):
+
+    api = BehaviorOphysLimsApi(ophys_experiment_id)
+    session = BehaviorOphysSession(api)
+    response_window = session.task_parameters['response_window_sec']
+    for _, row in session.trials.iterrows():
+
+        lick_times = [(t - row.change_time) for t in row.lick_times]
+        reward_times = [(t - row.change_time) for t in row.reward_times]
+
+        if len(reward_times) > 0:
+            assert response_window[0] < reward_times[0] + 1/60
+            assert reward_times[0] < response_window[1] + 1/60
+            if len(session.licks) > 0:
+                assert lick_times[0] < reward_times[0]
+
