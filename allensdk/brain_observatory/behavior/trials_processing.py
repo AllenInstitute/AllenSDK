@@ -125,7 +125,7 @@ def resolve_initial_image(stimuli, start_frame):
     return initial_image_category_name, initial_image_group, initial_image_name
 
 
-def get_trials(data, stimulus_timestamps_no_monitor_delay, licks_df, rewards_df, rebase):
+def get_trials(data, licks_df, rewards_df, rebase):
     assert rewards_df.index.name == 'timestamps'
     stimuli = data["items"]["behavior"]["stimuli"]
 
