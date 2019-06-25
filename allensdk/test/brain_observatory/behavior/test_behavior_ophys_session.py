@@ -15,6 +15,7 @@ from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorO
 from allensdk.brain_observatory.behavior.write_nwb.__main__ import BehaviorOphysJsonApi
 from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi, equals
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
+from allensdk.brain_observatory.behavior.trials_processing import dprime
 
 
 @pytest.mark.nightly
