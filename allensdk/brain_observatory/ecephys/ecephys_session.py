@@ -101,6 +101,12 @@ class EcephysSession(LazyPropertyMixin):
             Color : numeric
             Image : numeric
             Phase : float
+            stimulus_condition_id : integer
+                identifies the session-unique stimulus condition (permutation of parameters) to which this presentation 
+                belongs
+    stimulus_conditions : pd.DataFrame
+        Each row is a unique permutation (within this session) of stimulus parameters presented during this experiment. 
+        Columns are as stimulus presentations, sans start_time, end_time, stimulus_block, and duration.
     inter_presentation_intervals : pd.DataFrame
         The elapsed time between each immediately sequential pair of stimulus presentations. This is a dataframe with a 
         two-level multiindex (levels are 'from_presentation_id' and 'to_presentation_id'). It has a single column, 
