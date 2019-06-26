@@ -220,61 +220,13 @@ def test_presentationwise_spike_times(spike_times_api):
     pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)
 
 
-# def test_conditionwise_spike_counts(spike_times_api):
-#     session = EcephysSession(api=spike_times_api)
-#     obtained = session.conditionwise_spike_counts(session.stimulus_presentations.index.values, session.units.index.values)
+def test_conditionwise_spike_statistics(spike_times_api):
+    session = EcephysSession(api=spike_times_api)
+    obtained = session.conditionwise_spike_statistics(stimulus_presentation_ids=[0, 1, 2])
 
-#     expected = pd.DataFrame({
-#         'unit_id': [2],
-#         'stimulus_name': ['a'],
-#         'TF': ['null'],
-#         'SF': ['null'],
-#         'Ori': ['null'],
-#         'Contrast': ['null'],
-#         'Pos_x': ['null'],
-#         'Pos_y': ['null'],
-#         'Color': [11],
-#         'Image': ['null'],
-#         'Phase': 120,
-#         'count': 3
-#     })
-
-#     pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)
-
-
-# def test_conditionwise_mean_spike_counts(spike_times_api):
-#     session = EcephysSession(api=spike_times_api)
-#     obtained = session.conditionwise_mean_spike_counts(session.stimulus_presentations.index.values, session.units.index.values)
-
-#     expected = pd.DataFrame({
-#         'unit_id': [2],
-#         'stimulus_name': ['a'],
-#         'TF': ['null'],
-#         'SF': ['null'],
-#         'Ori': ['null'],
-#         'Contrast': ['null'],
-#         'Pos_x': ['null'],
-#         'Pos_y': ['null'],
-#         'Color': [11],
-#         'Image': ['null'],
-#         'Phase': 120,
-#         'mean_spike_count': 3
-#     })
-
-#     pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)
-
-
-# def test_get_stimulus_conditions(just_stimulus_table_api):
-#     session = EcephysSession(api=just_stimulus_table_api)
-#     obtained = session.get_stimulus_conditions(stimulus_presentation_ids=[3])
-
-#     expected = pd.DataFrame({
-#         'Color': [16.5],
-#         'stimulus_name': ['a_movie'],
-#         'Phase': [180]
-#     })
-
-#     pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)
+    pd.set_option('display.max_columns', None)
+    assert obtained.loc[(2, 2), "spike_count"] == 3
+    assert obtained.loc[(2, 2), "stimulus_presentation_count"] == 1
 
 
 def test_get_stimulus_parameter_values(just_stimulus_table_api):
