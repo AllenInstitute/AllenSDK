@@ -374,7 +374,21 @@ class EcephysSession(LazyPropertyMixin):
 
 
     def conditionwise_spike_statistics(self, stimulus_presentation_ids=None, unit_ids=None):
-        """
+        """ Produce summary statistics for each distinct stimulus condition
+
+        Parameters
+        ----------
+        stimulus_presentation_ids : array-like
+            identifies stimulus presentations from which spikes will be considered
+        unit_ids : array-like
+            identifies units whose spikes will be considered
+
+        Returns
+        -------
+        pd.DataFrame :
+            Rows are indexed by unit id and stimulus condition id. Values are summary statistics describing spikes 
+            emitted by a specific unit across presentations within a specific condition.
+
         """
 
         presentations = self.stimulus_presentations.loc[stimulus_presentation_ids, ["stimulus_condition_id"]]
