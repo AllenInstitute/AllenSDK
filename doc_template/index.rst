@@ -90,20 +90,17 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
-What's New - Release 0.16.3 (May 22, 2019)
+What's New - Release 0.16.4 (XXX XX, 2019)
 -----------------------------------------------
 
-The 0.16.3 release resolves changes to the api of a dependency that resizes an image:
+The 0.16.4 includes some operational changes (a CODEOWNERS file!), and some dependency management changes to simplify installation
 
-    * `#659 <https://github.com/AllenInstitute/AllenSDK/issues/659>`_ Use pillow/Image.resize instead of scipy.misc.imresize
-    
-We also went back and made sure that the example Jupyter notebooks still run:
-
-    * `#661 <https://github.com/AllenInstitute/AllenSDK/issues/661>`_ Update example notebooks
+    * `#691 <https://github.com/AllenInstitute/AllenSDK/issues/691>`_ Create CODEOWNERS file
 
 Previous Release Notes
 ----------------------
 
+    * `0.16.3 <https://github.com/AllenInstitute/AllenSDK/wiki/Release-Notes-(0.16.3)>`_
     * `0.16.2 <https://github.com/AllenInstitute/AllenSDK/wiki/Release-Notes-(0.16.2)>`_
     * `0.16.1 <https://github.com/AllenInstitute/AllenSDK/wiki/Release-Notes-(0.16.1)>`_
     * `0.16.0 <https://github.com/AllenInstitute/AllenSDK/wiki/Release-Notes-(0.16.0)>`_

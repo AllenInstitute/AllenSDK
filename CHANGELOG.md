@@ -1,6 +1,15 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [0.16.4] = x-x-x
+
+### Added
+ - https://github.com/AllenInstitute/AllenSDK/issues/691 Create CODEOWNERS file
+
+### Changed
+ - https://github.com/AllenInstitute/AllenSDK/issues/782 Pin conda in appveyor config (conda==4.6.14)
+ - https://github.com/AllenInstitute/AllenSDK/issues/770 Pin statsmodels (statsmodels==0.9.0)
+
 ## [0.16.3] = 2019-5-22
 
 ### Bug Fixes

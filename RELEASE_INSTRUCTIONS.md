@@ -22,9 +22,9 @@
   - [ ] Change the draft to pull request to "ready for review"
   - [ ] Code Review with the Project Owner
   - [ ] Merge when it is ready; this will generate a merge commit, and this commit will be the official release commit.
-- [ ] Confirm that this official release commit passes all continuous integration:
-  - [ ] [python36 Build Plan](http://bamboo.corp.alleninstitute.org/browse/IFR-APG)
-  - [ ] [python27 Build Plan](http://bamboo.corp.alleninstitute.org/browse/IFR-AAG)
+- [ ] Confirm that all stages of the this official release commit passes all continuous integration (master branch):
+  - [ ] [Nightly Build Plan](http://bamboo.corp.alleninstitute.org/browse/IFR-ANG)
+  - [ ] [Continuoue Build Plan](http://bamboo.corp.alleninstitute.org/browse/IFR-AAG)
 - [ ] Create a Release: https://github.com/AllenInstitute/AllenSDK/releases <"Draft a new release" button>
   - [ ] Create a draft release
   - [ ] Review the release with the Project Owner
@@ -32,9 +32,7 @@
 
 ### Publish:
 
-- [ ] Push to pypi
-  - [ ] [python36 Deployment Plan](http://bamboo.corp.alleninstitute.org/deploy/viewDeploymentProjectEnvironments.action?id=169639939)
-  - [ ] [python27 Deployment Plan](http://bamboo.corp.alleninstitute.org/deploy/viewDeploymentProjectEnvironments.action?id=169639938)
+- [ ] Push to pypi: [Deployment Plan (all build whls)](http://bamboo.corp.alleninstitute.org/deploy/config/configureDeploymentProject.action?id=169639938)
 - [ ] After release/deployment, merge master back into internal
 - [ ] Create a new page for the release notes on the wiki: https://github.com/AllenInstitute/AllenSDK/wiki
 - [ ] Announce release on https://community.brain-map.org
