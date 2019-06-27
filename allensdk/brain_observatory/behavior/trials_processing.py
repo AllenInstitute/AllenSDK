@@ -170,7 +170,7 @@ def get_trials(data, licks_df, rewards_df, rebase):
         false_alarm = ('false_alarm', "") in event_dict
         trial_data['false_alarm'].append(false_alarm)
 
-        correct_reject = catch and not false_alarm
+        correct_reject = catch and not false_alarm and not aborted
         trial_data['correct_reject'].append(correct_reject)
 
         response_time = event_dict.get(('hit', '')) or event_dict.get(('false_alarm', '')) if hit or false_alarm else float('nan')
