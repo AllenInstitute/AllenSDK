@@ -31,6 +31,10 @@ class StimulusAnalysis(object):
         self._sweep_p_values = None
         self._peak = None
 
+        # An padding of time to look back when gathering events belong to a given stimulus, used by sweep_events and
+        # get_reliability
+        self._sweep_pre_time = kwargs.get('sweep_pre_time', 1.0)
+
     @property
     def ecephys_session(self):
         return self._ecephys_session
@@ -111,7 +115,7 @@ class StimulusAnalysis(object):
         """
 
         if self._sweep_events is None:
-            start_times = self.stim_table['start_time'].values - 1.0  # TODO: 1 second pre?
+            start_times = self.stim_table['start_time'].values - self._sweep_pre_time
             stop_times = self.stim_table['stop_time'].values
             sweep_events = pd.DataFrame(index=self.stim_table.index.values, columns=self.spikes.keys())
 
@@ -122,7 +126,7 @@ class StimulusAnalysis(object):
                 start_indicies = np.searchsorted(spikes, start_times, side='left')
                 stop_indicies = np.searchsorted(spikes, stop_times, side='right')
 
-                sweep_events[unit_id] = [spikes[start_indx:stop_indx] - start_times[indx] - 1.0 if stop_indx > start_indx else np.array([])
+                sweep_events[unit_id] = [spikes[start_indx:stop_indx] - start_times[indx] - self._sweep_pre_time if stop_indx > start_indx else np.array([])
                                              for indx, (start_indx, stop_indx) in enumerate(zip(start_indicies, stop_indicies))]
 
             self._sweep_events = sweep_events

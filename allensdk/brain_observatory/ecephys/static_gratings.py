@@ -2,6 +2,7 @@ from six import string_types
 import numpy as np
 import pandas as pd
 from scipy.optimize import curve_fit
+from functools import partial
 
 from .stimulus_analysis import StimulusAnalysis
 from .stimulus_analysis import get_lifetime_sparseness, get_osi, get_reliability, get_running_modulation
@@ -107,8 +108,9 @@ class StaticGratings(StimulusAnalysis):
     @property
     def mean_sweep_events(self):
         if self._mean_sweep_events is None:
-            # TODO: Should dtype for matrix be uint?
-            self._mean_sweep_events = self.sweep_events.applymap(do_sweep_mean_shifted)
+            # TODO: Calculate the upper and lower offsets from stim table + pre_sweep_buffer
+            shifted_mean_fnc = partial(do_sweep_mean_shifted, offset_lower=0.066, offset_upper=0.316)
+            self._mean_sweep_events = self.sweep_events.applymap(shifted_mean_fnc)
 
         return self._mean_sweep_events
 
@@ -195,7 +197,7 @@ class StaticGratings(StimulusAnalysis):
                 sf_tuning_responses = self.response_events[pref_ori, 1:, pref_phase, nc, 0]
                 sf_trials = self.mean_sweep_events[(self.stim_table[self._col_ori] == self.orivals[pref_ori]) &
                                                    (self.stim_table[self._col_phase] == self.phasevals[pref_phase])][unit_id].values
-                peak_df.loc[nc, 'sfdi_sg'] = get_sfdi(sf_tuning_responses, sf_trials)
+                peak_df.loc[nc, 'sfdi_sg'] = get_sfdi(sf_tuning_responses, sf_trials, self.number_sf)
 
                 # Running speed statistics
                 speed_subset = self.running_speed[stim_table_mask]
@@ -290,7 +292,7 @@ def fit_sf_tuning(sf_tuning_responses, sf_values, pref_sf_index):
     sf_low_cutoff = np.NaN
     sf_high_cutoff = np.NaN
     if pref_sf_index in range(1, len(sf_values)-1):
-        # If the prefered spatial freq is surround by other sf values try to fit the tunning curve with a gaussian.
+        # If the prefered spatial freq is an interior case try to fit the tunning curve with a gaussian.
         try:
             popt, pcov = curve_fit(gauss_function, range(5), sf_tuning_responses, p0=[np.amax(sf_tuning_responses),
                                                                                       pref_sf_index, 1.], maxfev=2000)
@@ -308,7 +310,7 @@ def fit_sf_tuning(sf_tuning_responses, sf_values, pref_sf_index):
         except Exception:
             pass
     else:
-        # If the prefered spatial freq is the first or last sf_val try to fit the tunning curve with an exponential
+        # If the prefered spatial freq is a boundary value try to fit the tunning curve with an exponential
         fit_sf_ind = pref_sf_index
         fit_sf = sf_values[pref_sf_index]
         try:
@@ -329,20 +331,24 @@ def fit_sf_tuning(sf_tuning_responses, sf_values, pref_sf_index):
     return fit_sf_ind, fit_sf, sf_low_cutoff, sf_high_cutoff
 
 
-def get_sfdi(sf_tuning_responses, mean_sweeps_trials):
-    """computes spatial frequency discrimination index for cell
+def get_sfdi(sf_tuning_responses, mean_sweeps_trials, bias=5):
+    """Computes spatial frequency discrimination index for cell
 
-    :param pref_ori:
-    :param pref_phase:
-    :param nc:
-    :return: sf discrimination index
+    :param sf_tuning_responses: sf_tuning_responses: An array of len N, with each value the (averaged) response of a
+        cell at a given spatial freq. stimulus.
+    :param mean_sweeps_trials: The set of events (spikes) across all trials of varying
+    :param bias:
+    :return: The sfdi value (float)
     """
-    sse_part = np.sqrt(np.sum((mean_sweeps_trials - mean_sweeps_trials.mean())**2) / (len(mean_sweeps_trials)-5))
+
+    trial_mean = mean_sweeps_trials.mean()
+    sse_part = np.sqrt(np.sum((mean_sweeps_trials - trial_mean)**2) / (len(mean_sweeps_trials) - bias))
     return (np.ptp(sf_tuning_responses)) / (np.ptp(sf_tuning_responses) + 2 * sse_part)
 
 
-def do_sweep_mean_shifted(x):
-    return len(x[(x > 0.066) & (x < 0.316)])/0.25 # TODO: what? looks like spike count in a time range, but doesn't match logically to 1s offset
+def do_sweep_mean_shifted(x, offset_lower, offset_upper):
+    # return len(x[(x > 0.066) & (x < 0.316)])/0.25
+    return len(x[(x > offset_lower) & (x < offset_upper)]) / 0.25
 
 
 def gauss_function(x, a, x0, sigma):
