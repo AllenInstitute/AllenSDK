@@ -19,7 +19,7 @@ class StimulusAnalysis(object):
             self._ecephys_session = EcephysSession.from_nwb_path(path=ecephys_session, nwb_version=nwb_version)
 
         self._unit_ids = None
-        self._cells_filter = kwargs.get('filter', None)  # {'location': 'probeC', 'structure_acronym': 'VISp'}
+        self._cells_filter = kwargs.get('filter', None)
         self._number_cells = None
         self._spikes = None
         self._stim_table = None
@@ -38,7 +38,6 @@ class StimulusAnalysis(object):
     @property
     def unit_ids(self):
         """Returns a list of unit-ids for which to apply the analysis"""
-        # BOb analog
         if self._unit_ids is None:
             # Original analysis files was hardcoded that only cells from probeC/VISp, replaced with a filter dict.
             # TODO: Remove filter if it's unnessecary
@@ -55,7 +54,6 @@ class StimulusAnalysis(object):
     @property
     def numbercells(self):
         """Get the number of units/cells."""
-        # BOb analog
         if not self._number_cells:
             self._number_cells = len(self.unit_ids)
         return self._number_cells
@@ -76,13 +74,11 @@ class StimulusAnalysis(object):
     @property
     def dxcm(self):
         """Returns an array of session running-speed velocities"""
-        # BOb analog
         return self.ecephys_session.running_speed.values
 
     @property
     def dxtime(self):
         """Returns an array of session running speed timestamps"""
-        # BOb analog
         return self._ecephys_session.running_speed.timestamps
 
     @property
@@ -92,7 +88,6 @@ class StimulusAnalysis(object):
     @property
     def stim_table_spontaneous(self):
         """Returns a stimulus table with only 'spontaneous' stimulus selected."""
-        # BOb analog
         # Used by sweep_p_events for creating null dist.
         if self._stim_table_spontaneous is None:
             # TODO: The original version filtered out stims of len < 100, figure out why or if this value should
@@ -218,34 +213,104 @@ class StimulusAnalysis(object):
 
         return sweep_p_values
 
-    def _get_reliability(self, specimen_id, st_mask):
-        """computes trial-to-trial reliability of cell at its preferred condition
 
-        :param specimen_id:
-        :param st_mask:
-        :return:
-        """  # TODO: what are these?
-        subset = self.sweep_events[st_mask][specimen_id].values
-        subset += 1.0
-        corr_matrix = np.empty((len(subset), len(subset)))
-        for i in range(len(subset)):
-            fri = get_fr(subset[i])
-            for j in range(len(subset)):
-                frj = get_fr(subset[j])
-                # Warning: the pearson coefficient is likely to have a denominator of 0 for some cells/stimulus and give
-                # a divide by 0 warning.
-                r, p = st.pearsonr(fri[30:40], frj[30:40])
-                corr_matrix[i, j] = r
+def get_reliability(unit_sweeps, padding=1.0, num_timestep_second=30, filter_width=0.1):
+    """Computes the trial-to-trial reliability for a set of sweeps for a given cell
 
-        inds = np.triu_indices(len(subset), k=1)
-        upper = corr_matrix[inds[0], inds[1]]
-        return np.nanmean(upper)
+    :param unit_sweeps:
+    :param padding:
+    :return:
+    """
+    if isinstance(unit_sweeps, (list, tuple)):
+        unit_sweeps = np.array([np.array(l) for l in unit_sweeps])
+
+    unit_sweeps = unit_sweeps + padding  # DO NOT use the += as for python arrays that will do in-place modification
+    corr_matrix = np.empty((len(unit_sweeps), len(unit_sweeps)))
+    for i in range(len(unit_sweeps)):
+        fri = get_fr(unit_sweeps[i], num_timestep_second=num_timestep_second, filter_width=filter_width)
+        for j in range(len(unit_sweeps)):
+            frj = get_fr(unit_sweeps[j], num_timestep_second=num_timestep_second, filter_width=filter_width)
+            # Warning: the pearson coefficient is likely to have a denominator of 0 for some cells/stimulus and give
+            # a divide by 0 warning.
+            r, p = st.pearsonr(fri[30:40], frj[30:40])
+            corr_matrix[i, j] = r
+
+    inds = np.triu_indices(len(unit_sweeps), k=1)
+    upper = corr_matrix[inds[0], inds[1]]
+    return np.nanmean(upper)
 
 
-def get_fr(spikes, num_timestep_second=30, filter_width=0.1):
+def get_fr(spikes, num_timestep_second=30, sweep_length=3.1, filter_width=0.1):
+    """Uses a gaussian convolution to convert the spike-times into a contigous firing-rate series.
+
+    :param spikes: An array of spike times (shifted to start at 0)
+    :param num_timestep_second: The sampling frequency
+    :param sweep_length: The lenght of the returned array
+    :param filter_width: The window of the gaussian method
+    :return: A linear-spaced array of length num_timestep_second*sweep_length of the smoothed firing rates series.
+    """
+    # TODO: figure out the approiate sweep-length from the stimulus
     spikes = spikes.astype(float)
-    spike_train = np.zeros((int(3.1*num_timestep_second)))  # TODO: hardcoded 3 second sweep length
+    spike_train = np.zeros((int(sweep_length*num_timestep_second)))
     spike_train[(spikes*num_timestep_second).astype(int)] = 1
     filter_width = int(filter_width*num_timestep_second)
     fr = ndi.gaussian_filter(spike_train, filter_width)
     return fr
+
+
+def get_lifetime_sparseness(responses):
+    """Computes the lifetime sparseness across all the (mean) responses. See Olsen & Wilson 2008.
+
+    :param response_data: A floating-point vector/matrix of dimension N-Responses x M-Cells of the response values
+        to the different stimuli.
+    :return: An array of size M-Cells that calculates the lifetime sparseness for each cell.
+    """
+    if responses.ndim == 1:
+        # In the (rare) case their is only one cell, turn into a Mx1 matrix the function belows returns a 1x1 array
+        # instead of scalar.
+        responses = np.array([responses]).T
+    coeff = 1.0/responses.shape[0]
+    return (1.0 - coeff*((np.power(responses.sum(axis=0), 2)) / (np.power(responses, 2).sum(axis=0)))) / (1.0 - coeff)
+
+
+def get_osi(responses, ori_vals, in_radians=False):
+    """Computes the orientation selectivity of a cell. The calculation of the orientation is done using the normalized
+    circular variance (CirVar) as described in Ringbach 2002
+
+    :param tuning: Array of length N. Each value the (averaged) response of the cell at a differenet orientation.
+    :param ori_vals: Array of length N. Each value the oriention of the stimulus.
+    :param in_radians: Set to True if ori_vals is in units of radians. Default: False
+    :return: An N-dimensional array of the circular variance (scalar value, in radians) of the responses.
+    """
+    # TODO: Try and vectorize function so that it can take in a matrix of N-orientations x M-cells
+    ori_rad = ori_vals if in_radians else np.deg2rad(ori_vals)
+    num_ori = len(ori_rad)
+    cv_top_os = np.empty(num_ori, dtype=np.complex128)
+    for i in range(num_ori):
+        cv_top_os[i] = (responses[i] * np.exp(1j * 2 * ori_rad[i]))
+
+    return np.abs(cv_top_os.sum()) / responses.sum()
+
+
+def get_running_modulation(mean_sweep_runs, mean_sweep_stats):
+    """computes running modulation of cell at its preferred condition provided there are at least 2 trials for both
+    stationary and running conditions
+
+    :param mean_sweep_runs:
+    :param mean_sweep_stats:
+    :return: p_value of running modulation, running modulation metric, mean response to preferred condition when
+    running mean response to preferred condition when stationary
+    """
+    if np.logical_and(len(mean_sweep_runs) > 1, len(mean_sweep_stats) > 1):
+        run = mean_sweep_runs.mean()
+        stat = mean_sweep_stats.mean()
+        if run > stat:
+            run_mod = (run - stat) / run
+        elif stat > run:
+            run_mod = -1 * (stat - run) / stat
+        else:
+            run_mod = 0
+        (_, p) = st.ttest_ind(mean_sweep_runs, mean_sweep_stats, equal_var=False)
+        return p, run_mod, run, stat
+    else:
+        return np.NaN, np.NaN, np.NaN, np.NaN

@@ -1,10 +1,10 @@
-from .stimulus_analysis import StimulusAnalysis
-import numpy as np
 from six import string_types
+import numpy as np
 import pandas as pd
-import scipy.stats as st
-import scipy.ndimage as ndi
 from scipy.optimize import curve_fit
+
+from .stimulus_analysis import StimulusAnalysis
+from .stimulus_analysis import get_lifetime_sparseness, get_osi, get_reliability, get_running_modulation
 
 
 class StaticGratings(StimulusAnalysis):
@@ -159,7 +159,11 @@ class StaticGratings(StimulusAnalysis):
 
             # TODO: Make unit_id the df index?
             peak_df['cell_specimen_id'] = list(self.spikes.keys())
-            peak_df['lifetime_sparseness_sg'] = self._get_lifetime_sparseness()
+
+            # calculate the lifetime sparsness across all responses for every cell
+            responses = self.response_events[:, 1:, :, :, 0].reshape(self.number_phase*self.number_ori*self.number_sf,
+                                                                     self.numbercells)
+            peak_df['lifetime_sparseness_sg'] = get_lifetime_sparseness(responses)
 
             for nc, unit_id in enumerate(self.spikes.keys()):
                 peaks = np.where(self.response_events[:, 1:, :, nc, 0] == self.response_events[:, 1:, :, nc, 0].max())
@@ -174,19 +178,36 @@ class StaticGratings(StimulusAnalysis):
                 peak_df.loc[nc, 'num_pref_trials_sg'] = int(self.response_events[pref_ori, pref_sf+1, pref_phase, nc, 2])
                 peak_df.loc[nc, 'responsive_sg'] = self.response_events[pref_ori, pref_sf+1, pref_phase, nc, 2] > 11
 
+                # Get the osi using the mean response across all stimuli orientations (with SF and Phase fixed at their
+                # peak values).
+                ori_tuning_responses = self.response_events[:, pref_sf+1, pref_phase, nc, 0]
+                peak_df.loc[nc, 'g_osi_sg'] = get_osi(ori_tuning_responses, self.orivals)
+
                 stim_table_mask = (self.stim_table[self._col_sf] == self.sfvals[pref_sf]) & \
                                   (self.stim_table[self._col_ori] == self.orivals[pref_ori]) & \
                                   (self.stim_table[self._col_phase] == self.phasevals[pref_phase])
-                peak_df.loc[nc, 'g_osi_sg'] = self._get_osi(pref_sf, pref_phase, nc)
 
-                peak_df.loc[nc, 'reliability_sg'] = self._get_reliability(unit_id, stim_table_mask)
-                peak_df.loc[nc, 'sfdi_sg'] = self._get_sfdi(pref_ori, pref_phase, nc)
+                # Calculate reliability metric from sweep_events of prefered stimuli
+                pref_sweeps = self.sweep_events[stim_table_mask][unit_id].values
+                peak_df.loc[nc, 'reliability_sg'] = get_reliability(pref_sweeps)
+
+                # Calc. spatial frequency discrimination index
+                sf_tuning_responses = self.response_events[pref_ori, 1:, pref_phase, nc, 0]
+                sf_trials = self.mean_sweep_events[(self.stim_table[self._col_ori] == self.orivals[pref_ori]) &
+                                                   (self.stim_table[self._col_phase] == self.phasevals[pref_phase])][unit_id].values
+                peak_df.loc[nc, 'sfdi_sg'] = get_sfdi(sf_tuning_responses, sf_trials)
+
+                # Running speed statistics
+                speed_subset = self.running_speed[stim_table_mask]
+                mse_subset = self.mean_sweep_events[stim_table_mask]
+                mse_subset_run = mse_subset[speed_subset.running_speed >= 1][unit_id].values
+                mse_subset_stat = mse_subset[speed_subset.running_speed < 1][unit_id].values
                 peak_df.loc[nc, ['run_pval_sg', 'run_mod_sg', 'run_resp_sg', 'stat_resp_sg']] = \
-                    self._get_running_modulation(unit_id, stim_table_mask)
+                    get_running_modulation(mse_subset_run, mse_subset_stat)
 
                 if self.response_events[pref_ori, pref_sf+1, pref_phase, nc, 2] > 11:
                     peak_df.loc[nc, ['fit_sf_ind_sg', 'fit_sf_sg', 'sf_low_cutoff_sg', 'sf_high_cutoff_sg']] = \
-                        self._fit_sf_tuning(pref_ori, pref_sf, pref_phase, nc)
+                        fit_sf_tuning(sf_tuning_responses, sf_values=self.sfvals, pref_sf_index=pref_sf)
 
             self._peak = peak_df
 
@@ -203,14 +224,6 @@ class StaticGratings(StimulusAnalysis):
 
         self._phasevals = np.sort(sg_stim_table[self._col_phase].dropna().unique())
         self._number_phase = len(self._phasevals)
-
-    def _get_lifetime_sparseness(self):
-        # Olsen & Wilson 2008
-        n_features = self.number_phase * self.number_ori * self.number_sf
-        recipr = 1.0/n_features
-        response = self.response_events[:, 1:, :, :, 0].reshape(n_features, self.numbercells)
-        return ((1.0 - recipr * ((np.power(response.sum(axis=0), 2)) / (np.power(response, 2).sum(axis=0)))) / (
-                    1.0 - recipr))
 
     def _get_response_events(self):
         # for each cell, find all trials with the same orientation/spatial_freq/phase/cell combo; get averaged num
@@ -259,118 +272,73 @@ class StaticGratings(StimulusAnalysis):
 
         self._response_trials = response_trials
 
-    def _get_osi(self, pref_sf, pref_phase, nc):
-        """computes orientation selectivity (cv) for cell
 
-        :param self:
-        :param pref_sf:
-        :param pref_phase:
-        :param nc:
-        :return:
-        """
-        orivals_rad = np.deg2rad(self.orivals)
-        tuning = self.response_events[:, pref_sf+1, pref_phase, nc, 0]
-        cv_top_os = np.empty(self.number_ori, dtype=np.complex128)
-        for i in range(self.number_ori):
-            cv_top_os[i] = (tuning[i] * np.exp(1j*2*orivals_rad[i]))
+def fit_sf_tuning(sf_tuning_responses, sf_values, pref_sf_index):
+    """Performs gaussian or exponential fit on the spatial frequency tuning curve at preferred orientation/phase for
+    a given cell.
 
-        return np.abs(cv_top_os.sum()) / tuning.sum()
-
-    def _get_sfdi(self, pref_ori, pref_phase, nc):
-        """computes spatial frequency discrimination index for cell
-
-        :param pref_ori:
-        :param pref_phase:
-        :param nc:
-        :return: sf discrimination index
-        """
-        v = list(self.spikes.keys())[nc]
-        sf_tuning = self.response_events[pref_ori, 1:, pref_phase, nc, 0]
-        trials = self.mean_sweep_events[(self.stim_table[self._col_ori] == self.orivals[pref_ori]) &
-                                        (self.stim_table[self._col_phase] == self.phasevals[pref_phase])][v].values
-        sse_part = np.sqrt(np.sum((trials - trials.mean())**2) / (len(trials)-5))
-
-        return (np.ptp(sf_tuning)) / (np.ptp(sf_tuning) + 2 * sse_part)
-
-    def _get_running_modulation(self, unit_id, st_mask):
-        """computes running modulation of cell at its preferred condition provided there are at least 2 trials for both
-        stationary and running conditions
-
-        :param unit_id:
-        :param st_mask:
-        :return: p_value of running modulation, running modulation metric, mean response to preferred condition when
-        running mean response to preferred condition when stationary
-        """
-        subset = self.mean_sweep_events[st_mask]
-        speed_subset = self.running_speed[st_mask]
-
-        subset_run = subset[speed_subset.running_speed >= 1][unit_id]
-        subset_stat = subset[speed_subset.running_speed < 1][unit_id]
-        if np.logical_and(len(subset_run) > 1, len(subset_stat) > 1):
-            run = subset_run.mean()
-            stat = subset_stat.mean()
-            if run > stat:
-                run_mod = (run - stat) / run
-            elif stat > run:
-                run_mod = -1 * (stat - run) / stat
+    :param sf_tuning_responses: An array of len N, with each value the (averaged) response of a cell at a given spatial
+        freq. stimulus.
+    :param sf_values: An array of len N, with each value the spatial freq. of the stimulus (corresponding to
+        sf_tuning_response).
+    :param pref_sf_index: The pre-determined prefered spatial frequency (sf_values index) of the cell.
+    :return: index for the preferred sf from the curve fit, prefered sf from the curve fit, low cutoff sf from the
+        curve fit, high cutoff sf from the curve fit
+    """
+    fit_sf_ind = np.NaN
+    fit_sf = np.NaN
+    sf_low_cutoff = np.NaN
+    sf_high_cutoff = np.NaN
+    if pref_sf_index in range(1, len(sf_values)-1):
+        # If the prefered spatial freq is surround by other sf values try to fit the tunning curve with a gaussian.
+        try:
+            popt, pcov = curve_fit(gauss_function, range(5), sf_tuning_responses, p0=[np.amax(sf_tuning_responses),
+                                                                                      pref_sf_index, 1.], maxfev=2000)
+            sf_prediction = gauss_function(np.arange(0., 4.1, 0.1), *popt)
+            fit_sf_ind = popt[1]
+            fit_sf = 0.02*np.power(2, popt[1])
+            low_cut_ind = np.abs(sf_prediction-(sf_prediction.max()/2.))[:sf_prediction.argmax()].argmin()
+            high_cut_ind = np.abs(sf_prediction-(sf_prediction.max()/2.))[sf_prediction.argmax():].argmin() + sf_prediction.argmax()
+            if low_cut_ind > 0:
+                low_cutoff = np.arange(0, 4.1, 0.1)[low_cut_ind]
+                sf_low_cutoff = 0.02*np.power(2, low_cutoff)
+            elif high_cut_ind < 49:
+                high_cutoff = np.arange(0, 4.1, 0.1)[high_cut_ind]
+                sf_high_cutoff = 0.02*np.power(2, high_cutoff)
+        except Exception:
+            pass
+    else:
+        # If the prefered spatial freq is the first or last sf_val try to fit the tunning curve with an exponential
+        fit_sf_ind = pref_sf_index
+        fit_sf = sf_values[pref_sf_index]
+        try:
+            popt, pcov = curve_fit(exp_function, range(5), sf_tuning_responses,
+                                   p0=[np.amax(sf_tuning_responses), 2., np.amin(sf_tuning_responses)], maxfev=2000)
+            sf_prediction = exp_function(np.arange(0., 4.1, 0.1), *popt)
+            if pref_sf_index == 0:
+                high_cut_ind = np.abs(sf_prediction-(sf_prediction.max()/2.))[sf_prediction.argmax():].argmin()+sf_prediction.argmax()
+                high_cutoff = np.arange(0, 4.1, 0.1)[high_cut_ind]
+                sf_high_cutoff = 0.02*np.power(2, high_cutoff)
             else:
-                run_mod = 0
-            (_, p) = st.ttest_ind(subset_run, subset_stat, equal_var=False)
-            return p, run_mod, run, stat
-        else:
-            return np.NaN, np.NaN, np.NaN, np.NaN
-
-    def _fit_sf_tuning(self, pref_ori, pref_sf, pref_phase, nc):  # TODO: magic numbers?
-        """performs gaussian or exponential fit on the spatial frequency tuning curve at preferred orientation/phase.
-
-        :param pref_ori:
-        :param pref_sf:
-        :param pref_phase:
-        :param nc:
-        :return: index for the preferred sf from the curve fit prefered sf from the curve fit low cutoff sf from the
-        curve fit high cutoff sf from the curve fit
-        """
-        sf_tuning = self.response_events[pref_ori, 1:, pref_phase, nc, 0]
-        fit_sf_ind = np.NaN
-        fit_sf = np.NaN
-        sf_low_cutoff = np.NaN
-        sf_high_cutoff = np.NaN
-        if pref_sf in range(1, 4):  # TODO: Is this correct?
-            try:
-                popt, pcov = curve_fit(gauss_function, range(5), sf_tuning, p0=[np.amax(sf_tuning), pref_sf, 1.],
-                                       maxfev=2000)
-                sf_prediction = gauss_function(np.arange(0., 4.1, 0.1), *popt)
-                fit_sf_ind = popt[1]
-                fit_sf = 0.02*np.power(2, popt[1])
                 low_cut_ind = np.abs(sf_prediction-(sf_prediction.max()/2.))[:sf_prediction.argmax()].argmin()
-                high_cut_ind = np.abs(sf_prediction-(sf_prediction.max()/2.))[sf_prediction.argmax():].argmin() + sf_prediction.argmax()
-                if low_cut_ind > 0:
-                    low_cutoff = np.arange(0, 4.1, 0.1)[low_cut_ind]
-                    sf_low_cutoff = 0.02*np.power(2, low_cutoff)
-                elif high_cut_ind < 49:
-                    high_cutoff = np.arange(0, 4.1, 0.1)[high_cut_ind]
-                    sf_high_cutoff = 0.02*np.power(2, high_cutoff)
-            except Exception:
-                pass
-        else:
-            fit_sf_ind = pref_sf
-            fit_sf = self.sfvals[pref_sf]
-            try:
-                popt, pcov = curve_fit(exp_function, range(5), sf_tuning,
-                                       p0=[np.amax(sf_tuning), 2., np.amin(sf_tuning)], maxfev=2000)
-                sf_prediction = exp_function(np.arange(0., 4.1, 0.1), *popt)
-                if pref_sf == 0:
-                    high_cut_ind = np.abs(sf_prediction-(sf_prediction.max()/2.))[sf_prediction.argmax():].argmin()+sf_prediction.argmax()
-                    high_cutoff = np.arange(0, 4.1, 0.1)[high_cut_ind]
-                    sf_high_cutoff = 0.02*np.power(2, high_cutoff)
-                else:
-                    low_cut_ind = np.abs(sf_prediction-(sf_prediction.max()/2.))[:sf_prediction.argmax()].argmin()
-                    low_cutoff = np.arange(0, 4.1, 0.1)[low_cut_ind]
-                    sf_low_cutoff = 0.02*np.power(2, low_cutoff)
-            except Exception:
-                pass
+                low_cutoff = np.arange(0, 4.1, 0.1)[low_cut_ind]
+                sf_low_cutoff = 0.02*np.power(2, low_cutoff)
+        except Exception:
+            pass
 
-        return fit_sf_ind, fit_sf, sf_low_cutoff, sf_high_cutoff
+    return fit_sf_ind, fit_sf, sf_low_cutoff, sf_high_cutoff
+
+
+def get_sfdi(sf_tuning_responses, mean_sweeps_trials):
+    """computes spatial frequency discrimination index for cell
+
+    :param pref_ori:
+    :param pref_phase:
+    :param nc:
+    :return: sf discrimination index
+    """
+    sse_part = np.sqrt(np.sum((mean_sweeps_trials - mean_sweeps_trials.mean())**2) / (len(mean_sweeps_trials)-5))
+    return (np.ptp(sf_tuning_responses)) / (np.ptp(sf_tuning_responses) + 2 * sse_part)
 
 
 def do_sweep_mean_shifted(x):
