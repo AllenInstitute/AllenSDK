@@ -294,7 +294,7 @@ def fit_sf_tuning(sf_tuning_responses, sf_values, pref_sf_index):
     if pref_sf_index in range(1, len(sf_values)-1):
         # If the prefered spatial freq is an interior case try to fit the tunning curve with a gaussian.
         try:
-            popt, pcov = curve_fit(gauss_function, range(5), sf_tuning_responses, p0=[np.amax(sf_tuning_responses),
+            popt, pcov = curve_fit(gauss_function, np.arange(len(sf_values)), sf_tuning_responses, p0=[np.amax(sf_tuning_responses),
                                                                                       pref_sf_index, 1.], maxfev=2000)
             sf_prediction = gauss_function(np.arange(0., 4.1, 0.1), *popt)
             fit_sf_ind = popt[1]
@@ -307,14 +307,14 @@ def fit_sf_tuning(sf_tuning_responses, sf_values, pref_sf_index):
             elif high_cut_ind < 49:
                 high_cutoff = np.arange(0, 4.1, 0.1)[high_cut_ind]
                 sf_high_cutoff = 0.02*np.power(2, high_cutoff)
-        except Exception:
+        except Exception as e:
             pass
     else:
         # If the prefered spatial freq is a boundary value try to fit the tunning curve with an exponential
         fit_sf_ind = pref_sf_index
         fit_sf = sf_values[pref_sf_index]
         try:
-            popt, pcov = curve_fit(exp_function, range(5), sf_tuning_responses,
+            popt, pcov = curve_fit(exp_function, np.arange(len(sf_values)), sf_tuning_responses,
                                    p0=[np.amax(sf_tuning_responses), 2., np.amin(sf_tuning_responses)], maxfev=2000)
             sf_prediction = exp_function(np.arange(0., 4.1, 0.1), *popt)
             if pref_sf_index == 0:
@@ -325,7 +325,8 @@ def fit_sf_tuning(sf_tuning_responses, sf_values, pref_sf_index):
                 low_cut_ind = np.abs(sf_prediction-(sf_prediction.max()/2.))[:sf_prediction.argmax()].argmin()
                 low_cutoff = np.arange(0, 4.1, 0.1)[low_cut_ind]
                 sf_low_cutoff = 0.02*np.power(2, low_cutoff)
-        except Exception:
+        except Exception as e:
+            print(e)
             pass
 
     return fit_sf_ind, fit_sf, sf_low_cutoff, sf_high_cutoff

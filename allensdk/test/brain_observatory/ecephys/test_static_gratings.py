@@ -67,8 +67,8 @@ def test_get_sfdi(sf_tuning_responses, mean_sweeps_trials, expected):
 
 
 if __name__ == '__main__':
-    #test_fit_sf_tuning(np.array([2.69565217, 3.91836735, 2.36734694, 1.52, 2.21276596]), [0.02, 0.04, 0.08, 0.16, 0.32],
-    #                   1, (0.22704947240176027, 0.0234087755414, np.nan, 0.32))
+    test_fit_sf_tuning(np.array([2.69565217, 3.91836735, 2.36734694, 1.52, 2.21276596]), [0.02, 0.04, 0.08, 0.16, 0.32],
+                       1, (0.22704947240176027, 0.0234087755414, np.nan, 0.32))
     #test_fit_sf_tuning(np.array([1.14285714, 0.73469388, 7.44, 13.6, 11.6]), [0.02, 0.04, 0.08, 0.16, 0.32],
     #                   3, (3.290141840632274, 0.1956416782774323, 0.08, np.nan))
     #test_fit_sf_tuning(np.array([2.24, 1.83333333, 1.68, 1.87755102, 1.87755102]), [0.02, 0.04, 0.08, 0.16, 0.32],
@@ -81,15 +81,4 @@ if __name__ == '__main__':
     #              0.4402349784724991)
 
     #feature_matrix = np.empty((120, 3), dtype=np.float64)
-    orival = [0.0, 30.0, 60.0, 90.0, 120.0, 150.0]
-    sfvals = [0.02, 0.04, 0.08, 0.16, 0.32]
-    phasevals = [0.0, 0.25, 0.50, 0.75]
-    fmatrix = np.array(list(itertools.product(orival, sfvals, phasevals)))
-    #print(fmatrix)
-    stim_table = pd.DataFrame({'Ori': fmatrix[:, 0], 'SF': fmatrix[:, 1], 'Phase': fmatrix[:, 2]})
-    #print(list(itertools.product(, , )))
-    start_times = np.linspace(5000.0, 5060.0, 120)
-    print(start_times)
-    print(len(start_times))
-    print(start_times + 0.25)
     pass
