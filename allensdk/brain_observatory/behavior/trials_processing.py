@@ -8,6 +8,8 @@ import collections
 import dateutil
 from scipy.stats import norm
 
+from allensdk import one
+
 
 # TODO: add trial column descriptions
 TRIAL_COLUMN_DESCRIPTION_DICT = {}
@@ -167,7 +169,8 @@ def get_trials(data, licks_df, rewards_df, rebase):
         trial_data['miss'].append(miss)
 
         reward_times = rebased_reward_times[np.where(np.logical_and(rebased_reward_times >= start_time, rebased_reward_times <= stop_time))]
-        trial_data['reward_times'].append(reward_times)
+        reward_time = float('nan') if len(reward_times) == 0 else one(reward_times)
+        trial_data['reward_time'].append(reward_time)
 
         sham_change = True if ('sham_change', '') in event_dict else False
         trial_data['sham_change'].append(sham_change)
@@ -479,7 +482,7 @@ def find_licks(reward_times, licks, window=3.5):
     if len(reward_times) == 0:
         return []
     else:
-        reward_time = reward_times[0]
+        reward_time = one(reward_times)
         reward_lick_mask = ((licks['time'] > reward_time) & (licks['time'] < (reward_time + window)))
 
         tr_licks = licks[reward_lick_mask].copy()
