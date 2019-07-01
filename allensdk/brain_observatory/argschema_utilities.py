@@ -107,7 +107,7 @@ def optional_lims_inputs(argv, input_schema, output_schema, lims_input_getter):
         input_data = lims_input_getter(**lims_args.__dict__)
 
     try:
-        parser = ArgSchemaParserPlus(
+        parser = ArgSchemaParser(
             args=remaining_args,
             input_data=input_data,
             schema_type=input_schema,
