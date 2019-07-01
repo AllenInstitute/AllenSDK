@@ -149,7 +149,7 @@ class BehaviorOphysSession(LazyPropertyMixin):
 
         return performance_metrics_df
 
-    def get_performance_metrics(self):
+    def get_performance_metrics(self, engaged_trial_reward_rate_threshold=2):
         performance_metrics = {}
         performance_metrics['trial_count'] = len(self.trials)
         performance_metrics['go_trial_count'] = self.trials.go.sum()
@@ -164,7 +164,7 @@ class BehaviorOphysSession(LazyPropertyMixin):
         performance_metrics['total_reward_volume'] = self.rewards.volume.sum()
 
         rolling_performance_df = self.get_rolling_performance_df()
-        engaged_trial_mask = (rolling_performance_df['reward_rate'] > 2)
+        engaged_trial_mask = (rolling_performance_df['reward_rate'] > engaged_trial_reward_rate_threshold)
         performance_metrics['maximum_reward_rate'] = np.nanmax(rolling_performance_df['reward_rate'].values)
         performance_metrics['engaged_trial_count'] = (engaged_trial_mask).sum()
         performance_metrics['mean_hit_rate'] = rolling_performance_df['hit_rate'].mean()
@@ -173,6 +173,8 @@ class BehaviorOphysSession(LazyPropertyMixin):
         performance_metrics['mean_false_alarm_rate_engaged'] = rolling_performance_df['false_alarm_rate'][engaged_trial_mask].mean()
         performance_metrics['mean_dprime'] = rolling_performance_df['rolling_dprime'].mean()
         performance_metrics['mean_dprime_engaged'] = rolling_performance_df['rolling_dprime'][engaged_trial_mask].mean()
+        performance_metrics['max_dprime'] = rolling_performance_df['rolling_dprime'].mean()
+        performance_metrics['max_dprime_engaged'] = rolling_performance_df['rolling_dprime'][engaged_trial_mask].max()
 
         return performance_metrics
 

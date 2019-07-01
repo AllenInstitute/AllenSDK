@@ -5,6 +5,8 @@ from scipy.stats import norm
 from allensdk import one
 
 
+SLIDING_WINDOW = 100
+
 def get_go_responses(hit=None, miss=None, aborted=None):
     assert len(hit) == len(miss) == len(aborted)
     not_aborted = np.logical_not(np.array(aborted, dtype=np.bool))
@@ -20,13 +22,13 @@ def get_go_responses(hit=None, miss=None, aborted=None):
     return go_responses
 
 
-def get_hit_rate(hit=None, miss=None, aborted=None, sliding_window=100):
+def get_hit_rate(hit=None, miss=None, aborted=None, sliding_window=SLIDING_WINDOW):
     go_responses = get_go_responses(hit=hit, miss=miss, aborted=aborted)
     hit_rate = pd.Series(go_responses).rolling(window=sliding_window, min_periods=0).mean().values
     return hit_rate
 
 
-def get_trial_count_corrected_hit_rate(hit=None, miss=None, aborted=None, sliding_window=100):
+def get_trial_count_corrected_hit_rate(hit=None, miss=None, aborted=None, sliding_window=SLIDING_WINDOW):
     go_responses = get_go_responses(hit=hit, miss=miss, aborted=aborted)
     go_responses_count = pd.Series(go_responses).rolling(window=sliding_window, min_periods=0).count()
     hit_rate = pd.Series(go_responses).rolling(window=sliding_window, min_periods=0).mean().values
@@ -49,13 +51,13 @@ def get_catch_responses(correct_reject=None, false_alarm=None, aborted=None):
     return catch_responses
 
 
-def get_false_alarm_rate(correct_reject=None, false_alarm=None, aborted=None, sliding_window=100):
+def get_false_alarm_rate(correct_reject=None, false_alarm=None, aborted=None, sliding_window=SLIDING_WINDOW):
     catch_responses = get_catch_responses(correct_reject=correct_reject, false_alarm=false_alarm, aborted=aborted)
     false_alarm_rate = pd.Series(catch_responses).rolling(window=sliding_window, min_periods=0).mean().values
     return false_alarm_rate
 
 
-def get_trial_count_corrected_false_alarm_rate(correct_reject=None, false_alarm=None, aborted=None, sliding_window=100):
+def get_trial_count_corrected_false_alarm_rate(correct_reject=None, false_alarm=None, aborted=None, sliding_window=SLIDING_WINDOW):
     catch_responses = get_catch_responses(correct_reject=correct_reject, false_alarm=false_alarm, aborted=aborted)
     catch_responses_count = pd.Series(catch_responses).rolling(window=sliding_window, min_periods=0).count()
     false_alarm_rate = pd.Series(catch_responses).rolling(window=sliding_window, min_periods=0).mean().values
@@ -63,11 +65,11 @@ def get_trial_count_corrected_false_alarm_rate(correct_reject=None, false_alarm=
     return trial_count_corrected_false_alarm_rate
 
 
-def get_rolling_dprime(rolling_hit_rate, rolling_fa_rate, limits=(0.01, 0.99)):
-    return np.array([get_dprime(hr, far, limits=limits) for hr, far in zip(rolling_hit_rate, rolling_fa_rate)])
+def get_rolling_dprime(rolling_hit_rate, rolling_fa_rate, sliding_window=SLIDING_WINDOW):
+    return np.array([get_dprime(hr, far, sliding_window=SLIDING_WINDOW) for hr, far in zip(rolling_hit_rate, rolling_fa_rate)])
 
 
-def get_dprime(hit_rate, fa_rate, limits=(0.01, 0.99)):
+def get_dprime(hit_rate, fa_rate, sliding_window=SLIDING_WINDOW):
     """ calculates the d-prime for a given hit rate and false alarm rate
     https://en.wikipedia.org/wiki/Sensitivity_index
     Parameters
@@ -83,6 +85,7 @@ def get_dprime(hit_rate, fa_rate, limits=(0.01, 0.99)):
     d_prime
     """
 
+    limits = (1/SLIDING_WINDOW, 1 - 1/SLIDING_WINDOW)
     assert limits[0] > 0.0, 'limits[0] must be greater than 0.0'
     assert limits[1] < 1.0, 'limits[1] must be less than 1.0'
     Z = norm.ppf

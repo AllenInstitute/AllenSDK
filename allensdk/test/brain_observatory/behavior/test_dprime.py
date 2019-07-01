@@ -122,8 +122,6 @@ def test_rolling_dprime_unit():
     result = get_rolling_dprime(hr, far)
     np.testing.assert_allclose(result, [NaN, NaN, NaN, 2.326348, 4.652696, 4.652696])
 
-import visual_behavior.utilities as vbu
-
 
 def test_rolling_dprime_integration_legacy(mock_rolling_dprime_fixture):
     sliding_window = 100
@@ -164,7 +162,7 @@ def test_rolling_dprime_integration(mock_rolling_dprime_fixture):
     pytest.param(.5, .25, 0.6744897501960817),
 ])
 def test_dprime(hr, far, dprime):
-    val = get_dprime(hr, far, limits=(.01, .99))
+    val = get_dprime(hr, far)
     assert val == dprime
     if hr == far:
         assert dprime == 0
