@@ -42,6 +42,11 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
     def get_channels(self) -> pd.DataFrame:
         channels = self.nwbfile.electrodes.to_dataframe()
         channels.drop(columns='group', inplace=True)
+
+        # these are stored as string in nwb 2, which is not ideal
+        # float is also not ideal, but we have nans indicating out-of-brain structures
+        channels["manual_structure_id"] = [float(chid) if chid != "" else np.nan for chid in channels["manual_structure_id"]]
+        
         return channels
 
     def get_mean_waveforms(self) -> Dict[int, np.ndarray]:
