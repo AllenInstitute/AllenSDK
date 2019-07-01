@@ -59,6 +59,10 @@ class BehaviorSession(LazyPropertyMixin):
         self.task_parameters = LazyProperty(self.api.get_task_parameters)
         self.trials = LazyProperty(self.api.get_trials)
 
+    @classmethod
+    def from_lims(cls, behavior_session_id):
+        return cls(api=BehaviorOnlyLimsApi(behavior_session_id))
+
     def get_reward_rate(self):
         response_latency_list = []
         for _, t in self.trials.iterrows():
