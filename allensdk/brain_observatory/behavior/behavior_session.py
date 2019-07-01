@@ -17,7 +17,7 @@ class BehaviorSession(LazyPropertyMixin):
     """Represents data from a single Visual Behavior session. LazyProperty attributes access the data only on the first demand, and then memoize the result for reuse.
     
     Attributes:
-        ophys_experiment_id : int (LazyProperty)
+        behavior_session_id : int (LazyProperty)
             Unique identifier for this experimental session
         stimulus_timestamps : numpy.ndarray (LazyProperty)
             Timestamps associated the stimulus presentations on the monitor 
