@@ -87,7 +87,11 @@ def run_csd(args):
             'csd_channels': csd_channels.tolist()
         })
 
-    return {'probe_outputs': probewise_outputs}
+    return {
+        'probe_outputs': probewise_outputs, 
+        "stimulus_name": args["stimulus"]["key"], 
+        "stimulus_index": args["stimulus"]["index"]
+    }
 
 
 def main():

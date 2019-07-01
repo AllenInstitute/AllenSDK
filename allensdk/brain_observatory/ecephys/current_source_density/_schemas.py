@@ -50,4 +50,6 @@ class OutputSchema(DefaultSchema):
 
 
 class OutputParameters(OutputSchema): 
+    stimulus_name = String(required=True, help="name of stimulus from which CSD was calculated")
+    stimulus_index = Int(required=True, help="index of stimulus from which CSD was calculated")
     probe_outputs = Nested(ProbeOutputParameters, many=True, required=True, help='probewise outputs')
