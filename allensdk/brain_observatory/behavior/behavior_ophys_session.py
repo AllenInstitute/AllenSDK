@@ -159,7 +159,7 @@ class BehaviorOphysSession(LazyPropertyMixin):
         performance_metrics['false_alarm_trial_count'] = self.trials.false_alarm.sum()
         performance_metrics['correct_reject_trial_count'] = self.trials.correct_reject.sum()
         performance_metrics['auto_rewarded_trial_count'] = self.trials.auto_rewarded.sum()
-        performance_metrics['rewarded_trial_count'] = self.trials.reward_times.apply(lambda x: len(x) > 0).sum()
+        performance_metrics['rewarded_trial_count'] = self.trials.reward_times.apply(lambda x: not np.isnan(x)).sum()
         performance_metrics['total_reward_count'] = len(self.rewards)
         performance_metrics['total_reward_volume'] = self.rewards.volume.sum()
 
@@ -182,4 +182,4 @@ if __name__ == "__main__":
 
     ophys_experiment_id = 789359614
     session = BehaviorOphysSession.from_lims(ophys_experiment_id)
-    print(session.get_performance_metrics())
+    print(session.trials['reward_time'])
