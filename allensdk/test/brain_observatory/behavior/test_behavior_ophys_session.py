@@ -123,6 +123,7 @@ def test_legacy_dff_api():
         ind = session.get_cell_specimen_indices([csid])[0]
         np.testing.assert_array_almost_equal(dff_trace, dff_array[ind, :])
 
+
 @pytest.mark.requires_bamboo
 @pytest.mark.parametrize('ophys_experiment_id, number_omitted', [
     pytest.param(789359614, 153),

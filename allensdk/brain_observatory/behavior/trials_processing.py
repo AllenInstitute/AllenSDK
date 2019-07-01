@@ -146,20 +146,8 @@ def get_trials(data, licks_df, rewards_df, rebase):
         trial_length = stop_time - start_time
         trial_data['trial_length'].append(trial_length)
 
-        catch = trial["trial_params"]["catch"] == True
-        trial_data['catch'].append(catch)
-
-        auto_rewarded = trial["trial_params"]["auto_reward"]
-        trial_data['auto_rewarded'].append(auto_rewarded)
-
-        go = not catch and not auto_rewarded
-        trial_data['go'].append(go)
-
         lick_times = sync_lick_times[np.where(np.logical_and(sync_lick_times >= start_time, sync_lick_times <= stop_time))]
         trial_data['lick_times'].append(lick_times)
-
-        aborted = ("abort", "") in event_dict
-        trial_data['aborted'].append(aborted)
 
         reward_volume = sum([r[0] for r in trial.get("rewards", [])])
         trial_data['reward_volume'].append(reward_volume)
@@ -170,8 +158,7 @@ def get_trials(data, licks_df, rewards_df, rebase):
         false_alarm = ('false_alarm', "") in event_dict
         trial_data['false_alarm'].append(false_alarm)
 
-        correct_reject = catch and not false_alarm
-        trial_data['correct_reject'].append(correct_reject)
+
 
         response_time = event_dict.get(('hit', '')) or event_dict.get(('false_alarm', '')) if hit or false_alarm else float('nan')
         trial_data['response_time'].append(response_time)
@@ -190,6 +177,23 @@ def get_trials(data, licks_df, rewards_df, rebase):
 
         change_time = event_dict.get(('stimulus_changed', '')) or event_dict.get(('sham_change', '')) if stimulus_change or sham_change else float('nan')
         trial_data['change_time'].append(change_time)
+
+        # Trial type logic:
+        if pd.isnull(change_time):
+            aborted = True
+            go = catch = auto_rewarded = False
+        else:
+            aborted = False
+            catch = trial["trial_params"]["catch"] is True
+            auto_rewarded = trial["trial_params"]["auto_reward"]
+            go = not catch and not auto_rewarded
+        trial_data['aborted'].append(aborted)
+        trial_data['go'].append(go)
+        trial_data['catch'].append(catch)
+        trial_data['auto_rewarded'].append(auto_rewarded)
+
+        correct_reject = catch and not false_alarm
+        trial_data['correct_reject'].append(correct_reject)
 
         if not (sham_change or stimulus_change):
             response_latency = None
@@ -638,54 +642,3 @@ def get_extended_trials(data, time=None):
                                   licks=data_to_licks(data, time))
 
 
-# -> metrics
-def dprime(hit_rate, fa_rate, limits=(0.01, 0.99)):
-    """ calculates the d-prime for a given hit rate and false alarm rate
-
-    https://en.wikipedia.org/wiki/Sensitivity_index
-
-    Parameters
-    ----------
-    hit_rate : float
-        rate of hits in the True class
-    fa_rate : float
-        rate of false alarms in the False class
-    limits : tuple, optional
-        limits on extreme values, which distort. default: (0.01,0.99)
-
-    Returns
-    -------
-    d_prime
-
-    """
-    assert limits[0] > 0.0, 'limits[0] must be greater than 0.0'
-    assert limits[1] < 1.0, 'limits[1] must be less than 1.0'
-    Z = norm.ppf
-
-    # Limit values in order to avoid d' infinity
-    hit_rate = np.clip(hit_rate, limits[0], limits[1])
-    fa_rate = np.clip(fa_rate, limits[0], limits[1])
-
-    try:
-        last_hit_nan = np.where(np.isnan(hit_rate))[0].max()
-    except ValueError:
-        last_hit_nan = 0
-
-    try:
-        last_fa_nan = np.where(np.isnan(fa_rate))[0].max()
-    except ValueError:
-        last_fa_nan = 0
-
-    last_nan = np.max((last_hit_nan, last_fa_nan))
-
-    # fill nans with 0.5 to avoid warning about nans
-    d_prime = Z(pd.Series(hit_rate).fillna(0.5)) - Z(pd.Series(fa_rate).fillna(0.5))
-
-    # fill all values up to the last nan with nan
-    d_prime[:last_nan] = np.nan
-
-    if len(d_prime) == 1:
-        # if the result is a 1-length vector, return as a scalar
-        return d_prime[0]
-    else:
-        return d_prime

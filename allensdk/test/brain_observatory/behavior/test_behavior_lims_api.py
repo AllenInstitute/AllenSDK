@@ -1,6 +1,6 @@
 import pytest
 
-from allensdk.internal.api import OneResultExpectedError
+from allensdk import OneResultExpectedError
 from allensdk.internal.api.behavior_lims_api import BehaviorLimsApi
 from allensdk.brain_observatory.behavior.mtrain import ExtendedTrialSchema
 from marshmallow.schema import ValidationError

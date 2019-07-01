@@ -35,7 +35,7 @@
 #
 import logging
 
-__version__ = '1.0.0.dev10'
+__version__ = '1.0.0.dev11'
 
 try:
     from logging import NullHandler
@@ -43,6 +43,22 @@ except ImportError:
     class NullHandler(logging.Handler):
         def emit(self, record):
             pass
+
+
+class OneResultExpectedError(RuntimeError):
+    pass
+
+
+def one(x):
+    if isinstance(x, str):
+        return x
+    if len(x) != 1:
+        raise OneResultExpectedError('Expected length one result, received: {} results from query'.format(x))
+    if isinstance(x, set):
+        return list(x)[0]
+    else:
+        return x[0]
+
 
 logging.getLogger(__name__).addHandler(NullHandler())
 
