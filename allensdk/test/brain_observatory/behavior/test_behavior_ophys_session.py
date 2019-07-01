@@ -123,6 +123,7 @@ def test_legacy_dff_api():
         ind = session.get_cell_specimen_indices([csid])[0]
         np.testing.assert_array_almost_equal(dff_trace, dff_array[ind, :])
 
+
 @pytest.mark.requires_bamboo
 @pytest.mark.parametrize('ophys_experiment_id, number_omitted', [
     pytest.param(789359614, 153),
@@ -147,10 +148,9 @@ def test_trial_response_window_bounds_reward(ophys_experiment_id):
     for _, row in session.trials.iterrows():
 
         lick_times = [(t - row.change_time) for t in row.lick_times]
-        reward_times = [(t - row.change_time) for t in row.reward_times]
-
-        if len(reward_times) > 0:
-            assert response_window[0] < reward_times[0] + 1/60
-            assert reward_times[0] < response_window[1] + 1/60
+        if not np.isnan(row.reward_time):
+            reward_time = (row.reward_time - row.change_time)
+            assert response_window[0] < reward_time + 1/60
+            assert reward_time < response_window[1] + 1/60
             if len(session.licks) > 0:
-                assert lick_times[0] < reward_times[0]
+                assert lick_times[0] < reward_time

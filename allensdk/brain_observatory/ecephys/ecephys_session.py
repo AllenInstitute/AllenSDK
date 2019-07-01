@@ -650,6 +650,68 @@ def removed_unused_stimulus_presentation_columns(stimulus_presentations):
             to_drop.append(cn)
     return stimulus_presentations.drop(columns=to_drop)
 
+
+def intervals_structures(table, structure_id_key="manual_structure_id", structure_label_key="manual_structure_acronym"):
+    """ find on a channels / units table intervals of channels inserted into particular structures
+
+    Parameters
+    ----------
+    table : pd.DataFrame
+        A table of channels (or units, with peak channels)
+    structure_id_key : str
+        use this column for numerically identifying structures
+    structure_label_key : str
+        use this column for human-readable structure identification
+
+    Returns
+    -------
+    labels : np.ndarray
+        for each detected interval, the label associated with that interval
+    intervals : np.ndarray
+        one element longer than labels. Start and end indices for intervals.
+
+    """
+
+    intervals = nan_intervals(table[structure_id_key])
+    labels = table[structure_label_key][intervals[:-1]]
+
+    return labels, intervals
+
+
+def nan_intervals(array):
+    """ find interval bounds (bounding consecutive identical values) in an array, which may contain nans
+
+    Parameters
+    -----------
+    array : np.ndarray
+
+    Returns
+    -------
+    np.ndarray : 
+        start and end indices of detected intervals (one longer than the number of intervals)
+
+    """
+    return array_intervals(np.nan_to_num(array))
+
+
+def array_intervals(array):
+    """ find interval bounds (bounding consecutive identical values) in an array
+
+    Parameters
+    -----------
+    array : np.ndarray
+
+    Returns
+    -------
+    np.ndarray : 
+        start and end indices of detected intervals (one longer than the number of intervals)
+
+    """
+
+    changes = np.flatnonzero(np.diff(array)) + 1
+    return np.concatenate([ [0], changes, [len(array)] ])
+
+
 def warn_on_scalar(value, message):
     if not isinstance(value, Collection) or isinstance(value, str):
         warnings.warn(message)

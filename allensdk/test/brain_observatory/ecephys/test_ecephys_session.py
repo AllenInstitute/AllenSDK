@@ -4,7 +4,7 @@ import numpy as np
 import xarray as xr
 
 from allensdk.brain_observatory.ecephys.ecephys_session_api import EcephysSessionApi
-from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
+from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession, nan_intervals
 
 
 @pytest.fixture
@@ -317,3 +317,12 @@ def test_get_lfp(channels_table_api):
     )
 
     xr.testing.assert_equal(expected, obtained)
+
+
+@pytest.mark.parametrize("inp,expected", [
+    [[np.nan, np.nan, 4, 4, 4, 5, 5], [0, 2, 5, 7]]
+])
+def test_nan_intervals(inp, expected):
+    assert np.allclose(
+        expected, nan_intervals(inp)
+    )
