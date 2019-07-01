@@ -18,20 +18,20 @@ from allensdk.brain_observatory.nwb.nwb_api import NwbApi
 from allensdk.brain_observatory.behavior.trials_processing import TRIAL_COLUMN_DESCRIPTION_DICT
 from allensdk.brain_observatory.behavior.schemas import OphysBehaviorMetaDataSchema, OphysBehaviorTaskParametersSchema
 from allensdk.brain_observatory.nwb.metadata import load_LabMetaData_extension
-from allensdk.brain_observatory.behavior.behavior_ophys_api import BehaviorOphysApiBase
+from allensdk.brain_observatory.behavior.behavior_ophys_api import BehaviorApiBase
 
 
 load_LabMetaData_extension(OphysBehaviorMetaDataSchema, 'AIBS_ophys_behavior')
 load_LabMetaData_extension(OphysBehaviorTaskParametersSchema, 'AIBS_ophys_behavior')
 
 
-class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
+class BehaviorNwbApi(NwbApi, BehaviorApiBase):
 
     def save(self, session_object):
 
         nwbfile = NWBFile(
             session_description=str(session_object.metadata['session_type']),
-            identifier=str(session_object.ophys_experiment_id),
+            identifier=str(session_object.behavior_session_id),
             session_start_time=session_object.metadata['experiment_datetime'],
             file_create_date=pytz.utc.localize(datetime.datetime.now())
         )
@@ -66,32 +66,11 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
         if len(session_object.rewards) > 0:
             nwb.add_rewards(nwbfile, session_object.rewards)
 
-        # Add max_projection image data to NWB in-memory object:
-        nwb.add_max_projection(nwbfile, session_object.max_projection)
-
-        # Add average_image image data to NWB in-memory object:
-        nwb.add_average_image(nwbfile, session_object.average_projection)
-
-        # Add segmentation_mask_image image data to NWB in-memory object:
-        nwb.add_segmentation_mask_image(nwbfile, session_object.segmentation_mask_image)
-
         # Add metadata to NWB in-memory object:
         nwb.add_metadata(nwbfile, session_object.metadata)
 
         # Add task parameters to NWB in-memory object:
         nwb.add_task_parameters(nwbfile, session_object.task_parameters)
-
-        # Add roi metrics to NWB in-memory object:
-        nwb.add_cell_specimen_table(nwbfile, session_object.cell_specimen_table)
-
-        # Add dff to NWB in-memory object:
-        nwb.add_dff_traces(nwbfile, session_object.dff_traces, session_object.ophys_timestamps)
-
-        # Add corrected_fluorescence to NWB in-memory object:
-        nwb.add_corrected_fluorescence_traces(nwbfile, session_object.corrected_fluorescence_traces)
-
-        # Add motion correction to NWB in-memory object:
-        nwb.add_motion_correction(nwbfile, session_object.motion_correction)
 
         # Write the file:
         with NWBHDF5IO(self.path, 'w') as nwb_file_writer:
@@ -119,9 +98,6 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
     def get_stimulus_templates(self, **kwargs):
         return {key: val.data[:] for key, val in self.nwbfile.stimulus_template.items()}
 
-    def get_ophys_timestamps(self) -> np.ndarray:
-        return self.nwbfile.modules['two_photon_imaging'].get_data_interface('dff').roi_response_series['traces'].timestamps
-
     def get_stimulus_timestamps(self) -> np.ndarray:
         return self.nwbfile.modules['stimulus'].get_data_interface('timestamps').timestamps
 
@@ -147,15 +123,6 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
         else:
             return pd.DataFrame({'volume': [], 'timestamps': [], 'autorewarded': []}).set_index('timestamps')
 
-    def get_max_projection(self, image_api=None) -> sitk.Image:
-        return self.get_image('max_projection', 'two_photon_imaging', image_api=image_api)
-
-    def get_average_projection(self, image_api=None) -> sitk.Image:
-        return self.get_image('average_image', 'two_photon_imaging', image_api=image_api)
-
-    def get_segmentation_mask_image(self, image_api=None) -> sitk.Image:
-        return self.get_image('segmentation_mask_image', 'two_photon_imaging', image_api=image_api)
-
     def get_metadata(self) -> dict:
 
         metadata_nwb_obj = self.nwbfile.lab_meta_data['metadata']
@@ -170,44 +137,6 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
         metadata_nwb_obj = self.nwbfile.lab_meta_data['task_parameters']
         data = OphysBehaviorTaskParametersSchema().dump(metadata_nwb_obj)
         return data
-
-    def get_cell_specimen_table(self) -> pd.DataFrame:
-        df = self.nwbfile.modules['two_photon_imaging'].data_interfaces['image_segmentation'].plane_segmentations['cell_specimen_table'].to_dataframe()
-        df.index.rename('cell_roi_id', inplace=True)
-        df['cell_specimen_id'] = [None if csid == -1 else csid for csid in df['cell_specimen_id'].values]
-        df['image_mask'] = [mask.astype(bool) for mask in df['image_mask'].values]
-        df.reset_index(inplace=True)
-        df.set_index('cell_specimen_id', inplace=True)
-        return df
-
-    def get_dff_traces(self) -> pd.DataFrame:
-        dff_nwb = self.nwbfile.modules['two_photon_imaging'].data_interfaces['dff'].roi_response_series['traces']
-        dff_traces = dff_nwb.data[:]
-        number_of_cells, number_of_dff_frames = dff_traces.shape
-        num_of_timestamps = len(self.get_ophys_timestamps())
-        assert num_of_timestamps == number_of_dff_frames
-        
-        df = pd.DataFrame({'dff': [x for x in dff_traces]}, index=pd.Index(data=dff_nwb.rois.table.id[:], name='cell_roi_id'))
-        cell_specimen_table = self.get_cell_specimen_table()
-        df = cell_specimen_table[['cell_roi_id']].join(df, on='cell_roi_id')
-        return df
-
-    def get_corrected_fluorescence_traces(self) -> pd.DataFrame:
-        corrected_fluorescence_nwb = self.nwbfile.modules['two_photon_imaging'].data_interfaces['corrected_fluorescence'].roi_response_series['traces']
-        df = pd.DataFrame({'corrected_fluorescence': [x for x in corrected_fluorescence_nwb.data[:]]},
-                             index=pd.Index(data=corrected_fluorescence_nwb.rois.table.id[:], name='cell_roi_id'))
-
-        cell_specimen_table = self.get_cell_specimen_table()
-        df = cell_specimen_table[['cell_roi_id']].join(df, on='cell_roi_id')
-        return df
-
-    def get_motion_correction(self) -> pd.DataFrame:
-
-        motion_correction_data = {}
-        motion_correction_data['x'] = self.nwbfile.modules['motion_correction'].get_data_interface('x').data[:]
-        motion_correction_data['y'] = self.nwbfile.modules['motion_correction'].get_data_interface('y').data[:]
-
-        return pd.DataFrame(motion_correction_data)
 
 
 def equals(A, B):
