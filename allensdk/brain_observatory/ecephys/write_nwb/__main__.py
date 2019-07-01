@@ -1,12 +1,10 @@
 import logging
 import sys
-import argparse
 from pathlib import PurePath
 import multiprocessing as mp
 from functools import partial
 
-import marshmallow
-import argschema
+
 import pynwb
 import requests
 import pandas as pd
@@ -21,7 +19,7 @@ from allensdk.brain_observatory.nwb import (
     add_stimulus_timestamps,
 )
 from allensdk.brain_observatory.argschema_utilities import (
-    write_or_print_outputs,
+    write_or_print_outputs, optional_lims_inputs
 )
 from allensdk.brain_observatory import dict_to_indexed_array
 from allensdk.brain_observatory.ecephys.file_io.continuous_file import ContinuousFile
@@ -572,32 +570,7 @@ def main():
         format="%(asctime)s - %(process)s - %(levelname)s - %(message)s"
     )
 
-    remaining_args = sys.argv[1:]
-    input_data = {}
-    if "--get_inputs_from_lims" in sys.argv:
-        lims_parser = argparse.ArgumentParser(add_help=False)
-        lims_parser.add_argument("--host", type=str, default="http://lims2")
-        lims_parser.add_argument("--job_queue", type=str, default=None)
-        lims_parser.add_argument("--strategy", type=str, default=None)
-        lims_parser.add_argument("--ecephys_session_id", type=int, default=None)
-        lims_parser.add_argument("--output_root", type=str, default=None)
-
-        lims_args, remaining_args = lims_parser.parse_known_args(remaining_args)
-        remaining_args = [
-            item for item in remaining_args if item != "--get_inputs_from_lims"
-        ]
-        input_data = get_inputs_from_lims(**lims_args.__dict__)
-
-    try:
-        parser = argschema.ArgSchemaParser(
-            args=remaining_args,
-            input_data=input_data,
-            schema_type=InputSchema,
-            output_schema_type=OutputSchema,
-        )
-    except marshmallow.exceptions.ValidationError:
-        print(input_data)
-        raise
+    parser = optional_lims_inputs(sys.argv, InputSchema, OutputSchema, get_inputs_from_lims)
 
     output = write_ecephys_nwb(**parser.args)
     write_or_print_outputs(output, parser)
