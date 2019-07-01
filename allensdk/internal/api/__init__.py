@@ -2,24 +2,11 @@ import psycopg2
 import psycopg2.extras
 import pandas as pd
 
-
-class OneResultExpectedError(RuntimeError):
-    pass
+from allensdk import one, OneResultExpectedError
 
 
 class OneOrMoreResultExpectedError(RuntimeError):
     pass
-
-
-def one(x):
-    if isinstance(x, str):
-        return x
-    if len(x) != 1:
-        raise OneResultExpectedError('Expected length one result, received: {} results from query'.format(x))
-    if isinstance(x, set):
-        return list(x)[0]
-    else:
-        return x[0]
 
 
 def psycopg2_select(query, database, host, port, username, password):
