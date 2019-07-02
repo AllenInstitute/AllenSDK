@@ -425,6 +425,7 @@ def write_probe_lfp_file(session_start_time, log_level, probe):
     nwbfile, probe_nwb_device, probe_nwb_electrode_group = add_probe_to_nwbfile(nwbfile, probe['id'], description=probe['name'])
 
     channels = prepare_probewise_channel_table(probe['channels'], probe_nwb_electrode_group)
+    channel_li_id_map = {row["local_index"]: cid for cid, row in channels.iterrows()}
     lfp_channels = np.load(probe['lfp']['input_channels_path'], allow_pickle=False)
     
     channels.reset_index(inplace=True)
@@ -460,7 +461,7 @@ def write_probe_lfp_file(session_start_time, log_level, probe):
     nwbfile.add_acquisition(lfp)
 
     csd, csd_times, csd_channels = read_csd_data_from_h5(probe["csd_path"])
-    csd_channels = channels[channels["local_index"] == csd_channels].id.values
+    csd_channels = np.array([channel_li_id_map[li] for li in csd_channels])
     nwbfile = add_csd_to_nwbfile(nwbfile, csd, csd_times, csd_channels)
 
     with pynwb.NWBHDF5IO(probe['lfp']['output_path'], 'w') as lfp_writer:
