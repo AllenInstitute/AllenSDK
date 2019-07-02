@@ -25,8 +25,12 @@ class Channel(RaisingSchema):
     local_index = Int(required=True)
     probe_vertical_position = Int(required=True)
     probe_horizontal_position = Int(required=True)
-    manual_structure_id = Int(required=True, allow_none=True)
-    manual_structure_acronym = String(required=True, allow_none=True)
+    structure_id = Int(required=True, allow_none=True)
+    structure_acronym = String(required=True, allow_none=True)
+    AP_coordinate = Float(required=True, allow_none=True)
+    DV_coordinate = Float(required=True, allow_none=True)
+    ML_coordinate = Float(required=True, allow_none=True)
+    cortical_depth = Float(required=True, allow_none=True)
 
 
 class Unit(RaisingSchema):
@@ -40,6 +44,13 @@ class Unit(RaisingSchema):
     firing_rate = Float(required=True)
     snr = Float(required=True)
     isi_violations = Float(required=True)
+    presence_ratio = Float(required=True)
+    amplitude_cutoff = Float(required=True)
+    isolation_distance = Float(required=True)
+    l_ratio = Float(required=True)
+    d_prime = Float(required=True)
+    nn_hit_rate = Float(required=True)
+    nn_miss_rate = Float(required=True)
 
 
 class Lfp(RaisingSchema):
