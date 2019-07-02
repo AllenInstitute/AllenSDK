@@ -6,7 +6,7 @@ import os
 
 from allensdk.core.lazy_property import LazyProperty, LazyPropertyMixin
 from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import equals
-from allensdk.internal.api.behavior_only_api import BehaviorOnlyLimsApi
+from allensdk.internal.api.behavior_lims_api import BehaviorLimsApi
 from allensdk.deprecated import legacy
 from allensdk.brain_observatory.behavior.trials_processing import calculate_reward_rate
 from allensdk.brain_observatory.behavior.dprime import get_trial_count_corrected_hit_rate, get_trial_count_corrected_false_alarm_rate, get_rolling_dprime
@@ -61,7 +61,7 @@ class BehaviorSession(LazyPropertyMixin):
 
     @classmethod
     def from_lims(cls, behavior_session_id):
-        return cls(api=BehaviorOnlyLimsApi(behavior_session_id))
+        return cls(api=BehaviorLimsApi(behavior_session_id))
 
     def get_reward_rate(self):
         response_latency_list = []
@@ -132,7 +132,10 @@ class BehaviorSession(LazyPropertyMixin):
 if __name__=="__main__":
 
     # Behavior session from donor 842724844 on date 2019-04-26
-    behavior_session_id = 858098100
-    api = BehaviorOnlyLimsApi(behavior_session_id)
-    session = BehaviorSession(api)
-    print(session.get_performance_metrics())
+    behavior_session_id = 881427978
+    # behavior_session_id = 874324523
+    # api = BehaviorOnlyLimsApi(behavior_session_id)
+    # session = BehaviorSession(api)
+    session = BehaviorSession.from_lims(behavior_session_id)
+    print(session.stimulus_presentations)
+    # print(session.get_performance_metrics())

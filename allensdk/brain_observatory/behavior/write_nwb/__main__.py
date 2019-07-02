@@ -14,8 +14,10 @@ from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_a
 from allensdk.brain_observatory.behavior.write_nwb._schemas import InputSchema, OutputSchema
 from allensdk.brain_observatory.argschema_utilities import write_or_print_outputs
 
+class BehaviorJsonApi:
+    pass
 
-class BehaviorOphysJsonApi(BehaviorOphysLimsApi):
+class BehaviorOphysJsonApi(BehaviorJsonApi):
 
     def __init__(self, data):
         self.data = data

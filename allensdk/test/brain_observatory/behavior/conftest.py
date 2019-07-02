@@ -212,4 +212,20 @@ def session_data():
             "sex": "F",
             "age": "P139"}
 
+@pytest.fixture
+def behavior_session_data():
+
+    data = {'behavior_experiment_id': None,
+            "rig_name": None,
+            "targeted_structure": None,
+            "stimulus_name": None,
+            "date_of_acquisition": None,
+            "reporter_line": None,
+            "driver_line": None,
+            "external_specimen_name": None,
+            "full_genotype": None,
+            "behavior_stimulus_file": None,
+            "sex": None,
+            "age": None}
+
     return data

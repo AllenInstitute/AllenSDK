@@ -12,15 +12,15 @@ import SimpleITK as sitk
 from pandas.util.testing import assert_frame_equal
 
 from allensdk.brain_observatory.behavior.behavior_session import BehaviorSession
-# from allensdk.brain_observatory.behavior.write_nwb.__main__ import BehaviorJsonApi
-from allensdk.brain_observatory.behavior.behavior_api.behavior_nwb_api import BehaviorNwbApi, equals
-from allensdk.internal.api.behavior_only_api import BehaviorOnlyLimsApi
+from allensdk.brain_observatory.behavior.write_nwb.__main__ import BehaviorJsonApi
+from allensdk.brain_observatory.behavior.behavior_api.behavior_nwb_api import equals
+# from allensdk.internal.api.behavior_lims_api import BehaviorLimsApi
 
 
 @pytest.mark.nightly
 @pytest.mark.parametrize('oeid1, oeid2, expected', [
-    pytest.param(858098100, 858098100, True),
-    pytest.param(858098100, 874324523, False)
+    pytest.param(881427978, 881427978, True),
+    pytest.param(881427978, 874324523, False)
 ])
 def test_equal(oeid1, oeid2, expected):
     d1 = BehaviorSession.from_lims(oeid1)
@@ -28,26 +28,26 @@ def test_equal(oeid1, oeid2, expected):
 
     assert equals(d1, d2) == expected
 
-# @pytest.mark.nightly
-# def test_session_from_json(tmpdir_factory, session_data):
-#     oeid = 789359614
+@pytest.mark.nightly
+def test_session_from_json(tmpdir_factory, behavior_session_data):
+    oeid = 789359614
 
-#     d1 = BehaviorOphysSession(api=BehaviorOphysJsonApi(session_data))
-#     d2 = BehaviorOphysSession.from_lims(oeid)
+    d1 = BehaviorSession(api=BehaviorJsonApi(behavior_session_data))
+    d2 = BehaviorSession.from_lims(oeid)
 
-#     assert equals(d1, d2)
+    assert equals(d1, d2)
 
 
-# @pytest.mark.requires_bamboo
-# def test_nwb_end_to_end(tmpdir_factory):
-#     oeid = 789359614
-#     nwb_filepath = os.path.join(str(tmpdir_factory.mktemp('test_nwb_end_to_end')), 'nwbfile.nwb')
+@pytest.mark.requires_bamboo
+def test_nwb_end_to_end(tmpdir_factory):
+    oeid = 789359614
+    nwb_filepath = os.path.join(str(tmpdir_factory.mktemp('test_nwb_end_to_end')), 'nwbfile.nwb')
 
-#     d1 = BehaviorOphysSession.from_lims(oeid)
-#     BehaviorOphysNwbApi(nwb_filepath).save(d1)
+    d1 = BehaviorOphysSession.from_lims(oeid)
+    BehaviorOphysNwbApi(nwb_filepath).save(d1)
 
-#     d2 = BehaviorOphysSession(api=BehaviorOphysNwbApi(nwb_filepath))
-#     assert equals(d1, d2)
+    d2 = BehaviorOphysSession(api=BehaviorOphysNwbApi(nwb_filepath))
+    assert equals(d1, d2)
 
 
 # @pytest.mark.nightly

@@ -22,6 +22,10 @@ class BehaviorOphysLimsApi(BehaviorLimsApi, OphysLimsApi, BehaviorOphysApiBase):
         BehaviorLimsApi.__init__(self, ophys_experiment_id)
         OphysLimsApi.__init__(self, ophys_experiment_id)
 
+        # metadata = {}
+        # ophys_metadata = OphysLimsApi.get_metadata(self, ophys_experiment_id)
+        # behavior_metadata = BehaviorLimsApi.get_metadata(self, behavior_session_id)
+
     @memoize
     def get_sync_data(self):
         sync_path = self.get_sync_file()
@@ -74,36 +78,30 @@ class BehaviorOphysLimsApi(BehaviorLimsApi, OphysLimsApi, BehaviorOphysApiBase):
                 '''.format(self.get_ophys_experiment_id())
         return safe_system_path(self.fetchone(query, strict=True))
 
-    def get_behavior_session_uuid(self):
-        behavior_stimulus_file = self.get_behavior_stimulus_file()
-        data = pd.read_pickle(behavior_stimulus_file)
-        return data['session_uuid']
-
-
     @memoize
     def get_ophys_frame_rate(self):
         ophys_timestamps = self.get_ophys_timestamps()
         return np.round(1 / np.mean(np.diff(ophys_timestamps)), 0)
 
-    @memoize
-    def get_metadata(self):
+    # @memoize
+    # def get_metadata(self):
 
-        metadata = super().get_metadata()
-        metadata['ophys_experiment_id'] = self.get_ophys_experiment_id()
-        metadata['experiment_container_id'] = self.get_experiment_container_id()
-        metadata['ophys_frame_rate'] = self.get_ophys_frame_rate()
-        metadata['stimulus_frame_rate'] = self.get_stimulus_frame_rate()
-        metadata['targeted_structure'] = self.get_targeted_structure()
-        metadata['imaging_depth'] = self.get_imaging_depth()
-        metadata['session_type'] = self.get_stimulus_name()
-        metadata['experiment_datetime'] = self.get_experiment_date()
-        metadata['reporter_line'] = self.get_reporter_line()
-        metadata['driver_line'] = self.get_driver_line()
-        metadata['LabTracks_ID'] = self.get_external_specimen_name()
-        metadata['full_genotype'] = self.get_full_genotype()
-        metadata['behavior_session_uuid'] = uuid.UUID(self.get_behavior_session_uuid())
+    #     metadata = super().get_metadata()
+    #     metadata['ophys_experiment_id'] = self.get_ophys_experiment_id()
+    #     metadata['experiment_container_id'] = self.get_experiment_container_id()
+    #     metadata['ophys_frame_rate'] = self.get_ophys_frame_rate()
+    #     metadata['stimulus_frame_rate'] = self.get_stimulus_frame_rate()
+    #     metadata['targeted_structure'] = self.get_targeted_structure()
+    #     metadata['imaging_depth'] = self.get_imaging_depth()
+    #     metadata['session_type'] = self.get_stimulus_name()
+    #     metadata['experiment_datetime'] = self.get_experiment_date()
+    #     metadata['reporter_line'] = self.get_reporter_line()
+    #     metadata['driver_line'] = self.get_driver_line()
+    #     metadata['LabTracks_ID'] = self.get_external_specimen_name()
+    #     metadata['full_genotype'] = self.get_full_genotype()
+    #     metadata['behavior_session_uuid'] = uuid.UUID(self.get_behavior_session_uuid())
 
-        return metadata
+    #     return metadata
 
     @memoize
     def get_dff_traces(self):

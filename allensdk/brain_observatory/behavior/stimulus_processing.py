@@ -33,7 +33,7 @@ def get_stimulus_presentations(data, stimulus_timestamps):
     # workaround to rename columns to harmonize with visual coding and rebase timestamps to sync time
     stimulus_table.insert(loc=0, column='flash_number', value=np.arange(0, len(stimulus_table)))
     stimulus_table = stimulus_table.rename(columns={'frame': 'start_frame', 'time': 'start_time', 'flash_number':'stimulus_presentations_id'})
-    stimulus_table.start_time = [stimulus_timestamps[start_frame] for start_frame in stimulus_table.start_frame.values]
+    stimulus_table.start_time = [stimulus_timestamps[int(start_frame)] for start_frame in stimulus_table.start_frame.values]
     end_time = []
     for end_frame in stimulus_table.end_frame.values:
         if not np.isnan(end_frame):

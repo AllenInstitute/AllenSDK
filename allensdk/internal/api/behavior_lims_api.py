@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import uuid
 
 from allensdk.api.cache import memoize
 from allensdk.brain_observatory.behavior.stimulus_processing import get_stimulus_presentations, get_stimulus_templates, get_stimulus_metadata
@@ -31,6 +32,11 @@ class BehaviorLimsApi(PostgresQueryMixin):
 
     def get_behavior_experiment_id(self):
         return self.behavior_experiment_id
+
+    def get_behavior_session_uuid(self):
+        behavior_stimulus_file = self.get_behavior_stimulus_file()
+        data = pd.read_pickle(behavior_stimulus_file)
+        return data['session_uuid']
 
     @memoize
     def get_behavior_stimulus_file(self):
@@ -157,6 +163,26 @@ class BehaviorLimsApi(PostgresQueryMixin):
         trial_df = get_trials(data, licks, rewards, rebase_function)
 
         return trial_df
+
+    @memoize
+    def get_metadata(self):
+
+        metadata = {}
+        metadata['behavior_experiment_id'] = self.get_behavior_experiment_id()
+        # metadata['experiment_container_id'] = self.get_experiment_container_id()
+        # metadata['ophys_frame_rate'] = self.get_ophys_frame_rate()
+        metadata['stimulus_frame_rate'] = self.get_stimulus_frame_rate()
+        # metadata['targeted_structure'] = self.get_targeted_structure()
+        # metadata['imaging_depth'] = self.get_imaging_depth()
+        # metadata['session_type'] = self.get_stimulus_name()
+        # metadata['experiment_datetime'] = self.get_experiment_date()
+        # metadata['reporter_line'] = self.get_reporter_line()
+        # metadata['driver_line'] = self.get_driver_line()
+        # metadata['LabTracks_ID'] = self.get_external_specimen_name()
+        # metadata['full_genotype'] = self.get_full_genotype()
+        metadata['behavior_session_uuid'] = uuid.UUID(self.get_behavior_session_uuid())
+
+        return metadata
 
 if __name__=="__main__":
     api = BehaviorLimsApi(858098100)
