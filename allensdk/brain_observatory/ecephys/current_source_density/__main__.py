@@ -99,7 +99,7 @@ def run_csd(args):
 
 
 def write_csd_to_h5(path, csd, relative_window, channels, stimulus_name, stimulus_index, num_trials):
-    with h5py.File(path, "w") as output:
+    with h5py.File(str(path), "w") as output:
         output.create_dataset("current_source_density", data=csd)
         output.create_dataset("timestamps", data=relative_window)
         output.create_dataset("channels", data=channels)
