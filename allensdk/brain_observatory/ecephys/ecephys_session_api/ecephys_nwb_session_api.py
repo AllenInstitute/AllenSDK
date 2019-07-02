@@ -111,6 +111,24 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
     def get_ecephys_session_id(self) -> int:
         return int(self.nwbfile.identifier)
 
+
+    def get_current_source_density(self, probe_id):
+        csd_mod = self._probe_nwbfile(probe_id).get_processing_module("current_source_density")
+        csd_ts = csd_mod["current_source_density"]
+
+        return xr.DataArray(
+            data=csd_ts.data[:],
+            dims=["channel", "time"],
+            coords={
+                # Each CSD calculation step reduces the channel dimension by 2. 
+                # These channels contributed to the calculation, 
+                # but are not specifically associated with a row in the result
+                "channel": csd_ts.control[2:-2], 
+                "time": csd_ts.timestamps[:]
+            }
+        )
+
+
     def _get_full_units_table(self) -> pd.DataFrame:
         table = self.nwbfile.units.to_dataframe()
         table.index = table.index.astype(int)

@@ -162,6 +162,13 @@ class EcephysSession(LazyPropertyMixin):
         self.inter_presentation_intervals = self.LazyProperty(self._build_inter_presentation_intervals)
 
 
+    def get_current_source_density(self, probe_id):
+        """
+        """
+
+        return self.api.get_current_source_density(probe_id)
+
+
     def get_lfp(self, probe_id):
         ''' Load an xarray DataArray with LFP data from channels on a single probe
 

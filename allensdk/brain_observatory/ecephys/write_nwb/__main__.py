@@ -460,6 +460,7 @@ def write_probe_lfp_file(session_start_time, log_level, probe):
     nwbfile.add_acquisition(lfp)
 
     csd, csd_times, csd_channels = read_csd_data_from_h5(probe["csd_path"])
+    csd_channels = channels[channels["local_index"] == csd_channels].id.values
     nwbfile = add_csd_to_nwbfile(nwbfile, csd, csd_times, csd_channels)
 
     with pynwb.NWBHDF5IO(probe['lfp']['output_path'], 'w') as lfp_writer:
@@ -482,7 +483,7 @@ def add_csd_to_nwbfile(nwbfile, csd, times, channels, unit="V/cm^2"):
         name="current_source_density",
         data=csd,
         timestamps=times,
-        control=channels,
+        control=channels.astype(np.uint64),  # these are postgres ids, always non-negative
         control_description="ids of electrodes from which csd was calculated",
         unit=unit
     )
