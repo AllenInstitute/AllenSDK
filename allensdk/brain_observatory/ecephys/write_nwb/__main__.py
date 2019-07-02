@@ -4,7 +4,7 @@ from pathlib import PurePath
 import multiprocessing as mp
 from functools import partial
 
-
+import h5py
 import pynwb
 import requests
 import pandas as pd
@@ -459,10 +459,36 @@ def write_probe_lfp_file(session_start_time, log_level, probe):
 
     nwbfile.add_acquisition(lfp)
 
+    csd, csd_times, csd_channels = read_csd_data_from_h5(probe["csd_path"])
+    nwbfile = add_csd_to_nwbfile(nwbfile, csd, csd_times, csd_channels)
+
     with pynwb.NWBHDF5IO(probe['lfp']['output_path'], 'w') as lfp_writer:
         logging.info(f"writing probe lfp file to {probe['lfp']['output_path']}")
         lfp_writer.write(nwbfile)
     return {"id": probe["id"], "nwb_path": probe["lfp"]["output_path"]}
+
+
+def read_csd_data_from_h5(csd_path):
+    with h5py.File(csd_path, "r") as csd_file:
+        return csd_file["current_source_density"][:], csd_file["timestamps"][:], csd_file["channels"][:]
+
+
+def add_csd_to_nwbfile(nwbfile, csd, times, channels, unit="V/cm^2"):
+
+    csd_mod = pynwb.ProcessingModule("current_source_density", "precalculated current source density from a subset of channel")
+    nwbfile.add_processing_module(csd_mod)
+
+    csd_ts = pynwb.base.TimeSeries(
+        name="current_source_density",
+        data=csd,
+        timestamps=times,
+        control=channels,
+        control_description="ids of electrodes from which csd was calculated",
+        unit=unit
+    )
+    csd_mod.add_data_interface(csd_ts)
+
+    return nwbfile
 
 
 def write_probewise_lfp_files(probes, session_start_time, pool_size=3):
