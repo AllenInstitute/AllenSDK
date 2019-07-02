@@ -11,9 +11,13 @@ class HttpEngine:
         url = f"{self.scheme}://{self.host}/{path}"
         
         response = requests.get(url, stream=True)
+        response_mb = None
         if "Content-length" in response.headers:
-            mb = response.headers["Content-length"] / 1024 ** 2
-            logging.warning(f"downloading a {mb:3.3}mb file from {url}")
+            response_mb = response.headers["Content-length"] / 1024 ** 2
 
-        for chunk in response:            
+        # TODO: this should be async with write (response.raw.read_chunked?)
+        for ii, chunk in enumerate(response):
+            if ii == 0:
+                size_message = f"{response_mb:3.3}mb" if response_mb is not None else "potentially large"
+                logging.warning(f"downloading a {size_message} file from {url}")
             yield chunk
