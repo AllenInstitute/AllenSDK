@@ -7,29 +7,30 @@ import json
 
 from allensdk.api.cache import memoize
 from allensdk.internal.api.ophys_lims_api import OphysLimsApi
+from allensdk.internal.api.behavior_lims_api import BehaviorLimsApi
 from allensdk.brain_observatory.behavior.sync import get_sync_data, get_stimulus_rebase_function
-from allensdk.brain_observatory.behavior.stimulus_processing import get_stimulus_presentations, get_stimulus_templates, get_stimulus_metadata
-from allensdk.brain_observatory.behavior.metadata_processing import get_task_parameters
-from allensdk.brain_observatory.behavior.running_processing import get_running_df
-from allensdk.brain_observatory.behavior.rewards_processing import get_rewards
-from allensdk.brain_observatory.behavior.trials_processing import get_trials
-from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory.behavior.image_api import ImageApi
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.brain_observatory.behavior.behavior_ophys_api import BehaviorOphysApiBase
-from allensdk.brain_observatory.behavior.trials_processing import get_extended_trials
+#  from allensdk.brain_observatory.behavior.trials_processing import get_extended_trials
 from allensdk.internal.core.lims_utilities import safe_system_path
 
 
-class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
+class BehaviorOphysLimsApi(BehaviorLimsApi, OphysLimsApi, BehaviorOphysApiBase):
 
     def __init__(self, ophys_experiment_id):
-        super().__init__(ophys_experiment_id)
+        BehaviorLimsApi.__init__(self, ophys_experiment_id)
+        OphysLimsApi.__init__(self, ophys_experiment_id)
 
     @memoize
     def get_sync_data(self):
         sync_path = self.get_sync_file()
         return get_sync_data(sync_path)
+
+    @memoize
+    def get_licks(self):
+        lick_times = self.get_sync_data()['lick_times']
+        return pd.DataFrame({'time': lick_times})
 
     @memoize
     def get_stimulus_timestamps(self):
@@ -78,10 +79,6 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
         data = pd.read_pickle(behavior_stimulus_file)
         return data['session_uuid']
 
-    @memoize
-    def get_stimulus_frame_rate(self):
-        stimulus_timestamps = self.get_stimulus_timestamps()
-        return np.round(1 / np.mean(np.diff(stimulus_timestamps)), 0)
 
     @memoize
     def get_ophys_frame_rate(self):
@@ -117,73 +114,6 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
         cell_specimen_table = self.get_cell_specimen_table()
         df = cell_specimen_table[['cell_roi_id']].join(df, on='cell_roi_id')
         return df
-
-    @memoize
-    def get_running_data_df(self):
-        stimulus_timestamps = self.get_stimulus_timestamps()
-        behavior_stimulus_file = self.get_behavior_stimulus_file()
-        data = pd.read_pickle(behavior_stimulus_file)
-        return get_running_df(data, stimulus_timestamps)
-
-    @memoize
-    def get_running_speed(self):
-        running_data_df = self.get_running_data_df()
-        assert running_data_df.index.name == 'timestamps'
-        return RunningSpeed(timestamps=running_data_df.index.values,
-                            values=running_data_df.speed.values)
-
-    @memoize
-    def get_stimulus_presentations(self):
-        stimulus_timestamps = self.get_stimulus_timestamps()
-        behavior_stimulus_file = self.get_behavior_stimulus_file()
-        data = pd.read_pickle(behavior_stimulus_file)
-        stimulus_presentations_df_pre = get_stimulus_presentations(data, stimulus_timestamps)
-        stimulus_metadata_df = get_stimulus_metadata(data)
-        idx_name = stimulus_presentations_df_pre.index.name
-        stimulus_index_df = stimulus_presentations_df_pre.reset_index().merge(stimulus_metadata_df.reset_index(), on=['image_name']).set_index(idx_name)
-        stimulus_index_df.sort_index(inplace=True)
-        stimulus_index_df = stimulus_index_df[['image_set', 'image_index', 'start_time']].rename(columns={'start_time': 'timestamps'})
-        stimulus_index_df.set_index('timestamps', inplace=True, drop=True)
-        stimulus_presentations_df = stimulus_presentations_df_pre.merge(stimulus_index_df, left_on='start_time', right_index=True, how='left')
-        assert len(stimulus_presentations_df_pre) == len(stimulus_presentations_df)
-
-        return stimulus_presentations_df[sorted(stimulus_presentations_df.columns)]
-
-    @memoize
-    def get_stimulus_templates(self):
-        behavior_stimulus_file = self.get_behavior_stimulus_file()
-        data = pd.read_pickle(behavior_stimulus_file)
-        return get_stimulus_templates(data)
-
-    @memoize
-    def get_licks(self):
-        lick_times = self.get_sync_data()['lick_times']
-        return pd.DataFrame({'time': lick_times})
-
-    @memoize
-    def get_rewards(self):
-        behavior_stimulus_file = self.get_behavior_stimulus_file()
-        data = pd.read_pickle(behavior_stimulus_file)
-        rebase_function = self.get_stimulus_rebase_function()
-        return get_rewards(data, rebase_function)
-
-    @memoize
-    def get_task_parameters(self):
-        behavior_stimulus_file = self.get_behavior_stimulus_file()
-        data = pd.read_pickle(behavior_stimulus_file)
-        return get_task_parameters(data)
-
-    @memoize
-    def get_trials(self):
-
-        licks = self.get_licks()
-        behavior_stimulus_file = self.get_behavior_stimulus_file()
-        data = pd.read_pickle(behavior_stimulus_file)
-        rewards = self.get_rewards()
-        rebase_function = self.get_stimulus_rebase_function()
-        trial_df = get_trials(data, licks, rewards, rebase_function)
-
-        return trial_df
 
     @memoize
     def get_corrected_fluorescence_traces(self):
@@ -236,11 +166,6 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
         data = pd.read_pickle(behavior_stimulus_file)
         stimulus_rebase_function = get_stimulus_rebase_function(data, stimulus_timestamps_no_monitor_delay)
         return stimulus_rebase_function
-
-    def get_extended_trials(self):
-        filename = self.get_behavior_stimulus_file()
-        data = pd.read_pickle(filename)
-        return get_extended_trials(data)
 
     @staticmethod
     def get_ophys_experiment_df():
@@ -296,11 +221,13 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
         return [cls(oeid) for oeid in oeid_list]
 
 
-
-
 if __name__ == "__main__":
 
-    print(BehaviorOphysLimsApi.get_ophys_experiment_df())
+    #  print(BehaviorOphysLimsApi.get_ophys_experiment_df())
+    #  experiment_id = 880701931
+    experiment_id = 848697604
+    api = BehaviorOphysLimsApi(experiment_id)
+    print(api.get_trials())
     # print(BehaviorOphysLimsApi.get_containers_df(only_passed=False))
 
     # print(BehaviorOphysLimsApi.get_api_by_container(838105949))
