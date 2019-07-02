@@ -11,7 +11,6 @@ class ProbeInputParameters(DefaultSchema):
     surface_channel = Int(required=True, help='Estimate of surface (pia boundary) channel index')
     reference_channels = List(Int, many=True, help='Indices of reference channels for this probe')
     csd_output_path = String(required=True, help='CSD output will be written here.')
-    relative_window_output_path = String(required=True, help='Timestamp window surrounding each stimulus frame onset will be written here.')
     sampling_rate = Float(required=True, help='sampling rate assessed on master clock')
     total_channels = Int(default=384, help='Total channel count for this probe.')
     surface_channel_adjustment = Int(default=40, help='Erring up in the surface channel estimate is less dangerous for the CSD calculation than erring down, so an adjustment is provided.')
@@ -38,7 +37,6 @@ class InputParameters(ArgSchema):
 class ProbeOutputParameters(DefaultSchema):
     name = String(required=True, help='Identifier for this probe.')
     csd_path = String(required=True, help='Path to current source density file.')
-    relative_window_path = String(required=True, help='Path to npy file containing time window around each stimulus onset.')
     csd_channels = List(Int, required=True, help='LFP channels from which CSD was calculated.')
 
 
