@@ -105,14 +105,6 @@ def test_trimmed_stats(process, pctiles):
     assert obt_std == true_std
 
 
-@pytest.mark.parametrize('vs_times, expected, photodiode_cycle', [
-    [ [0.016, 0.033, 0.051, 0.067, 3.0], [0.016, 0.033, 0.051, 0.067], 60 ]
-])
-def test_trim_discontiguous_vsyncs(vs_times, photodiode_cycle, expected):
-    obtained = stimulus_sync.trim_discontiguous_vsyncs(vs_times, photodiode_cycle)
-    assert np.allclose(obtained, expected)
-
-
 @pytest.mark.parametrize('pd_times,vs_times, expected', [
     [ [1, 2, 3, 4, 5], [1.8, 3, 4], [2, 3, 4] ]
 ])

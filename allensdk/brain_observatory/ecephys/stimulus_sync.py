@@ -14,17 +14,6 @@ def trimmed_stats(data, pctiles=(10, 90)):
     )]
     
     return np.mean(trimmed), np.std(trimmed)
-
-
-def trim_discontiguous_vsyncs(vs_times, photodiode_cycle=60):
-    vs_times = np.array(vs_times)
-
-    breaks = np.where(np.diff(vs_times) > (1/photodiode_cycle)*100)[0]
-
-    if len(breaks) > 0:
-        return vs_times[:np.min(breaks+1)]
-    else:
-        return vs_times
     
 
 def trim_border_pulses(pd_times, vs_times, frame_interval=1/60, num_frames=5):

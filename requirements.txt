@@ -13,10 +13,10 @@ requests-toolbelt
 simplejson>=3.10.0
 scikit-image>=0.14.0
 scikit-build
-statsmodels>=0.8.0
+statsmodels==0.9.0
 simpleitk
 argschema
-marshmallow>=3.0.0rc6
+marshmallow==3.0.0rc6
 glymur
 xarray
 hdmf==1.0.2

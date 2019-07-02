@@ -1,6 +1,7 @@
 import os
-import warnings
 from datetime import datetime
+from pathlib import Path
+import logging
 
 import pytest
 import pynwb
@@ -22,6 +23,7 @@ def units_table():
         'isi_violations': [34, 39, 22]
     }, index=pd.Index([11, 22, 33], name='id')), name='units')
 
+
 @pytest.fixture
 def spike_times():
     return {
@@ -30,6 +32,25 @@ def spike_times():
         33: [13, 4, 12]
     }
 
+
+@pytest.fixture
+def running_speed():
+    return pd.DataFrame({
+        "start_time": [1., 2., 3., 4., 5.],
+        "end_time": [2., 3., 4., 5., 6.],
+        "velocity": [-1., -2., -1., 0., 1.],
+        "net_rotation": [-np.pi, -2 *np.pi, -np.pi, 0, np.pi]
+    })
+
+
+@pytest.fixture
+def raw_running_data():
+    return pd.DataFrame({
+        "frame_time": np.random.rand(4),
+        "dx": np.random.rand(4),
+        "vsig": np.random.rand(4),
+        "vin": np.random.rand(4),
+    })
 
 
 def test_roundtrip_metadata(roundtripper):
@@ -87,7 +108,7 @@ def test_prepare_probewise_channel_table():
         }
     ]
 
-    dev  = pynwb.device.Device(name='foo')
+    dev = pynwb.device.Device(name='foo')
     eg = pynwb.ecephys.ElectrodeGroup(name='foo_group', description='', location='', device=dev)
 
     expected = pd.DataFrame({
@@ -126,8 +147,11 @@ def test_add_ragged_data_to_dynamic_table(units_table, spike_times):
     assert np.allclose([13, 4, 12], units_table['spike_times'][2])
 
 
-@pytest.mark.parametrize('roundtrip', [True, False])
-def test_add_running_speed_to_nwbfile(nwbfile, running_speed, roundtripper, roundtrip):
+@pytest.mark.parametrize('roundtrip,include_rotation', [
+    [True, True],
+    [True, False]
+])
+def test_add_running_speed_to_nwbfile(nwbfile, running_speed, roundtripper, roundtrip, include_rotation):
 
     nwbfile = write_nwb.add_running_speed_to_nwbfile(nwbfile, running_speed)
     if roundtrip:
@@ -135,10 +159,28 @@ def test_add_running_speed_to_nwbfile(nwbfile, running_speed, roundtripper, roun
     else:
         api_obt = EcephysNwbSessionApi.from_nwbfile(nwbfile)
 
-    running_speed_obt = api_obt.get_running_speed()
+    obtained = api_obt.get_running_speed(include_rotation=include_rotation)
+    
+    expected = running_speed
+    if not include_rotation:
+        expected = expected.drop(columns="net_rotation")
+    pd.testing.assert_frame_equal(expected, obtained, check_like=True)
 
-    assert np.allclose(running_speed.timestamps, running_speed_obt.timestamps)
-    assert np.allclose(running_speed.values, running_speed_obt.values)
+
+@pytest.mark.parametrize('roundtrip', [[True]])
+def test_add_raw_running_Data_to_nwbfile(nwbfile, raw_running_data, roundtripper, roundtrip):
+
+    nwbfile = write_nwb.add_raw_running_data_to_nwbfile(nwbfile, raw_running_data)
+    if roundtrip:
+        api_obt = roundtripper(nwbfile, EcephysNwbSessionApi)
+    else:
+        api_obt = EcephysNwbSessionApi.from_nwbfile(nwbfile)
+
+    obtained = api_obt.get_raw_running_data()
+
+
+    expected = raw_running_data.rename(columns={"dx": "net_rotation", "vsig": "signal_voltage", "vin": "supply_voltage"})
+    pd.testing.assert_frame_equal(expected, obtained, check_like=True)
 
 
 def test_read_stimulus_table(tmpdir_factory, stimulus_presentations):
@@ -167,7 +209,7 @@ def test_read_spike_times_to_dictionary(tmpdir_factory):
 
     obtained = write_nwb.read_spike_times_to_dictionary(spike_times_path, spike_units_path, local_to_global_unit_map)
     for ii in range(15):
-        assert np.allclose(obtained[-ii], sorted([spike_times[ii], spike_times[15+ii]]))
+        assert np.allclose(obtained[-ii], sorted([spike_times[ii], spike_times[15 + ii]]))
 
 
 def test_read_waveforms_to_dictionary(tmpdir_factory):
@@ -186,3 +228,80 @@ def test_read_waveforms_to_dictionary(tmpdir_factory):
     obtained = write_nwb.read_waveforms_to_dictionary(waveforms_path, local_to_global_unit_map)
     for ii in range(nunits):
         assert np.allclose(mean_waveforms[ii, :, :], obtained[-ii])
+
+
+@pytest.fixture
+def lfp_data():
+    total_timestamps = 12
+    subsample_channels = np.array([3, 2])
+
+    return {
+        'data': np.arange(total_timestamps * len(subsample_channels), dtype=np.int16).reshape((total_timestamps, len(subsample_channels))),
+        'timestamps': np.linspace(0, 1, total_timestamps),
+        'subsample_channels': subsample_channels
+    }
+
+
+def test_write_probe_lfp_file(tmpdir_factory, lfp_data):
+
+    tmpdir = Path(tmpdir_factory.mktemp("probe_lfp_nwb"))
+    input_data_path = tmpdir / Path("lfp_data.dat")
+    input_timestamps_path = tmpdir / Path("lfp_timestamps.npy")
+    input_channels_path = tmpdir / Path("lfp_channels.npy")
+    output_path = str(tmpdir / Path("lfp.nwb"))  # pynwb.NWBHDF5IO chokes on Path
+
+    probe_data = {
+        "id": 12345,
+        "name": "probeA",
+        "channels":  [
+            {
+                'id': 0,
+                'probe_id': 12,
+                'local_index': 1,
+                'probe_vertical_position': 21,
+                'probe_horizontal_position': 33
+            },
+            {
+                'id': 1,
+                'probe_id': 12,
+                'local_index': 2,
+                'probe_vertical_position': 21,
+                'probe_horizontal_position': 32
+            },
+            {
+                'id': 2,
+                'probe_id': 12,
+                'local_index': 3,
+                'probe_vertical_position': 21,
+                'probe_horizontal_position': 31
+            }
+        ],
+        "lfp": {
+            "input_data_path": input_data_path,
+            "input_timestamps_path": input_timestamps_path,
+            "input_channels_path": input_channels_path,
+            "output_path": output_path
+        }
+    }
+
+    np.save(input_timestamps_path, lfp_data["timestamps"],  allow_pickle=False)
+    np.save(input_channels_path, lfp_data["subsample_channels"], allow_pickle=False)
+    with open(input_data_path, "wb") as input_data_file:
+        input_data_file.write(lfp_data["data"].tobytes())
+
+    write_nwb.write_probe_lfp_file(datetime.now(), logging.INFO, probe_data)
+
+    exp_electrodes = pd.DataFrame(probe_data["channels"]).set_index("id").loc[[2, 1], :]
+
+    with pynwb.NWBHDF5IO(output_path, "r") as obt_io:
+        obt_f = obt_io.read()
+        
+        obt_ser = obt_f.get_acquisition("probe_12345_lfp").electrical_series["probe_12345_lfp_data"]
+        assert np.allclose(lfp_data["data"], obt_ser.data[:])
+        assert np.allclose(lfp_data["timestamps"], obt_ser.timestamps[:])
+
+        obt_electrodes = obt_f.electrodes.to_dataframe().loc[
+            :, ['local_index', 'probe_horizontal_position', 'probe_id','probe_vertical_position']
+        ]
+
+        pd.testing.assert_frame_equal(exp_electrodes, obt_electrodes, check_like=True)
