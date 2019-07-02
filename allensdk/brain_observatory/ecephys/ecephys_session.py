@@ -696,7 +696,7 @@ def intervals_structures(table, structure_id_key="manual_structure_id", structur
     """
 
     intervals = nan_intervals(table[structure_id_key])
-    labels = table[structure_label_key][intervals[:-1]]
+    labels = table[structure_label_key].iloc[intervals[:-1]].values
 
     return labels, intervals
 
