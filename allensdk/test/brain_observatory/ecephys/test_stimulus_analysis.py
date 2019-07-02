@@ -27,16 +27,17 @@ def test_stimulus_analysis(ecephys_session):
     # TODO: implement running_speed - dxcm and dxtime
 
 
-@pytest.mark.parametrize('sweeps,expected,as_array',
+@pytest.mark.parametrize('sweeps,win_beg,win_end,expected,as_array',
                          [
-                             ([[0.82764702, 0.83624702, 1.09211374], [0.34899642, 0.49176312, 0.71626316], [0.1549371], [0.89921008, 1.07917679]], -0.6204065787016709, False),
-                             ([[0.82764702, 0.83624702, 1.09211374], [0.34899642, 0.49176312, 0.71626316], [0.1549371], [0.89921008, 1.07917679]], -0.6204065787016709, True),
-                             ([[0.82764702, 0.83624702, 1.09211374, 1.112345]], np.nan, True)
+                             ([[0.82764702, 0.83624702, 1.09211374], [0.34899642, 0.49176312, 0.71626316], [0.1549371], [0.89921008, 1.07917679]], 30, 40, -0.6204065787016709, False),
+                             ([[0.82764702, 0.83624702, 1.09211374], [0.34899642, 0.49176312, 0.71626316], [0.1549371], [0.89921008, 1.07917679]], 30, 40, -0.6204065787016709, True),
+                             ([[0.82764702, 0.83624702, 1.09211374, 1.112345]], 30, 40, np.nan, True)
                           ]
                          )
-def test_get_reliability(sweeps, expected, as_array):
+def test_get_reliability(sweeps, win_beg, win_end, expected, as_array):
     sweeps = np.array([np.array(s) for s in sweeps]) if as_array else sweeps
-    assert(np.isclose(sa.get_reliability(unit_sweeps=sweeps), expected, equal_nan=True))
+    assert(np.isclose(sa.get_reliability(unit_sweeps=sweeps, window_beg=win_beg, window_end=win_end), expected,
+                      equal_nan=True))
 
 
 @pytest.mark.parametrize('spikes,sampling_freq,sweep_length,expected',
@@ -72,7 +73,8 @@ def test_get_osi(responses, ori_vals, expected):
 @pytest.mark.parametrize('mean_sweep_runs,mean_sweep_stats,expected',
                          [
                              (np.array([0.0, 0.0, 4.0, 0.0, 4.0, 0.0, 4.0, 4.0, 8.0, 4.0, 0.0, 8.0, 8.0, 24.0, 16.0, 16.0, 12.0, 8.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 4.0, 0.0, 0.0]),
-                              np.array([4.0, 0.0, 0.0, 12.0, 4.0, 4.0, 0.0, 4.0, 0.0, 4.0, 4.0, 0.0, 4.0, 8.0, 0.0, 8.0, 4.0, 4.0, 0.0, 0.0, 4.0]), np.array([0.3892556112603236, 0.2688172043010753, 4.428571428571429, 3.238095238095238])),
+                              np.array([4.0, 0.0, 0.0, 12.0, 4.0, 4.0, 0.0, 4.0, 0.0, 4.0, 4.0, 0.0, 4.0, 8.0, 0.0, 8.0, 4.0, 4.0, 0.0, 0.0, 4.0]),
+                              np.array([0.3892556112603236, 0.2688172043010753, 4.428571428571429, 3.238095238095238])),
                              (np.array([0.0]), np.array([4.0, 0.0, 0.0, 12.0]), np.full(4, np.nan)),
                              (np.array([4.0, 0.0, 0.0, 12.0]), np.array([1.0]), np.full(4, np.nan))
                          ])
