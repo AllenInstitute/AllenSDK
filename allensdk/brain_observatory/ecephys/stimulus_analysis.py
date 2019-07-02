@@ -218,7 +218,7 @@ class StimulusAnalysis(object):
         return sweep_p_values
 
 
-def get_reliability(unit_sweeps, padding=1.0, num_timestep_second=30, filter_width=0.1):
+def get_reliability(unit_sweeps, padding=1.0, num_timestep_second=30, filter_width=0.1, window_beg=0, window_end=None):
     """Computes the trial-to-trial reliability for a set of sweeps for a given cell
 
     :param unit_sweeps:
@@ -230,13 +230,14 @@ def get_reliability(unit_sweeps, padding=1.0, num_timestep_second=30, filter_wid
 
     unit_sweeps = unit_sweeps + padding  # DO NOT use the += as for python arrays that will do in-place modification
     corr_matrix = np.empty((len(unit_sweeps), len(unit_sweeps)))
+    fr_window = slice(window_beg, window_end)
     for i in range(len(unit_sweeps)):
         fri = get_fr(unit_sweeps[i], num_timestep_second=num_timestep_second, filter_width=filter_width)
         for j in range(len(unit_sweeps)):
             frj = get_fr(unit_sweeps[j], num_timestep_second=num_timestep_second, filter_width=filter_width)
             # Warning: the pearson coefficient is likely to have a denominator of 0 for some cells/stimulus and give
             # a divide by 0 warning.
-            r, p = st.pearsonr(fri[30:40], frj[30:40])
+            r, p = st.pearsonr(fri[fr_window], frj[fr_window])
             corr_matrix[i, j] = r
 
     inds = np.triu_indices(len(unit_sweeps), k=1)
@@ -294,6 +295,24 @@ def get_osi(responses, ori_vals, in_radians=False):
         cv_top_os[i] = (responses[i] * np.exp(1j * 2 * ori_rad[i]))
 
     return np.abs(cv_top_os.sum()) / responses.sum()
+
+
+def get_dsi(responses, ori_vals, in_radians=False):
+    """Computes the direction selectivity of a cell. See Ringbach 2002, Van Hooser 2014
+
+    :param tuning: Array of length N. Each value the (averaged) response of the cell at a differenet orientation.
+    :param ori_vals: Array of length N. Each value the oriention of the stimulus.
+    :param in_radians: Set to True if ori_vals is in units of radians. Default: False
+    :return: An N-dimensional array of the circular variance (scalar value, in radians) of the responses.
+    """
+    # TODO: Try and vectorize function so that it can take in a matrix of N-orientations x M-cells
+    ori_rad = ori_vals if in_radians else np.deg2rad(ori_vals)
+    num_ori = len(ori_rad)
+    cv_top_ds = np.empty(num_ori, dtype=np.complex128)
+    for i in range(num_ori):
+        cv_top_ds[i] = (responses[i] * np.exp(1j * ori_rad[i]))
+
+    return np.abs(cv_top_ds.sum()) / responses.sum()
 
 
 def get_running_modulation(mean_sweep_runs, mean_sweep_stats):

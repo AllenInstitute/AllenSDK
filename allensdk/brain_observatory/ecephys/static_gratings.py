@@ -42,6 +42,17 @@ class StaticGratings(StimulusAnalysis):
         self._col_sf = 'SF'
         self._col_phase = 'Phase'
 
+        # Used to determine responsivness metric and if their is enough activity to try to fit a cell's sf values.
+        # TODO: Figure out how this value existed, possibly make it a user parameter?
+        self._responsivness_threshold = kwargs.get('responsivness_threshold', 11)
+
+        # TODO: If not explicity defined by the user calculate offsets from stim table + pre_sweep_buffer
+        self._mse_offset_low = kwargs.get('mean_sweep_events_offset_low', 0.066)
+        self._mse_offset_high = kwargs.get('mean_sweep_events_offset_hight', 0.316)
+
+        # Used to determine if a spontaneous repsonse if statistically significant
+        self._response_events_p_val = kwargs.get('response_events_p_val', 0.05)
+
     @property
     def stim_table(self):
         # Stimulus table is already in EcephysSession object, just need to subselect 'static_gratings' presentations.
@@ -108,8 +119,8 @@ class StaticGratings(StimulusAnalysis):
     @property
     def mean_sweep_events(self):
         if self._mean_sweep_events is None:
-            # TODO: Calculate the upper and lower offsets from stim table + pre_sweep_buffer
-            shifted_mean_fnc = partial(do_sweep_mean_shifted, offset_lower=0.066, offset_upper=0.316)
+            shifted_mean_fnc = partial(do_sweep_mean_shifted, offset_lower=self._mse_offset_low,
+                                       offset_upper=self._mse_offset_high)
             self._mean_sweep_events = self.sweep_events.applymap(shifted_mean_fnc)
 
         return self._mean_sweep_events
@@ -178,7 +189,7 @@ class StaticGratings(StimulusAnalysis):
                 peak_df.loc[nc, 'pref_phase_sg'] = self.phasevals[pref_phase]
 
                 peak_df.loc[nc, 'num_pref_trials_sg'] = int(self.response_events[pref_ori, pref_sf+1, pref_phase, nc, 2])
-                peak_df.loc[nc, 'responsive_sg'] = self.response_events[pref_ori, pref_sf+1, pref_phase, nc, 2] > 11
+                peak_df.loc[nc, 'responsive_sg'] = self.response_events[pref_ori, pref_sf+1, pref_phase, nc, 2] > self._responsivness_threshold
 
                 # Get the osi using the mean response across all stimuli orientations (with SF and Phase fixed at their
                 # peak values).
@@ -191,7 +202,7 @@ class StaticGratings(StimulusAnalysis):
 
                 # Calculate reliability metric from sweep_events of prefered stimuli
                 pref_sweeps = self.sweep_events[stim_table_mask][unit_id].values
-                peak_df.loc[nc, 'reliability_sg'] = get_reliability(pref_sweeps)
+                peak_df.loc[nc, 'reliability_sg'] = get_reliability(pref_sweeps, window_beg=30, window_end=40)
 
                 # Calc. spatial frequency discrimination index
                 sf_tuning_responses = self.response_events[pref_ori, 1:, pref_phase, nc, 0]
@@ -207,7 +218,7 @@ class StaticGratings(StimulusAnalysis):
                 peak_df.loc[nc, ['run_pval_sg', 'run_mod_sg', 'run_resp_sg', 'stat_resp_sg']] = \
                     get_running_modulation(mse_subset_run, mse_subset_stat)
 
-                if self.response_events[pref_ori, pref_sf+1, pref_phase, nc, 2] > 11:
+                if self.response_events[pref_ori, pref_sf+1, pref_phase, nc, 2] > self._responsivness_threshold:
                     peak_df.loc[nc, ['fit_sf_ind_sg', 'fit_sf_sg', 'sf_low_cutoff_sg', 'sf_high_cutoff_sg']] = \
                         fit_sf_tuning(sf_tuning_responses, sf_values=self.sfvals, pref_sf_index=pref_sf)
 
@@ -242,14 +253,14 @@ class StaticGratings(StimulusAnalysis):
 
                     response_events[oi, si+1, phi, :, 0] = subset.mean(axis=0)
                     response_events[oi, si+1, phi, :, 1] = subset.std(axis=0) / np.sqrt(len(subset))
-                    response_events[oi, si+1, phi, :, 2] = subset_p[subset_p < 0.05].count().values
+                    response_events[oi, si+1, phi, :, 2] = subset_p[subset_p < self._response_events_p_val].count().values
 
         # A special case for a blank (or invalid?) stimulus
         subset = self.mean_sweep_events[np.isnan(self.stim_table[self._col_ori])]
         subset_p = self.sweep_p_values[np.isnan(self.stim_table[self._col_ori])]
         response_events[0, 0, 0, :, 0] = subset.mean(axis=0)
         response_events[0, 0, 0, :, 1] = subset.std(axis=0) / np.sqrt(len(subset))
-        response_events[0, 0, 0, :, 2] = subset_p[subset_p < 0.05].count().values  # TODO: parametrize alpha
+        response_events[0, 0, 0, :, 2] = subset_p[subset_p < self._response_events_p_val].count().values
 
         self._response_events = response_events
 
@@ -304,7 +315,7 @@ def fit_sf_tuning(sf_tuning_responses, sf_values, pref_sf_index):
             if low_cut_ind > 0:
                 low_cutoff = np.arange(0, 4.1, 0.1)[low_cut_ind]
                 sf_low_cutoff = 0.02*np.power(2, low_cutoff)
-            elif high_cut_ind < 49:
+            elif high_cut_ind < 4:
                 high_cutoff = np.arange(0, 4.1, 0.1)[high_cut_ind]
                 sf_high_cutoff = 0.02*np.power(2, high_cutoff)
         except Exception as e:
@@ -326,7 +337,6 @@ def fit_sf_tuning(sf_tuning_responses, sf_values, pref_sf_index):
                 low_cutoff = np.arange(0, 4.1, 0.1)[low_cut_ind]
                 sf_low_cutoff = 0.02*np.power(2, low_cutoff)
         except Exception as e:
-            print(e)
             pass
 
     return fit_sf_ind, fit_sf, sf_low_cutoff, sf_high_cutoff
@@ -341,7 +351,6 @@ def get_sfdi(sf_tuning_responses, mean_sweeps_trials, bias=5):
     :param bias:
     :return: The sfdi value (float)
     """
-
     trial_mean = mean_sweeps_trials.mean()
     sse_part = np.sqrt(np.sum((mean_sweeps_trials - trial_mean)**2) / (len(mean_sweeps_trials) - bias))
     return (np.ptp(sf_tuning_responses)) / (np.ptp(sf_tuning_responses) + 2 * sse_part)
