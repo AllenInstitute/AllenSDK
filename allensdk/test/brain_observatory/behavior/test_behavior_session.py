@@ -20,7 +20,7 @@ from allensdk.internal.api.behavior_only_api import BehaviorOnlyLimsApi
 @pytest.mark.nightly
 @pytest.mark.parametrize('oeid1, oeid2, expected', [
     pytest.param(858098100, 858098100, True),
-    pytest.param(858098100, 860247677, False)
+    pytest.param(858098100, 874324523, False)
 ])
 def test_equal(oeid1, oeid2, expected):
     d1 = BehaviorSession.from_lims(oeid1)
