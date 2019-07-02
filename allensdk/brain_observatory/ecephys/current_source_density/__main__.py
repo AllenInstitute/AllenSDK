@@ -44,7 +44,6 @@ def get_inputs_from_lims(args):
     for probe in data['probes']:
         probe['surface_channel_adjustment'] = int(probe['surface_channel_adjustment'])
         probe['csd_output_path'] = os.path.join(output_root, os.path.split(probe['csd_output_path'])[-1])
-        probe['relative_window_output_path'] = os.path.join(output_root, os.path.split(probe['relative_window_output_path'])[-1])
 
     return data
 
@@ -83,14 +82,12 @@ def run_csd(args):
             probe["csd_output_path"], 
             current_source_density, 
             relative_window, 
-            lfp_channels, 
+            csd_channels, 
             args['stimulus']['key'], 
             args["stimulus"]["index"], 
             args["num_trials"]
         )
 
-        np.save(probe['csd_output_path'], current_source_density, allow_pickle=False)
-        np.save(probe['relative_window_output_path'], relative_window, allow_pickle=False)
         probewise_outputs.append({
             'name': probe['name'], 
             'csd_path': probe['csd_output_path'],
