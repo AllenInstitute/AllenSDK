@@ -8,6 +8,8 @@ from allensdk.core.lazy_property import LazyProperty, LazyPropertyMixin
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
 from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import equals
 from allensdk.deprecated import legacy
+from allensdk.brain_observatory.behavior.trials_processing import calculate_reward_rate
+from allensdk.brain_observatory.behavior.dprime import get_rolling_dprime, get_trial_count_corrected_false_alarm_rate, get_trial_count_corrected_hit_rate
 
 
 class BehaviorOphysSession(LazyPropertyMixin):
@@ -57,7 +59,7 @@ class BehaviorOphysSession(LazyPropertyMixin):
     """
 
     @classmethod
-    def from_LIMS(cls, ophys_experiment_id):
+    def from_lims(cls, ophys_experiment_id):
         return cls(api=BehaviorOphysLimsApi(ophys_experiment_id))
 
     def __init__(self, api=None):
@@ -111,90 +113,73 @@ class BehaviorOphysSession(LazyPropertyMixin):
             raise ValueError(f'cell_specimen_id values not assigned for {self.ophys_experiment_id}')
         return cell_specimen_ids
 
+    def get_reward_rate(self):
+        response_latency_list = []
+        for _, t in self.trials.iterrows():
+            valid_response_licks = [l for l in t.lick_times if l - t.change_time > self.task_parameters['response_window_sec'][0]]
+            response_latency = float('inf') if len(valid_response_licks) == 0 else valid_response_licks[0] - t.change_time
+            response_latency_list.append(response_latency)
+        reward_rate = calculate_reward_rate(response_latency=response_latency_list, starttime=self.trials.start_time.values)
+        reward_rate[np.isinf(reward_rate)] = float('nan')
+        return reward_rate
+
+    def get_rolling_performance_df(self):
+
+        # Indices to build trial metrics dataframe:
+        trials_index = self.trials.index
+        not_aborted_index = self.trials[np.logical_not(self.trials.aborted)].index
+
+        # Initialize dataframe:
+        performance_metrics_df = pd.DataFrame(index=trials_index)
+
+        # Reward rate:
+        performance_metrics_df['reward_rate'] = pd.Series(self.get_reward_rate(), index=self.trials.index)
+
+        # Hit rate:
+        hit_rate = get_trial_count_corrected_hit_rate(hit=self.trials.hit, miss=self.trials.miss, aborted=self.trials.aborted)
+        performance_metrics_df['hit_rate'] = pd.Series(hit_rate, index=not_aborted_index)
+
+        # False-alarm rate:
+        false_alarm_rate = get_trial_count_corrected_false_alarm_rate(false_alarm=self.trials.false_alarm, correct_reject=self.trials.correct_reject, aborted=self.trials.aborted)
+        performance_metrics_df['false_alarm_rate'] = pd.Series(false_alarm_rate, index=not_aborted_index)
+
+        # Rolling-dprime:
+        rolling_dprime = get_rolling_dprime(hit_rate, false_alarm_rate)
+        performance_metrics_df['rolling_dprime'] = pd.Series(rolling_dprime, index=not_aborted_index)
+
+        return performance_metrics_df
+
+    def get_performance_metrics(self, engaged_trial_reward_rate_threshold=2):
+        performance_metrics = {}
+        performance_metrics['trial_count'] = len(self.trials)
+        performance_metrics['go_trial_count'] = self.trials.go.sum()
+        performance_metrics['catch_trial_count'] = self.trials.catch.sum()
+        performance_metrics['hit_trial_count'] = self.trials.hit.sum()
+        performance_metrics['miss_trial_count'] = self.trials.miss.sum()
+        performance_metrics['false_alarm_trial_count'] = self.trials.false_alarm.sum()
+        performance_metrics['correct_reject_trial_count'] = self.trials.correct_reject.sum()
+        performance_metrics['auto_rewarded_trial_count'] = self.trials.auto_rewarded.sum()
+        performance_metrics['rewarded_trial_count'] = self.trials.reward_times.apply(lambda x: not np.isnan(x)).sum()
+        performance_metrics['total_reward_count'] = len(self.rewards)
+        performance_metrics['total_reward_volume'] = self.rewards.volume.sum()
+
+        rolling_performance_df = self.get_rolling_performance_df()
+        engaged_trial_mask = (rolling_performance_df['reward_rate'] > engaged_trial_reward_rate_threshold)
+        performance_metrics['maximum_reward_rate'] = np.nanmax(rolling_performance_df['reward_rate'].values)
+        performance_metrics['engaged_trial_count'] = (engaged_trial_mask).sum()
+        performance_metrics['mean_hit_rate'] = rolling_performance_df['hit_rate'].mean()
+        performance_metrics['mean_hit_rate_engaged'] = rolling_performance_df['hit_rate'][engaged_trial_mask].mean()
+        performance_metrics['mean_false_alarm_rate'] = rolling_performance_df['false_alarm_rate'].mean()
+        performance_metrics['mean_false_alarm_rate_engaged'] = rolling_performance_df['false_alarm_rate'][engaged_trial_mask].mean()
+        performance_metrics['mean_dprime'] = rolling_performance_df['rolling_dprime'].mean()
+        performance_metrics['mean_dprime_engaged'] = rolling_performance_df['rolling_dprime'][engaged_trial_mask].mean()
+        performance_metrics['max_dprime'] = rolling_performance_df['rolling_dprime'].mean()
+        performance_metrics['max_dprime_engaged'] = rolling_performance_df['rolling_dprime'][engaged_trial_mask].max()
+
+        return performance_metrics
 
 if __name__ == "__main__":
 
-    from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi
-
-    # blacklist = [797257159, 796306435, 791453299, 809191721, 796308505, 798404219] #
-    # api_list = []
-    # df = BehaviorOphysLimsApi.get_ophys_experiment_df()
-    # for cid in [791352433, 814796698, 814796612, 814796558, 814797528]:
-    #     df2 = df[(df['container_id'] == cid) & (df['workflow_state'] == 'passed')]
-    #     api_list += [BehaviorOphysLimsApi(oeid) for oeid in df2['ophys_experiment_id'].values if oeid not in blacklist]
-
-    # for api in api_list:
-
-    #     session = BehaviorOphysSession(api=api)
-    #     if len(session.licks) > 100:
-
-    #         print(api.get_ophys_experiment_id())
-
-        # session.max_projection
-        # session.stimulus_timestamps
-        # session.ophys_timestamps
-        # session.metadata
-        # session.dff_traces
-        # session.cell_specimen_table
-        # session.running_speed
-        # session.running_data_df
-
-        # print(api.get_ophys_experiment_id(), len(session.licks), session.metadata['experiment_datetime'])
-        # session.rewards
-        # session.task_parameters
-        # session.trials
-        # session.corrected_fluorescence_traces
-        # session.motion_correction
-
-            # nwb_filepath = '/allen/aibs/technology/nicholasc/tmp/behavior_ophys_session_{get_ophys_experiment_id}.nwb'.format(get_ophys_experiment_id=api.get_ophys_experiment_id())
-            # BehaviorOphysNwbApi(nwb_filepath).save(session)
-            # assert equals(session, BehaviorOphysSession(api=BehaviorOphysNwbApi(nwb_filepath)))
-
-
-
-
-        # print(session.running_speed)
-
-
-    nwb_filepath = '/home/nicholasc/projects/allensdk/tmp.nwb'
-    # session = BehaviorOphysSession(789359614)
-    # nwb_api = BehaviorOphysNwbApi(nwb_filepath)
-    # nwb_api.save(session)
-
-    # print(session.cell_specimen_table)
-
-    # session2 = BehaviorOphysSession(789359614, api=api_2)
-    
-    # assert session == session2
-    
-    ophys_experiment_id = 792813858
-    # ophys_experiment_id = 789359614
-
-    # nwb_filepath = BehaviorOphysSession.from_LIMS(ophys_experiment_id).api.get_nwb_filepath()
-    # api = BehaviorOphysNwbApi(nwb_filepath)
-    # session = BehaviorOphysSession(api=api)
-
-    session = BehaviorOphysSession.from_LIMS(ophys_experiment_id)
-
-
-    # session = BehaviorOphysSession.from_LIMS(789359614)
-    # BehaviorOphysNwbApi(nwb_filepath).save(session)
-    print(session.segmentation_mask_image)
-    # session.stimulus_timestamps
-    # session.ophys_timestamps
-    # session.metadata
-    # session.dff_traces
-    # session.cell_specimen_table
-    # running_speed
-    # print(session.stimulus_index)
-    # session.running_data_df
-    # print(session.stimulus_presentations)
-    # session.stimulus_templates
-    # session.stimulus_index
-    # session.licks
-    # session.rewards
-    # session.task_parameters
-    # session.trials
-    session.corrected_fluorescence_traces
-    # session.average_projection
-    # session.motion_correction
+    ophys_experiment_id = 789359614
+    session = BehaviorOphysSession.from_lims(ophys_experiment_id)
+    print(session.trials['reward_time'])

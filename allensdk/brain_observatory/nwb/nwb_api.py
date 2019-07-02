@@ -39,12 +39,8 @@ class NwbApi:
 
     @classmethod
     def from_path(cls, path, **kwargs):
-
-        try:
-            with open(path, 'r'):
-                pass
-        except Exception as err:
-            raise
+        with open(path, 'r'):
+            pass
 
         return cls(path=path)
 
@@ -60,8 +56,6 @@ class NwbApi:
 
     def get_stimulus_presentations(self) -> pd.DataFrame:
         
-
-
         table = pd.DataFrame({
             col.name: col.data for col in self.nwbfile.epochs.columns 
             if col.name not in set(['tags', 'timeseries', 'tags_index', 'timeseries_index'])

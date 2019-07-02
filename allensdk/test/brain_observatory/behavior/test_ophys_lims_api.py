@@ -262,3 +262,39 @@ def test_get_segmentation_mask_image_file(ophys_lims_api, compare_val):
         assert expected_fail is True
     else:
         assert ophys_lims_api.get_segmentation_mask_image_file() == compare_val
+
+
+@pytest.mark.requires_bamboo
+@pytest.mark.parametrize('ophys_lims_api, compare_val', [
+    pytest.param(OphysLimsApi(842510825), 'M'),
+    pytest.param(OphysLimsApi(0), None)
+])
+def test_get_sex(ophys_lims_api, compare_val):
+
+    if compare_val is None:
+        expected_fail = False
+        try:
+            ophys_lims_api.get_sex()
+        except OneResultExpectedError:
+            expected_fail = True
+        assert expected_fail is True
+    else:
+        assert ophys_lims_api.get_sex() == compare_val
+
+
+@pytest.mark.requires_bamboo
+@pytest.mark.parametrize('ophys_lims_api, compare_val', [
+    pytest.param(OphysLimsApi(842510825), 'P157'),
+    pytest.param(OphysLimsApi(0), None)
+])
+def test_get_age(ophys_lims_api, compare_val):
+
+    if compare_val is None:
+        expected_fail = False
+        try:
+            ophys_lims_api.get_age()
+        except OneResultExpectedError:
+            expected_fail = True
+        assert expected_fail is True
+    else:
+        assert ophys_lims_api.get_age() == compare_val

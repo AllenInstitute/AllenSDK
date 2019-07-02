@@ -2,24 +2,11 @@ import psycopg2
 import psycopg2.extras
 import pandas as pd
 
-
-class OneResultExpectedError(RuntimeError):
-    pass
+from allensdk import one, OneResultExpectedError
 
 
 class OneOrMoreResultExpectedError(RuntimeError):
     pass
-
-
-def one(x):
-    if isinstance(x, str):
-        return x
-    if len(x) != 1:
-        raise OneResultExpectedError('Expected length one result, received: {} results from query'.format(x))
-    if isinstance(x, set):
-        return list(x)[0]
-    else:
-        return x[0]
 
 
 def psycopg2_select(query, database, host, port, username, password):
@@ -57,11 +44,10 @@ class PostgresQueryMixin(object):
         return psycopg2.connect(dbname=self.dbname, user=self.user, host=self.host, password=self.password, port=self.port)
 
     def fetchone(self, query, strict=True):
-        if strict is True:
-            response = list(self.select(query).to_dict().values())
-            return one(one(response))
-        response = list(self.select_one(query).values())
-        return one(response)
+        response = one(list(self.select(query).to_dict().values()))
+        if strict is True and (len(response) != 1 or response[0] is None):
+            raise OneResultExpectedError
+        return response[0]
 
     def fetchall(self, query, strict=True):
         response = self.select(query)

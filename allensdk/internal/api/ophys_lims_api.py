@@ -103,7 +103,7 @@ class OphysLimsApi(PostgresQueryMixin):
                 JOIN ophys_sessions os ON oe.ophys_session_id = os.id
                 WHERE oe.id= {};
                 '''.format(self.get_ophys_experiment_id())
-        stimulus_name = self.fetchone(query, strict=True)
+        stimulus_name = self.fetchone(query, strict=False)
         stimulus_name = 'Unknown' if stimulus_name is None else stimulus_name
         return stimulus_name
 
@@ -249,6 +249,17 @@ class OphysLimsApi(PostgresQueryMixin):
         return safe_system_path(self.fetchone(query, strict=True))
 
     @memoize
+    def get_motion_corrected_image_stack_file(self):
+        query = f"""
+            select wkf.storage_directory || wkf.filename
+            from well_known_files wkf
+            join well_known_file_types wkft on wkft.id = wkf.well_known_file_type_id
+            where wkft.name = 'MotionCorrectedImageStack'
+            and wkf.attachable_id = {self.get_ophys_experiment_id()}
+        """
+        return safe_system_path(self.fetchone(query, strict=True))
+
+    @memoize
     def get_foraging_id(self):
         query = '''
                 SELECT os.foraging_id
@@ -290,6 +301,8 @@ class OphysLimsApi(PostgresQueryMixin):
 
         metadata = {}
         metadata['rig_name'] = self.get_rig_name()
+        metadata['sex'] = self.get_sex()
+        metadata['age'] = self.get_age()
         metadata['excitation_lambda'] = 910.
         metadata['emission_lambda'] = 520.
         metadata['indicator'] = 'GCAMP6f'
@@ -379,8 +392,34 @@ class OphysLimsApi(PostgresQueryMixin):
         segmentation_mask_image = mpimg.imread(segmentation_mask_image_file)
         return ImageApi.serialize(segmentation_mask_image, [pixel_size / 1000., pixel_size / 1000.], 'mm')
 
+    @memoize
+    def get_sex(self):
+        query = '''
+                SELECT g.name as sex
+                FROM ophys_experiments oe
+                JOIN ophys_sessions os ON oe.ophys_session_id = os.id
+                JOIN specimens sp ON sp.id=os.specimen_id
+                JOIN donors d ON d.id=sp.donor_id
+                JOIN genders g ON g.id=d.gender_id
+                WHERE oe.id= {};
+                '''.format(self.get_ophys_experiment_id())
+        return self.fetchone(query, strict=True)
+
+    @memoize
+    def get_age(self):
+        query = '''
+                SELECT a.name as age
+                FROM ophys_experiments oe
+                JOIN ophys_sessions os ON oe.ophys_session_id = os.id
+                JOIN specimens sp ON sp.id=os.specimen_id
+                JOIN donors d ON d.id=sp.donor_id
+                JOIN ages a ON a.id=d.age_id
+                WHERE oe.id= {};
+                '''.format(self.get_ophys_experiment_id())
+        return self.fetchone(query, strict=True)
+
 
 if __name__ == "__main__":
 
-    api = OphysLimsApi(842510825)
-    print(api.get_workflow_state())
+    api = OphysLimsApi(789359614)
+    print(api.get_age())

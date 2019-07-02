@@ -29,6 +29,7 @@ class SessionData(RaisingSchema):
     movie_width = Int(required=True, description='width of field-of-view for 2p movie')
     container_id = Int(required=True, description='container that this experiment is in')
     sync_file = String(required=True, description='path to sync file')
+    segmentation_mask_image_file = String(required=True, description='path to segmentation_mask_image file')
     max_projection_file = String(required=True, description='path to max_projection file')
     behavior_stimulus_file = String(required=True, description='path to behavior_stimulus file')
     dff_file = String(required=True, description='path to dff file')
@@ -46,6 +47,8 @@ class SessionData(RaisingSchema):
     surface_2p_pixel_size_um = Float(required=True, description='the spatial extent (in um) of the 2p field-of-view')
     ophys_cell_segmentation_run_id = Int(required=True, description='ID of the active segmentation run used to generate this file')
     cell_specimen_table_dict = Nested(CellSpecimenTable, required=True, description='Table of cell specimen info')
+    sex = String(required=True, description='sex')
+    age = String(required=True, description='age')
 
 
 class InputSchema(ArgSchema):

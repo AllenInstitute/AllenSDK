@@ -6,6 +6,9 @@ import uuid
 from copy import deepcopy
 import collections
 import dateutil
+from scipy.stats import norm
+
+from allensdk import one
 
 
 # TODO: add trial column descriptions
@@ -124,7 +127,7 @@ def resolve_initial_image(stimuli, start_frame):
     return initial_image_category_name, initial_image_group, initial_image_name
 
 
-def get_trials(data, stimulus_timestamps_no_monitor_delay, licks_df, rewards_df, rebase):
+def get_trials(data, licks_df, rewards_df, rebase):
     assert rewards_df.index.name == 'timestamps'
     stimuli = data["items"]["behavior"]["stimuli"]
 
@@ -145,23 +148,8 @@ def get_trials(data, stimulus_timestamps_no_monitor_delay, licks_df, rewards_df,
         trial_length = stop_time - start_time
         trial_data['trial_length'].append(trial_length)
 
-        catch = trial["trial_params"]["catch"] == True
-        trial_data['catch'].append(catch)
-
-        auto_rewarded = trial["trial_params"]["auto_reward"]
-        trial_data['auto_rewarded'].append(auto_rewarded)
-
-        go = not catch and not auto_rewarded
-        trial_data['go'].append(go)
-
-        lick_events = [rebase(lick_tuple[0]) for lick_tuple in trial["licks"]]
-        trial_data['lick_events'].append(lick_events)
-
         lick_times = sync_lick_times[np.where(np.logical_and(sync_lick_times >= start_time, sync_lick_times <= stop_time))]
         trial_data['lick_times'].append(lick_times)
-
-        aborted = ("abort", "") in event_dict
-        trial_data['aborted'].append(aborted)
 
         reward_volume = sum([r[0] for r in trial.get("rewards", [])])
         trial_data['reward_volume'].append(reward_volume)
@@ -172,6 +160,8 @@ def get_trials(data, stimulus_timestamps_no_monitor_delay, licks_df, rewards_df,
         false_alarm = ('false_alarm', "") in event_dict
         trial_data['false_alarm'].append(false_alarm)
 
+
+
         response_time = event_dict.get(('hit', '')) or event_dict.get(('false_alarm', '')) if hit or false_alarm else float('nan')
         trial_data['response_time'].append(response_time)
 
@@ -179,7 +169,8 @@ def get_trials(data, stimulus_timestamps_no_monitor_delay, licks_df, rewards_df,
         trial_data['miss'].append(miss)
 
         reward_times = rebased_reward_times[np.where(np.logical_and(rebased_reward_times >= start_time, rebased_reward_times <= stop_time))]
-        trial_data['reward_times'].append(reward_times)
+        reward_time = float('nan') if len(reward_times) == 0 else one(reward_times)
+        trial_data['reward_time'].append(reward_time)
 
         sham_change = True if ('sham_change', '') in event_dict else False
         trial_data['sham_change'].append(sham_change)
@@ -189,6 +180,23 @@ def get_trials(data, stimulus_timestamps_no_monitor_delay, licks_df, rewards_df,
 
         change_time = event_dict.get(('stimulus_changed', '')) or event_dict.get(('sham_change', '')) if stimulus_change or sham_change else float('nan')
         trial_data['change_time'].append(change_time)
+
+        # Trial type logic:
+        if pd.isnull(change_time):
+            aborted = True
+            go = catch = auto_rewarded = False
+        else:
+            aborted = False
+            catch = trial["trial_params"]["catch"] is True
+            auto_rewarded = trial["trial_params"]["auto_reward"]
+            go = not catch and not auto_rewarded
+        trial_data['aborted'].append(aborted)
+        trial_data['go'].append(go)
+        trial_data['catch'].append(catch)
+        trial_data['auto_rewarded'].append(auto_rewarded)
+
+        correct_reject = catch and not false_alarm
+        trial_data['correct_reject'].append(correct_reject)
 
         if not (sham_change or stimulus_change):
             response_latency = None
@@ -365,16 +373,32 @@ def get_image_info_from_trial(trial_log, ti):
         return prev_group, prev_name, prev_group, prev_name
 
 
-def get_ori_info_from_trial(trial_log, ti):
-    raise NotImplementedError
+def get_ori_info_from_trial(trial_log, ti, ):
+    if ti == -1:
+        raise IndexError('No change on first trial.')
+    
+    if len(trial_log[ti]["stimulus_changes"]) == 1:
+        (initial_group, initial_orientation), (change_group, change_orientation, ), _, _ = trial_log[ti]["stimulus_changes"][0]
+        return change_orientation, change_orientation, None
+    else:
+        return get_ori_info_from_trial(trial_log, ti - 1)
 
 
 def get_trials_v0(data, time):
+    stimuli = data["items"]["behavior"]["stimuli"]
+    if len(list(stimuli.keys())) != 1:
+        raise ValueError('Only one stimuli supported.')
+    
+    stim_name, stim = next(iter(stimuli.items()))
+    if stim_name not in ['images', 'grating', ]:
+        raise ValueError('Unsupported stimuli name: {}.'.format(stim_name))
 
-    implied_type = data["items"]["behavior"]["stimuli"]['images']["obj_type"]
+    implied_type = stim["obj_type"]
     trial_log = data["items"]["behavior"]["trial_log"]
     pre_change_time = data["items"]["behavior"]["config"]['DoC']['pre_change_time']
     initial_blank_duration = data["items"]["behavior"]["config"]["DoC"]["initial_blank"]
+
+    initial_stim = stim['set_log'][0]  # we need this for the situations where a change doesn't occur on the first trial
 
     trials = collections.defaultdict(list)
     for ti, trial in enumerate(trial_log):
@@ -404,26 +428,34 @@ def get_trials_v0(data, time):
         # Stimulus:
         if implied_type == 'DoCImageStimulus':
             from_group, from_name, to_group, to_name = get_image_info_from_trial(trial_log, ti)
-            trials['initial_image_category'].append(from_group)
             trials['initial_image_name'].append(from_name)
+            trials['initial_image_category'].append(from_group)
             trials['change_image_name'].append(to_name)
-            trials['change_image_category'].append(to_group)
+            trials['change_image_category'].append(to_group) 
             trials['change_ori'].append(None)
             trials['change_contrast'].append(None)
             trials['initial_ori'].append(None)
             trials['initial_contrast'].append(None)
             trials['delta_ori'].append(None)
-        else:
-            change_orientation, change_contrast, initial_orientation, initial_contrast, delta_orientation = get_ori_info_from_trial(trial_log, ti)
+        elif implied_type == 'DoCGratingStimulus':
+            try:
+                change_orientation, initial_orientation, delta_orientation = get_ori_info_from_trial(trial_log, ti)
+            except IndexError:
+                orientation = initial_stim[1]  # shape: group_name, orientation, stimulus time relative to start, frame
+                change_orientation = orientation
+                initial_orientation = orientation
+                delta_orientation = None
             trials['initial_image_category'].append('')
             trials['initial_image_name'].append('')
             trials['change_image_name'].append('')
             trials['change_image_category'].append('')
             trials['change_ori'].append(change_orientation)
-            trials['change_contrast'].append(change_contrast)
+            trials['change_contrast'].append(None)
             trials['initial_ori'].append(initial_orientation)
-            trials['initial_contrast'].append(initial_contrast)
+            trials['initial_contrast'].append(None)
             trials['delta_ori'].append(delta_orientation)
+        else:
+            raise NotImplementedError('Unsupported stimulus type: {}'.format(implied_type), )
 
     return pd.DataFrame(trials)
 
@@ -450,7 +482,7 @@ def find_licks(reward_times, licks, window=3.5):
     if len(reward_times) == 0:
         return []
     else:
-        reward_time = reward_times[0]
+        reward_time = one(reward_times)
         reward_lick_mask = ((licks['time'] > reward_time) & (licks['time'] < (reward_time + window)))
 
         tr_licks = licks[reward_lick_mask].copy()
@@ -611,3 +643,5 @@ def get_extended_trials(data, time=None):
                                   metadata=data_to_metadata(data, time),
                                   time=time,
                                   licks=data_to_licks(data, time))
+
+

@@ -23,8 +23,8 @@ from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
     pytest.param(789359614, 739216204, False)
 ])
 def test_equal(oeid1, oeid2, expected):
-    d1 = BehaviorOphysSession.from_LIMS(oeid1)
-    d2 = BehaviorOphysSession.from_LIMS(oeid2)
+    d1 = BehaviorOphysSession.from_lims(oeid1)
+    d2 = BehaviorOphysSession.from_lims(oeid2)
 
     assert equals(d1, d2) == expected
 
@@ -33,7 +33,7 @@ def test_session_from_json(tmpdir_factory, session_data):
     oeid = 789359614
 
     d1 = BehaviorOphysSession(api=BehaviorOphysJsonApi(session_data))
-    d2 = BehaviorOphysSession.from_LIMS(oeid)
+    d2 = BehaviorOphysSession.from_lims(oeid)
 
     assert equals(d1, d2)
 
@@ -43,7 +43,7 @@ def test_nwb_end_to_end(tmpdir_factory):
     oeid = 789359614
     nwb_filepath = os.path.join(str(tmpdir_factory.mktemp('test_nwb_end_to_end')), 'nwbfile.nwb')
 
-    d1 = BehaviorOphysSession.from_LIMS(oeid)
+    d1 = BehaviorOphysSession.from_lims(oeid)
     BehaviorOphysNwbApi(nwb_filepath).save(d1)
 
     d2 = BehaviorOphysSession(api=BehaviorOphysNwbApi(nwb_filepath))
@@ -54,7 +54,7 @@ def test_nwb_end_to_end(tmpdir_factory):
 def test_visbeh_ophys_data_set():
 
     ophys_experiment_id = 789359614
-    data_set = BehaviorOphysSession.from_LIMS(ophys_experiment_id)
+    data_set = BehaviorOphysSession.from_lims(ophys_experiment_id)
 
     # TODO: need to improve testing here:
     # for _, row in data_set.roi_metrics.iterrows():
@@ -94,7 +94,9 @@ def test_visbeh_ophys_data_set():
                                  'field_of_view_height': 512,
                                  'field_of_view_width': 447,
                                  'indicator': 'GCAMP6f',
-                                 'rig_name': 'CAM2P.5'}
+                                 'rig_name': 'CAM2P.5',
+                                 'age': 'P139',
+                                 'sex': 'F'}
 
     assert math.isnan(data_set.task_parameters.pop('omitted_flash_fraction'))
     assert data_set.task_parameters == {'reward_volume': 0.007,
@@ -120,3 +122,35 @@ def test_legacy_dff_api():
         dff_trace = session.dff_traces.loc[csid]['dff']
         ind = session.get_cell_specimen_indices([csid])[0]
         np.testing.assert_array_almost_equal(dff_trace, dff_array[ind, :])
+
+
+@pytest.mark.requires_bamboo
+@pytest.mark.parametrize('ophys_experiment_id, number_omitted', [
+    pytest.param(789359614, 153),
+    pytest.param(792813858, 129)
+])
+def test_stimulus_presentations_omitted(ophys_experiment_id, number_omitted):
+    session = BehaviorOphysSession.from_lims(ophys_experiment_id)
+    df = session.stimulus_presentations
+    assert df['omitted'].sum() == number_omitted
+
+
+@pytest.mark.requires_bamboo
+@pytest.mark.parametrize('ophys_experiment_id', [
+    pytest.param(789359614),
+    pytest.param(792813858)
+])
+def test_trial_response_window_bounds_reward(ophys_experiment_id):
+
+    api = BehaviorOphysLimsApi(ophys_experiment_id)
+    session = BehaviorOphysSession(api)
+    response_window = session.task_parameters['response_window_sec']
+    for _, row in session.trials.iterrows():
+
+        lick_times = [(t - row.change_time) for t in row.lick_times]
+        if not np.isnan(row.reward_time):
+            reward_time = (row.reward_time - row.change_time)
+            assert response_window[0] < reward_time + 1/60
+            assert reward_time < response_window[1] + 1/60
+            if len(session.licks) > 0:
+                assert lick_times[0] < reward_time
