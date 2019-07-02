@@ -162,6 +162,29 @@ class EcephysSession(LazyPropertyMixin):
         self.inter_presentation_intervals = self.LazyProperty(self._build_inter_presentation_intervals)
 
 
+    def get_current_source_density(self, probe_id):
+        """ Obtain current source density (CSD) image for this probe. Please see
+        allensdk.brain_observatory.ecephys.current_source_density for details and implementation of our current 
+        source density calculation. Briefly:
+        - we use a 2D method for csd calculation
+        - csd is calculated relative to flash stimulus onset
+
+        Parameters
+        ----------
+        probe_id : int
+            identify the probe whose CSD data ought to be loaded
+
+        Returns
+        -------
+        xr.DataArray :
+            dimensions are channel (id) and time (seconds, relative to stimulus onset). Values are current source 
+            density assessed on that channel at that time (V/s^2)
+
+        """
+
+        return self.api.get_current_source_density(probe_id)
+
+
     def get_lfp(self, probe_id):
         ''' Load an xarray DataArray with LFP data from channels on a single probe
 
@@ -474,8 +497,7 @@ class EcephysSession(LazyPropertyMixin):
         # pandas groupby ops ignore nans, so we need a new null value that pandas does not recognize as null ...
         stimulus_presentations.loc[stimulus_presentations['stimulus_name'] == '', 'stimulus_name'] = 'spontaneous_activity'
         stimulus_presentations[stimulus_presentations == ''] = np.nan
-        # This will convert columns to object dtypes
-        ## stimulus_presentations = stimulus_presentations.fillna('null') # 123 / 2**8
+        stimulus_presentations = stimulus_presentations.fillna('null') # 123 / 2**8
 
         stimulus_presentations['duration'] = stimulus_presentations['stop_time'] - stimulus_presentations['start_time']
 
@@ -651,46 +673,6 @@ def removed_unused_stimulus_presentation_columns(stimulus_presentations):
             to_drop.append(cn)
     return stimulus_presentations.drop(columns=to_drop)
 
-
-def count_by_condition(stimulus_presentations, exclude_parameters=NON_STIMULUS_PARAMETERS):
-    
-    stimulus_presentations =  stimulus_presentations.copy()
-    stimulus_presentations = stimulus_presentations.drop(columns=list(exclude_parameters))
-    
-    cols = stimulus_presentations.columns.tolist()
-    stimulus_presentations['count'] = 0
-    stimulus_presentations = stimulus_presentations.fillna('null')
-    return stimulus_presentations.groupby(cols, as_index=False).count()
-
-
-def count_spikes_by_condition(spike_times, stimulus_presentations):
-    spike_times = spike_times.copy()
-    spike_times = spike_times.merge(stimulus_presentations, left_on='stimulus_presentation_id', right_index=True)
-    spike_times = spike_times.drop(columns=['stimulus_presentation_id'])
-    return count_by_condition(spike_times)
-
-
-def mean_spikes_by_condition(spike_times, stimulus_presentations, non_stimulus_parameters=NON_STIMULUS_PARAMETERS):
-    presentation_counts_by_condition = count_by_condition(stimulus_presentations)
-    spike_counts_by_condition = count_spikes_by_condition(spike_times, stimulus_presentations)
-
-    colnames = set(spike_counts_by_condition.columns.values) & set(presentation_counts_by_condition.columns.values)
-    stimulus_parameters = [
-        sp for sp in colnames
-        if sp not in non_stimulus_parameters
-        and sp != 'count'
-    ]
-
-    mean_spikes = spike_counts_by_condition.merge(
-        presentation_counts_by_condition, 
-        left_on=stimulus_parameters,
-        right_on=stimulus_parameters,
-        suffixes=['_spikes', '_presentations'],
-        how='left'
-    )
-    
-    mean_spikes['mean_spike_count'] = mean_spikes['count_spikes'] / mean_spikes['count_presentations']
-    return mean_spikes.drop(columns=['count_spikes', 'count_presentations'])
 
 def intervals_structures(table, structure_id_key="manual_structure_id", structure_label_key="manual_structure_acronym"):
     """ find on a channels / units table intervals of channels inserted into particular structures
