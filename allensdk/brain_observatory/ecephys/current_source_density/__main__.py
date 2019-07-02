@@ -5,6 +5,7 @@ import sys
 
 import os
 import pandas as pd
+import h5py
 
 from ._schemas import InputParameters, OutputParameters
 from ._current_source_density import accumulate_lfp_data, compute_csd, extract_trial_windows, identify_lfp_channels, get_missing_channels
@@ -78,20 +79,40 @@ def run_csd(args):
         accumulated_lfp_data = accumulate_lfp_data(timestamps, lfp_raw, lfp_channels, trial_windows)
         current_source_density, csd_channels = compute_csd(accumulated_lfp_data, lfp_channels, missing_channels, spacing=probe['spacing'])
 
+        write_csd_to_h5(
+            probe["csd_output_path"], 
+            current_source_density, 
+            relative_window, 
+            lfp_channels, 
+            args['stimulus']['key'], 
+            args["stimulus"]["index"], 
+            args["num_trials"]
+        )
+
         np.save(probe['csd_output_path'], current_source_density, allow_pickle=False)
         np.save(probe['relative_window_output_path'], relative_window, allow_pickle=False)
         probewise_outputs.append({
             'name': probe['name'], 
             'csd_path': probe['csd_output_path'],
-            'relative_window_path': probe['relative_window_output_path'],
-            'csd_channels': csd_channels.tolist()
         })
 
     return {
         'probe_outputs': probewise_outputs, 
-        "stimulus_name": args["stimulus"]["key"], 
-        "stimulus_index": args["stimulus"]["index"]
     }
+
+
+def write_csd_to_h5(path, csd, relative_window, channels, stimulus_name, stimulus_index, num_trials):
+    with h5py.File(path, "w") as output:
+        output.create_dataset("current_source_density", data=csd)
+        output.create_dataset("timestamps", data=relative_window)
+        output.create_dataset("channels", data=channels)
+
+        output.attrs["stimulus_name"] = stimulus_name
+        output.attrs["num_trials"] = num_trials
+
+        if stimulus_index is not None:
+            output.attrs["stimulus_index"] = stimulus_index
+
 
 
 def main():
