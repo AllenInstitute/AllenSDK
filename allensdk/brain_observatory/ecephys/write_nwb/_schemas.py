@@ -27,9 +27,12 @@ class Channel(RaisingSchema):
     local_index = Int(required=True)
     probe_vertical_position = Int(required=True)
     probe_horizontal_position = Int(required=True)
-    manual_structure_id = Int(required=True, allow_none=True)
-    manual_structure_acronym = String(required=True, allow_none=True)
-
+    structure_id = Int(required=True, allow_none=True)
+    structure_acronym = String(required=True, allow_none=True)
+    AP_coordinate = Float(required=True, allow_none =True)
+    DV_coordinate = Float(required=True, allow_none= True)
+    ML_coordinate = Float(required=True, allow_none=True)
+    cortical_depth = Float(required=True, allow_none=True)
 
 class Unit(RaisingSchema):
     id = Int(required=True)
@@ -42,6 +45,13 @@ class Unit(RaisingSchema):
     firing_rate = Float(required=True)
     snr = Float(required=True)
     isi_violations = Float(required=True)
+    presence_ratio = Float(required=True)
+    amplitude_cutoff = Float(required=True)
+    isolation_distance = Float(required=True)
+    l_ratio = Float(required=True)
+    d_prime = Float(required=True)
+    nn_hit_rate = Float(required=True)
+    nn_miss_rate = Float(required=True)
 
 
 class Lfp(RaisingSchema):
@@ -59,7 +69,7 @@ class Probe(RaisingSchema):
     mean_waveforms_path = String(required=True, validate=check_read_access)
     channels = Nested(Channel, many=True, required=True)
     units = Nested(Unit, many=True, required=True)
-    lfp = Nested(Lfp, many=False, required=True)
+    #lfp = Nested(Lfp, many=False, required=True)
 
 
 class InputSchema(ArgSchema):
@@ -109,4 +119,4 @@ class ProbeOutputs(RaisingSchema):
 
 class OutputSchema(RaisingSchema):
     nwb_path = String(required=True, description='path to output file')
-    probe_outputs = Nested(ProbeOutputs, required=True, many=True)
+    #probe_outputs = Nested(ProbeOutputs, required=True, many=True)
