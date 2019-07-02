@@ -228,7 +228,7 @@ def compute_csd(accumulated_lfp, channels=None, missing_channels=None, spacing=0
     csd = np.zeros([np.shape(lfp_smooth)[0] - 2, np.shape(lfp_smooth)[1]])
     
     for t in range(np.shape(lfp)[1]):  # time
-        for d in range(1,np.shape(lfp)[0] - 1):  # depth
+        for d in range(1, np.shape(lfp)[0] - 1):  # depth
             lfp_smooth[d - 1, t] = 0.25 * ( lfp[d - 1, t] + 2 * lfp[d, t] + lfp[d + 1, t] )
     
     for t in range(np.shape(lfp_smooth)[1]): # time
