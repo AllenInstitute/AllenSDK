@@ -5,7 +5,7 @@ import scipy.ndimage as ndi
 import scipy.stats as st
 from scipy.optimize import curve_fit
 
-from allensdk.brain_observatory.ecephys.stimulus_analysis import StimulusAnalysis, get_fr
+from .stimulus_analysis import StimulusAnalysis, get_fr
 
 
 class DriftingGratings(StimulusAnalysis):

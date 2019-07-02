@@ -4,7 +4,7 @@ import pandas as pd
 import scipy.stats as st
 import scipy.ndimage as ndi
 
-from .ecephys_session import EcephysSession
+from ..ecephys_session import EcephysSession
 
 
 class StimulusAnalysis(object):

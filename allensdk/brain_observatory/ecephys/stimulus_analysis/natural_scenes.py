@@ -3,7 +3,7 @@ import pandas as pd
 from six import string_types
 import scipy.stats as st
 
-from allensdk.brain_observatory.ecephys.stimulus_analysis import StimulusAnalysis
+from .stimulus_analysis import StimulusAnalysis
 
 
 class NaturalScenes(StimulusAnalysis):
