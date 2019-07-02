@@ -6,7 +6,9 @@ import pandas as pd
 from allensdk.api.cache import Cache
 
 from allensdk.brain_observatory.ecephys.ecephys_project_api import EcephysProjectLimsApi, EcephysProjectWarehouseApi
+from allensdk.brain_observatory.ecephys.ecephys_session_api import EcephysNwbSessionApi
 from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
+from allensdk.brain_observatory.ecephys.file_promise import FilePromise, read_nwb, write_from_stream
 
 
 csv_io = {
@@ -32,8 +34,9 @@ class EcephysProjectCache(Cache):
     UNITS_KEY = 'units'
     SESSION_DIR_KEY = 'session_data'
     SESSION_NWB_KEY = 'session_nwb'
+    PROBE_LFP_NWB_KEY = "probe_lfp_nwb"
 
-    MANIFEST_VERSION = '0.1.0'
+    MANIFEST_VERSION = '0.2.0'
 
     def __init__(self, fetch_api, **kwargs):
         
@@ -62,19 +65,29 @@ class EcephysProjectCache(Cache):
     def get_session_data(self, session_id):
         path = self.get_cache_path(None, self.SESSION_NWB_KEY, session_id, session_id)
 
-        def writer(_path, data):
-            with open(_path, 'wb') as writer:
-                for chunk in data:
-                    writer.write(chunk)
+        probes = self.get_probes()
+        probe_ids = probes[probes["ecephys_session_id"] == session_id].index.values
+        
+        probe_promises = {
+            probe_id: FilePromise(
+                source=functools.partial(self.fetch_api.get_probe_lfp_data, probe_id),
+                path=Path(self.get_cache_path(None, self.PROBE_LFP_NWB_KEY, session_id, probe_id)),
+                reader=read_nwb
+            )
+            for probe_id in probe_ids
+        }
 
-        return call_caching(
+        call_caching(
             self.fetch_api.get_session_data, 
             path, 
             session_id=session_id, 
             strategy='lazy',
-            writer=writer,
-            reader=EcephysSession.from_nwb_path
+            writer=write_from_stream,
         )
+
+        session_api = EcephysNwbSessionApi(path=path, probe_lfp_paths=probe_promises)
+        return EcephysSession(api=session_api)
+
 
     def add_manifest_paths(self, manifest_builder):
         manifest_builder = super(EcephysProjectCache, self).add_manifest_paths(manifest_builder)
@@ -101,6 +114,10 @@ class EcephysProjectCache(Cache):
 
         manifest_builder.add_path(
             self.SESSION_NWB_KEY, 'session_%d.nwb', parent_key=self.SESSION_DIR_KEY, typename='file'
+        )
+
+        manifest_builder.add_path(
+            self.PROBE_LFP_NWB_KEY, 'probe_%d_lfp.nwb', parent_key=self.SESSION_DIR_KEY, typename='file'
         )
 
         return manifest_builder

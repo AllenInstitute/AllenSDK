@@ -122,3 +122,35 @@ def test_legacy_dff_api():
         dff_trace = session.dff_traces.loc[csid]['dff']
         ind = session.get_cell_specimen_indices([csid])[0]
         np.testing.assert_array_almost_equal(dff_trace, dff_array[ind, :])
+
+
+@pytest.mark.requires_bamboo
+@pytest.mark.parametrize('ophys_experiment_id, number_omitted', [
+    pytest.param(789359614, 153),
+    pytest.param(792813858, 129)
+])
+def test_stimulus_presentations_omitted(ophys_experiment_id, number_omitted):
+    session = BehaviorOphysSession.from_lims(ophys_experiment_id)
+    df = session.stimulus_presentations
+    assert df['omitted'].sum() == number_omitted
+
+
+@pytest.mark.requires_bamboo
+@pytest.mark.parametrize('ophys_experiment_id', [
+    pytest.param(789359614),
+    pytest.param(792813858)
+])
+def test_trial_response_window_bounds_reward(ophys_experiment_id):
+
+    api = BehaviorOphysLimsApi(ophys_experiment_id)
+    session = BehaviorOphysSession(api)
+    response_window = session.task_parameters['response_window_sec']
+    for _, row in session.trials.iterrows():
+
+        lick_times = [(t - row.change_time) for t in row.lick_times]
+        if not np.isnan(row.reward_time):
+            reward_time = (row.reward_time - row.change_time)
+            assert response_window[0] < reward_time + 1/60
+            assert reward_time < response_window[1] + 1/60
+            if len(session.licks) > 0:
+                assert lick_times[0] < reward_time

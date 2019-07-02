@@ -86,6 +86,10 @@ class Dataset(object):
 
     """
 
+
+    FRAME_KEYS = ('frames', 'stim_vsync')
+    PHOTODIODE_KEYS = ('photodiode', 'stim_photodiode')
+
     def __init__(self, path):
         self.dfile = self.load(path)
 
@@ -287,6 +291,27 @@ class Dataset(object):
         bit = self._line_to_bit(line)
         changes = self.get_bit_changes(bit)
         return self.get_all_times(units)[np.where(changes == 1)]
+
+    def get_edges(self, kind, keys, units='seconds'):
+        """ Utility function for extracting edge times from a line
+        """
+        if kind == 'falling':
+            fn = self.get_falling_edges
+        elif kind == 'rising':
+            fn = self.get_rising_edges
+        elif kind == 'all':
+            return np.sort(np.concatenate([
+                self.get_edges('rising', keys, units), 
+                self.get_edges('falling', keys, units)
+            ]))
+
+        for key in keys:
+            try:
+                return fn(key, units=units)
+            except ValueError:
+                continue
+
+        raise KeyError
 
     def get_falling_edges(self, line, units='samples'):
         """

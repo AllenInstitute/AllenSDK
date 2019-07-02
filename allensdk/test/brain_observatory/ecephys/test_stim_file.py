@@ -59,7 +59,7 @@ def camstimone_pickle_stim_file(stim_pkl_on_disk):
 @pytest.mark.parametrize('prop_name,expected,comp', [
     ['frames_per_second', 1000, op.eq],
     ['pre_blank_sec', 20, op.eq],
-    ['wheel_rotation', [1, 2, 3], np.allclose],
+    ['angular_wheel_rotation', [1, 2, 3], np.allclose],
     ['angular_wheel_velocity', [1000, 2000, 3000], np.allclose]
 ])
 def test_properties(camstimone_pickle_stim_file, prop_name, expected, comp):

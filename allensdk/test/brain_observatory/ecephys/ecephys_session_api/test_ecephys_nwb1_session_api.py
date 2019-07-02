@@ -1,22 +1,28 @@
-import pytest
+from pathlib import Path
 
-import os
-from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
+import pytest
 import pandas as pd
 import xarray as xr
 
+from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
 
 
-@pytest.mark.skipif(not os.path.exists('mouse412792.spikes.nwb'),
-                    reason='Unable to find nwb file mouse412792.spikes.nwb')
-def test_spikes_nwb1():
+@pytest.mark.requires_bamboo
+@pytest.mark.parametrize("nwb_path", [
+    Path("/", "allen", "aibs", "mat", "Kael", "ecephys_data", "mouse412792.spikes.nwb")
+])
+def test_spikes_nwb1(nwb_path):
     """
     This test was based on the file /allen/aibs/mat/ecephys_data/mouse412792.spikes.nwb. To run this test please copy
     or create a link to it in this directory.
     """
+
+    if not nwb_path.exists():
+        pytest.skip()
+
     # TODO: Convert this NWB 1 file into a NWB 2 file that way we can check that NWB Adaptors return the same data
     #  and computations (minus a few exceptions for missing NWB 1 data).
-    session = EcephysSession.from_nwb_path(path='mouse412792.spikes.nwb', nwb_version=1)
+    session = EcephysSession.from_nwb_path(path=str(nwb_path), nwb_version=1)
     assert(isinstance(session.units, pd.DataFrame))
     assert(len(session.units) == 1363)
 
@@ -31,8 +37,7 @@ def test_spikes_nwb1():
     assert(len(session.get_presentations_for_stimulus(['spontaneous'])) == 15)
     assert(len(session.get_presentations_for_stimulus(['static_gratings_6'])) == 6000)
 
-    assert(len(session.running_speed.timestamps) == 365700)
-    assert(len(session.running_speed.timestamps) == len(session.running_speed.values))
+    assert(session.running_speed.shape[0] == 365700)
 
     assert(len(session.spike_times.keys()) == 1363)
 
