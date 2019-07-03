@@ -65,10 +65,10 @@ def add_metrics_to_units_table(nwb_path, stimulus_classes, args):
 
     session = EcephysSession.from_nwb_path(nwb_path)
 
-    metrics = [stim(session, args).peak for stim in stimulus_classes]
+    metrics = [stim(session, params=args).metrics for stim in stimulus_classes]
     metrics.insert(0, session.units)
 
-    return reduce(lambda left,right: pd.merge(left, right, on='cluster_id'), metrics)
+    return reduce(lambda left,right: pd.merge(left, right, on='unit_id'), metrics)
 
 
 def main():

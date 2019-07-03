@@ -53,6 +53,9 @@ class StaticGratings(StimulusAnalysis):
         # Used to determine if a spontaneous repsonse if statistically significant
         self._response_events_p_val = kwargs.get('response_events_p_val', 0.05)
 
+        if self._params is not None:
+            self.params = self._params['static_gratings']
+
     @property
     def stim_table(self):
         # Stimulus table is already in EcephysSession object, just need to subselect 'static_gratings' presentations.
@@ -141,7 +144,7 @@ class StaticGratings(StimulusAnalysis):
 
     # Ran into issues with pandas 'deciding' certain floating point metrics are either ints or objects and messing
     # up the analysis. Explicity define the data-types.
-    PEAK_COLS = [('cell_specimen_id', np.uint64), ('pref_ori_sg', np.float64), ('pref_sf_sg', np.float64),
+    METRICS_COLUMNS = [('cell_specimen_id', np.uint64), ('pref_ori_sg', np.float64), ('pref_sf_sg', np.float64),
                  ('pref_phase_sg', np.float64), ('num_pref_trials_sg', np.uint64), ('responsive_sg', np.bool),
                  ('g_osi_sg', np.float64), ('sfdi_sg', np.float64), ('reliability_sg', np.float64),
                  ('lifetime_sparseness_sg', np.float64), ('fit_sf_sg', np.float64), ('fit_sf_ind_sg', np.float64),
@@ -149,34 +152,34 @@ class StaticGratings(StimulusAnalysis):
                  ('run_mod_sg', np.float64), ('run_resp_sg', np.float64), ('stat_resp_sg', np.float64)]
 
     @property
-    def peak_columns(self):
+    def metrics_names(self):
         return [c[0] for c in self.PEAK_COLS]
 
     @property
-    def peak_dtypes(self):
+    def metrics_dtypes(self):
         return [c[1] for c in self.PEAK_COLS]
 
     @property
-    def peak(self):
-        if self._peak is None:
+    def metrics(self):
+        if self._metrics is None:
             # pandas can have issues interpreting type and makes the column 'object' type, this should enforce the
             # correct data type for each column
-            peak_df = pd.DataFrame(np.empty(self.numbercells, dtype=np.dtype(self.PEAK_COLS)),
-                                   index=range(self.numbercells))
+            metrics_df = pd.DataFrame(np.empty(self.unit_count, dtype=np.dtype(self.METRICS_COLUMNS)),
+                                   index=range(self.unit_count))
 
             # set values to null by default
-            peak_df['fit_sf_sg'] = np.nan
-            peak_df['fit_sf_ind_sg'] = np.nan
-            peak_df['sf_low_cutoff_sg'] = np.nan
-            peak_df['sf_high_cutoff_sg'] = np.nan
+            metrics_df['fit_sf_sg'] = np.nan
+            metrics_df['fit_sf_ind_sg'] = np.nan
+            metrics_df['sf_low_cutoff_sg'] = np.nan
+            metrics_df['sf_high_cutoff_sg'] = np.nan
 
             # TODO: Make unit_id the df index?
-            peak_df['cell_specimen_id'] = list(self.spikes.keys())
+            metrics_df['cell_specimen_id'] = list(self.spikes.keys())
 
             # calculate the lifetime sparsness across all responses for every cell
             responses = self.response_events[:, 1:, :, :, 0].reshape(self.number_phase*self.number_ori*self.number_sf,
-                                                                     self.numbercells)
-            peak_df['lifetime_sparseness_sg'] = get_lifetime_sparseness(responses)
+                                                                     self.unit_count)
+            metrics_df['lifetime_sparseness_sg'] = get_lifetime_sparseness(responses)
 
             for nc, unit_id in enumerate(self.spikes.keys()):
                 peaks = np.where(self.response_events[:, 1:, :, nc, 0] == self.response_events[:, 1:, :, nc, 0].max())
@@ -184,17 +187,17 @@ class StaticGratings(StimulusAnalysis):
                 pref_sf = peaks[1][0]
                 pref_phase = peaks[2][0]
 
-                peak_df.loc[nc, 'pref_ori_sg'] = self.orivals[pref_ori]
-                peak_df.loc[nc, 'pref_sf_sg'] = self.sfvals[pref_sf]
-                peak_df.loc[nc, 'pref_phase_sg'] = self.phasevals[pref_phase]
+                metrics_df.loc[nc, 'pref_ori_sg'] = self.orivals[pref_ori]
+                metrics_df.loc[nc, 'pref_sf_sg'] = self.sfvals[pref_sf]
+                metrics_df.loc[nc, 'pref_phase_sg'] = self.phasevals[pref_phase]
 
-                peak_df.loc[nc, 'num_pref_trials_sg'] = int(self.response_events[pref_ori, pref_sf+1, pref_phase, nc, 2])
-                peak_df.loc[nc, 'responsive_sg'] = self.response_events[pref_ori, pref_sf+1, pref_phase, nc, 2] > self._responsivness_threshold
+                metrics_df.loc[nc, 'num_pref_trials_sg'] = int(self.response_events[pref_ori, pref_sf+1, pref_phase, nc, 2])
+                metrics_df.loc[nc, 'responsive_sg'] = self.response_events[pref_ori, pref_sf+1, pref_phase, nc, 2] > self._responsivness_threshold
 
                 # Get the osi using the mean response across all stimuli orientations (with SF and Phase fixed at their
                 # peak values).
                 ori_tuning_responses = self.response_events[:, pref_sf+1, pref_phase, nc, 0]
-                peak_df.loc[nc, 'g_osi_sg'] = get_osi(ori_tuning_responses, self.orivals)
+                metrics_df.loc[nc, 'g_osi_sg'] = get_osi(ori_tuning_responses, self.orivals)
 
                 stim_table_mask = (self.stim_table[self._col_sf] == self.sfvals[pref_sf]) & \
                                   (self.stim_table[self._col_ori] == self.orivals[pref_ori]) & \
@@ -202,29 +205,29 @@ class StaticGratings(StimulusAnalysis):
 
                 # Calculate reliability metric from sweep_events of prefered stimuli
                 pref_sweeps = self.sweep_events[stim_table_mask][unit_id].values
-                peak_df.loc[nc, 'reliability_sg'] = get_reliability(pref_sweeps, window_beg=30, window_end=40)
+                metrics_df.loc[nc, 'reliability_sg'] = get_reliability(pref_sweeps, window_beg=30, window_end=40)
 
                 # Calc. spatial frequency discrimination index
                 sf_tuning_responses = self.response_events[pref_ori, 1:, pref_phase, nc, 0]
                 sf_trials = self.mean_sweep_events[(self.stim_table[self._col_ori] == self.orivals[pref_ori]) &
                                                    (self.stim_table[self._col_phase] == self.phasevals[pref_phase])][unit_id].values
-                peak_df.loc[nc, 'sfdi_sg'] = get_sfdi(sf_tuning_responses, sf_trials, self.number_sf)
+                metrics_df.loc[nc, 'sfdi_sg'] = get_sfdi(sf_tuning_responses, sf_trials, self.number_sf)
 
                 # Running speed statistics
                 speed_subset = self.running_speed[stim_table_mask]
                 mse_subset = self.mean_sweep_events[stim_table_mask]
                 mse_subset_run = mse_subset[speed_subset.running_speed >= 1][unit_id].values
                 mse_subset_stat = mse_subset[speed_subset.running_speed < 1][unit_id].values
-                peak_df.loc[nc, ['run_pval_sg', 'run_mod_sg', 'run_resp_sg', 'stat_resp_sg']] = \
+                metrics_df.loc[nc, ['run_pval_sg', 'run_mod_sg', 'run_resp_sg', 'stat_resp_sg']] = \
                     get_running_modulation(mse_subset_run, mse_subset_stat)
 
                 if self.response_events[pref_ori, pref_sf+1, pref_phase, nc, 2] > self._responsivness_threshold:
-                    peak_df.loc[nc, ['fit_sf_ind_sg', 'fit_sf_sg', 'sf_low_cutoff_sg', 'sf_high_cutoff_sg']] = \
+                    metrics_df.loc[nc, ['fit_sf_ind_sg', 'fit_sf_sg', 'sf_low_cutoff_sg', 'sf_high_cutoff_sg']] = \
                         fit_sf_tuning(sf_tuning_responses, sf_values=self.sfvals, pref_sf_index=pref_sf)
 
-            self._peak = peak_df
+            self._metrics = metrics_df
 
-        return self._peak
+        return self._metrics
 
     def _get_stim_table_stats(self):
         sg_stim_table = self.stim_table
@@ -241,7 +244,7 @@ class StaticGratings(StimulusAnalysis):
     def _get_response_events(self):
         # for each cell, find all trials with the same orientation/spatial_freq/phase/cell combo; get averaged num
         # of spikes, the standard err, and a count of all statistically significant trials.
-        response_events = np.empty((self.number_ori, self.number_sf+1, self.number_phase, self.numbercells, 3))
+        response_events = np.empty((self.number_ori, self.number_sf+1, self.number_phase, self.unit_count, 3))
         for oi, ori in enumerate(self.orivals):
             ori_mask = self.stim_table[self._col_ori] == ori
             for si, sf in enumerate(self.sfvals):
@@ -271,7 +274,7 @@ class StaticGratings(StimulusAnalysis):
         #    consider removing this altogether?
         n_stims = len(self.stim_table)
         n_features = self.number_ori * self.number_sf * self.number_phase
-        response_trials = np.empty((self.number_ori, self.number_sf+1, self.number_phase, self.numbercells,
+        response_trials = np.empty((self.number_ori, self.number_sf+1, self.number_phase, self.unit_count,
                                     n_stims//n_features))
         response_trials[0, 0, 0, :, :] = np.nan
         for oi, ori in enumerate(self.orivals):

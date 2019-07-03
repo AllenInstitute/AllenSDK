@@ -19,8 +19,9 @@ class StimulusAnalysis(object):
             self._ecephys_session = EcephysSession.from_nwb_path(path=ecephys_session, nwb_version=nwb_version)
 
         self._unit_ids = None
-        self._cells_filter = kwargs.get('filter', None)
-        self._number_cells = None
+        self._unit_filter = kwargs.get('filter', None)
+        self._params = kwargs.get('params', None)
+        self._unit_count = None
         self._spikes = None
         self._stim_table = None
         self._stim_table_spontaneous = None
@@ -29,7 +30,9 @@ class StimulusAnalysis(object):
         self._sweep_events = None
         self._mean_sweep_events = None
         self._sweep_p_values = None
-        self._peak = None
+        self._metrics = None
+
+
 
         # An padding of time to look back when gathering events belong to a given stimulus, used by sweep_events and
         # get_reliability
@@ -46,9 +49,9 @@ class StimulusAnalysis(object):
             # Original analysis files was hardcoded that only cells from probeC/VISp, replaced with a filter dict.
             # TODO: Remove filter if it's unnessecary
             units_df = self.ecephys_session.units
-            if self._cells_filter:
+            if self._unit_filter:
                 mask = True
-                for col, val in self._cells_filter.items():
+                for col, val in self._unit_filter.items():
                     mask &= units_df[col] == val
                 units_df = units_df[mask]
             self._unit_ids = units_df.index.values
@@ -56,11 +59,11 @@ class StimulusAnalysis(object):
         return self._unit_ids
 
     @property
-    def numbercells(self):
+    def unit_count(self):
         """Get the number of units/cells."""
-        if not self._number_cells:
-            self._number_cells = len(self.unit_ids)
-        return self._number_cells
+        if not self._unit_count:
+            self._unit_count = len(self.unit_ids)
+        return self._unit_count
 
     @property
     def spikes(self):
@@ -69,7 +72,7 @@ class StimulusAnalysis(object):
             return self._spikes
         else:
             self._spikes = self.ecephys_session.spike_times
-            if len(self._spikes) > self.numbercells:
+            if len(self._spikes) > self.unit_count:
                 # if a filter has been applied such that not all the cells are being used in the analysis
                 self._spikes = {k: v for k, v in self._spikes.items() if k in self.unit_ids}
 
@@ -176,8 +179,8 @@ class StimulusAnalysis(object):
         return self._sweep_p_values
 
     @property
-    def peak(self):
-        """Returns a pandas DataFrame of the single-cell stimulus response metrics ranked by the cells unit-ids."""
+    def metrics(self):
+        """Returns a pandas DataFrame of the stimulus response metrics for each unit."""
         raise NotImplementedError()
 
     def calc_sweep_p_values(self, n_samples=10000, step_size=0.0001, offset=0.33):
@@ -198,7 +201,7 @@ class StimulusAnalysis(object):
         """
         # TODO: Code is currently a speed bottle-neck and could probably be improved.
         # Recreate the mean-sweep-table but using randomly selected 'spontaneuous' stimuli.
-        shuffled_mean = np.empty((self.numbercells, n_samples))
+        shuffled_mean = np.empty((self.unit_count, n_samples))
         idx = np.random.choice(np.arange(self.stim_table_spontaneous['start_time'].iloc[0],
                                          self.stim_table_spontaneous['stop_time'].iloc[0],
                                          step_size), n_samples)  # TODO: what step size for np.arange?

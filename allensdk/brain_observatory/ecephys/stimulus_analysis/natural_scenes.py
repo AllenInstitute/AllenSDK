@@ -16,20 +16,23 @@ class NaturalScenes(StimulusAnalysis):
         self._mean_sweep_events = None
         self._response_events = None
         self._response_trials = None
-        self._peak = None
+        self._metrics = None
 
-    PEAK_COLS = [('cell_specimen_id', np.uint64), ('pref_image_ns', np.uint64), ('num_pref_trials_ns', np.uint64),
+        if self._params is not None:
+            self.params = self._params['natural_scenes']
+
+    METRICS_COLUMNS = [('unit_id', np.uint64), ('pref_image_ns', np.uint64), ('num_pref_trials_ns', np.uint64),
                  ('responsive_ns', bool), ('image_selectivity_ns', np.float64), ('reliability_ns', np.float64),
                  ('lifetime_sparseness_ns', np.float64), ('run_pval_ns', np.float64), ('run_mod_ns', np.float64),
                  ('run_resp_ns', np.float64), ('stat_resp_ns', np.float64)]
 
     @property
-    def peak_columns(self):
-        return [c[0] for c in self.PEAK_COLS]
+    def metrics_names(self):
+        return [c[0] for c in self.METRICS_COLUMNS]
 
     @property
-    def peak_dtypes(self):
-        return [c[1] for c in self.PEAK_COLS]
+    def metrics_dtypes(self):
+        return [c[1] for c in self.METRICS_COLUMNS]
 
     @property
     def images(self):
@@ -101,32 +104,32 @@ class NaturalScenes(StimulusAnalysis):
         return self._response_trials
 
     @property
-    def peak(self):
-        if self._peak is None:
-            peak_df = pd.DataFrame(np.empty(self.numbercells, dtype=np.dtype(self.PEAK_COLS)),
-                                   index=range(self.numbercells))
+    def metrics(self):
+        if self._metrics is None:
+            metrics_df = pd.DataFrame(np.empty(self.unit_count, dtype=np.dtype(self.METRICS_COLUMNS)),
+                                   index=range(self.unit_count))
 
-            peak_df['cell_specimen_id'] = list(self.spikes.keys())
+            metrics_df['cell_specimen_id'] = list(self.spikes.keys())
             for nc, unit_id in enumerate(self.spikes.keys()):
                 pref_image = np.where(self.response_events[1:, nc, 0] == self.response_events[1:, nc, 0].max())[0][0]
-                peak_df.loc[nc, 'pref_image_ns'] = pref_image
-                peak_df.loc[nc, 'num_pref_trials_ns'] = self.response_events[pref_image + 1, nc, 2]
-                peak_df.loc[nc, 'responsive_ns'] = self.response_events[pref_image + 1, nc, 2] > 11
-                peak_df.loc[nc, 'image_selectivity_ns'] = self._get_image_selectivity(nc)
+                metrics_df.loc[nc, 'pref_image_ns'] = pref_image
+                metrics_df.loc[nc, 'num_pref_trials_ns'] = self.response_events[pref_image + 1, nc, 2]
+                metrics_df.loc[nc, 'responsive_ns'] = self.response_events[pref_image + 1, nc, 2] > 11
+                metrics_df.loc[nc, 'image_selectivity_ns'] = self._get_image_selectivity(nc)
 
                 stim_table_mask = self.stim_table['Image'] == pref_image
-                peak_df.loc[nc, 'reliability_ns'] = self._get_reliability(unit_id, stim_table_mask)
-                peak_df.loc[nc, ['run_pval_ns', 'run_mod_ns', 'run_resp_ns', 'stat_resp_ns']] = \
+                metrics_df.loc[nc, 'reliability_ns'] = self._get_reliability(unit_id, stim_table_mask)
+                metrics_df.loc[nc, ['run_pval_ns', 'run_mod_ns', 'run_resp_ns', 'stat_resp_ns']] = \
                     self._get_running_modulation(pref_image, unit_id)
 
             coeff_p = 1.0/float(self.number_nonblank)  # 1 - 1/18
             resp_means = self.response_events[:, :, 0]
-            peak_df['lifetime_sparseness_ns'] = (1 - coeff_p*((np.power(resp_means.sum(axis=0), 2)) /
+            metrics_df['lifetime_sparseness_ns'] = (1 - coeff_p*((np.power(resp_means.sum(axis=0), 2)) /
                                                               (np.power(resp_means, 2).sum(axis=0)))) / (1.0 - coeff_p)
 
-            self._peak = peak_df
+            self._metrics = metrics_df
 
-        return self._peak
+        return self._metrics
 
     def _get_stim_table_stats(self):
         stim_table = self.stim_table
@@ -137,8 +140,8 @@ class NaturalScenes(StimulusAnalysis):
         self._number_nonblank = len(self._images[self._images >= 0])
 
     def _get_response_events(self):
-        response_events = np.empty((self.number_images, self.numbercells, 3))
-        response_trials = np.empty((self.number_images, self.numbercells, 50))
+        response_events = np.empty((self.number_images, self.unit_count, 3))
+        response_trials = np.empty((self.number_images, self.unit_count, 50))
         response_trials[:] = np.nan
 
         for im in self.images:

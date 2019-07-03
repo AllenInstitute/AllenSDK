@@ -19,7 +19,10 @@ class DriftingGratings(StimulusAnalysis):
         self._response_events = None
         self._response_trials = None
 
-    PEAK_COLS = [('cell_specimen_id', np.uint64), ('pref_ori_dg', np.float64), ('pref_tf_dg', np.float64),
+        if self._params is not None:
+            self.params = self._params['drifting_gratings']
+
+    METRICS_COLUMNS = [('unit_id', np.uint64), ('pref_ori_dg', np.float64), ('pref_tf_dg', np.float64),
                  ('num_pref_trials_dg', np.uint64), ('responsive_dg', bool), ('g_osi_dg', np.float64),
                  ('g_dsi_dg', np.float64), ('tfdi_dg', np.float64), ('reliability_dg', np.float64),
                  ('lifetime_sparseness_dg', np.float64), ('fit_tf_dg', np.float64), ('fit_tf_ind_dg', np.float64),
@@ -28,12 +31,12 @@ class DriftingGratings(StimulusAnalysis):
                  ('peak_blank_dg', np.float64), ('all_blank_dg', np.float64)]
 
     @property
-    def peak_columns(self):
-        return [c[0] for c in self.PEAK_COLS]
+    def metrics_names(self):
+        return [c[0] for c in self.METRICS_COLUMNS]
 
     @property
-    def peak_dtypes(self):
-        return [c[1] for c in self.PEAK_COLS]
+    def metrics_dtypes(self):
+        return [c[1] for c in self.METRICS_COLUMNS]
 
     @property
     def orivals(self):
@@ -114,18 +117,18 @@ class DriftingGratings(StimulusAnalysis):
         return self._response_trials
 
     @property
-    def peak(self):
-        if self._peak is None:
-            peak_df = pd.DataFrame(np.empty(self.numbercells, dtype=np.dtype(self.PEAK_COLS)),
-                                   index=range(self.numbercells))
+    def metrics(self):
+        if self._metrics is None:
+            metrics_df = pd.DataFrame(np.empty(self.unit_count, dtype=np.dtype(self.METRICS_COLUMNS)),
+                                   index=range(self.unit_count))
 
-            peak_df['fit_tf_ind_dg'] = np.nan
-            peak_df['fit_tf_dg'] = np.nan
-            peak_df['tf_low_cutoff_dg'] = np.nan
-            peak_df['tf_high_cutoff_dg'] = np.nan
+            metrics_df['fit_tf_ind_dg'] = np.nan
+            metrics_df['fit_tf_dg'] = np.nan
+            metrics_df['tf_low_cutoff_dg'] = np.nan
+            metrics_df['tf_high_cutoff_dg'] = np.nan
 
-            peak_df['lifetime_sparseness_dg'] = self._get_lifetime_sparseness()
-            peak_df['cell_specimen_id'] = self.spikes.keys()
+            metrics_df['lifetime_sparseness_dg'] = self._get_lifetime_sparseness()
+            metrics_df['cell_specimen_id'] = self.spikes.keys()
             for nc, unit_id in enumerate(self.spikes.keys()):
                 peaks = np.where(self.response_events[:, 1:, nc, 0] == self.response_events[:, 1:, nc, 0].max())
                 pref_ori = peaks[0][0]
@@ -136,39 +139,39 @@ class DriftingGratings(StimulusAnalysis):
                 stim_table_mask = (self.stim_table['TF'] == self.tfvals[pref_tf]) & \
                                   (self.stim_table['Ori'] == self.orivals[pref_ori])
 
-                peak_df.loc[nc, 'pref_ori_dg'] = self.orivals[pref_ori]
-                peak_df.loc[nc, 'pref_tf_dg'] = self.tfvals[pref_tf]
-                peak_df.loc[nc, 'num_pref_trials_dg'] = self.response_events[pref_ori, pref_tf + 1, nc, 2]
-                peak_df.loc[nc, 'responsive_dg'] = self.response_events[pref_ori, pref_tf + 1, nc, 2] > 3
-                peak_df.loc[nc, ['g_osi_dg', 'g_dsi_dg']] = self._get_osi(pref_tf, nc)
-                peak_df.loc[nc, 'reliability_dg'] = self._get_reliability(unit_id, stim_table_mask)
-                peak_df.loc[nc, 'tfdi_dg'] = self._get_tfdi(pref_ori, nc)
-                peak_df.loc[nc, ['run_pval_dg', 'run_mod_dg', 'run_resp_dg', 'stat_resp_dg']] = \
+                metrics_df.loc[nc, 'pref_ori_dg'] = self.orivals[pref_ori]
+                metrics_df.loc[nc, 'pref_tf_dg'] = self.tfvals[pref_tf]
+                metrics_df.loc[nc, 'num_pref_trials_dg'] = self.response_events[pref_ori, pref_tf + 1, nc, 2]
+                metrics_df.loc[nc, 'responsive_dg'] = self.response_events[pref_ori, pref_tf + 1, nc, 2] > 3
+                metrics_df.loc[nc, ['g_osi_dg', 'g_dsi_dg']] = self._get_osi(pref_tf, nc)
+                metrics_df.loc[nc, 'reliability_dg'] = self._get_reliability(unit_id, stim_table_mask)
+                metrics_df.loc[nc, 'tfdi_dg'] = self._get_tfdi(pref_ori, nc)
+                metrics_df.loc[nc, ['run_pval_dg', 'run_mod_dg', 'run_resp_dg', 'stat_resp_dg']] = \
                     self._get_running_modulation(pref_ori, pref_tf, unit_id)
-                peak_df.loc[nc, ['peak_blank_dg', 'all_blank_dg']] = self._get_suppressed_contrast(pref_ori, pref_tf,
+                metrics_df.loc[nc, ['peak_blank_dg', 'all_blank_dg']] = self._get_suppressed_contrast(pref_ori, pref_tf,
                                                                                                    nc)
                 if self.response_events[pref_ori, pref_tf + 1, nc, 2] > 3:
-                    peak_df.loc[nc, ['fit_tf_ind_dg', 'fit_tf_dg', 'tf_low_cutoff_dg', 'tf_high_cutoff_dg']] = \
+                    metrics_df.loc[nc, ['fit_tf_ind_dg', 'fit_tf_dg', 'tf_low_cutoff_dg', 'tf_high_cutoff_dg']] = \
                         self._fit_tf_tuning(pref_ori, pref_tf, nc)
 
-            self._peak = peak_df
+            self._metrics = metrics_df
 
-        return self._peak
+        return self._metrics
 
     def _get_lifetime_sparseness(self):
         """Computes lifetime sparseness of responses for all cells
 
         :return:
         """
-        response = self.response_events[:, 1:, :, 0].reshape(40, self.numbercells)
+        response = self.response_events[:, 1:, :, 0].reshape(40, self.unit_count)
         return (1-(1/40.)*((np.power(response.sum(axis=0), 2))/(np.power(response, 2).sum(axis=0))))/(1-(1/40.))
 
     def _get_response_events(self):
-        response_events = np.empty((self.number_ori, self.number_tf+1, self.numbercells, 3))
+        response_events = np.empty((self.number_ori, self.number_tf+1, self.unit_count, 3))
         response_events[:] = np.NaN
 
         blank = self.mean_sweep_events[np.isnan(self.stim_table['Ori'])]
-        response_trials = np.empty((self.number_ori, self.number_tf+1, self.numbercells, len(blank)))
+        response_trials = np.empty((self.number_ori, self.number_tf+1, self.unit_count, len(blank)))
         response_trials[:] = np.NaN
 
         response_events[0, 0, :, 0] = blank.mean(axis=0)
