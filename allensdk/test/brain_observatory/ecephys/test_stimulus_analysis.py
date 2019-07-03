@@ -15,6 +15,7 @@ def ecephys_session():
     units_df = units_df.set_index('unit_id')
     ecephys_ses.units = units_df
     ecephys_ses.spike_times = {uid: np.linspace(0, 1.0, 5) for uid in np.arange(20)}
+    ecephys_ses.running_speed = pd.DataFrame({'start_time': np.linspace(0, 100.0, 20), 'velocity': [0.001]*20})
     return ecephys_ses
 
 # @patch('allensdk.brain_observatory.ecephys.ecephys_session.EcephysSession')
@@ -24,7 +25,8 @@ def test_stimulus_analysis(ecephys_session):
     assert(sa_obj.numbercells == 20)
     assert(len(sa_obj.spikes) == 20)
     assert(np.all(sa_obj.spikes[0] == np.linspace(0, 1.0, 5)))
-    # TODO: implement running_speed - dxcm and dxtime
+    assert(np.allclose(sa_obj.dxtime, np.linspace(0, 100.0, 20)))
+    assert(np.allclose(sa_obj.dxcm, [0.001]*20))
 
 
 @pytest.mark.parametrize('sweeps,win_beg,win_end,expected,as_array',
