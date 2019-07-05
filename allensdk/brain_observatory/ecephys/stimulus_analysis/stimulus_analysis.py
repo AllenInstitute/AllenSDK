@@ -44,10 +44,8 @@ class StimulusAnalysis(object):
 
     @property
     def unit_ids(self):
-        """Returns a list of unit-ids for which to apply the analysis"""
+        """Returns a list of unit IDs for which to apply the analysis"""
         if self._unit_ids is None:
-            # Original analysis files was hardcoded that only cells from probeC/VISp, replaced with a filter dict.
-            # TODO: Remove filter if it's unnessecary
             units_df = self.ecephys_session.units
             if self._unit_filter:
                 mask = True
@@ -60,14 +58,14 @@ class StimulusAnalysis(object):
 
     @property
     def unit_count(self):
-        """Get the number of units/cells."""
+        """Get the number of units."""
         if not self._unit_count:
             self._unit_count = len(self.unit_ids)
         return self._unit_count
 
     @property
     def spikes(self):
-        """Returns a diction unit_id -> spike-times."""
+        """Returns a dictionary of unit_id -> spike-times."""
         if self._spikes:
             return self._spikes
         else:

@@ -54,7 +54,10 @@ class StaticGratings(StimulusAnalysis):
         self._response_events_p_val = kwargs.get('response_events_p_val', 0.05)
 
         if self._params is not None:
-            self.params = self._params['static_gratings']
+            self._params = self._params['static_gratings']
+            self._stimulus_key = self._params['stimulus_key']
+        else:
+            self._stimulus_key = 'static_gratings'
 
     @property
     def stim_table(self):
@@ -66,7 +69,7 @@ class StaticGratings(StimulusAnalysis):
                 # self._stimulus_names is not explicity specified try to figure out stimulus
                 stims_table = self.ecephys_session.stimulus_presentations
                 stim_names = [s for s in stims_table['stimulus_name'].unique()
-                              if s.lower().startswith('static_gratings')]
+                              if s.lower().startswith(self._stimulus_key)]
 
                 self._stim_table = stims_table[stims_table['stimulus_name'].isin(stim_names)]
 
@@ -144,7 +147,7 @@ class StaticGratings(StimulusAnalysis):
 
     # Ran into issues with pandas 'deciding' certain floating point metrics are either ints or objects and messing
     # up the analysis. Explicity define the data-types.
-    METRICS_COLUMNS = [('cell_specimen_id', np.uint64), ('pref_ori_sg', np.float64), ('pref_sf_sg', np.float64),
+    METRICS_COLUMNS = [('unit_id', np.uint64), ('pref_ori_sg', np.float64), ('pref_sf_sg', np.float64),
                  ('pref_phase_sg', np.float64), ('num_pref_trials_sg', np.uint64), ('responsive_sg', np.bool),
                  ('g_osi_sg', np.float64), ('sfdi_sg', np.float64), ('reliability_sg', np.float64),
                  ('lifetime_sparseness_sg', np.float64), ('fit_sf_sg', np.float64), ('fit_sf_ind_sg', np.float64),
@@ -174,7 +177,7 @@ class StaticGratings(StimulusAnalysis):
             metrics_df['sf_high_cutoff_sg'] = np.nan
 
             # TODO: Make unit_id the df index?
-            metrics_df['cell_specimen_id'] = list(self.spikes.keys())
+            metrics_df['unit_id'] = list(self.spikes.keys())
 
             # calculate the lifetime sparsness across all responses for every cell
             responses = self.response_events[:, 1:, :, :, 0].reshape(self.number_phase*self.number_ori*self.number_sf,
@@ -231,14 +234,14 @@ class StaticGratings(StimulusAnalysis):
 
     def _get_stim_table_stats(self):
         sg_stim_table = self.stim_table
-        self._orivals = np.sort(sg_stim_table[self._col_ori].dropna().unique())
+        self._orivals = np.sort(sg_stim_table.loc[sg_stim_table[self._col_ori] != 'null'][self._col_ori].unique())
         self._number_ori = len(self._orivals)
 
-        self._sfvals = np.sort(sg_stim_table[self._col_sf].dropna().unique())
+        self._sfvals = np.sort(sg_stim_table.loc[sg_stim_table[self._col_sf] != 'null'][self._col_sf].unique())
         # TODO: Check that SF=0.0 isn't in the data, it is a special condition coded into responses table
         self._number_sf = len(self._sfvals)
 
-        self._phasevals = np.sort(sg_stim_table[self._col_phase].dropna().unique())
+        self._phasevals = np.sort(sg_stim_table.loc[sg_stim_table[self._col_phase] != 'null'][self._col_sf].unique())
         self._number_phase = len(self._phasevals)
 
     def _get_response_events(self):

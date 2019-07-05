@@ -20,7 +20,10 @@ class DriftingGratings(StimulusAnalysis):
         self._response_trials = None
 
         if self._params is not None:
-            self.params = self._params['drifting_gratings']
+            self._params = self._params['drifting_gratings']
+            self._stimulus_key = self._params['stimulus_key']
+        else:
+            self._stimulus_key = 'drifting_gratings'
 
     METRICS_COLUMNS = [('unit_id', np.uint64), ('pref_ori_dg', np.float64), ('pref_tf_dg', np.float64),
                  ('num_pref_trials_dg', np.uint64), ('responsive_dg', bool), ('g_osi_dg', np.float64),
@@ -68,7 +71,7 @@ class DriftingGratings(StimulusAnalysis):
 
     @property
     def stim_table(self):
-        # Stimulus table is already in EcephysSession object, just need to subselect 'static_gratings' presentations.
+        # Stimulus table is already in EcephysSession object, just need to subselect 'drifting_gratings' presentations.
         if self._stim_table is None:
             # TODO: Give warning if no stimulus
             if self._stimulus_names is None:
@@ -76,7 +79,7 @@ class DriftingGratings(StimulusAnalysis):
                 # self._stimulus_names is not explicity specified try to figure out stimulus
                 stims_table = self.ecephys_session.stimulus_presentations
                 stim_names = [s for s in stims_table['stimulus_name'].unique()
-                              if s.lower().startswith('drifting_gratings')]
+                              if s.lower().startswith(self._stimulus_key)]
 
                 self._stim_table = stims_table[stims_table['stimulus_name'].isin(stim_names)]
 
@@ -128,7 +131,8 @@ class DriftingGratings(StimulusAnalysis):
             metrics_df['tf_high_cutoff_dg'] = np.nan
 
             metrics_df['lifetime_sparseness_dg'] = self._get_lifetime_sparseness()
-            metrics_df['cell_specimen_id'] = self.spikes.keys()
+            metrics_df['unit_id'] = self.spikes.keys()
+
             for nc, unit_id in enumerate(self.spikes.keys()):
                 peaks = np.where(self.response_events[:, 1:, nc, 0] == self.response_events[:, 1:, nc, 0].max())
                 pref_ori = peaks[0][0]
@@ -170,13 +174,13 @@ class DriftingGratings(StimulusAnalysis):
         response_events = np.empty((self.number_ori, self.number_tf+1, self.unit_count, 3))
         response_events[:] = np.NaN
 
-        blank = self.mean_sweep_events[np.isnan(self.stim_table['Ori'])]
+        blank = self.mean_sweep_events[self.stim_table['Ori'] == 'null']
         response_trials = np.empty((self.number_ori, self.number_tf+1, self.unit_count, len(blank)))
         response_trials[:] = np.NaN
 
         response_events[0, 0, :, 0] = blank.mean(axis=0)
         response_events[0, 0, :, 1] = blank.std(axis=0) / np.sqrt(len(blank))
-        blank_p = self.sweep_p_values[np.isnan(self.stim_table['Ori'])]
+        blank_p = self.sweep_p_values[self.stim_table['Ori'] == 'null']
         response_events[0, 0, :, 2] = blank_p[blank_p < 0.05].count().values
         response_trials[0, 0, :, :] = blank.values.T
 
@@ -195,10 +199,10 @@ class DriftingGratings(StimulusAnalysis):
         self._response_trials = response_trials
 
     def _get_stim_table_stats(self):
-        self._orivals = np.sort(self.stim_table['Ori'].dropna().unique())
+        self._orivals = np.sort(self.stim_table.loc[self.stim_table['Ori'] != 'null']['Ori'].unique())
         self._number_ori = len(self._orivals)
 
-        self._tfvals = np.sort(self.stim_table['TF'].dropna().unique())
+        self._tfvals = np.sort(self.stim_table.loc[self.stim_table['TF'] != 'null']['TF'].unique())
         self._number_tf = len(self._tfvals)
 
     def _get_osi(self, pref_tf, nc):

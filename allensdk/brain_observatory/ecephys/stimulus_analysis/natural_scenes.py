@@ -19,7 +19,10 @@ class NaturalScenes(StimulusAnalysis):
         self._metrics = None
 
         if self._params is not None:
-            self.params = self._params['natural_scenes']
+            self._params = self._params['natural_scenes']
+            self._stimulus_key = self._params['stimulus_key']
+        else:
+            self._stimulus_key = 'Natural Images'
 
     METRICS_COLUMNS = [('unit_id', np.uint64), ('pref_image_ns', np.uint64), ('num_pref_trials_ns', np.uint64),
                  ('responsive_ns', bool), ('image_selectivity_ns', np.float64), ('reliability_ns', np.float64),
@@ -71,7 +74,7 @@ class NaturalScenes(StimulusAnalysis):
                 # self._stimulus_names is not explicity specified try to figure out stimulus
                 stims_table = self.ecephys_session.stimulus_presentations
                 stim_names = [s for s in stims_table['stimulus_name'].unique()
-                              if s.lower().startswith('natural_image') or s.lower().startswith('natural image')]
+                              if s.lower().startswith(._stimulus_key)]
 
                 self._stim_table = stims_table[stims_table['stimulus_name'].isin(stim_names)]
 
@@ -109,7 +112,7 @@ class NaturalScenes(StimulusAnalysis):
             metrics_df = pd.DataFrame(np.empty(self.unit_count, dtype=np.dtype(self.METRICS_COLUMNS)),
                                    index=range(self.unit_count))
 
-            metrics_df['cell_specimen_id'] = list(self.spikes.keys())
+            metrics_df['unit_id'] = list(self.spikes.keys())
             for nc, unit_id in enumerate(self.spikes.keys()):
                 pref_image = np.where(self.response_events[1:, nc, 0] == self.response_events[1:, nc, 0].max())[0][0]
                 metrics_df.loc[nc, 'pref_image_ns'] = pref_image
