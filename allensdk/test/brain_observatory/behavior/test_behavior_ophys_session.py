@@ -13,7 +13,8 @@ from pandas.util.testing import assert_frame_equal
 
 from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorOphysSession
 from allensdk.brain_observatory.behavior.write_nwb.__main__ import BehaviorOphysJsonApi
-from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi, equals
+from allensdk.brain_observatory.behavior.behavior_api.behavior_nwb_api import equals
+from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
 
 

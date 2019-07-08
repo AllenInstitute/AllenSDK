@@ -8,19 +8,31 @@ import json
 import argschema
 import marshmallow
 
-from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
+from allensdk.internal.api.behavior_lims_api import BehaviorLimsApi
 from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorOphysSession
-from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi, equals
+from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi
+from allensdk.brain_observatory.behavior.behavior_api.behavior_nwb_api import equals
 from allensdk.brain_observatory.behavior.write_nwb._schemas import InputSchema, OutputSchema
 from allensdk.brain_observatory.argschema_utilities import write_or_print_outputs
 
-class BehaviorJsonApi:
-    pass
+class BehaviorJsonApi(BehaviorLimsApi):
+
+    def __init__(self, data):
+        self.data = data
+
+    def get_behavior_experiment_id(self):
+        return self.data['behavior_experiment_id']
 
 class BehaviorOphysJsonApi(BehaviorJsonApi):
 
     def __init__(self, data):
         self.data = data
+
+    def get_ophys_experiment_id(self):
+        return self.data['ophys_experiment_id']
+
+    def get_behavior_experiment_id(self):
+        raise NotImplementedError
 
     def get_ophys_experiment_id(self):
         return self.data['ophys_experiment_id']

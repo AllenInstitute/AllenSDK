@@ -151,7 +151,6 @@ def equals(A, B):
 
     try:
         for field in sorted(field_set):
-            print(field)
             x1, x2 = getattr(A, field), getattr(B, field)
             if isinstance(x1, pd.DataFrame):
                 assert_frame_equal(x1, x2)
