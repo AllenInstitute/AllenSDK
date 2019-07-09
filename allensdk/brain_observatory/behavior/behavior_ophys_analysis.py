@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import pandas as pd
 
 from allensdk.core.lazy_property import LazyProperty, LazyPropertyMixin
 from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorOphysSession
@@ -104,6 +105,27 @@ class BehaviorOphysAnalysis(LazyPropertyMixin):
         length_mins = 1
         for xmin_seconds in np.arange(0, 5000, length_mins * 60):
             plot_example_traces_and_behavior(self.session, active_cell_roi_ids, xmin_seconds, length_mins, cell_label=False, include_running=True)
+
+
+def assign_to_interval(values, intervals_df, start_key='start_time', stop_key='stop_time', dropna=True):
+
+    index_values = intervals_df.index.values
+    start_times = intervals_df[start_key].values
+    stop_times = intervals_df[stop_key].values
+    interval_list = []
+    index_list = []
+    for start_time, stop_time, presentation_id in zip(start_times, stop_times, index_values):
+        if not np.isnan(start_time) and not np.isnan(stop_time):
+            interval_list.append(pd.Interval(start_time, stop_time))
+            index_list.append(presentation_id)
+    interval_index = pd.IntervalIndex(interval_list)
+    X = pd.DataFrame({intervals_df.index.name: index_list}, index=interval_index)
+    S = pd.cut(pd.Series(values, index=values), interval_index)
+    S = pd.Series(S.index.values, index=S, name='tmp')
+    Y = X.join(S).set_index(intervals_df.index.name)
+    if dropna is True:
+        Y = Y.dropna()
+    return Y['tmp']
 
 
 if __name__ == "__main__":
