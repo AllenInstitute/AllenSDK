@@ -5,7 +5,7 @@ from typing import NamedTuple
 import os
 
 from allensdk.core.lazy_property import LazyProperty, LazyPropertyMixin
-from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import equals
+from allensdk.brain_observatory.behavior.behavior_api.behavior_nwb_api import equals
 from allensdk.internal.api.behavior_lims_api import BehaviorLimsApi
 from allensdk.deprecated import legacy
 from allensdk.brain_observatory.behavior.trials_processing import calculate_reward_rate

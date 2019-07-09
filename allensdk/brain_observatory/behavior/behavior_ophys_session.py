@@ -6,7 +6,7 @@ import os
 
 from allensdk.core.lazy_property import LazyProperty, LazyPropertyMixin
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
-from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import equals
+from allensdk.brain_observatory.behavior.behavior_api.behavior_nwb_api import equals
 from allensdk.deprecated import legacy
 from allensdk.brain_observatory.behavior.behavior_session import BehaviorSession
 
