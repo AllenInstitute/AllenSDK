@@ -15,6 +15,7 @@ class MesoscopeSession(LazyPropertyMixin):
         self.session_df = LazyProperty(self.api.get_mesoscope_session_df)
         self.experiments = LazyProperty(self.api.get_session_experiments)
         self.pairs = LazyProperty(self.api.get_paired_experiments)
+        self.splitting_json =LazyProperty(self.api.get_splitting_json)
 
 if __name__ == "__main__":
 
@@ -22,5 +23,6 @@ if __name__ == "__main__":
     print(session.session_id)
     print(session.session_df)
     print(session.experiments)
+    print(session.splitting_json)
     print(session.pairs)
     

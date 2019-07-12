@@ -39,13 +39,14 @@ class MesoscopeLimsApi(PostgresQueryMixin):
 
     def get_splitting_json(self):
         session_folder = self.get_session_folder()
-        splitting_json = os.path.join(session_folder, f"MESOSCOPE_FILE_SPLITTING_QUEUE_{self.session_id}_input.json")
-        if not os.path.isfile(splitting_json):
+        self.splitting_json = os.path.join(session_folder, f"MESOSCOPE_FILE_SPLITTING_QUEUE_{self.session_id}_input.json")
+        if not os.path.isfile(self.splitting_json):
             logger.error("Unable to find splitting json for session: {}".format(self.session_id))
-        return splitting_json
+        return self.splitting_json
 
     def get_paired_experiments(self):
         splitting_json = self.get_splitting_json()
+        self.pairs = []
         with open(splitting_json, "r") as f:
             data = json.load(f)
         for pg in data.get("plane_groups", []):
