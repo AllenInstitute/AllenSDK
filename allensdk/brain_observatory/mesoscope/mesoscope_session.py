@@ -1,5 +1,6 @@
 from allensdk.core.lazy_property import LazyProperty, LazyPropertyMixin
 from allensdk.internal.api.mesoscope_lims_api import MesoscopeLimsApi
+import pandas as pd
 
 class MesoscopeSession(LazyPropertyMixin):
 
@@ -12,15 +13,21 @@ class MesoscopeSession(LazyPropertyMixin):
         self.api = api
         self.session_id = LazyProperty(self.api.get_session_id)
         self.metadata = LazyProperty(self.api.get_metadata)
-        self.session_df = LazyProperty(self.api.get_mesoscope_session_df)
+        self.session_df = LazyProperty(self.api.get_session_df)
         self.experiments = LazyProperty(self.api.get_session_experiments)
         self.pairs = LazyProperty(self.api.get_paired_experiments)
         self.splitting_json =LazyProperty(self.api.get_splitting_json)
+        self.experiment_df = LazyProperty(self.api.get_experiment_df)
+
+    def get_exp_by_structure(self, structure):
+        return self.experiments.loc[self.session_df.structure == structure]
+
 
 if __name__ == "__main__":
 
-    session = MesoscopeSession.from_lims(754606824)
+    session = MesoscopeSession.from_lims(902884228)
     print(session.session_id)
+    pd.options.display.width = 0
     print(session.session_df)
     print(session.experiments)
     print(session.splitting_json)
