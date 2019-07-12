@@ -305,26 +305,8 @@ class EcephysSession(LazyPropertyMixin):
 
         bin_edges = np.array(bin_edges)
         domain = build_time_window_domain(bin_edges, stimulus_presentations['start_time'].values, callback=time_domain_callback)
-        tiled_data = np.zeros(
-            (domain.shape[0], domain.shape[1], units.shape[0]), 
-            dtype=(np.uint8 if binarize else np.uint16) if dtype is None else dtype
-        )
 
-        for ii, unit_id in enumerate(np.array(units.index.values)):
-            data = self.spike_times[unit_id]
-            flat_indices = np.searchsorted(domain.flat, data)
-
-            unique, counts = np.unique(flat_indices, return_counts=True)
-            valid = np.where( 
-                (unique % len(bin_edges) != 0) 
-                & (unique >= 0) 
-                & (unique <= domain.size) 
-            )
-
-            unique = unique[valid]
-            counts = counts[valid]
-
-            tiled_data[:, :, ii].flat[unique] = counts > 0 if binarize else counts
+        tiled_data = build_spike_histogram_nonoverlapping(domain, self.spike_times, units.index.values, dtype=dtype, binarize=binarize)
 
         tiled_data = xr.DataArray(
             data=tiled_data[:, 1:, :], 
@@ -654,6 +636,32 @@ class EcephysSession(LazyPropertyMixin):
             raise Exception(f'specified NWB version {nwb_version} not supported. Supported versions are: 2.X, 1.X')
 
         return cls(api=NWBAdaptorCls.from_path(path=path, **api_kwargs), ** kwargs)
+
+
+def build_spike_histogram_nonoverlapping(time_domain, spike_times, unit_ids, dtype, binarize=False):
+
+    tiled_data = np.zeros(
+        (time_domain.shape[0], time_domain.shape[1], unit_ids.size), 
+        dtype=(np.uint8 if binarize else np.uint16) if dtype is None else dtype
+    )
+
+    for ii, unit_id in enumerate(unit_ids):
+        data = spike_times[unit_id]
+        flat_indices = np.searchsorted(time_domain.flat, data)
+
+        unique, counts = np.unique(flat_indices, return_counts=True)
+        valid = np.where( 
+            (unique % time_domain.shape[1] != 0) 
+            & (unique >= 0) 
+            & (unique <= time_domain.size) 
+        )
+
+        unique = unique[valid]
+        counts = counts[valid]
+
+        tiled_data[:, :, ii].flat[unique] = counts > 0 if binarize else counts
+    
+    return tiled_data
 
 
 def build_time_window_domain(bin_edges, offsets, callback=None):
