@@ -47,9 +47,10 @@ def test_copy_file_entry(tmpdir_factory, use_rsync, make_parent_dirs, chmod):
         assert df.read() == 'foo'
 
     get_human_mode = lambda path: int(oct(os.stat(path).st_mode & 0o777)[2:])
-    
     expected_mode = chmod if chmod is not None else get_human_mode(spath)
-    assert get_human_mode(dpath) == expected_mode
+
+    if mac_or_linux:
+        assert get_human_mode(dpath) == expected_mode
 
 
 @pytest.mark.parametrize('different', [True, False])
