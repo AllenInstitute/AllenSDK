@@ -27,7 +27,8 @@ def test_hash_file(tmpdir_factory):
 
 @pytest.mark.parametrize('use_rsync', [True, False])
 @pytest.mark.parametrize('make_parent_dirs', [True, False])
-def test_copy_file_entry(tmpdir_factory, use_rsync, make_parent_dirs):
+@pytest.mark.parametrize("chmod", [777, 775, 755, None])
+def test_copy_file_entry(tmpdir_factory, use_rsync, make_parent_dirs, chmod):
 
     mac_or_linux = sys.platform.startswith('darwin') or sys.platform.startswith('linux')
     if use_rsync and not mac_or_linux:
@@ -40,10 +41,15 @@ def test_copy_file_entry(tmpdir_factory, use_rsync, make_parent_dirs):
     with open(spath, 'w') as sf:
         sf.write('foo')
 
-    cu.copy_file_entry(spath, dpath, use_rsync, make_parent_dirs)
+    cu.copy_file_entry(spath, dpath, use_rsync, make_parent_dirs, chmod)
     
     with open(dpath, 'r') as df:
         assert df.read() == 'foo'
+
+    get_human_mode = lambda path: int(oct(os.stat(path).st_mode & 0o777)[2:])
+    
+    expected_mode = chmod if chmod is not None else get_human_mode(spath)
+    assert get_human_mode(dpath) == expected_mode
 
 
 @pytest.mark.parametrize('different', [True, False])
