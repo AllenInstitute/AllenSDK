@@ -187,7 +187,7 @@ def test_cacheable_pageable_csv(os_makedirs, read_csv,
                                         total_rows='all',
                                         **cache_style())
 
-        os_makedirs.assert_called_once_with('/path/to')
+        os_makedirs.assert_called_with('/path/to')
 
         base_query = ('http://api.brain-map.org/api/v2/data/query.json?'
                     'q=model::ApiCamCellMetric,'
@@ -255,7 +255,7 @@ def test_cacheable_pageable_json(os_makedirs, pj_read_json,
                                     total_rows='all',
                                     **cache_style())
 
-        os_makedirs.assert_called_once_with('/path/to')
+        os_makedirs.assert_called_with('/path/to')
 
         base_query = \
             ('http://api.brain-map.org/api/v2/data/query.json?'

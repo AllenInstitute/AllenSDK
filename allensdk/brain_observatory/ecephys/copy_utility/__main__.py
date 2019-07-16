@@ -19,10 +19,20 @@ def hash_file(path, hasher_cls):
         return hasher.digest()
 
 
-def copy_file_entry(source, dest, use_rsync, make_parent_dirs):
+def walk_fs_tree(root, fn):
+    root = Path(root)
+    fn(root)
 
+    if root.is_dir():
+        for item in root.iterdir():
+            walk_fs_tree(item, fn)
+
+
+def copy_file_entry(source, dest, use_rsync, make_parent_dirs, chmod=None):
+
+    leftmost = None
     if make_parent_dirs:
-        Manifest.safe_make_parent_dirs(dest)
+        leftmost = Manifest.safe_make_parent_dirs(dest)
 
     if use_rsync:
         sp.check_call(['rsync', '-a', source, dest])
@@ -32,6 +42,11 @@ def copy_file_entry(source, dest, use_rsync, make_parent_dirs):
         else:
             shutil.copy(source, dest)
     
+    if chmod is not None:
+        chmod_target = leftmost if leftmost is not None else dest
+        apply_permissions = lambda path: path.chmod(int(f"0o{chmod}", 0))
+        walk_fs_tree(chmod_target, apply_permissions)
+
     logging.info(f"copied from {source} to {dest}")
 
 
@@ -86,14 +101,22 @@ def compare_directories(source, dest, hasher_cls, raise_if_comparison_fails):
             compare(spath, dpath, hasher_cls, raise_if_comparison_fails)
     
 
-def main(files, use_rsync=True, hasher_key=None, raise_if_comparison_fails=True, make_parent_dirs=True, **kwargs):
+def main(
+    files, 
+    use_rsync=True, 
+    hasher_key=None, 
+    raise_if_comparison_fails=True, 
+    make_parent_dirs=True, 
+    chmod=775,
+    **kwargs
+):
     hasher_cls = available_hashers[hasher_key]
     output = []
 
     for file_entry in files:
         record = cp.deepcopy(file_entry)
 
-        copy_file_entry(file_entry['source'], file_entry['destination'], use_rsync, make_parent_dirs)
+        copy_file_entry(file_entry['source'], file_entry['destination'], use_rsync, make_parent_dirs, chmod=chmod)
 
         if hasher_cls is not None:
             hashes = compare(file_entry['source'], file_entry['destination'], hasher_cls, raise_if_comparison_fails)
