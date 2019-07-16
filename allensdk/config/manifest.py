@@ -39,6 +39,8 @@ import re
 import logging
 import errno
 import pandas as pd
+from pathlib import Path
+
 
 class ManifestVersionError(Exception): 
 
@@ -292,6 +294,12 @@ class Manifest(object):
         Parameters
         ----------
         file_name : string
+
+        Returns
+        -------
+        leftmost : string 
+            most rootward directory created
+
         '''
 
         dirname = os.path.dirname(file_name)
@@ -300,7 +308,7 @@ class Manifest(object):
         if not dirname:
             return
 
-        Manifest.safe_mkdir(dirname)
+        return Manifest.safe_mkdir(dirname)
 
     @classmethod
     def safe_mkdir(cls, directory):
@@ -310,29 +318,33 @@ class Manifest(object):
         ----------
         directory : string
             create it if it doesn't exist
+
+        Returns
+        -------
+        leftmost : string 
+            most rootward directory created
+
         '''
-        try:
-            os.makedirs(directory)
-        except OSError as e:
-            if ((sys.platform == "darwin") and (e.errno == errno.EISDIR) and \
-                (e.filename == "/")):
-                # undocumented behavior of mkdir on OSX where for / it raises
-                # EISDIR and not EEXIST
-                # https://bugs.python.org/issue24231 (old but still holds true)
-                pass
-            elif sys.platform == "win32" and e.errno == errno.EACCES:
-                root_path = os.path.abspath(os.sep)
-                if e.filename == root_path or \
-                   e.filename == root_path.replace("\\", "/"):
-                    # When attempting to os.makedirs the root drive letter on
-                    # Windows, EACCES is raised, not EEXIST
-                    pass
-                else:
-                    raise
-            elif e.errno == errno.EEXIST:
-                pass
-            else:
-                raise
+
+        path = Path(directory)
+        parts = path.parts
+
+        sub_paths = [Path(parts[0])]
+        for part in parts[1:]:
+            sub_paths.append(sub_paths[-1] / part)
+        
+        leftmost = None
+        for sub_path in sub_paths:
+            if not sub_path.exists():
+                # TODO: this ought to use pathlib, however, many api tests mock out os.makedirs and expect some number 
+                # of calls to it, so we cannot simply alter this implementation without updating all of those tests.
+                # Said tests ought to be fixed by having them use tmpdir_factory rather than mocks 
+                os.makedirs(str(sub_path))
+                if leftmost is None:
+                    leftmost = sub_path
+
+        return leftmost
+
 
     def create_dir(self, path_key):
         '''Make a directory for an entry.
