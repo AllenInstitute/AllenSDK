@@ -8,6 +8,7 @@ import pynwb
 import pandas as pd
 import numpy as np
 
+from allensdk.brain_observatory.ecephys.current_source_density.__main__ import write_csd_to_h5
 import allensdk.brain_observatory.ecephys.write_nwb.__main__ as write_nwb
 from allensdk.brain_observatory.ecephys.ecephys_session_api import EcephysNwbSessionApi
 
@@ -248,6 +249,7 @@ def test_write_probe_lfp_file(tmpdir_factory, lfp_data):
     input_data_path = tmpdir / Path("lfp_data.dat")
     input_timestamps_path = tmpdir / Path("lfp_timestamps.npy")
     input_channels_path = tmpdir / Path("lfp_channels.npy")
+    input_csd_path = tmpdir / Path("csd.h5")
     output_path = str(tmpdir / Path("lfp.nwb"))  # pynwb.NWBHDF5IO chokes on Path
 
     probe_data = {
@@ -281,8 +283,23 @@ def test_write_probe_lfp_file(tmpdir_factory, lfp_data):
             "input_timestamps_path": input_timestamps_path,
             "input_channels_path": input_channels_path,
             "output_path": output_path
-        }
+        },
+        "csd_path": input_csd_path
     }
+
+    csd = np.arange(20).reshape([2, 10])
+    csd_times = np.linspace(-1, 1, 10)
+    csd_channels = np.array([3, 2])
+
+    write_csd_to_h5(
+        path=input_csd_path, 
+        csd=csd, 
+        relative_window=csd_times, 
+        channels=csd_channels, 
+        stimulus_name="foo", 
+        stimulus_index=None, 
+        num_trials=1000
+    )
 
     np.save(input_timestamps_path, lfp_data["timestamps"],  allow_pickle=False)
     np.save(input_channels_path, lfp_data["subsample_channels"], allow_pickle=False)
@@ -305,3 +322,9 @@ def test_write_probe_lfp_file(tmpdir_factory, lfp_data):
         ]
 
         pd.testing.assert_frame_equal(exp_electrodes, obt_electrodes, check_like=True)
+
+        csd_series = obt_f.get_processing_module("current_source_density")["current_source_density"]
+
+        assert np.allclose(csd, csd_series.data[:])
+        assert np.allclose(csd_times, csd_series.timestamps[:])
+        assert np.allclose([2, 1], csd_series.control[:])  # ids

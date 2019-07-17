@@ -1,7 +1,6 @@
 from marshmallow import RAISE
 
-from argschema import ArgSchema, ArgSchemaParser
-from argschema.schemas import DefaultSchema
+from argschema import ArgSchema
 from argschema.fields import (
     LogLevel,
     String,
@@ -17,7 +16,6 @@ from allensdk.brain_observatory.argschema_utilities import (
     check_write_access,
     RaisingSchema,
 )
-from allensdk.brain_observatory.nwb.schemas import RunningSpeedPathsSchema
 
 
 class Channel(RaisingSchema):
@@ -69,7 +67,12 @@ class Probe(RaisingSchema):
     mean_waveforms_path = String(required=True, validate=check_read_access)
     channels = Nested(Channel, many=True, required=True)
     units = Nested(Unit, many=True, required=True)
+<<<<<<< HEAD
     #lfp = Nested(Lfp, many=False, required=True)
+=======
+    lfp = Nested(Lfp, many=False, required=True)
+    csd_path = String(required=True, validate=check_read_access, help="path to h5 file containing calculated current source density")
+>>>>>>> 84d50266004514d15660f22dd91f2f616513d3fe
 
 
 class InputSchema(ArgSchema):

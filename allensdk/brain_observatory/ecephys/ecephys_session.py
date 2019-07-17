@@ -702,7 +702,9 @@ def removed_unused_stimulus_presentation_columns(stimulus_presentations):
     return stimulus_presentations.drop(columns=to_drop)
 
 
+
 def intervals_structures(table, structure_id_key="structure_id", structure_label_key="structure_acronym"):
+
     """ find on a channels / units table intervals of channels inserted into particular structures
 
     Parameters
@@ -724,7 +726,7 @@ def intervals_structures(table, structure_id_key="structure_id", structure_label
     """
 
     intervals = nan_intervals(table[structure_id_key])
-    labels = table[structure_label_key][intervals[:-1]]
+    labels = table[structure_label_key].iloc[intervals[:-1]].values
 
     return labels, intervals
 

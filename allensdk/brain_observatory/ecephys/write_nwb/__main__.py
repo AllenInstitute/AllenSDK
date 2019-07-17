@@ -1,12 +1,10 @@
 import logging
 import sys
-import argparse
 from pathlib import PurePath
 import multiprocessing as mp
 from functools import partial
 
-import marshmallow
-import argschema
+import h5py
 import pynwb
 import requests
 import pandas as pd
@@ -21,7 +19,7 @@ from allensdk.brain_observatory.nwb import (
     add_stimulus_timestamps,
 )
 from allensdk.brain_observatory.argschema_utilities import (
-    write_or_print_outputs,
+    write_or_print_outputs, optional_lims_inputs
 )
 from allensdk.brain_observatory import dict_to_indexed_array
 from allensdk.brain_observatory.ecephys.file_io.continuous_file import ContinuousFile
@@ -427,6 +425,7 @@ def write_probe_lfp_file(session_start_time, log_level, probe):
     nwbfile, probe_nwb_device, probe_nwb_electrode_group = add_probe_to_nwbfile(nwbfile, probe['id'], description=probe['name'])
 
     channels = prepare_probewise_channel_table(probe['channels'], probe_nwb_electrode_group)
+    channel_li_id_map = {row["local_index"]: cid for cid, row in channels.iterrows()}
     lfp_channels = np.load(probe['lfp']['input_channels_path'], allow_pickle=False)
     
     channels.reset_index(inplace=True)
@@ -461,10 +460,37 @@ def write_probe_lfp_file(session_start_time, log_level, probe):
 
     nwbfile.add_acquisition(lfp)
 
+    csd, csd_times, csd_channels = read_csd_data_from_h5(probe["csd_path"])
+    csd_channels = np.array([channel_li_id_map[li] for li in csd_channels])
+    nwbfile = add_csd_to_nwbfile(nwbfile, csd, csd_times, csd_channels)
+
     with pynwb.NWBHDF5IO(probe['lfp']['output_path'], 'w') as lfp_writer:
         logging.info(f"writing probe lfp file to {probe['lfp']['output_path']}")
         lfp_writer.write(nwbfile)
     return {"id": probe["id"], "nwb_path": probe["lfp"]["output_path"]}
+
+
+def read_csd_data_from_h5(csd_path):
+    with h5py.File(csd_path, "r") as csd_file:
+        return csd_file["current_source_density"][:], csd_file["timestamps"][:], csd_file["channels"][:]
+
+
+def add_csd_to_nwbfile(nwbfile, csd, times, channels, unit="V/cm^2"):
+
+    csd_mod = pynwb.ProcessingModule("current_source_density", "precalculated current source density from a subset of channel")
+    nwbfile.add_processing_module(csd_mod)
+
+    csd_ts = pynwb.base.TimeSeries(
+        name="current_source_density",
+        data=csd,
+        timestamps=times,
+        control=channels.astype(np.uint64),  # these are postgres ids, always non-negative
+        control_description="ids of electrodes from which csd was calculated",
+        unit=unit
+    )
+    csd_mod.add_data_interface(csd_ts)
+
+    return nwbfile
 
 
 def write_probewise_lfp_files(probes, session_start_time, pool_size=3):
@@ -572,32 +598,7 @@ def main():
         format="%(asctime)s - %(process)s - %(levelname)s - %(message)s"
     )
 
-    remaining_args = sys.argv[1:]
-    input_data = {}
-    if "--get_inputs_from_lims" in sys.argv:
-        lims_parser = argparse.ArgumentParser(add_help=False)
-        lims_parser.add_argument("--host", type=str, default="http://lims2")
-        lims_parser.add_argument("--job_queue", type=str, default=None)
-        lims_parser.add_argument("--strategy", type=str, default=None)
-        lims_parser.add_argument("--ecephys_session_id", type=int, default=None)
-        lims_parser.add_argument("--output_root", type=str, default=None)
-
-        lims_args, remaining_args = lims_parser.parse_known_args(remaining_args)
-        remaining_args = [
-            item for item in remaining_args if item != "--get_inputs_from_lims"
-        ]
-        input_data = get_inputs_from_lims(**lims_args.__dict__)
-
-    try:
-        parser = argschema.ArgSchemaParser(
-            args=remaining_args,
-            input_data=input_data,
-            schema_type=InputSchema,
-            output_schema_type=OutputSchema,
-        )
-    except marshmallow.exceptions.ValidationError:
-        print(input_data)
-        raise
+    parser = optional_lims_inputs(sys.argv, InputSchema, OutputSchema, get_inputs_from_lims)
 
     output = write_ecephys_nwb(**parser.args)
     write_or_print_outputs(output, parser)
