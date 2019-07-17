@@ -310,21 +310,49 @@ class EcephysSession(LazyPropertyMixin):
             dtype=(np.uint8 if binarize else np.uint16) if dtype is None else dtype
         )
 
+        print(np.min(np.diff(domain.flatten())))
+
+        if np.min(np.diff(domain.flatten())) >= 0:
+            no_time_window_overlap = True
+            print('using fast method')
+        else:
+            no_time_window_overlap = False
+            print('using slow method')
+
         for ii, unit_id in enumerate(np.array(units.index.values)):
+
             data = self.spike_times[unit_id]
-            flat_indices = np.searchsorted(domain.flat, data)
 
-            unique, counts = np.unique(flat_indices, return_counts=True)
-            valid = np.where( 
-                (unique % len(bin_edges) != 0) 
-                & (unique >= 0) 
-                & (unique <= domain.size) 
-            )
+            if no_time_window_overlap:
+                flat_indices = np.searchsorted(domain.flat, data)
 
-            unique = unique[valid]
-            counts = counts[valid]
+                unique, counts = np.unique(flat_indices, return_counts=True)
+                valid = np.where( 
+                    (unique % len(bin_edges) != 0) 
+                    & (unique >= 0) 
+                    & (unique <= domain.size) 
+                )
 
-            tiled_data[:, :, ii].flat[unique] = counts > 0 if binarize else counts
+                unique = unique[valid]
+                counts = counts[valid]
+
+                tiled_data[:, :, ii].flat[unique] = counts > 0 if binarize else counts
+
+            else:
+
+                start_times = domain[:,0]
+
+                h,b = np.histogram(data, bins=np.arange(np.min(start_times), 
+                                                        np.max(start_times)+bin_edges[-1]*2, 
+                                                        np.mean(np.diff(bin_edges))))
+
+                start_edges = np.searchsorted(b, start_times)
+
+                inds = np.tile(np.arange(bin_edges.size), (start_edges.size, 1))
+                inds += start_edges[:, None]
+
+                tiled_data[:,:,ii] = h[inds]
+
 
         tiled_data = xr.DataArray(
             data=tiled_data[:, 1:, :], 
