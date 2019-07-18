@@ -18,6 +18,8 @@ class NaturalScenes(StimulusAnalysis):
         self._response_trials = None
         self._metrics = None
 
+        self._col_image = 'Image'
+
         if self._params is not None:
             self._params = self._params['natural_scenes']
             self._stimulus_key = self._params['stimulus_key']
@@ -65,27 +67,6 @@ class NaturalScenes(StimulusAnalysis):
         return self._number_nonblank
 
     @property
-    def stim_table(self):
-        # Stimulus table is already in EcephysSession object, just need to subselect 'static_gratings' presentations.
-        if self._stim_table is None:
-            # TODO: Give warning if no stimulus
-            if self._stimulus_names is None:
-                # Older versions of NWB files the stimulus name is in the form stimulus_gratings_N, so if
-                # self._stimulus_names is not explicity specified try to figure out stimulus
-                stims_table = self.ecephys_session.stimulus_presentations
-                stim_names = [s for s in stims_table['stimulus_name'].unique()
-                              if s.lower().startswith(._stimulus_key)]
-
-                self._stim_table = stims_table[stims_table['stimulus_name'].isin(stim_names)]
-
-            else:
-                self._stimulus_names = [self._stimulus_names] if isinstance(self._stimulus_names, string_types) \
-                    else self._stimulus_names
-                self._stim_table = self.ecephys_session.get_presentations_for_stimulus(self._stimulus_names)
-
-        return self._stim_table
-
-    @property
     def mean_sweep_events(self):
         if self._mean_sweep_events is None:
             self._mean_sweep_events = self.sweep_events.applymap(do_sweep_mean_shifted)
@@ -108,38 +89,44 @@ class NaturalScenes(StimulusAnalysis):
 
     @property
     def metrics(self):
+
         if self._metrics is None:
+
             metrics_df = pd.DataFrame(np.empty(self.unit_count, dtype=np.dtype(self.METRICS_COLUMNS)),
-                                   index=range(self.unit_count))
+                                   index=self.unit_ids).rename_axis('unit_id')
 
-            metrics_df['unit_id'] = list(self.spikes.keys())
-            for nc, unit_id in enumerate(self.spikes.keys()):
-                pref_image = np.where(self.response_events[1:, nc, 0] == self.response_events[1:, nc, 0].max())[0][0]
-                metrics_df.loc[nc, 'pref_image_ns'] = pref_image
-                metrics_df.loc[nc, 'num_pref_trials_ns'] = self.response_events[pref_image + 1, nc, 2]
-                metrics_df.loc[nc, 'responsive_ns'] = self.response_events[pref_image + 1, nc, 2] > 11
-                metrics_df.loc[nc, 'image_selectivity_ns'] = self._get_image_selectivity(nc)
+            metrics_df['pref_image_ns'] = [self._get_pref_image(unit) for unit in unit_ids]
+            metrics_df['image_selectivity_ns'] = [self._get_image_selectivity(unit) for unit in unit_ids]
+            metrics_df['lifetime_sparseness_ns'] = [self.get_lifetime_sparesness(unit) for unit in unit_ids]
 
-                stim_table_mask = self.stim_table['Image'] == pref_image
-                metrics_df.loc[nc, 'reliability_ns'] = self._get_reliability(unit_id, stim_table_mask)
-                metrics_df.loc[nc, ['run_pval_ns', 'run_mod_ns', 'run_resp_ns', 'stat_resp_ns']] = \
-                    self._get_running_modulation(pref_image, unit_id)
 
-            coeff_p = 1.0/float(self.number_nonblank)  # 1 - 1/18
-            resp_means = self.response_events[:, :, 0]
-            metrics_df['lifetime_sparseness_ns'] = (1 - coeff_p*((np.power(resp_means.sum(axis=0), 2)) /
-                                                              (np.power(resp_means, 2).sum(axis=0)))) / (1.0 - coeff_p)
+            #for nc, unit_id in enumerate(self.spikes.keys()):
+            #    pref_image = np.where(self.response_events[1:, nc, 0] == self.response_events[1:, nc, 0].max())[0][0]
+            ##    metrics_df.loc[nc, 'pref_image_ns'] = pref_image
+            #    metrics_df.loc[nc, 'num_pref_trials_ns'] = self.response_events[pref_image + 1, nc, 2]
+            #    metrics_df.loc[nc, 'responsive_ns'] = self.response_events[pref_image + 1, nc, 2] > 11
+            #    metrics_df.loc[nc, 'image_selectivity_ns'] = self._get_image_selectivity(nc)
+
+            #    stim_table_mask = self.stim_table['Image'] == pref_image
+            #    metrics_df.loc[nc, 'reliability_ns'] = self._get_reliability(unit_id, stim_table_mask)
+            #    metrics_df.loc[nc, ['run_pval_ns', 'run_mod_ns', 'run_resp_ns', 'stat_resp_ns']] = \
+            #        self._get_running_modulation(pref_image, unit_id)
+
+            #coeff_p = 1.0/float(self.number_nonblank)  # 1 - 1/18
+            #resp_means = self.response_events[:, :, 0]
+            #metrics_df['lifetime_sparseness_ns'] = (1 - coeff_p*((np.power(resp_means.sum(axis=0), 2)) /
+            #                                                  (np.power(resp_means, 2).sum(axis=0)))) / (1.0 - coeff_p)
 
             self._metrics = metrics_df
 
         return self._metrics
 
     def _get_stim_table_stats(self):
-        stim_table = self.stim_table
-        self._images = np.sort(stim_table['Image'].dropna().unique())
+
+        self._images = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_image] != 'null'][self._col_image].unique())
+        self._number_images = len(self._images)
         # In NWB 2 the Image col is a float, but need them as ints for indexing
         self._images = self._images.astype(np.int64)
-        self._number_images = len(self._images)
         self._number_nonblank = len(self._images[self._images >= 0])
 
     def _get_response_events(self):

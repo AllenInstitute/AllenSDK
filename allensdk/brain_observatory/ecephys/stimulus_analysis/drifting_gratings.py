@@ -5,7 +5,7 @@ import scipy.ndimage as ndi
 import scipy.stats as st
 from scipy.optimize import curve_fit
 
-from .stimulus_analysis import StimulusAnalysis, get_fr, _get_lifetime_sparseness
+from .stimulus_analysis import StimulusAnalysis, get_fr
 
 
 class DriftingGratings(StimulusAnalysis):
@@ -18,6 +18,9 @@ class DriftingGratings(StimulusAnalysis):
         self._number_tf = None
         self._response_events = None
         self._response_trials = None
+
+        self._col_ori = 'Ori'
+        self._col_tf = 'TF'
 
         if self._params is not None:
             self._params = self._params['drifting_gratings']
@@ -70,27 +73,6 @@ class DriftingGratings(StimulusAnalysis):
         return self._number_tf
 
     @property
-    def stim_table(self):
-        # Stimulus table is already in EcephysSession object, just need to subselect 'drifting_gratings' presentations.
-        if self._stim_table is None:
-            # TODO: Give warning if no stimulus
-            if self._stimulus_names is None:
-                # Older versions of NWB files the stimulus name is in the form stimulus_gratings_N, so if
-                # self._stimulus_names is not explicity specified try to figure out stimulus
-                stims_table = self.ecephys_session.stimulus_presentations
-                stim_names = [s for s in stims_table['stimulus_name'].unique()
-                              if s.lower().startswith(self._stimulus_key)]
-
-                self._stim_table = stims_table[stims_table['stimulus_name'].isin(stim_names)]
-
-            else:
-                self._stimulus_names = [self._stimulus_names] if isinstance(self._stimulus_names, string_types) \
-                    else self._stimulus_names
-                self._stim_table = self.ecephys_session.get_presentations_for_stimulus(self._stimulus_names)
-
-        return self._stim_table
-
-    @property
     def mean_sweep_events(self):
         if self._mean_sweep_events is None:
             # TODO: Should dtype for matrix be uint?
@@ -141,7 +123,7 @@ class DriftingGratings(StimulusAnalysis):
             metrics_df['pref_tf_dg'] = [self._get_pref_tf(unit) for unit in unit_ids]
             metrics_df['g_osi_dg'] = [self._get_selectivity(unit, metrics_df.loc[unit]['pref_tf_dg'], 'osi') for unit in unit_ids]
             metrics_df['g_dsi_dg'] = [self._get_selectivity(unit, metrics_df.loc[unit]['pref_tf_dg'], 'dsi') for unit in unit_ids]
-            metrics_df['lifetime_sparseness_dg'] = [self._get_lifetime_sparseness(unit) for unit in unit_ids]
+            metrics_df['lifetime_sparseness_dg'] = [self.get_lifetime_sparseness(unit) for unit in unit_ids]
 
             metrics_df['reliability_dg'] = [self._get_reliability(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
 
@@ -166,35 +148,25 @@ class DriftingGratings(StimulusAnalysis):
 
     def _get_pref_ori(self, unit_id):
 
-        similar_conditions = [self.stimulus_conditions.index[self.stimulus_conditions.TF == tf].tolist() for tf in self.tfvals]
+        similar_conditions = [self.stimulus_conditions.index[self.stimulus_conditions[self._col_tf] == tf].tolist() for tf in self.tfvals]
         df = pd.DataFrame(index=self.tfvals,
                          data = {'spike_mean' : 
                                 [self.conditionwise_statistics.loc[unit_id].loc[condition_inds]['spike_mean'].mean() for condition_inds in similar_conditions]
                              }
-                         ).rename_axis('TF')
+                         ).rename_axis(self._col_tf)
 
         return df.idxmax()
 
     def _get_pref_tf(self, unit_id):
 
-        similar_conditions = [self.stimulus_conditions.index[self.stimulus_conditions.Ori == ori].tolist() for ori in self.orivals]
+        similar_conditions = [self.stimulus_conditions.index[self.stimulus_conditions[self._col_ori] == ori].tolist() for ori in self.orivals]
         df = pd.DataFrame(index=self.orivals,
                          data = {'spike_mean' : 
                                 [self.conditionwise_statistics.loc[unit_id].loc[condition_inds]['spike_mean'].mean() for condition_inds in similar_conditions]
                              }
-                         ).rename_axis('Ori')
+                         ).rename_axis(self._col_ori)
 
         return df.idxmax()
-
-    
-    def _get_lifetime_sparseness(self, unit_id):
-        """Computes lifetime sparseness of responses for one unit
-        :return:
-        """
-        df = self.conditionwise_statistics.drop(index=self.null_condition, level=1)
-        responses = df.loc[unit_id]['spike_count'].values 
-
-        return get_lifetime_sparseness(responses)
 
 
     def _get_response_events(self):
@@ -226,13 +198,15 @@ class DriftingGratings(StimulusAnalysis):
         self._response_events = response_events
         self._response_trials = response_trials
 
+
     def _get_stim_table_stats(self):
 
-        self._orivals = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions['Ori'] != 'null']['Ori'].unique())
+        self._orivals = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_ori] != 'null'][self._col_ori].unique())
         self._number_ori = len(self._orivals)
 
-        self._tfvals = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions['TF'] != 'null']['TF'].unique())
+        self._tfvals = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_tf] != 'null'][self._col_tf].unique())
         self._number_tf = len(self._tfvals)
+
 
     def _get_selectivity(self, unit_id, pref_tf, selectivity_type='osi'):
         """computes orientation and direction selectivity (cv) for a particular unit
@@ -254,6 +228,7 @@ class DriftingGratings(StimulusAnalysis):
             return _osi(orivals_rad, tuning)
         elif selectivity_type == 'dsi':
             return _dsi(orivals_rad, tuning)
+
 
     def _osi(self, orivals, tuning):
         """Computes orientation selectivity for a tuning curve 

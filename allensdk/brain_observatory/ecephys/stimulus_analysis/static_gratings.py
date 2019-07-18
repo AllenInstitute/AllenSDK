@@ -60,27 +60,6 @@ class StaticGratings(StimulusAnalysis):
             self._stimulus_key = 'static_gratings'
 
     @property
-    def stim_table(self):
-        # Stimulus table is already in EcephysSession object, just need to subselect 'static_gratings' presentations.
-        if self._stim_table is None:
-            # TODO: Give warning if no static_gratings stimulus
-            if self._stimulus_names is None:
-                # Older versions of NWB files the stimulus name is in the form stimulus_gratings_N, so if
-                # self._stimulus_names is not explicity specified try to figure out stimulus
-                stims_table = self.ecephys_session.stimulus_presentations
-                stim_names = [s for s in stims_table['stimulus_name'].unique()
-                              if s.lower().startswith(self._stimulus_key)]
-
-                self._stim_table = stims_table[stims_table['stimulus_name'].isin(stim_names)]
-
-            else:
-                self._stimulus_names = [self._stimulus_names] if isinstance(self._stimulus_names, string_types) \
-                    else self._stimulus_names
-                self._stim_table = self.ecephys_session.get_presentations_for_stimulus(self._stimulus_names)
-
-        return self._stim_table
-
-    @property
     def orivals(self):
         if self._orivals is None:
             self._get_stim_table_stats()
@@ -168,7 +147,7 @@ class StaticGratings(StimulusAnalysis):
             # pandas can have issues interpreting type and makes the column 'object' type, this should enforce the
             # correct data type for each column
             metrics_df = pd.DataFrame(np.empty(self.unit_count, dtype=np.dtype(self.METRICS_COLUMNS)),
-                                   index=range(self.unit_count))
+                                   index=self.unit_ids).rename_axis('unit_id')
 
             # set values to null by default
             metrics_df['fit_sf_sg'] = np.nan
@@ -233,16 +212,16 @@ class StaticGratings(StimulusAnalysis):
         return self._metrics
 
     def _get_stim_table_stats(self):
-        sg_stim_table = self.stim_table
-        self._orivals = np.sort(sg_stim_table.loc[sg_stim_table[self._col_ori] != 'null'][self._col_ori].unique())
+
+        self._orivals = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_ori] != 'null'][self._col_ori].unique())
         self._number_ori = len(self._orivals)
 
-        self._sfvals = np.sort(sg_stim_table.loc[sg_stim_table[self._col_sf] != 'null'][self._col_sf].unique())
-        # TODO: Check that SF=0.0 isn't in the data, it is a special condition coded into responses table
+        self._sfvals = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_sf] != 'null'][self._col_sf].unique())
         self._number_sf = len(self._sfvals)
 
-        self._phasevals = np.sort(sg_stim_table.loc[sg_stim_table[self._col_phase] != 'null'][self._col_sf].unique())
-        self._number_phase = len(self._phasevals)
+        self._phasevals = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_phase] != 'null'][self._col_phase].unique())
+        self._number_sf = len(self._sfvals)
+
 
     def _get_response_events(self):
         # for each cell, find all trials with the same orientation/spatial_freq/phase/cell combo; get averaged num

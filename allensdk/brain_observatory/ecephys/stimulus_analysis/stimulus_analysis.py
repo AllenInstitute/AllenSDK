@@ -90,10 +90,27 @@ class StimulusAnalysis(object):
     def dxtime(self):
         """Returns an array of session running speed timestamps"""
         return self._ecephys_session.running_speed.timestamps
+    
 
     @property
     def stim_table(self):
-        raise NotImplementedError()
+        # Stimulus table is already in EcephysSession object, just need to subselect presentations for this stimulus.
+        if self._stim_table is None:
+            # TODO: Give warning if no stimulus
+            if self._stimulus_names is None:
+                # Older versions of NWB files the stimulus name is in the form stimulus_gratings_N, so if
+                # self._stimulus_names is not explicity specified try to figure out stimulus
+                stims_table = self.ecephys_session.stimulus_presentations
+                stim_names = [s for s in stims_table['stimulus_name'].unique()
+                              if s.lower().startswith(self._stimulus_key)]
+
+                self._stim_table = stims_table[stims_table['stimulus_name'].isin(stim_names)]
+            else:
+                self._stimulus_names = [self._stimulus_names] if isinstance(self._stimulus_names, string_types) \
+                    else self._stimulus_names
+                self._stim_table = self.ecephys_session.get_presentations_for_stimulus(self._stimulus_names)
+
+        return self._stim_table
 
     @property
     def stim_table_spontaneous(self):
@@ -338,6 +355,15 @@ class StimulusAnalysis(object):
         else:
             return np.NaN, np.NaN, np.NaN, np.NaN
 
+    def get_lifetime_sparseness(self, unit_id):
+        """Computes lifetime sparseness of responses for one unit
+        :return:
+        """
+        df = self.conditionwise_statistics.drop(index=self.null_condition, level=1)
+        responses = df.loc[unit_id]['spike_count'].values 
+
+        return lifetime_sparseness(responses)
+
 
     def get_preferred_condition(self, unit_id):
 
@@ -394,7 +420,7 @@ def get_fr(spikes, num_timestep_second=30, sweep_length=3.1, filter_width=0.1):
     return fr
 
 
-def get_lifetime_sparseness(responses):
+def lifetime_sparseness(responses):
     """Computes the lifetime sparseness across all the (mean) responses. See Olsen & Wilson 2008.
 
     :param response_data: A floating-point vector/matrix of dimension N-Responses x M-Cells of the response values
