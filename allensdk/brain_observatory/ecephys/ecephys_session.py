@@ -307,7 +307,7 @@ class EcephysSession(LazyPropertyMixin):
         domain = build_time_window_domain(bin_edges, stimulus_presentations['start_time'].values, callback=time_domain_callback)
 
         out_of_order = np.where(np.diff(domain, axis=1) < 0)
-        if len(out_of_order[0]):
+        if len(out_of_order[0]) > 0:
             out_of_order_time_bins = [(row, col) for row, col in zip(out_of_order)]
             raise ValueError(f"The time domain specified contains out-of-order bin edges at indices: {out_of_order_time_bins}")
 
