@@ -306,10 +306,24 @@ class EcephysSession(LazyPropertyMixin):
         bin_edges = np.array(bin_edges)
         domain = build_time_window_domain(bin_edges, stimulus_presentations['start_time'].values, callback=time_domain_callback)
 
-        tiled_data = build_spike_histogram_nonoverlapping(domain, self.spike_times, units.index.values, dtype=dtype, binarize=binarize)
+        out_of_order = np.where(np.diff(domain, axis=1) < 0)
+        if len(out_of_order[0]):
+            out_of_order_time_bins = [(row, col) for row, col in zip(out_of_order)]
+            raise ValueError(f"The time domain specified contains out-of-order bin edges at indices: {out_of_order_time_bins}")
+
+        ends = domain[:, -1]
+        starts = domain[:, 0]
+        overlapping = np.where((starts[1:] - ends[:-1]) < 0)[0]
+
+        if len(overlapping) > 0:
+            overlapping = [(first, second) for first, second in zip(overlapping[:-1], overlapping[1:])]
+            warnings.warn("You've specified some overlapping time intervals between rows: {overlapping}")
+        tiled_data = build_spike_histogram(
+            domain, self.spike_times, units.index.values, dtype=dtype, binarize=binarize
+        )
 
         tiled_data = xr.DataArray(
-            data=tiled_data[:, 1:, :], 
+            data=tiled_data, 
             coords={
                 'stimulus_presentation_id': stimulus_presentations.index.values,
                 'time_relative_to_stimulus_onset': bin_edges[:-1] + np.diff(bin_edges) / 2,
@@ -638,28 +652,27 @@ class EcephysSession(LazyPropertyMixin):
         return cls(api=NWBAdaptorCls.from_path(path=path, **api_kwargs), ** kwargs)
 
 
-def build_spike_histogram_nonoverlapping(time_domain, spike_times, unit_ids, dtype, binarize=False):
+def build_spike_histogram(time_domain, spike_times, unit_ids, dtype=None, binarize=False):
+
+    time_domain = np.array(time_domain)
+    unit_ids = np.array(unit_ids)
 
     tiled_data = np.zeros(
-        (time_domain.shape[0], time_domain.shape[1], unit_ids.size), 
+        (time_domain.shape[0], time_domain.shape[1] - 1, unit_ids.size), 
         dtype=(np.uint8 if binarize else np.uint16) if dtype is None else dtype
     )
 
+    starts = time_domain[:, :-1]
+    ends = time_domain[:, 1:]
+
     for ii, unit_id in enumerate(unit_ids):
-        data = spike_times[unit_id]
-        flat_indices = np.searchsorted(time_domain.flat, data)
+        data = np.array(spike_times[unit_id])
 
-        unique, counts = np.unique(flat_indices, return_counts=True)
-        valid = np.where( 
-            (unique % time_domain.shape[1] != 0) 
-            & (unique >= 0) 
-            & (unique <= time_domain.size) 
-        )
+        start_positions = np.searchsorted(data, starts.flat)
+        end_positions = np.searchsorted(data, ends.flat, side="right")
+        counts = (end_positions - start_positions)
 
-        unique = unique[valid]
-        counts = counts[valid]
-
-        tiled_data[:, :, ii].flat[unique] = counts > 0 if binarize else counts
+        tiled_data[:, :, ii].flat = counts > 0 if binarize else counts
     
     return tiled_data
 
