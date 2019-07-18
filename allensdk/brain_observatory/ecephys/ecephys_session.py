@@ -534,7 +534,7 @@ class EcephysSession(LazyPropertyMixin):
         presentation_conditions = []
         cid_counter = -1
 
-        params_only = stimulus_presentations.drop(columns=["start_time", "stop_time"])
+        params_only = stimulus_presentations.drop(columns=["start_time", "stop_time", "duration", "stimulus_block"])
         for row in params_only.itertuples(index=False):
 
             if row in stimulus_conditions:
