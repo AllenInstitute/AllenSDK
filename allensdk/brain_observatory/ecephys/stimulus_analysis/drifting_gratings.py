@@ -199,10 +199,11 @@ class DriftingGratings(StimulusAnalysis):
         self._response_trials = response_trials
 
     def _get_stim_table_stats(self):
-        self._orivals = np.sort(self.stim_table.loc[self.stim_table['Ori'] != 'null']['Ori'].unique())
+
+        self._orivals = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions['Ori'] != 'null']['Ori'].unique())
         self._number_ori = len(self._orivals)
 
-        self._tfvals = np.sort(self.stim_table.loc[self.stim_table['TF'] != 'null']['TF'].unique())
+        self._tfvals = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions['TF'] != 'null']['TF'].unique())
         self._number_tf = len(self._tfvals)
 
     def _get_osi(self, pref_tf, nc):
@@ -223,6 +224,39 @@ class DriftingGratings(StimulusAnalysis):
         osi = np.abs(cv_top_os.sum()) / tuning.sum()
         dsi = np.abs(cv_top_ds.sum()) / tuning.sum()
         return osi, dsi
+
+    def _get_selectivity(self, unit_id, pref_tf):
+        """computes orientation and direction selectivity (cv) for a particular unit
+
+        :param unit_id: ID for the unit of interest
+        :param pref_tf: preferred temporal frequency for this unit
+        :return:
+        """
+        orivals_rad = np.deg2rad(self.orivals)
+        
+        condition_inds = self.stimulus_conditions[self.stimulus_conditions['TF'] == pref_tf].index.values
+        df = self.conditionwise_statistics.loc[unit_id].loc[condition_inds]
+        df = df.assign(Ori = self.stimulus_conditions.loc[df.index.values]['Ori'])
+        df = df.sort_values(by=['Ori'])
+
+        tuning = df['spike_mean'].values
+
+        return _osi(orivals_rad, tuning), _dsi(orivals_rad, tuning)
+
+
+    def _osi(self, orivals, tuning):
+
+        cv_top = tuning * np.exp(1j * 2 * orivals)
+
+        return np.abs(cv_top.sum()) / tuning.sum()
+
+
+    def _dsi(self, orivals, tuning):
+
+        cv_top = tuning * np.exp(1j * orivals)
+
+        return np.abs(cv_top.sum()) / tuning.sum()
+
 
     def _get_reliability(self, specimen_id, st_mask):
         """Computes trial-to-trial reliability of cell at its preferred condition

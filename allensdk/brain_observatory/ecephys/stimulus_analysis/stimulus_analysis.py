@@ -22,8 +22,10 @@ class StimulusAnalysis(object):
         self._unit_filter = kwargs.get('filter', None)
         self._params = kwargs.get('params', None)
         self._unit_count = None
-        self._spikes = None
         self._stim_table = None
+        self._conditionwise_statistics = None
+
+        self._spikes = None
         self._stim_table_spontaneous = None
         self._stimulus_names = None
         self._running_speed = None
@@ -31,6 +33,8 @@ class StimulusAnalysis(object):
         self._mean_sweep_events = None
         self._sweep_p_values = None
         self._metrics = None
+
+        self._trial_duration = None
 
 
 
@@ -135,31 +139,95 @@ class StimulusAnalysis(object):
         return self._sweep_events
 
     @property
+    def conditionwise_statistics(self):
+        """ Construct a dataframe with the statistics for each stimulus condition, by unit
+
+        Returns
+        =======
+        pd.DataFrame :
+            MultiIndex : unit_id, stimulus_condition_id
+            Columns : spike_count, spike_mean, spike_sem, spike_std, stimulus_presentation_count
+
+        """
+
+        if self._conditionwise_statistics is None:
+
+            self._conditionwise_statistics = \
+                    self.ecephys_session.conditionwise_spike_statistics(self.stim_table.index.values,
+                        self.unit_ids)
+
+        return self._conditionwise_statistics
+
+
+    @property
+    def presentationwise_statistics(self):
+        """ Construct a dataframe with the statistics for each stimulus presentation, by unit
+
+        Returns
+        =======
+        pd.DataFrame :
+            MultiIndex : unit_id, stimulus_presentation_id
+            Columns : spike_count, stimulus_condition_id, running_speed 
+
+        """
+
+        if self._presentationwise_statistics is None:
+
+            df = \
+                    self.ecephys_session.presentationwise_spike_counts(
+                        bin_edges = np.linspace(0, self._trial_duration, 2),
+                        stimulus_presentation_ids = self.stim_table.index.values,
+                        unit_ids = self.unit_ids,
+                    ).to_dataframe().reset_index(level=1, drop=True)
+
+            df = df.join(self.stim_table.loc[df.index.levels[0].values]['stimulus_condition_id'])
+            self._presentationwise_statistics = df.join(self.running_speed)
+
+        return self._presentationwise_statistics
+
+
+    @property
+    def stimulus_conditions(self):
+        """ Construct a dataframe with the stimulus conditions
+
+        Returns
+        =======
+        pd.DataFrame :
+            Index : stimulus_condition_id
+            Columns : stimulus parameter types
+
+        """
+
+        if self._stimulus_conditions is None:
+
+            condition_list = self.stim_table.stimulus_condition_id.unique()
+
+            self._stimulus_conditions = \
+                    self.ecephys_session.stimulus_conditions[
+                        self.ecephys_session.stimulus_conditions.index.isin(condition_list)
+                    ]
+
+        return self._stimulus_conditions
+
+
+    @property
     def running_speed(self):
+        """ Construct a dataframe with the running speed for each trial
+
+        Return
+        ======
+        pd.DataFrame:
+            Index : presentation_id
+            Columns : running_speed
+        
+        """
         if self._running_speed is None:
-            stim_times = np.zeros(len(self.stim_table)*2, dtype=np.float64)
-            stim_times[::2] = self.stim_table['start_time'].values
-            stim_times[1::2] = self.stim_table['stop_time'].values
-            sampled_indicies = np.where((self.dxtime >= stim_times[0])&(self.dxtime <= stim_times[-1]))[0]
-            relevant_dxtimes = self.dxtime[sampled_indicies]
-            relevant_dxcms = self.dxcm[sampled_indicies]
-
-            indices = np.searchsorted(stim_times, relevant_dxtimes) - 1  # excludes dxtimes occuring at time_stop
-            rs_tmp_df = pd.DataFrame({'running_speed': relevant_dxcms, 'stim_indicies': indices})
-
-            # odd indicies have running speeds between start and stop times and should be removed
-            rs_tmp_df = rs_tmp_df[rs_tmp_df['stim_indicies'].mod(2) == 0]
-
-            # get averaged running speed for each stimulus
-            rs_tmp_df = rs_tmp_df.groupby('stim_indicies').agg('mean')
-
-            # some stimulus might not have an assoicated running_speed, set missing rows to NaN
-            new_index = pd.Index(range(0, len(self.stim_table)*2, 2), name='stim_indicies')
-            rs_tmp_df = rs_tmp_df.reindex(new_index)
-
-            # reset index with presentation ids
-            rs_tmp_df = rs_tmp_df.set_index(self.stim_table.index)
-            self._running_speed = rs_tmp_df
+            
+            self._running_speed = pd.DataFrame(index=stim_table.index.values, 
+                                               data = {'running_speed' :
+                                                    [get_velocity_for_presentation(i) for i in self.stim_table.index.values]
+                                                }
+                        ).rename_axis('stimulus_presentation_id')
 
         return self._running_speed
 
@@ -218,6 +286,13 @@ class StimulusAnalysis(object):
 
         return sweep_p_values
 
+    def get_velocity_for_presentation(self, presentation_id):
+
+        indices = (self.ecephys_session.running_speed.start_time >= self.stim_table.loc[presentation_id]['start_time']) & \
+            (self.ecephys_session.running_speed.start_time < self.stim_table.loc[presentation_id]['stop_time'])
+        
+        return self.ecephys_session.running_speed[indices]['velocity'].mean()
+
 
 def get_reliability(unit_sweeps, padding=1.0, num_timestep_second=30, filter_width=0.1, window_beg=0, window_end=None):
     """Computes the trial-to-trial reliability for a set of sweeps for a given cell
@@ -247,7 +322,7 @@ def get_reliability(unit_sweeps, padding=1.0, num_timestep_second=30, filter_wid
 
 
 def get_fr(spikes, num_timestep_second=30, sweep_length=3.1, filter_width=0.1):
-    """Uses a gaussian convolution to convert the spike-times into a contigous firing-rate series.
+    """Uses a gaussian convolution to convert the spike-times into a contiguous firing-rate series.
 
     :param spikes: An array of spike times (shifted to start at 0)
     :param num_timestep_second: The sampling frequency
