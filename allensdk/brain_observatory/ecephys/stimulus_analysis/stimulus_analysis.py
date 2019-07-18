@@ -35,6 +35,7 @@ class StimulusAnalysis(object):
         self._metrics = None
 
         self._trial_duration = None
+        self._preferred_condition = {}
 
 
 
@@ -137,6 +138,11 @@ class StimulusAnalysis(object):
             self._sweep_events = sweep_events
 
         return self._sweep_events
+
+    @property
+    def null_condition(self):
+        raise NotImplementedError()
+
 
     @property
     def conditionwise_statistics(self):
@@ -249,6 +255,8 @@ class StimulusAnalysis(object):
         """Returns a pandas DataFrame of the stimulus response metrics for each unit."""
         raise NotImplementedError()
 
+
+
     def calc_sweep_p_values(self, n_samples=10000, step_size=0.0001, offset=0.33):
         """ Calculates the probability, for each unit and stimulus presentation, that the number of spikes emitted by 
         that unit during that presentation could have been produced by that unit's spontaneous activity. This is 
@@ -292,6 +300,53 @@ class StimulusAnalysis(object):
             (self.ecephys_session.running_speed.start_time < self.stim_table.loc[presentation_id]['stop_time'])
         
         return self.ecephys_session.running_speed[indices]['velocity'].mean()
+
+    def get_running_modulation(self, unit_id, preferred_condition, threshold):
+        """Computes running modulation of a unit at its preferred condition provided there are at least 2 trials for both
+        stationary and running conditions
+
+        :param pref_ori:
+        :param pref_tf:
+        :param v:
+        :return: p_value of running modulation, mean response to preferred condition when running, mean response to
+        preferred condition when stationary
+        """
+
+        subset = self.presentationwise_statistics[
+                    self.presentationwise_statistics['stimulus_condition_id'] == preferred_condition
+                    ].xs(unit_id, level=1)
+
+        spike_counts = subset['spike_counts'].values 
+        running_speeds = subset['running_speed'].values 
+
+        is_running = running_speeds >= threshold
+
+        if 1 < np.sum(is_running) < (len(running_speeds) - 1):
+
+            run = spike_counts[is_running]
+            stat = spike_counts[np.invert(is_running)]
+
+            run_mean = np.mean(run)
+            stat_mean = np.mean(stat)
+
+            if run_mean > stat_mean:
+                run_mod = (run_mean - stat_mean) / run_mean
+            else:
+                run_mod = -1 * (stat_mean - run_mean) / stat_mean
+            (_, p) = st.ttest_ind(run, stat, equal_var=False)
+            return p, run_mod, run_mean, stat_mean
+        else:
+            return np.NaN, np.NaN, np.NaN, np.NaN
+
+
+    def get_preferred_condition(self, unit_id):
+
+        if unit_id not in self._preferred_condition:
+
+            df = self.conditionwise_statistics.drop(index=self.null_condition, level=1)
+            self._preferred_condition[unit_id] = df['spike_mean'].idxmax()
+
+        return self._preferred_condition[unit_id]
 
 
 def get_reliability(unit_sweeps, padding=1.0, num_timestep_second=30, filter_width=0.1, window_beg=0, window_end=None):
@@ -352,64 +407,3 @@ def get_lifetime_sparseness(responses):
         responses = np.array([responses]).T
     coeff = 1.0/responses.shape[0]
     return (1.0 - coeff*((np.power(responses.sum(axis=0), 2)) / (np.power(responses, 2).sum(axis=0)))) / (1.0 - coeff)
-
-
-def get_osi(responses, ori_vals, in_radians=False):
-    """Computes the orientation selectivity of a cell. The calculation of the orientation is done using the normalized
-    circular variance (CirVar) as described in Ringbach 2002
-
-    :param tuning: Array of length N. Each value the (averaged) response of the cell at a differenet orientation.
-    :param ori_vals: Array of length N. Each value the oriention of the stimulus.
-    :param in_radians: Set to True if ori_vals is in units of radians. Default: False
-    :return: An N-dimensional array of the circular variance (scalar value, in radians) of the responses.
-    """
-    # TODO: Try and vectorize function so that it can take in a matrix of N-orientations x M-cells
-    ori_rad = ori_vals if in_radians else np.deg2rad(ori_vals)
-    num_ori = len(ori_rad)
-    cv_top_os = np.empty(num_ori, dtype=np.complex128)
-    for i in range(num_ori):
-        cv_top_os[i] = (responses[i] * np.exp(1j * 2 * ori_rad[i]))
-
-    return np.abs(cv_top_os.sum()) / responses.sum()
-
-
-def get_dsi(responses, ori_vals, in_radians=False):
-    """Computes the direction selectivity of a cell. See Ringbach 2002, Van Hooser 2014
-
-    :param tuning: Array of length N. Each value the (averaged) response of the cell at a differenet orientation.
-    :param ori_vals: Array of length N. Each value the oriention of the stimulus.
-    :param in_radians: Set to True if ori_vals is in units of radians. Default: False
-    :return: An N-dimensional array of the circular variance (scalar value, in radians) of the responses.
-    """
-    # TODO: Try and vectorize function so that it can take in a matrix of N-orientations x M-cells
-    ori_rad = ori_vals if in_radians else np.deg2rad(ori_vals)
-    num_ori = len(ori_rad)
-    cv_top_ds = np.empty(num_ori, dtype=np.complex128)
-    for i in range(num_ori):
-        cv_top_ds[i] = (responses[i] * np.exp(1j * ori_rad[i]))
-
-    return np.abs(cv_top_ds.sum()) / responses.sum()
-
-
-def get_running_modulation(mean_sweep_runs, mean_sweep_stats):
-    """computes running modulation of cell at its preferred condition provided there are at least 2 trials for both
-    stationary and running conditions
-
-    :param mean_sweep_runs:
-    :param mean_sweep_stats:
-    :return: p_value of running modulation, running modulation metric, mean response to preferred condition when
-    running mean response to preferred condition when stationary
-    """
-    if np.logical_and(len(mean_sweep_runs) > 1, len(mean_sweep_stats) > 1):
-        run = mean_sweep_runs.mean()
-        stat = mean_sweep_stats.mean()
-        if run > stat:
-            run_mod = (run - stat) / run
-        elif stat > run:
-            run_mod = -1 * (stat - run) / stat
-        else:
-            run_mod = 0
-        (_, p) = st.ttest_ind(mean_sweep_runs, mean_sweep_stats, equal_var=False)
-        return p, run_mod, run, stat
-    else:
-        return np.NaN, np.NaN, np.NaN, np.NaN

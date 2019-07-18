@@ -5,7 +5,7 @@ import scipy.ndimage as ndi
 import scipy.stats as st
 from scipy.optimize import curve_fit
 
-from .stimulus_analysis import StimulusAnalysis, get_fr
+from .stimulus_analysis import StimulusAnalysis, get_fr, _get_lifetime_sparseness
 
 
 class DriftingGratings(StimulusAnalysis):
@@ -120,57 +120,85 @@ class DriftingGratings(StimulusAnalysis):
         return self._response_trials
 
     @property
+    def null_condition(self):
+        return self.stimulus_conditions[self.stimulus_conditions['TF'] == 'null'].index
+    
+
+    @property
     def metrics(self):
+
         if self._metrics is None:
+        
             metrics_df = pd.DataFrame(np.empty(self.unit_count, dtype=np.dtype(self.METRICS_COLUMNS)),
-                                   index=range(self.unit_count))
+                                   index=self.unit_ids).rename_axis('unit_id')
 
             metrics_df['fit_tf_ind_dg'] = np.nan
             metrics_df['fit_tf_dg'] = np.nan
             metrics_df['tf_low_cutoff_dg'] = np.nan
             metrics_df['tf_high_cutoff_dg'] = np.nan
 
-            metrics_df['lifetime_sparseness_dg'] = self._get_lifetime_sparseness()
-            metrics_df['unit_id'] = self.spikes.keys()
+            metrics_df['pref_ori_dg'] = [self._get_pref_ori(unit) for unit in unit_ids]
+            metrics_df['pref_tf_dg'] = [self._get_pref_tf(unit) for unit in unit_ids]
+            metrics_df['g_osi_dg'] = [self._get_selectivity(unit, metrics_df.loc[unit]['pref_tf_dg'], 'osi') for unit in unit_ids]
+            metrics_df['g_dsi_dg'] = [self._get_selectivity(unit, metrics_df.loc[unit]['pref_tf_dg'], 'dsi') for unit in unit_ids]
+            metrics_df['lifetime_sparseness_dg'] = [self._get_lifetime_sparseness(unit) for unit in unit_ids]
 
-            for nc, unit_id in enumerate(self.spikes.keys()):
-                peaks = np.where(self.response_events[:, 1:, nc, 0] == self.response_events[:, 1:, nc, 0].max())
-                pref_ori = peaks[0][0]
-                pref_tf = peaks[1][0]
+            metrics_df['reliability_dg'] = [self._get_reliability(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
 
+            metrics_df.loc[nc, ['run_pval_dg', 'run_mod_dg', 'run_resp_dg', 'stat_resp_dg']] = \
+                    [self.get_running_modulation(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
 
-
-                stim_table_mask = (self.stim_table['TF'] == self.tfvals[pref_tf]) & \
-                                  (self.stim_table['Ori'] == self.orivals[pref_ori])
-
-                metrics_df.loc[nc, 'pref_ori_dg'] = self.orivals[pref_ori]
-                metrics_df.loc[nc, 'pref_tf_dg'] = self.tfvals[pref_tf]
-                metrics_df.loc[nc, 'num_pref_trials_dg'] = self.response_events[pref_ori, pref_tf + 1, nc, 2]
-                metrics_df.loc[nc, 'responsive_dg'] = self.response_events[pref_ori, pref_tf + 1, nc, 2] > 3
-                metrics_df.loc[nc, ['g_osi_dg', 'g_dsi_dg']] = self._get_osi(pref_tf, nc)
-                metrics_df.loc[nc, 'reliability_dg'] = self._get_reliability(unit_id, stim_table_mask)
-                metrics_df.loc[nc, 'tfdi_dg'] = self._get_tfdi(pref_ori, nc)
-                metrics_df.loc[nc, ['run_pval_dg', 'run_mod_dg', 'run_resp_dg', 'stat_resp_dg']] = \
-                    self._get_running_modulation(pref_ori, pref_tf, unit_id)
-                metrics_df.loc[nc, ['peak_blank_dg', 'all_blank_dg']] = self._get_suppressed_contrast(pref_ori, pref_tf,
-                                                                                                   nc)
-                if self.response_events[pref_ori, pref_tf + 1, nc, 2] > 3:
-                    metrics_df.loc[nc, ['fit_tf_ind_dg', 'fit_tf_dg', 'tf_low_cutoff_dg', 'tf_high_cutoff_dg']] = \
-                        self._fit_tf_tuning(pref_ori, pref_tf, nc)
+                #metrics_df.loc[nc, 'num_pref_trials_dg'] = self.response_events[pref_ori, pref_tf + 1, nc, 2]
+                #metrics_df.loc[nc, 'responsive_dg'] = self.response_events[pref_ori, pref_tf + 1, nc, 2] > 3
+                #metrics_df.loc[nc, ['g_osi_dg', 'g_dsi_dg']] = self._get_osi(pref_tf, nc)
+                #metrics_df.loc[nc, 'reliability_dg'] = self._get_reliability(unit_id, stim_table_mask)
+                #metrics_df.loc[nc, 'tfdi_dg'] = self._get_tfdi(pref_ori, nc)
+                
+                #metrics_df.loc[nc, ['peak_blank_dg', 'all_blank_dg']] = self._get_suppressed_contrast(pref_ori, pref_tf,
+                #                                                                                   nc)
+                #if self.response_events[pref_ori, pref_tf + 1, nc, 2] > 3:
+                #    metrics_df.loc[nc, ['fit_tf_ind_dg', 'fit_tf_dg', 'tf_low_cutoff_dg', 'tf_high_cutoff_dg']] = \
+                #        self._fit_tf_tuning(pref_ori, pref_tf, nc)
 
             self._metrics = metrics_df
 
         return self._metrics
 
-    def _get_lifetime_sparseness(self):
-        """Computes lifetime sparseness of responses for all cells
+    def _get_pref_ori(self, unit_id):
 
+        similar_conditions = [self.stimulus_conditions.index[self.stimulus_conditions.TF == tf].tolist() for tf in self.tfvals]
+        df = pd.DataFrame(index=self.tfvals,
+                         data = {'spike_mean' : 
+                                [self.conditionwise_statistics.loc[unit_id].loc[condition_inds]['spike_mean'].mean() for condition_inds in similar_conditions]
+                             }
+                         ).rename_axis('TF')
+
+        return df.idxmax()
+
+    def _get_pref_tf(self, unit_id):
+
+        similar_conditions = [self.stimulus_conditions.index[self.stimulus_conditions.Ori == ori].tolist() for ori in self.orivals]
+        df = pd.DataFrame(index=self.orivals,
+                         data = {'spike_mean' : 
+                                [self.conditionwise_statistics.loc[unit_id].loc[condition_inds]['spike_mean'].mean() for condition_inds in similar_conditions]
+                             }
+                         ).rename_axis('Ori')
+
+        return df.idxmax()
+
+    
+    def _get_lifetime_sparseness(self, unit_id):
+        """Computes lifetime sparseness of responses for one unit
         :return:
         """
-        response = self.response_events[:, 1:, :, 0].reshape(40, self.unit_count)
-        return (1-(1/40.)*((np.power(response.sum(axis=0), 2))/(np.power(response, 2).sum(axis=0))))/(1-(1/40.))
+        df = self.conditionwise_statistics.drop(index=self.null_condition, level=1)
+        responses = df.loc[unit_id]['spike_count'].values 
+
+        return get_lifetime_sparseness(responses)
+
 
     def _get_response_events(self):
+        # DEPRECATED
         response_events = np.empty((self.number_ori, self.number_tf+1, self.unit_count, 3))
         response_events[:] = np.NaN
 
@@ -206,26 +234,7 @@ class DriftingGratings(StimulusAnalysis):
         self._tfvals = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions['TF'] != 'null']['TF'].unique())
         self._number_tf = len(self._tfvals)
 
-    def _get_osi(self, pref_tf, nc):
-        """computes orientation and direction selectivity (cv) for cell
-
-        :param pref_tf:
-        :param nc:
-        :return:
-        """
-        orivals_rad = np.deg2rad(self.orivals)
-        tuning = self.response_events[:, pref_tf + 1, nc, 0]
-        tuning = np.where(tuning > 0, tuning, 0)
-        cv_top_os = np.empty(self.number_ori, dtype=np.complex128)
-        cv_top_ds = np.empty(self.number_ori, dtype=np.complex128)
-        for i in range(self.number_ori):
-            cv_top_os[i] = (tuning[i] * np.exp(1j * 2 * orivals_rad[i]))
-            cv_top_ds[i] = (tuning[i] * np.exp(1j * orivals_rad[i]))
-        osi = np.abs(cv_top_os.sum()) / tuning.sum()
-        dsi = np.abs(cv_top_ds.sum()) / tuning.sum()
-        return osi, dsi
-
-    def _get_selectivity(self, unit_id, pref_tf):
+    def _get_selectivity(self, unit_id, pref_tf, selectivity_type='osi'):
         """computes orientation and direction selectivity (cv) for a particular unit
 
         :param unit_id: ID for the unit of interest
@@ -241,33 +250,43 @@ class DriftingGratings(StimulusAnalysis):
 
         tuning = df['spike_mean'].values
 
-        return _osi(orivals_rad, tuning), _dsi(orivals_rad, tuning)
-
+        if selectivity_type == 'osi':
+            return _osi(orivals_rad, tuning)
+        elif selectivity_type == 'dsi':
+            return _dsi(orivals_rad, tuning)
 
     def _osi(self, orivals, tuning):
+        """Computes orientation selectivity for a tuning curve 
+
+        """
 
         cv_top = tuning * np.exp(1j * 2 * orivals)
-
         return np.abs(cv_top.sum()) / tuning.sum()
 
 
     def _dsi(self, orivals, tuning):
+        """Computes direction selectivity for a tuning curve 
+
+        """
 
         cv_top = tuning * np.exp(1j * orivals)
-
         return np.abs(cv_top.sum()) / tuning.sum()
 
 
-    def _get_reliability(self, specimen_id, st_mask):
-        """Computes trial-to-trial reliability of cell at its preferred condition
+    def _get_reliability(self, unit_id, preferred_condition):
+        """Computes trial-to-trial reliability of units at their preferred condition
 
         :param pref_ori:
         :param pref_tf:
         :param v:
         :return:
         """
-        subset = self.sweep_events[st_mask][specimen_id].values
-        subset += 1.0
+
+        subset = self.presentationwise_statistics[
+                    self.presentationwise_statistics['stimulus_condition_id'] == preferred_condition
+                    ].xs(unit_id, level=1)['spike_counts'].values
+        subset += 1
+
         corr_matrix = np.empty((len(subset), len(subset)))
         for i in range(len(subset)):
             fri = get_fr(subset[i])
@@ -295,34 +314,6 @@ class DriftingGratings(StimulusAnalysis):
         trials = self.mean_sweep_events[(self.stim_table['Ori'] == self.orivals[pref_ori])][v].values
         sse_part = np.sqrt(np.sum((trials-trials.mean())**2)/(len(trials)-5))
         return (np.ptp(tf_tuning))/(np.ptp(tf_tuning) + 2*sse_part)
-
-    def _get_running_modulation(self, pref_ori, pref_tf, v):
-        """Computes running modulation of cell at its preferred condition provided there are at least 2 trials for both
-        stationary and running conditions
-
-        :param pref_ori:
-        :param pref_tf:
-        :param v:
-        :return: p_value of running modulation, mean response to preferred condition when running, mean response to
-        preferred condition when stationary
-        """
-        subset = self.mean_sweep_events[(self.stim_table['TF'] == self.tfvals[pref_tf]) &
-                                        (self.stim_table['Ori'] == self.orivals[pref_ori])]
-        speed_subset = self.running_speed[(self.stim_table['TF'] == self.tfvals[pref_tf]) &
-                                          (self.stim_table['Ori'] == self.orivals[pref_ori])]
-        subset_run = subset[speed_subset.running_speed >= 1]
-        subset_stat = subset[speed_subset.running_speed < 1]
-        if np.logical_and(len(subset_run) > 1, len(subset_stat) > 1):
-            run = subset[speed_subset.running_speed >= 1][v].mean()
-            stat = subset[speed_subset.running_speed < 1][v].mean()
-            if run > stat:
-                run_mod = (run - stat)/run
-            else:  # if stat > run:
-                run_mod = -1 * (stat - run)/stat
-            (_, p) = st.ttest_ind(subset_run[v], subset_stat[v], equal_var=False)
-            return p, run_mod, run, stat
-        else:
-            return np.NaN, np.NaN, np.NaN, np.NaN
 
     def _get_suppressed_contrast(self, pref_ori, pref_tf, nc):
         """Computes two metrics to be used to identify cells that are suppressed by contrast
