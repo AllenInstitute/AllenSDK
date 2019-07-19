@@ -258,7 +258,7 @@ class StaticGratings(StimulusAnalysis):
         df = df.assign(Ori = self.stimulus_conditions.loc[df.index.values][self._col_ori])
         df = df.sort_values(by=['Ori'])
 
-        tuning = np.array(df['spike_mean'].values).astype('complex128')
+        tuning = np.array(df['spike_mean'].values)
 
         return osi(orivals_rad, tuning)
 

@@ -57,7 +57,7 @@ class StimulusAnalysis(object):
                 units_df = units_df[mask]
             self._unit_ids = units_df.index.values
 
-        return self._unit_ids[:10]
+        return self._unit_ids
 
     @property
     def name(self):

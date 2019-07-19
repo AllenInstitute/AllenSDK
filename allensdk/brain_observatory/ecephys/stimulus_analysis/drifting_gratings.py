@@ -16,7 +16,7 @@ class DriftingGratings(StimulusAnalysis):
         session = EcephysSession.from_nwb_path('/path/to/my.nwb')
         dg_analysis = DriftingGratings(session)
 
-    or, alternativly, pass in the file path::
+    or, alternatively, pass in the file path::
         dg_analysis = DriftingGratings('/path/to/my.nwb')
 
     You can also pass in a unit filter dictionary which will only select units with certain properties. For example
@@ -215,7 +215,7 @@ class DriftingGratings(StimulusAnalysis):
         df = df.assign(Ori = self.stimulus_conditions.loc[df.index.values][self._col_ori])
         df = df.sort_values(by=[self._col_ori])
 
-        tuning = np.array(df['spike_mean'].values).astype('complex128')
+        tuning = np.array(df['spike_mean'].values)
 
         if selectivity_type == 'osi':
             return osi(orivals_rad, tuning)
