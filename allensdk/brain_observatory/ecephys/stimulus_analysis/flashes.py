@@ -16,6 +16,9 @@ class Flashes(StimulusAnalysis):
         session = EcephysSession.from_nwb_path('/path/to/my.nwb')
         fl_analysis = Flashes(session)
 
+    or, alternatively, pass in the file path::
+        fl_analysis = Flashes('/path/to/my.nwb')
+
     You can also pass in a unit filter dictionary which will only select units with certain properties. For example
     to get only those units which are on probe C and found in the VISp area::
         fl_analysis = Flashes(session, filter={'location': 'probeC', 'structure_acronym': 'VISp'})

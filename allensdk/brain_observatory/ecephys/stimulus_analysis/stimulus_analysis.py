@@ -93,13 +93,13 @@ class StimulusAnalysis(object):
                 # Older versions of NWB files the stimulus name is in the form stimulus_gratings_N, so if
                 # self._stimulus_names is not explicity specified try to figure out stimulus
                 stims_table = self.ecephys_session.stimulus_presentations
-                print(stims_table['stimulus_name'].unique())
-                print(self._stimulus_key)
+                #print(stims_table['stimulus_name'].unique())
+                #print(self._stimulus_key)
                 stim_names = [s for s in stims_table['stimulus_name'].unique()
                               if s.startswith(self._stimulus_key)]
 
                 self._stim_table = stims_table[stims_table['stimulus_name'].isin(stim_names)]
-                print(stim_names)
+                #print(stim_names)
             else:
                 self._stimulus_names = [self._stimulus_names] if isinstance(self._stimulus_names, string_types) \
                     else self._stimulus_names

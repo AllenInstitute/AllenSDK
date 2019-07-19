@@ -7,7 +7,7 @@ from .stimulus_analysis import StimulusAnalysis
 
 
 class NaturalScenes(StimulusAnalysis):
-     """
+    """
     A class for computing single-unit metrics from the natural scenes stimulus of an ecephys session NWB file.
 
     To use, pass in a EcephysSession object::

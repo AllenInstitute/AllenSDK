@@ -9,7 +9,7 @@ from .stimulus_analysis import StimulusAnalysis, get_fr
 
 
 class DotMotion(StimulusAnalysis):
-     """
+    """
     A class for computing single-unit metrics from the dot motion stimulus of an ecephys session NWB file.
 
     To use, pass in a EcephysSession object::

@@ -234,7 +234,7 @@ class StaticGratings(StimulusAnalysis):
     
 
     def _get_osi(self, unit_id, pref_sf, pref_phase):
-         """ Calculate the orientation selectivity for a given unit
+        """ Calculate the orientation selectivity for a given unit
 
         Params:
         -------
