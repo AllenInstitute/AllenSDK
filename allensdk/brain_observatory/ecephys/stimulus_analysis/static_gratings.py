@@ -38,6 +38,8 @@ class StaticGratings(StimulusAnalysis):
         self._response_events = None
         self._response_trials = None
 
+        self._metrics = None
+
         self._col_ori = 'Ori'
         self._col_sf = 'SF'
         self._col_phase = 'Phase'

@@ -12,6 +12,8 @@ class NaturalMovies(StimulusAnalysis):
     def __init__(self, ecephys_session, **kwargs):
         super(NaturalMovies, self).__init__(ecephys_session, **kwargs)
 
+        self._metrics = None
+
         if self._params is not None:
             self._params = self._params['natural_movies']
             self._stimulus_key = self._params['stimulus_key']

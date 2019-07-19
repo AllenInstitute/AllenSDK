@@ -12,6 +12,8 @@ class DriftingGratings(StimulusAnalysis):
     def __init__(self, ecephys_session, **kwargs):
         super(DriftingGratings, self).__init__(ecephys_session, **kwargs)
 
+        self._metrics = None
+
         self._orivals = None
         self._number_ori = None
         self._tfvals = None
