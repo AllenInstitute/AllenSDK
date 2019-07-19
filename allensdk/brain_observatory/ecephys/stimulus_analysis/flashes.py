@@ -23,9 +23,12 @@ class Flashes(StimulusAnalysis):
         else:
             self._stimulus_key = 'flash_250ms'
 
+        self._trial_duration = 0.25
+
 
     @property
     def colors(self):
+        """ Array of 'color' conditions (black vs. white flash) """
         if self._color is None:
             self._get_stim_table_stats()
 
@@ -34,6 +37,7 @@ class Flashes(StimulusAnalysis):
 
     @property
     def null_condition(self):
+        """ Stimulus condition ID for null stimulus (not used, so set to -1) """
         return -1
     
     @property
@@ -61,7 +65,7 @@ class Flashes(StimulusAnalysis):
             metrics_df['firing_rate_fl'] = [self.get_overall_firing_rate(unit) for unit in unit_ids]
             metrics_df['reliability_fl'] = [self.get_reliability(unit, get_preferred_condition(unit)) for unit in unit_ids]
             metrics_df['fano_fl'] = [self.get_fano_factor(unit, get_preferred_condition(unit)) for unit in unit_ids]
-            metrics_df['lifetime_sparseness_fl'] = [self.get_lifetime_sparesness(unit) for unit in unit_ids]
+            metrics_df['lifetime_sparseness_fl'] = [self.get_lifetime_sparseness(unit) for unit in unit_ids]
             metrics_df.loc[:, ['run_pval_fl', 'run_mod_fl']] = \
                     [self.get_running_modulation(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
 
@@ -72,5 +76,41 @@ class Flashes(StimulusAnalysis):
 
     def _get_stim_table_stats(self):
 
+        """ Extract colors from the stimulus table """
+
         self._colors = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_color] != 'null'][self._col_color].unique())
+
+
+    def _get_sustained_index(self, unit_id):
+
+        """ Calculate the sustained index for a given unit, a measure of the transience of
+        the flash response.
+
+        Params:
+        -------
+        unit_id - unique ID for the unit of interest
+
+        Returns:
+        -------
+        sustained_index - metric
+
+        """
+
+        return np.nan
+
+    def _get_on_off_ratio(self, unit_id):
+
+        """ Calculate the ratio of the on response vs. off response for a given unit
+
+        Params:
+        -------
+        unit_id - unique ID for the unit of interest
+
+        Returns:
+        -------
+        on_off_ratio - metric
+
+        """
+
+        return np.nan
 

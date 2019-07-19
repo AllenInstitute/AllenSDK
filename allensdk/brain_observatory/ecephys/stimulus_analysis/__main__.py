@@ -12,6 +12,11 @@ from ..ecephys_session import EcephysSession
 from .drifting_gratings import DriftingGratings
 from .static_gratings import StaticGratings
 from .natural_scenes import NaturalScenes
+from .natural_movies import NaturalMovies
+from .dot_motion import DotMotion
+from .flashes import Flashes
+from .receptive_field_mapping import ReceptiveFieldMapping
+
 
 def calculate_stimulus_metrics(args):
 
@@ -22,7 +27,11 @@ def calculate_stimulus_metrics(args):
     stimulus_classes = (
                  DriftingGratings,
                  StaticGratings,
-                 NaturalScenes
+                 NaturalScenes,
+                 NaturalMovies,
+                 DotMotion,
+                 Flashes,
+                 ReceptiveFieldMapping
                 )
 
     df = reduce(lambda output, nwb_path: \
@@ -32,7 +41,7 @@ def calculate_stimulus_metrics(args):
                  pd.DataFrame()
                  )
 
-    df.to_pickle(args['output_file'])
+    df.to_csv(args['output_file'])
 
     execution_time = time.time() - start
 

@@ -5,7 +5,7 @@ import scipy.ndimage as ndi
 import scipy.stats as st
 from scipy.optimize import curve_fit
 
-from .stimulus_analysis import StimulusAnalysis, get_fr
+from .stimulus_analysis import StimulusAnalysis, osi, dsi
 
 
 class DriftingGratings(StimulusAnalysis):
@@ -18,11 +18,11 @@ class DriftingGratings(StimulusAnalysis):
         self._number_ori = None
         self._tfvals = None
         self._number_tf = None
-        self._response_events = None
-        self._response_trials = None
 
         self._col_ori = 'Ori'
         self._col_tf = 'TF'
+
+        self._trial_duration = 2.0
 
         if self._params is not None:
             self._params = self._params['drifting_gratings']
@@ -31,15 +31,8 @@ class DriftingGratings(StimulusAnalysis):
             self._stimulus_key = 'drifting_gratings'
 
     @property
-    def metrics_names(self):
-        return [c[0] for c in self.METRICS_COLUMNS]
-
-    @property
-    def metrics_dtypes(self):
-        return [c[1] for c in self.METRICS_COLUMNS]
-
-    @property
     def orivals(self):
+        """ Array of grating orientation conditions """
         if self._orivals is None:
             self._get_stim_table_stats()
 
@@ -47,6 +40,7 @@ class DriftingGratings(StimulusAnalysis):
 
     @property
     def number_ori(self):
+        """ Number of grating orientation conditions """
         if self._number_ori is None:
             self._get_stim_table_stats()
 
@@ -54,6 +48,7 @@ class DriftingGratings(StimulusAnalysis):
 
     @property
     def tfvals(self):
+        """ Array of grating temporal frequency conditions """
         if self._tfvals is None:
             self._get_stim_table_stats()
 
@@ -61,42 +56,15 @@ class DriftingGratings(StimulusAnalysis):
 
     @property
     def number_tf(self):
+        """ Number of grating temporal frequency conditions """
         if self._tfvals is None:
             self._get_stim_table_stats()
 
         return self._number_tf
 
     @property
-    def mean_sweep_events(self):
-        if self._mean_sweep_events is None:
-            # TODO: Should dtype for matrix be uint?
-            self._mean_sweep_events = self.sweep_events.applymap(do_sweep_mean)
-
-        return self._mean_sweep_events
-
-    @property
-    def sweep_p_values(self):
-        if self._sweep_p_values is None:
-            self._sweep_p_values = self.calc_sweep_p_values(offset=2.0)
-
-        return self._sweep_p_values
-
-    @property
-    def response_events(self):
-        if self._response_events is None:
-            self._get_response_events()
-
-        return self._response_events
-
-    @property
-    def response_trials(self):
-        if self._response_trials is None:
-            self._get_response_events()
-
-        return self._response_trials
-
-    @property
     def null_condition(self):
+        """ Stimulus condition ID for null (blank) stimulus """
         return self.stimulus_conditions[self.stimulus_conditions[self._col_tf] == 'null'].index
     
     @property
@@ -126,13 +94,13 @@ class DriftingGratings(StimulusAnalysis):
 
             metrics_df['pref_ori_dg'] = [self._get_pref_ori(unit) for unit in unit_ids]
             metrics_df['pref_tf_dg'] = [self._get_pref_tf(unit) for unit in unit_ids]
-            metrics_df['c50_dg'] = np.nan
+            metrics_df['c50_dg'] = [self._get_c50(unit) for unit in unit_ids]
             metrics_df['f1_f0_dg'] = [self._get_f1_f0(unit) for unit in unit_ids]
             metrics_df['mod_idx_dg'] = [self._get_modulation_index(unit) for unit in unit_ids]
             metrics_df['g_osi_dg'] = [self._get_selectivity(unit, metrics_df.loc[unit]['pref_tf_dg'], 'osi') for unit in unit_ids]
             metrics_df['g_dsi_dg'] = [self._get_selectivity(unit, metrics_df.loc[unit]['pref_tf_dg'], 'dsi') for unit in unit_ids]
             metrics_df['firing_rate_dg'] = [self.get_overall_firing_rate(unit) for unit in unit_ids]
-            metrics_df['reliability_dg'] = [self._get_reliability(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+            metrics_df['reliability_dg'] = [self.get_reliability(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
             metrics_df['fano_dg'] = [self.get_fano_factor(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
             metrics_df['lifetime_sparseness_dg'] = [self.get_lifetime_sparseness(unit) for unit in unit_ids]
             metrics_df.loc[:, ['run_pval_dg', 'run_mod_dg']] = \
@@ -145,6 +113,8 @@ class DriftingGratings(StimulusAnalysis):
 
     def _get_stim_table_stats(self):
 
+        """ Extract orientations and temporal frequencies from the stimulus table """
+
         self._orivals = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_ori] != 'null'][self._col_ori].unique())
         self._number_ori = len(self._orivals)
 
@@ -153,6 +123,18 @@ class DriftingGratings(StimulusAnalysis):
 
 
     def _get_pref_ori(self, unit_id):
+
+        """ Calculate the preferred orientation condition for a given unit
+
+        Params:
+        -------
+        unit_id - unique ID for the unit of interest
+
+        Returns:
+        -------
+        pref_ori - stimulus orientation driving the maximal response
+
+        """
 
         similar_conditions = [self.stimulus_conditions.index[self.stimulus_conditions[self._col_tf] == tf].tolist() for tf in self.tfvals]
         df = pd.DataFrame(index=self.tfvals,
@@ -163,7 +145,20 @@ class DriftingGratings(StimulusAnalysis):
 
         return df.idxmax()
 
+
     def _get_pref_tf(self, unit_id):
+
+        """ Calculate the preferred temporal frequency condition for a given unit
+
+        Params:
+        -------
+        unit_id - unique ID for the unit of interest
+
+        Returns:
+        -------
+        pref_tf - stimulus temporal frequency driving the maximal response
+
+        """
 
         similar_conditions = [self.stimulus_conditions.index[self.stimulus_conditions[self._col_ori] == ori].tolist() for ori in self.orivals]
         df = pd.DataFrame(index=self.orivals,
@@ -175,14 +170,20 @@ class DriftingGratings(StimulusAnalysis):
         return df.idxmax()
 
 
-
-
     def _get_selectivity(self, unit_id, pref_tf, selectivity_type='osi'):
-        """computes orientation and direction selectivity (cv) for a particular unit
 
-        :param unit_id: ID for the unit of interest
-        :param pref_tf: preferred temporal frequency for this unit
-        :return:
+        """ Calculate the orientation or direction selectivity for a given unit
+
+        Params:
+        -------
+        unit_id - unique ID for the unit of interest
+        pref_tf - preferred temporal frequency for this unit
+        selectivity_type - 'osi' or 'dsi'
+
+        Returns:
+        -------
+        selectivity - orientation or direction selectivity value
+
         """
         orivals_rad = np.deg2rad(self.orivals)
         
@@ -194,95 +195,138 @@ class DriftingGratings(StimulusAnalysis):
         tuning = df['spike_mean'].values
 
         if selectivity_type == 'osi':
-            return _osi(orivals_rad, tuning)
+            return osi(orivals_rad, tuning)
         elif selectivity_type == 'dsi':
-            return _dsi(orivals_rad, tuning)
+            return dsi(orivals_rad, tuning)
 
 
-    def _osi(self, orivals, tuning):
-        """Computes orientation selectivity for a tuning curve 
+
+    def _get_f1_f0(self, unit_id):
+        """ Calculate F1/F0 for a given unit
+
+        A measure of how tightly locked a unit's firing rate is to the cycles of a drifting grating
+
+        Params:
+        -------
+        unit_id - unique ID for the unit of interest
+
+        Returns:
+        -------
+        f1_f0 - metric
 
         """
 
-        cv_top = tuning * np.exp(1j * 2 * orivals)
-        return np.abs(cv_top.sum()) / tuning.sum()
+        return np.nan
 
+    def _get_modulation_index(self, unit_id):
+        """ Calculate modulation index for a given unit.
 
-    def _dsi(self, orivals, tuning):
-        """Computes direction selectivity for a tuning curve 
+        Similar to F1/F0
+
+        Params:
+        -------
+        unit_id - unique ID for the unit of interest
+
+        Returns:
+        -------
+        modulation_index - metric
 
         """
 
-        cv_top = tuning * np.exp(1j * orivals)
-        return np.abs(cv_top.sum()) / tuning.sum()
+        return np.nan
 
+    def _get_c50(self, unit_id):
+        """ Calculate C50 for a given unit.
 
-    def _get_reliability(self, unit_id, preferred_condition):
-        """Computes trial-to-trial reliability of units at their preferred condition
+        Only valid if the contrast tuning stimulus is present
+        Otherwise, return NaN value
 
-        :param pref_ori:
-        :param pref_tf:
-        :param v:
-        :return:
+        Params:
+        -------
+        unit_id - unique ID for the unit of interest
+
+        Returns:
+        -------
+        c50 - metric
+
         """
 
-        subset = self.presentationwise_statistics[
-                    self.presentationwise_statistics['stimulus_condition_id'] == preferred_condition
-                    ].xs(unit_id, level=1)['spike_counts'].values
-        subset += 1
-
-        corr_matrix = np.empty((len(subset), len(subset)))
-        for i in range(len(subset)):
-            fri = get_fr(subset[i])
-            for j in range(len(subset)):
-                frj = get_fr(subset[j])
-                # TODO: Is there a reason this method get fr[30:] and the another stim analysis classes gets fr[30:40]?
-                #    We could consolidate this method across all the classes.
-                r, p = st.pearsonr(fri[30:], frj[30:])
-                corr_matrix[i, j] = r
-
-        inds = np.triu_indices(len(subset), k=1)
-        upper = corr_matrix[inds[0], inds[1]]
-        return np.nanmean(upper)
+        return np.nan
 
 
-    def _get_tfdi(self, pref_ori, nc):
-        """Computes temporal frequency discrimination index for cell
+    def _get_tfdi(self, unit_id, pref_ori):
+        """ Calculate temporal frequency discrimination index for a given unit
 
-        :param pref_ori:
-        :param nc:
-        :return: tf discrimination index
+        Only valid if the contrast tuning stimulus is present
+        Otherwise, return NaN value
+
+        Params:
+        -------
+        unit_id - unique ID for the unit of interest
+        pref_ori - preferred orientation for that cell
+
+        Returns:
+        -------
+        tfdi - metric
+
         """
+
+        ### NEEDS TO BE UPDATED FOR NEW ADAPTER
+
         v = list(self.spikes.keys())[nc]
         tf_tuning = self.response_events[pref_ori, 1:, nc, 0]
         trials = self.mean_sweep_events[(self.stim_table['Ori'] == self.orivals[pref_ori])][v].values
         sse_part = np.sqrt(np.sum((trials-trials.mean())**2)/(len(trials)-5))
         return (np.ptp(tf_tuning))/(np.ptp(tf_tuning) + 2*sse_part)
 
-    def _get_suppressed_contrast(self, pref_ori, pref_tf, nc):
-        """Computes two metrics to be used to identify cells that are suppressed by contrast
 
-        :param pref_ori:
-        :param pref_tf:
-        :param nc:
-        :return:
+    def _get_suppressed_contrast(self, unit_id, pref_ori, pref_tf):
+        """ Calculate two metrics used to determine if a unit is suppressed by contrast
+
+        Params:
+        -------
+        unit_id - unique ID for the unit of interest
+        pref_ori - preferred orientation for that cell
+        pref_tf - preferred temporal frequency for that cell
+
+        Returns:
+        -------
+        peak_blank - metric
+        all_blank - metric
+
         """
+
+        ### NEEDS TO BE UPDATED FOR NEW ADAPTER
+
         blank = self.response_events[0, 0, nc, 0]
         peak = self.response_events[pref_ori, pref_tf+1, nc, 0]
         all_resp = self.response_events[:, 1:, nc, 0].mean()
         peak_blank = peak - blank
         all_blank = all_resp - blank
+        
         return peak_blank, all_blank
 
-    def _fit_tf_tuning(self, pref_ori, pref_tf, nc):
-        """Performs gaussian or exponential fit on the temporal frequency tuning curve at preferred orientation.
 
-        :param pref_ori:
-        :param pref_tf:
-        :param nc:
-        :return: index for the preferred tf from the curve fit, prefered tf from the curve fit, low cutoff tf from the
-        curve fit, high cutoff tf from the curve fit
+    def _fit_tf_tuning(self, unit_id, pref_ori, pref_tf):
+
+        """ Performs Gaussian or exponential fit on the temporal frequency tuning curve at the preferred orientation.
+
+        Params:
+        -------
+        unit_id - unique ID for the unit of interest
+        pref_ori - preferred orientation for that cell
+        pref_tf - preferred temporal frequency for that cell
+
+        Returns:
+        -------
+        fit_tf_ind - metric
+        fit_tf - metric
+        tf_low_cutoff - metric
+        tf_high_cutoff - metric
         """
+
+        ### NEEDS TO BE UPDATED FOR NEW ADAPTER
+
         tf_tuning = self.response_events[pref_ori, 1:, nc, 0]
         fit_tf_ind = np.NaN
         fit_tf = np.NaN
@@ -327,9 +371,6 @@ class DriftingGratings(StimulusAnalysis):
                 pass
         return fit_tf_ind, fit_tf, tf_low_cutoff, tf_high_cutoff
 
-
-def do_sweep_mean(x):
-    return len(x[x > 0.])/2.0
 
 
 def gauss_function(x, a, x0, sigma):

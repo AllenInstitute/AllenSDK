@@ -38,11 +38,6 @@ class StimulusAnalysis(object):
         self._preferred_condition = {}
 
 
-
-        # An padding of time to look back when gathering events belong to a given stimulus, used by sweep_events and
-        # get_reliability
-        self._sweep_pre_time = kwargs.get('sweep_pre_time', 1.0)
-
     @property
     def ecephys_session(self):
         return self._ecephys_session
@@ -80,17 +75,6 @@ class StimulusAnalysis(object):
                 self._spikes = {k: v for k, v in self._spikes.items() if k in self.unit_ids}
 
         return self._spikes
-
-    @property
-    def dxcm(self):
-        """Returns an array of session running-speed velocities"""
-        return self.ecephys_session.running_speed.values
-
-    @property
-    def dxtime(self):
-        """Returns an array of session running speed timestamps"""
-        return self._ecephys_session.running_speed.timestamps
-    
 
     @property
     def stim_table(self):
@@ -171,6 +155,28 @@ class StimulusAnalysis(object):
     @property
     def null_condition(self):
         raise NotImplementedError()
+
+
+
+    @property
+    def conditionwise_psth(self):
+        """ Construct a PSTH for each stimulus condition, by unit
+
+        Returns
+        =======
+        pd.DataFrame :
+            MultiIndex : unit_id, stimulus_condition_id
+            Columns : spike_count, spike_mean, spike_sem, spike_std, stimulus_presentation_count
+
+        """
+
+        if self._conditionwise_statistics is None:
+
+            self._conditionwise_statistics = \
+                    self.ecephys_session.conditionwise_spike_statistics(self.stim_table.index.values,
+                        self.unit_ids)
+
+        return self._conditionwise_statistics
 
 
     @property
@@ -265,11 +271,6 @@ class StimulusAnalysis(object):
                         ).rename_axis('stimulus_presentation_id')
 
         return self._running_speed
-
-    @property
-    def mean_sweep_events(self):
-        """The mean values for sweep-events"""
-        raise NotImplementedError()
 
     @property
     def sweep_p_values(self):
@@ -367,16 +368,6 @@ class StimulusAnalysis(object):
         else:
             return np.NaN, np.NaN
 
-    def get_lifetime_sparseness(self, unit_id):
-        """Computes lifetime sparseness of responses for one unit
-        :return:
-        """
-        df = self.conditionwise_statistics.drop(index=self.null_condition, level=1)
-        responses = df.loc[unit_id]['spike_count'].values 
-
-        return lifetime_sparseness(responses)
-
-
     def get_preferred_condition(self, unit_id):
 
         if unit_id not in self._preferred_condition:
@@ -393,7 +384,48 @@ class StimulusAnalysis(object):
                                    index=self.unit_ids).rename_axis('unit_id')
 
 
-def get_reliability(unit_sweeps, padding=1.0, num_timestep_second=30, filter_width=0.1, window_beg=0, window_end=None):
+    def get_lifetime_sparseness(self, unit_id):
+        """Computes lifetime sparseness of responses for one unit
+        :return:
+        """
+        df = self.conditionwise_statistics.drop(index=self.null_condition, level=1)
+        responses = df.loc[unit_id]['spike_count'].values 
+
+        return lifetime_sparseness(responses)
+
+    def get_fano_factor(self, unit_id, preferred_condition):
+
+        # Fano factor calculation goes here:
+        #   Equal to variance of spike rate divided by the mean spike rate
+        #   See: https://en.wikipedia.org/wiki/Fano_factor
+
+        return np.nan
+
+
+    def get_time_to_peak(self, unit_id, preferred_condition):
+
+        # Time-to-peak calculation goes here:
+        #   Equal to the time of the maximum firing rate of the average PSTH at the preferred condition
+
+        return np.nan
+
+    def get_reliability(self, unit_id, preferred_condition):
+
+        # Reliability calculation goes here:
+        #   Depends on the trial-to-trial correlation of the smoothed response
+        #   What smoothing window is appropriate for ephys? We need to test this more
+
+        return np.nan
+
+    def get_overall_firing_rate(self, unit_id):
+
+        # Firing rate calculation goes here:
+        #   This is the average firing rate over the entire stimulus interval
+
+        return np.nan
+
+
+def reliability(unit_sweeps, padding=1.0, num_timestep_second=30, filter_width=0.1, window_beg=0, window_end=None):
     """Computes the trial-to-trial reliability for a set of sweeps for a given cell
 
     :param unit_sweeps:
@@ -439,15 +471,30 @@ def get_fr(spikes, num_timestep_second=30, sweep_length=3.1, filter_width=0.1):
 
 
 def lifetime_sparseness(responses):
-    """Computes the lifetime sparseness across all the (mean) responses. See Olsen & Wilson 2008.
+    """Computes the lifetime sparseness for one unit. See Olsen & Wilson 2008.
 
-    :param response_data: A floating-point vector/matrix of dimension N-Responses x M-Cells of the response values
-        to the different stimuli.
-    :return: An array of size M-Cells that calculates the lifetime sparseness for each cell.
+    :param responses: A floating-point vector of N responses for one unit
+    :return: The lifetime sparseness for one unit
     """
-    if responses.ndim == 1:
-        # In the (rare) case their is only one cell, turn into a Mx1 matrix the function belows returns a 1x1 array
-        # instead of scalar.
-        responses = np.array([responses]).T
-    coeff = 1.0/responses.shape[0]
-    return (1.0 - coeff*((np.power(responses.sum(axis=0), 2)) / (np.power(responses, 2).sum(axis=0)))) / (1.0 - coeff)
+
+    coeff = 1.0/len(responses)
+
+    return (1.0 - coeff*((np.power(np.sum(responses)), 2)) / (np.sum(np.power(responses, 2)))) / (1.0 - coeff)
+
+
+def osi(self, orivals, tuning):
+    """Computes orientation selectivity for a tuning curve 
+
+    """
+
+    cv_top = tuning * np.exp(1j * 2 * orivals)
+    return np.abs(cv_top.sum()) / tuning.sum()
+
+
+def dsi(self, orivals, tuning):
+    """Computes direction selectivity for a tuning curve 
+
+    """
+
+    cv_top = tuning * np.exp(1j * orivals)
+    return np.abs(cv_top.sum()) / tuning.sum()

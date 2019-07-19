@@ -20,6 +20,8 @@ class NaturalScenes(StimulusAnalysis):
 
         self._col_image = 'Image'
 
+        self._trial_duration = 0.25
+
         if self._params is not None:
             self._params = self._params['natural_scenes']
             self._stimulus_key = self._params['stimulus_key']
@@ -28,6 +30,7 @@ class NaturalScenes(StimulusAnalysis):
 
     @property
     def images(self):
+        """ Array of iamge labels """
         if self._images is None:
             self._get_stim_table_stats()
 
@@ -35,11 +38,12 @@ class NaturalScenes(StimulusAnalysis):
 
     @property
     def frames(self):
-        # here to deal with naming difference between NWB 1 and 2
+        # Required to deal with naming difference between NWB 1 and 2
         return self.images
 
     @property
     def number_images(self):
+        """ Number of images shown """
         if self._images is None:
             self._get_stim_table_stats()
 
@@ -47,7 +51,7 @@ class NaturalScenes(StimulusAnalysis):
 
     @property
     def number_nonblank(self):
-        # Some analysis function include -1 (119 values), others exlude it
+        """ Number of images shown (excluding blank condition) """
         if self._number_nonblank is None:
             self._get_stim_table_stats()
 
@@ -55,6 +59,7 @@ class NaturalScenes(StimulusAnalysis):
 
     @property
     def null_condition(self):
+        """ Stimulus condition ID for null (blank) stimulus """
         return self.stimulus_conditions[self.stimulus_conditions[self._col_image] == -1].index
 
     @property
@@ -81,11 +86,11 @@ class NaturalScenes(StimulusAnalysis):
             metrics_df['pref_image_ns'] = [self.get_preferred_condition(unit) for unit in unit_ids]
             metrics_df['image_selectivity_ns'] = [self._get_image_selectivity(unit) for unit in unit_ids]
             metrics_df['firing_rate_ns'] = [self.get_overall_firing_rate(unit) for unit in unit_ids]
-            metrics_df['fano_ns'] = [self.get_fano_factor]
+            metrics_df['fano_ns'] = [self.get_fano_factor(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
             metrics_df['time_to_peak_ns'] = [self.get_time_to_peak(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
             metrics_df['reliability_ns'] = [self.get_reliability(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
-            metrics_df['lifetime_sparseness_ns'] = [self.get_lifetime_sparesness(unit) for unit in unit_ids]
-            metrics_df.loc[:, ['run_pval_dg', 'run_mod_dg']] = \
+            metrics_df['lifetime_sparseness_ns'] = [self.get_lifetime_sparseness(unit) for unit in unit_ids]
+            metrics_df.loc[:, ['run_pval_ns', 'run_mod_ns']] = \
                     [self.get_running_modulation(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
 
             self._metrics = metrics_df
@@ -95,19 +100,27 @@ class NaturalScenes(StimulusAnalysis):
 
     def _get_stim_table_stats(self):
 
+        """ Extract image labels from the stimulus table """
+
         self._images = np.sort(self.stimulus_conditions[self._col_image].unique()).astype(np.int64)
         self._number_images = len(self._images)
         self._number_nonblank = len(self._images[self._images >= 0])
 
 
-    def _get_image_selectivity(self, nc):
-        """Calculates the image selectivity for cell
+    def _get_image_selectivity(self, unit_id):
+        """ Calculate the image selectivity for a given unit
 
-        # needs to be updated!
+        Params:
+        -------
+        unit_id - unique ID for the unit of interest
 
-        :param nc:
-        :return:
+        Returns:
+        -------
+        image_selectivity - metric
+
         """
+
+        ### NEEDS TO BE UPDATED FOR NEW ADAPTER
 
         fmin = self.response_events[1:, nc, 0].min()
         fmax = self.response_events[1:, nc, 0].max()
@@ -123,36 +136,3 @@ class NaturalScenes(StimulusAnalysis):
             rtj[j] = theta.mean()
         biga = rtj.mean()
         return 1 - (2*biga)
-
-
-    def _get_running_modulation(self, pref_image, v):
-        """Computes running modulation of cell at its preferred condition provided there are at least 2 trials for both
-        stationary and running conditions
-
-        :param pref_image:
-        :param v:
-        :return: p_value of running modulation, running modulation metric, mean response to preferred condition when
-        running, mean response to preferred condition when stationary
-        """
-        subset = self.mean_sweep_events[(self.stim_table['Image'] == pref_image)]
-        speed_subset = self.running_speed[(self.stim_table['Image'] == pref_image)]
-
-        subset_run = subset[speed_subset.running_speed >= 1]
-        subset_stat = subset[speed_subset.running_speed < 1]
-        if np.logical_and(len(subset_run) > 1, len(subset_stat) > 1):
-            run = subset_run[v].mean()
-            stat = subset_stat[v].mean()
-            if run > stat:
-                run_mod = (run - stat)/run
-            elif stat > run:
-                run_mod = -1 * (stat - run)/stat
-            else:
-                run_mod = 0
-            (_, p) = st.ttest_ind(subset_run[v], subset_stat[v], equal_var=False)
-            return p, run_mod, run, stat
-        else:
-            return np.NaN, np.NaN, np.NaN, np.NaN
-
-
-def do_sweep_mean_shifted(x):
-    return len(x[(x > 0.066) & (x < 0.316)])/0.25

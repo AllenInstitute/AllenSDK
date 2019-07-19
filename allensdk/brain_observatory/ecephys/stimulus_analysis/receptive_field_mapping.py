@@ -5,7 +5,7 @@ import scipy.ndimage as ndi
 import scipy.stats as st
 from scipy.optimize import curve_fit
 
-from .stimulus_analysis import StimulusAnalysis, get_fr
+from .stimulus_analysis import StimulusAnalysis
 
 
 class ReceptiveFieldMapping(StimulusAnalysis):
@@ -20,18 +20,17 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         self._col_pos_x = 'Pos_x'
         self._col_pos_y = 'Pos_y'
 
+        self._trial_duration = 0.25
+
         if self._params is not None:
             self._params = self._params['receptive_field_mapping']
             self._stimulus_key = self._params['stimulus_key']
         else:
             self._stimulus_key = 'gabor_20_deg_250ms_0'
 
-
-    
-
-
     @property
     def elevations(self):
+        """ Array of stimulus elevations """
         if self._pos_y is None:
             self._get_stim_table_stats()
 
@@ -39,19 +38,20 @@ class ReceptiveFieldMapping(StimulusAnalysis):
 
     @property
     def azimuths(self):
+        """ Array of stimulus azimuths """
         if self._pos_x is None:
             self._get_stim_table_stats()
 
         return self._pos_x
 
-
     @property
     def null_condition(self):
+        """ Stimulus condition ID for null stimulus (not used, so set to -1) """
         return -1
 
     @property
     def receptive_fields(self):
-
+        """ Spatial receptive fields for N units (9 x 9 x N matrix of responses) """
         if self._rf_matrix is None:
 
             bin_edges = np.linspace(0, 0.249, 249)
@@ -108,7 +108,7 @@ class ReceptiveFieldMapping(StimulusAnalysis):
             metrics_df['fano_rf'] = [self.get_fano_factor(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
             metrics_df['time_to_peak_rf'] = [self.get_time_to_peak(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
             metrics_df['reliability_rf'] = [self.get_reliability(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
-            metrics_df['lifetime_sparseness_rf'] = [self.get_lifetime_sparesness(unit) for unit in unit_ids]
+            metrics_df['lifetime_sparseness_rf'] = [self.get_lifetime_sparseness(unit) for unit in unit_ids]
             metrics_df.loc[:, ['run_pval_rf', 'run_mod_rf']] = \
                     [self.get_running_modulation(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
 
@@ -119,13 +119,27 @@ class ReceptiveFieldMapping(StimulusAnalysis):
 
     def _get_stim_table_stats(self):
 
+        """ Extract azimuths and elevations from stimulus table."""
+
         self._pos_y = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_pos_y] != 'null'][self._col_pos_y].unique())
         self._pos_x = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_pos_x] != 'null'][self._col_pos_x].unique())
 
 
     def _get_rf(self, unit_id):
 
-        return self._rf_matrix['spike_count'].sel(unit_id=unit_id).data
+        """ Extract the receptive field for one unit
+
+        Params:
+        -------
+        unit_id - unique ID for the unit of interest
+
+        Returns:
+        -------
+        receptive_field - 9 x 9 numpy array
+
+        """
+
+        return self.receptive_fields['spike_count'].sel(unit_id=unit_id).data
 
 
     def _response_by_stimulus_position(
@@ -133,6 +147,20 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         row_key='Pos_y', column_key='Pos_x',
         unit_key='unit_id', time_key='time_relative_to_stimulus_onset',
         spike_count_key='spike_count'):
+
+        """ Calculate the unit's response to different locations
+        of the Gabor patch
+
+        Params:
+        -------
+        dataset - xarray dataset of binned spike counts for each trial
+        presentations - list of presentation_ids
+
+        Returns:
+        -------
+        dataset - xarray dataset of receptive fields
+
+        """
 
         dataset = dataset.copy()
         dataset['spike_counts'] = dataset['spike_counts'].sum(dim=time_key)
@@ -149,6 +177,26 @@ class ReceptiveFieldMapping(StimulusAnalysis):
 
     def _get_rf_stats(self, unit_id):
 
+        """ Calculate a variety of metrics for one unit's receptive field
+
+        Params:
+        -------
+        unit_id - unique ID for the unit of interest
+
+        Returns:
+        -------
+        azimuth - preferred azimuth
+        elevation - preferred elevation
+        width - receptive field width 
+        height - receptive field height
+        area - receptive field area
+        exists - True if significant receptive field is present
+        on_screen - True if the receptive field is away from the screen edge
+
+        """
+
         RF = _get_rf(unit_id)
+
+        """ Calculation goes here """
 
         return azimuth, elevation, width, height, area, exists, on_screen

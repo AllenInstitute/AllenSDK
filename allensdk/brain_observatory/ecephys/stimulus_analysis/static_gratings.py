@@ -5,7 +5,7 @@ from scipy.optimize import curve_fit
 from functools import partial
 
 from .stimulus_analysis import StimulusAnalysis
-from .stimulus_analysis import get_lifetime_sparseness, get_osi, get_reliability, get_running_modulation
+from .stimulus_analysis import osi
 
 
 class StaticGratings(StimulusAnalysis):
@@ -43,6 +43,7 @@ class StaticGratings(StimulusAnalysis):
         self._col_ori = 'Ori'
         self._col_sf = 'SF'
         self._col_phase = 'Phase'
+        self._trial_duration = 0.25
 
         # Used to determine responsivness metric and if their is enough activity to try to fit a cell's sf values.
         # TODO: Figure out how this value existed, possibly make it a user parameter?
@@ -131,7 +132,7 @@ class StaticGratings(StimulusAnalysis):
             metrics_df['g_osi_sg'] = [self._get_osi(unit, metrics_df.loc[unit]['pref_sf_dg'], metrics_df.loc[unit]['pref_phase_sg']) for unit in unit_ids]
             metrics_df['time_to_peak_sg'] = [self.get_time_to_peak(unit, self.get_preferred_condition(unit)) for unit in unit_ids]  
             metrics_df['firing_rate_sg'] = [self.get_overall_firing_rate(unit) for unit in unit_ids]
-            metrics_df['reliability_sg'] = [self._get_reliability(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+            metrics_df['reliability_sg'] = [self.get_reliability(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
             metrics_df['fano_sg'] = [self.get_fano_factor(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
             metrics_df['lifetime_sparseness_sg'] = [self.get_lifetime_sparseness(unit) for unit in unit_ids]
             metrics_df.loc[:, ['run_pval_sg', 'run_mod_sg']] = \
@@ -205,9 +206,7 @@ class StaticGratings(StimulusAnalysis):
 
         tuning = df['spike_mean'].values
 
-        cv_top = tuning * np.exp(1j * 2 * orivals_rad)
-
-        return np.abs(cv_top.sum()) / tuning.sum()
+        return osi(orivals_rad, tuning)
 
 
 def fit_sf_tuning(sf_tuning_responses, sf_values, pref_sf_index):
