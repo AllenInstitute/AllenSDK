@@ -147,7 +147,19 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             """
                 {%- import 'postgres_macros' as pm -%}
                 {%- import 'macros' as m -%}
-                select es.* from ecephys_sessions es
+                select 
+                    stimulus_name as stimulus_set_name,
+                    sp.id as specimen_id, 
+                    es.id as ecephys_session_id, 
+                    dn.full_genotype as genotype,
+                    gd.name as gender, 
+                    ages.name as age,
+                    pr.code as project_code
+                from ecephys_sessions es 
+                join specimens sp on sp.id = es.specimen_id 
+                join donors dn on dn.id = sp.donor_id 
+                join genders gd on gd.id = dn.gender_id 
+                join ages on ages.id = dn.age_id
                 join projects pr on pr.id = es.project_id
                 where true
                 {{pm.optional_contains('es.id', session_ids) -}}
