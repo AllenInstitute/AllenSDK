@@ -10,20 +10,21 @@ from .stimulus_analysis import osi, deg2rad
 
 class StaticGratings(StimulusAnalysis):
     """
-    A class for getting single-cell metrics from the static-gratings stimulus of an ecephys session nwb file.
+    A class for computing single-unit metrics from the static gratings stimulus of an ecephys session NWB file.
 
     To use, pass in a EcephysSession object::
         session = EcephysSession.from_nwb_path('/path/to/my.nwb')
         sg_analysis = StaticGratings(session)
 
-    You can also pass in a cell filter dictionary which will only select cells with certain properties. For example
+    You can also pass in a unit filter dictionary which will only select units with certain properties. For example
     to get only those units which are on probe C and found in the VISp area::
         sg_analysis = StaticGratings(session, filter={'location': 'probeC', 'structure_acronym': 'VISp'})
 
-    To get a table of the individual cell metrics ranked by unit-id::
+    To get a table of the individual unit metrics ranked by unit ID::
         metrics_table_df = sg_analysis.metrics()
 
     """
+
     def __init__(self, ecephys_session, **kwargs):
         super(StaticGratings, self).__init__(ecephys_session, **kwargs)
         self._orivals = None

@@ -9,6 +9,22 @@ from .stimulus_analysis import StimulusAnalysis, get_fr
 
 
 class Flashes(StimulusAnalysis):
+    """
+    A class for computing single-unit metrics from the full-field flash stimulus of an ecephys session NWB file.
+
+    To use, pass in a EcephysSession object::
+        session = EcephysSession.from_nwb_path('/path/to/my.nwb')
+        fl_analysis = Flashes(session)
+
+    You can also pass in a unit filter dictionary which will only select units with certain properties. For example
+    to get only those units which are on probe C and found in the VISp area::
+        fl_analysis = Flashes(session, filter={'location': 'probeC', 'structure_acronym': 'VISp'})
+
+    To get a table of the individual unit metrics ranked by unit ID::
+        metrics_table_df = fl_analysis.metrics()
+
+    """
+
     def __init__(self, ecephys_session, **kwargs):
         super(Flashes, self).__init__(ecephys_session, **kwargs)
 

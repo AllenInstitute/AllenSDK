@@ -7,6 +7,22 @@ from .stimulus_analysis import StimulusAnalysis
 
 
 class NaturalScenes(StimulusAnalysis):
+     """
+    A class for computing single-unit metrics from the natural scenes stimulus of an ecephys session NWB file.
+
+    To use, pass in a EcephysSession object::
+        session = EcephysSession.from_nwb_path('/path/to/my.nwb')
+        ns_analysis = NaturalScenes(session)
+
+    You can also pass in a unit filter dictionary which will only select units with certain properties. For example
+    to get only those units which are on probe C and found in the VISp area::
+        ns_analysis = NaturalScenes(session, filter={'location': 'probeC', 'structure_acronym': 'VISp'})
+
+    To get a table of the individual unit metrics ranked by unit ID::
+        metrics_table_df = ns_analysis.metrics()
+
+    """
+
     def __init__(self, ecephys_session, **kwargs):
         super(NaturalScenes, self).__init__(ecephys_session, **kwargs)
 
