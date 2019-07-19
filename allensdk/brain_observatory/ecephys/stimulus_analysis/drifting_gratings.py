@@ -28,13 +28,14 @@ class DriftingGratings(StimulusAnalysis):
         else:
             self._stimulus_key = 'drifting_gratings'
 
-    METRICS_COLUMNS = [('unit_id', np.uint64), ('pref_ori_dg', np.float64), ('pref_tf_dg', np.float64),
-                 ('num_pref_trials_dg', np.uint64), ('responsive_dg', bool), ('g_osi_dg', np.float64),
-                 ('g_dsi_dg', np.float64), ('tfdi_dg', np.float64), ('reliability_dg', np.float64),
-                 ('lifetime_sparseness_dg', np.float64), ('fit_tf_dg', np.float64), ('fit_tf_ind_dg', np.float64),
-                 ('tf_low_cutoff_dg', np.float64), ('tf_high_cutoff_dg', np.float64), ('run_pval_dg', np.float64),
-                 ('run_resp_dg', np.float64), ('stat_resp_dg', np.float64), ('run_mod_dg', np.float64),
-                 ('peak_blank_dg', np.float64), ('all_blank_dg', np.float64)]
+    @property
+    def METRICS_COLUMNS(self):
+        return [('pref_ori_dg', np.float64), ('pref_tf_dg', np.float64), ('c50_dg', np.float64),
+                 ('f1_f0_dg', np.float64), ('mod_idx_dg', np.float64),
+                 ('g_osi_dg', np.float64), ('g_dsi_dg', np.float64), 
+                 ('firing_rate_dg', np.float64), ('reliability_dg', np.float64),
+                 ('fano_dg', np.float64), ('lifetime_sparseness_dg', np.float64), ('run_pval_dg', np.float64),
+                 ('run_mod_dg', np.float64)]
 
     @property
     def metrics_names(self):

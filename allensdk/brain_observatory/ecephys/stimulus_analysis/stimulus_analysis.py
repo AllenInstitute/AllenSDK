@@ -113,6 +113,18 @@ class StimulusAnalysis(object):
         return self._stim_table
 
     @property
+    def metrics_names(self):
+        return [c[0] for c in self.METRICS_COLUMNS]
+
+    @property
+    def metrics_dtypes(self):
+        return [c[1] for c in self.METRICS_COLUMNS]
+
+    @property
+    def METRICS_COLUMNS(self):
+        raise NotImplementedError
+
+    @property
     def stim_table_spontaneous(self):
         """Returns a stimulus table with only 'spontaneous' stimulus selected."""
         # Used by sweep_p_events for creating null dist.

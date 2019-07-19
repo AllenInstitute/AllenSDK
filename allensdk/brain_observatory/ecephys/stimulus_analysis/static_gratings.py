@@ -124,22 +124,13 @@ class StaticGratings(StimulusAnalysis):
 
         return self._response_trials
 
-    # Ran into issues with pandas 'deciding' certain floating point metrics are either ints or objects and messing
-    # up the analysis. Explicity define the data-types.
-    METRICS_COLUMNS = [('unit_id', np.uint64), ('pref_ori_sg', np.float64), ('pref_sf_sg', np.float64),
-                 ('pref_phase_sg', np.float64), ('num_pref_trials_sg', np.uint64), ('responsive_sg', np.bool),
-                 ('g_osi_sg', np.float64), ('sfdi_sg', np.float64), ('reliability_sg', np.float64),
-                 ('lifetime_sparseness_sg', np.float64), ('fit_sf_sg', np.float64), ('fit_sf_ind_sg', np.float64),
-                 ('sf_low_cutoff_sg', np.float64), ('sf_high_cutoff_sg', np.float64), ('run_pval_sg', np.float64),
-                 ('run_mod_sg', np.float64), ('run_resp_sg', np.float64), ('stat_resp_sg', np.float64)]
-
     @property
-    def metrics_names(self):
-        return [c[0] for c in self.PEAK_COLS]
-
-    @property
-    def metrics_dtypes(self):
-        return [c[1] for c in self.PEAK_COLS]
+    def METRICS_COLUMNS(self):
+        return [('pref_sf_sg', np.float64), ('pref_ori_sg', np.float64), ('pref_phase_sg', np.float64),
+                 ('g_osi_sg', np.float64), ('time_to_peak_sg', np.float64),
+                 ('firing_rate_sg', np.float64), ('reliability_sg', np.float64),
+                 ('fano_sg', np.float64), ('lifetime_sparseness_sg', np.float64), ('run_pval_sg', np.float64),
+                 ('run_mod_sg', np.float64)]
 
     @property
     def metrics(self):
@@ -154,9 +145,6 @@ class StaticGratings(StimulusAnalysis):
             metrics_df['fit_sf_ind_sg'] = np.nan
             metrics_df['sf_low_cutoff_sg'] = np.nan
             metrics_df['sf_high_cutoff_sg'] = np.nan
-
-            # TODO: Make unit_id the df index?
-            metrics_df['unit_id'] = list(self.spikes.keys())
 
             # calculate the lifetime sparsness across all responses for every cell
             responses = self.response_events[:, 1:, :, :, 0].reshape(self.number_phase*self.number_ori*self.number_sf,

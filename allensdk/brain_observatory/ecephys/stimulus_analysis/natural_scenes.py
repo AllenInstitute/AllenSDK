@@ -26,18 +26,14 @@ class NaturalScenes(StimulusAnalysis):
         else:
             self._stimulus_key = 'Natural Images'
 
-    METRICS_COLUMNS = [('unit_id', np.uint64), ('pref_image_ns', np.uint64), ('num_pref_trials_ns', np.uint64),
-                 ('responsive_ns', bool), ('image_selectivity_ns', np.float64), ('reliability_ns', np.float64),
-                 ('lifetime_sparseness_ns', np.float64), ('run_pval_ns', np.float64), ('run_mod_ns', np.float64),
-                 ('run_resp_ns', np.float64), ('stat_resp_ns', np.float64)]
 
     @property
-    def metrics_names(self):
-        return [c[0] for c in self.METRICS_COLUMNS]
-
-    @property
-    def metrics_dtypes(self):
-        return [c[1] for c in self.METRICS_COLUMNS]
+    def METRICS_COLUMNS(self):
+        return [('pref_image_ns', np.uint64), ('image_selectivity_ns', np.float64), 
+                ('firing_rate_ns', np.float64), ('fano_ns', np.float64),
+                ('time_to_peak_ns', np.float64), ('reliability_ns', np.float64),
+                ('lifetime_sparseness_ns', np.float64), ('run_pval_ns', np.float64), 
+                ('run_mod_ns', np.float64)]
 
     @property
     def images(self):
@@ -130,6 +126,7 @@ class NaturalScenes(StimulusAnalysis):
         self._number_nonblank = len(self._images[self._images >= 0])
 
     def _get_response_events(self):
+        # DEPRECATED
         response_events = np.empty((self.number_images, self.unit_count, 3))
         response_trials = np.empty((self.number_images, self.unit_count, 50))
         response_trials[:] = np.nan
@@ -148,9 +145,12 @@ class NaturalScenes(StimulusAnalysis):
     def _get_image_selectivity(self, nc):
         """Calculates the image selectivity for cell
 
+        # needs to be updated!
+
         :param nc:
         :return:
         """
+
         fmin = self.response_events[1:, nc, 0].min()
         fmax = self.response_events[1:, nc, 0].max()
         rtj = np.empty((1000, 1))
