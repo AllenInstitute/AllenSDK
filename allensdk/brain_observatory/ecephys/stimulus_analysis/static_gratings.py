@@ -43,17 +43,6 @@ class StaticGratings(StimulusAnalysis):
         self._trial_duration = 0.25
         self._module_name = 'Static Gratings'
 
-        # Used to determine responsivness metric and if their is enough activity to try to fit a cell's sf values.
-        # TODO: Figure out how this value existed, possibly make it a user parameter?
-        self._responsivness_threshold = kwargs.get('responsivness_threshold', 11)
-
-        # TODO: If not explicity defined by the user calculate offsets from stim table + pre_sweep_buffer
-        self._mse_offset_low = kwargs.get('mean_sweep_events_offset_low', 0.066)
-        self._mse_offset_high = kwargs.get('mean_sweep_events_offset_hight', 0.316)
-
-        # Used to determine if a spontaneous repsonse if statistically significant
-        self._response_events_p_val = kwargs.get('response_events_p_val', 0.05)
-
         if self._params is not None:
             self._params = self._params['static_gratings']
             self._stimulus_key = self._params['stimulus_key']
@@ -62,6 +51,7 @@ class StaticGratings(StimulusAnalysis):
 
     @property
     def orivals(self):
+        """ Array of grating orientation conditions """
         if self._orivals is None:
             self._get_stim_table_stats()
 
@@ -69,6 +59,7 @@ class StaticGratings(StimulusAnalysis):
 
     @property
     def number_ori(self):
+        """ Number of grating orientation conditions """
         if self._number_ori is None:
             self._get_stim_table_stats()
 
@@ -76,6 +67,7 @@ class StaticGratings(StimulusAnalysis):
 
     @property
     def sfvals(self):
+        """ Array of grating spatial frequency conditions """
         if self._sfvals is None:
             self._get_stim_table_stats()
 
@@ -83,6 +75,7 @@ class StaticGratings(StimulusAnalysis):
 
     @property
     def number_sf(self):
+        """ Number of grating orientation conditions """
         if self._number_sf is None:
             self._get_stim_table_stats()
 
@@ -90,6 +83,7 @@ class StaticGratings(StimulusAnalysis):
 
     @property
     def phasevals(self):
+        """ Array of grating phase conditions """
         if self._phasevals is None:
             self._get_stim_table_stats()
 
@@ -97,6 +91,7 @@ class StaticGratings(StimulusAnalysis):
 
     @property
     def number_phase(self):
+        """ Number of grating phase conditions """
         if self._number_phase is None:
             self._get_stim_table_stats()
 
@@ -150,6 +145,8 @@ class StaticGratings(StimulusAnalysis):
 
     def _get_stim_table_stats(self):
 
+        """ Extract orientations, spatial frequencies, and phases from the stimulus table """
+
         self._orivals = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_ori] != 'null'][self._col_ori].unique())
         self._number_ori = len(self._orivals)
 
@@ -161,6 +158,18 @@ class StaticGratings(StimulusAnalysis):
 
 
     def _get_pref_sf(self, unit_id):
+
+        """ Calculate the preferred spatial frequency condition for a given unit
+
+        Params:
+        -------
+        unit_id - unique ID for the unit of interest
+
+        Returns:
+        -------
+        pref_sf - spatial frequency driving the maximal response
+
+        """
 
         similar_conditions = [self.stimulus_conditions.index[self.stimulus_conditions[self._col_sf] == sf].tolist() for sf in self.sfvals]
         df = pd.DataFrame(index=self.sfvals,
@@ -174,6 +183,18 @@ class StaticGratings(StimulusAnalysis):
 
     def _get_pref_ori(self, unit_id):
 
+        """ Calculate the preferred orientation condition for a given unit
+
+        Params:
+        -------
+        unit_id - unique ID for the unit of interest
+
+        Returns:
+        -------
+        pref_ori - stimulus orientation driving the maximal response
+
+        """
+
         similar_conditions = [self.stimulus_conditions.index[self.stimulus_conditions[self._col_ori] == ori].tolist() for ori in self.orivals]
         df = pd.DataFrame(index=self.orivals,
                          data = {'spike_mean' : 
@@ -186,6 +207,18 @@ class StaticGratings(StimulusAnalysis):
 
     def _get_pref_phase(self, unit_id):
 
+        """ Calculate the preferred phase condition for a given unit
+
+        Params:
+        -------
+        unit_id - unique ID for the unit of interest
+
+        Returns:
+        -------
+        pref_phase - stimulus phase driving the maximal response
+
+        """
+
         similar_conditions = [self.stimulus_conditions.index[self.stimulus_conditions[self._col_phase] == phase].tolist() for phase in self.phasevals]
         df = pd.DataFrame(index=self.phasevals,
                          data = {'spike_mean' : 
@@ -197,13 +230,20 @@ class StaticGratings(StimulusAnalysis):
     
 
     def _get_osi(self, unit_id, pref_sf, pref_phase):
-        """computes orientation selectivity for a particular unit
+         """ Calculate the orientation selectivity for a given unit
 
-        :param unit_id: ID for the unit of interest
-        :param pref_sf: preferred spatial frequency for this unit
-        :param pref_phase: preferred phase for this unit
-        :return:
+        Params:
+        -------
+        unit_id - unique ID for the unit of interest
+        pref_sf - preferred spatial frequency for this unit
+        pref_phase - preferred phase for this unit
+
+        Returns:
+        -------
+        osi - orientation selectivity value
+
         """
+
         orivals_rad = deg2rad(self.orivals).astype('complex128')
         
         condition_inds = self.stimulus_conditions[
@@ -287,11 +327,6 @@ def get_sfdi(sf_tuning_responses, mean_sweeps_trials, bias=5):
     trial_mean = mean_sweeps_trials.mean()
     sse_part = np.sqrt(np.sum((mean_sweeps_trials - trial_mean)**2) / (len(mean_sweeps_trials) - bias))
     return (np.ptp(sf_tuning_responses)) / (np.ptp(sf_tuning_responses) + 2 * sse_part)
-
-
-def do_sweep_mean_shifted(x, offset_lower, offset_upper):
-    # return len(x[(x > 0.066) & (x < 0.316)])/0.25
-    return len(x[(x > offset_lower) & (x < offset_upper)]) / 0.25
 
 
 def gauss_function(x, a, x0, sigma):
