@@ -25,13 +25,13 @@ def calculate_stimulus_metrics(args):
     start = time.time()
 
     stimulus_classes = (
-                 #DriftingGratings,
-                 #StaticGratings,
+                 DriftingGratings,
+                 StaticGratings,
                  #NaturalScenes,
                  #NaturalMovies,
                  #DotMotion,
-                 Flashes,
-                 ReceptiveFieldMapping,
+                 #Flashes,
+                 #ReceptiveFieldMapping,
                 )
 
     df = reduce(lambda output, nwb_path: \
@@ -72,9 +72,7 @@ def add_metrics_to_units_table(nwb_path, stimulus_classes, args):
 
     print(nwb_path)
 
-    session = EcephysSession.from_nwb_path(nwb_path)
-
-    metrics = [stim(session, params=args).metrics for stim in stimulus_classes]
+    metrics = [stim(nwb_path, params=args).metrics for stim in stimulus_classes]
     metrics.insert(0, session.units)
 
     return reduce(lambda left,right: pd.merge(left, right, on='unit_id'), metrics)

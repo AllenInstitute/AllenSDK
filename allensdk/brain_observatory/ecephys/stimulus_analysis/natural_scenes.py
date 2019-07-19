@@ -14,6 +14,9 @@ class NaturalScenes(StimulusAnalysis):
         session = EcephysSession.from_nwb_path('/path/to/my.nwb')
         ns_analysis = NaturalScenes(session)
 
+    or, alternatively, pass in the file path::
+        ns_analysis = NaturalScenes('/path/to/my.nwb')
+
     You can also pass in a unit filter dictionary which will only select units with certain properties. For example
     to get only those units which are on probe C and found in the VISp area::
         ns_analysis = NaturalScenes(session, filter={'location': 'probeC', 'structure_acronym': 'VISp'})

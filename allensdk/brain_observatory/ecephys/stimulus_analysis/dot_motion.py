@@ -16,6 +16,9 @@ class DotMotion(StimulusAnalysis):
         session = EcephysSession.from_nwb_path('/path/to/my.nwb')
         dm_analysis = DotMotion(session)
 
+    or, alternatively, pass in the file path::
+        dm_analysis = DotMotion('/path/to/my.nwb')
+
     You can also pass in a unit filter dictionary which will only select units with certain properties. For example
     to get only those units which are on probe C and found in the VISp area::
         dm_analysis = DotMotion(session, filter={'location': 'probeC', 'structure_acronym': 'VISp'})

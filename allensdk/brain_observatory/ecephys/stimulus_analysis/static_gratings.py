@@ -16,6 +16,9 @@ class StaticGratings(StimulusAnalysis):
         session = EcephysSession.from_nwb_path('/path/to/my.nwb')
         sg_analysis = StaticGratings(session)
 
+    or, alternatively, pass in the file path::
+        sg_analysis = StaticGratings('/path/to/my.nwb')
+
     You can also pass in a unit filter dictionary which will only select units with certain properties. For example
     to get only those units which are on probe C and found in the VISp area::
         sg_analysis = StaticGratings(session, filter={'location': 'probeC', 'structure_acronym': 'VISp'})

@@ -16,6 +16,9 @@ class NaturalMovies(StimulusAnalysis):
         session = EcephysSession.from_nwb_path('/path/to/my.nwb')
         nm_analysis = NaturalMovies(session)
 
+    or, alternatively, pass in the file path::
+        nm_analysis = Flashes('/path/to/my.nwb')
+
     You can also pass in a unit filter dictionary which will only select units with certain properties. For example
     to get only those units which are on probe C and found in the VISp area::
         nm_analysis = NaturalMovies(session, filter={'location': 'probeC', 'structure_acronym': 'VISp'})

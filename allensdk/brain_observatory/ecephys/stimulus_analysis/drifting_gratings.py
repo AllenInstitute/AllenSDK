@@ -16,6 +16,9 @@ class DriftingGratings(StimulusAnalysis):
         session = EcephysSession.from_nwb_path('/path/to/my.nwb')
         dg_analysis = DriftingGratings(session)
 
+    or, alternativly, pass in the file path::
+        dg_analysis = DriftingGratings('/path/to/my.nwb')
+
     You can also pass in a unit filter dictionary which will only select units with certain properties. For example
     to get only those units which are on probe C and found in the VISp area::
         dg_analysis = DriftingGratings(session, filter={'location': 'probeC', 'structure_acronym': 'VISp'})
