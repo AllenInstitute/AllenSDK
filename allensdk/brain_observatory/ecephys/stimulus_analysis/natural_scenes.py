@@ -26,15 +26,6 @@ class NaturalScenes(StimulusAnalysis):
         else:
             self._stimulus_key = 'Natural Images'
 
-
-    @property
-    def METRICS_COLUMNS(self):
-        return [('pref_image_ns', np.uint64), ('image_selectivity_ns', np.float64), 
-                ('firing_rate_ns', np.float64), ('fano_ns', np.float64),
-                ('time_to_peak_ns', np.float64), ('reliability_ns', np.float64),
-                ('lifetime_sparseness_ns', np.float64), ('run_pval_ns', np.float64), 
-                ('run_mod_ns', np.float64)]
-
     @property
     def images(self):
         if self._images is None:
@@ -56,91 +47,58 @@ class NaturalScenes(StimulusAnalysis):
 
     @property
     def number_nonblank(self):
-        # Somee analysis function include -1 (119 values), others exlude it
+        # Some analysis function include -1 (119 values), others exlude it
         if self._number_nonblank is None:
             self._get_stim_table_stats()
 
         return self._number_nonblank
 
     @property
-    def mean_sweep_events(self):
-        if self._mean_sweep_events is None:
-            self._mean_sweep_events = self.sweep_events.applymap(do_sweep_mean_shifted)
-
-        return self._mean_sweep_events
+    def null_condition(self):
+        return self.stimulus_conditions[self.stimulus_conditions[self._col_image] == -1].index
 
     @property
-    def response_events(self):
-        if self._response_events is None:
-            self._get_response_events()
-
-        return self._response_events
-
-    @property
-    def response_trials(self):
-        if self._response_trials is None:
-            self._get_response_events()
-
-        return self._response_trials
+    def METRICS_COLUMNS(self):
+        return [('pref_image_ns', np.uint64), 
+                ('image_selectivity_ns', np.float64), 
+                ('firing_rate_ns', np.float64), 
+                ('fano_ns', np.float64),
+                ('time_to_peak_ns', np.float64), 
+                ('reliability_ns', np.float64),
+                ('lifetime_sparseness_ns', np.float64), 
+                ('run_pval_ns', np.float64), 
+                ('run_mod_ns', np.float64)]
 
     @property
     def metrics(self):
 
         if self._metrics is None:
 
-            metrics_df = pd.DataFrame(np.empty(self.unit_count, dtype=np.dtype(self.METRICS_COLUMNS)),
-                                   index=self.unit_ids).rename_axis('unit_id')
+            unit_ids = self.unit_ids
 
-            metrics_df['pref_image_ns'] = [self._get_pref_image(unit) for unit in unit_ids]
+            metrics_df = self.empty_metrics_table()
+
+            metrics_df['pref_image_ns'] = [self.get_preferred_condition(unit) for unit in unit_ids]
             metrics_df['image_selectivity_ns'] = [self._get_image_selectivity(unit) for unit in unit_ids]
+            metrics_df['firing_rate_ns'] = [self.get_overall_firing_rate(unit) for unit in unit_ids]
+            metrics_df['fano_ns'] = [self.get_fano_factor]
+            metrics_df['time_to_peak_ns'] = [self.get_time_to_peak(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+            metrics_df['reliability_ns'] = [self.get_reliability(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
             metrics_df['lifetime_sparseness_ns'] = [self.get_lifetime_sparesness(unit) for unit in unit_ids]
-
-
-            #for nc, unit_id in enumerate(self.spikes.keys()):
-            #    pref_image = np.where(self.response_events[1:, nc, 0] == self.response_events[1:, nc, 0].max())[0][0]
-            ##    metrics_df.loc[nc, 'pref_image_ns'] = pref_image
-            #    metrics_df.loc[nc, 'num_pref_trials_ns'] = self.response_events[pref_image + 1, nc, 2]
-            #    metrics_df.loc[nc, 'responsive_ns'] = self.response_events[pref_image + 1, nc, 2] > 11
-            #    metrics_df.loc[nc, 'image_selectivity_ns'] = self._get_image_selectivity(nc)
-
-            #    stim_table_mask = self.stim_table['Image'] == pref_image
-            #    metrics_df.loc[nc, 'reliability_ns'] = self._get_reliability(unit_id, stim_table_mask)
-            #    metrics_df.loc[nc, ['run_pval_ns', 'run_mod_ns', 'run_resp_ns', 'stat_resp_ns']] = \
-            #        self._get_running_modulation(pref_image, unit_id)
-
-            #coeff_p = 1.0/float(self.number_nonblank)  # 1 - 1/18
-            #resp_means = self.response_events[:, :, 0]
-            #metrics_df['lifetime_sparseness_ns'] = (1 - coeff_p*((np.power(resp_means.sum(axis=0), 2)) /
-            #                                                  (np.power(resp_means, 2).sum(axis=0)))) / (1.0 - coeff_p)
+            metrics_df.loc[:, ['run_pval_dg', 'run_mod_dg']] = \
+                    [self.get_running_modulation(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
 
             self._metrics = metrics_df
 
         return self._metrics
 
+
     def _get_stim_table_stats(self):
 
-        self._images = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_image] != 'null'][self._col_image].unique())
+        self._images = np.sort(self.stimulus_conditions[self._col_image].unique()).astype(np.int64)
         self._number_images = len(self._images)
-        # In NWB 2 the Image col is a float, but need them as ints for indexing
-        self._images = self._images.astype(np.int64)
         self._number_nonblank = len(self._images[self._images >= 0])
 
-    def _get_response_events(self):
-        # DEPRECATED
-        response_events = np.empty((self.number_images, self.unit_count, 3))
-        response_trials = np.empty((self.number_images, self.unit_count, 50))
-        response_trials[:] = np.nan
-
-        for im in self.images:
-            subset = self.mean_sweep_events[self.stim_table['Image'] == im]
-            subset_p = self.sweep_p_values[self.stim_table['Image'] == im]
-            response_events[im + 1, :, 0] = subset.mean(axis=0)
-            response_events[im + 1, :, 1] = subset.std(axis=0) / np.sqrt(len(subset))
-            response_events[im + 1, :, 2] = subset_p[subset_p < 0.05].count().values
-            response_trials[im + 1, :, :subset.shape[0]] = subset.values.T
-
-        self._response_trials = response_trials
-        self._response_events = response_events
 
     def _get_image_selectivity(self, nc):
         """Calculates the image selectivity for cell
@@ -165,6 +123,7 @@ class NaturalScenes(StimulusAnalysis):
             rtj[j] = theta.mean()
         biga = rtj.mean()
         return 1 - (2*biga)
+
 
     def _get_running_modulation(self, pref_image, v):
         """Computes running modulation of cell at its preferred condition provided there are at least 2 trials for both

@@ -363,9 +363,9 @@ class StimulusAnalysis(object):
             else:
                 run_mod = -1 * (stat_mean - run_mean) / stat_mean
             (_, p) = st.ttest_ind(run, stat, equal_var=False)
-            return p, run_mod, run_mean, stat_mean
+            return p, run_mod
         else:
-            return np.NaN, np.NaN, np.NaN, np.NaN
+            return np.NaN, np.NaN
 
     def get_lifetime_sparseness(self, unit_id):
         """Computes lifetime sparseness of responses for one unit
@@ -385,6 +385,12 @@ class StimulusAnalysis(object):
             self._preferred_condition[unit_id] = df['spike_mean'].idxmax()
 
         return self._preferred_condition[unit_id]
+
+    def empty_metrics_table(self):
+        # pandas can have issues interpreting type and makes the column 'object' type, this should enforce the
+        # correct data type for each column
+        return pd.DataFrame(np.empty(self.unit_count, dtype=np.dtype(self.METRICS_COLUMNS)),
+                                   index=self.unit_ids).rename_axis('unit_id')
 
 
 def get_reliability(unit_sweeps, padding=1.0, num_timestep_second=30, filter_width=0.1, window_beg=0, window_end=None):

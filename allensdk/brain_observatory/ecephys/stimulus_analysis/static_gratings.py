@@ -102,98 +102,38 @@ class StaticGratings(StimulusAnalysis):
         return self._number_phase
 
     @property
-    def mean_sweep_events(self):
-        if self._mean_sweep_events is None:
-            shifted_mean_fnc = partial(do_sweep_mean_shifted, offset_lower=self._mse_offset_low,
-                                       offset_upper=self._mse_offset_high)
-            self._mean_sweep_events = self.sweep_events.applymap(shifted_mean_fnc)
-
-        return self._mean_sweep_events
-
-    @property
-    def response_events(self):
-        if self._response_events is None:
-            self._get_response_events()
-
-        return self._response_events
-
-    @property
-    def response_trials(self):
-        if self._response_trials is None:
-            self._get_response_trials()
-
-        return self._response_trials
-
-    @property
     def METRICS_COLUMNS(self):
-        return [('pref_sf_sg', np.float64), ('pref_ori_sg', np.float64), ('pref_phase_sg', np.float64),
-                 ('g_osi_sg', np.float64), ('time_to_peak_sg', np.float64),
-                 ('firing_rate_sg', np.float64), ('reliability_sg', np.float64),
-                 ('fano_sg', np.float64), ('lifetime_sparseness_sg', np.float64), ('run_pval_sg', np.float64),
-                 ('run_mod_sg', np.float64)]
+        return [('pref_sf_sg', np.float64), 
+                ('pref_ori_sg', np.float64), 
+                ('pref_phase_sg', np.float64),
+                ('g_osi_sg', np.float64), 
+                ('time_to_peak_sg', np.float64),
+                ('firing_rate_sg', np.float64), 
+                ('reliability_sg', np.float64),
+                ('fano_sg', np.float64), 
+                ('lifetime_sparseness_sg', np.float64), 
+                ('run_pval_sg', np.float64),
+                ('run_mod_sg', np.float64)]
 
     @property
     def metrics(self):
         if self._metrics is None:
-            # pandas can have issues interpreting type and makes the column 'object' type, this should enforce the
-            # correct data type for each column
-            metrics_df = pd.DataFrame(np.empty(self.unit_count, dtype=np.dtype(self.METRICS_COLUMNS)),
-                                   index=self.unit_ids).rename_axis('unit_id')
 
-            # set values to null by default
-            metrics_df['fit_sf_sg'] = np.nan
-            metrics_df['fit_sf_ind_sg'] = np.nan
-            metrics_df['sf_low_cutoff_sg'] = np.nan
-            metrics_df['sf_high_cutoff_sg'] = np.nan
+            unit_ids = self.unit_ids
+            
+            metrics_df = self.empty_metrics_table()
 
-            # calculate the lifetime sparsness across all responses for every cell
-            responses = self.response_events[:, 1:, :, :, 0].reshape(self.number_phase*self.number_ori*self.number_sf,
-                                                                     self.unit_count)
-            metrics_df['lifetime_sparseness_sg'] = get_lifetime_sparseness(responses)
-
-            for nc, unit_id in enumerate(self.spikes.keys()):
-                peaks = np.where(self.response_events[:, 1:, :, nc, 0] == self.response_events[:, 1:, :, nc, 0].max())
-                pref_ori = peaks[0][0]
-                pref_sf = peaks[1][0]
-                pref_phase = peaks[2][0]
-
-                metrics_df.loc[nc, 'pref_ori_sg'] = self.orivals[pref_ori]
-                metrics_df.loc[nc, 'pref_sf_sg'] = self.sfvals[pref_sf]
-                metrics_df.loc[nc, 'pref_phase_sg'] = self.phasevals[pref_phase]
-
-                metrics_df.loc[nc, 'num_pref_trials_sg'] = int(self.response_events[pref_ori, pref_sf+1, pref_phase, nc, 2])
-                metrics_df.loc[nc, 'responsive_sg'] = self.response_events[pref_ori, pref_sf+1, pref_phase, nc, 2] > self._responsivness_threshold
-
-                # Get the osi using the mean response across all stimuli orientations (with SF and Phase fixed at their
-                # peak values).
-                ori_tuning_responses = self.response_events[:, pref_sf+1, pref_phase, nc, 0]
-                metrics_df.loc[nc, 'g_osi_sg'] = get_osi(ori_tuning_responses, self.orivals)
-
-                stim_table_mask = (self.stim_table[self._col_sf] == self.sfvals[pref_sf]) & \
-                                  (self.stim_table[self._col_ori] == self.orivals[pref_ori]) & \
-                                  (self.stim_table[self._col_phase] == self.phasevals[pref_phase])
-
-                # Calculate reliability metric from sweep_events of prefered stimuli
-                pref_sweeps = self.sweep_events[stim_table_mask][unit_id].values
-                metrics_df.loc[nc, 'reliability_sg'] = get_reliability(pref_sweeps, window_beg=30, window_end=40)
-
-                # Calc. spatial frequency discrimination index
-                sf_tuning_responses = self.response_events[pref_ori, 1:, pref_phase, nc, 0]
-                sf_trials = self.mean_sweep_events[(self.stim_table[self._col_ori] == self.orivals[pref_ori]) &
-                                                   (self.stim_table[self._col_phase] == self.phasevals[pref_phase])][unit_id].values
-                metrics_df.loc[nc, 'sfdi_sg'] = get_sfdi(sf_tuning_responses, sf_trials, self.number_sf)
-
-                # Running speed statistics
-                speed_subset = self.running_speed[stim_table_mask]
-                mse_subset = self.mean_sweep_events[stim_table_mask]
-                mse_subset_run = mse_subset[speed_subset.running_speed >= 1][unit_id].values
-                mse_subset_stat = mse_subset[speed_subset.running_speed < 1][unit_id].values
-                metrics_df.loc[nc, ['run_pval_sg', 'run_mod_sg', 'run_resp_sg', 'stat_resp_sg']] = \
-                    get_running_modulation(mse_subset_run, mse_subset_stat)
-
-                if self.response_events[pref_ori, pref_sf+1, pref_phase, nc, 2] > self._responsivness_threshold:
-                    metrics_df.loc[nc, ['fit_sf_ind_sg', 'fit_sf_sg', 'sf_low_cutoff_sg', 'sf_high_cutoff_sg']] = \
-                        fit_sf_tuning(sf_tuning_responses, sf_values=self.sfvals, pref_sf_index=pref_sf)
+            metrics_df['pref_sf_sg'] = [self._get_pref_sf(unit) for unit in unit_ids]
+            metrics_df['pref_ori_sg'] = [self._get_pref_ori(unit) for unit in unit_ids]
+            metrics_df['pref_phase_sg'] = [self._get_pref_phase(unit) for unit in unit_ids]
+            metrics_df['g_osi_sg'] = [self._get_osi(unit, metrics_df.loc[unit]['pref_sf_dg'], metrics_df.loc[unit]['pref_phase_sg']) for unit in unit_ids]
+            metrics_df['time_to_peak_sg'] = [self.get_time_to_peak(unit, self.get_preferred_condition(unit)) for unit in unit_ids]  
+            metrics_df['firing_rate_sg'] = [self.get_overall_firing_rate(unit) for unit in unit_ids]
+            metrics_df['reliability_sg'] = [self._get_reliability(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+            metrics_df['fano_sg'] = [self.get_fano_factor(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+            metrics_df['lifetime_sparseness_sg'] = [self.get_lifetime_sparseness(unit) for unit in unit_ids]
+            metrics_df.loc[:, ['run_pval_sg', 'run_mod_sg']] = \
+                    [self.get_running_modulation(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
 
             self._metrics = metrics_df
 
@@ -210,53 +150,62 @@ class StaticGratings(StimulusAnalysis):
         self._phasevals = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_phase] != 'null'][self._col_phase].unique())
         self._number_sf = len(self._sfvals)
 
+     def _get_pref_sf(self, unit_id):
 
-    def _get_response_events(self):
-        # for each cell, find all trials with the same orientation/spatial_freq/phase/cell combo; get averaged num
-        # of spikes, the standard err, and a count of all statistically significant trials.
-        response_events = np.empty((self.number_ori, self.number_sf+1, self.number_phase, self.unit_count, 3))
-        for oi, ori in enumerate(self.orivals):
-            ori_mask = self.stim_table[self._col_ori] == ori
-            for si, sf in enumerate(self.sfvals):
-                sf_mask = self.stim_table[self._col_sf] == sf
-                for phi, phase in enumerate(self.phasevals):
-                    mask = ori_mask & sf_mask & (self.stim_table[self._col_phase] == phase)
-                    subset = self.mean_sweep_events[mask]
-                    subset_p = self.sweep_p_values[mask]
+        similar_conditions = [self.stimulus_conditions.index[self.stimulus_conditions[self._col_sf] == sf].tolist() for sf in self.sfvals]
+        df = pd.DataFrame(index=self.sfvals,
+                         data = {'spike_mean' : 
+                                [self.conditionwise_statistics.loc[unit_id].loc[condition_inds]['spike_mean'].mean() for condition_inds in similar_conditions]
+                             }
+                         ).rename_axis(self._col_sf)
 
-                    response_events[oi, si+1, phi, :, 0] = subset.mean(axis=0)
-                    response_events[oi, si+1, phi, :, 1] = subset.std(axis=0) / np.sqrt(len(subset))
-                    response_events[oi, si+1, phi, :, 2] = subset_p[subset_p < self._response_events_p_val].count().values
+        return df.idxmax()
 
-        # A special case for a blank (or invalid?) stimulus
-        subset = self.mean_sweep_events[np.isnan(self.stim_table[self._col_ori])]
-        subset_p = self.sweep_p_values[np.isnan(self.stim_table[self._col_ori])]
-        response_events[0, 0, 0, :, 0] = subset.mean(axis=0)
-        response_events[0, 0, 0, :, 1] = subset.std(axis=0) / np.sqrt(len(subset))
-        response_events[0, 0, 0, :, 2] = subset_p[subset_p < self._response_events_p_val].count().values
+    def _get_pref_ori(self, unit_id):
 
-        self._response_events = response_events
+        similar_conditions = [self.stimulus_conditions.index[self.stimulus_conditions[self._col_ori] == ori].tolist() for ori in self.orivals]
+        df = pd.DataFrame(index=self.orivals,
+                         data = {'spike_mean' : 
+                                [self.conditionwise_statistics.loc[unit_id].loc[condition_inds]['spike_mean'].mean() for condition_inds in similar_conditions]
+                             }
+                         ).rename_axis(self._col_ori)
 
-    def _get_response_trials(self):
-        # Similar to special response_events, but instead of storing mean_sweep statistics stores the actual values.
-        # TODO: Assumes that there are an equal number of trials for every ori/sf/phase combo. Will fail if not
-        # TODO: This dataset is not being used by other part of class, and there is no analog in ophys. Should
-        #    consider removing this altogether?
-        n_stims = len(self.stim_table)
-        n_features = self.number_ori * self.number_sf * self.number_phase
-        response_trials = np.empty((self.number_ori, self.number_sf+1, self.number_phase, self.unit_count,
-                                    n_stims//n_features))
-        response_trials[0, 0, 0, :, :] = np.nan
-        for oi, ori in enumerate(self.orivals):
-            ori_mask = self.stim_table[self._col_ori] == ori
-            for si, sf in enumerate(self.sfvals):
-                sf_mask = self.stim_table[self._col_sf] == sf
-                for phi, phase in enumerate(self.phasevals):
-                    mask = ori_mask & sf_mask & (self.stim_table[self._col_phase] == phase)
-                    subset = self.mean_sweep_events[mask]
-                    response_trials[oi, si+1, phi, :, :subset.shape[0]] = subset.values.T
+        return df.idxmax()
 
-        self._response_trials = response_trials
+    def _get_pref_phase(self, unit_id):
+
+        similar_conditions = [self.stimulus_conditions.index[self.stimulus_conditions[self._col_phase] == phase].tolist() for phase in self.phasevals]
+        df = pd.DataFrame(index=self.phasevals,
+                         data = {'spike_mean' : 
+                                [self.conditionwise_statistics.loc[unit_id].loc[condition_inds]['spike_mean'].mean() for condition_inds in similar_conditions]
+                             }
+                         ).rename_axis(self._col_phase)
+
+        return df.idxmax()
+    
+    def _get_osi(self, unit_id, pref_sf, pref_phase):
+        """computes orientation selectivity for a particular unit
+
+        :param unit_id: ID for the unit of interest
+        :param pref_sf: preferred spatial frequency for this unit
+        :param pref_phase: preferred phase for this unit
+        :return:
+        """
+        orivals_rad = np.deg2rad(self.orivals)
+        
+        condition_inds = self.stimulus_conditions[
+                (self.stimulus_conditions[self._col_sf] == pref_sf) & \
+                (self.stimulus_conditions[self._col_phase] == pref_phase)
+                ].index.values
+        df = self.conditionwise_statistics.loc[unit_id].loc[condition_inds]
+        df = df.assign(Ori = self.stimulus_conditions.loc[df.index.values][self._col_ori])
+        df = df.sort_values(by=['Ori'])
+
+        tuning = df['spike_mean'].values
+
+        cv_top = tuning * np.exp(1j * 2 * orivals_rad)
+
+        return np.abs(cv_top.sum()) / tuning.sum()
 
 
 def fit_sf_tuning(sf_tuning_responses, sf_values, pref_sf_index):
