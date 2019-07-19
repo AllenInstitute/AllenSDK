@@ -25,6 +25,8 @@ class Flashes(StimulusAnalysis):
 
         self._trial_duration = 0.25
 
+        self._module_name = 'Flashes'
+
 
     @property
     def colors(self):
@@ -56,6 +58,8 @@ class Flashes(StimulusAnalysis):
 
         if self._metrics is None:
 
+            print('Calculating metrics for ' + self.name)
+
             unit_ids = self.unit_ids
         
             metrics_df = self.empty_metrics_table()
@@ -63,8 +67,8 @@ class Flashes(StimulusAnalysis):
             metrics_df['on_off_ratio_fl'] = [self._get_on_off_ratio(unit) for unit in unit_ids]
             metrics_df['sustained_idx_fl'] = [self._get_sustained_index(unit) for unit in unit_ids]
             metrics_df['firing_rate_fl'] = [self.get_overall_firing_rate(unit) for unit in unit_ids]
-            metrics_df['reliability_fl'] = [self.get_reliability(unit, get_preferred_condition(unit)) for unit in unit_ids]
-            metrics_df['fano_fl'] = [self.get_fano_factor(unit, get_preferred_condition(unit)) for unit in unit_ids]
+            metrics_df['reliability_fl'] = [self.get_reliability(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+            metrics_df['fano_fl'] = [self.get_fano_factor(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
             metrics_df['lifetime_sparseness_fl'] = [self.get_lifetime_sparseness(unit) for unit in unit_ids]
             metrics_df.loc[:, ['run_pval_fl', 'run_mod_fl']] = \
                     [self.get_running_modulation(unit, self.get_preferred_condition(unit)) for unit in unit_ids]

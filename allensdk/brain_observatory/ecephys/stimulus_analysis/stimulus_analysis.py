@@ -24,6 +24,9 @@ class StimulusAnalysis(object):
         self._unit_count = None
         self._stim_table = None
         self._conditionwise_statistics = None
+        self._presentationwise_statistics = None
+        self._conditionwise_psth = None
+        self._stimulus_conditions = None
 
         self._spikes = None
         self._stim_table_spontaneous = None
@@ -54,7 +57,12 @@ class StimulusAnalysis(object):
                 units_df = units_df[mask]
             self._unit_ids = units_df.index.values
 
-        return self._unit_ids
+        return self._unit_ids[:10]
+
+    @property
+    def name(self):
+        """ Return the stimulus name."""
+        return self._module_name
 
     @property
     def unit_count(self):
@@ -85,10 +93,13 @@ class StimulusAnalysis(object):
                 # Older versions of NWB files the stimulus name is in the form stimulus_gratings_N, so if
                 # self._stimulus_names is not explicity specified try to figure out stimulus
                 stims_table = self.ecephys_session.stimulus_presentations
+                print(stims_table['stimulus_name'].unique())
+                print(self._stimulus_key)
                 stim_names = [s for s in stims_table['stimulus_name'].unique()
-                              if s.lower().startswith(self._stimulus_key)]
+                              if s.startswith(self._stimulus_key)]
 
                 self._stim_table = stims_table[stims_table['stimulus_name'].isin(stim_names)]
+                print(stim_names)
             else:
                 self._stimulus_names = [self._stimulus_names] if isinstance(self._stimulus_names, string_types) \
                     else self._stimulus_names
@@ -214,12 +225,11 @@ class StimulusAnalysis(object):
 
         if self._presentationwise_statistics is None:
 
-            df = \
-                    self.ecephys_session.presentationwise_spike_counts(
-                        bin_edges = np.linspace(0, self._trial_duration, 2),
-                        stimulus_presentation_ids = self.stim_table.index.values,
-                        unit_ids = self.unit_ids,
-                    ).to_dataframe().reset_index(level=1, drop=True)
+            df = self.ecephys_session.presentationwise_spike_counts(
+                    bin_edges = np.linspace(0, self._trial_duration, 2),
+                    stimulus_presentation_ids = self.stim_table.index.values,
+                    unit_ids = self.unit_ids,
+                ).to_dataframe().reset_index(level=1, drop=True)
 
             df = df.join(self.stim_table.loc[df.index.levels[0].values]['stimulus_condition_id'])
             self._presentationwise_statistics = df.join(self.running_speed)
@@ -264,9 +274,9 @@ class StimulusAnalysis(object):
         """
         if self._running_speed is None:
             
-            self._running_speed = pd.DataFrame(index=stim_table.index.values, 
+            self._running_speed = pd.DataFrame(index=self.stim_table.index.values, 
                                                data = {'running_speed' :
-                                                    [get_velocity_for_presentation(i) for i in self.stim_table.index.values]
+                                                    [self.get_velocity_for_presentation(i) for i in self.stim_table.index.values]
                                                 }
                         ).rename_axis('stimulus_presentation_id')
 
@@ -331,7 +341,7 @@ class StimulusAnalysis(object):
         
         return self.ecephys_session.running_speed[indices]['velocity'].mean()
 
-    def get_running_modulation(self, unit_id, preferred_condition, threshold):
+    def get_running_modulation(self, unit_id, preferred_condition, threshold=1):
         """Computes running modulation of a unit at its preferred condition provided there are at least 2 trials for both
         stationary and running conditions
 
@@ -372,8 +382,12 @@ class StimulusAnalysis(object):
 
         if unit_id not in self._preferred_condition:
 
-            df = self.conditionwise_statistics.drop(index=self.null_condition, level=1)
-            self._preferred_condition[unit_id] = df['spike_mean'].idxmax()
+            try:
+                df = self.conditionwise_statistics.drop(index=self.null_condition, level=1)
+            except IndexError:
+                df = self.conditionwise_statistics
+
+            self._preferred_condition[unit_id] = df.loc[unit_id]['spike_mean'].idxmax()
 
         return self._preferred_condition[unit_id]
 
@@ -475,14 +489,16 @@ def lifetime_sparseness(responses):
 
     :param responses: A floating-point vector of N responses for one unit
     :return: The lifetime sparseness for one unit
+
+    ### CHECK THIS CALCULATION!
     """
 
     coeff = 1.0/len(responses)
 
-    return (1.0 - coeff*((np.power(np.sum(responses)), 2)) / (np.sum(np.power(responses, 2)))) / (1.0 - coeff)
+    return (1.0 - coeff*((np.power(np.sum(responses), 2)) / (np.sum(np.power(responses, 2))))) / (1.0 - coeff)
 
 
-def osi(self, orivals, tuning):
+def osi(orivals, tuning):
     """Computes orientation selectivity for a tuning curve 
 
     """
@@ -491,10 +507,17 @@ def osi(self, orivals, tuning):
     return np.abs(cv_top.sum()) / tuning.sum()
 
 
-def dsi(self, orivals, tuning):
+def dsi(orivals, tuning):
     """Computes direction selectivity for a tuning curve 
 
     """
 
     cv_top = tuning * np.exp(1j * orivals)
     return np.abs(cv_top.sum()) / tuning.sum()
+
+def deg2rad(arr):
+
+    """ Converts array-like input from degrees to radians
+    """
+
+    return arr / 180 * np.pi 

@@ -28,6 +28,8 @@ class NaturalScenes(StimulusAnalysis):
         else:
             self._stimulus_key = 'Natural Images'
 
+        self._module_name = 'Natural Scenes'
+
     @property
     def images(self):
         """ Array of iamge labels """
@@ -79,9 +81,13 @@ class NaturalScenes(StimulusAnalysis):
 
         if self._metrics is None:
 
+            print('Calculating metrics for ' + self.name)
+
             unit_ids = self.unit_ids
 
             metrics_df = self.empty_metrics_table()
+
+            print(self.null_condition)
 
             metrics_df['pref_image_ns'] = [self.get_preferred_condition(unit) for unit in unit_ids]
             metrics_df['image_selectivity_ns'] = [self._get_image_selectivity(unit) for unit in unit_ids]
@@ -121,18 +127,22 @@ class NaturalScenes(StimulusAnalysis):
         """
 
         ### NEEDS TO BE UPDATED FOR NEW ADAPTER
+        
+        if False:
 
-        fmin = self.response_events[1:, nc, 0].min()
-        fmax = self.response_events[1:, nc, 0].max()
-        rtj = np.empty((1000, 1))
-        for j in range(1000):
-            thresh = fmin + j*((fmax-fmin)/1000.)
-            theta = np.empty((self.number_nonblank, 1))
-            for im in range(self.number_nonblank):
-                if self.response_events[im+1, nc, 0] > thresh:  # im+1 to only look at images, not blanksweep
-                    theta[im] = 1
-                else:
-                    theta[im] = 0
-            rtj[j] = theta.mean()
-        biga = rtj.mean()
-        return 1 - (2*biga)
+            fmin = self.response_events[1:, nc, 0].min()
+            fmax = self.response_events[1:, nc, 0].max()
+            rtj = np.empty((1000, 1))
+            for j in range(1000):
+                thresh = fmin + j*((fmax-fmin)/1000.)
+                theta = np.empty((self.number_nonblank, 1))
+                for im in range(self.number_nonblank):
+                    if self.response_events[im+1, nc, 0] > thresh:  # im+1 to only look at images, not blanksweep
+                        theta[im] = 1
+                    else:
+                        theta[im] = 0
+                rtj[j] = theta.mean()
+            biga = rtj.mean()
+            return 1 - (2*biga)
+
+        return np.nan

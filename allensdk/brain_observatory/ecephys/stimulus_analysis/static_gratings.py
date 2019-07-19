@@ -5,26 +5,23 @@ from scipy.optimize import curve_fit
 from functools import partial
 
 from .stimulus_analysis import StimulusAnalysis
-from .stimulus_analysis import osi
+from .stimulus_analysis import osi, deg2rad
 
 
 class StaticGratings(StimulusAnalysis):
     """
     A class for getting single-cell metrics from the static-gratings stimulus of an ecephys session nwb file.
 
-    To use either pass in a EcephysSession object::
+    To use, pass in a EcephysSession object::
         session = EcephysSession.from_nwb_path('/path/to/my.nwb')
         sg_analysis = StaticGratings(session)
-
-    or alternativly pass in the file path::
-        sg_analysis = StaticGratings('/path/to/my.nwb')
 
     You can also pass in a cell filter dictionary which will only select cells with certain properties. For example
     to get only those units which are on probe C and found in the VISp area::
         sg_analysis = StaticGratings(session, filter={'location': 'probeC', 'structure_acronym': 'VISp'})
 
     To get a table of the individual cell metrics ranked by unit-id::
-        metrics_table_df = sg_analysis.peak()
+        metrics_table_df = sg_analysis.metrics()
 
     """
     def __init__(self, ecephys_session, **kwargs):
@@ -44,6 +41,7 @@ class StaticGratings(StimulusAnalysis):
         self._col_sf = 'SF'
         self._col_phase = 'Phase'
         self._trial_duration = 0.25
+        self._module_name = 'Static Gratings'
 
         # Used to determine responsivness metric and if their is enough activity to try to fit a cell's sf values.
         # TODO: Figure out how this value existed, possibly make it a user parameter?
@@ -105,6 +103,12 @@ class StaticGratings(StimulusAnalysis):
         return self._number_phase
 
     @property
+    def null_condition(self):
+        """ Stimulus condition ID for null (blank) stimulus """
+        return self.stimulus_conditions[self.stimulus_conditions[self._col_sf] == 'null'].index
+    
+
+    @property
     def METRICS_COLUMNS(self):
         return [('pref_sf_sg', np.float64), 
                 ('pref_ori_sg', np.float64), 
@@ -122,6 +126,8 @@ class StaticGratings(StimulusAnalysis):
     def metrics(self):
         if self._metrics is None:
 
+            print('Calculating metrics for ' + self.name)
+
             unit_ids = self.unit_ids
             
             metrics_df = self.empty_metrics_table()
@@ -129,7 +135,7 @@ class StaticGratings(StimulusAnalysis):
             metrics_df['pref_sf_sg'] = [self._get_pref_sf(unit) for unit in unit_ids]
             metrics_df['pref_ori_sg'] = [self._get_pref_ori(unit) for unit in unit_ids]
             metrics_df['pref_phase_sg'] = [self._get_pref_phase(unit) for unit in unit_ids]
-            metrics_df['g_osi_sg'] = [self._get_osi(unit, metrics_df.loc[unit]['pref_sf_dg'], metrics_df.loc[unit]['pref_phase_sg']) for unit in unit_ids]
+            metrics_df['g_osi_sg'] = [self._get_osi(unit, metrics_df.loc[unit]['pref_sf_sg'], metrics_df.loc[unit]['pref_phase_sg']) for unit in unit_ids]
             metrics_df['time_to_peak_sg'] = [self.get_time_to_peak(unit, self.get_preferred_condition(unit)) for unit in unit_ids]  
             metrics_df['firing_rate_sg'] = [self.get_overall_firing_rate(unit) for unit in unit_ids]
             metrics_df['reliability_sg'] = [self.get_reliability(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
@@ -153,7 +159,8 @@ class StaticGratings(StimulusAnalysis):
         self._phasevals = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_phase] != 'null'][self._col_phase].unique())
         self._number_sf = len(self._sfvals)
 
-     def _get_pref_sf(self, unit_id):
+
+    def _get_pref_sf(self, unit_id):
 
         similar_conditions = [self.stimulus_conditions.index[self.stimulus_conditions[self._col_sf] == sf].tolist() for sf in self.sfvals]
         df = pd.DataFrame(index=self.sfvals,
@@ -162,7 +169,8 @@ class StaticGratings(StimulusAnalysis):
                              }
                          ).rename_axis(self._col_sf)
 
-        return df.idxmax()
+        return df.idxmax().iloc[0]
+
 
     def _get_pref_ori(self, unit_id):
 
@@ -173,7 +181,8 @@ class StaticGratings(StimulusAnalysis):
                              }
                          ).rename_axis(self._col_ori)
 
-        return df.idxmax()
+        return df.idxmax().iloc[0]
+
 
     def _get_pref_phase(self, unit_id):
 
@@ -184,8 +193,9 @@ class StaticGratings(StimulusAnalysis):
                              }
                          ).rename_axis(self._col_phase)
 
-        return df.idxmax()
+        return df.idxmax().iloc[0]
     
+
     def _get_osi(self, unit_id, pref_sf, pref_phase):
         """computes orientation selectivity for a particular unit
 
@@ -194,7 +204,7 @@ class StaticGratings(StimulusAnalysis):
         :param pref_phase: preferred phase for this unit
         :return:
         """
-        orivals_rad = np.deg2rad(self.orivals)
+        orivals_rad = deg2rad(self.orivals).astype('complex128')
         
         condition_inds = self.stimulus_conditions[
                 (self.stimulus_conditions[self._col_sf] == pref_sf) & \
@@ -204,7 +214,7 @@ class StaticGratings(StimulusAnalysis):
         df = df.assign(Ori = self.stimulus_conditions.loc[df.index.values][self._col_ori])
         df = df.sort_values(by=['Ori'])
 
-        tuning = df['spike_mean'].values
+        tuning = np.array(df['spike_mean'].values).astype('complex128')
 
         return osi(orivals_rad, tuning)
 

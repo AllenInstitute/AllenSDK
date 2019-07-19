@@ -26,6 +26,7 @@ class DotMotion(StimulusAnalysis):
         else:
             self._stimulus_key = 'motion_stimulus'
 
+        self._module_name = 'Dot Motion'
 
     @property
     def directions(self):
@@ -65,6 +66,8 @@ class DotMotion(StimulusAnalysis):
     def metrics(self):
 
         if self._metrics is None:
+
+            print('Calculating metrics for ' + self.name)
 
             unit_ids = self.unit_ids
         
@@ -114,7 +117,7 @@ class DotMotion(StimulusAnalysis):
                              }
                          ).rename_axis(self._col_speed)
 
-        return df.idxmax()
+        return df.idxmax().iloc[0]
 
 
     def _get_pref_dir(self, unit_id):
@@ -138,7 +141,7 @@ class DotMotion(StimulusAnalysis):
                              }
                          ).rename_axis(self._col_dir)
 
-        return df.idxmax()
+        return df.idxmax().iloc[0]
 
 
     def _get_speed_tuning_index(self, unit_id):

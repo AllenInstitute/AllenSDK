@@ -28,6 +28,8 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         else:
             self._stimulus_key = 'gabor_20_deg_250ms_0'
 
+        self._module_name = 'Receptive Field Mapping'
+
     @property
     def elevations(self):
         """ Array of stimulus elevations """
@@ -61,7 +63,7 @@ class ReceptiveFieldMapping(StimulusAnalysis):
             presentationwise_response_matrix = self.ecephys_session.presentationwise_spike_counts(
                 bin_edges = bin_edges,
                 stimulus_presentation_ids = self.stim_table.index.values,
-                unit_ids = unit_ids,
+                unit_ids = self.unit_ids,
                 )
 
             self._rf_matrix = self._response_by_stimulus_position(presentationwise_response_matrix, 
@@ -92,6 +94,8 @@ class ReceptiveFieldMapping(StimulusAnalysis):
     def metrics(self):
 
         if self._metrics is None:
+
+            print('Calculating metrics for ' + self.name)
 
             unit_ids = self.unit_ids
         
@@ -142,8 +146,7 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         return self.receptive_fields['spike_count'].sel(unit_id=unit_id).data
 
 
-    def _response_by_stimulus_position(
-        dataset, presentations,
+    def _response_by_stimulus_position(self, dataset, presentations,
         row_key='Pos_y', column_key='Pos_x',
         unit_key='unit_id', time_key='time_relative_to_stimulus_onset',
         spike_count_key='spike_count'):
@@ -195,8 +198,16 @@ class ReceptiveFieldMapping(StimulusAnalysis):
 
         """
 
-        RF = _get_rf(unit_id)
+        RF = self._get_rf(unit_id)
 
         """ Calculation goes here """
+
+        azimuth = np.nan
+        elevation = np.nan
+        width = np.nan
+        height = np.nan
+        area = np.nan
+        exists = np.nan
+        on_screen = np.nan
 
         return azimuth, elevation, width, height, area, exists, on_screen

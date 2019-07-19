@@ -25,13 +25,13 @@ def calculate_stimulus_metrics(args):
     start = time.time()
 
     stimulus_classes = (
-                 DriftingGratings,
-                 StaticGratings,
-                 NaturalScenes,
-                 NaturalMovies,
-                 DotMotion,
+                 #DriftingGratings,
+                 #StaticGratings,
+                 #NaturalScenes,
+                 #NaturalMovies,
+                 #DotMotion,
                  Flashes,
-                 ReceptiveFieldMapping
+                 ReceptiveFieldMapping,
                 )
 
     df = reduce(lambda output, nwb_path: \

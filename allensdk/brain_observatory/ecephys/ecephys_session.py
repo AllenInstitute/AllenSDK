@@ -310,14 +310,14 @@ class EcephysSession(LazyPropertyMixin):
             dtype=(np.uint8 if binarize else np.uint16) if dtype is None else dtype
         )
 
-        print(np.min(np.diff(domain.flatten())))
+        #print(np.min(np.diff(domain.flatten())))
 
         if np.min(np.diff(domain.flatten())) >= 0:
             no_time_window_overlap = True
-            print('using fast method')
+            #print('using fast method')
         else:
             no_time_window_overlap = False
-            print('using slow method')
+            #print('using slow method')
 
         for ii, unit_id in enumerate(np.array(units.index.values)):
 

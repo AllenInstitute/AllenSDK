@@ -20,6 +20,8 @@ class NaturalMovies(StimulusAnalysis):
         else:
             self._stimulus_key = 'natural_movies'
 
+        self._module_name = 'Natural Movies'
+
 
     @property
     def null_condition(self):
@@ -40,12 +42,14 @@ class NaturalMovies(StimulusAnalysis):
 
         if self._metrics is None:
 
+            print('Calculating metrics for ' + self.name)
+
             unit_ids = self.unit_ids
 
             metrics_df = self.empty_metrics_table()
 
-            metrics_df['fano_nm'] = [self.get_fano_factor(unit) for unit in unit_ids]
-            metrics_df['reliability_nm'] = [self.get_reliability(unit) for unit in unit_ids]
+            metrics_df['fano_nm'] = [self.get_fano_factor(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+            metrics_df['reliability_nm'] = [self.get_reliability(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
             metrics_df['firing_rate_nm'] = [self.get_overall_firing_rate(unit) for unit in unit_ids]
             metrics_df['lifetime_sparseness_nm'] = [self.get_lifetime_sparseness(unit) for unit in unit_ids]
             metrics_df.loc[:, ['run_pval_nm', 'run_mod_nm']] = \

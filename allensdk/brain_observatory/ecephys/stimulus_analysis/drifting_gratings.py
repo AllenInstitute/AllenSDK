@@ -5,7 +5,7 @@ import scipy.ndimage as ndi
 import scipy.stats as st
 from scipy.optimize import curve_fit
 
-from .stimulus_analysis import StimulusAnalysis, osi, dsi
+from .stimulus_analysis import StimulusAnalysis, osi, dsi, deg2rad
 
 
 class DriftingGratings(StimulusAnalysis):
@@ -29,6 +29,8 @@ class DriftingGratings(StimulusAnalysis):
             self._stimulus_key = self._params['stimulus_key']
         else:
             self._stimulus_key = 'drifting_gratings'
+
+        self._module_name = 'Drifting Gratings'
 
     @property
     def orivals(self):
@@ -87,6 +89,8 @@ class DriftingGratings(StimulusAnalysis):
     def metrics(self):
 
         if self._metrics is None:
+
+            print('Calculating metrics for ' + self.name)
         
             unit_ids = self.unit_ids
 
@@ -136,14 +140,14 @@ class DriftingGratings(StimulusAnalysis):
 
         """
 
-        similar_conditions = [self.stimulus_conditions.index[self.stimulus_conditions[self._col_tf] == tf].tolist() for tf in self.tfvals]
-        df = pd.DataFrame(index=self.tfvals,
+        similar_conditions = [self.stimulus_conditions.index[self.stimulus_conditions[self._col_ori] == ori].tolist() for ori in self.orivals]
+        df = pd.DataFrame(index=self.orivals,
                          data = {'spike_mean' : 
                                 [self.conditionwise_statistics.loc[unit_id].loc[condition_inds]['spike_mean'].mean() for condition_inds in similar_conditions]
                              }
-                         ).rename_axis(self._col_tf)
+                         ).rename_axis(self._col_ori)
 
-        return df.idxmax()
+        return df.idxmax().iloc[0]
 
 
     def _get_pref_tf(self, unit_id):
@@ -160,14 +164,14 @@ class DriftingGratings(StimulusAnalysis):
 
         """
 
-        similar_conditions = [self.stimulus_conditions.index[self.stimulus_conditions[self._col_ori] == ori].tolist() for ori in self.orivals]
-        df = pd.DataFrame(index=self.orivals,
+        similar_conditions = [self.stimulus_conditions.index[self.stimulus_conditions[self._col_tf] == tf].tolist() for tf in self.tfvals]
+        df = pd.DataFrame(index=self.tfvals,
                          data = {'spike_mean' : 
                                 [self.conditionwise_statistics.loc[unit_id].loc[condition_inds]['spike_mean'].mean() for condition_inds in similar_conditions]
                              }
-                         ).rename_axis(self._col_ori)
+                         ).rename_axis(self._col_tf)
 
-        return df.idxmax()
+        return df.idxmax().iloc[0]
 
 
     def _get_selectivity(self, unit_id, pref_tf, selectivity_type='osi'):
@@ -185,14 +189,14 @@ class DriftingGratings(StimulusAnalysis):
         selectivity - orientation or direction selectivity value
 
         """
-        orivals_rad = np.deg2rad(self.orivals)
-        
+        orivals_rad = deg2rad(self.orivals).astype('complex128')
+
         condition_inds = self.stimulus_conditions[self.stimulus_conditions[self._col_tf] == pref_tf].index.values
         df = self.conditionwise_statistics.loc[unit_id].loc[condition_inds]
         df = df.assign(Ori = self.stimulus_conditions.loc[df.index.values][self._col_ori])
         df = df.sort_values(by=[self._col_ori])
 
-        tuning = df['spike_mean'].values
+        tuning = np.array(df['spike_mean'].values).astype('complex128')
 
         if selectivity_type == 'osi':
             return osi(orivals_rad, tuning)
