@@ -41,6 +41,7 @@ class InputSchema(ArgSchema):
     )
     raise_if_comparison_fails = Boolean(default=True, description='if a hash comparison fails, throw an error (vs. a warning)')
     make_parent_dirs = Boolean(default=True, description='build missing parent directories for destination')
+    chmod = Int(default=775, description="destination files (and any created parents will have these permissions")
     
 
 class OutputSchema(RaisingSchema):

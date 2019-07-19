@@ -497,7 +497,8 @@ class EcephysSession(LazyPropertyMixin):
         # pandas groupby ops ignore nans, so we need a new null value that pandas does not recognize as null ...
         stimulus_presentations.loc[stimulus_presentations['stimulus_name'] == '', 'stimulus_name'] = 'spontaneous_activity'
         stimulus_presentations[stimulus_presentations == ''] = np.nan
-        stimulus_presentations = stimulus_presentations.fillna('null') # 123 / 2**8
+        # This will convert columns to object dtypes
+        ## stimulus_presentations = stimulus_presentations.fillna('null') # 123 / 2**8
 
         stimulus_presentations['duration'] = stimulus_presentations['stop_time'] - stimulus_presentations['start_time']
 
@@ -696,7 +697,7 @@ def intervals_structures(table, structure_id_key="manual_structure_id", structur
     """
 
     intervals = nan_intervals(table[structure_id_key])
-    labels = table[structure_label_key][intervals[:-1]]
+    labels = table[structure_label_key].iloc[intervals[:-1]].values
 
     return labels, intervals
 
