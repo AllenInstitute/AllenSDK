@@ -37,6 +37,8 @@ class StimulusAnalysis(object):
         self._sweep_p_values = None
         self._metrics = None
 
+        self._psth_resolution = 0.01 # ms
+
         self._trial_duration = None
         self._preferred_condition = {}
 
@@ -131,42 +133,10 @@ class StimulusAnalysis(object):
 
         return self._stim_table_spontaneous
 
-    @property
-    def sweep_events(self):
-        """ Construct a dataframe describing events occuring within each stimulus presentation, by unit.
-
-        Returns
-        =======
-        pd.DataFrame : 
-            Each row is a stimulus presentation. Each column is a unit. Each cell contains a numpy array of 
-            spike times occurring during that presentation (and emitted by that unit) relative to the onset of the 
-            presentation (-1 second).
-
-        """
-
-        if self._sweep_events is None:
-            start_times = self.stim_table['start_time'].values - self._sweep_pre_time
-            stop_times = self.stim_table['stop_time'].values
-            sweep_events = pd.DataFrame(index=self.stim_table.index.values, columns=self.spikes.keys())
-
-            for unit_id, spikes in self.spikes.items():
-                # In theory we should be able to use EcephysSession presentationwise_spike_times(). But ran into issues
-                # with the "sides" certain boundary spikes will fall on, and will significantly affect the metrics
-                # upstream.
-                start_indicies = np.searchsorted(spikes, start_times, side='left')
-                stop_indicies = np.searchsorted(spikes, stop_times, side='right')
-
-                sweep_events[unit_id] = [spikes[start_indx:stop_indx] - start_times[indx] - self._sweep_pre_time if stop_indx > start_indx else np.array([])
-                                             for indx, (start_indx, stop_indx) in enumerate(zip(start_indicies, stop_indicies))]
-
-            self._sweep_events = sweep_events
-
-        return self._sweep_events
 
     @property
     def null_condition(self):
         raise NotImplementedError()
-
 
 
     @property
@@ -175,19 +145,28 @@ class StimulusAnalysis(object):
 
         Returns
         =======
-        pd.DataFrame :
-            MultiIndex : unit_id, stimulus_condition_id
-            Columns : spike_count, spike_mean, spike_sem, spike_std, stimulus_presentation_count
-
+        xarray.DataArray :
+            Coordinates: 
+                - stimulus_condition_id
+                - time_relative_to_stimulus_onset
+                - unit_id
         """
 
-        if self._conditionwise_statistics is None:
+        if self._conditionwise_psth is None:
 
-            self._conditionwise_statistics = \
-                    self.ecephys_session.conditionwise_spike_statistics(self.stim_table.index.values,
-                        self.unit_ids)
+            dataset = self.ecephys_session.presentationwise_spike_counts(
+                bin_edges = np.arange(0,self._trial_duration ,self._psth_resolution),
+                stimulus_presentation_ids = self.stim_table.index.values,
+                unit_ids = self.unit_ids
+                )
 
-        return self._conditionwise_statistics
+            da = dataset['spike_counts'].assign_coords(
+                        stimulus_presentation_id=self.stim_table['stimulus_condition_id'].values)
+            da = da.rename({'stimulus_presentation_id': 'stimulus_condition_id'})
+
+            self._conditionwise_psth = da.groupby('stimulus_condition_id').mean(dim='stimulus_condition_id')
+
+        return self._conditionwise_psth
 
 
     @property
