@@ -54,11 +54,8 @@ def test_query(method, conditions, expected):
     api = epla.EcephysProjectLimsApi(postgres_engine=pg_engine, app_engine=None)
 
     results = getattr(api, method)(**conditions)
-    if not isinstance(expected, re.Pattern):
-        expected = re.compile(expected)
+    
     match = expected.match(pg_engine.query.strip())
-
-    print(pg_engine.query.strip())
     assert match is not None
 
 
