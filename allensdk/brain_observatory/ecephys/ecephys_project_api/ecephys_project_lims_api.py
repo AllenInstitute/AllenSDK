@@ -112,7 +112,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             """
                 {%- import 'postgres_macros' as pm -%}
                 select 
-                    ec.id as ecephys_channel_id,
+                    ec.id as id,
                     ec.ecephys_probe_id,
                     ec.local_index,
                     ec.probe_vertical_position,
@@ -145,14 +145,14 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             probe_ids=probe_ids,
             session_ids=session_ids,
         )
-        return response.set_index("ecephys_channel_id")
+        return response.set_index("id")
 
     def get_probes(self, probe_ids=None, session_ids=None):
         response = build_and_execute(
             """
                 {%- import 'postgres_macros' as pm -%}
                 select 
-                    ep.id as ecephys_probe_id,
+                    ep.id as id,
                     ep.global_probe_sampling_rate,
                     ep.global_probe_lfp_sampling_rate,
                     total_time_shift,
@@ -221,7 +221,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             probe_ids=probe_ids,
             session_ids=session_ids,
         )
-        return response.set_index("ecephys_probe_id")
+        return response.set_index("id")
 
     def get_sessions(
         self,
@@ -241,7 +241,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
                 select 
                     stimulus_name as stimulus_set_name,
                     sp.id as specimen_id, 
-                    es.id as ecephys_session_id, 
+                    es.id as id, 
                     dn.full_genotype as genotype,
                     gd.name as gender, 
                     ages.name as age,
@@ -321,7 +321,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             project_names=project_names,
         )
         
-        response.set_index("ecephys_session_id", inplace=True) 
+        response.set_index("id", inplace=True) 
         return response
 
     @classmethod
