@@ -31,7 +31,7 @@ def postgres_macros():
                 {% endif %}
             {% endmacro %}
             {% macro optional_equals(key, value) %}
-                {% if data is not none -%}
+                {% if value is not none -%}
                     and {{key}} = {{value}}
                 {% endif %}
             {% endmacro %}
