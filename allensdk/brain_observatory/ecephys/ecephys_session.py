@@ -305,57 +305,25 @@ class EcephysSession(LazyPropertyMixin):
 
         bin_edges = np.array(bin_edges)
         domain = build_time_window_domain(bin_edges, stimulus_presentations['start_time'].values, callback=time_domain_callback)
-        tiled_data = np.zeros(
-            (domain.shape[0], domain.shape[1], units.shape[0]), 
-            dtype=(np.uint8 if binarize else np.uint16) if dtype is None else dtype
+
+        out_of_order = np.where(np.diff(domain, axis=1) < 0)
+        if len(out_of_order[0]) > 0:
+            out_of_order_time_bins = [(row, col) for row, col in zip(out_of_order)]
+            raise ValueError(f"The time domain specified contains out-of-order bin edges at indices: {out_of_order_time_bins}")
+
+        ends = domain[:, -1]
+        starts = domain[:, 0]
+        overlapping = np.where((starts[1:] - ends[:-1]) < 0)[0]
+
+        if len(overlapping) > 0:
+            overlapping = [(first, second) for first, second in zip(overlapping[:-1], overlapping[1:])]
+            warnings.warn("You've specified some overlapping time intervals between rows: {overlapping}")
+        tiled_data = build_spike_histogram(
+            domain, self.spike_times, units.index.values, dtype=dtype, binarize=binarize
         )
 
-        #print(np.min(np.diff(domain.flatten())))
-
-        if np.min(np.diff(domain.flatten())) >= 0:
-            no_time_window_overlap = True
-            #print('using fast method')
-        else:
-            no_time_window_overlap = False
-            #print('using slow method')
-
-        for ii, unit_id in enumerate(np.array(units.index.values)):
-
-            data = self.spike_times[unit_id]
-
-            if no_time_window_overlap:
-                flat_indices = np.searchsorted(domain.flat, data)
-
-                unique, counts = np.unique(flat_indices, return_counts=True)
-                valid = np.where( 
-                    (unique % len(bin_edges) != 0) 
-                    & (unique >= 0) 
-                    & (unique <= domain.size) 
-                )
-
-                unique = unique[valid]
-                counts = counts[valid]
-
-                tiled_data[:, :, ii].flat[unique] = counts > 0 if binarize else counts
-
-            else:
-
-                start_times = domain[:,0]
-
-                h,b = np.histogram(data, bins=np.arange(np.min(start_times), 
-                                                        np.max(start_times)+bin_edges[-1]*2, 
-                                                        np.mean(np.diff(bin_edges))))
-
-                start_edges = np.searchsorted(b, start_times)
-
-                inds = np.tile(np.arange(bin_edges.size), (start_edges.size, 1))
-                inds += start_edges[:, None]
-
-                tiled_data[:,:,ii] = h[inds]
-
-
         tiled_data = xr.DataArray(
-            data=tiled_data[:, 1:, :], 
+            data=tiled_data, 
             coords={
                 'stimulus_presentation_id': stimulus_presentations.index.values,
                 'time_relative_to_stimulus_onset': bin_edges[:-1] + np.diff(bin_edges) / 2,
@@ -683,6 +651,31 @@ class EcephysSession(LazyPropertyMixin):
             raise Exception(f'specified NWB version {nwb_version} not supported. Supported versions are: 2.X, 1.X')
 
         return cls(api=NWBAdaptorCls.from_path(path=path, **api_kwargs), ** kwargs)
+
+
+def build_spike_histogram(time_domain, spike_times, unit_ids, dtype=None, binarize=False):
+
+    time_domain = np.array(time_domain)
+    unit_ids = np.array(unit_ids)
+
+    tiled_data = np.zeros(
+        (time_domain.shape[0], time_domain.shape[1] - 1, unit_ids.size), 
+        dtype=(np.uint8 if binarize else np.uint16) if dtype is None else dtype
+    )
+
+    starts = time_domain[:, :-1]
+    ends = time_domain[:, 1:]
+
+    for ii, unit_id in enumerate(unit_ids):
+        data = np.array(spike_times[unit_id])
+
+        start_positions = np.searchsorted(data, starts.flat)
+        end_positions = np.searchsorted(data, ends.flat, side="right")
+        counts = (end_positions - start_positions)
+
+        tiled_data[:, :, ii].flat = counts > 0 if binarize else counts
+    
+    return tiled_data
 
 
 def build_time_window_domain(bin_edges, offsets, callback=None):
