@@ -4,7 +4,7 @@ import numpy as np
 import xarray as xr
 
 from allensdk.brain_observatory.ecephys.ecephys_session_api import EcephysSessionApi
-from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession, nan_intervals
+from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession, nan_intervals, build_spike_histogram
 
 
 @pytest.fixture
@@ -195,7 +195,7 @@ def test_build_units_table(units_table_api):
     assert np.allclose([1, 2], obtained.index.values)
 
 
-def test_framewise_spike_counts(spike_times_api):
+def test_presentationwise_spike_counts(spike_times_api):
     session = EcephysSession(api=spike_times_api)
     obtained = session.presentationwise_spike_counts(np.linspace(-.1, .1, 3), session.stimulus_presentations.index.values, session.units.index.values)
 
@@ -208,6 +208,43 @@ def test_framewise_spike_counts(spike_times_api):
     assert np.allclose([4, 2, 2], obtained['spike_counts'].shape)
 
 
+@pytest.mark.parametrize("spike_times,time_domain,expected", [
+    [
+        {1: [1.5, 2.5]}, 
+        [[1, 2, 3, 4], [1.1, 2.1, 3.1, 4.1]],
+        np.array([[1, 1, 0], [1, 1, 0]])[:, :, None]
+    ],
+    [
+        {1: [1.5, 2.5]}, 
+        [[1, 2, 3, 4], [1.6, 2.0, 4.0, 4.1]],
+        np.array([[1, 1, 0], [0, 1, 0]])[:, :, None]
+    ],
+    [
+        {1: [1.5, 2.5], 2: [1.5, 2.5]}, 
+        [[1, 2, 3, 4], [1.6, 2.0, 4.0, 4.1]],
+        np.stack(([[1, 1, 0], [0, 1, 0]], [[1, 1, 0], [0, 1, 0]]), axis=2)
+    ]
+,
+    [
+        {1: [1.5, 2.5], 2: [1.5, 1.55]}, 
+        [[1, 2, 3, 4], [1.6, 2.0, 4.0, 4.1]],
+        np.stack(([[1, 1, 0], [0, 1, 0]], [[2, 0, 0], [0, 0, 0]]), axis=2)
+    ]
+])
+@pytest.mark.parametrize("binarize", [True, False])
+def test_build_spike_histogram(spike_times, time_domain, expected, binarize):
+    
+    unit_ids = [k for k in spike_times.keys()]
+    obtained = build_spike_histogram(time_domain, spike_times, unit_ids, binarize=binarize)
+
+    expected = np.array(expected)
+    if binarize:
+        expected[expected > 0] = 1
+
+    print(expected - obtained)
+    assert np.allclose(expected, obtained)
+
+
 def test_presentationwise_spike_times(spike_times_api):
     session = EcephysSession(api=spike_times_api)
     obtained = session.presentationwise_spike_times(session.stimulus_presentations.index.values, session.units.index.values)
@@ -217,7 +254,7 @@ def test_presentationwise_spike_times(spike_times_api):
         'stimulus_presentation_id': [2, 2, 2, ]
     }, index=pd.Index(name='spike_time', data=[1.01, 1.02, 1.03]))
 
-    pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)
+    pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)    
 
 
 def test_conditionwise_spike_statistics(spike_times_api):
