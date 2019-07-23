@@ -102,7 +102,6 @@ class EcephysProjectLimsApi(EcephysProjectApi):
         )
 
         response.set_index("id", inplace=True)
-        response.drop(columns=["cluster_ids"], inplace=True)
         response.rename(columns={"ecephys_channel_id": "peak_channel_id"}, inplace=True)
 
         return response
@@ -317,7 +316,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             session_ids=session_ids,
             workflow_states=workflow_states,
             published=published,
-            habituation=f"'{habituation}'" if habituation is not None else habituation,
+            habituation=f"{habituation}".lower() if habituation is not None else habituation,
             project_names=project_names,
         )
         
