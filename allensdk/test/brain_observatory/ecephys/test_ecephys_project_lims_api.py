@@ -10,91 +10,53 @@ from allensdk.brain_observatory.ecephys.ecephys_project_api import (
 
 
 @pytest.mark.parametrize(
-    "method,conditions,expected_query",
+    "method,conditions,expected",
     [
         [
             "get_sessions",
             {"published": True},
-            (
-                "select es.* from ecephys_sessions es "
-                "join projects pr on pr.id = es.project_id "
-                "where true "
-                "and es.workflow_state in ('uploaded') "
-                "and es.habituation = false "
-                "and es.published_at is not null "
-                "and pr.name in ('BrainTV Neuropixels Visual Behavior','BrainTV Neuropixels Visual Coding')"
-            ),
+            re.compile(r".*where true and es\.workflow_state in \('uploaded'\) and es\.habituation = false and es\.published_at is not null and pr\.name in \('BrainTV Neuropixels Visual Behavior','BrainTV Neuropixels Visual Coding'\)$"),
         ],
         [
             "get_sessions",
             {"session_ids": [1, 2, 3]},
-            (
-                "select es.* from ecephys_sessions es "
-                "join projects pr on pr.id = es.project_id "
-                "where true "
-                "and es.id in (1,2,3) "
-                "and es.workflow_state in ('uploaded') "
-                "and es.habituation = false "
-                "and pr.name in ('BrainTV Neuropixels Visual Behavior','BrainTV Neuropixels Visual Coding')"
-            ),
+            re.compile(r".*and es\.id in \(1,2,3\).*"),
         ],
         [
             "get_units",
             {"session_ids": [1, 2, 3]},
-            (
-                "select eu.* from ecephys_units eu "
-                "join ecephys_channels ec on ec.id = eu.ecephys_channel_id "
-                "join ecephys_probes ep on ep.id = ec.ecephys_probe_id "
-                "join ecephys_sessions es on es.id = ep.ecephys_session_id "
-                "where true "
-                "and es.id in (1,2,3)"
-            ),
+            re.compile(r"select eu\.\*.*and es\.id in \(1,2,3\)$"),
         ],
         [
             "get_units",
             {"session_ids": [1, 2, 3], "unit_ids": (4, 5, 6)},
-            (
-                "select eu.* from ecephys_units eu "
-                "join ecephys_channels ec on ec.id = eu.ecephys_channel_id "
-                "join ecephys_probes ep on ep.id = ec.ecephys_probe_id "
-                "join ecephys_sessions es on es.id = ep.ecephys_session_id "
-                "where true "
-                "and eu.id in (4,5,6) "
-                "and es.id in (1,2,3)"
-            ),
+            re.compile(r"select eu\.\*.*and eu\.id in \(4,5,6\) and es\.id in \(1,2,3\)$")
         ],
         [
             "get_channels",
             {},
-            (
-                "select ec.* from ecephys_channels ec "
-                "join ecephys_probes ep on ep.id = ec.ecephys_probe_id "
-                "join ecephys_sessions es on es.id = ep.ecephys_session_id "
-                "where true "
-            ),
+            re.compile(r"select ec\.id as id.*where valid_data$"),
         ],
         [
             "get_probes",
             {},
-            (
-                "select ep.* from ecephys_probes ep "
-                "join ecephys_sessions es on es.id = ep.ecephys_session_id "
-                "where true "
-            ),
+            re.compile(r"select ep\.id as id.*where true$"),
         ],
     ],
 )
-def test_query(method, conditions, expected_query):
+def test_query(method, conditions, expected):
     class MockPgEngine:
         def select(self, rendered):
             self.query = " ".join([item.strip() for item in str(rendered).split()])
-            return pd.DataFrame({})
+            return pd.DataFrame({"id": [1, 2, 3], "ecephys_channel_id": [1, 2, 3]})
 
     pg_engine = MockPgEngine()
     api = epla.EcephysProjectLimsApi(postgres_engine=pg_engine, app_engine=None)
 
     results = getattr(api, method)(**conditions)
-    assert expected_query.strip() == pg_engine.query.strip()
+    
+    match = expected.match(pg_engine.query.strip())
+    assert match is not None
 
 
 def test_get_session_data():
