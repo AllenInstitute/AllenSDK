@@ -5,6 +5,8 @@ import scipy.stats as st
 
 from .stimulus_analysis import StimulusAnalysis
 
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 class NaturalScenes(StimulusAnalysis):
     """

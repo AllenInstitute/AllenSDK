@@ -7,6 +7,8 @@ from scipy.optimize import curve_fit
 
 from .stimulus_analysis import StimulusAnalysis
 
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 class ReceptiveFieldMapping(StimulusAnalysis):
     """

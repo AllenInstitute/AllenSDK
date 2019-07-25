@@ -7,6 +7,8 @@ from scipy.optimize import curve_fit
 
 from .stimulus_analysis import StimulusAnalysis, get_fr
 
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 class Flashes(StimulusAnalysis):
     """

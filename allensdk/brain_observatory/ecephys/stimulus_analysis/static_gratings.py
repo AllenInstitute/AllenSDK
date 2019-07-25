@@ -7,6 +7,8 @@ from functools import partial
 from .stimulus_analysis import StimulusAnalysis
 from .stimulus_analysis import osi, deg2rad
 
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 class StaticGratings(StimulusAnalysis):
     """
