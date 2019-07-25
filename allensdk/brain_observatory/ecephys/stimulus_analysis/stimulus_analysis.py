@@ -25,6 +25,7 @@ class StimulusAnalysis(object):
         self._stim_table = None
         self._conditionwise_statistics = None
         self._presentationwise_statistics = None
+        self._presentationwise_spikes = None
         self._conditionwise_psth = None
         self._stimulus_conditions = None
 
@@ -188,6 +189,29 @@ class StimulusAnalysis(object):
                         self.unit_ids)
 
         return self._conditionwise_statistics
+
+
+    @property
+    def presentationwise_spike_times(self):
+        """ Construct a dataframe with the spike times for each stimulus presentation
+
+        Returns
+        =======
+        pd.DataFrame :
+            Index : spike time
+            Columns : stimulus_presentation_id, unit_id 
+
+        """
+
+        if self._presentationwise_spikes is None:
+
+            self._presentationwise_spikes = self.ecephys_session.presentationwise_spike_times(
+                    stimulus_presentation_ids = self.stim_table.index.values,
+                    unit_ids = self.unit_ids,
+                )
+
+        return self._presentationwise_statistics
+
 
 
     @property
