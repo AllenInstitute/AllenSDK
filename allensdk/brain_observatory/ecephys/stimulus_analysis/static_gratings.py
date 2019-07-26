@@ -4,8 +4,11 @@ import pandas as pd
 from scipy.optimize import curve_fit
 from functools import partial
 
+import matplotlib.pyplot as plt
+
 from .stimulus_analysis import StimulusAnalysis
 from .stimulus_analysis import osi, deg2rad
+from ...circle_plots import FanPlotter
 
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -263,6 +266,93 @@ class StaticGratings(StimulusAnalysis):
         tuning = np.array(df['spike_mean'].values)
 
         return osi(orivals_rad, tuning)
+
+
+    ## VISUALIZATION ##
+
+    def plot_raster(self, stimulus_condition_id, unit_id):
+    
+        """ Plot raster for one condition and one unit """
+
+        idx_sf = np.where(self.sfvals == self.stimulus_conditions.loc[stimulus_condition_id][self._col_sf])[0]
+        idx_ori = np.where(self.orivals == self.stimulus_conditions.loc[stimulus_condition_id][self._col_ori])[0]
+        
+        if len(idx_sf) == len(idx_ori) == 1:
+     
+            presentation_ids = \
+                self.presentationwise_statistics.xs(unit_id, level=1)\
+                [self.presentationwise_statistics.xs(unit_id, level=1)\
+                ['stimulus_condition_id'] == stimulus_condition_id].index.values
+            
+            df = self.presentationwise_spike_times[ \
+                (self.presentationwise_spike_times['stimulus_presentation_id'].isin(presentation_ids)) & \
+                (self.presentationwise_spike_times['unit_id'] == unit_id) ]
+                
+            x = df.index.values - self.stim_table.loc[df.stimulus_presentation_id].start_time
+            _, y = np.unique(df.stimulus_presentation_id, return_inverse=True) 
+            
+            plt.subplot(self.number_sf, self.number_ori, idx_sf*self.number_ori + idx_ori + 1)
+            plt.scatter(x, y, c='k', s=1, alpha=0.25)
+            plt.axis('off')
+
+
+    def plot_response_summary(self, unit_id, bar_thickness=0.25):
+
+        """ Plot the spike counts across conditions """
+        df = self.stimulus_conditions.drop(index=self.null_condition)
+    
+        df['sf_index'] = np.searchsorted(self.sfvals, df[self._col_sf].values)
+        df['ori_index'] = np.searchsorted(self.orivals, df[self._col_ori].values)
+        df['phase_index'] = np.searchsorted(self.phasevals, df[self._col_phase].values)
+
+        cond_values = self.presentationwise_statistics.xs(unit_id, level=1)['stimulus_condition_id']
+        
+        x = df.loc[cond_values.values]['sf_index'] + np.random.rand(cond_values.size) * bar_thickness - bar_thickness/2
+        y = self.presentationwise_statistics.xs(unit_id, level=1)['spike_counts']
+        c = df.loc[cond_values.values]['phase_index']
+        
+        plt.subplot(2,1,1)
+        plt.scatter(y,x,c=c,alpha=0.5,cmap='Blues',vmin=-5)
+        locs, labels = plt.yticks(ticks=np.arange(self.number_sf), labels=self.sfvals)
+        plt.ylabel('Spatial frequency')
+        plt.xlabel('Spikes per trial')
+        plt.ylim([self.number_sf,-1])
+
+        x = df.loc[cond_values.values]['ori_index'] + np.random.rand(cond_values.size) * bar_thickness - bar_thickness/2
+        y = self.presentationwise_statistics.xs(unit_id, level=1)['spike_counts']
+        c = df.loc[cond_values.values]['phase_index']
+        
+        plt.subplot(2,1,2)
+        plt.scatter(x,y,c=c,alpha=0.5,cmap='Spectral')
+        locs, labels = plt.xticks(ticks=np.arange(self.number_ori), labels=self.orivals)
+        plt.xlabel('Orientation')
+        plt.ylabel('Spikes per trial')
+
+    
+    def make_fan_plot(self, unit_id):
+
+        """ Make a 2P-style Fan Plot based on presentationwise spike counts"""
+
+        angle_data = self.stimulus_conditions.loc[self.presentationwise_statistics.xs(unit_id, level=1)['stimulus_condition_id']][self._col_ori].values
+        r_data = self.stimulus_conditions.loc[self.presentationwise_statistics.xs(unit_id, level=1)['stimulus_condition_id']][self._col_sf].values
+        group_data = self.stimulus_conditions.loc[self.presentationwise_statistics.xs(unit_id, level=1)['stimulus_condition_id']][self._col_phase].values
+        data = self.presentationwise_statistics.xs(unit_id, level=1)['spike_counts'].values
+        
+        null_trials = np.where(angle_data == 'null')[0]
+        
+        angle_data = np.delete(angle_data, null_trials)
+        r_data = np.delete(r_data, null_trials)
+        group_data = np.delete(group_data, null_trials)
+        data = np.delete(data, null_trials)
+        
+        cmin = np.min(data)
+        cmax = np.max(data)
+
+        fp = FanPlotter.for_static_gratings()
+        fp.plot(r_data = r_data, angle_data = angle_data, group_data = group_data, data =data, clim=[cmin, cmax])
+        fp.show_axes(closed=False)
+        plt.axis('off')
+
 
 
 def fit_sf_tuning(sf_tuning_responses, sf_values, pref_sf_index):

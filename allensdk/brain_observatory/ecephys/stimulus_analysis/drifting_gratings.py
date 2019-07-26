@@ -401,19 +401,12 @@ class DriftingGratings(StimulusAnalysis):
 
     ## VISUALIZATION ##
 
-    def plot_conditionwise_raster(self, unit_id):
-
-        """ Plot a matrix of rasters for each condition (orientations x temporal frequencies) """
-
-        _ = [self.plot_raster(cond, unit_id) for cond in self.stimulus_conditions.index.values]
-
-
     def plot_raster(self, stimulus_condition_id, unit_id):
     
-        """ Plot raster for one conditions and one unit """
+        """ Plot raster for one condition and one unit """
 
-        idx_tf = np.where(self.tfvals == self.stimulus_conditions.loc[stimulus_condition_id]['TF'])[0]
-        idx_ori = np.where(self.orivals == self.stimulus_conditions.loc[stimulus_condition_id]['Ori'])[0]
+        idx_tf = np.where(self.tfvals == self.stimulus_conditions.loc[stimulus_condition_id][self._col_tf])[0]
+        idx_ori = np.where(self.orivals == self.stimulus_conditions.loc[stimulus_condition_id][self._col_ori])[0]
         
         if len(idx_tf) == len(idx_ori) == 1:
      
@@ -487,6 +480,7 @@ class DriftingGratings(StimulusAnalysis):
         fp.plot(r_data = r_data, angle_data = angle_data, data =data, clim=[cmin, cmax])
         fp.show_axes(closed=False)
         plt.axis('off')
+
 
 ### General functions ###
 

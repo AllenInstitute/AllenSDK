@@ -442,6 +442,20 @@ class StimulusAnalysis(object):
         return np.nan
 
 
+    ### VISUALIZATION ###
+
+    def plot_conditionwise_raster(self, unit_id):
+
+        """ Plot a matrix of rasters for each condition (orientations x temporal frequencies) """
+
+        _ = [self.plot_raster(cond, unit_id) for cond in self.stimulus_conditions.index.values]
+
+
+    def plot_raster(self, condition, unit_id):
+
+        raise NotImplementedError
+
+
 def reliability(unit_sweeps, padding=1.0, num_timestep_second=30, filter_width=0.1, window_beg=0, window_end=None):
     """Computes the trial-to-trial reliability for a set of sweeps for a given cell
 
