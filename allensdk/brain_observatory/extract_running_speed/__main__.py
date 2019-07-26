@@ -82,7 +82,7 @@ def extract_running_speeds(
 
 
 def main(
-    stimulus_pkl_path, sync_h5_path, output_path, wheel_radius, 
+    stimulus_pkl_path, sync_h5_path, output_running_speed_path, wheel_radius, 
     subject_position, **kwargs
 ):
 
@@ -127,12 +127,12 @@ def main(
         {"vsig": vsig, "vin": vin, "frame_time": frame_times, "dx": dx_deg}
     )
 
-    store = pd.HDFStore(output_path)
+    store = pd.HDFStore(output_running_speed_path)
     store.put("running_speed", velocities)
     store.put("raw_data", raw_data)
     store.close()
 
-    return {"output_path": output_path}
+    return {"output_path": output_running_speed_path}
 
 
 if __name__ == "__main__":

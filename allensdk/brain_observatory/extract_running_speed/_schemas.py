@@ -4,7 +4,7 @@ from argschema.fields import Nested, InputDir, String, Float, Dict, Int
 
 
 class InputParameters(ArgSchema):
-    output_path = String(required=True, help="write outputs to here")
+    output_running_speed_path = String(required=True, help="write outputs to here")
     stimulus_pkl_path = String(
         required=True,
         help="path to pkl file containing raw stimulus information",
