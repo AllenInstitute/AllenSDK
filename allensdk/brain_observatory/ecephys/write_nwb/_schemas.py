@@ -27,6 +27,7 @@ class Channel(RaisingSchema):
     probe_horizontal_position = Int(required=True)
     structure_id = Int(required=True, allow_none=True)
     structure_acronym = String(required=True, allow_none=True)
+    cortical_layer = String(required=True, allow_none=True)
     AP_coordinate = Float(required=True, allow_none =True)
     DV_coordinate = Float(required=True, allow_none= True)
     ML_coordinate = Float(required=True, allow_none=True)
