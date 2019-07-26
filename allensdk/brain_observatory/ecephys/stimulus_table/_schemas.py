@@ -36,10 +36,31 @@ class InputParameters(ArgSchema):
         help="optionally rename stimuli",
         default={
             "": "spontaneous",
+
+            "natural_movie_1" : "natural_movie_1",
+            "natural_movie_3" : "natural_movie_3",
             "Natural Images": "natural_scenes",
-            "flash_250ms": "flash",
+            "flash_250ms": "flashes",
+            "gabor_20_deg_250ms": "receptive_field_mapping",
+            "drifting_gratings" : "drifting_gratings",
+            "static_gratings" : "static_gratings",
+
             "contrast_response": "drifting_gratings_contrast",
-            "gabor_20_deg_250ms": "gabor",
+            "natural_movie_1_more_repeats" : "natural_movie_1",
+            "natural_movie_shuffled" : "natural_movie_1_shuffled",
+            "motion_stimulus" : "dot_motion",
+            
+            "signal_noise_test_0_200_repeats": "test_movie_1_40s",
+
+            "signal_noise_test_0": "test_movie_1_60s",
+            "signal_noise_test_0": "test_movie_2_60s",
+            "signal_noise_session_1" : "dense_movie_1",
+            "signal_noise_session_2" : "dense_movie_2",
+            "signal_noise_session_3" : "dense_movie_3",
+            "signal_noise_session_4" : "dense_movie_4",
+            "signal_noise_session_5" : "dense_movie_5",
+            "signal_noise_session_6" : "dense_movie_6",
+
         },
     )
     column_name_map = Dict(
