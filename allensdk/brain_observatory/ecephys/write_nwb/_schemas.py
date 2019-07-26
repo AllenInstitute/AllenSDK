@@ -67,13 +67,8 @@ class Probe(RaisingSchema):
     mean_waveforms_path = String(required=True, validate=check_read_access)
     channels = Nested(Channel, many=True, required=True)
     units = Nested(Unit, many=True, required=True)
-<<<<<<< HEAD
     #lfp = Nested(Lfp, many=False, required=True)
-=======
-    lfp = Nested(Lfp, many=False, required=True)
-    csd_path = String(required=True, validate=check_read_access, help="path to h5 file containing calculated current source density")
->>>>>>> 84d50266004514d15660f22dd91f2f616513d3fe
-
+    #csd_path = String(required=True, validate=check_read_access, help="path to h5 file containing calculated current source density")
 
 class InputSchema(ArgSchema):
     class Meta:
