@@ -5,7 +5,10 @@ import scipy.ndimage as ndi
 import scipy.stats as st
 from scipy.optimize import curve_fit
 
+import matplotlib.pyplot as plt
+
 from .stimulus_analysis import StimulusAnalysis, osi, dsi, deg2rad
+from ...circle_plots import FanPlotter
 
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -396,7 +399,96 @@ class DriftingGratings(StimulusAnalysis):
                 pass
         return fit_tf_ind, fit_tf, tf_low_cutoff, tf_high_cutoff
 
+    ## VISUALIZATION ##
 
+    def plot_conditionwise_raster(self, unit_id):
+
+        """ Plot a matrix of rasters for each condition (orientations x temporal frequencies) """
+
+        _ = [self.plot_raster(cond, unit_id) for cond in self.stimulus_conditions.index.values]
+
+
+    def plot_raster(self, stimulus_condition_id, unit_id):
+    
+        """ Plot raster for one conditions and one unit """
+
+        idx_tf = np.where(self.tfvals == self.stimulus_conditions.loc[stimulus_condition_id]['TF'])[0]
+        idx_ori = np.where(self.orivals == self.stimulus_conditions.loc[stimulus_condition_id]['Ori'])[0]
+        
+        if len(idx_tf) == len(idx_ori) == 1:
+     
+            presentation_ids = \
+                self.presentationwise_statistics.xs(unit_id, level=1)\
+                [self.presentationwise_statistics.xs(unit_id, level=1)\
+                ['stimulus_condition_id'] == stimulus_condition_id].index.values
+            
+            df = self.presentationwise_spike_times[ \
+                (self.presentationwise_spike_times['stimulus_presentation_id'].isin(presentation_ids)) & \
+                (self.presentationwise_spike_times['unit_id'] == unit_id) ]
+                
+            x = df.index.values - self.stim_table.loc[df.stimulus_presentation_id].start_time
+            _, y = np.unique(df.stimulus_presentation_id, return_inverse=True) 
+            
+            plt.subplot(self.number_tf, self.number_ori, idx_tf*self.number_ori + idx_ori + 1)
+            plt.scatter(x, y, c='k', s=1, alpha=0.25)
+            plt.axis('off')
+
+
+    def plot_response_summary(self, unit_id, bar_thickness=0.25):
+
+        """ Plot the spike counts across conditions """
+        df = self.stimulus_conditions.drop(index=self.null_condition)
+    
+        df['tf_index'] = np.searchsorted(self.tfvals, df[self._col_tf].values)
+        df['ori_index'] = np.searchsorted(self.orivals, df[self._col_ori].values)
+        
+        cond_values = self.presentationwise_statistics.xs(unit_id, level=1)['stimulus_condition_id']
+        
+        x = df.loc[cond_values.values]['tf_index'] + np.random.rand(cond_values.size) * bar_thickness - bar_thickness/2
+        y = self.presentationwise_statistics.xs(unit_id, level=1)['spike_counts']
+        c = df.loc[cond_values.values]['tf_index']
+        
+        plt.subplot(2,1,1)
+        plt.scatter(y,x,c=c,alpha=0.5,cmap='Purples',vmin=-5)
+        locs, labels = plt.yticks(ticks=np.arange(self.number_tf), labels=self.tfvals)
+        plt.ylabel('Temporal frequency')
+        plt.xlabel('Spikes per trial')
+        plt.ylim([self.number_tf,-1])
+
+        x = df.loc[cond_values.values]['ori_index'] + np.random.rand(cond_values.size) * bar_thickness - bar_thickness/2
+        y = self.presentationwise_statistics.xs(unit_id, level=1)['spike_counts']
+        c = df.loc[cond_values.values]['ori_index']
+        
+        plt.subplot(2,1,2)
+        plt.scatter(x,y,c=c,alpha=0.5,cmap='Spectral')
+        locs, labels = plt.xticks(ticks=np.arange(self.number_ori), labels=self.orivals)
+        plt.xlabel('Orientation')
+        plt.ylabel('Spikes per trial')
+
+    
+    def make_fan_plot(self, unit_id):
+
+        """ Make a 2P-style Fan Plot based on presentationwise spike counts"""
+
+        angle_data = self.stimulus_conditions.loc[self.presentationwise_statistics.xs(unit_id, level=1)['stimulus_condition_id']][self._col_ori].values
+        r_data = self.stimulus_conditions.loc[self.presentationwise_statistics.xs(unit_id, level=1)['stimulus_condition_id']][self._col_tf].values
+        data = self.presentationwise_statistics.xs(unit_id, level=1)['spike_counts'].values
+        
+        null_trials = np.where(angle_data == 'null')[0]
+        
+        angle_data = np.delete(angle_data, null_trials)
+        r_data = np.delete(r_data, null_trials)
+        data = np.delete(data, null_trials)
+        
+        cmin = np.min(data)
+        cmax = np.max(data)
+
+        fp = FanPlotter.for_drifting_gratings()
+        fp.plot(r_data = r_data, angle_data = angle_data, data =data, clim=[cmin, cmax])
+        fp.show_axes(closed=False)
+        plt.axis('off')
+
+### General functions ###
 
 def gauss_function(x, a, x0, sigma):
     return a*np.exp(-(x-x0)**2/(2*sigma**2))

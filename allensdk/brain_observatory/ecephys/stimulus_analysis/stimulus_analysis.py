@@ -210,7 +210,7 @@ class StimulusAnalysis(object):
                     unit_ids = self.unit_ids,
                 )
 
-        return self._presentationwise_statistics
+        return self._presentationwise_spikes
 
 
 
