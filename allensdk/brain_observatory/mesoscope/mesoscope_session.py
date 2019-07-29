@@ -17,19 +17,22 @@ class MesoscopeSession(LazyPropertyMixin):
         self.experiments = LazyProperty(self.api.get_session_experiments)
         self.pairs = LazyProperty(self.api.get_paired_experiments)
         self.splitting_json =LazyProperty(self.api.get_splitting_json)
-        self.experiment_df = LazyProperty(self.api.get_experiment_df)
+        self.folder = LazyProperty(self.api.get_session_folder)
 
     def get_exp_by_structure(self, structure):
         return self.experiments.loc[self.session_df.structure == structure]
-
 
 if __name__ == "__main__":
 
     session = MesoscopeSession.from_lims(902884228)
     print(session.session_id)
     pd.options.display.width = 0
-    print(session.session_df)
     print(session.experiments)
+    print(session.session_df)
+    print(session.folder)
     print(session.splitting_json)
     print(session.pairs)
-    
+    for exp in session.experiments['experiment_id']:
+        print(session.api.get_experiment_df(exp))
+
+
