@@ -74,6 +74,7 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         timestamps = series.timestamps[:]
 
         return xr.DataArray(
+            name="LFP",
             data=data,
             dims=['time', 'channel'],
             coords=[timestamps, electrodes.index.values]
@@ -117,6 +118,7 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         csd_ts = csd_mod["current_source_density"]
 
         return xr.DataArray(
+            name="CSD",
             data=csd_ts.data[:],
             dims=["channel", "time"],
             coords={
