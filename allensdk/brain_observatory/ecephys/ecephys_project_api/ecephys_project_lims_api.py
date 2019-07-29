@@ -152,6 +152,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
                 {%- import 'postgres_macros' as pm -%}
                 select 
                     ep.id as id,
+                    ep.ecephys_session_id,
                     ep.global_probe_sampling_rate,
                     ep.global_probe_lfp_sampling_rate,
                     total_time_shift,
