@@ -47,7 +47,7 @@ class ReceptiveFieldMapping(StimulusAnalysis):
             self._params = self._params['receptive_field_mapping']
             self._stimulus_key = self._params['stimulus_key']
         else:
-            self._stimulus_key = 'gabor_20_deg_250ms_0'
+            self._stimulus_key = 'receptive_field_mapping'
 
         self._module_name = 'Receptive Field Mapping'
 

@@ -43,7 +43,7 @@ class DriftingGratings(StimulusAnalysis):
         self._tfvals = None
         self._number_tf = None
 
-        self._col_ori = 'Ori'
+        self._col_ori = 'ori'
         self._col_tf = 'TF'
 
         self._trial_duration = 2.0

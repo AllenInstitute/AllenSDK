@@ -47,7 +47,7 @@ class NaturalScenes(StimulusAnalysis):
             self._params = self._params['natural_scenes']
             self._stimulus_key = self._params['stimulus_key']
         else:
-            self._stimulus_key = 'Natural Images'
+            self._stimulus_key = 'natural_scenes'
 
         self._module_name = 'Natural Scenes'
 

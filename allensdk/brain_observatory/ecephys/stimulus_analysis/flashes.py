@@ -42,7 +42,7 @@ class Flashes(StimulusAnalysis):
             self._params = self._params['flashes']
             self._stimulus_key = self._params['stimulus_key']
         else:
-            self._stimulus_key = 'flash_250ms'
+            self._stimulus_key = 'flashes'
 
         self._trial_duration = 0.25
 

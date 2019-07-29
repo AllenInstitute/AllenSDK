@@ -46,9 +46,9 @@ class StaticGratings(StimulusAnalysis):
 
         self._metrics = None
 
-        self._col_ori = 'Ori'
-        self._col_sf = 'SF'
-        self._col_phase = 'Phase'
+        self._col_ori = 'ori'
+        self._col_sf = 'sf'
+        self._col_phase = 'phase'
         self._trial_duration = 0.25
         self._module_name = 'Static Gratings'
 
