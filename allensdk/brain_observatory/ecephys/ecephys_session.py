@@ -419,8 +419,7 @@ class EcephysSession(LazyPropertyMixin):
             emitted by a specific unit across presentations within a specific condition.
 
         """
-
-        presentations = self.stimulus_presentations.loc[stimulus_presentation_ids, ["stimulus_condition_id"]]
+        presentations = self._filter_owned_df('stimulus_presentations', ids=stimulus_presentation_ids)["stimulus_condition_id"]
         spikes = self.presentationwise_spike_times(
             stimulus_presentation_ids=stimulus_presentation_ids, unit_ids=unit_ids
         )
