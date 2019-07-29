@@ -14,7 +14,7 @@ class MtrainApi(PostgresQueryMixin):
 
     def __init__(self, api_base='http://mtrain:5000'):
         self.api_base = api_base
-        self.behavior_lims_api = BehaviorLimsApi()
+        self.behavior_lims_api = BehaviorLimsApi
 
     def get_page(self, table_name, get_obj=None, filters=[], **kwargs):
       
