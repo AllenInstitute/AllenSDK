@@ -71,7 +71,7 @@ class ReceptiveFieldMapping(StimulusAnalysis):
 
     @property
     def number_elevations(self):
-        """ Array of stimulus elevations """
+        """ Number of stimulus elevations """
         if self._pos_y is None:
             self._get_stim_table_stats()
 
@@ -79,7 +79,7 @@ class ReceptiveFieldMapping(StimulusAnalysis):
 
     @property
     def number_azimuths(self):
-        """ Array of stimulus azimuths """
+        """ Number of stimulus azimuths """
         if self._pos_x is None:
             self._get_stim_table_stats()
 

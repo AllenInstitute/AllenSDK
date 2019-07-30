@@ -38,7 +38,7 @@ class Flashes(StimulusAnalysis):
         self._metrics = None
 
         self._colors = None
-        self._col_color = 'Color'
+        self._col_color = 'color'
 
         if self._params is not None:
             self._params = self._params['flashes']
@@ -54,10 +54,18 @@ class Flashes(StimulusAnalysis):
     @property
     def colors(self):
         """ Array of 'color' conditions (black vs. white flash) """
-        if self._color is None:
+        if self._colors is None:
             self._get_stim_table_stats()
 
         return self._colors
+
+    @property
+    def number_colors(self):
+        """ Number of 'color' conditions (black vs. white flash) """
+        if self._colors is None:
+            self._get_stim_table_stats()
+
+        return len(self._colors)
     
 
     @property
@@ -141,3 +149,35 @@ class Flashes(StimulusAnalysis):
 
         return np.nan
 
+
+    ## VISUALIZATION ##
+
+    def plot_raster(self, stimulus_condition_id, unit_id):
+    
+        """ Plot raster for one condition and one unit """
+
+        idx_color = np.where(self.colors == self.stimulus_conditions.loc[stimulus_condition_id][self._col_color])[0]
+
+        if len(idx_color) == 1:
+     
+            presentation_ids = \
+                self.presentationwise_statistics.xs(unit_id, level=1)\
+                [self.presentationwise_statistics.xs(unit_id, level=1)\
+                ['stimulus_condition_id'] == stimulus_condition_id].index.values
+            
+            df = self.presentationwise_spike_times[ \
+                (self.presentationwise_spike_times['stimulus_presentation_id'].isin(presentation_ids)) & \
+                (self.presentationwise_spike_times['unit_id'] == unit_id) ]
+                
+            x = df.index.values - self.stim_table.loc[df.stimulus_presentation_id].start_time
+            _, y = np.unique(df.stimulus_presentation_id, return_inverse=True) 
+            
+            plt.subplot(self.number_colors, 1, idx_color + 1)
+            plt.scatter(x, y, c='k', s=1, alpha=0.25)
+            plt.axis('off')
+
+
+    def plot_response(self, unit_id):
+
+        """ Plot a histogram for the two conditions """
+        pass
