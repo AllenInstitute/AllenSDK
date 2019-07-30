@@ -6,7 +6,7 @@ import os
 
 from allensdk.core.lazy_property import LazyProperty, LazyPropertyMixin
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
-from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import equals
+from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import equals, BehaviorOphysNwbApi
 from allensdk.deprecated import legacy
 from allensdk.brain_observatory.behavior.trials_processing import calculate_reward_rate
 from allensdk.brain_observatory.behavior.dprime import get_rolling_dprime, get_trial_count_corrected_false_alarm_rate, get_trial_count_corrected_hit_rate
@@ -61,6 +61,11 @@ class BehaviorOphysSession(LazyPropertyMixin):
     @classmethod
     def from_lims(cls, ophys_experiment_id):
         return cls(api=BehaviorOphysLimsApi(ophys_experiment_id))
+
+    @classmethod
+    def from_nwb_path(cls, nwb_path, **api_kwargs):
+        api_kwargs["filter_invalid_rois"] = api_kwargs.get("filter_invalid_rois", True)
+        return cls(api=BehaviorOphysNwbApi.from_path(path=nwb_path, **api_kwargs))
 
     def __init__(self, api=None):
 

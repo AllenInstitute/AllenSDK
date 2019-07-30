@@ -181,7 +181,8 @@ def main():
 
     with h5py.File(output_h5, 'w') as f:
         f.create_dataset("data", data=out_traces, compression="gzip")
-        f.create_dataset("roi_names", data=[str(rn) for rn in trace_ids ])
+        roi_names = np.array([str(rn) for rn in trace_ids]).astype(np.string_)
+        f.create_dataset("roi_names", data=roi_names)
 
     mod.write_output_data(dict(
             negative_transient_roi_ids=trace_ids[valid_idxs][nt_inds],

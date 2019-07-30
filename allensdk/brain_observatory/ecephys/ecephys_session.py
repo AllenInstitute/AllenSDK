@@ -305,29 +305,25 @@ class EcephysSession(LazyPropertyMixin):
 
         bin_edges = np.array(bin_edges)
         domain = build_time_window_domain(bin_edges, stimulus_presentations['start_time'].values, callback=time_domain_callback)
-        tiled_data = np.zeros(
-            (domain.shape[0], domain.shape[1], units.shape[0]), 
-            dtype=(np.uint8 if binarize else np.uint16) if dtype is None else dtype
+
+        out_of_order = np.where(np.diff(domain, axis=1) < 0)
+        if len(out_of_order[0]) > 0:
+            out_of_order_time_bins = [(row, col) for row, col in zip(out_of_order)]
+            raise ValueError(f"The time domain specified contains out-of-order bin edges at indices: {out_of_order_time_bins}")
+
+        ends = domain[:, -1]
+        starts = domain[:, 0]
+        overlapping = np.where((starts[1:] - ends[:-1]) < 0)[0]
+
+        if len(overlapping) > 0:
+            overlapping = [(first, second) for first, second in zip(overlapping[:-1], overlapping[1:])]
+            warnings.warn("You've specified some overlapping time intervals between rows: {overlapping}")
+        tiled_data = build_spike_histogram(
+            domain, self.spike_times, units.index.values, dtype=dtype, binarize=binarize
         )
 
-        for ii, unit_id in enumerate(np.array(units.index.values)):
-            data = self.spike_times[unit_id]
-            flat_indices = np.searchsorted(domain.flat, data)
-
-            unique, counts = np.unique(flat_indices, return_counts=True)
-            valid = np.where( 
-                (unique % len(bin_edges) != 0) 
-                & (unique >= 0) 
-                & (unique <= domain.size) 
-            )
-
-            unique = unique[valid]
-            counts = counts[valid]
-
-            tiled_data[:, :, ii].flat[unique] = counts > 0 if binarize else counts
-
         tiled_data = xr.DataArray(
-            data=tiled_data[:, 1:, :], 
+            data=tiled_data, 
             coords={
                 'stimulus_presentation_id': stimulus_presentations.index.values,
                 'time_relative_to_stimulus_onset': bin_edges[:-1] + np.diff(bin_edges) / 2,
@@ -428,9 +424,10 @@ class EcephysSession(LazyPropertyMixin):
         spike_counts = spikes.copy()
         spike_counts["spike_count"] = np.zeros(spike_counts.shape[0])
         spike_counts = spike_counts.groupby(["stimulus_presentation_id", "unit_id"]).count()
+        spike_counts.reset_index("unit_id", inplace=True)
 
         sp = pd.merge(spike_counts, presentations, left_on="stimulus_presentation_id", right_index=True, how="right")
-        sp.reset_index(level="stimulus_presentation_id", inplace=True)
+        sp.reset_index(inplace=True)
 
         summary = []
         for ind, gr in sp.groupby(["stimulus_condition_id", "unit_id"]):
@@ -654,6 +651,31 @@ class EcephysSession(LazyPropertyMixin):
             raise Exception(f'specified NWB version {nwb_version} not supported. Supported versions are: 2.X, 1.X')
 
         return cls(api=NWBAdaptorCls.from_path(path=path, **api_kwargs), ** kwargs)
+
+
+def build_spike_histogram(time_domain, spike_times, unit_ids, dtype=None, binarize=False):
+
+    time_domain = np.array(time_domain)
+    unit_ids = np.array(unit_ids)
+
+    tiled_data = np.zeros(
+        (time_domain.shape[0], time_domain.shape[1] - 1, unit_ids.size), 
+        dtype=(np.uint8 if binarize else np.uint16) if dtype is None else dtype
+    )
+
+    starts = time_domain[:, :-1]
+    ends = time_domain[:, 1:]
+
+    for ii, unit_id in enumerate(unit_ids):
+        data = np.array(spike_times[unit_id])
+
+        start_positions = np.searchsorted(data, starts.flat)
+        end_positions = np.searchsorted(data, ends.flat, side="right")
+        counts = (end_positions - start_positions)
+
+        tiled_data[:, :, ii].flat = counts > 0 if binarize else counts
+    
+    return tiled_data
 
 
 def build_time_window_domain(bin_edges, offsets, callback=None):
