@@ -3,6 +3,8 @@ import pandas as pd
 from six import string_types
 import scipy.stats as st
 
+import matplotlib.pyplot as plt
+
 from .stimulus_analysis import StimulusAnalysis
 
 import warnings

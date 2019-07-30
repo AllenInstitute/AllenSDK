@@ -5,6 +5,8 @@ import scipy.ndimage as ndi
 import scipy.stats as st
 from scipy.optimize import curve_fit
 
+import matplotlib.pyplot as plt
+
 from .stimulus_analysis import StimulusAnalysis, get_fr
 
 import warnings

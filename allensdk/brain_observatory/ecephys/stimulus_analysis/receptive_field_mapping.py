@@ -5,6 +5,8 @@ import scipy.ndimage as ndi
 import scipy.stats as st
 from scipy.optimize import curve_fit
 
+import matplotlib.pyplot as plt
+
 from .stimulus_analysis import StimulusAnalysis
 
 import warnings
@@ -66,6 +68,22 @@ class ReceptiveFieldMapping(StimulusAnalysis):
             self._get_stim_table_stats()
 
         return self._pos_x
+
+    @property
+    def number_elevations(self):
+        """ Array of stimulus elevations """
+        if self._pos_y is None:
+            self._get_stim_table_stats()
+
+        return len(self._pos_y)
+
+    @property
+    def number_azimuths(self):
+        """ Array of stimulus azimuths """
+        if self._pos_x is None:
+            self._get_stim_table_stats()
+
+        return len(self._pos_y)
 
     @property
     def null_condition(self):
@@ -232,3 +250,39 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         on_screen = np.nan
 
         return azimuth, elevation, width, height, area, exists, on_screen
+
+    ## VISUALIZATION ##
+
+    def plot_raster(self, stimulus_condition_id, unit_id):
+    
+        """ Plot raster for one condition and one unit """
+
+        idx_elev = np.where(self.elevations == self.stimulus_conditions.loc[stimulus_condition_id][self._col_pos_y])[0]
+        idx_azi = np.where(self.azimuths == self.stimulus_conditions.loc[stimulus_condition_id][self._col_pos_x])[0]
+        
+        if len(idx_elev) == len(idx_azi) == 1:
+     
+            presentation_ids = \
+                self.presentationwise_statistics.xs(unit_id, level=1)\
+                [self.presentationwise_statistics.xs(unit_id, level=1)\
+                ['stimulus_condition_id'] == stimulus_condition_id].index.values
+            
+            df = self.presentationwise_spike_times[ \
+                (self.presentationwise_spike_times['stimulus_presentation_id'].isin(presentation_ids)) & \
+                (self.presentationwise_spike_times['unit_id'] == unit_id) ]
+                
+            x = df.index.values - self.stim_table.loc[df.stimulus_presentation_id].start_time
+            _, y = np.unique(df.stimulus_presentation_id, return_inverse=True) 
+            
+            idx_elev = self.number_elevations - idx_elev - 1 # reverse the elevation index so it matches the RF
+
+            plt.subplot(self.number_elevations, self.number_azimuths, idx_elev*self.number_azimuths + idx_azi + 1)
+            plt.scatter(x, y, c='k', s=1, alpha=0.25)
+            plt.axis('off')
+
+
+    def plot_rf(self, unit_id):
+
+        """ Plot the spike counts across conditions """
+        plt.imshow(self._get_rf(unit_id), cmap='Greys')
+        plt.axis('off')
