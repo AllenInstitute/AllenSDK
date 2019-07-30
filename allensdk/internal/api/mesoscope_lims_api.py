@@ -36,42 +36,10 @@ class MesoscopeSessionLimsApi(PostgresQueryMixin):
         self.experiment_ids = pd.read_sql(query.format(self.get_session_id()), self.get_connection())
         return self.experiment_ids
 
-class MesoscopePlaneLimsApi(BehaviorOphysLimsApi):
-
-    def __init__(self, experiment_id):
-        self.experiment_id = experiment_id
-        super().__init__(experiment_id)
-
-    def get_experiment_id(self):
-        return self.experiment_id
-
-
-
     def get_session_folder(self):
         _session = pd.DataFrame(self.get_session_df())
         session_folder = _session['session_folder']
         return session_folder.values[0]
-
-    def get_splitting_json(self):
-        session_folder = self.get_session_folder()
-        """this info should not be read form splitting json, but right now this info is not stored in the database"""
-        json_path = os.path.join(session_folder, f"MESOSCOPE_FILE_SPLITTING_QUEUE_{self.session_id}_input.json")
-        self.splitting_json = safe_system_path(json_path)
-        if not os.path.isfile(self.splitting_json):
-            logger.error("Unable to find splitting json for session: {}".format(self.session_id))
-        return self.splitting_json
-
-    def get_paired_experiments(self):
-        splitting_json = self.get_splitting_json()
-        self.pairs = []
-        with open(splitting_json, "r") as f:
-            data = json.load(f)
-        for pg in data.get("plane_groups", []):
-            self.pairs.append([p["experiment_id"] for p in pg.get("ophys_experiments", [])])
-        return self.pairs
-
-    def get_metadata(self):
-        raise NotImplementedError
 
     def get_session_df(self):
         query = ' '.join(("SELECT oe.id as experiment_id, os.id as session_id",
@@ -97,6 +65,38 @@ class MesoscopePlaneLimsApi(BehaviorOphysLimsApi):
         query = query.format(self.get_session_id())
         self.session_df = pd.read_sql(query, self.get_connection())
         return self.session_df
+
+    def get_splitting_json(self):
+        session_folder = self.get_session_folder()
+        """this info should not be read form splitting json, but right now this info is not stored in the database"""
+        json_path = os.path.join(session_folder, f"MESOSCOPE_FILE_SPLITTING_QUEUE_{self.session_id}_input.json")
+        self.splitting_json = safe_system_path(json_path)
+        if not os.path.isfile(self.splitting_json):
+            logger.error("Unable to find splitting json for session: {}".format(self.session_id))
+        return self.splitting_json
+
+
+    def get_paired_experiments(self):
+        splitting_json = self.get_splitting_json()
+        self.pairs = []
+        with open(splitting_json, "r") as f:
+            data = json.load(f)
+        for pg in data.get("plane_groups", []):
+            self.pairs.append([p["experiment_id"] for p in pg.get("ophys_experiments", [])])
+        return self.pairs
+
+
+class MesoscopePlaneLimsApi(BehaviorOphysLimsApi):
+
+    def __init__(self, experiment_id):
+        self.experiment_id = experiment_id
+        super().__init__(experiment_id)
+
+    def get_experiment_id(self):
+        return self.experiment_id
+
+    def get_metadata(self):
+        raise NotImplementedError
 
     def get_experiment_df(self, experiment_id):
         session_df = self.get_session_df()
