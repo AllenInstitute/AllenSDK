@@ -10,13 +10,15 @@ from allensdk.internal.core.lims_utilities import safe_system_path
 from . import PostgresQueryMixin, OneOrMoreResultExpectedError
 from allensdk.api.cache import memoize
 
+from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
+
 logger = logging.getLogger(__name__)
 
-class MesoscopeLimsApi(PostgresQueryMixin):
+class MesoscopeSessionLimsApi(PostgresQueryMixin):
 
     def __init__(self, session_id):
         self.session_id = session_id
-        self.experiments = None
+        self.experiment_ids = None
         self.pairs = None
         self.splitting_json = None
         self.session_df = None
@@ -31,8 +33,19 @@ class MesoscopeLimsApi(PostgresQueryMixin):
             "FROM ophys_experiments oe",
             "WHERE oe.ophys_session_id = {}"
         ))
-        self.experiments = pd.read_sql(query.format(self.get_session_id()), self.get_connection())
-        return self.experiments
+        self.experiment_ids = pd.read_sql(query.format(self.get_session_id()), self.get_connection())
+        return self.experiment_ids
+
+class MesoscopePlaneLimsApi(BehaviorOphysLimsApi):
+
+    def __init__(self, experiment_id):
+        self.experiment_id = experiment_id
+        super().__init__(experiment_id)
+
+    def get_experiment_id(self):
+        return self.experiment_id
+
+
 
     def get_session_folder(self):
         _session = pd.DataFrame(self.get_session_df())
