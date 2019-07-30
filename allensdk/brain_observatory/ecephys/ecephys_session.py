@@ -424,10 +424,11 @@ class EcephysSession(LazyPropertyMixin):
         spike_counts = spikes.copy()
         spike_counts["spike_count"] = np.zeros(spike_counts.shape[0])
         spike_counts = spike_counts.groupby(["stimulus_presentation_id", "unit_id"]).count()
-        spike_counts.reset_index("unit_id", inplace=True)
+        spike_counts = spike_counts.reindex(pd.MultiIndex.from_product([spike_counts.index.levels[0], unit_ids], 
+                                                     names=['stimulus_presentation_id', 'unit_id']), fill_value=0)
 
         sp = pd.merge(spike_counts, presentations, left_on="stimulus_presentation_id", right_index=True, how="right")
-        sp.reset_index(inplace=True)
+        sp.reset_index(level="stimulus_presentation_id", inplace=True)
 
         summary = []
         for ind, gr in sp.groupby(["stimulus_condition_id", "unit_id"]):
@@ -494,8 +495,7 @@ class EcephysSession(LazyPropertyMixin):
         # pandas groupby ops ignore nans, so we need a new null value that pandas does not recognize as null ...
         stimulus_presentations.loc[stimulus_presentations['stimulus_name'] == '', 'stimulus_name'] = 'spontaneous_activity'
         stimulus_presentations[stimulus_presentations == ''] = np.nan
-        # This will convert columns to object dtypes
-        ## stimulus_presentations = stimulus_presentations.fillna('null') # 123 / 2**8
+        stimulus_presentations = stimulus_presentations.fillna('null') # 123 / 2**8
 
         stimulus_presentations['duration'] = stimulus_presentations['stop_time'] - stimulus_presentations['start_time']
 
@@ -504,7 +504,7 @@ class EcephysSession(LazyPropertyMixin):
         presentation_conditions = []
         cid_counter = -1
 
-        params_only = stimulus_presentations.drop(columns=["start_time", "stop_time"])
+        params_only = stimulus_presentations.drop(columns=["start_time", "stop_time", "duration", "stimulus_block"])
         for row in params_only.itertuples(index=False):
 
             if row in stimulus_conditions:
@@ -540,8 +540,8 @@ class EcephysSession(LazyPropertyMixin):
         table.index.name = 'unit_id'
         table = table.rename(columns={
             'description': 'probe_description',
-            'manual_structure_id': 'structure_id',
-            'manual_structure_acronym': 'structure_acronym',
+            #'manual_structure_id': 'structure_id',
+            #'manual_structure_acronym': 'structure_acronym',
             'local_index_channel': 'channel_local_index',
         })
 
@@ -697,7 +697,9 @@ def removed_unused_stimulus_presentation_columns(stimulus_presentations):
     return stimulus_presentations.drop(columns=to_drop)
 
 
-def intervals_structures(table, structure_id_key="manual_structure_id", structure_label_key="manual_structure_acronym"):
+
+def intervals_structures(table, structure_id_key="structure_id", structure_label_key="structure_acronym"):
+
     """ find on a channels / units table intervals of channels inserted into particular structures
 
     Parameters
