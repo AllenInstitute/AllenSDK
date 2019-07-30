@@ -23,26 +23,26 @@ class MesoscopeSession(LazyPropertyMixin):
         return self.experiments.loc[self.session_df.structure == structure]
 
     def get_planes(self):
-        planes = pd.DataFrame(columns=['plane_id', 'plane'], index=range(len(self.experiments_ids['experiment_id'])))
+        self.planes = pd.DataFrame(columns=['plane_id', 'plane'], index=range(len(self.experiments_ids['experiment_id'])))
         i=0
         for experiment_id in self.experiments_ids['experiment_id']:
             plane = MesoscopeOphysPlane(api=MesoscopePlaneLimsApi(experiment_id))
-            planes.plane_id[i] = experiment_id
-            planes.plane[i] = plane
+            self.planes.plane_id[i] = experiment_id
+            self.planes.plane[i] = plane
             i += 1
-        return planes
+        return self.planes
 
 if __name__ == "__main__":
 
     session = MesoscopeSession.from_lims(754606824)
-    print(session.experiments_ids)
+    # print(session.experiments_ids)
     pd.options.display.width = 0
-    print(session.session_df)
-    print(session.folder)
-    print(session.session_id)
-    print(session.splitting_json)
-    print(session.pairs)
-    print(session.get_planes())
+    # print(session.session_df)
+    # print(session.folder)
+    # print(session.session_id)
+    # print(session.splitting_json)
+    # print(session.pairs)
+    planes = session.get_planes()
 
 
     

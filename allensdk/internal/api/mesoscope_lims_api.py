@@ -6,13 +6,15 @@ import logging
 import json
 import os
 from allensdk.internal.core.lims_utilities import safe_system_path
+from allensdk.brain_observatory.behavior.sync import get_sync_data
 
-from . import PostgresQueryMixin, OneOrMoreResultExpectedError
-from allensdk.api.cache import memoize
+from . import PostgresQueryMixin
+
 
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
 
 logger = logging.getLogger(__name__)
+
 
 class MesoscopeSessionLimsApi(PostgresQueryMixin):
 
@@ -22,7 +24,21 @@ class MesoscopeSessionLimsApi(PostgresQueryMixin):
         self.pairs = None
         self.splitting_json = None
         self.session_df = None
+        self.sync_path = None
         super().__init__()
+
+    def get_well_known_file(self, file_type):
+        """Gets a well_known_file's location"""
+        query = ' '.join(['SELECT wkf.storage_directory, wkf.filename FROM well_known_files wkf',
+                           'JOIN well_known_file_types wkft',
+                           'ON wkf.well_known_file_type_id = wkft.id',
+                           'WHERE',
+                           'attachable_id = {}'.format(self.session_id),
+                           'AND wkft.name = \'{}\''.format(file_type)])
+
+        query = query.format(self.session_id)
+        filepath = pd.read_sql(query, self.get_connection())
+        return filepath
 
     def get_session_id(self):
         return self.session_id
@@ -75,7 +91,6 @@ class MesoscopeSessionLimsApi(PostgresQueryMixin):
             logger.error("Unable to find splitting json for session: {}".format(self.session_id))
         return self.splitting_json
 
-
     def get_paired_experiments(self):
         splitting_json = self.get_splitting_json()
         self.pairs = []
@@ -85,6 +100,31 @@ class MesoscopeSessionLimsApi(PostgresQueryMixin):
             self.pairs.append([p["experiment_id"] for p in pg.get("ophys_experiments", [])])
         return self.pairs
 
+    def get_sync_file(self):
+            sync_file_df = self.get_well_known_file(file_type='OphysRigSync')
+            sync_file_dir = safe_system_path(sync_file_df['storage_directory'].values[0])
+            sync_file_name = sync_file_df['filename'].values[0]
+            return os.path.join(sync_file_dir, sync_file_name)
+
+    def get_sync_data(self):
+        sync_path = self.get_sync_file()
+        return get_sync_data(sync_path)
+
+
+    def get_session_timestamps(self):
+
+        #this needs check for dropped frames: compare timestamps with scanimage header's timestamps.
+
+        timestamps = self.get_sync_data()['ophys_frames']
+        planes_timestamps = pd.DataFrame(columns= ['plane_id', 'ophys_timestamp'], index = range(len(self.get_session_experiments())))
+        pairs = self.get_paired_experiments()
+        i=0
+        for pair in range(len(pairs)):
+            planes_timestamps['plane_id'][i] = pairs[pair][0]
+            planes_timestamps['plane_id'][i+1] = pairs[pair][1]
+            planes_timestamps['ophys_timestamp'][i] = planes_timestamps['ophys_timestamp'][i+1]  = timestamps[pair::len(pairs)]
+            i += 2
+        return planes_timestamps
 
 class MesoscopePlaneLimsApi(BehaviorOphysLimsApi):
 
@@ -95,6 +135,10 @@ class MesoscopePlaneLimsApi(BehaviorOphysLimsApi):
     def get_experiment_id(self):
         return self.experiment_id
 
+    def get_timestamps(self):
+
+        return
+
     def get_metadata(self):
         raise NotImplementedError
 
@@ -102,6 +146,8 @@ class MesoscopePlaneLimsApi(BehaviorOphysLimsApi):
         session_df = self.get_session_df()
         experiment_df = session_df.loc[session_df['experiment_id'] == experiment_id]
         return experiment_df
+
+
 
 
 
