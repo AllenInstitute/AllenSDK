@@ -18,6 +18,7 @@ class MesoscopeSession(LazyPropertyMixin):
         self.pairs = LazyProperty(self.api.get_paired_experiments)
         self.splitting_json =LazyProperty(self.api.get_splitting_json)
         self.folder = LazyProperty(self.api.get_session_folder)
+        self.planes_timestamps = LazyProperty(self.api.split_session_timestamps)
 
     def get_exp_by_structure(self, structure):
         return self.experiments.loc[self.session_df.structure == structure]
@@ -31,6 +32,11 @@ class MesoscopeSession(LazyPropertyMixin):
             self.planes.plane[i] = plane
             i += 1
         return self.planes
+
+    def get_plane_timestamp(self, exp_id):
+        return self.planes_timestamps.loc[self.planes_timestamps['plane_id'] == exp_id]
+
+
 
 if __name__ == "__main__":
 

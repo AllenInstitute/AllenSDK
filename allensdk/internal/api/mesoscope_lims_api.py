@@ -5,6 +5,9 @@ import pandas as pd
 import logging
 import json
 import os
+
+from pandas import DataFrame
+
 from allensdk.internal.core.lims_utilities import safe_system_path
 from allensdk.brain_observatory.behavior.sync import get_sync_data
 
@@ -111,41 +114,71 @@ class MesoscopeSessionLimsApi(PostgresQueryMixin):
         return get_sync_data(sync_path)
 
 
-    def get_session_timestamps(self):
+    def split_session_timestamps(self):
 
-        #this needs check for dropped frames: compare timestamps with scanimage header's timestamps.
+        #this needs a check for dropped frames: compare timestamps with scanimage header's timestamps.
 
         timestamps = self.get_sync_data()['ophys_frames']
         planes_timestamps = pd.DataFrame(columns= ['plane_id', 'ophys_timestamp'], index = range(len(self.get_session_experiments())))
         pairs = self.get_paired_experiments()
-        i=0
+        i = 0
         for pair in range(len(pairs)):
             planes_timestamps['plane_id'][i] = pairs[pair][0]
             planes_timestamps['plane_id'][i+1] = pairs[pair][1]
-            planes_timestamps['ophys_timestamp'][i] = planes_timestamps['ophys_timestamp'][i+1]  = timestamps[pair::len(pairs)]
+            planes_timestamps['ophys_timestamp'][i] = planes_timestamps['ophys_timestamp'][i+1] = timestamps[pair::len(pairs)]
             i += 2
         return planes_timestamps
+
 
 class MesoscopePlaneLimsApi(BehaviorOphysLimsApi):
 
     def __init__(self, experiment_id):
         self.experiment_id = experiment_id
+        self.session_id = None
+        self.experiment_df = None
         super().__init__(experiment_id)
 
     def get_experiment_id(self):
         return self.experiment_id
 
-    def get_timestamps(self):
+    def get_experiment_df(self):
 
-        return
+        api = PostgresQueryMixin()
+        query = ''' 
+                SELECT 
+                
+                oe.id as experiment_id, 
+                os.id as session_id, 
+                oe.storage_directory as experiment_folder,
+                sp.name as specimen,
+                os.date_of_acquisition as date,
+                imaging_depths.depth as depth,
+                st.acronym as structure,
+                os.parent_session_id as parent_id,
+                oe.workflow_state as workflow_state,
+                os.stimulus_name as stimulus
+                
+                FROM ophys_experiments oe
+                JOIN ophys_sessions os ON os.id = oe.ophys_session_id 
+                JOIN specimens sp ON sp.id = os.specimen_id  
+                JOIN imaging_depths ON imaging_depths.id = oe.imaging_depth_id 
+                JOIN structures st ON st.id = oe.targeted_structure_id 
+                
+                AND oe.id='{}'
+                '''
 
-    def get_metadata(self):
-        raise NotImplementedError
+        query = query.format(self.get_experiment_id())
+        self.experiment_df = pd.read_sql(query, api.get_connection())
+        return self.experiment_df
 
-    def get_experiment_df(self, experiment_id):
-        session_df = self.get_session_df()
-        experiment_df = session_df.loc[session_df['experiment_id'] == experiment_id]
-        return experiment_df
+
+    def get_session_id(self):
+        self.session_id = self.experiment_df['session_id']
+        return self.session_id
+
+    # def get_metadata(self):
+    #     raise NotImplementedError
+
 
 
 
