@@ -9,6 +9,7 @@ CURR_FILE_DIR = os.path.dirname(os.path.abspath(__file__))
 DOCKERFILE_STAGE_1 = os.path.join(CURR_FILE_DIR, 'stage_1', 'Dockerfile')
 DOCKERFILE_STAGE_2 = os.path.join(CURR_FILE_DIR, 'stage_2', 'Dockerfile')
 DOCKERFILE_STAGE_3 = os.path.join(CURR_FILE_DIR, 'stage_3', 'Dockerfile')
+DOCKERFILE_STAGE_4 = os.path.join(CURR_FILE_DIR, 'stage_4', 'Dockerfile')
 MODELFILE_CACHE_LOC = os.path.join(CURR_FILE_DIR, 'stage_1', 'modelfile.zip')
 
 
@@ -47,6 +48,10 @@ def run_rule(rule, **kwargs):
         subprocess.check_call(['docker', 'build',
                                '-t', 'dlc-eye-tracking:stage-2', '-f', DOCKERFILE_STAGE_2, 'stage_2'])
 
+    elif rule == 'build:stage-4':
+        subprocess.check_call(['docker', 'build',
+                               '-t', 'dlc-eye-tracking:stage-4', '-f', DOCKERFILE_STAGE_4, 'stage_4'])
+
     elif rule == 'build:stage-3':
 
         # Download and cache modelfile:
@@ -81,7 +86,7 @@ def run_rule(rule, **kwargs):
                                '--runtime=nvidia',
                                '-e', 'VIDEO_INPUT_FILE={}'.format(video_input_file), 'dlc-eye-tracking:{}'.format(stage)])
 
-    elif rule in ['tag:stage-1', 'tag:stage-2', 'tag:stage-3']:
+    elif rule in ['tag:stage-1', 'tag:stage-2', 'tag:stage-3', 'tag:stage-4']:
         stage = rule.split(':')[-1]
         subprocess.check_call(['docker', 'tag', 'dlc-eye-tracking:{}'.format(stage), 'us.gcr.io/aibs-pilot/dlc-eye-tracking:{}'.format(stage)])
 
@@ -89,7 +94,7 @@ def run_rule(rule, **kwargs):
         stage = rule.split(':')[-1]
         subprocess.check_call(['docker', 'tag', 'dlc-eye-tracking:{}'.format(stage), 'docker.aibs-artifactory.corp.alleninstitute.org/dlc-eye-tracking:{}'.format(stage)])
 
-    elif rule in ['push:stage-1', 'push:stage-2', 'push:stage-3']:
+    elif rule in ['push:stage-1', 'push:stage-2', 'push:stage-3', 'push:stage-4']:
         stage = rule.split(':')[-1]
         subprocess.check_call(['docker', 'push', 'us.gcr.io/aibs-pilot/dlc-eye-tracking:{}'.format(stage)])
 
@@ -101,16 +106,19 @@ def run_rule(rule, **kwargs):
         run_rule('build:stage-1', **kwargs)
         run_rule('build:stage-2', **kwargs)
         run_rule('build:stage-3', **kwargs)
+        run_rule('build:stage-4', **kwargs)
 
     elif rule == 'tag:all':
         run_rule('tag:stage-1', **kwargs)
         run_rule('tag:stage-2', **kwargs)
         run_rule('tag:stage-3', **kwargs)
+        run_rule('tag:stage-4', **kwargs)
 
     elif rule == 'push:all':
         run_rule('push:stage-1', **kwargs)
         run_rule('push:stage-2', **kwargs)
         run_rule('push:stage-3', **kwargs)
+        run_rule('push:stage-4', **kwargs)
 
     elif rule == 'all':
         run_rule('build:all', **kwargs)
@@ -131,6 +139,7 @@ if __name__ == "__main__":
     parser.add_argument("rule", help="Rule to run", choices=['build:stage-1', 'run:stage-1', 'tag:stage-1', 'push:stage-1',
                                                              'build:stage-2', 'run:stage-2', 'tag:stage-2', 'push:stage-2',
                                                              'build:stage-3', 'tag:stage-3', 'push:stage-3',
+                                                             'build:stage-4', 'tag:stage-4', 'push:stage-4',
                                                              'tag-aibs:stage-1', 'tag-aibs:stage-2', 'push-aibs:stage-1', 'push-aibs:stage-2',
                                                              'clean', 'build:all', 'tag:all', 'push:all', 'all'], nargs='+')
     parser.add_argument("--modelfile", help="DLC model zip file location", type=str)
