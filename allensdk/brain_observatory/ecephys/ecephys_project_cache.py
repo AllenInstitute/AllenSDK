@@ -88,6 +88,31 @@ class EcephysProjectCache(Cache):
         session_api = EcephysNwbSessionApi(path=path, probe_lfp_paths=probe_promises)
         return EcephysSession(api=session_api)
 
+    def get_all_stimulus_sets(self, **session_kwargs):
+        return self._get_all_values("stimulus_set_name", self.get_sessions, **session_kwargs)
+
+    def get_all_genotypes(self, **session_kwargs):
+        return self._get_all_values("genotype", self.get_sessions, **session_kwargs)
+
+    def get_all_recorded_structures(self, **channel_kwargs):
+        return self._get_all_values("manual_structure_acronym", self.get_channels, **channel_kwargs)
+
+    def get_all_project_codes(self):
+        return self._get_all_values("project_code", self.get_sessions, **session_kwargs)
+
+    def get_all_ages(self):
+        return self._get_all_values("age", self.get_sessions, **session_kwargs)
+    
+    def get_all_genders(self):
+        return self._get_all_values("gender", self.get_sessions, **session_kwargs)
+
+
+    def _get_all_values(self, key, method=None, **method_kwargs):
+        if method is None:
+            method = self.get_sessions
+        data = method(**method_kwargs)
+        return data[key].unique().tolist()
+
 
     def add_manifest_paths(self, manifest_builder):
         manifest_builder = super(EcephysProjectCache, self).add_manifest_paths(manifest_builder)

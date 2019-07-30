@@ -39,6 +39,8 @@ import re
 import logging
 import errno
 import pandas as pd
+from pathlib import Path
+
 
 class ManifestVersionError(Exception): 
 
@@ -292,6 +294,12 @@ class Manifest(object):
         Parameters
         ----------
         file_name : string
+
+        Returns
+        -------
+        leftmost : string 
+            most rootward directory created
+
         '''
 
         dirname = os.path.dirname(file_name)
@@ -300,7 +308,7 @@ class Manifest(object):
         if not dirname:
             return
 
-        Manifest.safe_mkdir(dirname)
+        return Manifest.safe_mkdir(dirname)
 
     @classmethod
     def safe_mkdir(cls, directory):
@@ -310,7 +318,24 @@ class Manifest(object):
         ----------
         directory : string
             create it if it doesn't exist
+
+        Returns
+        -------
+        leftmost : string 
+            most rootward directory created
+
         '''
+
+        parts = Path(directory).parts
+        sub_paths = [Path(parts[0])]
+        for part in parts[1:]:
+            sub_paths.append(sub_paths[-1] / part)
+
+        leftmost = None
+        for sub_path in sub_paths:
+            if not sub_path.exists():
+                leftmost = str(sub_path)
+
         try:
             os.makedirs(directory)
         except OSError as e:
@@ -333,6 +358,9 @@ class Manifest(object):
                 pass
             else:
                 raise
+
+        return leftmost
+
 
     def create_dir(self, path_key):
         '''Make a directory for an entry.
