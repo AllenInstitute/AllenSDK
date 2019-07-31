@@ -1,6 +1,6 @@
 from allensdk.core.lazy_property import LazyProperty, LazyPropertyMixin
 import pandas as pd
-from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorOphysSession as MesoscopeOphysPlane
+from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorOphysSession
 from allensdk.internal.api.mesoscope_lims_api import MesoscopeSessionLimsApi, MesoscopePlaneLimsApi
 
 class MesoscopeSession(LazyPropertyMixin):
@@ -36,6 +36,17 @@ class MesoscopeSession(LazyPropertyMixin):
     def get_plane_timestamp(self, exp_id):
         return self.planes_timestamps.loc[self.planes_timestamps['plane_id'] == exp_id]
 
+class  MesoscopeOphysPlane(BehaviorOphysSession):
+
+    @classmethod
+    def from_lims(cls, experiment_id):
+        return cls(api=MesoscopePlaneLimsApi(experiment_id))
+
+    def __init__(self, api=None):
+        self.api = api
+        self.experiment_df = LazyProperty(self.api.get_experiment_df)
+        self.experiment_id = LazyProperty(self.api.get_experiment_id)
+        self.session_id = LazyProperty(self.api.get_session_id)
 
 
 if __name__ == "__main__":

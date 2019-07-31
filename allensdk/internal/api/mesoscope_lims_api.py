@@ -173,7 +173,11 @@ class MesoscopePlaneLimsApi(BehaviorOphysLimsApi):
 
 
     def get_session_id(self):
-        self.session_id = self.experiment_df['session_id']
+        if self.experiment_df :
+            self.session_id = self.experiment_df['session_id']
+        else :
+            self.get_experiment_df()
+            self.session_id = self.experiment_df['session_id']
         return self.session_id
 
     # def get_metadata(self):
