@@ -26,6 +26,7 @@ class MesoscopeSessionLimsApi(PostgresQueryMixin):
         self.experiment_ids = None
         self.pairs = None
         self.splitting_json = None
+        self.session_folder = None
         self.session_df = None
         self.sync_path = None
         self.planes_timestamps = None
@@ -59,7 +60,8 @@ class MesoscopeSessionLimsApi(PostgresQueryMixin):
     def get_session_folder(self):
         _session = pd.DataFrame(self.get_session_df())
         session_folder = _session['session_folder']
-        return session_folder.values[0]
+        self.session_folder = safe_system_path(session_folder.values[0])
+        return self.session_folder
 
     def get_session_df(self):
         query = ' '.join(("SELECT oe.id as experiment_id, os.id as session_id",
@@ -174,11 +176,8 @@ class MesoscopePlaneLimsApi(BehaviorOphysLimsApi):
 
 
     def get_session_id(self):
-        if self.experiment_df :
-            self.session_id = self.experiment_df['session_id']
-        else :
-            self.get_experiment_df()
-            self.session_id = self.experiment_df['session_id']
+        self.get_experiment_df()
+        self.session_id = self.experiment_df['session_id'].values[0]
         return self.session_id
 
     # def get_metadata(self):

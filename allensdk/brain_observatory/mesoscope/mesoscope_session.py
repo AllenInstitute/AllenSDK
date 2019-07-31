@@ -52,13 +52,7 @@ class  MesoscopeOphysPlane(BehaviorOphysSession):
 if __name__ == "__main__":
 
     session = MesoscopeSession.from_lims(754606824)
-    # print(session.experiments_ids)
     pd.options.display.width = 0
-    # print(session.session_df)
-    # print(session.folder)
-    # print(session.session_id)
-    # print(session.splitting_json)
-    # print(session.pairs)
     planes = session.get_planes()
 
 
