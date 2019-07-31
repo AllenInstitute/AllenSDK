@@ -144,8 +144,8 @@ def main():
         T = T - 1
 
     # make sure that ROI and neuropil trace files are organized the same
-    n_id = neuropil_traces["roi_names"]
-    r_id = roi_traces["roi_names"]
+    n_id = neuropil_traces["roi_names"][:].astype(str)
+    r_id = roi_traces["roi_names"][:].astype(str)
     logging.info("Processing %d traces", len(n_id))
     assert len(n_id) == len(r_id), "Input trace files are not aligned (ROI count)"
     for i in range(len(n_id)):
@@ -227,7 +227,7 @@ def main():
         hf.create_dataset("r", data=r_list)
         hf.create_dataset("RMSE", data=RMSE_list)
         hf.create_dataset("FC", data=corrected, compression="gzip")
-        hf.create_dataset("roi_names", data=roi_names)
+        hf.create_dataset("roi_names", data=roi_names.astype(np.string_))
 
         for n in range(num_traces):
             r = r_vals[n]
