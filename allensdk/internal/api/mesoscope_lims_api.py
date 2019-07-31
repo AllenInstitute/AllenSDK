@@ -28,6 +28,7 @@ class MesoscopeSessionLimsApi(PostgresQueryMixin):
         self.splitting_json = None
         self.session_df = None
         self.sync_path = None
+        self.planes_timestamps = None
         super().__init__()
 
     def get_well_known_file(self, file_type):
@@ -113,7 +114,6 @@ class MesoscopeSessionLimsApi(PostgresQueryMixin):
         sync_path = self.get_sync_file()
         return get_sync_data(sync_path)
 
-
     def split_session_timestamps(self):
 
         #this needs a check for dropped frames: compare timestamps with scanimage header's timestamps.
@@ -127,7 +127,8 @@ class MesoscopeSessionLimsApi(PostgresQueryMixin):
             planes_timestamps['plane_id'][i+1] = pairs[pair][1]
             planes_timestamps['ophys_timestamp'][i] = planes_timestamps['ophys_timestamp'][i+1] = timestamps[pair::len(pairs)]
             i += 2
-        return planes_timestamps
+        self.planes_timestamps = planes_timestamps
+        return self.planes_timestamps
 
 
 class MesoscopePlaneLimsApi(BehaviorOphysLimsApi):

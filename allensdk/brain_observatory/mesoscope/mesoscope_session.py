@@ -21,7 +21,7 @@ class MesoscopeSession(LazyPropertyMixin):
         self.planes_timestamps = LazyProperty(self.api.split_session_timestamps)
 
     def get_exp_by_structure(self, structure):
-        return self.experiments.loc[self.session_df.structure == structure]
+        return self.session_df.loc[self.session_df.structure == structure]
 
     def get_planes(self):
         self.planes = pd.DataFrame(columns=['plane_id', 'plane'], index=range(len(self.experiments_ids['experiment_id'])))
