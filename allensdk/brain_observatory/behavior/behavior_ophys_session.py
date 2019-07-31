@@ -19,7 +19,7 @@ class BehaviorOphysSession(LazyPropertyMixin):
     Attributes:
         ophys_experiment_id : int (LazyProperty)
             Unique identifier for this experimental session
-        max_projection : SimpleITK.Image (LazyProperty)
+        max_projection : allensdk.brain_observatory.behavior.image_api.Image (LazyProperty)
             2D max projection image
         stimulus_timestamps : numpy.ndarray (LazyProperty)
             Timestamps associated the stimulus presentations on the monitor 
@@ -53,7 +53,7 @@ class BehaviorOphysSession(LazyPropertyMixin):
             A dataframe containing behavioral trial start/stop times, and trial data
         corrected_fluorescence_traces : pandas.DataFrame (LazyProperty)
             The motion-corrected fluorescence traces organized into a dataframe; index is the cell roi ids
-        average_projection : SimpleITK.Image (LazyProperty)
+        average_projection : allensdk.brain_observatory.behavior.image_api.Image (LazyProperty)
             2D image of the microscope field of view, averaged across the experiment
         motion_correction : pandas.DataFrame LazyProperty
             A dataframe containing trace data used during motion correction computation
