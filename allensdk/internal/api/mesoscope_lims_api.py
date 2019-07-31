@@ -141,9 +141,12 @@ class MesoscopePlaneLimsApi(BehaviorOphysLimsApi):
         self.experiment_df = None
         super().__init__(experiment_id)
 
-    # def get_ophys_timestamps(self):
-    #     #re-define based on split timestamps
-    #     raise NotImplementedError
+    def get_ophys_timestamps(self):
+        session = MesoscopeSessionLimsApi(self.session_id)
+        session_timestamps = session.split_session_timestamps()
+        plane_timestamps = session_timestamps.loc[session_timestamps['plane_id'] == self.ophys_experiment_id]
+        self.ophys_timestamps = plane_timestamps
+        return self.ophys_timestamps
 
     def get_experiment_df(self):
 
@@ -171,7 +174,7 @@ class MesoscopePlaneLimsApi(BehaviorOphysLimsApi):
                 AND oe.id='{}'
                 '''
 
-        query = query.format(self.get_experiment_id())
+        query = query.format(self.get_ophys_experiment_id())
         self.experiment_df = pd.read_sql(query, api.get_connection())
         return self.experiment_df
 
