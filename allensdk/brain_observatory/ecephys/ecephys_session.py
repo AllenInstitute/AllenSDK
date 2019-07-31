@@ -263,7 +263,7 @@ class EcephysSession(LazyPropertyMixin):
         large_bin_size_threshold=0.001,
         time_domain_callback=None
     ):
-        ''' Build a dataset of spike counts surrounding stimulus onset per unit and stimulus frame.
+        ''' Build an array of spike counts surrounding stimulus onset per unit and stimulus frame.
 
         Parameters
         ---------
@@ -286,8 +286,8 @@ class EcephysSession(LazyPropertyMixin):
 
         Returns
         -------
-        xarray.Dataset :
-            Contains a data array named spike_counts whose dimensions are stimulus presentation, unit, 
+        xarray.DataArray :
+            Data array whose dimensions are stimulus presentation, unit, 
             and time bin and whose values are spike counts.
 
         '''
@@ -323,6 +323,7 @@ class EcephysSession(LazyPropertyMixin):
         )
 
         tiled_data = xr.DataArray(
+            name='spike_counts',
             data=tiled_data, 
             coords={
                 'stimulus_presentation_id': stimulus_presentations.index.values,
@@ -332,7 +333,7 @@ class EcephysSession(LazyPropertyMixin):
             dims=['stimulus_presentation_id', 'time_relative_to_stimulus_onset', 'unit_id']
         )
 
-        return xr.Dataset(data_vars={'spike_counts': tiled_data})
+        return tiled_data
 
 
     def presentationwise_spike_times(self, stimulus_presentation_ids=None, unit_ids=None):
