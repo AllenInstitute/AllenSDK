@@ -253,6 +253,44 @@ class EcephysSession(LazyPropertyMixin):
         return removed_unused_stimulus_presentation_columns(filtered_presentations)
 
 
+    def get_stimulus_epochs(self, duration_thresholds=None):
+        """ Reports continuous periods of time during which a single kind of stimulus was presented
+
+        Parameters
+        ---------
+        duration_thresholds : dict, optional
+            keys are stimulus names, values are floating point durations in seconds. All epochs with
+                - a given stimulus name
+                - a duration shorter than the associated threshold
+            will be removed from the results
+
+        """
+
+        if duration_thresholds is None:
+            duration_thresholds = {"spontaneous_activity": 90.0}
+
+        presentations = self.stimulus_presentations.copy()
+        diff_indices = nan_intervals(presentations["stimulus_block"])
+
+        epochs = []
+        for left, right in zip(diff_indices[:-1], diff_indices[1:]):
+            epochs.append({
+                "start_time": presentations.iloc[left]["start_time"],
+                "stop_time": presentations.iloc[right-1]["stop_time"],
+                "stimulus_name": presentations.iloc[left]["stimulus_name"],
+                "stimulus_block": presentations.iloc[left]["stimulus_block"]
+            })
+        epochs = pd.DataFrame(epochs)
+        epochs["duration"] = epochs["stop_time"] - epochs["start_time"]
+
+        for key, threshold in duration_thresholds.items():
+            epochs = epochs[
+                (epochs["stimulus_name"] != key)
+                | (epochs["duration"] >= threshold)
+            ]
+
+        return epochs.loc[:, ["start_time", "stop_time", "duration", "stimulus_name", "stimulus_block"]]
+
     def presentationwise_spike_counts(
         self, 
         bin_edges, 
@@ -737,7 +775,19 @@ def nan_intervals(array):
         start and end indices of detected intervals (one longer than the number of intervals)
 
     """
-    return array_intervals(np.nan_to_num(array))
+
+    array = np.array(array)
+    isnan = np.isnan(array)
+
+    uniques = np.unique(array[np.logical_not(isnan)])
+    gaps = np.diff(uniques)
+    left = np.argmax(gaps)
+    right = left + 1
+    nan_val = uniques[left] + (uniques[right] - uniques[left]) / 2
+
+    array = array.copy()
+    array[isnan] = nan_val
+    return array_intervals(array)
 
 
 def array_intervals(array):
