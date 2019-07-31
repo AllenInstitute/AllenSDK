@@ -159,7 +159,7 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
     def get_licks(self):
         behavior_stimulus_file = self.get_behavior_stimulus_file()
         data = pd.read_pickle(behavior_stimulus_file)
-        lick_frames = data['items']['behavior']['lick_sensors'][0]['lick_events'][0]
+        lick_frames = data['items']['behavior']['lick_sensors'][0]['lick_events']
         stimulus_timestamps_no_monitor_delay = self.get_sync_data()['stimulus_times_no_delay']
         lick_times  = stimulus_timestamps_no_monitor_delay[lick_frames]
         return pd.DataFrame({'time': lick_times})
