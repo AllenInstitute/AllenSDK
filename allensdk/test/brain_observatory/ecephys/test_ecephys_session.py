@@ -13,7 +13,7 @@ def raw_stimulus_table():
         'start_time': np.arange(4)/2,
         'stop_time':np.arange(1, 5)/2,
         'stimulus_name':['a', 'a', 'a', 'a_movie'],
-        'stimulus_block':[0, 0, 1, 1],
+        'stimulus_block':[0, 0, 0, 1],
         'TF': np.empty(4) * np.nan,
         'SF':np.empty(4) * np.nan,
         'Ori': np.empty(4) * np.nan,
@@ -156,6 +156,22 @@ def session_metadata_api():
         def get_ecephys_session_id(self):
             return 12345
     return EcephysSessionMetadataApi()
+
+
+def test_get_stimulus_epochs(just_stimulus_table_api):
+
+    expected = pd.DataFrame({
+        "start_time": [0, 3/2],
+        "stop_time": [3/2, 2],
+        "duration": [3/2, 1/2],
+        "stimulus_name": ["a", "a_movie"],
+        "stimulus_block": [0, 1]
+    })
+
+    session = EcephysSession(api=just_stimulus_table_api)
+    obtained = session.get_stimulus_epochs()
+
+    pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)
 
 
 def test_session_metadata(session_metadata_api):
