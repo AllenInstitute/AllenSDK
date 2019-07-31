@@ -141,8 +141,9 @@ class MesoscopePlaneLimsApi(BehaviorOphysLimsApi):
         self.experiment_df = None
         super().__init__(experiment_id)
 
-    def get_experiment_id(self):
-        return self.experiment_id
+    # def get_ophys_timestamps(self):
+    #     #re-define based on split timestamps
+    #     raise NotImplementedError
 
     def get_experiment_df(self):
 
@@ -175,7 +176,7 @@ class MesoscopePlaneLimsApi(BehaviorOphysLimsApi):
         return self.experiment_df
 
 
-    def get_session_id(self):
+    def get_ophys_session_id(self):
         self.get_experiment_df()
         self.session_id = self.experiment_df['session_id'].values[0]
         return self.session_id
