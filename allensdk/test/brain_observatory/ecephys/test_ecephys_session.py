@@ -199,13 +199,13 @@ def test_presentationwise_spike_counts(spike_times_api):
     session = EcephysSession(api=spike_times_api)
     obtained = session.presentationwise_spike_counts(np.linspace(-.1, .1, 3), session.stimulus_presentations.index.values, session.units.index.values)
 
-    first = obtained['spike_counts'].loc[{'unit_id': 2, 'stimulus_presentation_id': 2}]
+    first = obtained.loc[{'unit_id': 2, 'stimulus_presentation_id': 2}]
     assert np.allclose([0, 3], first)
 
-    second = obtained['spike_counts'].loc[{'unit_id': 1, 'stimulus_presentation_id': 3}]
+    second = obtained.loc[{'unit_id': 1, 'stimulus_presentation_id': 3}]
     assert np.allclose([0, 0], second)
 
-    assert np.allclose([4, 2, 2], obtained['spike_counts'].shape)
+    assert np.allclose([4, 2, 2], obtained.shape)
 
 
 @pytest.mark.parametrize("spike_times,time_domain,expected", [
