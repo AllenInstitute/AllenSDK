@@ -218,6 +218,15 @@ def get_trials(data, licks_df, rewards_df, rebase):
         trial_data['initial_image_name'].append(initial_image_name)
         trial_data['change_image_name'].append(change_image_name)
 
+    # ensure that there aren't redundant trial outcome labels 
+    for idx,row in trials[trials['auto_rewarded']==True].iterrows():
+        # if the trial is autorewarded, none of these other columns can be True
+        for col in ['hit','miss','false_alarm','correct_reject']:
+            trials.at[idx, col] = False 
+        # if the trial was aborted, we shouldn't also call it auto_rewarded
+        if row['aborted']:
+            trials.at[idx,'auto_rewarded'] = False 
+
     trials = pd.DataFrame(trial_data).set_index('trial')
     trials.index = trials.index.rename('trials_id')
 
