@@ -189,7 +189,7 @@ class Flashes(StimulusAnalysis):
             
             psth = self.conditionwise_psth.sel(unit_id=unit_id, stimulus_condition_id =condition_id).values
             
-            plt.bar(np.arange(len(psth))-0.5, pp, color=plot_colors[idx], alpha=0.5, width=1.0)
-            plt.step(np.arange(len(psth)), pp, color=plot_colors[idx])
+            plt.bar(np.arange(len(psth))-0.5, psth, color=plot_colors[idx], alpha=0.5, width=1.0)
+            plt.step(np.arange(len(psth)), psth, color=plot_colors[idx])
             plt.axis('off')
     
