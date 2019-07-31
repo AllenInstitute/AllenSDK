@@ -540,8 +540,8 @@ class EcephysSession(LazyPropertyMixin):
         table.index.name = 'unit_id'
         table = table.rename(columns={
             'description': 'probe_description',
-            #'manual_structure_id': 'structure_id',
-            #'manual_structure_acronym': 'structure_acronym',
+            'manual_structure_id': 'structure_id',
+            'manual_structure_acronym': 'structure_acronym',
             'local_index_channel': 'channel_local_index',
         })
 
