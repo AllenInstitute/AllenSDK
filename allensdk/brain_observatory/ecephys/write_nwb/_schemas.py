@@ -28,6 +28,7 @@ class Channel(RaisingSchema):
     manual_structure_id = Int(required=True, allow_none=True)
     manual_structure_acronym = String(required=True, allow_none=True)
 
+
 class Unit(RaisingSchema):
     id = Int(required=True)
     peak_channel_id = Int(required=True)
