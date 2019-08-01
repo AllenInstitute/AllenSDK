@@ -217,8 +217,17 @@ def get_trial_reward_time(rebased_reward_times, start_time, stop_time):
     return float('nan') if len(reward_times) == 0 else one(reward_times)
         
 
-def get_trial_timing(event_dict, hit, false_alarm, stimulus_change, sham_change):
-    '''extract trial timing data'''
+def get_trial_timing(event_dict, go, catch, hit, false_alarm):
+    '''
+    extract trial timing data
+    
+    content of trial log depends on trial type depends on trial type and response type
+    go, catch, hit, false_alarm must be passed as booleans to disambiguate trial and response type
+    '''
+
+    assert not (hit==True and miss==True), "both `hit` and `miss` cannot be True"
+    assert not (go==True and catch==True), "both `go` and `catch` cannot be True"
+
     start_time = event_dict["trial_start", ""]
     stop_time = event_dict["trial_end", ""]
 
@@ -229,14 +238,14 @@ def get_trial_timing(event_dict, hit, false_alarm, stimulus_change, sham_change)
     else:
         response_time = float("nan")
 
-    if stimulus_change:
+    if go:
         change_time = event_dict.get(('stimulus_changed', ''))
-    elif sham_change:
+    elif catch:
         change_time = event_dict.get(('sham_change', ''))
     else:
         change_time = float("nan")
 
-    if not (sham_change or stimulus_change):
+    if not (go or catch):
         response_latency = None
     else:
         if hit or false_alarm:
@@ -287,10 +296,10 @@ def get_trials(data, licks_df, rewards_df, rebase):
         tr_data.update(trial_data_from_log(trial))
         tr_data.update(get_trial_timing(
             event_dict,
+            tr_data['go'],
+            tr_data['catch'],
             tr_data['hit'],
             tr_data['false_alarm'],
-            tr_data['stimulus_change'],
-            tr_data['sham_change'],
         ))
         tr_data.update(get_trial_image_names(trial, stimuli))
 
