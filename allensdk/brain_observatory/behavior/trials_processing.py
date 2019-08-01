@@ -127,22 +127,7 @@ def resolve_initial_image(stimuli, start_frame):
     return initial_image_category_name, initial_image_group, initial_image_name
 
 
-def trial_data_from_log(trial, stimuli, sync_lick_times, rebased_reward_times, rebase):
-    event_dict = {(e[0], e[1]): rebase(e[2]) for e in trial['events']}
-
-    start_time = event_dict["trial_start", ""]
-    stop_time = event_dict["trial_end", ""]
-
-    lick_times = sync_lick_times[np.where(np.logical_and(
-        sync_lick_times >= start_time, 
-        sync_lick_times <= stop_time
-    ))]
-
-    reward_times = rebased_reward_times[np.where(np.logical_and(
-        rebased_reward_times >= start_time, 
-        rebased_reward_times <= stop_time
-    ))]
-    reward_time = float('nan') if len(reward_times) == 0 else one(reward_times)
+def trial_data_from_log(trial, event_dict, stimuli, rebase):
 
     hit = ('hit', "") in event_dict
     false_alarm = ('false_alarm', "") in event_dict
@@ -186,46 +171,21 @@ def trial_data_from_log(trial, stimuli, sync_lick_times, rebased_reward_times, r
         else:
             response_latency = float("inf")
 
-    trial_start_frame = trial["events"][0][3]
-    _, _, initial_image_name = resolve_initial_image(stimuli, trial_start_frame)
-    if len(trial["stimulus_changes"]) == 0:
-        change_image_name = initial_image_name
-    else:
-        (_, from_name), (_, to_name), _, _ = trial["stimulus_changes"][0]
-        assert from_name == initial_image_name
-        change_image_name = to_name
-
-    validate_trial_condition_exclusivity(
-        trial["index"],
-        aborted=aborted, 
-        auto_rewarded=auto_rewarded, 
-        hit=hit, miss=miss, 
-        false_alarm=false_alarm, 
-        correct_reject=correct_reject
-    )
     return {
-        "start_time": start_time,
-        "stop_time": stop_time,
-        "trial_length": stop_time - start_time,
-        "lick_times": lick_times,
         "reward_volume": sum([r[0] for r in trial.get("rewards", [])]),
         "hit": hit,
         "false_alarm": false_alarm,
-        "response_time": response_time, 
         "miss": miss,
-        "reward_time": reward_time,
         "sham_change": sham_change,
         "stimulus_change": stimulus_change,
-        "change_time": change_time,
         "aborted": aborted,
         "go": go,
         "catch": catch,
         "auto_rewarded": auto_rewarded,
         "correct_reject": correct_reject,
-        "response_latency": response_latency,
-        "initial_image_name": initial_image_name,
-        "change_image_name": change_image_name,
-        "trial": trial["index"]
+        "change_time": change_time,
+        "response_time": response_time, 
+        "response_latency": response_latency
     }
 
 
@@ -240,19 +200,73 @@ def validate_trial_condition_exclusivity(trial_index, **trial_conditions):
         raise AssertionError(f"expected exactly 1 trial condition out of {all_conditions} to be True, instead {on} were True (trial {trial_index})")
 
 
+def get_trial_lick_times(lick_times, start_time, stop_time):
+    return lick_times[np.where(np.logical_and(
+        lick_times >= start_time, 
+        lick_times <= stop_time
+    ))]
+
+
+def get_trial_reward_time(rebased_reward_times, start_time, stop_time):
+    reward_times = rebased_reward_times[np.where(np.logical_and(
+        rebased_reward_times >= start_time, 
+        rebased_reward_times <= stop_time
+    ))]
+    return float('nan') if len(reward_times) == 0 else one(reward_times)
+        
+
+def get_trial_timing(event_dict):
+
+    start_time = event_dict["trial_start", ""]
+    stop_time = event_dict["trial_end", ""]
+
+    return {
+        "start_time": start_time,
+        "stop_time": stop_time,
+        "trial_length": stop_time - start_time
+    }       
+
+
+def get_trial_image_names(trial, stimuli):
+    trial_start_frame = trial["events"][0][3]
+    _, _, initial_image_name = resolve_initial_image(stimuli, trial_start_frame)
+    if len(trial["stimulus_changes"]) == 0:
+        change_image_name = initial_image_name
+    else:
+        (_, from_name), (_, to_name), _, _ = trial["stimulus_changes"][0]
+        assert from_name == initial_image_name
+        change_image_name = to_name
+
+    return {
+        "initial_image_name": initial_image_name,
+        "change_image_name": change_image_name
+    }
+
+
 def get_trials(data, licks_df, rewards_df, rebase):
     assert rewards_df.index.name == 'timestamps'
     stimuli = data["items"]["behavior"]["stimuli"]
     trial_log = data["items"]["behavior"]["trial_log"]
 
-    trial_data = [None] * len(trial_log)
+    all_trial_data = [None] * len(trial_log)
     sync_lick_times = licks_df.time.values 
     rebased_reward_times = rewards_df.index.values
 
     for idx, trial in enumerate(trial_log):
-        trial_data[idx] = trial_data_from_log(trial, stimuli, sync_lick_times, rebased_reward_times, rebase)
+        event_dict = {(e[0], e[1]): rebase(e[2]) for e in trial['events']}
 
-    trials = pd.DataFrame(trial_data).set_index('trial')
+        tr_data = {"trial": trial["index"]}
+
+        tr_data.update(get_trial_timing(event_dict))
+        tr_data.update(trial_data_from_log(trial, event_dict, stimuli, rebase))
+        tr_data.update(get_trial_image_names(trial, stimuli))
+
+        tr_data["lick_times"] = get_trial_lick_times(sync_lick_times, tr_data["start_time"], tr_data["stop_time"])
+        tr_data["reward_time"] = get_trial_reward_time(rebased_reward_times, tr_data["start_time"], tr_data["stop_time"])
+
+        all_trial_data[idx] = tr_data
+
+    trials = pd.DataFrame(all_trial_data).set_index('trial')
     trials.index = trials.index.rename('trials_id')
 
     return trials
