@@ -80,3 +80,157 @@ def test_calculate_reward_rate(kwargs, expected):
         expected, 
     ), "calculared reward rate should match expected reward rate :("
 
+def test_trial_data_from_log():
+    test_trial_0 = {
+        'index': 3,
+        'cumulative_rewards': 1,
+        'licks': [(318.2737866026219, 18736),
+        (318.4235244484611, 18745),
+        (318.55351991075554, 18753),
+        (318.6735239364698, 18760),
+        (318.8235420609609, 18769),
+        (318.9733899117824, 18778),
+        (319.153503175955, 18789),
+        (319.35351008052305, 18801),
+        (321.24372627834714, 18914),
+        (321.3438153063156, 18920),
+        (321.49348118080985, 18929),
+        (321.6237259097134, 18937)],
+        'stimulus_changes': [(('im065', 'im065'),
+        ('im062', 'im062'),
+        317.76644976765834,
+        18706)],
+        'success': False,
+        'cumulative_volume': 0.005,
+        'trial_params': {'catch': False, 'auto_reward': True, 'change_time': 5},
+        'rewards': [(0.005, 317.92325660388286, 18715)],
+        'events': [['trial_start', '', 314.0120642698258, 18481],
+        ['initial_blank', 'enter', 314.01216666808074, 18481],
+        ['initial_blank', 'exit', 314.0122573636779, 18481],
+        ['pre_change', 'enter', 314.01233489378524, 18481],
+        ['pre_change', 'exit', 314.0124103759274, 18481],
+        ['stimulus_window', 'enter', 314.01248819860115, 18481],
+        ['stimulus_changed', '', 317.7666744586863, 18706],
+        ['auto_reward', '', 317.76681547571155, 18706],
+        ['response_window', 'enter', 317.9231027139341, 18715],
+        ['response_window', 'exit', 318.532233361527, 18752],
+        ['miss', '', 318.5324346472395, 18752],
+        ['stimulus_window', 'exit', 322.0351179203675, 18962],
+        ['no_lick', 'exit', 322.0352864386384, 18962],
+        ['trial_end', '', 322.0353750862705, 18962]]
+    }
+    
+    expected_result_0 = {
+        'reward_volume': 0.005,
+        'hit': False,
+        'false_alarm': False,
+        'miss': False,
+        'sham_change': False,
+        'stimulus_change': True,
+        'aborted': False,
+        'go': False,
+        'catch': False,
+        'auto_rewarded': True,
+        'correct_reject': False
+    }
+
+    assert trials_processing.trial_data_from_log(test_trial_0) == expected_result_0
+
+    test_trial_1 = {
+        'index': 4,
+        'cumulative_rewards': 1,
+        'licks': [(324.1935569847751, 19091),
+        (324.34329131981696, 19100),
+        (324.49368158882305, 19109)],
+        'stimulus_changes': [],
+        'success': False,
+        'cumulative_volume': 0.005,
+        'trial_params': {'catch': False, 'auto_reward': True, 'change_time': 6},
+        'rewards': [],
+        'events': [['trial_start', '', 322.2688823113451, 18976],
+        ['initial_blank', 'enter', 322.2689858798658, 18976],
+        ['initial_blank', 'exit', 322.26907599033007, 18976],
+        ['pre_change', 'enter', 322.2691523501716, 18976],
+        ['pre_change', 'exit', 322.26922900257955, 18976],
+        ['stimulus_window', 'enter', 322.26930536242105, 18976],
+        ['early_response', '', 324.1937059010944, 19091],
+        ['abort', '', 324.1937848940339, 19091],
+        ['timeout', 'enter', 324.19388963282034, 19091],
+        ['timeout', 'exit', 324.8042502297378, 19128],
+        ['trial_end', '', 324.80448691598986, 19128]]
+    }
+
+    expected_result_1 = {
+        'reward_volume': 0,
+        'hit': False,
+        'false_alarm': False,
+        'miss': False,
+        'sham_change': False,
+        'stimulus_change': False,
+        'aborted': True,
+        'go': False,
+        'catch': False,
+        'auto_rewarded': False,
+        'correct_reject': False
+    }
+
+    assert trials_processing.trial_data_from_log(test_trial_1) == expected_result_1
+
+    test_trial_2 = {
+        'index': 51,
+        'cumulative_rewards': 11,
+        'licks': [(542.6200214334176, 32186),
+        (542.7097825733969, 32191),
+        (542.8597161461861, 32200),
+        (542.9599280520605, 32206),
+        (543.059708422432, 32212),
+        (543.15998088956, 32218),
+        (543.2899491431752, 32226),
+        (543.4098750536493, 32233),
+        (543.5197477960238, 32240),
+        (543.6596846660369, 32248),
+        (543.7699336488565, 32255),
+        (543.8897463361172, 32262),
+        (544.0196821148575, 32270),
+        (544.13974055793, 32277),
+        (544.2596729048659, 32284),
+        (544.3896745110557, 32292),
+        (544.5397306691843, 32301)],
+        'stimulus_changes': [(('im069', 'im069'),
+        ('im085', 'im085'),
+        542.2007438794369,
+        32161)],
+        'success': True,
+        'cumulative_volume': 0.067,
+        'trial_params': {'catch': False, 'auto_reward': False, 'change_time': 4},
+        'rewards': [(0.007, 542.620156599114, 32186)],
+        'events': [['trial_start', '', 539.1971251251088, 31981],
+        ['initial_blank', 'enter', 539.197228401063, 31981],
+        ['initial_blank', 'exit', 539.1973220223246, 31981],
+        ['pre_change', 'enter', 539.1974007226976, 31981],
+        ['pre_change', 'exit', 539.197477667672, 31981],
+        ['stimulus_window', 'enter', 539.1975575383109, 31981],
+        ['stimulus_changed', '', 542.2009428246179, 32161],
+        ['response_window', 'enter', 542.3661398812824, 32171],
+        ['hit', '', 542.6201402153932, 32186],
+        ['response_window', 'exit', 542.9666720011281, 32207],
+        ['stimulus_window', 'exit', 546.4695340323526, 32417],
+        ['no_lick', 'exit', 546.4696966992947, 32417],
+        ['trial_end', '', 546.4697827138287, 32417]]
+    }
+
+    expected_result_2 = {
+        'reward_volume': 0.007,
+        'hit': True,
+        'false_alarm': False,
+        'miss': False,
+        'sham_change': False,
+        'stimulus_change': True,
+        'aborted': False,
+        'go': True,
+        'catch': False,
+        'auto_rewarded': False,
+        'correct_reject': False
+    }
+
+    assert trials_processing.trial_data_from_log(test_trial_2) == expected_result_2
