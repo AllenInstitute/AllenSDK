@@ -109,19 +109,21 @@ def test_visbeh_ophys_data_set():
                                         'response_window_sec': [0.15, 0.75],
                                         'stage': u'OPHYS_6_images_B'}
 
+
 @pytest.mark.requires_bamboo
 def test_legacy_dff_api():
 
     ophys_experiment_id = 792813858
     api = BehaviorOphysLimsApi(ophys_experiment_id)
     session = BehaviorOphysSession(api)
-    cell_specimen_ids = [878143453, 878143533, 878151801, 878143406, 878143302]
 
     _, dff_array = session.get_dff_traces()
-    for csid in cell_specimen_ids:
+    for csid in session.dff_traces.index.values:
         dff_trace = session.dff_traces.loc[csid]['dff']
         ind = session.get_cell_specimen_indices([csid])[0]
         np.testing.assert_array_almost_equal(dff_trace, dff_array[ind, :])
+
+    assert dff_array.shape[0] == session.dff_traces.shape[0]
 
 
 @pytest.mark.requires_bamboo
