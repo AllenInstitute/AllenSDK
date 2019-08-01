@@ -217,16 +217,23 @@ def get_trial_reward_time(rebased_reward_times, start_time, stop_time):
     return float('nan') if len(reward_times) == 0 else one(reward_times)
         
 
-def get_trial_timing(event_dict, go, catch, hit, false_alarm):
+def get_trial_timing(event_dict, go, catch, auto_rewarded, hit, false_alarm):
     '''
     extract trial timing data
     
     content of trial log depends on trial type depends on trial type and response type
-    go, catch, hit, false_alarm must be passed as booleans to disambiguate trial and response type
+    go, catch, auto_rewarded, hit, false_alarm must be passed as booleans to disambiguate trial and response type
+
+    on `go` or `auto_rewarded` trials, extract the stimulus_changed time
+    on `catch` trials, extract the sham_change time
+
+    on `hit` trials, extract the response time from the `hit` entry in event_dict
+    on `false_alarm` trials, extract the response time from the `false_alarm` entry in event_dict
     '''
 
     assert not (hit==True and false_alarm==True), "both `hit` and `false_alarm` cannot be True, they are mutually exclusive categories"
     assert not (go==True and catch==True), "both `go` and `catch` cannot be True, they are mutually exclusive categories"
+    assert not (go==True and auto_rewarded==True), "both `go` and `auto_rewarded` cannot be True, they are mutually exclusive categories"
 
     start_time = event_dict["trial_start", ""]
     stop_time = event_dict["trial_end", ""]
@@ -238,14 +245,14 @@ def get_trial_timing(event_dict, go, catch, hit, false_alarm):
     else:
         response_time = float("nan")
 
-    if go:
+    if go or auto_rewarded:
         change_time = event_dict.get(('stimulus_changed', ''))
     elif catch:
         change_time = event_dict.get(('sham_change', ''))
     else:
         change_time = float("nan")
 
-    if not (go or catch):
+    if not (go or catch or auto_rewarded):
         response_latency = None
     else:
         if hit or false_alarm:
@@ -298,6 +305,7 @@ def get_trials(data, licks_df, rewards_df, rebase):
             event_dict,
             tr_data['go'],
             tr_data['catch'],
+            tr_data['auto_rewarded'],
             tr_data['hit'],
             tr_data['false_alarm'],
         ))
