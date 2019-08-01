@@ -127,13 +127,15 @@ def resolve_initial_image(stimuli, start_frame):
     return initial_image_category_name, initial_image_group, initial_image_name
 
 
-def trial_data_from_log(trial, event_dict):
+def trial_data_from_log(trial):
 
-    hit = ('hit', "") in event_dict
-    false_alarm = ('false_alarm', "") in event_dict
-    miss = ('miss', "") in event_dict
-    sham_change = ('sham_change', '') in event_dict
-    stimulus_change = ('stimulus_changed', '') in event_dict
+    trial_event_names = [val[0] for val in trial['events']]
+    hit = 'hit' in trial_event_names
+    false_alarm = 'false_alarm' in trial_event_names
+    miss = 'miss' in trial_event_names
+    sham_change = 'sham_change' in trial_event_names
+    stimulus_change = 'stimulus_changed' in trial_event_names
+    aborted = 'abort' in trial_event_names
 
     if hit:
         response_time = event_dict.get(("hit", ""))
