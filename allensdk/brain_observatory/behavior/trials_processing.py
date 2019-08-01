@@ -137,22 +137,6 @@ def trial_data_from_log(trial):
     stimulus_change = 'stimulus_changed' in trial_event_names
     aborted = 'abort' in trial_event_names
 
-    if hit:
-        response_time = event_dict.get(("hit", ""))
-    elif false_alarm:
-        response_time = event_dict.get(("false_alarm", ""))
-    else:
-        response_time = float("nan")
-
-    aborted = False
-    if stimulus_change:
-        change_time = event_dict.get(('stimulus_changed', ''))
-    elif sham_change:
-        change_time = event_dict.get(('sham_change', ''))
-    else:
-        aborted = True
-        change_time = float("nan")
-
     if aborted:
         go = catch = auto_rewarded = False
     else:
@@ -164,14 +148,6 @@ def trial_data_from_log(trial):
 
     if auto_rewarded:
         hit = miss = correct_reject = false_alarm = False
-
-    if not (sham_change or stimulus_change):
-        response_latency = None
-    else:
-        if hit or false_alarm:
-            response_latency = response_time - change_time
-        else:
-            response_latency = float("inf")
 
     return {
         "reward_volume": sum([r[0] for r in trial.get("rewards", [])]),
@@ -185,9 +161,6 @@ def trial_data_from_log(trial):
         "catch": catch,
         "auto_rewarded": auto_rewarded,
         "correct_reject": correct_reject,
-        "change_time": change_time,
-        "response_time": response_time, 
-        "response_latency": response_latency
     }
 
 
@@ -217,15 +190,40 @@ def get_trial_reward_time(rebased_reward_times, start_time, stop_time):
     return float('nan') if len(reward_times) == 0 else one(reward_times)
         
 
-def get_trial_timing(event_dict):
+def get_trial_timing(event_dict, hit, false_alarm, stimulus_change, sham_change):
 
     start_time = event_dict["trial_start", ""]
     stop_time = event_dict["trial_end", ""]
 
+    if hit:
+        response_time = event_dict.get(("hit", ""))
+    elif false_alarm:
+        response_time = event_dict.get(("false_alarm", ""))
+    else:
+        response_time = float("nan")
+
+    if stimulus_change:
+        change_time = event_dict.get(('stimulus_changed', ''))
+    elif sham_change:
+        change_time = event_dict.get(('sham_change', ''))
+    else:
+        change_time = float("nan")
+
+    if not (sham_change or stimulus_change):
+        response_latency = None
+    else:
+        if hit or false_alarm:
+            response_latency = response_time - change_time
+        else:
+            response_latency = float("inf")
+
     return {
         "start_time": start_time,
         "stop_time": stop_time,
-        "trial_length": stop_time - start_time
+        "trial_length": stop_time - start_time,
+        "response_time": response_time,
+        "change_time": change_time,
+        "response_latency": response_latency,
     }       
 
 
@@ -259,8 +257,14 @@ def get_trials(data, licks_df, rewards_df, rebase):
 
         tr_data = {"trial": trial["index"]}
 
-        tr_data.update(get_trial_timing(event_dict))
-        tr_data.update(trial_data_from_log(trial, event_dict))
+        tr_data.update(trial_data_from_log(trial))
+        tr_data.update(get_trial_timing(
+            event_dict,
+            tr_data['hit'],
+            tr_data['false_alarm'],
+            tr_data['stimulus_change'],
+            tr_data['sham_change'],
+        ))
         tr_data.update(get_trial_image_names(trial, stimuli))
 
         tr_data["lick_times"] = get_trial_lick_times(sync_lick_times, tr_data["start_time"], tr_data["stop_time"])
