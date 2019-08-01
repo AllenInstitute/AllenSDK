@@ -225,8 +225,8 @@ def get_trial_timing(event_dict, go, catch, hit, false_alarm):
     go, catch, hit, false_alarm must be passed as booleans to disambiguate trial and response type
     '''
 
-    assert not (hit==True and miss==True), "both `hit` and `miss` cannot be True"
-    assert not (go==True and catch==True), "both `go` and `catch` cannot be True"
+    assert not (hit==True and false_alarm==True), "both `hit` and `false_alarm` cannot be True, they are mutually exclusive categories"
+    assert not (go==True and catch==True), "both `go` and `catch` cannot be True, they are mutually exclusive categories"
 
     start_time = event_dict["trial_start", ""]
     stop_time = event_dict["trial_end", ""]
