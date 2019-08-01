@@ -20,7 +20,7 @@ def createInputJson(output_file):
 
         "natural_scenes" : 
         {
-            "stimulus_key" : "Natural Images"
+            "stimulus_key" : "natural_scenes"
         },
 
         "natural_movies" : 
@@ -41,21 +41,20 @@ def createInputJson(output_file):
 
         "flashes" : 
         {
-            "stimulus_key" : "flash_250ms"
+            "stimulus_key" : "flashes"
         },
 
 
         "receptive_field_mapping" : 
         {
-            "stimulus_key" : "gabor_20_deg_250ms",
-            "spatial_p_value_n_iter" : 20,
+            "stimulus_key" : "receptive_field_mapping",
             "mask_threshold" : 0.5,
             "minimum_spike_count" : 10
         },
 
         "output_file" : '/mnt/md0/data/production_QC/stimulus_analysis_TEST.csv',
 
-        "nwb_paths" : ['/mnt/nvme0/ecephys_nwb_files/750749662.spikes.nwb2']
+        "nwb_paths" : ['/mnt/nvme0/ecephys_nwb_files_20190727/integration_test.spikes.nwb2']
         
     }
 

@@ -42,9 +42,8 @@ class ReceptiveFieldMapping(DefaultSchema):
 
     stimulus_key = String(help='Key for the receptive field mapping stimulus')
     minimum_spike_count = Int(help='Minimum number of spikes for computing receptive field parameters')
-    spatial_p_value_n_iter = Int(help='number of iterations for computing spatial p value')
     mask_threshold = Float(help='Threshold (as fraction of peak) for computing receptive field mask')
-
+    stimulus_step_size = Float(default=10.0, help='Distance between stimulus locations in degrees')
 
 
 class InputParameters(ArgSchema):

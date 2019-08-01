@@ -51,6 +51,18 @@ class Unit(RaisingSchema):
     d_prime = Float(required=True)
     nn_hit_rate = Float(required=True)
     nn_miss_rate = Float(required=True)
+    max_drift = Float(required=True)
+    cumulative_drift = Float(required=True)
+    silhouette_score = Float(required=True)
+    waveform_duration = Float(required=True)
+    waveform_halfwidth = Float(required=True)
+    PT_ratio = Float(required=True)
+    repolarization_slope = Float(required=True)
+    recovery_slope = Float(required=True)
+    amplitude = Float(required=True)
+    spread = Float(required=True)
+    velocity_above = Float(required=True)
+    velocity_below = Float(required=True)
 
 
 class Lfp(RaisingSchema):
