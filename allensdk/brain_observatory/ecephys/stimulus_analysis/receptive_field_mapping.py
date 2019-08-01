@@ -270,8 +270,8 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         (peak_height, center_y, center_x, width_y, width_x), success = fit_2d_gaussian(rf)
         on_screen = rf_on_screen(rf, center_y, center_x)
 
-        height = width_y * self._params['stimulus_step_size']
-        width = width_x * self._params['stimulus_step_size']
+        height = width_y #* self._params['stimulus_step_size']
+        width = width_x #* self._params['stimulus_step_size']
 
         return azimuth, elevation, width, height, area, p_value[0], on_screen
 
