@@ -139,10 +139,14 @@ class MesoscopePlaneLimsApi(BehaviorOphysLimsApi):
         self.experiment_id = experiment_id
         self.session_id = None
         self.experiment_df = None
+        self.ophys_timestamps = None
         super().__init__(experiment_id)
 
     def get_ophys_timestamps(self):
-        session = MesoscopeSessionLimsApi(self.session_id)
+        if not self.session_id :
+            self.get_ophys_session_id()
+
+        session = ApiFactory.getSessionAPI(self.session_id)
         session_timestamps = session.split_session_timestamps()
         plane_timestamps = session_timestamps.loc[session_timestamps['plane_id'] == self.ophys_experiment_id]
         self.ophys_timestamps = plane_timestamps
@@ -178,7 +182,6 @@ class MesoscopePlaneLimsApi(BehaviorOphysLimsApi):
         self.experiment_df = pd.read_sql(query, api.get_connection())
         return self.experiment_df
 
-
     def get_ophys_session_id(self):
         self.get_experiment_df()
         self.session_id = self.experiment_df['session_id'].values[0]
@@ -187,12 +190,16 @@ class MesoscopePlaneLimsApi(BehaviorOphysLimsApi):
     # def get_metadata(self):
     #     raise NotImplementedError
 
+class ApiFactory():
+    _instances = {}
 
+    @classmethod
+    def getSessionAPI(cls, session_id):
+        return cls._instances.setdefault(session_id, MesoscopeSessionLimsApi(session_id))
 
-
-
-
-
+    @classmethod
+    def getPlaneAPI(cls, experiment_id):
+        return cls._instances.setdefault(experiment_id, MesoscopePlaneLimsApi(experiment_id))
 
 
 

@@ -1,13 +1,13 @@
 from allensdk.core.lazy_property import LazyProperty, LazyPropertyMixin
 import pandas as pd
 from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorOphysSession
-from allensdk.internal.api.mesoscope_lims_api import MesoscopeSessionLimsApi, MesoscopePlaneLimsApi
+from allensdk.internal.api.mesoscope_lims_api import ApiFactory
 
 class MesoscopeSession(LazyPropertyMixin):
 
     @classmethod
     def from_lims(cls, session_id):
-        return cls(api=MesoscopeSessionLimsApi(session_id))
+        return cls(api=ApiFactory.getSessionAPI(session_id))
 
     def __init__(self, api=None):
 
@@ -28,7 +28,7 @@ class MesoscopeSession(LazyPropertyMixin):
         self.planes = pd.DataFrame(columns=['plane_id', 'plane'], index=range(len(self.experiments_ids['experiment_id'])))
         i=0
         for experiment_id in self.experiments_ids['experiment_id']:
-            plane = MesoscopeOphysPlane(api=MesoscopePlaneLimsApi(experiment_id))
+            plane = MesoscopeOphysPlane(api=ApiFactory.getPlaneAPI(experiment_id))
             self.planes.plane_id[i] = experiment_id
             self.planes.plane[i] = plane
             i += 1
@@ -41,7 +41,7 @@ class  MesoscopeOphysPlane(BehaviorOphysSession):
 
     @classmethod
     def from_lims(cls, experiment_id):
-        return cls(api=MesoscopePlaneLimsApi(experiment_id))
+        return cls(api=ApiFactory.getPlaneAPI(experiment_id))
 
     def __init__(self, api=None):
 
