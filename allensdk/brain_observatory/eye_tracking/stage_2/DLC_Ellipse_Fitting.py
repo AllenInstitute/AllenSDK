@@ -49,7 +49,7 @@ def fit_ellipse(h5name):
     
     df = pd.read_hdf(h5name).DeepCut_resnet50_universal_eye_trackingJul10shuffle1_1030000
 
-    l_threshold = 0.2
+    l_threshold = 0.8 #increased likelihood threshold for points that are allowed in fit
     min_num_points = 6
 
     # uses https://github.com/bdhammel/least-squares-ellipse-fitting
@@ -76,27 +76,33 @@ def fit_ellipse(h5name):
         x_data = df.filter(regex=("cr*")).iloc[j].values[0::3]
         y_data = df.filter(regex=("cr*")).iloc[j].values[1::3]
         l = df.filter(regex=("cr*")).iloc[j].values[2::3]
-        
-        if len(l[l>l_threshold]) >= min_num_points: #at least 6 tracked points for annotation quality data
-            lsqe = LSqEllipse() #make fitting object
-            lsqe.fit([x_data[l>l_threshold], y_data[l>l_threshold]])
-            center, width, height, phi = lsqe.parameters()
-            ellipse_dict = {'center_x' : center[0], 'center_y' : center[1], 'width' : width, 'height' : height, 'phi' : phi}
-        else:
+        try:
+            if len(l[l>l_threshold]) >= min_num_points: #at least 6 tracked points for annotation quality data
+                lsqe = LSqEllipse() #make fitting object
+                lsqe.fit([x_data[l>l_threshold], y_data[l>l_threshold]])
+                center, width, height, phi = lsqe.parameters()
+                ellipse_dict = {'center_x' : center[0], 'center_y' : center[1], 'width' : width, 'height' : height, 'phi' : phi}
+            else:
+                ellipse_dict = {'center_x' : np.nan, 'center_y' : np.nan, 'width' : np.nan, 'height' : np.nan, 'phi' : np.nan}
+        except Exception as e:
             ellipse_dict = {'center_x' : np.nan, 'center_y' : np.nan, 'width' : np.nan, 'height' : np.nan, 'phi' : np.nan}
+            print(e)
         cr.append(ellipse_dict)
         #eye
         x_data = df.filter(regex=("eye*")).iloc[j].values[0::3]
         y_data = df.filter(regex=("eye*")).iloc[j].values[1::3]
         l = df.filter(regex=("eye*")).iloc[j].values[2::3]
-        
-        if len(l[l>l_threshold]) >= min_num_points: #at least 6 tracked points for annotation quality data
-            lsqe = LSqEllipse() #make fitting object
-            lsqe.fit([x_data[l>l_threshold], y_data[l>l_threshold]])
-            center, width, height, phi = lsqe.parameters()
-            ellipse_dict = {'center_x' : center[0], 'center_y' : center[1], 'width' : width, 'height' : height, 'phi' : phi}
-        else:
+        try:
+            if len(l[l>l_threshold]) >= min_num_points: #at least 6 tracked points for annotation quality data
+                lsqe = LSqEllipse() #make fitting object
+                lsqe.fit([x_data[l>l_threshold], y_data[l>l_threshold]])
+                center, width, height, phi = lsqe.parameters()
+                ellipse_dict = {'center_x' : center[0], 'center_y' : center[1], 'width' : width, 'height' : height, 'phi' : phi}
+            else:
+                ellipse_dict = {'center_x' : np.nan, 'center_y' : np.nan, 'width' : np.nan, 'height' : np.nan, 'phi' : np.nan}
+        except Exception as e:
             ellipse_dict = {'center_x' : np.nan, 'center_y' : np.nan, 'width' : np.nan, 'height' : np.nan, 'phi' : np.nan}
+            print(e)
         eye.append(ellipse_dict)  
 
         
@@ -104,14 +110,17 @@ def fit_ellipse(h5name):
         x_data = df.filter(regex=("pupil*")).iloc[j].values[0::3]
         y_data = df.filter(regex=("pupil*")).iloc[j].values[1::3]
         l = df.filter(regex=("pupil*")).iloc[j].values[2::3]
-        
-        if len(l[l>l_threshold]) >= min_num_points: #at least 6 tracked points for annotation quality data
-            lsqe = LSqEllipse() #make fitting object
-            lsqe.fit([x_data[l>l_threshold], y_data[l>l_threshold]])
-            center, width, height, phi = lsqe.parameters()
-            ellipse_dict = {'center_x' : center[0], 'center_y' : center[1], 'width' : width, 'height' : height, 'phi' : phi}
-        else:
+        try:
+            if len(l[l>l_threshold]) >= min_num_points: #at least 6 tracked points for annotation quality data
+                lsqe = LSqEllipse() #make fitting object
+                lsqe.fit([x_data[l>l_threshold], y_data[l>l_threshold]])
+                center, width, height, phi = lsqe.parameters()
+                ellipse_dict = {'center_x' : center[0], 'center_y' : center[1], 'width' : width, 'height' : height, 'phi' : phi}
+            else:
+                ellipse_dict = {'center_x' : np.nan, 'center_y' : np.nan, 'width' : np.nan, 'height' : np.nan, 'phi' : np.nan}
+        except Exception as e:
             ellipse_dict = {'center_x' : np.nan, 'center_y' : np.nan, 'width' : np.nan, 'height' : np.nan, 'phi' : np.nan}
+            print(e)
         pupil.append(ellipse_dict) 
     
     pd.DataFrame(cr).to_hdf(ellipse_output_data_file, key='cr', mode='w') #overwrite file      
