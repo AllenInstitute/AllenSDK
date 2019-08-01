@@ -78,7 +78,7 @@ def test_calculate_reward_rate(kwargs, expected):
     assert np.allclose(
         trials_processing.calculate_reward_rate(**kwargs),
         expected, 
-    ), "calculared reward rate should match expected reward rate :("
+    ), "calculated reward rate should match expected reward rate :("
 
 def test_trial_data_from_log():
     test_trial_0 = {
