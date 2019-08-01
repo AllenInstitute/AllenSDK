@@ -128,7 +128,31 @@ def resolve_initial_image(stimuli, start_frame):
 
 
 def trial_data_from_log(trial):
+    '''
+    Infer trial logic from trial log. Returns a dictionary.
+    
+    * reward volume: volume of water delivered on the trial, in mL
 
+    Each of the following values is boolean:
+
+    Trial category values are mutually exclusive
+    * go: trial was a go trial (trial with a stimulus change)
+    * catch: trial was a catch trial (trial with a sham stimulus change)
+
+    stimulus_change/sham_change are mutually exclusive
+    * stimulus_change: did the stimulus change (True on 'go' trials)
+    * sham_change: stimulus did not change, but response was evaluated (True on 'catch' trials)
+
+    Each trial can be one (and only one) of the following:
+    * hit (stimulus changed, animal responded in response window)
+    * miss (stimulus changed, animal did not respond in response window)
+    * false_alarm (stimulus did not change, animal responded in response window)
+    * correct_reject (stimulus did not change, animal did not respond in response window)
+    * aborted (animal responded before change time)
+    * auto_rewarded (reward was automatically delivered following the change. This will bias the animals choice and should not be categorized as hit/miss)
+    
+    
+    '''
     trial_event_names = [val[0] for val in trial['events']]
     hit = 'hit' in trial_event_names
     false_alarm = 'false_alarm' in trial_event_names
@@ -165,6 +189,7 @@ def trial_data_from_log(trial):
 
 
 def validate_trial_condition_exclusivity(trial_index, **trial_conditions):
+    '''ensure that only one of N possible mutually exclusive trial conditions is True'''
     on = []
     for condition, value in trial_conditions.items():
         if value:
@@ -176,6 +201,7 @@ def validate_trial_condition_exclusivity(trial_index, **trial_conditions):
 
 
 def get_trial_lick_times(lick_times, start_time, stop_time):
+    '''extract lick times in time range'''
     return lick_times[np.where(np.logical_and(
         lick_times >= start_time, 
         lick_times <= stop_time
@@ -183,6 +209,7 @@ def get_trial_lick_times(lick_times, start_time, stop_time):
 
 
 def get_trial_reward_time(rebased_reward_times, start_time, stop_time):
+    '''extract reward times in time range'''
     reward_times = rebased_reward_times[np.where(np.logical_and(
         rebased_reward_times >= start_time, 
         rebased_reward_times <= stop_time
@@ -191,7 +218,7 @@ def get_trial_reward_time(rebased_reward_times, start_time, stop_time):
         
 
 def get_trial_timing(event_dict, hit, false_alarm, stimulus_change, sham_change):
-
+    '''extract trial timing data'''
     start_time = event_dict["trial_start", ""]
     stop_time = event_dict["trial_end", ""]
 
