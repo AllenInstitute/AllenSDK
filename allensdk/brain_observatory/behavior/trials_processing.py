@@ -127,7 +127,7 @@ def resolve_initial_image(stimuli, start_frame):
     return initial_image_category_name, initial_image_group, initial_image_name
 
 
-def trial_data_from_log(trial, event_dict, stimuli, rebase):
+def trial_data_from_log(trial, event_dict):
 
     hit = ('hit', "") in event_dict
     false_alarm = ('false_alarm', "") in event_dict
@@ -258,7 +258,7 @@ def get_trials(data, licks_df, rewards_df, rebase):
         tr_data = {"trial": trial["index"]}
 
         tr_data.update(get_trial_timing(event_dict))
-        tr_data.update(trial_data_from_log(trial, event_dict, stimuli, rebase))
+        tr_data.update(trial_data_from_log(trial, event_dict))
         tr_data.update(get_trial_image_names(trial, stimuli))
 
         tr_data["lick_times"] = get_trial_lick_times(sync_lick_times, tr_data["start_time"], tr_data["stop_time"])
