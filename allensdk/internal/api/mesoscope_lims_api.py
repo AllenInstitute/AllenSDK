@@ -121,13 +121,13 @@ class MesoscopeSessionLimsApi(PostgresQueryMixin):
         #this needs a check for dropped frames: compare timestamps with scanimage header's timestamps.
 
         timestamps = self.get_sync_data()['ophys_frames']
-        planes_timestamps = pd.DataFrame(columns= ['plane_id', 'ophys_timestamp'], index = range(len(self.get_session_experiments())))
+        planes_timestamps = pd.DataFrame(columns= ['plane_id', 'ophys_timestamps'], index = range(len(self.get_session_experiments())))
         pairs = self.get_paired_experiments()
         i = 0
         for pair in range(len(pairs)):
             planes_timestamps['plane_id'][i] = pairs[pair][0]
             planes_timestamps['plane_id'][i+1] = pairs[pair][1]
-            planes_timestamps['ophys_timestamp'][i] = planes_timestamps['ophys_timestamp'][i+1] = timestamps[pair::len(pairs)]
+            planes_timestamps['ophys_timestamps'][i] = planes_timestamps['ophys_timestamps'][i+1] = timestamps[pair::len(pairs)]
             i += 2
         self.planes_timestamps = planes_timestamps
         return self.planes_timestamps
@@ -148,7 +148,7 @@ class MesoscopePlaneLimsApi(BehaviorOphysLimsApi):
 
         session = ApiFactory.getSessionAPI(self.session_id)
         session_timestamps = session.split_session_timestamps()
-        plane_timestamps = session_timestamps.loc[session_timestamps['plane_id'] == self.ophys_experiment_id]
+        plane_timestamps = session_timestamps[session_timestamps.plane_id == self.ophys_experiment_id].reset_index().loc[0, 'ophys_timestamps']
         self.ophys_timestamps = plane_timestamps
         return self.ophys_timestamps
 
