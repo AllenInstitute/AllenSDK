@@ -127,105 +127,130 @@ def resolve_initial_image(stimuli, start_frame):
     return initial_image_category_name, initial_image_group, initial_image_name
 
 
+def trial_data_from_log(trial, stimuli, sync_lick_times, rebased_reward_times, rebase):
+    event_dict = {(e[0], e[1]): rebase(e[2]) for e in trial['events']}
+
+    start_time = event_dict["trial_start", ""]
+    stop_time = event_dict["trial_end", ""]
+
+    lick_times = sync_lick_times[np.where(np.logical_and(
+        sync_lick_times >= start_time, 
+        sync_lick_times <= stop_time
+    ))]
+
+    reward_times = rebased_reward_times[np.where(np.logical_and(
+        rebased_reward_times >= start_time, 
+        rebased_reward_times <= stop_time
+    ))]
+    reward_time = float('nan') if len(reward_times) == 0 else one(reward_times)
+
+    hit = ('hit', "") in event_dict
+    false_alarm = ('false_alarm', "") in event_dict
+    miss = ('miss', "") in event_dict
+    sham_change = ('sham_change', '') in event_dict
+    stimulus_change = ('stimulus_changed', '') in event_dict
+
+    if hit:
+        response_time = event_dict.get(("hit", ""))
+    elif false_alarm:
+        response_time = event_dict.get(("false_alarm", ""))
+    else:
+        response_time = float("nan")
+
+    aborted = False
+    if stimulus_change:
+        change_time = event_dict.get(('stimulus_changed', ''))
+    elif sham_change:
+        change_time = event_dict.get(('sham_change', ''))
+    else:
+        aborted = True
+        change_time = float("nan")
+
+    if aborted:
+        go = catch = auto_rewarded = False
+    else:
+        catch = trial["trial_params"]["catch"] is True
+        auto_rewarded = trial["trial_params"]["auto_reward"]
+        go = not catch and not auto_rewarded
+
+    correct_reject = catch and not false_alarm
+
+    if auto_rewarded:
+        hit = miss = correct_reject = false_alarm = False
+
+    if not (sham_change or stimulus_change):
+        response_latency = None
+    else:
+        if hit or false_alarm:
+            response_latency = response_time - change_time
+        else:
+            response_latency = float("inf")
+
+    trial_start_frame = trial["events"][0][3]
+    _, _, initial_image_name = resolve_initial_image(stimuli, trial_start_frame)
+    if len(trial["stimulus_changes"]) == 0:
+        change_image_name = initial_image_name
+    else:
+        (_, from_name), (_, to_name), _, _ = trial["stimulus_changes"][0]
+        assert from_name == initial_image_name
+        change_image_name = to_name
+
+    validate_trial_condition_exclusivity(
+        trial["index"],
+        aborted=aborted, 
+        auto_rewarded=auto_rewarded, 
+        hit=hit, miss=miss, 
+        false_alarm=false_alarm, 
+        correct_reject=correct_reject
+    )
+    return {
+        "start_time": start_time,
+        "stop_time": stop_time,
+        "trial_length": stop_time - start_time,
+        "lick_times": lick_times,
+        "reward_volume": sum([r[0] for r in trial.get("rewards", [])]),
+        "hit": hit,
+        "false_alarm": false_alarm,
+        "response_time": response_time, 
+        "miss": miss,
+        "reward_time": reward_time,
+        "sham_change": sham_change,
+        "stimulus_change": stimulus_change,
+        "change_time": change_time,
+        "aborted": aborted,
+        "go": go,
+        "catch": catch,
+        "auto_rewarded": auto_rewarded,
+        "correct_reject": correct_reject,
+        "response_latency": response_latency,
+        "initial_image_name": initial_image_name,
+        "change_image_name": change_image_name,
+        "trial": trial["index"]
+    }
+
+
+def validate_trial_condition_exclusivity(trial_index, **trial_conditions):
+    on = []
+    for condition, value in trial_conditions.items():
+        if value:
+            on.append(condition)
+    
+    if len(on) != 1:
+        all_conditions = list(trial_conditions.keys())
+        raise AssertionError(f"expected exactly 1 trial condition out of {all_conditions} to be True, instead {on} were True (trial {trial_index})")
+
+
 def get_trials(data, licks_df, rewards_df, rebase):
     assert rewards_df.index.name == 'timestamps'
     stimuli = data["items"]["behavior"]["stimuli"]
+    trial_log = data["items"]["behavior"]["trial_log"]
 
-    trial_data = collections.defaultdict(list)
+    trial_data = [None] * len(trial_log)
     sync_lick_times = licks_df.time.values 
     rebased_reward_times = rewards_df.index.values
-    for trial in data["items"]["behavior"]["trial_log"]:
-        event_dict = {(e[0], e[1]): rebase(e[2]) for e in trial['events']}
 
-        trial_data['trial'].append(trial["index"])
-
-        start_time = event_dict['trial_start', '']
-        trial_data['start_time'].append(start_time)
-
-        stop_time = event_dict['trial_end', '']
-        trial_data['stop_time'].append(stop_time)
-
-        trial_length = stop_time - start_time
-        trial_data['trial_length'].append(trial_length)
-
-        lick_times = sync_lick_times[np.where(np.logical_and(sync_lick_times >= start_time, sync_lick_times <= stop_time))]
-        trial_data['lick_times'].append(lick_times)
-
-        reward_volume = sum([r[0] for r in trial.get("rewards", [])])
-        trial_data['reward_volume'].append(reward_volume)
-
-        hit = ('hit', "") in event_dict
-        trial_data['hit'].append(hit)
-
-        false_alarm = ('false_alarm', "") in event_dict
-        trial_data['false_alarm'].append(false_alarm)
-
-
-
-        response_time = event_dict.get(('hit', '')) or event_dict.get(('false_alarm', '')) if hit or false_alarm else float('nan')
-        trial_data['response_time'].append(response_time)
-
-        miss = ('miss', "") in event_dict
-        trial_data['miss'].append(miss)
-
-        reward_times = rebased_reward_times[np.where(np.logical_and(rebased_reward_times >= start_time, rebased_reward_times <= stop_time))]
-        reward_time = float('nan') if len(reward_times) == 0 else one(reward_times)
-        trial_data['reward_time'].append(reward_time)
-
-        sham_change = True if ('sham_change', '') in event_dict else False
-        trial_data['sham_change'].append(sham_change)
-
-        stimulus_change = True if ('stimulus_changed', '') in event_dict else False
-        trial_data['stimulus_change'].append(stimulus_change)
-
-        change_time = event_dict.get(('stimulus_changed', '')) or event_dict.get(('sham_change', '')) if stimulus_change or sham_change else float('nan')
-        trial_data['change_time'].append(change_time)
-
-        # Trial type logic:
-        if pd.isnull(change_time):
-            aborted = True
-            go = catch = auto_rewarded = False
-        else:
-            aborted = False
-            catch = trial["trial_params"]["catch"] is True
-            auto_rewarded = trial["trial_params"]["auto_reward"]
-            go = not catch and not auto_rewarded
-        trial_data['aborted'].append(aborted)
-        trial_data['go'].append(go)
-        trial_data['catch'].append(catch)
-        trial_data['auto_rewarded'].append(auto_rewarded)
-
-        correct_reject = catch and not false_alarm
-        trial_data['correct_reject'].append(correct_reject)
-
-        if not (sham_change or stimulus_change):
-            response_latency = None
-        else:
-            if hit or false_alarm:
-                response_latency = response_time - change_time
-            else:
-                response_latency = float("inf")
-        trial_data['response_latency'].append(response_latency)
-
-        trial_start_frame = trial["events"][0][3]
-        _, _, initial_image_name = resolve_initial_image(stimuli, trial_start_frame)
-        if len(trial["stimulus_changes"]) == 0:
-            change_image_name = initial_image_name
-        else:
-            (_, from_name), (_, to_name), _, _ = trial["stimulus_changes"][0]
-            assert from_name == initial_image_name
-            change_image_name = to_name
-        trial_data['initial_image_name'].append(initial_image_name)
-        trial_data['change_image_name'].append(change_image_name)
-
-    # ensure that there aren't redundant trial outcome labels 
-    for idx,row in trials[trials['auto_rewarded']==True].iterrows():
-        # if the trial is autorewarded, none of these other columns can be True
-        for col in ['hit','miss','false_alarm','correct_reject']:
-            trials.at[idx, col] = False 
-        # if the trial was aborted, we shouldn't also call it auto_rewarded
-        if row['aborted']:
-            trials.at[idx,'auto_rewarded'] = False 
+    for idx, trial in enumerate(trial_log):
+        trial_data[idx] = trial_data_from_log(trial, stimuli, sync_lick_times, rebased_reward_times, rebase)
 
     trials = pd.DataFrame(trial_data).set_index('trial')
     trials.index = trials.index.rename('trials_id')
