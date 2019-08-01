@@ -270,6 +270,12 @@ def get_trials(data, licks_df, rewards_df, rebase):
         tr_data["lick_times"] = get_trial_lick_times(sync_lick_times, tr_data["start_time"], tr_data["stop_time"])
         tr_data["reward_time"] = get_trial_reward_time(rebased_reward_times, tr_data["start_time"], tr_data["stop_time"])
 
+        # ensure that only one trial condition is True (they are mutually exclusive)
+        condition_dict = {}
+        for key in ['hit','miss','false_alarm','correct_reject','auto_rewarded','aborted']:
+            condition_dict[key] = tr_data[key]
+        validate_trial_condition_exclusivity(idx,**condition_dict)
+
         all_trial_data[idx] = tr_data
 
     trials = pd.DataFrame(all_trial_data).set_index('trial')
