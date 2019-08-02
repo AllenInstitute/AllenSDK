@@ -34,7 +34,11 @@ class Unit(RaisingSchema):
     peak_channel_id = Int(required=True)
     local_index = Int(
         required=True,
-        help="within-probe index of this unit. Used for indexing into the spike times file.",
+        help="within-probe index of this unit.",
+    )
+    cluster_id = Int(
+        required=True,
+        help="within-probe identifier of this unit",
     )
     quality = String(required=True)
     firing_rate = Float(required=True)
