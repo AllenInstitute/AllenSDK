@@ -127,25 +127,39 @@ class BehaviorOphysSession(LazyPropertyMixin):
             sitk_image (SimpleITK image): image object returned by the api
 
         Returns
-            img (allensdk.brain_observatory.behavior.image_api.Image):
-                Image class with the following attributes:
-                data : np.ndarray
-                    Image data points
-                spacing : tuple
-                    Spacing describes the physical size of each pixel
-                unit : str
-                    Physical unit of the spacing (currently constrained to be isotropic)
+            img (allensdk.brain_observatory.behavior.image_api.Image)
         '''
         img = ImageApi.deserialize(sitk_image)
         return img
 
     def get_max_projection(self):
+        """ Returns an image whose values are the maximum obtained values at each pixel of the ophys movie over time.
+
+        Returns
+        ----------
+        allensdk.brain_observatory.behavior.image_api.Image:
+            array-like interface to max projection image data and metadata
+        """
         return self.deserialize_image(self.api.get_max_projection())
 
     def get_average_projection(self):
+        """ Returns an image whose values are the average obtained values at each pixel of the ophys movie over time.
+
+        Returns
+        ----------
+        allensdk.brain_observatory.behavior.image_api.Image:
+            array-like interface to max projection image data and metadata
+        """
         return self.deserialize_image(self.api.get_average_projection())
 
     def get_segmentation_mask_image(self):
+        """ Returns an image with a pixel value of zero if the pixel is not included in any ROI, and nonzero if included in a segmented ROI.
+
+        Returns
+        ----------
+        allensdk.brain_observatory.behavior.image_api.Image:
+            array-like interface to max projection image data and metadata
+        """
         return self.deserialize_image(self.api.get_segmentation_mask_image())
 
     def get_reward_rate(self):
