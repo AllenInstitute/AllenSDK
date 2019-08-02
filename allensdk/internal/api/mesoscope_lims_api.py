@@ -1,17 +1,15 @@
-
-import psycopg2
-import psycopg2.extras
 import pandas as pd
 import logging
 import json
 import os
 import uuid
+import matplotlib.image as mpimg
 
-from pandas import DataFrame
 
 from allensdk.api.cache import memoize
 from allensdk.internal.core.lims_utilities import safe_system_path
 from allensdk.brain_observatory.behavior.sync import get_sync_data
+from allensdk.brain_observatory.behavior.image_api import ImageApi
 
 from . import PostgresQueryMixin
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
@@ -214,4 +212,51 @@ class MesoscopePlaneLimsApi(BehaviorOphysLimsApi):
                 '''.format(self.get_ophys_experiment_id())
         return self.fetchone(query, strict=True)
 
+    @memoize
+    def get_max_projection(self, image_api=None):
 
+        if image_api is None:
+            image_api = ImageApi
+
+        maxInt_a13_file = self.get_max_projection_file()
+        if (self.get_surface_2p_pixel_size_um() == 0) :
+            pixel_size = 400/512
+        else : pixel_size = self.get_surface_2p_pixel_size_um()
+        max_projection = mpimg.imread(maxInt_a13_file)
+        return image_api.serialize(max_projection, [pixel_size / 1000., pixel_size / 1000.], 'mm')
+
+
+    @memoize
+    def get_average_projection(self, image_api=None):
+
+        if image_api is None:
+            image_api = ImageApi
+
+        avgint_a1X_file = self.get_average_intensity_projection_image_file()
+        if (self.get_surface_2p_pixel_size_um() == 0) :
+            pixel_size = 400/512
+        else : pixel_size = self.get_surface_2p_pixel_size_um()
+        average_image = mpimg.imread(avgint_a1X_file)
+        return image_api.serialize(average_image, [pixel_size / 1000., pixel_size / 1000.], 'mm')
+
+    @memoize
+    def get_segmentation_mask_image(self, image_api=None):
+
+        if image_api is None:
+            image_api = ImageApi
+
+        segmentation_mask_image_file = self.get_segmentation_mask_image_file()
+        if (self.get_surface_2p_pixel_size_um() == 0) :
+            pixel_size = 400/512
+        else : pixel_size = self.get_surface_2p_pixel_size_um()
+        segmentation_mask_image = mpimg.imread(segmentation_mask_image_file)
+        return image_api.serialize(segmentation_mask_image, [pixel_size / 1000., pixel_size / 1000.], 'mm')
+
+    def get_licks(self):
+        raise NotImplementedError
+
+    def get_rewards(self):
+        raise NotImplementedError
+
+    def get_trials(self):
+        raise NotImplementedError
