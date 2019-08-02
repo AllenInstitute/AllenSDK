@@ -80,7 +80,7 @@ def test_calculate_reward_rate(kwargs, expected):
         expected, 
     ), "calculated reward rate should match expected reward rate :("
 
-def test_trial_data_from_log():
+def test_trial_data_from_log_0():
     test_trial_0 = {
         'index': 3,
         'cumulative_rewards': 1,
@@ -136,6 +136,7 @@ def test_trial_data_from_log():
 
     assert trials_processing.trial_data_from_log(test_trial_0) == expected_result_0
 
+def test_trial_data_from_log_1():
     test_trial_1 = {
         'index': 4,
         'cumulative_rewards': 1,
@@ -176,6 +177,7 @@ def test_trial_data_from_log():
 
     assert trials_processing.trial_data_from_log(test_trial_1) == expected_result_1
 
+def test_trial_data_from_log_2():
     test_trial_2 = {
         'index': 51,
         'cumulative_rewards': 11,
