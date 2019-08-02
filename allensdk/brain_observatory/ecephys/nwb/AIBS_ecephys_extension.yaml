@@ -13,9 +13,6 @@ groups:
     - name: location
       dtype: text
       doc: description of location of this electrode group
-    - name: id
-      dtype: int32
-      doc: unique identifier for this EcephysProbe
     - name: sampling_rate
       dtype: float64
       doc: the sampling rate at which data were acquired on this probe's channels

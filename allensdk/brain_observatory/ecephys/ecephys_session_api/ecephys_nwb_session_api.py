@@ -33,10 +33,15 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
     def get_probes(self) -> pd.DataFrame:
         probes: Union[List, pd.DataFrame] = []
         for k, v in self.nwbfile.electrode_groups.items():
-            probes.append({'id': int(k), 'description': v.description, 'location': v.location})
+            probes.append({
+                'id': int(k), 
+                'description': v.description, 
+                'location': v.location,
+                "sampling_rate": v.sampling_rate,
+                "lfp_sampling_rate": v.lfp_sampling_rate
+            })
         probes = pd.DataFrame(probes)
         probes = probes.set_index(keys='id', drop=True)
-        probes['sampling_rate'] = 30000.0  # TODO: calculate real sampling rate for each probe.
         return probes
 
     def get_channels(self) -> pd.DataFrame:
