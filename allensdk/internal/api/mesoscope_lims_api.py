@@ -5,15 +5,15 @@ import pandas as pd
 import logging
 import json
 import os
+import uuid
 
 from pandas import DataFrame
 
+from allensdk.api.cache import memoize
 from allensdk.internal.core.lims_utilities import safe_system_path
 from allensdk.brain_observatory.behavior.sync import get_sync_data
 
 from . import PostgresQueryMixin
-
-
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
 
 logger = logging.getLogger(__name__)
@@ -135,8 +135,9 @@ class MesoscopeSessionLimsApi(PostgresQueryMixin):
 
 class MesoscopePlaneLimsApi(BehaviorOphysLimsApi):
 
-    def __init__(self, experiment_id):
+    def __init__(self, experiment_id, session):
         self.experiment_id = experiment_id
+        self.session = session
         self.session_id = None
         self.experiment_df = None
         self.ophys_timestamps = None
@@ -146,9 +147,7 @@ class MesoscopePlaneLimsApi(BehaviorOphysLimsApi):
         if not self.session_id :
             self.get_ophys_session_id()
 
-        session = ApiFactory.getSessionAPI(self.session_id)
-        session_timestamps = session.split_session_timestamps()
-        plane_timestamps = session_timestamps[session_timestamps.plane_id == self.ophys_experiment_id].reset_index().loc[0, 'ophys_timestamps']
+        plane_timestamps = self.session.get_plane_timestamps(self.ophys_experiment_id)
         self.ophys_timestamps = plane_timestamps
         return self.ophys_timestamps
 
@@ -183,26 +182,36 @@ class MesoscopePlaneLimsApi(BehaviorOphysLimsApi):
         return self.experiment_df
 
     def get_ophys_session_id(self):
-        self.get_experiment_df()
-        self.session_id = self.experiment_df['session_id'].values[0]
-        return self.session_id
+        return self.session.session_id
 
-    # def get_metadata(self):
-    #     raise NotImplementedError
+    @memoize
+    def get_metadata(self):
 
-class ApiFactory():
-    _instances = {}
+        metadata = super().get_metadata()
+        metadata['ophys_experiment_id'] = self.get_ophys_experiment_id()
+        metadata['experiment_container_id'] = self.get_experiment_container_id()
+        metadata['ophys_frame_rate'] = self.get_ophys_frame_rate()
+        metadata['stimulus_frame_rate'] = self.get_stimulus_frame_rate()
+        metadata['targeted_structure'] = self.get_targeted_structure()
+        metadata['imaging_depth'] = self.get_imaging_depth() #this is redefined below
+        metadata['session_type'] = self.get_stimulus_name()
+        metadata['experiment_datetime'] = self.get_experiment_date()
+        metadata['reporter_line'] = self.get_reporter_line()
+        metadata['driver_line'] = self.get_driver_line()
+        metadata['LabTracks_ID'] = self.get_external_specimen_name()
+        metadata['full_genotype'] = self.get_full_genotype()
+        metadata['behavior_session_uuid'] = uuid.UUID(self.get_behavior_session_uuid())
 
-    @classmethod
-    def getSessionAPI(cls, session_id):
-        return cls._instances.setdefault(session_id, MesoscopeSessionLimsApi(session_id))
+        return metadata
 
-    @classmethod
-    def getPlaneAPI(cls, experiment_id):
-        return cls._instances.setdefault(experiment_id, MesoscopePlaneLimsApi(experiment_id))
-
-
-
-
+    @memoize
+    def get_imaging_depth(self):
+        query = '''
+                SELECT id.depth
+                FROM ophys_experiments oe
+                JOIN imaging_depths id ON id.id = oe.imaging_depth_id 
+                WHERE oe.id= {};
+                '''.format(self.get_ophys_experiment_id())
+        return self.fetchone(query, strict=True)
 
 
