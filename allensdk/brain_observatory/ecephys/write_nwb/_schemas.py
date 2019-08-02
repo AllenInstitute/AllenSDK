@@ -59,6 +59,8 @@ class Probe(RaisingSchema):
     units = Nested(Unit, many=True, required=True)
     lfp = Nested(Lfp, many=False, required=True)
     csd_path = String(required=True, validate=check_read_access, help="path to h5 file containing calculated current source density")
+    sampling_rate = Float(default=30000.0, help="sampling rate (Hz, master clock) at which spike data was acquired on this probe")
+    lfp_sampling_rate = Float(default=2500.0, help="sampling rate (Hz, master clock) at which LFP data was acquired on this probe")
 
 
 class InputSchema(ArgSchema):
