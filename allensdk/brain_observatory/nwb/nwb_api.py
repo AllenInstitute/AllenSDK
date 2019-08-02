@@ -42,7 +42,7 @@ class NwbApi:
         with open(path, 'r'):
             pass
 
-        return cls(path=path)
+        return cls(path=path, **kwargs)
 
     def get_running_speed(self) -> RunningSpeed:
 

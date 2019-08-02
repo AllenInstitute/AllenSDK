@@ -331,7 +331,7 @@ def add_ragged_data_to_dynamic_table(
 
     """
 
-    idx, values = dict_to_indexed_array(data, table.id)
+    idx, values = dict_to_indexed_array(data, table.id.data)
     del data
 
     table.add_column(
@@ -522,7 +522,7 @@ def add_probewise_data_to_nwbfile(nwbfile, probes):
         channel_tables[probe["id"]] = prepare_probewise_channel_table(probe['channels'], probe_nwb_electrode_group)
         unit_tables.append(pd.DataFrame(probe['units']))
 
-        local_to_global_unit_map = {unit['local_index']: unit['id'] for unit in probe['units']}
+        local_to_global_unit_map = {unit['cluster_id']: unit['id'] for unit in probe['units']}
 
         spike_times.update(read_spike_times_to_dictionary(
             probe['spike_times_path'], probe['spike_clusters_file'], local_to_global_unit_map

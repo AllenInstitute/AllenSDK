@@ -13,7 +13,7 @@ def raw_stimulus_table():
         'start_time': np.arange(4)/2,
         'stop_time':np.arange(1, 5)/2,
         'stimulus_name':['a', 'a', 'a', 'a_movie'],
-        'stimulus_block':[0, 0, 1, 1],
+        'stimulus_block':[0, 0, 0, 1],
         'TF': np.empty(4) * np.nan,
         'SF':np.empty(4) * np.nan,
         'Ori': np.empty(4) * np.nan,
@@ -158,6 +158,22 @@ def session_metadata_api():
     return EcephysSessionMetadataApi()
 
 
+def test_get_stimulus_epochs(just_stimulus_table_api):
+
+    expected = pd.DataFrame({
+        "start_time": [0, 3/2],
+        "stop_time": [3/2, 2],
+        "duration": [3/2, 1/2],
+        "stimulus_name": ["a", "a_movie"],
+        "stimulus_block": [0, 1]
+    })
+
+    session = EcephysSession(api=just_stimulus_table_api)
+    obtained = session.get_stimulus_epochs()
+
+    pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)
+
+
 def test_session_metadata(session_metadata_api):
     session = EcephysSession(api=session_metadata_api)
 
@@ -199,13 +215,13 @@ def test_presentationwise_spike_counts(spike_times_api):
     session = EcephysSession(api=spike_times_api)
     obtained = session.presentationwise_spike_counts(np.linspace(-.1, .1, 3), session.stimulus_presentations.index.values, session.units.index.values)
 
-    first = obtained['spike_counts'].loc[{'unit_id': 2, 'stimulus_presentation_id': 2}]
+    first = obtained.loc[{'unit_id': 2, 'stimulus_presentation_id': 2}]
     assert np.allclose([0, 3], first)
 
-    second = obtained['spike_counts'].loc[{'unit_id': 1, 'stimulus_presentation_id': 3}]
+    second = obtained.loc[{'unit_id': 1, 'stimulus_presentation_id': 3}]
     assert np.allclose([0, 0], second)
 
-    assert np.allclose([4, 2, 2], obtained['spike_counts'].shape)
+    assert np.allclose([4, 2, 2], obtained.shape)
 
 
 @pytest.mark.parametrize("spike_times,time_domain,expected", [
