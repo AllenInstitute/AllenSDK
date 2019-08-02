@@ -480,6 +480,8 @@ class DriftingGratings(StimulusAnalysis):
         fp = FanPlotter.for_drifting_gratings()
         fp.plot(r_data = r_data, angle_data = angle_data, data =data, clim=[cmin, cmax])
         fp.show_axes(closed=False)
+        plt.ylim([-5,5])
+        plt.axis('equal')
         plt.axis('off')
 
 
