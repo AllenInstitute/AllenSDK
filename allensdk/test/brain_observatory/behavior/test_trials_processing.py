@@ -80,8 +80,8 @@ def test_calculate_reward_rate(kwargs, expected):
         expected, 
     ), "calculated reward rate should match expected reward rate :("
 
-def test_trial_data_from_log_0():
-    test_trial_0 = {
+def trial_data_and_expectation_0():
+    test_trial = {
         'index': 3,
         'cumulative_rewards': 1,
         'licks': [(318.2737866026219, 18736),
@@ -120,7 +120,7 @@ def test_trial_data_from_log_0():
         ['trial_end', '', 322.0353750862705, 18962]]
     }
     
-    expected_result_0 = {
+    expected_result = {
         'reward_volume': 0.005,
         'hit': False,
         'false_alarm': False,
@@ -134,10 +134,10 @@ def test_trial_data_from_log_0():
         'correct_reject': False
     }
 
-    assert trials_processing.trial_data_from_log(test_trial_0) == expected_result_0
+    return test_trial, expected_result
 
-def test_trial_data_from_log_1():
-    test_trial_1 = {
+def trial_data_and_expectation_1():
+    test_trial = {
         'index': 4,
         'cumulative_rewards': 1,
         'licks': [(324.1935569847751, 19091),
@@ -161,7 +161,7 @@ def test_trial_data_from_log_1():
         ['trial_end', '', 324.80448691598986, 19128]]
     }
 
-    expected_result_1 = {
+    expected_result = {
         'reward_volume': 0,
         'hit': False,
         'false_alarm': False,
@@ -175,10 +175,10 @@ def test_trial_data_from_log_1():
         'correct_reject': False
     }
 
-    assert trials_processing.trial_data_from_log(test_trial_1) == expected_result_1
+    return test_trial, expected_result
 
-def test_trial_data_from_log_2():
-    test_trial_2 = {
+def trial_data_and_expectation_2():
+    test_trial = {
         'index': 51,
         'cumulative_rewards': 11,
         'licks': [(542.6200214334176, 32186),
@@ -221,7 +221,7 @@ def test_trial_data_from_log_2():
         ['trial_end', '', 546.4697827138287, 32417]]
     }
 
-    expected_result_2 = {
+    expected_result = {
         'reward_volume': 0.007,
         'hit': True,
         'false_alarm': False,
@@ -235,4 +235,14 @@ def test_trial_data_from_log_2():
         'correct_reject': False
     }
 
-    assert trials_processing.trial_data_from_log(test_trial_2) == expected_result_2
+    return test_trial, expected_result
+
+
+@pytest.mark.parametrize("data_exp_getter", [
+    trial_data_and_expectation_0, 
+    trial_data_and_expectation_1,
+    trial_data_and_expectation_2
+])
+def test_trial_data_from_log(data_exp_getter):
+    data, expectation = data_exp_getter()
+    assert trials_processing.trial_data_from_log(data) == expectation
