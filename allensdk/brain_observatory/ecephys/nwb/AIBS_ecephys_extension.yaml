@@ -1,0 +1,28 @@
+groups:
+  - neurodata_type_def: EcephysProbe
+    neurodata_type_inc: ElectrodeGroup
+    doc: A group consisting of the channels on a single neuropixels probe.
+    attributes:
+    - name: help
+      dtype: text
+      value: A physical grouping of channels
+      doc: Value is 'Metadata about a physical grouping of channels'
+    - name: description
+      dtype: text
+      doc: description of this electrode group
+    - name: location
+      dtype: text
+      doc: description of location of this electrode group
+    - name: id
+      dtype: int32
+      doc: unique identifier for this EcephysProbe
+    - name: sampling_rate
+      dtype: float64
+      doc: the sampling rate at which data were acquired on this probe's channels
+    - name: lfp_sampling_rate
+      dtype: float64
+      doc: the (probably reduced) sampling rate at which lfp data were acquired on this probe's channels
+    links:
+    - name: device
+      target_type: Device
+      doc: the device that was used to record from this electrode group
