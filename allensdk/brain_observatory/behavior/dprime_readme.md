@@ -18,7 +18,7 @@ For a more in-depth discussion of d', see the "Understanding Yes-No Data" sectio
 ## Correction to avoid infinite values
 An important point to note about the d' is that the metric will be infinite with perfect performance, given that Z(1) = infinity and Z(0) = -infinity. Low trial counts exacerbate this issue. For example, with only one sample of a go-trial, the hit rate will either be 1 or 0. Macmillan and Creelman [1] offer a correction on the hit and false alarm rates to avoid infinite values whereby the response probabilities (P) are bounded by functions of trial count, N:
 
-    1-1/(2N) < P < 1/(2N)
+    1/(2N) < P < 1 - 1/(2N)
 
 Thus, for the example of just a single trial, the trial-corrected hit rate would be 0.5. Or after only two trials, the hit rate could take on the values of 0.25, 0.5, or 0.75. 
 
