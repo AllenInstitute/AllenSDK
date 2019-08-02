@@ -25,7 +25,7 @@ class Image(NamedTuple):
         return a and b and c
 
     def __array__(self):
-        return self.data
+        return np.array(self.data)
 
 class ImageApi:
 
