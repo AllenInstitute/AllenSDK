@@ -202,6 +202,9 @@ def regular_grid_extractor_factory(timestamps, lfp_raw, channel, method='linear'
     
 def compute_csd(accumulated_lfp, channels=None, missing_channels=None, spacing=0.04):
     ''' Compute current source density for a subset of channels on a neuropixels probe.
+        ref: Calculate CSD based on Stoelzel et al. (Swadlow) 2009. 
+             Positive is sink and negative is source.
+             duplicate first and last depth as per Stoelzel et al. (Swadlow) 2009.
 
     Parameters
     ----------
