@@ -33,7 +33,7 @@ class DriftingGratings(StimulusAnalysis):
 
     """
 
-    def __init__(self, ecephys_session, **kwargs):
+    def __init__(self, ecephys_session, col_ori='Ori', col_tf='TF', trial_duration=2.0, **kwargs):
         super(DriftingGratings, self).__init__(ecephys_session, **kwargs)
 
         self._metrics = None
@@ -43,10 +43,10 @@ class DriftingGratings(StimulusAnalysis):
         self._tfvals = None
         self._number_tf = None
 
-        self._col_ori = 'Ori'
-        self._col_tf = 'TF'
+        self._col_ori = col_ori
+        self._col_tf = col_tf
 
-        self._trial_duration = 2.0
+        self._trial_duration = trial_duration
 
         if self._params is not None:
             self._params = self._params['drifting_gratings']
@@ -218,7 +218,8 @@ class DriftingGratings(StimulusAnalysis):
         condition_inds = self.stimulus_conditions[self.stimulus_conditions[self._col_tf] == pref_tf].index.values
         df = self.conditionwise_statistics.loc[unit_id].loc[condition_inds]
         df = df.assign(Ori = self.stimulus_conditions.loc[df.index.values][self._col_ori])
-        df = df.sort_values(by=[self._col_ori])
+
+        df = df.sort_values(by=['Ori'])
 
         tuning = np.array(df['spike_mean'].values)
 

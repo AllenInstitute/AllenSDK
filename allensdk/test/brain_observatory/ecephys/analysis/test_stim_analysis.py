@@ -5,8 +5,8 @@ import h5py
 
 from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
 from allensdk.brain_observatory.ecephys.static_gratings import StaticGratings
-#from allensdk.brain_observatory.ecephys.drifting_gratings import DriftingGratings
-#from allensdk.brain_observatory.ecephys.natural_scenes import NaturalScenes
+from allensdk.brain_observatory.ecephys.drifting_gratings import DriftingGratings
+from allensdk.brain_observatory.ecephys.natural_scenes import NaturalScenes
 from allensdk.brain_observatory.ecephys.ecephys_session_api.ecephys_nwb1_session_api import EcephysNwb1Api
 
 
@@ -201,5 +201,5 @@ if __name__ == '__main__':
     mouseid = 'mouse412792.filtered'
     # mouseid = 'mouse412792'
     test_stimulus_data('data/{}.spikes.nwb'.format(mouseid), expected_file='expected/{}.static_grating.h5'.format(mouseid), stim_analysis_class=StaticGratings, nwb_version=1)
-    #test_stimulus_data('data/{}.spikes.nwb'.format(mouseid), expected_file='expected/{}.drifting_grating.h5'.format(mouseid), stim_analysis_class=DriftingGratings)
-    #test_stimulus_data('data/{}.spikes.nwb'.format(mouseid), expected_file='expected/{}.natural_scene.h5'.format(mouseid), stim_analysis_class=NaturalScenes)
+    #test_stimulus_data('data/{}.spikes.nwb'.format(mouseid), expected_file='expected/{}.drifting_grating.h5'.format(mouseid), stim_analysis_class=DriftingGratings, nwb_version=1)
+    #test_stimulus_data('data/{}.spikes.nwb'.format(mouseid), expected_file='expected/{}.natural_scene.h5'.format(mouseid), stim_analysis_class=NaturalScenes, nwb_version=1)

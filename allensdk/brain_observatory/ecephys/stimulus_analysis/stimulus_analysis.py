@@ -15,7 +15,7 @@ class StimulusAnalysis(object):
         if isinstance(ecephys_session, EcephysSession):
             self._ecephys_session = ecephys_session
         elif isinstance(ecephys_session, string_types):
-            nwb_version = kwargs.get('nwb_version', None)
+            nwb_version = kwargs.get('nwb_version', 2)
             self._ecephys_session = EcephysSession.from_nwb_path(path=ecephys_session, nwb_version=nwb_version)
 
         self._unit_ids = None

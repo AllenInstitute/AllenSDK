@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 from scipy.optimize import curve_fit
 from functools import partial
+import logging
 
 import matplotlib.pyplot as plt
 
@@ -12,6 +13,10 @@ from ...circle_plots import FanPlotter
 
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
+
+
+logger = logging.getLogger(__name__)
+
 
 class StaticGratings(StimulusAnalysis):
     """
@@ -33,7 +38,7 @@ class StaticGratings(StimulusAnalysis):
 
     """
 
-    def __init__(self, ecephys_session, **kwargs):
+    def __init__(self, ecephys_session, col_ori='Ori', col_sf='SF', col_phase='Phase', trial_duration=0.25, **kwargs):
         super(StaticGratings, self).__init__(ecephys_session, **kwargs)
         self._orivals = None
         self._number_ori = None
@@ -46,11 +51,11 @@ class StaticGratings(StimulusAnalysis):
 
         self._metrics = None
 
-        self._col_ori = 'Ori'
-        self._col_sf = 'SF'
-        self._col_phase = 'Phase'
-        self._trial_duration = 0.25
-        self._module_name = 'Static Gratings'
+        self._col_ori = col_ori
+        self._col_sf = col_sf
+        self._col_phase = col_phase
+        self._trial_duration = trial_duration
+        self._module_name = 'Static Gratings'  # Module name should be a static variable
 
         if self._params is not None:
             self._params = self._params['static_gratings']
@@ -130,7 +135,7 @@ class StaticGratings(StimulusAnalysis):
     def metrics(self):
         if self._metrics is None:
 
-            print('Calculating metrics for ' + self.name)
+            logger.info('Calculating metrics for ' + self.name)
 
             unit_ids = self.unit_ids
             
@@ -254,14 +259,14 @@ class StaticGratings(StimulusAnalysis):
         """
 
         orivals_rad = deg2rad(self.orivals).astype('complex128')
-        
         condition_inds = self.stimulus_conditions[
                 (self.stimulus_conditions[self._col_sf] == pref_sf) & \
                 (self.stimulus_conditions[self._col_phase] == pref_phase)
                 ].index.values
         df = self.conditionwise_statistics.loc[unit_id].loc[condition_inds]
-        df = df.assign(Ori = self.stimulus_conditions.loc[df.index.values][self._col_ori])
-        df = df.sort_values(by=['Ori'])
+        df = df.assign(ori=self.stimulus_conditions.loc[df.index.values][self._col_ori])
+        df = df.sort_values(by=['ori'])
+
 
         tuning = np.array(df['spike_mean'].values)
 
