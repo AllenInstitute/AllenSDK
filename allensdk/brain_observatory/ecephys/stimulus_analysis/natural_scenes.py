@@ -2,13 +2,17 @@ import numpy as np
 import pandas as pd
 from six import string_types
 import scipy.stats as st
-
+import logging
 import matplotlib.pyplot as plt
 
 from .stimulus_analysis import StimulusAnalysis
 
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
+
+
+logger = logging.getLogger(__name__)
+
 
 class NaturalScenes(StimulusAnalysis):
     """
@@ -30,8 +34,8 @@ class NaturalScenes(StimulusAnalysis):
 
     """
 
-    def __init__(self, ecephys_session, **kwargs):
-        super(NaturalScenes, self).__init__(ecephys_session, **kwargs)
+    def __init__(self, ecephys_session, col_image='Image', trial_duration=0.25, **kwargs):
+        super(NaturalScenes, self).__init__(ecephys_session, trial_duration=trial_duration, **kwargs)
 
         self._images = None
         self._number_images = None
@@ -41,9 +45,9 @@ class NaturalScenes(StimulusAnalysis):
         self._response_trials = None
         self._metrics = None
 
-        self._col_image = 'Image'
+        self._col_image = col_image # 'Image'
 
-        self._trial_duration = 0.25
+        # self._trial_duration = 0.25  # Passed in to kwargs and read by parent
 
         if self._params is not None:
             self._params = self._params['natural_scenes']
@@ -103,14 +107,11 @@ class NaturalScenes(StimulusAnalysis):
     def metrics(self):
 
         if self._metrics is None:
-
-            print('Calculating metrics for ' + self.name)
+            logger.info('Calculating metrics for ' + self.name)
 
             unit_ids = self.unit_ids
 
             metrics_df = self.empty_metrics_table()
-
-            print(self.null_condition)
 
             metrics_df['pref_image_ns'] = [self.get_preferred_condition(unit) for unit in unit_ids]
             metrics_df['image_selectivity_ns'] = [self._get_image_selectivity(unit) for unit in unit_ids]

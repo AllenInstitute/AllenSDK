@@ -4,6 +4,7 @@ from six import string_types
 import scipy.ndimage as ndi
 import scipy.stats as st
 from scipy.optimize import curve_fit
+import logging
 
 import matplotlib.pyplot as plt
 
@@ -12,6 +13,10 @@ from ...circle_plots import FanPlotter
 
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
+
+
+logger = logging.getLogger(__name__)
+
 
 class DriftingGratings(StimulusAnalysis):
     """
@@ -34,7 +39,7 @@ class DriftingGratings(StimulusAnalysis):
     """
 
     def __init__(self, ecephys_session, col_ori='Ori', col_tf='TF', trial_duration=2.0, **kwargs):
-        super(DriftingGratings, self).__init__(ecephys_session, **kwargs)
+        super(DriftingGratings, self).__init__(ecephys_session, trial_duration=trial_duration, **kwargs)
 
         self._metrics = None
 
@@ -46,7 +51,7 @@ class DriftingGratings(StimulusAnalysis):
         self._col_ori = col_ori
         self._col_tf = col_tf
 
-        self._trial_duration = trial_duration
+        # self._trial_duration = trial_duration
 
         if self._params is not None:
             self._params = self._params['drifting_gratings']
@@ -113,8 +118,7 @@ class DriftingGratings(StimulusAnalysis):
     def metrics(self):
 
         if self._metrics is None:
-
-            print('Calculating metrics for ' + self.name)
+            logger.info('Calculating metrics for ' + self.name)
         
             unit_ids = self.unit_ids
 

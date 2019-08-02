@@ -4,6 +4,7 @@ from six import string_types
 import scipy.ndimage as ndi
 import scipy.stats as st
 from scipy.optimize import curve_fit
+import logging
 
 import matplotlib.pyplot as plt
 
@@ -11,6 +12,10 @@ from .stimulus_analysis import StimulusAnalysis, get_fr
 
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
+
+
+logger = logging.getLogger(__name__)
+
 
 class NaturalMovies(StimulusAnalysis):
     """
@@ -64,8 +69,7 @@ class NaturalMovies(StimulusAnalysis):
     def metrics(self):
 
         if self._metrics is None:
-
-            print('Calculating metrics for ' + self.name)
+            logger.info('Calculating metrics for ' + self.name)
 
             unit_ids = self.unit_ids
 
@@ -75,8 +79,11 @@ class NaturalMovies(StimulusAnalysis):
             metrics_df['reliability_nm'] = [self.get_reliability(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
             metrics_df['firing_rate_nm'] = [self.get_overall_firing_rate(unit) for unit in unit_ids]
             metrics_df['lifetime_sparseness_nm'] = [self.get_lifetime_sparseness(unit) for unit in unit_ids]
-            metrics_df.loc[:, ['run_pval_nm', 'run_mod_nm']] = \
-                    [self.get_running_modulation(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+            run_vals = [self.get_running_modulation(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+            metrics_df['run_pval_nm'] = [rv[0] for rv in run_vals]
+            metrics_df['run_mod_nm'] = [rv[1] for rv in run_vals]
+            #metrics_df.loc[:, ['run_pval_nm', 'run_mod_nm']] = \
+            #        [self.get_running_modulation(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
 
             self._metrics = metrics_df
 

@@ -4,6 +4,7 @@ from six import string_types
 import scipy.ndimage as ndi
 import scipy.stats as st
 from scipy.optimize import curve_fit
+import logging
 
 import matplotlib.pyplot as plt
 
@@ -11,6 +12,10 @@ from .stimulus_analysis import StimulusAnalysis, get_fr
 
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
+
+
+logger = logging.getLogger(__name__)
+
 
 class Flashes(StimulusAnalysis):
     """
@@ -32,13 +37,13 @@ class Flashes(StimulusAnalysis):
 
     """
 
-    def __init__(self, ecephys_session, **kwargs):
-        super(Flashes, self).__init__(ecephys_session, **kwargs)
+    def __init__(self, ecephys_session, col_color='Color', trial_duration=0.25, **kwargs):
+        super(Flashes, self).__init__(ecephys_session, trial_duration=trial_duration, **kwargs)
 
         self._metrics = None
 
         self._colors = None
-        self._col_color = 'color'
+        self._col_color = col_color # 'color'
 
         if self._params is not None:
             self._params = self._params['flashes']
@@ -46,7 +51,7 @@ class Flashes(StimulusAnalysis):
         else:
             self._stimulus_key = 'flashes'
 
-        self._trial_duration = 0.25
+        # self._trial_duration = 0.25
 
         self._module_name = 'Flashes'
 
@@ -88,8 +93,7 @@ class Flashes(StimulusAnalysis):
     def metrics(self):
 
         if self._metrics is None:
-
-            print('Calculating metrics for ' + self.name)
+            logger.info('Calculating metrics for ' + self.name)
 
             unit_ids = self.unit_ids
         

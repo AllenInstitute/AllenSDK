@@ -4,6 +4,7 @@ from six import string_types
 import scipy.ndimage as ndi
 import scipy.stats as st
 from scipy.optimize import curve_fit
+import logging
 
 import matplotlib.pyplot as plt
 
@@ -11,6 +12,10 @@ from .stimulus_analysis import StimulusAnalysis, get_fr
 
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
+
+
+logger = logging.getLogger(__name__)
+
 
 class DotMotion(StimulusAnalysis):
     """
@@ -32,16 +37,16 @@ class DotMotion(StimulusAnalysis):
 
     """
 
-    def __init__(self, ecephys_session, **kwargs):
-        super(DotMotion, self).__init__(ecephys_session, **kwargs)
+    def __init__(self, ecephys_session, col_ori='Ori', col_speeds='Speed', trial_duration=1.0, **kwargs):
+        super(DotMotion, self).__init__(ecephys_session, trial_duration=trial_duration, **kwargs)
 
         self._dirvals = None
-        self._col_dir = 'Ori'
+        self._col_dir = col_ori
 
         self._speeds = None
-        self._col_speed = 'Speed'
+        self._col_speed = col_speeds
 
-        self._trial_duration = 1.0
+        #self._trial_duration = trial_duration
 
         if self._params is not None:
             self._params = self._params['dot_motion']
@@ -89,8 +94,7 @@ class DotMotion(StimulusAnalysis):
     def metrics(self):
 
         if self._metrics is None:
-
-            print('Calculating metrics for ' + self.name)
+            logger.info('Calculating metrics for ' + self.name)
 
             unit_ids = self.unit_ids
         

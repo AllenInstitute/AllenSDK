@@ -39,7 +39,7 @@ class StaticGratings(StimulusAnalysis):
     """
 
     def __init__(self, ecephys_session, col_ori='Ori', col_sf='SF', col_phase='Phase', trial_duration=0.25, **kwargs):
-        super(StaticGratings, self).__init__(ecephys_session, **kwargs)
+        super(StaticGratings, self).__init__(ecephys_session, trial_duration=trial_duration, **kwargs)
         self._orivals = None
         self._number_ori = None
         self._sfvals = None
@@ -160,7 +160,6 @@ class StaticGratings(StimulusAnalysis):
     def _get_stim_table_stats(self):
 
         """ Extract orientations, spatial frequencies, and phases from the stimulus table """
-
         self._orivals = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_ori] != 'null'][self._col_ori].unique())
         self._number_ori = len(self._orivals)
 

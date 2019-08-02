@@ -8,7 +8,7 @@ from ..ecephys_session import EcephysSession
 
 
 class StimulusAnalysis(object):
-    def __init__(self, ecephys_session, **kwargs):
+    def __init__(self, ecephys_session, trial_duration=None, **kwargs):
         """
         :param ecephys_session: an EcephySession object or path to ece nwb file.
         """
@@ -31,7 +31,7 @@ class StimulusAnalysis(object):
 
         self._spikes = None
         self._stim_table_spontaneous = None
-        self._stimulus_names = None
+        self._stimulus_names = kwargs.get('stimulus_names', None)
         self._running_speed = None
         self._sweep_events = None
         self._mean_sweep_events = None
@@ -40,7 +40,7 @@ class StimulusAnalysis(object):
 
         self._psth_resolution = 0.01 # ms
 
-        self._trial_duration = None
+        self._trial_duration = trial_duration
         self._preferred_condition = {}
 
 
@@ -96,17 +96,19 @@ class StimulusAnalysis(object):
                 # Older versions of NWB files the stimulus name is in the form stimulus_gratings_N, so if
                 # self._stimulus_names is not explicity specified try to figure out stimulus
                 stims_table = self.ecephys_session.stimulus_presentations
-                #print(stims_table['stimulus_name'].unique())
-                #print(self._stimulus_key)
                 stim_names = [s for s in stims_table['stimulus_name'].unique()
                               if s.startswith(self._stimulus_key)]
 
                 self._stim_table = stims_table[stims_table['stimulus_name'].isin(stim_names)]
-                #print(stim_names)
             else:
                 self._stimulus_names = [self._stimulus_names] if isinstance(self._stimulus_names, string_types) \
                     else self._stimulus_names
                 self._stim_table = self.ecephys_session.get_presentations_for_stimulus(self._stimulus_names)
+
+            if self._stim_table.empty:
+                stim_names = self._stimulus_names or self._stimulus_key
+                raise Exception(f'Could not find stimulus data with presentation name {stim_names}')
+
 
         return self._stim_table
 
@@ -227,7 +229,6 @@ class StimulusAnalysis(object):
         """
 
         if self._presentationwise_statistics is None:
-
             df = self.ecephys_session.presentationwise_spike_counts(
                     bin_edges = np.linspace(0, self._trial_duration, 2),
                     stimulus_presentation_ids = self.stim_table.index.values,

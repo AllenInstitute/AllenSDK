@@ -4,9 +4,7 @@ import numpy as np
 import h5py
 
 from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
-from allensdk.brain_observatory.ecephys.static_gratings import StaticGratings
-from allensdk.brain_observatory.ecephys.drifting_gratings import DriftingGratings
-from allensdk.brain_observatory.ecephys.natural_scenes import NaturalScenes
+from allensdk.brain_observatory.ecephys.stimulus_analysis import StaticGratings, DriftingGratings, NaturalScenes
 from allensdk.brain_observatory.ecephys.ecephys_session_api.ecephys_nwb1_session_api import EcephysNwb1Api
 
 

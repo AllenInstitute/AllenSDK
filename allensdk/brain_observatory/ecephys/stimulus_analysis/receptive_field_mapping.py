@@ -4,6 +4,7 @@ from six import string_types
 import scipy.ndimage as ndi
 import scipy.stats as st
 from scipy.optimize import curve_fit, leastsq
+import logging
 
 import matplotlib.pyplot as plt
 
@@ -13,6 +14,9 @@ from .stimulus_analysis import StimulusAnalysis
 
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
+
+
+logger = logging.getLogger(__name__)
 
 class ReceptiveFieldMapping(StimulusAnalysis):
     """
@@ -135,20 +139,26 @@ class ReceptiveFieldMapping(StimulusAnalysis):
     def metrics(self):
 
         if self._metrics is None:
-
-            print('Calculating metrics for ' + self.name)
+            logger.info('Calculating metrics for ' + self.name)
 
             unit_ids = self.unit_ids
         
             metrics_df = self.empty_metrics_table()
 
+            #metrics_df.loc[:, ['azimuth_rf',
+            #                   'elevation_rf',
+            #                   'width_rf',
+            #                   'height_rf',
+            #                   'area_rf',
+            #                   'p_value_rf',
+            #                   'on_screen_rf']] = [self._get_rf_stats(unit) for unit in unit_ids]
             metrics_df.loc[:, ['azimuth_rf',
                                'elevation_rf',
                                'width_rf',
                                'height_rf',
                                'area_rf',
                                'p_value_rf',
-                               'on_screen_rf']] = [self._get_rf_stats(unit) for unit in unit_ids]
+                               'on_screen_rf']] = [(None, None, None, None, None, None, None) for unit in unit_ids]
             metrics_df['firing_rate_rf'] = [self.get_overall_firing_rate(unit) for unit in unit_ids]
             metrics_df['fano_rf'] = [self.get_fano_factor(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
             metrics_df['time_to_peak_rf'] = [self.get_time_to_peak(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
@@ -255,6 +265,8 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         rf = self._get_rf(unit_id)
         spikes_per_trial = self.presentationwise_statistics.xs(unit_id, level=1)['spike_counts'].values
 
+        print(self._params['minimum_spike_count'])
+        exit()
         if np.sum(spikes_per_trial) < self._params['minimum_spike_count']:
             return np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan
 
