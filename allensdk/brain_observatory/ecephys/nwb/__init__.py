@@ -14,7 +14,6 @@ class EcephysProbe(pynwb.ecephys.ElectrodeGroup):
         "description",
         "location",
         "device",
-        "id",
         "sampling_rate",
         "lfp_sampling_rate"
     )
@@ -24,14 +23,10 @@ class EcephysProbe(pynwb.ecephys.ElectrodeGroup):
         {'name': 'description', 'type': str, 'doc': 'description of this electrode group'},
         {'name': 'location', 'type': str, 'doc': 'description of location of this electrode group'},
         {'name': 'device', 'type': pynwb.device.Device, 'doc': 'the device that was used to record from this electrode group'},
-        {"name": "id", "type": int, "doc": ""},
         {"name": "sampling_rate", "type": float, "doc": ""},
         {"name": "lfp_sampling_rate", "type": float, "doc": ""},
         {'name': 'parent', 'type': 'NWBContainer', 'doc': 'The parent NWBContainer for this NWBContainer', 'default': None})
     def __init__(self, **kwargs):
-        pid, sampling_rate, lfp_sampling_rate = pynwb.popargs(
-            "id", "sampling_rate", "lfp_sampling_rate",
-            kwargs
-        )
+        sampling_rate, lfp_sampling_rate = pynwb.popargs("sampling_rate", "lfp_sampling_rate", kwargs)
         pynwb.call_docval_func(super(EcephysProbe, self).__init__, kwargs)
-        self.id, self.sampling_rate, self.lfp_sampling_rate = pid, sampling_rate, lfp_sampling_rate
+        self.sampling_rate, self.lfp_sampling_rate = sampling_rate, lfp_sampling_rate

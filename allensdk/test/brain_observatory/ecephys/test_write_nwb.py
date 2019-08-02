@@ -76,18 +76,29 @@ def test_add_stimulus_presentations(nwbfile, stimulus_presentations, roundtrippe
     
 
 @pytest.mark.parametrize('roundtrip', [True, False])
-@pytest.mark.parametrize('pid,desc,loc, expected', [
-    [12, 'a probe', 'probeA', pd.DataFrame({'description': ['a probe'], 'location': ['probeA'], 'sampling_rate': [30000.0]}, index=pd.Index([12], name='id'))]
+@pytest.mark.parametrize('pid,desc,srate,lfp_srate,expected', [
+    [
+        12, 
+        'a probe', 
+        30000.0,
+        2500.0, 
+        pd.DataFrame({
+            'description': ['a probe'], 
+            'sampling_rate': [30000.0], 
+            "lfp_sampling_rate": [2500.0],
+            "location": [""]
+        }, index=pd.Index([12], name='id'))
+    ]
 ])
-def test_add_probe_to_nwbfile(nwbfile, roundtripper, roundtrip, pid, desc, loc, expected):
+def test_add_probe_to_nwbfile(nwbfile, roundtripper, roundtrip, pid, desc, srate, lfp_srate, expected):
 
-    nwbfile, _, _ = write_nwb.add_probe_to_nwbfile(nwbfile, pid, description=desc, location=loc)
+    nwbfile, _, _ = write_nwb.add_probe_to_nwbfile(nwbfile, pid, description=desc, sampling_rate=srate, lfp_sampling_rate=lfp_srate)
     if roundtrip:
         obt = roundtripper(nwbfile, EcephysNwbSessionApi)
     else:
         obt = EcephysNwbSessionApi.from_nwbfile(nwbfile)
 
-    pd.testing.assert_frame_equal(expected, obt.get_probes())
+    pd.testing.assert_frame_equal(expected, obt.get_probes(), check_like=True)
 
 
 def test_prepare_probewise_channel_table():
@@ -255,6 +266,8 @@ def test_write_probe_lfp_file(tmpdir_factory, lfp_data):
     probe_data = {
         "id": 12345,
         "name": "probeA",
+        "sampling_rate": 29.0,
+        "lfp_sampling_rate": 10.0,
         "channels":  [
             {
                 'id': 0,
