@@ -4,6 +4,7 @@ from six import string_types
 import scipy.ndimage as ndi
 import scipy.stats as st
 from scipy.optimize import curve_fit
+from scipy.fftpack import fft
 
 import matplotlib.pyplot as plt
 
@@ -123,7 +124,7 @@ class DriftingGratings(StimulusAnalysis):
             metrics_df['pref_ori_dg'] = [self._get_pref_ori(unit) for unit in unit_ids]
             metrics_df['pref_tf_dg'] = [self._get_pref_tf(unit) for unit in unit_ids]
             metrics_df['c50_dg'] = [self._get_c50(unit) for unit in unit_ids]
-            metrics_df['f1_f0_dg'] = [self._get_f1_f0(unit) for unit in unit_ids]
+            metrics_df['f1_f0_dg'] = [self._get_f1_f0(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
             metrics_df['mod_idx_dg'] = [self._get_modulation_index(unit) for unit in unit_ids]
             metrics_df['g_osi_dg'] = [self._get_selectivity(unit, metrics_df.loc[unit]['pref_tf_dg'], 'osi') for unit in unit_ids]
             metrics_df['g_dsi_dg'] = [self._get_selectivity(unit, metrics_df.loc[unit]['pref_tf_dg'], 'dsi') for unit in unit_ids]
@@ -229,7 +230,7 @@ class DriftingGratings(StimulusAnalysis):
 
 
 
-    def _get_f1_f0(self, unit_id):
+    def _get_f1_f0(self, unit_id, condition_id):
         """ Calculate F1/F0 for a given unit
 
         A measure of how tightly locked a unit's firing rate is to the cycles of a drifting grating
@@ -237,6 +238,7 @@ class DriftingGratings(StimulusAnalysis):
         Params:
         -------
         unit_id - unique ID for the unit of interest
+        condition_id - ID for the condition of interest (usually the preferred condition)
 
         Returns:
         -------
@@ -244,7 +246,36 @@ class DriftingGratings(StimulusAnalysis):
 
         """
 
-        return np.nan
+        presentation_ids = self.stim_table[self.stim_table['stimulus_condition_id'] == 
+                                              condition_id].index.values
+                                              
+        tf = self.stim_table.loc[presentation_ids[0]][self._col_tf]
+
+        dataset = self.ecephys_session.presentationwise_spike_counts(bin_edges = np.arange(0, self._trial_duration, 0.001),
+                                                                  stimulus_presentation_ids = presentation_ids,
+                                                                  unit_ids = unit_id
+                                                                  ).drop('unit_id')
+        arr = np.squeeze(dataset['spike_counts'].values)
+
+        num_trials = dataset.stimulus_presentation_id.size
+        num_bins = dataset.time_relative_to_stimulus_onset.size
+        trial_duration = dataset.time_relative_to_stimulus_onset.max()
+
+        cycles_per_trial = int(tf * trial_duration)
+
+        bins_per_cycle = int(num_bins / cycles_per_trial)
+
+        arr = arr[:, :cycles_per_trial*bins_per_cycle].reshape((num_trials, cycles_per_trial, bins_per_cycle))
+
+        avg_rate = np.mean(arr,1)
+
+        AMP = 2*np.abs(fft(avg_rate, bins_per_cycle)) / bins_per_cycle
+
+        f0 = 0.5*AMP[:,0]
+        f1 = AMP[:,1]
+
+        return np.nanmean(f1/f0)
+
 
     def _get_modulation_index(self, unit_id):
         """ Calculate modulation index for a given unit.
@@ -492,3 +523,4 @@ def gauss_function(x, a, x0, sigma):
 
 def exp_function(x, a, b, c):
     return a*np.exp(-b*x)+c
+
