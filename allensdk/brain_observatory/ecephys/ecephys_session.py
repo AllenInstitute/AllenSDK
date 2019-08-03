@@ -454,7 +454,13 @@ class EcephysSession(LazyPropertyMixin):
             emitted by a specific unit across presentations within a specific condition.
 
         """
-        presentations = self._filter_owned_df('stimulus_presentations', ids=stimulus_presentation_ids)["stimulus_condition_id"]
+        # TODO: To use filter_owned_df() make sure to convert the results from a Series to a Dataframe
+        stimulus_presentation_ids = stimulus_presentation_ids if stimulus_presentation_ids is not None else \
+                self.stimulus_presentations['stimulus_presentation_id'].unique()  # In case
+        presentations = self.stimulus_presentations.loc[stimulus_presentation_ids, ["stimulus_condition_id"]]
+        # presentations = self._filter_owned_df('stimulus_presentations', ids=stimulus_presentation_ids)["stimulus_presentation_id"]
+        # presentations = presentations.to_frame()
+
         spikes = self.presentationwise_spike_times(
             stimulus_presentation_ids=stimulus_presentation_ids, unit_ids=unit_ids
         )
@@ -462,10 +468,12 @@ class EcephysSession(LazyPropertyMixin):
         spike_counts = spikes.copy()
         spike_counts["spike_count"] = np.zeros(spike_counts.shape[0])
         spike_counts = spike_counts.groupby(["stimulus_presentation_id", "unit_id"]).count()
-        spike_counts = spike_counts.reindex(pd.MultiIndex.from_product([spike_counts.index.levels[0], unit_ids],
+        unit_ids = unit_ids if unit_ids is not None else spikes['unit_id'].unique()  # If not explicity stated get unit ids from spikes table.
+        spike_counts = spike_counts.reindex(pd.MultiIndex.from_product([spike_counts.index.levels[0],
+                                                                        unit_ids],
                                                                        names=['stimulus_presentation_id', 'unit_id']),
                                             fill_value=0)
-        # spike_counts.reset_index("unit_id", inplace=True)
+
         sp = pd.merge(spike_counts, presentations, left_on="stimulus_presentation_id", right_index=True, how="right")
         sp.reset_index(inplace=True)
 

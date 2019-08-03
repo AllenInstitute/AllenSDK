@@ -117,4 +117,6 @@ def test_get_sfdi(sf_tuning_responses, mean_sweeps_trials, expected):
 
 
 if __name__ == '__main__':
-    test_metrics()
+    test_metrics(os.path.join(data_dir, 'data', 'mouse406807_integration_test.spikes.nwb2'),
+                 os.path.join(data_dir, 'expected', 'mouse406807_integration_test.static_gratings.csv'),
+                 {'col_ori': 'ori', 'col_sf': 'sf', 'col_phase': 'phase'})
