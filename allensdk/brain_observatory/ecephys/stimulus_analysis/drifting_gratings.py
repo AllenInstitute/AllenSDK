@@ -46,6 +46,7 @@ class DriftingGratings(StimulusAnalysis):
 
         self._col_ori = 'ori'
         self._col_tf = 'TF'
+        self._col_contrast = 'contrast'
 
         self._trial_duration = 2.0
 
@@ -88,6 +89,22 @@ class DriftingGratings(StimulusAnalysis):
             self._get_stim_table_stats()
 
         return self._number_tf
+
+    @property
+    def contrastvals(self):
+        """ Array of grating temporal frequency conditions """
+        if self._contrast_vals is None:
+            self._get_stim_table_stats()
+
+        return self._contrast_vals
+
+    @property
+    def number_contrast(self):
+        """ Number of grating temporal frequency conditions """
+        if self._number_contrast is None:
+            self._get_stim_table_stats()
+
+        return self._number_contrast
 
     @property
     def null_condition(self):
@@ -150,6 +167,9 @@ class DriftingGratings(StimulusAnalysis):
         self._tfvals = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_tf] != 'null'][self._col_tf].unique())
         self._number_tf = len(self._tfvals)
 
+        self._contrastvals = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_contrast] != 'null'][self._col_contrast].unique())
+        self._number_contrast = len(self._contrastvals)
+
 
     def _get_pref_ori(self, unit_id):
 
@@ -188,6 +208,8 @@ class DriftingGratings(StimulusAnalysis):
         pref_tf - stimulus temporal frequency driving the maximal response
 
         """
+        if not 'drifting_gratings' in self.stim_table.stimulus_name.unique():
+            return np.nan
 
         similar_conditions = [self.stimulus_conditions.index[self.stimulus_conditions[self._col_tf] == tf].tolist() for tf in self.tfvals]
         df = pd.DataFrame(index=self.tfvals,
@@ -214,6 +236,9 @@ class DriftingGratings(StimulusAnalysis):
         selectivity - orientation or direction selectivity value
 
         """
+        if not 'drifting_gratings' in self.stim_table.stimulus_name.unique():
+            return np.nan
+
         orivals_rad = deg2rad(self.orivals).astype('complex128')
 
         condition_inds = self.stimulus_conditions[self.stimulus_conditions[self._col_tf] == pref_tf].index.values
@@ -309,8 +334,16 @@ class DriftingGratings(StimulusAnalysis):
         c50 - metric
 
         """
+        if not 'drifting_gratings_contrast' in self.stim_table.stimulus_name.unique():
+            return np.nan
 
-        return np.nan
+        contrast_conditions = self.stim_table[(self.stim_table.stimulus_name == 'drifting_gratings_contrast') & \
+                                    (self.stim_table.ori == self._get_pref_ori(unit_id))]['stimulus_condition_id'].unique()
+
+        contrasts = dg.stimulus_conditions.loc[contrast_conditions]['contrast'].values.astype('float')
+        mean_responses = dg.conditionwise_statistics.loc[unit_id].loc[contrast_conditions]['spike_mean'].values.astype('float')
+
+        return c50(contrasts, mean_responses)
 
 
     def _get_tfdi(self, unit_id, pref_ori):
@@ -518,9 +551,60 @@ class DriftingGratings(StimulusAnalysis):
 ### General functions ###
 
 def gauss_function(x, a, x0, sigma):
+    """
+    fit gaussian function at log scale
+    good for fitting band pass, not good at low pass or high pass
+    """
+
     return a*np.exp(-(x-x0)**2/(2*sigma**2))
 
 
 def exp_function(x, a, b, c):
     return a*np.exp(-b*x)+c
 
+def contrast_curve(x,b,c,d,e):
+    """
+     fit sigmoid function at log scale
+     not good for fitting band pass
+     - b: hill slope
+     - c: min response
+     - d: max response
+     - e: EC50
+    """
+    return (c+(d-c)/(1+np.exp(b*(np.log(x)-np.log(e)))))
+
+
+def c50(x,y):
+
+    """
+    Computes C50 of a contrast response function
+
+    Parameters:
+    -----------
+    x : array of contrast values
+    y : array of responses (spike rates)
+
+    Returns:
+    --------
+    c50 : metric
+
+    """
+
+    try:
+        fitCoefs, covMatrix = curve_fit(contrast_curve, x, y, maxfev = 100000)
+    except RuntimeError:
+        return np.nan
+    
+    resids = y-contrast_curve(x.astype('float'),*fitCoefs)
+    
+    X = np.linspace(min(x)*0.9,max(x)*1.1,256)
+    y_fit = contrast_curve(X,*fitCoefs)
+    
+    y_middle = (max(y_fit) - min(y_fit)) / 2 + min(y_fit)
+    
+    try:
+        c50 = X[np.searchsorted(y_fit, y_middle)]
+    except IndexError:
+        return np.nan
+        
+    return c50

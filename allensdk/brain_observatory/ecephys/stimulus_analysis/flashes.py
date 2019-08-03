@@ -147,7 +147,16 @@ class Flashes(StimulusAnalysis):
 
         """
 
-        return np.nan
+        on_condition_id = self.stimulus_conditions[self.stimulus_conditions[self._col_color] == '1.0'].index.values
+        off_condition_id = self.stimulus_conditions[self.stimulus_conditions[self._col_color] == '-1.0'].index.values
+
+        on_mean_spikes = self.conditionwise_statistics.loc[unit_id].loc[on_condition_id]['spike_mean']
+        off_mean_spikes = self.conditionwise_statistics.loc[unit_id].loc[off_condition_id]['spike_mean']
+
+        if off_mean_spikes > 0:
+            return on_mean_spikes / off_mean_spikes
+        else:
+            return np.nan
 
 
     ## VISUALIZATION ##
