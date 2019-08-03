@@ -243,7 +243,7 @@ class DriftingGratings(StimulusAnalysis):
 
         condition_inds = self.stimulus_conditions[self.stimulus_conditions[self._col_tf] == pref_tf].index.values
         df = self.conditionwise_statistics.loc[unit_id].loc[condition_inds]
-        df = df.assign(Ori = self.stimulus_conditions.loc[df.index.values][self._col_ori])
+        df = df.assign(ori = self.stimulus_conditions.loc[df.index.values][self._col_ori])
         df = df.sort_values(by=[self._col_ori])
 
         tuning = np.array(df['spike_mean'].values)

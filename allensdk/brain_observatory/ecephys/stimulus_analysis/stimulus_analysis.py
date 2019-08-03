@@ -461,13 +461,13 @@ class StimulusAnalysis(object):
         interval_end_inds = np.concatenate((np.where(start_time_intervals > self._trial_duration * 2)[0], 
                                             np.array([self.total_presentations-1])))
         interval_start_inds = np.concatenate((np.array([0]), 
-                                            np.where(start_time_intervals > sg._trial_duration * 2)[0] + 1))
+                                            np.where(start_time_intervals > self._trial_duration * 2)[0] + 1))
 
         starts = self.stim_table.iloc[interval_start_inds]['start_time'].values
         stops = self.stim_table.iloc[interval_end_inds]['stop_time'].values
 
-        firing_rate = np.sum(self.ecephys_session.spike_times[UNIT].searchsorted(stops) - 
-                             self.ecephys_session.spike_times[UNIT].searchsorted(starts)) / \
+        firing_rate = np.sum(self.ecephys_session.spike_times[unit_id].searchsorted(stops) - 
+                             self.ecephys_session.spike_times[unit_id].searchsorted(starts)) / \
                       np.sum(stops - starts)
 
         return firing_rate

@@ -109,9 +109,7 @@ class NaturalScenes(StimulusAnalysis):
             unit_ids = self.unit_ids
 
             metrics_df = self.empty_metrics_table()
-
-            print(self.null_condition)
-
+            
             metrics_df['pref_image_ns'] = [self.get_preferred_condition(unit) for unit in unit_ids]
             metrics_df['image_selectivity_ns'] = [self._get_image_selectivity(unit) for unit in unit_ids]
             metrics_df['firing_rate_ns'] = [self.get_overall_firing_rate(unit) for unit in unit_ids]
@@ -149,7 +147,7 @@ class NaturalScenes(StimulusAnalysis):
 
         """
 
-        unit_stats = self.conditionwise_statistics.loc[UNIT].drop(index=self.null_condition)
+        unit_stats = self.conditionwise_statistics.loc[unit_id].drop(index=self.null_condition)
 
         fmin = unit_stats['spike_mean'].min()
         fmax = unit_stats['spike_mean'].max()

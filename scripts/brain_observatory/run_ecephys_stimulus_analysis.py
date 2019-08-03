@@ -52,7 +52,7 @@ def createInputJson(output_file):
             "minimum_spike_count" : 10
         },
 
-        "output_file" : '/mnt/md0/data/production_QC/stimulus_analysis_TEST.csv',
+        "output_file" : '/mnt/md0/data/production_QC/stimulus_analysis_TEST2.csv',
 
         "nwb_paths" : ['/mnt/nvme0/ecephys_nwb_files_20190727/integration_test.spikes.nwb2']
         
