@@ -454,6 +454,7 @@ class EcephysSession(LazyPropertyMixin):
             emitted by a specific unit across presentations within a specific condition.
 
         """
+        # TODO: Need to return an empty df if no matching unit-ids or presentation-ids are found
         # TODO: To use filter_owned_df() make sure to convert the results from a Series to a Dataframe
         stimulus_presentation_ids = stimulus_presentation_ids if stimulus_presentation_ids is not None else \
                 self.stimulus_presentations['stimulus_presentation_id'].unique()  # In case
@@ -474,7 +475,9 @@ class EcephysSession(LazyPropertyMixin):
                                                                        names=['stimulus_presentation_id', 'unit_id']),
                                             fill_value=0)
 
-        sp = pd.merge(spike_counts, presentations, left_on="stimulus_presentation_id", right_index=True, how="right")
+        # In the case there are units/presentation_ids with no corresponding id in spikes not in presentations (see
+        #  unit test) a right join will mess up the index with nan values. Use left to ensure index is not affected.
+        sp = pd.merge(spike_counts, presentations, left_on="stimulus_presentation_id", right_index=True, how="left")
         sp.reset_index(inplace=True)
 
         summary = []
