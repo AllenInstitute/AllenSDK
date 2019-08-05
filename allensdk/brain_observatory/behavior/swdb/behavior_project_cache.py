@@ -31,11 +31,15 @@ class BehaviorProjectCache(object):
     def get_flash_response_df_path(self, experiment_id):
         return os.path.join(self.analysis_files_base_dir, 'flash_response_df_{}.h5'.format(experiment_id))
 
+    def get_extended_stumulus_presentations_df(self, experiment_id):
+        return os.path.join(self.analysis_files_base_dir, 'extended_stimulus_presentations_df_{}.h5'.format(experiment_id))
+
     def get_session(self, experiment_id):
         nwb_path = self.get_nwb_filepath(experiment_id)
         trial_response_df_path = self.get_trial_response_df_path(experiment_id)
         flash_response_df_path = self.get_flash_response_df_path(experiment_id)
-        api = ExtendedNwbApi(nwb_path, trial_response_df_path, flash_response_df_path)
+        extended_stim_df_path = self.get_extended_stumulus_presentations_df(experiment_id)
+        api = ExtendedNwbApi(nwb_path, trial_response_df_path, flash_response_df_path, extended_stim_df_path)
         session = ExtendedBehaviorSession(api)
         return session 
 
@@ -47,18 +51,27 @@ class BehaviorProjectCache(object):
 
 class ExtendedNwbApi(BehaviorOphysNwbApi):
     
-    def __init__(self, nwb_path, trial_response_df_path, flash_response_df_path):
+    def __init__(self, nwb_path, trial_response_df_path, flash_response_df_path, extended_stimulus_presentations_df_path):
         super(ExtendedNwbApi, self).__init__(nwb_path)
 
         self.trial_response_df_path = trial_response_df_path
         self.flash_response_df_path = flash_response_df_path
+        self.extended_stimulus_presentations_df_path = extended_stimulus_presentations_df_path
 
     def get_trial_response_df(self):
-
         return pd.read_hdf(self.trial_response_df_path, key='df')
 
     def get_flash_response_df(self):
         return pd.read_hdf(self.flash_response_df_path, key='df')
+
+    def get_extended_stumulus_presentations_df(self):
+        return pd.read_hdf(self.extended_stimulus_presentations_df_path, key='df')
+
+    def get_stimulus_presentations(self):
+        stimulus_presentations = super(ExtendedNwbApi, self).get_stimulus_presentations()
+        extended_stimulus_presentations = self.get_extended_stumulus_presentations_df()
+        extended_stimulus_presentations = extended_stimulus_presentations.drop(columns = ['omitted'])
+        return stimulus_presentations.join(extended_stimulus_presentations)
 
 
 class ExtendedBehaviorSession(BehaviorOphysSession):
@@ -68,17 +81,24 @@ class ExtendedBehaviorSession(BehaviorOphysSession):
         super(ExtendedBehaviorSession, self).__init__(api)
         self.api = api
 
-        self.image_index = LazyProperty(self.get_stimulus_index)
         self.trial_response_df = LazyProperty(self.get_trial_response_df)
         self.flash_response_df = LazyProperty(self.api.get_flash_response_df)
+        #  self.stimulus_presentations = LazyProperty(self.get_stimulus_presentations)
+        self.image_index = LazyProperty(self.get_stimulus_index)
 
     def get_trial_response_df(self):
         trial_response_df = self.api.get_trial_response_df()
+        trials_copy = self.trials.copy()
 
-        #TODO: Something like this but that doesn't mess with the trials index?
-        #  session.trials.index.names = ['trial_id']
-        #  trial_response_df = trial_response_df.join(session.trials)
+        #TODO: Can we make this not mess with the trials index?
+        trials_copy.index.names = ['trial_id']
+        trial_response_df = trial_response_df.join(trials_copy)
         return trial_response_df
 
-    def get_image_index(self):
+    #  def get_stimulus_presentations(self):
+    #      stimulus_presentations = self.api.get_stimulus_presentations()
+    #      extended_stimulus_presentations = self.api.get_extended_stumulus_presentations_df()
+    #      return stimulus_presentations.join(extended_stimulus_presentations)
+
+    def get_stimulus_index(self):
         return self.stimulus_presentations.groupby('image_index').apply(lambda group: group['image_name'].unique()[0])
