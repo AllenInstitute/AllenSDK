@@ -58,9 +58,35 @@ class EcephysProjectCache(Cache):
         path = self.get_cache_path(None, self.CHANNELS_KEY)
         return call_caching(self.fetch_api.get_channels, path, strategy='lazy', **csv_io)
 
-    def get_units(self):
+    def get_units(self, merge=False):
+        """ Reports a table consisting of all sorted units across the entire extracellular electrophysiology project.
+
+        Parameters
+        ----------
+        merge : bool, optional
+            If True, the returned table of units will be merged with channel, probe, and session information.
+
+        Returns
+        -------
+        pd.DataFrame : 
+            each row describes a single sorted unit
+
+        """
+
         path = self.get_cache_path(None, self.UNITS_KEY)
-        return call_caching(self.fetch_api.get_units, path, strategy='lazy', **csv_io)
+        units = call_caching(self.fetch_api.get_units, path, strategy='lazy', **csv_io)
+
+        if merge:
+            channels = self.get_channels().drop(columns=["unit_count"])
+            probes = self.get_probes().drop(columns=["unit_count", "channel_count"])
+            sessions = self.get_sessions().drop(columns=["probe_count", "unit_count", "channel_count", "channel_structure_acronyms"])
+
+            units = pd.merge(units, channels, left_on='peak_channel_id', right_index=True, suffixes=['_unit', '_channel'])
+            units = pd.merge(units, probes, left_on='ecephys_probe_id', right_index=True, suffixes=['_unit', '_probe'])
+            units = pd.merge(units, sessions, left_on='ecephys_session_id', right_index=True, suffixes=['_unit', '_session'])
+
+        return units
+
 
     def get_session_data(self, session_id):
         path = self.get_cache_path(None, self.SESSION_NWB_KEY, session_id, session_id)
