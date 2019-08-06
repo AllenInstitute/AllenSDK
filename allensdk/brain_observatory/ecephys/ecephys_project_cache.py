@@ -1,5 +1,6 @@
 import functools
 from pathlib import Path
+import ast
 
 import pandas as pd
 
@@ -48,7 +49,12 @@ class EcephysProjectCache(Cache):
 
     def get_sessions(self):
         path = self.get_cache_path(None, self.SESSIONS_KEY)
-        return call_caching(self.fetch_api.get_sessions, path=path, strategy='lazy', **csv_io)
+        def reader(path):
+            response = pd.read_csv(path, index_col='id')
+            if "channel_structure_acronyms" in response.columns: #  unfortunately, channel_structure_acronyms is a list of str
+                response["channel_structure_acronyms"] = [ast.literal_eval(item) for item in response["channel_structure_acronyms"]]
+            return response
+        return call_caching(self.fetch_api.get_sessions, path=path, strategy='lazy', writer=csv_io["writer"], reader=reader)
 
     def get_probes(self):
         path = self.get_cache_path(None, self.PROBES_KEY)
@@ -58,12 +64,12 @@ class EcephysProjectCache(Cache):
         path = self.get_cache_path(None, self.CHANNELS_KEY)
         return call_caching(self.fetch_api.get_channels, path, strategy='lazy', **csv_io)
 
-    def get_units(self, merge=False):
+    def get_units(self, annotate=False):
         """ Reports a table consisting of all sorted units across the entire extracellular electrophysiology project.
 
         Parameters
         ----------
-        merge : bool, optional
+        annotate : bool, optional
             If True, the returned table of units will be merged with channel, probe, and session information.
 
         Returns
@@ -76,7 +82,7 @@ class EcephysProjectCache(Cache):
         path = self.get_cache_path(None, self.UNITS_KEY)
         units = call_caching(self.fetch_api.get_units, path, strategy='lazy', **csv_io)
 
-        if merge:
+        if annotate:
             channels = self.get_channels().drop(columns=["unit_count"])
             probes = self.get_probes().drop(columns=["unit_count", "channel_count"])
             sessions = self.get_sessions().drop(columns=["probe_count", "unit_count", "channel_count", "channel_structure_acronyms"])
