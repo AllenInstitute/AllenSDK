@@ -322,6 +322,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
         )
         
         response.set_index("id", inplace=True) 
+        response["genotype"].fillna("wt", inplace=True)
         return response
 
     @classmethod
