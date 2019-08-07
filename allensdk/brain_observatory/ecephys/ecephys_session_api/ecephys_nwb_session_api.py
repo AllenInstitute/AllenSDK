@@ -19,6 +19,11 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         super(EcephysNwbSessionApi, self).__init__(path, **kwargs)
         self.probe_lfp_paths = probe_lfp_paths
 
+
+    def get_session_start_time(self):
+        return self.nwbfile.session_start_time
+
+
     def _probe_nwbfile(self, probe_id: int):
         if self.probe_lfp_paths is None:
             raise TypeError(
