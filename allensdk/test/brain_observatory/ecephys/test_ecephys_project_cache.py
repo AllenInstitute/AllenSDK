@@ -15,7 +15,7 @@ def sessions():
         "unit_count": [500, 1000, 1500],
         "channel_count": [40, 90, 140],
         "probe_count": [3, 4, 5],
-        "channel_structure_acronyms": [["a", "v"], ["a", "c"], ["b"]]
+        "structure_acronyms": [["a", "v"], ["a", "c"], ["b"]]
     }, index=pd.Series(name='id', data=[1, 2, 3]))
 
 
