@@ -35,14 +35,14 @@ def stimulus_presentations():
 
 @pytest.fixture
 def roundtripper(tmpdir_factory):
-    def f(nwbfile, api):
+    def f(nwbfile, api_cls, **api_kwargs):
         tmpdir = str(tmpdir_factory.mktemp('nwb_roundtrip_tests'))
         nwb_path = os.path.join(tmpdir, 'nwbfile.nwb')
 
         with pynwb.NWBHDF5IO(nwb_path, 'w') as write_io:
             write_io.write(nwbfile)
 
-        return api(nwb_path)
+        return api_cls(nwb_path, **api_kwargs)
     return f
 
 

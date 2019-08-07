@@ -27,6 +27,12 @@ load_LabMetaData_extension(OphysBehaviorTaskParametersSchema, 'AIBS_ophys_behavi
 
 class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
 
+
+    def __init__(self, *args, **kwargs):
+        self.filter_invalid_rois = kwargs.pop("filter_invalid_rois", False)
+        super(BehaviorOphysNwbApi, self).__init__(*args, **kwargs)
+
+
     def save(self, session_object):
 
         nwbfile = NWBFile(
@@ -178,6 +184,10 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
         df['image_mask'] = [mask.astype(bool) for mask in df['image_mask'].values]
         df.reset_index(inplace=True)
         df.set_index('cell_specimen_id', inplace=True)
+
+        if self.filter_invalid_rois:
+            df = df[df["valid_roi"]]
+
         return df
 
     def get_dff_traces(self) -> pd.DataFrame:

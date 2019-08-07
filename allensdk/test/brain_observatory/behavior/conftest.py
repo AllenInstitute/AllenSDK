@@ -165,6 +165,11 @@ def cell_specimen_table():
 
 
 @pytest.fixture
+def valid_roi_ids(cell_specimen_table):
+    return set(cell_specimen_table.loc[cell_specimen_table["valid_roi"], "cell_roi_id"].values.tolist())
+
+
+@pytest.fixture
 def dff_traces(ophys_timestamps, cell_specimen_table):
     return pd.DataFrame({'cell_roi_id': cell_specimen_table['cell_roi_id'],
                          'dff': [np.ones_like(ophys_timestamps)]},

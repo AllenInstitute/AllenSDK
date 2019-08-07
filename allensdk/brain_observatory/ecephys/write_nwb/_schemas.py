@@ -34,7 +34,11 @@ class Unit(RaisingSchema):
     peak_channel_id = Int(required=True)
     local_index = Int(
         required=True,
-        help="within-probe index of this unit. Used for indexing into the spike times file.",
+        help="within-probe index of this unit.",
+    )
+    cluster_id = Int(
+        required=True,
+        help="within-probe identifier of this unit",
     )
     quality = String(required=True)
     firing_rate = Float(required=True)
@@ -59,6 +63,8 @@ class Probe(RaisingSchema):
     units = Nested(Unit, many=True, required=True)
     lfp = Nested(Lfp, many=False, required=True)
     csd_path = String(required=True, validate=check_read_access, help="path to h5 file containing calculated current source density")
+    sampling_rate = Float(default=30000.0, help="sampling rate (Hz, master clock) at which raw data were acquired on this probe")
+    lfp_sampling_rate = Float(default=2500.0, help="sampling rate of LFP data on this probe")
 
 
 class InputSchema(ArgSchema):

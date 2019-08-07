@@ -11,22 +11,28 @@ import allensdk.brain_observatory.ecephys.ecephys_project_cache as epc
 @pytest.fixture
 def sessions():
     return pd.DataFrame({
-        'stimulus_name': ['stimulus_set_one', 'stimulus_set_two', 'stimulus_set_two']
+        'stimulus_name': ['stimulus_set_one', 'stimulus_set_two', 'stimulus_set_two'],
+        "unit_count": [500, 1000, 1500],
+        "channel_count": [40, 90, 140],
+        "probe_count": [3, 4, 5],
+        "channel_structure_acronyms": [["a", "v"], ["a", "c"], ["b"]]
     }, index=pd.Series(name='id', data=[1, 2, 3]))
 
 
 @pytest.fixture
 def units():
     return pd.DataFrame({
-        'ecephys_channel_id': [2, 1],
+        'peak_channel_id': [2, 1],
         'snr': [1.5, 4.9]
     }, index=pd.Series(name='id', data=[1, 2]))
+
 
 @pytest.fixture
 def channels():
     return pd.DataFrame({
         'ecephys_probe_id': [11, 11],
-        'ap': [1000, 2000]
+        'ap': [1000, 2000],
+        "unit_count": [5, 10]
     }, index=pd.Series(name='id', data=[1, 2]))
 
 
@@ -34,6 +40,8 @@ def channels():
 def probes():
     return pd.DataFrame({
         'ecephys_session_id': [3],
+        "unit_count": [50],
+        "channel_count": [10]
     }, index=pd.Series(name='id', data=[11]))
 
 
@@ -84,48 +92,35 @@ def tmpdir_cache(shared_tmpdir, mock_api):
     )
 
 
-def lazy_cache_test(cache, name, expected):
-    obtained_one = getattr(cache, name)()
-    obtained_two = getattr(cache, name)()
+def lazy_cache_test(cache, cache_name, api_name, expected):
+    obtained_one = getattr(cache, cache_name)()
+    obtained_two = getattr(cache, cache_name)()
 
     pd.testing.assert_frame_equal(expected, obtained_one)
     pd.testing.assert_frame_equal(expected, obtained_two)
 
-    assert 1 == cache.fetch_api.accesses[name]
+    assert 1 == cache.fetch_api.accesses[api_name]
 
 
 def test_get_sessions(tmpdir_cache, sessions):
-    lazy_cache_test(tmpdir_cache, 'get_sessions', sessions)
+    lazy_cache_test(tmpdir_cache, 'get_sessions', "get_sessions", sessions)
 
 
 def test_get_units(tmpdir_cache, units):
-    units_one = tmpdir_cache.get_units()
-    units_two = tmpdir_cache.get_units()
+    lazy_cache_test(tmpdir_cache, 'get_units', "get_units", units)
 
-    pd.testing.assert_frame_equal(units, units_one)
-    pd.testing.assert_frame_equal(units, units_two)
 
-    assert 1 == tmpdir_cache.fetch_api.accesses['get_units']
+def test_get_units_annotated(tmpdir_cache, units, channels, probes, sessions):
+    units = tmpdir_cache.get_units(annotate=True)
+    assert units.loc[2, "stimulus_name"] == "stimulus_set_two"
 
 
 def test_get_probes(tmpdir_cache, probes):
-    probes_one = tmpdir_cache.get_probes()
-    probes_two = tmpdir_cache.get_probes()
-
-    pd.testing.assert_frame_equal(probes, probes_one)
-    pd.testing.assert_frame_equal(probes, probes_two)
-
-    assert 1 == tmpdir_cache.fetch_api.accesses['get_probes']
+    lazy_cache_test(tmpdir_cache, 'get_probes', "get_probes", probes)
 
 
 def test_get_channels(tmpdir_cache, channels):
-    channels_one = tmpdir_cache.get_channels()
-    channels_two = tmpdir_cache.get_channels()
-
-    pd.testing.assert_frame_equal(channels, channels_one)
-    pd.testing.assert_frame_equal(channels, channels_two)
-
-    assert 1 == tmpdir_cache.fetch_api.accesses['get_channels']
+    lazy_cache_test(tmpdir_cache, 'get_channels', "get_channels", channels)
 
 
 def test_get_session_data(shared_tmpdir, tmpdir_cache):
