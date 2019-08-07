@@ -4,12 +4,16 @@ import json
 import os
 import uuid
 import matplotlib.image as mpimg
+import scipy.stats as sps
+import numpy as np
 
 
 from allensdk.api.cache import memoize
 from allensdk.internal.core.lims_utilities import safe_system_path
 from allensdk.brain_observatory.behavior.sync import get_sync_data
 from allensdk.brain_observatory.behavior.image_api import ImageApi
+
+from allensdk.brain_observatory.behavior.rewards_processing import get_rewards
 
 from . import PostgresQueryMixin
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
@@ -264,8 +268,6 @@ class MesoscopePlaneLimsApi(BehaviorOphysLimsApi):
             licks_df = pd.DataFrame({'time': lick_times})
         return licks_df
 
-    def get_rewards(self):
-        raise NotImplementedError
 
-    def get_trials(self):
-        raise NotImplementedError
+
+
