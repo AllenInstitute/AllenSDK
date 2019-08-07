@@ -52,8 +52,7 @@ class BehaviorProjectCache(object):
 class ExtendedNwbApi(BehaviorOphysNwbApi):
     
     def __init__(self, nwb_path, trial_response_df_path, flash_response_df_path, extended_stimulus_presentations_df_path):
-        super(ExtendedNwbApi, self).__init__(nwb_path)
-
+        super(ExtendedNwbApi, self).__init__(path=nwb_path, filter_invalid_rois=True)
         self.trial_response_df_path = trial_response_df_path
         self.flash_response_df_path = flash_response_df_path
         self.extended_stimulus_presentations_df_path = extended_stimulus_presentations_df_path
