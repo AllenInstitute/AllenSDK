@@ -9,6 +9,7 @@ import pynwb
 from .ecephys_session_api import EcephysSessionApi
 from allensdk.brain_observatory.ecephys.file_promise import FilePromise
 from allensdk.brain_observatory.nwb.nwb_api import NwbApi
+import allensdk.brain_observatory.ecephys.nwb
 
 
 
