@@ -112,7 +112,6 @@ class NaturalScenes(StimulusAnalysis):
             unit_ids = self.unit_ids
 
             metrics_df = self.empty_metrics_table()
-
             metrics_df['pref_image_ns'] = [self.get_preferred_condition(unit) for unit in unit_ids]
             metrics_df['image_selectivity_ns'] = [self._get_image_selectivity(unit) for unit in unit_ids]
             metrics_df['firing_rate_ns'] = [self.get_overall_firing_rate(unit) for unit in unit_ids]
@@ -137,7 +136,7 @@ class NaturalScenes(StimulusAnalysis):
         self._number_nonblank = len(self._images[self._images >= 0])
 
 
-    def _get_image_selectivity(self, unit_id):
+    def _get_image_selectivity(self, unit_id, num_steps=1000):
         """ Calculate the image selectivity for a given unit
 
         Params:
@@ -150,23 +149,13 @@ class NaturalScenes(StimulusAnalysis):
 
         """
 
-        ### NEEDS TO BE UPDATED FOR NEW ADAPTER
-        
-        if False:
+        unit_stats = self.conditionwise_statistics.loc[unit_id].drop(index=self.null_condition)
 
-            fmin = self.response_events[1:, nc, 0].min()
-            fmax = self.response_events[1:, nc, 0].max()
-            rtj = np.empty((1000, 1))
-            for j in range(1000):
-                thresh = fmin + j*((fmax-fmin)/1000.)
-                theta = np.empty((self.number_nonblank, 1))
-                for im in range(self.number_nonblank):
-                    if self.response_events[im+1, nc, 0] > thresh:  # im+1 to only look at images, not blanksweep
-                        theta[im] = 1
-                    else:
-                        theta[im] = 0
-                rtj[j] = theta.mean()
-            biga = rtj.mean()
-            return 1 - (2*biga)
+        fmin = unit_stats['spike_mean'].min()
+        fmax = unit_stats['spike_mean'].max()
 
-        return np.nan
+        j = np.arange(num_steps)
+        thresh = fmin + j * ((fmax-fmin) / len(j))
+        rtj = [np.mean(unit_stats['spike_mean'] > t) for t in thresh]
+
+        return 1 - (2*np.mean(rtj))

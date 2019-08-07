@@ -38,7 +38,7 @@ class StimulusAnalysis(object):
         self._sweep_p_values = None
         self._metrics = None
 
-        self._psth_resolution = 0.01 # ms
+        self._psth_resolution = 0.002
 
         self._trial_duration = trial_duration
         self._preferred_condition = {}
@@ -113,6 +113,12 @@ class StimulusAnalysis(object):
         return self._stim_table
 
     @property
+    def total_presentations(self):
+        """ Total nmber of presentations / trials"""
+        return len(self.stim_table)
+    
+
+    @property
     def metrics_names(self):
         return [c[0] for c in self.METRICS_COLUMNS]
 
@@ -158,13 +164,16 @@ class StimulusAnalysis(object):
         if self._conditionwise_psth is None:
 
             dataset = self.ecephys_session.presentationwise_spike_counts(
-                bin_edges = np.arange(0,self._trial_duration ,self._psth_resolution),
+                bin_edges = np.arange(0,self._trial_duration , self._psth_resolution),
                 stimulus_presentation_ids = self.stim_table.index.values,
                 unit_ids = self.unit_ids
                 )
+            #print(dataset)
+            #exit()
+            #da = dataset['spike_counts'].assign_coords(
+            #            stimulus_presentation_id=self.stim_table['stimulus_condition_id'].values)
+            da = dataset.assign_coords(stimulus_presentation_id=self.stim_table['stimulus_condition_id'].values)
 
-            da = dataset['spike_counts'].assign_coords(
-                        stimulus_presentation_id=self.stim_table['stimulus_condition_id'].values)
             da = da.rename({'stimulus_presentation_id': 'stimulus_condition_id'})
 
             self._conditionwise_psth = da.groupby('stimulus_condition_id').mean(dim='stimulus_condition_id')
@@ -339,10 +348,11 @@ class StimulusAnalysis(object):
         return sweep_p_values
 
     def get_velocity_for_presentation(self, presentation_id):
+        """Computes running velocity for a particular stimulus presentation"""
 
         indices = (self.ecephys_session.running_speed.start_time >= self.stim_table.loc[presentation_id]['start_time']) & \
             (self.ecephys_session.running_speed.start_time < self.stim_table.loc[presentation_id]['stop_time'])
-        
+
         return self.ecephys_session.running_speed[indices]['velocity'].mean()
 
     def get_running_modulation(self, unit_id, preferred_condition, threshold=1):
@@ -384,6 +394,8 @@ class StimulusAnalysis(object):
 
     def get_preferred_condition(self, unit_id):
 
+        """ Computes preferred condition for one unit (based on max number of spikes in presentation interval)"""
+
         if unit_id not in self._preferred_condition:
 
             try:
@@ -413,11 +425,16 @@ class StimulusAnalysis(object):
 
     def get_fano_factor(self, unit_id, preferred_condition):
 
-        # Fano factor calculation goes here:
         #   Equal to variance of spike rate divided by the mean spike rate
         #   See: https://en.wikipedia.org/wiki/Fano_factor
 
-        return np.nan
+        subset = self.presentationwise_statistics[
+                    self.presentationwise_statistics['stimulus_condition_id'] == preferred_condition
+                    ].xs(unit_id, level=1)
+
+        spike_counts = subset['spike_counts'].values 
+
+        return fano_factor(spike_counts)
 
 
     def get_time_to_peak(self, unit_id, preferred_condition):
@@ -425,7 +442,11 @@ class StimulusAnalysis(object):
         # Time-to-peak calculation goes here:
         #   Equal to the time of the maximum firing rate of the average PSTH at the preferred condition
 
-        return np.nan
+        psth = self.conditionwise_psth.sel(unit_id=unit_id, stimulus_condition_id =preferred_condition)
+
+        peak_time = psth.where(psth==psth.max(), drop=True).time_relative_to_stimulus_onset[0].values
+
+        return peak_time
 
     def get_reliability(self, unit_id, preferred_condition):
 
@@ -437,10 +458,23 @@ class StimulusAnalysis(object):
 
     def get_overall_firing_rate(self, unit_id):
 
-        # Firing rate calculation goes here:
-        #   This is the average firing rate over the entire stimulus interval
+        """ Average firing rate over the entire stimulus interval
+        """
+        start_time_intervals = np.diff(self.stim_table['start_time'])
 
-        return np.nan
+        interval_end_inds = np.concatenate((np.where(start_time_intervals > self._trial_duration * 2)[0], 
+                                            np.array([self.total_presentations-1])))
+        interval_start_inds = np.concatenate((np.array([0]), 
+                                            np.where(start_time_intervals > self._trial_duration * 2)[0] + 1))
+
+        starts = self.stim_table.iloc[interval_start_inds]['start_time'].values
+        stops = self.stim_table.iloc[interval_end_inds]['stop_time'].values
+
+        firing_rate = np.sum(self.ecephys_session.spike_times[unit_id].searchsorted(stops) - 
+                             self.ecephys_session.spike_times[unit_id].searchsorted(starts)) / \
+                      np.sum(stops - starts)
+
+        return firing_rate
 
 
     ### VISUALIZATION ###
@@ -533,9 +567,19 @@ def dsi(orivals, tuning):
     cv_top = tuning * np.exp(1j * orivals)
     return np.abs(cv_top.sum()) / tuning.sum()
 
+
+def fano_factor(spike_counts):
+
+    """ Computes the Fano factor for a set of trialwise spike counts
+    """
+
+    return np.var(spike_counts) / np.mean(spike_counts)
+
+
 def deg2rad(arr):
 
     """ Converts array-like input from degrees to radians
     """
 
     return arr / 180 * np.pi 
+

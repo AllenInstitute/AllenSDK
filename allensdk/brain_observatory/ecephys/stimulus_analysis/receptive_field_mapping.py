@@ -38,24 +38,28 @@ class ReceptiveFieldMapping(StimulusAnalysis):
 
     """
 
-    def __init__(self, ecephys_session, **kwargs):
-        super(ReceptiveFieldMapping, self).__init__(ecephys_session, **kwargs)
+    def __init__(self, ecephys_session, col_pos_x='Pos_x', col_pos_y='Pos_y', trial_duration=0.25, **kwargs):
+        super(ReceptiveFieldMapping, self).__init__(ecephys_session, trial_duration=trial_duration, **kwargs)
 
         self._pos_x = None
         self._pos_y = None
 
         self._rf_matrix = None
 
-        self._col_pos_x = 'Pos_x'
-        self._col_pos_y = 'Pos_y'
+        self._col_pos_x = col_pos_x  # 'Pos_x'
+        self._col_pos_y = col_pos_y  # 'Pos_y'
 
-        self._trial_duration = 0.25
+        # self._trial_duration = 0.25
 
         if self._params is not None:
             self._params = self._params['receptive_field_mapping']
             self._stimulus_key = self._params['stimulus_key']
         else:
             self._stimulus_key = 'receptive_field_mapping'
+            self._params = {
+                'minimum_spike_count': 10,
+                'mask_threshold': 0.5
+            }
 
         self._module_name = 'Receptive Field Mapping'
 
@@ -145,20 +149,20 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         
             metrics_df = self.empty_metrics_table()
 
-            #metrics_df.loc[:, ['azimuth_rf',
-            #                   'elevation_rf',
-            #                   'width_rf',
-            #                   'height_rf',
-            #                   'area_rf',
-            #                   'p_value_rf',
-            #                   'on_screen_rf']] = [self._get_rf_stats(unit) for unit in unit_ids]
             metrics_df.loc[:, ['azimuth_rf',
                                'elevation_rf',
                                'width_rf',
                                'height_rf',
                                'area_rf',
                                'p_value_rf',
-                               'on_screen_rf']] = [(None, None, None, None, None, None, None) for unit in unit_ids]
+                               'on_screen_rf']] = [self._get_rf_stats(unit) for unit in unit_ids]
+            #metrics_df.loc[:, ['azimuth_rf',
+            #                   'elevation_rf',
+            #                   'width_rf',
+            #                   'height_rf',
+            #                   'area_rf',
+            #                   'p_value_rf',
+            #                   'on_screen_rf']] = [(None, None, None, None, None, None, None) for unit in unit_ids]
             metrics_df['firing_rate_rf'] = [self.get_overall_firing_rate(unit) for unit in unit_ids]
             metrics_df['fano_rf'] = [self.get_fano_factor(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
             metrics_df['time_to_peak_rf'] = [self.get_time_to_peak(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
@@ -215,9 +219,12 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         dataset - xarray dataset of receptive fields
 
         """
+        # print(dataset)
+        # exit()
 
         dataset = dataset.copy()
-        dataset['spike_counts'] = dataset['spike_counts'].sum(dim=time_key)
+        # dataset['spike_counts'] = dataset['spike_counts'].sum(dim=time_key)
+        dataset[spike_count_key] = dataset.sum(dim=time_key)
         dataset = dataset.drop(time_key)
 
         dataset[row_key] = presentations.loc[:, row_key]
@@ -226,7 +233,8 @@ class ReceptiveFieldMapping(StimulusAnalysis):
 
         dataset = dataset.reset_index(unit_key).groupby([row_key, column_key, unit_key]).sum()
 
-        return dataset.rename(columns={'spike_counts': spike_count_key}).to_xarray()
+        return dataset.to_xarray()
+
 
 
     def _get_rf_stats(self, unit_id):
@@ -265,8 +273,6 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         rf = self._get_rf(unit_id)
         spikes_per_trial = self.presentationwise_statistics.xs(unit_id, level=1)['spike_counts'].values
 
-        print(self._params['minimum_spike_count'])
-        exit()
         if np.sum(spikes_per_trial) < self._params['minimum_spike_count']:
             return np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan
 

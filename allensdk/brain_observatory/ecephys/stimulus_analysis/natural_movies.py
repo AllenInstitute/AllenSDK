@@ -35,10 +35,11 @@ class NaturalMovies(StimulusAnalysis):
     To get a table of the individual unit metrics ranked by unit ID::
         metrics_table_df = nm_analysis.metrics()
 
+    TODO: Need to find a default trial_duration otherwise class will fail
     """
 
-    def __init__(self, ecephys_session, **kwargs):
-        super(NaturalMovies, self).__init__(ecephys_session, **kwargs)
+    def __init__(self, ecephys_session, trial_duration=None, **kwargs):
+        super(NaturalMovies, self).__init__(ecephys_session, trial_duration=trial_duration, **kwargs)
 
         self._metrics = None
 
