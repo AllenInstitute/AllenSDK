@@ -51,8 +51,8 @@ class EcephysProjectCache(Cache):
         path = self.get_cache_path(None, self.SESSIONS_KEY)
         def reader(path):
             response = pd.read_csv(path, index_col='id')
-            if "channel_structure_acronyms" in response.columns: #  unfortunately, channel_structure_acronyms is a list of str
-                response["channel_structure_acronyms"] = [ast.literal_eval(item) for item in response["channel_structure_acronyms"]]
+            if "structure_acronyms" in response.columns: #  unfortunately, structure_acronyms is a list of str
+                response["structure_acronyms"] = [ast.literal_eval(item) for item in response["structure_acronyms"]]
             return response
         return call_caching(self.fetch_api.get_sessions, path=path, strategy='lazy', writer=csv_io["writer"], reader=reader)
 
@@ -85,7 +85,7 @@ class EcephysProjectCache(Cache):
         if annotate:
             channels = self.get_channels().drop(columns=["unit_count"])
             probes = self.get_probes().drop(columns=["unit_count", "channel_count"])
-            sessions = self.get_sessions().drop(columns=["probe_count", "unit_count", "channel_count", "channel_structure_acronyms"])
+            sessions = self.get_sessions().drop(columns=["probe_count", "unit_count", "channel_count", "structure_acronyms"])
 
             units = pd.merge(units, channels, left_on='peak_channel_id', right_index=True, suffixes=['_unit', '_channel'])
             units = pd.merge(units, probes, left_on='ecephys_probe_id', right_index=True, suffixes=['_unit', '_probe'])
@@ -121,7 +121,7 @@ class EcephysProjectCache(Cache):
         return EcephysSession(api=session_api)
 
     def get_all_stimulus_sets(self, **session_kwargs):
-        return self._get_all_values("stimulus_set_name", self.get_sessions, **session_kwargs)
+        return self._get_all_values("session_type", self.get_sessions, **session_kwargs)
 
     def get_all_genotypes(self, **session_kwargs):
         return self._get_all_values("genotype", self.get_sessions, **session_kwargs)
