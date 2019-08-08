@@ -6,7 +6,7 @@ import behavior_project_cache as bpc
 
 python_file = r"/allen/programs/braintv/workgroups/nc-ophys/nick.ponvert/src/AllenSDK/allensdk/brain_observatory/behavior/swdb/save_flash_response_df.py"
 
-jobdir = '/allen/programs/braintv/workgroups/nc-ophys/nick.ponvert/cluster_jobs/20190801_save_flash_response_df'
+jobdir = '/allen/programs/braintv/workgroups/nc-ophys/nick.ponvert/cluster_jobs/20190808_save_flash_response_df'
 
 job_settings = {'queue': 'braintv',
                 'mem': '24g',
