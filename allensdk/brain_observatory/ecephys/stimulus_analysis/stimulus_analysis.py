@@ -38,7 +38,7 @@ class StimulusAnalysis(object):
         self._sweep_p_values = None
         self._metrics = None
 
-        self._psth_resolution = 0.002
+        self._psth_resolution = 0.001
 
         self._trial_duration = None
         self._preferred_condition = {}

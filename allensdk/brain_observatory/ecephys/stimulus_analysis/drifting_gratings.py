@@ -318,35 +318,16 @@ class DriftingGratings(StimulusAnalysis):
                                                                   ).drop('unit_id')
         arr = np.squeeze(dataset['spike_counts'].values)
 
-        num_trials = dataset.stimulus_presentation_id.size
-        num_bins = dataset.time_relative_to_stimulus_onset.size
-        trial_duration = dataset.time_relative_to_stimulus_onset.max()
-
-        cycles_per_trial = int(tf * trial_duration)
-
-        bins_per_cycle = int(num_bins / cycles_per_trial)
-
-        arr = arr[:, :cycles_per_trial*bins_per_cycle].reshape((num_trials, cycles_per_trial, bins_per_cycle))
-
-        avg_rate = np.mean(arr,1)
-
-        AMP = 2*np.abs(fft(avg_rate, bins_per_cycle)) / bins_per_cycle
-
-        f0 = 0.5*AMP[:,0]
-        f1 = AMP[:,1]
-        selection = f0 > 0.0
-
-        return np.nanmean(f1[selection]/f0[selection])
+        return f1_f0(arr, tf)
 
 
-    def _get_modulation_index(self, unit_id):
+    def _get_modulation_index(self, unit_id, condition_id):
         """ Calculate modulation index for a given unit.
-
-        Similar to F1/F0
 
         Params:
         -------
         unit_id - unique ID for the unit of interest
+        condition_id - ID for the condition of interest (usually the preferred condition)
 
         Returns:
         -------
@@ -354,7 +335,13 @@ class DriftingGratings(StimulusAnalysis):
 
         """
 
-        return np.nan
+        tf = self.stimulus_conditions.loc[condition_id][self._col_tf]
+
+        data = self.conditionwise_psth.sel(unit_id = unit_id, stimulus_condition_id=condition_id).data 
+        sample_rate = 1 / np.mean(np.diff(self.conditionwise_psth.time_relative_to_stimulus_onset))
+
+        return modulation_index(data, tf, sample_rate)
+
 
     def _get_c50(self, unit_id):
         """ Calculate C50 for a given unit.
@@ -380,120 +367,6 @@ class DriftingGratings(StimulusAnalysis):
         return c50(contrasts, mean_responses)
 
 
-    def _get_tfdi(self, unit_id, pref_ori):
-        """ Calculate temporal frequency discrimination index for a given unit
-
-
-        Params:
-        -------
-        unit_id - unique ID for the unit of interest
-        pref_ori - preferred orientation for that cell
-
-        Returns:
-        -------
-        tfdi - metric
-
-        """
-
-        ### NEEDS TO BE UPDATED FOR NEW ADAPTER
-
-        v = list(self.spikes.keys())[nc]
-        tf_tuning = self.response_events[pref_ori, 1:, nc, 0]
-        trials = self.mean_sweep_events[(self.stim_table['Ori'] == self.orivals[pref_ori])][v].values
-        sse_part = np.sqrt(np.sum((trials-trials.mean())**2)/(len(trials)-5))
-        return (np.ptp(tf_tuning))/(np.ptp(tf_tuning) + 2*sse_part)
-
-
-    def _get_suppressed_contrast(self, unit_id, pref_ori, pref_tf):
-        """ Calculate two metrics used to determine if a unit is suppressed by contrast
-
-        Params:
-        -------
-        unit_id - unique ID for the unit of interest
-        pref_ori - preferred orientation for that cell
-        pref_tf - preferred temporal frequency for that cell
-
-        Returns:
-        -------
-        peak_blank - metric
-        all_blank - metric
-
-        """
-
-        ### NEEDS TO BE UPDATED FOR NEW ADAPTER
-
-        blank = self.response_events[0, 0, nc, 0]
-        peak = self.response_events[pref_ori, pref_tf+1, nc, 0]
-        all_resp = self.response_events[:, 1:, nc, 0].mean()
-        peak_blank = peak - blank
-        all_blank = all_resp - blank
-        
-        return peak_blank, all_blank
-
-
-    def _fit_tf_tuning(self, unit_id, pref_ori, pref_tf):
-
-        """ Performs Gaussian or exponential fit on the temporal frequency tuning curve at the preferred orientation.
-
-        Params:
-        -------
-        unit_id - unique ID for the unit of interest
-        pref_ori - preferred orientation for that cell
-        pref_tf - preferred temporal frequency for that cell
-
-        Returns:
-        -------
-        fit_tf_ind - metric
-        fit_tf - metric
-        tf_low_cutoff - metric
-        tf_high_cutoff - metric
-        """
-
-        ### NEEDS TO BE UPDATED FOR NEW ADAPTER
-
-        tf_tuning = self.response_events[pref_ori, 1:, nc, 0]
-        fit_tf_ind = np.NaN
-        fit_tf = np.NaN
-        tf_low_cutoff = np.NaN
-        tf_high_cutoff = np.NaN
-        if pref_tf in range(1, 4):
-            try:
-                popt, pcov = curve_fit(gauss_function, range(5), tf_tuning, p0=[np.amax(tf_tuning), pref_tf, 1.],
-                                       maxfev=2000)
-                tf_prediction = gauss_function(np.arange(0., 4.1, 0.1), *popt)
-                fit_tf_ind = popt[1]
-                fit_tf = np.power(2, popt[1])
-                low_cut_ind = np.abs(tf_prediction - (tf_prediction.max() / 2.))[:tf_prediction.argmax()].argmin()
-                high_cut_ind = np.abs(tf_prediction - (tf_prediction.max() / 2.))[
-                               tf_prediction.argmax():].argmin() + tf_prediction.argmax()
-                if low_cut_ind > 0:
-                    low_cutoff = np.arange(0, 4.1, 0.1)[low_cut_ind]
-                    tf_low_cutoff = np.power(2, low_cutoff)
-                elif high_cut_ind < 49:
-                    high_cutoff = np.arange(0, 4.1, 0.1)[high_cut_ind]
-                    tf_high_cutoff = np.power(2, high_cutoff)
-            except Exception:
-                pass
-        else:
-            fit_tf_ind = pref_tf
-            fit_tf = self.tfvals[pref_tf]
-            try:
-                popt, pcov = curve_fit(exp_function, range(5), tf_tuning,
-                                       p0=[np.amax(tf_tuning), 2., np.amin(tf_tuning)], maxfev=2000)
-                tf_prediction = exp_function(np.arange(0., 4.1, 0.1), *popt)
-                if pref_tf == 0:
-                    high_cut_ind = np.abs(tf_prediction - (tf_prediction.max() / 2.))[
-                                   tf_prediction.argmax():].argmin() + tf_prediction.argmax()
-                    high_cutoff = np.arange(0, 4.1, 0.1)[high_cut_ind]
-                    tf_high_cutoff = np.power(2, high_cutoff)
-                else:
-                    low_cut_ind = np.abs(tf_prediction - (tf_prediction.max() / 2.))[
-                                  :tf_prediction.argmax()].argmin()
-                    low_cutoff = np.arange(0, 4.1, 0.1)[low_cut_ind]
-                    tf_low_cutoff = np.power(2, low_cutoff)
-            except Exception:
-                pass
-        return fit_tf_ind, fit_tf, tf_low_cutoff, tf_high_cutoff
 
     ## VISUALIZATION ##
 
@@ -555,9 +428,9 @@ class DriftingGratings(StimulusAnalysis):
         plt.ylabel('Spikes per trial')
 
     
-    def make_fan_plot(self, unit_id):
+    def make_star_plot(self, unit_id):
 
-        """ Make a 2P-style Fan Plot based on presentationwise spike counts"""
+        """ Make a 2P-style Star Plot based on presentationwise spike counts"""
 
         angle_data = self.stimulus_conditions.loc[self.presentationwise_statistics.xs(unit_id, level=1)['stimulus_condition_id']][self._col_ori].values
         r_data = self.stimulus_conditions.loc[self.presentationwise_statistics.xs(unit_id, level=1)['stimulus_condition_id']][self._col_tf].values
@@ -640,3 +513,58 @@ def c50(x,y):
         return np.nan
         
     return c50
+
+
+def f1_f0(arr, tf):
+
+    """
+    Computes F1/F0 of a drifting grating response
+
+    Parameters:
+    -----------
+    arr : DataArray with trials x times
+    tf : temporal frequency of the stimulus
+
+    Returns:
+    --------
+    f1_f0 : metric
+
+    """
+
+    num_trials = dataset.stimulus_presentation_id.size
+    num_bins = dataset.time_relative_to_stimulus_onset.size
+    trial_duration = dataset.time_relative_to_stimulus_onset.max()
+
+    cycles_per_trial = int(tf * trial_duration)
+
+    bins_per_cycle = int(num_bins / cycles_per_trial)
+
+    arr = arr[:, :cycles_per_trial*bins_per_cycle].reshape((num_trials, cycles_per_trial, bins_per_cycle))
+
+    avg_rate = np.mean(arr,1)
+
+    AMP = 2*np.abs(fft(avg_rate, bins_per_cycle)) / bins_per_cycle
+
+    f0 = 0.5*AMP[:,0]
+    f1 = AMP[:,1]
+    selection = f0 > 0.0
+
+    return np.nanmean(f1[selection]/f0[selection])
+
+
+def modulation_index(response, tf, sample_rate):
+
+    """  Depth of modulation by each cycle of a drifting grating; similar to F1/F0
+
+    ref: Matteucci et al. (2019) Nonlinear processing of shape information 
+         in rat lateral extrastriate cortex. J Neurosci 39: 1649-1670
+
+    """
+
+    f, psd = signal.welch(response, fs=sample_rate, nperseg=1024)
+
+    tf_index = np.searchsorted(f, tf)
+
+    MI = abs((psd[tf_index] - np.mean(psd))/np.sqrt(np.mean(psd**2)-np.mean(psd)**2))
+
+    return MI
