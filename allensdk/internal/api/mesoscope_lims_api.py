@@ -260,7 +260,7 @@ class MesoscopePlaneLimsApi(BehaviorOphysLimsApi):
             behavior_stimulus_file = self.get_behavior_stimulus_file()
             data = pd.read_pickle(behavior_stimulus_file)
             lick_frames = data['items']['behavior']['lick_sensors'][0]['lick_events']
-            stimulus_timestamps_no_monitor_delay = self.get_sync_data()['stimulus_times_no_delay']
+            stimulus_timestamps_no_monitor_delay = self.get_sync_data()['stimulus_times_no_delay'][:-1]
             lick_times  = stimulus_timestamps_no_monitor_delay[lick_frames]
             licks_df = pd.DataFrame({'time': lick_times})
         return licks_df
