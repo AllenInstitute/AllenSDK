@@ -614,10 +614,10 @@ class EcephysSession(LazyPropertyMixin):
         if isinstance(self.api, EcephysNwb1Api):
             return self._build_nwb1_waveforms(mean_waveforms)
 
-        channel_id_lut = defaultdict(
-            lambda *a, **k: -1,
-            {(row['local_index'], row['probe_id']): cid for cid, row in self.channels.iterrows()}
-        )
+        channel_id_lut = defaultdict(lambda: -1)
+        for cid, row in self.channels.iterrows():
+            channel_id_lut[(row["local_index"], row["probe_id"])] = cid
+
         probe_id_lut = {uid: row['probe_id'] for uid, row in self.units.iterrows()}
 
         output_waveforms = {}
