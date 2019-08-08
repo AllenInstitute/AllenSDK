@@ -9,6 +9,8 @@ import scipy.stats
 from allensdk.core.lazy_property import LazyPropertyMixin
 from allensdk.brain_observatory.ecephys.ecephys_session_api import EcephysSessionApi, EcephysNwbSessionApi, EcephysNwb1Api
 
+import warnings
+warnings.simplefilter(action='ignore', category=UserWarning)
 
 NON_STIMULUS_PARAMETERS = tuple([
     'start_time',

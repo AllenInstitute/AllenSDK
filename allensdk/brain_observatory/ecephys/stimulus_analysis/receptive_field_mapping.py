@@ -136,26 +136,28 @@ class ReceptiveFieldMapping(StimulusAnalysis):
 
         if self._metrics is None:
 
-            print('Calculating metrics for ' + self.name)
-
             unit_ids = self.unit_ids
         
             metrics_df = self.empty_metrics_table()
 
-            metrics_df.loc[:, ['azimuth_rf',
-                               'elevation_rf',
-                               'width_rf',
-                               'height_rf',
-                               'area_rf',
-                               'p_value_rf',
-                               'on_screen_rf']] = [self._get_rf_stats(unit) for unit in unit_ids]
-            metrics_df['firing_rate_rf'] = [self.get_overall_firing_rate(unit) for unit in unit_ids]
-            metrics_df['fano_rf'] = [self.get_fano_factor(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
-            metrics_df['time_to_peak_rf'] = [self.get_time_to_peak(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
-            metrics_df['reliability_rf'] = [self.get_reliability(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
-            metrics_df['lifetime_sparseness_rf'] = [self.get_lifetime_sparseness(unit) for unit in unit_ids]
-            metrics_df.loc[:, ['run_pval_rf', 'run_mod_rf']] = \
-                    [self.get_running_modulation(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+            if len(self.stim_table) > 0:
+
+                print('Calculating metrics for ' + self.name)
+
+                metrics_df.loc[:, ['azimuth_rf',
+                                   'elevation_rf',
+                                   'width_rf',
+                                   'height_rf',
+                                   'area_rf',
+                                   'p_value_rf',
+                                   'on_screen_rf']] = [self._get_rf_stats(unit) for unit in unit_ids]
+                metrics_df['firing_rate_rf'] = [self.get_overall_firing_rate(unit) for unit in unit_ids]
+                metrics_df['fano_rf'] = [self.get_fano_factor(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+                metrics_df['time_to_peak_rf'] = [self.get_time_to_peak(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+                metrics_df['reliability_rf'] = [self.get_reliability(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+                metrics_df['lifetime_sparseness_rf'] = [self.get_lifetime_sparseness(unit) for unit in unit_ids]
+                metrics_df.loc[:, ['run_pval_rf', 'run_mod_rf']] = \
+                        [self.get_running_modulation(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
 
             self._metrics = metrics_df
 

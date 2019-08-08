@@ -36,7 +36,7 @@ class DotMotion(StimulusAnalysis):
         super(DotMotion, self).__init__(ecephys_session, **kwargs)
 
         self._dirvals = None
-        self._col_dir = 'Ori'
+        self._col_dir = 'Dir'
 
         self._speeds = None
         self._col_speed = 'Speed'
@@ -47,7 +47,7 @@ class DotMotion(StimulusAnalysis):
             self._params = self._params['dot_motion']
             self._stimulus_key = self._params['stimulus_key']
         else:
-            self._stimulus_key = 'motion_stimulus'
+            self._stimulus_key = 'dot_motion'
 
         self._module_name = 'Dot Motion'
 
@@ -90,21 +90,23 @@ class DotMotion(StimulusAnalysis):
 
         if self._metrics is None:
 
-            print('Calculating metrics for ' + self.name)
-
             unit_ids = self.unit_ids
         
             metrics_df = self.empty_metrics_table()
 
-            metrics_df['pref_speed_dm'] = [self._get_pref_speed(unit) for unit in unit_ids]
-            metrics_df['pref_dir_dm'] = [self._get_pref_dir(unit) for unit in unit_ids]
-            metrics_df['firing_rate_dm'] = [self.get_overall_firing_rate(unit) for unit in unit_ids]
-            metrics_df['fano_dm'] = [self.get_fano_factor(unit, get_preferred_condition(unit)) for unit in unit_ids]
-            metrics_df['speed_tuning_idx_dm'] = [self._get_speed_tuning_index(unit) for unit in unit_ids]
-            metrics_df['reliability_dm'] = [self.get_reliability(unit, get_preferred_condition(unit)) for unit in unit_ids]
-            metrics_df['lifetime_sparseness_dm'] = [self.get_lifetime_sparseness(unit) for unit in unit_ids]
-            metrics_df.loc[:, ['run_pval_dm', 'run_mod_dm']] = \
-                    [self.get_running_modulation(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+            if len(self.stim_table) > 0:
+
+                print('Calculating metrics for ' + self.name)
+
+                metrics_df['pref_speed_dm'] = [self._get_pref_speed(unit) for unit in unit_ids]
+                metrics_df['pref_dir_dm'] = [self._get_pref_dir(unit) for unit in unit_ids]
+                metrics_df['firing_rate_dm'] = [self.get_overall_firing_rate(unit) for unit in unit_ids]
+                metrics_df['fano_dm'] = [self.get_fano_factor(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+                metrics_df['speed_tuning_idx_dm'] = [self._get_speed_tuning_index(unit) for unit in unit_ids]
+                metrics_df['reliability_dm'] = [self.get_reliability(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+                metrics_df['lifetime_sparseness_dm'] = [self.get_lifetime_sparseness(unit) for unit in unit_ids]
+                metrics_df.loc[:, ['run_pval_dm', 'run_mod_dm']] = \
+                        [self.get_running_modulation(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
 
             self._metrics = metrics_df
 
