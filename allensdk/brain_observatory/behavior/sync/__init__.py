@@ -21,8 +21,8 @@ def get_sync_data(sync_path):
     frames_2p = vs2p_r / sample_freq
     vs2p_fsec = vs2p_f / sample_freq
 
-    # use rising edge for Scientifica, falling edge for Nikon and mesoscope http://confluence.corp.alleninstitute.org/display/IT/Ophys+Time+Sync
-    stimulus_times_no_monitor_delay = sync_dataset.get_falling_edges('stim_vsync') / sample_freq
+    # use rising edge for Scientifica and Mesoscope falling edge for Nikon http://confluence.corp.alleninstitute.org/display/IT/Ophys+Time+Sync
+    stimulus_times_no_monitor_delay = sync_dataset.get_rising_edges('stim_vsync') / sample_freq
 
     if 'lick_times' in meta_data['line_labels']:
         lick_times = sync_dataset.get_rising_edges('lick_1') / sample_freq
