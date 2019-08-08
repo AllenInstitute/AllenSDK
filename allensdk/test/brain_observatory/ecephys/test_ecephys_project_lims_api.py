@@ -3,6 +3,7 @@ import re
 
 import pytest
 import pandas as pd
+import numpy as np
 
 from allensdk.brain_observatory.ecephys.ecephys_project_api import (
     ecephys_project_lims_api as epla,
@@ -48,7 +49,7 @@ def test_query(method, conditions, expected):
     class MockPgEngine:
         def select(self, rendered):
             self.query = " ".join([item.strip() for item in str(rendered).split()])
-            return pd.DataFrame({"id": [1, 2, 3], "ecephys_channel_id": [1, 2, 3]})
+            return pd.DataFrame({"id": [1, 2, 3], "ecephys_channel_id": [1, 2, 3], "genotype": [np.nan, "a", "b"]})
 
     pg_engine = MockPgEngine()
     api = epla.EcephysProjectLimsApi(postgres_engine=pg_engine, app_engine=None)

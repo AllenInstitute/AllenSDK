@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 import logging
 
@@ -55,14 +55,16 @@ def raw_running_data():
 
 
 def test_roundtrip_metadata(roundtripper):
+    dt = datetime.now(timezone.utc)
     nwbfile = pynwb.NWBFile(
         session_description='EcephysSession',
         identifier='{}'.format(12345),
-        session_start_time=datetime.now()
+        session_start_time=dt
     )
 
     api = roundtripper(nwbfile, EcephysNwbSessionApi)
     assert 12345 == api.get_ecephys_session_id()
+    assert dt == api.get_session_start_time()
 
 
 def test_add_stimulus_presentations(nwbfile, stimulus_presentations, roundtripper):
@@ -189,7 +191,6 @@ def test_add_raw_running_Data_to_nwbfile(nwbfile, raw_running_data, roundtripper
         api_obt = EcephysNwbSessionApi.from_nwbfile(nwbfile)
 
     obtained = api_obt.get_raw_running_data()
-
 
     expected = raw_running_data.rename(columns={"dx": "net_rotation", "vsig": "signal_voltage", "vin": "supply_voltage"})
     pd.testing.assert_frame_equal(expected, obtained, check_like=True)

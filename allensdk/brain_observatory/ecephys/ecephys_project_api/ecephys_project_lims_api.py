@@ -162,7 +162,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
                         when nwb_id is not null then true
                         else false
                     end as has_lfp_nwb,
-                    str.structure_acronyms as channel_structure_acronyms
+                    str.structure_acronyms as structure_acronyms
                 from ecephys_probes ep 
                 join ecephys_sessions es on es.id = ep.ecephys_session_id 
                 join (
@@ -239,12 +239,12 @@ class EcephysProjectLimsApi(EcephysProjectApi):
                 {%- import 'postgres_macros' as pm -%}
                 {%- import 'macros' as m -%}
                 select 
-                    stimulus_name as stimulus_set_name,
+                    stimulus_name as session_type,
                     sp.id as specimen_id, 
                     es.id as id, 
                     dn.full_genotype as genotype,
                     gd.name as gender, 
-                    ages.name as age,
+                    ages.days as age_in_days,
                     pr.code as project_code,
                     probe_count,
                     channel_count,
@@ -253,7 +253,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
                         when nwb_id is not null then true
                         else false
                     end as has_nwb,
-                    str.structure_acronyms as channel_structure_acronyms
+                    str.structure_acronyms as structure_acronyms
                 from ecephys_sessions es
                 join specimens sp on sp.id = es.specimen_id 
                 join donors dn on dn.id = sp.donor_id 
@@ -322,6 +322,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
         )
         
         response.set_index("id", inplace=True) 
+        response["genotype"].fillna("wt", inplace=True)
         return response
 
     @classmethod

@@ -126,10 +126,10 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
         return {key: val.data[:] for key, val in self.nwbfile.stimulus_template.items()}
 
     def get_ophys_timestamps(self) -> np.ndarray:
-        return self.nwbfile.modules['two_photon_imaging'].get_data_interface('dff').roi_response_series['traces'].timestamps
+        return self.nwbfile.modules['two_photon_imaging'].get_data_interface('dff').roi_response_series['traces'].timestamps[:]
 
     def get_stimulus_timestamps(self) -> np.ndarray:
-        return self.nwbfile.modules['stimulus'].get_data_interface('timestamps').timestamps
+        return self.nwbfile.modules['stimulus'].get_data_interface('timestamps').timestamps[:]
 
     def get_trials(self) -> pd.DataFrame:
         trials = self.nwbfile.trials.to_dataframe()
