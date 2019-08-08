@@ -351,11 +351,15 @@ class EcephysSession(LazyPropertyMixin):
 
         ends = domain[:, -1]
         starts = domain[:, 0]
-        overlapping = np.where((starts[1:] - ends[:-1]) < 0)[0]
+        time_diffs = starts[1:] - ends[:-1]
+        overlapping = np.where(time_diffs < 0)[0]
 
         if len(overlapping) > 0:
-            overlapping = [(first, second) for first, second in zip(overlapping[:-1], overlapping[1:])]
-            warnings.warn("You've specified some overlapping time intervals between rows: {overlapping}")
+            # Ignoring intervals that overlaps multiple time bins because trying to figure that out would take O(n)
+            overlapping = [(s, s+1) for s in overlapping]
+            warnings.warn(f"You've specified some overlapping time intervals between neighboring rows: {overlapping}, "
+                          f"with a maximum overlap of {np.abs(np.min(time_diffs))} seconds.")
+
         tiled_data = build_spike_histogram(
             domain, self.spike_times, units.index.values, dtype=dtype, binarize=binarize
         )

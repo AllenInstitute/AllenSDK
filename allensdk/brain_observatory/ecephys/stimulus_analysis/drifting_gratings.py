@@ -55,10 +55,11 @@ class DriftingGratings(StimulusAnalysis):
         # self._trial_duration = trial_duration
 
         if self._params is not None:
-            self._params = self._params['drifting_gratings']
-            self._stimulus_key = self._params['stimulus_key']
-        #else:
-        #    self._stimulus_key = 'drifting_gratings'
+            # TODO: Need to make sure
+            self._params = self._params.get('drifting_gratings', {})
+            self._stimulus_key = self._params.get('stimulus_key', None)  # Overwrites parent value with argvars
+        else:
+            self._params = {}
 
         self._module_name = 'Drifting Gratings'
 
@@ -354,6 +355,7 @@ class DriftingGratings(StimulusAnalysis):
 
         return c50(contrasts, mean_responses)
 
+    # Methods need to either be removed or updated to work with latest adaptor. Talked with Jsh and decision still pending.
     '''
     def _get_tfdi(self, unit_id, pref_ori):
         """ Calculate temporal frequency discrimination index for a given unit

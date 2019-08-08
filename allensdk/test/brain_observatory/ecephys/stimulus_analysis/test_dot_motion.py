@@ -30,6 +30,14 @@ def test_metrics(spikes_nwb, expected_csv, analysis_params, units_filter, skip_c
 
     analysis_params = analysis_params or {}
     analysis = dm.DotMotion(spikes_nwb, filter=units_filter, **analysis_params)
+    # Make sure some of the non-metrics structures are returning valid(ish) tables
+    assert(len(analysis.stim_table) > 1)
+    assert(set(analysis.unit_ids) == set(units_filter))
+    assert(len(analysis.running_speed) == len(analysis.stim_table))
+    assert(analysis.stim_table_spontaneous.shape == (3, 5))
+    assert(set(analysis.spikes.keys()) == set(units_filter))
+    assert(len(analysis.conditionwise_psth) > 1)
+
     actual_data = analysis.metrics.sort_index()
 
     expected_data = pd.read_csv(expected_csv)

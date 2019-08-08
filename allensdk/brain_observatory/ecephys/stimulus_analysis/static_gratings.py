@@ -55,13 +55,14 @@ class StaticGratings(StimulusAnalysis):
         self._col_sf = col_sf
         self._col_phase = col_phase
         self._trial_duration = trial_duration
-        self._module_name = 'Static Gratings'  # Module name should be a static variable
+        self._module_name = 'Static Gratings'  # TODO: module_name should be a static class variable
 
         if self._params is not None:
-            self._params = self._params['static_gratings']
-            self._stimulus_key = self._params['stimulus_key']
-        # else:
-        #     self._stimulus_key = 'static_gratings'
+            self._params = self._params.get('static_gratings', {})
+            self._stimulus_key = self._params.get('stimulus_key', None)  # Overwrites parent value with argvars
+        else:
+            self._params = {}
+
 
     @property
     def orivals(self):

@@ -48,7 +48,8 @@ class Unit(RaisingSchema):
     firing_rate = Float(required=True)
     snr = Float(required=True)
     isi_violations = Float(required=True)
-    # TODO: Re-add the below parameters
+    # TODO: Re-add the below parameters. Helpful parameters that can be used for analysizing data but not directly
+    #   required by EcephysSession or the StimulusAnalysis classes
     # presence_ratio = Float(required=True)
     # amplitude_cutoff = Float(required=True)
     # isolation_distance = Float(required=True)

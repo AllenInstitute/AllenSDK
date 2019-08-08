@@ -50,10 +50,10 @@ class NaturalScenes(StimulusAnalysis):
         # self._trial_duration = 0.25  # Passed in to kwargs and read by parent
 
         if self._params is not None:
-            self._params = self._params['natural_scenes']
-            self._stimulus_key = self._params['stimulus_key']
-        # else:
-        #    self._stimulus_key = 'natural_scenes'
+            self._params = self._params.get('natural_scenes', {})
+            self._stimulus_key = self._params.get('stimulus_key', None)  # Overwrites parent value with argvars
+        else:
+            self._params = {}
 
         self._module_name = 'Natural Scenes'
 

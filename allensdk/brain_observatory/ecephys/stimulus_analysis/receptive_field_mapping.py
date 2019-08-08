@@ -149,20 +149,20 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         
             metrics_df = self.empty_metrics_table()
 
-            #metrics_df.loc[:, ['azimuth_rf',
-            #                   'elevation_rf',
-            #                   'width_rf',
-            #                   'height_rf',
-            #                   'area_rf',
-            #                   'p_value_rf',
-            #                   'on_screen_rf']] = [self._get_rf_stats(unit) for unit in unit_ids]
             metrics_df.loc[:, ['azimuth_rf',
                                'elevation_rf',
                                'width_rf',
                                'height_rf',
                                'area_rf',
                                'p_value_rf',
-                               'on_screen_rf']] = [(None, None, None, None, None, None, None) for unit in unit_ids]
+                               'on_screen_rf']] = [self._get_rf_stats(unit) for unit in unit_ids]
+            #metrics_df.loc[:, ['azimuth_rf',
+            #                   'elevation_rf',
+            #                   'width_rf',
+            #                   'height_rf',
+            #                   'area_rf',
+            #                   'p_value_rf',
+            #                   'on_screen_rf']] = [(None, None, None, None, None, None, None) for unit in unit_ids]
             metrics_df['firing_rate_rf'] = [self.get_overall_firing_rate(unit) for unit in unit_ids]
             metrics_df['fano_rf'] = [self.get_fano_factor(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
             metrics_df['time_to_peak_rf'] = [self.get_time_to_peak(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
@@ -234,9 +234,6 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         dataset - xarray dataset of receptive fields
 
         """
-        # print(dataset)
-        # exit()
-
         dataset = dataset.copy()
         # dataset['spike_counts'] = dataset['spike_counts'].sum(dim=time_key)
         dataset[spike_count_key] = dataset.sum(dim=time_key)
@@ -289,7 +286,7 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         spikes_per_trial = self.presentationwise_statistics.xs(unit_id, level=1)['spike_counts'].values
 
         if np.sum(spikes_per_trial) < self._params['minimum_spike_count']:
-            return np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan
+            return np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, False
 
         p_value = chisq_from_stim_table(self.stim_table,
                                        ['Pos_x','Pos_y'],

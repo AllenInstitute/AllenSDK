@@ -12,7 +12,7 @@ from allensdk.brain_observatory.ecephys.stimulus_analysis import \
     ReceptiveFieldMapping
 
 OUTPUT_DIR = '/allen/aibs/informatics/module_test_data/ecephys/stimulus_analysis_fh/expected'
-OVERWRITE = True
+OVERWRITE = False
 
 #SPIKE_FILE = '/allen/aibs/informatics/module_test_data/ecephys/stimulus_analysis_fh/data/mouse406807_integration_test.spikes.nwb2'
 #col_opts = {'col_ori': 'ori', 'col_sf': 'sf', 'col_phase': 'phase', 'col_contrast': 'contrast', 'col_color': 'color'}
@@ -31,11 +31,11 @@ unit_id_filter = [914580630, 914580280, 914580278, 914580634, 914580610, 9145802
                   914580302, 914580316, 914580314, 914580312, 914580310, 914580318, 914580324, 914580322, 914580320,
                   914580328, 914580326, 914580334]
 avail_stims = [
-    #'static_gratings',
-    #'drifting_gratings',
-    #'natural_scenes',
+    'static_gratings',
+    'drifting_gratings',
+    'natural_scenes',
     #'natural_movies',
-    #'flashes',
+    'flashes',
     #'dot_motion',
     'receptive_field_mapping'
 ]

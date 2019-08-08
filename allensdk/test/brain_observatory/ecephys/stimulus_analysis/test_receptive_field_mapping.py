@@ -15,7 +15,8 @@ data_dir = '/allen/aibs/informatics/module_test_data/ecephys/stimulus_analysis_f
                              # os.path.join(data_dir, 'expected', 'mouse406807_integration_test.receptive_field_mapping.csv'),
                              # {})
                              (os.path.join(data_dir, 'data', 'ecephys_session_773418906.nwb'),
-                              os.path.join(data_dir, 'expected', 'ecephys_session_773418906.receptive_field_mapping.csv'),
+                              #os.path.join(data_dir, 'expected', 'ecephys_session_773418906.receptive_field_mapping.csv'),
+                              os.path.join(data_dir, 'expected', 'ecephys_session_773418906.receptive_field_mapping.v2.csv'),
                               {},
                               [914580630, 914580280, 914580278, 914580634, 914580610, 914580290, 914580288, 914580286,
                                914580284, 914580282, 914580294, 914580330, 914580304, 914580292, 914580300, 914580298,
@@ -31,6 +32,13 @@ def test_metrics(spikes_nwb, expected_csv, analysis_params, units_filter, skip_c
 
     analysis_params = analysis_params or {}
     analysis = rfm.ReceptiveFieldMapping(spikes_nwb, filter=units_filter, **analysis_params)
+    assert(len(analysis.stim_table) > 1)
+    assert(set(analysis.unit_ids) == set(units_filter))
+    assert(len(analysis.running_speed) == len(analysis.stim_table))
+    assert(analysis.stim_table_spontaneous.shape == (3, 5))
+    assert(set(analysis.spikes.keys()) == set(units_filter))
+    assert(len(analysis.conditionwise_psth) > 1)
+
     actual_data = analysis.metrics.sort_index()
 
     expected_data = pd.read_csv(expected_csv)
@@ -46,7 +54,8 @@ def test_metrics(spikes_nwb, expected_csv, analysis_params, units_filter, skip_c
     assert(np.allclose(actual_data['height_rf'].astype(np.float), expected_data['height_rf'], equal_nan=True))
     assert(np.allclose(actual_data['area_rf'].astype(np.float), expected_data['area_rf'], equal_nan=True))
     assert(np.allclose(actual_data['p_value_rf'].astype(np.float), expected_data['p_value_rf'], equal_nan=True))
-    assert(np.allclose(actual_data['on_screen_rf'].astype(np.float), expected_data['on_screen_rf'], equal_nan=True))
+    # assert(np.allclose(actual_data['on_screen_rf'].astype(np.float), expected_data['on_screen_rf'], equal_nan=True))
+    assert (np.all(actual_data['on_screen_rf'].astype(np.bool) == expected_data['on_screen_rf'].astype(np.bool)))
     assert(np.allclose(actual_data['firing_rate_rf'].astype(np.float), expected_data['firing_rate_rf'], equal_nan=True))
     assert(np.allclose(actual_data['fano_rf'].astype(np.float), expected_data['fano_rf'], equal_nan=True))
     assert(np.allclose(actual_data['time_to_peak_rf'].astype(np.float), expected_data['time_to_peak_rf'], equal_nan=True))

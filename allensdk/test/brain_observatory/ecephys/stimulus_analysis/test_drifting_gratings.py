@@ -27,19 +27,30 @@ data_dir = '/allen/aibs/informatics/module_test_data/ecephys/stimulus_analysis_f
                          ])
 def test_metrics(spikes_nwb, expected_csv, analysis_params, units_filter, skip_cols=[]):
     """Full intergration tests of metrics table"""
+    # TODO: Test is only temporary while the stimulus_analysis modules is in development. Replace with unit tests and/or move to integration testing framework
     if not os.path.exists(spikes_nwb):
         pytest.skip('No input spikes file {}.'.format(spikes_nwb))
 
+    np.random.seed(0)
+
     analysis_params = analysis_params or {}
     analysis = drifting_gratings.DriftingGratings(spikes_nwb, filter=units_filter, **analysis_params)
+    # Make sure some of the non-metrics structures are returning valid(ish) tables
+    assert(len(analysis.stim_table) > 1)
+    assert(set(analysis.unit_ids) == set(units_filter))
+    assert(len(analysis.running_speed) == len(analysis.stim_table))
+    assert(analysis.stim_table_spontaneous.shape == (3, 5))
+    assert(set(analysis.spikes.keys()) == set(units_filter))
+    assert(len(analysis.conditionwise_psth) > 1)
+
     actual_data = analysis.metrics.sort_index()
 
     expected_data = pd.read_csv(expected_csv)
     expected_data = expected_data.set_index('unit_id')
     expected_data = expected_data.sort_index()  # in theory this should be sorted in the csv, no point in risking it.
 
-    assert (np.all(actual_data.index.values == expected_data.index.values))
-    assert (set(actual_data.columns) == (set(expected_data.columns) - set(skip_cols)))
+    assert(np.all(actual_data.index.values == expected_data.index.values))
+    assert(set(actual_data.columns) == (set(expected_data.columns) - set(skip_cols)))
 
     assert(np.allclose(actual_data['pref_ori_dg'].astype(np.float), expected_data['pref_ori_dg'], equal_nan=True))
     assert(np.allclose(actual_data['pref_tf_dg'].astype(np.float), expected_data['pref_tf_dg'], equal_nan=True))

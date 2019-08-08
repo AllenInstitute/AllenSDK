@@ -30,10 +30,23 @@ data_dir = '/allen/aibs/informatics/module_test_data/ecephys/stimulus_analysis_f
                          ])
 def test_metrics(spikes_nwb, expected_csv, analysis_params, units_filter, skip_cols=[]):
     """Full intergration tests of metrics table"""
+    # TODO: Test is only temporary while the stimulus_analysis modules is in development. Replace with unit tests and/or move to integration testing framework
     if not os.path.exists(spikes_nwb):
         pytest.skip('No input spikes file {}.'.format(spikes_nwb))
+
+    np.random.seed(0)  # required by
+
     analysis_params = analysis_params or {}
     analysis = static_gratings.StaticGratings(spikes_nwb, filter=units_filter, **analysis_params)
+    # Make sure some of the non-metrics structures are returning valid(ish) tables
+    assert(len(analysis.stim_table) > 1)
+    assert(set(analysis.unit_ids) == set(units_filter))
+    assert(len(analysis.running_speed) == len(analysis.stim_table))
+    assert(analysis.stim_table_spontaneous.shape == (3, 5))
+    assert(set(analysis.spikes.keys()) == set(units_filter))
+    assert(len(analysis.conditionwise_psth) > 1)
+
+    # Test the metrics() table is returning consistant values
     actual_data = analysis.metrics.sort_index()
 
     expected_data = pd.read_csv(expected_csv)

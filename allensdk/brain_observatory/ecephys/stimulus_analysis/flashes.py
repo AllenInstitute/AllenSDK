@@ -46,13 +46,12 @@ class Flashes(StimulusAnalysis):
         self._col_color = col_color # 'color'
 
         if self._params is not None:
-            self._params = self._params['flashes']
-            self._stimulus_key = self._params['stimulus_key']
-        #else:
-        #    self._stimulus_key = 'flash_250ms' # 'flashes'
+            self._params = self._params.get('flashes', {})
+            self._stimulus_key = self._params.get('stimulus_key', None)  # Overwrites parent value with argvars
+        else:
+            self._params = {}
 
         # self._trial_duration = 0.25
-
         self._module_name = 'Flashes'
 
 

@@ -32,6 +32,9 @@ class DotMotion(StimulusAnalysis):
     to get only those units which are on probe C and found in the VISp area::
         dm_analysis = DotMotion(session, filter={'location': 'probeC', 'structure_acronym': 'VISp'})
 
+    or a list of unit_ids:
+        dm_analysis = DotMotion(session, filter=[914580630, 914580280, 914580278])
+
     To get a table of the individual unit metrics ranked by unit ID::
         metrics_table_df = dm_analysis.metrics()
 
