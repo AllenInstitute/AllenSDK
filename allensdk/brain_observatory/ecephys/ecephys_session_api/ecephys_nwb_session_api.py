@@ -9,6 +9,7 @@ import pynwb
 from .ecephys_session_api import EcephysSessionApi
 from allensdk.brain_observatory.ecephys.file_promise import FilePromise
 from allensdk.brain_observatory.nwb.nwb_api import NwbApi
+import allensdk.brain_observatory.ecephys.nwb
 
 
 
@@ -17,6 +18,11 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
     def __init__(self, path, probe_lfp_paths: Optional[Dict[int, FilePromise]] = None, **kwargs):
         super(EcephysNwbSessionApi, self).__init__(path, **kwargs)
         self.probe_lfp_paths = probe_lfp_paths
+
+
+    def get_session_start_time(self):
+        return self.nwbfile.session_start_time
+
 
     def _probe_nwbfile(self, probe_id: int):
         if self.probe_lfp_paths is None:
