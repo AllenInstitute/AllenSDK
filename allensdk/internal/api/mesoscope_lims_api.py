@@ -4,14 +4,13 @@ import json
 import os
 import uuid
 import matplotlib.image as mpimg
-import scipy.stats as sps
-import numpy as np
 
 
 from allensdk.api.cache import memoize
 from allensdk.internal.core.lims_utilities import safe_system_path
-from allensdk.brain_observatory.behavior.sync import get_sync_data
+
 from allensdk.brain_observatory.behavior.image_api import ImageApi
+from allensdk.brain_observatory.behavior.sync import get_sync_data, get_stimulus_rebase_function
 
 from . import PostgresQueryMixin
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
@@ -271,7 +270,7 @@ class MesoscopePlaneLimsApi(BehaviorOphysLimsApi):
         stimulus_timestamps_no_monitor_delay = self.get_sync_data()['stimulus_times_no_delay'][:-1]
         behavior_stimulus_file = self.get_behavior_stimulus_file()
         data = pd.read_pickle(behavior_stimulus_file)
-        rebase_function = self.get_stimulus_rebase_function(data, stimulus_timestamps_no_monitor_delay)
+        rebase_function = get_stimulus_rebase_function(data, stimulus_timestamps_no_monitor_delay)
         trial_df = pd.DataFrame(data["items"]["behavior"]['trial_log'])
         rewards_dict = {'volume': [], 'timestamps': [], 'autorewarded': []}
         for idx, trial in trial_df.iterrows():
