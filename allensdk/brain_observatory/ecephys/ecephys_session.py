@@ -1,5 +1,6 @@
 import warnings
 from collections.abc import Collection
+from collections import defaultdict
 
 import xarray as xr
 import numpy as np
@@ -584,12 +585,6 @@ class EcephysSession(LazyPropertyMixin):
             'local_index_channel': 'channel_local_index',
         })
 
-        table = table.loc[
-            (table['valid_data'])
-            & (table['quality'] == 'good')
-        ]
-
-        # table = table.drop(columns=['local_index_unit', 'quality', 'valid_data'])
         return table.sort_values(by=['probe_description', 'probe_vertical_position', 'probe_horizontal_position'])
 
 
@@ -622,7 +617,10 @@ class EcephysSession(LazyPropertyMixin):
         # TODO: there is a bug either here or (more likely) in LIMS unit data ingest which causes the peak channel 
         # to be off by a few (exactly 1?) indices
         # we could easily recompute here, but better to fix it at the source
-        channel_id_lut = {(row['local_index'], row['probe_id']): cid for cid, row in self.channels.iterrows()}
+        channel_id_lut = defaultdict(
+            lambda *a, **k: -1,
+            {(row['local_index'], row['probe_id']): cid for cid, row in self.channels.iterrows()}
+        )
         probe_id_lut = {uid: row['probe_id'] for uid, row in self.units.iterrows()}
 
         output_waveforms = {}
@@ -641,6 +639,7 @@ class EcephysSession(LazyPropertyMixin):
                     'time': np.arange(data.shape[1]) / self.probes.loc[probe_id]['sampling_rate']
                 }
             )
+            output_waveforms[uid] = output_waveforms[uid][output_waveforms[uid]["channel_id"] != -1]
 
         return output_waveforms
 
@@ -689,7 +688,7 @@ class EcephysSession(LazyPropertyMixin):
         else:
             raise Exception(f'specified NWB version {nwb_version} not supported. Supported versions are: 2.X, 1.X')
 
-        return cls(api=NWBAdaptorCls.from_path(path=path, **api_kwargs), ** kwargs)
+        return cls(api=NWBAdaptorCls.from_path(path=path, **api_kwargs), **kwargs)
 
 
 def build_spike_histogram(time_domain, spike_times, unit_ids, dtype=None, binarize=False):
