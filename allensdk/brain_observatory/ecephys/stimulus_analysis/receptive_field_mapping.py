@@ -55,7 +55,7 @@ class ReceptiveFieldMapping(StimulusAnalysis):
             self._params = self._params['receptive_field_mapping']
             self._stimulus_key = self._params['stimulus_key']
         else:
-            self._stimulus_key = 'receptive_field_mapping'
+            # self._stimulus_key = 'receptive_field_mapping'
             self._params = {
                 'minimum_spike_count': 10,
                 'mask_threshold': 0.5
@@ -149,20 +149,20 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         
             metrics_df = self.empty_metrics_table()
 
-            metrics_df.loc[:, ['azimuth_rf',
-                               'elevation_rf',
-                               'width_rf',
-                               'height_rf',
-                               'area_rf',
-                               'p_value_rf',
-                               'on_screen_rf']] = [self._get_rf_stats(unit) for unit in unit_ids]
             #metrics_df.loc[:, ['azimuth_rf',
             #                   'elevation_rf',
             #                   'width_rf',
             #                   'height_rf',
             #                   'area_rf',
             #                   'p_value_rf',
-            #                   'on_screen_rf']] = [(None, None, None, None, None, None, None) for unit in unit_ids]
+            #                   'on_screen_rf']] = [self._get_rf_stats(unit) for unit in unit_ids]
+            metrics_df.loc[:, ['azimuth_rf',
+                               'elevation_rf',
+                               'width_rf',
+                               'height_rf',
+                               'area_rf',
+                               'p_value_rf',
+                               'on_screen_rf']] = [(None, None, None, None, None, None, None) for unit in unit_ids]
             metrics_df['firing_rate_rf'] = [self.get_overall_firing_rate(unit) for unit in unit_ids]
             metrics_df['fano_rf'] = [self.get_fano_factor(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
             metrics_df['time_to_peak_rf'] = [self.get_time_to_peak(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
@@ -175,6 +175,21 @@ class ReceptiveFieldMapping(StimulusAnalysis):
 
         return self._metrics
 
+    @property
+    def known_stimulus_keys(self):
+        return ['receptive_field_mapping', 'gabor']
+
+    def _find_stimulus_key(self, stim_table):
+        known_keys_lc = [k.lower() for k in self.known_stimulus_keys]
+
+        for table_key in stim_table['stimulus_name'].unique():
+            table_key_lc = table_key.lower()
+            for known_key in known_keys_lc:
+                if table_key_lc.startswith(known_key):
+                    return table_key
+
+        else:
+            return None
 
     def _get_stim_table_stats(self):
 

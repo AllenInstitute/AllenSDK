@@ -10,19 +10,26 @@ data_dir = '/allen/aibs/informatics/module_test_data/ecephys/stimulus_analysis_f
 
 
 @pytest.mark.skip(reason='Missing implementation prevents us from gathering any metrics.')
-@pytest.mark.parametrize('spikes_nwb,expected_csv,analysis_params',
+@pytest.mark.parametrize('spikes_nwb,expected_csv,analysis_params,units_filter',
                          [
-                             (os.path.join(data_dir, 'data', 'mouse406807_integration_test.spikes.nwb2'),
-                              os.path.join(data_dir, 'expected', 'mouse406807_integration_test.dot_motion.csv'),
-                              {})
+                             #(os.path.join(data_dir, 'data', 'mouse406807_integration_test.spikes.nwb2'),
+                             # os.path.join(data_dir, 'expected', 'mouse406807_integration_test.dot_motion.csv'),
+                             # {})
+                             (os.path.join(data_dir, 'data', 'ecephys_session_773418906.nwb'),
+                              os.path.join(data_dir, 'expected', 'ecephys_session_773418906.dot_motion.csv'),
+                              {},
+                              [914580630, 914580280, 914580278, 914580634, 914580610, 914580290, 914580288, 914580286,
+                               914580284, 914580282, 914580294, 914580330, 914580304, 914580292, 914580300, 914580298,
+                               914580308, 914580306, 914580302, 914580316, 914580314, 914580312, 914580310, 914580318,
+                               914580324, 914580322, 914580320, 914580328, 914580326, 914580334])
                          ])
-def test_metrics(spikes_nwb, expected_csv, analysis_params, skip_cols=[]):
+def test_metrics(spikes_nwb, expected_csv, analysis_params, units_filter, skip_cols=[]):
     """Full intergration tests of metrics table"""
     if not os.path.exists(spikes_nwb):
         pytest.skip('No input spikes file {}.'.format(spikes_nwb))
 
     analysis_params = analysis_params or {}
-    analysis = dm.DotMotion(spikes_nwb, **analysis_params)
+    analysis = dm.DotMotion(spikes_nwb, filter=units_filter, **analysis_params)
     actual_data = analysis.metrics.sort_index()
 
     expected_data = pd.read_csv(expected_csv)

@@ -57,8 +57,8 @@ class DriftingGratings(StimulusAnalysis):
         if self._params is not None:
             self._params = self._params['drifting_gratings']
             self._stimulus_key = self._params['stimulus_key']
-        else:
-            self._stimulus_key = 'drifting_gratings'
+        #else:
+        #    self._stimulus_key = 'drifting_gratings'
 
         self._module_name = 'Drifting Gratings'
 
@@ -159,6 +159,9 @@ class DriftingGratings(StimulusAnalysis):
 
         return self._metrics
 
+    @property
+    def known_stimulus_keys(self):
+        return ['drifting_gratings']
 
     def _get_stim_table_stats(self):
 
@@ -246,8 +249,8 @@ class DriftingGratings(StimulusAnalysis):
 
         condition_inds = self.stimulus_conditions[self.stimulus_conditions[self._col_tf] == pref_tf].index.values
         df = self.conditionwise_statistics.loc[unit_id].loc[condition_inds]
-        df = df.assign(ori = self.stimulus_conditions.loc[df.index.values][self._col_ori])
-        df = df.sort_values(by=[self._col_ori])
+        df = df.assign(ori=self.stimulus_conditions.loc[df.index.values][self._col_ori])
+        df = df.sort_values(by=['ori'])  # do not replace with self._col_ori unless we modify the line above
 
         tuning = np.array(df['spike_mean'].values)
 

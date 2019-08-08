@@ -31,7 +31,7 @@ class StimulusAnalysis(object):
 
         self._spikes = None
         self._stim_table_spontaneous = None
-        self._stimulus_names = kwargs.get('stimulus_names', None)
+        self._stimulus_key = kwargs.get('stimulus_key', None)
         self._running_speed = None
         self._sweep_events = None
         self._mean_sweep_events = None
@@ -53,11 +53,25 @@ class StimulusAnalysis(object):
         """Returns a list of unit IDs for which to apply the analysis"""
         if self._unit_ids is None:
             units_df = self.ecephys_session.units
-            if self._unit_filter:
-                mask = True
-                for col, val in self._unit_filter.items():
-                    mask &= units_df[col] == val
-                units_df = units_df[mask]
+            if isinstance(self._unit_filter, (list, tuple, np.ndarray, pd.Series)):
+                # If the user passes a list/array of ids
+                units_df = units_df.loc[self._unit_filter]
+
+            elif isinstance(self._unit_filter, dict):
+                if 'unit_id' in self._unit_filter.keys():
+                    # If user wants to filter by the unit_id column which is actually the dataframe index
+                    units_df = units_df.loc[self._unit_filter['unit_id']]
+
+                else:
+                    # Create a mask for all units that match the all of specified conditions.
+                    mask = True
+                    for col, val in self._unit_filter.items():
+                        if isinstance(val, (list, np.ndarray)):
+                            mask &= units_df[col].isin(val)
+                        else:
+                            mask &= units_df[col] == val
+                    units_df = units_df[mask]
+
             self._unit_ids = units_df.index.values
 
         return self._unit_ids
@@ -91,26 +105,52 @@ class StimulusAnalysis(object):
     def stim_table(self):
         # Stimulus table is already in EcephysSession object, just need to subselect presentations for this stimulus.
         if self._stim_table is None:
-            # TODO: Give warning if no stimulus
-            if self._stimulus_names is None:
-                # Older versions of NWB files the stimulus name is in the form stimulus_gratings_N, so if
-                # self._stimulus_names is not explicity specified try to figure out stimulus
+            if self._stimulus_key is None:
                 stims_table = self.ecephys_session.stimulus_presentations
-                stim_names = [s for s in stims_table['stimulus_name'].unique()
-                              if s.startswith(self._stimulus_key)]
+                self._stimulus_key = self._find_stimulus_key(stims_table)
+                if self._stimulus_key is None:
+                    raise Exception('Could not find approipate stimulus_name key for current stimulus type. Please '
+                                    'specify using the stimulus_key parameter.')
 
-                self._stim_table = stims_table[stims_table['stimulus_name'].isin(stim_names)]
-            else:
-                self._stimulus_names = [self._stimulus_names] if isinstance(self._stimulus_names, string_types) \
-                    else self._stimulus_names
-                self._stim_table = self.ecephys_session.get_presentations_for_stimulus(self._stimulus_names)
+            self._stim_table = self.ecephys_session.get_presentations_for_stimulus(
+                [self._stimulus_key] if isinstance(self._stimulus_key, string_types) else self._stimulus_key
+            )
+            #print(self._stim_table)
+            #exit()
+
+            #    self._stim_table = stims_table[stims_table['stimulus_name'].isin(stim_names)]
+            #else:
+            #    # If the user specifies a set of
+            #    self._stimulus_name = [self._stimulus_names] if isinstance(self._stimulus_names, string_types) \
+            #        else self._stimulus_names
 
             if self._stim_table.empty:
-                stim_names = self._stimulus_names or self._stimulus_key
-                raise Exception(f'Could not find stimulus data with presentation name {stim_names}')
-
+                # stim_names = self._stimulus_names or self._stimulus_key
+                raise Exception(f'Could not find stimulus data with presentation name {self._stimulus_key}')
 
         return self._stim_table
+
+    def _find_stimulus_key(self, stim_table):
+        """Tries to guess the correct stimulus_key based on the data.
+
+        :param stim_table:
+        :return:
+        """
+        known_keys_lc = [k.lower() for k in self.known_stimulus_keys]
+        for table_key in stim_table['stimulus_name'].unique():
+            if table_key.lower() in known_keys_lc:
+                return table_key
+
+        else:
+            return None
+
+    @property
+    def known_stimulus_keys(self):
+        raise NotImplementedError()
+
+    @property
+    def known_spontaneous_keys(self):
+        return ['spontaneous', "spontaneous_activity"]
 
     @property
     def total_presentations(self):
@@ -137,7 +177,9 @@ class StimulusAnalysis(object):
         if self._stim_table_spontaneous is None:
             # TODO: The original version filtered out stims of len < 100, figure out why or if this value should
             #   be user-defined?
-            stim_table = self.ecephys_session.get_presentations_for_stimulus(['spontaneous'])
+            stim_table = self.ecephys_session.get_presentations_for_stimulus(self.known_spontaneous_keys)
+            print(stim_table)
+            exit()
             self._stim_table_spontaneous = stim_table[stim_table['duration'] > 100.0]
 
         return self._stim_table_spontaneous
@@ -146,7 +188,6 @@ class StimulusAnalysis(object):
     @property
     def null_condition(self):
         raise NotImplementedError()
-
 
     @property
     def conditionwise_psth(self):
@@ -308,7 +349,8 @@ class StimulusAnalysis(object):
         """Returns a pandas DataFrame of the stimulus response metrics for each unit."""
         raise NotImplementedError()
 
-
+    def _find_stimuli(self):
+        raise NotImplementedError()
 
     def calc_sweep_p_values(self, n_samples=10000, step_size=0.0001, offset=0.33):
         """ Calculates the probability, for each unit and stimulus presentation, that the number of spikes emitted by 

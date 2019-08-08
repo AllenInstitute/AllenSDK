@@ -46,8 +46,8 @@ class NaturalMovies(StimulusAnalysis):
         if self._params is not None:
             self._params = self._params['natural_movies']
             self._stimulus_key = self._params['stimulus_key']
-        else:
-            self._stimulus_key = 'natural_movies'
+        #else:
+        #    self._stimulus_key = 'natural_movies'
 
         self._module_name = 'Natural Movies'
 
@@ -89,6 +89,10 @@ class NaturalMovies(StimulusAnalysis):
             self._metrics = metrics_df
 
         return self._metrics
+
+    @property
+    def known_stimulus_keys(self):
+        return ['natural_movies', 'natural_movie_1', 'natural_movie_3']
 
 
     def _get_stim_table_stats(self):

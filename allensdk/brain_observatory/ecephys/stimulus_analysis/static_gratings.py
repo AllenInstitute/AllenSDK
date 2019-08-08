@@ -60,8 +60,8 @@ class StaticGratings(StimulusAnalysis):
         if self._params is not None:
             self._params = self._params['static_gratings']
             self._stimulus_key = self._params['stimulus_key']
-        else:
-            self._stimulus_key = 'static_gratings'
+        # else:
+        #     self._stimulus_key = 'static_gratings'
 
     @property
     def orivals(self):
@@ -156,6 +156,10 @@ class StaticGratings(StimulusAnalysis):
             self._metrics = metrics_df
 
         return self._metrics
+
+    @property
+    def known_stimulus_keys(self):
+        return ['static_gratings']
 
     def _get_stim_table_stats(self):
 
