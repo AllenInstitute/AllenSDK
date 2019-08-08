@@ -11,6 +11,7 @@ from allensdk.internal.core.lims_utilities import safe_system_path
 
 from allensdk.brain_observatory.behavior.image_api import ImageApi
 from allensdk.brain_observatory.behavior.sync import get_sync_data, get_stimulus_rebase_function
+from allensdk.brain_observatory.behavior.trials_processing import get_trials
 
 from . import PostgresQueryMixin
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
@@ -281,5 +282,16 @@ class MesoscopePlaneLimsApi(BehaviorOphysLimsApi):
                 rewards_dict["autorewarded"].append('auto_rewarded' in trial['trial_params'])
         df = pd.DataFrame(rewards_dict).set_index('timestamps', drop=True)
         return df
+
+    @memoize
+    def get_trials(self):
+        licks = self.get_licks()
+        behavior_stimulus_file = self.get_behavior_stimulus_file()
+        data = pd.read_pickle(behavior_stimulus_file)
+        rewards = self.get_rewards()
+        rebase_function = self.get_stimulus_rebase_function()
+        trial_df = get_trials(data, licks, rewards, rebase_function)
+        return trial_df
+
 
 
