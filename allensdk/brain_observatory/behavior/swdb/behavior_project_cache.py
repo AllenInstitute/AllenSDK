@@ -18,7 +18,20 @@ cache_json_example = {'manifest_path': '/allen/programs/braintv/workgroups/nc-op
 class BehaviorProjectCache(object):
 
     def __init__(self, cache_json):
-        self.manifest = csv_io['reader'](cache_json['manifest_path'])
+        manifest = csv_io['reader'](cache_json['manifest_path'])
+        self.manifest = manifest[[
+            'ophys_experiment_id',
+            'container_id',
+            'full_genotype',
+            'imaging_depth',
+            'targeted_structure',
+            'stage_name',
+            'retake_number',
+            'animal_name',
+            'sex',
+            'date_of_acquisition',
+            'equipment_name'
+        ]]
         self.nwb_base_dir = cache_json['nwb_base_dir']
         self.analysis_files_base_dir = cache_json['analysis_files_base_dir']
 
@@ -66,12 +79,68 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
     def get_extended_stumulus_presentations_df(self):
         return pd.read_hdf(self.extended_stimulus_presentations_df_path, key='df')
 
+    def get_trials(self):
+        trials = super(ExtendedNwbApi, self).get_trials()
+
+        # Reorder / drop some columns to make more sense to students
+        trials = trials[[
+            'initial_image_name',
+            'change_image_name',
+            'change_time',
+            'lick_times',
+            'response_latency',
+            'reward_time',
+            'go',
+            'catch',
+            'hit',
+            'miss',
+            'false_alarm',
+            'correct_reject',
+            'aborted',
+            'auto_rewarded',
+            'reward_volume',
+            'start_time',
+            'stop_time',
+            'trial_length'
+        ]]
+
+        return trials
+
     def get_stimulus_presentations(self):
         stimulus_presentations = super(ExtendedNwbApi, self).get_stimulus_presentations()
         extended_stimulus_presentations = self.get_extended_stumulus_presentations_df()
         extended_stimulus_presentations = extended_stimulus_presentations.drop(columns = ['omitted'])
-        return stimulus_presentations.join(extended_stimulus_presentations)
+        stimulus_presentations = stimulus_presentations.join(extended_stimulus_presentations)
 
+        # Reorder the columns returned to make more sense to students
+        stimulus_presentations = stimulus_presentations[[
+            'image_name',
+            'image_index',
+            'start_time',
+            'stop_time',
+            'omitted',
+            'change',
+            'duration',
+            'licks_each_flash',
+            'rewards_each_flash',
+            'flash_running_speed',
+            'index',
+            'time_from_last_lick',
+            'time_from_last_reward',
+            'time_from_last_change',
+            'block_index',
+            'image_block_repetition',
+            'index_within_block',
+            'image_set'
+        ]]
+
+        # Rename some columns to make more sense to students
+        stimulus_presentations = stimulus_presentations.rename(columns={'index':'absolute_flash_number',
+                                                                        'licks_each_flash':'licks',
+                                                                        'rewards_each_flash':'rewards',
+                                                                        'flash_running_speed':'running_speed',
+                                                                        'index_within_block':'repeat_within_block'})
+        return stimulus_presentations
 
 class ExtendedBehaviorSession(BehaviorOphysSession):
 
@@ -82,22 +151,15 @@ class ExtendedBehaviorSession(BehaviorOphysSession):
 
         self.trial_response_df = LazyProperty(self.get_trial_response_df)
         self.flash_response_df = LazyProperty(self.api.get_flash_response_df)
-        #  self.stimulus_presentations = LazyProperty(self.get_stimulus_presentations)
         self.image_index = LazyProperty(self.get_stimulus_index)
 
     def get_trial_response_df(self):
         trial_response_df = self.api.get_trial_response_df()
         trials_copy = self.trials.copy()
 
-        #TODO: Can we make this not mess with the trials index?
         trials_copy.index.names = ['trial_id']
         trial_response_df = trial_response_df.join(trials_copy)
         return trial_response_df
-
-    #  def get_stimulus_presentations(self):
-    #      stimulus_presentations = self.api.get_stimulus_presentations()
-    #      extended_stimulus_presentations = self.api.get_extended_stumulus_presentations_df()
-    #      return stimulus_presentations.join(extended_stimulus_presentations)
 
     def get_stimulus_index(self):
         return self.stimulus_presentations.groupby('image_index').apply(lambda group: group['image_name'].unique()[0])
