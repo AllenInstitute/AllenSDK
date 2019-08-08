@@ -63,7 +63,7 @@ def align_timestamps(args):
         mapped_files = {}
 
         for timestamp_file in probe["mappable_timestamp_files"]:
-            print(timestamp_file["name"])
+            # print(timestamp_file["name"])
             timestamps = np.load(timestamp_file["input_path"])
             aligned_timestamps = np.copy(timestamps).astype("float64")
 

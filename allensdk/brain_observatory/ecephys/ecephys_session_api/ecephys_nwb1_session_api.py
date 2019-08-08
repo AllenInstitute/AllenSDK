@@ -86,7 +86,7 @@ class EcephysNwb1Api(EcephysSessionApi):
 
         return pd.DataFrame({
             "start_time": running_speed_grp['timestamps'][:],
-            "velocity": running_speed_grp['data'][:] # TODO: what has been done to these? Are they just dx?
+            "velocity": running_speed_grp['data'][:]  # average velocities over a given interval
         })
 
     __stim_col_map = {

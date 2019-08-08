@@ -153,9 +153,9 @@ def read_spike_times_to_dictionary(
 
         if local_to_global_unit_map is not None:
             if local_unit not in local_to_global_unit_map:
-                #logging.warning(
-                #    f"unable to find unit at local position {local_unit} while reading spike times"
-                #)
+                logging.warning(
+                    f"unable to find unit at local position {local_unit} while reading spike times"
+                )
                 continue
             global_id = local_to_global_unit_map[local_unit]
             output_times[global_id] = unit_times
@@ -194,9 +194,9 @@ def read_waveforms_to_dictionary(
     ):
         if local_to_global_unit_map is not None:
             if unit_id not in local_to_global_unit_map:
-                #logging.warning(
-                #    f"unable to find unit at local position {unit_id} while reading waveforms"
-                #)
+                logging.warning(
+                    f"unable to find unit at local position {unit_id} while reading waveforms"
+                )
                 continue
             unit_id = local_to_global_unit_map[unit_id]
 
