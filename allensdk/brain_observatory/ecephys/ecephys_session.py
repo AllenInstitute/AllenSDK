@@ -753,7 +753,7 @@ def removed_unused_stimulus_presentation_columns(stimulus_presentations):
 
 
 
-def intervals_structures(table, structure_id_key="structure_id", structure_label_key="structure_acronym"):
+def intervals_structures(table, structure_id_key="manual_structure_id", structure_label_key="manual_structure_acronym"):
 
     """ find on a channels / units table intervals of channels inserted into particular structures
 

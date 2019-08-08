@@ -27,11 +27,12 @@ class Channel(RaisingSchema):
     probe_horizontal_position = Int(required=True)
     manual_structure_id = Int(required=True, allow_none=True)
     manual_structure_acronym = String(required=True, allow_none=True)
-    cortical_layer = String(required=True, allow_none=True)
-    AP_coordinate = Float(required=True, allow_none =True)
-    DV_coordinate = Float(required=True, allow_none= True)
-    ML_coordinate = Float(required=True, allow_none=True)
-    cortical_depth = Float(required=True, allow_none=True)
+    # TODO: Re-add later when variables are added to lims output
+    # cortical_layer = String(required=True, allow_none=True)
+    # AP_coordinate = Float(required=True, allow_none =True)
+    # DV_coordinate = Float(required=True, allow_none= True)
+    # ML_coordinate = Float(required=True, allow_none=True)
+    # cortical_depth = Float(required=True, allow_none=True)
 
 class Unit(RaisingSchema):
     id = Int(required=True)

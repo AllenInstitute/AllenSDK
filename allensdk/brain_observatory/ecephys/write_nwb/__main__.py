@@ -599,7 +599,7 @@ def write_ecephys_nwb(
 
     return {
         'nwb_path': output_path,
-        #"probe_outputs": probe_outputs
+        "probe_outputs": probe_outputs
     }
 
 
