@@ -4,6 +4,7 @@ import pandas as pd
 from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi
 from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorOphysSession
 from allensdk.core.lazy_property import LazyProperty
+from allensdk.brain_observatory.behavior.trials_processing import calculate_reward_rate
 
 csv_io = {
     'reader': lambda path: pd.read_csv(path, index_col='Unnamed: 0'),
@@ -103,6 +104,15 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
             'stop_time',
             'trial_length'
         ]]
+
+
+        trials['reward_rate'] = calculate_reward_rate(
+            response_latency=trials.response_latency,
+            starttime=trials.start_time,
+            window=.75,
+            trial_window=25,
+            initial_trials=10
+        )
 
         return trials
 
