@@ -289,7 +289,8 @@ class MesoscopePlaneLimsApi(BehaviorOphysLimsApi):
         behavior_stimulus_file = self.get_behavior_stimulus_file()
         data = pd.read_pickle(behavior_stimulus_file)
         rewards = self.get_rewards()
-        rebase_function = self.get_stimulus_rebase_function()
+        stimulus_timestamps_no_monitor_delay = self.get_sync_data()['stimulus_times_no_delay'][:-1]
+        rebase_function = get_stimulus_rebase_function(data, stimulus_timestamps_no_monitor_delay)
         trial_df = get_trials(data, licks, rewards, rebase_function)
         return trial_df
 
