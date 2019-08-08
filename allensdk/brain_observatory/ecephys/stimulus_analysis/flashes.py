@@ -180,4 +180,16 @@ class Flashes(StimulusAnalysis):
     def plot_response(self, unit_id):
 
         """ Plot a histogram for the two conditions """
-        pass
+
+        plot_colors = ('darkslateblue', 'grey')
+
+        for idx, color in enumerate(self.colors):
+
+            condition_id = self.stimulus_conditions[self.stimulus_conditions['color'] == color].index.values[0]
+            
+            psth = self.conditionwise_psth.sel(unit_id=unit_id, stimulus_condition_id =condition_id).values
+            
+            plt.bar(np.arange(len(psth))-0.5, psth, color=plot_colors[idx], alpha=0.5, width=1.0)
+            plt.step(np.arange(len(psth)), psth, color=plot_colors[idx])
+            plt.axis('off')
+    
