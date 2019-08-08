@@ -279,7 +279,7 @@ class MesoscopePlaneLimsApi(BehaviorOphysLimsApi):
                 rewards_dict["volume"].append(rewards[0][0])
                 rewards_dict["timestamps"].append(rebase_function(rewards[0][1]))
                 rewards_dict["autorewarded"].append('auto_rewarded' in trial['trial_params'])
-                df = pd.DataFrame(rewards_dict).set_index('timestamps', drop=True)
+        df = pd.DataFrame(rewards_dict).set_index('timestamps', drop=True)
         return df
 
 
