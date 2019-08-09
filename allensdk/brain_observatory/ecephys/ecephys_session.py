@@ -354,11 +354,15 @@ class EcephysSession(LazyPropertyMixin):
 
         ends = domain[:, -1]
         starts = domain[:, 0]
-        overlapping = np.where((starts[1:] - ends[:-1]) < 0)[0]
+        time_diffs = starts[1:] - ends[:-1]
+        overlapping = np.where(time_diffs < 0)[0]
 
         if len(overlapping) > 0:
-            overlapping = [(first, second) for first, second in zip(overlapping[:-1], overlapping[1:])]
-            warnings.warn("You've specified some overlapping time intervals between rows: {overlapping}")
+            # Ignoring intervals that overlaps multiple time bins because trying to figure that out would take O(n)
+            overlapping = [(s, s+1) for s in overlapping]
+            warnings.warn(f"You've specified some overlapping time intervals between neighboring rows: {overlapping}, "
+                          f"with a maximum overlap of {np.abs(np.min(time_diffs))} seconds.")
+
         tiled_data = build_spike_histogram(
             domain, self.spike_times, units.index.values, dtype=dtype, binarize=binarize
         )
@@ -457,7 +461,14 @@ class EcephysSession(LazyPropertyMixin):
             emitted by a specific unit across presentations within a specific condition.
 
         """
-        presentations = self._filter_owned_df('stimulus_presentations', ids=stimulus_presentation_ids)["stimulus_condition_id"]
+        # TODO: Need to return an empty df if no matching unit-ids or presentation-ids are found
+        # TODO: To use filter_owned_df() make sure to convert the results from a Series to a Dataframe
+        stimulus_presentation_ids = stimulus_presentation_ids if stimulus_presentation_ids is not None else \
+                self.stimulus_presentations['stimulus_presentation_id'].unique()  # In case
+        presentations = self.stimulus_presentations.loc[stimulus_presentation_ids, ["stimulus_condition_id"]]
+        # presentations = self._filter_owned_df('stimulus_presentations', ids=stimulus_presentation_ids)["stimulus_presentation_id"]
+        # presentations = presentations.to_frame()
+
         spikes = self.presentationwise_spike_times(
             stimulus_presentation_ids=stimulus_presentation_ids, unit_ids=unit_ids
         )
@@ -465,9 +476,15 @@ class EcephysSession(LazyPropertyMixin):
         spike_counts = spikes.copy()
         spike_counts["spike_count"] = np.zeros(spike_counts.shape[0])
         spike_counts = spike_counts.groupby(["stimulus_presentation_id", "unit_id"]).count()
-        spike_counts.reset_index("unit_id", inplace=True)
+        unit_ids = unit_ids if unit_ids is not None else spikes['unit_id'].unique()  # If not explicity stated get unit ids from spikes table.
+        spike_counts = spike_counts.reindex(pd.MultiIndex.from_product([spike_counts.index.levels[0],
+                                                                        unit_ids],
+                                                                       names=['stimulus_presentation_id', 'unit_id']),
+                                            fill_value=0)
 
-        sp = pd.merge(spike_counts, presentations, left_on="stimulus_presentation_id", right_index=True, how="right")
+        # In the case there are units/presentation_ids with no corresponding id in spikes not in presentations (see
+        #  unit test) a right join will mess up the index with nan values. Use left to ensure index is not affected.
+        sp = pd.merge(spike_counts, presentations, left_on="stimulus_presentation_id", right_index=True, how="left")
         sp.reset_index(inplace=True)
 
         summary = []
@@ -535,8 +552,7 @@ class EcephysSession(LazyPropertyMixin):
         # pandas groupby ops ignore nans, so we need a new null value that pandas does not recognize as null ...
         stimulus_presentations.loc[stimulus_presentations['stimulus_name'] == '', 'stimulus_name'] = 'spontaneous_activity'
         stimulus_presentations[stimulus_presentations == ''] = np.nan
-        # This will convert columns to object dtypes
-        ## stimulus_presentations = stimulus_presentations.fillna('null') # 123 / 2**8
+        stimulus_presentations = stimulus_presentations.fillna('null') # 123 / 2**8
 
         stimulus_presentations['duration'] = stimulus_presentations['stop_time'] - stimulus_presentations['start_time']
 
@@ -545,7 +561,9 @@ class EcephysSession(LazyPropertyMixin):
         presentation_conditions = []
         cid_counter = -1
 
-        params_only = stimulus_presentations.drop(columns=["start_time", "stop_time", "duration"])
+        # TODO: Can we have parameters on what columns to omit? If stimulus_block or duration is left in it can affect
+        #   how conditionwise_spike_statistics counts spikes
+        params_only = stimulus_presentations.drop(columns=["start_time", "stop_time", "duration", "stimulus_block"])
         for row in params_only.itertuples(index=False):
 
             if row in stimulus_conditions:
@@ -732,7 +750,9 @@ def removed_unused_stimulus_presentation_columns(stimulus_presentations):
     return stimulus_presentations.drop(columns=to_drop)
 
 
+
 def intervals_structures(table, structure_id_key="manual_structure_id", structure_label_key="manual_structure_acronym"):
+
     """ find on a channels / units table intervals of channels inserted into particular structures
 
     Parameters
