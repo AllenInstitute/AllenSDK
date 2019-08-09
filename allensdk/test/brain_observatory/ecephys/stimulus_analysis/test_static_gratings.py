@@ -7,6 +7,7 @@ from mock import MagicMock, patch
 
 from allensdk.brain_observatory.ecephys.stimulus_analysis import static_gratings
 from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
+from allensdk.brain_observatory.ecephys.ecephys_session_api import EcephysNwbSessionApi
 
 
 pd.set_option('display.max_columns', None)
@@ -23,10 +24,10 @@ data_dir = '/allen/aibs/informatics/module_test_data/ecephys/stimulus_analysis_f
                              (os.path.join(data_dir, 'data', 'ecephys_session_773418906.nwb'),
                               os.path.join(data_dir, 'expected', 'ecephys_session_773418906.static_gratings.csv'),
                               {},
-                              [914580630, 914580280, 914580278, 914580634, 914580610, 914580290, 914580288, 914580286,
-                               914580284, 914580282, 914580294, 914580330, 914580304, 914580292, 914580300, 914580298,
-                               914580308, 914580306, 914580302, 914580316, 914580314, 914580312, 914580310, 914580318,
-                               914580324, 914580322, 914580320, 914580328, 914580326, 914580334])
+                              [914580284, 914580302, 914580328, 914580366, 914580360, 914580362, 914580380, 914580370,
+                               914580408, 914580384, 914580402, 914580400, 914580396, 914580394, 914580392, 914580390,
+                               914580382, 914580412, 914580424, 914580422, 914580438, 914580420, 914580434, 914580432,
+                               914580428, 914580452, 914580450, 914580474, 914580470, 914580490])
                          ])
 def test_metrics(spikes_nwb, expected_csv, analysis_params, units_filter, skip_cols=[]):
     """Full intergration tests of metrics table"""
@@ -37,7 +38,9 @@ def test_metrics(spikes_nwb, expected_csv, analysis_params, units_filter, skip_c
     np.random.seed(0)  # required by
 
     analysis_params = analysis_params or {}
-    analysis = static_gratings.StaticGratings(spikes_nwb, filter=units_filter, **analysis_params)
+    session_api = EcephysNwbSessionApi(spikes_nwb, amplitude_cutoff_maximum=None, presence_ratio_minimum=None,
+                                       isi_violations_maximum=None)
+    analysis = static_gratings.StaticGratings(session_api, filter=units_filter, **analysis_params)
     # Make sure some of the non-metrics structures are returning valid(ish) tables
     assert(len(analysis.stim_table) > 1)
     assert(set(analysis.unit_ids) == set(units_filter))
@@ -53,8 +56,8 @@ def test_metrics(spikes_nwb, expected_csv, analysis_params, units_filter, skip_c
     expected_data = expected_data.set_index('unit_id')
     expected_data = expected_data.sort_index()  # in theory this should be sorted in the csv, no point in risking it.
 
-    assert (np.all(actual_data.index.values == expected_data.index.values))
-    assert (set(actual_data.columns) == (set(expected_data.columns) - set(skip_cols)))
+    assert(np.all(actual_data.index.values == expected_data.index.values))
+    assert(set(actual_data.columns) == (set(expected_data.columns) - set(skip_cols)))
 
     assert(np.allclose(actual_data['pref_sf_sg'].astype(np.float), expected_data['pref_sf_sg'], equal_nan=True))
     assert(np.allclose(actual_data['pref_ori_sg'].astype(np.float), expected_data['pref_ori_sg'], equal_nan=True))

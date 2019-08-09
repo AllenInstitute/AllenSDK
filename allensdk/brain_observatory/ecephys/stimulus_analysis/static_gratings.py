@@ -263,6 +263,7 @@ class StaticGratings(StimulusAnalysis):
         """
 
         orivals_rad = deg2rad(self.orivals).astype('complex128')
+
         condition_inds = self.stimulus_conditions[
                 (self.stimulus_conditions[self._col_sf] == pref_sf) & \
                 (self.stimulus_conditions[self._col_phase] == pref_phase)
@@ -270,7 +271,6 @@ class StaticGratings(StimulusAnalysis):
         df = self.conditionwise_statistics.loc[unit_id].loc[condition_inds]
         df = df.assign(ori=self.stimulus_conditions.loc[df.index.values][self._col_ori])
         df = df.sort_values(by=['ori'])
-
 
         tuning = np.array(df['spike_mean'].values)
 

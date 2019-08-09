@@ -1,7 +1,8 @@
 import os
 from argparse import ArgumentParser
 import numpy as np
-
+import pandas as pd
+from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
 from allensdk.brain_observatory.ecephys.stimulus_analysis import \
     StaticGratings, \
     DriftingGratings, \
@@ -10,6 +11,10 @@ from allensdk.brain_observatory.ecephys.stimulus_analysis import \
     Flashes, \
     DotMotion, \
     ReceptiveFieldMapping
+
+
+pd.set_option('display.max_columns', None)  # Helpful for debugging
+
 
 OUTPUT_DIR = '/allen/aibs/informatics/module_test_data/ecephys/stimulus_analysis_fh/expected'
 OVERWRITE = False
@@ -25,11 +30,26 @@ OVERWRITE = False
 
 SPIKE_FILE = '/allen/aibs/informatics/module_test_data/ecephys/stimulus_analysis_fh/data/ecephys_session_773418906.nwb'
 col_opts = {}
+
+"""
 # Since it would normally take 30+ mins to calculate metrics for all the units I've selected 30 units all from VISp
-unit_id_filter = [914580630, 914580280, 914580278, 914580634, 914580610, 914580290, 914580288, 914580286, 914580284,
-                  914580282, 914580294, 914580330, 914580304, 914580292, 914580300, 914580298, 914580308, 914580306,
-                  914580302, 914580316, 914580314, 914580312, 914580310, 914580318, 914580324, 914580322, 914580320,
-                  914580328, 914580326, 914580334]
+sess = EcephysSession.from_nwb_path(SPIKE_FILE)
+#print(list(sess.units[(sess.units['structure_acronym'] == 'VISp') & (sess.units['probe_description'] =='probeC')].index.values[:30]))
+#print(sess.stimulus_presentations)
+print(sess.stimulus_presentations['stimulus_name'].unique())
+#exit()
+"""
+
+
+unit_id_filter = [914580284, 914580302, 914580328, 914580366, 914580360, 914580362, 914580380, 914580370, 914580408,
+                  914580384, 914580402, 914580400, 914580396, 914580394, 914580392, 914580390, 914580382, 914580412,
+                  914580424, 914580422, 914580438, 914580420, 914580434, 914580432, 914580428, 914580452, 914580450,
+                  914580474, 914580470, 914580490]
+
+#unit_id_filter = [914580630, 914580280, 914580278, 914580634, 914580610, 914580290, 914580288, 914580286, 914580284,
+#                  914580282, 914580294, 914580330, 914580304, 914580292, 914580300, 914580298, 914580308, 914580306,
+#                  914580302, 914580316, 914580314, 914580312, 914580310, 914580318, 914580324, 914580322, 914580320,
+#                  914580328, 914580326, 914580334]
 avail_stims = [
     'static_gratings',
     'drifting_gratings',
@@ -58,6 +78,7 @@ def save_metrics_data(spikes_file, output_dir, stim_type, overwrite=True):
 
     metrics_file = os.path.join(output_dir, '{}.{}.csv'.format(mouse_id, stim_type))
     if not os.path.exists(metrics_file) or overwrite:
+        print('Running {}'.format(stim_type))
         analysis = stim_classes[stim_type](spikes_file, filter=unit_id_filter, **col_opts)
         analysis.metrics.to_csv(metrics_file)
 

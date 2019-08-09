@@ -5,6 +5,7 @@ import scipy.stats as st
 import scipy.ndimage as ndi
 
 from ..ecephys_session import EcephysSession
+from allensdk.brain_observatory.ecephys.ecephys_session_api import EcephysNwbSessionApi
 
 
 class StimulusAnalysis(object):
@@ -12,11 +13,17 @@ class StimulusAnalysis(object):
         """
         :param ecephys_session: an EcephySession object or path to ece nwb file.
         """
+        # TODO: Create a set of a class methods.
         if isinstance(ecephys_session, EcephysSession):
             self._ecephys_session = ecephys_session
         elif isinstance(ecephys_session, string_types):
             nwb_version = kwargs.get('nwb_version', 2)
             self._ecephys_session = EcephysSession.from_nwb_path(path=ecephys_session, nwb_version=nwb_version)
+        elif isinstance(ecephys_session, EcephysNwbSessionApi):
+            # nwb_version = kwargs.get('nwb_version', 2)
+            self._ecephys_session = EcephysSession(api=ecephys_session)
+        else:
+            raise TypeError(f"Don't know how to make a stimulus analysis object from a {type(ecephys_session)}")
 
         self._unit_ids = None
         self._unit_filter = kwargs.get('filter', None)
@@ -40,6 +47,9 @@ class StimulusAnalysis(object):
 
         self._psth_resolution = kwargs.get('ptsh_resultion', 0.002)
 
+        # TODO: If trial_duration is not pre-defined use the stim_table start_time to find minimal interval between
+        #   any two presenations
+        # TODO: Make trial_duration a property so users can check the values
         self._trial_duration = trial_duration
         self._preferred_condition = {}
 
@@ -270,8 +280,9 @@ class StimulusAnalysis(object):
 
         """
         if self._presentationwise_statistics is None:
+            # TODO: The predefined
             df = self.ecephys_session.presentationwise_spike_counts(
-                    bin_edges = np.linspace(0, self._trial_duration, 2),
+                    bin_edges = np.linspace(0, self._trial_duration, 2),  # TODO: Don't need to use linspace
                     stimulus_presentation_ids = self.stim_table.index.values,
                     unit_ids = self.unit_ids,
                 ).to_dataframe().reset_index(level=1, drop=True)

@@ -561,8 +561,9 @@ class EcephysSession(LazyPropertyMixin):
         presentation_conditions = []
         cid_counter = -1
 
-        # params_only = stimulus_presentations.drop(columns=["start_time", "stop_time", "duration", "stimulus_block"])
-        params_only = stimulus_presentations.drop(columns=["start_time", "stop_time"])
+        # TODO: Can we have parameters on what columns to omit? If stimulus_block or duration is left in it can affect
+        #   how conditionwise_spike_statistics counts spikes
+        params_only = stimulus_presentations.drop(columns=["start_time", "stop_time", "duration", "stimulus_block"])
         for row in params_only.itertuples(index=False):
 
             if row in stimulus_conditions:

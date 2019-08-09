@@ -595,7 +595,7 @@ def write_ecephys_nwb(
     io.write(nwbfile)
     io.close()
 
-    #probe_outputs = write_probewise_lfp_files(probes, session_start_time, pool_size=pool_size)
+    probe_outputs = write_probewise_lfp_files(probes, session_start_time, pool_size=pool_size)
 
     return {
         'nwb_path': output_path,
