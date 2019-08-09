@@ -1,6 +1,18 @@
+import os
 import numpy as np
 import pandas as pd
 import seaborn as sns
+import matplotlib as mpl
+
+
+def save_figure(fig, figsize, save_dir, folder, fig_title, formats=['.png']):
+    fig_dir = os.path.join(save_dir, folder)
+    if not os.path.exists(fig_dir):
+        os.mkdir(fig_dir)
+    mpl.rcParams['pdf.fonttype'] = 42
+    fig.set_size_inches(figsize)
+    for f in formats:
+        fig.savefig(os.path.join(fig_dir, fig_title + f), transparent=True, orientation='landscape')
 
 
 def get_dff_matrix(session):
@@ -8,8 +20,7 @@ def get_dff_matrix(session):
     return dff
 
 
-def get_mean_df(response_df, analysis=None, conditions=['cell_specimen_id', 'image_name'], flashes=False, omitted=False,
-                get_reliability=False):
+def get_mean_df(response_df, conditions=['cell_specimen_id', 'image_name'], flashes=False, omitted=False):
     '''
         Computes an analysis on a selection of responses (either flashes or trials). Computes mean_response, sem_response, the pref_stim, fraction_active_responses.
 
