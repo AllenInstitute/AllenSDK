@@ -229,12 +229,23 @@ def create_multi_session_mean_df(manifest,sessions,conditions=['cell_specimen_id
         else:
             mdf = get_mean_df(session.trial_response_df,conditions=conditions)
         mdf['experiment_id'] = session.metadata['ophys_experiment_id']
-        mdf['stage_name'] = manifest[manifest.ophys_experiment_id == session.metadata['ophys_experiment_id']].stage_name.values[0]
+        stage = manifest[manifest.ophys_experiment_id == session.metadata['ophys_experiment_id']].stage_name.values[0]
+        mdf['stage_name']= stage
+        mdf['passive'] = parse_stage_for_passive(stage)
+        mdf['image_set'] = parse_stage_for_image_set(stage)
         mega_mdf = pd.concat([mega_mdf,mdf])
     mega_mdf = mega_mdf.reset_index()
     mega_mdf = mega_mdf.set_index('experiment_id')
     mega_mdf = mega_mdf.drop(columns=['level_0','index'])
     return mega_mdf
+
+def parse_stage_for_passive(stage):
+    return 'passive' in stage
+
+def parse_stage_for_image_set(stage):
+    return stage[15]
+
+
 
 
 
