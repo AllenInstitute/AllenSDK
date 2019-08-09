@@ -10,7 +10,7 @@ from allensdk.api.cache import memoize
 from allensdk.internal.core.lims_utilities import safe_system_path
 
 from allensdk.brain_observatory.behavior.image_api import ImageApi
-from allensdk.brain_observatory.behavior.sync import get_sync_data, get_stimulus_rebase_function
+from allensdk.brain_observatory.behavior.sync import get_stimulus_rebase_function
 from allensdk.brain_observatory.behavior.trials_processing import get_trials
 from allensdk.brain_observatory.sync_dataset import Dataset as SyncDataset
 
@@ -114,8 +114,72 @@ class MesoscopeSessionLimsApi(PostgresQueryMixin):
             return os.path.join(sync_file_dir, sync_file_name)
 
     def get_sync_data(self):
-        sync_path = self.get_sync_file()
-        return get_sync_data(sync_path)
+
+        # let's fix line labels where they are off #
+
+        sync_file = self.get_sync_file()
+        sync_dataset = SyncDataset(sync_file)
+
+        wrong_labels = ['vsync_2p', 'photodiode', 'cam1', 'cam2']
+        correct_labels = ['2p_vsync', 'stim_photodiode', 'cam1_exposure', 'cam2_exposure']
+
+        line_labels = sync_dataset.line_labels
+
+        for line in line_labels:
+            if line in wrong_labels :
+                index = sync_dataset.line_labels.index(line)
+                sync_dataset.line_labels.remove(line)
+                sync_dataset.line_labels.insert(index, correct_labels[index])
+        meta_data = sync_dataset.meta_data
+        sample_freq = meta_data['ni_daq']['counter_output_freq']
+
+        # 2P vsyncs
+        vs2p_r = sync_dataset.get_rising_edges('2p_vsync')
+        vs2p_f = sync_dataset.get_falling_edges('2p_vsync')  # new sync may be able to do units = 'sec', so conversion can be skipped
+        frames_2p = vs2p_r / sample_freq
+        vs2p_fsec = vs2p_f / sample_freq
+
+        # use rising edge for Scientifica and Mesoscope falling edge for Nikon http://confluence.corp.alleninstitute.org/display/IT/Ophys+Time+Sync
+        stimulus_times_no_monitor_delay = sync_dataset.get_rising_edges('stim_vsync') / sample_freq
+
+        if 'lick_times' in meta_data['line_labels']:
+            lick_times = sync_dataset.get_rising_edges('lick_1') / sample_freq
+        elif 'lick_sensor' in meta_data['line_labels']:
+            lick_times = sync_dataset.get_rising_edges('lick_sensor') / sample_freq
+        else:
+            lick_times = None
+        if '2p_trigger' in meta_data['line_labels']:
+            trigger = sync_dataset.get_rising_edges('2p_trigger') / sample_freq
+        elif 'acq_trigger' in meta_data['line_labels']:
+            trigger = sync_dataset.get_rising_edges('acq_trigger') / sample_freq
+        if 'stim_photodiode' in meta_data['line_labels']:
+            a = sync_dataset.get_rising_edges('stim_photodiode') / sample_freq
+            b = sync_dataset.get_falling_edges('stim_photodiode') / sample_freq
+            stim_photodiode = sorted(list(a)+list(b))
+        elif 'photodiode' in meta_data['line_labels']:
+            a = sync_dataset.get_rising_edges('photodiode') / sample_freq
+            b = sync_dataset.get_falling_edges('photodiode') / sample_freq
+            stim_photodiode = sorted(list(a)+list(b))
+        if 'cam1_exposure' in meta_data['line_labels']:
+            eye_tracking = sync_dataset.get_rising_edges('cam1_exposure') / sample_freq
+        elif 'eye_tracking' in meta_data['line_labels']:
+            eye_tracking = sync_dataset.get_rising_edges('eye_tracking') / sample_freq
+        if 'cam2_exposure' in meta_data['line_labels']:
+            behavior_monitoring = sync_dataset.get_rising_edges('cam2_exposure') / sample_freq
+        elif 'behavior_monitoring' in meta_data['line_labels']:
+            behavior_monitoring = sync_dataset.get_rising_edges('behavior_monitoring') / sample_freq
+
+        sync_data = {'ophys_frames': frames_2p,
+                     'lick_times': lick_times,
+                     'ophys_trigger': trigger,
+                     'eye_tracking': eye_tracking,
+                     'behavior_monitoring': behavior_monitoring,
+                     'stim_photodiode': stim_photodiode,
+                     'stimulus_times_no_delay': stimulus_times_no_monitor_delay,
+                     }
+
+        return sync_data
+
 
     def split_session_timestamps(self):
 
@@ -269,7 +333,7 @@ class MesoscopePlaneLimsApi(BehaviorOphysLimsApi):
 
     @memoize
     def get_rewards(self):
-        stimulus_timestamps_no_monitor_delay = get_sync_data()['stimulus_times_no_delay'][:-1]
+        stimulus_timestamps_no_monitor_delay = self.get_sync_data()['stimulus_times_no_delay'][:-1]
         behavior_stimulus_file = self.get_behavior_stimulus_file()
         data = pd.read_pickle(behavior_stimulus_file)
         rebase_function = get_stimulus_rebase_function(data, stimulus_timestamps_no_monitor_delay)
@@ -295,71 +359,5 @@ class MesoscopePlaneLimsApi(BehaviorOphysLimsApi):
         trial_df = get_trials(data, licks, rewards, rebase_function)
         return trial_df
 
-    def get_sync_data(self):
-
-        # let's fix line labels where they are off #
-
-        sync_file = self.get_sync_file()
-        sync_dataset = SyncDataset(sync_file)
-
-        wrong_labels = ['vsync_2p', 'photodiode', 'cam1', 'cam2']
-        correct_labels = ['2p_vsync', 'stim_photodiode', 'cam1_exposure', 'cam2_exposure']
-
-        line_labels = sync_dataset.line_labels
-
-        for line in line_labels:
-            if line in wrong_labels :
-                index = sync_dataset.line_labels.index(line)
-                sync_dataset.line_labels.remove(line)
-                sync_dataset.line_labels.insert(index, correct_labels[index])
-        meta_data = sync_dataset.meta_data
-        sample_freq = meta_data['ni_daq']['counter_output_freq']
-
-        # 2P vsyncs
-        vs2p_r = sync_dataset.get_rising_edges('2p_vsync')
-        vs2p_f = sync_dataset.get_falling_edges('2p_vsync')  # new sync may be able to do units = 'sec', so conversion can be skipped
-        frames_2p = vs2p_r / sample_freq
-        vs2p_fsec = vs2p_f / sample_freq
-
-        # use rising edge for Scientifica and Mesoscope falling edge for Nikon http://confluence.corp.alleninstitute.org/display/IT/Ophys+Time+Sync
-        stimulus_times_no_monitor_delay = sync_dataset.get_rising_edges('stim_vsync') / sample_freq
-
-        if 'lick_times' in meta_data['line_labels']:
-            lick_times = sync_dataset.get_rising_edges('lick_1') / sample_freq
-        elif 'lick_sensor' in meta_data['line_labels']:
-            lick_times = sync_dataset.get_rising_edges('lick_sensor') / sample_freq
-        else:
-            lick_times = None
-        if '2p_trigger' in meta_data['line_labels']:
-            trigger = sync_dataset.get_rising_edges('2p_trigger') / sample_freq
-        elif 'acq_trigger' in meta_data['line_labels']:
-            trigger = sync_dataset.get_rising_edges('acq_trigger') / sample_freq
-        if 'stim_photodiode' in meta_data['line_labels']:
-            a = sync_dataset.get_rising_edges('stim_photodiode') / sample_freq
-            b = sync_dataset.get_falling_edges('stim_photodiode') / sample_freq
-            stim_photodiode = sorted(list(a)+list(b))
-        elif 'photodiode' in meta_data['line_labels']:
-            a = sync_dataset.get_rising_edges('photodiode') / sample_freq
-            b = sync_dataset.get_falling_edges('photodiode') / sample_freq
-            stim_photodiode = sorted(list(a)+list(b))
-        if 'cam1_exposure' in meta_data['line_labels']:
-            eye_tracking = sync_dataset.get_rising_edges('cam1_exposure') / sample_freq
-        elif 'eye_tracking' in meta_data['line_labels']:
-            eye_tracking = sync_dataset.get_rising_edges('eye_tracking') / sample_freq
-        if 'cam2_exposure' in meta_data['line_labels']:
-            behavior_monitoring = sync_dataset.get_rising_edges('cam2_exposure') / sample_freq
-        elif 'behavior_monitoring' in meta_data['line_labels']:
-            behavior_monitoring = sync_dataset.get_rising_edges('behavior_monitoring') / sample_freq
-
-        sync_data = {'ophys_frames': frames_2p,
-                     'lick_times': lick_times,
-                     'ophys_trigger': trigger,
-                     'eye_tracking': eye_tracking,
-                     'behavior_monitoring': behavior_monitoring,
-                     'stim_photodiode': stim_photodiode,
-                     'stimulus_times_no_delay': stimulus_times_no_monitor_delay,
-                     }
-
-        return sync_data
 
 
