@@ -146,11 +146,8 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
         ]]
 
         # Rename some columns to make more sense to students
-        stimulus_presentations = stimulus_presentations.rename(columns={'index':'absolute_flash_number',
-                                                                        'licks_each_flash':'licks',
-                                                                        'rewards_each_flash':'rewards',
-                                                                        'flash_running_speed':'running_speed',
-                                                                        'index_within_block':'repeat_within_block'})
+        stimulus_presentations = stimulus_presentations.rename(
+            columns={'index':'absolute_flash_number'})
         return stimulus_presentations
 
 class ExtendedBehaviorSession(BehaviorOphysSession):
