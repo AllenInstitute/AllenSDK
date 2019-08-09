@@ -16,8 +16,8 @@ from importlib import reload
 
 reload(bpc)
 
-
 def time_from_last(flash_times, other_times):
+
     last_other_index = np.searchsorted(a=other_times, v=flash_times) - 1
     time_from_last_other = flash_times - other_times[last_other_index]
 
@@ -26,11 +26,9 @@ def time_from_last(flash_times, other_times):
 
     return time_from_last_other
 
-
 def trace_average(values, timestamps, start_time, stop_time):
     values_this_range = values[((timestamps >= start_time) & (timestamps < stop_time))]
     return values_this_range.mean()
-
 
 test_values = np.array([1, 2, 3, 4, 5, 6])
 test_timestamps = np.array([1, 2, 3, 4, 5, 6])
@@ -45,13 +43,9 @@ def find_change(image_index, omitted_index):
     omitted = image_index == omitted_index
     omitted_inds = np.flatnonzero(omitted)
     change[omitted_inds] = False
-    change[
-        omitted_inds + 1
-    ] = (
-        False
-    )  # Neither the change to the omitted nor the change back should be counted.
+    change[omitted_inds + 1] = False  # Neither the change to the omitted
+                                      # nor the change back should be counted.
     return change
-
 
 def get_extended_stimulus_presentations(session):
 
@@ -64,8 +58,14 @@ def get_extended_stimulus_presentations(session):
     change_times = change_times[~np.isnan(change_times)]
 
     # Time from last other for each flash
-    time_from_last_lick = time_from_last(flash_times, lick_times)
-    time_from_last_reward = time_from_last(flash_times, reward_times)
+
+    if len(lick_times) < 5: #Passive sessions
+        time_from_last_lick = np.full(len(flash_times), np.nan)
+        time_from_last_reward = np.full(len(flash_times), np.nan)
+    else:
+        time_from_last_lick = time_from_last(flash_times, lick_times)
+        time_from_last_reward = time_from_last(flash_times, reward_times)
+
     time_from_last_change = time_from_last(flash_times, change_times)
 
     intermediate_df["time_from_last_lick"] = time_from_last_lick
@@ -119,7 +119,7 @@ def get_extended_stimulus_presentations(session):
                 repeat_number[ind_row] = repeat
                 repeat += 1
 
-    intermediate_df["index_within_block"] = repeat_number
+    intermediate_df["repeat_within_block"] = repeat_number
 
     # Lists of licks/rewards on each flash
     licks_each_flash = intermediate_df.apply(
@@ -138,8 +138,8 @@ def get_extended_stimulus_presentations(session):
         axis=1,
     )
 
-    intermediate_df["licks_each_flash"] = licks_each_flash
-    intermediate_df["rewards_each_flash"] = rewards_each_flash
+    intermediate_df["licks"] = licks_each_flash
+    intermediate_df["rewards"] = rewards_each_flash
 
     # Average running speed on each flash
     flash_running_speed = intermediate_df.apply(
@@ -152,7 +152,7 @@ def get_extended_stimulus_presentations(session):
         axis=1,
     )
 
-    intermediate_df["flash_running_speed"] = flash_running_speed
+    intermediate_df["running_speed"] = flash_running_speed
 
     # Do some tests
     # assert sum(licks_each_flash) == len(session.licks) #something like this
@@ -165,10 +165,10 @@ def get_extended_stimulus_presentations(session):
         "omitted",
         "block_index",
         "image_block_repetition",
-        "index_within_block",
-        "licks_each_flash",
-        "rewards_each_flash",
-        "flash_running_speed",
+        "repeat_within_block",
+        "licks",
+        "rewards",
+        "running_speed",
     ]
 
     return intermediate_df[extended_stim_columns]
@@ -176,7 +176,8 @@ def get_extended_stimulus_presentations(session):
 
 if __name__ == "__main__":
 
-    experiment_id = sys.argv[1]
+    case = 0
+
     cache_json = {
         "manifest_path": "/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/visual_behavior_data_manifest.csv",
         "nwb_base_dir": "/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/nwb_files",
@@ -184,17 +185,35 @@ if __name__ == "__main__":
     }
 
     cache = bpc.BehaviorProjectCache(cache_json)
-    # experiment_id = cache.manifest.iloc[5]['ophys_experiment_id']
-    nwb_path = cache.get_nwb_filepath(experiment_id)
-    api = BehaviorOphysNwbApi(nwb_path)
-    session = BehaviorOphysSession(api)
 
-    output_path = "/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/extra_files"
+    if case == 0:
 
-    extended_stimulus_presentations_df = get_extended_stimulus_presentations(session)
+        experiment_id = sys.argv[1]
+        # experiment_id = cache.manifest.iloc[5]['ophys_experiment_id']
+        nwb_path = cache.get_nwb_filepath(experiment_id)
+        api = BehaviorOphysNwbApi(nwb_path)
+        session = BehaviorOphysSession(api)
 
-    output_fn = os.path.join(
-        output_path, "extended_stimulus_presentations_df_{}.h5".format(experiment_id)
-    )
-    print("Writing extended_stimulus_presentations_df to {}".format(output_fn))
-    extended_stimulus_presentations_df.to_hdf(output_fn, key="df")
+        output_path = "/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/extra_files_final"
+
+        extended_stimulus_presentations_df = get_extended_stimulus_presentations(session)
+
+        output_fn = os.path.join(
+            output_path, "extended_stimulus_presentations_df_{}.h5".format(experiment_id)
+        )
+        print("Writing extended_stimulus_presentations_df to {}".format(output_fn))
+        extended_stimulus_presentations_df.to_hdf(output_fn, key="df")
+
+    elif case == 1:
+    
+        failed_oeid = 825623170
+        success_oeid = 826585773
+
+        #  nwb_path = cache.get_nwb_filepath(success_oeid)
+        nwb_path = cache.get_nwb_filepath(failed_oeid)
+        api = BehaviorOphysNwbApi(nwb_path, filter_invalid_rois = True)
+        session = BehaviorOphysSession(api)
+
+        extended_stimulus_presentations_df = get_extended_stimulus_presentations(session)
+
+
