@@ -46,14 +46,14 @@ class BehaviorProjectCache(object):
     def get_flash_response_df_path(self, experiment_id):
         return os.path.join(self.analysis_files_base_dir, 'flash_response_df_{}.h5'.format(experiment_id))
 
-    def get_extended_stumulus_presentations_df(self, experiment_id):
+    def get_extended_stimulus_presentations_df(self, experiment_id):
         return os.path.join(self.analysis_files_base_dir, 'extended_stimulus_presentations_df_{}.h5'.format(experiment_id))
 
     def get_session(self, experiment_id):
         nwb_path = self.get_nwb_filepath(experiment_id)
         trial_response_df_path = self.get_trial_response_df_path(experiment_id)
         flash_response_df_path = self.get_flash_response_df_path(experiment_id)
-        extended_stim_df_path = self.get_extended_stumulus_presentations_df(experiment_id)
+        extended_stim_df_path = self.get_extended_stimulus_presentations_df(experiment_id)
         api = ExtendedNwbApi(nwb_path, trial_response_df_path, flash_response_df_path, extended_stim_df_path)
         session = ExtendedBehaviorSession(api)
         return session 
@@ -78,11 +78,35 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
     def get_flash_response_df(self):
         return pd.read_hdf(self.flash_response_df_path, key='df')
 
-    def get_extended_stumulus_presentations_df(self):
+    def get_extended_stimulus_presentations_df(self):
         return pd.read_hdf(self.extended_stimulus_presentations_df_path, key='df')
 
     def get_trials(self):
         trials = super(ExtendedNwbApi, self).get_trials()
+        stimulus_presentations = super(ExtendedNwbApi, self).get_stimulus_presentations()
+
+        # Note: everything between dashed lines is a patch to deal with timing issues in the AllenSDK
+        # This should be removed in the future after issues #876 and #802 are fixed.
+        # -------------------------------------------------------------------------------------------------
+        def get_next_flash(timestamp):
+            # gets start_time of next stimulus after timestamp in stimulus_presentations 
+            query = stimulus_presentations.query('start_time >= @timestamp')
+            if len(query) > 0:
+                return query.iloc[0]['start_time']
+            else:
+                return None
+        trials['change_time'] = trials['change_time'].map(lambda x:get_next_flash(x))
+
+        def recalculate_response_latency(row):
+            # recalculates response latency based on corrected change time and first lick time
+            if len(row['lick_times'] > 0) and not pd.isnull(row['change_time']):
+                return row['lick_times'][0] - row['change_time']
+        trials['response_latency'] = trials.apply(recalculate_response_latency,axis=1)
+        # -------------------------------------------------------------------------------------------------
+
+        # asserts that every change time exists in the stimulus_presentations table
+        for change_time in trials[trials['change_time'].notna()]['change_time']:
+            assert change_time in stimulus_presentations['start_time'].values
 
         # Reorder / drop some columns to make more sense to students
         trials = trials[[
@@ -119,7 +143,7 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
 
     def get_stimulus_presentations(self):
         stimulus_presentations = super(ExtendedNwbApi, self).get_stimulus_presentations()
-        extended_stimulus_presentations = self.get_extended_stumulus_presentations_df()
+        extended_stimulus_presentations = self.get_extended_stimulus_presentations_df()
         extended_stimulus_presentations = extended_stimulus_presentations.drop(columns = ['omitted'])
         stimulus_presentations = stimulus_presentations.join(extended_stimulus_presentations)
 
@@ -132,25 +156,22 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
             'omitted',
             'change',
             'duration',
-            'licks_each_flash',
-            'rewards_each_flash',
-            'flash_running_speed',
+            'licks',
+            'rewards',
+            'running_speed',
             'index',
             'time_from_last_lick',
             'time_from_last_reward',
             'time_from_last_change',
             'block_index',
             'image_block_repetition',
-            'index_within_block',
+            'repeat_within_block',
             'image_set'
         ]]
 
         # Rename some columns to make more sense to students
-        stimulus_presentations = stimulus_presentations.rename(columns={'index':'absolute_flash_number',
-                                                                        'licks_each_flash':'licks',
-                                                                        'rewards_each_flash':'rewards',
-                                                                        'flash_running_speed':'running_speed',
-                                                                        'index_within_block':'repeat_within_block'})
+        stimulus_presentations = stimulus_presentations.rename(
+            columns={'index':'absolute_flash_number'})
         return stimulus_presentations
 
 class ExtendedBehaviorSession(BehaviorOphysSession):
