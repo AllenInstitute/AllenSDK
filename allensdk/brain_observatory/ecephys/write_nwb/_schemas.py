@@ -47,7 +47,7 @@ class Unit(RaisingSchema):
     )
     quality = String(required=True)
     firing_rate = Float(required=True)
-    snr = Float(required=True)
+    snr = Float(required=True, allow_none=True)
     isi_violations = Float(required=True)
     # TODO: Re-add the below parameters. Helpful parameters that can be used for analysizing data but not directly
     #   required by EcephysSession or the StimulusAnalysis classes

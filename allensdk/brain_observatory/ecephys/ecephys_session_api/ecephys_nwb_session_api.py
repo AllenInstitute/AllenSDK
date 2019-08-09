@@ -1,5 +1,6 @@
 from typing import Dict, Union, List, Optional, Callable, Iterable, Any
 from pathlib import Path
+from enum import IntEnum
 
 import pandas as pd
 import numpy as np
@@ -12,10 +13,15 @@ from allensdk.brain_observatory.nwb.nwb_api import NwbApi
 import allensdk.brain_observatory.ecephys.nwb
 
 
-
 class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
 
     def __init__(self, path, probe_lfp_paths: Optional[Dict[int, FilePromise]] = None, **kwargs):
+
+        self.filter_by_validity = kwargs.pop("filter_by_validity", True)
+        self.amplitude_cutoff_maximum = kwargs.pop("amplitude_cutoff_maximum", 0.1)
+        self.presence_ratio_minimum = kwargs.pop("presence_ratio_minimum", 0.95)
+        self.isi_violations_maximum = kwargs.pop("isi_violations_maximum", 0.5)
+
         super(EcephysNwbSessionApi, self).__init__(path, **kwargs)
         self.probe_lfp_paths = probe_lfp_paths
 
@@ -58,6 +64,10 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         # float is also not ideal, but we have nans indicating out-of-brain structures
         channels["manual_structure_id"] = [float(chid) if chid != "" else np.nan for chid in channels["manual_structure_id"]]
         
+        if self.filter_by_validity:
+            channels = channels[channels["valid_data"]]
+            channels = channels.drop(columns=["valid_data"])
+
         return channels
 
     def get_mean_waveforms(self) -> Dict[int, np.ndarray]:
@@ -69,10 +79,9 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         return units_table['spike_times'].to_dict()
 
     def get_units(self) -> pd.DataFrame:
-        units_table = self._get_full_units_table()
-        units_table.drop(columns=['spike_times', 'waveform_mean'], inplace=True)
-
-        return units_table
+        units = self._get_full_units_table()
+        units.drop(columns=['spike_times', 'waveform_mean'], inplace=True)
+        return units
 
     def get_lfp(self, probe_id: int) -> xr.DataArray:
         lfp_file = self._probe_nwbfile(probe_id)
@@ -128,7 +137,7 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         csd_mod = self._probe_nwbfile(probe_id).get_processing_module("current_source_density")
         csd_ts = csd_mod["current_source_density"]
 
-        return xr.DataArray(
+        csd = xr.DataArray(
             name="CSD",
             data=csd_ts.data[:],
             dims=["channel", "time"],
@@ -141,8 +150,30 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
             }
         )
 
+        known_channels = set(self.get_channels().index.values)
+        known_csd_channels = [ch for ch in csd["channel"].values if ch in known_channels]
+        csd = csd.loc[{"channel": known_csd_channels}]
+        return csd
 
     def _get_full_units_table(self) -> pd.DataFrame:
-        table = self.nwbfile.units.to_dataframe()
-        table.index = table.index.astype(int)
-        return table
+        units = self.nwbfile.units.to_dataframe()
+        units.index = units.index.astype(int)
+
+        if self.filter_by_validity:
+            valid_channels = set(self.get_channels().index.values.tolist())
+            units = units[
+                (units["quality"] == "good")
+                & (units["peak_channel_id"].isin(valid_channels))
+            ]
+            units.drop(columns=["quality"], inplace=True)
+
+        if self.amplitude_cutoff_maximum is not None:
+            units = units[units["amplitude_cutoff"] <= self.amplitude_cutoff_maximum]
+
+        if self.presence_ratio_minimum is not None:
+            units = units[units["presence_ratio"] >= self.presence_ratio_minimum]
+        
+        if self.isi_violations_maximum is not None:
+            units = units[units["isi_violations"] <= self.isi_violations_maximum]
+
+        return units
