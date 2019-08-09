@@ -69,10 +69,16 @@ if __name__=='__main__':
     cache = bpc.BehaviorProjectCache(cache_json)
     #  experiment_id = cache.manifest.iloc[5]['ophys_experiment_id']
     nwb_path = cache.get_nwb_filepath(experiment_id)
-    api = BehaviorOphysNwbApi(nwb_path, filter_invalid_rois=True)
-    session = BehaviorOphysSession(api)
+    #  api = BehaviorOphysNwbApi(nwb_path, filter_invalid_rois=True)
+    #  session = BehaviorOphysSession(api)
 
-    output_path = '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/extra_files_final'
+    # Get the session using the cache so that the change time fix is applied
+    session = cache.get_session(experiment_id)
+    change_times = session.trials['change_time'][~pd.isnull(session.trials['change_time'])].values
+    flash_times = session.stimulus_presentations['start_time'].values
+    assert np.all(np.isin(change_times, flash_times))
+
+    output_path = '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/trial_response_df_after_change_time_fix'
 
     response_analysis_params = {'window_around_timepoint_seconds':[-4,8],
                                'response_window_duration_seconds': 0.5,
