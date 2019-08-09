@@ -299,8 +299,8 @@ class MesoscopePlaneLimsApi(BehaviorOphysLimsApi):
         sync_file = self.get_sync_file()
         sync_dataset = SyncDataset(sync_file)
 
-        wrong_labels = ['vsync_2p', 'photodiode', 'cam1', 'cam2']
-        correct_labels = ['2p_vsync', 'stim_photodiode', 'cam1_exposure', 'cam2_exposure']
+        wrong_labels = ['vsync_2p', '', 'stim_vsync', '', 'photodiode', 'acq_trigger', '', '', 'cam1', 'cam2', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 'lick_sensor']
+        correct_labels = ['2p_vsync', '', 'stim_vsync', '', 'stim_photodiode', 'acq_trigger', '', '', 'cam1_exposure', 'cam2_exposure', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 'lick_sensor']
 
         line_labels = sync_dataset.line_labels
 
@@ -309,6 +309,8 @@ class MesoscopePlaneLimsApi(BehaviorOphysLimsApi):
                 index = sync_dataset.line_labels.index(line)
                 sync_dataset.line_labels.remove(line)
                 sync_dataset.line_labels.insert(index, correct_labels[index])
+
+
         meta_data = sync_dataset.meta_data
         sample_freq = meta_data['ni_daq']['counter_output_freq']
 
