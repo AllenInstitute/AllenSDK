@@ -38,13 +38,27 @@ expected = np.array([3.5, 3.0, 3.5])
 
 
 def find_change(image_index, omitted_index):
+    '''
+    Args: 
+        image_index (pd.Series): The index of the presented image for each flash
+        omitted_index (int): The index value for omitted stimuli
+
+    Returns:
+        change (np.array of bool): Whether each flash was a change flash
+    '''
+
     change = np.diff(image_index) != 0
     change = np.concatenate([np.array([False]), change])  # First flash not a change
     omitted = image_index == omitted_index
     omitted_inds = np.flatnonzero(omitted)
     change[omitted_inds] = False
-    change[omitted_inds + 1] = False  # Neither the change to the omitted
-                                      # nor the change back should be counted.
+
+    if image_index.iloc[-1] == omitted_index:
+        # If the last flash is omitted we can't set the +1 for that omitted idx
+        change[omitted_inds[:-1] + 1] = False
+    else:
+        change[omitted_inds + 1] = False
+                                               
     return change
 
 def get_extended_stimulus_presentations(session):
@@ -61,9 +75,12 @@ def get_extended_stimulus_presentations(session):
 
     if len(lick_times) < 5: #Passive sessions
         time_from_last_lick = np.full(len(flash_times), np.nan)
-        time_from_last_reward = np.full(len(flash_times), np.nan)
     else:
         time_from_last_lick = time_from_last(flash_times, lick_times)
+
+    if len(reward_times) < 1: # Sometimes mice are bad
+        time_from_last_reward = np.full(len(flash_times), np.nan)
+    else:
         time_from_last_reward = time_from_last(flash_times, reward_times)
 
     time_from_last_change = time_from_last(flash_times, change_times)
