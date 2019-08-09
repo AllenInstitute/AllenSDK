@@ -83,6 +83,30 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
 
     def get_trials(self):
         trials = super(ExtendedNwbApi, self).get_trials()
+        stimulus_presentations = super(ExtendedNwbApi, self).get_stimulus_presentations()
+
+        # Note: everything between dashed lines is a patch to deal with timing issues in the AllenSDK
+        # This should be removed in the future after issues #876 and #802 are fixed.
+        # -------------------------------------------------------------------------------------------------
+        def get_next_flash(timestamp):
+            # gets start_time of next stimulus after timestamp in stimulus_presentations 
+            query = stimulus_presentations.query('start_time >= @timestamp')
+            if len(query) > 0:
+                return query.iloc[0]['start_time']
+            else:
+                return None
+        trials['change_time'] = trials['change_time'].map(lambda x:get_next_flash(x))
+
+        def recalculate_response_latency(row):
+            # recalculates response latency based on corrected change time and first lick time
+            if len(row['lick_times'] > 0) and not pd.isnull(row['change_time']):
+                return row['lick_times'][0] - row['change_time']
+        trials['response_latency'] = trials.apply(recalculate_response_latency,axis=1)
+        # -------------------------------------------------------------------------------------------------
+
+        # asserts that every change time exists in the stimulus_presentations table
+        for change_time in trials[trials['change_time'].notna()]['change_time']:
+            assert change_time in stimulus_presentations['start_time'].values
 
         # Reorder / drop some columns to make more sense to students
         trials = trials[[
