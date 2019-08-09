@@ -180,8 +180,9 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
         behavior_stimulus_file = self.get_behavior_stimulus_file()
         data = pd.read_pickle(behavior_stimulus_file)
         rewards = self.get_rewards()
+        stimulus_presentations = self.get_stimulus_presentations()
         rebase_function = self.get_stimulus_rebase_function()
-        trial_df = get_trials(data, licks, rewards, rebase_function)
+        trial_df = get_trials(data, licks, rewards, stimulus_presentations, rebase_function)
 
         return trial_df
 
