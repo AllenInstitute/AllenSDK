@@ -217,7 +217,7 @@ def get_trial_reward_time(rebased_reward_times, start_time, stop_time):
     return float('nan') if len(reward_times) == 0 else one(reward_times)
         
 
-def get_trial_timing(event_dict, stimulus_presentations_df, go, catch, auto_rewarded, hit, false_alarm):
+def get_trial_timing(event_dict, stimulus_presentations_df, licks, go, catch, auto_rewarded, hit, false_alarm):
     '''
     extract trial timing data
     
@@ -266,11 +266,10 @@ def get_trial_timing(event_dict, stimulus_presentations_df, go, catch, auto_rewa
 
     if not (go or catch or auto_rewarded):
         response_latency = None
+    elif len(licks) > 0:
+        response_latency = licks[0] - change_time
     else:
-        if hit or false_alarm:
-            response_latency = response_time - change_time
-        else:
-            response_latency = float("inf")
+        response_latency = float("inf")
 
     return {
         "start_time": start_time,
@@ -313,11 +312,21 @@ def get_trials(data, licks_df, rewards_df, stimulus_presentations_df, rebase):
         event_dict = {(e[0], e[1]): {'rebased_time':rebase(e[2]),'frame':e[3]} for e in trial['events']}
 
         tr_data = {"trial": trial["index"]}
-
+        tr_data["lick_times"] = get_trial_lick_times(
+            sync_lick_times, 
+            event_dict[('trial_start', '')]['rebased_time'], 
+            event_dict[('trial_end', '')]['rebased_time']
+        )
+        tr_data["reward_time"] = get_trial_reward_time(
+            rebased_reward_times,
+            event_dict[('trial_start', '')]['rebased_time'], 
+            event_dict[('trial_end', '')]['rebased_time']
+        )
         tr_data.update(trial_data_from_log(trial))
         tr_data.update(get_trial_timing(
             event_dict,
             stimulus_presentations_df,
+            tr_data['lick_times'],
             tr_data['go'],
             tr_data['catch'],
             tr_data['auto_rewarded'],
@@ -325,9 +334,6 @@ def get_trials(data, licks_df, rewards_df, stimulus_presentations_df, rebase):
             tr_data['false_alarm'],
         ))
         tr_data.update(get_trial_image_names(trial, stimuli))
-
-        tr_data["lick_times"] = get_trial_lick_times(sync_lick_times, tr_data["start_time"], tr_data["stop_time"])
-        tr_data["reward_time"] = get_trial_reward_time(rebased_reward_times, tr_data["start_time"], tr_data["stop_time"])
 
         # ensure that only one trial condition is True (they are mutually exclusive)
         condition_dict = {}
