@@ -28,6 +28,10 @@ def test_metrics(spikes_nwb, expected_csv, analysis_params, units_filter, skip_c
     """Full intergration tests of metrics table"""
     if not os.path.exists(spikes_nwb):
         pytest.skip('No input spikes file {}.'.format(spikes_nwb))
+    if not os.access(spikes_nwb, os.R_OK):
+        pytest.skip(f"can't access file at {spikes_nwb}")
+    if not os.access(expected_csv, os.R_OK):
+        pytest.skip(f"can't access file at {expected_csv}")
 
     analysis_params = analysis_params or {}
     analysis = ns.NaturalScenes(spikes_nwb, filter=units_filter, **analysis_params)
