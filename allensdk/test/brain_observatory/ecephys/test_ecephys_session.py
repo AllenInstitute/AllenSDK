@@ -171,6 +171,9 @@ def test_get_stimulus_epochs(just_stimulus_table_api):
     session = EcephysSession(api=just_stimulus_table_api)
     obtained = session.get_stimulus_epochs()
 
+    print(expected)
+    print(obtained)
+
     pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)
 
 

@@ -273,7 +273,7 @@ class EcephysSession(LazyPropertyMixin):
             duration_thresholds = {"spontaneous_activity": 90.0}
 
         presentations = self.stimulus_presentations.copy()
-        diff_indices = nan_intervals(presentations["stimulus_block"])
+        diff_indices = nan_intervals(presentations["stimulus_block"].values)
 
         epochs = []
         for left, right in zip(diff_indices[:-1], diff_indices[1:]):
@@ -615,7 +615,6 @@ class EcephysSession(LazyPropertyMixin):
         sampling_rate_lu = {uid: self.probes.loc[r['probe_id']]['sampling_rate'] for uid, r in units_df.iterrows()}
 
         for uid in list(mean_waveforms.keys()):
-            # assert(sampling_rate_lu[uid] == 30000)
             data = mean_waveforms.pop(uid)
             output_waveforms[uid] = xr.DataArray(
                 data=data,
@@ -750,7 +749,6 @@ def removed_unused_stimulus_presentation_columns(stimulus_presentations):
     return stimulus_presentations.drop(columns=to_drop)
 
 
-
 def intervals_structures(table, structure_id_key="manual_structure_id", structure_label_key="manual_structure_acronym"):
 
     """ find on a channels / units table intervals of channels inserted into particular structures
@@ -773,13 +771,13 @@ def intervals_structures(table, structure_id_key="manual_structure_id", structur
 
     """
 
-    intervals = nan_intervals(table[structure_id_key])
+    intervals = nan_intervals(table[structure_id_key].values)
     labels = table[structure_label_key].iloc[intervals[:-1]].values
 
     return labels, intervals
 
 
-def nan_intervals(array):
+def nan_intervals(array, nan_like=["null"]):
     """ find interval bounds (bounding consecutive identical values) in an array, which may contain nans
 
     Parameters
@@ -793,18 +791,27 @@ def nan_intervals(array):
 
     """
 
-    array = np.array(array)
-    isnan = np.isnan(array)
+    intervals = [0]
+    current = array[0]
+    for ii, item in enumerate(array[1:]):
+        if is_distinct_from(item, current):
+            intervals.append(ii+1)
+        current = item
+    intervals.append(len(array))
 
-    uniques = np.unique(array[np.logical_not(isnan)])
-    gaps = np.diff(uniques)
-    left = np.argmax(gaps)
-    right = left + 1
-    nan_val = uniques[left] + (uniques[right] - uniques[left]) / 2
+    print(intervals)
+    return np.unique(intervals)
 
-    array = array.copy()
-    array[isnan] = nan_val
-    return array_intervals(array)
+
+def is_distinct_from(left, right):
+    if type(left) != type(right):
+        return True
+    if pd.isna(left) and pd.isna(right):
+        return False
+    if left is None and right is None:
+        return False
+
+    return left != right
 
 
 def array_intervals(array):
