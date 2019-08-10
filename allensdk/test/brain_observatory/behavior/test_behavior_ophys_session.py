@@ -47,7 +47,7 @@ def test_nwb_end_to_end(tmpdir_factory):
     BehaviorOphysNwbApi(nwb_filepath).save(d1)
 
     d2 = BehaviorOphysSession(api=BehaviorOphysNwbApi(nwb_filepath))
-    assert equals(d1, d2)
+    equals(d1, d2, reraise=True)
 
 
 @pytest.mark.nightly
