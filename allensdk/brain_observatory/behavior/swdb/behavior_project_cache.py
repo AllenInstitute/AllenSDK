@@ -28,11 +28,10 @@ class BehaviorProjectCache(object):
             'imaging_depth',
             'targeted_structure',
             'stage_name',
-            'retake_number',
             'animal_name',
             'sex',
             'date_of_acquisition',
-            'equipment_name'
+            'retake_number'
         ]]
         self.nwb_base_dir = cache_json['nwb_base_dir']
         self.analysis_files_base_dir = cache_json['analysis_files_base_dir']
