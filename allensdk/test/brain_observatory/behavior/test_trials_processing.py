@@ -272,6 +272,20 @@ def test_get_trial_timing():
         ('trial_end', ''): {'rebased_time': 315.23590438557534, 'frame': 18600}
     }
 
+    licks = [
+        312.24876,
+        312.58027,
+        312.73126,
+        312.86627,
+        313.02635,
+        313.16292,
+        313.54016,
+        314.04408,
+        314.47449,
+        314.61011,
+        314.75495,
+    ]
+
     nan = np.nan
     stimulus_presentations_df = pd.DataFrame({
         'duration': {
@@ -444,6 +458,7 @@ def test_get_trial_timing():
     result = trials_processing.get_trial_timing(
         event_dict,
         stimulus_presentations_df,
+        licks,
         go=False,
         catch=False,
         auto_rewarded=True,
@@ -458,7 +473,7 @@ def test_get_trial_timing():
         'response_time': nan,
         'change_frame': 18345,
         'change_time': 311.77086,
-        'response_latency': np.inf
+        'response_latency': 0.4778999999999769
         }
 
     # use assert_frame_equal to take advantage of the nice way it deals with NaNs
