@@ -141,6 +141,10 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
             initial_trials=10
         )
 
+        trials['response_binary'] = 0
+        trials['response_binary'] = [1 if hit == True else 0 for hit in trials.hit.values]
+        trials['response_binary'] = [1 if false_alarm == True else 0 for false_alarm in trials.false_alarm.values]
+
         return trials
 
     def get_stimulus_presentations(self):
