@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import numpy as np
 
 from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi
 from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorOphysSession
@@ -100,6 +101,8 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
             # recalculates response latency based on corrected change time and first lick time
             if len(row['lick_times'] > 0) and not pd.isnull(row['change_time']):
                 return row['lick_times'][0] - row['change_time']
+            else:
+                return np.nan
         trials['response_latency'] = trials.apply(recalculate_response_latency,axis=1)
         # -------------------------------------------------------------------------------------------------
 
