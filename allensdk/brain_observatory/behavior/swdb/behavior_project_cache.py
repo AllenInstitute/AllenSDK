@@ -173,6 +173,11 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
             columns={'index':'absolute_flash_number'})
         return stimulus_presentations
 
+    def get_stimulus_templates(self):
+        stimulus_templates = super(ExtendedNwbApi, self).get_stimulus_templates()
+        return stimulus_templates[list(stimulus_templates.keys())[0]]
+
+
 class ExtendedBehaviorSession(BehaviorOphysSession):
 
     def __init__(self, api):
