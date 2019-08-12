@@ -207,10 +207,6 @@ class ExtendedBehaviorSession(BehaviorOphysSession):
 
     def get_trial_response_df(self):
         trial_response_df = self.api.get_trial_response_df()
-        trials_copy = self.trials.copy()
-
-        trials_copy.index.names = ['trial_id']
-        trial_response_df = trial_response_df.join(trials_copy)
         return trial_response_df
 
     def get_stimulus_index(self):
