@@ -197,4 +197,4 @@ class EcephysProjectCache(Cache):
 
     @classmethod
     def fixed(cls, **kwargs):
-        return cls(api=EcephysProjectFixedApi(), **kwargs)
+        return cls(fetch_api=EcephysProjectFixedApi(), **kwargs)
