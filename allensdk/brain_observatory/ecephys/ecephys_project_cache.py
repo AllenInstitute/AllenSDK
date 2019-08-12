@@ -6,7 +6,7 @@ import pandas as pd
 
 from allensdk.api.cache import Cache
 
-from allensdk.brain_observatory.ecephys.ecephys_project_api import EcephysProjectLimsApi, EcephysProjectWarehouseApi
+from allensdk.brain_observatory.ecephys.ecephys_project_api import EcephysProjectLimsApi, EcephysProjectWarehouseApi, EcephysProjectFixedApi
 from allensdk.brain_observatory.ecephys.ecephys_session_api import EcephysNwbSessionApi
 from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
 from allensdk.brain_observatory.ecephys.file_promise import FilePromise, read_nwb, write_from_stream
@@ -194,3 +194,7 @@ class EcephysProjectCache(Cache):
             fetch_api=EcephysProjectWarehouseApi.default(**warehouse_kwargs), 
             **kwargs
         )
+
+    @classmethod
+    def fixed(cls, **kwargs):
+        return cls(fetch_api=EcephysProjectFixedApi(), **kwargs)
