@@ -215,3 +215,44 @@ class ExtendedBehaviorSession(BehaviorOphysSession):
 
     def get_stimulus_index(self):
         return self.stimulus_presentations.groupby('image_index').apply(lambda group: group['image_name'].unique()[0])
+
+
+
+#  def test_project_cache():
+if __name__=='__main__':
+
+    cache_test_base = '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019'
+    cache_paths = {
+        'manifest_path': os.path.join(cache_test_base, 'visual_behavior_data_manifest.csv'),
+        'nwb_base_dir': os.path.join(cache_test_base, 'nwb_files'),
+        'analysis_files_base_dir': os.path.join(cache_test_base, 'extra_files_final')
+    }
+
+    cache = BehaviorProjectCache(cache_paths)
+    session = cache.get_session(846487947)
+
+    # Test trials extra columns
+    for new_key in ['reward_rate', 'response_binary']:
+        assert new_key in session.trials.keys()
+
+    # Test stimulus_presentations extra columns
+    for new_key in [
+            'absolute_flash_number',
+            'time_from_last_lick',
+            'time_from_last_reward',
+            'time_from_last_change',
+            'block_index',
+            'image_block_repetition',
+            'repeat_within_block']:
+        assert new_key in session.stimulus_presentations.keys()
+
+    # Test trial response df
+    trial_response = session.trial_response_df
+
+    #  test_pairs = 
+    assert trial_response.loc[(915133315, 1)]['mean_response'] == 0.0440427
+    assert trial_response.loc[(915133315, 1)]['baseline_response'] == 0.0640069
+    assert trial_response.loc[(915133315, 1)]['p_value'] == 0.247066
+    assert trial_response.loc[(915133315, 1)]['go'] == False
+    assert trial_response.loc[(915133315, 1)]['initial_image_name'] == 'im000'
+
