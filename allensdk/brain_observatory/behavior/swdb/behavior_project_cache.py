@@ -108,6 +108,8 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
             # recalculates response latency based on corrected change time and first lick time
             if len(row['lick_times'] > 0) and not pd.isnull(row['change_time']):
                 return row['lick_times'][0] - row['change_time']
+            else:
+                return np.nan
         trials['response_latency'] = trials.apply(recalculate_response_latency,axis=1)
         # -------------------------------------------------------------------------------------------------
 
@@ -148,6 +150,10 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
             initial_trials=10
         )
 
+        trials['response_binary'] = 0
+        trials['response_binary'] = [1 if hit == True else 0 for hit in trials.hit.values]
+        trials['response_binary'] = [1 if false_alarm == True else 0 for false_alarm in trials.false_alarm.values]
+
         return trials
 
     def get_stimulus_presentations(self):
@@ -182,6 +188,11 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
         stimulus_presentations = stimulus_presentations.rename(
             columns={'index':'absolute_flash_number'})
         return stimulus_presentations
+
+    def get_stimulus_templates(self):
+        stimulus_templates = super(ExtendedNwbApi, self).get_stimulus_templates()
+        return stimulus_templates[list(stimulus_templates.keys())[0]]
+
 
 class ExtendedBehaviorSession(BehaviorOphysSession):
 
