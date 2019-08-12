@@ -59,7 +59,7 @@ def validate_last_trial_ends_adjacent_to_flash(ophys_experiment_id, api=None, ve
         # count number of omitted flashes at the very end of the session
         N_final_omitted_flashes = session.stimulus_presentations.index.max() - session.stimulus_presentations.query('omitted == False').index.max()
         
-        # get the star/end time of the last valid (non-omitted) flash
+        # get the start/end time of the last valid (non-omitted) flash
         last_flash_start = session.stimulus_presentations.query('omitted == False')['start_time'].iloc[-1]
         last_flash_end = session.stimulus_presentations.query('omitted == False')['stop_time'].iloc[-1]
         
