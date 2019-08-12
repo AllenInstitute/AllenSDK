@@ -2,7 +2,7 @@ class EcephysProjectApi:
     def get_sessions(self):
         raise NotImplementedError()
 
-    def get_session_data(self):
+    def get_session_data(self, session_id):
         raise NotImplementedError()
 
     def get_targeted_regions(self):
@@ -20,5 +20,5 @@ class EcephysProjectApi:
     def get_probes(self):
         raise NotImplementedError()
 
-    def get_probe_lfp_data(self):
+    def get_probe_lfp_data(self, probe_id):
         raise NotImplementedError()
