@@ -15,14 +15,14 @@ def get_sync_data(sync_path):
     meta_data = sync_dataset.meta_data
     sample_freq = meta_data['ni_daq']['counter_output_freq']
     
+    # use rising edge for Scientifica, falling edge for Nikon http://confluence.corp.alleninstitute.org/display/IT/Ophys+Time+Sync
     # 2P vsyncs
     vs2p_r = sync_dataset.get_rising_edges('2p_vsync')
     vs2p_f = sync_dataset.get_falling_edges('2p_vsync')  # new sync may be able to do units = 'sec', so conversion can be skipped
     frames_2p = vs2p_r / sample_freq
     vs2p_fsec = vs2p_f / sample_freq
 
-    # use rising edge for Scientifica, falling edge for Nikon http://confluence.corp.alleninstitute.org/display/IT/Ophys+Time+Sync
-    stimulus_times_no_monitor_delay = sync_dataset.get_rising_edges('stim_vsync') / sample_freq
+    stimulus_times_no_monitor_delay = sync_dataset.get_falling_edges('stim_vsync') / sample_freq
 
     if 'lick_times' in meta_data['line_labels']:
         lick_times = sync_dataset.get_rising_edges('lick_1') / sample_freq

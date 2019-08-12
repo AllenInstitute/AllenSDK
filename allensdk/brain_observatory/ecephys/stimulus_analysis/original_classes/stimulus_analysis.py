@@ -78,12 +78,12 @@ class StimulusAnalysis(object):
     @property
     def dxcm(self):
         """Returns an array of session running-speed velocities"""
-        return self.ecephys_session.running_speed.values
+        return self.ecephys_session.running_speed.velocity
 
     @property
     def dxtime(self):
         """Returns an array of session running speed timestamps"""
-        return self._ecephys_session.running_speed.timestamps
+        return self._ecephys_session.running_speed.start_time
 
     @property
     def stim_table(self):
