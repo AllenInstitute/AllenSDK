@@ -6,7 +6,7 @@ import behavior_project_cache as bpc
 
 python_file = r"/allen/programs/braintv/workgroups/nc-ophys/nick.ponvert/src/AllenSDK/allensdk/brain_observatory/behavior/swdb/save_extended_stimulus_presentations_df.py"
 
-jobdir = '/allen/programs/braintv/workgroups/nc-ophys/nick.ponvert/cluster_jobs/20190808_save_extended_stim'
+jobdir = '/allen/programs/braintv/workgroups/nc-ophys/nick.ponvert/cluster_jobs/20190810_save_extended_stim'
 
 job_settings = {'queue': 'braintv',
                 'mem': '15g',

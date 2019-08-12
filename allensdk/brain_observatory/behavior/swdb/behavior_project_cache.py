@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import numpy as np
 
 from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi
 from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorOphysSession
@@ -96,6 +97,13 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
                 return None
         trials['change_time'] = trials['change_time'].map(lambda x:get_next_flash(x))
 
+        ### This method can lead to a NaN change time for any trials at the end of the session.
+        ### However, aborted trials at the end of the session also don't have change times. 
+        ### The safest method seems like just droping any trials that aren't covered by the stimulus_presentations
+        #Using start time in case last stim is omitted
+        last_stimulus_presentation = stimulus_presentations.iloc[-1]['start_time']
+        trials = trials[np.logical_not(trials['stop_time'] > last_stimulus_presentation)]
+
         def recalculate_response_latency(row):
             # recalculates response latency based on corrected change time and first lick time
             if len(row['lick_times'] > 0) and not pd.isnull(row['change_time']):
@@ -106,6 +114,8 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
         # asserts that every change time exists in the stimulus_presentations table
         for change_time in trials[trials['change_time'].notna()]['change_time']:
             assert change_time in stimulus_presentations['start_time'].values
+
+        # Drop any trials at the end of the session for which we don't have stimulus_presentations
 
         # Reorder / drop some columns to make more sense to students
         trials = trials[[
