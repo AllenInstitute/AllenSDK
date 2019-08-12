@@ -137,8 +137,13 @@ if __name__=='__main__':
                                    'baseline_window_duration_seconds': 0.5}
 
         trial_response_df = get_trial_response_df(session, response_analysis_params)
+
+        trial_metadata = session.trials.copy()
+        trial_metadata.index.names = ['trial_id']
+        trial_response_df = trial_response_df.join(trial_metadata)
+
         trial_response_df = add_p_vals_tr(trial_response_df)
-        #  trial_response_df = annotate_trial_response_df_with_pref_stim(trial_response_df)
+        trial_response_df = annotate_trial_response_df_with_pref_stim(trial_response_df)
 
         output_fn = os.path.join(output_path, 'trial_response_df_{}.h5'.format(experiment_id))
         print('Writing trial response df to {}'.format(output_fn))
