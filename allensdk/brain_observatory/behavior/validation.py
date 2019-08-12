@@ -94,7 +94,12 @@ if __name__ == "__main__":
                                 808619526, 808619543, 808621034, 808621015]
 
     for ophys_experiment_id in ophys_experiment_id_list:
-        for validation_function in [validate_ophys_timestamps, validate_ophys_dff_length]:
+        validation_functions_to_run = [
+            validate_ophys_timestamps, 
+            validate_ophys_dff_length,
+            validate_last_trial_ends_adjacent_to_flash,
+        ]
+        for validation_function in validation_functions_to_run:
 
             try:
                 validation_function(ophys_experiment_id, api=api)
