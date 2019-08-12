@@ -7,8 +7,6 @@ class MissingDataError(ValueError):
 
 class EcephysProjectFixedApi(EcephysProjectApi):
 
-    SPECIALIZED = ("get_session_data", "get_probe_data")
-
     def get_session_data(self, session_id):
         raise MissingDataError(f"data for session {session_id} not found!")
 
