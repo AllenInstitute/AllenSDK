@@ -88,7 +88,7 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
         tdf = pd.read_hdf(self.trial_response_df_path, key='df')
         tdf.reset_index(level=1, inplace=True)
         # tdf.insert(loc=0, column='cell_specimen_id', value=tdf.index.values)
-        tdf['cell_specimen_id'] = tdf.index.values #add this as a column to the end
+        #  tdf['cell_specimen_id'] = tdf.index.values #add this as a column to the end
         tdf.drop(columns=['cell_roi_id'], inplace=True)
         return tdf
 
@@ -96,7 +96,7 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
         fdf = pd.read_hdf(self.flash_response_df_path, key='df')
         fdf.reset_index(level=1, inplace=True)
         # fdf.insert(loc=0, column='cell_specimen_id', value=fdf.index.values)
-        fdf['cell_specimen_id'] = fdf.index.values #add this as a column to the end
+        #  fdf['cell_specimen_id'] = fdf.index.values #add this as a column to the end
         fdf.drop(columns=['image_name', 'cell_roi_id'], inplace=True)
         fdf = fdf.join(self.get_stimulus_presentations(), on='flash_id', how='left')
         return fdf
@@ -224,6 +224,7 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
         return stimulus_presentations
 
     def get_stimulus_templates(self):
+        # super stim templates is a dict with one annoyingly-long key, so pop the val out
         stimulus_templates = super(ExtendedNwbApi, self).get_stimulus_templates()
         return stimulus_templates[list(stimulus_templates.keys())[0]]
 
@@ -246,45 +247,3 @@ class ExtendedBehaviorSession(BehaviorOphysSession):
     def get_stimulus_index(self):
         return self.stimulus_presentations.groupby('image_index').apply(lambda group: group['image_name'].unique()[0])
 
-
-
-#  def test_project_cache():
-if __name__=='__main__':
-
-    cache_test_base = '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019'
-    cache_paths = {
-        'manifest_path': os.path.join(cache_test_base, 'visual_behavior_data_manifest.csv'),
-        'nwb_base_dir': os.path.join(cache_test_base, 'nwb_files'),
-        'analysis_files_base_dir': os.path.join(cache_test_base, 'extra_files_final'),
-        'analysis_files_metadata_path': os.path.join(cache_test_base, 'analysis_files_metadata.json')
-    }
-
-    cache = BehaviorProjectCache(cache_paths)
-    session = cache.get_session(846487947)
-
-    # Test trials extra columns
-    for new_key in ['reward_rate', 'response_binary']:
-        assert new_key in session.trials.keys()
-
-    # Test stimulus_presentations extra columns
-    for new_key in [
-            'absolute_flash_number',
-            'time_from_last_lick',
-            'time_from_last_reward',
-            'time_from_last_change',
-            'block_index',
-            'image_block_repetition',
-            'repeat_within_block']:
-        assert new_key in session.stimulus_presentations.keys()
-
-    # Test trial response df
-    trial_response = session.trial_response_df
-
-    #  test_pairs = 
-    #### These need to use almost_equal
-    #  assert trial_response.loc[(915133315, 1)]['mean_response'] == 0.0440427
-    #  assert trial_response.loc[(915133315, 1)]['baseline_response'] == 0.0640069
-    #  assert trial_response.loc[(915133315, 1)]['p_value'] == 0.247066
-    #  assert trial_response.loc[(915133315, 1)]['go'] == False
-    #  assert trial_response.loc[(915133315, 1)]['initial_image_name'] == 'im000'
-    #  
