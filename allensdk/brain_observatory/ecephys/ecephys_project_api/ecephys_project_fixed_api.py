@@ -30,3 +30,9 @@ class EcephysProjectFixedApi(EcephysProjectApi):
 
     def get_probes(self):
         raise MissingDataError(f"Data not found!")
+
+    def get_natural_movie_template(self, number):
+        raise MissingDataError(f"natural movie template not found for movie {number}")
+
+    def get_natural_scene_template(self, number):
+        raise MissingDataError(f"natural scene template not found for scene {number}")
