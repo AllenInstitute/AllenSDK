@@ -85,10 +85,21 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
         self.extended_stimulus_presentations_df_path = extended_stimulus_presentations_df_path
 
     def get_trial_response_df(self):
-        return pd.read_hdf(self.trial_response_df_path, key='df')
+        tdf = pd.read_hdf(self.trial_response_df_path, key='df')
+        tdf.reset_index(level=1, inplace=True)
+        # tdf.insert(loc=0, column='cell_specimen_id', value=tdf.index.values)
+        tdf['cell_specimen_id'] = tdf.index.values #add this as a column to the end
+        tdf.drop(columns=['cell_roi_id'], inplace=True)
+        return tdf
 
     def get_flash_response_df(self):
-        return pd.read_hdf(self.flash_response_df_path, key='df')
+        fdf = pd.read_hdf(self.flash_response_df_path, key='df')
+        fdf.reset_index(level=1, inplace=True)
+        # fdf.insert(loc=0, column='cell_specimen_id', value=fdf.index.values)
+        fdf['cell_specimen_id'] = fdf.index.values #add this as a column to the end
+        fdf.drop(columns=['image_name', 'cell_roi_id'], inplace=True)
+        fdf = fdf.join(self.get_stimulus_presentations(), on='flash_id', how='left')
+        return fdf
 
     def get_extended_stimulus_presentations_df(self):
         return pd.read_hdf(self.extended_stimulus_presentations_df_path, key='df')
