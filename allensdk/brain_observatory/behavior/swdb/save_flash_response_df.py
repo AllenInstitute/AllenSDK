@@ -290,11 +290,11 @@ if __name__=='__main__':
         session = BehaviorOphysSession(api)
 
         # Where to save the results
-        output_path = '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/extra_files_final'
+        output_path = '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/flash_response_500msec_response'
 
         # Define parameters for dff_trace, and response_window
         response_analysis_params = {'window_around_timepoint_seconds':[-.5,.75], # -500ms, 750ms
-                                   'response_window_duration_seconds': 0.75, 
+                                   'response_window_duration_seconds': 0.5, 
                                    'baseline_window_duration_seconds': 0.5} 
 
         # compute the base flash_response_df
@@ -325,7 +325,7 @@ if __name__=='__main__':
         session.__dict__['stimulus_presentations'].value = session.stimulus_presentations.iloc[:20]
 
         response_analysis_params = {'window_around_timepoint_seconds':[-.5,.75], # -500ms, 750ms
-                                   'response_window_duration_seconds': 0.75, 
+                                   'response_window_duration_seconds': 0.5, 
                                    'baseline_window_duration_seconds': 0.5} 
 
         flash_response_df = get_flash_response_df(session, response_analysis_params)
