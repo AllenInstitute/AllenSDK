@@ -133,7 +133,7 @@ def get_p_values_from_shuffled_spontaneous(session, flash_response_df, response_
     # Test to ensure p values are bounded between 0 and 1, and dont include NaNs
     assert np.all(fdf['p_value'].values <= 1)
     assert np.all(fdf['p_value'].values >= 0)
-    assert np.all(~np.isnan(fdf['p_value'].values)    
+    assert np.all(~np.isnan(fdf['p_value'].values))
     
     return fdf 
 
@@ -246,7 +246,7 @@ def annotate_flash_response_df_with_pref_stim(fdf):
             fdf.loc[cell_flash_pairs, 'pref_stim'] = True
 
     # Test to ensure preferred stimulus is unique for each cell
-    for cell in fdf['cell_specimen_id'].unique()   
+    for cell in fdf['cell_specimen_id'].unique():
         assert len(fdf.set_index('cell_specimen_id').loc[cell].query('pref_stim').image_name.unique()) == 1
 
     # Reset the df index
