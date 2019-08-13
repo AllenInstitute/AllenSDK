@@ -171,6 +171,9 @@ def test_get_stimulus_epochs(just_stimulus_table_api):
     session = EcephysSession(api=just_stimulus_table_api)
     obtained = session.get_stimulus_epochs()
 
+    print(expected)
+    print(obtained)
+
     pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)
 
 
@@ -206,9 +209,9 @@ def test_build_units_table(units_table_api):
     session = EcephysSession(api=units_table_api)
     obtained = session.units
 
-    assert 2 == session.num_units
-    assert np.allclose([22, 33], obtained['probe_vertical_position'])
-    assert np.allclose([1, 2], obtained.index.values)
+    assert 3 == session.num_units
+    assert np.allclose([10, 22, 33], obtained['probe_vertical_position'])
+    assert np.allclose([0, 1, 2], obtained.index.values)
 
 
 def test_presentationwise_spike_counts(spike_times_api):
@@ -221,7 +224,7 @@ def test_presentationwise_spike_counts(spike_times_api):
     second = obtained.loc[{'unit_id': 1, 'stimulus_presentation_id': 3}]
     assert np.allclose([0, 0], second)
 
-    assert np.allclose([4, 2, 2], obtained.shape)
+    assert np.allclose([4, 2, 3], obtained.shape)
 
 
 @pytest.mark.parametrize("spike_times,time_domain,expected", [

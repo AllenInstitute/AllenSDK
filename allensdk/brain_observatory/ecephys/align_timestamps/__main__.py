@@ -14,7 +14,7 @@ from .channel_states import extract_barcodes_from_states, extract_splits_from_st
 
 
 def align_timestamps(args):
-
+    
     sync_dataset = BarcodeSyncDataset.factory(args["sync_h5_path"])
     sync_times, sync_codes = sync_dataset.extract_barcodes()
 
@@ -63,6 +63,7 @@ def align_timestamps(args):
         mapped_files = {}
 
         for timestamp_file in probe["mappable_timestamp_files"]:
+            # print(timestamp_file["name"])
             timestamps = np.load(timestamp_file["input_path"])
             aligned_timestamps = np.copy(timestamps).astype("float64")
 

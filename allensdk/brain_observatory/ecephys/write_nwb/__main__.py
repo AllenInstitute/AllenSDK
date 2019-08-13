@@ -23,6 +23,7 @@ from allensdk.brain_observatory.argschema_utilities import (
 )
 from allensdk.brain_observatory import dict_to_indexed_array
 from allensdk.brain_observatory.ecephys.file_io.continuous_file import ContinuousFile
+from allensdk.brain_observatory.ecephys.nwb import EcephysProbe
 
 
 STIM_TABLE_RENAMES_MAP = {"Start": "start_time", "End": "stop_time"}
@@ -230,7 +231,7 @@ def read_running_speed(path):
     )
 
 
-def add_probe_to_nwbfile(nwbfile, probe_id, description="", location=""):
+def add_probe_to_nwbfile(nwbfile, probe_id, sampling_rate, lfp_sampling_rate, description="", location=""):
     """ Creates objects required for representation of a single extracellular ephys probe within an NWB file. These objects amount 
     to a Device (this will be removed at some point from pynwb) and an ElectrodeGroup.
 
@@ -259,11 +260,13 @@ def add_probe_to_nwbfile(nwbfile, probe_id, description="", location=""):
     """
 
     probe_nwb_device = pynwb.device.Device(name=str(probe_id))
-    probe_nwb_electrode_group = pynwb.ecephys.ElectrodeGroup(
+    probe_nwb_electrode_group = EcephysProbe(
         name=str(probe_id),
         description=description,
         location=location,
         device=probe_nwb_device,
+        sampling_rate=sampling_rate,
+        lfp_sampling_rate=lfp_sampling_rate
     )
 
     nwbfile.add_device(probe_nwb_device)
@@ -331,7 +334,7 @@ def add_ragged_data_to_dynamic_table(
 
     """
 
-    idx, values = dict_to_indexed_array(data, table.id)
+    idx, values = dict_to_indexed_array(data, table.id.data)
     del data
 
     table.add_column(
@@ -422,7 +425,10 @@ def write_probe_lfp_file(session_start_time, log_level, probe):
         session_start_time=session_start_time
     )    
 
-    nwbfile, probe_nwb_device, probe_nwb_electrode_group = add_probe_to_nwbfile(nwbfile, probe['id'], description=probe['name'])
+    nwbfile, probe_nwb_device, probe_nwb_electrode_group = add_probe_to_nwbfile(nwbfile, 
+        probe_id=probe["id"], description=probe["name"], 
+        sampling_rate=probe["sampling_rate"], lfp_sampling_rate=probe["lfp_sampling_rate"]
+    )
 
     channels = prepare_probewise_channel_table(probe['channels'], probe_nwb_electrode_group)
     channel_li_id_map = {row["local_index"]: cid for cid, row in channels.iterrows()}
@@ -518,11 +524,15 @@ def add_probewise_data_to_nwbfile(nwbfile, probes):
     for probe in probes:
         logging.info(f'found probe {probe["id"]} with name {probe["name"]}')
 
-        nwbfile, probe_nwb_device, probe_nwb_electrode_group = add_probe_to_nwbfile(nwbfile, probe['id'], description=probe['name'])
+        nwbfile, probe_nwb_device, probe_nwb_electrode_group = add_probe_to_nwbfile(nwbfile, 
+            probe_id=probe["id"], description=probe["name"], 
+            sampling_rate=probe["sampling_rate"], lfp_sampling_rate=probe["lfp_sampling_rate"]
+        )
+
         channel_tables[probe["id"]] = prepare_probewise_channel_table(probe['channels'], probe_nwb_electrode_group)
         unit_tables.append(pd.DataFrame(probe['units']))
 
-        local_to_global_unit_map = {unit['local_index']: unit['id'] for unit in probe['units']}
+        local_to_global_unit_map = {unit['cluster_id']: unit['id'] for unit in probe['units']}
 
         spike_times.update(read_spike_times_to_dictionary(
             probe['spike_times_path'], probe['spike_clusters_file'], local_to_global_unit_map

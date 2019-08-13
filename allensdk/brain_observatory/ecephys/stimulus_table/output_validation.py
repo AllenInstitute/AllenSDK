@@ -1,4 +1,5 @@
 import numpy as np
+import warnings
 
 
 def validate_epoch_durations(table, start_key="Start", end_key="End"):

@@ -11,6 +11,7 @@ from allensdk.deprecated import legacy
 from allensdk.brain_observatory.behavior.trials_processing import calculate_reward_rate
 from allensdk.brain_observatory.behavior.dprime import get_rolling_dprime, get_trial_count_corrected_false_alarm_rate, get_trial_count_corrected_hit_rate
 from allensdk.brain_observatory.behavior.dprime import get_hit_rate, get_false_alarm_rate
+from allensdk.brain_observatory.behavior.image_api import ImageApi
 
 
 class BehaviorOphysSession(LazyPropertyMixin):
@@ -19,7 +20,7 @@ class BehaviorOphysSession(LazyPropertyMixin):
     Attributes:
         ophys_experiment_id : int (LazyProperty)
             Unique identifier for this experimental session
-        max_projection : SimpleITK.Image (LazyProperty)
+        max_projection : allensdk.brain_observatory.behavior.image_api.Image (LazyProperty)
             2D max projection image
         stimulus_timestamps : numpy.ndarray (LazyProperty)
             Timestamps associated the stimulus presentations on the monitor 
@@ -53,7 +54,7 @@ class BehaviorOphysSession(LazyPropertyMixin):
             A dataframe containing behavioral trial start/stop times, and trial data
         corrected_fluorescence_traces : pandas.DataFrame (LazyProperty)
             The motion-corrected fluorescence traces organized into a dataframe; index is the cell roi ids
-        average_projection : SimpleITK.Image (LazyProperty)
+        average_projection : allensdk.brain_observatory.behavior.image_api.Image (LazyProperty)
             2D image of the microscope field of view, averaged across the experiment
         motion_correction : pandas.DataFrame LazyProperty
             A dataframe containing trace data used during motion correction computation
@@ -73,7 +74,7 @@ class BehaviorOphysSession(LazyPropertyMixin):
         self.api = api
 
         self.ophys_experiment_id = LazyProperty(self.api.get_ophys_experiment_id)
-        self.max_projection = LazyProperty(self.api.get_max_projection)
+        self.max_projection = LazyProperty(self.get_max_projection)
         self.stimulus_timestamps = LazyProperty(self.api.get_stimulus_timestamps)
         self.ophys_timestamps = LazyProperty(self.api.get_ophys_timestamps)
         self.metadata = LazyProperty(self.api.get_metadata)
@@ -88,9 +89,9 @@ class BehaviorOphysSession(LazyPropertyMixin):
         self.task_parameters = LazyProperty(self.api.get_task_parameters)
         self.trials = LazyProperty(self.api.get_trials)
         self.corrected_fluorescence_traces = LazyProperty(self.api.get_corrected_fluorescence_traces)
-        self.average_projection = LazyProperty(self.api.get_average_projection)
+        self.average_projection = LazyProperty(self.get_average_projection)
         self.motion_correction = LazyProperty(self.api.get_motion_correction)
-        self.segmentation_mask_image = LazyProperty(self.api.get_segmentation_mask_image)
+        self.segmentation_mask_image = LazyProperty(self.get_segmentation_mask_image)
 
     @legacy('Consider using "get_dff_timeseries" instead.')
     def get_dff_traces(self, cell_specimen_ids=None):
@@ -118,6 +119,49 @@ class BehaviorOphysSession(LazyPropertyMixin):
         if np.isnan(cell_specimen_ids.astype(float)).sum() == len(self.cell_specimen_table):
             raise ValueError(f'cell_specimen_id values not assigned for {self.ophys_experiment_id}')
         return cell_specimen_ids
+
+    def deserialize_image(self, sitk_image):
+        '''
+        Convert SimpleITK image returned by the api to an Image class:
+
+        Args:
+            sitk_image (SimpleITK image): image object returned by the api
+
+        Returns
+            img (allensdk.brain_observatory.behavior.image_api.Image)
+        '''
+        img = ImageApi.deserialize(sitk_image)
+        return img
+
+    def get_max_projection(self):
+        """ Returns an image whose values are the maximum obtained values at each pixel of the ophys movie over time.
+
+        Returns
+        ----------
+        allensdk.brain_observatory.behavior.image_api.Image:
+            array-like interface to max projection image data and metadata
+        """
+        return self.deserialize_image(self.api.get_max_projection())
+
+    def get_average_projection(self):
+        """ Returns an image whose values are the average obtained values at each pixel of the ophys movie over time.
+
+        Returns
+        ----------
+        allensdk.brain_observatory.behavior.image_api.Image:
+            array-like interface to max projection image data and metadata
+        """
+        return self.deserialize_image(self.api.get_average_projection())
+
+    def get_segmentation_mask_image(self):
+        """ Returns an image with a pixel value of zero if the pixel is not included in any ROI, and nonzero if included in a segmented ROI.
+
+        Returns
+        ----------
+        allensdk.brain_observatory.behavior.image_api.Image:
+            array-like interface to max projection image data and metadata
+        """
+        return self.deserialize_image(self.api.get_segmentation_mask_image())
 
     def get_reward_rate(self):
         response_latency_list = []
