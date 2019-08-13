@@ -10,6 +10,7 @@ from allensdk.brain_observatory.ecephys.ecephys_project_api import EcephysProjec
 from allensdk.brain_observatory.ecephys.ecephys_session_api import EcephysNwbSessionApi
 from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
 from allensdk.brain_observatory.ecephys.file_promise import FilePromise, read_nwb, write_from_stream
+from allensdk.brain_observatory.ecephys import get_unit_filter_value
 
 
 csv_io = {
@@ -47,6 +48,7 @@ class EcephysProjectCache(Cache):
         super(EcephysProjectCache, self).__init__(**kwargs)
         self.fetch_api = fetch_api
 
+
     def get_sessions(self):
         path = self.get_cache_path(None, self.SESSIONS_KEY)
         def reader(path):
@@ -64,7 +66,7 @@ class EcephysProjectCache(Cache):
         path = self.get_cache_path(None, self.CHANNELS_KEY)
         return call_caching(self.fetch_api.get_channels, path, strategy='lazy', **csv_io)
 
-    def get_units(self, annotate=False):
+    def get_units(self, annotate=False, **kwargs):
         """ Reports a table consisting of all sorted units across the entire extracellular electrophysiology project.
 
         Parameters
@@ -80,6 +82,11 @@ class EcephysProjectCache(Cache):
         """
 
         path = self.get_cache_path(None, self.UNITS_KEY)
+        get_units = self.fetch_api.get_units(
+            amplitude_cutoff_maximum=None, # pull down all the units to csv and filter on the way out
+            presence_ratio_minimum=None, 
+            isi_violations_maximum=None
+        )
         units = call_caching(self.fetch_api.get_units, path, strategy='lazy', **csv_io)
 
         if annotate:
@@ -91,6 +98,12 @@ class EcephysProjectCache(Cache):
             units = pd.merge(units, probes, left_on='ecephys_probe_id', right_index=True, suffixes=['_unit', '_probe'])
             units = pd.merge(units, sessions, left_on='ecephys_session_id', right_index=True, suffixes=['_unit', '_session'])
 
+        units =units[
+            (units["amplitude_cutoff"] <= get_unit_filter_value("amplitude_cutoff_maximum", **kwargs))
+            & (units["presence_ratio"] >= get_unit_filter_value("presence_ratio_minimum", **kwargs))
+            & (units["isi_violations"] <= get_unit_filter_value("isi_violations_maximum", **kwargs))
+        ]
+        
         return units
 
 
