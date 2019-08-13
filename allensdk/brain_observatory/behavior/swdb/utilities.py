@@ -214,8 +214,8 @@ def create_multi_session_mean_df(cache, experiment_ids, conditions=['cell_specim
         Creates a mean response dataframe by combining multiple sessions. 
         
         manifest, the cache manifest
-        Sessions, is a list of session objects to merge
-        conditions is the set of conditions to send to get_mean_df() to merge. The first entry should be 'cell_specimen_id'
+        experiment_ids, is a list of experiment_ids for sessions to merge
+        conditions is the set of conditions to send to get_mean_df() to groupby. The first entry should be 'cell_specimen_id'
         flashes, if TRUE, merges the flash_response_df, otherwise merges the trial_response_df
 
         Returns a dataframe with index given by the session experiment ids. This allows for easy analysis like:
