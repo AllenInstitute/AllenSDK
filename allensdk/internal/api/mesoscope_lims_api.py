@@ -27,16 +27,17 @@ def get_all_mesoscope_data():
              "os.storage_directory as session_folder, oe.storage_directory as experiment_folder, "
              "sp.name as specimen, "
              "os.date_of_acquisition as date, "
-             "oe.workflow_state as exp_workflow_state, "
-             "os.workflow_state as session_workflow_state, " 
+             "oe.workflow_state as exp_wfl_state, "
+             "os.workflow_state as session_wfl_state, " 
              "os.stimulus_name as stimulus_name, "
-             "users.login as operator "
+             "users.login as operator, "
+             "p.code as project "
              "from ophys_experiments oe "
              "join ophys_sessions os on os.id = oe.ophys_session_id "
              "join specimens sp on sp.id = os.specimen_id "
              "join projects p on p.id = os.project_id "
              "join users on users.id = os.operator_id "
-             "where p.code in ('MesoscopeDevelopment', 'VisualBehaviorMultiscope') and oe.workflow_state = 'qc' and os.workflow_state ='uploaded' "
+             "where p.code in ('MesoscopeDevelopment', 'VisualBehaviorMultiscope')"
              "order by date")
     return pd.read_sql(query, db.get_connection())
 
