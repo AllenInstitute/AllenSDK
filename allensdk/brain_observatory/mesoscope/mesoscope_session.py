@@ -74,6 +74,11 @@ if __name__ == "__main__":
     session = MesoscopeSession.from_lims(754606824)
     pd.options.display.width = 0
     planes = session.get_planes()
+    print(planes)
+    print(session.session_df)
+    plane = planes[planes.plane_id == 807310592].plane.values[0]
+    print(plane.licks)
+
 
 
     

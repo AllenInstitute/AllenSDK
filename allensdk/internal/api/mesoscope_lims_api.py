@@ -298,19 +298,28 @@ class MesoscopePlaneLimsApi(BehaviorOphysLimsApi):
 
         sync_file = self.get_sync_file()
         sync_dataset = SyncDataset(sync_file)
-
-        wrong_labels = ['vsync_2p', '', 'stim_vsync', '', 'photodiode', 'acq_trigger', '', '', 'cam1', 'cam2', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 'lick_sensor']
-        correct_labels = ['2p_vsync', '', 'stim_vsync', '', 'stim_photodiode', 'acq_trigger', '', '', 'cam1_exposure', 'cam2_exposure', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 'lick_sensor']
-
         line_labels = sync_dataset.line_labels
 
-        for line in line_labels:
-            if line in wrong_labels :
-                index = sync_dataset.line_labels.index(line)
-                sync_dataset.line_labels.remove(line)
-                sync_dataset.line_labels.insert(index, correct_labels[index])
+        wrong_labels = ['vsync_2p', 'stim_vsync', 'photodiode', 'acq_trigger', 'cam1', 'cam2',]
+        correct_labels = ['2p_vsync', '', 'stim_vsync', '', 'stim_photodiode', 'acq_trigger', '', '', 'cam1_exposure', 'cam2_exposure', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 'lick_sensor']
 
 
+        if line_labels != correct_labels :
+            if all([line_labels[i] == '' for i in range(len(line_labels))]) == True :
+                line_labels = correct_labels
+            else:
+                i = 0
+                while i < len(line_labels):
+                    line = line_labels[i]
+                    print(f'current line : {line}')
+                    if line in wrong_labels :
+                        print(f'line index: {i}')
+                        line_labels.pop(i)
+                        line_labels.insert(i, correct_labels[i])
+                        print(f'this line is replaced with {correct_labels[i]}')
+                    i +=1
+
+        sync_dataset.line_labels = line_labels
         meta_data = sync_dataset.meta_data
         sample_freq = meta_data['ni_daq']['counter_output_freq']
 
