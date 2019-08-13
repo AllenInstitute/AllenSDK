@@ -490,12 +490,14 @@ if __name__ == '__main__':
     # save_dir = r'\\allen\programs\braintv\workgroups\nc-ophys\visual_behavior\SWDB_2019\summary_figures_final'
 
     save_dir = '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/summary_figures_final'
+    print('loading session')
     session = cache.get_session(experiment_id)
-    
+    print('plotting experiment summary')
     plot_experiment_summary_figure(session, save_dir=save_dir)
-
+    print('plotting example traces')
     for xmin_seconds in np.arange(500, 700, 18):
         plot_example_traces_and_behavior(session, xmin_seconds=xmin_seconds, length_mins=.3, save_dir=save_dir)
-
+    print('plotting behavior events')
     for xmin in np.arange(0, 1200, 30):
         plot_behavior_events_trace(session, xmin=xmin, length=0.5, ax=None, save_dir=save_dir)
+    print('done')
