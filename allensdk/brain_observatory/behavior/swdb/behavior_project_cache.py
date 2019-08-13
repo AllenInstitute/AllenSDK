@@ -330,6 +330,14 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
         rewards = rewards.reset_index()
         return rewards
 
+    def get_dff_traces(self):
+        # We want to drop the 'cell_roi_id' column from the dff traces dataframe
+        # This is just for Friday Harbor, not for eventual inclusion in the LIMS api.
+        dff_traces = super(ExtendedNwbApi, self).get_dff_traces()
+        dff_traces = dff_traces.drop(columns=['cell_roi_id'])
+        return dff_traces
+
+
 class ExtendedBehaviorSession(BehaviorOphysSession):
 
     def __init__(self, api):

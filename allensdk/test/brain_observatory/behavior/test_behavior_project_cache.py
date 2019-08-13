@@ -97,3 +97,6 @@ def test_licks_correct_colname():
 def test_rewards_correct_colname():
     assert (session.rewards.columns == ['timestamps', 'volume', 'autorewarded']).all()
 
+def test_dff_traces_correct_colname():
+    # This is a Friday-harbor specific change
+    assert 'cell_roi_id' not in session.dff_traces.columns
