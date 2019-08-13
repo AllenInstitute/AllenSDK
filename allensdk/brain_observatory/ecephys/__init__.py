@@ -13,7 +13,7 @@ UNIT_FILTER_DEFAULTS = {
     },
     "isi_violations_maximum": {
         "value": 0.5,
-        "misssing": np.inf
+        "missing": np.inf
     }
 }
 
