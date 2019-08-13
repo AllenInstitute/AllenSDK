@@ -142,9 +142,9 @@ def annotate_mean_df_with_pref_stim(mean_df):
     # Test to ensure preferred stimulus is unique for each cell
     for cell in mdf.reset_index()['cell_specimen_id'].unique():
         if image_name == 'image_name':
-             assert len(rdf.reset_index().set_index('cell_specimen_id').loc[cell].query('pref_stim').image_name.unique()) == 1  
+             assert len(mdf.reset_index().set_index('cell_specimen_id').loc[cell].query('pref_stim').image_name.unique()) == 1  
         else: 
-            assert len(rdf.reset_index().set_index('cell_specimen_id').loc[cell].query('pref_stim').change_image_name.unique()) == 1
+            assert len(mdf.reset_index().set_index('cell_specimen_id').loc[cell].query('pref_stim').change_image_name.unique()) == 1
     return mdf
 
 
