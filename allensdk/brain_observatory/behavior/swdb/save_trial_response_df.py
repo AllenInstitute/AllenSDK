@@ -47,7 +47,7 @@ def add_p_vals_tr(tr,response_window = [4,4.5]):
     # Test to ensure p values are bounded between 0 and 1, and dont include NaNs
     assert np.all(tr['p_value'].values <= 1)
     assert np.all(tr['p_value'].values >= 0)
-    assert np.all(~np.isnan(tr['p_value'].values)    
+    assert np.all(~np.isnan(tr['p_value'].values)) 
 
     return tr
 
@@ -109,7 +109,7 @@ def annotate_trial_response_df_with_pref_stim(trial_response_df):
         rdf.at[(cell,pref_image),'pref_stim'] = True
 
     # Test to ensure preferred stimulus is unique for each cell
-    for cell in rdf.reset_index()['cell_specimen_id'].unique()   
+    for cell in rdf.reset_index()['cell_specimen_id'].unique(): 
         assert len(rdf.reset_index().set_index('cell_specimen_id').loc[cell].query('pref_stim').change_image_name.unique()) == 1
 
     # Reset index to be cell/trial pairs
