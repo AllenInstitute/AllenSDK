@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import pandas as pd
 import pytest
 from allensdk.brain_observatory.behavior.swdb import behavior_project_cache as bpc
 
@@ -74,3 +75,9 @@ def test_get_container_sessions():
     session = container_sessions['OPHYS_1_images_A']
     assert isinstance(session, bpc.ExtendedBehaviorSession)
     np.testing.assert_almost_equal(session.dff_traces.loc[817103993]['dff'][0], 0.3538657529565)
+
+def test_cache_from_json():
+    json_path = os.path.join(cache_test_base, 'behavior_ophys_cache.json')
+    cache = bpc.BehaviorProjectCache.from_json(json_path)
+    assert isinstance(cache, bpc.BehaviorProjectCache)
+    assert isinstance(cache.manifest, pd.DataFrame)
