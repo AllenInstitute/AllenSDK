@@ -225,7 +225,7 @@ class EcephysProjectCache(Cache):
             self.NATURAL_SCENE_DIR_KEY, "natural_scene_templates", parent_key="BASEDIR", typename="dir"
         )
 
-        manifest_build.add_path(
+        manifest_builder.add_path(
             self.NATURAL_SCENE_KEY, "natural_scene_%d.tiff", parent_key=self.NATURAL_SCENE_DIR_KEY, typename="file"
         )
 
