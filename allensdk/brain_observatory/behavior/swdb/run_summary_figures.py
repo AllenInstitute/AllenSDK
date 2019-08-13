@@ -6,7 +6,8 @@ import behavior_project_cache as bpc
 
 # python_file = r"/allen/programs/braintv/workgroups/nc-ophys/nick.ponvert/src/AllenSDK/allensdk/brain_observatory/behavior/swdb/summary_figures.py"
 
-python_file = r"/home/marinag/AllenSDK/allensdk/brain_observatory/behavior/swdb/summary_figures.py"
+#  python_file = r"/home/marinag/AllenSDK/allensdk/brain_observatory/behavior/swdb/summary_figures.py"
+python_file = r"/home/nick.ponvert/src/AllenSDK/allensdk/brain_observatory/behavior/swdb/summary_figures.py"
 
 jobdir = '/allen/programs/braintv/workgroups/nc-ophys/nick.ponvert/cluster_jobs/visb_swdb_summary_figures'
 
@@ -30,9 +31,10 @@ experiment_ids = cache.manifest['ophys_experiment_id'].values
 for experiment_id in experiment_ids:
     PythonJob(
         python_file,
-        python_executable = '/home/marinag/anaconda2/envs/visual_behavior_sdk/bin/python',
+        python_executable = '/home/nick.ponvert/anaconda3/envs/allen/bin/python',
         python_args = experiment_id,
         conda_env = None,
         jobname = 'trial_response_df_{}'.format(experiment_id),
         **job_settings
     ).run(dryrun=False)
+#  python_executable = '/home/marinag/anaconda2/envs/visual_behavior_sdk/bin/python',
