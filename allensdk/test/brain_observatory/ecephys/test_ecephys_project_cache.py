@@ -23,7 +23,10 @@ def sessions():
 def units():
     return pd.DataFrame({
         'peak_channel_id': [2, 1],
-        'snr': [1.5, 4.9]
+        'snr': [1.5, 4.9],
+        "amplitude_cutoff": [0.05, 0.2],
+        "presence_ratio": [10, 20],
+        "isi_violations": [0.3, 0.4]
     }, index=pd.Series(name='id', data=[1, 2]))
 
 
@@ -107,11 +110,12 @@ def test_get_sessions(tmpdir_cache, sessions):
 
 
 def test_get_units(tmpdir_cache, units):
+    units = units[units["amplitude_cutoff"] <= 0.1]
     lazy_cache_test(tmpdir_cache, 'get_units', "get_units", units)
 
 
 def test_get_units_annotated(tmpdir_cache, units, channels, probes, sessions):
-    units = tmpdir_cache.get_units(annotate=True)
+    units = tmpdir_cache.get_units(annotate=True, amplitude_cutoff_maximum=10)
     assert units.loc[2, "stimulus_name"] == "stimulus_set_two"
 
 

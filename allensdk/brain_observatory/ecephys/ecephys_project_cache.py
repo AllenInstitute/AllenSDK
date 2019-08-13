@@ -47,8 +47,6 @@ class EcephysProjectCache(Cache):
 
         super(EcephysProjectCache, self).__init__(**kwargs)
         self.fetch_api = fetch_api
-        
-        self.unit_filter_defaults = unit_filter_defaults()
 
 
     def get_sessions(self):

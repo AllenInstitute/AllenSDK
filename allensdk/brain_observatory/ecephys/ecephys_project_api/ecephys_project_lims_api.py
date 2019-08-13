@@ -9,6 +9,7 @@ from .http_engine import HttpEngine
 from .utilities import postgres_macros, build_and_execute
 
 from allensdk.internal.api import PostgresQueryMixin
+from allensdk.brain_observatory.ecephys import get_unit_filter_value
 
 
 class EcephysProjectLimsApi(EcephysProjectApi):
@@ -96,9 +97,9 @@ class EcephysProjectLimsApi(EcephysProjectApi):
                 {{pm.optional_contains('ec.id', channel_ids) -}}
                 {{pm.optional_contains('ep.id', probe_ids) -}}
                 {{pm.optional_contains('es.id', session_ids) -}}
-                {{pm.optional_le('eun.amplitude_cutoff', amplitude_cutoff_maximum) -}}
-                {{pm.optional_ge('eun.presence_ratio', presence_ratio_minimum) -}}
-                {{pm.optional_le('eun.isi_violations', isi_violations_maximum) -}}
+                {{pm.optional_le('eu.amplitude_cutoff', amplitude_cutoff_maximum) -}}
+                {{pm.optional_ge('eu.presence_ratio', presence_ratio_minimum) -}}
+                {{pm.optional_le('eu.isi_violations', isi_violations_maximum) -}}
             """,
             base=postgres_macros(),
             engine=self.postgres_engine.select,
