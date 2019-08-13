@@ -3,6 +3,8 @@ from pathlib import Path
 import ast
 
 import pandas as pd
+import SimpleITK as sitk
+import h5py
 
 from allensdk.api.cache import Cache
 
@@ -134,7 +136,7 @@ class EcephysProjectCache(Cache):
             with h5py.File(path, "r") as fil:
                 return fil["data"][:]
 
-        call_caching(
+        return call_caching(
             self.fetch_api.get_natural_movie_template,
             path,
             number=number,
@@ -149,7 +151,7 @@ class EcephysProjectCache(Cache):
         def reader(path):
             return sitk.GetArrayFromImage(sitk.ReadImage(path))
 
-        call_caching(
+        return call_caching(
             self.fetch_api.get_natural_scene_template, 
             path, 
             number=number, 
