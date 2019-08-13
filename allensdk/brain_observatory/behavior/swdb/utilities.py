@@ -254,7 +254,15 @@ def parse_stage_for_passive(stage):
 def parse_stage_for_image_set(stage):
     return stage[15]
 
-
+def get_active_cell_indices(dff_traces):
+    snr_values = []
+    for i, trace in enumerate(dff_traces):
+        mean = np.mean(trace, axis=0)
+        std = np.std(trace, axis=0)
+        snr = mean / std
+        snr_values.append(snr)
+    active_cell_indices = np.argsort(snr_values)[-10:]
+    return active_cell_indices
 
 
 
