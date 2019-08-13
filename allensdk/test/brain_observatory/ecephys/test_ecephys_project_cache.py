@@ -4,6 +4,9 @@ import collections
 import pytest
 import pandas as pd
 import mock
+import numpy as np
+import SimpleITK as sitk
+import h5py
 
 import allensdk.brain_observatory.ecephys.ecephys_project_cache as epc
 
@@ -81,6 +84,19 @@ def mock_api(shared_tmpdir, sessions, units, channels, probes):
                 f.write(f'{session_id}')
             return open(path, 'rb')
 
+        def get_natural_scene_template(self, number):
+            path = os.path.join(shared_tmpdir, "tmp.tiff")
+            img = sitk.GetImageFromArray(np.eye(100, dtype=np.uint8))
+            sitk.WriteImage(img, path)
+            return open(path, "rb")
+
+        def get_natural_movie_template(self, number):
+            path = os.path.join(shared_tmpdir, "tmp.png")
+            with h5py.File(path, "w") as f:
+                f.create_dataset("data", data=np.eye(100))
+            return open(path, "rb")
+
+
     return MockApi
 
 
@@ -136,3 +152,23 @@ def test_get_session_data(shared_tmpdir, tmpdir_cache):
 
     assert 1 == tmpdir_cache.fetch_api.accesses['get_session_data']
     assert os.path.join(shared_tmpdir, f"session_{sid}", f"session_{sid}.nwb") == data_one.api.path
+
+
+def test_get_natural_scene_template(shared_tmpdir, tmpdir_cache):
+    num = 10
+
+    data_one = tmpdir_cache.get_natural_scene_template(num)
+    data_two = tmpdir_cache.get_natural_scene_template(num)
+
+    assert 1 == tmpdir_cache.fetch_api.accesses["get_natural_scene_template"]
+    assert np.allclose(np.eye(100), data_one)
+
+
+def test_get_natural_movie_template(shared_tmpdir, tmpdir_cache):
+    num = 10
+
+    data_one = tmpdir_cache.get_natural_movie_template(num)
+    data_two = tmpdir_cache.get_natural_movie_template(num)
+
+    assert 1 == tmpdir_cache.fetch_api.accesses["get_natural_movie_template"]
+    assert np.allclose(np.eye(100), data_one)

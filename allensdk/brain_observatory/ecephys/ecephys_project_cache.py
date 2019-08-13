@@ -3,6 +3,8 @@ from pathlib import Path
 import ast
 
 import pandas as pd
+import SimpleITK as sitk
+import h5py
 
 from allensdk.api.cache import Cache
 
@@ -34,9 +36,16 @@ class EcephysProjectCache(Cache):
     PROBES_KEY = 'probes'
     CHANNELS_KEY = 'channels'
     UNITS_KEY = 'units'
+
     SESSION_DIR_KEY = 'session_data'
     SESSION_NWB_KEY = 'session_nwb'
     PROBE_LFP_NWB_KEY = "probe_lfp_nwb"
+
+    NATURAL_MOVIE_DIR_KEY = "movie_dir"
+    NATURAL_MOVIE_KEY = "natural_movie"
+
+    NATURAL_SCENE_DIR_KEY = "natural_scene_dir"
+    NATURAL_SCENE_KEY = "natural_scene"
 
     MANIFEST_VERSION = '0.2.0'
 
@@ -133,6 +142,37 @@ class EcephysProjectCache(Cache):
         session_api = EcephysNwbSessionApi(path=path, probe_lfp_paths=probe_promises)
         return EcephysSession(api=session_api)
 
+    def get_natural_movie_template(self, number):
+        path = self.get_cache_path(None, self.NATURAL_MOVIE_KEY, number)
+
+        def reader(path):
+            with h5py.File(path, "r") as fil:
+                return fil["data"][:]
+
+        return call_caching(
+            self.fetch_api.get_natural_movie_template,
+            path,
+            number=number,
+            strategy="lazy",
+            writer=write_from_stream,
+            reader=reader
+        )
+
+    def get_natural_scene_template(self, number):
+        path = self.get_cache_path(None, self.NATURAL_SCENE_KEY, number)
+
+        def reader(path):
+            return sitk.GetArrayFromImage(sitk.ReadImage(path))
+
+        return call_caching(
+            self.fetch_api.get_natural_scene_template, 
+            path, 
+            number=number, 
+            strategy="lazy",
+            writer=write_from_stream,
+            reader=reader
+        )
+
     def get_all_stimulus_sets(self, **session_kwargs):
         return self._get_all_values("session_type", self.get_sessions, **session_kwargs)
 
@@ -151,13 +191,11 @@ class EcephysProjectCache(Cache):
     def get_all_genders(self):
         return self._get_all_values("gender", self.get_sessions, **session_kwargs)
 
-
     def _get_all_values(self, key, method=None, **method_kwargs):
         if method is None:
             method = self.get_sessions
         data = method(**method_kwargs)
         return data[key].unique().tolist()
-
 
     def add_manifest_paths(self, manifest_builder):
         manifest_builder = super(EcephysProjectCache, self).add_manifest_paths(manifest_builder)
@@ -188,6 +226,22 @@ class EcephysProjectCache(Cache):
 
         manifest_builder.add_path(
             self.PROBE_LFP_NWB_KEY, 'probe_%d_lfp.nwb', parent_key=self.SESSION_DIR_KEY, typename='file'
+        )
+
+        manifest_builder.add_path(
+            self.NATURAL_MOVIE_DIR_KEY, "natural_movie_templates", parent_key="BASEDIR", typename="dir"
+        )
+
+        manifest_builder.add_path(
+            self.NATURAL_MOVIE_KEY, "natural_movie_%d.h5", parent_key=self.NATURAL_MOVIE_DIR_KEY, typename="file"
+        )
+
+        manifest_builder.add_path(
+            self.NATURAL_SCENE_DIR_KEY, "natural_scene_templates", parent_key="BASEDIR", typename="dir"
+        )
+
+        manifest_builder.add_path(
+            self.NATURAL_SCENE_KEY, "natural_scene_%d.tiff", parent_key=self.NATURAL_SCENE_DIR_KEY, typename="file"
         )
 
         return manifest_builder

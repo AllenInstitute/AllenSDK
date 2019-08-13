@@ -22,3 +22,9 @@ class EcephysProjectApi:
 
     def get_probe_lfp_data(self, probe_id):
         raise NotImplementedError()
+
+    def get_natural_movie_template(self, number):
+        raise NotImplementedError()
+
+    def get_natural_scene_template(self, number):
+        raise NotImplementedError()
