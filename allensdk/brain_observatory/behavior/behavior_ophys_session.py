@@ -10,6 +10,7 @@ from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_a
 from allensdk.deprecated import legacy
 from allensdk.brain_observatory.behavior.trials_processing import calculate_reward_rate
 from allensdk.brain_observatory.behavior.dprime import get_rolling_dprime, get_trial_count_corrected_false_alarm_rate, get_trial_count_corrected_hit_rate
+from allensdk.brain_observatory.behavior.dprime import get_hit_rate, get_false_alarm_rate
 from allensdk.brain_observatory.behavior.image_api import ImageApi
 
 
@@ -184,11 +185,19 @@ class BehaviorOphysSession(LazyPropertyMixin):
         # Reward rate:
         performance_metrics_df['reward_rate'] = pd.Series(self.get_reward_rate(), index=self.trials.index)
 
-        # Hit rate:
+        # Hit rate raw:
+        hit_rate_raw = get_hit_rate(hit=self.trials.hit, miss=self.trials.miss, aborted=self.trials.aborted)
+        performance_metrics_df['hit_rate_raw'] = pd.Series(hit_rate_raw, index=not_aborted_index)
+        
+        # Hit rate with trial count correction:
         hit_rate = get_trial_count_corrected_hit_rate(hit=self.trials.hit, miss=self.trials.miss, aborted=self.trials.aborted)
         performance_metrics_df['hit_rate'] = pd.Series(hit_rate, index=not_aborted_index)
 
-        # False-alarm rate:
+        # False-alarm rate raw:
+        false_alarm_rate_raw = get_false_alarm_rate(false_alarm=self.trials.false_alarm, correct_reject=self.trials.correct_reject, aborted=self.trials.aborted)
+        performance_metrics_df['false_alarm_rate_raw'] = pd.Series(false_alarm_rate_raw, index=not_aborted_index)
+        
+        # False-alarm rate with trial count correction:
         false_alarm_rate = get_trial_count_corrected_false_alarm_rate(false_alarm=self.trials.false_alarm, correct_reject=self.trials.correct_reject, aborted=self.trials.aborted)
         performance_metrics_df['false_alarm_rate'] = pd.Series(false_alarm_rate, index=not_aborted_index)
 
@@ -217,8 +226,10 @@ class BehaviorOphysSession(LazyPropertyMixin):
         performance_metrics['maximum_reward_rate'] = np.nanmax(rolling_performance_df['reward_rate'].values)
         performance_metrics['engaged_trial_count'] = (engaged_trial_mask).sum()
         performance_metrics['mean_hit_rate'] = rolling_performance_df['hit_rate'].mean()
+        performance_metrics['mean_hit_rate_uncorrected'] = rolling_performance_df['hit_rate_raw'].mean()
         performance_metrics['mean_hit_rate_engaged'] = rolling_performance_df['hit_rate'][engaged_trial_mask].mean()
         performance_metrics['mean_false_alarm_rate'] = rolling_performance_df['false_alarm_rate'].mean()
+        performance_metrics['mean_false_alarm_rate_uncorrected'] = rolling_performance_df['false_alarm_rate_raw'].mean()
         performance_metrics['mean_false_alarm_rate_engaged'] = rolling_performance_df['false_alarm_rate'][engaged_trial_mask].mean()
         performance_metrics['mean_dprime'] = rolling_performance_df['rolling_dprime'].mean()
         performance_metrics['mean_dprime_engaged'] = rolling_performance_df['rolling_dprime'][engaged_trial_mask].mean()
