@@ -306,10 +306,10 @@ class MesoscopePlaneLimsApi(BehaviorOphysLimsApi):
 
         if line_labels != correct_labels :
             if all([line_labels[i] == '' for i in range(len(line_labels))]) == True :
-                logger.info('Line labels are empty, replacing with defaults')
+                logger.warning('Line labels are empty, replacing with defaults')
                 line_labels = correct_labels
             else:
-                logger.info('Some line labels are incorrect, renaming using defaults')
+                logger.warning('Some line labels are incorrect, renaming using defaults')
                 i = 0
                 while i < len(line_labels):
                     line = line_labels[i]
