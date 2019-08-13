@@ -27,7 +27,7 @@ experiment_ids = cache.manifest['ophys_experiment_id'].values
 for experiment_id in experiment_ids:
     PythonJob(
         python_file,
-        python_executable = '/home/nick.ponvert/anaconda3/envs/allen/bin/python',
+        python_executable = '/home/marinag/anaconda2/envs/visual_behavior_sdk/bin/python',
         python_args = experiment_id,
         conda_env = None,
         jobname = 'trial_response_df_{}'.format(experiment_id),

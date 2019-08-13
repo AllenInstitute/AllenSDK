@@ -472,13 +472,15 @@ if __name__ == '__main__':
     cache_json = {
         'manifest_path': '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/visual_behavior_data_manifest.csv',
         'nwb_base_dir': '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/nwb_files',
-        'analysis_files_base_dir': '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/extra_files_final'
+        'analysis_files_base_dir': '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/extra_files_final',
+        'analysis_files_metadata_path': '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/analysis_files_metadata.json',
         }
 
     # cache_json = {
     #     'manifest_path': r'\\allen\programs\braintv\workgroups\nc-ophys\visual_behavior\SWDB_2019\visual_behavior_data_manifest.csv',
     #     'nwb_base_dir': r'\\allen\programs\braintv\workgroups\nc-ophys\visual_behavior\SWDB_2019\nwb_files',
-    #     'analysis_files_base_dir': r'\\allen\programs\braintv\workgroups\nc-ophys\visual_behavior\SWDB_2019\extra_files_final'
+    #     'analysis_files_base_dir': r'\\allen\programs\braintv\workgroups\nc-ophys\visual_behavior\SWDB_2019\extra_files_final',
+    #     'analysis_files_metadata_path':r'\\allen\programs\braintv\workgroups\nc-ophys\visual_behavior\SWDB_2019\analysis_files_metadata.json',
     # }
 
     from allensdk.brain_observatory.behavior.swdb import behavior_project_cache as bpc
@@ -486,10 +488,10 @@ if __name__ == '__main__':
     cache = bpc.BehaviorProjectCache(cache_json)
     manifest = cache.manifest
 
-    # experiment_id = manifest.ophys_experiment_id.values[10]
+    # experiment_id = manifest.ophys_experiment_id.values[16]
     # save_dir = r'\\allen\programs\braintv\workgroups\nc-ophys\visual_behavior\SWDB_2019\summary_figures_final'
 
-    save_dir = '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/summary_figures_final'
+    save_dir = r'/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/summary_figures_final'
     print('loading session')
     session = cache.get_session(experiment_id)
     print('plotting experiment summary')
