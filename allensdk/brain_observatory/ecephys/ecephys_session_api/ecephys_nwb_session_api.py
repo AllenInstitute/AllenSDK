@@ -11,6 +11,7 @@ from .ecephys_session_api import EcephysSessionApi
 from allensdk.brain_observatory.ecephys.file_promise import FilePromise
 from allensdk.brain_observatory.nwb.nwb_api import NwbApi
 import allensdk.brain_observatory.ecephys.nwb
+from allensdk.brain_observatory.ecephys import get_unit_filter_value
 
 
 class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
@@ -18,9 +19,9 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
     def __init__(self, path, probe_lfp_paths: Optional[Dict[int, FilePromise]] = None, **kwargs):
 
         self.filter_by_validity = kwargs.pop("filter_by_validity", True)
-        self.amplitude_cutoff_maximum = kwargs.pop("amplitude_cutoff_maximum", 0.1)
-        self.presence_ratio_minimum = kwargs.pop("presence_ratio_minimum", 0.95)
-        self.isi_violations_maximum = kwargs.pop("isi_violations_maximum", 0.5)
+        self.amplitude_cutoff_maximum = get_unit_filter_value("amplitude_cutoff_maximum", **kwargs)
+        self.presence_ratio_minimum = get_unit_filter_value("presence_ratio_minimum", **kwargs)
+        self.isi_violations_maximum = get_unit_filter_value("isi_violations_maximum", **kwargs)
 
         super(EcephysNwbSessionApi, self).__init__(path, **kwargs)
         self.probe_lfp_paths = probe_lfp_paths
@@ -167,13 +168,8 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
             ]
             units.drop(columns=["quality"], inplace=True)
 
-        if self.amplitude_cutoff_maximum is not None:
-            units = units[units["amplitude_cutoff"] <= self.amplitude_cutoff_maximum]
-
-        if self.presence_ratio_minimum is not None:
-            units = units[units["presence_ratio"] >= self.presence_ratio_minimum]
-        
-        if self.isi_violations_maximum is not None:
-            units = units[units["isi_violations"] <= self.isi_violations_maximum]
+        units = units[units["amplitude_cutoff"] <= self.amplitude_cutoff_maximum]
+        units = units[units["presence_ratio"] >= self.presence_ratio_minimum]
+        units = units[units["isi_violations"] <= self.isi_violations_maximum]
 
         return units
