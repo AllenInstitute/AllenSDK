@@ -117,8 +117,6 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
         for change_time in trials[trials['change_time'].notna()]['change_time']:
             assert change_time in stimulus_presentations['start_time'].values
 
-        # Drop any trials at the end of the session for which we don't have stimulus_presentations
-
         # Reorder / drop some columns to make more sense to students
         trials = trials[[
             'initial_image_name',
@@ -150,9 +148,10 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
             initial_trials=10
         )
 
-        trials['response_binary'] = 0
-        trials['response_binary'] = [1 if hit == True else 0 for hit in trials.hit.values]
-        trials['response_binary'] = [1 if false_alarm == True else 0 for false_alarm in trials.false_alarm.values]
+        # Response_binary is just whether or not they responded - e.g. true for hit or FA. 
+        hit = trials['hit'].values
+        fa = trials['false_alarm'].values
+        trials['response_binary'] = np.logical_or(hit, fa)
 
         return trials
 
