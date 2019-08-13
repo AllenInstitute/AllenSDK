@@ -3,15 +3,14 @@ import numpy as np
 import pytest
 from allensdk.brain_observatory.behavior.swdb import behavior_project_cache as bpc
 
-cache_test_base = '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019'
+cache_test_base = '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/test_data'
 cache_paths = {
     'manifest_path': os.path.join(cache_test_base, 'visual_behavior_data_manifest.csv'),
     'nwb_base_dir': os.path.join(cache_test_base, 'nwb_files'),
-    'analysis_files_base_dir': os.path.join(cache_test_base, 'extra_files_final'),
+    'analysis_files_base_dir': os.path.join(cache_test_base, 'analysis_files'),
     'analysis_files_metadata_path': os.path.join(cache_test_base, 'analysis_files_metadata.json')
 }
 cache = bpc.BehaviorProjectCache(cache_paths)
-#  session = cache.get_session(846487947)
 session = cache.get_session(792815735)
 
 # Test trials extra columns
@@ -68,3 +67,10 @@ def test_session_image_loading():
 def test_no_invalid_rois():
     # We made the cache return sessions without the invalid rois
     assert session.cell_specimen_table['valid_roi'].all()
+
+def test_get_container_sessions():
+    container_id = cache.manifest['container_id'].unique()[0]
+    container_sessions = cache.get_container_sessions(container_id)
+    session = container_sessions['OPHYS_1_images_A']
+    assert isinstance(session, bpc.ExtendedBehaviorSession)
+    np.testing.assert_almost_equal(session.dff_traces.loc[817103993]['dff'][0], 0.3538657529565)

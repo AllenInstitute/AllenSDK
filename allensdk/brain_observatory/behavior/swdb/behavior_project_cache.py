@@ -13,7 +13,7 @@ csv_io = {
     'writer': lambda path, df: df.to_csv(path)
 }
 
-cache_json_example = {'manifest_path': '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/visual_behavior_data_manifest.csv',
+cache_paths_example = {'manifest_path': '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/visual_behavior_data_manifest.csv',
                       'nwb_base_dir': '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/nwb_files',
                       'analysis_files_base_dir': '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/analysis_files',
                       'analysis_files_metadata_path':'/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/analysis_files_metadata.json',
@@ -21,8 +21,42 @@ cache_json_example = {'manifest_path': '/allen/programs/braintv/workgroups/nc-op
 
 class BehaviorProjectCache(object):
 
-    def __init__(self, cache_json):
-        manifest = csv_io['reader'](cache_json['manifest_path'])
+    def __init__(self, cache_paths):
+        '''
+        A cache-level object for the behavior/ophys data. Provides access to the manifest of 
+        complete ophys/behavior containers, as well as pre-computed analysis files for each 
+        experiment.
+
+        Args:
+            cache_paths (dict): must provide the following keys:
+                manifest_path: Full path to the behavior project manifest CSV file
+                nwb_base_dir: Direcotry containing NWB files.
+                analysis_files_base_dir: Directory containing trial response, flash response,
+                                         and stimulus presentation extra columns files.
+                analysis_files_metadata_path: Full path to the JSON file providing metadata
+                                         relating to the creation of the analysis files.
+        
+        Attributes: 
+            manifest: (pd.DataFrame)
+                Table containing information about all ophys sessions from complete containers.
+            analysis_files_metadata (dict):
+                Metadata relating to the creation of the analysis files.
+            
+        Methods: 
+            get_session(ophys_experiment_id):
+                Returns an extended BehaviorOphysSession object, including trial_response_df and
+                flash_response_df
+
+            get_container_sessions(container_id):
+                Returns a dictionary with behavior stages as keys and the corresponding session
+                object from that container, that stage as the value.
+
+        Class Methods:
+            from_json(json_path):
+                Returns an instance constructed using cache_paths defined in a JSON file.
+
+        '''
+        manifest = csv_io['reader'](cache_paths['manifest_path'])
         self.manifest = manifest[[
             'ophys_experiment_id',
             'container_id',
@@ -35,11 +69,11 @@ class BehaviorProjectCache(object):
             'date_of_acquisition',
             'retake_number'
         ]]
-        self.nwb_base_dir = cache_json['nwb_base_dir']
-        self.analysis_files_base_dir = cache_json['analysis_files_base_dir']
+        self.nwb_base_dir = cache_paths['nwb_base_dir']
+        self.analysis_files_base_dir = cache_paths['analysis_files_base_dir']
 
-        if 'analysis_files_metadata_path' in cache_json:
-            self.analysis_files_metadata = self.get_analysis_files_metadata(cache_json['analysis_files_metadata_path'])
+        if 'analysis_files_metadata_path' in cache_paths:
+            self.analysis_files_metadata = self.get_analysis_files_metadata(cache_paths['analysis_files_metadata_path'])
         else:
             print('Warning! No metadata supplied for analysis files. Set analysis_files_metadata_path to point at the json file containing the metadata')
             self.analysis_files_metadata = None
@@ -50,35 +84,71 @@ class BehaviorProjectCache(object):
         return metadata
 
     def get_nwb_filepath(self, experiment_id):
-        return os.path.join(self.nwb_base_dir, 'behavior_ophys_session_{}.nwb'.format(experiment_id))
+        return os.path.join(
+            self.nwb_base_dir,
+            'behavior_ophys_session_{}.nwb'.format(experiment_id)
+        )
 
     def get_trial_response_df_path(self, experiment_id):
-        return os.path.join(self.analysis_files_base_dir, 'trial_response_df_{}.h5'.format(experiment_id))
+        return os.path.join(
+            self.analysis_files_base_dir,
+            'trial_response_df_{}.h5'.format(experiment_id)
+        )
 
     def get_flash_response_df_path(self, experiment_id):
-        return os.path.join(self.analysis_files_base_dir, 'flash_response_df_{}.h5'.format(experiment_id))
+        return os.path.join(
+            self.analysis_files_base_dir,
+            'flash_response_df_{}.h5'.format(experiment_id)
+        )
 
     def get_extended_stimulus_presentations_df(self, experiment_id):
-        return os.path.join(self.analysis_files_base_dir, 'extended_stimulus_presentations_df_{}.h5'.format(experiment_id))
+        return os.path.join(
+            self.analysis_files_base_dir,
+            'extended_stimulus_presentations_df_{}.h5'.format(experiment_id)
+        )
 
     def get_session(self, experiment_id):
+        '''
+        Return a BehaviorOphysSession object given an ophys_experiment_id.
+        '''
         nwb_path = self.get_nwb_filepath(experiment_id)
         trial_response_df_path = self.get_trial_response_df_path(experiment_id)
         flash_response_df_path = self.get_flash_response_df_path(experiment_id)
         extended_stim_df_path = self.get_extended_stimulus_presentations_df(experiment_id)
-        api = ExtendedNwbApi(nwb_path, trial_response_df_path, flash_response_df_path, extended_stim_df_path)
+        api = ExtendedNwbApi(
+            nwb_path,
+            trial_response_df_path,
+            flash_response_df_path,
+            extended_stim_df_path
+        )
         session = ExtendedBehaviorSession(api)
         return session 
 
     def get_container_sessions(self, container_id):
-        # TODO: Instead return a dict with stage name as key
+        container_stages = {}
         container_manifest = self.manifest.groupby('container_id').get_group(container_id)
-        return [self.get_session(experiment_id) for experiment_id in container_manifest['ophys_experiment_id'].values]
+        for ind_row, row in container_manifest.iterrows():
+            container_stages.update(
+                {row['stage_name']: self.get_session(row['ophys_experiment_id'])}
+            )
+        return container_stages
 
+    @classmethod
+    def from_json(cls, json_path):
+        '''
+        Return a cache using paths stored in a JSON file
+        '''
+        with open(json_path, 'r') as json_file:
+            cache_json = json.load(json_file)
+        return cls(cache_json)
 
 class ExtendedNwbApi(BehaviorOphysNwbApi):
     
-    def __init__(self, nwb_path, trial_response_df_path, flash_response_df_path, extended_stimulus_presentations_df_path):
+    def __init__(self, nwb_path, trial_response_df_path, flash_response_df_path,
+                 extended_stimulus_presentations_df_path):
+        '''
+        Api to read data from an NWB file and associated analysis HDF5 files.
+        '''
         super(ExtendedNwbApi, self).__init__(path=nwb_path, filter_invalid_rois=True)
         self.trial_response_df_path = trial_response_df_path
         self.flash_response_df_path = flash_response_df_path
@@ -105,8 +175,11 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
         return pd.read_hdf(self.extended_stimulus_presentations_df_path, key='df')
 
     def get_task_parameters(self):
-        # The task parameters are incorrect. See: https://github.com/AllenInstitute/AllenSDK/issues/637
-        # We need to hard-code the omitted flash fraction and stimulus duration here. 
+        '''
+        The task parameters are incorrect.
+        See: https://github.com/AllenInstitute/AllenSDK/issues/637
+        We need to hard-code the omitted flash fraction and stimulus duration here. 
+        '''
         task_parameters = super(ExtendedNwbApi, self).get_task_parameters()
         task_parameters['omitted_flash_fraction'] = 0.05
         task_parameters['stimulus_duration_sec'] = 0.25
@@ -116,11 +189,13 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
         trials = super(ExtendedNwbApi, self).get_trials()
         stimulus_presentations = super(ExtendedNwbApi, self).get_stimulus_presentations()
 
-        # Note: everything between dashed lines is a patch to deal with timing issues in the AllenSDK
+        # Note: everything between dashed lines is a patch to deal with timing issues in
+        # the AllenSDK
         # This should be removed in the future after issues #876 and #802 are fixed.
-        # -------------------------------------------------------------------------------------------------
+        # --------------------------------------------------------------------------------
+
+        # gets start_time of next stimulus after timestamp in stimulus_presentations 
         def get_next_flash(timestamp):
-            # gets start_time of next stimulus after timestamp in stimulus_presentations 
             query = stimulus_presentations.query('start_time >= @timestamp')
             if len(query) > 0:
                 return query.iloc[0]['start_time']
@@ -130,19 +205,20 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
 
         ### This method can lead to a NaN change time for any trials at the end of the session.
         ### However, aborted trials at the end of the session also don't have change times. 
-        ### The safest method seems like just droping any trials that aren't covered by the stimulus_presentations
+        ### The safest method seems like just droping any trials that aren't covered by the
+        ### stimulus_presentations
         #Using start time in case last stim is omitted
         last_stimulus_presentation = stimulus_presentations.iloc[-1]['start_time']
         trials = trials[np.logical_not(trials['stop_time'] > last_stimulus_presentation)]
 
+        # recalculates response latency based on corrected change time and first lick time
         def recalculate_response_latency(row):
-            # recalculates response latency based on corrected change time and first lick time
             if len(row['lick_times'] > 0) and not pd.isnull(row['change_time']):
                 return row['lick_times'][0] - row['change_time']
             else:
                 return np.nan
         trials['response_latency'] = trials.apply(recalculate_response_latency,axis=1)
-        # -------------------------------------------------------------------------------------------------
+        # -------------------------------------------------------------------------------
 
         # asserts that every change time exists in the stimulus_presentations table
         for change_time in trials[trials['change_time'].notna()]['change_time']:
@@ -170,7 +246,7 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
             'trial_length'
         ]]
 
-
+        # Calculate reward rate per trial
         trials['reward_rate'] = calculate_reward_rate(
             response_latency=trials.response_latency,
             starttime=trials.start_time,
@@ -228,7 +304,6 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
         stimulus_templates = super(ExtendedNwbApi, self).get_stimulus_templates()
         return stimulus_templates[list(stimulus_templates.keys())[0]]
 
-
 class ExtendedBehaviorSession(BehaviorOphysSession):
 
     def __init__(self, api):
@@ -236,14 +311,12 @@ class ExtendedBehaviorSession(BehaviorOphysSession):
         super(ExtendedBehaviorSession, self).__init__(api)
         self.api = api
 
-        self.trial_response_df = LazyProperty(self.get_trial_response_df)
+        self.trial_response_df = LazyProperty(self.api.get_trial_response_df)
         self.flash_response_df = LazyProperty(self.api.get_flash_response_df)
         self.image_index = LazyProperty(self.get_stimulus_index)
 
-    def get_trial_response_df(self):
-        trial_response_df = self.api.get_trial_response_df()
-        return trial_response_df
-
     def get_stimulus_index(self):
-        return self.stimulus_presentations.groupby('image_index').apply(lambda group: group['image_name'].unique()[0])
+        return self.stimulus_presentations.groupby('image_index').apply(
+            lambda group: group['image_name'].unique()[0]
+        )
 
