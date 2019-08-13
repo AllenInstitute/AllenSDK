@@ -109,8 +109,8 @@ def annotate_trial_response_df_with_pref_stim(trial_response_df):
         rdf.at[(cell,pref_image),'pref_stim'] = True
 
     # Test to ensure preferred stimulus is unique for each cell
-    for cell in rdf.reset_index().rdf['cell_specimen_id'].unique()   
-        assert len(rdf.reset_index().rdf.set_index('cell_specimen_id').loc[cell].query('pref_stim').change_image_name.unique()) == 1
+    for cell in rdf.reset_index()['cell_specimen_id'].unique()   
+        assert len(rdf.reset_index().set_index('cell_specimen_id').loc[cell].query('pref_stim').change_image_name.unique()) == 1
 
     # Reset index to be cell/trial pairs
     rdf = rdf.reset_index()
