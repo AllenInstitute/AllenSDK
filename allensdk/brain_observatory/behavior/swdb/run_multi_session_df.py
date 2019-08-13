@@ -8,7 +8,7 @@ import behavior_project_cache as bpc
 
 python_file = r"/home/marinag/AllenSDK/allensdk/brain_observatory/behavior/swdb/create_multi_session_df.py"
 
-# jobdir = '/allen/programs/braintv/workgroups/nc-ophys/nick.ponvert/cluster_jobs/visb_swdb_summary_figures'
+jobdir = '/allen/programs/braintv/workgroups/nc-ophys/nick.ponvert/cluster_jobs/visb_swdb_summary_figures'
 
 job_settings = {'queue': 'braintv',
                 'mem': '100g',
