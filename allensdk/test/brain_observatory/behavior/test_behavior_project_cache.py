@@ -87,3 +87,13 @@ def test_binarized_segmentation_mask_image():
         np.unique(session.segmentation_mask_image.data.ravel()),
         np.array([0, 1])
     )
+
+def test_no_nan_flash_running_speed():
+    assert not pd.isnull(session.stimulus_presentations['running_speed']).any()
+
+def test_licks_correct_colname():
+    assert session.licks.columns == ['timestamps']
+
+def test_rewards_correct_colname():
+    assert (session.rewards.columns == ['timestamps', 'volume', 'autorewarded']).all()
+

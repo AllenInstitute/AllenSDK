@@ -164,7 +164,7 @@ def get_extended_stimulus_presentations(session):
             session.running_speed.values,
             session.running_speed.timestamps,
             row["start_time"],
-            row["stop_time"],
+            row["start_time"]+0.25,
         ),
         axis=1,
     )
@@ -211,7 +211,8 @@ if __name__ == "__main__":
         api = BehaviorOphysNwbApi(nwb_path)
         session = BehaviorOphysSession(api)
 
-        output_path = "/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/extra_files_final"
+        #  output_path = "/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/extra_files_final"
+        output_path = "/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/corrected_extended_stim"
 
         extended_stimulus_presentations_df = get_extended_stimulus_presentations(session)
 

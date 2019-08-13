@@ -317,6 +317,19 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
                                                    unit=segmentation_mask_image.unit)
         return segmentation_mask_itk
 
+    def get_licks(self):
+        # Licks column 'time' should be 'timestamps' to be consistent with rest of session
+        licks = super(ExtendedNwbApi, self).get_licks()
+        licks = licks.rename(columns = {'time':'timestamps'})
+        return licks
+
+    def get_rewards(self):
+        # Rewards has timestamps in the index which is confusing and not consistent with the
+        # rest of the session. Use a normal index and have timestamps as a column
+        rewards = super(ExtendedNwbApi, self).get_rewards()
+        rewards = rewards.reset_index()
+        return rewards
+
 class ExtendedBehaviorSession(BehaviorOphysSession):
 
     def __init__(self, api):
