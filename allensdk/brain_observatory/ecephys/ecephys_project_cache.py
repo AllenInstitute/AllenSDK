@@ -82,6 +82,11 @@ class EcephysProjectCache(Cache):
         """
 
         path = self.get_cache_path(None, self.UNITS_KEY)
+        get_units = self.fetch_api.get_units(
+            amplitude_cutoff_maximum=None, # pull down all the units to csv and filter on the way out
+            presence_ratio_minimum=None, 
+            isi_violations_maximum=None
+        )
         units = call_caching(self.fetch_api.get_units, path, strategy='lazy', **csv_io)
 
         if annotate:

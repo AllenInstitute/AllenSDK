@@ -63,16 +63,16 @@ def mock_api(shared_tmpdir, sessions, units, channels, probes):
         def __getattr__(self, name):
             self.accesses[name] += 1
 
-        def get_sessions(self):
+        def get_sessions(self, **kwargs):
             return sessions
 
-        def get_units(self):
+        def get_units(self, **kwargs):
             return units
 
-        def get_channels(self):
+        def get_channels(self, **kwargs):
             return channels
 
-        def get_probes(self):
+        def get_probes(self, **kwargs):
             return probes
 
         def get_session_data(self, session_id):
