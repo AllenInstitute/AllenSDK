@@ -26,12 +26,12 @@ from allensdk.brain_observatory.ecephys.ecephys_project_api import (
         [
             "get_units",
             {"session_ids": [1, 2, 3]},
-            re.compile(r"select eu\.\*.*and es\.id in \(1,2,3\)$"),
+            re.compile(r"select eu\.\*.*and es\.id in \(1,2,3\) and eu.amplitude_cutoff <= 0.1 and eu.presence_ratio >= 0.95 and eu.isi_violations <= 0.5$"),
         ],
         [
             "get_units",
             {"session_ids": [1, 2, 3], "unit_ids": (4, 5, 6)},
-            re.compile(r"select eu\.\*.*and eu\.id in \(4,5,6\) and es\.id in \(1,2,3\)$")
+            re.compile(r"select eu\.\*.*and eu\.id in \(4,5,6\) and es\.id in \(1,2,3\) and eu.amplitude_cutoff <= 0.1 and eu.presence_ratio >= 0.95 and eu.isi_violations <= 0.5$")
         ],
         [
             "get_channels",
@@ -56,7 +56,9 @@ def test_query(method, conditions, expected):
 
     results = getattr(api, method)(**conditions)
     
-    match = expected.match(pg_engine.query.strip())
+    obtained = pg_engine.query.strip()
+    print(obtained)
+    match = expected.match(obtained)
     assert match is not None
 
 

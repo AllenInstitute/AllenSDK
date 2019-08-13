@@ -4,6 +4,9 @@ import collections
 import pytest
 import pandas as pd
 import mock
+import numpy as np
+import SimpleITK as sitk
+import h5py
 
 import allensdk.brain_observatory.ecephys.ecephys_project_cache as epc
 
@@ -23,7 +26,10 @@ def sessions():
 def units():
     return pd.DataFrame({
         'peak_channel_id': [2, 1],
-        'snr': [1.5, 4.9]
+        'snr': [1.5, 4.9],
+        "amplitude_cutoff": [0.05, 0.2],
+        "presence_ratio": [10, 20],
+        "isi_violations": [0.3, 0.4]
     }, index=pd.Series(name='id', data=[1, 2]))
 
 
@@ -60,16 +66,16 @@ def mock_api(shared_tmpdir, sessions, units, channels, probes):
         def __getattr__(self, name):
             self.accesses[name] += 1
 
-        def get_sessions(self):
+        def get_sessions(self, **kwargs):
             return sessions
 
-        def get_units(self):
+        def get_units(self, **kwargs):
             return units
 
-        def get_channels(self):
+        def get_channels(self, **kwargs):
             return channels
 
-        def get_probes(self):
+        def get_probes(self, **kwargs):
             return probes
 
         def get_session_data(self, session_id):
@@ -77,6 +83,19 @@ def mock_api(shared_tmpdir, sessions, units, channels, probes):
             with open(path, 'w') as f:
                 f.write(f'{session_id}')
             return open(path, 'rb')
+
+        def get_natural_scene_template(self, number):
+            path = os.path.join(shared_tmpdir, "tmp.tiff")
+            img = sitk.GetImageFromArray(np.eye(100, dtype=np.uint8))
+            sitk.WriteImage(img, path)
+            return open(path, "rb")
+
+        def get_natural_movie_template(self, number):
+            path = os.path.join(shared_tmpdir, "tmp.png")
+            with h5py.File(path, "w") as f:
+                f.create_dataset("data", data=np.eye(100))
+            return open(path, "rb")
+
 
     return MockApi
 
@@ -107,11 +126,12 @@ def test_get_sessions(tmpdir_cache, sessions):
 
 
 def test_get_units(tmpdir_cache, units):
+    units = units[units["amplitude_cutoff"] <= 0.1]
     lazy_cache_test(tmpdir_cache, 'get_units', "get_units", units)
 
 
 def test_get_units_annotated(tmpdir_cache, units, channels, probes, sessions):
-    units = tmpdir_cache.get_units(annotate=True)
+    units = tmpdir_cache.get_units(annotate=True, amplitude_cutoff_maximum=10)
     assert units.loc[2, "stimulus_name"] == "stimulus_set_two"
 
 
@@ -132,3 +152,23 @@ def test_get_session_data(shared_tmpdir, tmpdir_cache):
 
     assert 1 == tmpdir_cache.fetch_api.accesses['get_session_data']
     assert os.path.join(shared_tmpdir, f"session_{sid}", f"session_{sid}.nwb") == data_one.api.path
+
+
+def test_get_natural_scene_template(shared_tmpdir, tmpdir_cache):
+    num = 10
+
+    data_one = tmpdir_cache.get_natural_scene_template(num)
+    data_two = tmpdir_cache.get_natural_scene_template(num)
+
+    assert 1 == tmpdir_cache.fetch_api.accesses["get_natural_scene_template"]
+    assert np.allclose(np.eye(100), data_one)
+
+
+def test_get_natural_movie_template(shared_tmpdir, tmpdir_cache):
+    num = 10
+
+    data_one = tmpdir_cache.get_natural_movie_template(num)
+    data_two = tmpdir_cache.get_natural_movie_template(num)
+
+    assert 1 == tmpdir_cache.fetch_api.accesses["get_natural_movie_template"]
+    assert np.allclose(np.eye(100), data_one)
