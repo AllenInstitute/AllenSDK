@@ -7,6 +7,7 @@ from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_a
 from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorOphysSession
 from allensdk.core.lazy_property import LazyProperty
 from allensdk.brain_observatory.behavior.trials_processing import calculate_reward_rate
+from allensdk.brain_observatory.behavior.image_api import ImageApi
 
 csv_io = {
     'reader': lambda path: pd.read_csv(path, index_col='Unnamed: 0'),
@@ -303,6 +304,18 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
         # super stim templates is a dict with one annoyingly-long key, so pop the val out
         stimulus_templates = super(ExtendedNwbApi, self).get_stimulus_templates()
         return stimulus_templates[list(stimulus_templates.keys())[0]]
+
+    def get_segmentation_mask_image(self):
+        # We need to binarize the segmentation mask image. Currently ROIs have values
+        # between 0 and 1, but it is unclear what the values are and this will be 
+        # confusing to students.
+        segmentation_mask_itk = super(ExtendedNwbApi, self).get_segmentation_mask_image()
+        segmentation_mask_image = ImageApi.deserialize(segmentation_mask_itk)
+        segmentation_mask_image.data[segmentation_mask_image.data > 0] = 1
+        segmentation_mask_itk = ImageApi.serialize(data=segmentation_mask_image.data,
+                                                   spacing=segmentation_mask_image.spacing,
+                                                   unit=segmentation_mask_image.unit)
+        return segmentation_mask_itk
 
 class ExtendedBehaviorSession(BehaviorOphysSession):
 

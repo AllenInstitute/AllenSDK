@@ -81,3 +81,9 @@ def test_cache_from_json():
     cache = bpc.BehaviorProjectCache.from_json(json_path)
     assert isinstance(cache, bpc.BehaviorProjectCache)
     assert isinstance(cache.manifest, pd.DataFrame)
+
+def test_binarized_segmentation_mask_image():
+    np.testing.assert_array_equal(
+        np.unique(session.segmentation_mask_image.data.ravel()),
+        np.array([0, 1])
+    )
