@@ -18,6 +18,7 @@ from . import PostgresQueryMixin
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
 
 logger = logging.getLogger(__name__)
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
 
 class MesoscopeSessionLimsApi(PostgresQueryMixin):
