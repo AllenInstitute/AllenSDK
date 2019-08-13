@@ -47,8 +47,8 @@ def add_stim_color_span(session, ax, xlim=None):
 
 
 def plot_behavior_events(session, ax, behavior_only=False):
-    lick_times = session.licks.time.values
-    reward_times = session.rewards.index.values
+    lick_times = session.licks.timestamps.values
+    reward_times = session.rewards.timestamps.values
     if behavior_only:
         lick_y = 0
         reward_y = 0.25
@@ -95,19 +95,16 @@ def plot_behavior_events_trace(session, xmin=360, length=3, ax=None, save_dir=No
 
 
 def plot_traces_heatmap(session, ax=None):
-    timestamps_ophys = session.ophys_timestamps
     dff_traces = session.dff_traces
     dff_traces_array = np.vstack(dff_traces.dff.values)
-
     if ax is None:
         fig, ax = plt.subplots(figsize=(20, 5))
-    # ax = sns.heatmap(dff_traces_array, cmap='magma', vmin=0, vmax=np.percentile(dff_traces_array, 99), ax=ax)
     cax = ax.pcolormesh(dff_traces_array, cmap='magma', vmin=0, vmax=np.percentile(dff_traces_array, 99))
     ax.set_yticks(np.arange(0, len(dff_traces_array)), 10);
     ax.set_ylabel('cells')
     ax.set_xlabel('time (sec)')
-    ax.set_xticks(np.arange(0, len(timestamps_ophys), 10000));
-    ax.set_xticklabels(np.arange(0, timestamps_ophys[-1], int(10000 / 31.)));
+    ax.set_xticks(np.arange(0, len(session.ophys_timestamps), 10*60*31.));
+    ax.set_xticklabels(np.arange(0, session.ophys_timestamps[-1], 10*60));
     cb = plt.colorbar(cax, pad=0.015)
     cb.set_label('dF/F', labelpad=3)
     return ax
@@ -122,7 +119,7 @@ def plot_behavior_segment(session, xlims=[620, 640], ax=None):
     ax.set_xlim(xlims)
     ax.set_ylim(-15, 60)
     ax.plot(session.rewards.index.values, -10 * np.ones(np.shape(session.rewards.index.values)), 'ro')
-    ax.vlines(session.licks, ymin=-10, ymax=-5)
+    ax.vlines(session.licks.timestamps.values, ymin=-10, ymax=-5)
     image_index = -1
     last_omitted = False
     for index, row in session.stimulus_presentations.iterrows():
@@ -175,27 +172,42 @@ def plot_trace(timestamps, trace, ax=None, xlabel='time (seconds)', ylabel='fluo
     return ax
 
 
+def plot_trace(timestamps, trace, ax=None, xlabel='time (seconds)', ylabel='fluorescence', title='roi',
+               color=sns.color_palette()[0]):
+    if ax is None:
+        fig, ax = plt.subplots(figsize=(15, 5))
+    ax.plot(timestamps, trace, color=color, linewidth=2)
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    ax.set_title(title)
+    ax.set_xlim([timestamps[0], timestamps[-1]])
+    return ax
+
+
 def plot_example_traces_and_behavior(session, xmin_seconds, length_mins, cell_label=False, save_dir=None):
     traces = np.stack(session.dff_traces.dff.values)
     cell_indices = ut.get_active_cell_indices(traces)
 
-    interval_seconds = 20
+    interval_seconds = 10
     xmax_seconds = xmin_seconds + (length_mins * 60) + 1
     xlim = [xmin_seconds, xmax_seconds]
 
     figsize = (14, 10)
-    fig, ax = plt.subplots(len(cell_indices) + 1, 1, figsize=figsize, sharex=True)
+    fig, ax = plt.subplots(len(cell_indices) + 1, 1, figsize=figsize)
     ax = ax.ravel()
 
     ymins = []
     ymaxs = []
     for i, cell_index in enumerate(cell_indices):
+        ax[i].tick_params(reset=True, which='both', bottom='off', top='off', right='off', left='off',
+                          labeltop='off', labelright='off', labelleft='off', labelbottom='off')
         ax[i] = plot_trace(session.ophys_timestamps, traces[cell_index, :], ax=ax[i],
                            title='', ylabel=str(cell_index), color=[.5, .5, .5])
         ax[i] = add_stim_color_span(session, ax=ax[i], xlim=xlim)
         ax[i] = restrict_axes(xmin_seconds, xmax_seconds, interval_seconds, ax=ax[i])
-        ax[i].set_xticklabels('')
+        ax[i].set_xticks([])
         ax[i].set_xlabel('')
+        ax[i].set_xlim(xlim)
         ymin, ymax = ax[i].get_ylim()
         ymins.append(ymin)
         ymaxs.append(ymax)
@@ -203,12 +215,23 @@ def plot_example_traces_and_behavior(session, xmin_seconds, length_mins, cell_la
             ax[i].set_ylabel('cell ' + str(i), fontsize=12)
         else:
             ax[i].set_ylabel('')
-        ax[i].set_yticklabels('')
+        ax[i].set_yticks([])
         sns.despine(ax=ax[i], left=True, bottom=True)
-        ax[i].tick_params(which='both', bottom='off', top='off', right='off', left='off',
-                          labeltop='off', labelright='off', labelleft='off', labelbottom='off')
+        ymin, ymax = ax[i].get_ylim()
+        if 'Vip' in session.metadata['full_genotype']:
+            ax[i].vlines(x=xmin_seconds, ymin=0, ymax=2, linewidth=4)
+            ax[i].set_ylim(ymin=-0.5, ymax=5)
+        elif 'Slc' in session.metadata['full_genotype']:
+            ax[i].vlines(x=xmin_seconds, ymin=0, ymax=1, linewidth=4)
+            ax[i].set_ylim(ymin=-0.5, ymax=3)
+        ax[i].get_xaxis().set_ticks([])
+        ax[i].get_yaxis().set_ticks([])
+    ax[i].tick_params(which='both', bottom='off', top='off', right='off', left='off',
+                      labeltop='off', labelright='off', labelleft='off', labelbottom='off')
+    ax[i].set_xticklabels('')
 
     i += 1
+    ax[i].tick_params(axis="x", bottom=True, top=False, labelbottom=True, labeltop=False)
     ax[i].plot(session.running_speed.timestamps, session.running_speed.values, color=sns.color_palette()[0])
     ax[i] = plot_behavior_events(session, ax=ax[i])
     ax[i] = add_stim_color_span(session, ax=ax[i], xlim=xlim)
@@ -216,11 +239,10 @@ def plot_example_traces_and_behavior(session, xmin_seconds, length_mins, cell_la
     ax[i].set_xlim(xlim)
     ax[i].set_ylabel('run speed\n(cm/s)', fontsize=12)
     sns.despine(ax=ax[i], left=True, bottom=True)
-    ax[i].tick_params(which='both', bottom='on', top='off', right='off', left='off',
-                      labelbottom='on', labeltop='off', labelright='off', labelleft='off')
     ax[i].set_yticklabels('')
     xticks = np.arange(xmin_seconds, xmax_seconds, interval_seconds)
     ax[i].set_xticks(xticks)
+    ax[i].set_xticklabels(xticks)
     ax[i].set_xlabel('time (seconds)')
 
     ax[0].set_title(
@@ -248,6 +270,7 @@ def plot_transitions_response_heatmap(trials, ax=None):
                      annot_kws={"fontsize": 10}, vmin=0, vmax=1,
                      robust=True, cbar_kws={"drawedges": False, "shrink": 0.7, "label": 'response probability'}, ax=ax)
     return ax
+
 
 
 def plot_mean_trace_heatmap(mean_df, ax=None, save_dir=None, window=[-4, 8], interval_sec=2):
@@ -340,6 +363,32 @@ def plot_mean_image_response_heatmap(mean_df, title=None, ax=None, save_dir=None
         ut.save_figure(fig, figsize, save_dir, 'experiment_summary', 'mean_image_response_heatmap' + suffix)
 
 
+def plot_max_proj_and_roi_masks(session, save_dir=None):
+    figsize = (15, 5)
+    fig, ax = plt.subplots(1,3,figsize=figsize)
+    ax = ax.ravel()
+
+    ax[0].imshow(session.max_projection, cmap='gray', vmin=0, vmax=np.amax(session.max_projection))
+    ax[0].axis('off')
+    ax[0].set_title('max intensity projection')
+
+    ax[1].imshow(session.segmentation_mask_image, cmap='gray')
+    ax[1].set_title('roi masks')
+    ax[1].axis('off')
+
+    ax[2].imshow(session.max_projection, cmap='gray', vmin=0, vmax=np.amax(session.max_projection))
+    ax[2].axis('off')
+    ax[2].set_title(str(session.metadata['ophys_experiment_id']))
+
+    tmp = session.segmentation_mask_image.data.copy()
+    mask = np.empty(session.segmentation_mask_image.data.shape, dtype=np.float)
+    mask[:] = np.nan
+    mask[tmp > 0] = 1
+    cax = ax[2].imshow(mask, cmap='hsv', alpha=0.4, vmin=0, vmax=1)
+
+    if save_dir:
+        ut.save_figure(fig, figsize, save_dir, 'roi_masks', str(session.metadata['ophys_experiment_id']))
+
 
 def placeAxesOnGrid(fig, dim=[1, 1], xspan=[0, 1], yspan=[0, 1], wspace=None, hspace=None, sharex=False, sharey=False):
     '''
@@ -405,6 +454,7 @@ def plot_experiment_summary_figure(session, save_dir=None):
 
     ax = placeAxesOnGrid(fig, dim=(1, 1), xspan=(.0, .2), yspan=(0, .2))
     ax.imshow(session.max_projection, cmap='gray')
+    ax.set_title('max intensity projection')
     ax.axis('off')
 
     ax = placeAxesOnGrid(fig, dim=(1, 1), xspan=(0, .18), yspan=(.24, .4))
@@ -422,9 +472,11 @@ def plot_experiment_summary_figure(session, save_dir=None):
     ax.set_ylabel('running speed\n(cm/s)')
 
     ax = placeAxesOnGrid(fig, dim=(1, 1), xspan=(.86, 1.), yspan=(0, .2))
-    #     stimulus_templates = session.stimulus_templates[list(session.stimulus_templates.keys())[0]]
-    #     image_index = 0
-    ax.imshow(session.stimulus_templates[0, :, :], cmap='gray')
+    image_index = 0
+    ax.imshow(session.stimulus_templates[image_index, :, :], cmap='gray')
+    st = session.stimulus_presentations.copy()
+    image_name = st[st.image_index==image_index].image_name.values[0]
+    ax.set_title(image_name)
     ax.axis('off')
 
     ax = placeAxesOnGrid(fig, dim=(1, 1), xspan=(.0, .17), yspan=(.54, .99))
@@ -466,38 +518,41 @@ def plot_experiment_summary_figure(session, save_dir=None):
 
 
 if __name__ == '__main__':
-    import sys
-    experiment_id = sys.argv[1]
+    # import sys
+    # experiment_id = sys.argv[1]
+    #
+    # cache_json = {
+    #     'manifest_path': '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/visual_behavior_data_manifest.csv',
+    #     'nwb_base_dir': '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/nwb_files',
+    #     'analysis_files_base_dir': '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/extra_files_final',
+    #     'analysis_files_metadata_path': '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/analysis_files_metadata.json',
+    #     }
 
     cache_json = {
-        'manifest_path': '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/visual_behavior_data_manifest.csv',
-        'nwb_base_dir': '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/nwb_files',
-        'analysis_files_base_dir': '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/extra_files_final',
-        'analysis_files_metadata_path': '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/analysis_files_metadata.json',
-        }
-
-    # cache_json = {
-    #     'manifest_path': r'\\allen\programs\braintv\workgroups\nc-ophys\visual_behavior\SWDB_2019\visual_behavior_data_manifest.csv',
-    #     'nwb_base_dir': r'\\allen\programs\braintv\workgroups\nc-ophys\visual_behavior\SWDB_2019\nwb_files',
-    #     'analysis_files_base_dir': r'\\allen\programs\braintv\workgroups\nc-ophys\visual_behavior\SWDB_2019\extra_files_final',
-    #     'analysis_files_metadata_path':r'\\allen\programs\braintv\workgroups\nc-ophys\visual_behavior\SWDB_2019\analysis_files_metadata.json',
-    # }
+        'manifest_path': r'\\allen\programs\braintv\workgroups\nc-ophys\visual_behavior\SWDB_2019\visual_behavior_data_manifest.csv',
+        'nwb_base_dir': r'\\allen\programs\braintv\workgroups\nc-ophys\visual_behavior\SWDB_2019\nwb_files',
+        'analysis_files_base_dir': r'\\allen\programs\braintv\workgroups\nc-ophys\visual_behavior\SWDB_2019\analysis_files',
+        'analysis_files_metadata_path':r'\\allen\programs\braintv\workgroups\nc-ophys\visual_behavior\SWDB_2019\analysis_files_metadata.json',
+    }
 
     from allensdk.brain_observatory.behavior.swdb import behavior_project_cache as bpc
 
     cache = bpc.BehaviorProjectCache(cache_json)
     manifest = cache.manifest
 
-    # experiment_id = manifest.ophys_experiment_id.values[16]
-    # save_dir = r'\\allen\programs\braintv\workgroups\nc-ophys\visual_behavior\SWDB_2019\summary_figures_final'
+    experiment_id = manifest.ophys_experiment_id.values[16]
+    save_dir = r'\\allen\programs\braintv\workgroups\nc-ophys\visual_behavior\SWDB_2019\summary_figures'
 
-    save_dir = r'/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/summary_figures_final'
+    # save_dir = r'/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/summary_figures_final'
     print('loading session')
     session = cache.get_session(experiment_id)
     print('plotting experiment summary')
     plot_experiment_summary_figure(session, save_dir=save_dir)
+    plot_max_proj_and_roi_masks(session, save_dir=save_dir)
     print('plotting example traces')
-    for xmin_seconds in np.arange(500, 700, 18):
+    for xmin_seconds in np.arange(500, 1000, 60):
+        plot_example_traces_and_behavior(session, xmin_seconds=xmin_seconds, length_mins=1, save_dir=save_dir)
+    for xmin_seconds in np.arange(1600, 1800, 18):
         plot_example_traces_and_behavior(session, xmin_seconds=xmin_seconds, length_mins=.3, save_dir=save_dir)
     print('plotting behavior events')
     for xmin in np.arange(0, 1200, 30):

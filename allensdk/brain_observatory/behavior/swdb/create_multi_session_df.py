@@ -19,7 +19,7 @@ print('generating mega_trial_mdf')
 mega_trial_mdf = ut.create_multi_session_mean_df(cache, experiment_ids,  conditions=['cell_specimen_id','change_image_name'])
 save_dir = r'/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019'
 mega_trial_mdf.to_hdf(os.path.join(save_dir, 'multi_session_mean_trials_df.h5'), key='df')
-print('done with trials, creating fmega_flash_mdf')
+print('done with trials, creating mega_flash_mdf')
 mega_flash_mdf = ut.create_multi_session_mean_df(cache, experiment_ids, flashes=True, conditions=['cell_specimen_id','image_name'])
 save_dir = r'/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019'
 mega_flash_mdf.to_hdf(os.path.join(save_dir, 'multi_session_mean_flashes_df.h5'), key='df')
