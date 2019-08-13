@@ -18,13 +18,13 @@ UNIT_FILTER_DEFAULTS = {
 }
 
 
-def get_unit_filter_value(key, pop=True, **source):
+def get_unit_filter_value(key, pop=True, replace_none=True, **source):
     if pop:
         value = source.pop(key, UNIT_FILTER_DEFAULTS[key]["value"])
     else:
         value = source.get(key, UNIT_FILTER_DEFAULTS[key]["value"])
     
-    if value is None:
+    if value is None and replace_none:
         value = UNIT_FILTER_DEFAULTS[key]["default"]
 
     return value

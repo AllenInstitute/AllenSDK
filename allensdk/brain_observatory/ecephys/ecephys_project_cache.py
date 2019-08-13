@@ -95,9 +95,11 @@ class EcephysProjectCache(Cache):
             units = pd.merge(units, probes, left_on='ecephys_probe_id', right_index=True, suffixes=['_unit', '_probe'])
             units = pd.merge(units, sessions, left_on='ecephys_session_id', right_index=True, suffixes=['_unit', '_session'])
 
-        units = units[units["amplitude_cutoff"] <= get_unit_filter_value("amplitude_cutoff_maximum", **kwargs)]
-        units = units[units["presence_ratio"] >= get_unit_filter_value("presence_ratio_minimum", **kwargs)]
-        units = units[units["isi_violations"] <= get_unit_filter_value("isi_violations_maximum", **kwargs)]
+        units =units[
+            (units["amplitude_cutoff"] <= get_unit_filter_value("amplitude_cutoff_maximum", **kwargs))
+            & (units["presence_ratio"] >= get_unit_filter_value("presence_ratio_minimum", **kwargs))
+            & (units["isi_violations"] <= get_unit_filter_value("isi_violations_maximum", **kwargs))
+        ]
         
         return units
 

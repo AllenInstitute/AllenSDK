@@ -40,6 +40,16 @@ def postgres_macros():
                     and {{key}} is {{- ' not ' if value -}} null
                 {% endif %}
             {% endmacro %}
+            {% macro optional_le(key, value) %}
+                {% if value is not none -%}
+                    and {{key}} <= {{value}}
+                {% endif %}
+            {% endmacro %}
+            {% macro optional_ge(key, value) %}
+                {% if value is not none -%}
+                    and {{key}} >= {{value}}
+                {% endif %}
+            {% endmacro %}
         """,
         "macros": macros()["macros"]
     }

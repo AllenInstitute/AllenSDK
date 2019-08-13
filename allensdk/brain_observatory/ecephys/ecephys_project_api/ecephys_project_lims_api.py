@@ -74,7 +74,12 @@ class EcephysProjectLimsApi(EcephysProjectApi):
         )
 
     def get_units(
-        self, unit_ids=None, channel_ids=None, probe_ids=None, session_ids=None, quality="good"
+        self, unit_ids=None, 
+        channel_ids=None, 
+        probe_ids=None, 
+        session_ids=None, 
+        quality="good",
+        **kwargs
     ):
         response = build_and_execute(
             """
@@ -91,6 +96,9 @@ class EcephysProjectLimsApi(EcephysProjectApi):
                 {{pm.optional_contains('ec.id', channel_ids) -}}
                 {{pm.optional_contains('ep.id', probe_ids) -}}
                 {{pm.optional_contains('es.id', session_ids) -}}
+                {{pm.optional_le('eun.amplitude_cutoff', amplitude_cutoff_maximum) -}}
+                {{pm.optional_ge('eun.presence_ratio', presence_ratio_minimum) -}}
+                {{pm.optional_le('eun.isi_violations', isi_violations_maximum) -}}
             """,
             base=postgres_macros(),
             engine=self.postgres_engine.select,
@@ -98,7 +106,10 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             channel_ids=channel_ids,
             probe_ids=probe_ids,
             session_ids=session_ids,
-            quality=f"'{quality}'" if quality is not None else quality
+            quality=f"'{quality}'" if quality is not None else quality,
+            amplitude_cutoff_maximum=get_unit_filter_value("amplitude_cutoff_maximum", replace_none=False, **kwargs),
+            presence_ratio_minimum=get_unit_filter_value("presence_ratio_minimum", replace_none=False, **kwargs),
+            isi_violations_maximum=get_unit_filter_value("isi_violations_maximum", replace_none=False, **kwargs)
         )
 
         response.set_index("id", inplace=True)
@@ -106,7 +117,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
 
         return response
 
-    def get_channels(self, channel_ids=None, probe_ids=None, session_ids=None):
+    def get_channels(self, channel_ids=None, probe_ids=None, session_ids=None, **kwargs):
         response = build_and_execute(
             """
                 {%- import 'postgres_macros' as pm -%}
@@ -130,6 +141,9 @@ class EcephysProjectLimsApi(EcephysProjectApi):
                     join ecephys_units eun on (
                         eun.ecephys_channel_id = ech.id
                         and eun.quality = 'good'
+                        {{pm.optional_le('eun.amplitude_cutoff', amplitude_cutoff_maximum) -}}
+                        {{pm.optional_ge('eun.presence_ratio', presence_ratio_minimum) -}}
+                        {{pm.optional_le('eun.isi_violations', isi_violations_maximum) -}}
                     )
                     group by ech.id
                 ) pc on ec.id = pc.ecephys_channel_id
@@ -143,10 +157,13 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             channel_ids=channel_ids,
             probe_ids=probe_ids,
             session_ids=session_ids,
+            amplitude_cutoff_maximum=get_unit_filter_value("amplitude_cutoff_maximum", replace_none=False, **kwargs),
+            presence_ratio_minimum=get_unit_filter_value("presence_ratio_minimum", replace_none=False, **kwargs),
+            isi_violations_maximum=get_unit_filter_value("isi_violations_maximum", replace_none=False, **kwargs)
         )
         return response.set_index("id")
 
-    def get_probes(self, probe_ids=None, session_ids=None):
+    def get_probes(self, probe_ids=None, session_ids=None, **kwargs):
         response = build_and_execute(
             """
                 {%- import 'postgres_macros' as pm -%}
@@ -177,6 +194,9 @@ class EcephysProjectLimsApi(EcephysProjectApi):
                     join ecephys_units eun on (
                         eun.ecephys_channel_id = ech.id
                         and eun.quality = 'good'
+                        {{pm.optional_le('eun.amplitude_cutoff', amplitude_cutoff_maximum) -}}
+                        {{pm.optional_ge('eun.presence_ratio', presence_ratio_minimum) -}}
+                        {{pm.optional_le('eun.isi_violations', isi_violations_maximum) -}}
                     )
                     group by epr.id
                 ) chc on ep.id = chc.ecephys_probe_id
@@ -220,6 +240,9 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             engine=self.postgres_engine.select,
             probe_ids=probe_ids,
             session_ids=session_ids,
+            amplitude_cutoff_maximum=get_unit_filter_value("amplitude_cutoff_maximum", replace_none=False, **kwargs),
+            presence_ratio_minimum=get_unit_filter_value("presence_ratio_minimum", replace_none=False, **kwargs),
+            isi_violations_maximum=get_unit_filter_value("isi_violations_maximum", replace_none=False, **kwargs)
         )
         return response.set_index("id")
 
@@ -233,7 +256,9 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             "BrainTV Neuropixels Visual Behavior",
             "BrainTV Neuropixels Visual Coding",
         ),
+        **kwargs
     ):
+
         response = build_and_execute(
             """
                 {%- import 'postgres_macros' as pm -%}
@@ -274,6 +299,9 @@ class EcephysProjectLimsApi(EcephysProjectApi):
                     join ecephys_units eun on (
                         eun.ecephys_channel_id = ech.id
                         and eun.quality = 'good'
+                        {{pm.optional_le('eun.amplitude_cutoff', amplitude_cutoff_maximum) -}}
+                        {{pm.optional_ge('eun.presence_ratio', presence_ratio_minimum) -}}
+                        {{pm.optional_le('eun.isi_violations', isi_violations_maximum) -}}
                     )
                     group by es.id
                 ) pc on es.id = pc.ecephys_session_id
@@ -319,6 +347,9 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             published=published,
             habituation=f"{habituation}".lower() if habituation is not None else habituation,
             project_names=project_names,
+            amplitude_cutoff_maximum=get_unit_filter_value("amplitude_cutoff_maximum", replace_none=False, **kwargs),
+            presence_ratio_minimum=get_unit_filter_value("presence_ratio_minimum", replace_none=False, **kwargs),
+            isi_violations_maximum=get_unit_filter_value("isi_violations_maximum", replace_none=False, **kwargs)
         )
         
         response.set_index("id", inplace=True) 
