@@ -93,6 +93,14 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
     def get_extended_stimulus_presentations_df(self):
         return pd.read_hdf(self.extended_stimulus_presentations_df_path, key='df')
 
+    def get_task_parameters(self):
+        # The task parameters are incorrect. See: https://github.com/AllenInstitute/AllenSDK/issues/637
+        # We need to hard-code the omitted flash fraction and stimulus duration here. 
+        task_parameters = super(ExtendedNwbApi, self).get_task_parameters()
+        task_parameters['omitted_flash_fraction'] = 0.05
+        task_parameters['stimulus_duration_sec'] = 0.25
+        return task_parameters
+
     def get_trials(self):
         trials = super(ExtendedNwbApi, self).get_trials()
         stimulus_presentations = super(ExtendedNwbApi, self).get_stimulus_presentations()
