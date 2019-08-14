@@ -72,21 +72,18 @@ class MesoscopeSessionLimsApi(PostgresQueryMixin):
                     ", os.storage_directory as session_folder, oe.storage_directory as experiment_folder",
                     ", sp.name as specimen",
                     ", os.date_of_acquisition as date",
-                    ", imaging_depths.depth as depth",
+                    ", oe.calculated_depth as calc_depth",
+                    ", imaging_depths.depth as im_depth",
                     ", st.acronym as structure",
                     ", os.parent_session_id as parent_id",
-                    ", oe.workflow_state",
-                    ", os.stimulus_name as stimulus",
-                    " FROM ophys_experiments oe",
+                    ", oe.workflow_state as wfl_state ",
+                    "FROM ophys_experiments oe",
                     "join ophys_sessions os on os.id = oe.ophys_session_id "
                     "join specimens sp on sp.id = os.specimen_id "
                     "join projects p on p.id = os.project_id "
                     "join imaging_depths on imaging_depths.id = oe.imaging_depth_id "
                     "join structures st on st.id = oe.targeted_structure_id "
-                    " WHERE p.code in ('MesoscopeDevelopment', 'VisualBehaviorMultiscope') "
-                    " AND oe.workflow_state in ('processing', 'qc', 'passed', 'failed') "
-                    " AND os.workflow_state ='uploaded' "
-                    " AND os.id='{}' ",
+                    " WHERE os.id='{}' ",
         ))
         query = query.format(self.get_session_id())
         self.session_df = pd.read_sql(query, self.get_connection())
