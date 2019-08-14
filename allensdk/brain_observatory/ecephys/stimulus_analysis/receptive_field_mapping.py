@@ -470,7 +470,7 @@ def threshold_rf(rf, threshold):
     rf - numpy.ndarray
         2D matrix of spike counts
     threshold - float
-        Threshold as a fraction of the RF's peak value
+        Threshold as ratio of the RF's standard deviation
         
     Returns:
     --------
@@ -485,7 +485,7 @@ def threshold_rf(rf, threshold):
     
     """
     
-    threshold_value = np.max(rf) * threshold
+    threshold_value = np.max(rf) - np.std(rf) * threshold
         
     rf_thresh = np.zeros(rf.shape, dtype='bool')
     rf_thresh[rf > threshold_value] = True
