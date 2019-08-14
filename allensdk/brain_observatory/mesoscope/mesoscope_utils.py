@@ -5,6 +5,10 @@ import logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
+from pymongo import MongoClient
+mongo = MongoClient('10.128.105.108', 27017)
+
+
 def get_all_mesoscope_sessions():
 
     db = PostgresQueryMixin()
@@ -22,4 +26,16 @@ def get_all_mesoscope_sessions():
              "join equipment rigs on rigs.id = os.equipment_id "
              "where rigs.name in ('MESO.1', 'MESO.2')"
              "order by date")
-    return pd.read_sql(query, db.get_connection())
+
+    #let's for now read stim type from mouse_director
+    #in the future this should be in lims
+
+    meso_data_df = pd.read_sql(query, db.get_connection())
+    session_ids = meso_data_df['session_id']
+    meso_data_df['stimulus_type'] = None
+
+    for session_id in session_ids:
+        x = mongo.qc.metrics.find_one({'lims_id': int(session_id)})
+        meso_data_df.loc[meso_data_df['session_id']==session_id,'stimulus_type'] = x['change_detection']['stage']
+    return meso_data_df
+
