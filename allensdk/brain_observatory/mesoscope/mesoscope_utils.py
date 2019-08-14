@@ -30,12 +30,19 @@ def get_all_mesoscope_sessions():
     #let's for now read stim type from mouse_director
     #in the future this should be in lims
 
+    #return pd.read_sql(query, db.get_connection())
     meso_data_df = pd.read_sql(query, db.get_connection())
     session_ids = meso_data_df['session_id']
     meso_data_df['stimulus_type'] = None
 
     for session_id in session_ids:
         x = mongo.qc.metrics.find_one({'lims_id': int(session_id)})
-        meso_data_df.loc[meso_data_df['session_id']==session_id,'stimulus_type'] = x['change_detection']['stage']
+        if x :
+            if 'change_detection' in x.keys():
+                 stim_type = x['change_detection']['stage']
+                 meso_data_df.loc[meso_data_df['session_id'] == session_id,'stimulus_type'] = stim_type
+            else:
+                logger.warning(f'session {session_id} has no behavior data in mouse seeks')
+
     return meso_data_df
 
