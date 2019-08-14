@@ -68,21 +68,21 @@ class MesoscopeSessionLimsApi(PostgresQueryMixin):
         return self.session_folder
 
     def get_session_df(self):
-        query = ' '.join(("SELECT oe.id as experiment_id, os.id as session_id",
+        query = ' '.join(("SELECT oe.id as experiment_id, os.id as session_id, os.name as ses_name"
                     ", os.storage_directory as session_folder, oe.storage_directory as experiment_folder",
                     ", sp.name as specimen",
                     ", os.date_of_acquisition as date",
-                    ", oe.calculated_depth as calc_depth",
-                    ", imaging_depths.depth as im_depth",
+                    ", oe.calculated_depth as depth",
                     ", st.acronym as structure",
                     ", os.parent_session_id as parent_id",
                     ", oe.workflow_state as wfl_state ",
+                    ", users.login as operator "
                     "FROM ophys_experiments oe",
                     "join ophys_sessions os on os.id = oe.ophys_session_id "
                     "join specimens sp on sp.id = os.specimen_id "
                     "join projects p on p.id = os.project_id "
-                    "join imaging_depths on imaging_depths.id = oe.imaging_depth_id "
                     "join structures st on st.id = oe.targeted_structure_id "
+                    "join users on users.id = os.operator_id"
                     " WHERE os.id='{}' ",
         ))
         query = query.format(self.get_session_id())
