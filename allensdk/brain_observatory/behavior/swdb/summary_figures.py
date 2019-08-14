@@ -543,7 +543,7 @@ if __name__ == '__main__':
     # experiment_id = manifest.ophys_experiment_id.values[16]
     # save_dir = r'\\allen\programs\braintv\workgroups\nc-ophys\visual_behavior\SWDB_2019\summary_figures'
 
-    save_dir = r'/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/summary_figures_final'
+    save_dir = r'/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/summary_figures'
     print('loading session')
     session = cache.get_session(experiment_id)
     print('plotting experiment summary')
