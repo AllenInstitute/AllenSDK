@@ -466,9 +466,8 @@ def write_probe_lfp_file(session_start_time, log_level, probe):
 
     nwbfile.add_acquisition(lfp)
 
-    csd, csd_times, csd_channels = read_csd_data_from_h5(probe["csd_path"])
-    csd_channels = np.array([channel_li_id_map[li] for li in csd_channels])
-    nwbfile = add_csd_to_nwbfile(nwbfile, csd, csd_times, csd_channels)
+    csd, csd_times, csd_locs = read_csd_data_from_h5(probe["csd_path"])
+    nwbfile = add_csd_to_nwbfile(nwbfile, csd, csd_times, csd_locs)
 
     with pynwb.NWBHDF5IO(probe['lfp']['output_path'], 'w') as lfp_writer:
         logging.info(f"writing probe lfp file to {probe['lfp']['output_path']}")
@@ -478,20 +477,22 @@ def write_probe_lfp_file(session_start_time, log_level, probe):
 
 def read_csd_data_from_h5(csd_path):
     with h5py.File(csd_path, "r") as csd_file:
-        return csd_file["current_source_density"][:], csd_file["timestamps"][:], csd_file["channels"][:]
+        return (csd_file["current_source_density"][:],
+                csd_file["timestamps"][:],
+                csd_file["csd_locations"][:])
 
 
-def add_csd_to_nwbfile(nwbfile, csd, times, channels, unit="V/cm^2"):
+def add_csd_to_nwbfile(nwbfile, csd, times, csd_virt_channel_locs, unit="V/cm^2"):
 
-    csd_mod = pynwb.ProcessingModule("current_source_density", "precalculated current source density from a subset of channel")
+    csd_mod = pynwb.ProcessingModule("current_source_density", "Precalculated current source density from interpolated channel locations.")
     nwbfile.add_processing_module(csd_mod)
 
     csd_ts = pynwb.base.TimeSeries(
         name="current_source_density",
         data=csd,
         timestamps=times,
-        control=channels.astype(np.uint64),  # these are postgres ids, always non-negative
-        control_description="ids of electrodes from which csd was calculated",
+        control=csd_virt_channel_locs.astype(np.uint64),  # These are locations (x, y) of virtual interpolated electrodes
+        control_description="Virtual locations of electrodes from which csd was calculated",
         unit=unit
     )
     csd_mod.add_data_interface(csd_ts)

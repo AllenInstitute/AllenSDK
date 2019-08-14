@@ -7,15 +7,31 @@ import os
 import pandas as pd
 import h5py
 
+from pathlib import Path
+
+from typing import Optional
+
 from ._schemas import InputParameters, OutputParameters
-from ._current_source_density import accumulate_lfp_data, compute_csd, extract_trial_windows, identify_lfp_channels, get_missing_channels
-from allensdk.brain_observatory.ecephys.file_io.continuous_file import ContinuousFile
+from ._current_source_density import (
+    accumulate_lfp_data,
+    compute_csd,
+    extract_trial_windows
+)
+from ._filter_utils import filter_lfp_channels, select_good_channels
+from ._interpolation_utils import (
+    interp_channel_locs,
+    make_actual_channel_locations,
+    make_interp_channel_locations
+)
+from allensdk.brain_observatory.ecephys.file_io.continuous_file import (
+    ContinuousFile
+)
 from allensdk.brain_observatory.argschema_utilities import (
     write_or_print_outputs, optional_lims_inputs
 )
 
 
-def get_inputs_from_lims(args):
+def get_inputs_from_lims(args) -> dict:
 
     session_id = args.session_id
     output_root = args.output_root
@@ -44,78 +60,126 @@ def get_inputs_from_lims(args):
     for probe in data['probes']:
         probe['surface_channel_adjustment'] = int(probe['surface_channel_adjustment'])
         probe['csd_output_path'] = os.path.join(output_root, os.path.split(probe['csd_output_path'])[-1])
+        probe['phase'] = str(probe['phase'])
 
     return data
 
 
-def run_csd(args):
-    """
-    """
+def run_csd(args: dict) -> dict:
 
     stimulus_table = pd.read_csv(args['stimulus']['stimulus_table_path'])
 
     probewise_outputs = []
     for probe_idx, probe in enumerate(args['probes']):
-        logging.info('processing probe: {} (index: {})'.format(probe['name'], probe_idx))
+        logging.info('Processing probe: {} (index: {})'.format(probe['name'],
+                                                               probe_idx))
 
         time_step = 1.0 / probe['sampling_rate']
-        logging.info('calculated time step: {}'.format(time_step))
+        logging.info('Calculated time step: {}'.format(time_step))
 
+        logging.info('Extracting trial windows')
         trial_windows, relative_window = extract_trial_windows(
-            stimulus_table, args['stimulus']['key'], time_step, args['pre_stimulus_time'], args['post_stimulus_time'], 
-            args['num_trials'], args['stimulus']['index']
+            stimulus_table=stimulus_table,
+            stimulus_name=args['stimulus']['key'],
+            time_step=time_step,
+            pre_stimulus_time=args['pre_stimulus_time'],
+            post_stimulus_time=args['post_stimulus_time'],
+            num_trials=args['num_trials'],
+            stimulus_index=args['stimulus']['index']
         )
 
-        lfp_data_file = ContinuousFile(probe['lfp_data_path'],probe['lfp_timestamps_path'], probe['total_channels'])
-        lfp_raw, timestamps = lfp_data_file.load(memmap=args['memmap'], memmap_thresh=args['memmap_thresh'])
-        
-        surface_channel = min(probe['surface_channel'] + probe['surface_channel_adjustment'], probe['total_channels'] - 1)
-        logging.info('calculated surface channel: {}'.format(surface_channel))
+        logging.info('Loading LFP data')
+        lfp_data_file = ContinuousFile(probe['lfp_data_path'],
+                                       probe['lfp_timestamps_path'],
+                                       probe['total_channels'])
+        lfp_raw, timestamps = lfp_data_file.load(memmap=args['memmap'],
+                                                 memmap_thresh=args['memmap_thresh'])
 
-        lfp_channels = identify_lfp_channels(surface_channel, probe['reference_channels'])
-        missing_channels = get_missing_channels(lfp_channels)
+        if probe['phase'].lower() == '3a':
+            lfp_channels = lfp_data_file.get_lfp_channel_order()
+        else:
+            lfp_channels = np.arange(0, probe['total_channels'])
 
-        accumulated_lfp_data = accumulate_lfp_data(timestamps, lfp_raw, lfp_channels, trial_windows)
-        current_source_density, csd_channels = compute_csd(accumulated_lfp_data, lfp_channels, missing_channels, spacing=probe['spacing'])
+        logging.info('Accumulating LFP data')
+        accumulated_lfp_data = accumulate_lfp_data(timestamps=timestamps,
+                                                   lfp_raw=lfp_raw,
+                                                   lfp_channels=lfp_channels,
+                                                   trial_windows=trial_windows,
+                                                   volts_per_bit=args['volts_per_bit'])
 
+        logging.info('Removing noisy and reference channels')
+        clean_lfp, clean_channels = select_good_channels(lfp=accumulated_lfp_data,
+                                                         reference_channels=probe['reference_channels'],
+                                                         noisy_channel_threshold=args['noisy_channel_threshold'])
+
+        logging.info('Bandpass filtering LFP channel data')
+        filt_lfp = filter_lfp_channels(lfp=clean_lfp,
+                                       sampling_rate=probe['sampling_rate'],
+                                       filter_cuts=args['filter_cuts'],
+                                       filter_order=args['filter_order'])
+
+        logging.info('Interpolating LFP channel locations')
+        actual_locs = make_actual_channel_locations(0, accumulated_lfp_data.shape[1])
+        clean_actual_locs = actual_locs[clean_channels, :]
+        interp_locs = make_interp_channel_locations(0, accumulated_lfp_data.shape[1])
+        interp_lfp, spacing = interp_channel_locs(lfp=filt_lfp,
+                                                  actual_locs=clean_actual_locs,
+                                                  interp_locs=interp_locs)
+
+        logging.info('Averaging LFPs over trials')
+        trial_mean_lfp = np.nanmean(interp_lfp, axis=0)
+
+        logging.info('Computing CSD')
+        current_source_density, csd_channels = compute_csd(trial_mean_lfp=trial_mean_lfp,
+                                                           spacing=spacing)
+
+        logging.info('Saving data')
         write_csd_to_h5(
-            probe["csd_output_path"], 
-            current_source_density, 
-            relative_window, 
-            csd_channels, 
-            args['stimulus']['key'], 
-            args["stimulus"]["index"], 
-            args["num_trials"]
+            path=probe["csd_output_path"],
+            csd=current_source_density,
+            relative_window=relative_window,
+            channels=csd_channels,
+            csd_locations=interp_locs,
+            stimulus_name=args['stimulus']['key'],
+            stimulus_index=args["stimulus"]["index"],
+            num_trials=args["num_trials"]
         )
 
         probewise_outputs.append({
-            'name': probe['name'], 
+            'name': probe['name'],
             'csd_path': probe['csd_output_path'],
         })
 
     return {
-        'probe_outputs': probewise_outputs, 
+        'probe_outputs': probewise_outputs,
     }
 
 
-def write_csd_to_h5(path, csd, relative_window, channels, stimulus_name, stimulus_index, num_trials):
+def write_csd_to_h5(path: Path, csd: np.ndarray, relative_window,
+                    channels: np.ndarray, csd_locations: np.ndarray,
+                    stimulus_name: str, stimulus_index: Optional[int],
+                    num_trials: Optional[int]):
     with h5py.File(str(path), "w") as output:
         output.create_dataset("current_source_density", data=csd)
         output.create_dataset("timestamps", data=relative_window)
         output.create_dataset("channels", data=channels)
+        output.create_dataset("csd_locations", data=csd_locations)
 
-        output.attrs["stimulus_name"] = stimulus_name
-        output.attrs["num_trials"] = num_trials
+        output.attrs["stimulus_name"] = str(stimulus_name)
+
+        if num_trials is not None:
+            output.attrs["num_trials"] = int(num_trials)
 
         if stimulus_index is not None:
-            output.attrs["stimulus_index"] = stimulus_index
-
+            output.attrs["stimulus_index"] = int(stimulus_index)
 
 
 def main():
 
-    logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s')
-    parser = optional_lims_inputs(sys.argv, InputParameters, OutputParameters, get_inputs_from_lims)
+    logging.basicConfig(format=('%(asctime)s:%(funcName)s'
+                                ':%(levelname)s:%(message)s'))
+    parser = optional_lims_inputs(sys.argv, InputParameters,
+                                  OutputParameters, get_inputs_from_lims)
     output = run_csd(parser.args)
     write_or_print_outputs(output, parser)
 
