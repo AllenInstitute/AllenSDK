@@ -4,8 +4,23 @@ import pandas as pd
 import seaborn as sns
 import matplotlib as mpl
 
+'''
+    This file contains a set of functions that are useful in analyzing visual behavior data
+'''
+
 
 def save_figure(fig, figsize, save_dir, folder, fig_title, formats=['.png']):
+    '''
+        Function for saving a figure
+    
+        INPUTS:
+        fig, a figure object
+        figsize,
+        save_dir, the directory to save the figure
+        folder, 
+        fig_title, the name of the figure
+        formats, a list of file formats as strings to save the figure as
+    '''
     fig_dir = os.path.join(save_dir, folder)
     if not os.path.exists(fig_dir):
         os.mkdir(fig_dir)
@@ -18,6 +33,12 @@ def save_figure(fig, figsize, save_dir, folder, fig_title, formats=['.png']):
 def get_dff_matrix(session):
     '''
         Returns the dff_trace of a session as a numpy matrix
+
+        INPUTS:
+        session, a behaviorOphysSession object
+        
+        OUTPUTS:
+        dff, a matrix of cells x dff_trace for the entire session 
     '''
     dff = np.stack(session.dff_traces.dff, axis=0)
     return dff
@@ -31,15 +52,26 @@ def get_mean_df(response_df, conditions=['cell_specimen_id', 'image_name'], flas
         response_df, the dataframe to group
         conditions, the conditions to group by, the first entry should be 'cell_specimen_id', the second could be 'image_name' or 'change_image_name'
         flashes, if True, computes the fraction of individual images that were significant
+        omitted, does nothing #PROBLEM
 
-        Returns a dataframe, does not alter the response_df
+        OUTPUTS:
+        mdf, a dataframe with index given by conditions, and columns:
+            mean_response, the average mean_response for each condition
+            sem_response, the sem of the mean_response
+            mean_trace, the average dff trace for each condition
+            sem_trace, the sem of the mean_trace
+            mean_responses, the list of mean_responses for each element of each group
+            pref_stim, if conditions includes image_name or change_image_name, sets a boolean column for whether that was the cell's preferred stimulus
+            fraction_significant_responses, if flashes, then computes the fraction of individual image presentations that were significant 
     '''
-
+    
+    # Group by conditions
     rdf = response_df.copy()
     mdf = rdf.groupby(conditions).apply(get_mean_sem_trace)
     mdf = mdf[['mean_response', 'sem_response', 'mean_trace', 'sem_trace', 'mean_responses']]
     mdf = mdf.reset_index()
 
+    # Add preferred stimulus if we can
     if ('image_name' in conditions) or ('change_image_name' in conditions):
         mdf = annotate_mean_df_with_pref_stim(mdf)
 
@@ -49,13 +81,18 @@ def get_mean_df(response_df, conditions=['cell_specimen_id', 'image_name'], flas
         fraction_significant_responses = fraction_significant_responses.reset_index()
         mdf['fraction_significant_responses'] = fraction_significant_responses.fraction_significant_responses
 
-
     return mdf
 
 
 def get_mean_sem_trace(group):
     '''
         Computes the average and sem of the mean_response column
+
+        INPUTS:
+        group, a pandas group
+        
+        OUTPUT:
+        a pandas series with the mean_response, sem_response, mean_trace, sem_trace, and mean_responses computed for the group. 
     '''
     mean_response = np.mean(group['mean_response'])
     mean_responses = group['mean_response'].values
@@ -69,34 +106,59 @@ def get_mean_sem_trace(group):
 
 def annotate_mean_df_with_pref_stim(mean_df):
     '''
-        Calculates the preferred stimulus based on the mean_response index.
-        Inputs: mean_df is a dataframe of the mean responses.
+        Computes the preferred stimulus for each cell/trial or cell/flash combination. Preferred image is computed by seeing which image evoked the largest average mean_response across all images. 
+
+        INPUTS:
+        mean_df, the mean_df to be annotated
+
+        OUTPUTS:
+        mean_df with a new column appended 'pref_stim' which is a boolean TRUE/FALSE for whether that image was that cell's preferred image. 
+       
+        ASSERTS:
+        Each cell has one unique preferred stimulus 
     '''
+    
+    # Are we dealing with flash_response or trial_response
     if 'image_name' in mean_df.keys():
         image_name = 'image_name'
     else:
         image_name = 'change_image_name'
+    
+    # set up dataframe
     mdf = mean_df.reset_index()
     mdf['pref_stim'] = False
-    if 'cell_specimen_id' in mdf.keys():
-        cell_key = 'cell_specimen_id'
-    else:
-        cell_key = 'cell'
-    for cell in mdf[cell_key].unique():
-        mc = mdf[(mdf[cell_key] == cell)]
+
+    # Iterate through cells in df       
+    for cell in mdf['cell_specimen_id'].unique():
+        mc = mdf[(mdf['cell_specimen_id'] == cell)]
         mc = mc[mc[image_name] != 'omitted']
         temp = mc[(mc.mean_response == np.max(mc.mean_response.values))][image_name].values
-        if len(temp) > 0:
+        if len(temp) > 0: # need this test if the mean_response was nan
             pref_image = temp[0]
-            row = mdf[(mdf[cell_key] == cell) & (mdf[image_name] == pref_image)].index
+            # PROBLEM, this is slow, and sets on slice, better to use mdf.at[test, 'pref_stim']
+            row = mdf[(mdf['cell_specimen_id'] == cell) & (mdf[image_name] == pref_image)].index
             mdf.loc[row, 'pref_stim'] = True
+
+    # Test to ensure preferred stimulus is unique for each cell
+    for cell in mdf.reset_index()['cell_specimen_id'].unique():
+        if image_name == 'image_name':
+             assert len(mdf.reset_index().set_index('cell_specimen_id').loc[cell].query('pref_stim').image_name.unique()) == 1  
+        else: 
+            assert len(mdf.reset_index().set_index('cell_specimen_id').loc[cell].query('pref_stim').change_image_name.unique()) == 1
     return mdf
 
 
 def get_fraction_significant_responses(group, threshold=0.05):
     '''
         Calculates the fraction of trials or flashes that have a p_value below threshold
-        We really need to think about multiple comparisons corrections here!
+        PROBLEM: This function does not handle multiple comparisons
+    
+        INPUT:
+        group, a pandas group
+        threshold, the p_value threshold for significance for an individual response
+
+        OUTPUT:
+        a pandas series with column 'fraction_significant_responses
     '''
     fraction_significant_responses = len(group[group.p_value < threshold]) / float(len(group))
     return pd.Series({'fraction_significant_responses': fraction_significant_responses})
@@ -142,7 +204,7 @@ def plot_mean_trace(traces, window=[-4,8], interval_sec=1, ylabel='dF/F', legend
 
     :return: axis handle
     """
-    ophys_frame_rate = 31.
+    ophys_frame_rate = 31. #PROBLEM, shouldn't hard code this here
     if ax is None:
         fig, ax = plt.subplots()
     if len(traces) > 0:
@@ -177,7 +239,7 @@ def plot_flashes_on_trace(ax, window=[-4,8], go_trials_only=False, omitted=False
 
     :return: axis handle
     """
-
+    # PROBLEM: shouldn't hard code these things here
     frame_rate = 31.
     stim_duration = .25
     blank_duration = .5
@@ -205,31 +267,34 @@ def plot_flashes_on_trace(ax, window=[-4,8], go_trials_only=False, omitted=False
     return ax
 
 
-
-
-
-
 def create_multi_session_mean_df(cache, experiment_ids, conditions=['cell_specimen_id','change_image_name'], flashes=False):
     '''
         Creates a mean response dataframe by combining multiple sessions. 
-        
-        manifest, the cache manifest
-        Sessions, is a list of session objects to merge
-        conditions is the set of conditions to send to get_mean_df() to merge. The first entry should be 'cell_specimen_id'
+       
+        INPUTS: 
+        cache, the cache for the dataset
+        experiment_ids, is a list of experiment_ids for sessions to merge
+        conditions is the set of conditions to send to get_mean_df() to groupby. The first entry should be 'cell_specimen_id'
         flashes, if TRUE, merges the flash_response_df, otherwise merges the trial_response_df
 
-        Returns a dataframe with index given by the session experiment ids. This allows for easy analysis like:
+        OUTPUTS
+        mega_mdf, a dataframe with index given by the session experiment ids. This allows for easy analysis like:
         mega_mdf.groupby('experiment_id').mean_response.mean()
     '''
     manifest = cache.manifest
     mega_mdf = pd.DataFrame()
+    # Iterate through experiments
     for experiment_id in experiment_ids:
+        # load the session object
         session = cache.get_session(experiment_id)
         print(session.metadata['ophys_experiment_id'])
+        # Get the individual session mean_df
         if flashes:
             mdf = get_mean_df(session.flash_response_df,conditions=conditions)
         else:
             mdf = get_mean_df(session.trial_response_df,conditions=conditions)
+
+        # Append metadata
         mdf['experiment_id'] = session.metadata['ophys_experiment_id']
         mdf['experiment_container_id'] = session.metadata['experiment_container_id']
         stage = manifest[manifest.ophys_experiment_id == session.metadata['ophys_experiment_id']].stage_name.values[0]
@@ -241,20 +306,42 @@ def create_multi_session_mean_df(cache, experiment_ids, conditions=['cell_specim
         mdf['full_genotype'] = session.metadata['full_genotype']
         mdf['cre_line'] = session.metadata['full_genotype'].split('/')[0]
         mdf['retake_number'] = manifest[manifest.ophys_experiment_id == session.metadata['ophys_experiment_id']].retake_number.values[0]
-
+        
+        # Concatenate this session to the other sessions
         mega_mdf = pd.concat([mega_mdf, mdf])
+
+    # Clean up indexes
     mega_mdf = mega_mdf.reset_index()
     mega_mdf = mega_mdf.set_index('experiment_id')
     mega_mdf = mega_mdf.drop(columns=['level_0','index'])
+
     return mega_mdf
 
 def parse_stage_for_passive(stage):
+    '''
+        Returns TRUE if the stage_name indicates a passive sessions
+    '''
     return 'passive' in stage
 
 def parse_stage_for_image_set(stage):
+    '''
+        Returns the character for the image_set, for example 'A'
+    '''
     return stage[15]
 
-
+def get_active_cell_indices(dff_traces):
+    '''
+        Returns the ten most active cells.
+        Computes active cells by SNR = mean/std over all timepoints. 
+    '''
+    snr_values = []
+    for i, trace in enumerate(dff_traces):
+        mean = np.mean(trace, axis=0)
+        std = np.std(trace, axis=0)
+        snr = mean / std
+        snr_values.append(snr)
+    active_cell_indices = np.argsort(snr_values)[-10:]
+    return active_cell_indices
 
 
 
