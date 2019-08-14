@@ -1,4 +1,4 @@
-from argschema import ArgSchema 
+from argschema import ArgSchema
 from argschema.schemas import DefaultSchema
 from argschema.fields import Nested, String, Float, Int, List, Bool
 import numpy as np
@@ -15,6 +15,7 @@ class ProbeInputParameters(DefaultSchema):
     total_channels = Int(default=384, help='Total channel count for this probe.')
     surface_channel_adjustment = Int(default=40, help='Erring up in the surface channel estimate is less dangerous for the CSD calculation than erring down, so an adjustment is provided.')
     spacing = Float(default=0.04, help='distance (in millimiters) between lengthwise-adjacent rows of recording sites on this probe.')
+    phase = String(required=True, help='The probe type (3a or PXI) which determines if channels need to be reordered')
 
 
 class StimulusInputParameters(DefaultSchema):
@@ -32,6 +33,10 @@ class InputParameters(ArgSchema):
     volts_per_bit = Float(default=1.0, help='If the data are not in units of volts, they must be converted. In the past, this value was 0.195')
     memmap = Bool(default=True, help='whether to memory map the data file on disk or load it directly to main memory')
     memmap_thresh = Float(default=np.inf, help='files larger than this threshold (bytes) will be memmapped, regardless of the memmap setting.')
+    filter_cuts = List(Float, default=[5.0, 150.0], cli_as_single_argument=True, help='Cutoff frequencies for bandpass filter')
+    filter_order = Int(default=5, help='Order for bandpass filter')
+    reorder_channels = Bool(default=True, help='Determines whether LFP channels should be re-ordered')
+    noisy_channel_threshold = Float(default=1500.0, help='Threshold for removing noisy channels from analysis')
 
 
 class ProbeOutputParameters(DefaultSchema):
@@ -40,14 +45,14 @@ class ProbeOutputParameters(DefaultSchema):
     csd_channels = List(Int, required=True, help='LFP channels from which CSD was calculated.')
 
 
-class OutputSchema(DefaultSchema): 
-    input_parameters = Nested(InputParameters, 
-                              description=("Input parameters the module " 
-                                           "was run with"), 
-                              required=True) 
+class OutputSchema(DefaultSchema):
+    input_parameters = Nested(InputParameters,
+                              description=("Input parameters the module "
+                                           "was run with"),
+                              required=True)
 
 
-class OutputParameters(OutputSchema): 
+class OutputParameters(OutputSchema):
     stimulus_name = String(required=True, help="name of stimulus from which CSD was calculated")
     stimulus_index = Int(required=True, help="index of stimulus from which CSD was calculated")
     probe_outputs = Nested(ProbeOutputParameters, many=True, required=True, help='probewise outputs')

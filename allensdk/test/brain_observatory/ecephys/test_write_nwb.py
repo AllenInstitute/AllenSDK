@@ -304,14 +304,16 @@ def test_write_probe_lfp_file(tmpdir_factory, lfp_data):
     csd = np.arange(20).reshape([2, 10])
     csd_times = np.linspace(-1, 1, 10)
     csd_channels = np.array([3, 2])
+    csd_locations = np.array([[1, 2], [3, 3]])
 
     write_csd_to_h5(
-        path=input_csd_path, 
-        csd=csd, 
-        relative_window=csd_times, 
-        channels=csd_channels, 
-        stimulus_name="foo", 
-        stimulus_index=None, 
+        path=input_csd_path,
+        csd=csd,
+        relative_window=csd_times,
+        channels=csd_channels,
+        csd_locations=csd_locations,
+        stimulus_name="foo",
+        stimulus_index=None,
         num_trials=1000
     )
 
@@ -326,7 +328,7 @@ def test_write_probe_lfp_file(tmpdir_factory, lfp_data):
 
     with pynwb.NWBHDF5IO(output_path, "r") as obt_io:
         obt_f = obt_io.read()
-        
+
         obt_ser = obt_f.get_acquisition("probe_12345_lfp").electrical_series["probe_12345_lfp_data"]
         assert np.allclose(lfp_data["data"], obt_ser.data[:])
         assert np.allclose(lfp_data["timestamps"], obt_ser.timestamps[:])
@@ -341,4 +343,4 @@ def test_write_probe_lfp_file(tmpdir_factory, lfp_data):
 
         assert np.allclose(csd, csd_series.data[:])
         assert np.allclose(csd_times, csd_series.timestamps[:])
-        assert np.allclose([2, 1], csd_series.control[:])  # ids
+        assert np.allclose([[1, 2], [3, 3]], csd_series.control[:])  # csd interpolated channel locations
