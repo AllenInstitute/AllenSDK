@@ -42,7 +42,10 @@ def get_all_mesoscope_sessions():
                  stim_type = x['change_detection']['stage']
                  meso_data_df.loc[meso_data_df['session_id'] == session_id,'stimulus_type'] = stim_type
             else:
-                logger.warning(f'session {session_id} has no behavior data in mouse seeks')
-
+                if 'stimulus_pickle' in x.keys():
+                    stim_type = x['stimulus_pickle']['stage']
+                    meso_data_df.loc[meso_data_df['session_id'] == session_id,'stimulus_type'] = stim_type
+                else:
+                    logger.warning(f'session {session_id} has no behavior data in mouse seeks')
     return meso_data_df
 
