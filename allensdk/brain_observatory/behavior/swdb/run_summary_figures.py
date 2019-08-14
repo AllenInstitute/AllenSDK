@@ -6,8 +6,8 @@ import behavior_project_cache as bpc
 
 # python_file = r"/allen/programs/braintv/workgroups/nc-ophys/nick.ponvert/src/AllenSDK/allensdk/brain_observatory/behavior/swdb/summary_figures.py"
 
-#  python_file = r"/home/marinag/AllenSDK/allensdk/brain_observatory/behavior/swdb/summary_figures.py"
-python_file = r"/home/nick.ponvert/src/AllenSDK/allensdk/brain_observatory/behavior/swdb/summary_figures.py"
+ python_file = r"/home/marinag/AllenSDK/allensdk/brain_observatory/behavior/swdb/summary_figures.py"
+# python_file = r"/home/nick.ponvert/src/AllenSDK/allensdk/brain_observatory/behavior/swdb/summary_figures.py"
 
 jobdir = '/allen/programs/braintv/workgroups/nc-ophys/nick.ponvert/cluster_jobs/visb_swdb_summary_figures'
 
