@@ -1,6 +1,7 @@
 import numpy as np
 import datetime
 import uuid
+import SimpleITK as sitk
 import pynwb
 from pynwb.base import TimeSeries, Images
 from pynwb.behavior import BehavioralEvents
@@ -11,6 +12,7 @@ from pynwb.ophys import DfOverF, ImageSegmentation, OpticalChannel, Fluorescence
 import allensdk.brain_observatory.roi_masks as roi
 from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory import dict_to_indexed_array
+from allensdk.brain_observatory.behavior.image_api import Image
 from allensdk.brain_observatory.behavior.image_api import ImageApi
 from allensdk.brain_observatory.behavior.schemas import OphysBehaviorMetaDataSchema, OphysBehaviorTaskParametersSchema
 from allensdk.brain_observatory.nwb.metadata import load_LabMetaData_extension
@@ -248,7 +250,15 @@ def add_image(nwbfile, image_data, image_name, module_name, module_description, 
     if image_api is None:
         image_api = ImageApi
 
-    data, spacing, unit = ImageApi.deserialize(image_data)
+    if isinstance(image_data, sitk.Image):
+        data, spacing, unit = ImageApi.deserialize(image_data)
+    elif isinstance(image_data, Image):
+        data = image_data.data
+        spacing = image_data.spacing
+        unit = image_data.unit
+    else:
+        raise ValueError("Not a supported image_data type: {}".format(type(image_data)))
+
     assert spacing[0] == spacing[1] and len(spacing) == 2 and unit == 'mm'
 
     if module_name not in nwbfile.modules:

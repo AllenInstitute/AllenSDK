@@ -47,7 +47,7 @@ def test_nwb_end_to_end(tmpdir_factory):
     BehaviorOphysNwbApi(nwb_filepath).save(d1)
 
     d2 = BehaviorOphysSession(api=BehaviorOphysNwbApi(nwb_filepath))
-    assert equals(d1, d2)
+    equals(d1, d2, reraise=True)
 
 
 @pytest.mark.nightly
@@ -72,7 +72,7 @@ def test_visbeh_ophys_data_set():
     assert len(data_set.corrected_fluorescence_traces) == 269 and sorted(data_set.corrected_fluorescence_traces.columns) == ['cell_roi_id', 'corrected_fluorescence']
     np.testing.assert_array_almost_equal(data_set.running_speed.timestamps, data_set.stimulus_timestamps)
     assert len(data_set.cell_specimen_table) == len(data_set.dff_traces)
-    assert data_set.average_projection.GetSize() == data_set.max_projection.GetSize()
+    assert data_set.average_projection.data.shape == data_set.max_projection.data.shape
     assert list(data_set.motion_correction.columns) == ['x', 'y']
     assert len(data_set.trials) == 602
 
@@ -151,7 +151,12 @@ def test_trial_response_window_bounds_reward(ophys_experiment_id):
 
         lick_times = [(t - row.change_time) for t in row.lick_times]
         if not np.isnan(row.reward_time):
-            reward_time = (row.reward_time - row.change_time)
+
+            # monitor delay is incorporated into the trials table change time
+            # TODO: where is this set in the session object?
+            camstim_change_time = row.change_time - 0.0351  
+
+            reward_time = (row.reward_time - camstim_change_time)
             assert response_window[0] < reward_time + 1/60
             assert reward_time < response_window[1] + 1/60
             if len(session.licks) > 0:
