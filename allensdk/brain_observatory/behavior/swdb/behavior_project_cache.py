@@ -25,7 +25,7 @@ class BehaviorProjectCache(object):
     def __init__(self, cache_paths):
         '''
         A cache-level object for the behavior/ophys data. Provides access to the manifest of 
-        complete ophys/behavior containers, as well as pre-computed analysis files for each 
+        ophys/behavior containers, as well as pre-computed analysis files for each 
         experiment.
 
         Args:
@@ -39,7 +39,7 @@ class BehaviorProjectCache(object):
         
         Attributes: 
             manifest: (pd.DataFrame)
-                Table containing information about all ophys sessions from complete containers.
+                Table containing information about all ophys sessions.
             analysis_files_metadata (dict):
                 Metadata relating to the creation of the analysis files.
             
