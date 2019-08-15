@@ -343,7 +343,48 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
 
 
 class ExtendedBehaviorSession(BehaviorOphysSession):
-
+    """Represents data from a single Visual Behavior Ophys imaging session.  LazyProperty attributes access the data only on the first demand, and then memoize the result for reuse.
+    
+    Attributes:
+        ophys_experiment_id : int (LazyProperty)
+            Unique identifier for this experimental session
+        max_projection : allensdk.brain_observatory.behavior.image_api.Image (LazyProperty)
+            2D max projection image
+        stimulus_timestamps : numpy.ndarray (LazyProperty)
+            Timestamps associated the stimulus presentations on the monitor 
+        ophys_timestamps : numpy.ndarray (LazyProperty)
+            Timestamps associated with frames captured by the microscope
+        metadata : dict (LazyProperty)
+            A dictionary of session-specific metadata
+        dff_traces : pandas.DataFrame (LazyProperty)
+            The traces of dff organized into a dataframe; index is the cell roi ids
+        cell_specimen_table : pandas.DataFrame (LazyProperty)
+            Cell roi information organized into a dataframe; index is the cell roi ids
+        running_speed : allensdk.brain_observatory.running_speed.RunningSpeed (LazyProperty)
+            NamedTuple with two fields
+                timestamps : numpy.ndarray
+                    Timestamps of running speed data samples
+                values : np.ndarray
+                    Running speed of the experimental subject (in cm / s).
+        stimulus_presentations : pandas.DataFrame (LazyProperty)
+            Table whose rows are stimulus presentations (i.e. a given image, for a given duration, typically 250 ms) and whose columns are presentation characteristics.
+        stimulus_templates : dict (LazyProperty)
+            A dictionary containing the stimulus images presented during the session keys are data set names, and values are 3D numpy arrays.
+        licks : pandas.DataFrame (LazyProperty)
+            A dataframe containing lick timestamps
+        rewards : pandas.DataFrame (LazyProperty)
+            A dataframe containing timestamps of delivered rewards
+        task_parameters : dict (LazyProperty)
+            A dictionary containing parameters used to define the task runtime behavior
+        trials : pandas.DataFrame (LazyProperty)
+            A dataframe containing behavioral trial start/stop times, and trial data
+        corrected_fluorescence_traces : pandas.DataFrame (LazyProperty)
+            The motion-corrected fluorescence traces organized into a dataframe; index is the cell roi ids
+        average_projection : allensdk.brain_observatory.behavior.image_api.Image (LazyProperty)
+            2D image of the microscope field of view, averaged across the experiment
+        motion_correction : pandas.DataFrame LazyProperty
+            A dataframe containing trace data used during motion correction computation
+    """
     def __init__(self, api):
 
         super(ExtendedBehaviorSession, self).__init__(api)
