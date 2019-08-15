@@ -297,7 +297,8 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
 
         # Rename some columns to make more sense to students
         stimulus_presentations = stimulus_presentations.rename(
-            columns={'index':'absolute_flash_number'})
+            columns={'index':'absolute_flash_number',
+                     'running_speed':'mean_running_speed'})
         # Replace image set with A/B
         stimulus_presentations['image_set'] = self.get_task_parameters()['stage'][15]
         # Change index name for easier merge with flash_response_df
