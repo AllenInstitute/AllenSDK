@@ -484,15 +484,17 @@ def threshold_rf(rf, threshold):
         area of mask
     
     """
+
+    rf_filt = ndi.gaussian_filter(rf, 1)
     
-    threshold_value = np.max(rf) - np.std(rf) * threshold
+    threshold_value = np.max(rf_filt) - np.std(rf_filt) * threshold
         
     rf_thresh = np.zeros(rf.shape, dtype='bool')
-    rf_thresh[rf > threshold_value] = True
+    rf_thresh[rf_filt > threshold_value] = True
     
     labels, num_features = ndi.label(rf_thresh)
     
-    best_label = np.argmax(ndi.maximum(rf, labels=labels, index=np.unique(labels)))
+    best_label = np.argmax(ndi.maximum(rf_filt, labels=labels, index=np.unique(labels)))
 
     labels[labels != best_label] = 0
     labels[labels > 0] = 1
