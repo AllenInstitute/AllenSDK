@@ -9,6 +9,7 @@ from allensdk.brain_observatory.ecephys.ecephys_session_api import EcephysNwbSes
 
 data_dir = '/allen/aibs/informatics/module_test_data/ecephys/stimulus_analysis_fh'
 
+@pytest.mark.skipif(not os.access(data_dir, os.R_OK), reason="can't read data dir")
 @pytest.mark.parametrize('spikes_nwb,expected_csv,analysis_params,units_filter',
                          [
                              #(os.path.join(data_dir, 'data', 'mouse406807_integration_test.spikes.nwb2'),
@@ -29,6 +30,10 @@ def test_metrics(spikes_nwb, expected_csv, analysis_params, units_filter, skip_c
     # TODO: Only temporary, remove when all metrics have been precaclualted
     if not os.path.exists(spikes_nwb):
         pytest.skip('No input spikes file {}.'.format(spikes_nwb))
+    if not os.access(spikes_nwb, os.R_OK):
+        pytest.skip(f"can't access file at {spikes_nwb}")
+    if not os.access(expected_csv, os.R_OK):
+        pytest.skip(f"can't access file at {expected_csv}")
 
     analysis_params = analysis_params or {}
 

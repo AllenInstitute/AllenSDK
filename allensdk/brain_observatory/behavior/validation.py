@@ -3,6 +3,7 @@ import os
 
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
 from allensdk.internal.api.ophys_lims_api import OphysLimsApi
+from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorOphysSession
 
 class ValidationError(AssertionError):
     pass
@@ -37,6 +38,45 @@ def validate_ophys_timestamps(ophys_experiment_id, api=None):
     if raw_data_shape[0] != ophys_timestamps_shape[0]:
         raise ValidationError('ophys_timestamp length does not match raw data length')
 
+def validate_last_trial_ends_adjacent_to_flash(ophys_experiment_id, api=None, verbose=False):
+        # ensure that the last trial ends sometime on the last flash/blank cycle
+        # i.e, if this is the last flash/blank iteration (high = stimulus present):
+        #           -------           -------           -------           -------
+        #          |       |         |       |         |       |         |       |
+        # ---------         ---------         ---------         ---------         -------------------------------------------
+        #                                                                ^                                                  ^
+        # The last trial has to have ended somewhere between the two carrots where:
+        #   the first carrot represents the time of the last recorded stimulus flash
+        #   the second carrot represents the time at which another flash should have started, after accounting for the possibility of the session ending on an omitted flash
+        
+        api = BehaviorOphysLimsApi() if api is None else api
+        session = BehaviorOphysSession(api)
+
+        # get the flash/blank parameters
+        max_flash_duration = session.stimulus_presentations['duration'].max()
+        max_blank_duration = session.task_parameters['blank_duration_sec'][1]
+        
+        # count number of omitted flashes at the very end of the session
+        N_final_omitted_flashes = session.stimulus_presentations.index.max() - session.stimulus_presentations.query('omitted == False').index.max()
+        
+        # get the start/end time of the last valid (non-omitted) flash
+        last_flash_start = session.stimulus_presentations.query('omitted == False')['start_time'].iloc[-1]
+        last_flash_end = session.stimulus_presentations.query('omitted == False')['stop_time'].iloc[-1]
+        
+        # calculate when the next stimulus should have flashed, after accounting for any omitted flashes at the end of the session
+        next_flash_would_have_started = last_flash_end + max_blank_duration + N_final_omitted_flashes*(max_flash_duration + max_blank_duration)
+        
+        # get the end time of the last trial
+        last_trial_end = session.trials.iloc[-1]['stop_time']
+        
+        if verbose:
+            print('last flash ended at {}'.format(last_flash_end))
+            print('another flash should have started by {}'.format(next_flash_would_have_started))
+            print('last trial ended at {}'.format(last_trial_end))
+        
+        if not last_flash_start <= last_trial_end <= next_flash_would_have_started:
+            raise ValidationError('The last trial does not end between the start of the last flash and the expected start time of the next flash')
+
 if __name__ == "__main__":
 
     api = BehaviorOphysLimsApi()
@@ -54,7 +94,12 @@ if __name__ == "__main__":
                                 808619526, 808619543, 808621034, 808621015]
 
     for ophys_experiment_id in ophys_experiment_id_list:
-        for validation_function in [validate_ophys_timestamps, validate_ophys_dff_length]:
+        validation_functions_to_run = [
+            validate_ophys_timestamps, 
+            validate_ophys_dff_length,
+            validate_last_trial_ends_adjacent_to_flash,
+        ]
+        for validation_function in validation_functions_to_run:
 
             try:
                 validation_function(ophys_experiment_id, api=api)

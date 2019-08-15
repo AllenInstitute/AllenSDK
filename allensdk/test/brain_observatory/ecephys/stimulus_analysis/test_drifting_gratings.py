@@ -11,7 +11,6 @@ from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
 
 data_dir = '/allen/aibs/informatics/module_test_data/ecephys/stimulus_analysis_fh'
 
-
 @pytest.mark.parametrize('spikes_nwb,expected_csv,analysis_params,units_filter',
                          [
                              #(os.path.join(data_dir, 'data', 'mouse406807_integration_test.spikes.nwb2'),
@@ -30,6 +29,10 @@ def test_metrics(spikes_nwb, expected_csv, analysis_params, units_filter, skip_c
     # TODO: Test is only temporary while the stimulus_analysis modules is in development. Replace with unit tests and/or move to integration testing framework
     if not os.path.exists(spikes_nwb):
         pytest.skip('No input spikes file {}.'.format(spikes_nwb))
+    if not os.access(spikes_nwb, os.R_OK):
+        pytest.skip(f"can't access file at {spikes_nwb}")
+    if not os.access(expected_csv, os.R_OK):
+        pytest.skip(f"can't access file at {expected_csv}")
 
     np.random.seed(0)
 

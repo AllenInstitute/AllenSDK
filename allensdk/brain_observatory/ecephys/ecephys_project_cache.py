@@ -3,13 +3,16 @@ from pathlib import Path
 import ast
 
 import pandas as pd
+import SimpleITK as sitk
+import h5py
 
 from allensdk.api.cache import Cache
 
-from allensdk.brain_observatory.ecephys.ecephys_project_api import EcephysProjectLimsApi, EcephysProjectWarehouseApi
+from allensdk.brain_observatory.ecephys.ecephys_project_api import EcephysProjectLimsApi, EcephysProjectWarehouseApi, EcephysProjectFixedApi
 from allensdk.brain_observatory.ecephys.ecephys_session_api import EcephysNwbSessionApi
 from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
 from allensdk.brain_observatory.ecephys.file_promise import FilePromise, read_nwb, write_from_stream
+from allensdk.brain_observatory.ecephys import get_unit_filter_value
 
 
 csv_io = {
@@ -33,9 +36,16 @@ class EcephysProjectCache(Cache):
     PROBES_KEY = 'probes'
     CHANNELS_KEY = 'channels'
     UNITS_KEY = 'units'
+
     SESSION_DIR_KEY = 'session_data'
     SESSION_NWB_KEY = 'session_nwb'
     PROBE_LFP_NWB_KEY = "probe_lfp_nwb"
+
+    NATURAL_MOVIE_DIR_KEY = "movie_dir"
+    NATURAL_MOVIE_KEY = "natural_movie"
+
+    NATURAL_SCENE_DIR_KEY = "natural_scene_dir"
+    NATURAL_SCENE_KEY = "natural_scene"
 
     MANIFEST_VERSION = '0.2.0'
 
@@ -46,6 +56,7 @@ class EcephysProjectCache(Cache):
 
         super(EcephysProjectCache, self).__init__(**kwargs)
         self.fetch_api = fetch_api
+
 
     def get_sessions(self):
         path = self.get_cache_path(None, self.SESSIONS_KEY)
@@ -64,7 +75,7 @@ class EcephysProjectCache(Cache):
         path = self.get_cache_path(None, self.CHANNELS_KEY)
         return call_caching(self.fetch_api.get_channels, path, strategy='lazy', **csv_io)
 
-    def get_units(self, annotate=False):
+    def get_units(self, annotate=False, **kwargs):
         """ Reports a table consisting of all sorted units across the entire extracellular electrophysiology project.
 
         Parameters
@@ -80,7 +91,13 @@ class EcephysProjectCache(Cache):
         """
 
         path = self.get_cache_path(None, self.UNITS_KEY)
-        units = call_caching(self.fetch_api.get_units, path, strategy='lazy', **csv_io)
+        get_units = functools.partial(
+            self.fetch_api.get_units, 
+            amplitude_cutoff_maximum=None, # pull down all the units to csv and filter on the way out
+            presence_ratio_minimum=None, 
+            isi_violations_maximum=None
+        )
+        units = call_caching(get_units, path, strategy='lazy', **csv_io)
 
         if annotate:
             channels = self.get_channels().drop(columns=["unit_count"])
@@ -91,6 +108,12 @@ class EcephysProjectCache(Cache):
             units = pd.merge(units, probes, left_on='ecephys_probe_id', right_index=True, suffixes=['_unit', '_probe'])
             units = pd.merge(units, sessions, left_on='ecephys_session_id', right_index=True, suffixes=['_unit', '_session'])
 
+        units =units[
+            (units["amplitude_cutoff"] <= get_unit_filter_value("amplitude_cutoff_maximum", **kwargs))
+            & (units["presence_ratio"] >= get_unit_filter_value("presence_ratio_minimum", **kwargs))
+            & (units["isi_violations"] <= get_unit_filter_value("isi_violations_maximum", **kwargs))
+        ]
+        
         return units
 
 
@@ -120,6 +143,37 @@ class EcephysProjectCache(Cache):
         session_api = EcephysNwbSessionApi(path=path, probe_lfp_paths=probe_promises)
         return EcephysSession(api=session_api)
 
+    def get_natural_movie_template(self, number):
+        path = self.get_cache_path(None, self.NATURAL_MOVIE_KEY, number)
+
+        def reader(path):
+            with h5py.File(path, "r") as fil:
+                return fil["data"][:]
+
+        return call_caching(
+            self.fetch_api.get_natural_movie_template,
+            path,
+            number=number,
+            strategy="lazy",
+            writer=write_from_stream,
+            reader=reader
+        )
+
+    def get_natural_scene_template(self, number):
+        path = self.get_cache_path(None, self.NATURAL_SCENE_KEY, number)
+
+        def reader(path):
+            return sitk.GetArrayFromImage(sitk.ReadImage(path))
+
+        return call_caching(
+            self.fetch_api.get_natural_scene_template, 
+            path, 
+            number=number, 
+            strategy="lazy",
+            writer=write_from_stream,
+            reader=reader
+        )
+
     def get_all_stimulus_sets(self, **session_kwargs):
         return self._get_all_values("session_type", self.get_sessions, **session_kwargs)
 
@@ -138,13 +192,11 @@ class EcephysProjectCache(Cache):
     def get_all_genders(self):
         return self._get_all_values("gender", self.get_sessions, **session_kwargs)
 
-
     def _get_all_values(self, key, method=None, **method_kwargs):
         if method is None:
             method = self.get_sessions
         data = method(**method_kwargs)
         return data[key].unique().tolist()
-
 
     def add_manifest_paths(self, manifest_builder):
         manifest_builder = super(EcephysProjectCache, self).add_manifest_paths(manifest_builder)
@@ -177,6 +229,22 @@ class EcephysProjectCache(Cache):
             self.PROBE_LFP_NWB_KEY, 'probe_%d_lfp.nwb', parent_key=self.SESSION_DIR_KEY, typename='file'
         )
 
+        manifest_builder.add_path(
+            self.NATURAL_MOVIE_DIR_KEY, "natural_movie_templates", parent_key="BASEDIR", typename="dir"
+        )
+
+        manifest_builder.add_path(
+            self.NATURAL_MOVIE_KEY, "natural_movie_%d.h5", parent_key=self.NATURAL_MOVIE_DIR_KEY, typename="file"
+        )
+
+        manifest_builder.add_path(
+            self.NATURAL_SCENE_DIR_KEY, "natural_scene_templates", parent_key="BASEDIR", typename="dir"
+        )
+
+        manifest_builder.add_path(
+            self.NATURAL_SCENE_KEY, "natural_scene_%d.tiff", parent_key=self.NATURAL_SCENE_DIR_KEY, typename="file"
+        )
+
         return manifest_builder
 
     @classmethod
@@ -194,3 +262,7 @@ class EcephysProjectCache(Cache):
             fetch_api=EcephysProjectWarehouseApi.default(**warehouse_kwargs), 
             **kwargs
         )
+
+    @classmethod
+    def fixed(cls, **kwargs):
+        return cls(fetch_api=EcephysProjectFixedApi(), **kwargs)
