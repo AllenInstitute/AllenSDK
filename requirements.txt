@@ -22,3 +22,4 @@ xarray
 hdmf==1.0.2
 pynwb==1.0.2
 tables==3.5.1 # pinning this because updates tend to not include wheels immediately
+seaborn
