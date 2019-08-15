@@ -384,6 +384,10 @@ class ExtendedBehaviorSession(BehaviorOphysSession):
             2D image of the microscope field of view, averaged across the experiment
         motion_correction : pandas.DataFrame LazyProperty
             A dataframe containing trace data used during motion correction computation
+
+    Attributes for internal / advanced users
+        running_data_df : pandas.DataFrame (LazyProperty)
+            Dataframe containing various signals used to compute running speed
     """
     def __init__(self, api):
 
