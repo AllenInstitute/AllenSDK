@@ -41,7 +41,7 @@ class InputParameters(ArgSchema):
             "natural_movie_3" : "natural_movie_three",
             "Natural Images": "natural_scenes",
             "flash_250ms": "flashes",
-            "gabor_20_deg_250ms": "receptive_field_mapping",
+            "gabor_20_deg_250ms": "gabors",
             "drifting_gratings" : "drifting_gratings",
             "static_gratings" : "static_gratings",
 
@@ -65,7 +65,17 @@ class InputParameters(ArgSchema):
         },
     )
     column_name_map = Dict(
-        keys=String(), values=String(), help="optionally rename parameters", default={}
+        keys=String(), values=String(), help="optionally rename parameters", default={
+            "Contrast": "contrast",
+            "Ori":	"orientation",
+            "SF": "spatial_frequency",
+            "TF": "temporal_frequency",
+            "Phase": "phase",
+            "Color": "color",
+            "Image": "frame",
+            "Pos_x": "x_position",
+            "Pos_y": "y_position"
+        }
     )
     extract_const_params_from_repr = Bool(default=True)
     drop_const_params = List(
@@ -81,8 +91,6 @@ class OutputSchema(DefaultSchema):
         description=("Input parameters the module " "was run with"),
         required=True,
     )
-
-
-class OutputParameters(OutputSchema):
     output_path = String(help="Path to output csv file")
     output_frame_times_path = String(help="output all frame times here")
+
