@@ -186,7 +186,7 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
         task_parameters['stimulus_duration_sec'] = 0.25
         return task_parameters
 
-    def get_trials(self):
+    def get_trials(self, filter_aborted_trials=True):
         trials = super(ExtendedNwbApi, self).get_trials()
         stimulus_presentations = super(ExtendedNwbApi, self).get_stimulus_presentations()
 
@@ -224,6 +224,10 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
         # asserts that every change time exists in the stimulus_presentations table
         for change_time in trials[trials['change_time'].notna()]['change_time']:
             assert change_time in stimulus_presentations['start_time'].values
+
+        # Return only non-aborted trials from this API by default
+        if filter_aborted_trials:
+            trials = trials.query('not aborted')
 
         # Reorder / drop some columns to make more sense to students
         trials = trials[[
