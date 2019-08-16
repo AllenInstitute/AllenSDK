@@ -25,6 +25,6 @@ def get_unit_filter_value(key, pop=True, replace_none=True, **source):
         value = source.get(key, UNIT_FILTER_DEFAULTS[key]["value"])
     
     if value is None and replace_none:
-        value = UNIT_FILTER_DEFAULTS[key]["default"]
+        value = UNIT_FILTER_DEFAULTS[key]["missing"]
 
     return value
