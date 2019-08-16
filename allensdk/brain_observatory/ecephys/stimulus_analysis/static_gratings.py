@@ -38,7 +38,7 @@ class StaticGratings(StimulusAnalysis):
 
     """
 
-    def __init__(self, ecephys_session, col_ori='Ori', col_sf='SF', col_phase='Phase', trial_duration=0.25, **kwargs):
+    def __init__(self, ecephys_session, col_ori='orientation', col_sf='spatial_frequency', col_phase='phase', trial_duration=0.25, **kwargs):
         super(StaticGratings, self).__init__(ecephys_session, trial_duration=trial_duration, **kwargs)
         self._orivals = None
         self._number_ori = None

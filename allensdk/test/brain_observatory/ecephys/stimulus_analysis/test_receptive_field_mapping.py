@@ -23,7 +23,7 @@ data_dir = '/allen/aibs/informatics/module_test_data/ecephys/stimulus_analysis_f
                                914580428, 914580452, 914580450, 914580474, 914580470, 914580490])
                          ])
 def test_metrics(spikes_nwb, expected_csv, analysis_params, units_filter, skip_cols=[]):
-    """Full intergration tests of metrics table"""
+    """Full integration tests of metrics table"""
     if not os.path.exists(spikes_nwb):
         pytest.skip('No input spikes file {}.'.format(spikes_nwb))
     if not os.access(spikes_nwb, os.R_OK):
@@ -50,6 +50,11 @@ def test_metrics(spikes_nwb, expected_csv, analysis_params, units_filter, skip_c
 
     assert(np.all(actual_data.index.values == expected_data.index.values))
     assert(set(actual_data.columns) == (set(expected_data.columns) - set(skip_cols)))
+
+    pd.set_option("display.max_columns", None)
+    pd.set_option("display.max_rows", None)
+    print(actual_data.head(20))
+    print(expected_data.head(20))
 
     assert(np.allclose(actual_data['azimuth_rf'].astype(np.float), expected_data['azimuth_rf'], equal_nan=True))
     assert(np.allclose(actual_data['elevation_rf'].astype(np.float), expected_data['elevation_rf'], equal_nan=True))

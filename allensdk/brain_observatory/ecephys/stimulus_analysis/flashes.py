@@ -37,7 +37,7 @@ class Flashes(StimulusAnalysis):
 
     """
 
-    def __init__(self, ecephys_session, col_color='Color', trial_duration=0.25, **kwargs):
+    def __init__(self, ecephys_session, col_color='color', trial_duration=0.25, **kwargs):
         super(Flashes, self).__init__(ecephys_session, trial_duration=trial_duration, **kwargs)
 
         self._metrics = None
