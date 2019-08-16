@@ -120,7 +120,7 @@ class ReceptiveFieldMapping(StimulusAnalysis):
                 ('width_rf', np.float64), 
                 ('height_rf', np.float64),
                 ('area_rf', np.float64), 
-                ('p_value_rf', bool), 
+                ('p_value_rf', np.float64), 
                 ('on_screen_rf', bool), 
                 ('firing_rate_rf', np.float64),
                 ('fano_rf', np.float64), 
