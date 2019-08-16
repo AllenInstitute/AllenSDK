@@ -81,12 +81,12 @@ class EcephysNwb1Api(EcephysSessionApi):
         return [(pname, pgrp) for pname, pgrp in self.processing_grp.items()
                 if isinstance(pgrp, h5py.Group) and pname.lower().startswith('probe')]
 
-    def get_running_speed(self) -> RunningSpeed:
+    def get_running_speed(self):
         running_speed_grp = self.running_speed_grp
 
         return pd.DataFrame({
-            "timestamps": running_speed_grp['timestamps'][:],
-            "values": running_speed_grp['data'][:] # TODO: what has been done to these? Are they just dx?
+            "start_time": running_speed_grp['timestamps'][:],
+            "velocity": running_speed_grp['data'][:]  # average velocities over a given interval
         })
 
     __stim_col_map = {

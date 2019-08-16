@@ -85,3 +85,36 @@ class ArgSchemaParserPlus(ArgSchemaParser):  # pragma: no cover
         self.args = known_args
 
         super(ArgSchemaParserPlus, self).__init__(args=extra_args, **kwargs)
+
+
+def optional_lims_inputs(argv, input_schema, output_schema, lims_input_getter):
+
+    remaining_args = argv[1:]
+    input_data = {}
+
+    if "--get_inputs_from_lims" in argv:
+        lims_parser = argparse.ArgumentParser(add_help=False)
+        lims_parser.add_argument("--host", type=str, default="http://lims2")
+        lims_parser.add_argument("--job_queue", type=str, default=None)
+        lims_parser.add_argument("--strategy", type=str, default=None)
+        lims_parser.add_argument("--ecephys_session_id", type=int, default=None)
+        lims_parser.add_argument("--output_root", type=str, default=None)
+
+        lims_args, remaining_args = lims_parser.parse_known_args(remaining_args)
+        remaining_args = [
+            item for item in remaining_args if item != "--get_inputs_from_lims"
+        ]
+        input_data = lims_input_getter(**lims_args.__dict__)
+
+    try:
+        parser = ArgSchemaParser(
+            args=remaining_args,
+            input_data=input_data,
+            schema_type=input_schema,
+            output_schema_type=output_schema,
+        )
+    except ValidationError:
+        print(input_data)
+        raise
+
+    return parser

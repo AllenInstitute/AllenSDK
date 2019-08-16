@@ -8,6 +8,8 @@ import collections
 import dateutil
 from scipy.stats import norm
 
+from allensdk import one
+
 
 # TODO: add trial column descriptions
 TRIAL_COLUMN_DESCRIPTION_DICT = {}
@@ -125,93 +127,223 @@ def resolve_initial_image(stimuli, start_frame):
     return initial_image_category_name, initial_image_group, initial_image_name
 
 
-def get_trials(data, licks_df, rewards_df, rebase):
+def trial_data_from_log(trial):
+    '''
+    Infer trial logic from trial log. Returns a dictionary.
+    
+    * reward volume: volume of water delivered on the trial, in mL
+
+    Each of the following values is boolean:
+
+    Trial category values are mutually exclusive
+    * go: trial was a go trial (trial with a stimulus change)
+    * catch: trial was a catch trial (trial with a sham stimulus change)
+
+    stimulus_change/sham_change are mutually exclusive
+    * stimulus_change: did the stimulus change (True on 'go' trials)
+    * sham_change: stimulus did not change, but response was evaluated (True on 'catch' trials)
+
+    Each trial can be one (and only one) of the following:
+    * hit (stimulus changed, animal responded in response window)
+    * miss (stimulus changed, animal did not respond in response window)
+    * false_alarm (stimulus did not change, animal responded in response window)
+    * correct_reject (stimulus did not change, animal did not respond in response window)
+    * aborted (animal responded before change time)
+    * auto_rewarded (reward was automatically delivered following the change. This will bias the animals choice and should not be categorized as hit/miss)
+    
+    
+    '''
+    trial_event_names = [val[0] for val in trial['events']]
+    hit = 'hit' in trial_event_names
+    false_alarm = 'false_alarm' in trial_event_names
+    miss = 'miss' in trial_event_names
+    sham_change = 'sham_change' in trial_event_names
+    stimulus_change = 'stimulus_changed' in trial_event_names
+    aborted = 'abort' in trial_event_names
+
+    if aborted:
+        go = catch = auto_rewarded = False
+    else:
+        catch = trial["trial_params"]["catch"] is True
+        auto_rewarded = trial["trial_params"]["auto_reward"]
+        go = not catch and not auto_rewarded
+
+    correct_reject = catch and not false_alarm
+
+    if auto_rewarded:
+        hit = miss = correct_reject = false_alarm = False
+
+    return {
+        "reward_volume": sum([r[0] for r in trial.get("rewards", [])]),
+        "hit": hit,
+        "false_alarm": false_alarm,
+        "miss": miss,
+        "sham_change": sham_change,
+        "stimulus_change": stimulus_change,
+        "aborted": aborted,
+        "go": go,
+        "catch": catch,
+        "auto_rewarded": auto_rewarded,
+        "correct_reject": correct_reject,
+    }
+
+
+def validate_trial_condition_exclusivity(trial_index, **trial_conditions):
+    '''ensure that only one of N possible mutually exclusive trial conditions is True'''
+    on = []
+    for condition, value in trial_conditions.items():
+        if value:
+            on.append(condition)
+    
+    if len(on) != 1:
+        all_conditions = list(trial_conditions.keys())
+        raise AssertionError(f"expected exactly 1 trial condition out of {all_conditions} to be True, instead {on} were True (trial {trial_index})")
+
+
+def get_trial_lick_times(lick_times, start_time, stop_time):
+    '''extract lick times in time range'''
+    return lick_times[np.where(np.logical_and(
+        lick_times >= start_time, 
+        lick_times <= stop_time
+    ))]
+
+
+def get_trial_reward_time(rebased_reward_times, start_time, stop_time):
+    '''extract reward times in time range'''
+    reward_times = rebased_reward_times[np.where(np.logical_and(
+        rebased_reward_times >= start_time, 
+        rebased_reward_times <= stop_time
+    ))]
+    return float('nan') if len(reward_times) == 0 else one(reward_times)
+        
+
+def get_trial_timing(event_dict, stimulus_presentations_df, licks, go, catch, auto_rewarded, hit, false_alarm):
+    '''
+    extract trial timing data
+    
+    content of trial log depends on trial type depends on trial type and response type
+    go, catch, auto_rewarded, hit, false_alarm must be passed as booleans to disambiguate trial and response type
+
+    on `go` or `auto_rewarded` trials, extract the stimulus_changed time
+    on `catch` trials, extract the sham_change time
+
+    on `hit` trials, extract the response time from the `hit` entry in event_dict
+    on `false_alarm` trials, extract the response time from the `false_alarm` entry in event_dict
+    '''
+
+    assert not (hit==True and false_alarm==True), "both `hit` and `false_alarm` cannot be True, they are mutually exclusive categories"
+    assert not (go==True and catch==True), "both `go` and `catch` cannot be True, they are mutually exclusive categories"
+    assert not (go==True and auto_rewarded==True), "both `go` and `auto_rewarded` cannot be True, they are mutually exclusive categories"
+
+    start_time = event_dict["trial_start", ""]['rebased_time']
+    stop_time = event_dict["trial_end", ""]['rebased_time']
+
+    if hit:
+        response_time = event_dict.get(("hit", ""))['rebased_time']
+    elif false_alarm:
+        response_time = event_dict.get(("false_alarm", ""))['rebased_time']
+    else:
+        response_time = float("nan")
+
+    def get_change_time(change_frame,stimulus_presentations_df):
+        # get the first stimulus in the log after the current change frame:
+        query = stimulus_presentations_df.query('start_frame >= @change_frame')
+        if len(query) > 0:
+            return query['start_time'].iloc[0]
+        else:
+            # return NaN if the query is empty
+            return np.nan
+
+    if go or auto_rewarded:
+        change_frame = event_dict.get(('stimulus_changed', ''))['frame']
+        change_time = get_change_time(change_frame,stimulus_presentations_df)
+    elif catch:
+        change_frame = event_dict.get(('sham_change', ''))['frame']
+        change_time = get_change_time(change_frame,stimulus_presentations_df)
+    else:
+        change_time = float("nan")
+        change_frame = float("nan")
+
+    if not (go or catch or auto_rewarded):
+        response_latency = None
+    elif len(licks) > 0:
+        response_latency = licks[0] - change_time
+    else:
+        response_latency = float("inf")
+
+    return {
+        "start_time": start_time,
+        "stop_time": stop_time,
+        "trial_length": stop_time - start_time,
+        "response_time": response_time,
+        "change_frame": change_frame,
+        "change_time": change_time,
+        "response_latency": response_latency,
+    }       
+
+
+def get_trial_image_names(trial, stimuli):
+    trial_start_frame = trial["events"][0][3]
+    _, _, initial_image_name = resolve_initial_image(stimuli, trial_start_frame)
+    if len(trial["stimulus_changes"]) == 0:
+        change_image_name = initial_image_name
+    else:
+        (_, from_name), (_, to_name), _, _ = trial["stimulus_changes"][0]
+        assert from_name == initial_image_name
+        change_image_name = to_name
+
+    return {
+        "initial_image_name": initial_image_name,
+        "change_image_name": change_image_name
+    }
+
+
+def get_trials(data, licks_df, rewards_df, stimulus_presentations_df, rebase):
     assert rewards_df.index.name == 'timestamps'
     stimuli = data["items"]["behavior"]["stimuli"]
+    trial_log = data["items"]["behavior"]["trial_log"]
 
-    trial_data = collections.defaultdict(list)
+    all_trial_data = [None] * len(trial_log)
     sync_lick_times = licks_df.time.values 
     rebased_reward_times = rewards_df.index.values
-    for trial in data["items"]["behavior"]["trial_log"]:
-        event_dict = {(e[0], e[1]): rebase(e[2]) for e in trial['events']}
 
-        trial_data['trial'].append(trial["index"])
+    for idx, trial in enumerate(trial_log):
+        # extract rebased time and frame for each event in the trial log:
+        event_dict = {(e[0], e[1]): {'rebased_time':rebase(e[2]),'frame':e[3]} for e in trial['events']}
 
-        start_time = event_dict['trial_start', '']
-        trial_data['start_time'].append(start_time)
+        tr_data = {"trial": trial["index"]}
+        tr_data["lick_times"] = get_trial_lick_times(
+            sync_lick_times, 
+            event_dict[('trial_start', '')]['rebased_time'], 
+            event_dict[('trial_end', '')]['rebased_time']
+        )
+        tr_data["reward_time"] = get_trial_reward_time(
+            rebased_reward_times,
+            event_dict[('trial_start', '')]['rebased_time'], 
+            event_dict[('trial_end', '')]['rebased_time']
+        )
+        tr_data.update(trial_data_from_log(trial))
+        tr_data.update(get_trial_timing(
+            event_dict,
+            stimulus_presentations_df,
+            tr_data['lick_times'],
+            tr_data['go'],
+            tr_data['catch'],
+            tr_data['auto_rewarded'],
+            tr_data['hit'],
+            tr_data['false_alarm'],
+        ))
+        tr_data.update(get_trial_image_names(trial, stimuli))
 
-        stop_time = event_dict['trial_end', '']
-        trial_data['stop_time'].append(stop_time)
+        # ensure that only one trial condition is True (they are mutually exclusive)
+        condition_dict = {}
+        for key in ['hit','miss','false_alarm','correct_reject','auto_rewarded','aborted']:
+            condition_dict[key] = tr_data[key]
+        validate_trial_condition_exclusivity(idx,**condition_dict)
 
-        trial_length = stop_time - start_time
-        trial_data['trial_length'].append(trial_length)
+        all_trial_data[idx] = tr_data
 
-        catch = trial["trial_params"]["catch"] == True
-        trial_data['catch'].append(catch)
-
-        auto_rewarded = trial["trial_params"]["auto_reward"]
-        trial_data['auto_rewarded'].append(auto_rewarded)
-
-        go = not catch and not auto_rewarded
-        trial_data['go'].append(go)
-
-        lick_times = sync_lick_times[np.where(np.logical_and(sync_lick_times >= start_time, sync_lick_times <= stop_time))]
-        trial_data['lick_times'].append(lick_times)
-
-        aborted = ("abort", "") in event_dict
-        trial_data['aborted'].append(aborted)
-
-        reward_volume = sum([r[0] for r in trial.get("rewards", [])])
-        trial_data['reward_volume'].append(reward_volume)
-
-        hit = ('hit', "") in event_dict
-        trial_data['hit'].append(hit)
-
-        false_alarm = ('false_alarm', "") in event_dict
-        trial_data['false_alarm'].append(false_alarm)
-
-        correct_reject = catch and not false_alarm
-        trial_data['correct_reject'].append(correct_reject)
-
-        response_time = event_dict.get(('hit', '')) or event_dict.get(('false_alarm', '')) if hit or false_alarm else float('nan')
-        trial_data['response_time'].append(response_time)
-
-        miss = ('miss', "") in event_dict
-        trial_data['miss'].append(miss)
-
-        reward_times = rebased_reward_times[np.where(np.logical_and(rebased_reward_times >= start_time, rebased_reward_times <= stop_time))]
-        trial_data['reward_times'].append(reward_times)
-
-        sham_change = True if ('sham_change', '') in event_dict else False
-        trial_data['sham_change'].append(sham_change)
-
-        stimulus_change = True if ('stimulus_changed', '') in event_dict else False
-        trial_data['stimulus_change'].append(stimulus_change)
-
-        change_time = event_dict.get(('stimulus_changed', '')) or event_dict.get(('sham_change', '')) if stimulus_change or sham_change else float('nan')
-        trial_data['change_time'].append(change_time)
-
-        if not (sham_change or stimulus_change):
-            response_latency = None
-        else:
-            if hit or false_alarm:
-                response_latency = response_time - change_time
-            else:
-                response_latency = float("inf")
-        trial_data['response_latency'].append(response_latency)
-
-        trial_start_frame = trial["events"][0][3]
-        _, _, initial_image_name = resolve_initial_image(stimuli, trial_start_frame)
-        if len(trial["stimulus_changes"]) == 0:
-            change_image_name = initial_image_name
-        else:
-            (_, from_name), (_, to_name), _, _ = trial["stimulus_changes"][0]
-            assert from_name == initial_image_name
-            change_image_name = to_name
-        trial_data['initial_image_name'].append(initial_image_name)
-        trial_data['change_image_name'].append(change_image_name)
-
-    trials = pd.DataFrame(trial_data).set_index('trial')
+    trials = pd.DataFrame(all_trial_data).set_index('trial')
     trials.index = trials.index.rename('trials_id')
 
     return trials
@@ -475,7 +607,7 @@ def find_licks(reward_times, licks, window=3.5):
     if len(reward_times) == 0:
         return []
     else:
-        reward_time = reward_times[0]
+        reward_time = one(reward_times)
         reward_lick_mask = ((licks['time'] > reward_time) & (licks['time'] < (reward_time + window)))
 
         tr_licks = licks[reward_lick_mask].copy()
@@ -638,54 +770,3 @@ def get_extended_trials(data, time=None):
                                   licks=data_to_licks(data, time))
 
 
-# -> metrics
-def dprime(hit_rate, fa_rate, limits=(0.01, 0.99)):
-    """ calculates the d-prime for a given hit rate and false alarm rate
-
-    https://en.wikipedia.org/wiki/Sensitivity_index
-
-    Parameters
-    ----------
-    hit_rate : float
-        rate of hits in the True class
-    fa_rate : float
-        rate of false alarms in the False class
-    limits : tuple, optional
-        limits on extreme values, which distort. default: (0.01,0.99)
-
-    Returns
-    -------
-    d_prime
-
-    """
-    assert limits[0] > 0.0, 'limits[0] must be greater than 0.0'
-    assert limits[1] < 1.0, 'limits[1] must be less than 1.0'
-    Z = norm.ppf
-
-    # Limit values in order to avoid d' infinity
-    hit_rate = np.clip(hit_rate, limits[0], limits[1])
-    fa_rate = np.clip(fa_rate, limits[0], limits[1])
-
-    try:
-        last_hit_nan = np.where(np.isnan(hit_rate))[0].max()
-    except ValueError:
-        last_hit_nan = 0
-
-    try:
-        last_fa_nan = np.where(np.isnan(fa_rate))[0].max()
-    except ValueError:
-        last_fa_nan = 0
-
-    last_nan = np.max((last_hit_nan, last_fa_nan))
-
-    # fill nans with 0.5 to avoid warning about nans
-    d_prime = Z(pd.Series(hit_rate).fillna(0.5)) - Z(pd.Series(fa_rate).fillna(0.5))
-
-    # fill all values up to the last nan with nan
-    d_prime[:last_nan] = np.nan
-
-    if len(d_prime) == 1:
-        # if the result is a 1-length vector, return as a scalar
-        return d_prime[0]
-    else:
-        return d_prime

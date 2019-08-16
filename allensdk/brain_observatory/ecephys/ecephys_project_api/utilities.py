@@ -31,13 +31,23 @@ def postgres_macros():
                 {% endif %}
             {% endmacro %}
             {% macro optional_equals(key, value) %}
-                {% if data is not none -%}
+                {% if value is not none -%}
                     and {{key}} = {{value}}
                 {% endif %}
             {% endmacro %}
             {% macro optional_not_null(key, value=True) %}
                 {% if value is not none -%}
                     and {{key}} is {{- ' not ' if value -}} null
+                {% endif %}
+            {% endmacro %}
+            {% macro optional_le(key, value) %}
+                {% if value is not none -%}
+                    and {{key}} <= {{value}}
+                {% endif %}
+            {% endmacro %}
+            {% macro optional_ge(key, value) %}
+                {% if value is not none -%}
+                    and {{key}} >= {{value}}
                 {% endif %}
             {% endmacro %}
         """,

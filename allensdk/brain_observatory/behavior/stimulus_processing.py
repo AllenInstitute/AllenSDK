@@ -28,8 +28,7 @@ def load_pickle(pstream):
 
 def get_stimulus_presentations(data, stimulus_timestamps):
 
-    visual_stimuli = get_visual_stimuli_df(data, stimulus_timestamps)
-    stimulus_table = visual_stimuli[:-10]  # ignore last 10 flashes
+    stimulus_table = get_visual_stimuli_df(data, stimulus_timestamps)
     # workaround to rename columns to harmonize with visual coding and rebase timestamps to sync time
     stimulus_table.insert(loc=0, column='flash_number', value=np.arange(0, len(stimulus_table)))
     stimulus_table = stimulus_table.rename(columns={'frame': 'start_frame', 'time': 'start_time', 'flash_number':'stimulus_presentations_id'})
@@ -197,6 +196,11 @@ def get_visual_stimuli_df(data, time):
                 })
 
     visual_stimuli_df = pd.DataFrame(data=visual_stimuli_data)
+
+    # ensure that every rising edge in the draw_log is accounted for in the visual_stimuli_df
+    draw_log_rising_edges = len(np.where(np.diff(stimuli['images']['draw_log'])==1)[0])
+    discrete_flashes = len(visual_stimuli_data)
+    assert draw_log_rising_edges == discrete_flashes, "the number of rising edges in the draw log is expected to match the number of flashes in the stimulus table"
 
     # Add omitted flash info:
     omitted_flash_list = []

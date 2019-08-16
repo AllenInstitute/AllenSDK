@@ -6,9 +6,12 @@ import os
 
 from allensdk.core.lazy_property import LazyProperty, LazyPropertyMixin
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
-from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import equals
+from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import equals, BehaviorOphysNwbApi
 from allensdk.deprecated import legacy
-from allensdk.brain_observatory.behavior.trials_processing import calculate_reward_rate, dprime
+from allensdk.brain_observatory.behavior.trials_processing import calculate_reward_rate
+from allensdk.brain_observatory.behavior.dprime import get_rolling_dprime, get_trial_count_corrected_false_alarm_rate, get_trial_count_corrected_hit_rate
+from allensdk.brain_observatory.behavior.dprime import get_hit_rate, get_false_alarm_rate
+from allensdk.brain_observatory.behavior.image_api import ImageApi
 
 
 class BehaviorOphysSession(LazyPropertyMixin):
@@ -17,7 +20,7 @@ class BehaviorOphysSession(LazyPropertyMixin):
     Attributes:
         ophys_experiment_id : int (LazyProperty)
             Unique identifier for this experimental session
-        max_projection : SimpleITK.Image (LazyProperty)
+        max_projection : allensdk.brain_observatory.behavior.image_api.Image (LazyProperty)
             2D max projection image
         stimulus_timestamps : numpy.ndarray (LazyProperty)
             Timestamps associated the stimulus presentations on the monitor 
@@ -51,7 +54,7 @@ class BehaviorOphysSession(LazyPropertyMixin):
             A dataframe containing behavioral trial start/stop times, and trial data
         corrected_fluorescence_traces : pandas.DataFrame (LazyProperty)
             The motion-corrected fluorescence traces organized into a dataframe; index is the cell roi ids
-        average_projection : SimpleITK.Image (LazyProperty)
+        average_projection : allensdk.brain_observatory.behavior.image_api.Image (LazyProperty)
             2D image of the microscope field of view, averaged across the experiment
         motion_correction : pandas.DataFrame LazyProperty
             A dataframe containing trace data used during motion correction computation
@@ -61,12 +64,17 @@ class BehaviorOphysSession(LazyPropertyMixin):
     def from_lims(cls, ophys_experiment_id):
         return cls(api=BehaviorOphysLimsApi(ophys_experiment_id))
 
+    @classmethod
+    def from_nwb_path(cls, nwb_path, **api_kwargs):
+        api_kwargs["filter_invalid_rois"] = api_kwargs.get("filter_invalid_rois", True)
+        return cls(api=BehaviorOphysNwbApi.from_path(path=nwb_path, **api_kwargs))
+
     def __init__(self, api=None):
 
         self.api = api
 
         self.ophys_experiment_id = LazyProperty(self.api.get_ophys_experiment_id)
-        self.max_projection = LazyProperty(self.api.get_max_projection)
+        self.max_projection = LazyProperty(self.get_max_projection)
         self.stimulus_timestamps = LazyProperty(self.api.get_stimulus_timestamps)
         self.ophys_timestamps = LazyProperty(self.api.get_ophys_timestamps)
         self.metadata = LazyProperty(self.api.get_metadata)
@@ -81,9 +89,9 @@ class BehaviorOphysSession(LazyPropertyMixin):
         self.task_parameters = LazyProperty(self.api.get_task_parameters)
         self.trials = LazyProperty(self.api.get_trials)
         self.corrected_fluorescence_traces = LazyProperty(self.api.get_corrected_fluorescence_traces)
-        self.average_projection = LazyProperty(self.api.get_average_projection)
+        self.average_projection = LazyProperty(self.get_average_projection)
         self.motion_correction = LazyProperty(self.api.get_motion_correction)
-        self.segmentation_mask_image = LazyProperty(self.api.get_segmentation_mask_image)
+        self.segmentation_mask_image = LazyProperty(self.get_segmentation_mask_image)
 
     @legacy('Consider using "get_dff_timeseries" instead.')
     def get_dff_traces(self, cell_specimen_ids=None):
@@ -112,6 +120,49 @@ class BehaviorOphysSession(LazyPropertyMixin):
             raise ValueError(f'cell_specimen_id values not assigned for {self.ophys_experiment_id}')
         return cell_specimen_ids
 
+    def deserialize_image(self, sitk_image):
+        '''
+        Convert SimpleITK image returned by the api to an Image class:
+
+        Args:
+            sitk_image (SimpleITK image): image object returned by the api
+
+        Returns
+            img (allensdk.brain_observatory.behavior.image_api.Image)
+        '''
+        img = ImageApi.deserialize(sitk_image)
+        return img
+
+    def get_max_projection(self):
+        """ Returns an image whose values are the maximum obtained values at each pixel of the ophys movie over time.
+
+        Returns
+        ----------
+        allensdk.brain_observatory.behavior.image_api.Image:
+            array-like interface to max projection image data and metadata
+        """
+        return self.deserialize_image(self.api.get_max_projection())
+
+    def get_average_projection(self):
+        """ Returns an image whose values are the average obtained values at each pixel of the ophys movie over time.
+
+        Returns
+        ----------
+        allensdk.brain_observatory.behavior.image_api.Image:
+            array-like interface to max projection image data and metadata
+        """
+        return self.deserialize_image(self.api.get_average_projection())
+
+    def get_segmentation_mask_image(self):
+        """ Returns an image with a pixel value of zero if the pixel is not included in any ROI, and nonzero if included in a segmented ROI.
+
+        Returns
+        ----------
+        allensdk.brain_observatory.behavior.image_api.Image:
+            array-like interface to max projection image data and metadata
+        """
+        return self.deserialize_image(self.api.get_segmentation_mask_image())
+
     def get_reward_rate(self):
         response_latency_list = []
         for _, t in self.trials.iterrows():
@@ -123,23 +174,40 @@ class BehaviorOphysSession(LazyPropertyMixin):
         return reward_rate
 
     def get_rolling_performance_df(self):
-        performance_metrics = {}
-        performance_metrics['reward_rate'] = self.get_reward_rate()
 
-        hit = np.full(len(self.trials), np.nan)
-        hit[self.trials.hit] = True
-        hit[self.trials.miss] = False
-        performance_metrics['hit_rate'] = pd.Series(hit).rolling(window=100, min_periods=0).mean()
+        # Indices to build trial metrics dataframe:
+        trials_index = self.trials.index
+        not_aborted_index = self.trials[np.logical_not(self.trials.aborted)].index
 
-        false_alarm = np.full(len(self.trials), np.nan)
-        false_alarm[self.trials.false_alarm] = True
-        false_alarm[self.trials.correct_reject] = False
-        performance_metrics['false_alarm_rate'] = pd.Series(false_alarm).rolling(window=100, min_periods=0).mean()
+        # Initialize dataframe:
+        performance_metrics_df = pd.DataFrame(index=trials_index)
 
-        performance_metrics['dprime'] = dprime(performance_metrics['hit_rate'], performance_metrics['false_alarm_rate'])
-        return pd.DataFrame(performance_metrics)
+        # Reward rate:
+        performance_metrics_df['reward_rate'] = pd.Series(self.get_reward_rate(), index=self.trials.index)
 
-    def get_performance_metrics(self):
+        # Hit rate raw:
+        hit_rate_raw = get_hit_rate(hit=self.trials.hit, miss=self.trials.miss, aborted=self.trials.aborted)
+        performance_metrics_df['hit_rate_raw'] = pd.Series(hit_rate_raw, index=not_aborted_index)
+        
+        # Hit rate with trial count correction:
+        hit_rate = get_trial_count_corrected_hit_rate(hit=self.trials.hit, miss=self.trials.miss, aborted=self.trials.aborted)
+        performance_metrics_df['hit_rate'] = pd.Series(hit_rate, index=not_aborted_index)
+
+        # False-alarm rate raw:
+        false_alarm_rate_raw = get_false_alarm_rate(false_alarm=self.trials.false_alarm, correct_reject=self.trials.correct_reject, aborted=self.trials.aborted)
+        performance_metrics_df['false_alarm_rate_raw'] = pd.Series(false_alarm_rate_raw, index=not_aborted_index)
+        
+        # False-alarm rate with trial count correction:
+        false_alarm_rate = get_trial_count_corrected_false_alarm_rate(false_alarm=self.trials.false_alarm, correct_reject=self.trials.correct_reject, aborted=self.trials.aborted)
+        performance_metrics_df['false_alarm_rate'] = pd.Series(false_alarm_rate, index=not_aborted_index)
+
+        # Rolling-dprime:
+        rolling_dprime = get_rolling_dprime(hit_rate, false_alarm_rate)
+        performance_metrics_df['rolling_dprime'] = pd.Series(rolling_dprime, index=not_aborted_index)
+
+        return performance_metrics_df
+
+    def get_performance_metrics(self, engaged_trial_reward_rate_threshold=2):
         performance_metrics = {}
         performance_metrics['trial_count'] = len(self.trials)
         performance_metrics['go_trial_count'] = self.trials.go.sum()
@@ -149,28 +217,29 @@ class BehaviorOphysSession(LazyPropertyMixin):
         performance_metrics['false_alarm_trial_count'] = self.trials.false_alarm.sum()
         performance_metrics['correct_reject_trial_count'] = self.trials.correct_reject.sum()
         performance_metrics['auto_rewarded_trial_count'] = self.trials.auto_rewarded.sum()
-        performance_metrics['rewarded_trial_count'] = self.trials.reward_times.apply(lambda x: len(x) > 0).sum()
+        performance_metrics['rewarded_trial_count'] = self.trials.reward_time.apply(lambda x: not np.isnan(x)).sum()
         performance_metrics['total_reward_count'] = len(self.rewards)
         performance_metrics['total_reward_volume'] = self.rewards.volume.sum()
 
         rolling_performance_df = self.get_rolling_performance_df()
-        engaged_trial_mask = (rolling_performance_df['reward_rate'] > 2)
+        engaged_trial_mask = (rolling_performance_df['reward_rate'] > engaged_trial_reward_rate_threshold)
         performance_metrics['maximum_reward_rate'] = np.nanmax(rolling_performance_df['reward_rate'].values)
         performance_metrics['engaged_trial_count'] = (engaged_trial_mask).sum()
+        performance_metrics['mean_hit_rate'] = rolling_performance_df['hit_rate'].mean()
+        performance_metrics['mean_hit_rate_uncorrected'] = rolling_performance_df['hit_rate_raw'].mean()
+        performance_metrics['mean_hit_rate_engaged'] = rolling_performance_df['hit_rate'][engaged_trial_mask].mean()
         performance_metrics['mean_false_alarm_rate'] = rolling_performance_df['false_alarm_rate'].mean()
+        performance_metrics['mean_false_alarm_rate_uncorrected'] = rolling_performance_df['false_alarm_rate_raw'].mean()
         performance_metrics['mean_false_alarm_rate_engaged'] = rolling_performance_df['false_alarm_rate'][engaged_trial_mask].mean()
-        performance_metrics['mean_dprime'] = rolling_performance_df['dprime'].mean()
-        performance_metrics['mean_dprime_engaged'] = rolling_performance_df['dprime'][engaged_trial_mask].mean()
+        performance_metrics['mean_dprime'] = rolling_performance_df['rolling_dprime'].mean()
+        performance_metrics['mean_dprime_engaged'] = rolling_performance_df['rolling_dprime'][engaged_trial_mask].mean()
+        performance_metrics['max_dprime'] = rolling_performance_df['rolling_dprime'].mean()
+        performance_metrics['max_dprime_engaged'] = rolling_performance_df['rolling_dprime'][engaged_trial_mask].max()
 
-
-        
-
-        for key, val in performance_metrics.items():
-            print(key, val)
-
+        return performance_metrics
 
 if __name__ == "__main__":
 
     ophys_experiment_id = 789359614
     session = BehaviorOphysSession.from_lims(ophys_experiment_id)
-    session.get_performance_metrics()
+    print(session.trials['reward_time'])

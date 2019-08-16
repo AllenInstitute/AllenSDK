@@ -249,6 +249,17 @@ class OphysLimsApi(PostgresQueryMixin):
         return safe_system_path(self.fetchone(query, strict=True))
 
     @memoize
+    def get_motion_corrected_image_stack_file(self):
+        query = f"""
+            select wkf.storage_directory || wkf.filename
+            from well_known_files wkf
+            join well_known_file_types wkft on wkft.id = wkf.well_known_file_type_id
+            where wkft.name = 'MotionCorrectedImageStack'
+            and wkf.attachable_id = {self.get_ophys_experiment_id()}
+        """
+        return safe_system_path(self.fetchone(query, strict=True))
+
+    @memoize
     def get_foraging_id(self):
         query = '''
                 SELECT os.foraging_id

@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 import logging
 
@@ -8,6 +8,7 @@ import pynwb
 import pandas as pd
 import numpy as np
 
+from allensdk.brain_observatory.ecephys.current_source_density.__main__ import write_csd_to_h5
 import allensdk.brain_observatory.ecephys.write_nwb.__main__ as write_nwb
 from allensdk.brain_observatory.ecephys.ecephys_session_api import EcephysNwbSessionApi
 
@@ -54,14 +55,16 @@ def raw_running_data():
 
 
 def test_roundtrip_metadata(roundtripper):
+    dt = datetime.now(timezone.utc)
     nwbfile = pynwb.NWBFile(
         session_description='EcephysSession',
         identifier='{}'.format(12345),
-        session_start_time=datetime.now()
+        session_start_time=dt
     )
 
     api = roundtripper(nwbfile, EcephysNwbSessionApi)
     assert 12345 == api.get_ecephys_session_id()
+    assert dt == api.get_session_start_time()
 
 
 def test_add_stimulus_presentations(nwbfile, stimulus_presentations, roundtripper):
@@ -75,18 +78,29 @@ def test_add_stimulus_presentations(nwbfile, stimulus_presentations, roundtrippe
     
 
 @pytest.mark.parametrize('roundtrip', [True, False])
-@pytest.mark.parametrize('pid,desc,loc, expected', [
-    [12, 'a probe', 'probeA', pd.DataFrame({'description': ['a probe'], 'location': ['probeA'], 'sampling_rate': [30000.0]}, index=pd.Index([12], name='id'))]
+@pytest.mark.parametrize('pid,desc,srate,lfp_srate,expected', [
+    [
+        12, 
+        'a probe', 
+        30000.0,
+        2500.0, 
+        pd.DataFrame({
+            'description': ['a probe'], 
+            'sampling_rate': [30000.0], 
+            "lfp_sampling_rate": [2500.0],
+            "location": [""]
+        }, index=pd.Index([12], name='id'))
+    ]
 ])
-def test_add_probe_to_nwbfile(nwbfile, roundtripper, roundtrip, pid, desc, loc, expected):
+def test_add_probe_to_nwbfile(nwbfile, roundtripper, roundtrip, pid, desc, srate, lfp_srate, expected):
 
-    nwbfile, _, _ = write_nwb.add_probe_to_nwbfile(nwbfile, pid, description=desc, location=loc)
+    nwbfile, _, _ = write_nwb.add_probe_to_nwbfile(nwbfile, pid, description=desc, sampling_rate=srate, lfp_sampling_rate=lfp_srate)
     if roundtrip:
         obt = roundtripper(nwbfile, EcephysNwbSessionApi)
     else:
         obt = EcephysNwbSessionApi.from_nwbfile(nwbfile)
 
-    pd.testing.assert_frame_equal(expected, obt.get_probes())
+    pd.testing.assert_frame_equal(expected, obt.get_probes(), check_like=True)
 
 
 def test_prepare_probewise_channel_table():
@@ -178,7 +192,6 @@ def test_add_raw_running_Data_to_nwbfile(nwbfile, raw_running_data, roundtripper
 
     obtained = api_obt.get_raw_running_data()
 
-
     expected = raw_running_data.rename(columns={"dx": "net_rotation", "vsig": "signal_voltage", "vin": "supply_voltage"})
     pd.testing.assert_frame_equal(expected, obtained, check_like=True)
 
@@ -248,11 +261,14 @@ def test_write_probe_lfp_file(tmpdir_factory, lfp_data):
     input_data_path = tmpdir / Path("lfp_data.dat")
     input_timestamps_path = tmpdir / Path("lfp_timestamps.npy")
     input_channels_path = tmpdir / Path("lfp_channels.npy")
+    input_csd_path = tmpdir / Path("csd.h5")
     output_path = str(tmpdir / Path("lfp.nwb"))  # pynwb.NWBHDF5IO chokes on Path
 
     probe_data = {
         "id": 12345,
         "name": "probeA",
+        "sampling_rate": 29.0,
+        "lfp_sampling_rate": 10.0,
         "channels":  [
             {
                 'id': 0,
@@ -281,8 +297,23 @@ def test_write_probe_lfp_file(tmpdir_factory, lfp_data):
             "input_timestamps_path": input_timestamps_path,
             "input_channels_path": input_channels_path,
             "output_path": output_path
-        }
+        },
+        "csd_path": input_csd_path
     }
+
+    csd = np.arange(20).reshape([2, 10])
+    csd_times = np.linspace(-1, 1, 10)
+    csd_channels = np.array([3, 2])
+
+    write_csd_to_h5(
+        path=input_csd_path, 
+        csd=csd, 
+        relative_window=csd_times, 
+        channels=csd_channels, 
+        stimulus_name="foo", 
+        stimulus_index=None, 
+        num_trials=1000
+    )
 
     np.save(input_timestamps_path, lfp_data["timestamps"],  allow_pickle=False)
     np.save(input_channels_path, lfp_data["subsample_channels"], allow_pickle=False)
@@ -305,3 +336,9 @@ def test_write_probe_lfp_file(tmpdir_factory, lfp_data):
         ]
 
         pd.testing.assert_frame_equal(exp_electrodes, obt_electrodes, check_like=True)
+
+        csd_series = obt_f.get_processing_module("current_source_density")["current_source_density"]
+
+        assert np.allclose(csd, csd_series.data[:])
+        assert np.allclose(csd_times, csd_series.timestamps[:])
+        assert np.allclose([2, 1], csd_series.control[:])  # ids

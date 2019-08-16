@@ -1,4 +1,5 @@
 from typing import Dict
+from datetime import datetime
 
 import numpy as np
 import pandas as pd
@@ -15,6 +16,9 @@ class EcephysSessionApi:
 
     def __init__(self, *args, **kwargs):
         pass
+
+    def get_session_start_time(self) -> datetime:
+        raise NotImplementedError
 
     def get_running_speed(self) -> RunningSpeed:
         raise NotImplementedError
