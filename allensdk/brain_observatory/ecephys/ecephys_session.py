@@ -9,6 +9,8 @@ import scipy.stats
 
 from allensdk.core.lazy_property import LazyPropertyMixin
 from allensdk.brain_observatory.ecephys.ecephys_session_api import EcephysSessionApi, EcephysNwbSessionApi, EcephysNwb1Api
+from allensdk.brain_observatory.ecephys.stimulus_table import naming_utilities
+from allensdk.brain_observatory.ecephys.stimulus_table._schemas import default_stimulus_renames, default_column_renames    
 
 
 NON_STIMULUS_PARAMETERS = tuple([
@@ -464,10 +466,8 @@ class EcephysSession(LazyPropertyMixin):
         # TODO: Need to return an empty df if no matching unit-ids or presentation-ids are found
         # TODO: To use filter_owned_df() make sure to convert the results from a Series to a Dataframe
         stimulus_presentation_ids = stimulus_presentation_ids if stimulus_presentation_ids is not None else \
-                self.stimulus_presentations['stimulus_presentation_id'].unique()  # In case
+                self.stimulus_presentations.index.values  # In case
         presentations = self.stimulus_presentations.loc[stimulus_presentation_ids, ["stimulus_condition_id"]]
-        # presentations = self._filter_owned_df('stimulus_presentations', ids=stimulus_presentation_ids)["stimulus_presentation_id"]
-        # presentations = presentations.to_frame()
 
         spikes = self.presentationwise_spike_times(
             stimulus_presentation_ids=stimulus_presentation_ids, unit_ids=unit_ids
@@ -549,8 +549,17 @@ class EcephysSession(LazyPropertyMixin):
         stimulus_presentations.index.name = 'stimulus_presentation_id'
         stimulus_presentations = stimulus_presentations.drop(columns=['stimulus_index'])
 
+        # TODO: putting these here for now; after SWDB 2019, will rerun stimulus table module for all sessions 
+        # and can remove these
+        stimulus_presentations = naming_utilities.collapse_columns(stimulus_presentations)
+        stimulus_presentations = naming_utilities.standardize_movie_numbers(stimulus_presentations)
+        stimulus_presentations = naming_utilities.add_number_to_shuffled_movie(stimulus_presentations)
+        stimulus_presentations = naming_utilities.map_stimulus_names(
+            stimulus_presentations, default_stimulus_renames
+        )
+        stimulus_presentations.rename(columns=default_column_renames, inplace=True)
+
         # pandas groupby ops ignore nans, so we need a new null value that pandas does not recognize as null ...
-        stimulus_presentations.loc[stimulus_presentations['stimulus_name'] == '', 'stimulus_name'] = 'spontaneous_activity'
         stimulus_presentations[stimulus_presentations == ''] = np.nan
         stimulus_presentations = stimulus_presentations.fillna('null') # 123 / 2**8
 
@@ -799,7 +808,6 @@ def nan_intervals(array, nan_like=["null"]):
         current = item
     intervals.append(len(array))
 
-    print(intervals)
     return np.unique(intervals)
 
 

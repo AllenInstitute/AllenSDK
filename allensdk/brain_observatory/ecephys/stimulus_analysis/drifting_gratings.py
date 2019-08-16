@@ -39,7 +39,7 @@ class DriftingGratings(StimulusAnalysis):
 
     """
 
-    def __init__(self, ecephys_session, col_ori='Ori', col_tf='TF', col_contrast='Contrast', trial_duration=2.0, **kwargs):
+    def __init__(self, ecephys_session, col_ori='orientation', col_tf='temporal_frequency', col_contrast='contrast', trial_duration=2.0, **kwargs):
         super(DriftingGratings, self).__init__(ecephys_session, trial_duration=trial_duration, **kwargs)
 
         self._metrics = None
