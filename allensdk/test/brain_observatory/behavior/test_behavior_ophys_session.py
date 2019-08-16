@@ -194,21 +194,75 @@ def cell_specimen_table_api():
         )
     return CellSpecimenTableApi()
 
-def test_get_roi_masks_by_cell_roi_id(cell_specimen_table_api):
+@pytest.mark.parametrize("roi_ids,expected", [
+    [
+        1,
+        np.array([
+            [0, 0, 0, 0, 0],
+            [0, 0, 1, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0]
+        ])
+    ],
+    [
+        None,
+        np.array([
+            [
+                [0, 0, 0, 0, 0],
+                [0, 0, 1, 0, 0],
+                [0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0]
+            ],
+            [
+                [0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0],
+                [0, 0, 1, 0, 0],
+                [0, 0, 0, 0, 0]
+            ]
+        ])
+    ]
+])
+def test_get_roi_masks_by_cell_roi_id(roi_ids, expected, cell_specimen_table_api):
     ssn = BehaviorOphysSession(api=cell_specimen_table_api)
-
-    expected = np.array([
-        [0, 0, 0, 0, 0],
-        [0, 0, 1, 0, 0],
-        [0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0]
-    ])
-    obtained = ssn._get_roi_masks_by_cell_roi_id(1)
-
-    print(expected)
-    print(obtained.values)
-
-
+    obtained = ssn._get_roi_masks_by_cell_roi_id(roi_ids)
     assert np.allclose(expected, obtained.values)
 
+
+@pytest.mark.parametrize("cell_specimen_ids,expected", [
+    [
+        10,
+        np.array([
+            [0, 0, 0, 0, 0],
+            [0, 0, 1, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0]
+        ])
+    ],
+    [
+        [11, 10],
+        np.array([
+            [
+                [0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0],
+                [0, 0, 1, 0, 0],
+                [0, 0, 0, 0, 0]
+            ],
+            [
+                [0, 0, 0, 0, 0],
+                [0, 0, 1, 0, 0],
+                [0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0]
+            ]
+        ])
+    ]
+])
+def test_get_roi_masks(cell_specimen_ids, expected, cell_specimen_table_api):
+    ssn = BehaviorOphysSession(api=cell_specimen_table_api)
+    obtained = ssn.get_roi_masks(cell_specimen_ids)
+    assert np.allclose(expected, obtained.values)

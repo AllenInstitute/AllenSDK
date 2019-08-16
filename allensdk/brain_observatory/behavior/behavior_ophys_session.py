@@ -154,7 +154,7 @@ class BehaviorOphysSession(LazyPropertyMixin):
 
         """
         if cell_roi_ids is None:
-            cell_roi_ids = self.cell_roi_ids.index.values
+            cell_roi_ids = self.cell_specimen_table["cell_roi_id"].unique()
         elif isinstance(cell_roi_ids, int) or np.issubdtype(type(cell_roi_ids), np.integer):
             cell_roi_ids = np.array([int(cell_roi_ids)])
         else:
