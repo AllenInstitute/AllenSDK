@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import json
 
+from allensdk import one
 from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi
 from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorOphysSession
 from allensdk.core.lazy_property import LazyProperty
@@ -397,10 +398,10 @@ class ExtendedBehaviorSession(BehaviorOphysSession):
 
         self.trial_response_df = LazyProperty(self.api.get_trial_response_df)
         self.flash_response_df = LazyProperty(self.api.get_flash_response_df)
-        self.image_index = LazyProperty(self.get_stimulus_index)
+        self.image_index = LazyProperty(self.get_image_index)
 
-    def get_stimulus_index(self):
-        return self.stimulus_presentations.groupby('image_index').apply(
-            lambda group: group['image_name'].unique()[0]
+    def get_image_index(self):
+        image_index_names = self.get_stimulus_presentations().groupby('image_index').apply(
+            lambda group: one(group['image_name'].unique())
         )
 
