@@ -51,8 +51,10 @@ def test_stimulus_presentations_image_set(session):
 
 @pytest.mark.requires_bamboo
 def test_stimulus_templates(session):
-    # Was a dict with only one key, so we popped it out 
-    assert isinstance(session.stimulus_templates, np.ndarray)
+    # Was a dict with only one key, where the value was a 3d array.
+    # We made it a dict with image names as keys and 2d arrs (the images) as values
+    for image_name, image_arr in session.stimulus_templates.items():
+        assert image_arr.ndim == 2
 
 # Test trial response df
 @pytest.mark.requires_bamboo
@@ -68,7 +70,7 @@ def test_session_trial_response(key, output, session):
 @pytest.mark.requires_bamboo
 @pytest.mark.parametrize('key, output', [
     ('time_from_last_lick', 7.3577),
-    ('running_speed', 22.143871),
+    ('mean_running_speed', 22.143871),
     ('duration', 0.25024),
 ])
 def test_session_flash_response(key, output, session):
@@ -114,7 +116,7 @@ def test_binarized_segmentation_mask_image(session):
 
 @pytest.mark.requires_bamboo
 def test_no_nan_flash_running_speed(session):
-    assert not pd.isnull(session.stimulus_presentations['running_speed']).any()
+    assert not pd.isnull(session.stimulus_presentations['mean_running_speed']).any()
 
 @pytest.mark.requires_bamboo
 def test_licks_correct_colname(session):
