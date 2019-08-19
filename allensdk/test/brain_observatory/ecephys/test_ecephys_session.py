@@ -285,6 +285,7 @@ def test_conditionwise_spike_statistics(spike_times_api):
     obtained = session.conditionwise_spike_statistics(stimulus_presentation_ids=[0, 1, 2])
 
     pd.set_option('display.max_columns', None)
+
     assert obtained.loc[(2, 2), "spike_count"] == 3
     assert obtained.loc[(2, 2), "stimulus_presentation_count"] == 1
 
