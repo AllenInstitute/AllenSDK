@@ -35,7 +35,7 @@
 #
 import logging
 
-__version__ = '1.0.0.dev15'
+__version__ = '1.0.0.dev16'
 
 try:
     from logging import NullHandler
