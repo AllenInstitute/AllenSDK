@@ -16,7 +16,7 @@ from allensdk.brain_observatory.ecephys.file_io.stim_file import (
 from . import ephys_pre_spikes
 from . import naming_utilities
 from . import output_validation
-from ._schemas import InputParameters, OutputParameters
+from ._schemas import InputParameters, OutputSchema
 
 
 def build_stimulus_table(
@@ -90,7 +90,7 @@ def build_stimulus_table(
 def main():
 
     mod = ArgSchemaParserPlus(
-        schema_type=InputParameters, output_schema_type=OutputParameters
+        schema_type=InputParameters, output_schema_type=OutputSchema
     )
     output = build_stimulus_table(**mod.args)
 

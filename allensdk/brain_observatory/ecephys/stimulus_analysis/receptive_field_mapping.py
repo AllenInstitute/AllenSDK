@@ -38,7 +38,7 @@ class ReceptiveFieldMapping(StimulusAnalysis):
 
     """
 
-    def __init__(self, ecephys_session, col_pos_x='Pos_x', col_pos_y='Pos_y', trial_duration=0.25, **kwargs):
+    def __init__(self, ecephys_session, col_pos_x='x_position', col_pos_y='y_position', trial_duration=0.25, **kwargs):
         super(ReceptiveFieldMapping, self).__init__(ecephys_session, trial_duration=trial_duration, **kwargs)
 
         self._pos_x = None
@@ -46,8 +46,8 @@ class ReceptiveFieldMapping(StimulusAnalysis):
 
         self._rf_matrix = None
 
-        self._col_pos_x = col_pos_x  # 'Pos_x'
-        self._col_pos_y = col_pos_y  # 'Pos_y'
+        self._col_pos_x = col_pos_x
+        self._col_pos_y = col_pos_y
 
         # self._trial_duration = 0.25
 
@@ -107,7 +107,7 @@ class ReceptiveFieldMapping(StimulusAnalysis):
 
             bin_edges = np.linspace(0, 0.249, 249)
 
-            self.stim_table.loc[:, 'Pos_y'] = 40.0 - self.stim_table['Pos_y']
+            self.stim_table.loc[:, self._col_pos_y] = 40.0 - self.stim_table[self._col_pos_y]
 
             presentationwise_response_matrix = self.ecephys_session.presentationwise_spike_counts(
                 bin_edges = bin_edges,
@@ -177,7 +177,7 @@ class ReceptiveFieldMapping(StimulusAnalysis):
 
     @property
     def known_stimulus_keys(self):
-        return ['receptive_field_mapping', 'gabor']
+        return ['receptive_field_mapping', 'gabor', "gabors"]
 
     def _find_stimulus_key(self, stim_table):
         known_keys_lc = [k.lower() for k in self.known_stimulus_keys]
@@ -217,7 +217,7 @@ class ReceptiveFieldMapping(StimulusAnalysis):
 
 
     def _response_by_stimulus_position(self, dataset, presentations,
-        row_key='Pos_y', column_key='Pos_x',
+        row_key=None, column_key=None,
         unit_key='unit_id', time_key='time_relative_to_stimulus_onset',
         spike_count_key='spike_count'):
 
@@ -234,6 +234,11 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         dataset - xarray dataset of receptive fields
 
         """
+        if row_key is None:
+            row_key = self._col_pos_y
+        if column_key is None:
+            column_key = self._col_pos_x
+
         dataset = dataset.copy()
         # dataset['spike_counts'] = dataset['spike_counts'].sum(dim=time_key)
         dataset[spike_count_key] = dataset.sum(dim=time_key)
@@ -289,7 +294,7 @@ class ReceptiveFieldMapping(StimulusAnalysis):
             return np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, False
 
         p_value = chisq_from_stim_table(self.stim_table,
-                                       ['Pos_x','Pos_y'],
+                                       [self._col_pos_x, self._col_pos_y],
                                        np.expand_dims(spikes_per_trial,1))
 
         rf_thresh, azimuth, elevation, area = threshold_rf(rf, self._params['mask_threshold'])

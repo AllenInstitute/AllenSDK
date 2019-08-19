@@ -34,7 +34,7 @@ class NaturalScenes(StimulusAnalysis):
 
     """
 
-    def __init__(self, ecephys_session, col_image='Image', trial_duration=0.25, **kwargs):
+    def __init__(self, ecephys_session, col_image='frame', trial_duration=0.25, **kwargs):
         super(NaturalScenes, self).__init__(ecephys_session, trial_duration=trial_duration, **kwargs)
 
         self._images = None

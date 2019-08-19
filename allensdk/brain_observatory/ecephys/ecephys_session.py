@@ -9,6 +9,8 @@ import scipy.stats
 
 from allensdk.core.lazy_property import LazyPropertyMixin
 from allensdk.brain_observatory.ecephys.ecephys_session_api import EcephysSessionApi, EcephysNwbSessionApi, EcephysNwb1Api
+from allensdk.brain_observatory.ecephys.stimulus_table import naming_utilities
+from allensdk.brain_observatory.ecephys.stimulus_table._schemas import default_stimulus_renames, default_column_renames    
 
 
 NON_STIMULUS_PARAMETERS = tuple([
@@ -464,10 +466,8 @@ class EcephysSession(LazyPropertyMixin):
         # TODO: Need to return an empty df if no matching unit-ids or presentation-ids are found
         # TODO: To use filter_owned_df() make sure to convert the results from a Series to a Dataframe
         stimulus_presentation_ids = stimulus_presentation_ids if stimulus_presentation_ids is not None else \
-                self.stimulus_presentations['stimulus_presentation_id'].unique()  # In case
+                self.stimulus_presentations.index.values  # In case
         presentations = self.stimulus_presentations.loc[stimulus_presentation_ids, ["stimulus_condition_id"]]
-        # presentations = self._filter_owned_df('stimulus_presentations', ids=stimulus_presentation_ids)["stimulus_presentation_id"]
-        # presentations = presentations.to_frame()
 
         spikes = self.presentationwise_spike_times(
             stimulus_presentation_ids=stimulus_presentation_ids, unit_ids=unit_ids
@@ -502,6 +502,26 @@ class EcephysSession(LazyPropertyMixin):
         return pd.DataFrame(summary).set_index(keys=["unit_id", "stimulus_condition_id"])
 
 
+    def get_parameter_values_for_stimulus(self, stimulus_name, drop_nulls=True):
+        """ For each stimulus parameter, report the unique values taken on by that 
+        parameter while a named stimulus was presented.
+
+        Parameters
+        ----------
+        stimulus_name : str
+            filter to presentations of this stimulus
+
+        Returns
+        -------
+        dict : 
+            maps parameters (column names) to their unique values.
+
+        """
+
+        presentation_ids = self.get_presentations_for_stimulus([stimulus_name]).index.values
+        return self.get_stimulus_parameter_values(presentation_ids, drop_nulls=drop_nulls)
+
+
     def get_stimulus_parameter_values(self, stimulus_presentation_ids=None, drop_nulls=True):
         ''' For each stimulus parameter, report the unique values taken on by that 
         parameter throughout the course of the  session.
@@ -525,11 +545,52 @@ class EcephysSession(LazyPropertyMixin):
         parameters = {}
         for colname in stimulus_presentations.columns:
             uniques = stimulus_presentations[colname].unique()
-            if drop_nulls:
-                uniques = uniques[uniques != 'null']
-            parameters[colname] = uniques
+
+            non_null = np.array(uniques[uniques != "null"])
+            non_null = non_null
+            non_null = np.sort(non_null)
+
+            if not drop_nulls and "null" in uniques:
+                non_null = np.concatenate([non_null, ["null"]])
+
+            parameters[colname] = non_null
 
         return parameters
+
+    def channel_structure_intervals(self, channel_ids):
+
+        """ find on a list of channels the intervals of channels inserted into particular structures
+
+        Parameters
+        ----------
+        channel_ids : list
+            A list of channel ids
+        structure_id_key : str
+            use this column for numerically identifying structures
+        structure_label_key : str
+            use this column for human-readable structure identification
+
+        Returns
+        -------
+        labels : np.ndarray
+            for each detected interval, the label associated with that interval
+        intervals : np.ndarray
+            one element longer than labels. Start and end indices for intervals.
+
+        """
+        structure_id_key = "manual_structure_id"
+        structure_label_key = "manual_structure_acronym"
+        channel_ids.sort()
+        table = self.channels.loc[channel_ids]
+
+        unique_probes = table["probe_id"].unique()
+        if len(unique_probes)>1:
+            warnings.warn("Calculating structure boundaries across channels from multiple probes.")
+
+        intervals = nan_intervals(table[structure_id_key].values)
+        labels = table[structure_label_key].iloc[intervals[:-1]].values
+
+        return labels, intervals
 
 
     def _build_spike_times(self, spike_times):
@@ -549,8 +610,17 @@ class EcephysSession(LazyPropertyMixin):
         stimulus_presentations.index.name = 'stimulus_presentation_id'
         stimulus_presentations = stimulus_presentations.drop(columns=['stimulus_index'])
 
+        # TODO: putting these here for now; after SWDB 2019, will rerun stimulus table module for all sessions 
+        # and can remove these
+        stimulus_presentations = naming_utilities.collapse_columns(stimulus_presentations)
+        stimulus_presentations = naming_utilities.standardize_movie_numbers(stimulus_presentations)
+        stimulus_presentations = naming_utilities.add_number_to_shuffled_movie(stimulus_presentations)
+        stimulus_presentations = naming_utilities.map_stimulus_names(
+            stimulus_presentations, default_stimulus_renames
+        )
+        stimulus_presentations.rename(columns=default_column_renames, inplace=True)
+
         # pandas groupby ops ignore nans, so we need a new null value that pandas does not recognize as null ...
-        stimulus_presentations.loc[stimulus_presentations['stimulus_name'] == '', 'stimulus_name'] = 'spontaneous_activity'
         stimulus_presentations[stimulus_presentations == ''] = np.nan
         stimulus_presentations = stimulus_presentations.fillna('null') # 123 / 2**8
 
@@ -749,34 +819,6 @@ def removed_unused_stimulus_presentation_columns(stimulus_presentations):
     return stimulus_presentations.drop(columns=to_drop)
 
 
-def intervals_structures(table, structure_id_key="manual_structure_id", structure_label_key="manual_structure_acronym"):
-
-    """ find on a channels / units table intervals of channels inserted into particular structures
-
-    Parameters
-    ----------
-    table : pd.DataFrame
-        A table of channels (or units, with peak channels)
-    structure_id_key : str
-        use this column for numerically identifying structures
-    structure_label_key : str
-        use this column for human-readable structure identification
-
-    Returns
-    -------
-    labels : np.ndarray
-        for each detected interval, the label associated with that interval
-    intervals : np.ndarray
-        one element longer than labels. Start and end indices for intervals.
-
-    """
-
-    intervals = nan_intervals(table[structure_id_key].values)
-    labels = table[structure_label_key].iloc[intervals[:-1]].values
-
-    return labels, intervals
-
-
 def nan_intervals(array, nan_like=["null"]):
     """ find interval bounds (bounding consecutive identical values) in an array, which may contain nans
 
@@ -799,7 +841,6 @@ def nan_intervals(array, nan_like=["null"]):
         current = item
     intervals.append(len(array))
 
-    print(intervals)
     return np.unique(intervals)
 
 

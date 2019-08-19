@@ -180,7 +180,7 @@ class BehaviorOphysSession(LazyPropertyMixin):
             }
         ).squeeze()
 
-    @legacy('Consider using "get_dff_timeseries" instead.')
+    @legacy('Consider using "dff_traces" instead.')
     def get_dff_traces(self, cell_specimen_ids=None):
 
         if cell_specimen_ids is None:

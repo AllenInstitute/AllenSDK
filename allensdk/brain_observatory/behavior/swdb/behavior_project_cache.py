@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import json
 
+from allensdk import one
 from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi
 from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorOphysSession
 from allensdk.core.lazy_property import LazyProperty
@@ -25,7 +26,7 @@ class BehaviorProjectCache(object):
     def __init__(self, cache_paths):
         '''
         A cache-level object for the behavior/ophys data. Provides access to the manifest of 
-        complete ophys/behavior containers, as well as pre-computed analysis files for each 
+        ophys/behavior containers, as well as pre-computed analysis files for each 
         experiment.
 
         Args:
@@ -39,7 +40,7 @@ class BehaviorProjectCache(object):
         
         Attributes: 
             manifest: (pd.DataFrame)
-                Table containing information about all ophys sessions from complete containers.
+                Table containing information about all ophys sessions.
             analysis_files_metadata (dict):
                 Metadata relating to the creation of the analysis files.
             
@@ -186,7 +187,34 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
         task_parameters['stimulus_duration_sec'] = 0.25
         return task_parameters
 
-    def get_trials(self):
+    def get_metadata(self):
+        metadata = super(ExtendedNwbApi, self).get_metadata()
+
+        # We want stage name in metadata for easy access by the students
+        task_parameters = self.get_task_parameters()
+        metadata['stage'] = task_parameters['stage']
+
+        # metadata should not include 'session_type' because it is 'Unknown'
+        metadata.pop('session_type')
+
+        # For SWDB only
+        # metadata should not include 'behavior_session_uuid' because it is not useful to students and confusing
+        metadata.pop('behavior_session_uuid')
+
+        # Rename LabTracks_ID to mouse_id to reduce student confusion
+        metadata['mouse_id'] = metadata.pop('LabTracks_ID')
+
+        return metadata
+
+    def get_running_speed(self):
+        # We want the running speed attribute to be a dataframe (like licks, rewards, etc.) instead of a 
+        # RunningSpeed object. This will improve consistency for students. For SWDB we have also opted to 
+        # have columns for both 'timestamps' and 'values' of things, since this is more intuitive for students
+        running_speed = super(ExtendedNwbApi, self).get_running_speed()
+        return pd.DataFrame({'speed': running_speed.values,
+                             'timestamps': running_speed.timestamps})
+
+    def get_trials(self, filter_aborted_trials=True):
         trials = super(ExtendedNwbApi, self).get_trials()
         stimulus_presentations = super(ExtendedNwbApi, self).get_stimulus_presentations()
 
@@ -224,6 +252,10 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
         # asserts that every change time exists in the stimulus_presentations table
         for change_time in trials[trials['change_time'].notna()]['change_time']:
             assert change_time in stimulus_presentations['start_time'].values
+
+        # Return only non-aborted trials from this API by default
+        if filter_aborted_trials:
+            trials = trials.query('not aborted')
 
         # Reorder / drop some columns to make more sense to students
         trials = trials[[
@@ -293,7 +325,8 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
 
         # Rename some columns to make more sense to students
         stimulus_presentations = stimulus_presentations.rename(
-            columns={'index':'absolute_flash_number'})
+            columns={'index':'absolute_flash_number',
+                     'running_speed':'mean_running_speed'})
         # Replace image set with A/B
         stimulus_presentations['image_set'] = self.get_task_parameters()['stage'][15]
         # Change index name for easier merge with flash_response_df
@@ -303,7 +336,15 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
     def get_stimulus_templates(self):
         # super stim templates is a dict with one annoyingly-long key, so pop the val out
         stimulus_templates = super(ExtendedNwbApi, self).get_stimulus_templates()
-        return stimulus_templates[list(stimulus_templates.keys())[0]]
+        stimulus_template_array = stimulus_templates[list(stimulus_templates.keys())[0]]
+
+        # What we really want is a dict with image_name as key
+        template_dict = {}
+        image_index_names = self.get_image_index_names()
+        for image_index, image_name in image_index_names.iteritems():
+            if image_name != 'omitted':
+                template_dict.update({image_name:stimulus_template_array[image_index, :, :]})
+        return template_dict
 
     def get_segmentation_mask_image(self):
         # We need to binarize the segmentation mask image. Currently ROIs have values
@@ -337,9 +378,60 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
         dff_traces = dff_traces.drop(columns=['cell_roi_id'])
         return dff_traces
 
+    def get_image_index_names(self):
+        image_index_names = self.get_stimulus_presentations().groupby('image_index').apply(
+            lambda group: one(group['image_name'].unique())
+        )
+        return image_index_names
+
 
 class ExtendedBehaviorSession(BehaviorOphysSession):
+    """Represents data from a single Visual Behavior Ophys imaging session.  LazyProperty attributes access the data only on the first demand, and then memoize the result for reuse.
+    
+    Attributes:
+        ophys_experiment_id : int (LazyProperty)
+            Unique identifier for this experimental session
+        max_projection : allensdk.brain_observatory.behavior.image_api.Image (LazyProperty)
+            2D max projection image
+        stimulus_timestamps : numpy.ndarray (LazyProperty)
+            Timestamps associated the stimulus presentations on the monitor 
+        ophys_timestamps : numpy.ndarray (LazyProperty)
+            Timestamps associated with frames captured by the microscope
+        metadata : dict (LazyProperty)
+            A dictionary of session-specific metadata
+        dff_traces : pandas.DataFrame (LazyProperty)
+            The traces of dff organized into a dataframe; index is the cell roi ids
+        cell_specimen_table : pandas.DataFrame (LazyProperty)
+            Cell roi information organized into a dataframe; index is the cell roi ids
+        running_speed : allensdk.brain_observatory.running_speed.RunningSpeed (LazyProperty)
+            NamedTuple with two fields
+                timestamps : numpy.ndarray
+                    Timestamps of running speed data samples
+                values : np.ndarray
+                    Running speed of the experimental subject (in cm / s).
+        stimulus_presentations : pandas.DataFrame (LazyProperty)
+            Table whose rows are stimulus presentations (i.e. a given image, for a given duration, typically 250 ms) and whose columns are presentation characteristics.
+        stimulus_templates : dict (LazyProperty)
+            A dictionary containing the stimulus images presented during the session. Keys are image names, values are 2D numpy arrays.
+        licks : pandas.DataFrame (LazyProperty)
+            A dataframe containing lick timestamps
+        rewards : pandas.DataFrame (LazyProperty)
+            A dataframe containing timestamps of delivered rewards
+        task_parameters : dict (LazyProperty)
+            A dictionary containing parameters used to define the task runtime behavior
+        trials : pandas.DataFrame (LazyProperty)
+            A dataframe containing behavioral trial start/stop times, and trial data
+        corrected_fluorescence_traces : pandas.DataFrame (LazyProperty)
+            The motion-corrected fluorescence traces organized into a dataframe; index is the cell roi ids
+        average_projection : allensdk.brain_observatory.behavior.image_api.Image (LazyProperty)
+            2D image of the microscope field of view, averaged across the experiment
+        motion_correction : pandas.DataFrame LazyProperty
+            A dataframe containing trace data used during motion correction computation
 
+    Attributes for internal / advanced users
+        running_data_df : pandas.DataFrame (LazyProperty)
+            Dataframe containing various signals used to compute running speed
+    """
     def __init__(self, api):
 
         super(ExtendedBehaviorSession, self).__init__(api)
@@ -347,10 +439,9 @@ class ExtendedBehaviorSession(BehaviorOphysSession):
 
         self.trial_response_df = LazyProperty(self.api.get_trial_response_df)
         self.flash_response_df = LazyProperty(self.api.get_flash_response_df)
-        self.image_index = LazyProperty(self.get_stimulus_index)
+        self.image_index = LazyProperty(self.api.get_image_index_names)
 
-    def get_stimulus_index(self):
-        return self.stimulus_presentations.groupby('image_index').apply(
-            lambda group: group['image_name'].unique()[0]
-        )
+if __name__ == "__main__":
+    cache = BehaviorProjectCache(cache_paths_example)
+    session = cache.get_session(cache.manifest.iloc[0]['ophys_experiment_id'])
 
