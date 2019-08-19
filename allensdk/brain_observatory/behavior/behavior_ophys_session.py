@@ -93,7 +93,7 @@ class BehaviorOphysSession(LazyPropertyMixin):
         self.motion_correction = LazyProperty(self.api.get_motion_correction)
         self.segmentation_mask_image = LazyProperty(self.get_segmentation_mask_image)
 
-    @legacy('Consider using "get_dff_timeseries" instead.')
+    @legacy('Consider using "dff_traces" instead.')
     def get_dff_traces(self, cell_specimen_ids=None):
 
         if cell_specimen_ids is None:
