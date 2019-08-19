@@ -531,6 +531,41 @@ class EcephysSession(LazyPropertyMixin):
 
         return parameters
 
+    def channel_structure_intervals(self, channel_ids):
+
+        """ find on a list of channels the intervals of channels inserted into particular structures
+
+        Parameters
+        ----------
+        channel_ids : list
+            A list of channel ids
+        structure_id_key : str
+            use this column for numerically identifying structures
+        structure_label_key : str
+            use this column for human-readable structure identification
+
+        Returns
+        -------
+        labels : np.ndarray
+            for each detected interval, the label associated with that interval
+        intervals : np.ndarray
+            one element longer than labels. Start and end indices for intervals.
+
+        """
+        structure_id_key = "manual_structure_id"
+        structure_label_key = "manual_structure_acronym"
+        channel_ids.sort()
+        table = self.channels.loc[channel_ids]
+
+        unique_probes = table["probe_id"].unique()
+        if len(unique_probes)>1:
+            warnings.warn("Calculating structure boundaries across channels from multiple probes.")
+
+        intervals = nan_intervals(table[structure_id_key].values)
+        labels = table[structure_label_key].iloc[intervals[:-1]].values
+
+        return labels, intervals
+
 
     def _build_spike_times(self, spike_times):
         retained_units = set(self.units.index.values)
@@ -756,34 +791,6 @@ def removed_unused_stimulus_presentation_columns(stimulus_presentations):
         elif np.all(stimulus_presentations[cn].astype(str).values == 'null'):
             to_drop.append(cn)
     return stimulus_presentations.drop(columns=to_drop)
-
-
-def intervals_structures(table, structure_id_key="manual_structure_id", structure_label_key="manual_structure_acronym"):
-
-    """ find on a channels / units table intervals of channels inserted into particular structures
-
-    Parameters
-    ----------
-    table : pd.DataFrame
-        A table of channels (or units, with peak channels)
-    structure_id_key : str
-        use this column for numerically identifying structures
-    structure_label_key : str
-        use this column for human-readable structure identification
-
-    Returns
-    -------
-    labels : np.ndarray
-        for each detected interval, the label associated with that interval
-    intervals : np.ndarray
-        one element longer than labels. Start and end indices for intervals.
-
-    """
-
-    intervals = nan_intervals(table[structure_id_key].values)
-    labels = table[structure_label_key].iloc[intervals[:-1]].values
-
-    return labels, intervals
 
 
 def nan_intervals(array, nan_like=["null"]):
