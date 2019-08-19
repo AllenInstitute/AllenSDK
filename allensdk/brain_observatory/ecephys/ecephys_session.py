@@ -499,7 +499,7 @@ class EcephysSession(LazyPropertyMixin):
                 "spike_sem": scipy.stats.sem(gr["spike_count"].values)
             })
 
-        return pd.DataFrame(summary)
+        return pd.DataFrame(summary).set_index(keys=["unit_id", "stimulus_condition_id"])
 
 
     def get_parameter_values_for_stimulus(self, stimulus_name, drop_nulls=True):
