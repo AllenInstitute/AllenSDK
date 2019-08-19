@@ -499,7 +499,27 @@ class EcephysSession(LazyPropertyMixin):
                 "spike_sem": scipy.stats.sem(gr["spike_count"].values)
             })
 
-        return pd.DataFrame(summary).set_index(keys=["unit_id", "stimulus_condition_id"])
+        return pd.DataFrame(summary)
+
+
+    def get_parameter_values_for_stimulus(self, stimulus_name, drop_nulls=True):
+        """ For each stimulus parameter, report the unique values taken on by that 
+        parameter while a named stimulus was presented.
+
+        Parameters
+        ----------
+        stimulus_name : str
+            filter to presentations of this stimulus
+
+        Returns
+        -------
+        dict : 
+            maps parameters (column names) to their unique values.
+
+        """
+
+        presentation_ids = self.get_presentations_for_stimulus([stimulus_name]).index.values
+        return self.get_stimulus_parameter_values(presentation_ids, drop_nulls=drop_nulls)
 
 
     def get_stimulus_parameter_values(self, stimulus_presentation_ids=None, drop_nulls=True):
@@ -525,9 +545,15 @@ class EcephysSession(LazyPropertyMixin):
         parameters = {}
         for colname in stimulus_presentations.columns:
             uniques = stimulus_presentations[colname].unique()
-            if drop_nulls:
-                uniques = uniques[uniques != 'null']
-            parameters[colname] = uniques
+
+            non_null = np.array(uniques[uniques != "null"])
+            non_null = non_null
+            non_null = np.sort(non_null)
+
+            if not drop_nulls and "null" in uniques:
+                non_null = np.concatenate([non_null, ["null"]])
+
+            parameters[colname] = non_null
 
         return parameters
 
