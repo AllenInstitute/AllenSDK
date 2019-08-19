@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import xarray as xr
 import math
 from typing import NamedTuple
 import os
@@ -92,6 +93,92 @@ class BehaviorOphysSession(LazyPropertyMixin):
         self.average_projection = LazyProperty(self.get_average_projection)
         self.motion_correction = LazyProperty(self.api.get_motion_correction)
         self.segmentation_mask_image = LazyProperty(self.get_segmentation_mask_image)
+
+    def get_roi_masks(self, cell_specimen_ids=None):
+        """ Obtains boolean masks indicating the location of one or more cell's ROIs in this session.
+
+        Parameters
+        ----------
+        cell_specimen_ids : array-like of int, optional
+            ROI masks for these cell specimens will be returned. The default behavior is to return masks for all 
+            cell specimens.
+        
+        Returns
+        -------
+        result : xr.DataArray
+            dimensions are:
+                - cell_specimen_id : which cell's roi is described by this mask?
+                - row : index within the underlying image
+                - column : index within the image
+            values are 1 where an ROI was present, otherwise 0.
+
+        """
+
+        if cell_specimen_ids is None:
+            cell_specimen_ids = self.cell_specimen_table.index.values
+        elif isinstance(cell_specimen_ids, int) or np.issubdtype(type(cell_specimen_ids), np.integer):
+            cell_specimen_ids = np.array([int(cell_specimen_ids)])
+        else:
+            cell_specimen_ids = np.array(cell_specimen_ids)
+
+        cell_roi_ids = self.cell_specimen_table.loc[cell_specimen_ids, "cell_roi_id"].values
+        result = self._get_roi_masks_by_cell_roi_id(cell_roi_ids)
+        if "cell_roi_id" in result.dims:
+            result = result.rename({"cell_roi_id": "cell_specimen_id"})
+            result.coords["cell_specimen_id"] = cell_specimen_ids
+
+        return result
+
+    def _get_roi_masks_by_cell_roi_id(self, cell_roi_ids=None):
+        """ Obtains boolean masks indicating the location of one or more ROIs in this session.
+
+        Parameters
+        ----------
+        cell_roi_ids : array-like of int, optional
+            ROI masks for these rois will be returned. The default behavior is to return masks for all rois.
+        
+        Returns
+        -------
+        result : xr.DataArray
+            dimensions are:
+                - roi_id : which roi is described by this mask?
+                - row : index within the underlying image
+                - column : index within the image
+            values are 1 where an ROI was present, otherwise 0.
+
+        Notes
+        -----
+        This method helps Allen Institute scientists to look at sessions that have not yet had cell specimen ids assigned.
+        You probably want to use get_roi_masks instead.
+
+
+        """
+        if cell_roi_ids is None:
+            cell_roi_ids = self.cell_specimen_table["cell_roi_id"].unique()
+        elif isinstance(cell_roi_ids, int) or np.issubdtype(type(cell_roi_ids), np.integer):
+            cell_roi_ids = np.array([int(cell_roi_ids)])
+        else:
+            cell_roi_ids = np.array(cell_roi_ids)
+
+        table = self.cell_specimen_table.copy()
+        table.set_index("cell_roi_id", inplace=True)
+        table = table.loc[cell_roi_ids, :]
+
+        full_image_shape = table.iloc[0]["image_mask"].shape
+
+        output = np.zeros((len(cell_roi_ids), full_image_shape[0], full_image_shape[1]), dtype=np.uint8)
+        for ii, (_, row) in enumerate(table.iterrows()):
+            output[ii, :, :] = _translate_roi_mask(row["image_mask"], int(row["y"]), int(row["x"]))
+
+        return xr.DataArray(
+            data=output,
+            dims=("cell_roi_id", "row", "column"),
+            coords={
+                "cell_roi_id": cell_roi_ids,
+                "row": np.arange(full_image_shape[0]),
+                "column": np.arange(full_image_shape[1])
+            }
+        ).squeeze(drop=True)
 
     @legacy('Consider using "dff_traces" instead.')
     def get_dff_traces(self, cell_specimen_ids=None):
@@ -237,6 +324,15 @@ class BehaviorOphysSession(LazyPropertyMixin):
         performance_metrics['max_dprime_engaged'] = rolling_performance_df['rolling_dprime'][engaged_trial_mask].max()
 
         return performance_metrics
+
+
+def _translate_roi_mask(mask, row_offset, col_offset):
+    return np.roll(
+        mask, 
+        shift=(row_offset, col_offset), 
+        axis=(0, 1)
+    )
+
 
 if __name__ == "__main__":
 

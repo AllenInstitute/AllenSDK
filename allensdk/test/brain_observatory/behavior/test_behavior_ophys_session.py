@@ -15,6 +15,7 @@ from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorO
 from allensdk.brain_observatory.behavior.write_nwb.__main__ import BehaviorOphysJsonApi
 from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi, equals
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
+from allensdk.brain_observatory.behavior.behavior_ophys_api import BehaviorOphysApiBase
 
 
 @pytest.mark.nightly
@@ -161,3 +162,107 @@ def test_trial_response_window_bounds_reward(ophys_experiment_id):
             assert reward_time < response_window[1] + 1/60
             if len(session.licks) > 0:
                 assert lick_times[0] < reward_time
+
+
+@pytest.fixture
+def cell_specimen_table_api():
+
+    roi_1 = np.array([
+        [1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0]
+    ])
+
+    roi_2 = np.array([
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 1, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0]
+    ])
+
+    class CellSpecimenTableApi(BehaviorOphysApiBase):
+        def get_cell_specimen_table(self):
+            return pd.DataFrame({
+                "cell_roi_id": [1, 2],
+                "y": [1, 1],
+                "x": [2, 1],
+                "image_mask": [roi_1, roi_2]
+            }, index=pd.Index(data=[10, 11], name="cell_specimen_id")
+        )
+    return CellSpecimenTableApi()
+
+@pytest.mark.parametrize("roi_ids,expected", [
+    [
+        1,
+        np.array([
+            [0, 0, 0, 0, 0],
+            [0, 0, 1, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0]
+        ])
+    ],
+    [
+        None,
+        np.array([
+            [
+                [0, 0, 0, 0, 0],
+                [0, 0, 1, 0, 0],
+                [0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0]
+            ],
+            [
+                [0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0],
+                [0, 0, 1, 0, 0],
+                [0, 0, 0, 0, 0]
+            ]
+        ])
+    ]
+])
+def test_get_roi_masks_by_cell_roi_id(roi_ids, expected, cell_specimen_table_api):
+    ssn = BehaviorOphysSession(api=cell_specimen_table_api)
+    obtained = ssn._get_roi_masks_by_cell_roi_id(roi_ids)
+    assert np.allclose(expected, obtained.values)
+
+
+@pytest.mark.parametrize("cell_specimen_ids,expected", [
+    [
+        10,
+        np.array([
+            [0, 0, 0, 0, 0],
+            [0, 0, 1, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0]
+        ])
+    ],
+    [
+        [11, 10],
+        np.array([
+            [
+                [0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0],
+                [0, 0, 1, 0, 0],
+                [0, 0, 0, 0, 0]
+            ],
+            [
+                [0, 0, 0, 0, 0],
+                [0, 0, 1, 0, 0],
+                [0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0]
+            ]
+        ])
+    ]
+])
+def test_get_roi_masks(cell_specimen_ids, expected, cell_specimen_table_api):
+    ssn = BehaviorOphysSession(api=cell_specimen_table_api)
+    obtained = ssn.get_roi_masks(cell_specimen_ids)
+    assert np.allclose(expected, obtained.values)
