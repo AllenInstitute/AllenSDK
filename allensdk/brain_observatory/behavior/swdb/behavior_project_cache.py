@@ -336,7 +336,17 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
     def get_stimulus_templates(self):
         # super stim templates is a dict with one annoyingly-long key, so pop the val out
         stimulus_templates = super(ExtendedNwbApi, self).get_stimulus_templates()
-        return stimulus_templates[list(stimulus_templates.keys())[0]]
+        stimulus_template_array = stimulus_templates[list(stimulus_templates.keys())[0]]
+
+        # What we really want is a dict with image_name as key
+        template_dict = {}
+        image_index_names = self.get_stimulus_presentations().groupby('image_index').apply(
+            lambda group: one(group['image_name'].unique())
+        )
+        for image_index, image_name in image_index_names.iteritems():
+            if image_name != 'omitted':
+                template_dict.update({image_name:stimulus_template_array[image_index, :, :]})
+        return template_dict
 
     def get_segmentation_mask_image(self):
         # We need to binarize the segmentation mask image. Currently ROIs have values
@@ -398,7 +408,7 @@ class ExtendedBehaviorSession(BehaviorOphysSession):
         stimulus_presentations : pandas.DataFrame (LazyProperty)
             Table whose rows are stimulus presentations (i.e. a given image, for a given duration, typically 250 ms) and whose columns are presentation characteristics.
         stimulus_templates : dict (LazyProperty)
-            A dictionary containing the stimulus images presented during the session keys are data set names, and values are 3D numpy arrays.
+            A dictionary containing the stimulus images presented during the session. Keys are image names, values are 2D numpy arrays.
         licks : pandas.DataFrame (LazyProperty)
             A dataframe containing lick timestamps
         rewards : pandas.DataFrame (LazyProperty)
@@ -431,4 +441,8 @@ class ExtendedBehaviorSession(BehaviorOphysSession):
         image_index_names = self.get_stimulus_presentations().groupby('image_index').apply(
             lambda group: one(group['image_name'].unique())
         )
+
+if __name__ == "__main__":
+    cache = BehaviorProjectCache(cache_paths_example)
+    session = cache.get_session(cache.manifest.iloc[0]['ophys_experiment_id'])
 
