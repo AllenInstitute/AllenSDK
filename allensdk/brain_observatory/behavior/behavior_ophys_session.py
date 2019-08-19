@@ -123,7 +123,7 @@ class BehaviorOphysSession(LazyPropertyMixin):
 
         cell_roi_ids = self.cell_specimen_table.loc[cell_specimen_ids, "cell_roi_id"].values
         result = self._get_roi_masks_by_cell_roi_id(cell_roi_ids)
-        if result.ndim == 3:
+        if "cell_roi_id" in result.dims:
             result = result.rename({"cell_roi_id": "cell_specimen_id"})
             result.coords["cell_specimen_id"] = cell_specimen_ids
 
@@ -178,7 +178,7 @@ class BehaviorOphysSession(LazyPropertyMixin):
                 "row": np.arange(full_image_shape[0]),
                 "column": np.arange(full_image_shape[1])
             }
-        ).squeeze()
+        ).squeeze(drop=True)
 
     @legacy('Consider using "dff_traces" instead.')
     def get_dff_traces(self, cell_specimen_ids=None):
