@@ -187,6 +187,33 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
         task_parameters['stimulus_duration_sec'] = 0.25
         return task_parameters
 
+    def get_metadata(self):
+        metadata = super(ExtendedNwbApi, self).get_metadata()
+
+        # We want stage name in metadata for easy access by the students
+        task_parameters = self.get_task_parameters()
+        metadata['stage'] = task_parameters['stage']
+
+        # metadata should not include 'session_type' because it is 'Unknown'
+        metadata.pop('session_type')
+
+        # For SWDB only
+        # metadata should not include 'behavior_session_uuid' because it is not useful to students and confusing
+        metadata.pop('behavior_session_uuid')
+
+        # Rename LabTracks_ID to mouse_id to reduce student confusion
+        metadata['mouse_id'] = metadata.pop('LabTracks_ID')
+
+        return metadata
+
+    def get_running_speed(self):
+        # We want the running speed attribute to be a dataframe (like licks, rewards, etc.) instead of a 
+        # RunningSpeed object. This will improve consistency for students. For SWDB we have also opted to 
+        # have columns for both 'timestamps' and 'values' of things, since this is more intuitive for students
+        running_speed = super(ExtendedNwbApi, self).get_running_speed()
+        return pd.DataFrame({'speed': running_speed.values,
+                             'timestamps': running_speed.timestamps})
+
     def get_trials(self, filter_aborted_trials=True):
         trials = super(ExtendedNwbApi, self).get_trials()
         stimulus_presentations = super(ExtendedNwbApi, self).get_stimulus_presentations()
