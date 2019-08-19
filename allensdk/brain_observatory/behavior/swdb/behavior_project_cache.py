@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import numpy as np
 import json
+import re
 
 from allensdk import one
 from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi
@@ -71,6 +72,43 @@ class BehaviorProjectCache(object):
             'date_of_acquisition',
             'retake_number'
         ]]
+
+        def _parse_cre_line(full_genotype):
+            '''
+            Args:
+                full_genotype (str): formatted from LIMS, e.g. Vip-IRES-Cre/wt;Ai148(TIT2L-GC6f-ICL-tTA2)/wt
+            Returns:
+                cre_line (str): just the Cre line, e.g. Vip-IRES-Cre
+            '''
+            return full_genotype.split(';')[0].split('/')[0] # Drop the /wt
+        self.manifest['cre_line'] = self.manifest['full_genotype'].apply(_parse_cre_line)
+
+        def _parse_passive(behavior_stage):
+            '''
+            Args:
+                behavior_stage (str): the stage string, e.g. OPHYS_1_images_A or OPHYS_1_images_A_passive
+            Returns:
+                passive (bool): whether or not the session was a passive session
+            '''
+            r = re.compile(".*_passive")
+            if r.match(behavior_stage):
+                return True
+            else:
+                return False
+        self.manifest['passive_session'] = self.manifest['stage_name'].apply(_parse_passive)
+
+        def _parse_image_set(behavior_stage):
+            '''
+            Args:
+                behavior_stage (str): the stage string, e.g. OPHYS_1_images_A or OPHYS_1_images_A_passive
+            Returns:
+                image_set (str): which image set is designated by the stage name
+            '''
+            r = re.compile(".*images_(?P<image_set>[AB]).*")
+            image_set = r.match(behavior_stage).groups('image_set')[0]
+            return image_set
+        self.manifest['image_set'] = self.manifest['stage_name'].apply(_parse_image_set)
+
         self.nwb_base_dir = cache_paths['nwb_base_dir']
         self.analysis_files_base_dir = cache_paths['analysis_files_base_dir']
 
