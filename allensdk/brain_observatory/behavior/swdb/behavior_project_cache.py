@@ -340,9 +340,7 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
 
         # What we really want is a dict with image_name as key
         template_dict = {}
-        image_index_names = self.get_stimulus_presentations().groupby('image_index').apply(
-            lambda group: one(group['image_name'].unique())
-        )
+        image_index_names = self.get_image_index_names()
         for image_index, image_name in image_index_names.iteritems():
             if image_name != 'omitted':
                 template_dict.update({image_name:stimulus_template_array[image_index, :, :]})
@@ -379,6 +377,12 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
         dff_traces = super(ExtendedNwbApi, self).get_dff_traces()
         dff_traces = dff_traces.drop(columns=['cell_roi_id'])
         return dff_traces
+
+    def get_image_index_names(self):
+        image_index_names = self.get_stimulus_presentations().groupby('image_index').apply(
+            lambda group: one(group['image_name'].unique())
+        )
+        return image_index_names
 
 
 class ExtendedBehaviorSession(BehaviorOphysSession):
@@ -435,12 +439,7 @@ class ExtendedBehaviorSession(BehaviorOphysSession):
 
         self.trial_response_df = LazyProperty(self.api.get_trial_response_df)
         self.flash_response_df = LazyProperty(self.api.get_flash_response_df)
-        self.image_index = LazyProperty(self.get_image_index)
-
-    def get_image_index(self):
-        image_index_names = self.get_stimulus_presentations().groupby('image_index').apply(
-            lambda group: one(group['image_name'].unique())
-        )
+        self.image_index = LazyProperty(self.api.get_image_index_names)
 
 if __name__ == "__main__":
     cache = BehaviorProjectCache(cache_paths_example)
