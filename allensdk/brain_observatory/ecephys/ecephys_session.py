@@ -555,7 +555,7 @@ class EcephysSession(LazyPropertyMixin):
         structure_id_key = "manual_structure_id"
         structure_label_key = "manual_structure_acronym"
         channel_ids.sort()
-        table = session.channels.loc[channel_ids]
+        table = self.channels.loc[channel_ids]
 
         unique_probes = table["probe_id"].unique()
         if len(unique_probes)>1:
