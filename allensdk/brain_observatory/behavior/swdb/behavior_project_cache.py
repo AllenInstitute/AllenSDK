@@ -228,6 +228,8 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
         task_parameters = super(ExtendedNwbApi, self).get_task_parameters()
         task_parameters['omitted_flash_fraction'] = 0.05
         task_parameters['stimulus_duration_sec'] = 0.25
+        task_parameters['blank_duration_sec'] = 0.5
+        task_parameters.pop('task')
         return task_parameters
 
     def get_metadata(self):
