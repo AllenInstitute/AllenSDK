@@ -9,17 +9,17 @@ import matplotlib as mpl
 '''
 
 
-def save_figure(fig, figsize, save_dir, folder, fig_title, formats=['.png']):
+def save_figure(fig, figsize, save_dir, folder, filename, formats=['.png']):
     '''
         Function for saving a figure
     
         INPUTS:
-        fig, a figure object
-        figsize,
-        save_dir, the directory to save the figure
-        folder, 
-        fig_title, the name of the figure
-        formats, a list of file formats as strings to save the figure as
+        fig: a figure object
+        figsize: tuple of desired figure size
+        save_dir: string, the directory to save the figure
+        folder: string, the sub-folder to save the figure in. if the folder does not exist, it will be created
+        filename: string, the desired name of the saved figure
+        formats: a list of file formats as strings to save the figure as, ex: ['.png','.pdf']
     '''
     fig_dir = os.path.join(save_dir, folder)
     if not os.path.exists(fig_dir):
@@ -35,10 +35,10 @@ def get_dff_matrix(session):
         Returns the dff_trace of a session as a numpy matrix
 
         INPUTS:
-        session, a behaviorOphysSession object
+        session: a behaviorOphysSession object
         
         OUTPUTS:
-        dff, a matrix of cells x dff_trace for the entire session 
+        dff: a matrix of cells x dff_trace for the entire session
     '''
     dff = np.stack(session.dff_traces.dff, axis=0)
     return dff
@@ -49,18 +49,18 @@ def get_mean_df(response_df, conditions=['cell_specimen_id', 'image_name']):
         Computes an analysis on a selection of responses (either flashes or trials). Computes mean_response, sem_response, the pref_stim, fraction_active_responses.
 
         INPUTS
-        response_df, the dataframe to group by
-        conditions, the conditions to group by, the first entry should be 'cell_specimen_id', the second could be 'image_name' or 'change_image_name'
+        response_df: the dataframe to group
+        conditions: the conditions to group by, the first entry should be 'cell_specimen_id', the second could be 'image_name' or 'change_image_name'
 
         OUTPUTS:
-        mdf, a dataframe with the following columns:
-            mean_response, the average mean_response for each condition
-            sem_response, the sem of the mean_response
-            mean_trace, the average dff trace for each condition
-            sem_trace, the sem of the mean_trace
-            mean_responses, the list of mean_responses for each element of each group
-            pref_stim, if conditions includes image_name or change_image_name, sets a boolean column for whether that was the cell's preferred stimulus
-            fraction_significant_responses, the fraction of individual image presentations or trials that were significant (p_value > 0.05)
+        mdf: a dataframe with the following columns:
+            mean_response: the average mean_response for each condition
+            sem_response: the sem of the mean_response
+            mean_trace: the average dff trace for each condition
+            sem_trace: the sem of the mean_trace
+            mean_responses: the list of mean_responses for each element of each group
+            pref_stim: if conditions includes image_name or change_image_name, sets a boolean column for whether that was the cell's preferred stimulus
+            fraction_significant_responses: the fraction of individual image presentations or trials that were significant (p_value > 0.05)
     '''
     
     # Group by conditions
@@ -89,7 +89,7 @@ def get_mean_sem_trace(group):
         Computes the average and sem of the mean_response column
 
         INPUTS:
-        group, a pandas group
+        group: a pandas group_by object
         
         OUTPUT:
         a pandas series with the mean_response, sem_response, mean_trace, sem_trace, and mean_responses computed for the group. 
@@ -109,10 +109,10 @@ def annotate_mean_df_with_pref_stim(mean_df):
         Computes the preferred stimulus for each cell/trial or cell/flash combination. Preferred image is computed by seeing which image evoked the largest average mean_response across all images. 
 
         INPUTS:
-        mean_df, the mean_df to be annotated
+        mean_df: the mean_df to be annotated
 
         OUTPUTS:
-        mean_df with a new column appended 'pref_stim' which is a boolean TRUE/FALSE for whether that image was that cell's preferred image. 
+        mean_df with a new column appended 'pref_stim' which is a boolean TRUE/FALSE for whether that image was that cell's preferred image.
        
         ASSERTS:
         Each cell has one unique preferred stimulus 
@@ -151,14 +151,14 @@ def annotate_mean_df_with_pref_stim(mean_df):
 def get_fraction_significant_responses(group, threshold=0.05):
     '''
         Calculates the fraction of trials or flashes that have a p_value below threshold
-        PROBLEM: This function does not handle multiple comparisons
+        Note that this function does not handle multiple comparisons
     
         INPUT:
-        group, a pandas group
-        threshold, the p_value threshold for significance for an individual response
+        group: a pandas group_by object
+        threshold: the p_value threshold for significance for an individual response
 
         OUTPUT:
-        a pandas series with column 'fraction_significant_responses
+        a pandas series with column 'fraction_significant_responses'
     '''
     fraction_significant_responses = len(group[group.p_value < threshold]) / float(len(group))
     return pd.Series({'fraction_significant_responses': fraction_significant_responses})
@@ -272,10 +272,10 @@ def create_multi_session_mean_df(cache, experiment_ids, conditions=['cell_specim
         Creates a mean response dataframe by combining multiple sessions. 
        
         INPUTS: 
-        cache, the cache for the dataset
-        experiment_ids, is a list of experiment_ids for sessions to merge
-        conditions is the set of conditions to send to get_mean_df() to groupby. The first entry should be 'cell_specimen_id'
-        flashes, if TRUE, merges the flash_response_df, otherwise merges the trial_response_df
+        cache: the cache object for the dataset
+        experiment_ids:  a list of experiment_ids for sessions to merge
+        conditions: the set of conditions to group by. The first entry should be 'cell_specimen_id'
+        flashes: if TRUE, uses the flash_response_df to merge, otherwise uses the trial_response_df
 
         OUTPUTS
         mega_mdf, a dataframe with index given by the session experiment ids. This allows for easy analysis like:
