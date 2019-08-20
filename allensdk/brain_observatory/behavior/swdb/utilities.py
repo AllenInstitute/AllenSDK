@@ -44,25 +44,23 @@ def get_dff_matrix(session):
     return dff
 
 
-def get_mean_df(response_df, conditions=['cell_specimen_id', 'image_name'], flashes=False, omitted=False):
+def get_mean_df(response_df, conditions=['cell_specimen_id', 'image_name']):
     '''
         Computes an analysis on a selection of responses (either flashes or trials). Computes mean_response, sem_response, the pref_stim, fraction_active_responses.
 
         INPUTS
-        response_df, the dataframe to group
+        response_df, the dataframe to group by
         conditions, the conditions to group by, the first entry should be 'cell_specimen_id', the second could be 'image_name' or 'change_image_name'
-        flashes, if True, computes the fraction of individual images that were significant
-        omitted, does nothing #PROBLEM
 
         OUTPUTS:
-        mdf, a dataframe with index given by conditions, and columns:
+        mdf, a dataframe with the following columns:
             mean_response, the average mean_response for each condition
             sem_response, the sem of the mean_response
             mean_trace, the average dff trace for each condition
             sem_trace, the sem of the mean_trace
             mean_responses, the list of mean_responses for each element of each group
             pref_stim, if conditions includes image_name or change_image_name, sets a boolean column for whether that was the cell's preferred stimulus
-            fraction_significant_responses, if flashes, then computes the fraction of individual image presentations that were significant 
+            fraction_significant_responses, the fraction of individual image presentations or trials that were significant (p_value > 0.05)
     '''
     
     # Group by conditions
@@ -76,10 +74,10 @@ def get_mean_df(response_df, conditions=['cell_specimen_id', 'image_name'], flas
         mdf = annotate_mean_df_with_pref_stim(mdf)
 
     # What fraction of individual responses were significant?
-    if flashes:
-        fraction_significant_responses = rdf.groupby(conditions).apply(get_fraction_significant_responses)
-        fraction_significant_responses = fraction_significant_responses.reset_index()
-        mdf['fraction_significant_responses'] = fraction_significant_responses.fraction_significant_responses
+    # if flashes:
+    fraction_significant_responses = rdf.groupby(conditions).apply(get_fraction_significant_responses)
+    fraction_significant_responses = fraction_significant_responses.reset_index()
+    mdf['fraction_significant_responses'] = fraction_significant_responses.fraction_significant_responses
 
     if 'index' in mdf.keys():
         mdf = mdf.drop(columns=['index'])
@@ -315,7 +313,10 @@ def create_multi_session_mean_df(cache, experiment_ids, conditions=['cell_specim
     # Clean up indexes
     mega_mdf = mega_mdf.reset_index()
     mega_mdf = mega_mdf.set_index('experiment_id')
-    mega_mdf = mega_mdf.drop(columns=['level_0','index'])
+    if 'index' in mega_mdf.keys():
+        mega_mdf = mega_mdf.drop(columns=['index'])
+    if 'level_0' in mega_mdf.keys():
+        mega_mdf = mega_mdf.drop(columns=['level_0'])
 
     return mega_mdf
 
