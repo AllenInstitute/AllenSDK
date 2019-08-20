@@ -14,8 +14,9 @@ def validate_epoch_durations(table, start_key="Start", end_key="End"):
         )
     if min_duration < 0:
         print(table.loc[min_duration_index - 5 : min_duration_index + 5, :])
-        raise ValueError(
-            f"there is an epoch with negative duration (index: {min_duration_index}"
+        warnings.warn(
+            f"there is an epoch with negative duration (index: {min_duration_index}",
+            UserWarning,
         )
 
 

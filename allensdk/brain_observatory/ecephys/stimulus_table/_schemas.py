@@ -41,7 +41,7 @@ class InputParameters(ArgSchema):
             "natural_movie_3" : "natural_movie_three",
             "Natural Images": "natural_scenes",
             "flash_250ms": "flashes",
-            "gabor_20_deg_250ms": "receptive_field_mapping",
+            "gabor_20_deg_250ms": "gabors",
             "drifting_gratings" : "drifting_gratings",
             "static_gratings" : "static_gratings",
 
