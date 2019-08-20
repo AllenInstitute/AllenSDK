@@ -10,9 +10,9 @@ def createInputJson(output_file):
 
     df = pd.read_csv('/mnt/md0/data/production_QC/experiment_table_2019-07-31.csv',index_col=0)
 
-    fc_mice = np.sort(df[df['stimulus_set'].str.match('Functional')].index.values)
+    #fc_mice = np.sort(df[df['stimulus_set'].str.match('Functional')].index.values)
 
-    nwb_files = ['/mnt/nvme0/ecephys_nwb_files_20190727/mouse' + str(mouse) + '.spikes.nwb2' for mouse in fc_mice]
+    nwb_files = glob.glob('/mnt/nvme0/ecephys_nwb_files_20190815/*.nwb2') #['/mnt/nvme0/ecephys_nwb_files_20190727/mouse' + str(mouse) + '.spikes.nwb2' for mouse in df.index.values]
 
     print('Found ' + str(len(nwb_files)) + ' nwb files')
 
@@ -57,8 +57,8 @@ def createInputJson(output_file):
 
         "receptive_field_mapping" : 
         {
-            "stimulus_key" : "receptive_field_mapping",
-            "mask_threshold" : 0.5,
+            "stimulus_key" : "gabors",
+            "mask_threshold" : 1.0,
             "minimum_spike_count" : 10
         },
 

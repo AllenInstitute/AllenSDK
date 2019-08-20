@@ -29,15 +29,15 @@ def calculate_stimulus_metrics(args):
 
     stimulus_classes = (
                  DriftingGratings,
-                 StaticGratings,
-                 NaturalScenes,
+                 #StaticGratings,
+                 #NaturalScenes,
                  #NaturalMovies,
-                 DotMotion,
+                 #DotMotion,
                  Flashes,
                  ReceptiveFieldMapping,
                 )
 
-    result = Parallel(n_jobs=20, verbose=10) \
+    result = Parallel(n_jobs=16, verbose=10) \
             (delayed(add_metrics_to_units_table)(path, stimulus_classes, args) 
                 for path in args['nwb_paths'])
 

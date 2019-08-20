@@ -3,6 +3,7 @@ import pandas as pd
 from six import string_types
 import scipy.ndimage as ndi
 import scipy.stats as st
+from scipy.signal import welch
 from scipy.optimize import curve_fit
 from scipy.fftpack import fft
 
@@ -51,10 +52,10 @@ class DriftingGratings(StimulusAnalysis):
         self._trial_duration = 2.0
 
         if self._params is not None:
-            self._params = self._params['drifting_gratings']
+            self._params = self._params['receptive_field_mapping']
             self._stimulus_key = self._params['stimulus_key']
         else:
-            self._stimulus_key = 'drifting_gratings'
+            self._stimulus_key = 'gabors'
 
         self._module_name = 'Drifting Gratings'
 
@@ -175,7 +176,7 @@ class DriftingGratings(StimulusAnalysis):
                 metrics_df['pref_ori_dg'] = [self._get_pref_ori(unit) for unit in unit_ids]
                 metrics_df['pref_tf_dg'] = [self._get_pref_tf(unit) for unit in unit_ids]
                 metrics_df['f1_f0_dg'] = [self._get_f1_f0(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
-                metrics_df['mod_idx_dg'] = [self._get_modulation_index(unit) for unit in unit_ids]
+                metrics_df['mod_idx_dg'] = [self._get_modulation_index(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
                 metrics_df['g_osi_dg'] = [self._get_selectivity(unit, metrics_df.loc[unit]['pref_tf_dg'], 'osi') for unit in unit_ids]
                 metrics_df['g_dsi_dg'] = [self._get_selectivity(unit, metrics_df.loc[unit]['pref_tf_dg'], 'dsi') for unit in unit_ids]
                 metrics_df['firing_rate_dg'] = [self.get_overall_firing_rate(unit) for unit in unit_ids]
@@ -185,8 +186,8 @@ class DriftingGratings(StimulusAnalysis):
                 metrics_df.loc[:, ['run_pval_dg', 'run_mod_dg']] = \
                         [self.get_running_modulation(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
 
-            if len(self._stim_table_contrast) > 0:
-                metrics_df['c50_dg'] = [self._get_c50(unit) for unit in unit_ids]
+            #if len(self._stim_table_contrast) > 0:
+            #    metrics_df['c50_dg'] = [self._get_c50(unit) for unit in unit_ids]
 
             self._metrics = metrics_df
 
@@ -318,7 +319,9 @@ class DriftingGratings(StimulusAnalysis):
                                                                   ).drop('unit_id')
         arr = np.squeeze(dataset['spike_counts'].values)
 
-        return f1_f0(arr, tf)
+        trial_duration = dataset.time_relative_to_stimulus_onset.max()
+
+        return f1_f0(arr, tf, trial_duration)
 
 
     def _get_modulation_index(self, unit_id, condition_id):
@@ -515,7 +518,7 @@ def c50(x,y):
     return c50
 
 
-def f1_f0(arr, tf):
+def f1_f0(arr, tf, trial_duration):
 
     """
     Computes F1/F0 of a drifting grating response
@@ -531,9 +534,8 @@ def f1_f0(arr, tf):
 
     """
 
-    num_trials = dataset.stimulus_presentation_id.size
-    num_bins = dataset.time_relative_to_stimulus_onset.size
-    trial_duration = dataset.time_relative_to_stimulus_onset.max()
+    num_trials = arr.shape[0]
+    num_bins = arr.shape[1]
 
     cycles_per_trial = int(tf * trial_duration)
 
@@ -561,7 +563,7 @@ def modulation_index(response, tf, sample_rate):
 
     """
 
-    f, psd = signal.welch(response, fs=sample_rate, nperseg=1024)
+    f, psd = welch(response, fs=sample_rate, nperseg=1024)
 
     tf_index = np.searchsorted(f, tf)
 

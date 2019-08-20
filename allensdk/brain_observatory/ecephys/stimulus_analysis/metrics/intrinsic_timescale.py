@@ -54,9 +54,11 @@ def cal_rsc(spikes, PSTH_bintime=25):
                     amo[lum, idx, i,j]=r
                     amo_p[lum, idx,i,j]=p
                     if p<0.05:
-                        amo_sig[lum, idx,i,j]=1          
+                        amo_sig[lum, idx,i,j]=1    
+
     rsc_time_matrix = amo
     rsc_time_matrix = np.nanmean(rsc_time_matrix, axis=0)
+    
     return rsc_time_matrix
 
 def fit_exp(rsc_time_matrix):
