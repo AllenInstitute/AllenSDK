@@ -502,6 +502,26 @@ class EcephysSession(LazyPropertyMixin):
         return pd.DataFrame(summary).set_index(keys=["unit_id", "stimulus_condition_id"])
 
 
+    def get_parameter_values_for_stimulus(self, stimulus_name, drop_nulls=True):
+        """ For each stimulus parameter, report the unique values taken on by that 
+        parameter while a named stimulus was presented.
+
+        Parameters
+        ----------
+        stimulus_name : str
+            filter to presentations of this stimulus
+
+        Returns
+        -------
+        dict : 
+            maps parameters (column names) to their unique values.
+
+        """
+
+        presentation_ids = self.get_presentations_for_stimulus([stimulus_name]).index.values
+        return self.get_stimulus_parameter_values(presentation_ids, drop_nulls=drop_nulls)
+
+
     def get_stimulus_parameter_values(self, stimulus_presentation_ids=None, drop_nulls=True):
         ''' For each stimulus parameter, report the unique values taken on by that 
         parameter throughout the course of the  session.
@@ -525,11 +545,52 @@ class EcephysSession(LazyPropertyMixin):
         parameters = {}
         for colname in stimulus_presentations.columns:
             uniques = stimulus_presentations[colname].unique()
-            if drop_nulls:
-                uniques = uniques[uniques != 'null']
-            parameters[colname] = uniques
+
+            non_null = np.array(uniques[uniques != "null"])
+            non_null = non_null
+            non_null = np.sort(non_null)
+
+            if not drop_nulls and "null" in uniques:
+                non_null = np.concatenate([non_null, ["null"]])
+
+            parameters[colname] = non_null
 
         return parameters
+
+    def channel_structure_intervals(self, channel_ids):
+
+        """ find on a list of channels the intervals of channels inserted into particular structures
+
+        Parameters
+        ----------
+        channel_ids : list
+            A list of channel ids
+        structure_id_key : str
+            use this column for numerically identifying structures
+        structure_label_key : str
+            use this column for human-readable structure identification
+
+        Returns
+        -------
+        labels : np.ndarray
+            for each detected interval, the label associated with that interval
+        intervals : np.ndarray
+            one element longer than labels. Start and end indices for intervals.
+
+        """
+        structure_id_key = "manual_structure_id"
+        structure_label_key = "manual_structure_acronym"
+        channel_ids.sort()
+        table = self.channels.loc[channel_ids]
+
+        unique_probes = table["probe_id"].unique()
+        if len(unique_probes)>1:
+            warnings.warn("Calculating structure boundaries across channels from multiple probes.")
+
+        intervals = nan_intervals(table[structure_id_key].values)
+        labels = table[structure_label_key].iloc[intervals[:-1]].values
+
+        return labels, intervals
 
 
     def _build_spike_times(self, spike_times):
@@ -756,34 +817,6 @@ def removed_unused_stimulus_presentation_columns(stimulus_presentations):
         elif np.all(stimulus_presentations[cn].astype(str).values == 'null'):
             to_drop.append(cn)
     return stimulus_presentations.drop(columns=to_drop)
-
-
-def intervals_structures(table, structure_id_key="manual_structure_id", structure_label_key="manual_structure_acronym"):
-
-    """ find on a channels / units table intervals of channels inserted into particular structures
-
-    Parameters
-    ----------
-    table : pd.DataFrame
-        A table of channels (or units, with peak channels)
-    structure_id_key : str
-        use this column for numerically identifying structures
-    structure_label_key : str
-        use this column for human-readable structure identification
-
-    Returns
-    -------
-    labels : np.ndarray
-        for each detected interval, the label associated with that interval
-    intervals : np.ndarray
-        one element longer than labels. Start and end indices for intervals.
-
-    """
-
-    intervals = nan_intervals(table[structure_id_key].values)
-    labels = table[structure_label_key].iloc[intervals[:-1]].values
-
-    return labels, intervals
 
 
 def nan_intervals(array, nan_like=["null"]):
