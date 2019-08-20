@@ -36,12 +36,12 @@ from allensdk.brain_observatory.ecephys.ecephys_project_api import (
         [
             "get_channels",
             {},
-            re.compile(r"select ec\.id as id.*where valid_data$"),
+            re.compile(r"select ec\.id as id.*where valid_data and ep.workflow_state != 'failed' and es.workflow_state != 'failed'$"),
         ],
         [
             "get_probes",
             {},
-            re.compile(r"select ep\.id as id, ep.ecephys_session_id.*where true$"),
+            re.compile(r"select ep\.id as id, ep.ecephys_session_id.*where true and ep.workflow_state != 'failed' and es.workflow_state != 'failed'$"),
         ],
     ],
 )
