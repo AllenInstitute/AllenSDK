@@ -241,14 +241,16 @@ class BehaviorOphysSession(LazyPropertyMixin):
         return self.deserialize_image(self.api.get_average_projection())
 
     def get_segmentation_mask_image(self):
-        """ Returns an image with a pixel value of zero if the pixel is not included in any ROI, and nonzero if included in a segmented ROI.
+        """ Returns an image with value 1 if the pixel was included in an ROI, and 0 otherwise
 
         Returns
         ----------
-        allensdk.brain_observatory.behavior.image_api.Image:
-            array-like interface to max projection image data and metadata
+        mask_image (xarray.DataArray):
+            Image with 1 if the pixel was included in any ROI, and 0 otherwise
         """
-        return self.deserialize_image(self.api.get_segmentation_mask_image())
+        masks = self.get_roi_masks()
+        mask_image = masks.any(dim='cell_specimen_id')
+        return mask_image
 
     def get_reward_rate(self):
         response_latency_list = []
