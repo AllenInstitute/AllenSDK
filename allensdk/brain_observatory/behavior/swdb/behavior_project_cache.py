@@ -201,7 +201,7 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
 
     def get_trial_response_df(self):
         tdf = pd.read_hdf(self.trial_response_df_path, key='df')
-        tdf.reset_index(level=1, inplace=True)
+        tdf.reset_index(inplace=True)
         # tdf.insert(loc=0, column='cell_specimen_id', value=tdf.index.values)
         #  tdf['cell_specimen_id'] = tdf.index.values #add this as a column to the end
         tdf.drop(columns=['cell_roi_id'], inplace=True)
@@ -209,7 +209,7 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
 
     def get_flash_response_df(self):
         fdf = pd.read_hdf(self.flash_response_df_path, key='df')
-        fdf.reset_index(level=1, inplace=True)
+        fdf.reset_index(inplace=True)
         # fdf.insert(loc=0, column='cell_specimen_id', value=fdf.index.values)
         #  fdf['cell_specimen_id'] = fdf.index.values #add this as a column to the end
         fdf.drop(columns=['image_name', 'cell_roi_id'], inplace=True)
