@@ -12,7 +12,7 @@ from allensdk.deprecated import legacy
 from allensdk.brain_observatory.behavior.trials_processing import calculate_reward_rate
 from allensdk.brain_observatory.behavior.dprime import get_rolling_dprime, get_trial_count_corrected_false_alarm_rate, get_trial_count_corrected_hit_rate
 from allensdk.brain_observatory.behavior.dprime import get_hit_rate, get_false_alarm_rate
-from allensdk.brain_observatory.behavior.image_api import ImageApi
+from allensdk.brain_observatory.behavior.image_api import Image, ImageApi
 
 
 class BehaviorOphysSession(LazyPropertyMixin):
@@ -170,13 +170,21 @@ class BehaviorOphysSession(LazyPropertyMixin):
         for ii, (_, row) in enumerate(table.iterrows()):
             output[ii, :, :] = _translate_roi_mask(row["image_mask"], int(row["y"]), int(row["x"]))
 
+        segmentation_mask_image = self.api.get_segmentation_mask_image()
+        spacing = segmentation_mask_image.GetSpacing()
+        unit = segmentation_mask_image.GetMetaData('unit')
+
         return xr.DataArray(
             data=output,
             dims=("cell_roi_id", "row", "column"),
             coords={
                 "cell_roi_id": cell_roi_ids,
-                "row": np.arange(full_image_shape[0]),
-                "column": np.arange(full_image_shape[1])
+                "row": np.arange(full_image_shape[0])*spacing[0],
+                "column": np.arange(full_image_shape[1])*spacing[1]
+            },
+            attrs={
+                "spacing":spacing,
+                "unit":unit
             }
         ).squeeze(drop=True)
 
@@ -249,7 +257,12 @@ class BehaviorOphysSession(LazyPropertyMixin):
             Image with 1 if the pixel was included in any ROI, and 0 otherwise
         """
         masks = self.get_roi_masks()
-        mask_image = masks.any(dim='cell_specimen_id')
+        mask_image_data = masks.any(dim='cell_specimen_id').astype(int)
+        mask_image = Image(
+            data = mask_image_data.values,
+            spacing = masks.attrs['spacing'],
+            unit = masks.attrs['unit']
+        )
         return mask_image
 
     def get_reward_rate(self):
