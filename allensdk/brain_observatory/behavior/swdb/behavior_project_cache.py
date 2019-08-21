@@ -10,7 +10,6 @@ from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorO
 from allensdk.core.lazy_property import LazyProperty
 from allensdk.brain_observatory.behavior.trials_processing import calculate_reward_rate
 from allensdk.brain_observatory.behavior.image_api import ImageApi
-from allensdk.internal.core.lims_utilities import safe_system_path
 
 csv_io = {
     'reader': lambda path: pd.read_csv(path, index_col='Unnamed: 0'),
