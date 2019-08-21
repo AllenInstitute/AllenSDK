@@ -10,6 +10,7 @@ from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorO
 from allensdk.core.lazy_property import LazyProperty
 from allensdk.brain_observatory.behavior.trials_processing import calculate_reward_rate
 from allensdk.brain_observatory.behavior.image_api import ImageApi
+from allensdk.internal.core.lims_utilities import safe_system_path
 
 csv_io = {
     'reader': lambda path: pd.read_csv(path, index_col='Unnamed: 0'),
@@ -21,14 +22,14 @@ cache_path_example = '/allen/programs/braintv/workgroups/nc-ophys/visual_behavio
 
 class BehaviorProjectCache(object):
 
-    def __init__(self, cache_path):
+    def __init__(self, cache_base):
         '''
         A cache-level object for the behavior/ophys data. Provides access to the manifest of 
         ophys/behavior containers, as well as pre-computed analysis files for each 
         experiment.
 
         Args:
-            cache_path (str): Path to the directory containing the cached behavior/ophys data
+            cache_base (str): Path to the directory containing the cached behavior/ophys data
         
         Attributes: 
             experiment_table: (pd.DataFrame)
@@ -47,13 +48,12 @@ class BehaviorProjectCache(object):
         '''
 
 
-        cache_structure_base = {
-            'manifest_path': '{}/visual_behavior_data_manifest.csv',
-            'nwb_base_dir': '{}/nwb_files',
-            'analysis_files_base_dir': '{}/analysis_files',
-            'analysis_files_metadata_path':'{}/analysis_files_metadata.json',
+        self.cache_paths = {
+            'manifest_path': os.path.join(cache_base, 'visual_behavior_data_manifest.csv'),
+            'nwb_base_dir': os.path.join(cache_base, 'nwb_files'),
+            'analysis_files_base_dir': os.path.join(cache_base, 'analysis_files'),
+            'analysis_files_metadata_path':os.path.join(cache_base, 'analysis_files_metadata.json'),
         }
-        self.cache_paths = {key:val.format(cache_path) for key, val in cache_structure_base.items()}
 
         self.experiment_table = csv_io['reader'](self.cache_paths['manifest_path'])
 
