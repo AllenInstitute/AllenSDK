@@ -281,7 +281,7 @@ def create_multi_session_mean_df(cache, experiment_ids, conditions=['cell_specim
         mega_mdf, a dataframe with index given by the session experiment ids. This allows for easy analysis like:
         mega_mdf.groupby('experiment_id').mean_response.mean()
     '''
-    manifest = cache.manifest
+    manifest = cache.experiment_table
     mega_mdf = pd.DataFrame()
     # Iterate through experiments
     for experiment_id in experiment_ids:
