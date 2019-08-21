@@ -91,13 +91,6 @@ def test_get_container_sessions(cache):
     assert isinstance(session, bpc.ExtendedBehaviorSession)
     np.testing.assert_almost_equal(session.dff_traces.loc[817103993]['dff'][0], 0.3538657529565)
 
-#  @pytest.mark.requires_bamboo
-#  def test_cache_from_json(cache_test_base):
-#      json_path = os.path.join(cache_test_base, 'behavior_ophys_cache.json')
-#      cache = bpc.BehaviorProjectCache.from_json(json_path)
-#      assert isinstance(cache, bpc.BehaviorProjectCache)
-#      assert isinstance(cache.experiment_table, pd.DataFrame)
-
 @pytest.mark.requires_bamboo
 def test_binarized_segmentation_mask_image(session):
     np.testing.assert_array_equal(

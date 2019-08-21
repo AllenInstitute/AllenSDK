@@ -16,11 +16,10 @@ csv_io = {
     'writer': lambda path, df: df.to_csv(path)
 }
 
-
 cache_path_example = '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/cache_20190813'
 
-class BehaviorProjectCache(object):
 
+class BehaviorProjectCache(object):
     def __init__(self, cache_base):
         '''
         A cache-level object for the behavior/ophys data. Provides access to the manifest of 
@@ -46,12 +45,11 @@ class BehaviorProjectCache(object):
                 object from that container, that stage as the value.
         '''
 
-
         self.cache_paths = {
             'manifest_path': os.path.join(cache_base, 'visual_behavior_data_manifest.csv'),
             'nwb_base_dir': os.path.join(cache_base, 'nwb_files'),
             'analysis_files_base_dir': os.path.join(cache_base, 'analysis_files'),
-            'analysis_files_metadata_path':os.path.join(cache_base, 'analysis_files_metadata.json'),
+            'analysis_files_metadata_path': os.path.join(cache_base, 'analysis_files_metadata.json'),
         }
 
         self.experiment_table = csv_io['reader'](self.cache_paths['manifest_path'])
@@ -126,7 +124,7 @@ class BehaviorProjectCache(object):
             extended_stim_df_path
         )
         session = ExtendedBehaviorSession(api)
-        return session 
+        return session
 
     def get_container_sessions(self, container_id):
         container_stages = {}
@@ -137,14 +135,6 @@ class BehaviorProjectCache(object):
             )
         return container_stages
 
-    #  @classmethod
-    #  def from_json(cls, json_path):
-    #      '''
-    #      Return a cache using paths stored in a JSON file
-    #      '''
-    #      with open(json_path, 'r') as json_file:
-    #          cache_json = json.load(json_file)
-    #      return cls(cache_json)
 
 def parse_cre_line(full_genotype):
     '''
@@ -153,7 +143,8 @@ def parse_cre_line(full_genotype):
     Returns:
         cre_line (str): just the Cre line, e.g. Vip-IRES-Cre
     '''
-    return full_genotype.split(';')[0].split('/')[0] # Drop the /wt
+    return full_genotype.split(';')[0].split('/')[0]  # Drop the /wt
+
 
 def parse_passive(behavior_stage):
     '''
@@ -168,6 +159,7 @@ def parse_passive(behavior_stage):
     else:
         return False
 
+
 def parse_image_set(behavior_stage):
     '''
     Args:
@@ -179,8 +171,8 @@ def parse_image_set(behavior_stage):
     image_set = r.match(behavior_stage).groups('image_set')[0]
     return image_set
 
+
 class ExtendedNwbApi(BehaviorOphysNwbApi):
-    
     def __init__(self, nwb_path, trial_response_df_path, flash_response_df_path,
                  extended_stimulus_presentations_df_path):
         '''
@@ -194,16 +186,12 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
     def get_trial_response_df(self):
         tdf = pd.read_hdf(self.trial_response_df_path, key='df')
         tdf.reset_index(inplace=True)
-        # tdf.insert(loc=0, column='cell_specimen_id', value=tdf.index.values)
-        #  tdf['cell_specimen_id'] = tdf.index.values #add this as a column to the end
         tdf.drop(columns=['cell_roi_id'], inplace=True)
         return tdf
 
     def get_flash_response_df(self):
         fdf = pd.read_hdf(self.flash_response_df_path, key='df')
         fdf.reset_index(inplace=True)
-        # fdf.insert(loc=0, column='cell_specimen_id', value=fdf.index.values)
-        #  fdf['cell_specimen_id'] = fdf.index.values #add this as a column to the end
         fdf.drop(columns=['image_name', 'cell_roi_id'], inplace=True)
         fdf = fdf.join(self.get_stimulus_presentations(), on='flash_id', how='left')
         return fdf
@@ -267,13 +255,14 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
                 return query.iloc[0]['start_time']
             else:
                 return None
-        trials['change_time'] = trials['change_time'].map(lambda x:get_next_flash(x))
+
+        trials['change_time'] = trials['change_time'].map(lambda x: get_next_flash(x))
 
         ### This method can lead to a NaN change time for any trials at the end of the session.
         ### However, aborted trials at the end of the session also don't have change times. 
         ### The safest method seems like just droping any trials that aren't covered by the
         ### stimulus_presentations
-        #Using start time in case last stim is omitted
+        # Using start time in case last stim is omitted
         last_stimulus_presentation = stimulus_presentations.iloc[-1]['start_time']
         trials = trials[np.logical_not(trials['stop_time'] > last_stimulus_presentation)]
 
@@ -283,7 +272,8 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
                 return row['lick_times'][0] - row['change_time']
             else:
                 return np.nan
-        trials['response_latency'] = trials.apply(recalculate_response_latency,axis=1)
+
+        trials['response_latency'] = trials.apply(recalculate_response_latency, axis=1)
         # -------------------------------------------------------------------------------
 
         # asserts that every change time exists in the stimulus_presentations table
@@ -335,7 +325,7 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
     def get_stimulus_presentations(self):
         stimulus_presentations = super(ExtendedNwbApi, self).get_stimulus_presentations()
         extended_stimulus_presentations = self.get_extended_stimulus_presentations_df()
-        extended_stimulus_presentations = extended_stimulus_presentations.drop(columns = ['omitted'])
+        extended_stimulus_presentations = extended_stimulus_presentations.drop(columns=['omitted'])
         stimulus_presentations = stimulus_presentations.join(extended_stimulus_presentations)
 
         # Reorder the columns returned to make more sense to students
@@ -362,8 +352,8 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
 
         # Rename some columns to make more sense to students
         stimulus_presentations = stimulus_presentations.rename(
-            columns={'index':'absolute_flash_number',
-                     'running_speed':'mean_running_speed'})
+            columns={'index': 'absolute_flash_number',
+                     'running_speed': 'mean_running_speed'})
         # Replace image set with A/B
         stimulus_presentations['image_set'] = self.get_task_parameters()['stage'][15]
         # Change index name for easier merge with flash_response_df
@@ -380,13 +370,13 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
         image_index_names = self.get_image_index_names()
         for image_index, image_name in image_index_names.iteritems():
             if image_name != 'omitted':
-                template_dict.update({image_name:stimulus_template_array[image_index, :, :]})
+                template_dict.update({image_name: stimulus_template_array[image_index, :, :]})
         return template_dict
 
     def get_licks(self):
         # Licks column 'time' should be 'timestamps' to be consistent with rest of session
         licks = super(ExtendedNwbApi, self).get_licks()
-        licks = licks.rename(columns = {'time':'timestamps'})
+        licks = licks.rename(columns={'time': 'timestamps'})
         return licks
 
     def get_rewards(self):
@@ -453,8 +443,8 @@ class ExtendedBehaviorSession(BehaviorOphysSession):
         running_data_df : pandas.DataFrame (LazyProperty)
             Dataframe containing various signals used to compute running speed
     """
-    def __init__(self, api):
 
+    def __init__(self, api):
         super(ExtendedBehaviorSession, self).__init__(api)
         self.api = api
 
@@ -462,7 +452,7 @@ class ExtendedBehaviorSession(BehaviorOphysSession):
         self.flash_response_df = LazyProperty(self.api.get_flash_response_df)
         self.image_index = LazyProperty(self.api.get_image_index_names)
 
+
 if __name__ == "__main__":
     cache = BehaviorProjectCache(cache_path_example)
     session = cache.get_session(cache.manifest.iloc[0]['ophys_experiment_id'])
-

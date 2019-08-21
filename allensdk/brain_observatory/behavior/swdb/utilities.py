@@ -62,7 +62,7 @@ def get_mean_df(response_df, conditions=['cell_specimen_id', 'image_name']):
             pref_stim: if conditions includes image_name or change_image_name, sets a boolean column for whether that was the cell's preferred stimulus
             fraction_significant_responses: the fraction of individual image presentations or trials that were significant (p_value > 0.05)
     '''
-    
+
     # Group by conditions
     rdf = response_df.copy()
     mdf = rdf.groupby(conditions).apply(get_mean_sem_trace)
@@ -116,13 +116,13 @@ def annotate_mean_df_with_pref_stim(mean_df):
         ASSERTS:
         Each cell has one unique preferred stimulus 
     '''
-    
+
     # Are we dealing with flash_response or trial_response
     if 'image_name' in mean_df.keys():
         image_name = 'image_name'
     else:
         image_name = 'change_image_name'
-    
+
     # set up dataframe
     mdf = mean_df.reset_index()
     mdf['pref_stim'] = False
@@ -132,7 +132,7 @@ def annotate_mean_df_with_pref_stim(mean_df):
         mc = mdf[(mdf['cell_specimen_id'] == cell)]
         mc = mc[mc[image_name] != 'omitted']
         temp = mc[(mc.mean_response == np.max(mc.mean_response.values))][image_name].values
-        if len(temp) > 0: # need this test if the mean_response was nan
+        if len(temp) > 0:  # need this test if the mean_response was nan
             pref_image = temp[0]
             # PROBLEM, this is slow, and sets on slice, better to use mdf.at[test, 'pref_stim']
             row = mdf[(mdf['cell_specimen_id'] == cell) & (mdf[image_name] == pref_image)].index
@@ -141,9 +141,11 @@ def annotate_mean_df_with_pref_stim(mean_df):
     # Test to ensure preferred stimulus is unique for each cell
     for cell in mdf.reset_index()['cell_specimen_id'].unique():
         if image_name == 'image_name':
-             assert len(mdf.reset_index().set_index('cell_specimen_id').loc[cell].query('pref_stim').image_name.unique()) == 1  
-        else: 
-            assert len(mdf.reset_index().set_index('cell_specimen_id').loc[cell].query('pref_stim').change_image_name.unique()) == 1
+            assert len(
+                mdf.reset_index().set_index('cell_specimen_id').loc[cell].query('pref_stim').image_name.unique()) == 1
+        else:
+            assert len(mdf.reset_index().set_index('cell_specimen_id').loc[cell].query(
+                'pref_stim').change_image_name.unique()) == 1
     return mdf
 
 
@@ -188,7 +190,7 @@ def get_xticks_xticklabels(trace, ophys_frame_rate=31., interval_sec=1, window=[
     return xticks, xticklabels
 
 
-def plot_mean_trace(traces, window=[-4,8], interval_sec=1, ylabel='dF/F', legend_label=None, color='k', ax=None):
+def plot_mean_trace(traces, window=[-4, 8], interval_sec=1, ylabel='dF/F', legend_label=None, color='k', ax=None):
     """
     Function that accepts an array of single trial traces and plots the mean and SEM of the trace, with xticklabels in seconds
 
@@ -203,7 +205,7 @@ def plot_mean_trace(traces, window=[-4,8], interval_sec=1, ylabel='dF/F', legend
 
     :return: axis handle
     """
-    ophys_frame_rate = 31. #PROBLEM, shouldn't hard code this here
+    ophys_frame_rate = 31.  # PROBLEM, shouldn't hard code this here
     if ax is None:
         fig, ax = plt.subplots()
     if len(traces) > 0:
@@ -226,7 +228,8 @@ def plot_mean_trace(traces, window=[-4,8], interval_sec=1, ylabel='dF/F', legend
     return ax
 
 
-def plot_flashes_on_trace(ax, window=[-4,8], go_trials_only=False, omitted=False, flashes=False, alpha=0.25, facecolor='gray'):
+def plot_flashes_on_trace(ax, window=[-4, 8], go_trials_only=False, omitted=False, flashes=False, alpha=0.25,
+                          facecolor='gray'):
     """
     Function to create transparent gray bars spanning the duration of visual stimulus presentations to overlay on existing figure
 
@@ -266,7 +269,8 @@ def plot_flashes_on_trace(ax, window=[-4,8], go_trials_only=False, omitted=False
     return ax
 
 
-def create_multi_session_mean_df(cache, experiment_ids, conditions=['cell_specimen_id','change_image_name'], flashes=False):
+def create_multi_session_mean_df(cache, experiment_ids, conditions=['cell_specimen_id', 'change_image_name'],
+                                 flashes=False):
     '''
         Creates a mean response dataframe by combining multiple sessions. 
        
@@ -289,23 +293,24 @@ def create_multi_session_mean_df(cache, experiment_ids, conditions=['cell_specim
         print(session.metadata['ophys_experiment_id'])
         # Get the individual session mean_df
         if flashes:
-            mdf = get_mean_df(session.flash_response_df,conditions=conditions)
+            mdf = get_mean_df(session.flash_response_df, conditions=conditions)
         else:
-            mdf = get_mean_df(session.trial_response_df,conditions=conditions)
+            mdf = get_mean_df(session.trial_response_df, conditions=conditions)
 
         # Append metadata
         mdf['experiment_id'] = session.metadata['ophys_experiment_id']
         mdf['experiment_container_id'] = session.metadata['experiment_container_id']
         stage = manifest[manifest.ophys_experiment_id == session.metadata['ophys_experiment_id']].stage_name.values[0]
-        mdf['stage_name']= stage
+        mdf['stage_name'] = stage
         mdf['passive'] = parse_stage_for_passive(stage)
         mdf['image_set'] = parse_stage_for_image_set(stage)
         mdf['targeted_structure'] = session.metadata['targeted_structure']
         mdf['imaging_depth'] = session.metadata['imaging_depth']
         mdf['full_genotype'] = session.metadata['full_genotype']
         mdf['cre_line'] = session.metadata['full_genotype'].split('/')[0]
-        mdf['retake_number'] = manifest[manifest.ophys_experiment_id == session.metadata['ophys_experiment_id']].retake_number.values[0]
-        
+        mdf['retake_number'] = \
+            manifest[manifest.ophys_experiment_id == session.metadata['ophys_experiment_id']].retake_number.values[0]
+
         # Concatenate this session to the other sessions
         mega_mdf = pd.concat([mega_mdf, mdf])
 
@@ -319,17 +324,20 @@ def create_multi_session_mean_df(cache, experiment_ids, conditions=['cell_specim
 
     return mega_mdf
 
+
 def parse_stage_for_passive(stage):
     '''
         Returns TRUE if the stage_name indicates a passive sessions
     '''
     return 'passive' in stage
 
+
 def parse_stage_for_image_set(stage):
     '''
         Returns the character for the image_set, for example 'A'
     '''
     return stage[15]
+
 
 def get_active_cell_indices(dff_traces):
     '''
@@ -345,11 +353,13 @@ def get_active_cell_indices(dff_traces):
     active_cell_indices = np.argsort(snr_values)[-10:]
     return active_cell_indices
 
+
 def compute_lifetime_sparseness(image_responses):
     # image responses should be an array of the trial averaged responses to each image
     # sparseness = 1-(sum of trial averaged responses to images / N)squared / (sum of (squared mean responses / n)) / (1-(1/N))
     # N = number of images
     # after Vinje & Gallant, 2000; Froudarakis et al., 2014
     N = float(len(image_responses))
-    ls = ((1-(1/N) * ((np.power(image_responses.sum(axis=0),2)) / (np.power(image_responses,2).sum(axis=0)))) / (1-(1/N)))
+    ls = ((1 - (1 / N) * ((np.power(image_responses.sum(axis=0), 2)) / (np.power(image_responses, 2).sum(axis=0)))) / (
+        1 - (1 / N)))
     return ls
