@@ -1,5 +1,5 @@
 from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorOphysSession
-from allensdk.internal.api.mesoscope_session_lims_api import MesoscopePlaneLimsApi
+from allensdk.internal.api.mesoscope_plane_lims_api import MesoscopePlaneLimsApi
 from allensdk.core.lazy_property import LazyProperty
 
 class  MesoscopeOphysPlane(BehaviorOphysSession):
