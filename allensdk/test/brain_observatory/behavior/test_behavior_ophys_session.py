@@ -16,6 +16,7 @@ from allensdk.brain_observatory.behavior.write_nwb.__main__ import BehaviorOphys
 from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi, equals
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
 from allensdk.brain_observatory.behavior.behavior_ophys_api import BehaviorOphysApiBase
+from allensdk.brain_observatory.behavior.image_api import ImageApi
 
 
 @pytest.mark.nightly
@@ -192,6 +193,11 @@ def cell_specimen_table_api():
                 "image_mask": [roi_1, roi_2]
             }, index=pd.Index(data=[10, 11], name="cell_specimen_id")
         )
+        def get_segmentation_mask_image(self):
+            data = roi_1 #useless image data here
+            spacing = (1, 1)
+            unit = 'index'
+            return ImageApi.serialize(data, spacing, unit)
     return CellSpecimenTableApi()
 
 @pytest.mark.parametrize("roi_ids,expected", [
