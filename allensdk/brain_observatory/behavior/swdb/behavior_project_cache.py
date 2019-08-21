@@ -382,18 +382,6 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
                 template_dict.update({image_name:stimulus_template_array[image_index, :, :]})
         return template_dict
 
-    def get_segmentation_mask_image(self):
-        # We need to binarize the segmentation mask image. Currently ROIs have values
-        # between 0 and 1, but it is unclear what the values are and this will be 
-        # confusing to students.
-        segmentation_mask_itk = super(ExtendedNwbApi, self).get_segmentation_mask_image()
-        segmentation_mask_image = ImageApi.deserialize(segmentation_mask_itk)
-        segmentation_mask_image.data[segmentation_mask_image.data > 0] = 1
-        segmentation_mask_itk = ImageApi.serialize(data=segmentation_mask_image.data,
-                                                   spacing=segmentation_mask_image.spacing,
-                                                   unit=segmentation_mask_image.unit)
-        return segmentation_mask_itk
-
     def get_licks(self):
         # Licks column 'time' should be 'timestamps' to be consistent with rest of session
         licks = super(ExtendedNwbApi, self).get_licks()
