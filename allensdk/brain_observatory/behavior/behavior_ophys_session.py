@@ -253,8 +253,8 @@ class BehaviorOphysSession(LazyPropertyMixin):
 
         Returns
         ----------
-        mask_image (xarray.DataArray):
-            Image with 1 if the pixel was included in any ROI, and 0 otherwise
+        allensdk.brain_observatory.behavior.image_api.Image:
+            array-like interface to segmentation_mask image data and metadata
         """
         masks = self.get_roi_masks()
         mask_image_data = masks.any(dim='cell_specimen_id').astype(int)
