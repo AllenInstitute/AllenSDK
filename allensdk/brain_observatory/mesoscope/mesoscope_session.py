@@ -1,6 +1,6 @@
 from allensdk.core.lazy_property import LazyProperty, LazyPropertyMixin
 import pandas as pd
-from allensdk.internal.api.mesoscope_lims_api import MesoscopeSessionLimsApi
+from allensdk.internal.api.mesoscope_session_lims_api import MesoscopeSessionLimsApi
 from allensdk.brain_observatory.mesoscope.mesoscope_plane import MesoscopeOphysPlane
 
 class MesoscopeSession(LazyPropertyMixin):
