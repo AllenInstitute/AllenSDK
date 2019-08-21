@@ -9,22 +9,13 @@ from allensdk.brain_observatory.behavior.swdb import behavior_project_cache as b
 def cache_test_base():
     return '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/test_data'
 
-
 @pytest.fixture
 def cache(cache_test_base):
-    cache_paths = {
-        'manifest_path': os.path.join(cache_test_base, 'visual_behavior_data_manifest.csv'),
-        'nwb_base_dir': os.path.join(cache_test_base, 'nwb_files'),
-        'analysis_files_base_dir': os.path.join(cache_test_base, 'analysis_files'),
-        'analysis_files_metadata_path': os.path.join(cache_test_base, 'analysis_files_metadata.json')
-    }
-    return bpc.BehaviorProjectCache(cache_paths)
-
+    return bpc.BehaviorProjectCache(cache_test_base)
 
 @pytest.fixture
 def session(cache):
     return cache.get_session(792815735)
-
 
 # Test trials extra columns
 @pytest.mark.requires_bamboo
@@ -94,18 +85,18 @@ def test_no_invalid_rois(session):
 
 @pytest.mark.requires_bamboo
 def test_get_container_sessions(cache):
-    container_id = cache.manifest['container_id'].unique()[0]
+    container_id = cache.experiment_table['container_id'].unique()[0]
     container_sessions = cache.get_container_sessions(container_id)
     session = container_sessions['OPHYS_1_images_A']
     assert isinstance(session, bpc.ExtendedBehaviorSession)
     np.testing.assert_almost_equal(session.dff_traces.loc[817103993]['dff'][0], 0.3538657529565)
 
-@pytest.mark.requires_bamboo
-def test_cache_from_json(cache_test_base):
-    json_path = os.path.join(cache_test_base, 'behavior_ophys_cache.json')
-    cache = bpc.BehaviorProjectCache.from_json(json_path)
-    assert isinstance(cache, bpc.BehaviorProjectCache)
-    assert isinstance(cache.manifest, pd.DataFrame)
+#  @pytest.mark.requires_bamboo
+#  def test_cache_from_json(cache_test_base):
+#      json_path = os.path.join(cache_test_base, 'behavior_ophys_cache.json')
+#      cache = bpc.BehaviorProjectCache.from_json(json_path)
+#      assert isinstance(cache, bpc.BehaviorProjectCache)
+#      assert isinstance(cache.experiment_table, pd.DataFrame)
 
 @pytest.mark.requires_bamboo
 def test_binarized_segmentation_mask_image(session):
