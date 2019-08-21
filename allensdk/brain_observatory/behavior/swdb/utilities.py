@@ -74,7 +74,6 @@ def get_mean_df(response_df, conditions=['cell_specimen_id', 'image_name']):
         mdf = annotate_mean_df_with_pref_stim(mdf)
 
     # What fraction of individual responses were significant?
-    # if flashes:
     fraction_significant_responses = rdf.groupby(conditions).apply(get_fraction_significant_responses)
     fraction_significant_responses = fraction_significant_responses.reset_index()
     mdf['fraction_significant_responses'] = fraction_significant_responses.fraction_significant_responses
@@ -345,37 +344,6 @@ def get_active_cell_indices(dff_traces):
         snr_values.append(snr)
     active_cell_indices = np.argsort(snr_values)[-10:]
     return active_cell_indices
-
-
-def dprime(hit_rate, fa_rate, limits=(0.01, 0.99)):
-    from scipy.stats import norm
-    """ calculates the d-prime for a given hit rate and false alarm rate
-    https://en.wikipedia.org/wiki/Sensitivity_index
-    Parameters
-    ----------
-    hit_rate : float
-        rate of hits in the True class
-    fa_rate : float
-        rate of false alarms in the False class
-    limits : tuple, optional
-        limits on extreme values, which distort. default: (0.01,0.99)
-    Returns
-    -------
-    d_prime
-    """
-    assert limits[0] > 0.0, 'limits[0] must be greater than 0.0'
-    assert limits[1] < 1.0, 'limits[1] must be less than 1.0'
-    # use Percent point function.
-    # specifies the value of the variable such that the probability of the variable being less than or equal
-    # to that value equals the given probability
-    Z = norm.ppf
-
-    # Limit values in order to avoid d' infinity
-    hit_rate = np.clip(hit_rate, limits[0], limits[1])
-    fa_rate = np.clip(fa_rate, limits[0], limits[1])
-
-    return Z(hit_rate) - Z(fa_rate)
-
 
 def compute_lifetime_sparseness(image_responses):
     # image responses should be an array of the trial averaged responses to each image
