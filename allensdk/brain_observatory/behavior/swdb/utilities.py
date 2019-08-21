@@ -89,7 +89,7 @@ def get_mean_sem_trace(group):
         Computes the average and sem of the mean_response column
 
         INPUTS:
-        group: a pandas group_by object
+        group: a pandas groupby object
         
         OUTPUT:
         a pandas series with the mean_response, sem_response, mean_trace, sem_trace, and mean_responses computed for the group. 
@@ -154,7 +154,7 @@ def get_fraction_significant_responses(group, threshold=0.05):
         Note that this function does not handle multiple comparisons
     
         INPUT:
-        group: a pandas group_by object
+        group: a pandas groupby object
         threshold: the p_value threshold for significance for an individual response
 
         OUTPUT:
