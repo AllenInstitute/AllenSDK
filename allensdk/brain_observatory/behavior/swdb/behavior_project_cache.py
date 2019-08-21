@@ -428,12 +428,8 @@ class ExtendedBehaviorSession(BehaviorOphysSession):
             The traces of dff organized into a dataframe; index is the cell roi ids
         cell_specimen_table : pandas.DataFrame (LazyProperty)
             Cell roi information organized into a dataframe; index is the cell roi ids
-        running_speed : allensdk.brain_observatory.running_speed.RunningSpeed (LazyProperty)
-            NamedTuple with two fields
-                timestamps : numpy.ndarray
-                    Timestamps of running speed data samples
-                values : np.ndarray
-                    Running speed of the experimental subject (in cm / s).
+        running_speed : pandas.DataFrame (LazyProperty)
+            A dataframe containing the running_speed in cm/s and the timestamps of each data point
         stimulus_presentations : pandas.DataFrame (LazyProperty)
             Table whose rows are stimulus presentations (i.e. a given image, for a given duration, typically 250 ms) and whose columns are presentation characteristics.
         stimulus_templates : dict (LazyProperty)
@@ -450,7 +446,7 @@ class ExtendedBehaviorSession(BehaviorOphysSession):
             The motion-corrected fluorescence traces organized into a dataframe; index is the cell roi ids
         average_projection : allensdk.brain_observatory.behavior.image_api.Image (LazyProperty)
             2D image of the microscope field of view, averaged across the experiment
-        motion_correction : pandas.DataFrame LazyProperty
+        motion_correction : pandas.DataFrame (LazyProperty)
             A dataframe containing trace data used during motion correction computation
 
     Attributes for internal / advanced users
