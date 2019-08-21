@@ -56,7 +56,7 @@ def test_stimulus_templates(session):
 ])
 def test_session_trial_response(key, output, session):
     trial_response = session.trial_response_df
-    np.testing.assert_almost_equal(trial_response.loc[817103993].iloc[0][key], output, decimal=6)
+    np.testing.assert_almost_equal(trial_response.query("cell_specimen_id == 817103993").iloc[0][key], output, decimal=6)
 
 @pytest.mark.requires_bamboo
 @pytest.mark.parametrize('key, output', [
@@ -66,7 +66,7 @@ def test_session_trial_response(key, output, session):
 ])
 def test_session_flash_response(key, output, session):
     flash_response = session.flash_response_df
-    np.testing.assert_almost_equal(flash_response.loc[817103993].iloc[0][key], output, decimal=6)
+    np.testing.assert_almost_equal(flash_response.query("cell_specimen_id == 817103993").iloc[0][key], output, decimal=6)
 
 @pytest.mark.requires_bamboo
 def test_analysis_files_metadata(cache):
