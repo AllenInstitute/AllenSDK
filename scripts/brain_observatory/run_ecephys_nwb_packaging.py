@@ -25,7 +25,8 @@ mice = [#386129,387858,388521,394208,
         #       429860,434843,
         #       434488,437660,437661,434836,
         #       434838,448503]
-        434845, 425589]
+        434494]
+        #434845, 425589]
 
 #mice = [int(name[-6:]) for name in available_directories] 
 # = [int(name) for name in mice] 
@@ -33,7 +34,7 @@ mice = [#386129,387858,388521,394208,
 
 json_directory = '/mnt/md0/data/json_files'
 
-modules = ['allensdk.brain_observatory.ecephys.align_timestamps', 
+modules = [#'allensdk.brain_observatory.ecephys.align_timestamps', 
            'allensdk.brain_observatory.ecephys.stimulus_table', 
            'allensdk.brain_observatory.extract_running_speed', #, 
            'allensdk.brain_observatory.ecephys.write_nwb']
@@ -45,7 +46,7 @@ df = pd.DataFrame()
 
 for mouse in mice:
 
-    try:
+    #try:
         mouse_directory = data_directory + '/mouse' + str(mouse)
 
         if os.path.exists(mouse_directory):
@@ -72,6 +73,6 @@ for mouse in mice:
                                 "--output_json", output_json]
 
                 subprocess.check_call(command_string)
-    except:
-        print('Error processing')
+    #except:
+    #    print('Error processing')
 
