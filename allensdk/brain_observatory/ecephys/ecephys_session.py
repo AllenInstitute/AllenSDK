@@ -618,7 +618,7 @@ class EcephysSession(LazyPropertyMixin):
         stimulus_presentations = naming_utilities.map_stimulus_names(
             stimulus_presentations, default_stimulus_renames
         )
-        stimulus_presentations.rename(columns=default_column_renames, inplace=True)
+        stimulus_presentations = naming_utilities.map_column_names(stimulus_presentations, default_column_renames)
 
         # pandas groupby ops ignore nans, so we need a new null value that pandas does not recognize as null ...
         stimulus_presentations[stimulus_presentations == ''] = np.nan

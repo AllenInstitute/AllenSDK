@@ -16,32 +16,23 @@ csv_io = {
     'writer': lambda path, df: df.to_csv(path)
 }
 
-cache_paths_example = {'manifest_path': '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/visual_behavior_data_manifest.csv',
-                      'nwb_base_dir': '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/nwb_files',
-                      'analysis_files_base_dir': '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/analysis_files',
-                      'analysis_files_metadata_path':'/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/analysis_files_metadata.json',
-                      }
+
+cache_path_example = '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/cache_20190813'
 
 class BehaviorProjectCache(object):
 
-    def __init__(self, cache_paths):
+    def __init__(self, cache_base):
         '''
         A cache-level object for the behavior/ophys data. Provides access to the manifest of 
         ophys/behavior containers, as well as pre-computed analysis files for each 
         experiment.
 
         Args:
-            cache_paths (dict): must provide the following keys:
-                manifest_path: Full path to the behavior project manifest CSV file
-                nwb_base_dir: Direcotry containing NWB files.
-                analysis_files_base_dir: Directory containing trial response, flash response,
-                                         and stimulus presentation extra columns files.
-                analysis_files_metadata_path: Full path to the JSON file providing metadata
-                                         relating to the creation of the analysis files.
+            cache_base (str): Path to the directory containing the cached behavior/ophys data
         
         Attributes: 
-            manifest: (pd.DataFrame)
-                Table containing information about all ophys sessions.
+            experiment_table: (pd.DataFrame)
+                Table containing information about all ophys experiments.
             analysis_files_metadata (dict):
                 Metadata relating to the creation of the analysis files.
             
@@ -53,19 +44,23 @@ class BehaviorProjectCache(object):
             get_container_sessions(container_id):
                 Returns a dictionary with behavior stages as keys and the corresponding session
                 object from that container, that stage as the value.
-
-        Class Methods:
-            from_json(json_path):
-                Returns an instance constructed using cache_paths defined in a JSON file.
-
         '''
-        self.manifest = csv_io['reader'](cache_paths['manifest_path'])
 
-        self.manifest['cre_line'] = self.manifest['full_genotype'].apply(parse_cre_line)
-        self.manifest['passive_session'] = self.manifest['stage_name'].apply(parse_passive)
-        self.manifest['image_set'] = self.manifest['stage_name'].apply(parse_image_set)
 
-        self.manifest = self.manifest[[
+        self.cache_paths = {
+            'manifest_path': os.path.join(cache_base, 'visual_behavior_data_manifest.csv'),
+            'nwb_base_dir': os.path.join(cache_base, 'nwb_files'),
+            'analysis_files_base_dir': os.path.join(cache_base, 'analysis_files'),
+            'analysis_files_metadata_path':os.path.join(cache_base, 'analysis_files_metadata.json'),
+        }
+
+        self.experiment_table = csv_io['reader'](self.cache_paths['manifest_path'])
+
+        self.experiment_table['cre_line'] = self.experiment_table['full_genotype'].apply(parse_cre_line)
+        self.experiment_table['passive_session'] = self.experiment_table['stage_name'].apply(parse_passive)
+        self.experiment_table['image_set'] = self.experiment_table['stage_name'].apply(parse_image_set)
+
+        self.experiment_table = self.experiment_table[[
             'ophys_experiment_id',
             'container_id',
             'full_genotype',
@@ -81,14 +76,11 @@ class BehaviorProjectCache(object):
             'retake_number'
         ]]
 
-        self.nwb_base_dir = cache_paths['nwb_base_dir']
-        self.analysis_files_base_dir = cache_paths['analysis_files_base_dir']
-
-        if 'analysis_files_metadata_path' in cache_paths:
-            self.analysis_files_metadata = self.get_analysis_files_metadata(cache_paths['analysis_files_metadata_path'])
-        else:
-            print('Warning! No metadata supplied for analysis files. Set analysis_files_metadata_path to point at the json file containing the metadata')
-            self.analysis_files_metadata = None
+        self.nwb_base_dir = self.cache_paths['nwb_base_dir']
+        self.analysis_files_base_dir = self.cache_paths['analysis_files_base_dir']
+        self.analysis_files_metadata = self.get_analysis_files_metadata(
+            self.cache_paths['analysis_files_metadata_path']
+        )
 
     def get_analysis_files_metadata(self, path):
         with open(path, 'r') as metadata_path:
@@ -138,21 +130,21 @@ class BehaviorProjectCache(object):
 
     def get_container_sessions(self, container_id):
         container_stages = {}
-        container_manifest = self.manifest.groupby('container_id').get_group(container_id)
-        for ind_row, row in container_manifest.iterrows():
+        container_experiments = self.experiment_table.groupby('container_id').get_group(container_id)
+        for ind_row, row in container_experiments.iterrows():
             container_stages.update(
                 {row['stage_name']: self.get_session(row['ophys_experiment_id'])}
             )
         return container_stages
 
-    @classmethod
-    def from_json(cls, json_path):
-        '''
-        Return a cache using paths stored in a JSON file
-        '''
-        with open(json_path, 'r') as json_file:
-            cache_json = json.load(json_file)
-        return cls(cache_json)
+    #  @classmethod
+    #  def from_json(cls, json_path):
+    #      '''
+    #      Return a cache using paths stored in a JSON file
+    #      '''
+    #      with open(json_path, 'r') as json_file:
+    #          cache_json = json.load(json_file)
+    #      return cls(cache_json)
 
 def parse_cre_line(full_genotype):
     '''
@@ -391,18 +383,6 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
                 template_dict.update({image_name:stimulus_template_array[image_index, :, :]})
         return template_dict
 
-    def get_segmentation_mask_image(self):
-        # We need to binarize the segmentation mask image. Currently ROIs have values
-        # between 0 and 1, but it is unclear what the values are and this will be 
-        # confusing to students.
-        segmentation_mask_itk = super(ExtendedNwbApi, self).get_segmentation_mask_image()
-        segmentation_mask_image = ImageApi.deserialize(segmentation_mask_itk)
-        segmentation_mask_image.data[segmentation_mask_image.data > 0] = 1
-        segmentation_mask_itk = ImageApi.serialize(data=segmentation_mask_image.data,
-                                                   spacing=segmentation_mask_image.spacing,
-                                                   unit=segmentation_mask_image.unit)
-        return segmentation_mask_itk
-
     def get_licks(self):
         # Licks column 'time' should be 'timestamps' to be consistent with rest of session
         licks = super(ExtendedNwbApi, self).get_licks()
@@ -487,6 +467,6 @@ class ExtendedBehaviorSession(BehaviorOphysSession):
         self.image_index = LazyProperty(self.api.get_image_index_names)
 
 if __name__ == "__main__":
-    cache = BehaviorProjectCache(cache_paths_example)
+    cache = BehaviorProjectCache(cache_path_example)
     session = cache.get_session(cache.manifest.iloc[0]['ophys_experiment_id'])
 

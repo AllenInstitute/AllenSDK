@@ -1,5 +1,6 @@
 import re
 import warnings
+import functools
 
 import pandas as pd
 import numpy as np
@@ -174,3 +175,14 @@ def map_stimulus_names(table, name_map=None, stim_colname="stimulus_name"):
         to_replace=name_map, inplace=False
     )
     return table
+
+
+def map_column_names(table, name_map=None, ignore_case=True):
+
+    if ignore_case and name_map is not None:
+        name_map = {key.lower(): value for key, value in name_map.items()}
+        mapper = lambda name: name if name.lower() not in name_map else name_map[name.lower()]
+    else:
+        mapper = name_map
+
+    return table.rename(columns=mapper)
