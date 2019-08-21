@@ -1,9 +1,10 @@
 import pandas as pd
-import logging
 import json
 import os
 from allensdk.internal.core.lims_utilities import safe_system_path
 from . import PostgresQueryMixin
+from allensdk.brain_observatory.mesoscope.sync import get_sync_data
+import logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
@@ -103,7 +104,7 @@ class MesoscopeSessionLimsApi(PostgresQueryMixin):
 
         #this needs a check for dropped frames: compare timestamps with scanimage header's timestamps.
 
-        timestamps = self.get_sync_data()['ophys_frames']
+        timestamps = get_sync_data(self)['ophys_frames']
         planes_timestamps = pd.DataFrame(columns= ['plane_id', 'ophys_timestamps'], index = range(len(self.get_session_experiments())))
         pairs = self.get_paired_experiments()
         i = 0

@@ -1,6 +1,7 @@
 from allensdk.core.lazy_property import LazyProperty, LazyPropertyMixin
 import pandas as pd
 from allensdk.internal.api.mesoscope_session_lims_api import MesoscopeSessionLimsApi
+from allensdk.internal.api.mesoscope_plane_lims_api import MesoscopePlaneLimsApi
 from allensdk.brain_observatory.mesoscope.mesoscope_plane import MesoscopeOphysPlane
 
 class MesoscopeSession(LazyPropertyMixin):
@@ -28,7 +29,7 @@ class MesoscopeSession(LazyPropertyMixin):
         self.planes = pd.DataFrame(columns=['plane_id', 'plane'], index=range(len(self.experiments_ids['experiment_id'])))
         i=0
         for experiment_id in self.experiments_ids['experiment_id']:
-            plane = MesoscopeOphysPlane(experiment_id)
+            plane = MesoscopeOphysPlane(api = MesoscopePlaneLimsApi(experiment_id, self))
             self.planes.plane_id[i] = experiment_id
             self.planes.plane[i] = plane
             i += 1
