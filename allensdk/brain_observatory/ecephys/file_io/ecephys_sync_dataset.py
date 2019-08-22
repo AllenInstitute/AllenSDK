@@ -38,14 +38,19 @@ class EcephysSyncDataset(Dataset):
         pass
 
 
-    def extract_led_times(self, key='LED_sync', fallback_line=18):
+    def extract_led_times(self, keys=Dataset.OPTOGENETIC_STIMULATION_KEYS, fallback_line=18):
 
-        if key in self.line_labels:
-            led_indices = self.get_rising_edges(self.line_labels.index(key))
-        else:
-            led_indices = self.get_rising_edges(fallback_line)
-        
-        return led_indices / float(self.sample_frequency)
+        try:
+            led_times = self.get_edges(
+                kind="falling",
+                keys=keys,
+                units="seconds"
+            )
+        except KeyError:
+            warnings.warn(f"unable to find LED times using line labels {keys}, returning line {fallback_line}")
+            led_times = self.get_rising_edges(fallback_line, units="seconds")
+
+        return led__times
 
 
     def extract_frame_times_from_photodiode(self, photodiode_cycle=60, frame_keys=Dataset.FRAME_KEYS, photodiode_keys=Dataset.PHOTODIODE_KEYS):
