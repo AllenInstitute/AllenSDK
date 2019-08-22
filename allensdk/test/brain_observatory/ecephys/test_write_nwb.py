@@ -77,6 +77,25 @@ def test_add_stimulus_presentations(nwbfile, stimulus_presentations, roundtrippe
     pd.testing.assert_frame_equal(stimulus_presentations, obtained_stimulus_table, check_dtype=False)
     
 
+def test_add_optotagging_table_to_nwbfile(nwbfile, roundtripper):
+    opto_table = pd.DataFrame({
+        "start_time": [0., 1., 2., 3.],
+        "stop_time": [0.5, 1.5, 2.5, 3.5],
+        "level": [10., 9., 8., 7.],
+        "condition": ["a", "a", "b", "c"]
+    })
+    opto_table["duration"] = opto_table["stop_time"] - opto_table["start_time"]
+
+    nwbfile = write_nwb.add_optotagging_table_to_nwbfile(nwbfile, opto_table)
+    api = roundtripper(nwbfile, EcephysNwbSessionApi)
+
+    obtained = api.get_optogenetic_stimulation()
+    pd.set_option("display.max_columns", None)
+    print(obtained)
+    
+    pd.testing.assert_frame_equal(opto_table, obtained, check_like=True)
+
+
 @pytest.mark.parametrize('roundtrip', [True, False])
 @pytest.mark.parametrize('pid,desc,srate,lfp_srate,expected', [
     [

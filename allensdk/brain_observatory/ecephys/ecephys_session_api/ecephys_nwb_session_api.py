@@ -156,6 +156,13 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         csd = csd.loc[{"channel": known_csd_channels}]
         return csd
 
+    def get_optogenetic_stimulation(self) -> pd.DataFrame:
+        mod = self.nwbfile.get_processing_module("optotagging")
+        table = mod.get_data_interface("optogenetic_stimuluation").to_dataframe()
+        table.drop(columns=["tags", "timeseries"], inplace=True)
+        return table
+
+
     def _get_full_units_table(self) -> pd.DataFrame:
         units = self.nwbfile.units.to_dataframe()
         units.index = units.index.astype(int)
