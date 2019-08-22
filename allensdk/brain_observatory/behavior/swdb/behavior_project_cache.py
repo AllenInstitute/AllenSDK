@@ -416,6 +416,9 @@ class ExtendedBehaviorSession(BehaviorOphysSession):
             A dictionary of session-specific metadata
         dff_traces : pandas.DataFrame (LazyProperty)
             The traces of dff organized into a dataframe; index is the cell roi ids
+        roi_masks : dict (LazyProperty)
+            A dictionary with cell specimen ids as keys and roi mask arrays as values
+        segmentation_mask_image:
         cell_specimen_table : pandas.DataFrame (LazyProperty)
             Cell roi information organized into a dataframe; index is the cell roi ids
         running_speed : pandas.DataFrame (LazyProperty)
@@ -451,7 +454,18 @@ class ExtendedBehaviorSession(BehaviorOphysSession):
         self.trial_response_df = LazyProperty(self.api.get_trial_response_df)
         self.flash_response_df = LazyProperty(self.api.get_flash_response_df)
         self.image_index = LazyProperty(self.api.get_image_index_names)
+        self.roi_masks = LazyProperty(self.get_roi_masks)
 
+    def get_roi_masks(self):
+        masks = super(ExtendedBehaviorSession, self).get_roi_masks()
+        return {
+            cell_specimen_id: masks.loc[{"cell_specimen_id": cell_specimen_id}].data
+            for cell_specimen_id in masks["cell_specimen_id"].data
+        }
+
+    def get_segmentation_mask_image(self):
+        masks = self.roi_masks
+        return np.any([submask for submask in masks.values()], axis=0)
 
 if __name__ == "__main__":
     cache = BehaviorProjectCache(cache_path_example)
