@@ -441,6 +441,10 @@ class ExtendedBehaviorSession(BehaviorOphysSession):
             2D image of the microscope field of view, averaged across the experiment
         motion_correction : pandas.DataFrame (LazyProperty)
             A dataframe containing trace data used during motion correction computation
+        segmentation_mask_image: allensdk.brain_observatory.behavior.image_api.Image (LazyProperty)
+            An image with pixel value 1 if that pixel was included in an ROI, and 0 otherwise
+        roi_masks: dict (LazyProperty)
+            A dictionary with individual ROI masks for each cell specimen ID. Keys are cell specimen IDs, values are 2D numpy arrays.
 
     Attributes for internal / advanced users
         running_data_df : pandas.DataFrame (LazyProperty)
@@ -469,4 +473,4 @@ class ExtendedBehaviorSession(BehaviorOphysSession):
 
 if __name__ == "__main__":
     cache = BehaviorProjectCache(cache_path_example)
-    session = cache.get_session(cache.manifest.iloc[0]['ophys_experiment_id'])
+    session = cache.get_session(cache.experiment_table.iloc[0]['ophys_experiment_id'])
