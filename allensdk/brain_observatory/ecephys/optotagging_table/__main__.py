@@ -1,5 +1,3 @@
-from dataclasses import dataclass
-
 import pandas as pd
 
 from allensdk.brain_observatory.argschema_utilities import ArgSchemaParserPlus
