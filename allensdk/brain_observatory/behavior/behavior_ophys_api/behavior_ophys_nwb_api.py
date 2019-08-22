@@ -10,6 +10,7 @@ from pandas.util.testing import assert_frame_equal
 import os
 import math
 import numpy as np
+import xarray as xr
 import pandas as pd
 
 
@@ -243,6 +244,8 @@ def equals(A, B, reraise=False):
                     raise
             elif isinstance(x1, np.ndarray):
                 np.testing.assert_array_almost_equal(x1, x2, err_msg=err_msg)
+            elif isinstance(x1, xr.DataArray):
+                xr.testing.assert_allclose(x1, x2)
             elif isinstance(x1, (list,)):
                 assert x1 == x2, err_msg
             elif isinstance(x1, (sitk.Image,)):
