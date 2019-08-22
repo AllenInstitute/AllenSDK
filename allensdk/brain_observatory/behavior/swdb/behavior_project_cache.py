@@ -416,9 +416,10 @@ class ExtendedBehaviorSession(BehaviorOphysSession):
             A dictionary of session-specific metadata
         dff_traces : pandas.DataFrame (LazyProperty)
             The traces of dff organized into a dataframe; index is the cell roi ids
-        roi_masks : dict (LazyProperty)
-            A dictionary with cell specimen ids as keys and roi mask arrays as values
-        segmentation_mask_image:
+        segmentation_mask_image: allensdk.brain_observatory.behavior.image_api.Image (LazyProperty)
+            An image with pixel value 1 if that pixel was included in an ROI, and 0 otherwise
+        roi_masks: dict (LazyProperty)
+            A dictionary with individual ROI masks for each cell specimen ID. Keys are cell specimen IDs, values are 2D numpy arrays.
         cell_specimen_table : pandas.DataFrame (LazyProperty)
             Cell roi information organized into a dataframe; index is the cell roi ids
         running_speed : pandas.DataFrame (LazyProperty)
@@ -441,10 +442,6 @@ class ExtendedBehaviorSession(BehaviorOphysSession):
             2D image of the microscope field of view, averaged across the experiment
         motion_correction : pandas.DataFrame (LazyProperty)
             A dataframe containing trace data used during motion correction computation
-        segmentation_mask_image: allensdk.brain_observatory.behavior.image_api.Image (LazyProperty)
-            An image with pixel value 1 if that pixel was included in an ROI, and 0 otherwise
-        roi_masks: dict (LazyProperty)
-            A dictionary with individual ROI masks for each cell specimen ID. Keys are cell specimen IDs, values are 2D numpy arrays.
 
     Attributes for internal / advanced users
         running_data_df : pandas.DataFrame (LazyProperty)
