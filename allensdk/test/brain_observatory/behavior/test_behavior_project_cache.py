@@ -94,7 +94,7 @@ def test_get_container_sessions(cache):
 @pytest.mark.requires_bamboo
 def test_binarized_segmentation_mask_image(session):
     np.testing.assert_array_equal(
-        np.unique(session.segmentation_mask_image.data.ravel()),
+        np.unique(np.array(session.segmentation_mask_image.data).ravel()),
         np.array([0, 1])
     )
 
