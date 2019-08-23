@@ -12,10 +12,18 @@ def build_opto_table(args):
     opto_file = pd.read_pickle(args['opto_pickle_path'])
     sync_file = EcephysSyncDataset.factory(args['sync_h5_path'])
 
+    start_times = sync_file.extract_led_times()
+    conditions = [str(item) for item in opto_file['opto_conditions']]
+    levels = opto_file['opto_levels']
+
+    assert len(conditions) == len(levels)
+    if len(start_times) > len(conditions):
+        raise ValueError(f"there are {len(start_times) - len(conditions)} extra optotagging sync times!")
+
     optotagging_table = pd.DataFrame({
-        'start_time': sync_file.extract_led_times(),
-        'condition': [str(item) for item in opto_file['opto_conditions']],
-        'level': opto_file['opto_levels']
+        'start_time':start_times,
+        'condition': conditions,
+        'level': levels
     })
     optotagging_table = optotagging_table.sort_values(by='start_time', axis=0)    
 
