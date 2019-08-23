@@ -316,7 +316,7 @@ def create_multi_session_mean_df(cache, experiment_ids, conditions=['cell_specim
 
     # Clean up indexes
     mega_mdf = mega_mdf.reset_index()
-    mega_mdf = mega_mdf.set_index('experiment_id')
+    # mega_mdf = mega_mdf.set_index('experiment_id')
     if 'index' in mega_mdf.keys():
         mega_mdf = mega_mdf.drop(columns=['index'])
     if 'level_0' in mega_mdf.keys():
