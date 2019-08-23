@@ -303,13 +303,16 @@ class Dataset(object):
             fn = self.get_rising_edges
         elif kind == 'all':
             return np.sort(np.concatenate([
-                self.get_edges('rising', keys, units), 
-                self.get_edges('falling', keys, units)
+                self.get_edges('rising', key, units), 
+                self.get_edges('falling', key, units)
             ]))
+
+        if isinstance(keys, str):
+            keys = [keys]
 
         for key in keys:
             try:
-                return fn(key, units=units)
+                return fn(key, units)
             except ValueError:
                 continue
 

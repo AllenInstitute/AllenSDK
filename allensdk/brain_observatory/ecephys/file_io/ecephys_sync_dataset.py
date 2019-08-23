@@ -2,6 +2,7 @@ from itertools import product
 import functools
 from collections import defaultdict
 import logging
+import warnings
 
 import numpy as np
 
@@ -42,7 +43,7 @@ class EcephysSyncDataset(Dataset):
 
         try:
             led_times = self.get_edges(
-                kind="falling",
+                kind="rising",
                 keys=keys,
                 units="seconds"
             )
