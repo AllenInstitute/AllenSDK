@@ -50,7 +50,7 @@ class EcephysSyncDataset(Dataset):
             warnings.warn(f"unable to find LED times using line labels {keys}, returning line {fallback_line}")
             led_times = self.get_rising_edges(fallback_line, units="seconds")
 
-        return led__times
+        return led_times
 
 
     def extract_frame_times_from_photodiode(self, photodiode_cycle=60, frame_keys=Dataset.FRAME_KEYS, photodiode_keys=Dataset.PHOTODIODE_KEYS):
