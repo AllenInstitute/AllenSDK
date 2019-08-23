@@ -206,6 +206,15 @@ def createInputJson(directory, resort_directory, module, output_file):
            "log_level" : 'INFO'
         }
 
+    elif module == 'allensdk.brain_observatory.ecephys.optotagging_table':
+
+        dictionary = \
+        {
+            'opto_pickle_path' : glob(join(directory, '*.opto.pkl.v2'))[0],
+            'sync_h5_path' : glob(join(directory, '*.sync'))[0],
+            'output_opto_table_path' : join(directory, 'opto_table.h5')
+        }
+
     elif module == 'allensdk.brain_observatory.ecephys.write_nwb':
 
         session_string = os.path.basename(probe_directories[0])

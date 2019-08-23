@@ -35,8 +35,9 @@ mice = [#386129,387858,388521,394208,
 json_directory = '/mnt/md0/data/json_files'
 
 modules = [#'allensdk.brain_observatory.ecephys.align_timestamps', 
-           'allensdk.brain_observatory.ecephys.stimulus_table', 
-           'allensdk.brain_observatory.extract_running_speed', #, 
+           #'allensdk.brain_observatory.ecephys.stimulus_table', 
+           'allensdk.brain_observatory.ecephys.optotagging_table', 
+           #'allensdk.brain_observatory.extract_running_speed', #, 
            'allensdk.brain_observatory.ecephys.write_nwb']
 
 data_directory = '/mnt/md0/data'

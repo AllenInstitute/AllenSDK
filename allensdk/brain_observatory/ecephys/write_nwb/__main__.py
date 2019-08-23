@@ -17,12 +17,14 @@ from ._schemas import InputSchema, OutputSchema
 from allensdk.brain_observatory.nwb import (
     add_stimulus_presentations,
     add_stimulus_timestamps,
+    setup_table_for_epochs
 )
 from allensdk.brain_observatory.argschema_utilities import (
     write_or_print_outputs, optional_lims_inputs
 )
 from allensdk.brain_observatory import dict_to_indexed_array
 from allensdk.brain_observatory.ecephys.file_io.continuous_file import ContinuousFile
+from allensdk.brain_observatory.ecephys.nwb import EcephysProbe
 
 
 STIM_TABLE_RENAMES_MAP = {"Start": "start_time", "End": "stop_time"}
@@ -152,9 +154,9 @@ def read_spike_times_to_dictionary(
 
         if local_to_global_unit_map is not None:
             if local_unit not in local_to_global_unit_map:
-                #logging.warning(
-                #    f"unable to find unit at local position {local_unit} while reading spike times"
-                #)
+                logging.warning(
+                    f"unable to find unit at local position {local_unit} while reading spike times"
+                )
                 continue
             global_id = local_to_global_unit_map[local_unit]
             output_times[global_id] = unit_times
@@ -193,9 +195,9 @@ def read_waveforms_to_dictionary(
     ):
         if local_to_global_unit_map is not None:
             if unit_id not in local_to_global_unit_map:
-                #logging.warning(
-                #    f"unable to find unit at local position {unit_id} while reading waveforms"
-                #)
+                logging.warning(
+                    f"unable to find unit at local position {unit_id} while reading waveforms"
+                )
                 continue
             unit_id = local_to_global_unit_map[unit_id]
 
@@ -230,7 +232,7 @@ def read_running_speed(path):
     )
 
 
-def add_probe_to_nwbfile(nwbfile, probe_id, description="", location=""):
+def add_probe_to_nwbfile(nwbfile, probe_id, sampling_rate, lfp_sampling_rate, description="", location=""):
     """ Creates objects required for representation of a single extracellular ephys probe within an NWB file. These objects amount 
     to a Device (this will be removed at some point from pynwb) and an ElectrodeGroup.
 
@@ -259,11 +261,13 @@ def add_probe_to_nwbfile(nwbfile, probe_id, description="", location=""):
     """
 
     probe_nwb_device = pynwb.device.Device(name=str(probe_id))
-    probe_nwb_electrode_group = pynwb.ecephys.ElectrodeGroup(
+    probe_nwb_electrode_group = EcephysProbe(
         name=str(probe_id),
         description=description,
         location=location,
         device=probe_nwb_device,
+        sampling_rate=sampling_rate,
+        lfp_sampling_rate=lfp_sampling_rate
     )
 
     nwbfile.add_device(probe_nwb_device)
@@ -331,7 +335,7 @@ def add_ragged_data_to_dynamic_table(
 
     """
 
-    idx, values = dict_to_indexed_array(data, table.id)
+    idx, values = dict_to_indexed_array(data, table.id.data)
     del data
 
     table.add_column(
@@ -422,7 +426,10 @@ def write_probe_lfp_file(session_start_time, log_level, probe):
         session_start_time=session_start_time
     )    
 
-    nwbfile, probe_nwb_device, probe_nwb_electrode_group = add_probe_to_nwbfile(nwbfile, probe['id'], description=probe['name'])
+    nwbfile, probe_nwb_device, probe_nwb_electrode_group = add_probe_to_nwbfile(nwbfile, 
+        probe_id=probe["id"], description=probe["name"], 
+        sampling_rate=probe["sampling_rate"], lfp_sampling_rate=probe["lfp_sampling_rate"]
+    )
 
     channels = prepare_probewise_channel_table(probe['channels'], probe_nwb_electrode_group)
     channel_li_id_map = {row["local_index"]: cid for cid, row in channels.iterrows()}
@@ -518,11 +525,15 @@ def add_probewise_data_to_nwbfile(nwbfile, probes):
     for probe in probes:
         logging.info(f'found probe {probe["id"]} with name {probe["name"]}')
 
-        nwbfile, probe_nwb_device, probe_nwb_electrode_group = add_probe_to_nwbfile(nwbfile, probe['id'], description=probe['name'])
+        nwbfile, probe_nwb_device, probe_nwb_electrode_group = add_probe_to_nwbfile(nwbfile, 
+            probe_id=probe["id"], description=probe["name"], 
+            sampling_rate=probe["sampling_rate"], lfp_sampling_rate=probe["lfp_sampling_rate"]
+        )
+
         channel_tables[probe["id"]] = prepare_probewise_channel_table(probe['channels'], probe_nwb_electrode_group)
         unit_tables.append(pd.DataFrame(probe['units']))
 
-        local_to_global_unit_map = {unit['local_index']: unit['id'] for unit in probe['units']}
+        local_to_global_unit_map = {unit['cluster_id']: unit['id'] for unit in probe['units']}
 
         spike_times.update(read_spike_times_to_dictionary(
             probe['spike_times_path'], probe['spike_clusters_file'], local_to_global_unit_map
@@ -553,6 +564,25 @@ def add_probewise_data_to_nwbfile(nwbfile, probes):
     return nwbfile
 
 
+def add_optotagging_table_to_nwbfile(nwbfile, optotagging_table, tag="optical_stimulation"):
+    opto_ts = pynwb.base.TimeSeries(
+        name="optotagging",
+        timestamps=optotagging_table["start_time"].values,
+        data=optotagging_table["duration"].values
+    )
+
+    opto_mod = pynwb.ProcessingModule("optotagging", "optogenetic stimulution data")
+    opto_mod.add_data_interface(opto_ts)
+    nwbfile.add_processing_module(opto_mod)
+
+    optotagging_table = setup_table_for_epochs(optotagging_table, opto_ts, tag)
+    container = pynwb.epoch.TimeIntervals.from_dataframe(optotagging_table, "optogenetic_stimuluation")
+    opto_mod.add_data_interface(container)
+
+    return nwbfile
+
+
+
 def write_ecephys_nwb(
     output_path, 
     session_id, session_start_time, 
@@ -560,6 +590,7 @@ def write_ecephys_nwb(
     probes, 
     running_speed_path,
     pool_size,
+    optotagging_table_path=None,
     **kwargs
 ):
 
@@ -573,6 +604,10 @@ def write_ecephys_nwb(
     nwbfile = add_stimulus_timestamps(nwbfile, stimulus_table['start_time'].values) # TODO: patch until full timestamps are output by stim table module
     nwbfile = add_stimulus_presentations(nwbfile, stimulus_table)
 
+    if optotagging_table_path is not None:
+        optotagging_table = pd.read_csv(optotagging_table_path)
+        nwbfile = add_optotagging_table_to_nwbfile(nwbfile, optotagging_table)
+
     nwbfile = add_probewise_data_to_nwbfile(nwbfile, probes)
 
     running_speed, raw_running_data = read_running_speed(running_speed_path)
@@ -585,11 +620,11 @@ def write_ecephys_nwb(
     io.write(nwbfile)
     io.close()
 
-    #probe_outputs = write_probewise_lfp_files(probes, session_start_time, pool_size=pool_size)
+    probe_outputs = write_probewise_lfp_files(probes, session_start_time, pool_size=pool_size)
 
     return {
         'nwb_path': output_path,
-        #"probe_outputs": probe_outputs
+        "probe_outputs": probe_outputs
     }
 
 

@@ -1,6 +1,7 @@
 import numpy as np
 import datetime
 import uuid
+import SimpleITK as sitk
 import pynwb
 from pynwb.base import TimeSeries, Images
 from pynwb.behavior import BehavioralEvents
@@ -11,6 +12,7 @@ from pynwb.ophys import DfOverF, ImageSegmentation, OpticalChannel, Fluorescence
 import allensdk.brain_observatory.roi_masks as roi
 from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory import dict_to_indexed_array
+from allensdk.brain_observatory.behavior.image_api import Image
 from allensdk.brain_observatory.behavior.image_api import ImageApi
 from allensdk.brain_observatory.behavior.schemas import OphysBehaviorMetaDataSchema, OphysBehaviorTaskParametersSchema
 from allensdk.brain_observatory.nwb.metadata import load_LabMetaData_extension
@@ -148,16 +150,21 @@ def add_stimulus_presentations(nwbfile, stimulus_table, tag='stimulus_epoch'):
             series.fillna('', inplace=True)
             stimulus_table[colname] = series.transform(str)
 
-    indices = np.searchsorted(ts.timestamps[:], stimulus_table['start_time'].values)
-    diffs = np.concatenate([np.diff(indices), [stimulus_table.shape[0] - indices[-1]]])
-
-    stimulus_table['tags'] = [(tag,)] * stimulus_table.shape[0]
-    stimulus_table['timeseries'] = [[[indices[ii], diffs[ii], ts]] for ii in range(stimulus_table.shape[0])]
-
+    stimulus_table = setup_table_for_epochs(stimulus_table, ts, tag)
     container = pynwb.epoch.TimeIntervals.from_dataframe(stimulus_table, 'epochs')
     nwbfile.epochs = container
 
     return nwbfile
+
+
+def setup_table_for_epochs(table, timeseries, tag):
+    table = table.copy()
+    indices = np.searchsorted(timeseries.timestamps[:], table['start_time'].values)
+    diffs = np.concatenate([np.diff(indices), [table.shape[0] - indices[-1]]])
+
+    table['tags'] = [(tag,)] * table.shape[0]
+    table['timeseries'] = [[[indices[ii], diffs[ii], timeseries]] for ii in range(table.shape[0])]
+    return table
 
 
 def add_stimulus_timestamps(nwbfile, stimulus_timestamps, module_name='stimulus'):
@@ -248,7 +255,15 @@ def add_image(nwbfile, image_data, image_name, module_name, module_description, 
     if image_api is None:
         image_api = ImageApi
 
-    data, spacing, unit = ImageApi.deserialize(image_data)
+    if isinstance(image_data, sitk.Image):
+        data, spacing, unit = ImageApi.deserialize(image_data)
+    elif isinstance(image_data, Image):
+        data = image_data.data
+        spacing = image_data.spacing
+        unit = image_data.unit
+    else:
+        raise ValueError("Not a supported image_data type: {}".format(type(image_data)))
+
     assert spacing[0] == spacing[1] and len(spacing) == 2 and unit == 'mm'
 
     if module_name not in nwbfile.modules:
