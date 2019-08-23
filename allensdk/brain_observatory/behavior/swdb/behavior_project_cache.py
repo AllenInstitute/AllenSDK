@@ -71,7 +71,8 @@ class BehaviorProjectCache(object):
             'animal_name',
             'sex',
             'date_of_acquisition',
-            'retake_number'
+            'retake_number',
+            'valid_cell_matching'
         ]]
 
         self.nwb_base_dir = self.cache_paths['nwb_base_dir']
