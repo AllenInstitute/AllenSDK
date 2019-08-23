@@ -82,6 +82,7 @@ class Flashes(StimulusAnalysis):
         return [('on_off_ratio_fl', np.float64), 
                 ('sustained_idx_fl', np.float64),
                 ('firing_rate_fl', np.float64), 
+                ('time_to_peak_fl', np.float64), 
                 ('reliability_fl', np.float64),
                 ('fano_fl', np.float64), 
                 ('lifetime_sparseness_fl', np.float64), 
@@ -92,20 +93,22 @@ class Flashes(StimulusAnalysis):
     def metrics(self):
 
         if self._metrics is None:
-            logger.info('Calculating metrics for ' + self.name)
-
             unit_ids = self.unit_ids
         
             metrics_df = self.empty_metrics_table()
 
-            metrics_df['on_off_ratio_fl'] = [self._get_on_off_ratio(unit) for unit in unit_ids]
-            metrics_df['sustained_idx_fl'] = [self._get_sustained_index(unit) for unit in unit_ids]
-            metrics_df['firing_rate_fl'] = [self.get_overall_firing_rate(unit) for unit in unit_ids]
-            metrics_df['reliability_fl'] = [self.get_reliability(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
-            metrics_df['fano_fl'] = [self.get_fano_factor(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
-            metrics_df['lifetime_sparseness_fl'] = [self.get_lifetime_sparseness(unit) for unit in unit_ids]
-            metrics_df.loc[:, ['run_pval_fl', 'run_mod_fl']] = \
-                    [self.get_running_modulation(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+            if len(self. stim_table) > 0:
+                logger.info('Calculating metrics for ' + self.name)
+
+                metrics_df['on_off_ratio_fl'] = [self._get_on_off_ratio(unit) for unit in unit_ids]
+                metrics_df['sustained_idx_fl'] = [self._get_sustained_index(unit) for unit in unit_ids]
+                metrics_df['firing_rate_fl'] = [self.get_overall_firing_rate(unit) for unit in unit_ids]
+                metrics_df['reliability_fl'] = [self.get_reliability(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+                metrics_df['time_to_peak_fl'] = [self.get_time_to_peak(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+                metrics_df['fano_fl'] = [self.get_fano_factor(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+                metrics_df['lifetime_sparseness_fl'] = [self.get_lifetime_sparseness(unit) for unit in unit_ids]
+                metrics_df.loc[:, ['run_pval_fl', 'run_mod_fl']] = \
+                        [self.get_running_modulation(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
 
             self._metrics = metrics_df
 

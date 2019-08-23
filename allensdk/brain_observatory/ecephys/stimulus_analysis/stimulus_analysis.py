@@ -45,7 +45,7 @@ class StimulusAnalysis(object):
         self._sweep_p_values = None
         self._metrics = None
 
-        self._psth_resolution = kwargs.get('ptsh_resultion', 0.002)
+        self._psth_resolution = kwargs.get('ptsh_resultion', 0.001)
 
         # TODO: If trial_duration is not pre-defined use the stim_table start_time to find minimal interval between
         #   any two presenations
@@ -454,8 +454,10 @@ class StimulusAnalysis(object):
     def empty_metrics_table(self):
         # pandas can have issues interpreting type and makes the column 'object' type, this should enforce the
         # correct data type for each column
-        return pd.DataFrame(np.empty(self.unit_count, dtype=np.dtype(self.METRICS_COLUMNS)),
-                                   index=self.unit_ids).rename_axis('unit_id')
+        empty_array = np.empty(self.unit_count, dtype=np.dtype(self.METRICS_COLUMNS))
+        empty_array[:] = np.nan
+
+        return pd.DataFrame(empty_array, index=self.unit_ids).rename_axis('unit_id')
 
 
     def get_lifetime_sparseness(self, unit_id):

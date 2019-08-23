@@ -128,7 +128,7 @@ class ReceptiveFieldMapping(StimulusAnalysis):
                 ('width_rf', np.float64), 
                 ('height_rf', np.float64),
                 ('area_rf', np.float64), 
-                ('p_value_rf', bool), 
+                ('p_value_rf', np.float64), 
                 ('on_screen_rf', bool), 
                 ('firing_rate_rf', np.float64),
                 ('fano_rf', np.float64), 
@@ -143,33 +143,27 @@ class ReceptiveFieldMapping(StimulusAnalysis):
     def metrics(self):
 
         if self._metrics is None:
-            logger.info('Calculating metrics for ' + self.name)
-
             unit_ids = self.unit_ids
         
             metrics_df = self.empty_metrics_table()
 
-            metrics_df.loc[:, ['azimuth_rf',
-                               'elevation_rf',
-                               'width_rf',
-                               'height_rf',
-                               'area_rf',
-                               'p_value_rf',
-                               'on_screen_rf']] = [self._get_rf_stats(unit) for unit in unit_ids]
-            #metrics_df.loc[:, ['azimuth_rf',
-            #                   'elevation_rf',
-            #                   'width_rf',
-            #                   'height_rf',
-            #                   'area_rf',
-            #                   'p_value_rf',
-            #                   'on_screen_rf']] = [(None, None, None, None, None, None, None) for unit in unit_ids]
-            metrics_df['firing_rate_rf'] = [self.get_overall_firing_rate(unit) for unit in unit_ids]
-            metrics_df['fano_rf'] = [self.get_fano_factor(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
-            metrics_df['time_to_peak_rf'] = [self.get_time_to_peak(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
-            metrics_df['reliability_rf'] = [self.get_reliability(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
-            metrics_df['lifetime_sparseness_rf'] = [self.get_lifetime_sparseness(unit) for unit in unit_ids]
-            metrics_df.loc[:, ['run_pval_rf', 'run_mod_rf']] = \
-                    [self.get_running_modulation(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+            if len(self.stim_table) > 0:
+                logger.info('Calculating metrics for ' + self.name)
+
+                metrics_df.loc[:, ['azimuth_rf',
+                                   'elevation_rf',
+                                   'width_rf',
+                                   'height_rf',
+                                   'area_rf',
+                                   'p_value_rf',
+                                   'on_screen_rf']] = [self._get_rf_stats(unit) for unit in unit_ids]
+                metrics_df['firing_rate_rf'] = [self.get_overall_firing_rate(unit) for unit in unit_ids]
+                metrics_df['fano_rf'] = [self.get_fano_factor(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+                metrics_df['time_to_peak_rf'] = [self.get_time_to_peak(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+                metrics_df['reliability_rf'] = [self.get_reliability(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+                metrics_df['lifetime_sparseness_rf'] = [self.get_lifetime_sparseness(unit) for unit in unit_ids]
+                metrics_df.loc[:, ['run_pval_rf', 'run_mod_rf']] = \
+                        [self.get_running_modulation(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
 
             self._metrics = metrics_df
 
@@ -503,7 +497,7 @@ def threshold_rf(rf, threshold):
     rf - numpy.ndarray
         2D matrix of spike counts
     threshold - float
-        Threshold as a fraction of the RF's peak value
+        Threshold as ratio of the RF's standard deviation
         
     Returns:
     --------
@@ -517,15 +511,17 @@ def threshold_rf(rf, threshold):
         area of mask
     
     """
+
+    rf_filt = ndi.gaussian_filter(rf, 1)
     
-    threshold_value = np.max(rf) * threshold
+    threshold_value = np.max(rf_filt) - np.std(rf_filt) * threshold
         
     rf_thresh = np.zeros(rf.shape, dtype='bool')
-    rf_thresh[rf > threshold_value] = True
+    rf_thresh[rf_filt > threshold_value] = True
     
     labels, num_features = ndi.label(rf_thresh)
     
-    best_label = np.argmax(ndi.maximum(rf, labels=labels, index=np.unique(labels)))
+    best_label = np.argmax(ndi.maximum(rf_filt, labels=labels, index=np.unique(labels)))
 
     labels[labels != best_label] = 0
     labels[labels > 0] = 1

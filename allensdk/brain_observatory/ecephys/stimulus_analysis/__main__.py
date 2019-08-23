@@ -1,6 +1,7 @@
 
 from argschema import ArgSchemaParser
 import time
+import os
 
 import pandas as pd
 import numpy as np
@@ -17,6 +18,8 @@ from .dot_motion import DotMotion
 from .flashes import Flashes
 from .receptive_field_mapping import ReceptiveFieldMapping
 
+from joblib import Parallel, delayed
+
 
 def calculate_stimulus_metrics(args):
 
@@ -29,19 +32,23 @@ def calculate_stimulus_metrics(args):
                  StaticGratings,
                  NaturalScenes,
                  #NaturalMovies,
-                 #DotMotion,
+                 DotMotion,
                  Flashes,
                  ReceptiveFieldMapping,
                 )
 
-    df = reduce(lambda output, nwb_path: \
-                 pd.concat((output,
-                           add_metrics_to_units_table(nwb_path, stimulus_classes, args))),
-                 args['nwb_paths'],
-                 pd.DataFrame()
-                 )
+    result = Parallel(n_jobs=20, verbose=10) \
+            (delayed(add_metrics_to_units_table)(path, stimulus_classes, args) 
+                for path in args['nwb_paths'])
 
-    df.to_csv(args['output_file'])
+    #df = reduce(lambda output, nwb_path: \
+    #             pd.concat((output,
+    #                       add_metrics_to_units_table(nwb_path, stimulus_classes, args))),
+    #             args['nwb_paths'],
+    #             pd.DataFrame()
+    #             )
+
+    #df.to_csv(args['output_file'])
 
     execution_time = time.time() - start
 
@@ -72,12 +79,25 @@ def add_metrics_to_units_table(nwb_path, stimulus_classes, args):
 
     print(nwb_path)
 
-    session = EcephysSession.from_nwb_path(nwb_path)
+    try:
+        session = EcephysSession.from_nwb_path(nwb_path)
+    except FileNotFoundError:
+        return pd.DataFrame()
 
     metrics = [stim(session, params=args).metrics for stim in stimulus_classes]
-    metrics.insert(0, session.units)
+    units_table = session.units
+    units_table['nwb_file'] = nwb_path
+    metrics.insert(0, units_table)
 
-    return reduce(lambda left,right: pd.merge(left, right, on='unit_id'), metrics)
+    final_table = reduce(lambda left,right: pd.merge(left, right, on='unit_id'), metrics)
+
+    fname = os.path.basename(nwb_path)
+    fname = fname.split('.')[0] + '.stimulus_analysis.csv'
+
+    output_file = os.path.join('/mnt/nvme0/unit_tables', fname)
+    final_table.to_csv(output_file)
+
+    return final_table
 
 
 def main():

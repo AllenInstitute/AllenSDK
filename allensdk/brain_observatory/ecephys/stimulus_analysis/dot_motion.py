@@ -45,6 +45,7 @@ class DotMotion(StimulusAnalysis):
 
         self._dirvals = None
         self._col_dir = col_ori
+        self._col_dir = 'Dir'
 
         self._speeds = None
         self._col_speed = col_speeds
@@ -97,21 +98,22 @@ class DotMotion(StimulusAnalysis):
     def metrics(self):
 
         if self._metrics is None:
-            logger.info('Calculating metrics for ' + self.name)
-
             unit_ids = self.unit_ids
         
             metrics_df = self.empty_metrics_table()
 
-            metrics_df['pref_speed_dm'] = [self._get_pref_speed(unit) for unit in unit_ids]
-            metrics_df['pref_dir_dm'] = [self._get_pref_dir(unit) for unit in unit_ids]
-            metrics_df['firing_rate_dm'] = [self.get_overall_firing_rate(unit) for unit in unit_ids]
-            metrics_df['fano_dm'] = [self.get_fano_factor(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
-            metrics_df['speed_tuning_idx_dm'] = [self._get_speed_tuning_index(unit) for unit in unit_ids]
-            metrics_df['reliability_dm'] = [self.get_reliability(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
-            metrics_df['lifetime_sparseness_dm'] = [self.get_lifetime_sparseness(unit) for unit in unit_ids]
-            metrics_df.loc[:, ['run_pval_dm', 'run_mod_dm']] = \
-                    [self.get_running_modulation(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+            if len(self.stim_table) > 0:
+                logger.info('Calculating metrics for ' + self.name)
+
+                metrics_df['pref_speed_dm'] = [self._get_pref_speed(unit) for unit in unit_ids]
+                metrics_df['pref_dir_dm'] = [self._get_pref_dir(unit) for unit in unit_ids]
+                metrics_df['firing_rate_dm'] = [self.get_overall_firing_rate(unit) for unit in unit_ids]
+                metrics_df['fano_dm'] = [self.get_fano_factor(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+                metrics_df['speed_tuning_idx_dm'] = [self._get_speed_tuning_index(unit) for unit in unit_ids]
+                metrics_df['reliability_dm'] = [self.get_reliability(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+                metrics_df['lifetime_sparseness_dm'] = [self.get_lifetime_sparseness(unit) for unit in unit_ids]
+                metrics_df.loc[:, ['run_pval_dm', 'run_mod_dm']] = \
+                        [self.get_running_modulation(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
 
             self._metrics = metrics_df
 

@@ -34,6 +34,7 @@ class Channel(RaisingSchema):
     # ML_coordinate = Float(required=True, allow_none=True)
     # cortical_depth = Float(required=True, allow_none=True)
 
+
 class Unit(RaisingSchema):
     id = Int(required=True)
     peak_channel_id = Int(required=True)
@@ -68,6 +69,16 @@ class Unit(RaisingSchema):
     spread = Float(required=True, allow_none=True)
     velocity_above = Float(required=True, allow_none=True)
     velocity_below = Float(required=True, allow_none=True)
+    # TODO: The below have been modified by jsiegle in his lastest push. Check to see if changes should be perminant.
+    # waveform_duration = Float(required=True)
+    # waveform_halfwidth = Float(required=True)
+    # waveform_PT_ratio = Float(required=True)
+    # waveform_repolarization_slope = Float(required=True)
+    # waveform_recovery_slope = Float(required=True)
+    # waveform_amplitude = Float(required=True)
+    # waveform_spread = Float(required=True)
+    # waveform_velocity_above = Float(required=True)
+    # waveform_velocity_below = Float(required=True)
 
 
 class Lfp(RaisingSchema):

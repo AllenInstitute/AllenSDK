@@ -12,6 +12,8 @@ from allensdk.brain_observatory.ecephys.ecephys_session_api import EcephysSessio
 from allensdk.brain_observatory.ecephys.stimulus_table import naming_utilities
 from allensdk.brain_observatory.ecephys.stimulus_table._schemas import default_stimulus_renames, default_column_renames    
 
+import warnings
+warnings.simplefilter(action='ignore', category=UserWarning)
 
 NON_STIMULUS_PARAMETERS = tuple([
     'start_time',

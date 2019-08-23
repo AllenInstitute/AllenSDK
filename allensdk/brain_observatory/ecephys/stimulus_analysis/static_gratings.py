@@ -135,24 +135,24 @@ class StaticGratings(StimulusAnalysis):
     @property
     def metrics(self):
         if self._metrics is None:
-
-            logger.info('Calculating metrics for ' + self.name)
-
             unit_ids = self.unit_ids
             
             metrics_df = self.empty_metrics_table()
 
-            metrics_df['pref_sf_sg'] = [self._get_pref_sf(unit) for unit in unit_ids]
-            metrics_df['pref_ori_sg'] = [self._get_pref_ori(unit) for unit in unit_ids]
-            metrics_df['pref_phase_sg'] = [self._get_pref_phase(unit) for unit in unit_ids]
-            metrics_df['g_osi_sg'] = [self._get_osi(unit, metrics_df.loc[unit]['pref_sf_sg'], metrics_df.loc[unit]['pref_phase_sg']) for unit in unit_ids]
-            metrics_df['time_to_peak_sg'] = [self.get_time_to_peak(unit, self.get_preferred_condition(unit)) for unit in unit_ids]  
-            metrics_df['firing_rate_sg'] = [self.get_overall_firing_rate(unit) for unit in unit_ids]
-            metrics_df['reliability_sg'] = [self.get_reliability(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
-            metrics_df['fano_sg'] = [self.get_fano_factor(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
-            metrics_df['lifetime_sparseness_sg'] = [self.get_lifetime_sparseness(unit) for unit in unit_ids]
-            metrics_df.loc[:, ['run_pval_sg', 'run_mod_sg']] = \
-                    [self.get_running_modulation(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+            if len(self.stim_table) > 0:
+                logger.info('Calculating metrics for ' + self.name)
+
+                metrics_df['pref_sf_sg'] = [self._get_pref_sf(unit) for unit in unit_ids]
+                metrics_df['pref_ori_sg'] = [self._get_pref_ori(unit) for unit in unit_ids]
+                metrics_df['pref_phase_sg'] = [self._get_pref_phase(unit) for unit in unit_ids]
+                metrics_df['g_osi_sg'] = [self._get_osi(unit, metrics_df.loc[unit]['pref_sf_sg'], metrics_df.loc[unit]['pref_phase_sg']) for unit in unit_ids]
+                metrics_df['time_to_peak_sg'] = [self.get_time_to_peak(unit, self.get_preferred_condition(unit)) for unit in unit_ids]  
+                metrics_df['firing_rate_sg'] = [self.get_overall_firing_rate(unit) for unit in unit_ids]
+                metrics_df['reliability_sg'] = [self.get_reliability(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+                metrics_df['fano_sg'] = [self.get_fano_factor(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+                metrics_df['lifetime_sparseness_sg'] = [self.get_lifetime_sparseness(unit) for unit in unit_ids]
+                metrics_df.loc[:, ['run_pval_sg', 'run_mod_sg']] = \
+                        [self.get_running_modulation(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
 
             self._metrics = metrics_df
 

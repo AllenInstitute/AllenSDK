@@ -3,8 +3,18 @@ import io
 import json
 import subprocess
 import glob
+import pandas as pd
+import numpy as np
 
 def createInputJson(output_file):
+
+    df = pd.read_csv('/mnt/md0/data/production_QC/experiment_table_2019-07-31.csv',index_col=0)
+
+    fc_mice = np.sort(df[df['stimulus_set'].str.match('Functional')].index.values)
+
+    nwb_files = ['/mnt/nvme0/ecephys_nwb_files_20190727/mouse' + str(mouse) + '.spikes.nwb2' for mouse in fc_mice]
+
+    print('Found ' + str(len(nwb_files)) + ' nwb files')
 
     dictionary = { \
 
@@ -52,11 +62,12 @@ def createInputJson(output_file):
             "minimum_spike_count" : 10
         },
 
-        "output_file" : '/mnt/md0/data/production_QC/stimulus_analysis_TEST2.csv',
+        "output_file" : '/mnt/md0/data/production_QC/stimulus_analysis_TEST20190805.csv',
 
-        "nwb_paths" : ['/mnt/nvme0/ecephys_nwb_files_20190727/integration_test.spikes.nwb2']
-        
-    }
+        "nwb_paths" : nwb_files #['/mnt/nvme0/ecephys_nwb_files_20190727/mouse412804_integration_test_fc.spikes.nwb2',
+                        #'/mnt/nvme0/ecephys_nwb_files_20190727/integration_test.spikes.nwb2']#'
+        #nwb_files[:20] 
+    } 
 
     with io.open(output_file, 'w', encoding='utf-8') as f:
             f.write(json.dumps(dictionary, ensure_ascii=False, sort_keys=True, indent=4))
