@@ -204,36 +204,45 @@ def test_add_task_parameters(nwbfile, roundtrip, roundtripper, task_parameters):
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
-def test_get_cell_specimen_table(nwbfile, roundtrip, roundtripper, cell_specimen_table, metadata, ophys_timestamps):
+@pytest.mark.parametrize("filter_invalid_rois", [True, False])
+def test_get_cell_specimen_table(nwbfile, roundtrip, filter_invalid_rois, valid_roi_ids, roundtripper, cell_specimen_table, metadata, ophys_timestamps):
 
     nwb.add_metadata(nwbfile, metadata)
     nwb.add_cell_specimen_table(nwbfile, cell_specimen_table)
 
     if roundtrip:
-        obt = roundtripper(nwbfile, BehaviorOphysNwbApi)
+        obt = roundtripper(nwbfile, BehaviorOphysNwbApi, filter_invalid_rois=filter_invalid_rois)
     else:
-        obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
+        obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile, filter_invalid_rois=filter_invalid_rois)
+
+    if filter_invalid_rois:
+        cell_specimen_table = cell_specimen_table[cell_specimen_table["cell_roi_id"].isin(valid_roi_ids)]
 
     pd.testing.assert_frame_equal(cell_specimen_table, obt.get_cell_specimen_table(), check_dtype=False)
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
-def test_get_dff_traces(nwbfile, roundtrip, roundtripper, dff_traces, cell_specimen_table, metadata, ophys_timestamps):
+@pytest.mark.parametrize("filter_invalid_rois", [True, False])
+def test_get_dff_traces(nwbfile, roundtrip, filter_invalid_rois, valid_roi_ids, roundtripper, dff_traces, cell_specimen_table, metadata, ophys_timestamps):
 
     nwb.add_metadata(nwbfile, metadata)
     nwb.add_cell_specimen_table(nwbfile, cell_specimen_table)
     nwb.add_dff_traces(nwbfile, dff_traces, ophys_timestamps)
 
     if roundtrip:
-        obt = roundtripper(nwbfile, BehaviorOphysNwbApi)
+        obt = roundtripper(nwbfile, BehaviorOphysNwbApi, filter_invalid_rois=filter_invalid_rois)
     else:
-        obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
+        obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile, filter_invalid_rois=filter_invalid_rois)
+
+    if filter_invalid_rois:
+        dff_traces = dff_traces[dff_traces["cell_roi_id"].isin(valid_roi_ids)]
 
     pd.testing.assert_frame_equal(dff_traces, obt.get_dff_traces(), check_dtype=False)
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
-def test_get_corrected_fluorescence_traces(nwbfile, roundtrip, roundtripper, dff_traces, corrected_fluorescence_traces, cell_specimen_table, metadata, ophys_timestamps):
+@pytest.mark.parametrize("filter_invalid_rois", [True, False])
+def test_get_corrected_fluorescence_traces(nwbfile, roundtrip, filter_invalid_rois, valid_roi_ids, roundtripper, dff_traces, corrected_fluorescence_traces, cell_specimen_table, metadata, ophys_timestamps):
 
     nwb.add_metadata(nwbfile, metadata)
     nwb.add_cell_specimen_table(nwbfile, cell_specimen_table)
@@ -241,9 +250,12 @@ def test_get_corrected_fluorescence_traces(nwbfile, roundtrip, roundtripper, dff
     nwb.add_corrected_fluorescence_traces(nwbfile, corrected_fluorescence_traces)
 
     if roundtrip:
-        obt = roundtripper(nwbfile, BehaviorOphysNwbApi)
+        obt = roundtripper(nwbfile, BehaviorOphysNwbApi, filter_invalid_rois=filter_invalid_rois)
     else:
-        obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile)
+        obt = BehaviorOphysNwbApi.from_nwbfile(nwbfile, filter_invalid_rois=filter_invalid_rois)
+
+    if filter_invalid_rois:
+        corrected_fluorescence_traces = corrected_fluorescence_traces[corrected_fluorescence_traces["cell_roi_id"].isin(valid_roi_ids)]
 
     pd.testing.assert_frame_equal(corrected_fluorescence_traces, obt.get_corrected_fluorescence_traces(), check_dtype=False)
 

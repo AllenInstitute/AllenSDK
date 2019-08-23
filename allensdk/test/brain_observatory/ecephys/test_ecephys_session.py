@@ -13,7 +13,7 @@ def raw_stimulus_table():
         'start_time': np.arange(4)/2,
         'stop_time':np.arange(1, 5)/2,
         'stimulus_name':['a', 'a', 'a', 'a_movie'],
-        'stimulus_block':[0, 0, 1, 1],
+        'stimulus_block':[0, 0, 0, 1],
         'TF': np.empty(4) * np.nan,
         'SF':np.empty(4) * np.nan,
         'Ori': np.empty(4) * np.nan,
@@ -158,6 +158,25 @@ def session_metadata_api():
     return EcephysSessionMetadataApi()
 
 
+def test_get_stimulus_epochs(just_stimulus_table_api):
+
+    expected = pd.DataFrame({
+        "start_time": [0, 3/2],
+        "stop_time": [3/2, 2],
+        "duration": [3/2, 1/2],
+        "stimulus_name": ["a", "a_movie"],
+        "stimulus_block": [0, 1]
+    })
+
+    session = EcephysSession(api=just_stimulus_table_api)
+    obtained = session.get_stimulus_epochs()
+
+    print(expected)
+    print(obtained)
+
+    pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)
+
+
 def test_session_metadata(session_metadata_api):
     session = EcephysSession(api=session_metadata_api)
 
@@ -166,12 +185,16 @@ def test_session_metadata(session_metadata_api):
 
 def test_build_stimulus_presentations(just_stimulus_table_api):
     expected_columns = [
-        'start_time', 'stop_time', 'stimulus_name', 'stimulus_block', 'TF', 'SF', 'Ori', 'Contrast', 
-        'Pos_x', 'Pos_y', 'Color', 'Image', 'Phase', 'duration', "stimulus_condition_id"
+        'start_time', 'stop_time', 'stimulus_name', 'stimulus_block', 
+        'temporal_frequency', 'spatial_frequency', 'orientation', 'contrast', 
+        'x_position', 'y_position', 'color', 'frame', 'phase', 'duration', "stimulus_condition_id"
     ]
 
     session = EcephysSession(api=just_stimulus_table_api)
     obtained = session.stimulus_presentations
+
+    print(obtained.head())
+    print(obtained.columns)
 
     assert set(expected_columns) == set(obtained.columns)
     assert 'stimulus_presentation_id' == obtained.index.name
@@ -190,22 +213,22 @@ def test_build_units_table(units_table_api):
     session = EcephysSession(api=units_table_api)
     obtained = session.units
 
-    assert 2 == session.num_units
-    assert np.allclose([22, 33], obtained['probe_vertical_position'])
-    assert np.allclose([1, 2], obtained.index.values)
+    assert 3 == session.num_units
+    assert np.allclose([10, 22, 33], obtained['probe_vertical_position'])
+    assert np.allclose([0, 1, 2], obtained.index.values)
 
 
 def test_presentationwise_spike_counts(spike_times_api):
     session = EcephysSession(api=spike_times_api)
     obtained = session.presentationwise_spike_counts(np.linspace(-.1, .1, 3), session.stimulus_presentations.index.values, session.units.index.values)
 
-    first = obtained['spike_counts'].loc[{'unit_id': 2, 'stimulus_presentation_id': 2}]
+    first = obtained.loc[{'unit_id': 2, 'stimulus_presentation_id': 2}]
     assert np.allclose([0, 3], first)
 
-    second = obtained['spike_counts'].loc[{'unit_id': 1, 'stimulus_presentation_id': 3}]
+    second = obtained.loc[{'unit_id': 1, 'stimulus_presentation_id': 3}]
     assert np.allclose([0, 0], second)
 
-    assert np.allclose([4, 2, 2], obtained['spike_counts'].shape)
+    assert np.allclose([4, 2, 3], obtained.shape)
 
 
 @pytest.mark.parametrize("spike_times,time_domain,expected", [
@@ -262,6 +285,7 @@ def test_conditionwise_spike_statistics(spike_times_api):
     obtained = session.conditionwise_spike_statistics(stimulus_presentation_ids=[0, 1, 2])
 
     pd.set_option('display.max_columns', None)
+
     assert obtained.loc[(2, 2), "spike_count"] == 3
     assert obtained.loc[(2, 2), "stimulus_presentation_count"] == 1
 
@@ -271,8 +295,8 @@ def test_get_stimulus_parameter_values(just_stimulus_table_api):
     obtained = session.get_stimulus_parameter_values()
 
     expected = {
-        'Color': [0, 5.5, 11, 16.5],
-        'Phase': [0, 60, 120, 180]
+        'color': [0, 5.5, 11, 16.5],
+        'phase': [0, 60, 120, 180]
     }
     
     for k, v in expected.items():
@@ -289,6 +313,10 @@ def test_get_presentations_for_stimulus(just_stimulus_table_api, raw_stimulus_ta
     ]]
     expected['duration'] = expected['stop_time'] - expected['start_time']
     expected["stimulus_condition_id"] = [0, 1, 2]
+    expected.rename(columns={"Color": "color", "Phase": "phase"}, inplace=True)
+
+    print(expected)
+    print(obtained)
 
     pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)
 
@@ -298,7 +326,7 @@ def test_filter_owned_df(just_stimulus_table_api):
     ids = [0, 2]
     obtained = session._filter_owned_df('stimulus_presentations', ids)
 
-    assert np.allclose([0, 120], obtained['Phase'].values)
+    assert np.allclose([0, 120], obtained['phase'].values)
 
 
 def test_filter_owned_df_scalar(just_stimulus_table_api):
@@ -309,7 +337,7 @@ def test_filter_owned_df_scalar(just_stimulus_table_api):
         obtained = session._filter_owned_df('stimulus_presentations', ids)
 
     assert w[-1].message.args[0] == 'a scalar (3) was provided as ids, filtering to a single row of stimulus_presentations.'
-    assert obtained['Phase'].values[0] == 180
+    assert obtained['phase'].values[0] == 180
 
 
 def test_build_inter_presentation_intervals(just_stimulus_table_api):

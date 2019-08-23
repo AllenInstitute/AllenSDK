@@ -461,7 +461,6 @@ class MouseConnectivityCache(ReferenceSpaceCache):
         '''
 
         output_keys = ['experiment_id', rank_on, 'hemisphere_id', 'structure_id']
-        filter_fields = lambda fieldname: fieldname in output_keys
 
         if hemisphere_ids is None:
             hemisphere_ids = [1, 2]
@@ -480,7 +479,7 @@ class MouseConnectivityCache(ReferenceSpaceCache):
 
             this_experiment_unionizes = unionizes[unionizes['experiment_id'] == eid]
             this_experiment_unionizes = this_experiment_unionizes.sort_values(by=rank_on, ascending=False)
-            this_experiment_unionizes = this_experiment_unionizes.select(filter_fields, axis=1)
+            this_experiment_unionizes = this_experiment_unionizes.loc[:, output_keys]
 
             records = this_experiment_unionizes.to_dict('record')
             if len(records) > n:

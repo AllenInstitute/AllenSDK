@@ -4,6 +4,7 @@ from six import string_types
 import scipy.ndimage as ndi
 import scipy.stats as st
 from scipy.optimize import curve_fit
+import logging
 
 import matplotlib.pyplot as plt
 
@@ -11,6 +12,10 @@ from .stimulus_analysis import StimulusAnalysis, get_fr
 
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
+
+
+logger = logging.getLogger(__name__)
+
 
 class Flashes(StimulusAnalysis):
     """
@@ -32,22 +37,21 @@ class Flashes(StimulusAnalysis):
 
     """
 
-    def __init__(self, ecephys_session, **kwargs):
-        super(Flashes, self).__init__(ecephys_session, **kwargs)
+    def __init__(self, ecephys_session, col_color='color', trial_duration=0.25, **kwargs):
+        super(Flashes, self).__init__(ecephys_session, trial_duration=trial_duration, **kwargs)
 
         self._metrics = None
 
         self._colors = None
-        self._col_color = 'color'
+        self._col_color = col_color # 'color'
 
         if self._params is not None:
-            self._params = self._params['flashes']
-            self._stimulus_key = self._params['stimulus_key']
+            self._params = self._params.get('flashes', {})
+            self._stimulus_key = self._params.get('stimulus_key', None)  # Overwrites parent value with argvars
         else:
-            self._stimulus_key = 'flashes'
+            self._params = {}
 
-        self._trial_duration = 0.25
-
+        # self._trial_duration = 0.25
         self._module_name = 'Flashes'
 
 
@@ -90,6 +94,8 @@ class Flashes(StimulusAnalysis):
 
         if self._metrics is None:
 
+            logger.info('Calculating metrics for ' + self.name)
+            
             unit_ids = self.unit_ids
         
             metrics_df = self.empty_metrics_table()
@@ -111,6 +117,27 @@ class Flashes(StimulusAnalysis):
             self._metrics = metrics_df
 
         return self._metrics
+
+    def _find_stimulus_key(self, stim_table):
+        """Tries to guess the correct stimulus_key based on the data.
+
+        :param stim_table:
+        :return:
+        """
+        known_keys_lc = [k.lower() for k in self.known_stimulus_keys]
+
+        for table_key in stim_table['stimulus_name'].unique():
+            table_key_lc = table_key.lower()
+            for known_key in known_keys_lc:
+                if table_key_lc.startswith(known_key):
+                    return table_key
+
+        else:
+            return None
+
+    @property
+    def known_stimulus_keys(self):
+        return ['flash', 'flashes']
 
 
     def _get_stim_table_stats(self):
@@ -156,6 +183,9 @@ class Flashes(StimulusAnalysis):
 
         on_mean_spikes = self.conditionwise_statistics.loc[unit_id].loc[on_condition_id]['spike_mean'].values
         off_mean_spikes = self.conditionwise_statistics.loc[unit_id].loc[off_condition_id]['spike_mean'].values
+
+        if len(on_mean_spikes) == 0 and len(off_mean_spikes) == 0:
+            return np.nan
 
         if off_mean_spikes[0] > 0:
             return on_mean_spikes[0] / off_mean_spikes[0]

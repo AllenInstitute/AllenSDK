@@ -2,13 +2,17 @@ import numpy as np
 import pandas as pd
 from six import string_types
 import scipy.stats as st
-
+import logging
 import matplotlib.pyplot as plt
 
 from .stimulus_analysis import StimulusAnalysis
 
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
+
+
+logger = logging.getLogger(__name__)
+
 
 class NaturalScenes(StimulusAnalysis):
     """
@@ -30,8 +34,8 @@ class NaturalScenes(StimulusAnalysis):
 
     """
 
-    def __init__(self, ecephys_session, **kwargs):
-        super(NaturalScenes, self).__init__(ecephys_session, **kwargs)
+    def __init__(self, ecephys_session, col_image='frame', trial_duration=0.25, **kwargs):
+        super(NaturalScenes, self).__init__(ecephys_session, trial_duration=trial_duration, **kwargs)
 
         self._images = None
         self._number_images = None
@@ -41,15 +45,15 @@ class NaturalScenes(StimulusAnalysis):
         self._response_trials = None
         self._metrics = None
 
-        self._col_image = 'Image'
+        self._col_image = col_image # 'Image'
 
-        self._trial_duration = 0.25
+        # self._trial_duration = 0.25  # Passed in to kwargs and read by parent
 
         if self._params is not None:
-            self._params = self._params['natural_scenes']
-            self._stimulus_key = self._params['stimulus_key']
+            self._params = self._params.get('natural_scenes', {})
+            self._stimulus_key = self._params.get('stimulus_key', None)  # Overwrites parent value with argvars
         else:
-            self._stimulus_key = 'natural_scenes'
+            self._params = {}
 
         self._module_name = 'Natural Scenes'
 
@@ -104,6 +108,8 @@ class NaturalScenes(StimulusAnalysis):
 
         if self._metrics is None:
 
+            logger.info('Calculating metrics for ' + self.name)
+
             unit_ids = self.unit_ids
 
             metrics_df = self.empty_metrics_table()
@@ -122,10 +128,13 @@ class NaturalScenes(StimulusAnalysis):
                 metrics_df.loc[:, ['run_pval_ns', 'run_mod_ns']] = \
                         [self.get_running_modulation(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
 
-
             self._metrics = metrics_df
 
         return self._metrics
+
+    @property
+    def known_stimulus_keys(self):
+        return ['natural_scenes', 'Natural_Images', 'Natural Images']
 
 
     def _get_stim_table_stats(self):

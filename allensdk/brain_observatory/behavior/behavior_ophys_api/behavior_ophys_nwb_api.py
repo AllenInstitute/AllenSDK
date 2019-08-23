@@ -10,6 +10,7 @@ from pandas.util.testing import assert_frame_equal
 import os
 import math
 import numpy as np
+import xarray as xr
 import pandas as pd
 
 
@@ -26,6 +27,12 @@ load_LabMetaData_extension(OphysBehaviorTaskParametersSchema, 'AIBS_ophys_behavi
 
 
 class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
+
+
+    def __init__(self, *args, **kwargs):
+        self.filter_invalid_rois = kwargs.pop("filter_invalid_rois", False)
+        super(BehaviorOphysNwbApi, self).__init__(*args, **kwargs)
+
 
     def save(self, session_object):
 
@@ -120,10 +127,10 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
         return {key: val.data[:] for key, val in self.nwbfile.stimulus_template.items()}
 
     def get_ophys_timestamps(self) -> np.ndarray:
-        return self.nwbfile.modules['two_photon_imaging'].get_data_interface('dff').roi_response_series['traces'].timestamps
+        return self.nwbfile.modules['two_photon_imaging'].get_data_interface('dff').roi_response_series['traces'].timestamps[:]
 
     def get_stimulus_timestamps(self) -> np.ndarray:
-        return self.nwbfile.modules['stimulus'].get_data_interface('timestamps').timestamps
+        return self.nwbfile.modules['stimulus'].get_data_interface('timestamps').timestamps[:]
 
     def get_trials(self) -> pd.DataFrame:
         trials = self.nwbfile.trials.to_dataframe()
@@ -178,6 +185,10 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
         df['image_mask'] = [mask.astype(bool) for mask in df['image_mask'].values]
         df.reset_index(inplace=True)
         df.set_index('cell_specimen_id', inplace=True)
+
+        if self.filter_invalid_rois:
+            df = df[df["valid_roi"]]
+
         return df
 
     def get_dff_traces(self) -> pd.DataFrame:
@@ -210,7 +221,7 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
         return pd.DataFrame(motion_correction_data)
 
 
-def equals(A, B):
+def equals(A, B, reraise=False):
 
     field_set = set()
     for key, val in A.__dict__.items():
@@ -223,29 +234,39 @@ def equals(A, B):
     try:
         for field in sorted(field_set):
             x1, x2 = getattr(A, field), getattr(B, field)
+            err_msg = f"{field} on {A} did not equal {field} on {B} (\n{x1} vs\n{x2}\n)"
+
             if isinstance(x1, pd.DataFrame):
-                assert_frame_equal(x1, x2)
+                try:
+                    assert_frame_equal(x1, x2, check_like=True)
+                except:
+                    print(err_msg)
+                    raise
             elif isinstance(x1, np.ndarray):
-                np.testing.assert_array_almost_equal(x1, x2)
+                np.testing.assert_array_almost_equal(x1, x2, err_msg=err_msg)
+            elif isinstance(x1, xr.DataArray):
+                xr.testing.assert_allclose(x1, x2)
             elif isinstance(x1, (list,)):
-                assert x1 == x2
+                assert x1 == x2, err_msg
             elif isinstance(x1, (sitk.Image,)):
-                assert x1.GetSize() == x2.GetSize()
-                assert x1 == x2
+                assert x1.GetSize() == x2.GetSize(), err_msg
+                assert x1 == x2, err_msg
             elif isinstance(x1, (dict,)):
                 for key in set(x1.keys()).union(set(x2.keys())):
+                    key_err_msg = f"{key} on {field} on {A} did not equal {key} on {field} on {B}"
+
                     if isinstance(x1[key], (np.ndarray,)):
-                        np.testing.assert_array_almost_equal(x1[key], x2[key])
+                        np.testing.assert_array_almost_equal(x1[key], x2[key], err_msg=key_err_msg)
                     elif isinstance(x1[key], (float,)):
                         if math.isnan(x1[key]) or math.isnan(x2[key]):
-                            assert math.isnan(x1[key]) and math.isnan(x2[key])
+                            assert math.isnan(x1[key]) and math.isnan(x2[key]), key_err_msg
                         else:
-                            assert x1[key] == x2[key]
+                            assert x1[key] == x2[key], key_err_msg
                     else:
-                        assert x1[key] == x2[key]
+                        assert x1[key] == x2[key], key_err_msg
 
             else:
-                assert x1 == x2
+                assert x1 == x2, err_msg
 
     except NotImplementedError as e:
         A_implements_get_field = hasattr(A.api, getattr(type(A), field).getter_name)
@@ -253,6 +274,8 @@ def equals(A, B):
         assert A_implements_get_field == B_implements_get_field == False
 
     except (AssertionError, AttributeError) as e:
+        if reraise:
+            raise
         return False
 
     return True

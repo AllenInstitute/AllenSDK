@@ -1,15 +1,18 @@
 import numpy as np
 import pandas as pd
+import xarray as xr
 import math
 from typing import NamedTuple
 import os
 
 from allensdk.core.lazy_property import LazyProperty, LazyPropertyMixin
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
-from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import equals
+from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import equals, BehaviorOphysNwbApi
 from allensdk.deprecated import legacy
 from allensdk.brain_observatory.behavior.trials_processing import calculate_reward_rate
 from allensdk.brain_observatory.behavior.dprime import get_rolling_dprime, get_trial_count_corrected_false_alarm_rate, get_trial_count_corrected_hit_rate
+from allensdk.brain_observatory.behavior.dprime import get_hit_rate, get_false_alarm_rate
+from allensdk.brain_observatory.behavior.image_api import Image, ImageApi
 
 
 class BehaviorOphysSession(LazyPropertyMixin):
@@ -18,7 +21,7 @@ class BehaviorOphysSession(LazyPropertyMixin):
     Attributes:
         ophys_experiment_id : int (LazyProperty)
             Unique identifier for this experimental session
-        max_projection : SimpleITK.Image (LazyProperty)
+        max_projection : allensdk.brain_observatory.behavior.image_api.Image (LazyProperty)
             2D max projection image
         stimulus_timestamps : numpy.ndarray (LazyProperty)
             Timestamps associated the stimulus presentations on the monitor 
@@ -52,7 +55,7 @@ class BehaviorOphysSession(LazyPropertyMixin):
             A dataframe containing behavioral trial start/stop times, and trial data
         corrected_fluorescence_traces : pandas.DataFrame (LazyProperty)
             The motion-corrected fluorescence traces organized into a dataframe; index is the cell roi ids
-        average_projection : SimpleITK.Image (LazyProperty)
+        average_projection : allensdk.brain_observatory.behavior.image_api.Image (LazyProperty)
             2D image of the microscope field of view, averaged across the experiment
         motion_correction : pandas.DataFrame LazyProperty
             A dataframe containing trace data used during motion correction computation
@@ -62,12 +65,17 @@ class BehaviorOphysSession(LazyPropertyMixin):
     def from_lims(cls, ophys_experiment_id):
         return cls(api=BehaviorOphysLimsApi(ophys_experiment_id))
 
+    @classmethod
+    def from_nwb_path(cls, nwb_path, **api_kwargs):
+        api_kwargs["filter_invalid_rois"] = api_kwargs.get("filter_invalid_rois", True)
+        return cls(api=BehaviorOphysNwbApi.from_path(path=nwb_path, **api_kwargs))
+
     def __init__(self, api=None):
 
         self.api = api
 
         self.ophys_experiment_id = LazyProperty(self.api.get_ophys_experiment_id)
-        self.max_projection = LazyProperty(self.api.get_max_projection)
+        self.max_projection = LazyProperty(self.get_max_projection)
         self.stimulus_timestamps = LazyProperty(self.api.get_stimulus_timestamps)
         self.ophys_timestamps = LazyProperty(self.api.get_ophys_timestamps)
         self.metadata = LazyProperty(self.api.get_metadata)
@@ -82,11 +90,105 @@ class BehaviorOphysSession(LazyPropertyMixin):
         self.task_parameters = LazyProperty(self.api.get_task_parameters)
         self.trials = LazyProperty(self.api.get_trials)
         self.corrected_fluorescence_traces = LazyProperty(self.api.get_corrected_fluorescence_traces)
-        self.average_projection = LazyProperty(self.api.get_average_projection)
+        self.average_projection = LazyProperty(self.get_average_projection)
         self.motion_correction = LazyProperty(self.api.get_motion_correction)
-        self.segmentation_mask_image = LazyProperty(self.api.get_segmentation_mask_image)
+        self.segmentation_mask_image = LazyProperty(self.get_segmentation_mask_image)
 
-    @legacy('Consider using "get_dff_timeseries" instead.')
+    def get_roi_masks(self, cell_specimen_ids=None):
+        """ Obtains boolean masks indicating the location of one or more cell's ROIs in this session.
+
+        Parameters
+        ----------
+        cell_specimen_ids : array-like of int, optional
+            ROI masks for these cell specimens will be returned. The default behavior is to return masks for all 
+            cell specimens.
+        
+        Returns
+        -------
+        result : xr.DataArray
+            dimensions are:
+                - cell_specimen_id : which cell's roi is described by this mask?
+                - row : index within the underlying image
+                - column : index within the image
+            values are 1 where an ROI was present, otherwise 0.
+
+        """
+
+        if cell_specimen_ids is None:
+            cell_specimen_ids = self.cell_specimen_table.index.values
+        elif isinstance(cell_specimen_ids, int) or np.issubdtype(type(cell_specimen_ids), np.integer):
+            cell_specimen_ids = np.array([int(cell_specimen_ids)])
+        else:
+            cell_specimen_ids = np.array(cell_specimen_ids)
+
+        cell_roi_ids = self.cell_specimen_table.loc[cell_specimen_ids, "cell_roi_id"].values
+        result = self._get_roi_masks_by_cell_roi_id(cell_roi_ids)
+        if "cell_roi_id" in result.dims:
+            result = result.rename({"cell_roi_id": "cell_specimen_id"})
+            result.coords["cell_specimen_id"] = cell_specimen_ids
+
+        return result
+
+    def _get_roi_masks_by_cell_roi_id(self, cell_roi_ids=None):
+        """ Obtains boolean masks indicating the location of one or more ROIs in this session.
+
+        Parameters
+        ----------
+        cell_roi_ids : array-like of int, optional
+            ROI masks for these rois will be returned. The default behavior is to return masks for all rois.
+        
+        Returns
+        -------
+        result : xr.DataArray
+            dimensions are:
+                - roi_id : which roi is described by this mask?
+                - row : index within the underlying image
+                - column : index within the image
+            values are 1 where an ROI was present, otherwise 0.
+
+        Notes
+        -----
+        This method helps Allen Institute scientists to look at sessions that have not yet had cell specimen ids assigned.
+        You probably want to use get_roi_masks instead.
+
+
+        """
+        if cell_roi_ids is None:
+            cell_roi_ids = self.cell_specimen_table["cell_roi_id"].unique()
+        elif isinstance(cell_roi_ids, int) or np.issubdtype(type(cell_roi_ids), np.integer):
+            cell_roi_ids = np.array([int(cell_roi_ids)])
+        else:
+            cell_roi_ids = np.array(cell_roi_ids)
+
+        table = self.cell_specimen_table.copy()
+        table.set_index("cell_roi_id", inplace=True)
+        table = table.loc[cell_roi_ids, :]
+
+        full_image_shape = table.iloc[0]["image_mask"].shape
+
+        output = np.zeros((len(cell_roi_ids), full_image_shape[0], full_image_shape[1]), dtype=np.uint8)
+        for ii, (_, row) in enumerate(table.iterrows()):
+            output[ii, :, :] = _translate_roi_mask(row["image_mask"], int(row["y"]), int(row["x"]))
+
+        segmentation_mask_image = self.api.get_segmentation_mask_image()
+        spacing = segmentation_mask_image.GetSpacing()
+        unit = segmentation_mask_image.GetMetaData('unit')
+
+        return xr.DataArray(
+            data=output,
+            dims=("cell_roi_id", "row", "column"),
+            coords={
+                "cell_roi_id": cell_roi_ids,
+                "row": np.arange(full_image_shape[0])*spacing[0],
+                "column": np.arange(full_image_shape[1])*spacing[1]
+            },
+            attrs={
+                "spacing":spacing,
+                "unit":unit
+            }
+        ).squeeze(drop=True)
+
+    @legacy('Consider using "dff_traces" instead.')
     def get_dff_traces(self, cell_specimen_ids=None):
 
         if cell_specimen_ids is None:
@@ -113,6 +215,56 @@ class BehaviorOphysSession(LazyPropertyMixin):
             raise ValueError(f'cell_specimen_id values not assigned for {self.ophys_experiment_id}')
         return cell_specimen_ids
 
+    def deserialize_image(self, sitk_image):
+        '''
+        Convert SimpleITK image returned by the api to an Image class:
+
+        Args:
+            sitk_image (SimpleITK image): image object returned by the api
+
+        Returns
+            img (allensdk.brain_observatory.behavior.image_api.Image)
+        '''
+        img = ImageApi.deserialize(sitk_image)
+        return img
+
+    def get_max_projection(self):
+        """ Returns an image whose values are the maximum obtained values at each pixel of the ophys movie over time.
+
+        Returns
+        ----------
+        allensdk.brain_observatory.behavior.image_api.Image:
+            array-like interface to max projection image data and metadata
+        """
+        return self.deserialize_image(self.api.get_max_projection())
+
+    def get_average_projection(self):
+        """ Returns an image whose values are the average obtained values at each pixel of the ophys movie over time.
+
+        Returns
+        ----------
+        allensdk.brain_observatory.behavior.image_api.Image:
+            array-like interface to max projection image data and metadata
+        """
+        return self.deserialize_image(self.api.get_average_projection())
+
+    def get_segmentation_mask_image(self):
+        """ Returns an image with value 1 if the pixel was included in an ROI, and 0 otherwise
+
+        Returns
+        ----------
+        allensdk.brain_observatory.behavior.image_api.Image:
+            array-like interface to segmentation_mask image data and metadata
+        """
+        masks = self.get_roi_masks()
+        mask_image_data = masks.any(dim='cell_specimen_id').astype(int)
+        mask_image = Image(
+            data = mask_image_data.values,
+            spacing = masks.attrs['spacing'],
+            unit = masks.attrs['unit']
+        )
+        return mask_image
+
     def get_reward_rate(self):
         response_latency_list = []
         for _, t in self.trials.iterrows():
@@ -135,11 +287,19 @@ class BehaviorOphysSession(LazyPropertyMixin):
         # Reward rate:
         performance_metrics_df['reward_rate'] = pd.Series(self.get_reward_rate(), index=self.trials.index)
 
-        # Hit rate:
+        # Hit rate raw:
+        hit_rate_raw = get_hit_rate(hit=self.trials.hit, miss=self.trials.miss, aborted=self.trials.aborted)
+        performance_metrics_df['hit_rate_raw'] = pd.Series(hit_rate_raw, index=not_aborted_index)
+        
+        # Hit rate with trial count correction:
         hit_rate = get_trial_count_corrected_hit_rate(hit=self.trials.hit, miss=self.trials.miss, aborted=self.trials.aborted)
         performance_metrics_df['hit_rate'] = pd.Series(hit_rate, index=not_aborted_index)
 
-        # False-alarm rate:
+        # False-alarm rate raw:
+        false_alarm_rate_raw = get_false_alarm_rate(false_alarm=self.trials.false_alarm, correct_reject=self.trials.correct_reject, aborted=self.trials.aborted)
+        performance_metrics_df['false_alarm_rate_raw'] = pd.Series(false_alarm_rate_raw, index=not_aborted_index)
+        
+        # False-alarm rate with trial count correction:
         false_alarm_rate = get_trial_count_corrected_false_alarm_rate(false_alarm=self.trials.false_alarm, correct_reject=self.trials.correct_reject, aborted=self.trials.aborted)
         performance_metrics_df['false_alarm_rate'] = pd.Series(false_alarm_rate, index=not_aborted_index)
 
@@ -159,7 +319,7 @@ class BehaviorOphysSession(LazyPropertyMixin):
         performance_metrics['false_alarm_trial_count'] = self.trials.false_alarm.sum()
         performance_metrics['correct_reject_trial_count'] = self.trials.correct_reject.sum()
         performance_metrics['auto_rewarded_trial_count'] = self.trials.auto_rewarded.sum()
-        performance_metrics['rewarded_trial_count'] = self.trials.reward_times.apply(lambda x: not np.isnan(x)).sum()
+        performance_metrics['rewarded_trial_count'] = self.trials.reward_time.apply(lambda x: not np.isnan(x)).sum()
         performance_metrics['total_reward_count'] = len(self.rewards)
         performance_metrics['total_reward_volume'] = self.rewards.volume.sum()
 
@@ -168,8 +328,10 @@ class BehaviorOphysSession(LazyPropertyMixin):
         performance_metrics['maximum_reward_rate'] = np.nanmax(rolling_performance_df['reward_rate'].values)
         performance_metrics['engaged_trial_count'] = (engaged_trial_mask).sum()
         performance_metrics['mean_hit_rate'] = rolling_performance_df['hit_rate'].mean()
+        performance_metrics['mean_hit_rate_uncorrected'] = rolling_performance_df['hit_rate_raw'].mean()
         performance_metrics['mean_hit_rate_engaged'] = rolling_performance_df['hit_rate'][engaged_trial_mask].mean()
         performance_metrics['mean_false_alarm_rate'] = rolling_performance_df['false_alarm_rate'].mean()
+        performance_metrics['mean_false_alarm_rate_uncorrected'] = rolling_performance_df['false_alarm_rate_raw'].mean()
         performance_metrics['mean_false_alarm_rate_engaged'] = rolling_performance_df['false_alarm_rate'][engaged_trial_mask].mean()
         performance_metrics['mean_dprime'] = rolling_performance_df['rolling_dprime'].mean()
         performance_metrics['mean_dprime_engaged'] = rolling_performance_df['rolling_dprime'][engaged_trial_mask].mean()
@@ -177,6 +339,15 @@ class BehaviorOphysSession(LazyPropertyMixin):
         performance_metrics['max_dprime_engaged'] = rolling_performance_df['rolling_dprime'][engaged_trial_mask].max()
 
         return performance_metrics
+
+
+def _translate_roi_mask(mask, row_offset, col_offset):
+    return np.roll(
+        mask, 
+        shift=(row_offset, col_offset), 
+        axis=(0, 1)
+    )
+
 
 if __name__ == "__main__":
 

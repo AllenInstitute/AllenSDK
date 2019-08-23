@@ -4,6 +4,7 @@ from six import string_types
 import scipy.ndimage as ndi
 import scipy.stats as st
 from scipy.optimize import curve_fit
+import logging
 
 import matplotlib.pyplot as plt
 
@@ -11,6 +12,10 @@ from .stimulus_analysis import StimulusAnalysis, get_fr
 
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
+
+
+logger = logging.getLogger(__name__)
+
 
 class DotMotion(StimulusAnalysis):
     """
@@ -27,21 +32,25 @@ class DotMotion(StimulusAnalysis):
     to get only those units which are on probe C and found in the VISp area::
         dm_analysis = DotMotion(session, filter={'location': 'probeC', 'structure_acronym': 'VISp'})
 
+    or a list of unit_ids:
+        dm_analysis = DotMotion(session, filter=[914580630, 914580280, 914580278])
+
     To get a table of the individual unit metrics ranked by unit ID::
         metrics_table_df = dm_analysis.metrics()
 
     """
 
-    def __init__(self, ecephys_session, **kwargs):
-        super(DotMotion, self).__init__(ecephys_session, **kwargs)
+    def __init__(self, ecephys_session, col_ori='Ori', col_speeds='Speed', trial_duration=1.0, **kwargs):
+        super(DotMotion, self).__init__(ecephys_session, trial_duration=trial_duration, **kwargs)
 
         self._dirvals = None
         self._col_dir = 'Dir'
 
-        self._speeds = None
-        self._col_speed = 'Speed'
 
-        self._trial_duration = 1.0
+        self._speeds = None
+        self._col_speed = col_speeds
+
+        #self._trial_duration = trial_duration
 
         if self._params is not None:
             self._params = self._params['dot_motion']
@@ -90,6 +99,8 @@ class DotMotion(StimulusAnalysis):
 
         if self._metrics is None:
 
+            logger.info('Calculating metrics for ' + self.name)
+
             unit_ids = self.unit_ids
         
             metrics_df = self.empty_metrics_table()
@@ -112,6 +123,9 @@ class DotMotion(StimulusAnalysis):
 
         return self._metrics
 
+    @property
+    def known_stimulus_keys(self):
+        return ['motion_stimulus']
 
     def _get_stim_table_stats(self):
 

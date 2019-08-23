@@ -6,6 +6,7 @@ import scipy.stats as st
 from scipy.signal import welch
 from scipy.optimize import curve_fit
 from scipy.fftpack import fft
+import logging
 
 import matplotlib.pyplot as plt
 
@@ -14,6 +15,10 @@ from ...circle_plots import FanPlotter
 
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
+
+
+logger = logging.getLogger(__name__)
+
 
 class DriftingGratings(StimulusAnalysis):
     """
@@ -35,8 +40,8 @@ class DriftingGratings(StimulusAnalysis):
 
     """
 
-    def __init__(self, ecephys_session, **kwargs):
-        super(DriftingGratings, self).__init__(ecephys_session, **kwargs)
+    def __init__(self, ecephys_session, col_ori='orientation', col_tf='temporal_frequency', col_contrast='contrast', trial_duration=2.0, **kwargs):
+        super(DriftingGratings, self).__init__(ecephys_session, trial_duration=trial_duration, **kwargs)
 
         self._metrics = None
 
@@ -45,17 +50,17 @@ class DriftingGratings(StimulusAnalysis):
         self._tfvals = None
         self._number_tf = None
 
-        self._col_ori = 'ori'
-        self._col_tf = 'TF'
-        self._col_contrast = 'contrast'
-
-        self._trial_duration = 2.0
+        self._col_ori = col_ori
+        self._col_tf = col_tf
+        self._col_contrast = col_contrast
+        # self._trial_duration = trial_duration
 
         if self._params is not None:
-            self._params = self._params['receptive_field_mapping']
-            self._stimulus_key = self._params['stimulus_key']
+            # TODO: Need to make sure
+            self._params = self._params.get('drifting_gratings', {})
+            self._stimulus_key = self._params.get('stimulus_key', None)  # Overwrites parent value with argvars
         else:
-            self._stimulus_key = 'gabors'
+            self._params = {}
 
         self._module_name = 'Drifting Gratings'
 
@@ -164,8 +169,7 @@ class DriftingGratings(StimulusAnalysis):
     def metrics(self):
 
         if self._metrics is None:
-
-            print('Calculating metrics for ' + self.name)
+            logger.info('Calculating metrics for ' + self.name)
         
             unit_ids = self.unit_ids
 
@@ -193,6 +197,9 @@ class DriftingGratings(StimulusAnalysis):
 
         return self._metrics
 
+    @property
+    def known_stimulus_keys(self):
+        return ['drifting_gratings']
 
     def _get_stim_table_stats(self):
 
@@ -280,8 +287,8 @@ class DriftingGratings(StimulusAnalysis):
 
         condition_inds = self.stimulus_conditions[self.stimulus_conditions[self._col_tf] == pref_tf].index.values
         df = self.conditionwise_statistics.loc[unit_id].loc[condition_inds]
-        df = df.assign(ori = self.stimulus_conditions.loc[df.index.values][self._col_ori])
-        df = df.sort_values(by=[self._col_ori])
+        df = df.assign(ori=self.stimulus_conditions.loc[df.index.values][self._col_ori])
+        df = df.sort_values(by=['ori'])  # do not replace with self._col_ori unless we modify the line above
 
         tuning = np.array(df['spike_mean'].values)
 
@@ -315,9 +322,10 @@ class DriftingGratings(StimulusAnalysis):
 
         dataset = self.ecephys_session.presentationwise_spike_counts(bin_edges = np.arange(0, self._trial_duration, 0.001),
                                                                   stimulus_presentation_ids = presentation_ids,
-                                                                  unit_ids = unit_id
+                                                                  unit_ids = [unit_id]
                                                                   ).drop('unit_id')
-        arr = np.squeeze(dataset['spike_counts'].values)
+        # arr = np.squeeze(dataset['spike_counts'].values)
+        arr = np.squeeze(dataset.values)
 
         trial_duration = dataset.time_relative_to_stimulus_onset.max()
 
@@ -369,8 +377,128 @@ class DriftingGratings(StimulusAnalysis):
 
         return c50(contrasts, mean_responses)
 
+    # Methods need to either be removed or updated to work with latest adaptor. Talked with Jsh and decision still pending.
+    '''
+    def _get_tfdi(self, unit_id, pref_ori):
+        """ Calculate temporal frequency discrimination index for a given unit
+
+        Only valid if the contrast tuning stimulus is present
+        Otherwise, return NaN value
+
+        Params:
+        -------
+        unit_id - unique ID for the unit of interest
+        pref_ori - preferred orientation for that cell
+
+        Returns:
+        -------
+        tfdi - metric
+
+        """
+
+        ### NEEDS TO BE UPDATED FOR NEW ADAPTER
+
+        v = list(self.spikes.keys())[nc]
+        tf_tuning = self.response_events[pref_ori, 1:, nc, 0]
+        trials = self.mean_sweep_events[(self.stim_table['Ori'] == self.orivals[pref_ori])][v].values
+        sse_part = np.sqrt(np.sum((trials-trials.mean())**2)/(len(trials)-5))
+        return (np.ptp(tf_tuning))/(np.ptp(tf_tuning) + 2*sse_part)
+    '''
 
 
+    '''
+    def _get_suppressed_contrast(self, unit_id, pref_ori, pref_tf):
+        """ Calculate two metrics used to determine if a unit is suppressed by contrast
+
+        Params:
+        -------
+        unit_id - unique ID for the unit of interest
+        pref_ori - preferred orientation for that cell
+        pref_tf - preferred temporal frequency for that cell
+
+        Returns:
+        -------
+        peak_blank - metric
+        all_blank - metric
+
+        """
+
+        ### NEEDS TO BE UPDATED FOR NEW ADAPTER
+
+        blank = self.response_events[0, 0, nc, 0]
+        peak = self.response_events[pref_ori, pref_tf+1, nc, 0]
+        all_resp = self.response_events[:, 1:, nc, 0].mean()
+        peak_blank = peak - blank
+        all_blank = all_resp - blank
+        
+        return peak_blank, all_blank
+    '''
+
+    '''
+    def _fit_tf_tuning(self, unit_id, pref_ori, pref_tf):
+
+        """ Performs Gaussian or exponential fit on the temporal frequency tuning curve at the preferred orientation.
+
+        Params:
+        -------
+        unit_id - unique ID for the unit of interest
+        pref_ori - preferred orientation for that cell
+        pref_tf - preferred temporal frequency for that cell
+
+        Returns:
+        -------
+        fit_tf_ind - metric
+        fit_tf - metric
+        tf_low_cutoff - metric
+        tf_high_cutoff - metric
+        """
+
+        ### NEEDS TO BE UPDATED FOR NEW ADAPTER
+
+        tf_tuning = self.response_events[pref_ori, 1:, nc, 0]
+        fit_tf_ind = np.NaN
+        fit_tf = np.NaN
+        tf_low_cutoff = np.NaN
+        tf_high_cutoff = np.NaN
+        if pref_tf in range(1, 4):
+            try:
+                popt, pcov = curve_fit(gauss_function, range(5), tf_tuning, p0=[np.amax(tf_tuning), pref_tf, 1.],
+                                       maxfev=2000)
+                tf_prediction = gauss_function(np.arange(0., 4.1, 0.1), *popt)
+                fit_tf_ind = popt[1]
+                fit_tf = np.power(2, popt[1])
+                low_cut_ind = np.abs(tf_prediction - (tf_prediction.max() / 2.))[:tf_prediction.argmax()].argmin()
+                high_cut_ind = np.abs(tf_prediction - (tf_prediction.max() / 2.))[
+                               tf_prediction.argmax():].argmin() + tf_prediction.argmax()
+                if low_cut_ind > 0:
+                    low_cutoff = np.arange(0, 4.1, 0.1)[low_cut_ind]
+                    tf_low_cutoff = np.power(2, low_cutoff)
+                elif high_cut_ind < 49:
+                    high_cutoff = np.arange(0, 4.1, 0.1)[high_cut_ind]
+                    tf_high_cutoff = np.power(2, high_cutoff)
+            except Exception:
+                pass
+        else:
+            fit_tf_ind = pref_tf
+            fit_tf = self.tfvals[pref_tf]
+            try:
+                popt, pcov = curve_fit(exp_function, range(5), tf_tuning,
+                                       p0=[np.amax(tf_tuning), 2., np.amin(tf_tuning)], maxfev=2000)
+                tf_prediction = exp_function(np.arange(0., 4.1, 0.1), *popt)
+                if pref_tf == 0:
+                    high_cut_ind = np.abs(tf_prediction - (tf_prediction.max() / 2.))[
+                                   tf_prediction.argmax():].argmin() + tf_prediction.argmax()
+                    high_cutoff = np.arange(0, 4.1, 0.1)[high_cut_ind]
+                    tf_high_cutoff = np.power(2, high_cutoff)
+                else:
+                    low_cut_ind = np.abs(tf_prediction - (tf_prediction.max() / 2.))[
+                                  :tf_prediction.argmax()].argmin()
+                    low_cutoff = np.arange(0, 4.1, 0.1)[low_cut_ind]
+                    tf_low_cutoff = np.power(2, low_cutoff)
+            except Exception:
+                pass
+        return fit_tf_ind, fit_tf, tf_low_cutoff, tf_high_cutoff
+    '''
     ## VISUALIZATION ##
 
     def plot_raster(self, stimulus_condition_id, unit_id):
@@ -517,7 +645,6 @@ def c50(x,y):
         
     return c50
 
-
 def f1_f0(arr, tf, trial_duration):
 
     """
@@ -570,3 +697,4 @@ def modulation_index(response, tf, sample_rate):
     MI = abs((psd[tf_index] - np.mean(psd))/np.sqrt(np.mean(psd**2)-np.mean(psd)**2))
 
     return MI
+

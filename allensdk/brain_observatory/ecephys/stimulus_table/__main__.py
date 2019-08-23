@@ -16,7 +16,7 @@ from allensdk.brain_observatory.ecephys.file_io.stim_file import (
 from . import ephys_pre_spikes
 from . import naming_utilities
 from . import output_validation
-from ._schemas import InputParameters, OutputParameters
+from ._schemas import InputParameters, OutputSchema
 
 
 def build_stimulus_table(
@@ -77,7 +77,7 @@ def build_stimulus_table(
     stim_table_full = naming_utilities.map_stimulus_names(
         stim_table_full, stimulus_name_map
     )
-    stim_table_full.rename(columns=column_name_map, inplace=True)
+    stim_table_full = naming_utilities.map_column_names(stim_table_full, column_name_map)
 
     stim_table_full.to_csv(output_stimulus_table_path, index=False)
     np.save(output_frame_times_path, frame_times, allow_pickle=False)
@@ -90,7 +90,7 @@ def build_stimulus_table(
 def main():
 
     mod = ArgSchemaParserPlus(
-        schema_type=InputParameters, output_schema_type=OutputParameters
+        schema_type=InputParameters, output_schema_type=OutputSchema
     )
     output = build_stimulus_table(**mod.args)
 

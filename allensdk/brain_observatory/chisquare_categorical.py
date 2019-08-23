@@ -5,6 +5,7 @@ Created on Wed Jun  5 15:52:22 2019
 
 @author: dan
 """
+# TODO: Fix header
 
 import numpy as np
 
@@ -32,6 +33,7 @@ def compute_chi_shuffle(mean_sweep_events,
     
     (num_sweeps,num_cells) = np.shape(mean_sweep_events) 
     
+    # TODO: throw error w/ message
     assert len(sweep_categories) == num_sweeps
     
     sweep_categories_dummy = make_category_dummy(sweep_categories)
@@ -42,8 +44,6 @@ def compute_chi_shuffle(mean_sweep_events,
     
     chi_shuffle = np.zeros((num_cells,num_shuffles))
     for ns in range(num_shuffles):
-        #print 'shuffle ' + str(ns+1) + ' of ' + str(num_shuffles)
-        
         shuffle_sweeps = np.random.choice(num_sweeps,size=(num_sweeps,))
         shuffle_sweep_events = mean_sweep_events[shuffle_sweeps]
         
@@ -63,6 +63,7 @@ def stim_table_to_categories(stim_table,
     #   parameters in 'columns' being one category
     # sweeps with non-finite values in ANY column (e.g. np.NaN) are labeled 
     #   as blank sweeps (category = -1)
+    # TODO: Replace with EcephysSession.get_stimulus_conditions
     
     num_sweeps = len(stim_table)
     num_params = len(columns)

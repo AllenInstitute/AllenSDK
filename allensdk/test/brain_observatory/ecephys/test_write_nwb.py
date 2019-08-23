@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 import logging
 
@@ -55,14 +55,16 @@ def raw_running_data():
 
 
 def test_roundtrip_metadata(roundtripper):
+    dt = datetime.now(timezone.utc)
     nwbfile = pynwb.NWBFile(
         session_description='EcephysSession',
         identifier='{}'.format(12345),
-        session_start_time=datetime.now()
+        session_start_time=dt
     )
 
     api = roundtripper(nwbfile, EcephysNwbSessionApi)
     assert 12345 == api.get_ecephys_session_id()
+    assert dt == api.get_session_start_time()
 
 
 def test_add_stimulus_presentations(nwbfile, stimulus_presentations, roundtripper):
@@ -75,19 +77,49 @@ def test_add_stimulus_presentations(nwbfile, stimulus_presentations, roundtrippe
     pd.testing.assert_frame_equal(stimulus_presentations, obtained_stimulus_table, check_dtype=False)
     
 
-@pytest.mark.parametrize('roundtrip', [True, False])
-@pytest.mark.parametrize('pid,desc,loc, expected', [
-    [12, 'a probe', 'probeA', pd.DataFrame({'description': ['a probe'], 'location': ['probeA'], 'sampling_rate': [30000.0]}, index=pd.Index([12], name='id'))]
-])
-def test_add_probe_to_nwbfile(nwbfile, roundtripper, roundtrip, pid, desc, loc, expected):
+def test_add_optotagging_table_to_nwbfile(nwbfile, roundtripper):
+    opto_table = pd.DataFrame({
+        "start_time": [0., 1., 2., 3.],
+        "stop_time": [0.5, 1.5, 2.5, 3.5],
+        "level": [10., 9., 8., 7.],
+        "condition": ["a", "a", "b", "c"]
+    })
+    opto_table["duration"] = opto_table["stop_time"] - opto_table["start_time"]
 
-    nwbfile, _, _ = write_nwb.add_probe_to_nwbfile(nwbfile, pid, description=desc, location=loc)
+    nwbfile = write_nwb.add_optotagging_table_to_nwbfile(nwbfile, opto_table)
+    api = roundtripper(nwbfile, EcephysNwbSessionApi)
+
+    obtained = api.get_optogenetic_stimulation()
+    pd.set_option("display.max_columns", None)
+    print(obtained)
+    
+    pd.testing.assert_frame_equal(opto_table, obtained, check_like=True)
+
+
+@pytest.mark.parametrize('roundtrip', [True, False])
+@pytest.mark.parametrize('pid,desc,srate,lfp_srate,expected', [
+    [
+        12, 
+        'a probe', 
+        30000.0,
+        2500.0, 
+        pd.DataFrame({
+            'description': ['a probe'], 
+            'sampling_rate': [30000.0], 
+            "lfp_sampling_rate": [2500.0],
+            "location": [""]
+        }, index=pd.Index([12], name='id'))
+    ]
+])
+def test_add_probe_to_nwbfile(nwbfile, roundtripper, roundtrip, pid, desc, srate, lfp_srate, expected):
+
+    nwbfile, _, _ = write_nwb.add_probe_to_nwbfile(nwbfile, pid, description=desc, sampling_rate=srate, lfp_sampling_rate=lfp_srate)
     if roundtrip:
         obt = roundtripper(nwbfile, EcephysNwbSessionApi)
     else:
         obt = EcephysNwbSessionApi.from_nwbfile(nwbfile)
 
-    pd.testing.assert_frame_equal(expected, obt.get_probes())
+    pd.testing.assert_frame_equal(expected, obt.get_probes(), check_like=True)
 
 
 def test_prepare_probewise_channel_table():
@@ -179,7 +211,6 @@ def test_add_raw_running_Data_to_nwbfile(nwbfile, raw_running_data, roundtripper
 
     obtained = api_obt.get_raw_running_data()
 
-
     expected = raw_running_data.rename(columns={"dx": "net_rotation", "vsig": "signal_voltage", "vin": "supply_voltage"})
     pd.testing.assert_frame_equal(expected, obtained, check_like=True)
 
@@ -255,6 +286,8 @@ def test_write_probe_lfp_file(tmpdir_factory, lfp_data):
     probe_data = {
         "id": 12345,
         "name": "probeA",
+        "sampling_rate": 29.0,
+        "lfp_sampling_rate": 10.0,
         "channels":  [
             {
                 'id': 0,

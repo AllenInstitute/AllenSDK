@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 from scipy.optimize import curve_fit
 from functools import partial
+import logging
 
 import matplotlib.pyplot as plt
 
@@ -12,6 +13,10 @@ from ...circle_plots import FanPlotter
 
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
+
+
+logger = logging.getLogger(__name__)
+
 
 class StaticGratings(StimulusAnalysis):
     """
@@ -33,8 +38,8 @@ class StaticGratings(StimulusAnalysis):
 
     """
 
-    def __init__(self, ecephys_session, **kwargs):
-        super(StaticGratings, self).__init__(ecephys_session, **kwargs)
+    def __init__(self, ecephys_session, col_ori='orientation', col_sf='spatial_frequency', col_phase='phase', trial_duration=0.25, **kwargs):
+        super(StaticGratings, self).__init__(ecephys_session, trial_duration=trial_duration, **kwargs)
         self._orivals = None
         self._number_ori = None
         self._sfvals = None
@@ -46,17 +51,18 @@ class StaticGratings(StimulusAnalysis):
 
         self._metrics = None
 
-        self._col_ori = 'ori'
-        self._col_sf = 'sf'
-        self._col_phase = 'phase'
-        self._trial_duration = 0.25
-        self._module_name = 'Static Gratings'
+        self._col_ori = col_ori
+        self._col_sf = col_sf
+        self._col_phase = col_phase
+        self._trial_duration = trial_duration
+        self._module_name = 'Static Gratings'  # TODO: module_name should be a static class variable
 
         if self._params is not None:
-            self._params = self._params['static_gratings']
-            self._stimulus_key = self._params['stimulus_key']
+            self._params = self._params.get('static_gratings', {})
+            self._stimulus_key = self._params.get('stimulus_key', None)  # Overwrites parent value with argvars
         else:
-            self._stimulus_key = 'static_gratings'
+            self._params = {}
+
 
     @property
     def orivals(self):
@@ -130,6 +136,8 @@ class StaticGratings(StimulusAnalysis):
     def metrics(self):
         if self._metrics is None:
 
+            logger.info('Calculating metrics for ' + self.name)
+            
             unit_ids = self.unit_ids
             
             metrics_df = self.empty_metrics_table()
@@ -154,10 +162,13 @@ class StaticGratings(StimulusAnalysis):
 
         return self._metrics
 
+    @property
+    def known_stimulus_keys(self):
+        return ['static_gratings']
+
     def _get_stim_table_stats(self):
 
         """ Extract orientations, spatial frequencies, and phases from the stimulus table """
-
         self._orivals = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_ori] != 'null'][self._col_ori].unique())
         self._number_ori = len(self._orivals)
 
@@ -256,14 +267,14 @@ class StaticGratings(StimulusAnalysis):
         """
 
         orivals_rad = deg2rad(self.orivals).astype('complex128')
-        
+
         condition_inds = self.stimulus_conditions[
                 (self.stimulus_conditions[self._col_sf] == pref_sf) & \
                 (self.stimulus_conditions[self._col_phase] == pref_phase)
                 ].index.values
         df = self.conditionwise_statistics.loc[unit_id].loc[condition_inds]
-        df = df.assign(Ori = self.stimulus_conditions.loc[df.index.values][self._col_ori])
-        df = df.sort_values(by=['Ori'])
+        df = df.assign(ori=self.stimulus_conditions.loc[df.index.values][self._col_ori])
+        df = df.sort_values(by=['ori'])
 
         tuning = np.array(df['spike_mean'].values)
 
