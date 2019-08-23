@@ -46,3 +46,6 @@ class EcephysSessionApi:
 
     def get_lfp(self, probe_id: int) -> xr.DataArray:
         raise NotImplementedError
+
+    def get_optogenetic_stimulation(self) -> pd.DataFrame:
+        raise NotImplementedError

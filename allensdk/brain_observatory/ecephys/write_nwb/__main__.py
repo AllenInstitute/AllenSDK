@@ -17,6 +17,7 @@ from ._schemas import InputSchema, OutputSchema
 from allensdk.brain_observatory.nwb import (
     add_stimulus_presentations,
     add_stimulus_timestamps,
+    setup_table_for_epochs
 )
 from allensdk.brain_observatory.argschema_utilities import (
     write_or_print_outputs, optional_lims_inputs
@@ -564,6 +565,25 @@ def add_probewise_data_to_nwbfile(nwbfile, probes):
     return nwbfile
 
 
+def add_optotagging_table_to_nwbfile(nwbfile, optotagging_table, tag="optical_stimulation"):
+    opto_ts = pynwb.base.TimeSeries(
+        name="optotagging",
+        timestamps=optotagging_table["start_time"].values,
+        data=optotagging_table["duration"].values
+    )
+
+    opto_mod = pynwb.ProcessingModule("optotagging", "optogenetic stimulution data")
+    opto_mod.add_data_interface(opto_ts)
+    nwbfile.add_processing_module(opto_mod)
+
+    optotagging_table = setup_table_for_epochs(optotagging_table, opto_ts, tag)
+    container = pynwb.epoch.TimeIntervals.from_dataframe(optotagging_table, "optogenetic_stimuluation")
+    opto_mod.add_data_interface(container)
+
+    return nwbfile
+
+
+
 def write_ecephys_nwb(
     output_path, 
     session_id, session_start_time, 
@@ -571,6 +591,7 @@ def write_ecephys_nwb(
     probes, 
     running_speed_path,
     pool_size,
+    optotagging_table_path=None,
     **kwargs
 ):
 
@@ -583,6 +604,10 @@ def write_ecephys_nwb(
     stimulus_table = read_stimulus_table(stimulus_table_path)
     nwbfile = add_stimulus_timestamps(nwbfile, stimulus_table['start_time'].values) # TODO: patch until full timestamps are output by stim table module
     nwbfile = add_stimulus_presentations(nwbfile, stimulus_table)
+
+    if optotagging_table_path is not None:
+        optotagging_table = pd.read_csv(optotagging_table_path)
+        nwbfile = add_optotagging_table_to_nwbfile(nwbfile, optotagging_table)
 
     nwbfile = add_probewise_data_to_nwbfile(nwbfile, probes)
 
