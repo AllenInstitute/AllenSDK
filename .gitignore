@@ -31,3 +31,4 @@ debug.log
 .mypy_cache/
 /cell_types/
 example_ecephys_project_cache/
+.DS_Store
