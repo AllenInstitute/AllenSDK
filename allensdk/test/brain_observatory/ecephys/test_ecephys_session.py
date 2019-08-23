@@ -333,10 +333,7 @@ def test_filter_owned_df_scalar(just_stimulus_table_api):
     session = EcephysSession(api=just_stimulus_table_api)
     ids = 3
 
-    with pytest.warns(UserWarning) as w:
-        obtained = session._filter_owned_df('stimulus_presentations', ids)
-
-    assert w[-1].message.args[0] == 'a scalar (3) was provided as ids, filtering to a single row of stimulus_presentations.'
+    obtained = session._filter_owned_df('stimulus_presentations', ids)
     assert obtained['phase'].values[0] == 180
 
 
