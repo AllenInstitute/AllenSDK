@@ -6,8 +6,8 @@ import behavior_project_cache as bpc
 
 # python_file = r"/allen/programs/braintv/workgroups/nc-ophys/nick.ponvert/src/AllenSDK/allensdk/brain_observatory/behavior/swdb/summary_figures.py"
 
-#  python_file = r"/home/marinag/AllenSDK/allensdk/brain_observatory/behavior/swdb/summary_figures.py"
-python_file = r"/home/nick.ponvert/src/AllenSDK/allensdk/brain_observatory/behavior/swdb/summary_figures.py"
+python_file = r"/home/marinag/AllenSDK/allensdk/brain_observatory/behavior/swdb/summary_figures.py"
+# python_file = r"/home/nick.ponvert/src/AllenSDK/allensdk/brain_observatory/behavior/swdb/summary_figures.py"
 
 jobdir = '/allen/programs/braintv/workgroups/nc-ophys/nick.ponvert/cluster_jobs/visb_swdb_summary_figures'
 
@@ -18,10 +18,10 @@ job_settings = {'queue': 'braintv',
                 'jobdir': jobdir,
                 }
 
-cache_json = {'manifest_path': '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/visual_behavior_data_manifest.csv',
-              'nwb_base_dir': '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/nwb_files',
-              'analysis_files_base_dir': '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/analysis_files',
-              'analysis_files_metadata_path': '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/analysis_files_metadata.json',
+cache_json = {'manifest_path': '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/cache_20190813/visual_behavior_data_manifest.csv',
+              'nwb_base_dir': '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/cache_20190813/nwb_files',
+              'analysis_files_base_dir': '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/cache_20190813/analysis_files',
+              'analysis_files_metadata_path': '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/cache_20190813/analysis_files_metadata.json',
               }
 
 cache = bpc.BehaviorProjectCache(cache_json)

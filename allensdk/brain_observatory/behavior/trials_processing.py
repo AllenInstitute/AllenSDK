@@ -615,16 +615,14 @@ def find_licks(reward_times, licks, window=3.5):
         return tr_licks['time'].values
 
 
-def calculate_reward_rate(response_latency=None, starttime=None, window=1.0, trial_window=25, initial_trials=10):
+def calculate_reward_rate(response_latency=None, starttime=None, window=0.75, trial_window=25, initial_trials=10):
     assert len(response_latency) == len(starttime)
 
     df = pd.DataFrame({'response_latency': response_latency, 'starttime':starttime})
 
-    # written by Dan Denman (stolen from http://stash.corp.alleninstitute.org/users/danield/repos/djd/browse/calculate_reward_rate.py)
-    # add a column called reward_rate to the input dataframe
+    # adds a column called reward_rate to the input dataframe
     # the reward_rate column contains a rolling average of rewards/min
     # window sets the window in which a response is considered correct, so a window of 1.0 means licks before 1.0 second are considered correct
-    # remove_aborted flag needs work, don't use it for now
     # Reorganized into this unit-testable form by Nick Cain April 25 2019
 
     reward_rate = np.zeros(len(df))

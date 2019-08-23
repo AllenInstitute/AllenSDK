@@ -158,6 +158,7 @@ class EcephysSession(LazyPropertyMixin):
         self.running_speed= self.LazyProperty(self.api.get_running_speed)
         self.mean_waveforms = self.LazyProperty(self.api.get_mean_waveforms, wrappers=[self._build_mean_waveforms])
         self.spike_times = self.LazyProperty(self.api.get_spike_times, wrappers=[self._build_spike_times])
+        self.optogenetic_stimulation = self.LazyProperty(self.api.get_optogenetic_stimulation)
 
         self.probes = self.LazyProperty(self.api.get_probes)
         self.channels = self.LazyProperty(self.api.get_channels)
@@ -580,7 +581,7 @@ class EcephysSession(LazyPropertyMixin):
         """
         structure_id_key = "manual_structure_id"
         structure_label_key = "manual_structure_acronym"
-        channel_ids.sort()
+        np.array(channel_ids).sort()
         table = self.channels.loc[channel_ids]
 
         unique_probes = table["probe_id"].unique()
