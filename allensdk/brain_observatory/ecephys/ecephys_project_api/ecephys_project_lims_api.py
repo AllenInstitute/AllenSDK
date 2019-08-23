@@ -326,7 +326,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
                     )
                     join well_known_file_types wkft on wkft.id = wkf.well_known_file_type_id
                     where wkft.name = 'EcephysNwb'
-                ) nwb on es.id = nwb.ecephy {{pm.optional_contains('es.workflow_state', workflow_states, True) -}}s_session_id
+                ) nwb on es.id = nwb.ecephys_session_id
                 left join (
                     select es.id as ecephys_session_id,
                     array_agg (st.id) as structure_ids,
