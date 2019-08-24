@@ -44,7 +44,7 @@ def test_metrics(spikes_nwb, expected_csv, analysis_params, units_filter, skip_c
     analysis_params = analysis_params or {}
     session_api = EcephysNwbSessionApi(spikes_nwb, amplitude_cutoff_maximum=None, presence_ratio_minimum=None,
                                        isi_violations_maximum=None)
-    analysis = static_gratings.StaticGratings(session_api, filter=units_filter, **analysis_params)
+    analysis = static_gratings.StaticGratings(session_api, filter=units_filter, psth_resolution=0.002, **analysis_params)
     # Make sure some of the non-metrics structures are returning valid(ish) tables
     assert(len(analysis.stim_table) > 1)
     assert(set(analysis.unit_ids) == set(units_filter))
@@ -67,7 +67,6 @@ def test_metrics(spikes_nwb, expected_csv, analysis_params, units_filter, skip_c
     assert(np.allclose(actual_data['pref_ori_sg'].astype(np.float), expected_data['pref_ori_sg'], equal_nan=True))
     assert(np.allclose(actual_data['pref_phase_sg'].astype(np.float), expected_data['pref_phase_sg'], equal_nan=True))
     assert(np.allclose(actual_data['g_osi_sg'].astype(np.float), expected_data['g_osi_sg'], equal_nan=True))
-    assert(np.allclose(actual_data['pref_sf_sg'].astype(np.float), expected_data['pref_sf_sg'], equal_nan=True))
     assert(np.allclose(actual_data['time_to_peak_sg'].astype(np.float), expected_data['time_to_peak_sg'],
                        equal_nan=True))
     assert(np.allclose(actual_data['firing_rate_sg'].astype(np.float), expected_data['firing_rate_sg'], equal_nan=True))

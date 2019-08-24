@@ -3,7 +3,9 @@ import numpy as np
 import pandas as pd
 from mock import MagicMock
 
+from allensdk.brain_observatory.ecephys.ecephys_session_api import EcephysSessionApi
 from allensdk.brain_observatory.ecephys.stimulus_analysis import stimulus_analysis as sa
+from allensdk.brain_observatory.ecephys.stimulus_analysis.stimulus_analysis import StimulusAnalysis, running_modulation, lifetime_sparseness, fano_factor, overall_firing_rate
 from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
 
 
@@ -87,6 +89,269 @@ def test_get_osi(responses, ori_vals, expected):
                          ])
 def test_get_running_modulation(mean_sweep_runs, mean_sweep_stats, expected):
     assert(np.allclose(sa.get_running_modulation(mean_sweep_runs, mean_sweep_stats), expected, equal_nan=True))
+
+
+
+def mock_ecephys_api():
+    class EcephysSpikeTimesApi(EcephysSessionApi):
+        def get_spike_times(self):
+            return {
+                0: np.array([1, 2, 3, 4]),
+                1: np.array([2.5]),
+                2: np.array([1.01, 1.03, 1.02]),
+                3: np.array([]),
+                4: np.array([0.01, 1.7, 2.13, 3.19, 4.25]),
+                5: np.array([1.5, 3.0, 4.5])
+            }
+
+        def get_channels(self):
+            return pd.DataFrame({
+                'local_index': [0, 1, 2],
+                'probe_horizontal_position': [5, 10, 15],
+                'probe_id': [0, 0, 1],
+                'probe_vertical_position': [10, 22, 33],
+                'valid_data': [False, True, True]
+            }, index=pd.Index(name='channel_id', data=[0, 1, 2]))
+
+        def get_units(self):
+            udf = pd.DataFrame({
+                'firing_rate': np.linspace(1, 3, 4),
+                'isi_violations': [40, 0.5, 0.1, 0.2],
+                'local_index': [0, 0, 1, 1],
+                'peak_channel_id': [0, 2, 1, 1],
+                'quality': ['good', 'good', 'good', 'bad'],
+                #'snr': [0.1, 1.4, 10.0, 0.3]
+            }, index=pd.Index(name='unit_id', data=np.arange(4)[::-1]))
+            return udf
+
+        def get_probes(self):
+            return pd.DataFrame({
+                'description': ['probeA', 'probeB'],
+                'location': ['VISp', 'VISam'],
+                'sampling_rate': [30000.0, 30000.0]
+            }, index=pd.Index(name='id', data=[0, 1]))
+
+        def get_stimulus_presentations(self):
+            return pd.DataFrame({
+                'start_time': np.linspace(0.0, 4.5, 10, endpoint=True),
+                'stop_time': np.linspace(0.5, 5.0, 10, endpoint=True),
+                'stimulus_name': ['spontaneous'] + ['s0']*6 + ['spontaneous'] + ['s1']*2,
+                'stimulus_block': [0] + [1]*6 + [0] + [2]*2,
+                'duration': 0.5,
+                #'TF': np.empty(4) * np.nan,
+                #'SF': np.empty(4) * np.nan,
+                #'Ori': np.empty(4) * np.nan,
+                #'Contrast': np.empty(4) * np.nan,
+                #'Pos_x': np.empty(4) * np.nan,
+                #'Pos_y': np.empty(4) * np.nan,
+                'stimulus_index': [0] + [1]*6 + [0] + [2]*2,
+                'conditions': [0, 0, 0, 0, 1, 1, 1, 0, 1, 1]  # generic stimulus condition
+                #'conditions': np.arange(10)
+                #'Color': np.arange(4) * 5.5,
+                #'Image': np.empty(4) * np.nan,
+                #'Phase': np.linspace(0, 180, 4),
+            }, index=pd.Index(name='id', data=np.arange(10)))
+
+        def get_running_speed(self):
+            return pd.DataFrame({
+                "start_time": np.linspace(0.0, 9.9, 100),
+                "end_time": np.linspace(0.1, 10.0, 100),
+                "velocity": np.linspace(-0.1, 11.0, 100)
+            })
+
+    return EcephysSpikeTimesApi()
+
+def test_unit_ids():
+    """"""
+    session = EcephysSession(api=mock_ecephys_api())
+    stim_analysis = StimulusAnalysis(ecephys_session=session)
+    print(stim_analysis.unit_ids)
+    print(stim_analysis.unit_count)
+
+def test_unit_ids_filter_by_id():
+    """"""
+    session = EcephysSession(api=mock_ecephys_api())
+    stim_analysis = StimulusAnalysis(ecephys_session=session, filter=[3, 2, 1])
+    print(stim_analysis.unit_ids)
+    print(stim_analysis.unit_count)
+
+    stim_analysis = StimulusAnalysis(ecephys_session=session, filter={'unit_id': [3, 0]})
+    print(stim_analysis.unit_ids)
+    print(stim_analysis.unit_count)
+
+    # TODO: Write test that will fail if bad ids are used
+
+def test_unit_ids_filtered():
+    #
+    session = EcephysSession(api=mock_ecephys_api())
+    stim_analysis = StimulusAnalysis(ecephys_session=session, filter={'location': 'VISp'})
+    print(stim_analysis.unit_ids)
+    print(stim_analysis.unit_count)
+
+    stim_analysis = StimulusAnalysis(ecephys_session=session, filter={'location': 'VISp', 'quality': 'good'})
+    print(stim_analysis.unit_ids)
+    print(stim_analysis.unit_count)
+
+    # Bad
+    stim_analysis = StimulusAnalysis(ecephys_session=session, filter={'location': 'pSIV'})
+    print(stim_analysis.unit_ids)
+    print(stim_analysis.unit_count)
+
+def test_filtered_unit_ids_nomatches():
+    session = EcephysSession(api=mock_ecephys_api())
+    #print(session.units)
+    stim_analysis = StimulusAnalysis(ecephys_session=session, filter={'location': 'invalid'})
+    print(stim_analysis.unit_ids)
+    print(stim_analysis.unit_count)
+
+def test_stim_table():
+    session = EcephysSession(api=mock_ecephys_api())
+    stim_analysis = StimulusAnalysis(ecephys_session=session, stimulus_key='a')
+    print(stim_analysis.stim_table)
+    print(len(stim_analysis.stim_table))
+    print(stim_analysis.total_presentations)
+
+
+    # TODO: Write test that will fail with bad stimulus_key
+    #stim_analysis = StimulusAnalysis(ecephys_session=session, stimulus_key='b')
+    #print(stim_analysis.stim_table)
+
+    # TODO: Write test to check sponateous stim table
+    # print(stim_analysis.stim_table_spontaneous)
+
+def test_conditionwise_psth():
+    session = EcephysSession(api=mock_ecephys_api())
+    stim_analysis = StimulusAnalysis(ecephys_session=session, stimulus_key='s0', trial_duration=0.5, psth_resultion=0.02)
+    print(stim_analysis.conditionwise_psth.shape)
+    print(stim_analysis.conditionwise_psth)
+
+    # TODO: Write special case where each stimulus_condition_id is unique
+    #print(stim_analysis.conditionwise_psth[{'unit_id': 3}])
+
+def test_conditionwise_statistics():
+    session = EcephysSession(api=mock_ecephys_api())
+    stim_analysis = StimulusAnalysis(ecephys_session=session, stimulus_key='s0')
+    print(stim_analysis.conditionwise_statistics)
+
+def test_presentationwise_spike_times():
+    session = EcephysSession(api=mock_ecephys_api())
+    stim_analysis = StimulusAnalysis(ecephys_session=session, stimulus_key='s0')
+    print(stim_analysis.presentationwise_spike_times)
+
+def test_presentationwise_statistics():
+    session = EcephysSession(api=mock_ecephys_api())
+    stim_analysis = StimulusAnalysis(ecephys_session=session, stimulus_key='s0', trial_duration=0.5)
+    print(stim_analysis.presentationwise_statistics)
+
+def test_stimulus_conditions():
+    session = EcephysSession(api=mock_ecephys_api())
+    stim_analysis = StimulusAnalysis(ecephys_session=session, stimulus_key='s0', trial_duration=0.5)
+    print(stim_analysis.stimulus_conditions)
+
+def test_running_speed():
+    session = EcephysSession(api=mock_ecephys_api())
+    stim_analysis = StimulusAnalysis(ecephys_session=session, stimulus_key='s0')
+    print(stim_analysis.running_speed)
+
+
+def test_spikes():
+    session = EcephysSession(api=mock_ecephys_api())
+    stim_analysis = StimulusAnalysis(ecephys_session=session, stimulus_key='s0')
+    print(stim_analysis.spikes)
+
+def test_spikes_filtered():
+    session = EcephysSession(api=mock_ecephys_api())
+    stim_analysis = StimulusAnalysis(ecephys_session=session, stimulus_key='s0', filter=[0, 2])
+    print(stim_analysis.spikes)
+
+def test_stim_table_spontaneous():
+    # By default table should be empty because non of the stimulus are above the duration threshold
+    session = EcephysSession(api=mock_ecephys_api())
+    stim_analysis = StimulusAnalysis(ecephys_session=session, stimulus_key='s0')
+    print(stim_analysis.stim_table_spontaneous)
+
+    session = EcephysSession(api=mock_ecephys_api())
+    stim_analysis = StimulusAnalysis(ecephys_session=session, stimulus_key='s0', spontaneous_threshold=0.49)
+    print(stim_analysis.stim_table_spontaneous)
+
+def test_get_preferred_condition():
+    session = EcephysSession(api=mock_ecephys_api())
+    stim_analysis = StimulusAnalysis(ecephys_session=session, stimulus_key='s0')
+    print(stim_analysis._get_preferred_condition(3))
+
+"""
+def test_running_modulation():
+    session = EcephysSession(api=mock_ecephys_api())
+    stim_analysis = StimulusAnalysis(ecephys_session=session, stimulus_key='s0', trial_duration=0.5, threshold=0.01)
+    print(stim_analysis.get_running_modulation(1, stim_analysis._get_preferred_condition(1)))
+"""
+
+def test_running_modulation(spike_counts, running_speeds, speed_threshold):
+    print(running_modulation(spike_counts, running_speeds, speed_threshold))
+
+def test_lifetime_sparseness(responses):
+    print(lifetime_sparseness(responses))
+
+def test_fano_factor(spike_counts):
+    print(fano_factor(spike_counts))
+
+def test_get_time_to_peak():
+    session = EcephysSession(api=mock_ecephys_api())
+    stim_analysis = StimulusAnalysis(ecephys_session=session, stimulus_key='s0', trial_duration=0.5)
+    print(stim_analysis._get_time_to_peak(1, stim_analysis._get_preferred_condition(1)))
+
+def test_overall_firing_rate(start_times, stop_times, spike_times):
+    print(overall_firing_rate(start_times, stop_times, spike_times))
+
+## test_unit_ids()
+## test_unit_ids_filter_by_id()
+## test_unit_ids_filtered()
+## test_stim_table()
+## test_conditionwise_psth()
+## test_conditionwise_statistics()
+## test_presentationwise_spike_times()
+## test_presentationwise_statistics()
+## test_stimulus_conditions()
+## test_running_speed()
+## test_spikes()
+## test_spikes_filtered()
+## test_stim_table_spontaneous()
+## test_get_preferred_condition()
+
+## Doesn't require MockApi
+## test_running_modulation(spike_counts=np.zeros(10), running_speeds=np.zeros(1), speed_threshold=1.0)  # Input error, should return nan
+## test_running_modulation(spike_counts=np.zeros(5), running_speeds=np.full(5, 2.0), speed_threshold=1.0)  # returns Nan, always running
+## test_running_modulation(spike_counts=np.zeros(5), running_speeds=np.full(5, 2.0), speed_threshold=2.1) # returns Nan, always stationary
+## test_running_modulation(spike_counts=np.zeros(5), running_speeds=np.array([0.0, 0.0, 2.0, 2.5, 3.0]), speed_threshold=1.0) # No firing, return Nans
+## test_running_modulation(spike_counts=np.ones(5), running_speeds=np.array([0.0, 0.0, 2.0, 2.0, 2.0]), speed_threshold=1.0)  # always the same fr, pval is Nan but run_mod is 0.0
+## test_running_modulation(spike_counts=np.array([3.0, 3.0, 1.5, 1.5, 0.9]), running_speeds=np.array([0.0, 0.0, 2.0, 2.5, 3.0]), speed_threshold=1.0) # (0.013559949584378913, -0.5666666666666667)
+## test_running_modulation(spike_counts=np.array([3.0, 3.0, 1.5, 1.5, 1.5]), running_speeds=np.array([0.0, 0.0, 2.0, 2.5, 3.0]), speed_threshold=1.0)  # (0.0, -0.5)
+## test_running_modulation(spike_counts=np.array([3.0, 3.0, 1.5, 5.5, 2.5]), running_speeds=np.array([0.0, 0.0, 2.0, 2.5, 3.0]), speed_threshold=1.0)  # (0.9024099927051468, 0.052631578947368376)
+## test_running_modulation(spike_counts=np.array([0.0, 0.0, 4.0, 4.0]), running_speeds=np.array([0.0, 0.0, 2.5, 3.0]), speed_threshold=1.0)  # (0.0, 1.0)
+
+## Doesn't require MockApi
+## test_lifetime_sparseness(np.array([1.0]))  # returns nan
+## test_lifetime_sparseness(np.full(20, 3.2))  # always the same, sparsness is 0.0
+## test_lifetime_sparseness(np.array([10.0, 0.0, 0.0, 0.0, 0.0]))  # spareness should be 1.0
+## test_lifetime_sparseness(np.array(np.array([2.24, 3.6, 0.8, 2.4, 3.52, 5.68, 8.96, 0.0])))  # 0.43500091849856115
+
+## Doesn't require MockApi
+## test_fano_factor(np.zeros(10))  # mean 0.0 leads to Nan
+## test_fano_factor(np.array([-1.5, 1.5]))  # mean 0
+## test_fano_factor(np.ones(5))  # no variance
+## test_fano_factor(np.array([1.2, 20.0, 0.0, 36.2, 0.6]))  # 17.921379310344832, High variance
+## test_fano_factor(np.array([5.1, 5.3, 5.2, 5.1, 5.2]))  # 0.0010810810810810846, low variance
+
+
+# test_get_time_to_peak()
+
+## Doesn't require MockApi
+## test_overall_firing_rate(np.array([0.0]), np.array([0.0]), np.linspace(0, 10.0, 10))  # nan, total time 0.0
+## test_overall_firing_rate(np.arange(1.0, 3.0), np.arange(0.0, 2.0), np.linspace(0, 10.0, 10))  # nan, total_time negative
+## test_overall_firing_rate(np.arange(1.0, 4.0), np.arange(0.0, 2.0), np.linspace(0, 10.0, 10))  # nan, time lengths don't match
+## test_overall_firing_rate(np.array([0.0]), np.array([1.0]), np.linspace(0, 10.0, 100))  # 10.0 Hz
+## test_overall_firing_rate(np.array([0.0, 9.0]), np.array([1.0, 10.0]), np.linspace(0, 10.0, 101))  # 10.0 Hz, split up into blocks
+exit()
 
 
 if __name__ == '__main__':
