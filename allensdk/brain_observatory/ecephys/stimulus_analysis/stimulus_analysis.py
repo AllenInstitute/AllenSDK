@@ -75,7 +75,6 @@ class StimulusAnalysis(object):
             units_df = self.ecephys_session.units
             if isinstance(self._unit_filter, (list, tuple, np.ndarray, pd.Series)):
                 # If the user passes a list/array of ids
-                # TODO: Check that units are a in the index, same as below
                 units_df = units_df.loc[self._unit_filter]
 
             elif isinstance(self._unit_filter, dict):
@@ -93,7 +92,10 @@ class StimulusAnalysis(object):
                             mask &= units_df[col] == val
                     units_df = units_df[mask]
 
-            # TODO: Raise error if no units are found
+            if units_df is None or units_df.empty:
+                # If not units are found don't proceed.
+                raise Exception('Could not find units for ecephys session.')
+
             self._unit_ids = units_df.index.values
 
         return self._unit_ids
@@ -121,6 +123,7 @@ class StimulusAnalysis(object):
     @property
     def spikes(self):
         """Returns a dictionary of unit_id -> spike-times."""
+        # TODO: This may be unecessary since we already have the presentationwise_spike_times table.
         if self._spikes is None:
             self._spikes = self.ecephys_session.spike_times
             if len(self._spikes) > self.unit_count:
@@ -145,7 +148,7 @@ class StimulusAnalysis(object):
             )
 
             if self._stim_table.empty:
-                raise Exception(f'Could not find stimulus data with presentation name {self._stimulus_key}')
+                raise Exception(f'Could not find stimulus data with "stimulus_key" {self._stimulus_key}')
 
         return self._stim_table
 
@@ -195,6 +198,7 @@ class StimulusAnalysis(object):
     def stim_table_spontaneous(self):
         """Returns a stimulus table with only 'spontaneous' stimulus selected."""
         # Used by sweep_p_events for creating null dist.
+        # TODO: This may not be need anymore? Ask the scientists if sweep_p_events will be required in the future.
         if self._stim_table_spontaneous is None:
             stim_table = self.ecephys_session.get_presentations_for_stimulus(self.known_spontaneous_keys)
             # TODO: If duration does not exists in stim_table create it from stop and start times
@@ -440,15 +444,6 @@ class StimulusAnalysis(object):
 
     def _find_stimuli(self):
         raise NotImplementedError()
-    '''
-    def get_velocity_for_presentation(self, presentation_id):
-        """Computes running velocity for a particular stimulus presentation"""
-
-        indices = (self.ecephys_session.running_speed.start_time >= self.stim_table.loc[presentation_id]['start_time'])\
-           & (self.ecephys_session.running_speed.start_time < self.stim_table.loc[presentation_id]['stop_time'])
-
-        return self.ecephys_session.running_speed[indices]['velocity'].mean()
-    '''
 
     ## Helper functions for calling metrics of individual units. ##
     def _get_preferred_condition(self, unit_id):
@@ -664,6 +659,33 @@ def overall_firing_rate(start_times, stop_times, spike_times):
     return np.sum(spike_times.searchsorted(stop_times) - spike_times.searchsorted(start_times)) / total_time
 
 
+def get_fr(spikes, num_timestep_second=30, sweep_length=3.1, filter_width=0.1):
+    """Uses a gaussian convolution to convert the spike-times into a contiguous firing-rate series.
+
+    Parameters
+    ----------
+    spikes : array
+        An array of spike times (shifted to start at 0)
+    num_timestep_second : float
+        The sampling frequency
+    sweep_length : float
+        The lenght of the returned array
+    filter_width: float
+        The window of the gaussian method
+
+    Returns
+    -------
+    firing_rate : float
+        A linear-spaced array of length num_timestep_second*sweep_length of the smoothed firing rates series.
+    """
+    spikes = spikes.astype(float)
+    spike_train = np.zeros((int(sweep_length*num_timestep_second)))
+    spike_train[(spikes*num_timestep_second).astype(int)] = 1
+    filter_width = int(filter_width*num_timestep_second)
+    fr = ndi.gaussian_filter(spike_train, filter_width)
+    return fr
+
+
 def reliability(unit_sweeps, padding=1.0, num_timestep_second=30, filter_width=0.1, window_beg=0, window_end=None):
     """Computes the trial-to-trial reliability for a set of sweeps for a given cell
 
@@ -691,53 +713,54 @@ def reliability(unit_sweeps, padding=1.0, num_timestep_second=30, filter_width=0
     return np.nanmean(upper)
 
 
-
-
-def get_fr(spikes, num_timestep_second=30, sweep_length=3.1, filter_width=0.1):
-    """Uses a gaussian convolution to convert the spike-times into a contiguous firing-rate series.
-
-    :param spikes: An array of spike times (shifted to start at 0)
-    :param num_timestep_second: The sampling frequency
-    :param sweep_length: The lenght of the returned array
-    :param filter_width: The window of the gaussian method
-    :return: A linear-spaced array of length num_timestep_second*sweep_length of the smoothed firing rates series.
-    """
-    # TODO: figure out the approiate sweep-length from the stimulus
-    spikes = spikes.astype(float)
-    spike_train = np.zeros((int(sweep_length*num_timestep_second)))
-    spike_train[(spikes*num_timestep_second).astype(int)] = 1
-    filter_width = int(filter_width*num_timestep_second)
-    fr = ndi.gaussian_filter(spike_train, filter_width)
-    return fr
-
-
-
-
 def osi(orivals, tuning):
-    """Computes orientation selectivity for a tuning curve 
+    """Computes the orientation selectivity of a cell. The calculation of the orientation is done using the normalized
+    circular variance (CirVar) as described in Ringbach 2002
 
+    Parameters
+    ----------
+    ori_vals : complex array of length N
+         Each value the oriention of the stimulus.
+    tuning : float array of length N
+        Each value the (averaged) response of the cell at a different orientation.
+
+    Returns
+    -------
+    osi : float
+        An N-dimensional array of the circular variance (scalar value, in radians) of the responses.
     """
+    if len(orivals) == 0 or len(orivals) != len(tuning):
+        warnings.warn('orivals and tunings are of different lengths')
+        return np.nan
 
     cv_top = tuning * np.exp(1j * 2 * orivals)
     return np.abs(cv_top.sum()) / tuning.sum()
 
 
 def dsi(orivals, tuning):
-    """Computes direction selectivity for a tuning curve 
+    """Computes the direction selectivity of a cell. See Ringbach 2002, Van Hooser 2014
 
+    Parameters
+    ----------
+    ori_vals : complex array of length N
+         Each value the oriention of the stimulus.
+    tuning : float array of length N
+        Each value the (averaged) response of the cell at a different orientation.
+
+    Returns
+    -------
+    osi : float
+        An N-dimensional array of the circular variance (scalar value, in radians) of the responses.
     """
+    if len(orivals) == 0 or len(orivals) != len(tuning):
+        warnings.warn('orivals and tunings are of different lengths')
+        return np.nan
 
     cv_top = tuning * np.exp(1j * orivals)
     return np.abs(cv_top.sum()) / tuning.sum()
 
 
-
-
-
 def deg2rad(arr):
-
-    """ Converts array-like input from degrees to radians
-    """
-
-    return arr / 180 * np.pi 
-
+    """ Converts array-like input from degrees to radians"""
+    # TODO: Is there any reason not to use np.deg2rad?
+    return arr / 180 * np.pi
