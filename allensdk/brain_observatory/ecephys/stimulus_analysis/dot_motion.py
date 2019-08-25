@@ -107,13 +107,13 @@ class DotMotion(StimulusAnalysis):
 
                 metrics_df['pref_speed_dm'] = [self._get_pref_speed(unit) for unit in unit_ids]
                 metrics_df['pref_dir_dm'] = [self._get_pref_dir(unit) for unit in unit_ids]
-                metrics_df['firing_rate_dm'] = [self.get_overall_firing_rate(unit) for unit in unit_ids]
-                metrics_df['fano_dm'] = [self.get_fano_factor(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+                metrics_df['firing_rate_dm'] = [self._get_overall_firing_rate(unit) for unit in unit_ids]
+                metrics_df['fano_dm'] = [self._get_fano_factor(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
                 metrics_df['speed_tuning_idx_dm'] = [self._get_speed_tuning_index(unit) for unit in unit_ids]
-                metrics_df['reliability_dm'] = [self.get_reliability(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
-                metrics_df['lifetime_sparseness_dm'] = [self.get_lifetime_sparseness(unit) for unit in unit_ids]
+                metrics_df['reliability_dm'] = [self._get_reliability(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
+                metrics_df['lifetime_sparseness_dm'] = [self._get_lifetime_sparseness(unit) for unit in unit_ids]
                 metrics_df.loc[:, ['run_pval_dm', 'run_mod_dm']] = \
-                        [self.get_running_modulation(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+                        [self._get_running_modulation(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
 
             self._metrics = metrics_df
 

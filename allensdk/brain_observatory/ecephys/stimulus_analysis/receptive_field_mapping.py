@@ -157,13 +157,13 @@ class ReceptiveFieldMapping(StimulusAnalysis):
                                    'area_rf',
                                    'p_value_rf',
                                    'on_screen_rf']] = [self._get_rf_stats(unit) for unit in unit_ids]
-                metrics_df['firing_rate_rf'] = [self.get_overall_firing_rate(unit) for unit in unit_ids]
-                metrics_df['fano_rf'] = [self.get_fano_factor(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
-                metrics_df['time_to_peak_rf'] = [self.get_time_to_peak(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
-                metrics_df['reliability_rf'] = [self.get_reliability(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
-                metrics_df['lifetime_sparseness_rf'] = [self.get_lifetime_sparseness(unit) for unit in unit_ids]
+                metrics_df['firing_rate_rf'] = [self._get_overall_firing_rate(unit) for unit in unit_ids]
+                metrics_df['fano_rf'] = [self._get_fano_factor(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
+                metrics_df['time_to_peak_rf'] = [self._get_time_to_peak(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
+                metrics_df['reliability_rf'] = [self._get_reliability(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
+                metrics_df['lifetime_sparseness_rf'] = [self._get_lifetime_sparseness(unit) for unit in unit_ids]
                 metrics_df.loc[:, ['run_pval_rf', 'run_mod_rf']] = \
-                        [self.get_running_modulation(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+                        [self._get_running_modulation(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
 
             self._metrics = metrics_df
 

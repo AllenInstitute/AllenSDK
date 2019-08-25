@@ -76,11 +76,11 @@ class NaturalMovies(StimulusAnalysis):
 
             metrics_df = self.empty_metrics_table()
 
-            metrics_df['fano_nm'] = [self.get_fano_factor(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
-            metrics_df['reliability_nm'] = [self.get_reliability(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
-            metrics_df['firing_rate_nm'] = [self.get_overall_firing_rate(unit) for unit in unit_ids]
-            metrics_df['lifetime_sparseness_nm'] = [self.get_lifetime_sparseness(unit) for unit in unit_ids]
-            run_vals = [self.get_running_modulation(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+            metrics_df['fano_nm'] = [self._get_fano_factor(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
+            metrics_df['reliability_nm'] = [self._get_reliability(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
+            metrics_df['firing_rate_nm'] = [self._get_overall_firing_rate(unit) for unit in unit_ids]
+            metrics_df['lifetime_sparseness_nm'] = [self._get_lifetime_sparseness(unit) for unit in unit_ids]
+            run_vals = [self._get_running_modulation(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
             metrics_df['run_pval_nm'] = [rv[0] for rv in run_vals]
             metrics_df['run_mod_nm'] = [rv[1] for rv in run_vals]
             #metrics_df.loc[:, ['run_pval_nm', 'run_mod_nm']] = \

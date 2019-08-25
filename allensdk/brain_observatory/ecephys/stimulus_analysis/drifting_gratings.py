@@ -39,7 +39,8 @@ class DriftingGratings(StimulusAnalysis):
 
     """
 
-    def __init__(self, ecephys_session, col_ori='orientation', col_tf='temporal_frequency', col_contrast='contrast', trial_duration=2.0, **kwargs):
+    def __init__(self, ecephys_session, col_ori='orientation', col_tf='temporal_frequency', col_contrast='contrast',
+                 trial_duration=2.0, **kwargs):
         super(DriftingGratings, self).__init__(ecephys_session, trial_duration=trial_duration, **kwargs)
 
         self._metrics = None
@@ -178,16 +179,16 @@ class DriftingGratings(StimulusAnalysis):
 
                 metrics_df['pref_ori_dg'] = [self._get_pref_ori(unit) for unit in unit_ids]
                 metrics_df['pref_tf_dg'] = [self._get_pref_tf(unit) for unit in unit_ids]
-                metrics_df['f1_f0_dg'] = [self._get_f1_f0(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+                metrics_df['f1_f0_dg'] = [self._get_f1_f0(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
                 metrics_df['mod_idx_dg'] = [self._get_modulation_index(unit) for unit in unit_ids]
                 metrics_df['g_osi_dg'] = [self._get_selectivity(unit, metrics_df.loc[unit]['pref_tf_dg'], 'osi') for unit in unit_ids]
                 metrics_df['g_dsi_dg'] = [self._get_selectivity(unit, metrics_df.loc[unit]['pref_tf_dg'], 'dsi') for unit in unit_ids]
-                metrics_df['firing_rate_dg'] = [self.get_overall_firing_rate(unit) for unit in unit_ids]
-                metrics_df['reliability_dg'] = [self.get_reliability(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
-                metrics_df['fano_dg'] = [self.get_fano_factor(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
-                metrics_df['lifetime_sparseness_dg'] = [self.get_lifetime_sparseness(unit) for unit in unit_ids]
+                metrics_df['firing_rate_dg'] = [self._get_overall_firing_rate(unit) for unit in unit_ids]
+                metrics_df['reliability_dg'] = [self._get_reliability(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
+                metrics_df['fano_dg'] = [self._get_fano_factor(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
+                metrics_df['lifetime_sparseness_dg'] = [self._get_lifetime_sparseness(unit) for unit in unit_ids]
                 metrics_df.loc[:, ['run_pval_dg', 'run_mod_dg']] = \
-                        [self.get_running_modulation(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+                        [self._get_running_modulation(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
 
             if len(self._stim_table_contrast) > 0:
                 metrics_df['c50_dg'] = [self._get_c50(unit) for unit in unit_ids]
@@ -313,6 +314,7 @@ class DriftingGratings(StimulusAnalysis):
         f1_f0 - metric
 
         """
+        return np.nan
 
         presentation_ids = self.stim_table[self.stim_table['stimulus_condition_id'] == 
                                               condition_id].index.values
@@ -325,6 +327,16 @@ class DriftingGratings(StimulusAnalysis):
                                                                   ).drop('unit_id')
         # arr = np.squeeze(dataset['spike_counts'].values)
         arr = np.squeeze(dataset.values)
+        num_trials = dataset.stimulus_presentation_id.size
+        num_bins = dataset.time_relative_to_stimulus_onset.size
+        trial_duration = dataset.time_relative_to_stimulus_onset.max()
+        print(num_trials)
+        print(num_bins)
+        print(trial_duration)
+
+        #print(dataset)
+        #print(arr)
+        exit()
 
         return f1_f0(arr, tf)
 
