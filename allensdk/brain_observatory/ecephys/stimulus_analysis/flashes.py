@@ -52,8 +52,11 @@ class Flashes(StimulusAnalysis):
             self._params = {}
 
         # self._trial_duration = 0.25
-        self._module_name = 'Flashes'
+        # self._module_name = 'Flashes'
 
+    @property
+    def name(self):
+        return 'Flashes'
 
     @property
     def colors(self):
@@ -75,6 +78,7 @@ class Flashes(StimulusAnalysis):
     @property
     def null_condition(self):
         """ Stimulus condition ID for null stimulus (not used, so set to -1) """
+        # TODO: If null_condition is not used remove it, parent should have it set to 1
         return -1
     
     @property

@@ -50,6 +50,8 @@ class DriftingGratings(StimulusAnalysis):
         self._number_ori = None
         self._tfvals = None
         self._number_tf = None
+        self._contrastvals = None
+        self._number_constrast = None
 
         self._col_ori = col_ori
         self._col_tf = col_tf
@@ -63,7 +65,7 @@ class DriftingGratings(StimulusAnalysis):
         else:
             self._params = {}
 
-        self._module_name = 'Drifting Gratings'
+        #self._module_name = 'Drifting Gratings'
 
         stim_table = self.stim_table
 
@@ -72,6 +74,10 @@ class DriftingGratings(StimulusAnalysis):
 
         self._conditionwise_statistics_contrast = None
         self._stimulus_conditions_contrast = None
+
+    @property
+    def name(self):
+        return 'Drifting Gratings'
 
     @property
     def orivals(self):
@@ -108,10 +114,10 @@ class DriftingGratings(StimulusAnalysis):
     @property
     def contrastvals(self):
         """ Array of grating temporal frequency conditions """
-        if self._contrast_vals is None:
+        if self._contrastvals is None:
             self._get_stim_table_stats()
 
-        return self._contrast_vals
+        return self._contrastvals
 
     @property
     def number_contrast(self):
@@ -181,7 +187,7 @@ class DriftingGratings(StimulusAnalysis):
                 metrics_df['pref_ori_dg'] = [self._get_pref_ori(unit) for unit in unit_ids]
                 metrics_df['pref_tf_dg'] = [self._get_pref_tf(unit) for unit in unit_ids]
                 metrics_df['f1_f0_dg'] = [self._get_f1_f0(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
-                metrics_df['mod_idx_dg'] = [self._get_modulation_index(unit) for unit in unit_ids]
+                metrics_df['mod_idx_dg'] = [self._get_modulation_index(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
                 metrics_df['g_osi_dg'] = [self._get_selectivity(unit, metrics_df.loc[unit]['pref_tf_dg'], 'osi') for unit in unit_ids]
                 metrics_df['g_dsi_dg'] = [self._get_selectivity(unit, metrics_df.loc[unit]['pref_tf_dg'], 'dsi') for unit in unit_ids]
                 metrics_df['firing_rate_dg'] = [self._get_overall_firing_rate(unit) for unit in unit_ids]
@@ -203,7 +209,6 @@ class DriftingGratings(StimulusAnalysis):
         return ['drifting_gratings']
 
     def _get_stim_table_stats(self):
-
         """ Extract orientations and temporal frequencies from the stimulus table """
 
         self._orivals = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_ori] != 'null'][self._col_ori].unique())
@@ -215,21 +220,19 @@ class DriftingGratings(StimulusAnalysis):
         self._contrastvals = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_contrast] != 'null'][self._col_contrast].unique())
         self._number_contrast = len(self._contrastvals)
 
-
     def _get_pref_ori(self, unit_id):
-
         """ Calculate the preferred orientation condition for a given unit
 
-        Params:
-        -------
-        unit_id - unique ID for the unit of interest
+        Parameters
+        ----------
+        unit_id : int
+            unique ID for the unit of interest
 
-        Returns:
+        Returns
         -------
-        pref_ori - stimulus orientation driving the maximal response
-
+        pref_ori : float
+            stimulus orientation driving the maximal response
         """
-
         similar_conditions = [self.stimulus_conditions.index[self.stimulus_conditions[self._col_ori] == ori].tolist() for ori in self.orivals]
         df = pd.DataFrame(index=self.orivals,
                          data = {'spike_mean' : 
@@ -239,9 +242,7 @@ class DriftingGratings(StimulusAnalysis):
 
         return df.idxmax().iloc[0]
 
-
     def _get_pref_tf(self, unit_id):
-
         """ Calculate the preferred temporal frequency condition for a given unit
 
         Params:
@@ -253,9 +254,6 @@ class DriftingGratings(StimulusAnalysis):
         pref_tf - stimulus temporal frequency driving the maximal response
 
         """
-        if not 'drifting_gratings' in self.stim_table.stimulus_name.unique():
-            return np.nan
-
         similar_conditions = [self.stimulus_conditions.index[self.stimulus_conditions[self._col_tf] == tf].tolist() for tf in self.tfvals]
         df = pd.DataFrame(index=self.tfvals,
                          data = {'spike_mean' : 
@@ -265,9 +263,7 @@ class DriftingGratings(StimulusAnalysis):
 
         return df.idxmax().iloc[0]
 
-
     def _get_selectivity(self, unit_id, pref_tf, selectivity_type='osi'):
-
         """ Calculate the orientation or direction selectivity for a given unit
 
         Params:
@@ -281,9 +277,6 @@ class DriftingGratings(StimulusAnalysis):
         selectivity - orientation or direction selectivity value
 
         """
-        if not 'drifting_gratings' in self.stim_table.stimulus_name.unique():
-            return np.nan
-
         orivals_rad = deg2rad(self.orivals).astype('complex128')
 
         condition_inds = self.stimulus_conditions[self.stimulus_conditions[self._col_tf] == pref_tf].index.values
@@ -297,8 +290,6 @@ class DriftingGratings(StimulusAnalysis):
             return osi(orivals_rad, tuning)
         elif selectivity_type == 'dsi':
             return dsi(orivals_rad, tuning)
-
-
 
     def _get_f1_f0(self, unit_id, condition_id):
         """ Calculate F1/F0 for a given unit
@@ -315,6 +306,7 @@ class DriftingGratings(StimulusAnalysis):
         f1_f0 - metric
 
         """
+        # TODO: This need to be fixed, f1_f0 is completely broken
         return np.nan
 
         presentation_ids = self.stim_table[self.stim_table['stimulus_condition_id'] == 
@@ -328,18 +320,12 @@ class DriftingGratings(StimulusAnalysis):
                                                                   ).drop('unit_id')
         # arr = np.squeeze(dataset['spike_counts'].values)
         arr = np.squeeze(dataset.values)
+
         num_trials = dataset.stimulus_presentation_id.size
         num_bins = dataset.time_relative_to_stimulus_onset.size
         trial_duration = dataset.time_relative_to_stimulus_onset.max()
-        print(num_trials)
-        print(num_bins)
-        print(trial_duration)
 
-        #print(dataset)
-        #print(arr)
-        exit()
-
-        return f1_f0(arr, tf)
+        return f1_f0(arr, tf, num_trials, num_bins, trial_duration)
 
 
     def _get_modulation_index(self, unit_id, condition_id):
@@ -355,14 +341,12 @@ class DriftingGratings(StimulusAnalysis):
         modulation_index - metric
 
         """
-
         tf = self.stimulus_conditions.loc[condition_id][self._col_tf]
 
         data = self.conditionwise_psth.sel(unit_id = unit_id, stimulus_condition_id=condition_id).data 
         sample_rate = 1 / np.mean(np.diff(self.conditionwise_psth.time_relative_to_stimulus_onset))
 
         return modulation_index(data, tf, sample_rate)
-
 
     def _get_c50(self, unit_id):
         """ Calculate C50 for a given unit.
@@ -573,7 +557,6 @@ class DriftingGratings(StimulusAnalysis):
 
     
     def make_star_plot(self, unit_id):
-
         """ Make a 2P-style Star Plot based on presentationwise spike counts"""
 
         angle_data = self.stimulus_conditions.loc[self.presentationwise_statistics.xs(unit_id, level=1)['stimulus_condition_id']][self._col_ori].values
@@ -659,7 +642,7 @@ def c50(x,y):
     return c50
 
 
-def f1_f0(arr, tf):
+def f1_f0(arr, tf, num_trials, num_bins, trial_duration):
 
     """
     Computes F1/F0 of a drifting grating response
@@ -675,9 +658,9 @@ def f1_f0(arr, tf):
 
     """
 
-    num_trials = dataset.stimulus_presentation_id.size
-    num_bins = dataset.time_relative_to_stimulus_onset.size
-    trial_duration = dataset.time_relative_to_stimulus_onset.max()
+    #num_trials = dataset.stimulus_presentation_id.size
+    #num_bins = dataset.time_relative_to_stimulus_onset.size
+    #trial_duration = dataset.time_relative_to_stimulus_onset.max()
 
     cycles_per_trial = int(tf * trial_duration)
 
@@ -697,7 +680,6 @@ def f1_f0(arr, tf):
 
 
 def modulation_index(response, tf, sample_rate):
-
     """  Depth of modulation by each cycle of a drifting grating; similar to F1/F0
 
     ref: Matteucci et al. (2019) Nonlinear processing of shape information 

@@ -40,14 +40,15 @@ class DotMotion(StimulusAnalysis):
 
     """
 
-    def __init__(self, ecephys_session, col_ori='Ori', col_speeds='Speed', trial_duration=1.0, **kwargs):
+    def __init__(self, ecephys_session, col_dir='Dir', col_speeds='Speed', trial_duration=1.0, **kwargs):
         super(DotMotion, self).__init__(ecephys_session, trial_duration=trial_duration, **kwargs)
 
         self._dirvals = None
-        self._col_dir = col_ori
-        self._col_dir = 'Dir'
+        self._number_dir = None
+        self._speedvals = None
+        self._number_speed = None
 
-        self._speeds = None
+        self._col_dir = col_dir
         self._col_speed = col_speeds
 
         #self._trial_duration = trial_duration
@@ -58,23 +59,43 @@ class DotMotion(StimulusAnalysis):
         #else:
         #    self._stimulus_key = 'motion_stimulus'
 
-        self._module_name = 'Dot Motion'
+        #self._module_name = 'Dot Motion'
+
+    @property
+    def name(self):
+        return 'Dot Motion'
 
     @property
     def directions(self):
-        """ Array of dot motion direction conditions """
         if self._dirvals is None:
             self._get_stim_table_stats()
 
         return self._dirvals
+
+    @property
+    def number_directions(self):
+        if self._number_dir is None:
+            self._get_stim_table_stats()
+
+        return self._number_dir
     
     @property
     def speeds(self):
-        """ Array of dot motion speed conditions """
-        if self._speeds is None:
+        if self._speedvals is None:
             self._get_stim_table_stats()
 
-        return self._speeds
+        return self._speedvals
+
+    @property
+    def number_speeds(self):
+        if self._number_speed is None:
+            self._get_stim_table_stats()
+
+        return self._number_speed
+
+    @property
+    def known_spontaneous_keys(self):
+        return ['dot_motion', "spontaneous_activity"]
 
     @property
     def null_condition(self):
@@ -96,15 +117,12 @@ class DotMotion(StimulusAnalysis):
 
     @property
     def metrics(self):
-
         if self._metrics is None:
             unit_ids = self.unit_ids
-        
             metrics_df = self.empty_metrics_table()
 
             if len(self.stim_table) > 0:
                 logger.info('Calculating metrics for ' + self.name)
-
                 metrics_df['pref_speed_dm'] = [self._get_pref_speed(unit) for unit in unit_ids]
                 metrics_df['pref_dir_dm'] = [self._get_pref_dir(unit) for unit in unit_ids]
                 metrics_df['firing_rate_dm'] = [self._get_overall_firing_rate(unit) for unit in unit_ids]
@@ -121,18 +139,19 @@ class DotMotion(StimulusAnalysis):
 
     @property
     def known_stimulus_keys(self):
-        return ['motion_stimulus']
+        return ['motion_stimulus', 'dot_motion']
 
     def _get_stim_table_stats(self):
 
         """ Extract directions and speeds from the stimulus table """
 
         self._dirvals = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_dir] != 'null'][self._col_dir].unique())
-        self._speeds = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_speed] != 'null'][self._col_speed].unique())
+        self._number_dir = len(self._dirvals)
 
+        self._speedvals = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_speed] != 'null'][self._col_speed].unique())
+        self._number_speed = len(self._speedvals)
 
     def _get_pref_speed(self, unit_id):
-
         """ Calculate the preferred speed condition for a given unit
 
         Params:
@@ -144,7 +163,6 @@ class DotMotion(StimulusAnalysis):
         pref_speed - stimulus speed driving the maximal response
 
         """
-
         similar_conditions = [self.stimulus_conditions.index[self.stimulus_conditions[self._col_speed] == speed].tolist() for speed in self.speeds]
         df = pd.DataFrame(index=self.speeds,
                          data = {'spike_mean' : 
@@ -154,9 +172,7 @@ class DotMotion(StimulusAnalysis):
 
         return df.idxmax().iloc[0]
 
-
     def _get_pref_dir(self, unit_id):
-
         """ Calculate the preferred direction condition for a given unit
 
         Params:
@@ -168,7 +184,6 @@ class DotMotion(StimulusAnalysis):
         pref_dir - stimulus direction driving the maximal response
 
         """
-
         similar_conditions = [self.stimulus_conditions.index[self.stimulus_conditions[self._col_dir] == direction].tolist() for direction in self.directions]
         df = pd.DataFrame(index=self.directions,
                          data = {'spike_mean' : 
@@ -178,9 +193,7 @@ class DotMotion(StimulusAnalysis):
 
         return df.idxmax().iloc[0]
 
-
     def _get_speed_tuning_index(self, unit_id):
-
         """ Calculate the speed tuning for a given unit
 
         SEE: https://github.com/AllenInstitute/ecephys_analysis_modules/blob/master/ecephys_analysis_modules/modules/tuning/tuning_speed.py
@@ -192,9 +205,6 @@ class DotMotion(StimulusAnalysis):
         Returns:
         -------
         speed_tuning - degree to which the unit's responses are modulated by stimulus speed
-
         """
-
-
         return np.nan
 

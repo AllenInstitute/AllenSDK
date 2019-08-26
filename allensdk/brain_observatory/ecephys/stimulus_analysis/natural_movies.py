@@ -94,9 +94,7 @@ class NaturalMovies(StimulusAnalysis):
     def known_stimulus_keys(self):
         return ['natural_movies', 'natural_movie_1', 'natural_movie_3']
 
-
     def _get_stim_table_stats(self):
-
         pass
 
 

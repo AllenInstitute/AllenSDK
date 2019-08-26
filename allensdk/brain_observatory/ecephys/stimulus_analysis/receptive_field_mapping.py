@@ -1,15 +1,10 @@
 import numpy as np
-import pandas as pd
-from six import string_types
 import scipy.ndimage as ndi
-import scipy.stats as st
 from scipy.optimize import curve_fit, leastsq
 import logging
-
 import matplotlib.pyplot as plt
 
 from ...chisquare_categorical import chisq_from_stim_table
-
 from .stimulus_analysis import StimulusAnalysis
 
 import warnings
@@ -17,6 +12,7 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 
 
 logger = logging.getLogger(__name__)
+
 
 class ReceptiveFieldMapping(StimulusAnalysis):
     """
@@ -37,7 +33,6 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         metrics_table_df = rf_analysis.metrics()
 
     """
-
     def __init__(self, ecephys_session, col_pos_x='x_position', col_pos_y='y_position', trial_duration=0.25, **kwargs):
         super(ReceptiveFieldMapping, self).__init__(ecephys_session, trial_duration=trial_duration, **kwargs)
 
@@ -56,12 +51,17 @@ class ReceptiveFieldMapping(StimulusAnalysis):
             self._stimulus_key = self._params['stimulus_key']
         else:
             # self._stimulus_key = 'receptive_field_mapping'
+            # TODO: Remove params dictionary
             self._params = {
                 'minimum_spike_count': 10,
                 'mask_threshold': 0.5
             }
 
-        self._module_name = 'Receptive Field Mapping'
+        # self._module_name = 'Receptive Field Mapping'
+
+    @property
+    def name(self):
+        return 'Receptive Field Mapping'
 
     @property
     def elevations(self):
@@ -93,11 +93,12 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         if self._pos_x is None:
             self._get_stim_table_stats()
 
-        return len(self._pos_y)
+        return len(self._pos_y)  # TODO: Save this instead of calculating every time.
 
     @property
     def null_condition(self):
         """ Stimulus condition ID for null stimulus (not used, so set to -1) """
+        # TODO: Remove
         return -1
 
     @property
@@ -192,9 +193,7 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         self._pos_y = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_pos_y] != 'null'][self._col_pos_y].unique())
         self._pos_x = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_pos_x] != 'null'][self._col_pos_x].unique())
 
-
     def _get_rf(self, unit_id):
-
         """ Extract the receptive field for one unit
 
         Params:
@@ -209,12 +208,8 @@ class ReceptiveFieldMapping(StimulusAnalysis):
 
         return self.receptive_fields['spike_count'].sel(unit_id=unit_id).data
 
-
-    def _response_by_stimulus_position(self, dataset, presentations,
-        row_key=None, column_key=None,
-        unit_key='unit_id', time_key='time_relative_to_stimulus_onset',
-        spike_count_key='spike_count'):
-
+    def _response_by_stimulus_position(self, dataset, presentations, row_key=None, column_key=None, unit_key='unit_id',
+                                       time_key='time_relative_to_stimulus_onset', spike_count_key='spike_count'):
         """ Calculate the unit's response to different locations
         of the Gabor patch
 
@@ -246,10 +241,7 @@ class ReceptiveFieldMapping(StimulusAnalysis):
 
         return dataset.to_xarray()
 
-
-
     def _get_rf_stats(self, unit_id):
-
         """ Calculate a variety of metrics for one unit's receptive field
 
         Params:
@@ -280,7 +272,6 @@ class ReceptiveFieldMapping(StimulusAnalysis):
             - based on Gaussian fit
 
         """
-
         rf = self._get_rf(unit_id)
         spikes_per_trial = self.presentationwise_statistics.xs(unit_id, level=1)['spike_counts'].values
 
@@ -304,9 +295,7 @@ class ReceptiveFieldMapping(StimulusAnalysis):
 
         return azimuth, elevation, width, height, area, p_value[0], on_screen
 
-
     ## VISUALIZATION ##
-
     def plot_raster(self, stimulus_condition_id, unit_id):
     
         """ Plot raster for one condition and one unit """
@@ -334,16 +323,13 @@ class ReceptiveFieldMapping(StimulusAnalysis):
             plt.scatter(x, y, c='k', s=1, alpha=0.25)
             plt.axis('off')
 
-
     def plot_rf(self, unit_id):
-
         """ Plot the spike counts across conditions """
         plt.imshow(self._get_rf(unit_id), cmap='Greys')
         plt.axis('off')
 
 
 #### HELPER FUNCTIONS ####
-
 def gaussian_function_2d(peak_height, center_y, center_x, width_y, width_x):
     
     """Returns a 2D Gaussian function
@@ -431,8 +417,6 @@ def fit_2d_gaussian(matrix):
         True if a fit was found, False otherwise
 
     """
-    
-
     params = gaussian_moments_2d(matrix)
     errorfunction = lambda p: np.ravel(gaussian_function_2d(*p)(*np.indices(matrix.shape)) - matrix)
     fit_params, ier = leastsq(errorfunction, params)
@@ -454,7 +438,6 @@ def is_rf_inverted(rf_thresh):
     bool - True if the receptive field is inverted
 
     """
-
     edge_mask = np.zeros(rf_thresh.shape)
 
     edge_mask[:,0] = 1
@@ -468,7 +451,6 @@ def is_rf_inverted(rf_thresh):
 
 
 def invert_rf(rf):
-
     """
     Creates an inverted version of the receptive field
 
@@ -483,7 +465,6 @@ def invert_rf(rf):
     """
     
     return np.max(rf) - rf
-
 
 
 def threshold_rf(rf, threshold):
@@ -511,7 +492,6 @@ def threshold_rf(rf, threshold):
         area of mask
     
     """
-
     rf_filt = ndi.gaussian_filter(rf, 1)
     
     threshold_value = np.max(rf_filt) - np.std(rf_filt) * threshold
@@ -533,5 +513,4 @@ def threshold_rf(rf, threshold):
 
 
 def rf_on_screen(rf, center_y, center_x):
-
     return 0 < center_y < rf.shape[0] and 0 < center_x < rf.shape[1]

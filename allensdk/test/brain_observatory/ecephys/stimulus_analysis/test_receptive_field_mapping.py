@@ -1,73 +1,118 @@
 import pytest
-import os
 import pandas as pd
 import numpy as np
 
-from allensdk.brain_observatory.ecephys.stimulus_analysis import receptive_field_mapping as rfm
+from .conftest import MockSessionApi
+from allensdk.brain_observatory.ecephys.stimulus_analysis.receptive_field_mapping import ReceptiveFieldMapping
+from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
 
 
-data_dir = '/allen/aibs/informatics/module_test_data/ecephys/stimulus_analysis_fh'
+class MockRFMSessionApi(MockSessionApi):
+    def get_stimulus_presentations(self):
+        features = np.array(np.meshgrid([30.0, -20.0, 40.0, 20.0, 0.0, -30.0, -40.0, 10.0, -10.0],  # x_position
+                                        [10.0, -10.0, 30.0, 40.0, -40.0, -30.0, -20.0, 20.0, 0.0])  # y_position
+                            ).reshape(2, 81)
+
+        return pd.DataFrame({
+            'start_time': np.concatenate(([0.0], np.linspace(0.5, 20.50, 81, endpoint=True), [20.75])),
+            'stop_time': np.concatenate(([0.5], np.linspace(0.75, 20.75, 81, endpoint=True), [21.25])),
+            'stimulus_name': ['spontaneous'] + ['gabors']*81 + ['spontaneous'],
+            'stimulus_block': [0] + [1]*81 + [0],
+            'duration': [0.5] + [0.25]*81 + [0.5],
+            'stimulus_index': [0] + [1]*81 + [0],
+            'x_position': np.concatenate(([np.nan], features[0, :], [np.nan])),
+            'y_position': np.concatenate(([np.nan], features[1, :], [np.nan]))
+        }, index=pd.Index(name='id', data=np.arange(83)))
 
 
-@pytest.mark.parametrize('spikes_nwb,expected_csv,analysis_params,units_filter',
-                         [
-                             #(os.path.join(data_dir, 'data', 'mouse406807_integration_test.spikes.nwb2'),
-                             # os.path.join(data_dir, 'expected', 'mouse406807_integration_test.receptive_field_mapping.csv'),
-                             # {})
-                             (os.path.join(data_dir, 'data', 'ecephys_session_773418906.nwb'),
-                              os.path.join(data_dir, 'expected', 'ecephys_session_773418906.receptive_field_mapping.csv'),
-                              {},
-                              [914580284, 914580302, 914580328, 914580366, 914580360, 914580362, 914580380, 914580370,
-                               914580408, 914580384, 914580402, 914580400, 914580396, 914580394, 914580392, 914580390,
-                               914580382, 914580412, 914580424, 914580422, 914580438, 914580420, 914580434, 914580432,
-                               914580428, 914580452, 914580450, 914580474, 914580470, 914580490])
-                         ])
-def test_metrics(spikes_nwb, expected_csv, analysis_params, units_filter, skip_cols=[]):
-    """Full integration tests of metrics table"""
-    if not os.path.exists(spikes_nwb):
-        pytest.skip('No input spikes file {}.'.format(spikes_nwb))
-    if not os.access(spikes_nwb, os.R_OK):
-        pytest.skip(f"can't access file at {spikes_nwb}")
-    if not os.access(expected_csv, os.R_OK):
-        pytest.skip(f"can't access file at {expected_csv}")
+@pytest.fixture
+def ecephys_api():
+    return MockRFMSessionApi()
 
-    np.random.seed(0)
 
-    analysis_params = analysis_params or {}
-    analysis = rfm.ReceptiveFieldMapping(spikes_nwb, filter=units_filter, **analysis_params)
-    assert(len(analysis.stim_table) > 1)
-    assert(set(analysis.unit_ids) == set(units_filter))
-    assert(len(analysis.running_speed) == len(analysis.stim_table))
-    assert(analysis.stim_table_spontaneous.shape == (3, 5))
-    assert(set(analysis.spikes.keys()) == set(units_filter))
-    assert(len(analysis.conditionwise_psth) > 1)
+def mock_ecephys_api():
+    return MockRFMSessionApi()
 
-    actual_data = analysis.metrics.sort_index()
 
-    expected_data = pd.read_csv(expected_csv)
-    expected_data = expected_data.set_index('unit_id')
-    expected_data = expected_data.sort_index()  # in theory this should be sorted in the csv, no point in risking it.
+def test_load(ecephys_api):
+    session = EcephysSession(api=ecephys_api)
+    rfm = ReceptiveFieldMapping(ecephys_session=session)
+    assert(rfm.name == 'Receptive Field Mapping')
+    assert(set(rfm.unit_ids) == set(range(6)))
+    assert(len(rfm.conditionwise_statistics) == 81*6)
+    assert(rfm.conditionwise_psth.shape == (81, 249, 6))
+    assert(not rfm.presentationwise_spike_times.empty)
+    assert(len(rfm.presentationwise_statistics) == 81*6)
+    assert(len(rfm.stimulus_conditions) == 81)
 
-    assert(np.all(actual_data.index.values == expected_data.index.values))
-    assert(set(actual_data.columns) == (set(expected_data.columns) - set(skip_cols)))
 
-    pd.set_option("display.max_columns", None)
-    pd.set_option("display.max_rows", None)
-    print(actual_data.head(20))
-    print(expected_data.head(20))
+def test_stimulus(ecephys_api):
+    session = EcephysSession(api=ecephys_api)
+    rfm = ReceptiveFieldMapping(ecephys_session=session)
+    assert(isinstance(rfm.stim_table, pd.DataFrame))
+    assert(len(rfm.stim_table) == 81)
+    assert(set(rfm.stim_table.columns).issuperset({'x_position', 'y_position', 'start_time', 'stop_time'}))
 
-    assert(np.allclose(actual_data['azimuth_rf'].astype(np.float), expected_data['azimuth_rf'], equal_nan=True))
-    assert(np.allclose(actual_data['elevation_rf'].astype(np.float), expected_data['elevation_rf'], equal_nan=True))
-    assert(np.allclose(actual_data['width_rf'].astype(np.float), expected_data['width_rf'], equal_nan=True))
-    assert(np.allclose(actual_data['height_rf'].astype(np.float), expected_data['height_rf'], equal_nan=True))
-    assert(np.allclose(actual_data['area_rf'].astype(np.float), expected_data['area_rf'], equal_nan=True))
-    assert(np.allclose(actual_data['p_value_rf'].astype(np.float), expected_data['p_value_rf'], equal_nan=True))
-    assert (np.all(actual_data['on_screen_rf'].astype(np.bool) == expected_data['on_screen_rf'].astype(np.bool)))
-    assert(np.allclose(actual_data['firing_rate_rf'].astype(np.float), expected_data['firing_rate_rf'], equal_nan=True))
-    assert(np.allclose(actual_data['fano_rf'].astype(np.float), expected_data['fano_rf'], equal_nan=True))
-    assert(np.allclose(actual_data['time_to_peak_rf'].astype(np.float), expected_data['time_to_peak_rf'], equal_nan=True))
-    assert(np.allclose(actual_data['reliability_rf'].astype(np.float), expected_data['reliability_rf'], equal_nan=True))
-    assert(np.allclose(actual_data['lifetime_sparseness_rf'].astype(np.float), expected_data['lifetime_sparseness_rf'],
-                       equal_nan=True))
-    assert(np.allclose(actual_data['run_mod_rf'].astype(np.float), expected_data['run_mod_rf'], equal_nan=True))
-    assert(np.allclose(actual_data['run_pval_rf'].astype(np.float), expected_data['run_pval_rf'], equal_nan=True))
+    assert(set(rfm.azimuths) == {30.0, -20.0, 40.0, 20.0, 0.0, -30.0, -40.0, 10.0, -10.0})
+    assert(rfm.number_azimuths == 9)
+
+    assert(set(rfm.elevations) == {10.0, -10.0, 30.0, 40.0, -40.0, -30.0, -20.0, 20.0, 0.0})
+    assert(rfm.number_elevations == 9)
+
+
+def test_metrics(ecephys_api):
+    session = EcephysSession(api=ecephys_api)
+    rfm = ReceptiveFieldMapping(ecephys_session=session)
+    assert(isinstance(rfm.metrics, pd.DataFrame))
+    assert(len(rfm.metrics) == 6)
+    assert(rfm.metrics.index.names == ['unit_id'])
+
+    assert('azimuth_rf' in rfm.metrics.columns)
+    assert('elevation_rf' in rfm.metrics.columns)
+    assert('width_rf' in rfm.metrics.columns)
+    assert('height_rf' in rfm.metrics.columns)
+    assert('area_rf' in rfm.metrics.columns)
+    assert('p_value_rf' in rfm.metrics.columns)
+    assert('on_screen_rf' in rfm.metrics.columns)
+    assert('firing_rate_rf' in rfm.metrics.columns)
+    assert('fano_rf' in rfm.metrics.columns)
+    assert('time_to_peak_rf' in rfm.metrics.columns)
+    assert('reliability_rf' in rfm.metrics.columns)
+    assert('lifetime_sparseness_rf' in rfm.metrics.columns)
+    assert('run_pval_rf' in rfm.metrics.columns)
+    assert('run_mod_rf' in rfm.metrics.columns)
+
+
+@pytest.mark.skip(reason='Write a test for the receptive_fields()/_get_rf() methods')
+def test_receptive_fields():
+    # TODO: Implement
+    pass
+
+
+@pytest.mark.skip()
+def test_response_by_stimulus_position():
+    # TODO: Implement
+    pass
+
+
+@pytest.mark.skip()
+def test_rf_stats():
+    pass
+
+
+@pytest.mark.skip()
+def test_fit_2d_gaussian():
+    pass
+
+@pytest.mark.skip()
+def test_invert_rf():
+    pass
+
+@pytest.mark.skip()
+def test_threshold_rf():
+    pass
+
+if __name__ == '__main__':
+    # test_load()
+    # test_stimulus()
+    test_metrics()

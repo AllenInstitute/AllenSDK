@@ -190,6 +190,7 @@ class StaticGratings(StimulusAnalysis):
             spatial frequency driving the maximal response
 
         """
+        # TODO: Most of the _get_pref_*() methods can be combined into one method and shared among the classes
         # Combine the stimulus_condition_id values that have the save spatial-frequency
         similar_conditions_ids = [self.stimulus_conditions.index[self.stimulus_conditions[self._col_sf] == sf].tolist()
                                   for sf in self.sfvals]

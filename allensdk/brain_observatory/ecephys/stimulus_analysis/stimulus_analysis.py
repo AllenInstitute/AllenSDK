@@ -150,6 +150,9 @@ class StimulusAnalysis(object):
             if self._stim_table.empty:
                 raise Exception(f'Could not find stimulus data with "stimulus_key" {self._stimulus_key}')
 
+            # TODO: Should we remove columns that are not relevant to the selected stimulus? If a feature for another
+            #  has random junk it can mess up stimulus_conditions table.
+
         return self._stim_table
 
     def _find_stimulus_key(self, stim_table):

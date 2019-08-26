@@ -24,7 +24,8 @@ def get_psth(binarized, PSTH_bintime, value='count'):
         unit_psth = unit_psth.mean(-1)
     if value=='count':
         unit_psth = unit_psth.sum(-1)
-    time = np.array(range(int(unit_binarized.shape[-1]/PSTH_bintime)))*PSTH_bintime/1000.
+    #### time = np.array(range(int(unit_binarized.shape[-1]/PSTH_bintime)))*PSTH_bintime/1000.
+    time = np.array(range(int(binarized.shape[-1] / PSTH_bintime))) * PSTH_bintime / 1000.
     return unit_psth, time
 
 def cal_rsc(spikes, PSTH_bintime=25):

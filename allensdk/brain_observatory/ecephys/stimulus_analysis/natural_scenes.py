@@ -45,7 +45,7 @@ class NaturalScenes(StimulusAnalysis):
         self._response_trials = None
         self._metrics = None
 
-        self._col_image = col_image # 'Image'
+        self._col_image = col_image
 
         # self._trial_duration = 0.25  # Passed in to kwargs and read by parent
 
@@ -55,7 +55,9 @@ class NaturalScenes(StimulusAnalysis):
         else:
             self._params = {}
 
-        self._module_name = 'Natural Scenes'
+    @property
+    def name(self):
+        return 'Natural Scenes'
 
     @property
     def images(self):
@@ -105,12 +107,8 @@ class NaturalScenes(StimulusAnalysis):
 
     @property
     def metrics(self):
-
         if self._metrics is None:
-
-
             unit_ids = self.unit_ids
-
             metrics_df = self.empty_metrics_table()
 
             if len(self.stim_table) > 0:
@@ -134,15 +132,12 @@ class NaturalScenes(StimulusAnalysis):
     def known_stimulus_keys(self):
         return ['natural_scenes', 'Natural_Images', 'Natural Images']
 
-
     def _get_stim_table_stats(self):
-
         """ Extract image labels from the stimulus table """
 
         self._images = np.sort(self.stimulus_conditions[self._col_image].unique()).astype(np.int64)
         self._number_images = len(self._images)
         self._number_nonblank = len(self._images[self._images >= 0])
-
 
     def _get_image_selectivity(self, unit_id, num_steps=1000):
         """ Calculate the image selectivity for a given unit

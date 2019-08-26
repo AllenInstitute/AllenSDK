@@ -82,8 +82,14 @@ def test_metrics(ecephys_api):
     assert(sg.metrics.index.names == ['unit_id'])
 
     assert('pref_sf_sg' in sg.metrics.columns)
+    assert(np.all(sg.metrics['pref_sf_sg'].loc[[0, 2, 4]] == [0.02, 0.02, 0.04]))
+
     assert('pref_ori_sg' in sg.metrics.columns)
+    assert(np.all(sg.metrics['pref_ori_sg'].loc[[0, 2, 4]] == [0.0, 0.0, 0.0]))
+
     assert('pref_phase_sg' in sg.metrics.columns)
+    assert(np.all(sg.metrics['pref_phase_sg'].loc[[0, 1, 2, 3]] == [0.25, 0.75, 0.5, 0.0]))
+
     assert('g_osi_sg' in sg.metrics.columns)
     assert('time_to_peak_sg' in sg.metrics.columns)
     assert('firing_rate_sg' in sg.metrics.columns)
