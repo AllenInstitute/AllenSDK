@@ -117,12 +117,15 @@ class NaturalScenes(StimulusAnalysis):
                 metrics_df['pref_image_ns'] = [self._get_preferred_condition(unit) for unit in unit_ids]
                 metrics_df['image_selectivity_ns'] = [self._get_image_selectivity(unit) for unit in unit_ids]
                 metrics_df['firing_rate_ns'] = [self._get_overall_firing_rate(unit) for unit in unit_ids]
-                metrics_df['fano_ns'] = [self._get_fano_factor(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
-                metrics_df['time_to_peak_ns'] = [self._get_time_to_peak(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
-                metrics_df['reliability_ns'] = [self._get_reliability(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
+                metrics_df['fano_ns'] = [self._get_fano_factor(unit, self._get_preferred_condition(unit))
+                                         for unit in unit_ids]
+                metrics_df['time_to_peak_ns'] = [self._get_time_to_peak(unit, self._get_preferred_condition(unit))
+                                                 for unit in unit_ids]
+                metrics_df['reliability_ns'] = [self._get_reliability(unit, self._get_preferred_condition(unit))
+                                                for unit in unit_ids]
                 metrics_df['lifetime_sparseness_ns'] = [self._get_lifetime_sparseness(unit) for unit in unit_ids]
-                metrics_df.loc[:, ['run_pval_ns', 'run_mod_ns']] = \
-                        [self._get_running_modulation(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
+                metrics_df.loc[:, ['run_pval_ns', 'run_mod_ns']] = [
+                    self._get_running_modulation(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
 
             self._metrics = metrics_df
 

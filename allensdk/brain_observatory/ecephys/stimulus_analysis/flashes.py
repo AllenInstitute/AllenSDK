@@ -39,20 +39,16 @@ class Flashes(StimulusAnalysis):
 
     def __init__(self, ecephys_session, col_color='color', trial_duration=0.25, **kwargs):
         super(Flashes, self).__init__(ecephys_session, trial_duration=trial_duration, **kwargs)
-
         self._metrics = None
 
         self._colors = None
-        self._col_color = col_color # 'color'
+        self._col_color = col_color
 
         if self._params is not None:
             self._params = self._params.get('flashes', {})
             self._stimulus_key = self._params.get('stimulus_key', None)  # Overwrites parent value with argvars
         else:
             self._params = {}
-
-        # self._trial_duration = 0.25
-        # self._module_name = 'Flashes'
 
     @property
     def name(self):
@@ -74,7 +70,6 @@ class Flashes(StimulusAnalysis):
 
         return len(self._colors)
     
-
     @property
     def null_condition(self):
         """ Stimulus condition ID for null stimulus (not used, so set to -1) """
@@ -95,7 +90,6 @@ class Flashes(StimulusAnalysis):
 
     @property
     def metrics(self):
-
         if self._metrics is None:
             unit_ids = self.unit_ids
         
@@ -107,12 +101,15 @@ class Flashes(StimulusAnalysis):
                 metrics_df['on_off_ratio_fl'] = [self._get_on_off_ratio(unit) for unit in unit_ids]
                 metrics_df['sustained_idx_fl'] = [self._get_sustained_index(unit) for unit in unit_ids]
                 metrics_df['firing_rate_fl'] = [self._get_overall_firing_rate(unit) for unit in unit_ids]
-                metrics_df['reliability_fl'] = [self._get_reliability(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
-                metrics_df['time_to_peak_fl'] = [self._get_time_to_peak(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
-                metrics_df['fano_fl'] = [self._get_fano_factor(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
+                metrics_df['reliability_fl'] = [self._get_reliability(unit, self._get_preferred_condition(unit))
+                                                for unit in unit_ids]
+                metrics_df['time_to_peak_fl'] = [self._get_time_to_peak(unit, self._get_preferred_condition(unit))
+                                                 for unit in unit_ids]
+                metrics_df['fano_fl'] = [self._get_fano_factor(unit, self._get_preferred_condition(unit))
+                                         for unit in unit_ids]
                 metrics_df['lifetime_sparseness_fl'] = [self._get_lifetime_sparseness(unit) for unit in unit_ids]
-                metrics_df.loc[:, ['run_pval_fl', 'run_mod_fl']] = \
-                        [self._get_running_modulation(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
+                metrics_df.loc[:, ['run_pval_fl', 'run_mod_fl']] = [
+                    self._get_running_modulation(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
 
             self._metrics = metrics_df
 
@@ -139,16 +136,12 @@ class Flashes(StimulusAnalysis):
     def known_stimulus_keys(self):
         return ['flash', 'flashes']
 
-
     def _get_stim_table_stats(self):
-
         """ Extract colors from the stimulus table """
-
-        self._colors = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_color] != 'null'][self._col_color].unique())
-
+        self._colors = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_color]
+                                                            != 'null'][self._col_color].unique())
 
     def _get_sustained_index(self, unit_id):
-
         """ Calculate the sustained index for a given unit, a measure of the transience of
         the flash response.
 
@@ -161,11 +154,9 @@ class Flashes(StimulusAnalysis):
         sustained_index - metric
 
         """
-
         return np.nan
 
     def _get_on_off_ratio(self, unit_id):
-
         """ Calculate the ratio of the on response vs. off response for a given unit
 
         Params:
@@ -177,7 +168,6 @@ class Flashes(StimulusAnalysis):
         on_off_ratio - metric
 
         """
-
         on_condition_id = self.stimulus_conditions[self.stimulus_conditions[self._col_color] == '1.0'].index.values
         off_condition_id = self.stimulus_conditions[self.stimulus_conditions[self._col_color] == '-1.0'].index.values
 
@@ -192,9 +182,7 @@ class Flashes(StimulusAnalysis):
         else:
             return np.nan
 
-
     ## VISUALIZATION ##
-
     def plot_raster(self, stimulus_condition_id, unit_id):
     
         """ Plot raster for one condition and one unit """
@@ -203,14 +191,14 @@ class Flashes(StimulusAnalysis):
 
         if len(idx_color) == 1:
      
-            presentation_ids = \
-                self.presentationwise_statistics.xs(unit_id, level=1)\
-                [self.presentationwise_statistics.xs(unit_id, level=1)\
-                ['stimulus_condition_id'] == stimulus_condition_id].index.values
+            presentation_ids = self.presentationwise_statistics.xs(unit_id, level=1)[
+                self.presentationwise_statistics.xs(unit_id, level=1)['stimulus_condition_id']
+                == stimulus_condition_id].index.values
             
-            df = self.presentationwise_spike_times[ \
-                (self.presentationwise_spike_times['stimulus_presentation_id'].isin(presentation_ids)) & \
-                (self.presentationwise_spike_times['unit_id'] == unit_id) ]
+            df = self.presentationwise_spike_times[
+                (self.presentationwise_spike_times['stimulus_presentation_id'].isin(presentation_ids)) &
+                (self.presentationwise_spike_times['unit_id'] == unit_id)
+            ]
                 
             x = df.index.values - self.stim_table.loc[df.stimulus_presentation_id].start_time
             _, y = np.unique(df.stimulus_presentation_id, return_inverse=True) 
@@ -219,20 +207,16 @@ class Flashes(StimulusAnalysis):
             plt.scatter(x, y, c='k', s=1, alpha=0.25)
             plt.axis('off')
 
-
     def plot_response(self, unit_id):
-
         """ Plot a histogram for the two conditions """
-
         plot_colors = ('darkslateblue', 'grey')
 
         for idx, color in enumerate(self.colors):
 
             condition_id = self.stimulus_conditions[self.stimulus_conditions['color'] == color].index.values[0]
             
-            psth = self.conditionwise_psth.sel(unit_id=unit_id, stimulus_condition_id =condition_id).values
+            psth = self.conditionwise_psth.sel(unit_id=unit_id, stimulus_condition_id=condition_id).values
             
             plt.bar(np.arange(len(psth))-0.5, psth, color=plot_colors[idx], alpha=0.5, width=1.0)
             plt.step(np.arange(len(psth)), psth, color=plot_colors[idx])
             plt.axis('off')
-    

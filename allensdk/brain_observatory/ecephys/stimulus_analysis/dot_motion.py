@@ -1,18 +1,13 @@
+import warnings
 import numpy as np
 import pandas as pd
-from six import string_types
-import scipy.ndimage as ndi
-import scipy.stats as st
-from scipy.optimize import curve_fit
 import logging
-
 import matplotlib.pyplot as plt
 
-from .stimulus_analysis import StimulusAnalysis, get_fr
+from .stimulus_analysis import StimulusAnalysis
 
-import warnings
+
 warnings.simplefilter(action='ignore', category=FutureWarning)
-
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +34,6 @@ class DotMotion(StimulusAnalysis):
         metrics_table_df = dm_analysis.metrics()
 
     """
-
     def __init__(self, ecephys_session, col_dir='Dir', col_speeds='Speed', trial_duration=1.0, **kwargs):
         super(DotMotion, self).__init__(ecephys_session, trial_duration=trial_duration, **kwargs)
 
@@ -51,15 +45,11 @@ class DotMotion(StimulusAnalysis):
         self._col_dir = col_dir
         self._col_speed = col_speeds
 
-        #self._trial_duration = trial_duration
-
         if self._params is not None:
             self._params = self._params['dot_motion']
             self._stimulus_key = self._params['stimulus_key']
         #else:
         #    self._stimulus_key = 'motion_stimulus'
-
-        #self._module_name = 'Dot Motion'
 
     @property
     def name(self):
@@ -126,9 +116,11 @@ class DotMotion(StimulusAnalysis):
                 metrics_df['pref_speed_dm'] = [self._get_pref_speed(unit) for unit in unit_ids]
                 metrics_df['pref_dir_dm'] = [self._get_pref_dir(unit) for unit in unit_ids]
                 metrics_df['firing_rate_dm'] = [self._get_overall_firing_rate(unit) for unit in unit_ids]
-                metrics_df['fano_dm'] = [self._get_fano_factor(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
+                metrics_df['fano_dm'] = [self._get_fano_factor(unit, self._get_preferred_condition(unit))
+                                         for unit in unit_ids]
                 metrics_df['speed_tuning_idx_dm'] = [self._get_speed_tuning_index(unit) for unit in unit_ids]
-                metrics_df['reliability_dm'] = [self._get_reliability(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
+                metrics_df['reliability_dm'] = [self._get_reliability(unit, self._get_preferred_condition(unit))
+                                                for unit in unit_ids]
                 metrics_df['lifetime_sparseness_dm'] = [self._get_lifetime_sparseness(unit) for unit in unit_ids]
                 metrics_df.loc[:, ['run_pval_dm', 'run_mod_dm']] = \
                         [self._get_running_modulation(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
@@ -142,54 +134,59 @@ class DotMotion(StimulusAnalysis):
         return ['motion_stimulus', 'dot_motion']
 
     def _get_stim_table_stats(self):
-
         """ Extract directions and speeds from the stimulus table """
-
-        self._dirvals = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_dir] != 'null'][self._col_dir].unique())
+        self._dirvals = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_dir]
+                                                             != 'null'][self._col_dir].unique())
         self._number_dir = len(self._dirvals)
 
-        self._speedvals = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_speed] != 'null'][self._col_speed].unique())
+        self._speedvals = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_speed]
+                                                               != 'null'][self._col_speed].unique())
         self._number_speed = len(self._speedvals)
 
     def _get_pref_speed(self, unit_id):
         """ Calculate the preferred speed condition for a given unit
 
-        Params:
-        -------
-        unit_id - unique ID for the unit of interest
+        Parameters
+        ----------
+        unit_id : int
+            unique ID for the unit of interest
 
-        Returns:
+        Returns
         -------
-        pref_speed - stimulus speed driving the maximal response
-
+        pref_speed :
+            stimulus speed driving the maximal response
         """
-        similar_conditions = [self.stimulus_conditions.index[self.stimulus_conditions[self._col_speed] == speed].tolist() for speed in self.speeds]
-        df = pd.DataFrame(index=self.speeds,
-                         data = {'spike_mean' : 
-                                [self.conditionwise_statistics.loc[unit_id].loc[condition_inds]['spike_mean'].mean() for condition_inds in similar_conditions]
-                             }
-                         ).rename_axis(self._col_speed)
+        # TODO: Most of the _get_pref_*() methods can be combined into one method and shared among the classes
+        similar_conditions = [self.stimulus_conditions.index[self.stimulus_conditions[self._col_speed]
+                                                             == speed].tolist() for speed in self.speeds]
+        df = pd.DataFrame(
+            index=self.speeds,
+            data={'spike_mean': [self.conditionwise_statistics.loc[unit_id].loc[condition_inds]['spike_mean'].mean()
+                                 for condition_inds in similar_conditions]}
+        ).rename_axis(self._col_speed)
 
         return df.idxmax().iloc[0]
 
     def _get_pref_dir(self, unit_id):
-        """ Calculate the preferred direction condition for a given unit
+        """Calculate the preferred direction condition for a given unit
 
-        Params:
+        Parameters
+        ----------
+        unit_id : int
+            unique ID for the unit of interest
+
+        Returns
         -------
-        unit_id - unique ID for the unit of interest
-
-        Returns:
-        -------
-        pref_dir - stimulus direction driving the maximal response
-
+        pref_dir : float
+            stimulus direction driving the maximal response
         """
-        similar_conditions = [self.stimulus_conditions.index[self.stimulus_conditions[self._col_dir] == direction].tolist() for direction in self.directions]
-        df = pd.DataFrame(index=self.directions,
-                         data = {'spike_mean' : 
-                                [self.conditionwise_statistics.loc[unit_id].loc[condition_inds]['spike_mean'].mean() for condition_inds in similar_conditions]
-                             }
-                         ).rename_axis(self._col_dir)
+        similar_conditions = [self.stimulus_conditions.index[self.stimulus_conditions[self._col_dir]
+                                                             == direction].tolist() for direction in self.directions]
+        df = pd.DataFrame(
+            index=self.directions,
+            data={'spike_mean': [self.conditionwise_statistics.loc[unit_id].loc[condition_inds]['spike_mean'].mean()
+                                 for condition_inds in similar_conditions]}
+        ).rename_axis(self._col_dir)
 
         return df.idxmax().iloc[0]
 
@@ -207,4 +204,3 @@ class DotMotion(StimulusAnalysis):
         speed_tuning - degree to which the unit's responses are modulated by stimulus speed
         """
         return np.nan
-
