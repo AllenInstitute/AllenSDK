@@ -479,7 +479,7 @@ class EcephysSession(LazyPropertyMixin):
         spike_counts["spike_count"] = np.zeros(spike_counts.shape[0])
         spike_counts = spike_counts.groupby(["stimulus_presentation_id", "unit_id"]).count()
         unit_ids = unit_ids if unit_ids is not None else spikes['unit_id'].unique()  # If not explicity stated get unit ids from spikes table.
-        spike_counts = spike_counts.reindex(pd.MultiIndex.from_product([spike_counts.index.levels[0],
+        spike_counts = spike_counts.reindex(pd.MultiIndex.from_product([stimulus_presentation_ids,
                                                                         unit_ids],
                                                                        names=['stimulus_presentation_id', 'unit_id']),
                                             fill_value=0)

@@ -41,8 +41,8 @@ class StimulusAnalysis(object):
         self._stim_table_spontaneous = None
         self._stimulus_key = kwargs.get('stimulus_key', None)
         self._running_speed = None
-        self._sweep_events = None
-        self._mean_sweep_events = None
+        # self._sweep_events = None
+        # self._mean_sweep_events = None
         #  self._sweep_p_values = None
         self._metrics = None
 

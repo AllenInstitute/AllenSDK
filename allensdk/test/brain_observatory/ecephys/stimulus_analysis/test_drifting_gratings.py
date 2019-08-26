@@ -3,12 +3,43 @@ import numpy as np
 import pandas as pd
 import pytest
 import itertools
-from mock import MagicMock, patch
 
-from allensdk.brain_observatory.ecephys.stimulus_analysis import drifting_gratings
+from conftest import MockSessionApi
+#from allensdk.brain_observatory.ecephys.stimulus_analysis import drifting_gratings
 from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
+from allensdk.brain_observatory.ecephys.stimulus_analysis.drifting_gratings import DriftingGratings
+
+class MockDGSessionApi(MockSessionApi):
+    def get_stimulus_presentations(self):
+        features = np.array(np.meshgrid([1.0, 2.0, 4.0, 8.0, 15.0],                            # TF
+                                        [0.0, 45.0, 90.0, 135.0, 180.0, 225.0, 270.0, 315.0])  # ORI
+                            ).reshape(2, 40)
+                                        #[0.0, 0.25, 0.50, 0.75]))#.reshape(3, 120)  # Phase
+        print(features)
+        print(features.shape)
+        exit()
+
+        return pd.DataFrame({
+            'start_time': np.concatenate(([0.0], np.linspace(0.5, 30.25, 120, endpoint=True), [31.5])),
+            'stop_time': np.concatenate(([0.5], np.linspace(0.75, 30.50, 120, endpoint=True), [32.0])),
+            'stimulus_name': ['spontaneous'] + ['static_gratings']*120 + ['spontaneous'],
+            'stimulus_block': [0] + [1]*120 + [0],
+            'duration': [0.5] + [0.25]*120 + [0.5],
+            'stimulus_index': [0] + [1]*120 + [0],
+            'spatial_frequency': np.concatenate(([np.nan], features[0, :], [np.nan])),
+            'orientation': np.concatenate(([np.nan], features[1, :], [np.nan])),
+            'phase': np.concatenate(([np.nan], features[2, :], [np.nan]))
+        }, index=pd.Index(name='id', data=np.arange(122)))
+
+def mock_ecephys_api():
+    return MockDGSessionApi()
 
 
+session = EcephysSession(api=mock_ecephys_api())
+sg = DriftingGratings(ecephys_session=session)
+print(sg.stim_table)
+
+"""
 data_dir = '/allen/aibs/informatics/module_test_data/ecephys/stimulus_analysis_fh'
 
 @pytest.mark.parametrize('spikes_nwb,expected_csv,analysis_params,units_filter',
@@ -25,7 +56,7 @@ data_dir = '/allen/aibs/informatics/module_test_data/ecephys/stimulus_analysis_f
                                914580428, 914580452, 914580450, 914580474, 914580470, 914580490])
                          ])
 def test_metrics(spikes_nwb, expected_csv, analysis_params, units_filter, skip_cols=[]):
-    """Full intergration tests of metrics table"""
+    ## Full intergration tests of metrics table
     # TODO: Test is only temporary while the stimulus_analysis modules is in development. Replace with unit tests and/or move to integration testing framework
     if not os.path.exists(spikes_nwb):
         pytest.skip('No input spikes file {}.'.format(spikes_nwb))
@@ -151,3 +182,4 @@ def test_get_suppressed_contrast(peak_response, all_responses, blank_responses, 
                          ])
 def test_fit_tf_tuning(tuning_responses, tf_values, pref_tf_index, expected):
     assert (np.allclose(drifting_gratings.get_fit_tf_tuning(tuning_responses, tf_values, pref_tf_index), expected, equal_nan=True))
+"""

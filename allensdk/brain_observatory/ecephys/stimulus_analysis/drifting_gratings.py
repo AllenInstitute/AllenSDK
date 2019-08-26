@@ -5,6 +5,7 @@ import scipy.ndimage as ndi
 import scipy.stats as st
 from scipy.optimize import curve_fit
 from scipy.fftpack import fft
+from scipy import signal
 import logging
 
 import matplotlib.pyplot as plt
