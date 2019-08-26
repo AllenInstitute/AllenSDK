@@ -17,26 +17,27 @@ def test_sample_frequency(expected):
     assert dataset.sample_frequency == dataset.meta_data['ni_daq']['counter_output_freq']
 
 
-@pytest.mark.parametrize('key,line_labels,led_indices,sample_frequency', [
-    [ 'foo', ('LED_sync',), np.array([1, 2, 3]), 1000 ],
-    [ 'LED_sync', ('LED_sync',), np.array([1, 2, 3]), 1000 ],
+@pytest.mark.parametrize('key,line_labels,led_vals', [
+    [ 'foo', ('LED_sync',), np.array([1, 2, 3]) ],
+    [ 'LED_sync', ('LED_sync',), np.array([1, 2, 3]) ],
 ])
-def test_extract_led_times(key, line_labels, led_indices, sample_frequency):
+def test_extract_led_times(key, line_labels, led_vals):
 
     dataset = EcephysSyncDataset()
     dataset.line_labels = line_labels
-    dataset.sample_frequency = sample_frequency
+    dataset.sample_frequency = 1000
 
-    with mock.patch('allensdk.brain_observatory.sync_dataset.Dataset.get_rising_edges', return_value=led_indices) as p:
-        obtained = dataset.extract_led_times(key)
-        
-        if key in line_labels:
-            p.assert_called_once_with(line_labels.index(key))
-        else:
-            p.assert_called_once_with(18)
+    with mock.patch('allensdk.brain_observatory.sync_dataset.Dataset.get_all_times', return_value=led_vals) as p:
+        with mock.patch("allensdk.brain_observatory.sync_dataset.Dataset.get_bit_changes", return_value=np.ones_like(led_vals)) as q:
+            obtained = dataset.extract_led_times(key)
+            
+            if key in line_labels:
+                q.assert_called_once_with(0)
+            else:
+                q.assert_called_with(18)
 
-    expected = led_indices / sample_frequency
-    assert np.allclose(obtained, expected)
+        assert np.allclose(obtained, led_vals)
+
 
 @pytest.mark.parametrize('photodiode_times,vsyncs,cycle,expected', [
     [ # expected timing, using vsyncs

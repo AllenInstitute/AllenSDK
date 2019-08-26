@@ -141,20 +141,20 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         csd = xr.DataArray(
             name="CSD",
             data=csd_ts.data[:],
-            dims=["channel", "time"],
+            dims=["virtual channel location", "time"],
             coords={
-                # Each CSD calculation step reduces the channel dimension by 2. 
-                # These channels contributed to the calculation, 
-                # but are not specifically associated with a row in the result
-                "channel": csd_ts.control[2:-2], 
+                "virtual channel location": csd_ts.control[:],
                 "time": csd_ts.timestamps[:]
             }
         )
-
-        known_channels = set(self.get_channels().index.values)
-        known_csd_channels = [ch for ch in csd["channel"].values if ch in known_channels]
-        csd = csd.loc[{"channel": known_csd_channels}]
         return csd
+
+    def get_optogenetic_stimulation(self) -> pd.DataFrame:
+        mod = self.nwbfile.get_processing_module("optotagging")
+        table = mod.get_data_interface("optogenetic_stimuluation").to_dataframe()
+        table.drop(columns=["tags", "timeseries"], inplace=True)
+        return table
+
 
     def _get_full_units_table(self) -> pd.DataFrame:
         units = self.nwbfile.units.to_dataframe()

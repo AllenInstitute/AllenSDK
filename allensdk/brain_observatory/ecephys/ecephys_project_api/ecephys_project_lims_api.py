@@ -92,6 +92,8 @@ class EcephysProjectLimsApi(EcephysProjectApi):
                 join ecephys_probes ep on ep.id = ec.ecephys_probe_id
                 join ecephys_sessions es on es.id = ep.ecephys_session_id 
                 where ec.valid_data
+                and ep.workflow_state != 'failed'
+                and es.workflow_state != 'failed'
                 {{pm.optional_equals('eu.quality', quality) -}}
                 {{pm.optional_contains('eu.id', unit_ids) -}}
                 {{pm.optional_contains('ec.id', channel_ids) -}}
@@ -149,6 +151,8 @@ class EcephysProjectLimsApi(EcephysProjectApi):
                     group by ech.id
                 ) pc on ec.id = pc.ecephys_channel_id
                 where valid_data
+                and ep.workflow_state != 'failed'
+                and es.workflow_state != 'failed'
                 {{pm.optional_contains('ec.id', channel_ids) -}}
                 {{pm.optional_contains('ep.id', probe_ids) -}}
                 {{pm.optional_contains('es.id', session_ids) -}}
@@ -234,6 +238,8 @@ class EcephysProjectLimsApi(EcephysProjectApi):
                     group by epr.id
                 ) str on ep.id = str.ecephys_probe_id
                 where true
+                and ep.workflow_state != 'failed'
+                and es.workflow_state != 'failed'
                 {{pm.optional_contains('ep.id', probe_ids) -}}
                 {{pm.optional_contains('es.id', session_ids) -}}
             """,

@@ -140,6 +140,11 @@ class InputSchema(ArgSchema):
         default=3, 
         help="number of child processes used to write probewise lfp files"
     )
+    optotagging_table_path = String(
+        required=False,
+        validate=check_read_access,
+        help="file at this path contains information about the optogenetic stimulation applied during this "
+    )
 
 
 class ProbeOutputs(RaisingSchema):

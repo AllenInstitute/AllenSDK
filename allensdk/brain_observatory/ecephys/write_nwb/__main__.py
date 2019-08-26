@@ -17,6 +17,7 @@ from ._schemas import InputSchema, OutputSchema
 from allensdk.brain_observatory.nwb import (
     add_stimulus_presentations,
     add_stimulus_timestamps,
+    setup_table_for_epochs
 )
 from allensdk.brain_observatory.argschema_utilities import (
     write_or_print_outputs, optional_lims_inputs
@@ -466,9 +467,8 @@ def write_probe_lfp_file(session_start_time, log_level, probe):
 
     nwbfile.add_acquisition(lfp)
 
-    csd, csd_times, csd_channels = read_csd_data_from_h5(probe["csd_path"])
-    csd_channels = np.array([channel_li_id_map[li] for li in csd_channels])
-    nwbfile = add_csd_to_nwbfile(nwbfile, csd, csd_times, csd_channels)
+    csd, csd_times, csd_locs = read_csd_data_from_h5(probe["csd_path"])
+    nwbfile = add_csd_to_nwbfile(nwbfile, csd, csd_times, csd_locs)
 
     with pynwb.NWBHDF5IO(probe['lfp']['output_path'], 'w') as lfp_writer:
         logging.info(f"writing probe lfp file to {probe['lfp']['output_path']}")
@@ -478,20 +478,22 @@ def write_probe_lfp_file(session_start_time, log_level, probe):
 
 def read_csd_data_from_h5(csd_path):
     with h5py.File(csd_path, "r") as csd_file:
-        return csd_file["current_source_density"][:], csd_file["timestamps"][:], csd_file["channels"][:]
+        return (csd_file["current_source_density"][:],
+                csd_file["timestamps"][:],
+                csd_file["csd_locations"][:])
 
 
-def add_csd_to_nwbfile(nwbfile, csd, times, channels, unit="V/cm^2"):
+def add_csd_to_nwbfile(nwbfile, csd, times, csd_virt_channel_locs, unit="V/cm^2"):
 
-    csd_mod = pynwb.ProcessingModule("current_source_density", "precalculated current source density from a subset of channel")
+    csd_mod = pynwb.ProcessingModule("current_source_density", "Precalculated current source density from interpolated channel locations.")
     nwbfile.add_processing_module(csd_mod)
 
     csd_ts = pynwb.base.TimeSeries(
         name="current_source_density",
         data=csd,
         timestamps=times,
-        control=channels.astype(np.uint64),  # these are postgres ids, always non-negative
-        control_description="ids of electrodes from which csd was calculated",
+        control=csd_virt_channel_locs.astype(np.uint64),  # These are locations (x, y) of virtual interpolated electrodes
+        control_description="Virtual locations of electrodes from which csd was calculated",
         unit=unit
     )
     csd_mod.add_data_interface(csd_ts)
@@ -563,6 +565,25 @@ def add_probewise_data_to_nwbfile(nwbfile, probes):
     return nwbfile
 
 
+def add_optotagging_table_to_nwbfile(nwbfile, optotagging_table, tag="optical_stimulation"):
+    opto_ts = pynwb.base.TimeSeries(
+        name="optotagging",
+        timestamps=optotagging_table["start_time"].values,
+        data=optotagging_table["duration"].values
+    )
+
+    opto_mod = pynwb.ProcessingModule("optotagging", "optogenetic stimulution data")
+    opto_mod.add_data_interface(opto_ts)
+    nwbfile.add_processing_module(opto_mod)
+
+    optotagging_table = setup_table_for_epochs(optotagging_table, opto_ts, tag)
+    container = pynwb.epoch.TimeIntervals.from_dataframe(optotagging_table, "optogenetic_stimuluation")
+    opto_mod.add_data_interface(container)
+
+    return nwbfile
+
+
+
 def write_ecephys_nwb(
     output_path, 
     session_id, session_start_time, 
@@ -570,6 +591,7 @@ def write_ecephys_nwb(
     probes, 
     running_speed_path,
     pool_size,
+    optotagging_table_path=None,
     **kwargs
 ):
 
@@ -582,6 +604,10 @@ def write_ecephys_nwb(
     stimulus_table = read_stimulus_table(stimulus_table_path)
     nwbfile = add_stimulus_timestamps(nwbfile, stimulus_table['start_time'].values) # TODO: patch until full timestamps are output by stim table module
     nwbfile = add_stimulus_presentations(nwbfile, stimulus_table)
+
+    if optotagging_table_path is not None:
+        optotagging_table = pd.read_csv(optotagging_table_path)
+        nwbfile = add_optotagging_table_to_nwbfile(nwbfile, optotagging_table)
 
     nwbfile = add_probewise_data_to_nwbfile(nwbfile, probes)
 
