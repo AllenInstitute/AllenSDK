@@ -79,9 +79,16 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         units_table = self._get_full_units_table()
         return units_table['spike_times'].to_dict()
 
+    def get_spike_amplitudes(self) -> Dict[int, np.ndarray]:
+        units_table = self._get_full_units_table()
+        return units_table["spike_amplitudes"].to_dict()
+
     def get_units(self) -> pd.DataFrame:
         units = self._get_full_units_table()
-        units.drop(columns=['spike_times', 'waveform_mean'], inplace=True)
+
+        to_drop = set(["spike_times", "spike_amplitudes", "waveform_mean"]) & set(units.columns)
+        units.drop(columns=list(to_drop), inplace=True)
+
         return units
 
     def get_lfp(self, probe_id: int) -> xr.DataArray:

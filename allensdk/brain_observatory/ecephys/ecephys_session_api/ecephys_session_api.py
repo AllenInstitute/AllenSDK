@@ -52,3 +52,6 @@ class EcephysSessionApi:
 
     def get_optogenetic_stimulation(self) -> pd.DataFrame:
         raise NotImplementedError
+
+    def get_spike_amplitudes(self) -> Dict[int, np.ndarray]:
+        raise NotImplementedError
