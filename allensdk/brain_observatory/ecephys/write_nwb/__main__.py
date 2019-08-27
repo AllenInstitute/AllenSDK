@@ -31,6 +31,11 @@ from allensdk.brain_observatory.ecephys.nwb import EcephysProbe
 
 STIM_TABLE_RENAMES_MAP = {"Start": "start_time", "End": "stop_time"}
 
+
+def load_and_squeeze_npy(path):
+    return np.squeeze(np.load(path, allow_pickle=False))
+
+
 def fill_df(df, str_fill=""):
     df = df.copy()
 
@@ -134,37 +139,69 @@ def read_spike_times_to_dictionary(
 
     """
 
-    spike_times = np.squeeze(np.load(spike_times_path, allow_pickle=False))
-    spike_units = np.squeeze(np.load(spike_units_path, allow_pickle=False))
+    spike_times = load_and_squeeze_npy(spike_times_path)
+    spike_units = load_and_squeeze_npy(spike_units_path)
 
-    sort_order = np.argsort(spike_units)
-    spike_units = spike_units[sort_order]
-    spike_times = spike_times[sort_order]
+    return group_1d_by_unit(spike_times, spike_units, local_to_global_unit_map)
+
+
+def read_spike_amplitudes_to_dictionary(
+    spike_amplitudes_path, spike_units_path, 
+    templates_path, spike_templates_path,
+    local_to_global_unit_map=None,
+    scale_factor=1.0
+):
+
+    spike_amplitudes = load_and_squeeze_npy(spike_amplitudes_path)
+    spike_units = load_and_squeeze_npy(spike_units_path)
+
+    templates = load_and_squeeze_npy(templates_path)
+    spike_templates = load_and_squeeze_npy(spike_templates_path)
+
+    scaled_amplitudes = scale_amplitudes(spike_amplitudes, templates, spike_templates, scale_factor=scale_factor)
+    return group_1d_by_unit(scaled_amplitudes, spike_units, local_to_global_unit_map)
+
+
+def scale_amplitudes(spike_amplitudes, templates, spike_templates, scale_factor=1.0):
+
+    template_full_amplitudes = templates.max(axis=1) - templates.min(axis=1)
+    template_amplitudes = template_full_amplitudes.max(axis=1)
+
+    template_amplitudes = template_amplitudes[spike_templates]
+    spike_amplitudes = template_amplitudes * spike_amplitudes * scale_factor
+    return spike_amplitudes
+
+
+def group_1d_by_unit(data, data_unit_map, local_to_global_unit_map=None):
+    sort_order = np.argsort(data_unit_map, kind="stable")
+    data_unit_map = data_unit_map[sort_order]
+    data = data[sort_order]
+
     changes = np.concatenate(
         [
             np.array([0]),
-            np.where(np.diff(spike_units))[0] + 1,
-            np.array([spike_times.size]),
+            np.where(np.diff(data_unit_map))[0] + 1,
+            np.array([data.size]),
         ]
     )
 
-    output_times = {}
+    output = {}
     for jj, (low, high) in enumerate(zip(changes[:-1], changes[1:])):
-        local_unit = spike_units[low]
-        unit_times = np.sort(spike_times[low:high])
+        local_unit = data_unit_map[low]
+        current = data[low:high]
 
         if local_to_global_unit_map is not None:
             if local_unit not in local_to_global_unit_map:
                 logging.warning(
-                    f"unable to find unit at local position {local_unit} while reading spike times"
+                    f"unable to find unit at local position {local_unit}"
                 )
                 continue
             global_id = local_to_global_unit_map[local_unit]
-            output_times[global_id] = unit_times
+            output[global_id] = current
         else:
-            output_times[local_unit] = unit_times
+            output[local_unit] = current
 
-    return output_times
+    return output
 
 
 def read_waveforms_to_dictionary(
@@ -522,6 +559,7 @@ def add_probewise_data_to_nwbfile(nwbfile, probes):
     channel_tables = {}
     unit_tables = []
     spike_times = {}
+    spike_amplitudes = {}
     mean_waveforms = {}
 
     for probe in probes:
@@ -543,6 +581,13 @@ def add_probewise_data_to_nwbfile(nwbfile, probes):
         mean_waveforms.update(read_waveforms_to_dictionary(
             probe['mean_waveforms_path'], local_to_global_unit_map
         ))
+
+        spike_amplitudes.update(read_spike_amplitudes_to_dictionary(
+            probe["spike_amplitudes_path"], probe["spike_clusters_file"], 
+            probe["templates_path"], probe["spike_templates_path"],
+            local_to_global_unit_map=local_to_global_unit_map,
+            scale_factor=probe["amplitude_scale_factor"]
+        ))
     
     electrodes_table = fill_df(pd.concat(list(channel_tables.values())))
     nwbfile.electrodes = pynwb.file.ElectrodeTable().from_dataframe(electrodes_table, name='electrodes')
@@ -554,6 +599,13 @@ def add_probewise_data_to_nwbfile(nwbfile, probes):
         data=spike_times,
         column_name="spike_times",
         column_description="times (s) of detected spiking events",
+    )
+
+    add_ragged_data_to_dynmaic_table(
+        table=nwbfile.units,
+        data=spike_amplitudes,
+        column_name="spike_amplitudes",
+        column_description="amplitude (s) of detected spiking events"
     )
 
     add_ragged_data_to_dynamic_table(
