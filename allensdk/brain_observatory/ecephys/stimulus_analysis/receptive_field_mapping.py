@@ -105,7 +105,7 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         """ Spatial receptive fields for N units (9 x 9 x N matrix of responses) """
         if self._rf_matrix is None:
 
-            bin_edges = np.linspace(0, 0.249, 249)
+            bin_edges = np.linspace(0, 0.249, 3)
 
             self.stim_table.loc[:, self._col_pos_y] = 40.0 - self.stim_table[self._col_pos_y]
 
@@ -211,13 +211,12 @@ class ReceptiveFieldMapping(StimulusAnalysis):
 
         """
 
-        return self.receptive_fields['spike_count'].sel(unit_id=unit_id).data
+        return self.receptive_fields['spike_counts'].sel(unit_id=unit_id).data
 
 
     def _response_by_stimulus_position(self, dataset, presentations,
         row_key=None, column_key=None,
-        unit_key='unit_id', time_key='time_relative_to_stimulus_onset',
-        spike_count_key='spike_count'):
+        unit_key='unit_id', time_key='time_relative_to_stimulus_onset'):
 
         """ Calculate the unit's response to different locations
         of the Gabor patch
@@ -237,18 +236,15 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         if column_key is None:
             column_key = self._col_pos_x
 
-        dataset = dataset.copy()
-        # dataset['spike_counts'] = dataset['spike_counts'].sum(dim=time_key)
-        dataset[spike_count_key] = dataset.sum(dim=time_key)
-        dataset = dataset.drop(time_key)
+        ds = dataset.sum(dim=time_key)
 
-        dataset[row_key] = presentations.loc[:, row_key]
-        dataset[column_key] = presentations.loc[:, column_key]
-        dataset = dataset.to_dataframe()
+        ds[row_key] = presentations.loc[:, row_key]
+        ds[column_key] = presentations.loc[:, column_key]
 
-        dataset = dataset.reset_index(unit_key).groupby([row_key, column_key, unit_key]).sum()
+        df = ds.to_dataframe()
+        df = df.reset_index(unit_key).groupby([row_key, column_key, unit_key]).sum()
 
-        return dataset.to_xarray()
+        return df.to_xarray()
 
 
 
