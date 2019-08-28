@@ -108,11 +108,11 @@ class DotMotion(StimulusAnalysis):
     @property
     def metrics(self):
         if self._metrics is None:
+            logger.info('Calculating metrics for ' + self.name)
             unit_ids = self.unit_ids
             metrics_df = self.empty_metrics_table()
 
             if len(self.stim_table) > 0:
-                logger.info('Calculating metrics for ' + self.name)
                 metrics_df['pref_speed_dm'] = [self._get_pref_speed(unit) for unit in unit_ids]
                 metrics_df['pref_dir_dm'] = [self._get_pref_dir(unit) for unit in unit_ids]
                 metrics_df['firing_rate_dm'] = [self._get_overall_firing_rate(unit) for unit in unit_ids]

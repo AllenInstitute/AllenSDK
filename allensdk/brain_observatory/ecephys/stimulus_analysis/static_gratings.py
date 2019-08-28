@@ -139,12 +139,11 @@ class StaticGratings(StimulusAnalysis):
     @property
     def metrics(self):
         if self._metrics is None:
+            logger.info('Calculating metrics for ' + self.name)
             unit_ids = self.unit_ids
             metrics_df = self.empty_metrics_table()
 
             if len(self.stim_table) > 0:
-                logger.info('Calculating metrics for ' + self.name)
-
                 metrics_df['pref_sf_sg'] = [self._get_pref_sf(unit) for unit in unit_ids]
                 metrics_df['pref_ori_sg'] = [self._get_pref_ori(unit) for unit in unit_ids]
                 metrics_df['pref_phase_sg'] = [self._get_pref_phase(unit) for unit in unit_ids]

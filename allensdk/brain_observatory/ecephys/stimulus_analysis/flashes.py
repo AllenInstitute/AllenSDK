@@ -91,15 +91,14 @@ class Flashes(StimulusAnalysis):
     @property
     def metrics(self):
         if self._metrics is None:
+            logger.info('Calculating metrics for ' + self.name)
             unit_ids = self.unit_ids
-        
             metrics_df = self.empty_metrics_table()
 
             if len(self. stim_table) > 0:
-                logger.info('Calculating metrics for ' + self.name)
-
                 metrics_df['on_off_ratio_fl'] = [self._get_on_off_ratio(unit) for unit in unit_ids]
-                metrics_df['sustained_idx_fl'] = [self._get_sustained_index(unit) for unit in unit_ids]
+                metrics_df['sustained_idx_fl'] = [self._get_sustained_index(unit, self._get_preferred_condition(unit))
+                                                  for unit in unit_ids]
                 metrics_df['firing_rate_fl'] = [self._get_overall_firing_rate(unit) for unit in unit_ids]
                 metrics_df['reliability_fl'] = [self._get_reliability(unit, self._get_preferred_condition(unit))
                                                 for unit in unit_ids]
@@ -141,7 +140,7 @@ class Flashes(StimulusAnalysis):
         self._colors = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_color]
                                                             != 'null'][self._col_color].unique())
 
-    def _get_sustained_index(self, unit_id):
+    def _get_sustained_index(self, unit_id, condition_id):
         """ Calculate the sustained index for a given unit, a measure of the transience of
         the flash response.
 
@@ -151,10 +150,14 @@ class Flashes(StimulusAnalysis):
 
         Returns:
         -------
-        sustained_index - metric
+        sustained_index - ratio of the mean PSTH and the maximum of the PSTH
+            A cell that fires very transiently will have a sustained index close to 0
+            A cell that first continuously throughout the flash will have a sustained
+                index closer to 1
 
         """
-        return np.nan
+        psth = self.conditionwise_psth.sel(unit_id=unit_id, stimulus_condition_id=condition_id).data
+        return np.mean(psth)/np.amax(psth)
 
     def _get_on_off_ratio(self, unit_id):
         """Gets the ratio of mean spikes for on-stimuli vs off stimuli.

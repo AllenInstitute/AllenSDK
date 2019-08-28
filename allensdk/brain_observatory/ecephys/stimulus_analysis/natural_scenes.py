@@ -104,6 +104,8 @@ class NaturalScenes(StimulusAnalysis):
     @property
     def metrics(self):
         if self._metrics is None:
+            logger.info('Calculating metrics for ' + self.name)
+
             unit_ids = self.unit_ids
             metrics_df = self.empty_metrics_table()
 

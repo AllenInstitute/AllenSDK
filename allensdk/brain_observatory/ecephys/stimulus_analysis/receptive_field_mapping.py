@@ -101,7 +101,8 @@ class ReceptiveFieldMapping(StimulusAnalysis):
     def receptive_fields(self):
         """ Spatial receptive fields for N units (9 x 9 x N matrix of responses) """
         if self._rf_matrix is None:
-            bin_edges = np.linspace(0, 0.249, 249)
+            bin_edges = np.linspace(0, 0.249, 3)
+
             self.stim_table.loc[:, self._col_pos_y] = 40.0 - self.stim_table[self._col_pos_y]
             presentationwise_response_matrix = self.ecephys_session.presentationwise_spike_counts(
                 bin_edges=bin_edges,
@@ -135,12 +136,11 @@ class ReceptiveFieldMapping(StimulusAnalysis):
     @property
     def metrics(self):
         if self._metrics is None:
+            logger.info('Calculating metrics for ' + self.name)
             unit_ids = self.unit_ids
             metrics_df = self.empty_metrics_table()
 
             if len(self.stim_table) > 0:
-                logger.info('Calculating metrics for ' + self.name)
-
                 metrics_df.loc[:, ['azimuth_rf',
                                    'elevation_rf',
                                    'width_rf',
@@ -199,34 +199,35 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         -------
         receptive_field : 9 x 9 numpy array
         """
-        return self.receptive_fields['spike_count'].sel(unit_id=unit_id).data
+        return self.receptive_fields['spike_counts'].sel(unit_id=unit_id).data
 
-    def _response_by_stimulus_position(self, dataset, presentations):
-        """ Calculate the unit's response to different locations of the Gabor patch
+    def _response_by_stimulus_position(self, dataset, presentations,
+        row_key=None, column_key=None,
+        unit_key='unit_id', time_key='time_relative_to_stimulus_onset'):
 
-        Parameters
-        ----------
-        dataset : xarray
-            dataset of binned spike counts for each trial
-        presentations : list
-            presentation_ids
+        """ Calculate the unit's response to different locations
+        of the Gabor patch
 
         Returns
         -------
         dataset : xarray
             dataset of receptive fields
         """
-        dataset = dataset.copy()
-        dataset['spike_count'] = dataset.sum(dim='time_relative_to_stimulus_onset')
-        dataset = dataset.drop('time_relative_to_stimulus_onset')
 
-        dataset[self._col_pos_y] = presentations.loc[:, self._col_pos_y]
-        dataset[self._col_pos_x] = presentations.loc[:, self._col_pos_x]
-        dataset = dataset.to_dataframe()
+        if row_key is None:
+            row_key = self._col_pos_y
+        if column_key is None:
+            column_key = self._col_pos_x
 
-        dataset = dataset.reset_index('unit_id').groupby([self._col_pos_y, self._col_pos_x, 'unit_id']).sum()
+        ds = dataset.sum(dim=time_key)
 
-        return dataset.to_xarray()
+        ds[row_key] = presentations.loc[:, row_key]
+        ds[column_key] = presentations.loc[:, column_key]
+
+        df = ds.to_dataframe()
+        df = df.reset_index(unit_key).groupby([row_key, column_key, unit_key]).sum()
+
+        return df.to_xarray()
 
     def _get_rf_stats(self, unit_id):
         """ Calculate a variety of metrics for one unit's receptive field

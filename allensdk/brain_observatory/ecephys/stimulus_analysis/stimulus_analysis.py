@@ -5,9 +5,15 @@ import scipy.stats as st
 import scipy.ndimage as ndi
 import warnings
 
+from scipy.optimize import curve_fit
+from scipy.ndimage import gaussian_filter
+
+
 from ..ecephys_session import EcephysSession
 from allensdk.brain_observatory.ecephys.ecephys_session_api import EcephysNwbSessionApi
 
+import warnings
+warnings.simplefilter(action='ignore', category=RuntimeWarning)
 
 class StimulusAnalysis(object):
     def __init__(self, ecephys_session, trial_duration=None, **kwargs):
@@ -451,6 +457,7 @@ class StimulusAnalysis(object):
     ## Helper functions for calling metrics of individual units. ##
     def _get_preferred_condition(self, unit_id):
         """Determines and caches the prefered stimulus_condition_id based on mean spikes, ignoring null conditions."""
+        # TODO: Should probably be renamed to preferred_condition_id so there is no confusion.
         if unit_id not in self._preferred_condition:
             # Use conditionwise_statistics 'spike_mean' column to find stimulus_condition_id that gives the highest
             # value.
@@ -526,6 +533,22 @@ class StimulusAnalysis(object):
 
         return overall_firing_rate(start_times=self._block_starts, stop_times=self._block_stops,
                                    spike_times=self.ecephys_session.spike_times[unit_id])
+
+    def get_intrinsic_timescale(self, unit_ids):
+
+        """
+        Calculates the intrinsic timescale for a subset of units
+        """
+        dataset = self.ecephys_session.presentationwise_spike_counts(bin_edges = np.arange(0, self._trial_duration, 0.025),
+                      stimulus_presentation_ids = self.stim_table.index.values,
+                      unit_ids = unit_ids
+                      )
+
+        rsc_time_matrix = calculate_time_delayed_correlation(dataset)
+
+        t, y, y_std, a, intrinsic_timescale, c = fit_exp(rsc_time_matrix)
+
+        return intrinsic_timescale
 
     ### VISUALIZATION ###
     def plot_conditionwise_raster(self, unit_id):
@@ -775,3 +798,41 @@ def deg2rad(arr):
     """ Converts array-like input from degrees to radians"""
     # TODO: Is there any reason not to use np.deg2rad?
     return arr / 180 * np.pi
+
+def fit_exp(rsc_time_matrix):
+    
+    intr = abs(rsc_time_matrix)
+    tmp = np.nanmean(intr, axis=0)
+    n=intr.shape[0]
+    
+    t = np.arange(len(tmp))[1:]
+    y=gaussian_filter(np.nanmean(tmp, axis=0)[1:],0.8)
+    
+    p, amo = curve_fit(lambda t,a,b,c: a*np.exp(-1/b*t)+c,  t,  y,  p0=(-4, 2, 1), maxfev = 1000000000)
+
+    a=p[0]
+    b=p[1] # this is the intrinsic timescale
+    c=p[2]
+    y_std = np.nanstd(tmp, axis=0)[1:]/np.sqrt(n)
+
+    return t, y, y_std, a, b, c
+
+
+def calculate_time_delayed_correlation(dataset):
+
+    nbins = dataset.time_relative_to_stimulus_onset.size
+    num_units = dataset.unit_id.size
+
+    rsc_time_matrix = np.zeros((num_units, nbins, nbins)) * np.nan
+
+    for unit_idx, unit in enumerate(dataset.unit_id):
+        
+        spikes_for_unit = dataset.sel(unit_id=unit).data
+
+        for i in np.arange(nbins-1):
+            for j in np.arange(i+1, nbins):
+                good_trials = (spikes_for_unit[:,i] * spikes_for_unit[:,j]) > 0 # remove zero spike count bins
+                r, p = st.pearsonr(spikes_for_unit[good_trials,i], spikes_for_unit[good_trials,j])
+                rsc_time_matrix[unit_idx, i, j] = r
+
+    return rsc_time_matrix

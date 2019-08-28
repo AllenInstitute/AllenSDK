@@ -3,6 +3,7 @@ import pandas as pd
 from six import string_types
 import scipy.ndimage as ndi
 import scipy.stats as st
+from scipy.signal import welch
 from scipy.optimize import curve_fit
 from scipy.fftpack import fft
 from scipy import signal
@@ -210,6 +211,7 @@ class DriftingGratings(StimulusAnalysis):
             if len(self.stim_table_contrast) > 0:
                 metrics_df['c50_dg'] = [self._get_c50(unit) for unit in unit_ids]
 
+
             self._metrics = metrics_df
 
         return self._metrics
@@ -337,7 +339,6 @@ class DriftingGratings(StimulusAnalysis):
 
         arr = np.squeeze(dataset.values)
         trial_duration = dataset.time_relative_to_stimulus_onset.max()  #TODO: If there a reason not to use self.trial_duration?
-
         return f1_f0(arr, tf, trial_duration)
 
     def _get_modulation_index(self, unit_id, condition_id):
@@ -380,7 +381,8 @@ class DriftingGratings(StimulusAnalysis):
         contrast_conditions = self.stim_table_contrast[
             (self.stim_table_contrast[self._col_ori] == self._get_pref_ori(unit_id))]['stimulus_condition_id'].unique()
 
-        contrasts = self.stimulus_conditions_contrast.loc[contrast_conditions]['contrast'].values.astype('float')
+        # contrasts = self.stimulus_conditions_contrast.loc[contrast_conditions]['contrast'].values.astype('float')
+        contrasts = self.stimulus_conditions_contrast.loc[contrast_conditions][self._col_contrast].values.astype('float')
         mean_responses = self.conditionwise_statistics_contrast.loc[unit_id].loc[contrast_conditions]['spike_mean'].values.astype('float')
 
         return c50(contrasts, mean_responses)
@@ -740,3 +742,4 @@ def modulation_index(response_psth, tf, sample_rate):
         return np.nan
 
     return abs((psd[tf_index] - np.mean(psd))/np.sqrt(np.mean(psd**2)- mean_psd**2))
+
