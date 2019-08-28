@@ -6,10 +6,7 @@ from allensdk.brain_observatory.ecephys.ecephys_session_api import EcephysSessio
 
 
 class MockSessionApi(EcephysSessionApi):
-    """Mock Data to create an EcephysSession object and pass it into stimulus analysis
-
-    # TODO: move to conftest so other tests can use data
-    """
+    """Mock Data to create an EcephysSession object and pass it into stimulus analysis"""
     def get_spike_times(self):
         return {
             0: np.array([1, 2, 3, 4]),

@@ -4,19 +4,35 @@ import pytest
 
 from .conftest import MockSessionApi
 from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
-from allensdk.brain_observatory.ecephys.stimulus_analysis.drifting_gratings import DriftingGratings
+from allensdk.brain_observatory.ecephys.stimulus_analysis.drifting_gratings import DriftingGratings, modulation_index, c50
 
 
 pd.set_option('display.max_columns', None)
 
 
 class MockDGSessionApi(MockSessionApi):
+    ## c50 will be calculated differently depending on if 'drifting_gratings_contrast' stimuli exists.
+
+    def __init__(self, with_dg_contrast=False):
+        self._with_dg_contrast = with_dg_contrast
+
+    def get_spike_times(self):
+        return {
+            0: np.array([1, 2, 3, 4]),
+            1: np.array([2.5]),
+            2: np.array([1.01, 1.03, 1.02]),
+            3: np.array([]),
+            4: np.array([0.01, 1.7, 2.13, 3.19, 4.25, 46.4, 48.7, 54.2, 80.3, 85.40, 85.44, 85.47]),
+            #5: np.array([1.5, 3.0, 4.5, 90.1])  # make sure there is a spike for the contrast stimulus
+            5: np.concatenate(([1.5, 3.0, 4.5], np.linspace(85.0, 89.0, 20)))
+        }
+
     def get_stimulus_presentations(self):
         features = np.array(np.meshgrid([1.0, 2.0, 4.0, 8.0, 15.0],                            # TF
                                         [0.0, 45.0, 90.0, 135.0, 180.0, 225.0, 270.0, 315.0])  # ORI
                             ).reshape(2, 40)
 
-        return pd.DataFrame({
+        stim_table = pd.DataFrame({
             'start_time': np.concatenate(([0.0], np.linspace(0.5, 78.5, 40, endpoint=True), [80.0])),
             'stop_time': np.concatenate(([0.0], np.linspace(2.5, 80.5, 40, endpoint=True), [81.0])),
             'stimulus_name': ['spontaneous'] + ['drifting_gratings']*40 + ['spontaneous'],
@@ -28,10 +44,39 @@ class MockDGSessionApi(MockSessionApi):
             'contrast': 0.8
         }, index=pd.Index(name='id', data=np.arange(42)))
 
+        if self._with_dg_contrast:
+            features = np.array(np.meshgrid([0.0, 45.0, 90.0, 135.0],                             # ORI
+                                            [0.01, 0.02, 0.04, 0.08, 0.13, 0.2, 0.35, 0.6, 1.0])  # contrast
+                                ).reshape(2, 36)
+
+            dg_constrast = pd.DataFrame({
+                'start_time': np.concatenate((80.0 + np.linspace(0.0, 17.5, 36, endpoint=True), [97.5])),
+                'stop_time': np.concatenate((81.5 + np.linspace(0.5, 18.0, 36, endpoint=True), [98.0])),
+                'stimulus_name': ['drifting_gratings_contrast']*36 + ['spontaneous'],
+                'stimulus_block': [2]*36 + [0],
+                'duration': [0.5]*36 + [0.5],
+                'stimulus_index': [2]*36 + [0],
+                'temporal_frequency': 2.0,
+                'orientation': np.concatenate((features[0, :], [np.nan])),
+                'contrast': np.concatenate((features[1, :], [np.nan]))
+            }, index=pd.Index(name='id', data=np.arange(42, 42+37)))
+            stim_table = pd.concat((stim_table, dg_constrast))
+
+        return stim_table
+
+
 
 @pytest.fixture
 def ecephys_api():
     return MockDGSessionApi()
+
+#def mock_ecephys_api():
+#    return MockDGSessionApi()
+
+@pytest.fixture
+def ecephys_api_w_contrast():
+    return MockDGSessionApi(with_dg_contrast=True)
+
 
 
 def test_load(ecephys_api):
@@ -51,6 +96,8 @@ def test_stimulus(ecephys_api):
     dg = DriftingGratings(ecephys_session=session)
     assert(isinstance(dg.stim_table, pd.DataFrame))
     assert(len(dg.stim_table) == 40)
+    assert(len(dg.stim_table_contrast) == 0)
+
     assert(set(dg.stim_table.columns).issuperset({'temporal_frequency', 'orientation', 'contrast', 'start_time',
                                                   'stop_time'}))
 
@@ -64,7 +111,10 @@ def test_stimulus(ecephys_api):
     assert(dg.number_contrast == 1)
 
 
+
+
 def test_metrics(ecephys_api):
+    # Run metrics with no drifting_gratings_contrast stimuli
     session = EcephysSession(api=ecephys_api)
     dg = DriftingGratings(ecephys_session=session)
     assert(isinstance(dg.metrics, pd.DataFrame))
@@ -76,6 +126,10 @@ def test_metrics(ecephys_api):
 
     assert('pref_tf_dg' in dg.metrics.columns)
     assert(np.all(dg.metrics['pref_tf_dg'].loc[[0, 5]] == [1.0, 2.0]))
+
+    # with no contrast stimuli the c50 metric should be null
+    assert('c50_dg' in dg.metrics.columns)
+    assert(np.allclose(dg.metrics['c50_dg'].values, [np.nan]*6, equal_nan=True))
 
     assert('f1_f0_dg' in dg.metrics.columns)
     assert('mod_idx_dg' in dg.metrics.columns)
@@ -89,14 +143,61 @@ def test_metrics(ecephys_api):
     assert('run_mod_dg' in dg.metrics.columns)
 
 
-@pytest.mark.skip(reason='Function is broken')
-def test_contrast_curve():
-    pass
+def test_contrast_stimulus(ecephys_api_w_contrast):
+    session = EcephysSession(api=ecephys_api_w_contrast)
+    dg = DriftingGratings(ecephys_session=session)
+    assert(len(dg.stim_table) == 40)
+
+    assert(len(dg.stim_table_contrast) == 36)
+    assert(len(dg.stimulus_conditions_contrast) == 36)
+    assert(len(dg.conditionwise_statistics_contrast) == 36*6)
 
 
-@pytest.mark.skip(reason='Function is broken')
-def test_c50():
-    pass
+def test_metric_with_contrast(ecephys_api_w_contrast):
+    session = EcephysSession(api=ecephys_api_w_contrast)
+    dg = DriftingGratings(ecephys_session=session)
+
+    assert(isinstance(dg.metrics, pd.DataFrame))
+    assert(len(dg.metrics) == 6)
+    assert(dg.metrics.index.names == ['unit_id'])
+
+    # make sure normal prefered conditions remain the same
+    assert('pref_ori_dg' in dg.metrics.columns)
+    assert(np.all(dg.metrics['pref_ori_dg'].loc[[0, 1, 2, 3, 4, 5]] == np.full(6, 0.0)))
+    assert('pref_tf_dg' in dg.metrics.columns)
+    assert(np.all(dg.metrics['pref_tf_dg'].loc[[0, 5]] == [1.0, 2.0]))
+
+    # Make sure class can see drifting_gratings_contrasts stimuli
+    assert('c50_dg' in dg.metrics.columns)
+    assert(np.allclose(dg.metrics['c50_dg'].loc[[0, 4, 5]], [0.359831, np.nan, 0.175859], equal_nan=True))
+
+
+@pytest.mark.parametrize('response,tf,sampling_rate,expected',
+                         [
+                             (np.array([]), 2.0, 1000.0, np.nan),  # invalid input
+                             (np.zeros(2000), 2.0, 1000.0, 0.0),  # no responses, MI ~ 0
+                             (np.ones(2000), 4.0, 1000.0, 0.0),  # no derivation, MI ~ 0
+                             (np.linspace(0.5, 12.1), 8.0, 1.0, np.nan),  # tf is outside niquist freq.
+                             (np.array([0.1, 0.2, 0.2, 1.1]), 2.0, 4.0, 0.1389328986),  # low mi
+                             (np.linspace(0.5, 12.1, 50), 8.0, 1000.0, 4.993941),  # high mi
+                         ])
+def test_modulation_index(response, tf, sampling_rate, expected):
+    mi = modulation_index(response, tf, sampling_rate)  # return nan, invalid
+    assert(np.isclose(mi, expected, equal_nan=True))
+
+
+@pytest.mark.parametrize('contrast_vals,responses,expected',
+                         [
+                             (np.array([0.01, 0.02, 0.04, 0.08, 0.13, 0.2, 0.35, 0.6, 1.0]), np.array([]), np.nan),  # invalid input
+                             (np.array([0.01, 0.02, 0.04, 0.08, 0.13, 0.2, 0.35, 0.6, 1.0]), np.full(9, 12.0), 0.0090),  # flat non-zero curve
+                             (np.array([0.01, 0.02, 0.04, 0.08, 0.13, 0.2, 0.35, 0.6, 1.0]), np.zeros(9), 0.3598313725490197), # no responses
+                             (np.array([0.01, 0.02, 0.04, 0.08, 0.13, 0.2, 0.35, 0.6, 1.0]), np.linspace(0.0, 12.0, 9), 0.1330745098039216),
+                             (np.array([0.01, 0.02, 0.04, 0.08, 0.13, 0.2, 0.35, 0.6, 1.0]), np.array([0.1, 1.0, 2.0, 5.0, 0.9, 2.0, 5.3, 0.1, 0.1]), 0.5224117647058825),
+                             (np.array([0.01, 0.02, 0.04, 0.08, 0.13, 0.2, 0.35, 0.6, 1.0]), np.array([10.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]), np.nan),  # nan, special case where curve can't be fitted
+                         ])
+def test_c50(contrast_vals, responses, expected):
+    c50_metric = c50(contrast_vals, responses)
+    assert(np.isclose(c50_metric, expected, equal_nan=True))
 
 
 @pytest.mark.skip(reason='Function is broken')
@@ -104,11 +205,10 @@ def test_f1_f0():
     pass
 
 
-@pytest.mark.skip(reason='Function is broken')
-def test_modulation_index():
-    pass
-
-
 if __name__ == '__main__':
     # test_stimulus()
-    test_metrics()
+    #test_metrics()
+    # test_stim_table_contrast()
+    # test_contrast_stimulus()
+    test_metric_with_contrast()
+

@@ -1,13 +1,11 @@
 import numpy as np
 import pandas as pd
-from six import string_types
-import scipy.stats as st
 import logging
-import matplotlib.pyplot as plt
+import warnings
 
 from .stimulus_analysis import StimulusAnalysis
 
-import warnings
+
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 
@@ -46,8 +44,6 @@ class NaturalScenes(StimulusAnalysis):
         self._metrics = None
 
         self._col_image = col_image
-
-        # self._trial_duration = 0.25  # Passed in to kwargs and read by parent
 
         if self._params is not None:
             self._params = self._params.get('natural_scenes', {})
@@ -137,31 +133,48 @@ class NaturalScenes(StimulusAnalysis):
 
     def _get_stim_table_stats(self):
         """ Extract image labels from the stimulus table """
-
         self._images = np.sort(self.stimulus_conditions[self._col_image].unique()).astype(np.int64)
         self._number_images = len(self._images)
         self._number_nonblank = len(self._images[self._images >= 0])
 
     def _get_image_selectivity(self, unit_id, num_steps=1000):
-        """ Calculate the image selectivity for a given unit
-
-        Params:
-        -------
-        unit_id - unique ID for the unit of interest
-
-        Returns:
-        -------
-        image_selectivity - metric
-
-        """
+        """ Calculate the image selectivity for a given unit using spike means at every image"""
 
         unit_stats = self.conditionwise_statistics.loc[unit_id].drop(index=self.null_condition)
+        return image_selectivity(unit_stats['spike_mean'].values, num_steps=num_steps)
 
-        fmin = unit_stats['spike_mean'].min()
-        fmax = unit_stats['spike_mean'].max()
 
-        j = np.arange(num_steps)
-        thresh = fmin + j * ((fmax-fmin) / len(j))
-        rtj = [np.mean(unit_stats['spike_mean'] > t) for t in thresh]
+def image_selectivity(spike_means, num_steps=1000):
+    """Quantifies how selective a cell is for images, based on Quian Quiroga et al., 2007. A value of 0 indicates
+    the cell responds the same no mater what the image. While if the neuron only responds to a single image it
+    will have a selectivity of 1 - 2/N (1.0 and N goes to inf).
 
-        return 1 - (2*np.mean(rtj))
+    Parameters
+    ----------
+    spike_means : array of floats
+        Averaged spiking responses to a series of images for a given neuron
+    num_steps : int
+        Number of threshold values used to build response distribution (default to 1000 as in Quian paper)
+
+    Returns
+    -------
+    selectivity : float
+        selectivity of neuron to images
+    """
+    if spike_means.size < 2 or num_steps < 2:
+        # What is the selectivity of none of 0 spikes (by definition should be 0 and 1)
+        return np.nan
+
+    # Essentially creates a cumulative distribution function of responses at a given set of thresholds, finds the
+    # area under the response distribution and normalizes between 0 and 1.
+    fmin = spike_means.min()
+    fmax = spike_means.max()
+    if fmin == fmax:
+        # A uniform response of none for each image, make sure to return 0
+        return 0.0
+
+    j = np.arange(num_steps)
+    thresh = fmin + j*((fmax - fmin) / num_steps)
+    rtj = [np.mean(spike_means > t) for t in thresh]
+
+    return 1 - (2 * np.mean(rtj))

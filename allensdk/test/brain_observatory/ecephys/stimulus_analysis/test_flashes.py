@@ -24,6 +24,8 @@ class MockFlSessionApi(MockSessionApi):
 def ecephys_api():
     return MockFlSessionApi()
 
+def mock_ecephys_api():
+    return MockFlSessionApi()
 
 def test_load(ecephys_api):
     session = EcephysSession(api=ecephys_api)
@@ -56,6 +58,9 @@ def test_metrics(ecephys_api):
     assert(fl.metrics.index.names == ['unit_id'])
 
     assert('on_off_ratio_fl' in fl.metrics.columns)
+    assert(np.allclose(fl.metrics['on_off_ratio_fl'].loc[[0, 1, 2, 3, 4, 5]],
+                       [0.0, np.nan, 0.0, np.nan, 3.0, 2.0], equal_nan=True))  # Check _get_on_off_ratio() method
+
     assert('sustained_idx_fl' in fl.metrics.columns)
     assert('firing_rate_fl' in fl.metrics.columns)
     assert('reliability_fl' in fl.metrics.columns)
@@ -64,11 +69,6 @@ def test_metrics(ecephys_api):
     assert('lifetime_sparseness_fl' in fl.metrics.columns)
     assert('run_pval_fl' in fl.metrics.columns)
     assert('run_mod_fl' in fl.metrics.columns)
-
-
-@pytest.mark.skip(reason='Update method to be indepent of stim_table')
-def test_on_off_ratio():
-    pass
 
 
 @pytest.mark.skip(reason='Not implemented')

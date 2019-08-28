@@ -4,7 +4,7 @@ import pandas as pd
 
 from .conftest import MockSessionApi
 from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
-from allensdk.brain_observatory.ecephys.stimulus_analysis.natural_scenes import NaturalScenes
+from allensdk.brain_observatory.ecephys.stimulus_analysis.natural_scenes import NaturalScenes, image_selectivity
 
 
 class MockNSSessionApi(MockSessionApi):
@@ -69,9 +69,19 @@ def test_metrics(ecephys_api):
     assert('run_mod_ns' in ns.metrics.columns)
 
 
-@pytest.mark.skip(reason='Fix get_image_selectivity to make it a function.')
-def test_image_selectivity():
-    pass
+@pytest.mark.parametrize('responses,expected',
+                         [
+                             (np.array([]), np.nan),  # invalid input
+                             (np.array([1.0]), np.nan),  # selectivity of one image is undefined
+                             (np.array([0.0]), np.nan),
+                             (np.zeros(118), 0.0),  # responds uniformly
+                             (np.ones(118), 0.0),  # responds uniformly
+                             (np.array([0.0]*200 + [1.0]), 0.99004975),  # reponse to 1 image ~ 1.0
+                             (np.array([5.5, 0.0, 15.0, 10.0, 2.3, 4.9]), 0.16166666666666674)
+                         ])
+def test_image_selectivity(responses, expected):
+    img_sel = image_selectivity(responses)
+    assert(np.isclose(img_sel, expected, equal_nan=True))
 
 
 if __name__ == '__main__':

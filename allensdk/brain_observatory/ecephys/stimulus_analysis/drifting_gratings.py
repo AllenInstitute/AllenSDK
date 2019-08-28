@@ -63,12 +63,25 @@ class DriftingGratings(StimulusAnalysis):
         else:
             self._params = {}
 
-        stim_table = self.stim_table
-        self._stim_table_contrast = stim_table[stim_table['stimulus_name'] == 'drifting_gratings_contrast']
-        self._stim_table = stim_table[stim_table['stimulus_name'] != 'drifting_gratings_contrast']
+        self._stim_table_contrast = None
 
+        #stim_table = self.stim_table
+        #self._stim_table_contrast = stim_table[stim_table['stimulus_name'] == 'drifting_gratings_contrast']
+        #self._stim_table = stim_table[stim_table['stimulus_name'] != 'drifting_gratings_contrast']
         self._conditionwise_statistics_contrast = None
         self._stimulus_conditions_contrast = None
+
+
+    @property
+    def stim_table_contrast(self):
+        if self._stim_table_contrast is None:
+            stim_table = self.ecephys_session.stimulus_presentations
+            if 'drifting_gratings_contrast' in stim_table['stimulus_name'].unique():
+                self._stim_table_contrast = stim_table[stim_table['stimulus_name'] == 'drifting_gratings_contrast']
+            else:
+                self._stim_table_contrast = pd.DataFrame()
+
+        return self._stim_table_contrast
 
     @property
     def name(self):
@@ -131,7 +144,7 @@ class DriftingGratings(StimulusAnalysis):
     def stimulus_conditions_contrast(self):
         """ Stimulus conditions for contrast stimulus """
         if self._stimulus_conditions_contrast is None:
-            contrast_condition_list = self._stim_table_contrast.stimulus_condition_id.unique()
+            contrast_condition_list = self.stim_table_contrast.stimulus_condition_id.unique()
 
             self._stimulus_conditions_contrast = self.ecephys_session.stimulus_conditions[
                 self.ecephys_session.stimulus_conditions.index.isin(contrast_condition_list)
@@ -143,10 +156,10 @@ class DriftingGratings(StimulusAnalysis):
     def conditionwise_statistics_contrast(self):
         """ Conditionwise statistics for contrast stimulus """
         if self._conditionwise_statistics_contrast is None:
-
-            self._conditionwise_statistics_contrast = \
-                    self.ecephys_session.conditionwise_spike_statistics(self._stim_table_contrast.index.values,
-                        self.unit_ids)
+            self._conditionwise_statistics_contrast = self.ecephys_session.conditionwise_spike_statistics(
+                self.stim_table_contrast.index.values,
+                self.unit_ids
+            )
 
         return self._conditionwise_statistics_contrast
 
@@ -194,7 +207,7 @@ class DriftingGratings(StimulusAnalysis):
                 metrics_df.loc[:, ['run_pval_dg', 'run_mod_dg']] = [
                     self._get_running_modulation(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
 
-            if len(self._stim_table_contrast) > 0:
+            if len(self.stim_table_contrast) > 0:
                 metrics_df['c50_dg'] = [self._get_c50(unit) for unit in unit_ids]
 
             self._metrics = metrics_df
@@ -367,13 +380,11 @@ class DriftingGratings(StimulusAnalysis):
 
         """
 
-        contrast_conditions = self._stim_table_contrast[
-            (self._stim_table_contrast[self._col_ori] == self._get_pref_ori(unit_id))]['stimulus_condition_id'].unique()
+        contrast_conditions = self.stim_table_contrast[
+            (self.stim_table_contrast[self._col_ori] == self._get_pref_ori(unit_id))]['stimulus_condition_id'].unique()
 
-        # contrasts = dg.stimulus_conditions.loc[contrast_conditions]['contrast'].values.astype('float')
-        # mean_responses = dg.conditionwise_statistics.loc[unit_id].loc[contrast_conditions]['spike_mean'].values.astype('float')
-        contrasts = self.stimulus_conditions.loc[contrast_conditions]['contrast'].values.astype('float')
-        mean_responses = self.conditionwise_statistics.loc[unit_id].loc[contrast_conditions]['spike_mean'].values.astype('float')
+        contrasts = self.stimulus_conditions_contrast.loc[contrast_conditions]['contrast'].values.astype('float')
+        mean_responses = self.conditionwise_statistics_contrast.loc[unit_id].loc[contrast_conditions]['spike_mean'].values.astype('float')
 
         return c50(contrasts, mean_responses)
 
@@ -577,7 +588,7 @@ class DriftingGratings(StimulusAnalysis):
 
 
 ### General functions ###
-def gauss_function(x, a, x0, sigma):
+def _gauss_function(x, a, x0, sigma):
     """
     fit gaussian function at log scale
     good for fitting band pass, not good at low pass or high pass
@@ -585,12 +596,12 @@ def gauss_function(x, a, x0, sigma):
     return a*np.exp(-(x-x0)**2/(2*sigma**2))
 
 
-def exp_function(x, a, b, c):
+def _exp_function(x, a, b, c):
     return a*np.exp(-b*x)+c
 
 
-def contrast_curve(x, b, c, d, e):
-    """
+def _contrast_curve(x, b, c, d, e):
+    """Difference of gaussian.
      fit sigmoid function at log scale
      not good for fitting band pass
      - b: hill slope
@@ -601,36 +612,49 @@ def contrast_curve(x, b, c, d, e):
     return c+(d-c)/(1+np.exp(b*(np.log(x)-np.log(e))))
 
 
-def c50(x, y):
-    """Computes C50 of a contrast response function
+def c50(contrasts, responses):
+    """Computes C50, the halfway point between the maximum and minimum values in a curved fitted against a difference
+    of gaussian for the contrast values and their responese (mean spike rates)
 
-    Parameters:
-    -----------
-    x : array of floats
-        array of contrast values
-    y : array of floats
+    Parameters
+    ----------
+    contrasts : array of floats
+        list of different contrast stimuli
+    responses : array of floats
         array of responses (spike rates)
 
     Returns
     -------
     c50 : float
-        metric
     """
+    if contrasts.size == 0 or contrasts.size != responses.size:
+        warnings.warn('the contrasts and responses arrays must be of the same length')
+        return np.nan
+
     try:
-        fitCoefs, covMatrix = curve_fit(contrast_curve, x, y, maxfev=100000)
-    except RuntimeError:
+        # find the paraemters that best fit the contrast curve give x = contrast-vals and y = responses
+        fitCoefs, _ = curve_fit(_contrast_curve, contrasts, responses, maxfev=100000)
+
+    except RuntimeError as e:
+        warnings.warn(str(e))
         return np.nan
     
-    resids = y-contrast_curve(x.astype('float'), *fitCoefs)
-    
-    X = np.linspace(min(x)*0.9, max(x)*1.1, 256)
-    y_fit = contrast_curve(X, *fitCoefs)
-    
-    y_middle = (max(y_fit) - min(y_fit)) / 2 + min(y_fit)
-    
+    # Create the constrast curve using the optimized parameters, get the halfway range point on the curve
+    # resids = responses - contrast_curve(contrasts.astype('float'), *fitCoefs)
+    X = np.linspace(min(contrasts)*0.9, max(contrasts)*1.1, 256)  #
+    y_fit = _contrast_curve(X, *fitCoefs)
+    y_middle = (np.max(y_fit) - np.min(y_fit)) / 2 + np.min(y_fit)
+
     try:
-        c50 = X[np.searchsorted(y_fit, y_middle)]
-    except IndexError:
+        # y_fit is unlikely to be sorted, so to get the optimial value we should sort by y_fit and X before calling
+        # numpy's searchsorted()
+        sorted_indicies = np.argsort(y_fit)
+        X_sorted = X[sorted_indicies]
+        y_fit_sorted = y_fit[sorted_indicies]
+        c50 = X_sorted[np.searchsorted(y_fit_sorted, y_middle)]
+
+    except IndexError as e:
+        warnings.warn(str(e))
         return np.nan
         
     return c50
@@ -673,18 +697,41 @@ def f1_f0(arr, tf, num_trials, num_bins, trial_duration):
     return np.nanmean(f1[selection]/f0[selection])
 
 
-def modulation_index(response, tf, sample_rate):
-    """  Depth of modulation by each cycle of a drifting grating; similar to F1/F0
+def modulation_index(response_psth, tf, sample_rate):
+    """Depth of modulation by each cycle of a drifting grating; similar to F1/F0
 
     ref: Matteucci et al. (2019) Nonlinear processing of shape information 
          in rat lateral extrastriate cortex. J Neurosci 39: 1649-1670
 
-    """
+    Parameters
+    ----------
+    response_psth : array of floats
+        the binned responses of a unit for a given stimuli
+    tf : float
+        the temporal frequency
+    sample_rate : float
+        the sampling rate of response_psth
 
-    f, psd = signal.welch(response, fs=sample_rate, nperseg=1024)
+    Returns
+    -------
+    modulation_index : float
+        the mi value
+
+    """
+    if response_psth.size == 0:
+        warnings.warn('response_psth is empty')
+        return np.nan
+
+    f, psd = signal.welch(response_psth, fs=sample_rate, nperseg=1024)  # get freqs. and power spectral density
+    mean_psd = np.mean(psd)
+    if mean_psd == 0.0:
+        # TODO: Check with josh, should it be 0 or nan?
+        return 0.0
 
     tf_index = np.searchsorted(f, tf)
+    if not 0 <= tf_index < psd.size:
+        warnings.warn('specified temporal frequency is not within the singals sampling range. Please adjust tf and/or'
+                      'sample_rate parameters.')
+        return np.nan
 
-    MI = abs((psd[tf_index] - np.mean(psd))/np.sqrt(np.mean(psd**2)-np.mean(psd)**2))
-
-    return MI
+    return abs((psd[tf_index] - np.mean(psd))/np.sqrt(np.mean(psd**2)- mean_psd**2))

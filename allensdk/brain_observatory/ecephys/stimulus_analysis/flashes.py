@@ -157,24 +157,24 @@ class Flashes(StimulusAnalysis):
         return np.nan
 
     def _get_on_off_ratio(self, unit_id):
-        """ Calculate the ratio of the on response vs. off response for a given unit
+        """Gets the ratio of mean spikes for on-stimuli vs off stimuli.
 
-        Params:
+        Parameters
+        ----------
+        unit_id : int
+            unique ID for the unit of interest
+
+        Returns
         -------
-        unit_id - unique ID for the unit of interest
-
-        Returns:
-        -------
-        on_off_ratio - metric
-
+        on_off_ratio : float
         """
-        on_condition_id = self.stimulus_conditions[self.stimulus_conditions[self._col_color] == '1.0'].index.values
-        off_condition_id = self.stimulus_conditions[self.stimulus_conditions[self._col_color] == '-1.0'].index.values
+        on_condition_id = self.stimulus_conditions[self.stimulus_conditions[self._col_color] == 1.0].index.values
+        off_condition_id = self.stimulus_conditions[self.stimulus_conditions[self._col_color] == -1.0].index.values
 
         on_mean_spikes = self.conditionwise_statistics.loc[unit_id].loc[on_condition_id]['spike_mean'].values
         off_mean_spikes = self.conditionwise_statistics.loc[unit_id].loc[off_condition_id]['spike_mean'].values
 
-        if len(on_mean_spikes) == 0 and len(off_mean_spikes) == 0:
+        if len(on_mean_spikes) == 0 or len(off_mean_spikes) == 0:
             return np.nan
 
         if off_mean_spikes[0] > 0:
