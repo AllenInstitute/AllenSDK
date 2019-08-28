@@ -33,7 +33,8 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         metrics_table_df = rf_analysis.metrics()
 
     """
-    def __init__(self, ecephys_session, col_pos_x='x_position', col_pos_y='y_position', trial_duration=0.25, **kwargs):
+    def __init__(self, ecephys_session, col_pos_x='x_position', col_pos_y='y_position', trial_duration=0.25,
+                 minimum_spike_count=10.0, mask_threshold=0.5, **kwargs):
         super(ReceptiveFieldMapping, self).__init__(ecephys_session, trial_duration=trial_duration, **kwargs)
 
         self._pos_x = None
@@ -44,20 +45,15 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         self._col_pos_x = col_pos_x
         self._col_pos_y = col_pos_y
 
-        # self._trial_duration = 0.25
+        self._minimum_spike_count = minimum_spike_count
+        self._mask_threshold = mask_threshold
+
 
         if self._params is not None:
             self._params = self._params['receptive_field_mapping']
             self._stimulus_key = self._params['stimulus_key']
-        else:
-            # self._stimulus_key = 'receptive_field_mapping'
-            # TODO: Remove params dictionary
-            self._params = {
-                'minimum_spike_count': 10,
-                'mask_threshold': 0.5
-            }
-
-        # self._module_name = 'Receptive Field Mapping'
+            self._minimum_spike_count = self._params.get('minimum_spike_count', minimum_spike_count)
+            self._mask_threshold = self._params.get('mask_threshold', mask_threshold)
 
     @property
     def name(self):
@@ -105,19 +101,15 @@ class ReceptiveFieldMapping(StimulusAnalysis):
     def receptive_fields(self):
         """ Spatial receptive fields for N units (9 x 9 x N matrix of responses) """
         if self._rf_matrix is None:
-
             bin_edges = np.linspace(0, 0.249, 249)
-
             self.stim_table.loc[:, self._col_pos_y] = 40.0 - self.stim_table[self._col_pos_y]
-
             presentationwise_response_matrix = self.ecephys_session.presentationwise_spike_counts(
-                bin_edges = bin_edges,
-                stimulus_presentation_ids = self.stim_table.index.values,
-                unit_ids = self.unit_ids,
-                )
+                bin_edges=bin_edges,
+                stimulus_presentation_ids=self.stim_table.index.values,
+                unit_ids=self.unit_ids,
+            )
 
-            self._rf_matrix = self._response_by_stimulus_position(presentationwise_response_matrix, 
-                                              self.stim_table)
+            self._rf_matrix = self._response_by_stimulus_position(presentationwise_response_matrix, self.stim_table)
 
         return self._rf_matrix
     
@@ -142,10 +134,8 @@ class ReceptiveFieldMapping(StimulusAnalysis):
 
     @property
     def metrics(self):
-
         if self._metrics is None:
             unit_ids = self.unit_ids
-        
             metrics_df = self.empty_metrics_table()
 
             if len(self.stim_table) > 0:
@@ -156,12 +146,15 @@ class ReceptiveFieldMapping(StimulusAnalysis):
                                    'width_rf',
                                    'height_rf',
                                    'area_rf',
-                                   'p_value_rf',
-                                   'on_screen_rf']] = [self._get_rf_stats(unit) for unit in unit_ids]
+                                   'on_screen_rf',
+                                   'p_value_rf']] = [self._get_rf_stats(unit) for unit in unit_ids]
                 metrics_df['firing_rate_rf'] = [self._get_overall_firing_rate(unit) for unit in unit_ids]
-                metrics_df['fano_rf'] = [self._get_fano_factor(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
-                metrics_df['time_to_peak_rf'] = [self._get_time_to_peak(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
-                metrics_df['reliability_rf'] = [self._get_reliability(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
+                metrics_df['fano_rf'] = [self._get_fano_factor(unit, self._get_preferred_condition(unit))
+                                         for unit in unit_ids]
+                metrics_df['time_to_peak_rf'] = [self._get_time_to_peak(unit, self._get_preferred_condition(unit))
+                                                 for unit in unit_ids]
+                metrics_df['reliability_rf'] = [self._get_reliability(unit, self._get_preferred_condition(unit))
+                                                for unit in unit_ids]
                 metrics_df['lifetime_sparseness_rf'] = [self._get_lifetime_sparseness(unit) for unit in unit_ids]
                 metrics_df.loc[:, ['run_pval_rf', 'run_mod_rf']] = \
                         [self._get_running_modulation(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
@@ -187,113 +180,90 @@ class ReceptiveFieldMapping(StimulusAnalysis):
             return None
 
     def _get_stim_table_stats(self):
-
         """ Extract azimuths and elevations from stimulus table."""
 
-        self._pos_y = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_pos_y] != 'null'][self._col_pos_y].unique())
-        self._pos_x = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_pos_x] != 'null'][self._col_pos_x].unique())
+        self._pos_y = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_pos_y]
+                                                           != 'null'][self._col_pos_y].unique())
+        self._pos_x = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_pos_x]
+                                                           != 'null'][self._col_pos_x].unique())
 
     def _get_rf(self, unit_id):
         """ Extract the receptive field for one unit
 
-        Params:
-        -------
-        unit_id - unique ID for the unit of interest
+        Parameters
+        ----------
+        unit_id : int
+            unique ID for the unit of interest
 
-        Returns:
+        Returns
         -------
-        receptive_field - 9 x 9 numpy array
-
+        receptive_field : 9 x 9 numpy array
         """
-
         return self.receptive_fields['spike_count'].sel(unit_id=unit_id).data
 
-    def _response_by_stimulus_position(self, dataset, presentations, row_key=None, column_key=None, unit_key='unit_id',
-                                       time_key='time_relative_to_stimulus_onset', spike_count_key='spike_count'):
-        """ Calculate the unit's response to different locations
-        of the Gabor patch
+    def _response_by_stimulus_position(self, dataset, presentations):
+        """ Calculate the unit's response to different locations of the Gabor patch
 
-        Params:
+        Parameters
+        ----------
+        dataset : xarray
+            dataset of binned spike counts for each trial
+        presentations : list
+            presentation_ids
+
+        Returns
         -------
-        dataset - xarray dataset of binned spike counts for each trial
-        presentations - list of presentation_ids
-
-        Returns:
-        -------
-        dataset - xarray dataset of receptive fields
-
+        dataset : xarray
+            dataset of receptive fields
         """
-        if row_key is None:
-            row_key = self._col_pos_y
-        if column_key is None:
-            column_key = self._col_pos_x
-
         dataset = dataset.copy()
-        # dataset['spike_counts'] = dataset['spike_counts'].sum(dim=time_key)
-        dataset[spike_count_key] = dataset.sum(dim=time_key)
-        dataset = dataset.drop(time_key)
+        dataset['spike_count'] = dataset.sum(dim='time_relative_to_stimulus_onset')
+        dataset = dataset.drop('time_relative_to_stimulus_onset')
 
-        dataset[row_key] = presentations.loc[:, row_key]
-        dataset[column_key] = presentations.loc[:, column_key]
+        dataset[self._col_pos_y] = presentations.loc[:, self._col_pos_y]
+        dataset[self._col_pos_x] = presentations.loc[:, self._col_pos_x]
         dataset = dataset.to_dataframe()
 
-        dataset = dataset.reset_index(unit_key).groupby([row_key, column_key, unit_key]).sum()
+        dataset = dataset.reset_index('unit_id').groupby([self._col_pos_y, self._col_pos_x, 'unit_id']).sum()
 
         return dataset.to_xarray()
 
     def _get_rf_stats(self, unit_id):
         """ Calculate a variety of metrics for one unit's receptive field
 
-        Params:
+        Parameters
+        ----------
+        unit_id : int
+            unique ID for the unit of interest
+
+        Returns
         -------
-        unit_id - unique ID for the unit of interest
-
-        Returns:
-        -------
-        azimuth - preferred azimuth in degrees
-            * based on center of mass of thresholded RF
-
-        elevation - preferred elevation in degrees
-            * based on center of mass of thresholded RF
-        
-        width - receptive field width in degrees
-            * based on Gaussian fit
-        
-        height - receptive field height in degrees
-            * based on Gaussian fit
-        
-        area - receptive field area in degrees^2
-            * based on thresholded RF area
-        
-        p_value - probability that a significant receptive field is present
-            * based on categorical chi-square test
-        
-        on_screen - True if the receptive field is away from the screen edge
-            - based on Gaussian fit
-
+        azimuth :
+            preferred azimuth in degrees, based on center of mass of thresholded RF
+        elevation :
+            preferred elevation in degrees, based on center of mass of thresholded RF
+        width :
+            receptive field width in degrees, based on Gaussian fit
+        height :
+            receptive field height in degrees, based on Gaussian fit
+        area :
+            receptive field area in degrees^2, based on thresholded RF area
+        p_value :
+            probability that a significant receptive field is present, based on categorical chi-square test
+        on_screen :
+            True if the receptive field is away from the screen edge, based on Gaussian fit
         """
         rf = self._get_rf(unit_id)
         spikes_per_trial = self.presentationwise_statistics.xs(unit_id, level=1)['spike_counts'].values
 
-        if np.sum(spikes_per_trial) < self._params['minimum_spike_count']:
+        if np.sum(spikes_per_trial) < self._minimum_spike_count:
             return np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, False
 
-        p_value = chisq_from_stim_table(self.stim_table,
-                                       [self._col_pos_x, self._col_pos_y],
-                                       np.expand_dims(spikes_per_trial,1))
+        p_value = chisq_from_stim_table(self.stim_table, [self._col_pos_x, self._col_pos_y],
+                                        np.expand_dims(spikes_per_trial, 1))
 
-        rf_thresh, azimuth, elevation, area = threshold_rf(rf, self._params['mask_threshold'])
-
-        if is_rf_inverted(rf_thresh):
-            rf = invert_rf(rf)
-
-        (peak_height, center_y, center_x, width_y, width_x), success = fit_2d_gaussian(rf)
-        on_screen = rf_on_screen(rf, center_y, center_x)
-
-        height = width_y #* self._params['stimulus_step_size']
-        width = width_x #* self._params['stimulus_step_size']
-
-        return azimuth, elevation, width, height, area, p_value[0], on_screen
+        azimuth, elevation, width, height, area, on_screen = rf_stats(rf, self._mask_threshold)
+        return azimuth, elevation, width, height, area, on_screen, p_value[0]
 
     ## VISUALIZATION ##
     def plot_raster(self, stimulus_condition_id, unit_id):
@@ -305,10 +275,9 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         
         if len(idx_elev) == len(idx_azi) == 1:
      
-            presentation_ids = \
-                self.presentationwise_statistics.xs(unit_id, level=1)\
-                [self.presentationwise_statistics.xs(unit_id, level=1)\
-                ['stimulus_condition_id'] == stimulus_condition_id].index.values
+            presentation_ids = self.presentationwise_statistics.xs(unit_id, level=1)[
+                self.presentationwise_statistics.xs(unit_id, level=1)[
+                    'stimulus_condition_id'] == stimulus_condition_id].index.values
             
             df = self.presentationwise_spike_times[ \
                 (self.presentationwise_spike_times['stimulus_presentation_id'].isin(presentation_ids)) & \
@@ -329,21 +298,45 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         plt.axis('off')
 
 
+def rf_stats(rf, mask_threshold):
+    rf_thresh, azimuth, elevation, area = threshold_rf(rf, mask_threshold)
+
+    if is_rf_inverted(rf_thresh):
+        rf = invert_rf(rf)
+
+    # Fits a receptive field with a 2-dimensional Gaussian distribution
+    params = gaussian_moments_2d(rf)
+    if params is None:
+        return np.nan, np.nan, np.nan, np.nan, np.nan, False
+
+    errorfunction = lambda p: np.ravel(_gaussian_function_2d(*p)(*np.indices(rf.shape)) - rf)
+    (peak_height, center_y, center_x, width_y, width_x), ier = leastsq(errorfunction, params)
+
+    on_screen = rf_on_screen(rf, center_y, center_x)
+    height = width_y
+    width = width_x
+    return azimuth, elevation, width, height, area, on_screen
+
+
 #### HELPER FUNCTIONS ####
-def gaussian_function_2d(peak_height, center_y, center_x, width_y, width_x):
-    
+def _gaussian_function_2d(peak_height, center_y, center_x, width_y, width_x):
     """Returns a 2D Gaussian function
     
-    Parameters:
-    -----------
-    peak_height : peak of distribution
-    center_y : y-coordinate of distribution center
-    center_x : x-coordinate of distribution center
-    width_y : width of distribution along x-axis
-    width_x : width of distribution along y-axis
+    Parameters
+    ----------
+    peak_height :
+        peak of distribution
+    center_y :
+        y-coordinate of distribution center
+    center_x :
+        x-coordinate of distribution center
+    width_y :
+        width of distribution along x-axis
+    width_x :
+        width of distribution along y-axis
     
-    Returns:
-    --------
+    Returns
+    -------
     f(x,y) : function
         Returns the value of the distribution at a particular x,y coordinate
     
@@ -360,22 +353,26 @@ def gaussian_function_2d(peak_height, center_y, center_x, width_y, width_x):
 
 
 def gaussian_moments_2d(data):
-    
     """
     Finds the moments of a 2D Gaussian distribution, given an input matrix
     
-    Parameters:
-    -----------
-    data - numpy.ndarray
+    Parameters
+    ----------
+    data : numpy.ndarray
         2D matrix
         
-    Returns:
-    --------
-    peak_height : peak of distribution
-    center_y : y-coordinate of distribution center
-    center_x : x-coordinate of distribution center
-    width_y : width of distribution along x-axis
-    width_x : width of distribution along y-axis
+    Returns
+    -------
+    peak_height :
+        peak of distribution
+    center_y :
+        y-coordinate of distribution center
+    center_x :
+        x-coordinate of distribution center
+    width_y :
+        width of distribution along x-axis
+    width_x :
+        width of distribution along y-axis
 
     """
     
@@ -385,7 +382,10 @@ def gaussian_moments_2d(data):
     Y, X = np.indices(data.shape)
     center_y = (Y*data).sum()/total
     center_x = (X*data).sum()/total
-    
+
+    if np.isnan(center_y) or np.isinf(center_y) or np.isnan(center_x) or np.isinf(center_x):
+        return None
+
     col = data[:, int(center_x)]    
     row = data[int(center_y), :]
 
@@ -395,48 +395,17 @@ def gaussian_moments_2d(data):
     return height, center_y, center_x, width_y, width_x
 
 
-def fit_2d_gaussian(matrix):
-    
-    """
-    Fits a receptive field with a 2-dimensional Gaussian distribution
-    
-    Parameters:
-    -----------
-    matrix - numpy.ndarray
-        2D matrix of spike counts
-        
-    Returns:
-    --------
-    parameters - tuple
-        peak_height : peak of distribution
-        center_y : y-coordinate of distribution center
-        center_x : x-coordinate of distribution center
-        width_y : width of distribution along x-axis
-        width_x : width of distribution along y-axis
-    success - bool
-        True if a fit was found, False otherwise
-
-    """
-    params = gaussian_moments_2d(matrix)
-    errorfunction = lambda p: np.ravel(gaussian_function_2d(*p)(*np.indices(matrix.shape)) - matrix)
-    fit_params, ier = leastsq(errorfunction, params)
-    success = True if ier < 5 else False
-    
-    return fit_params, success
-
-
 def is_rf_inverted(rf_thresh):
     """
     Checks if the receptive field mapping timulus is suppressing or exciting the cell
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     rf_thresh - matrix of spike counts at each stimulus position
 
-    Returns:
-    --------
+    Returns
+    -------
     bool - True if the receptive field is inverted
-
     """
     edge_mask = np.zeros(rf_thresh.shape)
 
@@ -454,43 +423,39 @@ def invert_rf(rf):
     """
     Creates an inverted version of the receptive field
 
-    Parameters:
+    Parameters
     ----------
     rf - matrix of spike counts at each stimulus position
 
-    Returns:
-    --------
+    Returns
+    -------
     rf_inverted - new RF matrix
 
     """
-    
     return np.max(rf) - rf
 
 
 def threshold_rf(rf, threshold):
+    """Creates a spatial mask based on the receptive field peak, and returns the x, y coordinates of the center of
+    mass, as well as the area.
     
-    """
-    Creates a spatial mask based on the receptive field peak, and returns
-    the x, y coordinates of the center of mass, as well as the area
-    
-    Parameters:
-    -----------
+    Parameters
+    ----------
     rf - numpy.ndarray
         2D matrix of spike counts
     threshold - float
         Threshold as ratio of the RF's standard deviation
         
-    Returns:
-    --------
-    threshold_rf - numpy.ndarray
+    Returns
+    -------
+    threshold_rf : numpy.ndarray
         Thresholded version of the original RF
-    center_x - float
+    center_x : float
         x-coordinate of mask center of mass
-    center_y - float
+    center_y : float
         y-coordinate of mask center of mass
-    area - float
+    area : float
         area of mask
-    
     """
     rf_filt = ndi.gaussian_filter(rf, 1)
     
@@ -498,7 +463,7 @@ def threshold_rf(rf, threshold):
         
     rf_thresh = np.zeros(rf.shape, dtype='bool')
     rf_thresh[rf_filt > threshold_value] = True
-    
+
     labels, num_features = ndi.label(rf_thresh)
     
     best_label = np.argmax(ndi.maximum(rf_filt, labels=labels, index=np.unique(labels)))
@@ -509,7 +474,7 @@ def threshold_rf(rf, threshold):
     center_y, center_x = ndi.measurements.center_of_mass(labels)
     area = float(np.sum(labels))
 
-    return labels, np.around(center_x,4), np.around(center_y,4), area
+    return labels, np.around(center_x, 4), np.around(center_y, 4), area
 
 
 def rf_on_screen(rf, center_y, center_x):
