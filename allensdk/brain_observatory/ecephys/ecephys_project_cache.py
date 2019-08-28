@@ -1,6 +1,7 @@
 import functools
 from pathlib import Path
 import ast
+import re
 
 import pandas as pd
 import SimpleITK as sitk
@@ -28,6 +29,9 @@ def call_caching(fn, path, strategy=None, pre=lambda d: d, writer=None, reader=N
     except:
         Path(path).unlink
         raise
+
+
+scene_number_re = re.compile(".*(?P<num>\d+).*")
 
 
 class EcephysProjectCache(Cache):
@@ -144,6 +148,12 @@ class EcephysProjectCache(Cache):
         return EcephysSession(api=session_api)
 
     def get_natural_movie_template(self, number):
+        if isinstance(number, str):
+            if "three" in number:
+                number = 3
+            if "one" in number:
+                number = 1
+
         path = self.get_cache_path(None, self.NATURAL_MOVIE_KEY, number)
 
         def reader(path):
@@ -160,6 +170,11 @@ class EcephysProjectCache(Cache):
         )
 
     def get_natural_scene_template(self, number):
+        if isinstance(number, str):
+            match = scene_number_re.match(number)
+            if match is not None:
+                number = int(match["num"])
+
         path = self.get_cache_path(None, self.NATURAL_SCENE_KEY, number)
 
         def reader(path):
