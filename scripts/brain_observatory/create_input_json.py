@@ -8,7 +8,7 @@ import pandas as pd
 import datetime
 import re
 
-def createInputJson(directory, resort_directory, module, output_file):
+def createInputJson(directory, resort_directory, module, output_file, last_unit_id):
 
     session_id = basename(directory)
 
@@ -19,7 +19,7 @@ def createInputJson(directory, resort_directory, module, output_file):
 
     LIMS_session_id = os.path.basename(sync_file).split('.')[0][:9]
 
-    nwb_output_path = join('/mnt/nvme0/ecephys_nwb_files_20190815', session_id + '.spikes.nwb2')
+    nwb_output_path = join('/mnt/nvme0/ecephys_nwb_files_20190827-2', session_id + '.spikes.nwb2')
 
     stimulus_table_path = join(directory, 'stim_table.csv')
 
@@ -116,9 +116,9 @@ def createInputJson(directory, resort_directory, module, output_file):
 
                 channels.append(channel_dict)
 
-            unit_info = pd.read_csv(join(new_sorting_directory, 'metrics.csv'), index_col=0)
-            unit_quality = pd.read_csv(join(new_sorting_directory, 'cluster_group.tsv'), index_col=0, sep='\t')
-            unit_quality = unit_quality.replace(to_replace='unsorted',value='good')
+            unit_info = pd.read_csv(join(new_sorting_directory, 'metrics.csv.v2'), index_col=0)
+            #unit_quality = pd.read_csv(join(new_sorting_directory, 'cluster_group.tsv'), index_col=0, sep='\t')
+            #unit_quality = unit_quality.replace(to_replace='unsorted',value='good')
 
             units = []
 
@@ -126,39 +126,43 @@ def createInputJson(directory, resort_directory, module, output_file):
 
             for idx, row in unit_info.iterrows():
 
-                    quality = unit_quality.loc[row['cluster_id']]['group']
+                    if row['quality'] == 'good':
 
-                    unit_dict = {
-                        'id' : row['cluster_id'] + probe_idx * 1000,
-                        'peak_channel_id' : row['peak_channel'] + probe_idx * 1000,
-                        'local_index' : row['cluster_id'],
-                        'quality' : quality,
-                        'firing_rate' : cleanUpNanAndInf(row['firing_rate']), 
-                        'snr' : cleanUpNanAndInf(row['snr']),
-                        'isi_violations' : cleanUpNanAndInf(row['isi_viol']),
-                        'presence_ratio' : cleanUpNanAndInf(row['presence_ratio']),
-                        'amplitude_cutoff' : cleanUpNanAndInf(row['amplitude_cutoff']),
-                        'isolation_distance' : cleanUpNanAndInf(row['isolation_distance']),
-                        'l_ratio' : cleanUpNanAndInf(row['l_ratio']),
-                        'd_prime' : cleanUpNanAndInf(row['d_prime']),
-                        'nn_hit_rate' : cleanUpNanAndInf(row['nn_hit_rate']),
-                        'nn_miss_rate' : cleanUpNanAndInf(row['nn_miss_rate']),
-                        'max_drift' : cleanUpNanAndInf(row['max_drift']),
-                        'cumulative_drift' : cleanUpNanAndInf(row['cumulative_drift']),
-                        'silhouette_score' : cleanUpNanAndInf(row['silhouette_score']),
-                        'waveform_duration' : cleanUpNanAndInf(row['duration']),
-                        'waveform_halfwidth' : cleanUpNanAndInf(row['halfwidth']),
-                        'waveform_PT_ratio' : cleanUpNanAndInf(row['PT_ratio']),
-                        'waveform_repolarization_slope' : cleanUpNanAndInf(row['repolarization_slope']),
-                        'waveform_recovery_slope' : cleanUpNanAndInf(row['recovery_slope']),
-                        'waveform_amplitude' : cleanUpNanAndInf(row['amplitude']),
-                        'waveform_spread' : cleanUpNanAndInf(row['spread']),
-                        'waveform_velocity_above' : cleanUpNanAndInf(row['velocity_above']),
-                        'waveform_velocity_below' : cleanUpNanAndInf(row['velocity_below'])
-                    }
+                        unit_dict = {
+                            'id' : last_unit_id,
+                            'peak_channel_id' : row['peak_channel'] + probe_idx * 1000,
+                            'local_index' : idx,
+                            'cluster_id' : row['cluster_id'],
+                            'quality' : row['quality'],
+                            'firing_rate' : cleanUpNanAndInf(row['firing_rate']), 
+                            'snr' : cleanUpNanAndInf(row['snr']),
+                            'isi_violations' : cleanUpNanAndInf(row['isi_viol']),
+                            'presence_ratio' : cleanUpNanAndInf(row['presence_ratio']),
+                            'amplitude_cutoff' : cleanUpNanAndInf(row['amplitude_cutoff']),
+                            'isolation_distance' : cleanUpNanAndInf(row['isolation_distance']),
+                            'l_ratio' : cleanUpNanAndInf(row['l_ratio']),
+                            'd_prime' : cleanUpNanAndInf(row['d_prime']),
+                            'nn_hit_rate' : cleanUpNanAndInf(row['nn_hit_rate']),
+                            'nn_miss_rate' : cleanUpNanAndInf(row['nn_miss_rate']),
+                            'max_drift' : cleanUpNanAndInf(row['max_drift']),
+                            'cumulative_drift' : cleanUpNanAndInf(row['cumulative_drift']),
+                            'silhouette_score' : cleanUpNanAndInf(row['silhouette_score']),
+                            'waveform_duration' : cleanUpNanAndInf(row['duration']),
+                            'waveform_halfwidth' : cleanUpNanAndInf(row['halfwidth']),
+                            'waveform_PT_ratio' : cleanUpNanAndInf(row['PT_ratio']),
+                            'waveform_repolarization_slope' : cleanUpNanAndInf(row['repolarization_slope']),
+                            'waveform_recovery_slope' : cleanUpNanAndInf(row['recovery_slope']),
+                            'waveform_amplitude' : cleanUpNanAndInf(row['amplitude']),
+                            'waveform_spread' : cleanUpNanAndInf(row['spread']),
+                            'waveform_velocity_above' : cleanUpNanAndInf(row['velocity_above']),
+                            'waveform_velocity_below' : cleanUpNanAndInf(row['velocity_below'])
+                        }
 
-                    #if channel_info.loc[row['peak_channel']]['structure_acronym'] == 'VISp5':
-                    units.append(unit_dict)
+                        #if channel_info.loc[row['peak_channel']]['structure_acronym'] == 'VISp5':
+                        units.append(unit_dict)
+                        last_unit_id += 1
+
+            #print(len(unit_info))
 
             probe_dict = {
                 'id' : probe_idx,
@@ -212,7 +216,7 @@ def createInputJson(directory, resort_directory, module, output_file):
         {
             'opto_pickle_path' : glob(join(directory, '*.opto.pkl.v2'))[0],
             'sync_h5_path' : glob(join(directory, '*.sync'))[0],
-            'output_opto_table_path' : join(directory, 'opto_table.h5')
+            'output_opto_table_path' : join(directory, 'optotagging_table.csv')
         }
 
     elif module == 'allensdk.brain_observatory.ecephys.write_nwb':
@@ -230,14 +234,15 @@ def createInputJson(directory, resort_directory, module, output_file):
            "session_start_time" : datetime.datetime(YYYY, MM, DD, 0, 0, 0).isoformat(),
            "stimulus_table_path" : os.path.join(directory, 'stim_table_allensdk.csv'),
            "probes" : probes,
-           "running_speed_path" : join(directory, 'running_speed.h5')
+           "running_speed_path" : join(directory, 'running_speed.h5')#,
+          # "optotagging_table_path" : join(directory, 'optotagging_table.csv')
         }
 
 
     with io.open(output_file, 'w', encoding='utf-8') as f:
             f.write(json.dumps(dictionary, ensure_ascii=False, sort_keys=True, indent=4))
 
-    return dictionary
+    return dictionary, last_unit_id
 
 
 

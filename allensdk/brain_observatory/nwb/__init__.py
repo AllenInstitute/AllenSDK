@@ -160,7 +160,10 @@ def add_stimulus_presentations(nwbfile, stimulus_table, tag='stimulus_epoch'):
 def setup_table_for_epochs(table, timeseries, tag):
     table = table.copy()
     indices = np.searchsorted(timeseries.timestamps[:], table['start_time'].values)
-    diffs = np.concatenate([np.diff(indices), [table.shape[0] - indices[-1]]])
+    if len(indices > 0):
+        diffs = np.concatenate([np.diff(indices), [table.shape[0] - indices[-1]]])
+    else:
+        diffs = []
 
     table['tags'] = [(tag,)] * table.shape[0]
     table['timeseries'] = [[[indices[ii], diffs[ii], timeseries]] for ii in range(table.shape[0])]

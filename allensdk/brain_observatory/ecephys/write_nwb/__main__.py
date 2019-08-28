@@ -576,8 +576,10 @@ def add_optotagging_table_to_nwbfile(nwbfile, optotagging_table, tag="optical_st
     nwbfile.add_processing_module(opto_mod)
 
     optotagging_table = setup_table_for_epochs(optotagging_table, opto_ts, tag)
-    container = pynwb.epoch.TimeIntervals.from_dataframe(optotagging_table, "optogenetic_stimuluation")
-    opto_mod.add_data_interface(container)
+    
+    if len(optotagging_table) > 0:
+        container = pynwb.epoch.TimeIntervals.from_dataframe(optotagging_table, "optogenetic_stimuluation")
+        opto_mod.add_data_interface(container)
 
     return nwbfile
 
@@ -620,11 +622,11 @@ def write_ecephys_nwb(
     io.write(nwbfile)
     io.close()
 
-    probe_outputs = write_probewise_lfp_files(probes, session_start_time, pool_size=pool_size)
+    #probe_outputs = write_probewise_lfp_files(probes, session_start_time, pool_size=pool_size)
 
     return {
         'nwb_path': output_path,
-        "probe_outputs": probe_outputs
+        #"probe_outputs": probe_outputs
     }
 
 
