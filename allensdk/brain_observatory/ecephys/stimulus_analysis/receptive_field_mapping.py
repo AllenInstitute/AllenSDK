@@ -201,10 +201,8 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         """
         return self.receptive_fields['spike_counts'].sel(unit_id=unit_id).data
 
-    def _response_by_stimulus_position(self, dataset, presentations,
-        row_key=None, column_key=None,
-        unit_key='unit_id', time_key='time_relative_to_stimulus_onset'):
-
+    def _response_by_stimulus_position(self, dataset, presentations, row_key=None, column_key=None, unit_key='unit_id',
+                                       time_key='time_relative_to_stimulus_onset'):
         """ Calculate the unit's response to different locations
         of the Gabor patch
 
@@ -354,8 +352,7 @@ def _gaussian_function_2d(peak_height, center_y, center_x, width_y, width_x):
 
 
 def gaussian_moments_2d(data):
-    """
-    Finds the moments of a 2D Gaussian distribution, given an input matrix
+    """Finds the moments of a 2D Gaussian distribution, given an input matrix
     
     Parameters
     ----------
@@ -374,7 +371,6 @@ def gaussian_moments_2d(data):
         width of distribution along x-axis
     width_x :
         width of distribution along y-axis
-
     """
     
     total = data.sum()
@@ -397,16 +393,17 @@ def gaussian_moments_2d(data):
 
 
 def is_rf_inverted(rf_thresh):
-    """
-    Checks if the receptive field mapping timulus is suppressing or exciting the cell
+    """Checks if the receptive field mapping timulus is suppressing or exciting the cell
 
     Parameters
     ----------
-    rf_thresh - matrix of spike counts at each stimulus position
+    rf_thresh : matrix
+        matrix of spike counts at each stimulus position
 
     Returns
     -------
-    bool - True if the receptive field is inverted
+    if_rf_inverted : bool
+        True if the receptive field is inverted
     """
     edge_mask = np.zeros(rf_thresh.shape)
 

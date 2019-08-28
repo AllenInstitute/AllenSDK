@@ -82,6 +82,11 @@ def test_metrics(ecephys_api):
     assert('run_mod_dm' in rfm.metrics.columns)
 
 
+@pytest.mark.skip(reason='metric not yet implemented')
+def test_speed_tuning_idx():
+    pass
+
+
 if __name__ == '__main__':
     # test_load()
     # test_stimulus()

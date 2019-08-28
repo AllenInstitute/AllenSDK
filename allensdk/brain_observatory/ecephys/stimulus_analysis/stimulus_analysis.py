@@ -535,19 +535,15 @@ class StimulusAnalysis(object):
                                    spike_times=self.ecephys_session.spike_times[unit_id])
 
     def get_intrinsic_timescale(self, unit_ids):
-
-        """
-        Calculates the intrinsic timescale for a subset of units
-        """
-        dataset = self.ecephys_session.presentationwise_spike_counts(bin_edges = np.arange(0, self._trial_duration, 0.025),
-                      stimulus_presentation_ids = self.stim_table.index.values,
-                      unit_ids = unit_ids
-                      )
-
+        """Calculates the intrinsic timescale for a subset of units"""
+        # TODO: Recently added by not yet being used, should indicate if/how it will be used! Maybe make protected?
+        dataset = self.ecephys_session.presentationwise_spike_counts(
+            bin_edges=np.arange(0, self.trial_duration, 0.025),
+            stimulus_presentation_ids = self.stim_table.index.values,
+            unit_ids=unit_ids
+        )
         rsc_time_matrix = calculate_time_delayed_correlation(dataset)
-
         t, y, y_std, a, intrinsic_timescale, c = fit_exp(rsc_time_matrix)
-
         return intrinsic_timescale
 
     ### VISUALIZATION ###

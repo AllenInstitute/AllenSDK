@@ -8,6 +8,8 @@ Created on Wed Jun  5 15:52:22 2019
 # TODO: Fix header
 
 import numpy as np
+import warnings
+
 
 def chisq_from_stim_table(stim_table,
                           columns,
@@ -33,8 +35,10 @@ def compute_chi_shuffle(mean_sweep_events,
     
     (num_sweeps,num_cells) = np.shape(mean_sweep_events) 
     
-    # TODO: throw error w/ message
-    assert len(sweep_categories) == num_sweeps
+    if len(sweep_categories) != num_sweeps:
+        warnings.warn('sweep_categories and num_sweeps do not match')
+        return np.nan
+
     
     sweep_categories_dummy = make_category_dummy(sweep_categories)
     

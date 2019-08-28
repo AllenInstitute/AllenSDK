@@ -141,20 +141,19 @@ class Flashes(StimulusAnalysis):
                                                             != 'null'][self._col_color].unique())
 
     def _get_sustained_index(self, unit_id, condition_id):
-        """ Calculate the sustained index for a given unit, a measure of the transience of
-        the flash response.
+        """ Calculate the sustained index for a given unit, a measure of the transience of the flash response.
 
-        Params:
-        -------
-        unit_id - unique ID for the unit of interest
+        Parameters
+        ----------
+        unit_id : int
+            unique ID for the unit of interest
 
-        Returns:
+        Returns
         -------
-        sustained_index - ratio of the mean PSTH and the maximum of the PSTH
+        sustained_index :
+            ratio of the mean PSTH and the maximum of the PSTH
             A cell that fires very transiently will have a sustained index close to 0
-            A cell that first continuously throughout the flash will have a sustained
-                index closer to 1
-
+            A cell that first continuously throughout the flash will have a sustained index closer to 1
         """
         psth = self.conditionwise_psth.sel(unit_id=unit_id, stimulus_condition_id=condition_id).data
         return np.mean(psth)/np.amax(psth)

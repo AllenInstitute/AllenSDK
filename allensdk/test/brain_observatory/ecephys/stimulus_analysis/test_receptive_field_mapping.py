@@ -29,10 +29,6 @@ def ecephys_api():
     return MockRFMSessionApi()
 
 
-def mock_ecephys_api():
-    return MockRFMSessionApi()
-
-
 def test_load(ecephys_api):
     session = EcephysSession(api=ecephys_api)
     rfm = ReceptiveFieldMapping(ecephys_session=session)
@@ -59,8 +55,8 @@ def test_stimulus(ecephys_api):
     assert(rfm.number_elevations == 9)
 
 
-def test_metrics():
-    session = EcephysSession(api=mock_ecephys_api())
+def test_metrics(ecephys_api):
+    session = EcephysSession(api=ecephys_api)
     rfm = ReceptiveFieldMapping(ecephys_session=session)
     assert(isinstance(rfm.metrics, pd.DataFrame))
     assert(len(rfm.metrics) == 6)
@@ -80,6 +76,29 @@ def test_metrics():
     assert('lifetime_sparseness_rf' in rfm.metrics.columns)
     assert('run_pval_rf' in rfm.metrics.columns)
     assert('run_mod_rf' in rfm.metrics.columns)
+
+
+def test_receptive_fields(ecephys_api):
+    # Also test_response_by_stimulus_position()
+    session = EcephysSession(api=ecephys_api)
+    rfm = ReceptiveFieldMapping(ecephys_session=session)
+    assert(rfm.receptive_fields)
+    assert(type(rfm.receptive_fields))
+    assert('spike_counts' in rfm.receptive_fields)
+    assert(rfm.receptive_fields['spike_counts'].shape == (9, 9, 6))  # x, y, units
+    assert(set(rfm.receptive_fields['spike_counts'].coords) == {'y_position', 'x_position', 'unit_id'})
+    assert(np.all(rfm.receptive_fields['spike_counts'].coords['x_position']
+                  == [-40.0, -30.0, -20.0, -10.0, 0.0, 10.0, 20.0, 30.0, 40.0]))
+    assert(np.all(rfm.receptive_fields['spike_counts'].coords['y_position']
+                  == [0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0]))
+
+
+    # Some randomly sampled testing to make sure everything works like it should
+    assert(rfm.receptive_fields['spike_counts'][{'unit_id': 0}].values.sum() == 4)
+    assert(rfm.receptive_fields['spike_counts'][{'unit_id': 3}].values.sum() == 0)
+    assert(rfm.receptive_fields['spike_counts'][{'unit_id': 2, 'x_position': 8, 'y_position': 3}] == 3)
+    assert(np.all(rfm.receptive_fields['spike_counts'][{'x_position': 2, 'y_position': 5}] == [1, 0, 0, 0, 1, 1]))
+
 
 
 # Some special receptive fields for testing
@@ -115,19 +134,9 @@ def test_rf_stats(rf_field, threshold, expected):
 
 
 
-@pytest.mark.skip(reason='Write a test for the receptive_fields()/_get_rf() methods')
-def test_receptive_fields():
-    # TODO: Implement
-    pass
-
-
-@pytest.mark.skip()
-def test_response_by_stimulus_position():
-    # TODO: Implement
-    pass
-
 
 if __name__ == '__main__':
     # test_load()
     # test_stimulus()
-    test_metrics()
+    # test_metrics()
+    test_receptive_fields()
