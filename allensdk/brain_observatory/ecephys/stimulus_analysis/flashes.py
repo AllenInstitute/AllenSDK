@@ -158,11 +158,17 @@ class Flashes(StimulusAnalysis):
 
         Returns:
         -------
-        sustained_index - metric
+        sustained_index - ratio of the mean PSTH and the maximum of the PSTH
+            A cell that fires very transiently will have a sustained index close to 0
+            A cell that first continuously throughout the flash will have a sustained
+                index closer to 1
 
         """
 
-        return np.nan
+        psth = self.conditionwise_psth.sel(unit_id=unit_id, stimulus_condition_id=condition_id).data
+        
+        return np.mean(psth)/np.amax(psth)
+        
 
     def _get_on_off_ratio(self, unit_id):
 
