@@ -680,7 +680,7 @@ def calculate_time_delayed_correlation(dataset):
 
     for unit_idx, unit in enumerate(dataset.unit_id):
         
-        spikes_for_unit = dataset['spike_counts'].sel(unit_id=unit).data
+        spikes_for_unit = dataset.sel(unit_id=unit).data
 
         for i in np.arange(nbins-1):
             for j in np.arange(i+1, nbins):
