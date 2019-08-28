@@ -11,6 +11,7 @@ python:
    version: 3.7
    install:
       - requirements: doc_requirements.txt
+      - requirements: requirements.txt
 
 formats:
   - epub
