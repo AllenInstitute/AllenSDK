@@ -51,7 +51,7 @@ class StimulusAnalysis(object):
         self._block_starts = None
         self._block_stops = None
 
-        self._module_name = None  # TODO: Remove, .name() should be hardcoded
+        # self._module_name = None  # TODO: Remove, .name() should be hardcoded
 
         self._psth_resolution = kwargs.get('psth_resolution', 0.001)
 
@@ -736,8 +736,12 @@ def osi(orivals, tuning):
         warnings.warn('orivals and tunings are of different lengths')
         return np.nan
 
+    tuning_sum = tuning.sum()
+    if tuning_sum == 0.0:
+        return np.nan
+
     cv_top = tuning * np.exp(1j * 2 * orivals)
-    return np.abs(cv_top.sum()) / tuning.sum()
+    return np.abs(cv_top.sum()) / tuning_sum
 
 
 def dsi(orivals, tuning):
@@ -759,8 +763,12 @@ def dsi(orivals, tuning):
         warnings.warn('orivals and tunings are of different lengths')
         return np.nan
 
+    tuning_sum = tuning.sum()
+    if tuning_sum == 0.0:
+        return np.nan
+
     cv_top = tuning * np.exp(1j * orivals)
-    return np.abs(cv_top.sum()) / tuning.sum()
+    return np.abs(cv_top.sum()) / tuning_sum
 
 
 def deg2rad(arr):

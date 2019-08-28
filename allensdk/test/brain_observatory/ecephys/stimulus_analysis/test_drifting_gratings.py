@@ -4,7 +4,7 @@ import pytest
 
 from .conftest import MockSessionApi
 from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
-from allensdk.brain_observatory.ecephys.stimulus_analysis.drifting_gratings import DriftingGratings, modulation_index, c50
+from allensdk.brain_observatory.ecephys.stimulus_analysis.drifting_gratings import DriftingGratings, modulation_index, c50, f1_f0
 
 
 pd.set_option('display.max_columns', None)
@@ -111,8 +111,6 @@ def test_stimulus(ecephys_api):
     assert(dg.number_contrast == 1)
 
 
-
-
 def test_metrics(ecephys_api):
     # Run metrics with no drifting_gratings_contrast stimuli
     session = EcephysSession(api=ecephys_api)
@@ -132,9 +130,16 @@ def test_metrics(ecephys_api):
     assert(np.allclose(dg.metrics['c50_dg'].values, [np.nan]*6, equal_nan=True))
 
     assert('f1_f0_dg' in dg.metrics.columns)
+    assert(np.allclose(dg.metrics['f1_f0_dg'].loc[[0, 1, 2, 3, 4, 5]],
+                       [0.001572, np.nan, 1.999778, np.nan, 1.560436, 1.999978], equal_nan=True, atol=1.0e-06))
+
     assert('mod_idx_dg' in dg.metrics.columns)
     assert('g_osi_dg' in dg.metrics.columns)
+    assert(np.allclose(dg.metrics['g_osi_dg'].loc[[0, 3, 4, 5]], [1.0, np.nan, 0.745356, 1.0], equal_nan=True))
+
     assert('g_dsi_dg' in dg.metrics.columns)
+    assert(np.allclose(dg.metrics['g_dsi_dg'].loc[[0, 3, 4, 5]], [1.0, np.nan, 0.491209, 1.0], equal_nan=True))
+
     assert('firing_rate_dg' in dg.metrics.columns)
     assert('reliability_dg' in dg.metrics.columns)
     assert('fano_dg' in dg.metrics.columns)
@@ -190,9 +195,8 @@ def test_modulation_index(response, tf, sampling_rate, expected):
                          [
                              (np.array([0.01, 0.02, 0.04, 0.08, 0.13, 0.2, 0.35, 0.6, 1.0]), np.array([]), np.nan),  # invalid input
                              (np.array([0.01, 0.02, 0.04, 0.08, 0.13, 0.2, 0.35, 0.6, 1.0]), np.full(9, 12.0), 0.0090),  # flat non-zero curve
-                             (np.array([0.01, 0.02, 0.04, 0.08, 0.13, 0.2, 0.35, 0.6, 1.0]), np.zeros(9), 0.3598313725490197), # no responses
+                             (np.array([0.01, 0.02, 0.04, 0.08, 0.13, 0.2, 0.35, 0.6, 1.0]), np.zeros(9), 0.3598313725490197),  # no responses
                              (np.array([0.01, 0.02, 0.04, 0.08, 0.13, 0.2, 0.35, 0.6, 1.0]), np.linspace(0.0, 12.0, 9), 0.1330745098039216),
-                             # (np.array([0.01, 0.02, 0.04, 0.08, 0.13, 0.2, 0.35, 0.6, 1.0]), np.array([0.1, 1.0, 2.0, 5.0, 0.9, 2.0, 5.3, 0.1, 0.1]), 0.5224117647058825),
                              (np.array([0.01, 0.02, 0.04, 0.08, 0.13, 0.2, 0.35, 0.6, 1.0]), np.array([10.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]), np.nan),  # nan, special case where curve can't be fitted
                          ])
 def test_c50(contrast_vals, responses, expected):
@@ -200,15 +204,24 @@ def test_c50(contrast_vals, responses, expected):
     assert(np.isclose(c50_metric, expected, equal_nan=True))
 
 
-@pytest.mark.skip(reason='Function is broken')
-def test_f1_f0():
-    pass
+@pytest.mark.parametrize('data_arr,tf,trial_duration,expected',
+                         [
+                             (np.array([]), 2.0, 1.0, np.nan),  # invalid input
+                             (np.zeros((5, 256)), 4.0, 2.0, np.nan),  # no spikes
+                             (np.ones((5, 256)), 18.0, 16.0, np.nan),  # tf*trial_duration is too high, returns nan
+                             (np.full((5, 256), 5.0), 4.0, 2.0, 0.0),  # has constant spiking
+                             (np.array([0, 0, 1, 1, 2, 0, 5, 1]), 2.0, 1.0, 0.894427190999916),  # can handle arrays
+                             (np.array([[0, 0, 1, 1, 2, 0, 5, 1]]), 2.0, 1.0, 0.894427190999916)  # same as above but int matrix form
+                         ])
+def test_f1_f0(data_arr, tf, trial_duration, expected):
+    f1_f0_val = f1_f0(data_arr, tf, trial_duration)
+    assert(np.isclose(f1_f0_val, expected, equal_nan=True))
 
 
 if __name__ == '__main__':
     # test_stimulus()
-    #test_metrics()
+    test_metrics()
     # test_stim_table_contrast()
     # test_contrast_stimulus()
-    test_metric_with_contrast()
+    # test_metric_with_contrast()
 

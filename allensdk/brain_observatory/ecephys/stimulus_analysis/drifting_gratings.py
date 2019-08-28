@@ -216,7 +216,7 @@ class DriftingGratings(StimulusAnalysis):
 
     @property
     def known_stimulus_keys(self):
-        return ['drifting_gratings']
+        return ['drifting_gratings', 'drifting_gratings_75_repeats']
 
     def _get_stim_table_stats(self):
         """ Extract orientations and temporal frequencies from the stimulus table """
@@ -306,25 +306,25 @@ class DriftingGratings(StimulusAnalysis):
             return osi(orivals_rad, tuning)
         elif selectivity_type == 'dsi':
             return dsi(orivals_rad, tuning)
+        else:
+            warnings.warn(f'unkown selectivity function {selectivity_type}.')
+            return np.nan
 
     def _get_f1_f0(self, unit_id, condition_id):
         """ Calculate F1/F0 for a given unit
 
         A measure of how tightly locked a unit's firing rate is to the cycles of a drifting grating
 
-        Params:
-        -------
+        Parameters
+        ----------
         unit_id - unique ID for the unit of interest
         condition_id - ID for the condition of interest (usually the preferred condition)
 
-        Returns:
+        Returns
         -------
         f1_f0 - metric
 
         """
-        # TODO: This need to be fixed, f1_f0 is broken
-        return np.nan
-
         presentation_ids = self.stim_table[self.stim_table['stimulus_condition_id'] == condition_id].index.values
                                               
         tf = self.stim_table.loc[presentation_ids[0]][self._col_tf]
@@ -335,27 +335,24 @@ class DriftingGratings(StimulusAnalysis):
             unit_ids=[unit_id]
         ).drop('unit_id')
 
-        # arr = np.squeeze(dataset['spike_counts'].values)
         arr = np.squeeze(dataset.values)
+        trial_duration = dataset.time_relative_to_stimulus_onset.max()  #TODO: If there a reason not to use self.trial_duration?
 
-        num_trials = dataset.stimulus_presentation_id.size
-        num_bins = dataset.time_relative_to_stimulus_onset.size
-        trial_duration = dataset.time_relative_to_stimulus_onset.max()
-
-        return f1_f0(arr, tf, num_trials, num_bins, trial_duration)
+        return f1_f0(arr, tf, trial_duration)
 
     def _get_modulation_index(self, unit_id, condition_id):
         """ Calculate modulation index for a given unit.
 
-        Params:
-        -------
-        unit_id - unique ID for the unit of interest
-        condition_id - ID for the condition of interest (usually the preferred condition)
+        Parameters
+        ----------
+        unit_id : int
+            unique ID for the unit of interest
+        condition_id :
+            ID for the condition of interest (usually the preferred condition)
 
-        Returns:
+        Returns
         -------
-        modulation_index - metric
-
+        modulation_index : metric
         """
         tf = self.stimulus_conditions.loc[condition_id][self._col_tf]
 
@@ -365,18 +362,18 @@ class DriftingGratings(StimulusAnalysis):
         return modulation_index(data, tf, sample_rate)
 
     def _get_c50(self, unit_id):
-        """ Calculate C50 for a given unit.
+        """ Calculate C50 for a given unit. Only valid if the contrast tuning stimulus is present. Otherwise,
+        return NaN value
 
-        Only valid if the contrast tuning stimulus is present
-        Otherwise, return NaN value
-
-        Params:
-        -------
-        unit_id - unique ID for the unit of interest
+        Parameters
+        ----------
+        unit_id : int
+            unique ID for the unit of interest
 
         Returns:
         -------
-        c50 - metric
+        c50 : float
+            metric
 
         """
 
@@ -660,13 +657,13 @@ def c50(contrasts, responses):
     return c50
 
 
-def f1_f0(arr, tf, num_trials, num_bins, trial_duration):
+def f1_f0(arr, tf, trial_duration):
     """Computes F1/F0 of a drifting grating response
 
     Parameters
     ----------
     arr :
-        DataArray with trials x times
+        DataArray with trials x bin-times
     tf :
         temporal frequency of the stimulus
 
@@ -676,23 +673,31 @@ def f1_f0(arr, tf, num_trials, num_bins, trial_duration):
         metric
 
     """
-    #num_trials = dataset.stimulus_presentation_id.size
-    #num_bins = dataset.time_relative_to_stimulus_onset.size
-    #trial_duration = dataset.time_relative_to_stimulus_onset.max()
+    if arr.size == 0:
+        return np.nan
 
+    if arr.ndim == 1:
+        arr = arr.reshape(1, arr.size)
+
+    # For each trial group the bins into blocks that will go to the length of the temporal frequency
+    num_bins = arr.shape[1]
+    num_trials = arr.shape[0]
     cycles_per_trial = int(tf * trial_duration)
-
     bins_per_cycle = int(num_bins / cycles_per_trial)
+    if bins_per_cycle == 0:
+        # can occur if temp-freq x trial duration is greater than the total trial duration
+        return np.nan
 
     arr = arr[:, :cycles_per_trial*bins_per_cycle].reshape((num_trials, cycles_per_trial, bins_per_cycle))
-
     avg_rate = np.mean(arr, 1)
-
     AMP = 2*np.abs(fft(avg_rate, bins_per_cycle)) / bins_per_cycle
 
     f0 = 0.5*AMP[:, 0]
     f1 = AMP[:, 1]
     selection = f0 > 0.0
+    if not np.any(selection):
+        # No spikes found
+        return np.nan
 
     return np.nanmean(f1[selection]/f0[selection])
 
