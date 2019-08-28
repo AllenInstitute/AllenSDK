@@ -121,6 +121,8 @@ class DotMotion(StimulusAnalysis):
                 metrics_df['speed_tuning_idx_dm'] = [self._get_speed_tuning_index(unit) for unit in unit_ids]
                 metrics_df['reliability_dm'] = [self._get_reliability(unit, self._get_preferred_condition(unit))
                                                 for unit in unit_ids]
+                metrics_df['time_to_peak_dm'] = [self._get_time_to_peak(unit, self._get_preferred_condition(unit)) for
+                                                 unit in unit_ids]
                 metrics_df['lifetime_sparseness_dm'] = [self._get_lifetime_sparseness(unit) for unit in unit_ids]
                 metrics_df.loc[:, ['run_pval_dm', 'run_mod_dm']] = \
                         [self._get_running_modulation(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
