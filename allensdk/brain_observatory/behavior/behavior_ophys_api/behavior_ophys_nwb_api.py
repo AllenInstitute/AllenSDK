@@ -220,6 +220,235 @@ class BehaviorOphysNwbApi(NwbApi, BehaviorOphysApiBase):
 
         return pd.DataFrame(motion_correction_data)
 
+class ExtendedBehaviorOphysNwbApi(BehaviorOphysNwbApi):
+    def __init__(self, nwb_path, trial_response_df_path, flash_response_df_path,
+                 extended_stimulus_presentations_df_path):
+        '''
+        Api to read data from an NWB file and associated cached analysis HDF5 files.
+        '''
+        super(ExtendedBehaviorOphysNwbApi, self).__init__(path=nwb_path, filter_invalid_rois=True)
+        self.trial_response_df_path = trial_response_df_path
+        self.flash_response_df_path = flash_response_df_path
+        self.extended_stimulus_presentations_df_path = extended_stimulus_presentations_df_path
+
+    def get_trial_response_df(self):
+        tdf = pd.read_hdf(self.trial_response_df_path, key='df')
+        tdf.reset_index(inplace=True)
+        tdf.drop(columns=['cell_roi_id'], inplace=True)
+        return tdf
+
+    def get_flash_response_df(self):
+        fdf = pd.read_hdf(self.flash_response_df_path, key='df')
+        fdf.reset_index(inplace=True)
+        fdf.drop(columns=['image_name', 'cell_roi_id'], inplace=True)
+        fdf = fdf.join(self.get_stimulus_presentations(), on='flash_id', how='left')
+        return fdf
+
+    def get_extended_stimulus_presentations_df(self):
+        return pd.read_hdf(self.extended_stimulus_presentations_df_path, key='df')
+
+    def get_task_parameters(self):
+        '''
+        The task parameters are incorrect.
+        See: https://github.com/AllenInstitute/AllenSDK/issues/637
+        We need to hard-code the omitted flash fraction and stimulus duration here. 
+        '''
+        task_parameters = super(ExtendedBehaviorOphysNwbApi, self).get_task_parameters()
+        task_parameters['omitted_flash_fraction'] = 0.05
+        task_parameters['stimulus_duration_sec'] = 0.25
+        task_parameters['blank_duration_sec'] = 0.5
+        task_parameters.pop('task')
+        return task_parameters
+
+    def get_metadata(self):
+        metadata = super(ExtendedBehaviorOphysNwbApi, self).get_metadata()
+
+        # We want stage name in metadata for easy access by the students
+        task_parameters = self.get_task_parameters()
+        metadata['stage'] = task_parameters['stage']
+
+        # metadata should not include 'session_type' because it is 'Unknown'
+        metadata.pop('session_type')
+
+        # For SWDB only
+        # metadata should not include 'behavior_session_uuid' because it is not useful to students and confusing
+        metadata.pop('behavior_session_uuid')
+
+        # Rename LabTracks_ID to mouse_id to reduce student confusion
+        metadata['mouse_id'] = metadata.pop('LabTracks_ID')
+
+        return metadata
+
+    def get_running_speed(self):
+        # We want the running speed attribute to be a dataframe (like licks, rewards, etc.) instead of a 
+        # RunningSpeed object. This will improve consistency for students. For SWDB we have also opted to 
+        # have columns for both 'timestamps' and 'values' of things, since this is more intuitive for students
+        running_speed = super(ExtendedBehaviorOphysNwbApi, self).get_running_speed()
+        return pd.DataFrame({'speed': running_speed.values,
+                             'timestamps': running_speed.timestamps})
+
+    def get_trials(self, filter_aborted_trials=True):
+        trials = super(ExtendedBehaviorOphysNwbApi, self).get_trials()
+        stimulus_presentations = super(ExtendedBehaviorOphysNwbApi, self).get_stimulus_presentations()
+
+        # Note: everything between dashed lines is a patch to deal with timing issues in
+        # the AllenSDK
+        # This should be removed in the future after issues #876 and #802 are fixed.
+        # --------------------------------------------------------------------------------
+
+        # gets start_time of next stimulus after timestamp in stimulus_presentations 
+        def get_next_flash(timestamp):
+            query = stimulus_presentations.query('start_time >= @timestamp')
+            if len(query) > 0:
+                return query.iloc[0]['start_time']
+            else:
+                return None
+
+        trials['change_time'] = trials['change_time'].map(lambda x: get_next_flash(x))
+
+        ### This method can lead to a NaN change time for any trials at the end of the session.
+        ### However, aborted trials at the end of the session also don't have change times. 
+        ### The safest method seems like just droping any trials that aren't covered by the
+        ### stimulus_presentations
+        # Using start time in case last stim is omitted
+        last_stimulus_presentation = stimulus_presentations.iloc[-1]['start_time']
+        trials = trials[np.logical_not(trials['stop_time'] > last_stimulus_presentation)]
+
+        # recalculates response latency based on corrected change time and first lick time
+        def recalculate_response_latency(row):
+            if len(row['lick_times'] > 0) and not pd.isnull(row['change_time']):
+                return row['lick_times'][0] - row['change_time']
+            else:
+                return np.nan
+
+        trials['response_latency'] = trials.apply(recalculate_response_latency, axis=1)
+        # -------------------------------------------------------------------------------
+
+        # asserts that every change time exists in the stimulus_presentations table
+        for change_time in trials[trials['change_time'].notna()]['change_time']:
+            assert change_time in stimulus_presentations['start_time'].values
+
+        # Return only non-aborted trials from this API by default
+        if filter_aborted_trials:
+            trials = trials.query('not aborted')
+
+        # Reorder / drop some columns to make more sense to students
+        trials = trials[[
+            'initial_image_name',
+            'change_image_name',
+            'change_time',
+            'lick_times',
+            'response_latency',
+            'reward_time',
+            'go',
+            'catch',
+            'hit',
+            'miss',
+            'false_alarm',
+            'correct_reject',
+            'aborted',
+            'auto_rewarded',
+            'reward_volume',
+            'start_time',
+            'stop_time',
+            'trial_length'
+        ]]
+
+        # Calculate reward rate per trial
+        trials['reward_rate'] = calculate_reward_rate(
+            response_latency=trials.response_latency,
+            starttime=trials.start_time,
+            window=.75,
+            trial_window=25,
+            initial_trials=10
+        )
+
+        # Response_binary is just whether or not they responded - e.g. true for hit or FA. 
+        hit = trials['hit'].values
+        fa = trials['false_alarm'].values
+        trials['response_binary'] = np.logical_or(hit, fa)
+
+        return trials
+
+    def get_stimulus_presentations(self):
+        stimulus_presentations = super(ExtendedBehaviorOphysNwbApi, self).get_stimulus_presentations()
+        extended_stimulus_presentations = self.get_extended_stimulus_presentations_df()
+        extended_stimulus_presentations = extended_stimulus_presentations.drop(columns=['omitted'])
+        stimulus_presentations = stimulus_presentations.join(extended_stimulus_presentations)
+
+        # Reorder the columns returned to make more sense to students
+        stimulus_presentations = stimulus_presentations[[
+            'image_name',
+            'image_index',
+            'start_time',
+            'stop_time',
+            'omitted',
+            'change',
+            'duration',
+            'licks',
+            'rewards',
+            'running_speed',
+            'index',
+            'time_from_last_lick',
+            'time_from_last_reward',
+            'time_from_last_change',
+            'block_index',
+            'image_block_repetition',
+            'repeat_within_block',
+            'image_set'
+        ]]
+
+        # Rename some columns to make more sense to students
+        stimulus_presentations = stimulus_presentations.rename(
+            columns={'index': 'absolute_flash_number',
+                     'running_speed': 'mean_running_speed'})
+        # Replace image set with A/B
+        stimulus_presentations['image_set'] = self.get_task_parameters()['stage'][15]
+        # Change index name for easier merge with flash_response_df
+        stimulus_presentations.index.rename('flash_id', inplace=True)
+        return stimulus_presentations
+
+    def get_stimulus_templates(self):
+        # super stim templates is a dict with one annoyingly-long key, so pop the val out
+        stimulus_templates = super(ExtendedBehaviorOphysNwbApi, self).get_stimulus_templates()
+        stimulus_template_array = stimulus_templates[list(stimulus_templates.keys())[0]]
+
+        # What we really want is a dict with image_name as key
+        template_dict = {}
+        image_index_names = self.get_image_index_names()
+        for image_index, image_name in image_index_names.iteritems():
+            if image_name != 'omitted':
+                template_dict.update({image_name: stimulus_template_array[image_index, :, :]})
+        return template_dict
+
+    def get_licks(self):
+        # Licks column 'time' should be 'timestamps' to be consistent with rest of session
+        licks = super(ExtendedBehaviorOphysNwbApi, self).get_licks()
+        licks = licks.rename(columns={'time': 'timestamps'})
+        return licks
+
+    def get_rewards(self):
+        # Rewards has timestamps in the index which is confusing and not consistent with the
+        # rest of the session. Use a normal index and have timestamps as a column
+        rewards = super(ExtendedBehaviorOphysNwbApi, self).get_rewards()
+        rewards = rewards.reset_index()
+        return rewards
+
+    def get_dff_traces(self):
+        # We want to drop the 'cell_roi_id' column from the dff traces dataframe
+        # This is just for Friday Harbor, not for eventual inclusion in the LIMS api.
+        dff_traces = super(ExtendedBehaviorOphysNwbApi, self).get_dff_traces()
+        dff_traces = dff_traces.drop(columns=['cell_roi_id'])
+        return dff_traces
+
+    def get_image_index_names(self):
+        image_index_names = self.get_stimulus_presentations().groupby('image_index').apply(
+            lambda group: one(group['image_name'].unique())
+        )
+        return image_index_names
+
+
+
 
 def equals(A, B, reraise=False):
 

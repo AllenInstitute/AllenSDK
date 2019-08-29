@@ -348,6 +348,73 @@ def _translate_roi_mask(mask, row_offset, col_offset):
         axis=(0, 1)
     )
 
+class ExtendedBehaviorOphysSession(BehaviorOphysSession):
+    """Represents data from a single Visual Behavior Ophys imaging session.  LazyProperty attributes access the data only on the first demand, and then memoize the result for reuse.
+    
+    Attributes:
+        ophys_experiment_id : int (LazyProperty)
+            Unique identifier for this experimental session
+        max_projection : allensdk.brain_observatory.behavior.image_api.Image (LazyProperty)
+            2D max projection image
+        stimulus_timestamps : numpy.ndarray (LazyProperty)
+            Timestamps associated the stimulus presentations on the monitor 
+        ophys_timestamps : numpy.ndarray (LazyProperty)
+            Timestamps associated with frames captured by the microscope
+        metadata : dict (LazyProperty)
+            A dictionary of session-specific metadata
+        dff_traces : pandas.DataFrame (LazyProperty)
+            The traces of dff organized into a dataframe; index is the cell roi ids
+        segmentation_mask_image: allensdk.brain_observatory.behavior.image_api.Image (LazyProperty)
+            An image with pixel value 1 if that pixel was included in an ROI, and 0 otherwise
+        roi_masks: dict (LazyProperty)
+            A dictionary with individual ROI masks for each cell specimen ID. Keys are cell specimen IDs, values are 2D numpy arrays.
+        cell_specimen_table : pandas.DataFrame (LazyProperty)
+            Cell roi information organized into a dataframe; index is the cell roi ids
+        running_speed : pandas.DataFrame (LazyProperty)
+            A dataframe containing the running_speed in cm/s and the timestamps of each data point
+        stimulus_presentations : pandas.DataFrame (LazyProperty)
+            Table whose rows are stimulus presentations (i.e. a given image, for a given duration, typically 250 ms) and whose columns are presentation characteristics.
+        stimulus_templates : dict (LazyProperty)
+            A dictionary containing the stimulus images presented during the session. Keys are image names, values are 2D numpy arrays.
+        licks : pandas.DataFrame (LazyProperty)
+            A dataframe containing lick timestamps
+        rewards : pandas.DataFrame (LazyProperty)
+            A dataframe containing timestamps of delivered rewards
+        task_parameters : dict (LazyProperty)
+            A dictionary containing parameters used to define the task runtime behavior
+        trials : pandas.DataFrame (LazyProperty)
+            A dataframe containing behavioral trial start/stop times, and trial data
+        corrected_fluorescence_traces : pandas.DataFrame (LazyProperty)
+            The motion-corrected fluorescence traces organized into a dataframe; index is the cell roi ids
+        average_projection : allensdk.brain_observatory.behavior.image_api.Image (LazyProperty)
+            2D image of the microscope field of view, averaged across the experiment
+        motion_correction : pandas.DataFrame (LazyProperty)
+            A dataframe containing trace data used during motion correction computation
+
+    Attributes for internal / advanced users
+        running_data_df : pandas.DataFrame (LazyProperty)
+            Dataframe containing various signals used to compute running speed
+    """
+
+    def __init__(self, api):
+        super(ExtendedBehaviorOphysSession, self).__init__(api)
+        self.api = api
+
+        self.trial_response_df = LazyProperty(self.api.get_trial_response_df)
+        self.flash_response_df = LazyProperty(self.api.get_flash_response_df)
+        self.image_index = LazyProperty(self.api.get_image_index_names)
+        self.roi_masks = LazyProperty(self.get_roi_masks)
+
+    def get_roi_masks(self):
+        masks = super(ExtendedBehaviorOphysSession, self).get_roi_masks()
+        return {
+            cell_specimen_id: masks.loc[{"cell_specimen_id": cell_specimen_id}].data
+            for cell_specimen_id in masks["cell_specimen_id"].data
+        }
+
+    def get_segmentation_mask_image(self):
+        masks = self.roi_masks
+        return np.any([submask for submask in masks.values()], axis=0)
 
 if __name__ == "__main__":
 
