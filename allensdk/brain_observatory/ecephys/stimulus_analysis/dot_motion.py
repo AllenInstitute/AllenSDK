@@ -118,7 +118,7 @@ class DotMotion(StimulusAnalysis):
                 metrics_df['firing_rate_dm'] = [self._get_overall_firing_rate(unit) for unit in unit_ids]
                 metrics_df['fano_dm'] = [self._get_fano_factor(unit, self._get_preferred_condition(unit))
                                          for unit in unit_ids]
-                metrics_df['speed_tuning_idx_dm'] = [self._get_speed_tuning_index(unit) for unit in unit_ids]
+                # metrics_df['speed_tuning_idx_dm'] = [self._get_speed_tuning_index(unit) for unit in unit_ids]
                 metrics_df['reliability_dm'] = [self._get_reliability(unit, self._get_preferred_condition(unit))
                                                 for unit in unit_ids]
                 metrics_df['time_to_peak_dm'] = [self._get_time_to_peak(unit, self._get_preferred_condition(unit)) for
@@ -197,12 +197,15 @@ class DotMotion(StimulusAnalysis):
 
         SEE: https://github.com/AllenInstitute/ecephys_analysis_modules/blob/master/ecephys_analysis_modules/modules/tuning/tuning_speed.py
 
-        Params:
-        -------
-        unit_id - unique ID for the unit of interest
+        Parameters
+        ----------
+        unit_id : int
+            unique ID for the unit of interest
 
-        Returns:
+        Returns
         -------
-        speed_tuning - degree to which the unit's responses are modulated by stimulus speed
+        speed_tuning : float
+            degree to which the unit's responses are modulated by stimulus speed
         """
+        # TODO: Not implemented yet.
         return np.nan
