@@ -69,16 +69,6 @@ class Unit(RaisingSchema):
     spread = Float(required=True, allow_none=True)
     velocity_above = Float(required=True, allow_none=True)
     velocity_below = Float(required=True, allow_none=True)
-    # TODO: The below have been modified by jsiegle in his lastest push. Check to see if changes should be perminant.
-    # waveform_duration = Float(required=True)
-    # waveform_halfwidth = Float(required=True)
-    # waveform_PT_ratio = Float(required=True)
-    # waveform_repolarization_slope = Float(required=True)
-    # waveform_recovery_slope = Float(required=True)
-    # waveform_amplitude = Float(required=True)
-    # waveform_spread = Float(required=True)
-    # waveform_velocity_above = Float(required=True)
-    # waveform_velocity_below = Float(required=True)
 
 
 class Lfp(RaisingSchema):
@@ -96,8 +86,8 @@ class Probe(RaisingSchema):
     mean_waveforms_path = String(required=True, validate=check_read_access)
     channels = Nested(Channel, many=True, required=True)
     units = Nested(Unit, many=True, required=True)
-    #lfp = Nested(Lfp, many=False, required=True)
-    #csd_path = String(required=True, validate=check_read_access, help="path to h5 file containing calculated current source density")
+    lfp = Nested(Lfp, many=False, required=True)
+    csd_path = String(required=True, validate=check_read_access, help="path to h5 file containing calculated current source density")
     sampling_rate = Float(default=30000.0, help="sampling rate (Hz, master clock) at which raw data were acquired on this probe")
     lfp_sampling_rate = Float(default=2500.0, help="sampling rate of LFP data on this probe")
 
