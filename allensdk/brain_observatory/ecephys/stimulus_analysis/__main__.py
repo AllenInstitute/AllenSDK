@@ -29,10 +29,10 @@ def calculate_stimulus_metrics(args):
 
     stimulus_classes = (
                  DriftingGratings,
-                 #StaticGratings,
-                 #NaturalScenes,
+                 StaticGratings,
+                 NaturalScenes,
                  #NaturalMovies,
-                 #DotMotion,
+                 DotMotion,
                  Flashes,
                  ReceptiveFieldMapping,
                 )

@@ -168,8 +168,8 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
             ]
             units.drop(columns=["quality"], inplace=True)
 
-        #units = units[units["amplitude_cutoff"] <= self.amplitude_cutoff_maximum]
-        #units = units[units["presence_ratio"] >= self.presence_ratio_minimum]
-        #units = units[units["isi_violations"] <= self.isi_violations_maximum]
+        units = units[units["amplitude_cutoff"] <= self.amplitude_cutoff_maximum]
+        units = units[units["presence_ratio"] >= self.presence_ratio_minimum]
+        units = units[units["isi_violations"] <= self.isi_violations_maximum]
 
         return units
