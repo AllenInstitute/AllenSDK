@@ -3,43 +3,38 @@ import shutil
 import warnings
 
 import pandas as pd
-from multiprocessing import  Pool
-from functools import partial
-import numpy as np
 
 from .behavior_project_api import BehaviorProjectApi
 from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine import HttpEngine
 from allensdk.brain_observatory.ecephys.ecephys_project_api.utilities import postgres_macros, build_and_execute
 from allensdk.brain_observatory.behavior.metadata_processing import get_task_parameters
-
 from allensdk.internal.api import PostgresQueryMixin
-from allensdk.brain_observatory.ecephys import get_unit_filter_value
 
 class BehaviorProjectLimsApi(BehaviorProjectApi):
     def __init__(self, postgres_engine, app_engine):
         self.postgres_engine = postgres_engine
         self.app_engine = app_engine
 
-    def get_session_data(self, session_id):
+    def get_session_nwb(self, experiment_id):
         nwb_response = build_and_execute(
             """
-            select wkf.id, wkf.filename, wkf.storage_directory, wkf.attachable_id from well_known_files wkf 
-            join ecephys_analysis_runs ear on (
-                ear.id = wkf.attachable_id
-                and wkf.attachable_type = 'EcephysAnalysisRun'
-            )
-            join well_known_file_types wkft on wkft.id = wkf.well_known_file_type_id
-            where ear.current
-            and wkft.name = 'EcephysNwb'
-            and ear.ecephys_session_id = {{session_id}}
-        """,
+            SELECT 
+            wkf.id, wkf.storage_directory, wkf.attachable_id, wkf.filename
+            FROM ophys_experiments oe
+            LEFT JOIN well_known_files wkf 
+                ON wkf.attachable_id=oe.id
+            LEFT JOIN well_known_file_types wkt
+                ON wkf.well_known_file_type_id = wkt.id
+            WHERE wkt.name = 'BehaviorOphysNwb'
+            AND oe.id = {{experiment_id}}
+            """,
             engine=self.postgres_engine.select,
-            session_id=session_id,
+            experiment_id=experiment_id,
         )
 
         if nwb_response.shape[0] != 1:
             raise ValueError(
-                f"expected exactly 1 current NWB file for session {session_id}, "
+                f"expected exactly 1 current NWB file for session {experiment_id}, "
                 f"found {nwb_response.shape[0]}: {pd.DataFrame(nwb_response)}"
             )
 
@@ -178,42 +173,6 @@ class BehaviorProjectLimsApi(BehaviorProjectApi):
         pg_engine = PostgresQueryMixin(**_pg_kwargs)
         app_engine = HttpEngine(**_app_kwargs)
         return cls(pg_engine, app_engine)
-
-def parallelize(data, func, num_of_processes):
-    data_split = np.array_split(data, num_of_processes)
-    pool = Pool(num_of_processes)
-    data = pd.concat(pool.map(func, data_split))
-    pool.close()
-    pool.join()
-    return data
-
-def run_on_subset(func, data_subset):
-    return data_subset.apply(func, axis=1)
-
-def parallelize_on_rows(data, func, num_of_processes=16):
-    return parallelize(data, partial(run_on_subset, func), num_of_processes)
-
-def get_stage_name(row):
-    '''
-    Since the Mtrain stage isn't stored in LIMS, and we need it,
-    we have to get it from the pickle files.  This can take a few
-    seconds per file.
-
-    Args:
-        row (pandas.DataFrame row): must provide 'behavior_stimulus_file_path' col
-    Returns:
-        stage_name (str): The MTrain stage name for the behavior session
-    '''
-    data = pd.read_pickle(row['behavior_stimulus_file_path'])
-    try:
-        stage_name = get_task_parameters(data)['stage']
-    except KeyError as e: # Happens for RF mapping sessions
-        print("Behavior file load error")
-        print(e)
-        return "NO_BEHAVIOR"
-    else:
-        print(stage_name)
-        return stage_name
 
 def parse_passive(behavior_stage):
     '''

@@ -4,8 +4,8 @@ from allensdk.brain_observatory.ecephys.ecephys_project_cache import call_cachin
 from allensdk.brain_observatory.ecephys.file_promise import write_from_stream
 from allensdk.brain_observatory.behavior.behavior_project_api.behavior_project_fixed_api import BehaviorProjectFixedApi
 from allensdk.brain_observatory.behavior.behavior_project_api.behavior_project_lims_api import BehaviorProjectLimsApi
-from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import ExtendedBehaviorOphysNwbApi
-from allensdk.brain_observatory.behavior.behavior_ophys_session import ExtendedBehaviorOphysSession
+from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi, ExtendedBehaviorOphysNwbApi
+from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorOphysSession, ExtendedBehaviorOphysSession
 
 csv_io = {
     'reader': lambda path: pd.read_csv(path, index_col='Unnamed: 0'),
@@ -47,15 +47,19 @@ class BehaviorProjectCache(Cache):
         flash_response_path = self.get_cache_path(None, self.FLASH_RESPONSE_KEY, experiment_id)
         extended_stim_path = self.get_cache_path(None, self.EXTENDED_STIM_COLUMNS_KEY, experiment_id)
 
+        #  fetch_api_fns = zip(
+        #      [self.fetch_api.get_session_nwb,
+        #       self.fetch_api.get_session_trial_response,
+        #       self.fetch_api.get_session_flash_response,
+        #       self.fetch_api.get_session_extended_stimulus_columns],
+        #      [nwb_path, 
+        #       trial_response_path,
+        #       flash_response_path,
+        #       extended_stim_path]
+        #  )
         fetch_api_fns = zip(
-            [self.fetch_api.get_session_nwb,
-             self.fetch_api.get_session_trial_response,
-             self.fetch_api.get_session_flash_response,
-             self.fetch_api.get_session_extended_stimulus_columns],
-            [nwb_path, 
-             trial_response_path,
-             flash_response_path,
-             extended_stim_path]
+            [self.fetch_api.get_session_nwb],
+            [nwb_path]
         )
 
         for fetch_api_fn, path in fetch_api_fns:
@@ -65,13 +69,10 @@ class BehaviorProjectCache(Cache):
                          strategy='lazy',
                          writer=write_from_stream)
 
-        session_api = ExtendedBehaviorOphysNwbApi(
-            nwb_path=nwb_path,
-            trial_response_df_path=trial_response_path,
-            flash_response_df_path=flash_response_path,
-            extended_stimulus_presentations_df_path=extended_stim_path
+        session_api = BehaviorOphysNwbApi(
+            path=nwb_path,
         )
-        return ExtendedBehaviorOphysSession(api=session_api)
+        return BehaviorOphysSession(api=session_api)
 
     def add_manifest_paths(self, manifest_builder):
         manifest_builder = super(BehaviorProjectCache, self).add_manifest_paths(manifest_builder)
