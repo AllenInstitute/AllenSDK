@@ -3,10 +3,14 @@ import shutil
 import warnings
 
 import pandas as pd
+from multiprocessing import  Pool
+from functools import partial
+import numpy as np
 
 from .behavior_project_api import BehaviorProjectApi
 from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine import HttpEngine
 from allensdk.brain_observatory.ecephys.ecephys_project_api.utilities import postgres_macros, build_and_execute
+from allensdk.brain_observatory.behavior.metadata_processing import get_task_parameters
 
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.brain_observatory.ecephys import get_unit_filter_value
@@ -44,224 +48,12 @@ class BehaviorProjectLimsApi(BehaviorProjectApi):
             f"well_known_files/download/{nwb_id}?wkf_id={nwb_id}"
         )
 
-    def get_probe_lfp_data(self, probe_id):
-        nwb_response = build_and_execute(
-            """
-            select wkf.id from well_known_files wkf
-            join ecephys_analysis_run_probes earp on (
-                earp.id = wkf.attachable_id
-                and wkf.attachable_type = 'EcephysAnalysisRunProbe'
-            )
-            join ecephys_analysis_runs ear on ear.id = earp.ecephys_analysis_run_id
-            join well_known_file_types wkft on wkft.id = wkf.well_known_file_type_id
-            where wkft.name ~ 'EcephysLfpNwb'
-            and ear.current
-            and earp.ecephys_probe_id = {{probe_id}}
-            """,
-            engine=self.postgres_engine.select,
-            probe_id=probe_id
-        )
-
-        if nwb_response.shape[0] != 1:
-            raise ValueError(
-                f"expected exactly 1 current LFP NWB file for probe {probe_id}, "
-                f"found {nwb_response.shape[0]}: {pd.DataFrame(nwb_response)}"
-            )
-
-        nwb_id = nwb_response.loc[0, "id"]
-        return self.app_engine.stream(
-            f"well_known_files/download/{nwb_id}?wkf_id={nwb_id}"
-        )
-
-    def get_units(
-        self, unit_ids=None, 
-        channel_ids=None, 
-        probe_ids=None, 
-        session_ids=None, 
-        quality="good",
-        **kwargs
-    ):
-        response = build_and_execute(
-            """
-                {%- import 'postgres_macros' as pm -%}
-                {%- import 'macros' as m -%}
-                select eu.*
-                from ecephys_units eu
-                join ecephys_channels ec on ec.id = eu.ecephys_channel_id
-                join ecephys_probes ep on ep.id = ec.ecephys_probe_id
-                join ecephys_sessions es on es.id = ep.ecephys_session_id 
-                where ec.valid_data
-                and ep.workflow_state != 'failed'
-                and es.workflow_state != 'failed'
-                {{pm.optional_equals('eu.quality', quality) -}}
-                {{pm.optional_contains('eu.id', unit_ids) -}}
-                {{pm.optional_contains('ec.id', channel_ids) -}}
-                {{pm.optional_contains('ep.id', probe_ids) -}}
-                {{pm.optional_contains('es.id', session_ids) -}}
-                {{pm.optional_le('eu.amplitude_cutoff', amplitude_cutoff_maximum) -}}
-                {{pm.optional_ge('eu.presence_ratio', presence_ratio_minimum) -}}
-                {{pm.optional_le('eu.isi_violations', isi_violations_maximum) -}}
-            """,
-            base=postgres_macros(),
-            engine=self.postgres_engine.select,
-            unit_ids=unit_ids,
-            channel_ids=channel_ids,
-            probe_ids=probe_ids,
-            session_ids=session_ids,
-            quality=f"'{quality}'" if quality is not None else quality,
-            amplitude_cutoff_maximum=get_unit_filter_value("amplitude_cutoff_maximum", replace_none=False, **kwargs),
-            presence_ratio_minimum=get_unit_filter_value("presence_ratio_minimum", replace_none=False, **kwargs),
-            isi_violations_maximum=get_unit_filter_value("isi_violations_maximum", replace_none=False, **kwargs)
-        )
-
-        response.set_index("id", inplace=True)
-        response.rename(columns={"ecephys_channel_id": "peak_channel_id"}, inplace=True)
-
-        return response
-
-    def get_channels(self, channel_ids=None, probe_ids=None, session_ids=None, **kwargs):
-        response = build_and_execute(
-            """
-                {%- import 'postgres_macros' as pm -%}
-                select 
-                    ec.id as id,
-                    ec.ecephys_probe_id,
-                    ec.local_index,
-                    ec.probe_vertical_position,
-                    ec.probe_horizontal_position,
-                    ec.manual_structure_id,
-                    st.acronym as manual_structure_acronym,
-                    pc.unit_count
-                from ecephys_channels ec 
-                join ecephys_probes ep on ep.id = ec.ecephys_probe_id
-                join ecephys_sessions es on es.id = ep.ecephys_session_id 
-                left join structures st on st.id = ec.manual_structure_id
-                join (
-                    select ech.id as ecephys_channel_id,
-                    count (distinct eun.id) as unit_count
-                    from ecephys_channels ech
-                    join ecephys_units eun on (
-                        eun.ecephys_channel_id = ech.id
-                        and eun.quality = 'good'
-                        {{pm.optional_le('eun.amplitude_cutoff', amplitude_cutoff_maximum) -}}
-                        {{pm.optional_ge('eun.presence_ratio', presence_ratio_minimum) -}}
-                        {{pm.optional_le('eun.isi_violations', isi_violations_maximum) -}}
-                    )
-                    group by ech.id
-                ) pc on ec.id = pc.ecephys_channel_id
-                where valid_data
-                and ep.workflow_state != 'failed'
-                and es.workflow_state != 'failed'
-                {{pm.optional_contains('ec.id', channel_ids) -}}
-                {{pm.optional_contains('ep.id', probe_ids) -}}
-                {{pm.optional_contains('es.id', session_ids) -}}
-            """,
-            base=postgres_macros(),
-            engine=self.postgres_engine.select,
-            channel_ids=channel_ids,
-            probe_ids=probe_ids,
-            session_ids=session_ids,
-            amplitude_cutoff_maximum=get_unit_filter_value("amplitude_cutoff_maximum", replace_none=False, **kwargs),
-            presence_ratio_minimum=get_unit_filter_value("presence_ratio_minimum", replace_none=False, **kwargs),
-            isi_violations_maximum=get_unit_filter_value("isi_violations_maximum", replace_none=False, **kwargs)
-        )
-        return response.set_index("id")
-
-    def get_probes(self, probe_ids=None, session_ids=None, **kwargs):
-        response = build_and_execute(
-            """
-                {%- import 'postgres_macros' as pm -%}
-                select 
-                    ep.id as id,
-                    ep.ecephys_session_id,
-                    ep.global_probe_sampling_rate,
-                    ep.global_probe_lfp_sampling_rate,
-                    total_time_shift,
-                    channel_count,
-                    unit_count,
-                    case 
-                        when nwb_id is not null then true
-                        else false
-                    end as has_lfp_nwb,
-                    str.structure_acronyms as structure_acronyms
-                from ecephys_probes ep 
-                join ecephys_sessions es on es.id = ep.ecephys_session_id 
-                join (
-                    select epr.id as ecephys_probe_id,
-                    count (distinct ech.id) as channel_count,
-                    count (distinct eun.id) as unit_count
-                    from ecephys_probes epr
-                    join ecephys_channels ech on (
-                        ech.ecephys_probe_id = epr.id
-                        and ech.valid_data
-                    )
-                    join ecephys_units eun on (
-                        eun.ecephys_channel_id = ech.id
-                        and eun.quality = 'good'
-                        {{pm.optional_le('eun.amplitude_cutoff', amplitude_cutoff_maximum) -}}
-                        {{pm.optional_ge('eun.presence_ratio', presence_ratio_minimum) -}}
-                        {{pm.optional_le('eun.isi_violations', isi_violations_maximum) -}}
-                    )
-                    group by epr.id
-                ) chc on ep.id = chc.ecephys_probe_id
-                left join (
-                    select
-                        epr.id as ecephys_probe_id,
-                        wkf.id as nwb_id
-                    from ecephys_probes epr 
-                    join ecephys_analysis_runs ear on (
-                        ear.ecephys_session_id = epr.ecephys_session_id
-                        and ear.current
-                    )
-                    right join ecephys_analysis_run_probes earp on (
-                        earp.ecephys_probe_id = epr.id
-                        and earp.ecephys_analysis_run_id = ear.id
-                    )
-                    right join well_known_files wkf on (
-                        wkf.attachable_id = earp.id
-                        and wkf.attachable_type = 'EcephysAnalysisRunProbe'
-                    )
-                    join well_known_file_types wkft on wkft.id = wkf.well_known_file_type_id
-                    where wkft.name = 'EcephysLfpNwb'
-                ) nwb on ep.id = nwb.ecephys_probe_id
-                left join (
-                    select epr.id as ecephys_probe_id,
-                    array_agg (st.id) as structure_ids,
-                    array_agg (distinct st.acronym) as structure_acronyms
-                    from ecephys_probes epr
-                    join ecephys_channels ech on (
-                        ech.ecephys_probe_id = epr.id
-                        and ech.valid_data
-                    )
-                    left join structures st on st.id = ech.manual_structure_id
-                    group by epr.id
-                ) str on ep.id = str.ecephys_probe_id
-                where true
-                and ep.workflow_state != 'failed'
-                and es.workflow_state != 'failed'
-                {{pm.optional_contains('ep.id', probe_ids) -}}
-                {{pm.optional_contains('es.id', session_ids) -}}
-            """,
-            base=postgres_macros(),
-            engine=self.postgres_engine.select,
-            probe_ids=probe_ids,
-            session_ids=session_ids,
-            amplitude_cutoff_maximum=get_unit_filter_value("amplitude_cutoff_maximum", replace_none=False, **kwargs),
-            presence_ratio_minimum=get_unit_filter_value("presence_ratio_minimum", replace_none=False, **kwargs),
-            isi_violations_maximum=get_unit_filter_value("isi_violations_maximum", replace_none=False, **kwargs)
-        )
-        return response.set_index("id")
-
     def get_sessions(
         self,
-        session_ids=None,
-        workflow_states=("uploaded",),
-        published=None,
-        habituation=False,
-        project_names=(
-            "BrainTV Neuropixels Visual Behavior",
-            "BrainTV Neuropixels Visual Coding",
-        ),
+        container_ids=None,
+        container_workflow_states=("container_qc","postprocessing","complete"),
+        project_names=("Visual Behavior production",),
+        reporter_lines=('Ai148(TIT2L-GC6f-ICL-tTA2)', 'Ai93(TITL-GCaMP6f)',),
         **kwargs
     ):
 
@@ -269,98 +61,95 @@ class BehaviorProjectLimsApi(BehaviorProjectApi):
             """
                 {%- import 'postgres_macros' as pm -%}
                 {%- import 'macros' as m -%}
-                select 
-                    stimulus_name as session_type,
-                    sp.id as specimen_id, 
-                    es.id as id, 
-                    dn.full_genotype as genotype,
-                    gd.name as gender, 
-                    ages.days as age_in_days,
-                    pr.code as project_code,
-                    probe_count,
-                    channel_count,
-                    unit_count,
-                    case 
-                        when nwb_id is not null then true
-                        else false
-                    end as has_nwb,
-                    str.structure_acronyms as structure_acronyms
-                from ecephys_sessions es
-                join specimens sp on sp.id = es.specimen_id 
-                join donors dn on dn.id = sp.donor_id 
-                join genders gd on gd.id = dn.gender_id 
-                join ages on ages.id = dn.age_id
-                join projects pr on pr.id = es.project_id
-                join (
-                    select es.id as ecephys_session_id,
-                    count (distinct epr.id) as probe_count,
-                    count (distinct ech.id) as channel_count,
-                    count (distinct eun.id) as unit_count
-                    from ecephys_sessions es
-                    join ecephys_probes epr on epr.ecephys_session_id = es.id
-                    join ecephys_channels ech on (
-                        ech.ecephys_probe_id = epr.id
-                        and ech.valid_data
-                    )
-                    join ecephys_units eun on (
-                        eun.ecephys_channel_id = ech.id
-                        and eun.quality = 'good'
-                        {{pm.optional_le('eun.amplitude_cutoff', amplitude_cutoff_maximum) -}}
-                        {{pm.optional_ge('eun.presence_ratio', presence_ratio_minimum) -}}
-                        {{pm.optional_le('eun.isi_violations', isi_violations_maximum) -}}
-                    )
-                    group by es.id
-                ) pc on es.id = pc.ecephys_session_id
-                left join (
-                    select ecephys_sessions.id as ecephys_session_id,
-                    wkf.id as nwb_id
-                    from ecephys_sessions 
-                    join ecephys_analysis_runs ear on (
-                        ear.ecephys_session_id = ecephys_sessions.id
-                        and ear.current
-                    )
-                    join well_known_files wkf on (
-                        wkf.attachable_id = ear.id
-                        and wkf.attachable_type = 'EcephysAnalysisRun'
-                    )
-                    join well_known_file_types wkft on wkft.id = wkf.well_known_file_type_id
-                    where wkft.name = 'EcephysNwb'
-                ) nwb on es.id = nwb.ecephy {{pm.optional_contains('es.workflow_state', workflow_states, True) -}}s_session_id
-                left join (
-                    select es.id as ecephys_session_id,
-                    array_agg (st.id) as structure_ids,
-                    array_agg (distinct st.acronym) as structure_acronyms
-                    from ecephys_sessions es
-                    join ecephys_probes epr on epr.ecephys_session_id = es.id
-                    join ecephys_channels ech on (
-                        ech.ecephys_probe_id = epr.id
-                        and ech.valid_data
-                    )
-                    left join structures st on st.id = ech.manual_structure_id
-                    group by es.id
-                ) str on es.id = str.ecephys_session_id
-                where true
-                {{pm.optional_contains('es.id', session_ids) -}}
-                {{pm.optional_contains('es.workflow_state', workflow_states, True) -}}
-                {{pm.optional_equals('es.habituation', habituation) -}}
-                {{pm.optional_not_null('es.published_at', published) -}}
+
+                SELECT
+                oec.visual_behavior_experiment_container_id as container_id,
+                oec.ophys_experiment_id,
+                vbc.workflow_state as container_workflow_state,
+                oe.workflow_state as experiment_workflow_state,
+                os.date_of_acquisition,
+                d.full_genotype as full_genotype,
+                rg.reporter_line,
+                d.id as donor_id,
+                genders.name as sex,
+                id.depth as imaging_depth,
+                st.acronym as targeted_structure,
+                os.name as session_name,
+                equipment.name as equipment_name,
+                pr.name as project_name,
+                stim.behavior_stimulus_file_path
+
+                FROM ophys_experiments_visual_behavior_experiment_containers oec
+                JOIN visual_behavior_experiment_containers vbc 
+                    ON oec.visual_behavior_experiment_container_id = vbc.id
+                JOIN ophys_experiments oe ON oe.id = oec.ophys_experiment_id
+                JOIN ophys_sessions os ON oe.ophys_session_id = os.id
+                JOIN behavior_sessions bs ON bs.ophys_session_id = os.id
+
+                JOIN (
+                    SELECT 
+                    wkf.storage_directory || wkf.filename AS behavior_stimulus_file_path,
+                    bs.id as behavior_session_id
+                    FROM behavior_sessions bs
+                    LEFT JOIN well_known_files wkf 
+                    ON wkf.attachable_id=bs.id 
+                    LEFT JOIN well_known_file_types wkt
+                    ON wkf.well_known_file_type_id = wkt.id
+                    WHERE wkt.name = 'StimulusPickle'
+                ) stim ON stim.behavior_session_id = bs.id
+
+                JOIN projects pr ON pr.id = os.project_id
+                JOIN specimens sp ON sp.id=os.specimen_id
+                JOIN donors d ON d.id=sp.donor_id
+
+                JOIN (
+                    SELECT g.name as reporter_line, d.id as donor_id
+                    FROM donors d
+                    LEFT JOIN donors_genotypes dg ON dg.donor_id=d.id
+                    LEFT JOIN genotypes g ON g.id=dg.genotype_id
+                    LEFT JOIN genotype_types gt ON gt.id=g.genotype_type_id
+                    WHERE gt.name='reporter'
+                ) rg ON rg.donor_id = d.id
+
+                JOIN genders ON genders.id = d.gender_id
+                JOIN imaging_depths id ON id.id=os.imaging_depth_id
+                JOIN structures st ON st.id=oe.targeted_structure_id
+                JOIN equipment ON equipment.id=os.equipment_id
+
+                WHERE TRUE
+                {{pm.optional_contains('oec.visual_behavior_experiment_container_id', container_ids) -}}
+                {{pm.optional_contains('vbc.workflow_state', container_workflow_states, True) -}}
                 {{pm.optional_contains('pr.name', project_names, True) -}}
+                {{pm.optional_contains('rg.reporter_line', reporter_lines, True) -}}
             """,
             base=postgres_macros(),
             engine=self.postgres_engine.select,
-            session_ids=session_ids,
-            workflow_states=workflow_states,
-            published=published,
-            habituation=f"{habituation}".lower() if habituation is not None else habituation,
+            container_ids=container_ids,
+            container_workflow_states=container_workflow_states,
+            reporter_lines=reporter_lines,
             project_names=project_names,
-            amplitude_cutoff_maximum=get_unit_filter_value("amplitude_cutoff_maximum", replace_none=False, **kwargs),
-            presence_ratio_minimum=get_unit_filter_value("presence_ratio_minimum", replace_none=False, **kwargs),
-            isi_violations_maximum=get_unit_filter_value("isi_violations_maximum", replace_none=False, **kwargs)
         )
-        
-        response.set_index("id", inplace=True) 
-        response["genotype"].fillna("wt", inplace=True)
-        return response
+
+        # Get the Mtrain stage by reading the pickle files, since it isn't in LIMS
+        response['stage_name'] = parallelize_on_rows(response, get_stage_name)
+
+        # Load errors happen for RF mapping sessions
+        behavior_sessions = response.query("stage_name != 'NO_BEHAVIOR'").copy()
+
+        # Need to figure out what the retake number is for each type of session
+        mouse_gb = behavior_sessions.groupby('donor_id')
+        unique_mice = behavior_sessions['donor_id'].unique()
+        for mouse_id in unique_mice:
+            mouse_df = mouse_gb.get_group(mouse_id)
+            stage_gb = mouse_df.groupby('stage_name')
+            unique_stages = mouse_df['stage_name'].unique()
+            for stage_name in unique_stages:
+                # Iterate through the sessions sorted by date and save the index to the row
+                sessions_this_stage = stage_gb.get_group(stage_name).sort_values('date_of_acquisition')
+                for ind_enum, (ind_row, row) in enumerate(sessions_this_stage.iterrows()):
+                    behavior_sessions.at[ind_row, 'retake_number'] = ind_enum
+
+        return behavior_sessions
 
     @classmethod
     def default(cls, pg_kwargs=None, app_kwargs=None):
@@ -377,3 +166,63 @@ class BehaviorProjectLimsApi(BehaviorProjectApi):
         app_engine = HttpEngine(**_app_kwargs)
         return cls(pg_engine, app_engine)
 
+def parallelize(data, func, num_of_processes):
+    data_split = np.array_split(data, num_of_processes)
+    pool = Pool(num_of_processes)
+    data = pd.concat(pool.map(func, data_split))
+    pool.close()
+    pool.join()
+    return data
+
+def run_on_subset(func, data_subset):
+    return data_subset.apply(func, axis=1)
+
+def parallelize_on_rows(data, func, num_of_processes=16):
+    return parallelize(data, partial(run_on_subset, func), num_of_processes)
+
+def get_stage_name(row):
+    '''
+    Since the Mtrain stage isn't stored in LIMS, and we need it,
+    we have to get it from the pickle files.  This can take a few
+    seconds per file.
+
+    Args:
+        row (pandas.DataFrame row): must provide 'behavior_stimulus_file_path' col
+    Returns:
+        stage_name (str): The MTrain stage name for the behavior session
+    '''
+    data = pd.read_pickle(row['behavior_stimulus_file_path'])
+    try:
+        stage_name = get_task_parameters(data)['stage']
+    except KeyError as e: # Happens for RF mapping sessions
+        print("Behavior file load error")
+        print(e)
+        return "NO_BEHAVIOR"
+    else:
+        print(stage_name)
+        return stage_name
+
+def parse_passive(behavior_stage):
+    '''
+    Args:
+        behavior_stage (str): the stage string, e.g. OPHYS_1_images_A or OPHYS_1_images_A_passive
+    Returns:
+        passive (bool): whether or not the session was a passive session
+    '''
+    r = re.compile(".*_passive")
+    if r.match(behavior_stage):
+        return True
+    else:
+        return False
+
+
+def parse_image_set(behavior_stage):
+    '''
+    Args:
+        behavior_stage (str): the stage string, e.g. OPHYS_1_images_A or OPHYS_1_images_A_passive
+    Returns:
+        image_set (str): which image set is designated by the stage name
+    '''
+    r = re.compile(".*images_(?P<image_set>[AB]).*")
+    image_set = r.match(behavior_stage).groups('image_set')[0]
+    return image_set
