@@ -145,6 +145,7 @@ class DriftingGratings(StimulusAnalysis):
     def stimulus_conditions_contrast(self):
         """ Stimulus conditions for contrast stimulus """
         if self._stimulus_conditions_contrast is None:
+            # TODO: look into efficiency of using a table intersect instead.
             contrast_condition_list = self.stim_table_contrast.stimulus_condition_id.unique()
 
             self._stimulus_conditions_contrast = self.ecephys_session.stimulus_conditions[
