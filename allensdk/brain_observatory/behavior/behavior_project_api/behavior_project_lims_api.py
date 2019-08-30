@@ -54,6 +54,7 @@ class BehaviorProjectLimsApi(BehaviorProjectApi):
         container_workflow_states=("container_qc","postprocessing","complete"),
         project_names=("Visual Behavior production",),
         reporter_lines=('Ai148(TIT2L-GC6f-ICL-tTA2)', 'Ai93(TITL-GCaMP6f)',),
+        filter_failed_experiments=True,
         **kwargs
     ):
 
@@ -70,11 +71,13 @@ class BehaviorProjectLimsApi(BehaviorProjectApi):
                 os.date_of_acquisition,
                 d.full_genotype as full_genotype,
                 rg.reporter_line,
+                dg.driver_line,
                 d.id as donor_id,
                 genders.name as sex,
                 id.depth as imaging_depth,
                 st.acronym as targeted_structure,
                 os.name as session_name,
+				os.foraging_id,
                 equipment.name as equipment_name,
                 pr.name as project_name,
                 stim.behavior_stimulus_file_path
@@ -111,6 +114,16 @@ class BehaviorProjectLimsApi(BehaviorProjectApi):
                     WHERE gt.name='reporter'
                 ) rg ON rg.donor_id = d.id
 
+                JOIN (
+                    SELECT ARRAY_AGG (g.name) as driver_line, d.id as donor_id
+                    FROM donors d
+                    LEFT JOIN donors_genotypes dg ON dg.donor_id=d.id
+                    LEFT JOIN genotypes g ON g.id=dg.genotype_id
+                    LEFT JOIN genotype_types gt ON gt.id=g.genotype_type_id
+                    WHERE gt.name='driver'
+                    GROUP BY d.id
+                ) dg ON dg.donor_id = d.id
+
                 JOIN genders ON genders.id = d.gender_id
                 JOIN imaging_depths id ON id.id=os.imaging_depth_id
                 JOIN structures st ON st.id=oe.targeted_structure_id
@@ -130,26 +143,40 @@ class BehaviorProjectLimsApi(BehaviorProjectApi):
             project_names=project_names,
         )
 
-        # Get the Mtrain stage by reading the pickle files, since it isn't in LIMS
-        response['stage_name'] = parallelize_on_rows(response, get_stage_name)
+		# Need to get the mtrain stage for each recording session
+        foraging_ids = response['foraging_id'][~pd.isnull(response['foraging_id'])]
+        mtrain_api = PostgresQueryMixin(dbname="mtrain", user="mtrainreader", host="prodmtrain1", password="mtrainro", port=5432)
+        query = """
+                SELECT
+				stages.name as stage_name, 
+				bs.id as foraging_id
+				FROM behavior_sessions bs
+				LEFT JOIN states ON states.id = bs.state_id
+				LEFT JOIN stages ON stages.id = states.stage_id
+                WHERE bs.id IN ({})
+            """.format(",".join(["'{}'".format(x) for x in foraging_ids]))
+        mtrain_response = pd.read_sql(query, mtrain_api.get_connection())
+        response = response.merge(mtrain_response, on='foraging_id', how='left')
 
-        # Load errors happen for RF mapping sessions
-        behavior_sessions = response.query("stage_name != 'NO_BEHAVIOR'").copy()
-
-        # Need to figure out what the retake number is for each type of session
-        mouse_gb = behavior_sessions.groupby('donor_id')
-        unique_mice = behavior_sessions['donor_id'].unique()
+        # Need to determine the retake number for each type of session
+        mouse_gb = response.groupby('donor_id')
+        unique_mice = response['donor_id'].unique()
         for mouse_id in unique_mice:
             mouse_df = mouse_gb.get_group(mouse_id)
             stage_gb = mouse_df.groupby('stage_name')
-            unique_stages = mouse_df['stage_name'].unique()
+            unique_stages = mouse_df['stage_name'][~pd.isnull(mouse_df['stage_name'])].unique()
             for stage_name in unique_stages:
                 # Iterate through the sessions sorted by date and save the index to the row
                 sessions_this_stage = stage_gb.get_group(stage_name).sort_values('date_of_acquisition')
                 for ind_enum, (ind_row, row) in enumerate(sessions_this_stage.iterrows()):
-                    behavior_sessions.at[ind_row, 'retake_number'] = ind_enum
+                    response.at[ind_row, 'retake_number'] = ind_enum
 
-        return behavior_sessions
+        # Failed sessions are needed to calculate the retake number, so we can't filter them out
+        # in the LIMS query.
+        if filter_failed_experiments:
+            response = response.query("experiment_workflow_state == 'passed'")
+
+        return response
 
     @classmethod
     def default(cls, pg_kwargs=None, app_kwargs=None):
@@ -223,6 +250,6 @@ def parse_image_set(behavior_stage):
     Returns:
         image_set (str): which image set is designated by the stage name
     '''
-    r = re.compile(".*images_(?P<image_set>[AB]).*")
+    r = re.compile(".*images_(?P<image_set>[A-Z]).*")
     image_set = r.match(behavior_stage).groups('image_set')[0]
     return image_set
