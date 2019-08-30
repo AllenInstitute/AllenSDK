@@ -70,17 +70,16 @@ class BehaviorProjectLimsApi(BehaviorProjectApi):
                 oe.workflow_state as experiment_workflow_state,
                 os.date_of_acquisition,
                 d.full_genotype as full_genotype,
-                rg.reporter_line,
-                dg.driver_line,
+                rl.reporter_line,
+                dl.driver_line,
                 d.id as donor_id,
                 genders.name as sex,
                 id.depth as imaging_depth,
                 st.acronym as targeted_structure,
                 os.name as session_name,
-				os.foraging_id,
+                os.foraging_id,
                 equipment.name as equipment_name,
-                pr.name as project_name,
-                stim.behavior_stimulus_file_path
+                pr.name as project_name
 
                 FROM ophys_experiments_visual_behavior_experiment_containers oec
                 JOIN visual_behavior_experiment_containers vbc 
@@ -88,19 +87,6 @@ class BehaviorProjectLimsApi(BehaviorProjectApi):
                 JOIN ophys_experiments oe ON oe.id = oec.ophys_experiment_id
                 JOIN ophys_sessions os ON oe.ophys_session_id = os.id
                 JOIN behavior_sessions bs ON bs.ophys_session_id = os.id
-
-                JOIN (
-                    SELECT 
-                    wkf.storage_directory || wkf.filename AS behavior_stimulus_file_path,
-                    bs.id as behavior_session_id
-                    FROM behavior_sessions bs
-                    LEFT JOIN well_known_files wkf 
-                    ON wkf.attachable_id=bs.id 
-                    LEFT JOIN well_known_file_types wkt
-                    ON wkf.well_known_file_type_id = wkt.id
-                    WHERE wkt.name = 'StimulusPickle'
-                ) stim ON stim.behavior_session_id = bs.id
-
                 JOIN projects pr ON pr.id = os.project_id
                 JOIN specimens sp ON sp.id=os.specimen_id
                 JOIN donors d ON d.id=sp.donor_id
@@ -112,7 +98,7 @@ class BehaviorProjectLimsApi(BehaviorProjectApi):
                     LEFT JOIN genotypes g ON g.id=dg.genotype_id
                     LEFT JOIN genotype_types gt ON gt.id=g.genotype_type_id
                     WHERE gt.name='reporter'
-                ) rg ON rg.donor_id = d.id
+                ) rl ON rl.donor_id = d.id
 
                 JOIN (
                     SELECT ARRAY_AGG (g.name) as driver_line, d.id as donor_id
@@ -122,7 +108,7 @@ class BehaviorProjectLimsApi(BehaviorProjectApi):
                     LEFT JOIN genotype_types gt ON gt.id=g.genotype_type_id
                     WHERE gt.name='driver'
                     GROUP BY d.id
-                ) dg ON dg.donor_id = d.id
+                ) dl ON dl.donor_id = d.id
 
                 JOIN genders ON genders.id = d.gender_id
                 JOIN imaging_depths id ON id.id=os.imaging_depth_id
@@ -133,7 +119,7 @@ class BehaviorProjectLimsApi(BehaviorProjectApi):
                 {{pm.optional_contains('oec.visual_behavior_experiment_container_id', container_ids) -}}
                 {{pm.optional_contains('vbc.workflow_state', container_workflow_states, True) -}}
                 {{pm.optional_contains('pr.name', project_names, True) -}}
-                {{pm.optional_contains('rg.reporter_line', reporter_lines, True) -}}
+                {{pm.optional_contains('rl.reporter_line', reporter_lines, True) -}}
             """,
             base=postgres_macros(),
             engine=self.postgres_engine.select,
@@ -143,7 +129,7 @@ class BehaviorProjectLimsApi(BehaviorProjectApi):
             project_names=project_names,
         )
 
-		# Need to get the mtrain stage for each recording session
+        # Need to get the mtrain stage for each recording session
         foraging_ids = response['foraging_id'][~pd.isnull(response['foraging_id'])]
         mtrain_api = PostgresQueryMixin(dbname="mtrain", user="mtrainreader", host="prodmtrain1", password="mtrainro", port=5432)
         query = """
