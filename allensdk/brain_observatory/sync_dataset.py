@@ -89,6 +89,8 @@ class Dataset(object):
 
     FRAME_KEYS = ('frames', 'stim_vsync')
     PHOTODIODE_KEYS = ('photodiode', 'stim_photodiode')
+    OPTOGENETIC_STIMULATION_KEYS = ("LED_sync", "opto_trial")
+
 
     def __init__(self, path):
         self.dfile = self.load(path)
@@ -305,13 +307,16 @@ class Dataset(object):
                 self.get_edges('falling', keys, units)
             ]))
 
+        if isinstance(keys, str):
+            keys = [keys]
+
         for key in keys:
             try:
-                return fn(key, units=units)
+                return fn(key, units)
             except ValueError:
                 continue
 
-        raise KeyError
+        raise KeyError(f"none of {keys} were found in this dataset's line labels")
 
     def get_falling_edges(self, line, units='samples'):
         """

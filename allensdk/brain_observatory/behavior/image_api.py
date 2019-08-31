@@ -24,6 +24,8 @@ class Image(NamedTuple):
         c = self.unit == other.unit
         return a and b and c
 
+    def __array__(self):
+        return np.array(self.data)
 
 class ImageApi:
 

@@ -31,6 +31,12 @@ class Channel(RaisingSchema):
     DV_coordinate = Float(required=True, allow_none=True)
     ML_coordinate = Float(required=True, allow_none=True)
     cortical_depth = Float(required=True, allow_none=True)
+    # TODO: Re-add later when variables are added to lims output
+    # cortical_layer = String(required=True, allow_none=True)
+    # AP_coordinate = Float(required=True, allow_none =True)
+    # DV_coordinate = Float(required=True, allow_none= True)
+    # ML_coordinate = Float(required=True, allow_none=True)
+    # cortical_depth = Float(required=True, allow_none=True)
 
 
 class Unit(RaisingSchema):
@@ -38,19 +44,43 @@ class Unit(RaisingSchema):
     peak_channel_id = Int(required=True)
     local_index = Int(
         required=True,
-        help="within-probe index of this unit. Used for indexing into the spike times file.",
+        help="within-probe index of this unit.",
+    )
+    cluster_id = Int(
+        required=True,
+        help="within-probe identifier of this unit",
     )
     quality = String(required=True)
     firing_rate = Float(required=True)
-    snr = Float(required=True)
+    snr = Float(required=True, allow_none=True)
     isi_violations = Float(required=True)
     presence_ratio = Float(required=True)
     amplitude_cutoff = Float(required=True)
+<<<<<<< HEAD
     isolation_distance = Float(required=True)
     l_ratio = Float(required=True)
     d_prime = Float(required=True)
     nn_hit_rate = Float(required=True)
     nn_miss_rate = Float(required=True)
+=======
+    isolation_distance = Float(required=True, allow_none=True)
+    l_ratio = Float(required=True, allow_none=True)
+    d_prime = Float(required=True, allow_none=True)
+    nn_hit_rate = Float(required=True, allow_none=True)
+    nn_miss_rate = Float(required=True, allow_none=True)
+    max_drift = Float(required=True, allow_none=True)
+    cumulative_drift = Float(required=True, allow_none=True)
+    silhouette_score = Float(required=True, allow_none=True)
+    waveform_duration = Float(required=True, allow_none=True)
+    waveform_halfwidth = Float(required=True, allow_none=True)
+    PT_ratio = Float(required=True, allow_none=True)
+    repolarization_slope = Float(required=True, allow_none=True)
+    recovery_slope = Float(required=True, allow_none=True)
+    amplitude = Float(required=True, allow_none=True)
+    spread = Float(required=True, allow_none=True)
+    velocity_above = Float(required=True, allow_none=True)
+    velocity_below = Float(required=True, allow_none=True)
+>>>>>>> 207bbbf428be5b7ddc10953b6ed0b268d7770a91
 
 
 class Lfp(RaisingSchema):
@@ -70,6 +100,8 @@ class Probe(RaisingSchema):
     units = Nested(Unit, many=True, required=True)
     lfp = Nested(Lfp, many=False, required=True)
     csd_path = String(required=True, validate=check_read_access, help="path to h5 file containing calculated current source density")
+    sampling_rate = Float(default=30000.0, help="sampling rate (Hz, master clock) at which raw data were acquired on this probe")
+    lfp_sampling_rate = Float(default=2500.0, help="sampling rate of LFP data on this probe")
 
 
 class InputSchema(ArgSchema):
@@ -109,6 +141,11 @@ class InputSchema(ArgSchema):
     pool_size = Int(
         default=3, 
         help="number of child processes used to write probewise lfp files"
+    )
+    optotagging_table_path = String(
+        required=False,
+        validate=check_read_access,
+        help="file at this path contains information about the optogenetic stimulation applied during this "
     )
 
 

@@ -1,5 +1,6 @@
 import warnings
 from collections.abc import Collection
+from collections import defaultdict
 
 import xarray as xr
 import numpy as np
@@ -8,6 +9,8 @@ import scipy.stats
 
 from allensdk.core.lazy_property import LazyPropertyMixin
 from allensdk.brain_observatory.ecephys.ecephys_session_api import EcephysSessionApi, EcephysNwbSessionApi, EcephysNwb1Api
+from allensdk.brain_observatory.ecephys.stimulus_table import naming_utilities
+from allensdk.brain_observatory.ecephys.stimulus_table._schemas import default_stimulus_renames, default_column_renames    
 
 
 NON_STIMULUS_PARAMETERS = tuple([
@@ -40,8 +43,9 @@ class EcephysSession(LazyPropertyMixin):
                 rate of the unit over periods where spikes would be isi-violating vs the total firing 
                 rate of the unit.
             peak_channel_id : int
-                Unique integer identifier for this unit's peak channel (the channel on which this 
-                unit's responses were greatest)
+                Unique integer identifier for this unit's peak channel. A unit's peak channel is the channel on 
+                which its peak-to-trough amplitude difference is maximized. This is assessed using the kilosort 2 
+                templates rather than the mean waveforms for a unit.
             snr : float
                 Signal to noise ratio for this unit.
             probe_horizontal_position :  numeric
@@ -150,9 +154,11 @@ class EcephysSession(LazyPropertyMixin):
         self.api: EcephysSessionApi = api
 
         self.ecephys_session_id = self.LazyProperty(self.api.get_ecephys_session_id)
+        self.session_start_time = self.LazyProperty(self.api.get_session_start_time)
         self.running_speed= self.LazyProperty(self.api.get_running_speed)
         self.mean_waveforms = self.LazyProperty(self.api.get_mean_waveforms, wrappers=[self._build_mean_waveforms])
         self.spike_times = self.LazyProperty(self.api.get_spike_times, wrappers=[self._build_spike_times])
+        self.optogenetic_stimulation_epochs = self.LazyProperty(self.api.get_optogenetic_stimulation)
 
         self.probes = self.LazyProperty(self.api.get_probes)
         self.channels = self.LazyProperty(self.api.get_channels)
@@ -253,6 +259,44 @@ class EcephysSession(LazyPropertyMixin):
         return removed_unused_stimulus_presentation_columns(filtered_presentations)
 
 
+    def get_stimulus_epochs(self, duration_thresholds=None):
+        """ Reports continuous periods of time during which a single kind of stimulus was presented
+
+        Parameters
+        ---------
+        duration_thresholds : dict, optional
+            keys are stimulus names, values are floating point durations in seconds. All epochs with
+                - a given stimulus name
+                - a duration shorter than the associated threshold
+            will be removed from the results
+
+        """
+
+        if duration_thresholds is None:
+            duration_thresholds = {"spontaneous_activity": 90.0}
+
+        presentations = self.stimulus_presentations.copy()
+        diff_indices = nan_intervals(presentations["stimulus_block"].values)
+
+        epochs = []
+        for left, right in zip(diff_indices[:-1], diff_indices[1:]):
+            epochs.append({
+                "start_time": presentations.iloc[left]["start_time"],
+                "stop_time": presentations.iloc[right-1]["stop_time"],
+                "stimulus_name": presentations.iloc[left]["stimulus_name"],
+                "stimulus_block": presentations.iloc[left]["stimulus_block"]
+            })
+        epochs = pd.DataFrame(epochs)
+        epochs["duration"] = epochs["stop_time"] - epochs["start_time"]
+
+        for key, threshold in duration_thresholds.items():
+            epochs = epochs[
+                (epochs["stimulus_name"] != key)
+                | (epochs["duration"] >= threshold)
+            ]
+
+        return epochs.loc[:, ["start_time", "stop_time", "duration", "stimulus_name", "stimulus_block"]]
+
     def presentationwise_spike_counts(
         self, 
         bin_edges, 
@@ -263,7 +307,7 @@ class EcephysSession(LazyPropertyMixin):
         large_bin_size_threshold=0.001,
         time_domain_callback=None
     ):
-        ''' Build a dataset of spike counts surrounding stimulus onset per unit and stimulus frame.
+        ''' Build an array of spike counts surrounding stimulus onset per unit and stimulus frame.
 
         Parameters
         ---------
@@ -286,8 +330,8 @@ class EcephysSession(LazyPropertyMixin):
 
         Returns
         -------
-        xarray.Dataset :
-            Contains a data array named spike_counts whose dimensions are stimulus presentation, unit, 
+        xarray.DataArray :
+            Data array whose dimensions are stimulus presentation, unit, 
             and time bin and whose values are spike counts.
 
         '''
@@ -313,16 +357,21 @@ class EcephysSession(LazyPropertyMixin):
 
         ends = domain[:, -1]
         starts = domain[:, 0]
-        overlapping = np.where((starts[1:] - ends[:-1]) < 0)[0]
+        time_diffs = starts[1:] - ends[:-1]
+        overlapping = np.where(time_diffs < 0)[0]
 
         if len(overlapping) > 0:
-            overlapping = [(first, second) for first, second in zip(overlapping[:-1], overlapping[1:])]
-            warnings.warn("You've specified some overlapping time intervals between rows: {overlapping}")
+            # Ignoring intervals that overlaps multiple time bins because trying to figure that out would take O(n)
+            overlapping = [(s, s+1) for s in overlapping]
+            warnings.warn(f"You've specified some overlapping time intervals between neighboring rows: {overlapping}, "
+                          f"with a maximum overlap of {np.abs(np.min(time_diffs))} seconds.")
+
         tiled_data = build_spike_histogram(
             domain, self.spike_times, units.index.values, dtype=dtype, binarize=binarize
         )
 
         tiled_data = xr.DataArray(
+            name='spike_counts',
             data=tiled_data, 
             coords={
                 'stimulus_presentation_id': stimulus_presentations.index.values,
@@ -332,7 +381,7 @@ class EcephysSession(LazyPropertyMixin):
             dims=['stimulus_presentation_id', 'time_relative_to_stimulus_onset', 'unit_id']
         )
 
-        return xr.Dataset(data_vars={'spike_counts': tiled_data})
+        return tiled_data
 
 
     def presentationwise_spike_times(self, stimulus_presentation_ids=None, unit_ids=None):
@@ -415,8 +464,12 @@ class EcephysSession(LazyPropertyMixin):
             emitted by a specific unit across presentations within a specific condition.
 
         """
-
+        # TODO: Need to return an empty df if no matching unit-ids or presentation-ids are found
+        # TODO: To use filter_owned_df() make sure to convert the results from a Series to a Dataframe
+        stimulus_presentation_ids = stimulus_presentation_ids if stimulus_presentation_ids is not None else \
+                self.stimulus_presentations.index.values  # In case
         presentations = self.stimulus_presentations.loc[stimulus_presentation_ids, ["stimulus_condition_id"]]
+
         spikes = self.presentationwise_spike_times(
             stimulus_presentation_ids=stimulus_presentation_ids, unit_ids=unit_ids
         )
@@ -424,9 +477,15 @@ class EcephysSession(LazyPropertyMixin):
         spike_counts = spikes.copy()
         spike_counts["spike_count"] = np.zeros(spike_counts.shape[0])
         spike_counts = spike_counts.groupby(["stimulus_presentation_id", "unit_id"]).count()
-        spike_counts.reset_index("unit_id", inplace=True)
+        unit_ids = unit_ids if unit_ids is not None else spikes['unit_id'].unique()  # If not explicity stated get unit ids from spikes table.
+        spike_counts = spike_counts.reindex(pd.MultiIndex.from_product([spike_counts.index.levels[0],
+                                                                        unit_ids],
+                                                                       names=['stimulus_presentation_id', 'unit_id']),
+                                            fill_value=0)
 
-        sp = pd.merge(spike_counts, presentations, left_on="stimulus_presentation_id", right_index=True, how="right")
+        # In the case there are units/presentation_ids with no corresponding id in spikes not in presentations (see
+        #  unit test) a right join will mess up the index with nan values. Use left to ensure index is not affected.
+        sp = pd.merge(spike_counts, presentations, left_on="stimulus_presentation_id", right_index=True, how="left")
         sp.reset_index(inplace=True)
 
         summary = []
@@ -442,6 +501,26 @@ class EcephysSession(LazyPropertyMixin):
             })
 
         return pd.DataFrame(summary).set_index(keys=["unit_id", "stimulus_condition_id"])
+
+
+    def get_parameter_values_for_stimulus(self, stimulus_name, drop_nulls=True):
+        """ For each stimulus parameter, report the unique values taken on by that 
+        parameter while a named stimulus was presented.
+
+        Parameters
+        ----------
+        stimulus_name : str
+            filter to presentations of this stimulus
+
+        Returns
+        -------
+        dict : 
+            maps parameters (column names) to their unique values.
+
+        """
+
+        presentation_ids = self.get_presentations_for_stimulus([stimulus_name]).index.values
+        return self.get_stimulus_parameter_values(presentation_ids, drop_nulls=drop_nulls)
 
 
     def get_stimulus_parameter_values(self, stimulus_presentation_ids=None, drop_nulls=True):
@@ -467,11 +546,52 @@ class EcephysSession(LazyPropertyMixin):
         parameters = {}
         for colname in stimulus_presentations.columns:
             uniques = stimulus_presentations[colname].unique()
-            if drop_nulls:
-                uniques = uniques[uniques != 'null']
-            parameters[colname] = uniques
+
+            non_null = np.array(uniques[uniques != "null"])
+            non_null = non_null
+            non_null = np.sort(non_null)
+
+            if not drop_nulls and "null" in uniques:
+                non_null = np.concatenate([non_null, ["null"]])
+
+            parameters[colname] = non_null
 
         return parameters
+
+    def channel_structure_intervals(self, channel_ids):
+
+        """ find on a list of channels the intervals of channels inserted into particular structures
+
+        Parameters
+        ----------
+        channel_ids : list
+            A list of channel ids
+        structure_id_key : str
+            use this column for numerically identifying structures
+        structure_label_key : str
+            use this column for human-readable structure identification
+
+        Returns
+        -------
+        labels : np.ndarray
+            for each detected interval, the label associated with that interval
+        intervals : np.ndarray
+            one element longer than labels. Start and end indices for intervals.
+
+        """
+        structure_id_key = "manual_structure_id"
+        structure_label_key = "manual_structure_acronym"
+        np.array(channel_ids).sort()
+        table = self.channels.loc[channel_ids]
+
+        unique_probes = table["probe_id"].unique()
+        if len(unique_probes)>1:
+            warnings.warn("Calculating structure boundaries across channels from multiple probes.")
+
+        intervals = nan_intervals(table[structure_id_key].values)
+        labels = table[structure_label_key].iloc[intervals[:-1]].values
+
+        return labels, intervals
 
 
     def _build_spike_times(self, spike_times):
@@ -491,11 +611,19 @@ class EcephysSession(LazyPropertyMixin):
         stimulus_presentations.index.name = 'stimulus_presentation_id'
         stimulus_presentations = stimulus_presentations.drop(columns=['stimulus_index'])
 
+        # TODO: putting these here for now; after SWDB 2019, will rerun stimulus table module for all sessions 
+        # and can remove these
+        stimulus_presentations = naming_utilities.collapse_columns(stimulus_presentations)
+        stimulus_presentations = naming_utilities.standardize_movie_numbers(stimulus_presentations)
+        stimulus_presentations = naming_utilities.add_number_to_shuffled_movie(stimulus_presentations)
+        stimulus_presentations = naming_utilities.map_stimulus_names(
+            stimulus_presentations, default_stimulus_renames
+        )
+        stimulus_presentations = naming_utilities.map_column_names(stimulus_presentations, default_column_renames)
+
         # pandas groupby ops ignore nans, so we need a new null value that pandas does not recognize as null ...
-        stimulus_presentations.loc[stimulus_presentations['stimulus_name'] == '', 'stimulus_name'] = 'spontaneous_activity'
         stimulus_presentations[stimulus_presentations == ''] = np.nan
-        # This will convert columns to object dtypes
-        ## stimulus_presentations = stimulus_presentations.fillna('null') # 123 / 2**8
+        stimulus_presentations = stimulus_presentations.fillna('null') # 123 / 2**8
 
         stimulus_presentations['duration'] = stimulus_presentations['stop_time'] - stimulus_presentations['start_time']
 
@@ -504,7 +632,9 @@ class EcephysSession(LazyPropertyMixin):
         presentation_conditions = []
         cid_counter = -1
 
-        params_only = stimulus_presentations.drop(columns=["start_time", "stop_time"])
+        # TODO: Can we have parameters on what columns to omit? If stimulus_block or duration is left in it can affect
+        #   how conditionwise_spike_statistics counts spikes
+        params_only = stimulus_presentations.drop(columns=["start_time", "stop_time", "duration", "stimulus_block"])
         for row in params_only.itertuples(index=False):
 
             if row in stimulus_conditions:
@@ -545,12 +675,6 @@ class EcephysSession(LazyPropertyMixin):
             'local_index_channel': 'channel_local_index',
         })
 
-        table = table.loc[
-            (table['valid_data'])
-            & (table['quality'] == 'good')
-        ]
-
-        # table = table.drop(columns=['local_index_unit', 'quality', 'valid_data'])
         return table.sort_values(by=['probe_description', 'probe_vertical_position', 'probe_horizontal_position'])
 
 
@@ -562,7 +686,6 @@ class EcephysSession(LazyPropertyMixin):
         sampling_rate_lu = {uid: self.probes.loc[r['probe_id']]['sampling_rate'] for uid, r in units_df.iterrows()}
 
         for uid in list(mean_waveforms.keys()):
-            # assert(sampling_rate_lu[uid] == 30000)
             data = mean_waveforms.pop(uid)
             output_waveforms[uid] = xr.DataArray(
                 data=data,
@@ -576,14 +699,13 @@ class EcephysSession(LazyPropertyMixin):
         return output_waveforms
 
     def _build_mean_waveforms(self, mean_waveforms):
-        # from ecephys_analysis_modules.modules.modality_comparison.ecephys_nwb1_adaptor import EcephysNwb1Adaptor
         if isinstance(self.api, EcephysNwb1Api):
             return self._build_nwb1_waveforms(mean_waveforms)
 
-        # TODO: there is a bug either here or (more likely) in LIMS unit data ingest which causes the peak channel 
-        # to be off by a few (exactly 1?) indices
-        # we could easily recompute here, but better to fix it at the source
-        channel_id_lut = {(row['local_index'], row['probe_id']): cid for cid, row in self.channels.iterrows()}
+        channel_id_lut = defaultdict(lambda: -1)
+        for cid, row in self.channels.iterrows():
+            channel_id_lut[(row["local_index"], row["probe_id"])] = cid
+
         probe_id_lut = {uid: row['probe_id'] for uid, row in self.units.iterrows()}
 
         output_waveforms = {}
@@ -602,6 +724,7 @@ class EcephysSession(LazyPropertyMixin):
                     'time': np.arange(data.shape[1]) / self.probes.loc[probe_id]['sampling_rate']
                 }
             )
+            output_waveforms[uid] = output_waveforms[uid][output_waveforms[uid]["channel_id"] != -1]
 
         return output_waveforms
 
@@ -650,7 +773,7 @@ class EcephysSession(LazyPropertyMixin):
         else:
             raise Exception(f'specified NWB version {nwb_version} not supported. Supported versions are: 2.X, 1.X')
 
-        return cls(api=NWBAdaptorCls.from_path(path=path, **api_kwargs), ** kwargs)
+        return cls(api=NWBAdaptorCls.from_path(path=path, **api_kwargs), **kwargs)
 
 
 def build_spike_histogram(time_domain, spike_times, unit_ids, dtype=None, binarize=False):
@@ -697,34 +820,7 @@ def removed_unused_stimulus_presentation_columns(stimulus_presentations):
     return stimulus_presentations.drop(columns=to_drop)
 
 
-def intervals_structures(table, structure_id_key="manual_structure_id", structure_label_key="manual_structure_acronym"):
-    """ find on a channels / units table intervals of channels inserted into particular structures
-
-    Parameters
-    ----------
-    table : pd.DataFrame
-        A table of channels (or units, with peak channels)
-    structure_id_key : str
-        use this column for numerically identifying structures
-    structure_label_key : str
-        use this column for human-readable structure identification
-
-    Returns
-    -------
-    labels : np.ndarray
-        for each detected interval, the label associated with that interval
-    intervals : np.ndarray
-        one element longer than labels. Start and end indices for intervals.
-
-    """
-
-    intervals = nan_intervals(table[structure_id_key])
-    labels = table[structure_label_key].iloc[intervals[:-1]].values
-
-    return labels, intervals
-
-
-def nan_intervals(array):
+def nan_intervals(array, nan_like=["null"]):
     """ find interval bounds (bounding consecutive identical values) in an array, which may contain nans
 
     Parameters
@@ -737,7 +833,27 @@ def nan_intervals(array):
         start and end indices of detected intervals (one longer than the number of intervals)
 
     """
-    return array_intervals(np.nan_to_num(array))
+
+    intervals = [0]
+    current = array[0]
+    for ii, item in enumerate(array[1:]):
+        if is_distinct_from(item, current):
+            intervals.append(ii+1)
+        current = item
+    intervals.append(len(array))
+
+    return np.unique(intervals)
+
+
+def is_distinct_from(left, right):
+    if type(left) != type(right):
+        return True
+    if pd.isna(left) and pd.isna(right):
+        return False
+    if left is None and right is None:
+        return False
+
+    return left != right
 
 
 def array_intervals(array):

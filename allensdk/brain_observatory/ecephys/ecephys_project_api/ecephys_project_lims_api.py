@@ -9,6 +9,7 @@ from .http_engine import HttpEngine
 from .utilities import postgres_macros, build_and_execute
 
 from allensdk.internal.api import PostgresQueryMixin
+from allensdk.brain_observatory.ecephys import get_unit_filter_value
 
 
 class EcephysProjectLimsApi(EcephysProjectApi):
@@ -74,7 +75,12 @@ class EcephysProjectLimsApi(EcephysProjectApi):
         )
 
     def get_units(
-        self, unit_ids=None, channel_ids=None, probe_ids=None, session_ids=None, quality="good"
+        self, unit_ids=None, 
+        channel_ids=None, 
+        probe_ids=None, 
+        session_ids=None, 
+        quality="good",
+        **kwargs
     ):
         response = build_and_execute(
             """
@@ -86,11 +92,16 @@ class EcephysProjectLimsApi(EcephysProjectApi):
                 join ecephys_probes ep on ep.id = ec.ecephys_probe_id
                 join ecephys_sessions es on es.id = ep.ecephys_session_id 
                 where ec.valid_data
+                and ep.workflow_state != 'failed'
+                and es.workflow_state != 'failed'
                 {{pm.optional_equals('eu.quality', quality) -}}
                 {{pm.optional_contains('eu.id', unit_ids) -}}
                 {{pm.optional_contains('ec.id', channel_ids) -}}
                 {{pm.optional_contains('ep.id', probe_ids) -}}
                 {{pm.optional_contains('es.id', session_ids) -}}
+                {{pm.optional_le('eu.amplitude_cutoff', amplitude_cutoff_maximum) -}}
+                {{pm.optional_ge('eu.presence_ratio', presence_ratio_minimum) -}}
+                {{pm.optional_le('eu.isi_violations', isi_violations_maximum) -}}
             """,
             base=postgres_macros(),
             engine=self.postgres_engine.select,
@@ -98,7 +109,10 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             channel_ids=channel_ids,
             probe_ids=probe_ids,
             session_ids=session_ids,
-            quality=f"'{quality}'" if quality is not None else quality
+            quality=f"'{quality}'" if quality is not None else quality,
+            amplitude_cutoff_maximum=get_unit_filter_value("amplitude_cutoff_maximum", replace_none=False, **kwargs),
+            presence_ratio_minimum=get_unit_filter_value("presence_ratio_minimum", replace_none=False, **kwargs),
+            isi_violations_maximum=get_unit_filter_value("isi_violations_maximum", replace_none=False, **kwargs)
         )
 
         response.set_index("id", inplace=True)
@@ -106,7 +120,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
 
         return response
 
-    def get_channels(self, channel_ids=None, probe_ids=None, session_ids=None):
+    def get_channels(self, channel_ids=None, probe_ids=None, session_ids=None, **kwargs):
         response = build_and_execute(
             """
                 {%- import 'postgres_macros' as pm -%}
@@ -130,10 +144,15 @@ class EcephysProjectLimsApi(EcephysProjectApi):
                     join ecephys_units eun on (
                         eun.ecephys_channel_id = ech.id
                         and eun.quality = 'good'
+                        {{pm.optional_le('eun.amplitude_cutoff', amplitude_cutoff_maximum) -}}
+                        {{pm.optional_ge('eun.presence_ratio', presence_ratio_minimum) -}}
+                        {{pm.optional_le('eun.isi_violations', isi_violations_maximum) -}}
                     )
                     group by ech.id
                 ) pc on ec.id = pc.ecephys_channel_id
                 where valid_data
+                and ep.workflow_state != 'failed'
+                and es.workflow_state != 'failed'
                 {{pm.optional_contains('ec.id', channel_ids) -}}
                 {{pm.optional_contains('ep.id', probe_ids) -}}
                 {{pm.optional_contains('es.id', session_ids) -}}
@@ -143,10 +162,13 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             channel_ids=channel_ids,
             probe_ids=probe_ids,
             session_ids=session_ids,
+            amplitude_cutoff_maximum=get_unit_filter_value("amplitude_cutoff_maximum", replace_none=False, **kwargs),
+            presence_ratio_minimum=get_unit_filter_value("presence_ratio_minimum", replace_none=False, **kwargs),
+            isi_violations_maximum=get_unit_filter_value("isi_violations_maximum", replace_none=False, **kwargs)
         )
         return response.set_index("id")
 
-    def get_probes(self, probe_ids=None, session_ids=None):
+    def get_probes(self, probe_ids=None, session_ids=None, **kwargs):
         response = build_and_execute(
             """
                 {%- import 'postgres_macros' as pm -%}
@@ -162,7 +184,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
                         when nwb_id is not null then true
                         else false
                     end as has_lfp_nwb,
-                    str.structure_acronyms as channel_structure_acronyms
+                    str.structure_acronyms as structure_acronyms
                 from ecephys_probes ep 
                 join ecephys_sessions es on es.id = ep.ecephys_session_id 
                 join (
@@ -177,6 +199,9 @@ class EcephysProjectLimsApi(EcephysProjectApi):
                     join ecephys_units eun on (
                         eun.ecephys_channel_id = ech.id
                         and eun.quality = 'good'
+                        {{pm.optional_le('eun.amplitude_cutoff', amplitude_cutoff_maximum) -}}
+                        {{pm.optional_ge('eun.presence_ratio', presence_ratio_minimum) -}}
+                        {{pm.optional_le('eun.isi_violations', isi_violations_maximum) -}}
                     )
                     group by epr.id
                 ) chc on ep.id = chc.ecephys_probe_id
@@ -213,6 +238,8 @@ class EcephysProjectLimsApi(EcephysProjectApi):
                     group by epr.id
                 ) str on ep.id = str.ecephys_probe_id
                 where true
+                and ep.workflow_state != 'failed'
+                and es.workflow_state != 'failed'
                 {{pm.optional_contains('ep.id', probe_ids) -}}
                 {{pm.optional_contains('es.id', session_ids) -}}
             """,
@@ -220,6 +247,9 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             engine=self.postgres_engine.select,
             probe_ids=probe_ids,
             session_ids=session_ids,
+            amplitude_cutoff_maximum=get_unit_filter_value("amplitude_cutoff_maximum", replace_none=False, **kwargs),
+            presence_ratio_minimum=get_unit_filter_value("presence_ratio_minimum", replace_none=False, **kwargs),
+            isi_violations_maximum=get_unit_filter_value("isi_violations_maximum", replace_none=False, **kwargs)
         )
         return response.set_index("id")
 
@@ -233,18 +263,20 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             "BrainTV Neuropixels Visual Behavior",
             "BrainTV Neuropixels Visual Coding",
         ),
+        **kwargs
     ):
+
         response = build_and_execute(
             """
                 {%- import 'postgres_macros' as pm -%}
                 {%- import 'macros' as m -%}
                 select 
-                    stimulus_name as stimulus_set_name,
+                    stimulus_name as session_type,
                     sp.id as specimen_id, 
                     es.id as id, 
                     dn.full_genotype as genotype,
                     gd.name as gender, 
-                    ages.name as age,
+                    ages.days as age_in_days,
                     pr.code as project_code,
                     probe_count,
                     channel_count,
@@ -253,7 +285,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
                         when nwb_id is not null then true
                         else false
                     end as has_nwb,
-                    str.structure_acronyms as channel_structure_acronyms
+                    str.structure_acronyms as structure_acronyms
                 from ecephys_sessions es
                 join specimens sp on sp.id = es.specimen_id 
                 join donors dn on dn.id = sp.donor_id 
@@ -274,6 +306,9 @@ class EcephysProjectLimsApi(EcephysProjectApi):
                     join ecephys_units eun on (
                         eun.ecephys_channel_id = ech.id
                         and eun.quality = 'good'
+                        {{pm.optional_le('eun.amplitude_cutoff', amplitude_cutoff_maximum) -}}
+                        {{pm.optional_ge('eun.presence_ratio', presence_ratio_minimum) -}}
+                        {{pm.optional_le('eun.isi_violations', isi_violations_maximum) -}}
                     )
                     group by es.id
                 ) pc on es.id = pc.ecephys_session_id
@@ -319,9 +354,13 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             published=published,
             habituation=f"{habituation}".lower() if habituation is not None else habituation,
             project_names=project_names,
+            amplitude_cutoff_maximum=get_unit_filter_value("amplitude_cutoff_maximum", replace_none=False, **kwargs),
+            presence_ratio_minimum=get_unit_filter_value("presence_ratio_minimum", replace_none=False, **kwargs),
+            isi_violations_maximum=get_unit_filter_value("isi_violations_maximum", replace_none=False, **kwargs)
         )
         
         response.set_index("id", inplace=True) 
+        response["genotype"].fillna("wt", inplace=True)
         return response
 
     @classmethod

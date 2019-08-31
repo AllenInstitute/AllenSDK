@@ -15,6 +15,8 @@ from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorO
 from allensdk.brain_observatory.behavior.write_nwb.__main__ import BehaviorOphysJsonApi
 from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi, equals
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
+from allensdk.brain_observatory.behavior.behavior_ophys_api import BehaviorOphysApiBase
+from allensdk.brain_observatory.behavior.image_api import ImageApi
 
 
 @pytest.mark.nightly
@@ -47,7 +49,7 @@ def test_nwb_end_to_end(tmpdir_factory):
     BehaviorOphysNwbApi(nwb_filepath).save(d1)
 
     d2 = BehaviorOphysSession(api=BehaviorOphysNwbApi(nwb_filepath))
-    assert equals(d1, d2)
+    equals(d1, d2, reraise=True)
 
 
 @pytest.mark.nightly
@@ -72,7 +74,7 @@ def test_visbeh_ophys_data_set():
     assert len(data_set.corrected_fluorescence_traces) == 269 and sorted(data_set.corrected_fluorescence_traces.columns) == ['cell_roi_id', 'corrected_fluorescence']
     np.testing.assert_array_almost_equal(data_set.running_speed.timestamps, data_set.stimulus_timestamps)
     assert len(data_set.cell_specimen_table) == len(data_set.dff_traces)
-    assert data_set.average_projection.GetSize() == data_set.max_projection.GetSize()
+    assert data_set.average_projection.data.shape == data_set.max_projection.data.shape
     assert list(data_set.motion_correction.columns) == ['x', 'y']
     assert len(data_set.trials) == 602
 
@@ -109,19 +111,21 @@ def test_visbeh_ophys_data_set():
                                         'response_window_sec': [0.15, 0.75],
                                         'stage': u'OPHYS_6_images_B'}
 
+
 @pytest.mark.requires_bamboo
 def test_legacy_dff_api():
 
     ophys_experiment_id = 792813858
     api = BehaviorOphysLimsApi(ophys_experiment_id)
     session = BehaviorOphysSession(api)
-    cell_specimen_ids = [878143453, 878143533, 878151801, 878143406, 878143302]
 
     _, dff_array = session.get_dff_traces()
-    for csid in cell_specimen_ids:
+    for csid in session.dff_traces.index.values:
         dff_trace = session.dff_traces.loc[csid]['dff']
         ind = session.get_cell_specimen_indices([csid])[0]
         np.testing.assert_array_almost_equal(dff_trace, dff_array[ind, :])
+
+    assert dff_array.shape[0] == session.dff_traces.shape[0]
 
 
 @pytest.mark.requires_bamboo
@@ -149,8 +153,122 @@ def test_trial_response_window_bounds_reward(ophys_experiment_id):
 
         lick_times = [(t - row.change_time) for t in row.lick_times]
         if not np.isnan(row.reward_time):
-            reward_time = (row.reward_time - row.change_time)
+
+            # monitor delay is incorporated into the trials table change time
+            # TODO: where is this set in the session object?
+            camstim_change_time = row.change_time - 0.0351  
+
+            reward_time = (row.reward_time - camstim_change_time)
             assert response_window[0] < reward_time + 1/60
             assert reward_time < response_window[1] + 1/60
             if len(session.licks) > 0:
                 assert lick_times[0] < reward_time
+
+
+@pytest.fixture
+def cell_specimen_table_api():
+
+    roi_1 = np.array([
+        [1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0]
+    ])
+
+    roi_2 = np.array([
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 1, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0]
+    ])
+
+    class CellSpecimenTableApi(BehaviorOphysApiBase):
+        def get_cell_specimen_table(self):
+            return pd.DataFrame({
+                "cell_roi_id": [1, 2],
+                "y": [1, 1],
+                "x": [2, 1],
+                "image_mask": [roi_1, roi_2]
+            }, index=pd.Index(data=[10, 11], name="cell_specimen_id")
+        )
+        def get_segmentation_mask_image(self):
+            data = roi_1 #useless image data here
+            spacing = (1, 1)
+            unit = 'index'
+            return ImageApi.serialize(data, spacing, unit)
+    return CellSpecimenTableApi()
+
+@pytest.mark.parametrize("roi_ids,expected", [
+    [
+        1,
+        np.array([
+            [0, 0, 0, 0, 0],
+            [0, 0, 1, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0]
+        ])
+    ],
+    [
+        None,
+        np.array([
+            [
+                [0, 0, 0, 0, 0],
+                [0, 0, 1, 0, 0],
+                [0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0]
+            ],
+            [
+                [0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0],
+                [0, 0, 1, 0, 0],
+                [0, 0, 0, 0, 0]
+            ]
+        ])
+    ]
+])
+def test_get_roi_masks_by_cell_roi_id(roi_ids, expected, cell_specimen_table_api):
+    ssn = BehaviorOphysSession(api=cell_specimen_table_api)
+    obtained = ssn._get_roi_masks_by_cell_roi_id(roi_ids)
+    assert np.allclose(expected, obtained.values)
+
+
+@pytest.mark.parametrize("cell_specimen_ids,expected", [
+    [
+        10,
+        np.array([
+            [0, 0, 0, 0, 0],
+            [0, 0, 1, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0]
+        ])
+    ],
+    [
+        [11, 10],
+        np.array([
+            [
+                [0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0],
+                [0, 0, 1, 0, 0],
+                [0, 0, 0, 0, 0]
+            ],
+            [
+                [0, 0, 0, 0, 0],
+                [0, 0, 1, 0, 0],
+                [0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0]
+            ]
+        ])
+    ]
+])
+def test_get_roi_masks(cell_specimen_ids, expected, cell_specimen_table_api):
+    ssn = BehaviorOphysSession(api=cell_specimen_table_api)
+    obtained = ssn.get_roi_masks(cell_specimen_ids)
+    assert np.allclose(expected, obtained.values)

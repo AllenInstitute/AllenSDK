@@ -78,5 +78,403 @@ def test_calculate_reward_rate(kwargs, expected):
     assert np.allclose(
         trials_processing.calculate_reward_rate(**kwargs),
         expected, 
-    ), "calculared reward rate should match expected reward rate :("
+    ), "calculated reward rate should match expected reward rate :("
 
+def trial_data_and_expectation_0():
+    test_trial = {
+        'index': 3,
+        'cumulative_rewards': 1,
+        'licks': [(318.2737866026219, 18736),
+        (318.4235244484611, 18745),
+        (318.55351991075554, 18753),
+        (318.6735239364698, 18760),
+        (318.8235420609609, 18769),
+        (318.9733899117824, 18778),
+        (319.153503175955, 18789),
+        (319.35351008052305, 18801),
+        (321.24372627834714, 18914),
+        (321.3438153063156, 18920),
+        (321.49348118080985, 18929),
+        (321.6237259097134, 18937)],
+        'stimulus_changes': [(('im065', 'im065'),
+        ('im062', 'im062'),
+        317.76644976765834,
+        18706)],
+        'success': False,
+        'cumulative_volume': 0.005,
+        'trial_params': {'catch': False, 'auto_reward': True, 'change_time': 5},
+        'rewards': [(0.005, 317.92325660388286, 18715)],
+        'events': [['trial_start', '', 314.0120642698258, 18481],
+        ['initial_blank', 'enter', 314.01216666808074, 18481],
+        ['initial_blank', 'exit', 314.0122573636779, 18481],
+        ['pre_change', 'enter', 314.01233489378524, 18481],
+        ['pre_change', 'exit', 314.0124103759274, 18481],
+        ['stimulus_window', 'enter', 314.01248819860115, 18481],
+        ['stimulus_changed', '', 317.7666744586863, 18706],
+        ['auto_reward', '', 317.76681547571155, 18706],
+        ['response_window', 'enter', 317.9231027139341, 18715],
+        ['response_window', 'exit', 318.532233361527, 18752],
+        ['miss', '', 318.5324346472395, 18752],
+        ['stimulus_window', 'exit', 322.0351179203675, 18962],
+        ['no_lick', 'exit', 322.0352864386384, 18962],
+        ['trial_end', '', 322.0353750862705, 18962]]
+    }
+    
+    expected_result = {
+        'reward_volume': 0.005,
+        'hit': False,
+        'false_alarm': False,
+        'miss': False,
+        'sham_change': False,
+        'stimulus_change': True,
+        'aborted': False,
+        'go': False,
+        'catch': False,
+        'auto_rewarded': True,
+        'correct_reject': False
+    }
+
+    return test_trial, expected_result
+
+def trial_data_and_expectation_1():
+    test_trial = {
+        'index': 4,
+        'cumulative_rewards': 1,
+        'licks': [(324.1935569847751, 19091),
+        (324.34329131981696, 19100),
+        (324.49368158882305, 19109)],
+        'stimulus_changes': [],
+        'success': False,
+        'cumulative_volume': 0.005,
+        'trial_params': {'catch': False, 'auto_reward': True, 'change_time': 6},
+        'rewards': [],
+        'events': [['trial_start', '', 322.2688823113451, 18976],
+        ['initial_blank', 'enter', 322.2689858798658, 18976],
+        ['initial_blank', 'exit', 322.26907599033007, 18976],
+        ['pre_change', 'enter', 322.2691523501716, 18976],
+        ['pre_change', 'exit', 322.26922900257955, 18976],
+        ['stimulus_window', 'enter', 322.26930536242105, 18976],
+        ['early_response', '', 324.1937059010944, 19091],
+        ['abort', '', 324.1937848940339, 19091],
+        ['timeout', 'enter', 324.19388963282034, 19091],
+        ['timeout', 'exit', 324.8042502297378, 19128],
+        ['trial_end', '', 324.80448691598986, 19128]]
+    }
+
+    expected_result = {
+        'reward_volume': 0,
+        'hit': False,
+        'false_alarm': False,
+        'miss': False,
+        'sham_change': False,
+        'stimulus_change': False,
+        'aborted': True,
+        'go': False,
+        'catch': False,
+        'auto_rewarded': False,
+        'correct_reject': False
+    }
+
+    return test_trial, expected_result
+
+def trial_data_and_expectation_2():
+    test_trial = {
+        'index': 51,
+        'cumulative_rewards': 11,
+        'licks': [(542.6200214334176, 32186),
+        (542.7097825733969, 32191),
+        (542.8597161461861, 32200),
+        (542.9599280520605, 32206),
+        (543.059708422432, 32212),
+        (543.15998088956, 32218),
+        (543.2899491431752, 32226),
+        (543.4098750536493, 32233),
+        (543.5197477960238, 32240),
+        (543.6596846660369, 32248),
+        (543.7699336488565, 32255),
+        (543.8897463361172, 32262),
+        (544.0196821148575, 32270),
+        (544.13974055793, 32277),
+        (544.2596729048659, 32284),
+        (544.3896745110557, 32292),
+        (544.5397306691843, 32301)],
+        'stimulus_changes': [(('im069', 'im069'),
+        ('im085', 'im085'),
+        542.2007438794369,
+        32161)],
+        'success': True,
+        'cumulative_volume': 0.067,
+        'trial_params': {'catch': False, 'auto_reward': False, 'change_time': 4},
+        'rewards': [(0.007, 542.620156599114, 32186)],
+        'events': [['trial_start', '', 539.1971251251088, 31981],
+        ['initial_blank', 'enter', 539.197228401063, 31981],
+        ['initial_blank', 'exit', 539.1973220223246, 31981],
+        ['pre_change', 'enter', 539.1974007226976, 31981],
+        ['pre_change', 'exit', 539.197477667672, 31981],
+        ['stimulus_window', 'enter', 539.1975575383109, 31981],
+        ['stimulus_changed', '', 542.2009428246179, 32161],
+        ['response_window', 'enter', 542.3661398812824, 32171],
+        ['hit', '', 542.6201402153932, 32186],
+        ['response_window', 'exit', 542.9666720011281, 32207],
+        ['stimulus_window', 'exit', 546.4695340323526, 32417],
+        ['no_lick', 'exit', 546.4696966992947, 32417],
+        ['trial_end', '', 546.4697827138287, 32417]]
+    }
+
+    expected_result = {
+        'reward_volume': 0.007,
+        'hit': True,
+        'false_alarm': False,
+        'miss': False,
+        'sham_change': False,
+        'stimulus_change': True,
+        'aborted': False,
+        'go': True,
+        'catch': False,
+        'auto_rewarded': False,
+        'correct_reject': False
+    }
+
+    return test_trial, expected_result
+
+
+@pytest.mark.parametrize("data_exp_getter", [
+    trial_data_and_expectation_0, 
+    trial_data_and_expectation_1,
+    trial_data_and_expectation_2
+])
+def test_trial_data_from_log(data_exp_getter):
+    data, expectation = data_exp_getter()
+    assert trials_processing.trial_data_from_log(data) == expectation
+
+
+def test_get_trial_timing():
+    event_dict = {
+        ('trial_start', ''): {'rebased_time': 306.4785879253758, 'frame': 18075},
+        ('initial_blank', 'enter'): {'rebased_time': 306.47868008512637,
+        'frame': 18075},
+        ('initial_blank', 'exit'): {'rebased_time': 306.4787637603285,
+        'frame': 18075},
+        ('pre_change', 'enter'): {'rebased_time': 306.47883573270514, 'frame': 18075},
+        ('pre_change', 'exit'): {'rebased_time': 306.4789062422286, 'frame': 18075},
+        ('stimulus_window', 'enter'): {'rebased_time': 306.478977629464,
+        'frame': 18075},
+        ('stimulus_changed', ''): {'rebased_time': 310.9827406729944, 'frame': 18345},
+        ('auto_reward', ''): {'rebased_time': 310.98279450599154, 'frame': 18345},
+        ('response_window', 'enter'): {'rebased_time': 311.13223900212347,
+        'frame': 18354},
+        ('response_window', 'exit'): {'rebased_time': 311.73284526699706,
+        'frame': 18390},
+        ('miss', ''): {'rebased_time': 311.7330193465259, 'frame': 18390},
+        ('stimulus_window', 'exit'): {'rebased_time': 315.2356723770604,
+        'frame': 18600},
+        ('no_lick', 'exit'): {'rebased_time': 315.23582480636213, 'frame': 18600},
+        ('trial_end', ''): {'rebased_time': 315.23590438557534, 'frame': 18600}
+    }
+
+    licks = [
+        312.24876,
+        312.58027,
+        312.73126,
+        312.86627,
+        313.02635,
+        313.16292,
+        313.54016,
+        314.04408,
+        314.47449,
+        314.61011,
+        314.75495,
+    ]
+
+    nan = np.nan
+    stimulus_presentations_df = pd.DataFrame({
+        'duration': {
+            2: 0.2499599999999873,
+            3: nan,
+            4: 0.24966999999998052,
+            5: 0.24990999999999985,
+            6: 0.2499800000000505,
+            7: 0.2499300000000062,
+            8: 0.24996999999996206,
+            9: 0.24968999999998687,
+            10: 0.25983999999999696,
+            11: nan,
+            12: 0.24995000000001255,
+            13: 0.2500800000000254,
+            14: 0.2500800000000254
+        },
+        'end_frame': {
+            2: 18091.0,
+            3: nan,
+            4: 18181.0,
+            5: 18226.0,
+            6: 18271.0,
+            7: 18316.0,
+            8: 18361.0,
+            9: 18406.0,
+            10: 18451.0,
+            11: nan,
+            12: 18541.0,
+            13: 18586.0,
+            14: 18631.0
+        },
+        'image_index': {
+            2: 0,
+            3: 8,
+            4: 0,
+            5: 0,
+            6: 0,
+            7: 0,
+            8: 5,
+            9: 5,
+            10: 5,
+            11: 8,
+            12: 5,
+            13: 5,
+            14: 5
+        },
+        'image_name': {
+            2: 'im065',
+            3: 'omitted',
+            4: 'im065',
+            5: 'im065',
+            6: 'im065',
+            7: 'im065',
+            8: 'im062',
+            9: 'im062',
+            10: 'im062',
+            11: 'omitted',
+            12: 'im062',
+            13: 'im062',
+            14: 'im062'
+        },
+        'image_set': {
+            2: 'Natural_Images_Lum_Matched_set_training_2017.07.14_2',
+            3: 'omitted',
+            4: 'Natural_Images_Lum_Matched_set_training_2017.07.14_2',
+            5: 'Natural_Images_Lum_Matched_set_training_2017.07.14_2',
+            6: 'Natural_Images_Lum_Matched_set_training_2017.07.14_2',
+            7: 'Natural_Images_Lum_Matched_set_training_2017.07.14_2',
+            8: 'Natural_Images_Lum_Matched_set_training_2017.07.14_2',
+            9: 'Natural_Images_Lum_Matched_set_training_2017.07.14_2',
+            10: 'Natural_Images_Lum_Matched_set_training_2017.07.14_2',
+            11: 'omitted',
+            12: 'Natural_Images_Lum_Matched_set_training_2017.07.14_2',
+            13: 'Natural_Images_Lum_Matched_set_training_2017.07.14_2',
+            14: 'Natural_Images_Lum_Matched_set_training_2017.07.14_2'
+        },
+        'index': {
+            2: 2,
+            3: 0,
+            4: 3,
+            5: 4,
+            6: 5,
+            7: 6,
+            8: 7,
+            9: 8,
+            10: 9,
+            11: 1,
+            12: 10,
+            13: 11,
+            14: 12
+        },
+        'omitted': {
+            2: False,
+            3: True,
+            4: False,
+            5: False,
+            6: False,
+            7: False,
+            8: False,
+            9: False,
+            10: False,
+            11: True,
+            12: False,
+            13: False,
+            14: False
+        },
+        'orientation': {
+            2: nan,
+            3: nan,
+            4: nan,
+            5: nan,
+            6: nan,
+            7: nan,
+            8: nan,
+            9: nan,
+            10: nan,
+            11: nan,
+            12: nan,
+            13: nan,
+            14: nan
+        },
+        'start_frame': {
+            2: 18076,
+            3: 18120,
+            4: 18166,
+            5: 18211,
+            6: 18256,
+            7: 18301,
+            8: 18346,
+            9: 18391,
+            10: 18436,
+            11: 18480,
+            12: 18526,
+            13: 18571,
+            14: 18616
+        },
+        'start_time': {
+            2: 307.2712,
+            3: 308.00111,
+            4: 308.77121,
+            5: 309.52094,
+            6: 310.27088,
+            7: 311.02089,
+            8: 311.77086,
+            9: 312.52112,
+            10: 313.27098,
+            11: 314.01115,
+            12: 314.78083,
+            13: 315.53094,
+            14: 316.2808
+        },
+        'stop_time': {
+            2: 307.52116,
+            3: nan,
+            4: 309.02088,
+            5: 309.77085,
+            6: 310.52086,
+            7: 311.27082,
+            8: 312.02083,
+            9: 312.77081,
+            10: 313.53082,
+            11: nan,
+            12: 315.03078,
+            13: 315.78102,
+            14: 316.53088
+        }
+    })
+
+    result = trials_processing.get_trial_timing(
+        event_dict,
+        stimulus_presentations_df,
+        licks,
+        go=False,
+        catch=False,
+        auto_rewarded=True,
+        hit=False,
+        false_alarm=False,
+    )
+
+    expected_result = {
+        'start_time': 306.4785879253758,
+        'stop_time': 315.23590438557534,
+        'trial_length': 8.757316460199547,
+        'response_time': nan,
+        'change_frame': 18345,
+        'change_time': 311.77086,
+        'response_latency': 0.4778999999999769
+        }
+
+    # use assert_frame_equal to take advantage of the nice way it deals with NaNs
+    pd.testing.assert_frame_equal(pd.DataFrame(result,index=[0]), pd.DataFrame(expected_result,index=[0]), check_names=False)
