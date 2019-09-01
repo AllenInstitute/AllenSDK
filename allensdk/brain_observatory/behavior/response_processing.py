@@ -153,8 +153,27 @@ if __name__=="__main__":
         for event_time in event_times
     ])
 
+    insertion_ind = np.searchsorted(session.ophys_timestamps, event_times)
+    a = session.ophys_timestamps[insertion_ind] - event_times
+    #vs.
+    b = np.abs(session.ophys_timestamps[np.clip(insertion_ind-1, 0, np.inf).astype(int)] - event_times)
+    #if a<b, closer to insertion_ind. else, closer to insertion_ind - 1
+    # Therefore we need to subtract int(a>b) from insertion_inds to get the true index of the closest point
+    insertion_ind - (a>b).astype(int)
+
+    def index_of_nearest_value(a, v):
+        '''
+        The index of the nearest element in a for each element in v
+        '''
+        insertion_ind = np.searchsorted(a, v)
+        a = a[insertion_ind] - v
+        b = np.abs(a[np.clip(insertion_ind-1, 0, np.inf).astype(int)] - v)
+        return insertion_ind - (a>b).astype(int)
+
     # TODO: Assert 0+start_ind_offset... etc
-    assert np.all((event_inds_closest > 0)&(event_inds_closest<len(session.ophys_timestamps)))
+    #  assert np.all((event_inds_closest > 0)&(event_inds_closest<len(session.ophys_timestamps)))
+
+
 
     all_inds = event_inds_closest + np.arange(start_ind_offset, end_ind_offset)[:,None] 
     data = np.stack(session.dff_traces['dff'].values)
