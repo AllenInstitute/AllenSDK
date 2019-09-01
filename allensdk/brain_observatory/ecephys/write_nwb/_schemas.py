@@ -25,19 +25,14 @@ class Channel(RaisingSchema):
     local_index = Int(required=True)
     probe_vertical_position = Int(required=True)
     probe_horizontal_position = Int(required=True)
-    structure_id = Int(required=True, allow_none=True)
-    structure_acronym = String(required=True, allow_none=True)
-    AP_coordinate = Float(required=True, allow_none=True)
-    DV_coordinate = Float(required=True, allow_none=True)
-    ML_coordinate = Float(required=True, allow_none=True)
-    cortical_depth = Float(required=True, allow_none=True)
+    manual_structure_id = Int(required=True, allow_none=True)
+    manual_structure_acronym = String(required=True, allow_none=True)
     # TODO: Re-add later when variables are added to lims output
     # cortical_layer = String(required=True, allow_none=True)
     # AP_coordinate = Float(required=True, allow_none =True)
     # DV_coordinate = Float(required=True, allow_none= True)
     # ML_coordinate = Float(required=True, allow_none=True)
     # cortical_depth = Float(required=True, allow_none=True)
-
 
 class Unit(RaisingSchema):
     id = Int(required=True)
@@ -56,13 +51,6 @@ class Unit(RaisingSchema):
     isi_violations = Float(required=True)
     presence_ratio = Float(required=True)
     amplitude_cutoff = Float(required=True)
-<<<<<<< HEAD
-    isolation_distance = Float(required=True)
-    l_ratio = Float(required=True)
-    d_prime = Float(required=True)
-    nn_hit_rate = Float(required=True)
-    nn_miss_rate = Float(required=True)
-=======
     isolation_distance = Float(required=True, allow_none=True)
     l_ratio = Float(required=True, allow_none=True)
     d_prime = Float(required=True, allow_none=True)
@@ -80,7 +68,6 @@ class Unit(RaisingSchema):
     spread = Float(required=True, allow_none=True)
     velocity_above = Float(required=True, allow_none=True)
     velocity_below = Float(required=True, allow_none=True)
->>>>>>> 207bbbf428be5b7ddc10953b6ed0b268d7770a91
 
 
 class Lfp(RaisingSchema):
