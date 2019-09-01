@@ -240,7 +240,6 @@ class ReceptiveFieldMapping(StimulusAnalysis):
             column_key = self._col_pos_x
 
         dataset = dataset.copy()
-        # dataset['spike_counts'] = dataset['spike_counts'].sum(dim=time_key)
         dataset[spike_count_key] = dataset.sum(dim=time_key)
         dataset = dataset.drop(time_key)
 
@@ -305,10 +304,13 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         (peak_height, center_y, center_x, width_y, width_x), success = fit_2d_gaussian(rf)
         on_screen = rf_on_screen(rf, center_y, center_x)
 
-        height = width_y #* self._params['stimulus_step_size']
-        width = width_x #* self._params['stimulus_step_size']
+        height_deg = convert_pixels_to_degrees(width_y)
+        width_deg = convert_pixels_to_degrees(width_x)
+        azimuth_deg = convert_azimuth_to_degrees(azimuth)
+        elevation_deg = convert_elevation_to_degrees(elevation)
+        area_deg = convert_pixel_area_to_degrees(area)
 
-        return azimuth, elevation, width, height, area, p_value[0], on_screen
+        return azimuth_deg, elevation_deg, width_deg, height_deg, area_deg, p_value[0], on_screen
 
 
     ## VISUALIZATION ##
@@ -538,4 +540,95 @@ def threshold_rf(rf, threshold):
 
 def rf_on_screen(rf, center_y, center_x):
 
+    """
+    Checks whether the receptive field is on the screen, given the center location.
+
+    """
+
     return 0 < center_y < rf.shape[0] and 0 < center_x < rf.shape[1]
+
+
+def convert_elevation_to_degrees(elevation_in_pixels, elevation_offset_degrees=-30):
+
+    """
+    Converts a pixel-based elevation into degrees relative to center of gaze
+
+    The receptive field computed by this class is oriented such that the
+    pixel values are in the correct relative location when using matplotlib.pyplot.imshow(),
+    which places (0,0) in the upper-left corner of the figure.
+
+    Therefore, we need to invert the elevation value prior to converting to degrees.
+
+    Parameters:
+    -----------
+    elevation_in_pixels : float
+    elevation_offset_degrees: float
+
+    Returns:
+    --------
+    elevation_in_degrees : float
+
+    """
+    
+    elevation_in_degrees = convert_pixels_to_degrees(8 - elevation_in_pixels) + elevation_offset_degrees
+    
+    return elevation_in_degrees
+
+def convert_azimuth_to_degrees(azimuth_in_pixels, azimuth_offset_degrees=10):
+
+    """
+    Converts a pixel-based azimuth into degrees relative to center of gaze
+
+    Parameters:
+    -----------
+    azimuth_in_pixels : float
+    azimuth_offset_degrees: float
+
+    Returns:
+    --------
+    azimuth_in_degrees : float
+
+    """
+    
+    azimuth_in_degrees = convert_pixels_to_degrees((azimuth_in_pixels)) + azimuth_offset_degrees
+    
+    return azimuth_in_degrees
+
+def convert_pixels_to_degrees(value_in_pixels, degrees_to_pixels_ratio=10):
+
+    """
+    Converts a pixel-based distance into degrees
+
+    Parameters:
+    -----------
+    value_in_pixels : float
+    degrees_to_pixels_ratio: float
+
+    Returns:
+    --------
+    value in degrees : float
+
+    """
+    
+    return value_in_pixels * degrees_to_pixels_ratio
+
+def convert_pixel_area_to_degrees(area_in_pixels):
+
+    """
+    Converts a pixel-based area measure into degrees
+
+    Each pixel is a square with side of length <degrees_to_pixels_ratio>
+
+    So the area in degrees is area_in_pixels * <degrees to_pixels_ratio>^2
+
+    Parameters:
+    -----------
+    area_in_pixels : float
+
+    Returns:
+    --------
+    area_in_degrees : float
+
+    """
+    
+    return area_in_pixels * pow(convert_pixels_to_degrees(1), 2)
