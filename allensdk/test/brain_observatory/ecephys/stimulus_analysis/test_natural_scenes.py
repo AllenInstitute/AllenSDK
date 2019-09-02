@@ -1,117 +1,90 @@
-import os
 import pytest
 import numpy as np
 import pandas as pd
-from mock import MagicMock
 
-from allensdk.brain_observatory.ecephys.stimulus_analysis import natural_scenes as ns
+from .conftest import MockSessionApi
 from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
+from allensdk.brain_observatory.ecephys.stimulus_analysis.natural_scenes import NaturalScenes, image_selectivity
 
 
-data_dir = '/allen/aibs/informatics/module_test_data/ecephys/stimulus_analysis_fh'
-
-
-@pytest.mark.parametrize('spikes_nwb,expected_csv,analysis_params,units_filter',
-                         [
-                             #(os.path.join(data_dir, 'data', 'mouse406807_integration_test.spikes.nwb2'),
-                             # os.path.join(data_dir, 'expected', 'mouse406807_integration_test.natural_scenes.csv'),
-                             # {})
-                             (os.path.join(data_dir, 'data', 'ecephys_session_773418906.nwb'),
-                              os.path.join(data_dir, 'expected', 'ecephys_session_773418906.natural_scenes.csv'),
-                              {},
-                              [914580284, 914580302, 914580328, 914580366, 914580360, 914580362, 914580380, 914580370,
-                               914580408, 914580384, 914580402, 914580400, 914580396, 914580394, 914580392, 914580390,
-                               914580382, 914580412, 914580424, 914580422, 914580438, 914580420, 914580434, 914580432,
-                               914580428, 914580452, 914580450, 914580474, 914580470, 914580490])
-                         ])
-def test_metrics(spikes_nwb, expected_csv, analysis_params, units_filter, skip_cols=[]):
-    """Full intergration tests of metrics table"""
-    if not os.path.exists(spikes_nwb):
-        pytest.skip('No input spikes file {}.'.format(spikes_nwb))
-    if not os.access(spikes_nwb, os.R_OK):
-        pytest.skip(f"can't access file at {spikes_nwb}")
-    if not os.access(expected_csv, os.R_OK):
-        pytest.skip(f"can't access file at {expected_csv}")
-
-    analysis_params = analysis_params or {}
-    analysis = ns.NaturalScenes(spikes_nwb, filter=units_filter, **analysis_params)
-    # Make sure some of the non-metrics structures are returning valid(ish) tables
-    assert(len(analysis.stim_table) > 1)
-    assert(set(analysis.unit_ids) == set(units_filter))
-    assert(len(analysis.running_speed) == len(analysis.stim_table))
-    assert(analysis.stim_table_spontaneous.shape == (3, 5))
-    assert(set(analysis.spikes.keys()) == set(units_filter))
-    assert(len(analysis.conditionwise_psth) > 1)
-
-    actual_data = analysis.metrics.sort_index()
-
-    expected_data = pd.read_csv(expected_csv)
-    expected_data = expected_data.set_index('unit_id')
-    expected_data = expected_data.sort_index()  # in theory this should be sorted in the csv, no point in risking it.
-
-    assert(np.all(actual_data.index.values == expected_data.index.values))
-    assert(set(actual_data.columns) == (set(expected_data.columns) - set(skip_cols)))
-
-    assert(np.allclose(actual_data['pref_image_ns'].astype(np.float), expected_data['pref_image_ns'], equal_nan=True))
-    assert(np.allclose(actual_data['image_selectivity_ns'].astype(np.float), expected_data['image_selectivity_ns'],
-                       equal_nan=True))
-    assert(np.allclose(actual_data['firing_rate_ns'].astype(np.float), expected_data['firing_rate_ns'], equal_nan=True))
-    assert(np.allclose(actual_data['fano_ns'].astype(np.float), expected_data['fano_ns'], equal_nan=True))
-    assert(np.allclose(actual_data['time_to_peak_ns'].astype(np.float), expected_data['time_to_peak_ns'],
-                       equal_nan=True))
-    assert(np.allclose(actual_data['reliability_ns'].astype(np.float), expected_data['reliability_ns'], equal_nan=True))
-    assert(np.allclose(actual_data['lifetime_sparseness_ns'].astype(np.float), expected_data['lifetime_sparseness_ns'],
-                       equal_nan=True))
-    assert(np.allclose(actual_data['run_pval_ns'].astype(np.float), expected_data['run_pval_ns'], equal_nan=True))
-    assert(np.allclose(actual_data['run_mod_ns'].astype(np.float), expected_data['run_mod_ns'], equal_nan=True))
-
+class MockNSSessionApi(MockSessionApi):
+    def get_stimulus_presentations(self):
+        return pd.DataFrame({
+            'start_time': np.concatenate(([0.0], np.linspace(0.5, 29.50, 119, endpoint=True), [39.75])),
+            'stop_time': np.concatenate(([0.5], np.linspace(0.75, 39.75, 119, endpoint=True), [40.25])),
+            'stimulus_name': ['spontaneous'] + ['natural_scenes']*119 + ['spontaneous'],
+            'stimulus_block': [0] + [1]*119 + [0],
+            'duration': [0.5] + [0.25]*119 + [0.5],
+            'stimulus_index': [0] + [1]*119 + [0],
+            'frame': np.concatenate(([np.nan], np.arange(-1.0, 118.0), [np.nan]))
+        }, index=pd.Index(name='id', data=np.arange(121)))
 
 
 @pytest.fixture
-def ecephys_session():
-    ecephys_ses = MagicMock(spec=EcephysSession)
-    units_df = pd.DataFrame({'unit_id': np.arange(20)})
-    units_df = units_df.set_index('unit_id')
-    ecephys_ses.units = units_df
-    ecephys_ses.spike_times = {uid: np.linspace(0, 1.0, 5) for uid in np.arange(20)}
-    return ecephys_ses
+def ecephys_api():
+    return MockNSSessionApi()
 
 
-@pytest.fixture
-def stimulus_table():
-    images = np.empty(119*3*2)
-    images[0:(119*3)] = np.repeat(np.arange(-1, 118), 3)
-    images[(119*3):] = np.nan
-    return pd.DataFrame({'Image': images,
-                         'stimulus_name': ['Natural images_5']*119*3 + ['spontaneous']*119*3,
-                         'start_time': np.linspace(5000.0, 5060.0, 119*3*2),
-                         'stop_time': np.linspace(5000.0, 5060.0, 119*3*2) + 0.25,
-                         'duration': 0.25})
-
-@pytest.mark.skip()
-def test_static_gratings(ecephys_session, stimulus_table):
-    ecephys_session.stimulus_presentations = stimulus_table  # patch.object won't work since stimulus_presentations is a constructor variable.
-    ns_obj = ns.NaturalScenes(ecephys_session)
-    assert(isinstance(ns_obj.stim_table, pd.DataFrame))
-    assert(len(ns_obj.stim_table) == 119*3)
-    assert(ns_obj.number_images == 119)
-    assert(ns_obj.number_nonblank == 118)
-    assert(ns_obj.numbercells == 20)
-    assert(ns_obj.mean_sweep_events.shape == (119*3, 20))
+def test_load(ecephys_api):
+    session = EcephysSession(api=ecephys_api)
+    ns = NaturalScenes(ecephys_session=session)
+    assert(ns.name == 'Natural Scenes')
+    assert(set(ns.unit_ids) == set(range(6)))
+    assert(len(ns.conditionwise_statistics) == 119*6)
+    assert(ns.conditionwise_psth.shape == (119, 249, 6))
+    assert(not ns.presentationwise_spike_times.empty)
+    assert(len(ns.presentationwise_statistics) == 119*6)
+    assert(len(ns.stimulus_conditions) == 119)
 
 
-"""
-@pytest.mark.parametrize('responses,number_nonblank,expected',
+def test_stimulus(ecephys_api):
+    session = EcephysSession(api=ecephys_api)
+    ns = NaturalScenes(ecephys_session=session)
+    assert(isinstance(ns.stim_table, pd.DataFrame))
+    assert(len(ns.stim_table) == 119)
+    assert(set(ns.stim_table.columns).issuperset({'frame', 'start_time', 'stop_time'}))
+
+    assert(np.all(ns.images == np.arange(-1.0, 118)))
+    assert(ns.number_images == 119)
+    assert(ns.number_nonblank == 118)
+
+
+def test_metrics(ecephys_api):
+    session = EcephysSession(api=ecephys_api)
+    ns = NaturalScenes(ecephys_session=session)
+    assert(isinstance(ns.metrics, pd.DataFrame))
+    assert(len(ns.metrics) == 6)
+    assert(ns.metrics.index.names == ['unit_id'])
+
+    assert('pref_image_ns' in ns.metrics.columns)
+    assert(np.all(ns.metrics['pref_image_ns'].loc[[0, 1, 3, 4]] == [2, 9, 2, 4]))
+
+    assert('image_selectivity_ns' in ns.metrics.columns)
+    assert('firing_rate_ns' in ns.metrics.columns)
+    assert('fano_ns' in ns.metrics.columns)
+    assert('time_to_peak_ns' in ns.metrics.columns)
+    assert('reliability_ns' in ns.metrics.columns)
+    assert('lifetime_sparseness_ns' in ns.metrics.columns)
+    assert('run_pval_ns' in ns.metrics.columns)
+    assert('run_mod_ns' in ns.metrics.columns)
+
+
+@pytest.mark.parametrize('responses,expected',
                          [
-                             (np.array([1.04, 2.8, 0.88, 2.08, 2.0, 0.48, 1.36, 2.72, 1.04, 0.96, 2.16, 0.56, 0.56, 0.96, 1.28, 1.52, 1.28, 1.36, 2.56, 1.76, 1.36, 1.04, 2.16, 1.2, 0.96, 0.88, 1.28, 2.88,
-                                        1.28, 2.0, 1.6, 2.32, 1.84, 0.8, 1.04, 2.08, 2.56, 1.28, 1.04, 0.72, 1.6, 1.6, 1.44, 0.8, 1.52, 1.28, 2.4, 1.52, 1.04, 2.72, 0.96, 1.44, 1.04, 1.6, 2.24, 1.28, 1.2,
-                                        1.44, 0.64, 1.36, 1.68, 0.72, 5.36, 1.12, 1.84, 0.88, 2.8, 1.84, 1.36, 1.04, 3.44, 1.28, 1.36, 2.16, 1.28, 1.36, 1.52, 0.88, 0.88, 1.12, 1.36, 0.8, 2.48, 1.28, 1.6,
-                                        1.52, 1.04, 0.48, 0.8, 0.48, 2.48, 2.48, 1.2, 0.72, 1.28, 2.16, 1.68, 0.8, 1.28, 3.68, 1.6, 1.2, 1.92, 1.28, 1.6, 1.28, 3.12, 3.28, 2.0, 0.88, 1.92, 2.32, 0.88, 1.6,
-                                        1.84, 1.12, 1.68, 1.36, 1.2]),
-                              118, 0.559033898),
-                             (np.zeros(119), 118, 1.0)
+                             (np.array([]), np.nan),  # invalid input
+                             (np.array([1.0]), np.nan),  # selectivity of one image is undefined
+                             (np.array([0.0]), np.nan),
+                             (np.zeros(118), 0.0),  # responds uniformly
+                             (np.ones(118), 0.0),  # responds uniformly
+                             (np.array([0.0]*200 + [1.0]), 0.99004975),  # reponse to 1 image ~ 1.0
+                             (np.array([5.5, 0.0, 15.0, 10.0, 2.3, 4.9]), 0.16166666666666674)
                          ])
-"""
-@pytest.mark.skip()
-def test_get_image_selectivity(responses, number_nonblank, expected):
-    assert(np.isclose(ns.get_image_selectivity(responses, number_nonblank), expected))
+def test_image_selectivity(responses, expected):
+    img_sel = image_selectivity(responses)
+    assert(np.isclose(img_sel, expected, equal_nan=True))
+
+
+if __name__ == '__main__':
+    test_load()
+    # test_stimulus()
+    # test_metrics()
