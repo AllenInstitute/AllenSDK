@@ -16,7 +16,7 @@ csv_io = {
     'writer': lambda path, df: df.to_csv(path)
 }
 
-cache_path_example = '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/cache_20190813'
+cache_path_example = '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019'
 
 
 class BehaviorProjectCache(object):
@@ -49,6 +49,7 @@ class BehaviorProjectCache(object):
             'manifest_path': os.path.join(cache_base, 'visual_behavior_data_manifest.csv'),
             'nwb_base_dir': os.path.join(cache_base, 'nwb_files'),
             'analysis_files_base_dir': os.path.join(cache_base, 'analysis_files'),
+            'eye_tracking_base_dir': os.path.join(cache_base, 'eye_tracking_files'),
             'analysis_files_metadata_path': os.path.join(cache_base, 'analysis_files_metadata.json'),
         }
 
@@ -80,6 +81,14 @@ class BehaviorProjectCache(object):
         self.analysis_files_metadata = self.get_analysis_files_metadata(
             self.cache_paths['analysis_files_metadata_path']
         )
+        self.eye_tracking_base_dir = self.cache_paths['eye_tracking_base_dir']
+        if os.path.exists(self.eye_tracking_base_dir):
+            self.eye_tracking_available=True
+            with open(os.path.join(self.eye_tracking_base_dir, 'oeid_to_eye_tracking_file.json'), 'r') as json_file:
+                self.oeid_to_eye_tracking_file = json.load(json_file)
+        else:
+            self.eye_tracking_available=False
+            self.oeid_to_eye_tracking_file = None
 
     def get_analysis_files_metadata(self, path):
         with open(path, 'r') as metadata_path:
@@ -110,6 +119,17 @@ class BehaviorProjectCache(object):
             'extended_stimulus_presentations_df_{}.h5'.format(experiment_id)
         )
 
+    def get_eye_tracking_file(self, experiment_id):
+        try:
+            return os.path.join(
+                self.eye_tracking_base_dir,
+                self.oeid_to_eye_tracking_file[str(experiment_id)]
+            )
+        except TypeError: # Nonetype for oeid_to_eye_tracking_file dict because it doesn't exist
+            print("No eye tracking available in this cache")
+        except KeyError: # Experiment not in json file
+            print("No eye tracking for this experiment")
+
     def get_session(self, experiment_id):
         '''
         Return a BehaviorOphysSession object given an ophys_experiment_id.
@@ -118,11 +138,13 @@ class BehaviorProjectCache(object):
         trial_response_df_path = self.get_trial_response_df_path(experiment_id)
         flash_response_df_path = self.get_flash_response_df_path(experiment_id)
         extended_stim_df_path = self.get_extended_stimulus_presentations_df(experiment_id)
+        eye_tracking_path = self.get_eye_tracking_file(experiment_id)
         api = ExtendedNwbApi(
-            nwb_path,
-            trial_response_df_path,
-            flash_response_df_path,
-            extended_stim_df_path
+            nwb_path=nwb_path,
+            trial_response_df_path=trial_response_df_path,
+            flash_response_df_path=flash_response_df_path,
+            extended_stimulus_presentations_df_path=extended_stim_df_path,
+            eye_tracking_path = eye_tracking_path
         )
         session = ExtendedBehaviorSession(api)
         return session
@@ -175,7 +197,8 @@ def parse_image_set(behavior_stage):
 
 class ExtendedNwbApi(BehaviorOphysNwbApi):
     def __init__(self, nwb_path, trial_response_df_path, flash_response_df_path,
-                 extended_stimulus_presentations_df_path):
+                 extended_stimulus_presentations_df_path,
+                 eye_tracking_path=None):
         '''
         Api to read data from an NWB file and associated analysis HDF5 files.
         '''
@@ -183,6 +206,7 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
         self.trial_response_df_path = trial_response_df_path
         self.flash_response_df_path = flash_response_df_path
         self.extended_stimulus_presentations_df_path = extended_stimulus_presentations_df_path
+        self.eye_tracking_path=eye_tracking_path
 
     def get_trial_response_df(self):
         tdf = pd.read_hdf(self.trial_response_df_path, key='df')
@@ -199,6 +223,17 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
 
     def get_extended_stimulus_presentations_df(self):
         return pd.read_hdf(self.extended_stimulus_presentations_df_path, key='df')
+
+    def get_eye_tracking_data(self):
+        if self.eye_tracking_path:
+            output = {
+            'cr':pd.read_hdf(self.eye_tracking_path, key='cr'),
+            'eye':pd.read_hdf(self.eye_tracking_path, key='eye'),
+            "pupil":pd.read_hdf(self.eye_tracking_path, key='pupil')
+            }
+            return output
+        else:
+            raise ValueError("No eye tracking data available for this session")
 
     def get_task_parameters(self):
         '''
@@ -457,6 +492,7 @@ class ExtendedBehaviorSession(BehaviorOphysSession):
         self.flash_response_df = LazyProperty(self.api.get_flash_response_df)
         self.image_index = LazyProperty(self.api.get_image_index_names)
         self.roi_masks = LazyProperty(self.get_roi_masks)
+        self.eye_tracking_data = LazyProperty(self.api.get_eye_tracking_data)
 
     def get_roi_masks(self):
         masks = super(ExtendedBehaviorSession, self).get_roi_masks()
@@ -471,4 +507,8 @@ class ExtendedBehaviorSession(BehaviorOphysSession):
 
 if __name__ == "__main__":
     cache = BehaviorProjectCache(cache_path_example)
-    session = cache.get_session(cache.experiment_table.iloc[0]['ophys_experiment_id'])
+    #  session = cache.get_session(cache.experiment_table.iloc[0]['ophys_experiment_id'])
+    oeid_with_eye_tracking = 879331157
+    session = cache.get_session(oeid_with_eye_tracking)
+
+
