@@ -166,7 +166,7 @@ class EcephysSession(LazyPropertyMixin):
         self.stimulus_presentations = self.LazyProperty(self.api.get_stimulus_presentations, wrappers=[self._build_stimulus_presentations])
         self.units = self.LazyProperty(self.api.get_units, wrappers=[self._build_units_table])
         self.inter_presentation_intervals = self.LazyProperty(self._build_inter_presentation_intervals)
-
+        self.invalid_times = self.LazyProperty(self.api.get_invalid_times)
 
     def get_current_source_density(self, probe_id):
         """ Obtain current source density (CSD) image for this probe. Please see
@@ -296,6 +296,11 @@ class EcephysSession(LazyPropertyMixin):
             ]
 
         return epochs.loc[:, ["start_time", "stop_time", "duration", "stimulus_name", "stimulus_block"]]
+
+    def get_invalid_times(self):
+
+        return self.invalid_times
+
 
     def presentationwise_spike_counts(
         self, 
