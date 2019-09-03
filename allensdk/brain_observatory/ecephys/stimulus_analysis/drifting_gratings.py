@@ -3,8 +3,10 @@ import pandas as pd
 from six import string_types
 import scipy.ndimage as ndi
 import scipy.stats as st
+from scipy.signal import welch
 from scipy.optimize import curve_fit
 from scipy.fftpack import fft
+from scipy import signal
 import logging
 
 import matplotlib.pyplot as plt
@@ -38,8 +40,8 @@ class DriftingGratings(StimulusAnalysis):
         metrics_table_df = dg_analysis.metrics()
 
     """
-
-    def __init__(self, ecephys_session, col_ori='orientation', col_tf='temporal_frequency', col_contrast='contrast', trial_duration=2.0, **kwargs):
+    def __init__(self, ecephys_session, col_ori='orientation', col_tf='temporal_frequency', col_contrast='contrast',
+                 trial_duration=2.0, **kwargs):
         super(DriftingGratings, self).__init__(ecephys_session, trial_duration=trial_duration, **kwargs)
 
         self._metrics = None
@@ -48,11 +50,12 @@ class DriftingGratings(StimulusAnalysis):
         self._number_ori = None
         self._tfvals = None
         self._number_tf = None
+        self._contrastvals = None
+        self._number_constrast = None
 
         self._col_ori = col_ori
         self._col_tf = col_tf
         self._col_contrast = col_contrast
-        # self._trial_duration = trial_duration
 
         if self._params is not None:
             # TODO: Need to make sure
@@ -61,7 +64,29 @@ class DriftingGratings(StimulusAnalysis):
         else:
             self._params = {}
 
-        self._module_name = 'Drifting Gratings'
+        self._stim_table_contrast = None
+
+        #stim_table = self.stim_table
+        #self._stim_table_contrast = stim_table[stim_table['stimulus_name'] == 'drifting_gratings_contrast']
+        #self._stim_table = stim_table[stim_table['stimulus_name'] != 'drifting_gratings_contrast']
+        self._conditionwise_statistics_contrast = None
+        self._stimulus_conditions_contrast = None
+
+
+    @property
+    def stim_table_contrast(self):
+        if self._stim_table_contrast is None:
+            stim_table = self.ecephys_session.stimulus_presentations
+            if 'drifting_gratings_contrast' in stim_table['stimulus_name'].unique():
+                self._stim_table_contrast = stim_table[stim_table['stimulus_name'] == 'drifting_gratings_contrast']
+            else:
+                self._stim_table_contrast = pd.DataFrame()
+
+        return self._stim_table_contrast
+
+    @property
+    def name(self):
+        return 'Drifting Gratings'
 
     @property
     def orivals(self):
@@ -98,10 +123,10 @@ class DriftingGratings(StimulusAnalysis):
     @property
     def contrastvals(self):
         """ Array of grating temporal frequency conditions """
-        if self._contrast_vals is None:
+        if self._contrastvals is None:
             self._get_stim_table_stats()
 
-        return self._contrast_vals
+        return self._contrastvals
 
     @property
     def number_contrast(self):
@@ -115,7 +140,31 @@ class DriftingGratings(StimulusAnalysis):
     def null_condition(self):
         """ Stimulus condition ID for null (blank) stimulus """
         return self.stimulus_conditions[self.stimulus_conditions[self._col_tf] == 'null'].index
-    
+
+    @property
+    def stimulus_conditions_contrast(self):
+        """ Stimulus conditions for contrast stimulus """
+        if self._stimulus_conditions_contrast is None:
+            # TODO: look into efficiency of using a table intersect instead.
+            contrast_condition_list = self.stim_table_contrast.stimulus_condition_id.unique()
+
+            self._stimulus_conditions_contrast = self.ecephys_session.stimulus_conditions[
+                self.ecephys_session.stimulus_conditions.index.isin(contrast_condition_list)
+            ]
+
+        return self._stimulus_conditions_contrast
+
+    @property
+    def conditionwise_statistics_contrast(self):
+        """ Conditionwise statistics for contrast stimulus """
+        if self._conditionwise_statistics_contrast is None:
+            self._conditionwise_statistics_contrast = self.ecephys_session.conditionwise_spike_statistics(
+                self.stim_table_contrast.index.values,
+                self.unit_ids
+            )
+
+        return self._conditionwise_statistics_contrast
+
     @property
     def METRICS_COLUMNS(self):
         return [('pref_ori_dg', np.float64), 
@@ -137,24 +186,32 @@ class DriftingGratings(StimulusAnalysis):
 
         if self._metrics is None:
             logger.info('Calculating metrics for ' + self.name)
-        
             unit_ids = self.unit_ids
-
             metrics_df = self.empty_metrics_table()
 
-            metrics_df['pref_ori_dg'] = [self._get_pref_ori(unit) for unit in unit_ids]
-            metrics_df['pref_tf_dg'] = [self._get_pref_tf(unit) for unit in unit_ids]
-            metrics_df['c50_dg'] = [self._get_c50(unit) for unit in unit_ids]
-            metrics_df['f1_f0_dg'] = [self._get_f1_f0(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
-            metrics_df['mod_idx_dg'] = [self._get_modulation_index(unit) for unit in unit_ids]
-            metrics_df['g_osi_dg'] = [self._get_selectivity(unit, metrics_df.loc[unit]['pref_tf_dg'], 'osi') for unit in unit_ids]
-            metrics_df['g_dsi_dg'] = [self._get_selectivity(unit, metrics_df.loc[unit]['pref_tf_dg'], 'dsi') for unit in unit_ids]
-            metrics_df['firing_rate_dg'] = [self.get_overall_firing_rate(unit) for unit in unit_ids]
-            metrics_df['reliability_dg'] = [self.get_reliability(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
-            metrics_df['fano_dg'] = [self.get_fano_factor(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
-            metrics_df['lifetime_sparseness_dg'] = [self.get_lifetime_sparseness(unit) for unit in unit_ids]
-            metrics_df.loc[:, ['run_pval_dg', 'run_mod_dg']] = \
-                    [self.get_running_modulation(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+            if len(self.stim_table) > 0:
+                metrics_df['pref_ori_dg'] = [self._get_pref_ori(unit) for unit in unit_ids]
+                metrics_df['pref_tf_dg'] = [self._get_pref_tf(unit) for unit in unit_ids]
+                metrics_df['f1_f0_dg'] = [self._get_f1_f0(unit, self._get_preferred_condition(unit))
+                                          for unit in unit_ids]
+                metrics_df['mod_idx_dg'] = [self._get_modulation_index(unit, self._get_preferred_condition(unit))
+                                            for unit in unit_ids]
+                metrics_df['g_osi_dg'] = [self._get_selectivity(unit, metrics_df.loc[unit]['pref_tf_dg'], 'osi')
+                                          for unit in unit_ids]
+                metrics_df['g_dsi_dg'] = [self._get_selectivity(unit, metrics_df.loc[unit]['pref_tf_dg'], 'dsi')
+                                          for unit in unit_ids]
+                metrics_df['firing_rate_dg'] = [self._get_overall_firing_rate(unit) for unit in unit_ids]
+                metrics_df['reliability_dg'] = [self._get_reliability(unit, self._get_preferred_condition(unit))
+                                                for unit in unit_ids]
+                metrics_df['fano_dg'] = [self._get_fano_factor(unit, self._get_preferred_condition(unit))
+                                         for unit in unit_ids]
+                metrics_df['lifetime_sparseness_dg'] = [self._get_lifetime_sparseness(unit) for unit in unit_ids]
+                metrics_df.loc[:, ['run_pval_dg', 'run_mod_dg']] = [
+                    self._get_running_modulation(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
+
+            if len(self.stim_table_contrast) > 0:
+                metrics_df['c50_dg'] = [self._get_c50(unit) for unit in unit_ids]
+
 
             self._metrics = metrics_df
 
@@ -162,74 +219,70 @@ class DriftingGratings(StimulusAnalysis):
 
     @property
     def known_stimulus_keys(self):
-        return ['drifting_gratings']
+        return ['drifting_gratings', 'drifting_gratings_75_repeats']
 
     def _get_stim_table_stats(self):
-
         """ Extract orientations and temporal frequencies from the stimulus table """
-
-        self._orivals = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_ori] != 'null'][self._col_ori].unique())
+        self._orivals = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_ori]
+                                                             != 'null'][self._col_ori].unique())
         self._number_ori = len(self._orivals)
 
-        self._tfvals = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_tf] != 'null'][self._col_tf].unique())
+        self._tfvals = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_tf]
+                                                            != 'null'][self._col_tf].unique())
         self._number_tf = len(self._tfvals)
 
-        self._contrastvals = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_contrast] != 'null'][self._col_contrast].unique())
+        self._contrastvals = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_contrast]
+                                                                  != 'null'][self._col_contrast].unique())
         self._number_contrast = len(self._contrastvals)
 
-
     def _get_pref_ori(self, unit_id):
-
         """ Calculate the preferred orientation condition for a given unit
 
-        Params:
-        -------
-        unit_id - unique ID for the unit of interest
+        Parameters
+        ----------
+        unit_id : int
+            unique ID for the unit of interest
 
-        Returns:
+        Returns
         -------
-        pref_ori - stimulus orientation driving the maximal response
-
+        pref_ori : float
+            stimulus orientation driving the maximal response
         """
-
-        similar_conditions = [self.stimulus_conditions.index[self.stimulus_conditions[self._col_ori] == ori].tolist() for ori in self.orivals]
-        df = pd.DataFrame(index=self.orivals,
-                         data = {'spike_mean' : 
-                                [self.conditionwise_statistics.loc[unit_id].loc[condition_inds]['spike_mean'].mean() for condition_inds in similar_conditions]
-                             }
-                         ).rename_axis(self._col_ori)
+        # TODO: Most of the _get_pref_*() methods can be combined into one method and shared among the classes
+        similar_conditions = [self.stimulus_conditions.index[self.stimulus_conditions[self._col_ori] == ori].tolist()
+                              for ori in self.orivals]
+        df = pd.DataFrame(
+            index=self.orivals,
+            data={'spike_mean': [self.conditionwise_statistics.loc[unit_id].loc[condition_inds]['spike_mean'].mean()
+                                 for condition_inds in similar_conditions]}
+        ).rename_axis(self._col_ori)
 
         return df.idxmax().iloc[0]
 
-
     def _get_pref_tf(self, unit_id):
-
         """ Calculate the preferred temporal frequency condition for a given unit
 
         Params:
         -------
-        unit_id - unique ID for the unit of interest
+        unit_id : int
+            unique ID for the unit of interest
 
-        Returns:
+        Returns
         -------
-        pref_tf - stimulus temporal frequency driving the maximal response
-
+        pref_tf : float
+            stimulus temporal frequency driving the maximal response
         """
-        if not 'drifting_gratings' in self.stim_table.stimulus_name.unique():
-            return np.nan
-
-        similar_conditions = [self.stimulus_conditions.index[self.stimulus_conditions[self._col_tf] == tf].tolist() for tf in self.tfvals]
-        df = pd.DataFrame(index=self.tfvals,
-                         data = {'spike_mean' : 
-                                [self.conditionwise_statistics.loc[unit_id].loc[condition_inds]['spike_mean'].mean() for condition_inds in similar_conditions]
-                             }
-                         ).rename_axis(self._col_tf)
+        similar_conditions = [self.stimulus_conditions.index[self.stimulus_conditions[self._col_tf] == tf].tolist()
+                              for tf in self.tfvals]
+        df = pd.DataFrame(
+            index=self.tfvals,
+            data={'spike_mean': [self.conditionwise_statistics.loc[unit_id].loc[condition_inds]['spike_mean'].mean()
+                                 for condition_inds in similar_conditions]}
+        ).rename_axis(self._col_tf)
 
         return df.idxmax().iloc[0]
 
-
     def _get_selectivity(self, unit_id, pref_tf, selectivity_type='osi'):
-
         """ Calculate the orientation or direction selectivity for a given unit
 
         Params:
@@ -243,9 +296,6 @@ class DriftingGratings(StimulusAnalysis):
         selectivity - orientation or direction selectivity value
 
         """
-        if not 'drifting_gratings' in self.stim_table.stimulus_name.unique():
-            return np.nan
-
         orivals_rad = deg2rad(self.orivals).astype('complex128')
 
         condition_inds = self.stimulus_conditions[self.stimulus_conditions[self._col_tf] == pref_tf].index.values
@@ -259,103 +309,87 @@ class DriftingGratings(StimulusAnalysis):
             return osi(orivals_rad, tuning)
         elif selectivity_type == 'dsi':
             return dsi(orivals_rad, tuning)
-
-
+        else:
+            warnings.warn(f'unkown selectivity function {selectivity_type}.')
+            return np.nan
 
     def _get_f1_f0(self, unit_id, condition_id):
         """ Calculate F1/F0 for a given unit
 
         A measure of how tightly locked a unit's firing rate is to the cycles of a drifting grating
 
-        Params:
-        -------
+        Parameters
+        ----------
         unit_id - unique ID for the unit of interest
         condition_id - ID for the condition of interest (usually the preferred condition)
 
-        Returns:
+        Returns
         -------
         f1_f0 - metric
 
         """
-
-        presentation_ids = self.stim_table[self.stim_table['stimulus_condition_id'] == 
-                                              condition_id].index.values
+        presentation_ids = self.stim_table[self.stim_table['stimulus_condition_id'] == condition_id].index.values
                                               
         tf = self.stim_table.loc[presentation_ids[0]][self._col_tf]
 
-        dataset = self.ecephys_session.presentationwise_spike_counts(bin_edges = np.arange(0, self._trial_duration, 0.001),
-                                                                  stimulus_presentation_ids = presentation_ids,
-                                                                  unit_ids = [unit_id]
-                                                                  ).drop('unit_id')
-        # arr = np.squeeze(dataset['spike_counts'].values)
+        dataset = self.ecephys_session.presentationwise_spike_counts(
+            bin_edges=np.arange(0, self.trial_duration, 0.001),
+            stimulus_presentation_ids=presentation_ids,
+            unit_ids=[unit_id]
+        ).drop('unit_id')
+
         arr = np.squeeze(dataset.values)
+        trial_duration = dataset.time_relative_to_stimulus_onset.max()  #TODO: If there a reason not to use self.trial_duration?
+        return f1_f0(arr, tf, trial_duration)
 
-        num_trials = dataset.stimulus_presentation_id.size
-        num_bins = dataset.time_relative_to_stimulus_onset.size
-        trial_duration = dataset.time_relative_to_stimulus_onset.max()
-
-        cycles_per_trial = int(tf * trial_duration)
-
-        bins_per_cycle = int(num_bins / cycles_per_trial)
-
-        arr = arr[:, :cycles_per_trial*bins_per_cycle].reshape((num_trials, cycles_per_trial, bins_per_cycle))
-
-        avg_rate = np.mean(arr,1)
-
-        AMP = 2*np.abs(fft(avg_rate, bins_per_cycle)) / bins_per_cycle
-
-        f0 = 0.5*AMP[:,0]
-        f1 = AMP[:,1]
-
-        return np.nanmean(f1/f0)
-
-
-    def _get_modulation_index(self, unit_id):
+    def _get_modulation_index(self, unit_id, condition_id):
         """ Calculate modulation index for a given unit.
 
-        Similar to F1/F0
+        Parameters
+        ----------
+        unit_id : int
+            unique ID for the unit of interest
+        condition_id :
+            ID for the condition of interest (usually the preferred condition)
 
-        Params:
+        Returns
         -------
-        unit_id - unique ID for the unit of interest
-
-        Returns:
-        -------
-        modulation_index - metric
-
+        modulation_index : metric
         """
+        tf = self.stimulus_conditions.loc[condition_id][self._col_tf]
 
-        return np.nan
+        data = self.conditionwise_psth.sel(unit_id=unit_id, stimulus_condition_id=condition_id).data
+        sample_rate = 1 / np.mean(np.diff(self.conditionwise_psth.time_relative_to_stimulus_onset))
+
+        return modulation_index(data, tf, sample_rate)
 
     def _get_c50(self, unit_id):
-        """ Calculate C50 for a given unit.
+        """ Calculate C50 for a given unit. Only valid if the contrast tuning stimulus is present. Otherwise,
+        return NaN value
 
-        Only valid if the contrast tuning stimulus is present
-        Otherwise, return NaN value
-
-        Params:
-        -------
-        unit_id - unique ID for the unit of interest
+        Parameters
+        ----------
+        unit_id : int
+            unique ID for the unit of interest
 
         Returns:
         -------
-        c50 - metric
+        c50 : float
+            metric
 
         """
-        if not 'drifting_gratings_contrast' in self.stim_table.stimulus_name.unique():
-            return np.nan
 
-        contrast_conditions = self.stim_table[(self.stim_table.stimulus_name == 'drifting_gratings_contrast') & \
-                                    (self.stim_table.ori == self._get_pref_ori(unit_id))]['stimulus_condition_id'].unique()
+        contrast_conditions = self.stim_table_contrast[
+            (self.stim_table_contrast[self._col_ori] == self._get_pref_ori(unit_id))]['stimulus_condition_id'].unique()
 
-        # contrasts = dg.stimulus_conditions.loc[contrast_conditions]['contrast'].values.astype('float')
-        # mean_responses = dg.conditionwise_statistics.loc[unit_id].loc[contrast_conditions]['spike_mean'].values.astype('float')
-        contrasts = self.stimulus_conditions.loc[contrast_conditions]['contrast'].values.astype('float')
-        mean_responses = self.conditionwise_statistics.loc[unit_id].loc[contrast_conditions]['spike_mean'].values.astype('float')
+        # contrasts = self.stimulus_conditions_contrast.loc[contrast_conditions]['contrast'].values.astype('float')
+        contrasts = self.stimulus_conditions_contrast.loc[contrast_conditions][self._col_contrast].values.astype('float')
+        mean_responses = self.conditionwise_statistics_contrast.loc[unit_id].loc[contrast_conditions]['spike_mean'].values.astype('float')
 
         return c50(contrasts, mean_responses)
 
-    # Methods need to either be removed or updated to work with latest adaptor. Talked with Jsh and decision still pending.
+    # Methods need to either be removed or updated to work with latest adaptor. Talked with Jsh and decision still
+    # pending.
     '''
     def _get_tfdi(self, unit_id, pref_ori):
         """ Calculate temporal frequency discrimination index for a given unit
@@ -382,7 +416,6 @@ class DriftingGratings(StimulusAnalysis):
         sse_part = np.sqrt(np.sum((trials-trials.mean())**2)/(len(trials)-5))
         return (np.ptp(tf_tuning))/(np.ptp(tf_tuning) + 2*sse_part)
     '''
-
 
     '''
     def _get_suppressed_contrast(self, unit_id, pref_ori, pref_tf):
@@ -479,24 +512,20 @@ class DriftingGratings(StimulusAnalysis):
     '''
 
     ## VISUALIZATION ##
-
     def plot_raster(self, stimulus_condition_id, unit_id):
-    
         """ Plot raster for one condition and one unit """
-
         idx_tf = np.where(self.tfvals == self.stimulus_conditions.loc[stimulus_condition_id][self._col_tf])[0]
         idx_ori = np.where(self.orivals == self.stimulus_conditions.loc[stimulus_condition_id][self._col_ori])[0]
         
         if len(idx_tf) == len(idx_ori) == 1:
      
-            presentation_ids = \
-                self.presentationwise_statistics.xs(unit_id, level=1)\
-                [self.presentationwise_statistics.xs(unit_id, level=1)\
-                ['stimulus_condition_id'] == stimulus_condition_id].index.values
+            presentation_ids = self.presentationwise_statistics.xs(unit_id, level=1)[
+                self.presentationwise_statistics.xs(unit_id, level=1)['stimulus_condition_id'] == stimulus_condition_id
+            ].index.values
             
-            df = self.presentationwise_spike_times[ \
-                (self.presentationwise_spike_times['stimulus_presentation_id'].isin(presentation_ids)) & \
-                (self.presentationwise_spike_times['unit_id'] == unit_id) ]
+            df = self.presentationwise_spike_times[
+                (self.presentationwise_spike_times['stimulus_presentation_id'].isin(presentation_ids)) &
+                (self.presentationwise_spike_times['unit_id'] == unit_id)]
                 
             x = df.index.values - self.stim_table.loc[df.stimulus_presentation_id].start_time
             _, y = np.unique(df.stimulus_presentation_id, return_inverse=True) 
@@ -505,9 +534,7 @@ class DriftingGratings(StimulusAnalysis):
             plt.scatter(x, y, c='k', s=1, alpha=0.25)
             plt.axis('off')
 
-
     def plot_response_summary(self, unit_id, bar_thickness=0.25):
-
         """ Plot the spike counts across conditions """
         df = self.stimulus_conditions.drop(index=self.null_condition)
     
@@ -520,28 +547,25 @@ class DriftingGratings(StimulusAnalysis):
         y = self.presentationwise_statistics.xs(unit_id, level=1)['spike_counts']
         c = df.loc[cond_values.values]['tf_index']
         
-        plt.subplot(2,1,1)
-        plt.scatter(y,x,c=c,alpha=0.5,cmap='Purples',vmin=-5)
+        plt.subplot(2, 1, 1)
+        plt.scatter(y, x, c=c, alpha=0.5, cmap='Purples', vmin=-5)
         locs, labels = plt.yticks(ticks=np.arange(self.number_tf), labels=self.tfvals)
         plt.ylabel('Temporal frequency')
         plt.xlabel('Spikes per trial')
-        plt.ylim([self.number_tf,-1])
+        plt.ylim([self.number_tf, -1])
 
         x = df.loc[cond_values.values]['ori_index'] + np.random.rand(cond_values.size) * bar_thickness - bar_thickness/2
         y = self.presentationwise_statistics.xs(unit_id, level=1)['spike_counts']
         c = df.loc[cond_values.values]['ori_index']
         
-        plt.subplot(2,1,2)
-        plt.scatter(x,y,c=c,alpha=0.5,cmap='Spectral')
+        plt.subplot(2, 1, 2)
+        plt.scatter(x, y, c=c, alpha=0.5, cmap='Spectral')
         locs, labels = plt.xticks(ticks=np.arange(self.number_ori), labels=self.orivals)
         plt.xlabel('Orientation')
         plt.ylabel('Spikes per trial')
 
-    
-    def make_fan_plot(self, unit_id):
-
-        """ Make a 2P-style Fan Plot based on presentationwise spike counts"""
-
+    def make_star_plot(self, unit_id):
+        """ Make a 2P-style Star Plot based on presentationwise spike counts"""
         angle_data = self.stimulus_conditions.loc[self.presentationwise_statistics.xs(unit_id, level=1)['stimulus_condition_id']][self._col_ori].values
         r_data = self.stimulus_conditions.loc[self.presentationwise_statistics.xs(unit_id, level=1)['stimulus_condition_id']][self._col_tf].values
         data = self.presentationwise_statistics.xs(unit_id, level=1)['spike_counts'].values
@@ -556,29 +580,28 @@ class DriftingGratings(StimulusAnalysis):
         cmax = np.max(data)
 
         fp = FanPlotter.for_drifting_gratings()
-        fp.plot(r_data = r_data, angle_data = angle_data, data =data, clim=[cmin, cmax])
+        fp.plot(r_data=r_data, angle_data=angle_data, data=data, clim=[cmin, cmax])
         fp.show_axes(closed=False)
-        plt.ylim([-5,5])
+        plt.ylim([-5, 5])
         plt.axis('equal')
         plt.axis('off')
 
 
 ### General functions ###
-
-def gauss_function(x, a, x0, sigma):
+def _gauss_function(x, a, x0, sigma):
     """
     fit gaussian function at log scale
     good for fitting band pass, not good at low pass or high pass
     """
-
     return a*np.exp(-(x-x0)**2/(2*sigma**2))
 
 
-def exp_function(x, a, b, c):
+def _exp_function(x, a, b, c):
     return a*np.exp(-b*x)+c
 
-def contrast_curve(x,b,c,d,e):
-    """
+
+def _contrast_curve(x, b, c, d, e):
+    """Difference of gaussian.
      fit sigmoid function at log scale
      not good for fitting band pass
      - b: hill slope
@@ -586,40 +609,138 @@ def contrast_curve(x,b,c,d,e):
      - d: max response
      - e: EC50
     """
-    return (c+(d-c)/(1+np.exp(b*(np.log(x)-np.log(e)))))
+    return c+(d-c)/(1+np.exp(b*(np.log(x)-np.log(e))))
 
 
-def c50(x,y):
+def c50(contrasts, responses):
+    """Computes C50, the halfway point between the maximum and minimum values in a curved fitted against a difference
+    of gaussian for the contrast values and their responese (mean spike rates)
 
+    Parameters
+    ----------
+    contrasts : array of floats
+        list of different contrast stimuli
+    responses : array of floats
+        array of responses (spike rates)
+
+    Returns
+    -------
+    c50 : float
     """
-    Computes C50 of a contrast response function
-
-    Parameters:
-    -----------
-    x : array of contrast values
-    y : array of responses (spike rates)
-
-    Returns:
-    --------
-    c50 : metric
-
-    """
+    if contrasts.size == 0 or contrasts.size != responses.size:
+        warnings.warn('the contrasts and responses arrays must be of the same length')
+        return np.nan
 
     try:
-        fitCoefs, covMatrix = curve_fit(contrast_curve, x, y, maxfev = 100000)
-    except RuntimeError:
+        # find the paraemters that best fit the contrast curve give x = contrast-vals and y = responses
+        fitCoefs, _ = curve_fit(_contrast_curve, contrasts, responses, maxfev=100000)
+
+    except RuntimeError as e:
+        warnings.warn(str(e))
         return np.nan
     
-    resids = y-contrast_curve(x.astype('float'),*fitCoefs)
-    
-    X = np.linspace(min(x)*0.9,max(x)*1.1,256)
-    y_fit = contrast_curve(X,*fitCoefs)
-    
-    y_middle = (max(y_fit) - min(y_fit)) / 2 + min(y_fit)
-    
+    # Create the constrast curve using the optimized parameters, get the halfway range point on the curve
+    # resids = responses - contrast_curve(contrasts.astype('float'), *fitCoefs)
+    X = np.linspace(min(contrasts)*0.9, max(contrasts)*1.1, 256)  #
+    y_fit = _contrast_curve(X, *fitCoefs)
+    y_middle = (np.max(y_fit) - np.min(y_fit)) / 2 + np.min(y_fit)
+
     try:
-        c50 = X[np.searchsorted(y_fit, y_middle)]
-    except IndexError:
+        # y_fit is unlikely to be sorted, so to get the optimial value we should sort by y_fit and X before calling
+        # numpy's searchsorted()
+        sorted_indicies = np.argsort(y_fit)
+        X_sorted = X[sorted_indicies]
+        y_fit_sorted = y_fit[sorted_indicies]
+        c50 = X_sorted[np.searchsorted(y_fit_sorted, y_middle)]
+
+    except IndexError as e:
+        warnings.warn(str(e))
         return np.nan
         
     return c50
+
+
+def f1_f0(arr, tf, trial_duration):
+    """Computes F1/F0 of a drifting grating response
+
+    Parameters
+    ----------
+    arr :
+        DataArray with trials x bin-times
+    tf :
+        temporal frequency of the stimulus
+
+    Returns
+    -------
+    f1_f0 : float
+        metric
+
+    """
+    if arr.size == 0:
+        return np.nan
+
+    if arr.ndim == 1:
+        arr = arr.reshape(1, arr.size)
+
+    # For each trial group the bins into blocks that will go to the length of the temporal frequency
+    num_bins = arr.shape[1]
+    num_trials = arr.shape[0]
+    cycles_per_trial = int(tf * trial_duration)
+    bins_per_cycle = int(num_bins / cycles_per_trial)
+    if bins_per_cycle == 0:
+        # can occur if temp-freq x trial duration is greater than the total trial duration
+        return np.nan
+
+    arr = arr[:, :cycles_per_trial*bins_per_cycle].reshape((num_trials, cycles_per_trial, bins_per_cycle))
+    avg_rate = np.mean(arr, 1)
+    AMP = 2*np.abs(fft(avg_rate, bins_per_cycle)) / bins_per_cycle
+
+    f0 = 0.5*AMP[:, 0]
+    f1 = AMP[:, 1]
+    selection = f0 > 0.0
+    if not np.any(selection):
+        # No spikes found
+        return np.nan
+
+    return np.nanmean(f1[selection]/f0[selection])
+
+
+def modulation_index(response_psth, tf, sample_rate):
+    """Depth of modulation by each cycle of a drifting grating; similar to F1/F0
+
+    ref: Matteucci et al. (2019) Nonlinear processing of shape information 
+         in rat lateral extrastriate cortex. J Neurosci 39: 1649-1670
+
+    Parameters
+    ----------
+    response_psth : array of floats
+        the binned responses of a unit for a given stimuli
+    tf : float
+        the temporal frequency
+    sample_rate : float
+        the sampling rate of response_psth
+
+    Returns
+    -------
+    modulation_index : float
+        the mi value
+
+    """
+    if response_psth.size == 0:
+        warnings.warn('response_psth is empty')
+        return np.nan
+
+    f, psd = signal.welch(response_psth, fs=sample_rate, nperseg=1024)  # get freqs. and power spectral density
+    mean_psd = np.mean(psd)
+    if mean_psd == 0.0:
+        # TODO: Check with josh, should it be 0 or nan?
+        return 0.0
+
+    tf_index = np.searchsorted(f, tf)
+    if not 0 <= tf_index < psd.size:
+        warnings.warn('specified temporal frequency is not within the singals sampling range. Please adjust tf and/or'
+                      'sample_rate parameters.')
+        return np.nan
+
+    return abs((psd[tf_index] - np.mean(psd))/np.sqrt(np.mean(psd**2)- mean_psd**2))
+

@@ -63,7 +63,7 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
 
         # these are stored as string in nwb 2, which is not ideal
         # float is also not ideal, but we have nans indicating out-of-brain structures
-        channels["manual_structure_id"] = [float(chid) if chid != "" else np.nan for chid in channels["manual_structure_id"]]
+        channels["structure_id"] = [float(chid) if chid != "" else np.nan for chid in channels["structure_id"]]
         
         if self.filter_by_validity:
             channels = channels[channels["valid_data"]]
