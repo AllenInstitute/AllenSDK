@@ -4,7 +4,10 @@ import numpy as np
 
 from .conftest import MockSessionApi
 from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
-from allensdk.brain_observatory.ecephys.stimulus_analysis.receptive_field_mapping import ReceptiveFieldMapping, rf_stats
+from allensdk.brain_observatory.ecephys.stimulus_analysis.receptive_field_mapping import \
+    ReceptiveFieldMapping, \
+    fit_2d_gaussian, \
+    threshold_rf
 
 class MockRFMSessionApi(MockSessionApi):
     def get_stimulus_presentations(self):
@@ -57,7 +60,8 @@ def test_stimulus(ecephys_api):
 
 def test_metrics(ecephys_api):
     session = EcephysSession(api=ecephys_api)
-    rfm = ReceptiveFieldMapping(ecephys_session=session)
+    rfm = ReceptiveFieldMapping(ecephys_session=session, minimum_spike_count=1.0, trial_duration=0.25,
+                                mask_threshold=0.5)
     assert(isinstance(rfm.metrics, pd.DataFrame))
     assert(len(rfm.metrics) == 6)
     assert(rfm.metrics.index.names == ['unit_id'])
@@ -65,8 +69,17 @@ def test_metrics(ecephys_api):
     assert('azimuth_rf' in rfm.metrics.columns)
     assert('elevation_rf' in rfm.metrics.columns)
     assert('width_rf' in rfm.metrics.columns)
+    assert(np.allclose(rfm.metrics['width_rf'].loc[[0, 1, 2, 3, 4, 5]],
+                       [22.5, 0.0, -7.34247088, np.nan, np.nan, np.nan], equal_nan=True))
+
     assert('height_rf' in rfm.metrics.columns)
+    assert(np.allclose(rfm.metrics['height_rf'].loc[[0, 1, 2, 3, 4, 5]],
+                       [np.nan, 0.0, 129.522395, np.nan, np.nan, np.nan], equal_nan=True))
+
     assert('area_rf' in rfm.metrics.columns)
+    assert(np.allclose(rfm.metrics['area_rf'].loc[[0, 1, 2, 3, 4, 5]],
+                       [0.0, 0.0, 0.0, np.nan, 0.0, 0.0], equal_nan=True))
+
     assert('p_value_rf' in rfm.metrics.columns)
     assert('on_screen_rf' in rfm.metrics.columns)
     assert('firing_rate_rf' in rfm.metrics.columns)
@@ -92,7 +105,6 @@ def test_receptive_fields(ecephys_api):
     assert(np.all(rfm.receptive_fields['spike_counts'].coords['y_position']
                   == [0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0]))
 
-
     # Some randomly sampled testing to make sure everything works like it should
     assert(rfm.receptive_fields['spike_counts'][{'unit_id': 0}].values.sum() == 4)
     assert(rfm.receptive_fields['spike_counts'][{'unit_id': 3}].values.sum() == 0)
@@ -101,7 +113,9 @@ def test_receptive_fields(ecephys_api):
 
 
 
-# Some special receptive fields for testing
+##  Some special receptive fields for testing
+
+# Data taken from real example
 rf_field_real = np.array([[7440, 5704,  11408, 8184, 9920, 5952, 11904, 11904, 9672],
                           [8184, 12152, 10912, 12648, 15128, 19096, 17112, 14384, 11656],
                           [12152, 17856, 25048, 36208, 47368, 30256, 20336, 10912, 10168],
@@ -110,15 +124,50 @@ rf_field_real = np.array([[7440, 5704,  11408, 8184, 9920, 5952, 11904, 11904, 9
                           [9672, 7192, 10912, 16120, 16368, 18600, 14880, 6696, 11408],
                           [11656, 7688, 6696, 5456, 11408, 9672, 11160, 12152, 7936],
                           [6696, 6696, 9424, 8928, 6200, 11160, 7688, 6200, 9672],
-                          [8928, 10912, 9176, 8432, 7688, 9424, 5704, 8184, 14384]])
+                          [8928, 10912, 9176, 8432, 7688, 9424, 5704, 8184, 14384]], dtype=np.float64)
 
+# RF as a typical gaussian
 x, y = np.meshgrid(np.linspace(-1, 1, 9), np.linspace(-1, 1, 9))
 rf_field_gaussian = np.exp(-((np.sqrt(x*x + y*y) - 0.0)**2 /(2.0*1.0**2)))
 
+# Only activity at one of the corners of the field
 rf_field_edge = np.zeros((9, 9))
 rf_field_edge[8, 8] = 5.0
 
 
+@pytest.mark.parametrize('rf,threshold,expected_mask,expected_x,expected_y,expected_area',
+                         [
+                             (np.zeros((9, 9)), 0.5, np.zeros((9, 9)), np.nan, np.nan, 0.0), # No firing
+                             (np.full((9, 9), 100.0), 0.5, np.zeros((9, 9)), np.nan, np.nan, 0.0),  # completely consistant firing, no center
+                             (rf_field_real, 0.5, None, 3.5, 3.0, 2.0),  # example from real data
+                             (rf_field_gaussian, 0.5, None, 4.0, 4.0, 9.0),
+                             (rf_field_edge, 0.05, None, 8.0, 8.0, 1.0)
+                         ])
+def test_threshold_rf(rf, threshold, expected_mask, expected_x, expected_y, expected_area):
+    mask_rf, x, y, area = threshold_rf(rf, threshold)
+    assert(np.isclose(x, expected_x, equal_nan=True))
+    assert(np.isclose(y, expected_y, equal_nan=True))
+    assert(np.isclose(area, expected_area, equal_nan=True))
+    if expected_mask is not None:
+        # TODO: Find a better way to check the resulting mask, it should match up with the center/area
+        assert(np.allclose(mask_rf, expected_mask, equal_nan=True))
+
+
+@pytest.mark.parametrize('matrix,expected',
+                         [
+                             (rf_field_real, (np.array([1.04991433e+05, 3.74217858e+00, 3.24465965e+00, 1.66477569e+00, 1.04485211e+00]), True)),
+                             (rf_field_gaussian, (np.array([1.0, 4.0, 4.0, 4.0, 4.0]), True)),
+                             (np.zeros((9, 9)), ((np.nan, np.nan, np.nan, np.nan, np.nan), False)),
+                             (np.full((9, 9), 20.5), (np.array([20.5000000, 3.62601891, 3.55521927, 1.20266006e+05, 1.08161135e+05]), True)),
+                             (rf_field_edge, (np.array([5.0, 8.0, 8.0, 0.0, 0.0]), True))
+                         ])
+def test_fit_2d_gaussian(matrix, expected):
+    fit_params, success = fit_2d_gaussian(matrix)
+    assert(np.allclose(fit_params, expected[0], equal_nan=True))
+    assert(success == expected[1])
+
+
+"""
 @pytest.mark.parametrize('rf_field,threshold,expected',
                          [
                              (rf_field_real, 0.5, (3.5, 3.0, 1.044852108639198, 1.6647756938016467, 2.0, True)),
@@ -131,12 +180,24 @@ rf_field_edge[8, 8] = 5.0
 def test_rf_stats(rf_field, threshold, expected):
     stats = rf_stats(rf_field, threshold)
     assert(np.allclose(stats, expected, equal_nan=True))
-
-
+"""
 
 
 if __name__ == '__main__':
     # test_load()
     # test_stimulus()
-    # test_metrics()
-    test_receptive_fields()
+    test_metrics()
+    # test_receptive_fields()
+
+    # test_threshold_rf(np.zeros((9, 9)), 0.5, np.zeros((9, 9)), np.nan, np.nan, 0.0)  # No firing
+    # test_threshold_rf(np.full((9, 9), 100.0), 0.5, np.zeros((9, 9)), np.nan, np.nan, 0.0)  # completely consistant firing, no center
+    # test_threshold_rf(rf_field_real, 0.5, None, 3.5, 3.0, 2.0)  # example from real data
+    # test_threshold_rf(rf_field_gaussian, 0.5, None, 4.0, 4.0, 9.0)
+    # test_threshold_rf(rf_field_edge, 0.05, None, 8.0, 8.0, 1.0)
+
+    # test_fit_2d_gaussian(rf_field_real, (np.array([1.04991433e+05, 3.74217858e+00, 3.24465965e+00, 1.66477569e+00, 1.04485211e+00]), True))
+    # test_fit_2d_gaussian(rf_field_gaussian, (np.array([1.0, 4.0, 4.0, 4.0, 4.0]), True))
+    # test_fit_2d_gaussian(np.zeros((9, 9)), ((np.nan, np.nan, np.nan, np.nan, np.nan), False))
+    # test_fit_2d_gaussian(np.full((9, 9), 20.5), (np.array([20.5000000, 3.62601891, 3.55521927, 1.20266006e+05, 1.08161135e+05]), True))
+    test_fit_2d_gaussian(rf_field_edge, (np.array([5.0, 8.0, 8.0, 0.0, 0.0]), True))
+    pass
