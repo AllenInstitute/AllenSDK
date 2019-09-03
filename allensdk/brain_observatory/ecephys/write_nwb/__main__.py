@@ -17,7 +17,9 @@ from ._schemas import InputSchema, OutputSchema
 from allensdk.brain_observatory.nwb import (
     add_stimulus_presentations,
     add_stimulus_timestamps,
-    setup_table_for_epochs
+    add_invalid_times,
+    setup_table_for_epochs,
+    setup_table_for_invalid_times,
 )
 from allensdk.brain_observatory.argschema_utilities import (
     write_or_print_outputs, optional_lims_inputs
@@ -28,7 +30,6 @@ from allensdk.brain_observatory.ecephys.nwb import EcephysProbe
 
 
 STIM_TABLE_RENAMES_MAP = {"Start": "start_time", "End": "stop_time"}
-
 
 def fill_df(df, str_fill=""):
     df = df.copy()
@@ -589,7 +590,8 @@ def add_optotagging_table_to_nwbfile(nwbfile, optotagging_table, tag="optical_st
 def write_ecephys_nwb(
     output_path, 
     session_id, session_start_time, 
-    stimulus_table_path, 
+    stimulus_table_path,
+    invalid_epochs,
     probes, 
     running_speed_path,
     pool_size,
@@ -606,6 +608,7 @@ def write_ecephys_nwb(
     stimulus_table = read_stimulus_table(stimulus_table_path)
     nwbfile = add_stimulus_timestamps(nwbfile, stimulus_table['start_time'].values) # TODO: patch until full timestamps are output by stim table module
     nwbfile = add_stimulus_presentations(nwbfile, stimulus_table)
+    nwbfile = add_invalid_times(nwbfile,invalid_epochs)
 
     if optotagging_table_path is not None:
         optotagging_table = pd.read_csv(optotagging_table_path)

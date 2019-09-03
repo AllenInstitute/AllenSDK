@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import datetime
 import uuid
 import SimpleITK as sitk
@@ -157,7 +158,71 @@ def add_stimulus_presentations(nwbfile, stimulus_table, tag='stimulus_epoch'):
     return nwbfile
 
 
+def add_invalid_times(nwbfile, epochs):
+    """
+    Write invalid times to nwbfile if epochs are not empty
+    Parameters
+    ----------
+    nwbfile: pynwb.NWBFile
+    epochs: list of dicts
+        records of invalid epochs
+
+    Returns
+    -------
+    pynwb.NWBFile
+    """
+    table = setup_table_for_invalid_times(epochs)
+
+    if not table.empty:
+        container = pynwb.epoch.TimeIntervals('invalid_times')
+
+        for index, row in table.iterrows():
+
+            container.add_interval(start_time=row['start_time'],
+                                   stop_time=row['stop_time'],
+                                   tags=row['tags'],
+                                   )
+
+        nwbfile.invalid_times = container
+
+    return nwbfile
+
+
+def setup_table_for_invalid_times(invalid_epochs):
+    """
+    Create table with invalid times if invalid_epochs are present
+
+    Parameters
+    ----------
+    invalid_epochs:  list of dicts
+        of invalid epoch records
+
+    Returns
+    -------
+    pd.DataFrame of invalid times if epochs are not empty, otherwise return None
+    """
+
+    if invalid_epochs:
+        df = pd.DataFrame.from_dict(invalid_epochs)
+
+        start_time = df['start_time'].values
+        stop_time = df['end_time'].values
+        tags = [[t,str(id),l,] for t,id,l in zip(df['type'],df['id'],df['label'])]
+
+        table = pd.DataFrame({'start_time': start_time,
+                              'stop_time': stop_time,
+                              'tags': tags}
+                             )
+        table.index.name = 'id'
+
+    else:
+        table = pd.DataFrame()
+
+    return table
+
+
 def setup_table_for_epochs(table, timeseries, tag):
+
     table = table.copy()
     indices = np.searchsorted(timeseries.timestamps[:], table['start_time'].values)
     if len(indices > 0):
