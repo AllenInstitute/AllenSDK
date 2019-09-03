@@ -577,8 +577,10 @@ def add_optotagging_table_to_nwbfile(nwbfile, optotagging_table, tag="optical_st
     nwbfile.add_processing_module(opto_mod)
 
     optotagging_table = setup_table_for_epochs(optotagging_table, opto_ts, tag)
-    container = pynwb.epoch.TimeIntervals.from_dataframe(optotagging_table, "optogenetic_stimuluation")
-    opto_mod.add_data_interface(container)
+    
+    if len(optotagging_table) > 0:
+        container = pynwb.epoch.TimeIntervals.from_dataframe(optotagging_table, "optogenetic_stimuluation")
+        opto_mod.add_data_interface(container)
 
     return nwbfile
 

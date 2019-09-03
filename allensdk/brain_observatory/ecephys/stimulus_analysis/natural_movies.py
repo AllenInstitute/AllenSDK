@@ -49,14 +49,14 @@ class NaturalMovies(StimulusAnalysis):
         #else:
         #    self._stimulus_key = 'natural_movies'
 
-        self._module_name = 'Natural Movies'
-
+    @property
+    def name(self):
+        return 'Natural Movies'
 
     @property
     def null_condition(self):
         return -1
     
-
     @property
     def METRICS_COLUMNS(self):
         return [('fano_nm', np.uint64), 
@@ -68,23 +68,20 @@ class NaturalMovies(StimulusAnalysis):
 
     @property
     def metrics(self):
-
         if self._metrics is None:
             logger.info('Calculating metrics for ' + self.name)
 
             unit_ids = self.unit_ids
-
             metrics_df = self.empty_metrics_table()
-
-            metrics_df['fano_nm'] = [self.get_fano_factor(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
-            metrics_df['reliability_nm'] = [self.get_reliability(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
-            metrics_df['firing_rate_nm'] = [self.get_overall_firing_rate(unit) for unit in unit_ids]
-            metrics_df['lifetime_sparseness_nm'] = [self.get_lifetime_sparseness(unit) for unit in unit_ids]
-            run_vals = [self.get_running_modulation(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+            metrics_df['fano_nm'] = [self._get_fano_factor(unit, self._get_preferred_condition(unit))
+                                     for unit in unit_ids]
+            metrics_df['reliability_nm'] = [self._get_reliability(unit, self._get_preferred_condition(unit))
+                                            for unit in unit_ids]
+            metrics_df['firing_rate_nm'] = [self._get_overall_firing_rate(unit) for unit in unit_ids]
+            metrics_df['lifetime_sparseness_nm'] = [self._get_lifetime_sparseness(unit) for unit in unit_ids]
+            run_vals = [self._get_running_modulation(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
             metrics_df['run_pval_nm'] = [rv[0] for rv in run_vals]
             metrics_df['run_mod_nm'] = [rv[1] for rv in run_vals]
-            #metrics_df.loc[:, ['run_pval_nm', 'run_mod_nm']] = \
-            #        [self.get_running_modulation(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
 
             self._metrics = metrics_df
 
@@ -94,9 +91,5 @@ class NaturalMovies(StimulusAnalysis):
     def known_stimulus_keys(self):
         return ['natural_movies', 'natural_movie_1', 'natural_movie_3']
 
-
     def _get_stim_table_stats(self):
-
         pass
-
-

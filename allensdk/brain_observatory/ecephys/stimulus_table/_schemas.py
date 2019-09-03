@@ -77,7 +77,7 @@ class InputParameters(ArgSchema):
         keys=String(),
         values=String(),
         help="optionally rename stimuli",
-        default=default_stimulus_renames,
+        default=default_stimulus_renames
     )
     column_name_map = Dict(
         keys=String(), 

@@ -38,7 +38,8 @@ class StaticGratings(StimulusAnalysis):
 
     """
 
-    def __init__(self, ecephys_session, col_ori='orientation', col_sf='spatial_frequency', col_phase='phase', trial_duration=0.25, **kwargs):
+    def __init__(self, ecephys_session, col_ori='orientation', col_sf='spatial_frequency', col_phase='phase',
+                 trial_duration=0.25, **kwargs):
         super(StaticGratings, self).__init__(ecephys_session, trial_duration=trial_duration, **kwargs)
         self._orivals = None
         self._number_ori = None
@@ -46,8 +47,8 @@ class StaticGratings(StimulusAnalysis):
         self._number_sf = None
         self._phasevals = None
         self._number_phase = None
-        self._response_events = None
-        self._response_trials = None
+        # self._response_events = None
+        # self._response_trials = None
 
         self._metrics = None
 
@@ -55,7 +56,7 @@ class StaticGratings(StimulusAnalysis):
         self._col_sf = col_sf
         self._col_phase = col_phase
         self._trial_duration = trial_duration
-        self._module_name = 'Static Gratings'  # TODO: module_name should be a static class variable
+        # self._module_name = 'Static Gratings'  # TODO: module_name should be a static class variable
 
         if self._params is not None:
             self._params = self._params.get('static_gratings', {})
@@ -63,6 +64,9 @@ class StaticGratings(StimulusAnalysis):
         else:
             self._params = {}
 
+    @property
+    def name(self):
+        return 'Static Gratings'
 
     @property
     def orivals(self):
@@ -135,24 +139,22 @@ class StaticGratings(StimulusAnalysis):
     @property
     def metrics(self):
         if self._metrics is None:
-
             logger.info('Calculating metrics for ' + self.name)
-
             unit_ids = self.unit_ids
-            
             metrics_df = self.empty_metrics_table()
 
-            metrics_df['pref_sf_sg'] = [self._get_pref_sf(unit) for unit in unit_ids]
-            metrics_df['pref_ori_sg'] = [self._get_pref_ori(unit) for unit in unit_ids]
-            metrics_df['pref_phase_sg'] = [self._get_pref_phase(unit) for unit in unit_ids]
-            metrics_df['g_osi_sg'] = [self._get_osi(unit, metrics_df.loc[unit]['pref_sf_sg'], metrics_df.loc[unit]['pref_phase_sg']) for unit in unit_ids]
-            metrics_df['time_to_peak_sg'] = [self.get_time_to_peak(unit, self.get_preferred_condition(unit)) for unit in unit_ids]  
-            metrics_df['firing_rate_sg'] = [self.get_overall_firing_rate(unit) for unit in unit_ids]
-            metrics_df['reliability_sg'] = [self.get_reliability(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
-            metrics_df['fano_sg'] = [self.get_fano_factor(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
-            metrics_df['lifetime_sparseness_sg'] = [self.get_lifetime_sparseness(unit) for unit in unit_ids]
-            metrics_df.loc[:, ['run_pval_sg', 'run_mod_sg']] = \
-                    [self.get_running_modulation(unit, self.get_preferred_condition(unit)) for unit in unit_ids]
+            if len(self.stim_table) > 0:
+                metrics_df['pref_sf_sg'] = [self._get_pref_sf(unit) for unit in unit_ids]
+                metrics_df['pref_ori_sg'] = [self._get_pref_ori(unit) for unit in unit_ids]
+                metrics_df['pref_phase_sg'] = [self._get_pref_phase(unit) for unit in unit_ids]
+                metrics_df['g_osi_sg'] = [self._get_osi(unit, metrics_df.loc[unit]['pref_sf_sg'], metrics_df.loc[unit]['pref_phase_sg']) for unit in unit_ids]
+                metrics_df['time_to_peak_sg'] = [self._get_time_to_peak(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
+                metrics_df['firing_rate_sg'] = [self._get_overall_firing_rate(unit) for unit in unit_ids]
+                metrics_df['reliability_sg'] = [self._get_reliability(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
+                metrics_df['fano_sg'] = [self._get_fano_factor(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
+                metrics_df['lifetime_sparseness_sg'] = [self._get_lifetime_sparseness(unit) for unit in unit_ids]
+                metrics_df.loc[:, ['run_pval_sg', 'run_mod_sg']] = \
+                        [self._get_running_modulation(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
 
             self._metrics = metrics_df
 
@@ -163,7 +165,6 @@ class StaticGratings(StimulusAnalysis):
         return ['static_gratings']
 
     def _get_stim_table_stats(self):
-
         """ Extract orientations, spatial frequencies, and phases from the stimulus table """
         self._orivals = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_ori] != 'null'][self._col_ori].unique())
         self._number_ori = len(self._orivals)
@@ -172,115 +173,119 @@ class StaticGratings(StimulusAnalysis):
         self._number_sf = len(self._sfvals)
 
         self._phasevals = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_phase] != 'null'][self._col_phase].unique())
-        self._number_sf = len(self._sfvals)
-
+        self._number_phase = len(self._phasevals)
 
     def _get_pref_sf(self, unit_id):
+        """Calculate the preferred spatial frequency condition for a given unit.
 
-        """ Calculate the preferred spatial frequency condition for a given unit
+        Parameters
+        ----------
+        unit_id : int
+            unique ID for the unit of interest
 
-        Params:
+        Returns
         -------
-        unit_id - unique ID for the unit of interest
-
-        Returns:
-        -------
-        pref_sf - spatial frequency driving the maximal response
+        pref_sf : float
+            spatial frequency driving the maximal response
 
         """
+        # TODO: Most of the _get_pref_*() methods can be combined into one method and shared among the classes
+        # Combine the stimulus_condition_id values that have the save spatial-frequency
+        similar_conditions_ids = [self.stimulus_conditions.index[self.stimulus_conditions[self._col_sf] == sf].tolist()
+                                  for sf in self.sfvals]
 
-        similar_conditions = [self.stimulus_conditions.index[self.stimulus_conditions[self._col_sf] == sf].tolist() for sf in self.sfvals]
-        df = pd.DataFrame(index=self.sfvals,
-                         data = {'spike_mean' : 
-                                [self.conditionwise_statistics.loc[unit_id].loc[condition_inds]['spike_mean'].mean() for condition_inds in similar_conditions]
-                             }
-                         ).rename_axis(self._col_sf)
+        # For each spatial frequency average up conditionwise_statistics 'spike_mean' column using the indicies above.
+        # return the sf with the largest spike_mean.
+        df = pd.DataFrame(
+            index=self.sfvals,
+            data={'spike_mean': [self.conditionwise_statistics.loc[unit_id].loc[condition_inds]['spike_mean'].mean()
+                                 for condition_inds in similar_conditions_ids]}
+        ).rename_axis(self._col_sf)
 
         return df.idxmax().iloc[0]
-
 
     def _get_pref_ori(self, unit_id):
-
         """ Calculate the preferred orientation condition for a given unit
 
-        Params:
-        -------
-        unit_id - unique ID for the unit of interest
+        Parameters
+        ----------
+        unit_id : int
+             unique ID for the unit of interest
 
-        Returns:
+        Returns
         -------
-        pref_ori - stimulus orientation driving the maximal response
-
+        pref_ori :float
+            stimulus orientation driving the maximal response
         """
 
-        similar_conditions = [self.stimulus_conditions.index[self.stimulus_conditions[self._col_ori] == ori].tolist() for ori in self.orivals]
-        df = pd.DataFrame(index=self.orivals,
-                         data = {'spike_mean' : 
-                                [self.conditionwise_statistics.loc[unit_id].loc[condition_inds]['spike_mean'].mean() for condition_inds in similar_conditions]
-                             }
-                         ).rename_axis(self._col_ori)
+        # Combine the stimulus_condition_id values that have the save orientations
+        similar_conditions = [self.stimulus_conditions.index[self.stimulus_conditions[self._col_ori] == ori].tolist()
+                              for ori in self.orivals]
+
+        # For each orientations average up conditionwise_statistics 'spike_mean' column using the indicies above.
+        # Return the oris with the largest spike_mean.
+        df = pd.DataFrame(
+            index=self.orivals,
+            data={'spike_mean': [self.conditionwise_statistics.loc[unit_id].loc[condition_inds]['spike_mean'].mean()
+                                 for condition_inds in similar_conditions]}
+        ).rename_axis(self._col_ori)
 
         return df.idxmax().iloc[0]
-
 
     def _get_pref_phase(self, unit_id):
+        """Calculate the preferred phase condition for a given unit
 
-        """ Calculate the preferred phase condition for a given unit
+        Parameters
+        ----------
+        unit_id : int
+            unique ID for the unit of interest
 
-        Params:
+        Returns
         -------
-        unit_id - unique ID for the unit of interest
-
-        Returns:
-        -------
-        pref_phase - stimulus phase driving the maximal response
-
+        pref_phase : float
+            stimulus phase driving the maximal response
         """
-
-        similar_conditions = [self.stimulus_conditions.index[self.stimulus_conditions[self._col_phase] == phase].tolist() for phase in self.phasevals]
-        df = pd.DataFrame(index=self.phasevals,
-                         data = {'spike_mean' : 
-                                [self.conditionwise_statistics.loc[unit_id].loc[condition_inds]['spike_mean'].mean() for condition_inds in similar_conditions]
-                             }
-                         ).rename_axis(self._col_phase)
+        combined_cond_ids = [self.stimulus_conditions.index[self.stimulus_conditions[self._col_phase] == phase].tolist()
+                             for phase in self.phasevals]
+        df = pd.DataFrame(
+            index=self.phasevals,
+            data = {'spike_mean': [self.conditionwise_statistics.loc[unit_id].loc[condition_inds]['spike_mean'].mean()
+                                   for condition_inds in combined_cond_ids]}
+        ).rename_axis(self._col_phase)
 
         return df.idxmax().iloc[0]
-    
 
     def _get_osi(self, unit_id, pref_sf, pref_phase):
         """ Calculate the orientation selectivity for a given unit
 
-        Params:
-        -------
-        unit_id - unique ID for the unit of interest
-        pref_sf - preferred spatial frequency for this unit
-        pref_phase - preferred phase for this unit
+        Parameters
+        ----------
+        unit_id : int
+            unique ID for the unit of interest
+        pref_sf : float
+            preferred spatial frequency for this unit
+        pref_phase : float
+            preferred phase for this unit
 
-        Returns:
+        Returns
         -------
-        osi - orientation selectivity value
-
+        osi : float
+            orientation selectivity value
         """
-
-        orivals_rad = deg2rad(self.orivals).astype('complex128')
+        orivals_rad = deg2rad(self.orivals).astype('complex128')  # TODO: can we use numpy deg2rad?
 
         condition_inds = self.stimulus_conditions[
-                (self.stimulus_conditions[self._col_sf] == pref_sf) & \
-                (self.stimulus_conditions[self._col_phase] == pref_phase)
-                ].index.values
+            (self.stimulus_conditions[self._col_sf] == pref_sf) &
+            (self.stimulus_conditions[self._col_phase] == pref_phase)
+        ].index.values
         df = self.conditionwise_statistics.loc[unit_id].loc[condition_inds]
         df = df.assign(ori=self.stimulus_conditions.loc[df.index.values][self._col_ori])
         df = df.sort_values(by=['ori'])
-
         tuning = np.array(df['spike_mean'].values)
-
         return osi(orivals_rad, tuning)
 
-
     ## VISUALIZATION ##
-
     def plot_raster(self, stimulus_condition_id, unit_id):
-    
         """ Plot raster for one condition and one unit """
 
         idx_sf = np.where(self.sfvals == self.stimulus_conditions.loc[stimulus_condition_id][self._col_sf])[0]
@@ -337,9 +342,7 @@ class StaticGratings(StimulusAnalysis):
         plt.xlabel('Orientation')
         plt.ylabel('Spikes per trial')
 
-    
     def make_fan_plot(self, unit_id):
-
         """ Make a 2P-style Fan Plot based on presentationwise spike counts"""
 
         angle_data = self.stimulus_conditions.loc[self.presentationwise_statistics.xs(unit_id, level=1)['stimulus_condition_id']][self._col_ori].values
@@ -361,7 +364,6 @@ class StaticGratings(StimulusAnalysis):
         fp.plot(r_data = r_data, angle_data = angle_data, group_data = group_data, data =data, clim=[cmin, cmax])
         fp.show_axes(closed=False)
         plt.axis('off')
-
 
 
 def fit_sf_tuning(sf_tuning_responses, sf_values, pref_sf_index):

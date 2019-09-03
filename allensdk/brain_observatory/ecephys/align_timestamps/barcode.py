@@ -188,14 +188,17 @@ def match_barcodes(master_times, master_barcodes, probe_times, probe_barcodes):
     # print(master_barcodes)
     # print(probe_barcodes)
 
-    # print("Master start index: " + str(master_start_index))
+    print("Master start index: " + str(master_start_index))
     if len(probe_barcodes) > 2:
-        master_end_index, probe_end_index = find_matching_index(
-            master_barcodes, probe_barcodes, alignment_type="end"
-        )
-        # print("Probe end index: " + str(probe_end_index))
-        t_m_end = master_times[master_end_index]
-        t_p_end = probe_times[probe_end_index]
+        master_end_index, probe_end_index = find_matching_index(master_barcodes, probe_barcodes, alignment_type='end')
+        
+        if probe_end_index is not None:
+            print("Probe end index: " + str(probe_end_index))
+            t_m_end = master_times[master_end_index]
+            t_p_end = probe_times[probe_end_index]
+        else:
+            t_m_end = None
+            t_p_end = None
     else:
         t_m_end, t_p_end = None, None
 

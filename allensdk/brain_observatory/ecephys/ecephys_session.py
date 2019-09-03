@@ -478,7 +478,7 @@ class EcephysSession(LazyPropertyMixin):
         spike_counts["spike_count"] = np.zeros(spike_counts.shape[0])
         spike_counts = spike_counts.groupby(["stimulus_presentation_id", "unit_id"]).count()
         unit_ids = unit_ids if unit_ids is not None else spikes['unit_id'].unique()  # If not explicity stated get unit ids from spikes table.
-        spike_counts = spike_counts.reindex(pd.MultiIndex.from_product([spike_counts.index.levels[0],
+        spike_counts = spike_counts.reindex(pd.MultiIndex.from_product([stimulus_presentation_ids,
                                                                         unit_ids],
                                                                        names=['stimulus_presentation_id', 'unit_id']),
                                             fill_value=0)
@@ -579,8 +579,8 @@ class EcephysSession(LazyPropertyMixin):
             one element longer than labels. Start and end indices for intervals.
 
         """
-        structure_id_key = "manual_structure_id"
-        structure_label_key = "manual_structure_acronym"
+        structure_id_key = "structure_id"
+        structure_label_key = "structure_acronym"
         np.array(channel_ids).sort()
         table = self.channels.loc[channel_ids]
 
@@ -670,8 +670,8 @@ class EcephysSession(LazyPropertyMixin):
         table.index.name = 'unit_id'
         table = table.rename(columns={
             'description': 'probe_description',
-            'manual_structure_id': 'structure_id',
-            'manual_structure_acronym': 'structure_acronym',
+            #'manual_structure_id': 'structure_id',
+            #'manual_structure_acronym': 'structure_acronym',
             'local_index_channel': 'channel_local_index',
         })
 

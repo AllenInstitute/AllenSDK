@@ -34,6 +34,7 @@ class Channel(RaisingSchema):
     # ML_coordinate = Float(required=True, allow_none=True)
     # cortical_depth = Float(required=True, allow_none=True)
 
+
 class Unit(RaisingSchema):
     id = Int(required=True)
     peak_channel_id = Int(required=True)
