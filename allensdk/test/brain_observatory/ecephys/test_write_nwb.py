@@ -8,6 +8,8 @@ import pynwb
 import pandas as pd
 import numpy as np
 
+from pynwb import NWBFile, NWBHDF5IO
+
 from allensdk.brain_observatory.ecephys.current_source_density.__main__ import write_csd_to_h5
 import allensdk.brain_observatory.ecephys.write_nwb.__main__ as write_nwb
 from allensdk.brain_observatory.ecephys.ecephys_session_api import EcephysNwbSessionApi
@@ -363,3 +365,88 @@ def test_write_probe_lfp_file(tmpdir_factory, lfp_data):
         assert np.allclose(csd, csd_series.data[:])
         assert np.allclose(csd_times, csd_series.timestamps[:])
         assert np.allclose([[1, 2], [3, 3]], csd_series.control[:])  # csd interpolated channel locations
+
+@pytest.fixture
+def invalid_epochs():
+
+    epochs = [
+    {
+      "type": "EcephysSession",
+      "id": 739448407,
+      "label": "stimulus",
+      "start_time": 1998.0,
+      "end_time": 2005.0,
+    },
+    {
+      "type": "EcephysSession",
+      "id": 739448407,
+      "label": "stimulus",
+      "start_time": 2114.0,
+      "end_time": 2121.0,
+    },
+    {
+      "type": "EcephysProbe",
+      "id": 123448407,
+      "label": "ProbeB",
+      "start_time": 114.0,
+      "end_time": 211.0,
+    },
+    ]
+
+    return epochs
+
+
+def test_add_invalid_times(invalid_epochs, tmpdir_factory):
+
+    nwbfile_name = str(tmpdir_factory.mktemp("test").join("test_invalid_times.nwb"))
+
+    nwbfile = NWBFile(
+        session_description='EcephysSession',
+        identifier='{}'.format(739448407),
+        session_start_time=datetime.now()
+    )
+
+    nwbfile = write_nwb.add_invalid_times(nwbfile, invalid_epochs)
+
+    with NWBHDF5IO(nwbfile_name, mode='w') as io:
+        io.write(nwbfile)
+    nwbfile_in = NWBHDF5IO(nwbfile_name, mode='r').read()
+
+    df = nwbfile.invalid_times.to_dataframe()
+    df_in = nwbfile_in.invalid_times.to_dataframe()
+
+    pd.testing.assert_frame_equal(df, df_in, check_like=True, check_dtype=False)
+
+
+def test_roundtrip_add_invalid_times(nwbfile, invalid_epochs, roundtripper):
+
+    expected = write_nwb.setup_table_for_invalid_times(invalid_epochs)
+
+    nwbfile = write_nwb.add_invalid_times(nwbfile, invalid_epochs)
+    api = roundtripper(nwbfile, EcephysNwbSessionApi)
+    obtained = api.get_invalid_times()
+
+    pd.testing.assert_frame_equal(expected, obtained, check_dtype=False)
+
+
+def test_no_invalid_times_table():
+
+    epochs = []
+    assert write_nwb.setup_table_for_invalid_times(epochs).empty is True
+
+
+def test_setup_table_for_invalid_times():
+
+    epoch = {
+      "type": "EcephysSession",
+      "id": 739448407,
+      "label": "stimulus",
+      "start_time": 1998.0,
+      "end_time": 2005.0,
+    }
+
+    s = write_nwb.setup_table_for_invalid_times([epoch]).loc[0]
+
+    assert s['start_time'] == epoch['start_time']
+    assert s['stop_time'] == epoch['end_time']
+    assert s['tags'] == [epoch['type'], str(epoch['id']), epoch['label']]
