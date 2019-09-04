@@ -159,6 +159,7 @@ class EcephysSession(LazyPropertyMixin):
         self.mean_waveforms = self.LazyProperty(self.api.get_mean_waveforms, wrappers=[self._build_mean_waveforms])
         self.spike_times = self.LazyProperty(self.api.get_spike_times, wrappers=[self._build_spike_times])
         self.optogenetic_stimulation_epochs = self.LazyProperty(self.api.get_optogenetic_stimulation)
+        self.spike_amplitudes = self.LazyProperty(self.api.get_spike_amplitudes)
 
         self.probes = self.LazyProperty(self.api.get_probes)
         self.channels = self.LazyProperty(self.api.get_channels)
