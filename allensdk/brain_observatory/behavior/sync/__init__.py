@@ -42,12 +42,12 @@ def get_sync_data(sync_path):
         a = sync_dataset.get_rising_edges('photodiode') / sample_freq
         b = sync_dataset.get_falling_edges('photodiode') / sample_freq
         stim_photodiode = sorted(list(a)+list(b))
-    if 'cam1_exposure' in meta_data['line_labels']:
-        eye_tracking = sync_dataset.get_rising_edges('cam1_exposure') / sample_freq
+    if 'cam2_exposure' in meta_data['line_labels']:
+        eye_tracking = sync_dataset.get_rising_edges('cam2_exposure') / sample_freq
     elif 'eye_tracking' in meta_data['line_labels']:
         eye_tracking = sync_dataset.get_rising_edges('eye_tracking') / sample_freq
-    if 'cam2_exposure' in meta_data['line_labels']:
-        behavior_monitoring = sync_dataset.get_rising_edges('cam2_exposure') / sample_freq
+    if 'cam1_exposure' in meta_data['line_labels']:
+        behavior_monitoring = sync_dataset.get_rising_edges('cam1_exposure') / sample_freq
     elif 'behavior_monitoring' in meta_data['line_labels']:
         behavior_monitoring = sync_dataset.get_rising_edges('behavior_monitoring') / sample_freq
 
