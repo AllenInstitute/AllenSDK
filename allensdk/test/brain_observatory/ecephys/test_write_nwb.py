@@ -233,7 +233,7 @@ def test_read_spike_times_to_dictionary(tmpdir_factory):
     spike_times_path = os.path.join(dirname, 'spike_times.npy')
     spike_units_path = os.path.join(dirname, 'spike_units.npy')
 
-    spike_times = np.random.rand(30)
+    spike_times = np.sort(np.random.rand(30))
     np.save(spike_times_path, spike_times, allow_pickle=False)
 
     spike_units = np.concatenate([np.arange(15), np.arange(15)])

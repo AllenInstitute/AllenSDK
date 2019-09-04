@@ -27,12 +27,6 @@ class Channel(RaisingSchema):
     probe_horizontal_position = Int(required=True)
     manual_structure_id = Int(required=True, allow_none=True)
     manual_structure_acronym = String(required=True, allow_none=True)
-    # TODO: Re-add later when variables are added to lims output
-    # cortical_layer = String(required=True, allow_none=True)
-    # AP_coordinate = Float(required=True, allow_none =True)
-    # DV_coordinate = Float(required=True, allow_none= True)
-    # ML_coordinate = Float(required=True, allow_none=True)
-    # cortical_depth = Float(required=True, allow_none=True)
 
 
 class Unit(RaisingSchema):
@@ -90,7 +84,18 @@ class Probe(RaisingSchema):
     csd_path = String(required=True, validate=check_read_access, help="path to h5 file containing calculated current source density")
     sampling_rate = Float(default=30000.0, help="sampling rate (Hz, master clock) at which raw data were acquired on this probe")
     lfp_sampling_rate = Float(default=2500.0, help="sampling rate of LFP data on this probe")
-
+    spike_amplitudes_path = String(validate=check_read_access, 
+        help="path to npy file containing scale factor applied to the kilosort template used to extract each spike"
+    )
+    spike_templates_path = String(validate=check_read_access, 
+        help="path to file associating each spike with a kilosort template"    
+    )
+    templates_path = String(validate=check_read_access,
+        help="path to file contianing an (nTemplates)x(nSamples)x(nUnits) array of kilosort templates"
+    )
+    amplitude_scale_factor = Float(default=0.195e-6, 
+        help="amplitude scale factor converting raw amplitudes to Volts"
+    )
 
 class InvalidEpoch(RaisingSchema):
     id = Int(required=True)
