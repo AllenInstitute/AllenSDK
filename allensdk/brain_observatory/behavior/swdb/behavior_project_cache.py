@@ -130,6 +130,12 @@ class BehaviorProjectCache(object):
         except KeyError: # Experiment not in json file
             print("No eye tracking for this experiment")
 
+    def get_eye_tracking_sync_file(self, experiment_id):
+        return os.path.join(
+            self.eye_tracking_base_dir,
+             'eye_tracking_sync_ophys_experiment_{}.h5'.format(experiment_id)
+        )
+
     def get_session(self, experiment_id):
         '''
         Return a BehaviorOphysSession object given an ophys_experiment_id.
@@ -139,12 +145,14 @@ class BehaviorProjectCache(object):
         flash_response_df_path = self.get_flash_response_df_path(experiment_id)
         extended_stim_df_path = self.get_extended_stimulus_presentations_df(experiment_id)
         eye_tracking_path = self.get_eye_tracking_file(experiment_id)
+        eye_tracking_sync_file = self.get_eye_tracking_sync_file(experiment_id)
         api = ExtendedNwbApi(
             nwb_path=nwb_path,
             trial_response_df_path=trial_response_df_path,
             flash_response_df_path=flash_response_df_path,
             extended_stimulus_presentations_df_path=extended_stim_df_path,
-            eye_tracking_path = eye_tracking_path
+            eye_tracking_path = eye_tracking_path,
+            eye_tracking_sync_file = eye_tracking_sync_file
         )
         session = ExtendedBehaviorSession(api)
         return session
@@ -198,6 +206,7 @@ def parse_image_set(behavior_stage):
 class ExtendedNwbApi(BehaviorOphysNwbApi):
     def __init__(self, nwb_path, trial_response_df_path, flash_response_df_path,
                  extended_stimulus_presentations_df_path,
+                 eye_tracking_sync_file,
                  eye_tracking_path=None):
         '''
         Api to read data from an NWB file and associated analysis HDF5 files.
@@ -207,6 +216,7 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
         self.flash_response_df_path = flash_response_df_path
         self.extended_stimulus_presentations_df_path = extended_stimulus_presentations_df_path
         self.eye_tracking_path=eye_tracking_path
+        self.eye_tracking_sync_file=eye_tracking_sync_file
 
     def get_trial_response_df(self):
         tdf = pd.read_hdf(self.trial_response_df_path, key='df')
@@ -227,9 +237,10 @@ class ExtendedNwbApi(BehaviorOphysNwbApi):
     def get_eye_tracking_data(self):
         if self.eye_tracking_path:
             output = {
-            'cr':pd.read_hdf(self.eye_tracking_path, key='cr'),
-            'eye':pd.read_hdf(self.eye_tracking_path, key='eye'),
-            "pupil":pd.read_hdf(self.eye_tracking_path, key='pupil')
+                'cr':pd.read_hdf(self.eye_tracking_path, key='cr'),
+                'eye':pd.read_hdf(self.eye_tracking_path, key='eye'),
+                'pupil':pd.read_hdf(self.eye_tracking_path, key='pupil'),
+                'sync': pd.read_hdf(self.eye_tracking_sync_file, key='df')
             }
             return output
         else:
@@ -509,6 +520,11 @@ if __name__ == "__main__":
     cache = BehaviorProjectCache(cache_path_example)
     #  session = cache.get_session(cache.experiment_table.iloc[0]['ophys_experiment_id'])
     oeid_with_eye_tracking = 879331157
+    oeid_without_eye_tracking = 795953296
     session = cache.get_session(oeid_with_eye_tracking)
 
-
+    #  cache_base_without_eye_tracking_data = os.path.join(
+    #      cache_path_example,
+    #      'cache_20190813'
+    #  )
+    #  cache_no_eye_tracking = BehaviorProjectCache(cache_base_without_eye_tracking_data)
