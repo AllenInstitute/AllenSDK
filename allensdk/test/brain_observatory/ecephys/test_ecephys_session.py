@@ -26,6 +26,15 @@ def raw_stimulus_table():
         'Phase': np.linspace(0, 180, 4),
     }, index=pd.Index(name='id', data=np.arange(4)))
 
+@pytest.fixture
+def raw_invalid_times_table():
+    return pd.DataFrame({
+        "start_time": [2114.0,114.0],
+        "end_time": [2121.0,211.0],
+        "tags":[["EcephysSession", "739448407", "stimulus"],
+                ["EcephysProbe", "123448407", "ProbeB"]],
+    })
+
 
 @pytest.fixture
 def raw_spike_times():
@@ -95,6 +104,12 @@ def just_stimulus_table_api(raw_stimulus_table):
             return raw_stimulus_table
     return EcephysJustStimulusTableApi()
 
+@pytest.fixture
+def just_invalid_times_table_api(raw_invalid_times_table):
+    class EcephysJustInvalidTimesTableApi(EcephysSessionApi):
+        def get_invalid_times(self):
+            return raw_invalid_times_table
+    return EcephysJustInvalidTimesTableApi()
 
 @pytest.fixture
 def channels_table_api(raw_channels, raw_probes, raw_lfp):
@@ -176,6 +191,22 @@ def test_get_stimulus_epochs(just_stimulus_table_api):
 
     pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)
 
+
+def test_get_invalid_times(just_invalid_times_table_api):
+
+    expected = pd.DataFrame({
+        "start_time": [2114.0,114.0],
+        "end_time": [2121.0,211.0],
+        "tags":[["EcephysSession", "739448407", "stimulus"],
+                ["EcephysProbe", "123448407", "ProbeB"]],
+    })
+
+
+    session = EcephysSession(api=just_invalid_times_table_api)
+
+    obtained = session.get_invalid_times()
+
+    pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)
 
 def test_session_metadata(session_metadata_api):
     session = EcephysSession(api=session_metadata_api)

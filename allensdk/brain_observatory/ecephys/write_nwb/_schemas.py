@@ -92,6 +92,14 @@ class Probe(RaisingSchema):
     lfp_sampling_rate = Float(default=2500.0, help="sampling rate of LFP data on this probe")
 
 
+class InvalidEpoch(RaisingSchema):
+    id = Int(required=True)
+    type = String(required=True)
+    label = String(required=True)
+    start_time = Float(required=True)
+    end_time = Float(required=True)
+
+
 class InputSchema(ArgSchema):
     class Meta:
         unknown = RAISE
@@ -115,6 +123,12 @@ class InputSchema(ArgSchema):
         required=True,
         validate=check_read_access,
         help="path to stimulus table file",
+    )
+    invalid_epochs = Nested(
+        InvalidEpoch,
+        many=True,
+        required=True,
+        help="epochs with invalid data"
     )
     probes = Nested(
         Probe,

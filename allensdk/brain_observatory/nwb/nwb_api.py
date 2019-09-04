@@ -64,6 +64,14 @@ class NwbApi:
 
         return table[sorted(table.columns)]
 
+    def get_invalid_times(self) -> pd.DataFrame:
+
+        container = self.nwbfile.invalid_times
+        if container:
+            return container.to_dataframe()
+        else:
+            raise ValueError('There are no invalid time intervals in this session!')
+
     def get_image(self, name, module, image_api=None) -> sitk.Image:
 
         if image_api is None:

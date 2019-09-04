@@ -26,6 +26,9 @@ class EcephysSessionApi:
     def get_stimulus_presentations(self) -> pd.DataFrame:
         raise NotImplementedError
 
+    def get_invalid_times(self) -> pd.DataFrame:
+        raise NotImplementedError
+
     def get_probes(self) -> pd.DataFrame:
         raise NotImplementedError
 
