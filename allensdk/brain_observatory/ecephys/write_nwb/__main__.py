@@ -601,7 +601,7 @@ def add_probewise_data_to_nwbfile(nwbfile, probes):
         column_description="times (s) of detected spiking events",
     )
 
-    add_ragged_data_to_dynmaic_table(
+    add_ragged_data_to_dynamic_table(
         table=nwbfile.units,
         data=spike_amplitudes,
         column_name="spike_amplitudes",
