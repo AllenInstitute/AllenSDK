@@ -2,6 +2,7 @@ import pytest
 import pandas as pd
 import numpy as np
 import xarray as xr
+import types
 
 from allensdk.brain_observatory.ecephys.ecephys_session_api import EcephysSessionApi
 from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession, nan_intervals, build_spike_histogram
@@ -165,6 +166,16 @@ def spike_times_api(raw_units, raw_channels, raw_probes, raw_stimulus_table, raw
     return EcephysSpikeTimesApi()
 
 
+def get_no_spikes_times(self):
+    # A special method used for testing cases when there are no spikes for a given session, will be swapped out for
+    # get_spike_times()
+    return {
+        0: np.array([]),
+        1: np.array([]),
+        2: np.array([])
+    }
+
+
 @pytest.fixture
 def session_metadata_api():
     class EcephysSessionMetadataApi(EcephysSessionApi):
@@ -311,6 +322,16 @@ def test_presentationwise_spike_times(spike_times_api):
     pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)    
 
 
+def test_empty_presentationwise_spike_times(spike_times_api):
+    # Test that when there are no spikes presentationwise_spike_times doesn't fail and instead returns a empty dataframe
+    spike_times_api.get_spike_times = types.MethodType(get_no_spikes_times, spike_times_api)
+    session = EcephysSession(api=spike_times_api)
+    obtained = session.presentationwise_spike_times(session.stimulus_presentations.index.values,
+                                                    session.units.index.values)
+    assert(isinstance(obtained, pd.DataFrame))
+    assert(obtained.empty)
+
+
 def test_conditionwise_spike_statistics(spike_times_api):
     session = EcephysSession(api=spike_times_api)
     obtained = session.conditionwise_spike_statistics(stimulus_presentation_ids=[0, 1, 2])
@@ -319,6 +340,21 @@ def test_conditionwise_spike_statistics(spike_times_api):
 
     assert obtained.loc[(2, 2), "spike_count"] == 3
     assert obtained.loc[(2, 2), "stimulus_presentation_count"] == 1
+
+
+def test_empty_conditionwise_spike_statistics(spike_times_api):
+    # special case when there are no spikes
+    spike_times_api.get_spike_times = types.MethodType(get_no_spikes_times, spike_times_api)
+    session = EcephysSession(api=spike_times_api)
+    obtained = session.conditionwise_spike_statistics(
+        stimulus_presentation_ids=session.stimulus_presentations.index.values,
+        unit_ids=session.units.index.values
+    )
+    assert(len(obtained) == 12)
+    assert(not np.any(obtained['spike_count']))  # check all spike_counts are 0
+    assert(not np.any(obtained['spike_mean']))  # spike_means are 0
+    assert(np.all(np.isnan(obtained['spike_std'])))  # std/sem will be undefined
+    assert(np.all(np.isnan(obtained['spike_sem'])))
 
 
 def test_get_stimulus_parameter_values(just_stimulus_table_api):
