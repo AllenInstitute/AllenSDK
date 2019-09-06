@@ -75,6 +75,9 @@ class Lfp(RaisingSchema):
 class Probe(RaisingSchema):
     id = Int(required=True)
     name = String(required=True)
+    workflow_state = String(required=True)
+    use_spike_data = Boolean(required=True)
+    use_lfp_data = Boolean(required=True)
     spike_times_path = String(required=True, validate=check_read_access)
     spike_clusters_file = String(required=True, validate=check_read_access)
     mean_waveforms_path = String(required=True, validate=check_read_access)
