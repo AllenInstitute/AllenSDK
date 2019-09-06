@@ -17,7 +17,7 @@ from allensdk.brain_observatory.ecephys import get_unit_filter_value
 
 
 csv_io = {
-    'reader': lambda path: pd.read_csv(path, index_col='id'),
+    'reader': lambda path: pd.read_csv(path, index_col='id', engine="python"),
     'writer': lambda path, df: df.to_csv(path)
 }
 
