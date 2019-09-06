@@ -60,7 +60,6 @@ class NaturalMovies(StimulusAnalysis):
     @property
     def METRICS_COLUMNS(self):
         return [('fano_nm', np.uint64), 
-                ('reliability_nm', np.float64),
                 ('firing_rate_nm', np.float64),
                 ('lifetime_sparseness_nm', np.float64), 
                 ('run_pval_ns', np.float64), 
@@ -75,8 +74,6 @@ class NaturalMovies(StimulusAnalysis):
             metrics_df = self.empty_metrics_table()
             metrics_df['fano_nm'] = [self._get_fano_factor(unit, self._get_preferred_condition(unit))
                                      for unit in unit_ids]
-            metrics_df['reliability_nm'] = [self._get_reliability(unit, self._get_preferred_condition(unit))
-                                            for unit in unit_ids]
             metrics_df['firing_rate_nm'] = [self._get_overall_firing_rate(unit) for unit in unit_ids]
             metrics_df['lifetime_sparseness_nm'] = [self._get_lifetime_sparseness(unit) for unit in unit_ids]
             run_vals = [self._get_running_modulation(unit, self._get_preferred_condition(unit)) for unit in unit_ids]

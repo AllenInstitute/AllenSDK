@@ -141,7 +141,6 @@ def test_metrics(ecephys_api):
     assert(np.allclose(dg.metrics['g_dsi_dg'].loc[[0, 3, 4, 5]], [1.0, np.nan, 0.491209, 1.0], equal_nan=True))
 
     assert('firing_rate_dg' in dg.metrics.columns)
-    assert('reliability_dg' in dg.metrics.columns)
     assert('fano_dg' in dg.metrics.columns)
     assert('lifetime_sparseness_dg' in dg.metrics.columns)
     assert('run_pval_dg' in dg.metrics.columns)

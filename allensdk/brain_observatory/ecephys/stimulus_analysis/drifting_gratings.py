@@ -175,8 +175,7 @@ class DriftingGratings(StimulusAnalysis):
                 ('g_osi_dg', np.float64), 
                 ('g_dsi_dg', np.float64), 
                 ('firing_rate_dg', np.float64), 
-                ('reliability_dg', np.float64),
-                ('fano_dg', np.float64), 
+                ('fano_dg', np.float64),
                 ('lifetime_sparseness_dg', np.float64), 
                 ('run_pval_dg', np.float64),
                 ('run_mod_dg', np.float64)]
@@ -201,8 +200,6 @@ class DriftingGratings(StimulusAnalysis):
                 metrics_df['g_dsi_dg'] = [self._get_selectivity(unit, metrics_df.loc[unit]['pref_tf_dg'], 'dsi')
                                           for unit in unit_ids]
                 metrics_df['firing_rate_dg'] = [self._get_overall_firing_rate(unit) for unit in unit_ids]
-                metrics_df['reliability_dg'] = [self._get_reliability(unit, self._get_preferred_condition(unit))
-                                                for unit in unit_ids]
                 metrics_df['fano_dg'] = [self._get_fano_factor(unit, self._get_preferred_condition(unit))
                                          for unit in unit_ids]
                 metrics_df['lifetime_sparseness_dg'] = [self._get_lifetime_sparseness(unit) for unit in unit_ids]

@@ -82,8 +82,7 @@ class Flashes(StimulusAnalysis):
                 ('sustained_idx_fl', np.float64),
                 ('firing_rate_fl', np.float64), 
                 ('time_to_peak_fl', np.float64), 
-                ('reliability_fl', np.float64),
-                ('fano_fl', np.float64), 
+                ('fano_fl', np.float64),
                 ('lifetime_sparseness_fl', np.float64), 
                 ('run_pval_fl', np.float64),
                 ('run_mod_fl', np.float64)]
@@ -100,8 +99,6 @@ class Flashes(StimulusAnalysis):
                 metrics_df['sustained_idx_fl'] = [self._get_sustained_index(unit, self._get_preferred_condition(unit))
                                                   for unit in unit_ids]
                 metrics_df['firing_rate_fl'] = [self._get_overall_firing_rate(unit) for unit in unit_ids]
-                metrics_df['reliability_fl'] = [self._get_reliability(unit, self._get_preferred_condition(unit))
-                                                for unit in unit_ids]
                 metrics_df['time_to_peak_fl'] = [self._get_time_to_peak(unit, self._get_preferred_condition(unit))
                                                  for unit in unit_ids]
                 metrics_df['fano_fl'] = [self._get_fano_factor(unit, self._get_preferred_condition(unit))
