@@ -147,7 +147,7 @@ def read_spike_times_to_dictionary(
 
 def read_spike_amplitudes_to_dictionary(
     spike_amplitudes_path, spike_units_path, 
-    templates_path, spike_templates_path,
+    templates_path, spike_templates_path, inverse_whitening_matrix_path,
     local_to_global_unit_map=None,
     scale_factor=1.0
 ):
@@ -157,6 +157,13 @@ def read_spike_amplitudes_to_dictionary(
 
     templates = load_and_squeeze_npy(templates_path)
     spike_templates = load_and_squeeze_npy(spike_templates_path)
+    inverse_whitening_matrix = load_and_squeeze_npy(inverse_whitening_matrix_path)
+
+    for temp_idx in range(templates.shape[0]):
+        templates[temp_idx,:,:] = np.dot(
+            np.ascontiguousarray(templates[temp_idx,:,:]), 
+            np.ascontiguousarray(inverse_whitening_matrix)
+        )
 
     scaled_amplitudes = scale_amplitudes(spike_amplitudes, templates, spike_templates, scale_factor=scale_factor)
     return group_1d_by_unit(scaled_amplitudes, spike_units, local_to_global_unit_map)
@@ -584,7 +591,7 @@ def add_probewise_data_to_nwbfile(nwbfile, probes):
 
         spike_amplitudes.update(read_spike_amplitudes_to_dictionary(
             probe["spike_amplitudes_path"], probe["spike_clusters_file"], 
-            probe["templates_path"], probe["spike_templates_path"],
+            probe["templates_path"], probe["spike_templates_path"], probe["inverse_whitening_matrix_path"],
             local_to_global_unit_map=local_to_global_unit_map,
             scale_factor=probe["amplitude_scale_factor"]
         ))
