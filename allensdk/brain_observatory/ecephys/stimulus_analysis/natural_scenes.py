@@ -129,8 +129,8 @@ class NaturalScenes(StimulusAnalysis):
 
         return self._metrics
 
-    @property
-    def known_stimulus_keys(self):
+    @classmethod
+    def known_stimulus_keys(cls):
         return ['natural_scenes', 'Natural_Images', 'Natural Images']
 
     def _get_stim_table_stats(self):

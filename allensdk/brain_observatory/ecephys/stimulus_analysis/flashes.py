@@ -120,7 +120,7 @@ class Flashes(StimulusAnalysis):
         :param stim_table:
         :return:
         """
-        known_keys_lc = [k.lower() for k in self.known_stimulus_keys]
+        known_keys_lc = [k.lower() for k in self.__class__.known_stimulus_keys()]
 
         for table_key in stim_table['stimulus_name'].unique():
             table_key_lc = table_key.lower()
@@ -131,8 +131,8 @@ class Flashes(StimulusAnalysis):
         else:
             return None
 
-    @property
-    def known_stimulus_keys(self):
+    @classmethod
+    def known_stimulus_keys(cls):
         return ['flash', 'flashes']
 
     def _get_stim_table_stats(self):

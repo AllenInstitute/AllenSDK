@@ -163,8 +163,8 @@ class ReceptiveFieldMapping(StimulusAnalysis):
 
         return self._metrics
 
-    @property
-    def known_stimulus_keys(self):
+    @classmethod
+    def known_stimulus_keys(cls):
         return ['receptive_field_mapping', 'gabor', "gabors"]
 
     def _find_stimulus_key(self, stim_table):
