@@ -93,8 +93,11 @@ class Probe(RaisingSchema):
     templates_path = String(validate=check_read_access,
         help="path to file contianing an (nTemplates)x(nSamples)x(nUnits) array of kilosort templates"
     )
+    inverse_whitening_matrix_path = String(validate=check_read_access,
+        help="Kilosort templates are whitened. In order to use them for scaling spike amplitudes to volts, we need to remove the whitening"
+    )
     amplitude_scale_factor = Float(default=0.195e-6, 
-        help="amplitude scale factor converting raw amplitudes to Volts"
+        help="amplitude scale factor converting raw amplitudes to Volts. Default converts from bits -> uV -> V"
     )
 
 class InvalidEpoch(RaisingSchema):
