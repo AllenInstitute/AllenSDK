@@ -173,7 +173,7 @@ class EcephysSession(LazyPropertyMixin):
         """ Obtain current source density (CSD) image for this probe. Please see
         allensdk.brain_observatory.ecephys.current_source_density for details and implementation of our current 
         source density calculation. Briefly:
-        - we use a 2D method for csd calculation
+        - we use a 1D method for csd calculation
         - csd is calculated relative to flash stimulus onset
 
         Parameters
@@ -185,7 +185,7 @@ class EcephysSession(LazyPropertyMixin):
         -------
         xr.DataArray :
             dimensions are channel (id) and time (seconds, relative to stimulus onset). Values are current source 
-            density assessed on that channel at that time (V/s^2)
+            density assessed on that channel at that time (V/m^2)
 
         """
 
