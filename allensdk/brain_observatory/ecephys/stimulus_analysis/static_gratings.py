@@ -149,15 +149,15 @@ class StaticGratings(StimulusAnalysis):
             if len(self.stim_table) > 0:
                 metrics_df['pref_sf_sg'] = [self._get_pref_sf(unit) for unit in unit_ids]
                 metrics_df['pref_sf_multi_sg'] = [
-                    self._check_mulitple_pref_conditions(unit_id, self._col_sf, self.sfvals) for unit_id in unit_ids
+                    self._check_multiple_pref_conditions(unit_id, self._col_sf, self.sfvals) for unit_id in unit_ids
                 ]
                 metrics_df['pref_ori_sg'] = [self._get_pref_ori(unit) for unit in unit_ids]
                 metrics_df['pref_ori_multi_sg'] = [
-                    self._check_mulitple_pref_conditions(unit_id, self._col_ori, self.orivals) for unit_id in unit_ids
+                    self._check_multiple_pref_conditions(unit_id, self._col_ori, self.orivals) for unit_id in unit_ids
                 ]
                 metrics_df['pref_phase_sg'] = [self._get_pref_phase(unit) for unit in unit_ids]
                 metrics_df['pref_phase_multi_sg'] = [
-                    self._check_mulitple_pref_conditions(unit_id, self._col_phase, self.phasevals) for unit_id in unit_ids
+                    self._check_multiple_pref_conditions(unit_id, self._col_phase, self.phasevals) for unit_id in unit_ids
                 ]
                 metrics_df['g_osi_sg'] = [self._get_osi(unit, metrics_df.loc[unit]['pref_sf_sg'], metrics_df.loc[unit]['pref_phase_sg']) for unit in unit_ids]
                 metrics_df['time_to_peak_sg'] = [self._get_time_to_peak(unit, self._get_preferred_condition(unit)) for unit in unit_ids]

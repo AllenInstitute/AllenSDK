@@ -122,7 +122,7 @@ class NaturalScenes(StimulusAnalysis):
 
                 metrics_df['pref_image_ns'] = [self._get_preferred_condition(unit) for unit in unit_ids]
                 metrics_df['pref_images_multi_ns'] = [
-                    self._check_mulitple_pref_conditions(unit_id, self._col_image, self.images_nonblank)
+                    self._check_multiple_pref_conditions(unit_id, self._col_image, self.images_nonblank)
                     for unit_id in unit_ids
                 ]
                 metrics_df['image_selectivity_ns'] = [self._get_image_selectivity(unit) for unit in unit_ids]

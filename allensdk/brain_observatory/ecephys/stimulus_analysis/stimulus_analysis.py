@@ -471,7 +471,7 @@ class StimulusAnalysis(object):
 
         return self._preferred_condition[unit_id]
 
-    def _check_mulitple_pref_conditions(self, unit_id, stim_cond_col, valid_conditions):
+    def _check_multiple_pref_conditions(self, unit_id, stim_cond_col, valid_conditions):
         # find all stimulus_condition which share the same 'stim_cond_col' (eg TF, ORI, etc) value, calculate the avg
         # spiking
         similar_conditions = [self.stimulus_conditions.index[self.stimulus_conditions[stim_cond_col] == v].tolist()

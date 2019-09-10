@@ -194,11 +194,11 @@ class DriftingGratings(StimulusAnalysis):
             if len(self.stim_table) > 0:
                 metrics_df['pref_ori_dg'] = [self._get_pref_ori(unit) for unit in unit_ids]
                 metrics_df['pref_ori_multi_dg'] = [
-                    self._check_mulitple_pref_conditions(unit_id, self._col_ori, self.orivals) for unit_id in unit_ids
+                    self._check_multiple_pref_conditions(unit_id, self._col_ori, self.orivals) for unit_id in unit_ids
                 ]
                 metrics_df['pref_tf_dg'] = [self._get_pref_tf(unit) for unit in unit_ids]
                 metrics_df['pref_tf_multi_dg'] = [
-                    self._check_mulitple_pref_conditions(unit_id, self._col_tf, self.tfvals) for unit_id in unit_ids
+                    self._check_multiple_pref_conditions(unit_id, self._col_tf, self.tfvals) for unit_id in unit_ids
                 ]
                 metrics_df['f1_f0_dg'] = [self._get_f1_f0(unit, self._get_preferred_condition(unit))
                                           for unit in unit_ids]

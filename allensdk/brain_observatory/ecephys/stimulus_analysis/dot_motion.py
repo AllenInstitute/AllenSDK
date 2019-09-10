@@ -117,11 +117,11 @@ class DotMotion(StimulusAnalysis):
             if len(self.stim_table) > 0:
                 metrics_df['pref_speed_dm'] = [self._get_pref_speed(unit) for unit in unit_ids]
                 metrics_df['pref_speed_multi_dm'] = [
-                    self._check_mulitple_pref_conditions(unit_id, self._col_speed, self.speeds) for unit_id in unit_ids
+                    self._check_multiple_pref_conditions(unit_id, self._col_speed, self.speeds) for unit_id in unit_ids
                 ]
                 metrics_df['pref_dir_dm'] = [self._get_pref_dir(unit) for unit in unit_ids]
                 metrics_df['pref_dir_multi_dm'] = [
-                    self._check_mulitple_pref_conditions(unit_id, self._col_dir, self.directions) for unit_id in unit_ids
+                    self._check_multiple_pref_conditions(unit_id, self._col_dir, self.directions) for unit_id in unit_ids
                 ]
                 metrics_df['firing_rate_dm'] = [self._get_overall_firing_rate(unit) for unit in unit_ids]
                 metrics_df['fano_dm'] = [self._get_fano_factor(unit, self._get_preferred_condition(unit))
