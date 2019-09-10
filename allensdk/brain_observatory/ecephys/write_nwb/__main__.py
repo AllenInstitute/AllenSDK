@@ -692,7 +692,10 @@ def write_ecephys_nwb(
         optotagging_table = pd.read_csv(optotagging_table_path)
         nwbfile = add_optotagging_table_to_nwbfile(nwbfile, optotagging_table)
 
-    nwbfile = add_probewise_data_to_nwbfile(nwbfile, probes)
+    nwbfile = add_channels_to_nwbfile(nwbfile, probes)
+
+    probes_with_valid_spike = [p for p in probes if p["use_spike_data"]]
+    nwbfile = add_spike_data_to_nwbfile(nwbfile, probes_with_valid_spike)
 
     running_speed, raw_running_data = read_running_speed(running_speed_path)
     add_running_speed_to_nwbfile(nwbfile, running_speed)
@@ -704,7 +707,8 @@ def write_ecephys_nwb(
     io.write(nwbfile)
     io.close()
 
-    probe_outputs = write_probewise_lfp_files(probes, session_start_time, pool_size=pool_size)
+    probes_with_valid_lfp = [p for p in probes if p["use_lfp_data"]]
+    probe_outputs = write_probewise_lfp_files(probes_with_valid_lfp, session_start_time, pool_size=pool_size)
 
     return {
         'nwb_path': output_path,
