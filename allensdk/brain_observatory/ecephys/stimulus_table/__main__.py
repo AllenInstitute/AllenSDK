@@ -31,6 +31,7 @@ def build_stimulus_table(
     column_name_map,
     output_stimulus_table_path,
     output_frame_times_path,
+    fail_on_negative_duration,
     **kwargs
 ):
 
@@ -65,7 +66,7 @@ def build_stimulus_table(
         stim_table_full, frame_times, stim_file.frames_per_second, True
     )
 
-    output_validation.validate_epoch_durations(stim_table_full)
+    output_validation.validate_epoch_durations(stim_table_full, fail_on_negative_durations=fail_on_negative_duration)
     output_validation.validate_max_spontaneous_epoch_duration(
         stim_table_full, maximum_expected_spontanous_activity_duration
     )

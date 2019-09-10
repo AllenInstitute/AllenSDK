@@ -306,6 +306,7 @@ def test_build_stimulus_table(tmpdir_factory, expected_table):
         column_name_map={},
         output_stimulus_table_path=table_path,
         output_frame_times_path=frame_times_path,
+        fail_on_negative_duration=True
     )
 
     obtained_table = pd.read_csv(table_path)
