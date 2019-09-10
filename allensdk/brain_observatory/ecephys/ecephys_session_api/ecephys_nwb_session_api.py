@@ -149,10 +149,12 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         csd = xr.DataArray(
             name="CSD",
             data=csd_ts.data[:],
-            dims=["virtual channel location", "time"],
+            dims=["virtual_channel_index", "time"],
             coords={
-                "virtual channel location": csd_ts.control[:],
-                "time": csd_ts.timestamps[:]
+                "virtual_channel_index": np.arange(csd_ts.data.shape[0]),
+                "time": csd_ts.timestamps[:],
+                "vertical_position": (("virtual_channel_index",), csd_ts.control[:, 1]),
+                "horizontal_position": (("virtual_channel_index",), csd_ts.control[:, 0])
             }
         )
         return csd
