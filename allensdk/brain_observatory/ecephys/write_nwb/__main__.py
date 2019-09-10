@@ -270,7 +270,14 @@ def read_running_speed(path):
     )
 
 
-def add_probe_to_nwbfile(nwbfile, probe_id, sampling_rate, lfp_sampling_rate, description="", location=""):
+def add_probe_to_nwbfile(nwbfile,
+                         probe_id,
+                         sampling_rate,
+                         lfp_sampling_rate,
+                         has_spike_data=True,
+                         has_lfp_data=True,
+                         description="",
+                         location=""):
     """ Creates objects required for representation of a single extracellular ephys probe within an NWB file. These objects amount 
     to a Device (this will be removed at some point from pynwb) and an ElectrodeGroup.
 
@@ -305,6 +312,8 @@ def add_probe_to_nwbfile(nwbfile, probe_id, sampling_rate, lfp_sampling_rate, de
         location=location,
         device=probe_nwb_device,
         sampling_rate=sampling_rate,
+        has_spike_data=has_spike_data,
+        has_lfp_data=has_lfp_data,
         lfp_sampling_rate=lfp_sampling_rate
     )
 
@@ -552,25 +561,20 @@ def write_probewise_lfp_files(probes, session_start_time, pool_size=3):
     return output_paths
     
 
-def add_probewise_data_to_nwbfile(nwbfile, probes):
-    """ Adds channel and spike data for a single probe to the session-level nwb file.
+
+
+def add_spike_data_to_nwbfile(nwbfile, probes):
+    """ Adds spike data to the session-level nwb file.
     """
 
-    channel_tables = {}
     unit_tables = []
     spike_times = {}
     spike_amplitudes = {}
     mean_waveforms = {}
 
     for probe in probes:
-        logging.info(f'found probe {probe["id"]} with name {probe["name"]}')
+        logging.info(f'Adding spikes to probe {probe["id"]} with name {probe["name"]}')
 
-        nwbfile, probe_nwb_device, probe_nwb_electrode_group = add_probe_to_nwbfile(nwbfile, 
-            probe_id=probe["id"], description=probe["name"], 
-            sampling_rate=probe["sampling_rate"], lfp_sampling_rate=probe["lfp_sampling_rate"]
-        )
-
-        channel_tables[probe["id"]] = prepare_probewise_channel_table(probe['channels'], probe_nwb_electrode_group)
         unit_tables.append(pd.DataFrame(probe['units']))
 
         local_to_global_unit_map = {unit['cluster_id']: unit['id'] for unit in probe['units']}
@@ -588,9 +592,7 @@ def add_probewise_data_to_nwbfile(nwbfile, probes):
             local_to_global_unit_map=local_to_global_unit_map,
             scale_factor=probe["amplitude_scale_factor"]
         ))
-    
-    electrodes_table = fill_df(pd.concat(list(channel_tables.values())))
-    nwbfile.electrodes = pynwb.file.ElectrodeTable().from_dataframe(electrodes_table, name='electrodes')
+
     units_table = pd.concat(unit_tables).set_index(keys='id', drop=True)
     nwbfile.units = pynwb.misc.Units.from_dataframe(fill_df(units_table), name='units')
 
@@ -618,6 +620,31 @@ def add_probewise_data_to_nwbfile(nwbfile, probes):
     return nwbfile
 
 
+def add_channels_to_nwbfile(nwbfile,probes):
+
+    channel_tables = {}
+
+    for probe in probes:
+        logging.info(f'found probe {probe["id"]} with name {probe["name"]}')
+
+        nwbfile, probe_nwb_device, probe_nwb_electrode_group = add_probe_to_nwbfile(
+            nwbfile,
+            probe_id=probe["id"],
+            description=probe["name"],
+            sampling_rate=probe["sampling_rate"],
+            lfp_sampling_rate=probe["lfp_sampling_rate"],
+            has_lfp_data=probe["use_lfp_data"],
+            has_spike_data=probe["use_spike_data"],
+        )
+
+        channel_tables[probe["id"]] = prepare_probewise_channel_table(probe['channels'], probe_nwb_electrode_group)
+
+    electrodes_table = fill_df(pd.concat(list(channel_tables.values())))
+    nwbfile.electrodes = pynwb.file.ElectrodeTable().from_dataframe(electrodes_table, name='electrodes')
+
+    return nwbfile
+
+
 def add_optotagging_table_to_nwbfile(nwbfile, optotagging_table, tag="optical_stimulation"):
     opto_ts = pynwb.base.TimeSeries(
         name="optotagging",
@@ -636,7 +663,6 @@ def add_optotagging_table_to_nwbfile(nwbfile, optotagging_table, tag="optical_st
         opto_mod.add_data_interface(container)
 
     return nwbfile
-
 
 
 def write_ecephys_nwb(
