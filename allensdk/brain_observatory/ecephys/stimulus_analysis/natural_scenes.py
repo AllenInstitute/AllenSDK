@@ -96,8 +96,7 @@ class NaturalScenes(StimulusAnalysis):
                 ('firing_rate_ns', np.float64), 
                 ('fano_ns', np.float64),
                 ('time_to_peak_ns', np.float64), 
-                ('reliability_ns', np.float64),
-                ('lifetime_sparseness_ns', np.float64), 
+                ('lifetime_sparseness_ns', np.float64),
                 ('run_pval_ns', np.float64), 
                 ('run_mod_ns', np.float64)]
 
@@ -119,8 +118,6 @@ class NaturalScenes(StimulusAnalysis):
                                          for unit in unit_ids]
                 metrics_df['time_to_peak_ns'] = [self._get_time_to_peak(unit, self._get_preferred_condition(unit))
                                                  for unit in unit_ids]
-                metrics_df['reliability_ns'] = [self._get_reliability(unit, self._get_preferred_condition(unit))
-                                                for unit in unit_ids]
                 metrics_df['lifetime_sparseness_ns'] = [self._get_lifetime_sparseness(unit) for unit in unit_ids]
                 metrics_df.loc[:, ['run_pval_ns', 'run_mod_ns']] = [
                     self._get_running_modulation(unit, self._get_preferred_condition(unit)) for unit in unit_ids]

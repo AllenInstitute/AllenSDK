@@ -127,7 +127,6 @@ class ReceptiveFieldMapping(StimulusAnalysis):
                 ('firing_rate_rf', np.float64),
                 ('fano_rf', np.float64), 
                 ('time_to_peak_rf', np.float64), 
-                ('reliability_rf', np.float64),
                 ('lifetime_sparseness_rf', np.float64),
                 ('run_mod_rf', np.float64), 
                 ('run_pval_rf', np.float64)
@@ -153,8 +152,6 @@ class ReceptiveFieldMapping(StimulusAnalysis):
                                          for unit in unit_ids]
                 metrics_df['time_to_peak_rf'] = [self._get_time_to_peak(unit, self._get_preferred_condition(unit))
                                                  for unit in unit_ids]
-                metrics_df['reliability_rf'] = [self._get_reliability(unit, self._get_preferred_condition(unit))
-                                                for unit in unit_ids]
                 metrics_df['lifetime_sparseness_rf'] = [self._get_lifetime_sparseness(unit) for unit in unit_ids]
                 metrics_df.loc[:, ['run_pval_rf', 'run_mod_rf']] = \
                         [self._get_running_modulation(unit, self._get_preferred_condition(unit)) for unit in unit_ids]

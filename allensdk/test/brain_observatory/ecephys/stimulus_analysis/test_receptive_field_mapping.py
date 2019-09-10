@@ -72,7 +72,6 @@ def test_metrics(ecephys_api):
     assert('firing_rate_rf' in rfm.metrics.columns)
     assert('fano_rf' in rfm.metrics.columns)
     assert('time_to_peak_rf' in rfm.metrics.columns)
-    assert('reliability_rf' in rfm.metrics.columns)
     assert('lifetime_sparseness_rf' in rfm.metrics.columns)
     assert('run_pval_rf' in rfm.metrics.columns)
     assert('run_mod_rf' in rfm.metrics.columns)

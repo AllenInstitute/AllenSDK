@@ -64,7 +64,6 @@ def test_metrics(ecephys_api):
                        [0.00401606, np.nan, 0.01204819, np.nan, 0.02811245, 0.00401606], equal_nan=True))
 
     assert('firing_rate_fl' in fl.metrics.columns)
-    assert('reliability_fl' in fl.metrics.columns)
     assert('time_to_peak_fl' in fl.metrics.columns)
     assert('fano_fl' in fl.metrics.columns)
     assert('lifetime_sparseness_fl' in fl.metrics.columns)
