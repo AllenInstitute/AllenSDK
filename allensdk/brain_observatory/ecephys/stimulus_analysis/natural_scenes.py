@@ -37,6 +37,7 @@ class NaturalScenes(StimulusAnalysis):
 
         self._images = None
         self._number_images = None
+        self._images_nonblank = None
         self._number_nonblank = None  # does not include Image number = -1.
         self._mean_sweep_events = None
         self._response_events = None
@@ -62,6 +63,13 @@ class NaturalScenes(StimulusAnalysis):
             self._get_stim_table_stats()
 
         return self._images
+
+    @property
+    def images_nonblank(self):
+        if self._images_nonblank is None:
+            self._get_stim_table_stats()
+
+        return self._images_nonblank
 
     @property
     def frames(self):
@@ -112,6 +120,10 @@ class NaturalScenes(StimulusAnalysis):
                 logger.info('Calculating metrics for ' + self.name)
 
                 metrics_df['pref_image_ns'] = [self._get_preferred_condition(unit) for unit in unit_ids]
+                metrics_df['pref_images_multi_ns'] = [
+                    self._check_multiple_pref_conditions(unit_id, self._col_image, self.images_nonblank)
+                    for unit_id in unit_ids
+                ]
                 metrics_df['image_selectivity_ns'] = [self._get_image_selectivity(unit) for unit in unit_ids]
                 metrics_df['firing_rate_ns'] = [self._get_overall_firing_rate(unit) for unit in unit_ids]
                 metrics_df['fano_ns'] = [self._get_fano_factor(unit, self._get_preferred_condition(unit))
@@ -134,7 +146,8 @@ class NaturalScenes(StimulusAnalysis):
         """ Extract image labels from the stimulus table """
         self._images = np.sort(self.stimulus_conditions[self._col_image].unique()).astype(np.int64)
         self._number_images = len(self._images)
-        self._number_nonblank = len(self._images[self._images >= 0])
+        self._images_nonblank = self._images[self._images >= 0]
+        self._number_nonblank = len(self._images_nonblank)
 
     def _get_image_selectivity(self, unit_id, num_steps=1000):
         """ Calculate the image selectivity for a given unit using spike means at every image"""

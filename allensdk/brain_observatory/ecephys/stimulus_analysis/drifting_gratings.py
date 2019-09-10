@@ -167,8 +167,10 @@ class DriftingGratings(StimulusAnalysis):
 
     @property
     def METRICS_COLUMNS(self):
-        return [('pref_ori_dg', np.float64), 
-                ('pref_tf_dg', np.float64), 
+        return [('pref_ori_dg', np.float64),
+                ('pref_ori_multi_dg', bool),
+                ('pref_tf_dg', np.float64),
+                ('pref_tf_multi_dg', bool),
                 ('c50_dg', np.float64),
                 ('f1_f0_dg', np.float64), 
                 ('mod_idx_dg', np.float64),
@@ -190,7 +192,13 @@ class DriftingGratings(StimulusAnalysis):
 
             if len(self.stim_table) > 0:
                 metrics_df['pref_ori_dg'] = [self._get_pref_ori(unit) for unit in unit_ids]
+                metrics_df['pref_ori_multi_dg'] = [
+                    self._check_multiple_pref_conditions(unit_id, self._col_ori, self.orivals) for unit_id in unit_ids
+                ]
                 metrics_df['pref_tf_dg'] = [self._get_pref_tf(unit) for unit in unit_ids]
+                metrics_df['pref_tf_multi_dg'] = [
+                    self._check_multiple_pref_conditions(unit_id, self._col_tf, self.tfvals) for unit_id in unit_ids
+                ]
                 metrics_df['f1_f0_dg'] = [self._get_f1_f0(unit, self._get_preferred_condition(unit))
                                           for unit in unit_ids]
                 metrics_df['mod_idx_dg'] = [self._get_modulation_index(unit, self._get_preferred_condition(unit))

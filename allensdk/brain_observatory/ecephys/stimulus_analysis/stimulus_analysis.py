@@ -471,6 +471,18 @@ class StimulusAnalysis(object):
 
         return self._preferred_condition[unit_id]
 
+    def _check_multiple_pref_conditions(self, unit_id, stim_cond_col, valid_conditions):
+        # find all stimulus_condition which share the same 'stim_cond_col' (eg TF, ORI, etc) value, calculate the avg
+        # spiking
+        similar_conditions = [self.stimulus_conditions.index[self.stimulus_conditions[stim_cond_col] == v].tolist()
+                              for v in valid_conditions]
+        spike_means = [self.conditionwise_statistics.loc[unit_id].loc[condition_inds]['spike_mean'].mean()
+                       for condition_inds in similar_conditions]
+
+        # Check if there is more than one stimulus condition that provokes a maximum response
+        return len(np.argwhere(spike_means == np.amax(spike_means))) > 1
+
+
     def _get_running_modulation(self, unit_id, preferred_condition, threshold=1.0):
         """Get running modulation for the preferred condition of a given unit"""
         subset = self.presentationwise_statistics[
