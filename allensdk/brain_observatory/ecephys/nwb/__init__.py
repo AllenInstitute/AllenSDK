@@ -16,6 +16,8 @@ class EcephysProbe(pynwb.ecephys.ElectrodeGroup):
         "device",
         "sampling_rate",
         "lfp_sampling_rate"
+        "has_spike_data"
+        "has_lfp_data"
     )
 
     @pynwb.docval(
@@ -25,6 +27,8 @@ class EcephysProbe(pynwb.ecephys.ElectrodeGroup):
         {'name': 'device', 'type': pynwb.device.Device, 'doc': 'the device that was used to record from this electrode group'},
         {"name": "sampling_rate", "type": float, "doc": ""},
         {"name": "lfp_sampling_rate", "type": float, "doc": ""},
+        {"name": "has_lfp_data", "type": bool, "doc": "missing or invalid data would be omitted from file", 'default': True},
+        {"name": "has_spike_data", "type": bool, "doc": "missing or invalid data would be omitted from file", 'default': True},
         {'name': 'parent', 'type': 'NWBContainer', 'doc': 'The parent NWBContainer for this NWBContainer', 'default': None})
     def __init__(self, **kwargs):
         sampling_rate, lfp_sampling_rate = pynwb.popargs("sampling_rate", "lfp_sampling_rate", kwargs)
