@@ -501,6 +501,8 @@ def write_probe_lfp_file(session_start_time, log_level, probe):
         total_num_channels=channels.shape[0]
     ).load(memmap=False)
 
+    lfp_data = lfp_data * probe["amplitude_scale_factor"]
+
     lfp = pynwb.ecephys.LFP(name=f"probe_{probe['id']}_lfp")
 
     nwbfile.add_acquisition(lfp.create_electrical_series(
