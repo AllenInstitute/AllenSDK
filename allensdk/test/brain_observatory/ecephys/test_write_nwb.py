@@ -319,7 +319,8 @@ def test_write_probe_lfp_file(tmpdir_factory, lfp_data):
             "input_channels_path": input_channels_path,
             "output_path": output_path
         },
-        "csd_path": input_csd_path
+        "csd_path": input_csd_path,
+        "amplitude_scale_factor": 1.0
     }
 
     csd = np.arange(20).reshape([2, 10])
