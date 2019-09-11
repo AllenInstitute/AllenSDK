@@ -18,6 +18,14 @@ class InputSchema(ArgSchema):
                      'eye, pupil, and corneal reflections.')
     )
 
+    session_sync_file = String(
+        required=True,
+        validate=check_read_access,
+        description=('An h5 file containing timestamps to synchronize '
+                     'eye tracking video frames with rest of ephys '
+                     'session events.')
+    )
+
     output_file = String(
         required=True,
         validate=check_write_access_overwrite,
