@@ -2,7 +2,7 @@ import numpy as np
 import warnings
 
 
-def validate_epoch_durations(table, start_key="Start", end_key="End"):
+def validate_epoch_durations(table, start_key="Start", end_key="End", fail_on_negative_durations=False):
     durations = table[end_key] - table[start_key]
     min_duration_index = durations.idxmin()
     min_duration = durations[min_duration_index]
@@ -13,8 +13,10 @@ def validate_epoch_durations(table, start_key="Start", end_key="End"):
             UserWarning,
         )
     if min_duration < 0:
-        print(table.loc[min_duration_index - 5 : min_duration_index + 5, :])
-        raise ValueError(f"there is an epoch with negative duration (index: {min_duration_index}")
+        msg = f"there is an epoch with negative duration (index: {min_duration_index})"
+        if fail_on_negative_durations:
+            raise ValueError(msg)
+        warnings.warn(msg)
 
 
 def validate_epoch_order(table, time_keys=("Start", "End")):

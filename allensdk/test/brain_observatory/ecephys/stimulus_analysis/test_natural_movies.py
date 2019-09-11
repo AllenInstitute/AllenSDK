@@ -51,7 +51,6 @@ def test_metrics(ecephys_api):
     assert(nm.metrics.index.names == ['unit_id'])
 
     assert('fano_nm' in nm.metrics.columns)
-    assert('reliability_nm' in nm.metrics.columns)
     assert('firing_rate_nm' in nm.metrics.columns)
     assert('lifetime_sparseness_nm' in nm.metrics.columns)
     assert('run_pval_nm' in nm.metrics.columns)

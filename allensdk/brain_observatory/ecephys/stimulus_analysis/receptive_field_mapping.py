@@ -48,12 +48,11 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         self._minimum_spike_count = minimum_spike_count
         self._mask_threshold = mask_threshold
 
-
-        if self._params is not None:
-            self._params = self._params['receptive_field_mapping']
-            self._stimulus_key = self._params['stimulus_key']
-            self._minimum_spike_count = self._params.get('minimum_spike_count', minimum_spike_count)
-            self._mask_threshold = self._params.get('mask_threshold', mask_threshold)
+        #if self._params is not None:
+        #    self._params = self._params['receptive_field_mapping']
+        #    self._stimulus_key = self._params['stimulus_key']
+        #    self._minimum_spike_count = self._params.get('minimum_spike_count', minimum_spike_count)
+        #    self._mask_threshold = self._params.get('mask_threshold', mask_threshold)
 
     @property
     def name(self):
@@ -127,7 +126,6 @@ class ReceptiveFieldMapping(StimulusAnalysis):
                 ('firing_rate_rf', np.float64),
                 ('fano_rf', np.float64), 
                 ('time_to_peak_rf', np.float64), 
-                ('reliability_rf', np.float64),
                 ('lifetime_sparseness_rf', np.float64),
                 ('run_mod_rf', np.float64), 
                 ('run_pval_rf', np.float64)
@@ -153,8 +151,6 @@ class ReceptiveFieldMapping(StimulusAnalysis):
                                          for unit in unit_ids]
                 metrics_df['time_to_peak_rf'] = [self._get_time_to_peak(unit, self._get_preferred_condition(unit))
                                                  for unit in unit_ids]
-                metrics_df['reliability_rf'] = [self._get_reliability(unit, self._get_preferred_condition(unit))
-                                                for unit in unit_ids]
                 metrics_df['lifetime_sparseness_rf'] = [self._get_lifetime_sparseness(unit) for unit in unit_ids]
                 metrics_df.loc[:, ['run_pval_rf', 'run_mod_rf']] = \
                         [self._get_running_modulation(unit, self._get_preferred_condition(unit)) for unit in unit_ids]
@@ -202,7 +198,7 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         return self.receptive_fields['spike_counts'].sel(unit_id=unit_id).data
 
     def _response_by_stimulus_position(self, dataset, presentations, row_key=None, column_key=None, unit_key='unit_id',
-                                       time_key='time_relative_to_stimulus_onset'):
+                                       time_key='time_relative_to_stimulus_onset', spike_count_key='spike_count'):
         """ Calculate the unit's response to different locations
         of the Gabor patch
 
@@ -217,15 +213,17 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         if column_key is None:
             column_key = self._col_pos_x
 
-        ds = dataset.sum(dim=time_key)
+        dataset = dataset.copy()
+        dataset[spike_count_key] = dataset.sum(dim=time_key)
+        dataset = dataset.drop(time_key)
 
-        ds[row_key] = presentations.loc[:, row_key]
-        ds[column_key] = presentations.loc[:, column_key]
+        dataset[row_key] = presentations.loc[:, row_key]
+        dataset[column_key] = presentations.loc[:, column_key]
+        dataset = dataset.to_dataframe()
 
-        df = ds.to_dataframe()
-        df = df.reset_index(unit_key).groupby([row_key, column_key, unit_key]).sum()
+        dataset = dataset.reset_index(unit_key).groupby([row_key, column_key, unit_key]).sum()
 
-        return df.to_xarray()
+        return dataset.to_xarray()
 
     def _get_rf_stats(self, unit_id):
         """ Calculate a variety of metrics for one unit's receptive field
@@ -255,14 +253,30 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         rf = self._get_rf(unit_id)
         spikes_per_trial = self.presentationwise_statistics.xs(unit_id, level=1)['spike_counts'].values
 
+
         if np.sum(spikes_per_trial) < self._minimum_spike_count:
             return np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, False
 
         p_value = chisq_from_stim_table(self.stim_table, [self._col_pos_x, self._col_pos_y],
-                                        np.expand_dims(spikes_per_trial, 1))
+                                        np.expand_dims(spikes_per_trial,1))
 
-        azimuth, elevation, width, height, area, on_screen = rf_stats(rf, self._mask_threshold)
-        return azimuth, elevation, width, height, area, on_screen, p_value[0]
+        #print(self._params)
+        #exit()
+        rf_thresh, azimuth, elevation, area = threshold_rf(rf, self._mask_threshold)
+
+        if is_rf_inverted(rf_thresh):
+            rf = invert_rf(rf)
+
+        (peak_height, center_y, center_x, width_y, width_x), success = fit_2d_gaussian(rf)
+        on_screen = rf_on_screen(rf, center_y, center_x)
+
+        height_deg = convert_pixels_to_degrees(width_y)
+        width_deg = convert_pixels_to_degrees(width_x)
+        azimuth_deg = convert_azimuth_to_degrees(azimuth)
+        elevation_deg = convert_elevation_to_degrees(elevation)
+        area_deg = convert_pixel_area_to_degrees(area)
+
+        return azimuth_deg, elevation_deg, width_deg, height_deg, area_deg, p_value[0], on_screen
 
     ## VISUALIZATION ##
     def plot_raster(self, stimulus_condition_id, unit_id):
@@ -295,26 +309,6 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         """ Plot the spike counts across conditions """
         plt.imshow(self._get_rf(unit_id), cmap='Greys')
         plt.axis('off')
-
-
-def rf_stats(rf, mask_threshold):
-    rf_thresh, azimuth, elevation, area = threshold_rf(rf, mask_threshold)
-
-    if is_rf_inverted(rf_thresh):
-        rf = invert_rf(rf)
-
-    # Fits a receptive field with a 2-dimensional Gaussian distribution
-    params = gaussian_moments_2d(rf)
-    if params is None:
-        return np.nan, np.nan, np.nan, np.nan, np.nan, False
-
-    errorfunction = lambda p: np.ravel(_gaussian_function_2d(*p)(*np.indices(rf.shape)) - rf)
-    (peak_height, center_y, center_x, width_y, width_x), ier = leastsq(errorfunction, params)
-
-    on_screen = rf_on_screen(rf, center_y, center_x)
-    height = width_y
-    width = width_x
-    return azimuth, elevation, width, height, area, on_screen
 
 
 #### HELPER FUNCTIONS ####
@@ -392,6 +386,37 @@ def gaussian_moments_2d(data):
     return height, center_y, center_x, width_y, width_x
 
 
+def fit_2d_gaussian(matrix):
+    """Fits a receptive field with a 2-dimensional Gaussian distribution
+
+    Parameters
+    ----------
+    matrix : numpy.ndarray
+        2D matrix of spike counts
+
+    Returns
+    -------
+    parameters - tuple
+        peak_height : peak of distribution
+        center_y : y-coordinate of distribution center
+        center_x : x-coordinate of distribution center
+        width_y : width of distribution along x-axis
+        width_x : width of distribution along y-axis
+    success - bool
+        True if a fit was found, False otherwise
+    """
+
+    params = gaussian_moments_2d(matrix)
+    if params is None:
+        return (np.nan, np.nan, np.nan, np.nan, np.nan), False
+
+    errorfunction = lambda p: np.ravel(_gaussian_function_2d(*p)(*np.indices(matrix.shape)) - matrix)
+    fit_params, ier = leastsq(errorfunction, params)
+    success = True if ier < 5 else False
+
+    return fit_params, success
+
+
 def is_rf_inverted(rf_thresh):
     """Checks if the receptive field mapping timulus is suppressing or exciting the cell
 
@@ -418,8 +443,7 @@ def is_rf_inverted(rf_thresh):
 
 
 def invert_rf(rf):
-    """
-    Creates an inverted version of the receptive field
+    """Creates an inverted version of the receptive field
 
     Parameters
     ----------
@@ -439,9 +463,9 @@ def threshold_rf(rf, threshold):
     
     Parameters
     ----------
-    rf - numpy.ndarray
+    rf : numpy.ndarray
         2D matrix of spike counts
-    threshold - float
+    threshold : float
         Threshold as ratio of the RF's standard deviation
         
     Returns
@@ -476,4 +500,78 @@ def threshold_rf(rf, threshold):
 
 
 def rf_on_screen(rf, center_y, center_x):
+    """Checks whether the receptive field is on the screen, given the center location."""
     return 0 < center_y < rf.shape[0] and 0 < center_x < rf.shape[1]
+
+
+def convert_elevation_to_degrees(elevation_in_pixels, elevation_offset_degrees=-30):
+    """Converts a pixel-based elevation into degrees relative to center of gaze
+
+    The receptive field computed by this class is oriented such that the
+    pixel values are in the correct relative location when using matplotlib.pyplot.imshow(),
+    which places (0,0) in the upper-left corner of the figure.
+
+    Therefore, we need to invert the elevation value prior to converting to degrees.
+
+    Parameters
+    ----------
+    elevation_in_pixels : float
+    elevation_offset_degrees: float
+
+    Returns
+    -------
+    elevation_in_degrees : float
+    """
+    elevation_in_degrees = convert_pixels_to_degrees(8 - elevation_in_pixels) + elevation_offset_degrees
+    
+    return elevation_in_degrees
+
+
+def convert_azimuth_to_degrees(azimuth_in_pixels, azimuth_offset_degrees=10):
+    """Converts a pixel-based azimuth into degrees relative to center of gaze
+
+    Parameters
+    ----------
+    azimuth_in_pixels : float
+    azimuth_offset_degrees: float
+
+    Returns
+    -------
+    azimuth_in_degrees : float
+    """
+    azimuth_in_degrees = convert_pixels_to_degrees((azimuth_in_pixels)) + azimuth_offset_degrees
+    
+    return azimuth_in_degrees
+
+
+def convert_pixels_to_degrees(value_in_pixels, degrees_to_pixels_ratio=10):
+    """Converts a pixel-based distance into degrees
+
+    Parameters
+    ----------
+    value_in_pixels : float
+    degrees_to_pixels_ratio: float
+
+    Returns
+    -------
+    value in degrees : float
+    """
+    return value_in_pixels * degrees_to_pixels_ratio
+
+
+def convert_pixel_area_to_degrees(area_in_pixels):
+    """Converts a pixel-based area measure into degrees
+
+    Each pixel is a square with side of length <degrees_to_pixels_ratio>
+
+    So the area in degrees is area_in_pixels * <degrees to_pixels_ratio>^2
+
+    Parameters
+    ----------
+    area_in_pixels : float
+
+    Returns
+    -------
+    area_in_degrees : float
+    """
+    return area_in_pixels * pow(convert_pixels_to_degrees(1), 2)

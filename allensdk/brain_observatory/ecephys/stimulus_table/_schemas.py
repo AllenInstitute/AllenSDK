@@ -92,6 +92,11 @@ class InputParameters(ArgSchema):
         default=["name", "maskParams", "win", "autoLog", "autoDraw"],
     )
 
+    fail_on_negative_duration = Bool(
+        default=False,
+        help="Determine if the module should fail if a stimulus epoch has a negative duration."
+    )
+
 
 class OutputSchema(DefaultSchema):
     input_parameters = Nested(

@@ -93,7 +93,6 @@ def test_metrics(ecephys_api):
     assert('g_osi_sg' in sg.metrics.columns)
     assert('time_to_peak_sg' in sg.metrics.columns)
     assert('firing_rate_sg' in sg.metrics.columns)
-    assert('reliability_sg' in sg.metrics.columns)
     assert('fano_sg' in sg.metrics.columns)
     assert('lifetime_sparseness_sg' in sg.metrics.columns)
     assert('run_pval_sg' in sg.metrics.columns)

@@ -173,7 +173,7 @@ class EcephysSession(LazyPropertyMixin):
         """ Obtain current source density (CSD) image for this probe. Please see
         allensdk.brain_observatory.ecephys.current_source_density for details and implementation of our current 
         source density calculation. Briefly:
-        - we use a 2D method for csd calculation
+        - we use a 1D method for csd calculation
         - csd is calculated relative to flash stimulus onset
 
         Parameters
@@ -185,7 +185,7 @@ class EcephysSession(LazyPropertyMixin):
         -------
         xr.DataArray :
             dimensions are channel (id) and time (seconds, relative to stimulus onset). Values are current source 
-            density assessed on that channel at that time (V/s^2)
+            density assessed on that channel at that time (V/m^2)
 
         """
 
@@ -447,6 +447,10 @@ class EcephysSession(LazyPropertyMixin):
                 presentation_ids.append(np.zeros([values.size]) + presentations[ii])
                 spike_times.append(values)
 
+        if not spike_times:
+            # If there are no units firing during the given stimulus return an empty dataframe
+            return pd.DataFrame(columns=['spike_times', 'stimulus_presentation', 'unit_id'])
+
         return pd.DataFrame({
             'stimulus_presentation_id': np.concatenate(presentation_ids).astype(int),
             'unit_id': np.concatenate(unit_ids).astype(int)
@@ -480,17 +484,22 @@ class EcephysSession(LazyPropertyMixin):
             stimulus_presentation_ids=stimulus_presentation_ids, unit_ids=unit_ids
         )
 
-        spike_counts = spikes.copy()
-        spike_counts["spike_count"] = np.zeros(spike_counts.shape[0])
-        spike_counts = spike_counts.groupby(["stimulus_presentation_id", "unit_id"]).count()
-        unit_ids = unit_ids if unit_ids is not None else spikes['unit_id'].unique()  # If not explicity stated get unit ids from spikes table.
-        spike_counts = spike_counts.reindex(pd.MultiIndex.from_product([stimulus_presentation_ids,
-                                                                        unit_ids],
-                                                                       names=['stimulus_presentation_id', 'unit_id']),
-                                            fill_value=0)
+        if spikes.empty:
+            # In the case there are no spikes
+            spike_counts = pd.DataFrame({'spike_count': 0},
+                                        index=pd.MultiIndex.from_product([stimulus_presentation_ids, unit_ids],
+                                                                         names=['stimulus_presentation_id', 'unit_id']))
 
-        # In the case there are units/presentation_ids with no corresponding id in spikes not in presentations (see
-        #  unit test) a right join will mess up the index with nan values. Use left to ensure index is not affected.
+        else:
+            spike_counts = spikes.copy()
+            spike_counts["spike_count"] = np.zeros(spike_counts.shape[0])
+            spike_counts = spike_counts.groupby(["stimulus_presentation_id", "unit_id"]).count()
+            unit_ids = unit_ids if unit_ids is not None else spikes['unit_id'].unique()  # If not explicity stated get unit ids from spikes table.
+            spike_counts = spike_counts.reindex(pd.MultiIndex.from_product([stimulus_presentation_ids,
+                                                                            unit_ids],
+                                                                           names=['stimulus_presentation_id',
+                                                                                  'unit_id']), fill_value=0)
+
         sp = pd.merge(spike_counts, presentations, left_on="stimulus_presentation_id", right_index=True, how="left")
         sp.reset_index(inplace=True)
 

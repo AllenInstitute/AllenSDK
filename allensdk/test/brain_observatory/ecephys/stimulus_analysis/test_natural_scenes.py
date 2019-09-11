@@ -63,7 +63,6 @@ def test_metrics(ecephys_api):
     assert('firing_rate_ns' in ns.metrics.columns)
     assert('fano_ns' in ns.metrics.columns)
     assert('time_to_peak_ns' in ns.metrics.columns)
-    assert('reliability_ns' in ns.metrics.columns)
     assert('lifetime_sparseness_ns' in ns.metrics.columns)
     assert('run_pval_ns' in ns.metrics.columns)
     assert('run_mod_ns' in ns.metrics.columns)

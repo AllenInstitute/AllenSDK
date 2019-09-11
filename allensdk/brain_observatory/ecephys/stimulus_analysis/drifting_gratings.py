@@ -167,16 +167,17 @@ class DriftingGratings(StimulusAnalysis):
 
     @property
     def METRICS_COLUMNS(self):
-        return [('pref_ori_dg', np.float64), 
-                ('pref_tf_dg', np.float64), 
+        return [('pref_ori_dg', np.float64),
+                ('pref_ori_multi_dg', bool),
+                ('pref_tf_dg', np.float64),
+                ('pref_tf_multi_dg', bool),
                 ('c50_dg', np.float64),
                 ('f1_f0_dg', np.float64), 
                 ('mod_idx_dg', np.float64),
                 ('g_osi_dg', np.float64), 
                 ('g_dsi_dg', np.float64), 
                 ('firing_rate_dg', np.float64), 
-                ('reliability_dg', np.float64),
-                ('fano_dg', np.float64), 
+                ('fano_dg', np.float64),
                 ('lifetime_sparseness_dg', np.float64), 
                 ('run_pval_dg', np.float64),
                 ('run_mod_dg', np.float64)]
@@ -191,7 +192,13 @@ class DriftingGratings(StimulusAnalysis):
 
             if len(self.stim_table) > 0:
                 metrics_df['pref_ori_dg'] = [self._get_pref_ori(unit) for unit in unit_ids]
+                metrics_df['pref_ori_multi_dg'] = [
+                    self._check_multiple_pref_conditions(unit_id, self._col_ori, self.orivals) for unit_id in unit_ids
+                ]
                 metrics_df['pref_tf_dg'] = [self._get_pref_tf(unit) for unit in unit_ids]
+                metrics_df['pref_tf_multi_dg'] = [
+                    self._check_multiple_pref_conditions(unit_id, self._col_tf, self.tfvals) for unit_id in unit_ids
+                ]
                 metrics_df['f1_f0_dg'] = [self._get_f1_f0(unit, self._get_preferred_condition(unit))
                                           for unit in unit_ids]
                 metrics_df['mod_idx_dg'] = [self._get_modulation_index(unit, self._get_preferred_condition(unit))
@@ -201,8 +208,6 @@ class DriftingGratings(StimulusAnalysis):
                 metrics_df['g_dsi_dg'] = [self._get_selectivity(unit, metrics_df.loc[unit]['pref_tf_dg'], 'dsi')
                                           for unit in unit_ids]
                 metrics_df['firing_rate_dg'] = [self._get_overall_firing_rate(unit) for unit in unit_ids]
-                metrics_df['reliability_dg'] = [self._get_reliability(unit, self._get_preferred_condition(unit))
-                                                for unit in unit_ids]
                 metrics_df['fano_dg'] = [self._get_fano_factor(unit, self._get_preferred_condition(unit))
                                          for unit in unit_ids]
                 metrics_df['lifetime_sparseness_dg'] = [self._get_lifetime_sparseness(unit) for unit in unit_ids]

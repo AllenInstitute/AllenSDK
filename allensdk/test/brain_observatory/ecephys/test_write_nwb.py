@@ -203,7 +203,7 @@ def test_add_running_speed_to_nwbfile(nwbfile, running_speed, roundtripper, roun
 
 
 @pytest.mark.parametrize('roundtrip', [[True]])
-def test_add_raw_running_Data_to_nwbfile(nwbfile, raw_running_data, roundtripper, roundtrip):
+def test_add_raw_running_data_to_nwbfile(nwbfile, raw_running_data, roundtripper, roundtrip):
 
     nwbfile = write_nwb.add_raw_running_data_to_nwbfile(nwbfile, raw_running_data)
     if roundtrip:
@@ -319,7 +319,8 @@ def test_write_probe_lfp_file(tmpdir_factory, lfp_data):
             "input_channels_path": input_channels_path,
             "output_path": output_path
         },
-        "csd_path": input_csd_path
+        "csd_path": input_csd_path,
+        "amplitude_scale_factor": 1.0
     }
 
     csd = np.arange(20).reshape([2, 10])
@@ -450,3 +451,83 @@ def test_setup_table_for_invalid_times():
     assert s['start_time'] == epoch['start_time']
     assert s['stop_time'] == epoch['end_time']
     assert s['tags'] == [epoch['type'], str(epoch['id']), epoch['label']]
+
+
+@pytest.fixture
+def spike_amplitudes():
+    return np.arange(5)
+
+
+@pytest.fixture
+def templates():
+    return np.array([
+        [
+            [0, 1, 2],
+            [0, 1, 2],
+            [0, 1, 2],
+            [10, 21, 32]
+        ],
+        [
+            [0, 1, 2],
+            [0, 1, 2],
+            [0, 1, 2],
+            [15, 9, 4]
+        ]
+    ])
+
+
+@pytest.fixture
+def spike_templates():
+    return np.array([0, 1, 0, 1, 0])
+
+
+@pytest.fixture
+def expected_amplitudes():
+    return np.array([0, 15, 60, 45, 120])
+
+
+def test_scale_amplitudes(spike_amplitudes, templates, spike_templates, expected_amplitudes):
+
+    scale_factor = 0.195
+
+    expected = expected_amplitudes * scale_factor
+    obtained = write_nwb.scale_amplitudes(spike_amplitudes, templates, spike_templates, scale_factor)
+
+    assert np.allclose(expected, obtained)
+
+
+def test_read_spike_amplitudes_to_dictionary(tmpdir_factory, spike_amplitudes, templates, spike_templates, expected_amplitudes):
+    tmpdir = str(tmpdir_factory.mktemp("spike_amps"))
+
+    spike_amplitudes_path = os.path.join(tmpdir, "spike_amplitudes.npy")
+    spike_units_path = os.path.join(tmpdir, "spike_units.npy")
+    templates_path = os.path.join(tmpdir, "templates.npy")
+    spike_templates_path = os.path.join(tmpdir, "spike_templates.npy")
+    inverse_whitening_matrix_path = os.path.join(tmpdir, "inverse_whitening_matrix_path.npy")
+
+    whitening_matrix = np.diag(np.arange(3) + 1)
+    inverse_whitening_matrix = np.linalg.inv(whitening_matrix)
+
+    spike_units = np.array([0, 0, 0, 1, 1])
+
+    for idx in range(templates.shape[0]):
+        templates[idx, :, :] = np.dot(
+            templates[idx, :, :], whitening_matrix
+        )
+
+    np.save(spike_amplitudes_path, spike_amplitudes, allow_pickle=False)
+    np.save(spike_units_path, spike_units, allow_pickle=False)
+    np.save(templates_path, templates, allow_pickle=False)
+    np.save(spike_templates_path, spike_templates, allow_pickle=False)
+    np.save(inverse_whitening_matrix_path, inverse_whitening_matrix, allow_pickle=False)
+
+    obtained = write_nwb.read_spike_amplitudes_to_dictionary(
+        spike_amplitudes_path, 
+        spike_units_path, 
+        templates_path, 
+        spike_templates_path, 
+        inverse_whitening_matrix_path
+    )
+
+    assert np.allclose(expected_amplitudes[:3], obtained[0])
+    assert np.allclose(expected_amplitudes[3:], obtained[1])

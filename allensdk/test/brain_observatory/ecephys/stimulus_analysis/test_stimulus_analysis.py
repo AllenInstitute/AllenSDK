@@ -242,6 +242,13 @@ def test_get_preferred_condition(ecephys_api):
     with pytest.raises(KeyError):
         stim_analysis._get_preferred_condition(10)
 
+def test_check_multiple_preferred_conditions(ecephys_api):
+    session = EcephysSession(api=ecephys_api)
+    stim_analysis = StimulusAnalysis(ecephys_session=session, stimulus_key='s0')
+
+    assert(stim_analysis._check_multiple_pref_conditions(0, 'conditions', [0, 1]) is False)
+    assert(stim_analysis._check_multiple_pref_conditions(3, 'conditions', [0, 1]) is True)
+
 
 def test_get_time_to_peak(ecephys_api):
     session = EcephysSession(api=ecephys_api)
