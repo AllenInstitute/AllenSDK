@@ -17,6 +17,7 @@ from ._schemas import InputSchema, OutputSchema
 from ._eye_calibration import compute_ellipse_areas, EyeCalibration
 from ._filter_utils import (post_process_cr,
                             post_process_areas)
+from ._sync_frames import get_synchronized_camera_frame_times
 
 
 def repackage_input_args(parser_args: dict) -> dict:
@@ -35,6 +36,7 @@ def repackage_input_args(parser_args: dict) -> dict:
     new_args: dict = {}
 
     new_args["input_file"] = Path(parser_args["input_file"])
+    new_args["session_sync_file"] = Path(parser_args["session_sync_file"])
     new_args["output_file"] = Path(parser_args["output_file"])
 
     monitor_position = np.array([parser_args["monitor_position_x_mm"],
@@ -212,6 +214,8 @@ def write_gaze_mapping_output_to_h5(output_savepath: Path,
     gaze_map_output["new_pupil_on_monitor_cm"].to_hdf(output_savepath, key="new_screen_coordinates", mode="a")
     gaze_map_output["new_pupil_on_monitor_deg"].to_hdf(output_savepath, key="new_screen_coordinates_spherical", mode="a")
 
+    gaze_map_output["synced_frame_timestamps_sec"].to_hdf(output_savepath, key="synced_frame_timestamps", mode="a")
+
 
 def main():
 
@@ -231,6 +235,15 @@ def main():
     cr_params = pd.read_hdf(args['input_file'], key="cr").astype(float)
     eye_params = pd.read_hdf(args['input_file'], key="eye").astype(float)
 
+    num_frames_match = ((pupil_params.shape[0] == cr_params.shape[0]) and
+                        (cr_params.shape[0] == eye_params.shape[0]))
+    if not num_frames_match:
+        raise RuntimeError("The number of frames for ellipse fits don't "
+                           "match when they should: "
+                           f"pupil_params ({pupil_params.shape[0]}), "
+                           f"cr_params ({cr_params.shape[0]}), "
+                           f"eye_params ({eye_params.shape[0]}).")
+
     output = run_gaze_mapping(pupil_parameters=pupil_params,
                               cr_parameters=cr_params,
                               eye_parameters=eye_params,
@@ -241,6 +254,15 @@ def main():
                               led_position=args["led_position"],
                               eye_radius_cm=args["eye_radius_cm"],
                               cm_per_pixel=args["cm_per_pixel"])
+
+    # Add synchronized frame times
+    frame_times = get_synchronized_camera_frame_times(args["session_sync_file"])
+    if (pupil_params.shape[0] != len(frame_times)):
+        raise RuntimeError("The number of camera sync pulses in the "
+                           f"sync file ({len(frame_times)}) do not match "
+                           "with the number of eye tracking frames "
+                           f"({pupil_params.shape[0]})!!!")
+    output["synced_frame_timestamps_sec"] = frame_times
 
     write_gaze_mapping_output_to_h5(args["output_file"], output)
     module_output = {"screen_mapping_file": str(args["output_file"])}

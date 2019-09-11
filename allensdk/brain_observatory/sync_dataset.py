@@ -85,8 +85,6 @@ class Dataset(object):
     ...     dset.stats()
 
     """
-
-
     FRAME_KEYS = ('frames', 'stim_vsync')
     PHOTODIODE_KEYS = ('photodiode', 'stim_photodiode')
     OPTOGENETIC_STIMULATION_KEYS = ("LED_sync", "opto_trial")
