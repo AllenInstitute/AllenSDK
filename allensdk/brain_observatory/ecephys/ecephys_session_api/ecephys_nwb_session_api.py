@@ -51,7 +51,8 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
                 'description': v.description, 
                 'location': v.location,
                 "sampling_rate": v.sampling_rate,
-                "lfp_sampling_rate": v.lfp_sampling_rate
+                "lfp_sampling_rate": v.lfp_sampling_rate,
+                "has_lfp_data": v.has_lfp_data
             })
         probes = pd.DataFrame(probes)
         probes = probes.set_index(keys='id', drop=True)
