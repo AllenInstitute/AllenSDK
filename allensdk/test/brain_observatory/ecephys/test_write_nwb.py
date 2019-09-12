@@ -99,23 +99,29 @@ def test_add_optotagging_table_to_nwbfile(nwbfile, roundtripper):
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
-@pytest.mark.parametrize('pid,desc,srate,lfp_srate,expected', [
+@pytest.mark.parametrize('pid,desc,srate,lfp_srate,has_lfp,expected', [
     [
         12, 
         'a probe', 
         30000.0,
-        2500.0, 
+        2500.0,
+        True,
         pd.DataFrame({
             'description': ['a probe'], 
             'sampling_rate': [30000.0], 
             "lfp_sampling_rate": [2500.0],
+            "has_lfp_data": [True],
             "location": [""]
         }, index=pd.Index([12], name='id'))
     ]
 ])
-def test_add_probe_to_nwbfile(nwbfile, roundtripper, roundtrip, pid, desc, srate, lfp_srate, expected):
+def test_add_probe_to_nwbfile(nwbfile, roundtripper, roundtrip, pid, desc, srate, lfp_srate, has_lfp,expected):
 
-    nwbfile, _, _ = write_nwb.add_probe_to_nwbfile(nwbfile, pid, description=desc, sampling_rate=srate, lfp_sampling_rate=lfp_srate)
+    nwbfile, _, _ = write_nwb.add_probe_to_nwbfile(nwbfile, pid,
+                                                   description=desc,
+                                                   sampling_rate=srate,
+                                                   lfp_sampling_rate=lfp_srate,
+                                                   has_lfp_data=has_lfp)
     if roundtrip:
         obt = roundtripper(nwbfile, EcephysNwbSessionApi)
     else:

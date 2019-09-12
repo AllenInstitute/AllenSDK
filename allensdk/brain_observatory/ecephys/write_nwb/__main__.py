@@ -277,7 +277,9 @@ def read_running_speed(path):
     )
 
 
-def add_probe_to_nwbfile(nwbfile, probe_id, sampling_rate, lfp_sampling_rate, description="", location=""):
+def add_probe_to_nwbfile(nwbfile, probe_id, sampling_rate, lfp_sampling_rate, has_lfp_data,
+                         description="",
+                         location=""):
     """ Creates objects required for representation of a single extracellular ephys probe within an NWB file. These objects amount 
     to a Device (this will be removed at some point from pynwb) and an ElectrodeGroup.
 
@@ -287,6 +289,12 @@ def add_probe_to_nwbfile(nwbfile, probe_id, sampling_rate, lfp_sampling_rate, de
         file to which probe information will be assigned.
     probe_id : int
         unique identifier for this probe - will be used to fill the "name" field on this probe's device and group
+    sampling_rate: float,
+        sampling rate
+    lfp_sampling_rate: float
+        sampling rate of LFP
+    has_lfp_data: bool
+        True if LFP data is available for the probe, otherwise False
     description : str, optional
         human-readable description of this probe. Practically (and temporarily), we use tags like "probeA" or "probeB"
     location : str, optional
@@ -304,7 +312,6 @@ def add_probe_to_nwbfile(nwbfile, probe_id, sampling_rate, lfp_sampling_rate, de
             electrode group object corresponding to this probe
 
     """
-
     probe_nwb_device = pynwb.device.Device(name=str(probe_id))
     probe_nwb_electrode_group = EcephysProbe(
         name=str(probe_id),
@@ -312,7 +319,8 @@ def add_probe_to_nwbfile(nwbfile, probe_id, sampling_rate, lfp_sampling_rate, de
         location=location,
         device=probe_nwb_device,
         sampling_rate=sampling_rate,
-        lfp_sampling_rate=lfp_sampling_rate
+        lfp_sampling_rate=lfp_sampling_rate,
+        has_lfp_data=has_lfp_data,
     )
 
     nwbfile.add_device(probe_nwb_device)
@@ -471,9 +479,13 @@ def write_probe_lfp_file(session_start_time, log_level, probe):
         session_start_time=session_start_time
     )    
 
-    nwbfile, probe_nwb_device, probe_nwb_electrode_group = add_probe_to_nwbfile(nwbfile, 
-        probe_id=probe["id"], description=probe["name"], 
-        sampling_rate=probe["sampling_rate"], lfp_sampling_rate=probe["lfp_sampling_rate"]
+    nwbfile, probe_nwb_device, probe_nwb_electrode_group = add_probe_to_nwbfile(
+        nwbfile,
+        probe_id=probe["id"],
+        description=probe["name"],
+        sampling_rate=probe["sampling_rate"],
+        lfp_sampling_rate=probe["lfp_sampling_rate"],
+        has_lfp_data=probe["lfp"] is not None
     )
 
     channels = prepare_probewise_channel_table(probe['channels'], probe_nwb_electrode_group)
@@ -574,9 +586,13 @@ def add_probewise_data_to_nwbfile(nwbfile, probes):
     for probe in probes:
         logging.info(f'found probe {probe["id"]} with name {probe["name"]}')
 
-        nwbfile, probe_nwb_device, probe_nwb_electrode_group = add_probe_to_nwbfile(nwbfile, 
-            probe_id=probe["id"], description=probe["name"], 
-            sampling_rate=probe["sampling_rate"], lfp_sampling_rate=probe["lfp_sampling_rate"]
+        nwbfile, probe_nwb_device, probe_nwb_electrode_group = add_probe_to_nwbfile(
+            nwbfile,
+            probe_id=probe["id"],
+            description=probe["name"],
+            sampling_rate=probe["sampling_rate"],
+            lfp_sampling_rate=probe["lfp_sampling_rate"],
+            has_lfp_data=probe["lfp"] is not None
         )
 
         channel_tables[probe["id"]] = prepare_probewise_channel_table(probe['channels'], probe_nwb_electrode_group)
@@ -687,7 +703,8 @@ def write_ecephys_nwb(
     io.write(nwbfile)
     io.close()
 
-    probe_outputs = write_probewise_lfp_files(probes, session_start_time, pool_size=pool_size)
+    probes_with_lfp = [p for p in probes if p["lfp"] is not None]
+    probe_outputs = write_probewise_lfp_files(probes_with_lfp, session_start_time, pool_size=pool_size)
 
     return {
         'nwb_path': output_path,

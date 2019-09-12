@@ -19,6 +19,9 @@ groups:
     - name: lfp_sampling_rate
       dtype: float64
       doc: the (probably reduced) sampling rate at which lfp data were acquired on this probe's channels
+    - name: has_lfp_data
+      dtype: bool
+      doc: indicates availability of lfp data
     links:
     - name: device
       target_type: Device
