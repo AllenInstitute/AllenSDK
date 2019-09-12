@@ -151,8 +151,18 @@ class InputSchema(ArgSchema):
         required=True,
         help="data collected about the running behavior of the experiment's subject",
     )
+    eye_dlc_ellipses_path = String(
+        required=True,
+        validate=check_read_access,
+        help="h5 filepath containing raw ellipse fits produced by Deep Lab Cuts of subject eye, pupil, and corneal reflections during experiment"
+    )
+    eye_gaze_mapping_path = String(
+        required=True,
+        validate=check_read_access,
+        help="h5 filepath containing eye gaze behavior of the experiment's subject"
+    )
     pool_size = Int(
-        default=3, 
+        default=3,
         help="number of child processes used to write probewise lfp files"
     )
     optotagging_table_path = String(

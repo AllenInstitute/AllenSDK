@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import datetime
@@ -17,6 +19,194 @@ from allensdk.brain_observatory.behavior.image_api import Image
 from allensdk.brain_observatory.behavior.image_api import ImageApi
 from allensdk.brain_observatory.behavior.schemas import OphysBehaviorMetaDataSchema, OphysBehaviorTaskParametersSchema
 from allensdk.brain_observatory.nwb.metadata import load_LabMetaData_extension
+
+
+def read_eye_dlc_tracking_ellipses(input_path: Path) -> dict:
+    """Reads eye tracking ellipse fit data from an h5 file.
+
+    Args:
+        input_path (Path): Path to eye tracking ellipse fit h5 file
+
+    Returns:
+        dict: Loaded h5 data. Each 'params' field contains dataframes with]
+            ellipse fit parameters. Dataframes contain 5 columns each
+            consisting of: "center_x", "center_y", "height", "phi", "width"
+    """
+
+    eye_dlc_tracking_data = {}
+
+    # TODO: Some ellipses.h5 files have the 'cr' key as complex type instead of
+    # float. For now, when loading ellipses.h5 files, always coerce to float
+    # but this should eventually be resolved upstream...
+    # See: allensdk.brain_observatory.eye_tracking
+    pupil_params = pd.read_hdf(input_path, key="pupil").astype(float)
+    cr_params = pd.read_hdf(input_path, key="cr").astype(float)
+    eye_params = pd.read_hdf(input_path, key="eye").astype(float)
+
+    eye_dlc_tracking_data["pupil_params"] = pupil_params
+    eye_dlc_tracking_data["cr_params"] = cr_params
+    eye_dlc_tracking_data["eye_params"] = eye_params
+
+    return eye_dlc_tracking_data
+
+
+def read_eye_gaze_mappings(input_path: Path) -> dict:
+    """Reads eye gaze mapping data from an h5 file.
+
+    Args:
+        input_path (Path): Path to eye gaze mapping h5 data file produced by
+            'allensdk.brain_observatory.gaze_mapping' module.
+
+    Returns:
+        dict: Loaded h5 data.
+            *_eye_areas: Area of eye (in pixels^2) over time
+            *_pupil_areas: Area of pupil (in pixels^2) over time
+            *_screen_coordinates: y, x screen coordinates (in cm) over time
+            *_screen_coordinates_spherical: y, x screen coordinates (in deg) over time
+            synced_frame_timestamps: synced timestamps for video frames (in sec)
+    """
+
+    eye_gaze_data = {}
+
+    eye_gaze_data["raw_eye_areas"] = pd.read_hdf(input_path, key="raw_eye_areas")
+    eye_gaze_data["raw_pupil_areas"] = pd.read_hdf(input_path, key="raw_pupil_areas")
+    eye_gaze_data["raw_screen_coordinates"] = pd.read_hdf(input_path, key="raw_screen_coordinates")
+    eye_gaze_data["raw_screen_coordinates_spherical"] = pd.read_hdf(input_path, key="raw_screen_coordinates_spherical")
+
+    eye_gaze_data["new_eye_areas"] = pd.read_hdf(input_path, key="new_eye_areas")
+    eye_gaze_data["new_pupil_areas"] = pd.read_hdf(input_path, key="new_pupil_areas")
+    eye_gaze_data["new_screen_coordinates"] = pd.read_hdf(input_path, key="new_screen_coordinates")
+    eye_gaze_data["new_screen_coordinates_spherical"] = pd.read_hdf(input_path, key="new_screen_coordinates_spherical")
+
+    eye_gaze_data["synced_frame_timestamps"] = pd.read_hdf(input_path, key="synced_frame_timestamps")
+
+    return eye_gaze_data
+
+
+def create_eye_tracking_nwb_processing_module(eye_dlc_tracking_data: dict,
+                                              synced_timestamps: pd.Series) -> pynwb.ProcessingModule:
+
+    # Top level container for eye tracking processed data
+    eye_tracking_mod = pynwb.ProcessingModule(name='eye_tracking',
+                                              description='Eye tracking processing module')
+
+    # Data interfaces of dlc_fits_container
+    pupil_fits = eye_dlc_tracking_data["pupil_params"].assign(timestamps=synced_timestamps)
+    pupil_params = pynwb.core.DynamicTable.from_dataframe(df=pupil_fits,
+                                                          name="pupil_ellipse_fits")
+
+    cr_fits = eye_dlc_tracking_data["cr_params"].assign(timestamps=synced_timestamps)
+    cr_params = pynwb.core.DynamicTable.from_dataframe(df=cr_fits,
+                                                       name="cr_ellipse_fits")
+
+    eye_fits = eye_dlc_tracking_data["eye_params"].assign(timestamps=synced_timestamps)
+    eye_params = pynwb.core.DynamicTable.from_dataframe(df=eye_fits,
+                                                        name="eye_ellipse_fits")
+
+    eye_tracking_mod.add_data_interface(pupil_params)
+    eye_tracking_mod.add_data_interface(cr_params)
+    eye_tracking_mod.add_data_interface(eye_params)
+
+    return eye_tracking_mod
+
+
+def add_eye_gaze_data_interfaces(pynwb_container: pynwb.NWBContainer,
+                                 pupil_areas: pd.Series,
+                                 eye_areas: pd.Series,
+                                 screen_coordinates: pd.DataFrame,
+                                 screen_coordinates_spherical: pd.DataFrame,
+                                 synced_timestamps: pd.Series) -> pynwb.NWBContainer:
+
+    pupil_area_ts = pynwb.base.TimeSeries(
+        name="pupil_area",
+        data=pupil_areas.values,
+        timestamps=synced_timestamps.values,
+        unit="pixels ^ 2"
+    )
+
+    eye_area_ts = pynwb.base.TimeSeries(
+        name="eye_area",
+        data=eye_areas.values,
+        timestamps=synced_timestamps.values,
+        unit="pixels ^ 2"
+    )
+
+    screen_coord_ss = pynwb.behavior.SpatialSeries(
+        name="screen_coordinates",
+        data=screen_coordinates.values,
+        timestamps=synced_timestamps.values,
+        conversion=0.01,  # scalar to multiply each element by to convert to meters
+        reference_frame="Monitor coordinates"
+    )
+
+    screen_coord_spherical_ss = pynwb.behavior.SpatialSeries(
+        name="screen_coordinates_spherical",
+        data=screen_coordinates_spherical.values,
+        timestamps=synced_timestamps.values,
+        conversion=0.01,  # scalar to multiply each element by to convert to meters
+        reference_frame="Monitor coordinates"
+    )
+
+    pynwb_container.add_data_interface(pupil_area_ts)
+    pynwb_container.add_data_interface(eye_area_ts)
+    pynwb_container.add_data_interface(screen_coord_ss)
+    pynwb_container.add_data_interface(screen_coord_spherical_ss)
+
+    return pynwb_container
+
+
+def create_gaze_mapping_nwb_processing_modules(eye_gaze_data: dict):
+    # Container for raw gaze mapped data
+    raw_gaze_mapping_mod = pynwb.ProcessingModule(name='raw_gaze_mapping',
+                                                  description='Gaze mapping processing module raw outputs')
+
+    raw_gaze_mapping_mod = add_eye_gaze_data_interfaces(raw_gaze_mapping_mod,
+                                                        pupil_areas=eye_gaze_data["raw_pupil_areas"],
+                                                        eye_areas=eye_gaze_data["raw_eye_areas"],
+                                                        screen_coordinates=eye_gaze_data["raw_screen_coordinates"],
+                                                        screen_coordinates_spherical=eye_gaze_data["raw_screen_coordinates_spherical"],
+                                                        synced_timestamps=eye_gaze_data["synced_frame_timestamps"])
+
+    # Container for filtered gaze mapped data
+    filt_gaze_mapping_mod = pynwb.ProcessingModule(name='filtered_gaze_mapping',
+                                                   description='Gaze mapping processing module filtered outputs')
+
+    filt_gaze_mapping_mod = add_eye_gaze_data_interfaces(filt_gaze_mapping_mod,
+                                                         pupil_areas=eye_gaze_data["new_pupil_areas"],
+                                                         eye_areas=eye_gaze_data["new_eye_areas"],
+                                                         screen_coordinates=eye_gaze_data["new_screen_coordinates"],
+                                                         screen_coordinates_spherical=eye_gaze_data["new_screen_coordinates_spherical"],
+                                                         synced_timestamps=eye_gaze_data["synced_frame_timestamps"])
+
+    return (raw_gaze_mapping_mod, filt_gaze_mapping_mod)
+
+
+def add_eye_behavior_data_to_nwbfile(nwbfile: pynwb.NWBFile,
+                                     eye_dlc_tracking_data: dict,
+                                     eye_gaze_data: dict) -> pynwb.NWBFile:
+    """Add eye tracking and eye gaze mapping data to nwbfile.
+
+    Args:
+        nwbfile (pynwb.NWBFile): nwbfile instance that will have eye tracking
+            data added.
+        eye_dlc_tracking_data (dict): Loaded ellipse fit data from Deep Lab Cuts h5 file
+        eye_gaze_data (dict): Loaded raw and filtered data from gaze_mapping h5 file
+
+    Returns:
+        pynwb.NWBFile: nwbfile instance with eye data added
+    """
+
+    synced_timestamps = eye_gaze_data["synced_frame_timestamps"]
+
+    eye_tracking_mod = create_eye_tracking_nwb_processing_module(eye_dlc_tracking_data,
+                                                                 synced_timestamps)
+    nwbfile.add_processing_module(eye_tracking_mod)
+
+    raw_gaze_mapping_mod, filt_gaze_mapping_mod = create_gaze_mapping_nwb_processing_modules(eye_gaze_data)
+    nwbfile.add_processing_module(raw_gaze_mapping_mod)
+    nwbfile.add_processing_module(filt_gaze_mapping_mod)
+
+    return nwbfile
 
 
 def add_running_speed_to_nwbfile(nwbfile, running_speed, name='speed', unit='cm/s'):
