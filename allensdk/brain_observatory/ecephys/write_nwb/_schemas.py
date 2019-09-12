@@ -80,10 +80,13 @@ class Probe(RaisingSchema):
     mean_waveforms_path = String(required=True, validate=check_read_access)
     channels = Nested(Channel, many=True, required=True)
     units = Nested(Unit, many=True, required=True)
-    lfp = Nested(Lfp, many=False, required=True)
-    csd_path = String(required=True, validate=check_read_access, help="path to h5 file containing calculated current source density")
+    lfp = Nested(Lfp, many=False, required=True, allow_none=True)
+    csd_path = String(required=True,
+                      validate=check_read_access,
+                      allow_none=True,
+                      help="path to h5 file containing calculated current source density")
     sampling_rate = Float(default=30000.0, help="sampling rate (Hz, master clock) at which raw data were acquired on this probe")
-    lfp_sampling_rate = Float(default=2500.0, help="sampling rate of LFP data on this probe")
+    lfp_sampling_rate = Float(default=2500.0, allow_none=True, help="sampling rate of LFP data on this probe")
     spike_amplitudes_path = String(validate=check_read_access, 
         help="path to npy file containing scale factor applied to the kilosort template used to extract each spike"
     )
