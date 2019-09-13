@@ -179,27 +179,18 @@ def create_gaze_mapping_nwb_processing_modules(eye_gaze_data: dict):
     return (raw_gaze_mapping_mod, filt_gaze_mapping_mod)
 
 
-def add_eye_behavior_data_to_nwbfile(nwbfile: pynwb.NWBFile,
-                                     eye_dlc_tracking_data: dict,
-                                     eye_gaze_data: dict) -> pynwb.NWBFile:
-    """Add eye tracking and eye gaze mapping data to nwbfile.
-
-    Args:
-        nwbfile (pynwb.NWBFile): nwbfile instance that will have eye tracking
-            data added.
-        eye_dlc_tracking_data (dict): Loaded ellipse fit data from Deep Lab Cuts h5 file
-        eye_gaze_data (dict): Loaded raw and filtered data from gaze_mapping h5 file
-
-    Returns:
-        pynwb.NWBFile: nwbfile instance with eye data added
-    """
-
-    synced_timestamps = eye_gaze_data["synced_frame_timestamps"]
-
+def add_eye_tracking_ellipse_fit_data_to_nwbfile(nwbfile: pynwb.NWBFile,
+                                                 eye_dlc_tracking_data: dict,
+                                                 synced_timestamps: pd.Series) -> pynwb.NWBFile:
     eye_tracking_mod = create_eye_tracking_nwb_processing_module(eye_dlc_tracking_data,
                                                                  synced_timestamps)
     nwbfile.add_processing_module(eye_tracking_mod)
 
+    return nwbfile
+
+
+def add_eye_gaze_mapping_data_to_nwbfile(nwbfile: pynwb.NWBFile,
+                                         eye_gaze_data: dict) -> pynwb.NWBFile:
     raw_gaze_mapping_mod, filt_gaze_mapping_mod = create_gaze_mapping_nwb_processing_modules(eye_gaze_data)
     nwbfile.add_processing_module(raw_gaze_mapping_mod)
     nwbfile.add_processing_module(filt_gaze_mapping_mod)
