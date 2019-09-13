@@ -22,7 +22,8 @@ from allensdk.brain_observatory.nwb import (
     setup_table_for_invalid_times,
     read_eye_dlc_tracking_ellipses,
     read_eye_gaze_mappings,
-    add_eye_behavior_data_to_nwbfile
+    add_eye_tracking_ellipse_fit_data_to_nwbfile,
+    add_eye_gaze_mapping_data_to_nwbfile
 )
 from allensdk.brain_observatory.argschema_utilities import (
     write_or_print_outputs, optional_lims_inputs
@@ -702,11 +703,18 @@ def write_ecephys_nwb(
     add_running_speed_to_nwbfile(nwbfile, running_speed)
     add_raw_running_data_to_nwbfile(nwbfile, raw_running_data)
 
-    eye_dlc_tracking_data = read_eye_dlc_tracking_ellipses(Path(eye_dlc_ellipses_path))
-    eye_gaze_data = read_eye_gaze_mappings(Path(eye_gaze_mapping_path))
-    add_eye_behavior_data_to_nwbfile(nwbfile,
-                                     eye_dlc_tracking_data=eye_dlc_tracking_data,
-                                     eye_gaze_data=eye_gaze_data)
+    if eye_gaze_mapping_path and eye_dlc_ellipses_path:
+        eye_gaze_data = read_eye_gaze_mappings(Path(eye_gaze_mapping_path))
+
+        eye_tracking_synced_timestamps = eye_gaze_data["synced_frame_timestamps"]
+
+        eye_dlc_tracking_data = read_eye_dlc_tracking_ellipses(Path(eye_dlc_ellipses_path))
+        add_eye_tracking_ellipse_fit_data_to_nwbfile(nwbfile,
+                                                    eye_dlc_tracking_data=eye_dlc_tracking_data,
+                                                    synced_timestamps=eye_tracking_synced_timestamps)
+
+        add_eye_gaze_mapping_data_to_nwbfile(nwbfile,
+                                             eye_gaze_data=eye_gaze_data)
 
     Manifest.safe_make_parent_dirs(output_path)
     io = pynwb.NWBHDF5IO(output_path, mode='w')
