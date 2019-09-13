@@ -167,20 +167,13 @@ class StimulusAnalysis(object):
         :param stim_table:
         :return:
         """
-        known_keys_lc = [k.lower() for k in self.known_stimulus_keys]
+        known_keys_lc = [k.lower() for k in self.__class__.known_stimulus_keys()]
         for table_key in stim_table['stimulus_name'].unique():
             if table_key.lower() in known_keys_lc:
                 return table_key
 
         else:
             return None
-
-    @property
-    def known_stimulus_keys(self):
-        """Used for discovering the correct stimulus_name key for a given StimulusAnalysis subclass (when stimulus_key
-        is not explicity set). Should return a list of "stimulus_name" strings.
-        """
-        raise NotImplementedError()
 
     @property
     def known_spontaneous_keys(self):
@@ -564,6 +557,14 @@ class StimulusAnalysis(object):
         _ = [self.plot_raster(cond, unit_id) for cond in self.stimulus_conditions.index.values]
 
     def plot_raster(self, condition, unit_id):
+        raise NotImplementedError()
+
+
+    @classmethod
+    def known_stimulus_keys(cls):
+        """Used for discovering the correct stimulus_name key for a given StimulusAnalysis subclass (when stimulus_key
+        is not explicity set). Should return a list of "stimulus_name" strings.
+        """
         raise NotImplementedError()
 
 

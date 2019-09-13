@@ -170,8 +170,8 @@ class StaticGratings(StimulusAnalysis):
 
         return self._metrics
 
-    @property
-    def known_stimulus_keys(self):
+    @classmethod
+    def known_stimulus_keys(cls):
         return ['static_gratings']
 
     def _get_stim_table_stats(self):

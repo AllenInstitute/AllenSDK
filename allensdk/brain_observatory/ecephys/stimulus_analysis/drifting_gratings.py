@@ -222,8 +222,8 @@ class DriftingGratings(StimulusAnalysis):
 
         return self._metrics
 
-    @property
-    def known_stimulus_keys(self):
+    @classmethod
+    def known_stimulus_keys(cls):
         return ['drifting_gratings', 'drifting_gratings_75_repeats']
 
     def _get_stim_table_stats(self):

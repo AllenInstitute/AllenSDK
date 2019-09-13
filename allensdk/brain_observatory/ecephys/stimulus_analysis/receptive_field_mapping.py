@@ -159,12 +159,12 @@ class ReceptiveFieldMapping(StimulusAnalysis):
 
         return self._metrics
 
-    @property
-    def known_stimulus_keys(self):
+    @classmethod
+    def known_stimulus_keys(cls):
         return ['receptive_field_mapping', 'gabor', "gabors"]
 
     def _find_stimulus_key(self, stim_table):
-        known_keys_lc = [k.lower() for k in self.known_stimulus_keys]
+        known_keys_lc = [k.lower() for k in self.__class__.known_stimulus_keys()]
 
         for table_key in stim_table['stimulus_name'].unique():
             table_key_lc = table_key.lower()

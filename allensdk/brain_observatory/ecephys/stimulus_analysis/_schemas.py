@@ -2,22 +2,29 @@ from argschema import ArgSchema
 from argschema.schemas import DefaultSchema
 from argschema.fields import Nested, String, Float, List, Int
 
+from .drifting_gratings import DriftingGratings
+from .static_gratings import StaticGratings
+from .natural_scenes import NaturalScenes
+from .dot_motion import DotMotion
+from .flashes import Flashes
+from .receptive_field_mapping import ReceptiveFieldMapping
+
 
 class DriftingGratings(DefaultSchema):
-    stimulus_key = String(help='Key for the drifting gratings stimulus')
+    stimulus_key = List(String, default=DriftingGratings.known_stimulus_keys(), help='Key for the drifting gratings stimulus')
     trial_duration = Float(default=2.0, help='typical length of a epoch for given stimulus in seconds')
     psth_resolution = Float(default=0.001, help='resultion (seconds) for generating PSTH')
 
 
 
 class StaticGratings(DefaultSchema):
-    stimulus_key = String(help='Key for the static gratings stimulus')
+    stimulus_key = List(String, default=StaticGratings.known_stimulus_keys(), help='Key for the static gratings stimulus')
     trial_duration = Float(default=0.25, help='typical length of a epoch for given stimulus in seconds')
     psth_resolution = Float(default=0.001, help='resultion (seconds) for generating PSTH')
 
 
 class NaturalScenes(DefaultSchema):
-    stimulus_key = String(help='Key for the natural scenes stimulus')
+    stimulus_key = List(String, default=NaturalScenes.known_stimulus_keys(), help='Key for the natural scenes stimulus')
     trial_duration = Float(default=0.25, help='typical length of a epoch for given stimulus in seconds')
     psth_resolution = Float(default=0.001, help='resultion (seconds) for generating PSTH')
 
@@ -28,7 +35,7 @@ class NaturalScenes(DefaultSchema):
 
 
 class DotMotion(DefaultSchema):
-    stimulus_key = String(help='Key for the dot motion stimulus')
+    stimulus_key = List(String, default=DotMotion.known_stimulus_keys(), help='Key for the dot motion stimulus')
     trial_duration = Float(default=1.0, help='typical length of a epoch for given stimulus in seconds')
     psth_resolution = Float(default=0.001, help='resultion (seconds) for generating PSTH')
 
@@ -39,16 +46,16 @@ class DotMotion(DefaultSchema):
 
 
 class Flashes(DefaultSchema):
-    stimulus_key = String(help='Key for the flash stimulus')
+    stimulus_key = List(String, default=Flashes.known_stimulus_keys(), help='Key for the flash stimulus')
     trial_duration = Float(default=0.25, help='typical length of a epoch for given stimulus in seconds')
     psth_resolution = Float(default=0.001, help='resultion (seconds) for generating PSTH')
 
 
 class ReceptiveFieldMapping(DefaultSchema):
-    stimulus_key = String(help='Key for the receptive field mapping stimulus')
+    stimulus_key = List(String, default=ReceptiveFieldMapping.known_stimulus_keys(), help='Key for the receptive field mapping stimulus')
     trial_duration = Float(default=0.25, help='typical length of a epoch for given stimulus in seconds')
-    minimum_spike_count = Int(help='Minimum number of spikes for computing receptive field parameters')
-    mask_threshold = Float(help='Threshold (as fraction of peak) for computing receptive field mask')
+    minimum_spike_count = Int(default=10, help='Minimum number of spikes for computing receptive field parameters')
+    mask_threshold = Float(default=1.0, help='Threshold (as fraction of peak) for computing receptive field mask')
     stimulus_step_size = Float(default=10.0, help='Distance between stimulus locations in degrees')
 
 

@@ -84,8 +84,8 @@ class NaturalMovies(StimulusAnalysis):
 
         return self._metrics
 
-    @property
-    def known_stimulus_keys(self):
+    @classmethod
+    def known_stimulus_keys(cls):
         return ['natural_movies', 'natural_movie_1', 'natural_movie_3']
 
     def _get_stim_table_stats(self):
