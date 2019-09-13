@@ -121,36 +121,34 @@ def add_eye_gaze_data_interfaces(pynwb_container: pynwb.NWBContainer,
         name="pupil_area",
         data=pupil_areas.values,
         timestamps=synced_timestamps.values,
-        unit="pixels ^ 2"
+        unit="Pixels ^ 2"
     )
 
     eye_area_ts = pynwb.base.TimeSeries(
         name="eye_area",
         data=eye_areas.values,
         timestamps=synced_timestamps.values,
-        unit="pixels ^ 2"
+        unit="Pixels ^ 2"
     )
 
-    screen_coord_ss = pynwb.behavior.SpatialSeries(
+    screen_coord_ts = pynwb.base.TimeSeries(
         name="screen_coordinates",
         data=screen_coordinates.values,
         timestamps=synced_timestamps.values,
-        conversion=0.01,  # scalar to multiply each element by to convert to meters
-        reference_frame="Monitor coordinates"
+        unit="Centimeters"
     )
 
-    screen_coord_spherical_ss = pynwb.behavior.SpatialSeries(
+    screen_coord_spherical_ts = pynwb.base.TimeSeries(
         name="screen_coordinates_spherical",
         data=screen_coordinates_spherical.values,
         timestamps=synced_timestamps.values,
-        conversion=0.01,  # scalar to multiply each element by to convert to meters
-        reference_frame="Monitor coordinates"
+        unit="Degrees"
     )
 
     pynwb_container.add_data_interface(pupil_area_ts)
     pynwb_container.add_data_interface(eye_area_ts)
-    pynwb_container.add_data_interface(screen_coord_ss)
-    pynwb_container.add_data_interface(screen_coord_spherical_ss)
+    pynwb_container.add_data_interface(screen_coord_ts)
+    pynwb_container.add_data_interface(screen_coord_spherical_ts)
 
     return pynwb_container
 
