@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 
 import numpy as np
@@ -19,6 +20,9 @@ from allensdk.brain_observatory.behavior.image_api import Image
 from allensdk.brain_observatory.behavior.image_api import ImageApi
 from allensdk.brain_observatory.behavior.schemas import OphysBehaviorMetaDataSchema, OphysBehaviorTaskParametersSchema
 from allensdk.brain_observatory.nwb.metadata import load_LabMetaData_extension
+
+
+log = logging.getLogger("allensdk.brain_observatory.nwb")
 
 
 def read_eye_dlc_tracking_ellipses(input_path: Path) -> dict:
@@ -81,6 +85,34 @@ def read_eye_gaze_mappings(input_path: Path) -> dict:
     eye_gaze_data["synced_frame_timestamps"] = pd.read_hdf(input_path, key="synced_frame_timestamps")
 
     return eye_gaze_data
+
+
+def eye_tracking_data_is_valid(eye_dlc_tracking_data: dict,
+                               synced_timestamps: pd.Series) -> bool:
+    is_valid = True
+
+    pupil_params = eye_dlc_tracking_data["pupil_params"]
+    cr_params = eye_dlc_tracking_data["cr_params"]
+    eye_params = eye_dlc_tracking_data["eye_params"]
+
+    num_frames_match = ((pupil_params.shape[0] == cr_params.shape[0]) and
+                        (cr_params.shape[0] == eye_params.shape[0]))
+    if not num_frames_match:
+        log.warn("The number of frames for ellipse fits don't "
+                 "match when they should. No ellipse fits will be written! "
+                 f"pupil_params ({pupil_params.shape[0]}), "
+                 f"cr_params ({cr_params.shape[0]}), "
+                 f"eye_params ({eye_params.shape[0]})")
+        is_valid = False
+
+    if (pupil_params.shape[0] != len(synced_timestamps)):
+        log.warn("The number of camera sync pulses in the "
+                 f"sync file ({len(synced_timestamps)}) do not match "
+                 "with the number of eye tracking frames "
+                 f"({pupil_params.shape[0]})! No ellipse fits will be written!")
+        is_valid = False
+
+    return is_valid
 
 
 def create_eye_tracking_nwb_processing_module(eye_dlc_tracking_data: dict,

@@ -3,6 +3,7 @@ from marshmallow import RAISE
 from argschema import ArgSchema
 from argschema.fields import (
     LogLevel,
+    Dict,
     String,
     Int,
     DateTime,
@@ -103,6 +104,7 @@ class Probe(RaisingSchema):
         help="amplitude scale factor converting raw amplitudes to Volts. Default converts from bits -> uV -> V"
     )
 
+
 class InvalidEpoch(RaisingSchema):
     id = Int(required=True)
     type = String(required=True)
@@ -151,9 +153,18 @@ class InputSchema(ArgSchema):
         required=True,
         help="data collected about the running behavior of the experiment's subject",
     )
+    session_sync_path = String(
+        required=True,
+        validate=check_read_access,
+        help="Path to an h5 experiment session sync file (*.sync). This file relates events from different acquisition modalities to one another in time."
+    )
+    eye_tracking_rig_geometry = Dict(
+        required=True,
+        help="Mapping containing information about session rig geometry used for eye gaze mapping."
+    )
     eye_dlc_ellipses_path = String(
-        required=False,
-        allow_none=True,
+        required=True,
+        validate=check_read_access,
         help="h5 filepath containing raw ellipse fits produced by Deep Lab Cuts of subject eye, pupil, and corneal reflections during experiment"
     )
     eye_gaze_mapping_path = String(

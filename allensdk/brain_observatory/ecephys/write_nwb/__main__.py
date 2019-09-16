@@ -23,7 +23,8 @@ from allensdk.brain_observatory.nwb import (
     read_eye_dlc_tracking_ellipses,
     read_eye_gaze_mappings,
     add_eye_tracking_ellipse_fit_data_to_nwbfile,
-    add_eye_gaze_mapping_data_to_nwbfile
+    add_eye_gaze_mapping_data_to_nwbfile,
+    eye_tracking_data_is_valid
 )
 from allensdk.brain_observatory.argschema_utilities import (
     write_or_print_outputs, optional_lims_inputs
@@ -31,6 +32,7 @@ from allensdk.brain_observatory.argschema_utilities import (
 from allensdk.brain_observatory import dict_to_indexed_array
 from allensdk.brain_observatory.ecephys.file_io.continuous_file import ContinuousFile
 from allensdk.brain_observatory.ecephys.nwb import EcephysProbe
+from allensdk.brain_observatory.gaze_mapping._sync_frames import get_synchronized_camera_frame_times
 
 
 STIM_TABLE_RENAMES_MAP = {"Start": "start_time", "End": "stop_time"}
@@ -668,6 +670,32 @@ def add_optotagging_table_to_nwbfile(nwbfile, optotagging_table, tag="optical_st
     return nwbfile
 
 
+def append_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile: pynwb.NWBFile,
+                                                     eye_tracking_rig_geometry: dict) -> pynwb.NWBFile:
+    """ Rig geometry dict should consist of the following fields:
+    monitor_position_mm: [x, y, z]
+    monitor_rotation_deg: [x, y, z]
+    camera_position_mm: [x, y, z]
+    camera_rotation_deg: [x, y, z]
+    led_position_mm: [x, y, z]
+    equipment: A string describing rig
+    """
+    rig_geometry_data = pd.DataFrame(eye_tracking_rig_geometry,
+                                     index=['x', 'y', 'z']).drop('equipment', axis=1)
+    rig_geometry_data['pynwb_index'] = range(len(rig_geometry_data))
+    equipment_data = pd.DataFrame({"equipment": eye_tracking_rig_geometry['equipment']}, index=[0])
+
+    eye_tracking_mod = nwbfile.modules['eye_tracking']
+    rig_geometry_interface = pynwb.core.DynamicTable.from_dataframe(df=rig_geometry_data,
+                                                                    name="rig_geometry_data",
+                                                                    index_column='pynwb_index')
+    equipment_interface = pynwb.core.DynamicTable.from_dataframe(df=equipment_data,
+                                                                 name="equipment")
+    eye_tracking_mod.add_data_interface(rig_geometry_interface)
+    eye_tracking_mod.add_data_interface(equipment_interface)
+
+    return nwbfile
+
 
 def write_ecephys_nwb(
     output_path, 
@@ -676,6 +704,8 @@ def write_ecephys_nwb(
     invalid_epochs,
     probes, 
     running_speed_path,
+    session_sync_path,
+    eye_tracking_rig_geometry,
     eye_dlc_ellipses_path,
     eye_gaze_mapping_path,
     pool_size,
@@ -704,18 +734,25 @@ def write_ecephys_nwb(
     add_running_speed_to_nwbfile(nwbfile, running_speed)
     add_raw_running_data_to_nwbfile(nwbfile, raw_running_data)
 
-    if eye_gaze_mapping_path and eye_dlc_ellipses_path:
-        eye_gaze_data = read_eye_gaze_mappings(Path(eye_gaze_mapping_path))
+    # --- Add eye tracking ellipse fits to nwb file ---
+    eye_tracking_frame_times = get_synchronized_camera_frame_times(session_sync_path)
+    eye_dlc_tracking_data = read_eye_dlc_tracking_ellipses(Path(eye_dlc_ellipses_path))
 
-        eye_tracking_synced_timestamps = eye_gaze_data["synced_frame_timestamps"]
-
-        eye_dlc_tracking_data = read_eye_dlc_tracking_ellipses(Path(eye_dlc_ellipses_path))
+    if eye_tracking_data_is_valid(eye_dlc_tracking_data=eye_dlc_tracking_data,
+                                  synced_timestamps=eye_tracking_frame_times):
         add_eye_tracking_ellipse_fit_data_to_nwbfile(nwbfile,
                                                     eye_dlc_tracking_data=eye_dlc_tracking_data,
-                                                    synced_timestamps=eye_tracking_synced_timestamps)
+                                                    synced_timestamps=eye_tracking_frame_times)
 
-        add_eye_gaze_mapping_data_to_nwbfile(nwbfile,
-                                             eye_gaze_data=eye_gaze_data)
+        # --- Append eye tracking rig geometry info to nwb file (with eye tracking) ---
+        append_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile,
+                                                        eye_tracking_rig_geometry=eye_tracking_rig_geometry)
+
+        # --- Add gaze mapped positions to nwb file ---
+        if eye_gaze_mapping_path:
+            eye_gaze_data = read_eye_gaze_mappings(Path(eye_gaze_mapping_path))
+            add_eye_gaze_mapping_data_to_nwbfile(nwbfile,
+                                                eye_gaze_data=eye_gaze_data)
 
     Manifest.safe_make_parent_dirs(output_path)
     io = pynwb.NWBHDF5IO(output_path, mode='w')
