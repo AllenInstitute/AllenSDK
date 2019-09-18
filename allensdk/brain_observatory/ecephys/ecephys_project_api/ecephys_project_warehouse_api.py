@@ -46,7 +46,7 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
 
     def get_sessions(self, session_ids=None, has_eye_tracking=None, stimulus_names=None):
         criteria = session_ids is not None or has_eye_tracking is not None or stimulus_names is not None
-        return build_and_execute(
+        response = build_and_execute(
             (
                 "{% import 'rma_macros' as rm %}"
                 "{% import 'macros' as m %}"
@@ -55,14 +55,49 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
                 r"{{rm.optional_contains('id',session_ids)}}"
                 r"{%if has_eye_tracking is not none%}[fail_eye_tracking$eq{{m.str(not has_eye_tracking).lower()}}]{%endif%}"
                 r"{{rm.optional_contains('stimulus_name',stimulus_names,True)}}"
+                # ",rma::include,specimen(donor(age))"
+                ",well_known_files(well_known_file_type)"
             ), 
             base=rma_macros(), engine=self.rma_engine.get_rma_tabular, criteria=criteria, session_ids=session_ids, 
             has_eye_tracking=has_eye_tracking, stimulus_names=stimulus_names
         )
 
+        response.set_index("id", inplace=True)
+
+        # age_in_days = []
+        # sex = []
+        # genotype = []
+        has_nwb = []
+
+        for idx, row in response.iterrows():
+            # age_in_days.append(row["specimen"]["donor"]["age"]["days"])
+            # sex.append(row["specimen"]["donor"]["sex"])
+
+            # gt = row["specimen"]["donor"]["full_genotype"]
+            # if gt is None:
+            #     gt = "wt"
+            # genotype.append(gt)
+
+            current_has_nwb = False
+            for wkf in row["well_known_files"]:
+                if wkf["well_known_file_type"]["name"] == "EcephysNwb":
+                    current_has_nwb = True
+            has_nwb.append(current_has_nwb)
+
+        # response["age_in_days"] = age_in_days
+        # response["sex"] = sex
+        # response["genotype"] = genotype
+        response["has_nwb"] = has_nwb
+
+        # response.drop(columns=["specimen", "fail_eye_tracking", "well_known_files"], inplace=True)
+        response.rename(columns={"stimulus_name": "session_type"}, inplace=True)
+
+        return response
+
+
     def get_probes(self, probe_ids=None, session_ids=None):
         criteria = probe_ids is not None and session_ids is not None
-        return build_and_execute(
+        response = build_and_execute(
             (
                 "{% import 'rma_macros' as rm %}"
                 "{% import 'macros' as m %}"           
@@ -75,9 +110,13 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
             criteria=criteria
         )
 
+        response.set_index("id", inplace=True)
+
+        return response
+
     def get_channels(self, channel_ids=None, probe_ids=None, session_ids=None):
         criteria = probe_ids is not None and session_ids is not None
-        return build_and_execute(
+        response = build_and_execute(
             (
                 "{% import 'rma_macros' as rm %}"
                 "{% import 'macros' as m %}"           
@@ -91,9 +130,11 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
             channel_ids=channel_ids, criteria=criteria
         )
 
+        return response
+
     def get_units(self, unit_ids=None, channel_ids=None, probe_ids=None, session_ids=None):
         criteria = probe_ids is not None and session_ids is not None
-        return build_and_execute(
+        response =  build_and_execute(
             (
                 "{% import 'macros' as m %}" 
                 "criteria=model::EcephysUnit"
@@ -105,6 +146,12 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
             base=rma_macros(), engine=self.rma_engine.get_rma_tabular, session_ids=session_ids, probe_ids=probe_ids,
             channel_ids=channel_ids, unit_ids=unit_ids, criteria=criteria
         )
+
+        response.set_index("id", inplace=True)
+
+        return response
+
+
     @classmethod
     def default(cls, **rma_kwargs):
         _rma_kwargs = {"scheme": "http", "host": "api.brain-map.org"}
