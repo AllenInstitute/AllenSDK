@@ -55,7 +55,7 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
                 r"{{rm.optional_contains('id',session_ids)}}"
                 r"{%if has_eye_tracking is not none%}[fail_eye_tracking$eq{{m.str(not has_eye_tracking).lower()}}]{%endif%}"
                 r"{{rm.optional_contains('stimulus_name',stimulus_names,True)}}"
-                # ",rma::include,specimen(donor(age))"
+                ",rma::include,specimen(donor(age))"
                 ",well_known_files(well_known_file_type)"
             ), 
             base=rma_macros(), engine=self.rma_engine.get_rma_tabular, criteria=criteria, session_ids=session_ids, 
