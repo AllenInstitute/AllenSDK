@@ -226,7 +226,7 @@ def get_components(receptive_field_data):
     s1, s2 = receptive_field_data.shape
 
     candidate_pixel_list = np.where(receptive_field_data.flatten()==True)[0]
-    pixel_coord_dict = dict((px, (px/s2, (px - s2 * (px/s2)), px% (s1 * s2) == px)) for px in candidate_pixel_list)
+    pixel_coord_dict = dict((px, (int(px/s2), (px - s2 * int(px/s2)), px% (s1 * s2) == px)) for px in candidate_pixel_list)
 
     component_list = []
 
