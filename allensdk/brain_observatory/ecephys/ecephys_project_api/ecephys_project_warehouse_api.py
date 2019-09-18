@@ -64,19 +64,19 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
 
         response.set_index("id", inplace=True)
 
-        # age_in_days = []
-        # sex = []
-        # genotype = []
+        age_in_days = []
+        sex = []
+        genotype = []
         has_nwb = []
 
         for idx, row in response.iterrows():
-            # age_in_days.append(row["specimen"]["donor"]["age"]["days"])
-            # sex.append(row["specimen"]["donor"]["sex"])
+            age_in_days.append(row["specimen"]["donor"]["age"]["days"])
+            sex.append(row["specimen"]["donor"]["sex"])
 
-            # gt = row["specimen"]["donor"]["full_genotype"]
-            # if gt is None:
-            #     gt = "wt"
-            # genotype.append(gt)
+            gt = row["specimen"]["donor"]["full_genotype"]
+            if gt is None:
+                gt = "wt"
+            genotype.append(gt)
 
             current_has_nwb = False
             for wkf in row["well_known_files"]:
@@ -84,12 +84,12 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
                     current_has_nwb = True
             has_nwb.append(current_has_nwb)
 
-        # response["age_in_days"] = age_in_days
-        # response["sex"] = sex
-        # response["genotype"] = genotype
+        response["age_in_days"] = age_in_days
+        response["sex"] = sex
+        response["genotype"] = genotype
         response["has_nwb"] = has_nwb
 
-        # response.drop(columns=["specimen", "fail_eye_tracking", "well_known_files"], inplace=True)
+        response.drop(columns=["specimen", "fail_eye_tracking", "well_known_files"], inplace=True)
         response.rename(columns={"stimulus_name": "session_type"}, inplace=True)
 
         return response
