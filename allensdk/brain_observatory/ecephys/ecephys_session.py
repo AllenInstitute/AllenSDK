@@ -144,10 +144,36 @@ class EcephysSession(LazyPropertyMixin):
     def stimulus_names(self):
         return self.stimulus_presentations['stimulus_name'].unique().tolist()
 
+
     @property
     def stimulus_conditions(self):
         self.stimulus_presentations
         return self._stimulus_conditions
+
+
+    @property
+    def corneal_reflection_ellipse_fits(self):
+        return self._eye_tracking_ellipse_fit_data["cr_ellipse_fits"]
+
+
+    @property
+    def eye_ellipse_fits(self):
+        return self._eye_tracking_ellipse_fit_data["eye_ellipse_fits"]
+
+
+    @property
+    def pupil_ellipse_fits(self):
+        return self._eye_tracking_ellipse_fit_data["pupil_ellipse_fits"]
+    
+
+    @property
+    def rig_geometry_data(self):
+        return self._eye_tracking_ellipse_fit_data["rig_geometry_data"]
+
+
+    @property
+    def rig_equipment_name(self):
+        return self._eye_tracking_ellipse_fit_data["rig_equipment"]
 
 
     def __init__(self, api, **kwargs):
@@ -168,6 +194,11 @@ class EcephysSession(LazyPropertyMixin):
         self.units = self.LazyProperty(self.api.get_units, wrappers=[self._build_units_table])
         self.inter_presentation_intervals = self.LazyProperty(self._build_inter_presentation_intervals)
         self.invalid_times = self.LazyProperty(self.api.get_invalid_times)
+
+        self._eye_tracking_ellipse_fit_data = self.LazyProperty(self.api.get_eye_tracking_ellipse_fit_data)
+        self.raw_eye_gaze_mapping_data = self.LazyProperty(self.api.get_raw_eye_gaze_mapping_data)
+        self.filtered_eye_gaze_mapping_data = self.LazyProperty(self.api.get_filtered_eye_gaze_mapping_data)
+
 
     def get_current_source_density(self, probe_id):
         """ Obtain current source density (CSD) image for this probe. Please see

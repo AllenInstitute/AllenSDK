@@ -55,3 +55,12 @@ class EcephysSessionApi:
 
     def get_spike_amplitudes(self) -> Dict[int, np.ndarray]:
         raise NotImplementedError
+
+    def get_eye_tracking_ellipse_fit_data(self):
+        raise NotImplementedError
+
+    def get_raw_eye_gaze_mapping_data(self):
+        raise NotImplementedError
+
+    def get_filtered_eye_gaze_mapping_data(self):
+        raise NotImplementedError
