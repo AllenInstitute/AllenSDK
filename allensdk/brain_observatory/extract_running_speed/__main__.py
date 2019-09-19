@@ -48,7 +48,7 @@ def angular_to_linear_velocity(angular_velocity, radius):
 
 
 def extract_running_speeds(
-    frame_times, dx_deg, vsig, vin, wheel_radius, subject_position
+    frame_times, dx_deg, vsig, vin, wheel_radius, subject_position, use_median_duration=False
 ):
 
     # the first interval does not have a known start time, so we can't compute
@@ -59,7 +59,10 @@ def extract_running_speeds(
     end_times = frame_times[1:]
 
     durations = end_times - start_times
-    angular_velocity = dx_rad / durations
+    if use_median_duration:
+        angular_velocity = dx_rad / durations
+    else:
+        angular_velocity = dx_rad = np.median(durations)
 
     radius = wheel_radius * subject_position
     linear_velocity = angular_to_linear_velocity(angular_velocity, radius)
@@ -83,7 +86,7 @@ def extract_running_speeds(
 
 def main(
     stimulus_pkl_path, sync_h5_path, output_path, wheel_radius, 
-    subject_position, **kwargs
+    subject_position, use_median_duration, **kwargs
 ):
 
     stim_file = pd.read_pickle(stimulus_pkl_path)
@@ -121,6 +124,7 @@ def main(
         vin=vin,
         wheel_radius=wheel_radius,
         subject_position=subject_position,
+        use_median_duration=use_median_duration
     )
 
     raw_data = pd.DataFrame(
