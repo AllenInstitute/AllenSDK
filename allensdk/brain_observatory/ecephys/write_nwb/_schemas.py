@@ -191,7 +191,7 @@ class InputSchema(ArgSchema):
         validate=check_read_access,
         help="file at this path contains information about the optogenetic stimulation applied during this "
     )
-    session_metadata = Nested(SessionMetadata, required=False, help="miscellaneous information describing this session")
+    session_metadata = Nested(SessionMetadata, allow_none=True, required=False, help="miscellaneous information describing this session")
 
 
 class ProbeOutputs(RaisingSchema):
