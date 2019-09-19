@@ -114,6 +114,15 @@ class InvalidEpoch(RaisingSchema):
     end_time = Float(required=True)
 
 
+class SessionMetadata(RaisingSchema):
+      specimen_name = String(required=True)
+      age_in_day = Float(required=True)
+      full_genotype = String(required=True)
+      strain = String(required=True)
+      sex = String(required=True)
+      stimulus_name = String(required=True)
+
+
 class InputSchema(ArgSchema):
     class Meta:
         unknown = RAISE
@@ -182,6 +191,7 @@ class InputSchema(ArgSchema):
         validate=check_read_access,
         help="file at this path contains information about the optogenetic stimulation applied during this "
     )
+    session_metadata = Nested(SessionMetadata, required=False, help="miscellaneous information describing this session")
 
 
 class ProbeOutputs(RaisingSchema):
