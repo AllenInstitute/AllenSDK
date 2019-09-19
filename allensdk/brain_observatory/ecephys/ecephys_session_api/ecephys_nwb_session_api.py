@@ -232,3 +232,6 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         units = units[units["isi_violations"] <= self.isi_violations_maximum]
 
         return units
+
+    def get_metadata(self):
+        return self.nwbfile.lab_meta_data['metadata'].to_dict()

@@ -56,7 +56,7 @@ def raw_running_data():
     })
 
 
-def test_roundtrip_metadata(roundtripper):
+def test_roundtrip_basic_metadata(roundtripper):
     dt = datetime.now(timezone.utc)
     nwbfile = pynwb.NWBFile(
         session_description='EcephysSession',
@@ -67,6 +67,30 @@ def test_roundtrip_metadata(roundtripper):
     api = roundtripper(nwbfile, EcephysNwbSessionApi)
     assert 12345 == api.get_ecephys_session_id()
     assert dt == api.get_session_start_time()
+
+
+def test_add_metadata(nwbfile, roundtripper):
+    metadata = {
+      "specimen_name": "mouse_1",
+      "age_in_days": 100.0,
+      "full_genotype": "wt",
+      "strain": "c57",
+      "sex": "F",
+      "stimulus_name": "brain_observatory_2.0"
+    }
+    write_nwb.add_metadata_to_nwbfile(nwbfile, metadata)
+
+    api = roundtripper(nwbfile, EcephysNwbSessionApi)
+    obtained = api.get_metadata()
+
+    assert set(metadata.keys()) == set(obtained.keys())
+
+    misses = {}
+    for key, value in metadata.items():
+        if obtained[key] != value:
+            misses[key] = {"expected": value, "obtained": obtained[key]}
+
+    assert len(misses) == 0, f"the following metadata items were mismatched: {misses}"
 
 
 def test_add_stimulus_presentations(nwbfile, stimulus_presentations, roundtripper):

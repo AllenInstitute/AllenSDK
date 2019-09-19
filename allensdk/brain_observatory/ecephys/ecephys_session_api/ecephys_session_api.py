@@ -64,3 +64,6 @@ class EcephysSessionApi:
 
     def get_filtered_eye_gaze_mapping_data(self):
         raise NotImplementedError
+
+    def get_metadata(self):
+        raise NotImplementedError

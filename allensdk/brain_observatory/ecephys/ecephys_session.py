@@ -176,6 +176,31 @@ class EcephysSession(LazyPropertyMixin):
         return self._eye_tracking_ellipse_fit_data["rig_equipment"]
 
 
+    @property
+    def specimen_name(self):
+        return self._metadata["specimen_name"]
+
+
+    @property
+    def age_in_days(self):
+        return self._metadata["age_in_days"]
+
+
+    @property
+    def sex(self):
+        return self._metadata["sex"]
+
+
+    @property
+    def full_genotype(self):
+        return self._metadata["full_genotype"]
+
+
+    @property
+    def session_type(self):
+        return self._metadata["stimulus_name"]
+
+
     def __init__(self, api, **kwargs):
         self.api: EcephysSessionApi = api
 
@@ -198,6 +223,8 @@ class EcephysSession(LazyPropertyMixin):
         self._eye_tracking_ellipse_fit_data = self.LazyProperty(self.api.get_eye_tracking_ellipse_fit_data)
         self.raw_eye_gaze_mapping_data = self.LazyProperty(self.api.get_raw_eye_gaze_mapping_data)
         self.filtered_eye_gaze_mapping_data = self.LazyProperty(self.api.get_filtered_eye_gaze_mapping_data)
+
+        self._metadata = self.LazyProperty(self.api.get_metadata)
 
 
     def get_current_source_density(self, probe_id):

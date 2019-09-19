@@ -116,7 +116,7 @@ class InvalidEpoch(RaisingSchema):
 
 class SessionMetadata(RaisingSchema):
       specimen_name = String(required=True)
-      age_in_day = Float(required=True)
+      age_in_days = Float(required=True)
       full_genotype = String(required=True)
       strain = String(required=True)
       sex = String(required=True)
