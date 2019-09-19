@@ -485,6 +485,10 @@ def write_probe_lfp_file(session_start_time, log_level, probe):
         session_start_time=session_start_time
     )    
 
+
+    if probe.get("temporal_subsampling_factor", None) is not None:
+        probe["lfp_sampling_rate"] = probe["lfp_sampling_rate"] / probe["temporal_subsampling_factor"]
+
     nwbfile, probe_nwb_device, probe_nwb_electrode_group = add_probe_to_nwbfile(
         nwbfile,
         probe_id=probe["id"],
@@ -592,6 +596,9 @@ def add_probewise_data_to_nwbfile(nwbfile, probes):
 
     for probe in probes:
         logging.info(f'found probe {probe["id"]} with name {probe["name"]}')
+
+        if probe.get("temporal_subsampling_factor", None) is not None:
+            probe["lfp_sampling_rate"] = probe["lfp_sampling_rate"] / probe["temporal_subsampling_factor"]
 
         nwbfile, probe_nwb_device, probe_nwb_electrode_group = add_probe_to_nwbfile(
             nwbfile,

@@ -88,6 +88,7 @@ class Probe(RaisingSchema):
                       help="path to h5 file containing calculated current source density")
     sampling_rate = Float(default=30000.0, help="sampling rate (Hz, master clock) at which raw data were acquired on this probe")
     lfp_sampling_rate = Float(default=2500.0, allow_none=True, help="sampling rate of LFP data on this probe")
+    temporal_subsampling_factor = Float(default=2.0, allow_none=True, help="subsampling factor applied to lfp data for this probe (across time)")
     spike_amplitudes_path = String(validate=check_read_access, 
         help="path to npy file containing scale factor applied to the kilosort template used to extract each spike"
     )

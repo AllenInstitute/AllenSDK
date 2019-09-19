@@ -296,6 +296,7 @@ def test_write_probe_lfp_file(tmpdir_factory, lfp_data):
         "name": "probeA",
         "sampling_rate": 29.0,
         "lfp_sampling_rate": 10.0,
+        "temporal_subsampling_factor": 2.0,
         "channels":  [
             {
                 'id': 0,
