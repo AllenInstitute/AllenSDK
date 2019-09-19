@@ -31,7 +31,7 @@ from allensdk.brain_observatory.argschema_utilities import (
 )
 from allensdk.brain_observatory import dict_to_indexed_array
 from allensdk.brain_observatory.ecephys.file_io.continuous_file import ContinuousFile
-from allensdk.brain_observatory.ecephys.nwb import EcephysProbe
+from allensdk.brain_observatory.ecephys.nwb import EcephysProbe, EcephysLabMetaData
 from allensdk.brain_observatory.gaze_mapping._sync_frames import get_synchronized_camera_frame_times
 
 
@@ -215,6 +215,13 @@ def group_1d_by_unit(data, data_unit_map, local_to_global_unit_map=None):
             output[local_unit] = current
 
     return output
+
+
+def add_metadata_to_nwbfile(nwbfile, metadata):
+    nwbfile.add_lab_meta_data(
+        EcephysLabMetaData(name="metadata", **metadata)
+    )
+    return nwbfile
 
 
 def read_waveforms_to_dictionary(
