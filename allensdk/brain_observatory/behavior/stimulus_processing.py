@@ -90,18 +90,34 @@ def get_stimulus_templates(pkl):
 
 def get_stimulus_metadata(pkl):
 
-    images = get_images_dict(pkl)
-    stimulus_index_df = pd.DataFrame(images['image_attributes'])
-    image_set_filename = convert_filepath_caseinsensitive(images['metadata']['image_set'])
-    stimulus_index_df['image_set'] = IMAGE_SETS_REV[image_set_filename]
+    if 'images' in pkl["items"]["behavior"]["stimuli"]:
+        images = get_images_dict(pkl)
+        stimulus_index_df = pd.DataFrame(images['image_attributes'])
+        image_set_filename = convert_filepath_caseinsensitive(images['metadata']['image_set'])
+        stimulus_index_df['image_set'] = IMAGE_SETS_REV[image_set_filename]
 
-    # Add an entry for omitted stimuli
-    omitted_df = pd.DataFrame({'image_category':['omitted'],
-                               'image_name':['omitted'],
-                               'image_set':['omitted'],
-                               'image_index':[stimulus_index_df['image_index'].max()+1]})
-    stimulus_index_df = stimulus_index_df.append(omitted_df, ignore_index=True, sort=False)
-    stimulus_index_df.set_index(['image_index'], inplace=True, drop=True)
+        # Add an entry for omitted stimuli
+        omitted_df = pd.DataFrame({'image_category':['omitted'],
+                                   'image_name':['omitted'],
+                                   'image_set':['omitted'],
+                                   'image_index':[stimulus_index_df['image_index'].max()+1]})
+        stimulus_index_df = stimulus_index_df.append(omitted_df, ignore_index=True, sort=False)
+        stimulus_index_df.set_index(['image_index'], inplace=True, drop=True)
+    else:
+        stim_groups = pkl['items']['behavior']['stimuli']['grating']['stim_groups']
+        image_sets = []
+        image_names = []
+        for group in stim_groups.keys():
+            for ori in stim_groups[group][1]:
+                image_sets.append(group)
+                image_names.append('gratings_{}'.format(ori))
+        image_groups = image_names
+        stimulus_index_df = pd.DataFrame({
+            'image_name': image_names,
+            'image_group': image_groups,
+            'image_set': image_sets
+        })
+        stimulus_index_df.index.name = 'image_index'
     return stimulus_index_df
 
 

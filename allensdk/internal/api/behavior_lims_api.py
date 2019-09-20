@@ -132,19 +132,7 @@ class BehaviorLimsApi(PostgresQueryMixin):
             else:
                 raise ValueError('non_null orientation and image_name')
                     
-        if 'images' in data["items"]["behavior"]["stimuli"]:
-            stimulus_metadata_df = get_stimulus_metadata(data) 
-        else:
-            image_names = stimulus_presentations_df_pre['image_name'].unique()
-            image_groups = image_names
-            image_sets = ['vertical' if x in ['gratings_0', 'gratings_180'] else 'horizontal' for x in image_names]
-            stimulus_metadata_df = pd.DataFrame({
-                'image_name': image_names,
-                'image_group': image_groups,
-                'image_set': image_sets
-            })
-            stimulus_metadata_df.index.name = 'image_index'
-
+        stimulus_metadata_df = get_stimulus_metadata(data) 
         idx_name = stimulus_presentations_df_pre.index.name
         stimulus_index_df = stimulus_presentations_df_pre.reset_index().merge(stimulus_metadata_df.reset_index(), on=['image_name']).set_index(idx_name)
         stimulus_index_df.sort_index(inplace=True)
