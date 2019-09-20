@@ -176,8 +176,14 @@ def test_conditionwise_statistics(ecephys_api):
     assert(set(stim_analysis.conditionwise_statistics.index.names) == {'unit_id', 'stimulus_condition_id'})
     assert(set(stim_analysis.conditionwise_statistics.columns) ==
            {'spike_std', 'spike_sem', 'spike_count', 'stimulus_presentation_count', 'spike_mean'})
-    assert(np.allclose(stim_analysis.conditionwise_statistics.loc[(0, 1)].values,
-                       [2.0, 3.0, 0.66666667, 0.57735027, 0.33333333]))
+
+    expected = pd.Series(
+        [2.0, 3.0, 0.66666667, 0.57735027, 0.33333333], 
+        ["spike_count", "stimulus_presentation_count", "spike_mean", "spike_std", "spike_sem"]
+    )
+    obtained = stim_analysis.conditionwise_statistics.loc[(0, 1)]
+    pd.testing.assert_series_equal(expected, obtained[expected.index], check_less_precise=5, check_names=False)
+
 
 def test_presentationwise_spike_times(ecephys_api):
     session = EcephysSession(api=ecephys_api)
