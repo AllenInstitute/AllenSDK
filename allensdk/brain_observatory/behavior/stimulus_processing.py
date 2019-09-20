@@ -28,8 +28,7 @@ def load_pickle(pstream):
 
 def get_stimulus_presentations(data, stimulus_timestamps):
 
-    visual_stimuli = get_visual_stimuli_df(data, stimulus_timestamps)
-    stimulus_table = visual_stimuli[:-10]  # ignore last 10 flashes
+    stimulus_table = get_visual_stimuli_df(data, stimulus_timestamps)
     # workaround to rename columns to harmonize with visual coding and rebase timestamps to sync time
     stimulus_table.insert(loc=0, column='flash_number', value=np.arange(0, len(stimulus_table)))
     stimulus_table = stimulus_table.rename(columns={'frame': 'start_frame', 'time': 'start_time', 'flash_number':'stimulus_presentations_id'})
@@ -199,30 +198,32 @@ def get_visual_stimuli_df(data, time):
     visual_stimuli_df = pd.DataFrame(data=visual_stimuli_data)
 
     # Add omitted flash info:
-    omitted_flash_list = []
-    omitted_flash_frame_log = data['items']['behavior']['omitted_flash_frame_log']
-    for stimuli_group_name, omitted_flash_frames in omitted_flash_frame_log.items():
+    if 'omitted_flash_frame_log' in data['items']['behavior']:
+        omitted_flash_list = []
+        omitted_flash_frame_log = data['items']['behavior']['omitted_flash_frame_log']
+        for stimuli_group_name, omitted_flash_frames in omitted_flash_frame_log.items():
 
-        stim_frames = visual_stimuli_df['frame'].values
-        omitted_flash_frames = np.array(omitted_flash_frames)
+            stim_frames = visual_stimuli_df['frame'].values
+            omitted_flash_frames = np.array(omitted_flash_frames)
 
-        #  Test offsets of omitted flash frames to see if they are in the stim log
-        offsets = np.arange(-3, 4)
-        offset_arr = np.add(np.repeat(omitted_flash_frames[:, np.newaxis], offsets.shape[0], axis=1), offsets)
-        matched_any_offset = np.any(np.isin(offset_arr, stim_frames), axis=1)
+            #  Test offsets of omitted flash frames to see if they are in the stim log
+            offsets = np.arange(-3, 4)
+            offset_arr = np.add(np.repeat(omitted_flash_frames[:, np.newaxis], offsets.shape[0], axis=1), offsets)
+            matched_any_offset = np.any(np.isin(offset_arr, stim_frames), axis=1)
 
-        #  Remove omitted flashes that also exist in the stimulus log
-        was_true_omitted = np.logical_not(matched_any_offset)  # bool
-        omitted_flash_frames_to_keep = omitted_flash_frames[was_true_omitted]
+            #  Remove omitted flashes that also exist in the stimulus log
+            was_true_omitted = np.logical_not(matched_any_offset)  # bool
+            omitted_flash_frames_to_keep = omitted_flash_frames[was_true_omitted]
 
-        # Have to remove frames that are double-counted in omitted log
-        omitted_flash_list += list(np.unique(omitted_flash_frames_to_keep))
+            # Have to remove frames that are double-counted in omitted log
+            omitted_flash_list += list(np.unique(omitted_flash_frames_to_keep))
 
-    omitted = np.ones_like(omitted_flash_list).astype(bool)
-    time = [time[fi] for fi in omitted_flash_list]
-    omitted_df = pd.DataFrame({'omitted': omitted, 'frame': omitted_flash_list, 'time': time,
-                               'image_name':'omitted'})
+        omitted = np.ones_like(omitted_flash_list).astype(bool)
+        time = [time[fi] for fi in omitted_flash_list]
+        omitted_df = pd.DataFrame({'omitted': omitted, 'frame': omitted_flash_list, 'time': time,
+                                   'image_name':'omitted'})
 
-    df = pd.concat((visual_stimuli_df, omitted_df), sort=False).sort_values('frame').reset_index()
+        df = pd.concat((visual_stimuli_df, omitted_df), sort=False).sort_values('frame').reset_index()
+    else:
+        df = visual_stimuli_df
     return df
-
