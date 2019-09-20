@@ -18,20 +18,20 @@ from allensdk.internal.core.lims_utilities import safe_system_path
 
 class BehaviorLimsApi(PostgresQueryMixin):
 
-    def __init__(self, behavior_experiment_id):
+    def __init__(self, behavior_session_id):
         """
         Notes
         -----
-        - behavior_experiment_id is the same as behavior_session_id which is in lims
-        - behavior_experiment_id is associated with foraging_id in lims
+        - behavior_session_id is the same as behavior_session_id which is in lims
+        - behavior_session_id is associated with foraging_id in lims
         - foraging_id in lims is the same as behavior_session_uuid in mtrain which is the same
         as session_uuid in the pickle returned by behavior_stimulus_file
         """
-        self.behavior_experiment_id = behavior_experiment_id
+        self.behavior_session_id = behavior_session_id
         PostgresQueryMixin.__init__(self)
 
-    def get_behavior_experiment_id(self):
-        return self.behavior_experiment_id
+    def get_behavior_session_id(self):
+        return self.behavior_session_id
 
     def get_behavior_session_uuid(self):
         behavior_stimulus_file = self.get_behavior_stimulus_file()
@@ -45,7 +45,7 @@ class BehaviorLimsApi(PostgresQueryMixin):
                 FROM behavior_sessions bs 
                 LEFT JOIN well_known_files stim ON stim.attachable_id=bs.id AND stim.attachable_type = 'BehaviorSession' AND stim.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'StimulusPickle') 
                 WHERE bs.id= {};
-                '''.format(self.get_behavior_experiment_id())
+                '''.format(self.get_behavior_session_id())
         return safe_system_path(self.fetchone(query, strict=True))
 
     def get_extended_trials(self):
@@ -72,7 +72,7 @@ class BehaviorLimsApi(PostgresQueryMixin):
     @classmethod
     def from_foraging_id(cls, foraging_id):
         return cls(
-            behavior_experiment_id=cls.foraging_id_to_behavior_session_id(foraging_id),
+            behavior_session_id=cls.foraging_id_to_behavior_session_id(foraging_id),
         )
 
     @memoize
@@ -168,7 +168,7 @@ class BehaviorLimsApi(PostgresQueryMixin):
     def get_metadata(self):
 
         metadata = {}
-        metadata['behavior_experiment_id'] = self.get_behavior_experiment_id()
+        metadata['behavior_session_id'] = self.get_behavior_session_id()
         # metadata['experiment_container_id'] = self.get_experiment_container_id()
         # metadata['ophys_frame_rate'] = self.get_ophys_frame_rate()
         metadata['stimulus_frame_rate'] = self.get_stimulus_frame_rate()
