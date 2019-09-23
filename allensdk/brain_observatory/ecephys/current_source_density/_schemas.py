@@ -31,7 +31,7 @@ class InputParameters(ArgSchema):
     post_stimulus_time = Float(required=True, help='how much time post stimulus onset is used for CSD calculation ')
     num_trials = Int(default=None, allow_none=True, help='Number of trials after stimulus onset from which to compute CSD')
     volts_per_bit = Float(default=1.0, help='If the data are not in units of volts, they must be converted. In the past, this value was 0.195')
-    memmap = Bool(default=True, help='whether to memory map the data file on disk or load it directly to main memory')
+    memmap = Bool(default=False, help='whether to memory map the data file on disk or load it directly to main memory')
     memmap_thresh = Float(default=np.inf, help='files larger than this threshold (bytes) will be memmapped, regardless of the memmap setting.')
     filter_cuts = List(Float, default=[5.0, 150.0], cli_as_single_argument=True, help='Cutoff frequencies for bandpass filter')
     filter_order = Int(default=5, help='Order for bandpass filter')
