@@ -724,7 +724,7 @@ def write_ecephys_nwb(
     eye_gaze_mapping_path,
     pool_size,
     optotagging_table_path=None,
-    metadata=None,
+    session_metadata=None,
     **kwargs
 ):
 
@@ -734,8 +734,8 @@ def write_ecephys_nwb(
         session_start_time=session_start_time
     )
 
-    if metadata is not None:
-        nwbfile = add_metadata_to_nwbfile(nwbfile, metadata)
+    if session_metadata is not None:
+        nwbfile = add_metadata_to_nwbfile(nwbfile, session_metadata)
 
     stimulus_table = read_stimulus_table(stimulus_table_path)
     nwbfile = add_stimulus_timestamps(nwbfile, stimulus_table['start_time'].values) # TODO: patch until full timestamps are output by stim table module
