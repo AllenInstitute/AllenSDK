@@ -201,11 +201,12 @@ class EcephysSession(LazyPropertyMixin):
 
 
     def get_current_source_density(self, probe_id):
-        """ Obtain current source density (CSD) image for this probe. Please see
-        allensdk.brain_observatory.ecephys.current_source_density for details and implementation of our current 
-        source density calculation. Briefly:
-        - we use a 1D method for csd calculation
-        - csd is calculated relative to flash stimulus onset
+        """ Obtain current source density (CSD) of trial-averaged response to a flash stimuli for this probe.
+        See allensdk.brain_observatory.ecephys.current_source_density for details of CSD calculation.
+
+        CSD is computed with a 1D method (second spatial derivative) without prior spatial smoothing
+        User should apply spatial smoothing of their choice (e.g., Gaussian filter) to the computed CSD
+
 
         Parameters
         ----------
