@@ -330,6 +330,24 @@ class EcephysSession(LazyPropertyMixin):
         return epochs.loc[:, ["start_time", "stop_time", "duration", "stimulus_name", "stimulus_block"]]
 
     def get_invalid_times(self):
+        """ Report invalid time intervals with tags describing the scope of invalid data
+
+        The tags format: [scope,scope_id,label]
+
+        scope:
+            'EcephysSession': data is invalid across session
+            'EcephysProbe': data is invalid for a single probe
+        label:
+            'all_probes': gain fluctuations on the Neuropixels probe result in missed spikes and LFP saturation events
+            'stimulus' : very long frames (>3x the normal frame length) make any stimulus-locked analysis invalid
+            'probe#': probe # stopped sending data during this interval (spikes and LFP samples will be missing)
+            'optotagging': missing optotagging data
+
+        Returns
+        -------
+        pd.DataFrame :
+            Rows are invalid intervals, columns are 'start_time' (s), 'stop_time' (s), 'tags'
+        """
 
         return self.invalid_times
 
