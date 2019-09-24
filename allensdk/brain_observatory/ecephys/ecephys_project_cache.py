@@ -208,6 +208,23 @@ class EcephysProjectCache(Cache):
         return data[key].unique().tolist()
 
     def get_unit_analysis_metrics_for_session(self, session_id, annotate=True):
+        """ Cache and return a table of analysis metrics calculated on each unit from a specified session. See 
+        get_sessions for a list of sessions.
+
+        Parameters
+        ----------
+        session_id : int
+            identifies the session from which to fetch analysis metrics.
+        annotate : bool, optional
+            if True, information from the annotated units table will be merged onto the outputs
+
+        Returns
+        -------
+        metrics : pd.DataFrame
+            Each row corresponds to a single unit, describing a set of analysis metrics calculated on that unit.
+
+        """
+
         path = self.get_cache_path(None, self.SESSION_ANALYSIS_METRICS_KEY, session_id, session_id)
         metrics = call_caching(
             self.fetch_api.get_unit_analysis_metrics, 
@@ -227,8 +244,23 @@ class EcephysProjectCache(Cache):
         return metrics
 
     def get_unit_analysis_metrics_by_session_type(self, session_type, annotate=True):
-        """ Cache and return a table of analysis metrics calculated on each unit 
+        """ Cache and return a table of analysis metrics calculated on each unit from a specified session type. See 
+        get_all_stimulus_sets for a list of session types.
+
+        Parameters
+        ----------
+        session_type : str
+            identifies the session type for which to fetch analysis metrics.
+        annotate : bool, optional
+            if True, information from the annotated units table will be merged onto the outputs
+
+        Returns
+        -------
+        metrics : pd.DataFrame
+            Each row corresponds to a single unit, describing a set of analysis metrics calculated on that unit.
+
         """
+
         known_session_types = self.get_all_stimulus_sets()
         if session_type not in known_session_types:
             raise ValueError(f"unrecognized session type: {session_type}. Available types: {known_session_types}")
