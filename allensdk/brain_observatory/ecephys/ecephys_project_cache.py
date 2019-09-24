@@ -78,7 +78,7 @@ class EcephysProjectCache(Cache):
         path = self.get_cache_path(None, self.CHANNELS_KEY)
         return call_caching(self.fetch_api.get_channels, path, strategy='lazy', **csv_io)
 
-    def get_units(self, annotate=False, **kwargs):
+    def get_units(self, annotate=True, **kwargs):
         """ Reports a table consisting of all sorted units across the entire extracellular electrophysiology project.
 
         Parameters
@@ -207,9 +207,9 @@ class EcephysProjectCache(Cache):
         data = method(**method_kwargs)
         return data[key].unique().tolist()
 
-    def get_unit_analysis_metrics_for_session(self, session_id):
+    def get_unit_analysis_metrics_for_session(self, session_id, annotate=True):
         path = self.get_cache_path(None, self.SESSION_ANALYSIS_METRICS_KEY, session_id, session_id)
-        return call_caching(
+        metrics = call_caching(
             self.fetch_api.get_unit_analysis_metrics, 
             path, 
             strategy='lazy', 
@@ -217,6 +217,14 @@ class EcephysProjectCache(Cache):
             reader=lambda path: pd.read_csv(path, index_col='ecephys_unit_id'),
             writer=lambda path, df: df.to_csv(path)
         )
+
+        if annotate:
+            units = self.get_units(annotate=True)
+            units = units[units["ecephys_session_id"] == session_id]
+            metrics = units.merge(metrics, left_index=True, right_index=True, how="left")
+            metrics.index.rename("ecephys_unit_id", inplace=True)
+
+        return metrics
 
     def get_unit_analysis_metrics_by_session_type(self, session_type):
         known_session_types = self.get_all_stimulus_sets()
