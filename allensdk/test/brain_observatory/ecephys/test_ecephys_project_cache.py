@@ -14,7 +14,7 @@ import allensdk.brain_observatory.ecephys.ecephys_project_cache as epc
 @pytest.fixture
 def sessions():
     return pd.DataFrame({
-        'stimulus_name': ['stimulus_set_one', 'stimulus_set_two', 'stimulus_set_two'],
+        'session_type': ['stimulus_set_one', 'stimulus_set_two', 'stimulus_set_two'],
         "unit_count": [500, 1000, 1500],
         "channel_count": [40, 90, 140],
         "probe_count": [3, 4, 5],
@@ -31,6 +31,14 @@ def units():
         "presence_ratio": [10, 20],
         "isi_violations": [0.3, 0.4]
     }, index=pd.Series(name='id', data=[1, 2]))
+
+
+@pytest.fixture
+def analysis_metrics():
+    return pd.DataFrame({
+        "a": [0, 1, 2],
+        "b": [3, 4, 5]
+    }, index=pd.Index(name="ecephys_unit_id", data=[1, 2, 3]))
 
 
 @pytest.fixture
@@ -57,7 +65,7 @@ def shared_tmpdir(tmpdir_factory):
 
 
 @pytest.fixture
-def mock_api(shared_tmpdir, sessions, units, channels, probes):
+def mock_api(shared_tmpdir, sessions, units, channels, probes, analysis_metrics):
     class MockApi:
         
         def __init__(self, **kwargs):
@@ -96,6 +104,9 @@ def mock_api(shared_tmpdir, sessions, units, channels, probes):
                 f.create_dataset("data", data=np.eye(100))
             return open(path, "rb")
 
+        def get_unit_analysis_metrics(self, *a, **k):
+            return analysis_metrics
+
 
     return MockApi
 
@@ -111,9 +122,9 @@ def tmpdir_cache(shared_tmpdir, mock_api):
     )
 
 
-def lazy_cache_test(cache, cache_name, api_name, expected):
-    obtained_one = getattr(cache, cache_name)()
-    obtained_two = getattr(cache, cache_name)()
+def lazy_cache_test(cache, cache_name, api_name, expected, *args, **kwargs):
+    obtained_one = getattr(cache, cache_name)(*args, **kwargs)
+    obtained_two = getattr(cache, cache_name)(*args, **kwargs)
 
     pd.testing.assert_frame_equal(expected, obtained_one)
     pd.testing.assert_frame_equal(expected, obtained_two)
@@ -127,12 +138,12 @@ def test_get_sessions(tmpdir_cache, sessions):
 
 def test_get_units(tmpdir_cache, units):
     units = units[units["amplitude_cutoff"] <= 0.1]
-    lazy_cache_test(tmpdir_cache, 'get_units', "get_units", units)
+    lazy_cache_test(tmpdir_cache, 'get_units', "get_units", units, annotate=False)
 
 
 def test_get_units_annotated(tmpdir_cache, units, channels, probes, sessions):
     units = tmpdir_cache.get_units(annotate=True, amplitude_cutoff_maximum=10)
-    assert units.loc[2, "stimulus_name"] == "stimulus_set_two"
+    assert units.loc[2, "session_type"] == "stimulus_set_two"
 
 
 def test_get_probes(tmpdir_cache, probes):
@@ -172,3 +183,23 @@ def test_get_natural_movie_template(shared_tmpdir, tmpdir_cache):
 
     assert 1 == tmpdir_cache.fetch_api.accesses["get_natural_movie_template"]
     assert np.allclose(np.eye(100), data_one)
+
+def test_get_unit_analysis_metrics_for_session(tmpdir_cache, analysis_metrics):
+    lazy_cache_test(
+        tmpdir_cache, 
+        'get_unit_analysis_metrics_for_session', 
+        "get_unit_analysis_metrics", 
+        analysis_metrics, 
+        session_id=3, 
+        annotate=False
+    )
+
+def test_get_unit_analysis_metrics_by_session_type(tmpdir_cache, analysis_metrics):
+    lazy_cache_test(
+        tmpdir_cache, 
+        'get_unit_analysis_metrics_by_session_type', 
+        "get_unit_analysis_metrics", 
+        analysis_metrics, 
+        session_type="stimulus_set_two", 
+        annotate=False
+    )
