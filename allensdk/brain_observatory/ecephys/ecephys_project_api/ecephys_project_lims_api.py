@@ -363,6 +363,37 @@ class EcephysProjectLimsApi(EcephysProjectApi):
         response["genotype"].fillna("wt", inplace=True)
         return response
 
+
+    def get_unit_analysis_metrics(self, unit_ids=None, ecephys_session_ids=None, session_types=None):
+        response = build_and_execute(
+            """
+            {%- import 'postgres_macros' as pm -%}
+            {%- import 'macros' as m -%}
+            select eumb.data, eumb.ecephys_unit_id from ecephys_unit_metric_bundles eumb
+            join ecephys_analysis_runs ear on eumb.ecephys_analysis_run_id = ear.id
+            join ecephys_units eu on eumb.ecephys_unit_id = eu.id
+            join ecephys_channels ec on eu.ecephys_channel_id = ec.id 
+            join ecephys_probes ep on ec.ecephys_probe_id = ep.id
+            join ecephys_sessions es on es.id = ep.ecephys_session_id
+            where ear.current
+            {{pm.optional_contains('eumb.id', unit_ids) -}}
+            {{pm.optional_contains('es.id', ecephys_session_ids) -}}
+            {{pm.optional_contains('es.stimulus_name', session_types, True) -}}
+        """,
+            base=postgres_macros(),
+            engine=self.postgres_engine.select,
+            unit_ids=unit_ids,
+            ecephys_session_ids=ecephys_session_ids,
+            session_types=session_types
+        )
+
+        data = pd.DataFrame(response.pop("data").values.tolist(), index=response.index)
+        response = pd.merge(response, data, left_index=True, right_index=True)
+        response.set_index("ecephys_unit_id", inplace=True)
+
+        return response
+
+
     @classmethod
     def default(cls, pg_kwargs=None, app_kwargs=None):
 

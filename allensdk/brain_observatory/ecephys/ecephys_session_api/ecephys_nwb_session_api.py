@@ -16,7 +16,12 @@ from allensdk.brain_observatory.ecephys import get_unit_filter_value
 
 class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
 
-    def __init__(self, path, probe_lfp_paths: Optional[Dict[int, FilePromise]] = None, **kwargs):
+    def __init__(self, 
+        path, 
+        probe_lfp_paths: Optional[Dict[int, FilePromise]] = None, 
+        additional_unit_metrics=None, 
+        **kwargs
+    ):
 
         self.filter_by_validity = kwargs.pop("filter_by_validity", True)
         self.amplitude_cutoff_maximum = get_unit_filter_value("amplitude_cutoff_maximum", **kwargs)
@@ -26,6 +31,7 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         super(EcephysNwbSessionApi, self).__init__(path, **kwargs)
         self.probe_lfp_paths = probe_lfp_paths
 
+        self.additional_unit_metrics = additional_unit_metrics
 
     def get_session_start_time(self):
         return self.nwbfile.session_start_time
@@ -90,6 +96,10 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
 
         to_drop = set(["spike_times", "spike_amplitudes", "waveform_mean"]) & set(units.columns)
         units.drop(columns=list(to_drop), inplace=True)
+
+        if self.additional_unit_metrics is not None:
+            additional_metrics = self.additional_unit_metrics()
+            units = pd.merge(units, additional_metrics, left_index=True, right_index=True)
 
         return units
 
