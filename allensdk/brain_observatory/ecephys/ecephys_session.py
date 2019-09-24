@@ -228,11 +228,12 @@ class EcephysSession(LazyPropertyMixin):
 
 
     def get_current_source_density(self, probe_id):
-        """ Obtain current source density (CSD) image for this probe. Please see
-        allensdk.brain_observatory.ecephys.current_source_density for details and implementation of our current 
-        source density calculation. Briefly:
-        - we use a 1D method for csd calculation
-        - csd is calculated relative to flash stimulus onset
+        """ Obtain current source density (CSD) of trial-averaged response to a flash stimuli for this probe.
+        See allensdk.brain_observatory.ecephys.current_source_density for details of CSD calculation.
+
+        CSD is computed with a 1D method (second spatial derivative) without prior spatial smoothing
+        User should apply spatial smoothing of their choice (e.g., Gaussian filter) to the computed CSD
+
 
         Parameters
         ----------
@@ -357,6 +358,24 @@ class EcephysSession(LazyPropertyMixin):
         return epochs.loc[:, ["start_time", "stop_time", "duration", "stimulus_name", "stimulus_block"]]
 
     def get_invalid_times(self):
+        """ Report invalid time intervals with tags describing the scope of invalid data
+
+        The tags format: [scope,scope_id,label]
+
+        scope:
+            'EcephysSession': data is invalid across session
+            'EcephysProbe': data is invalid for a single probe
+        label:
+            'all_probes': gain fluctuations on the Neuropixels probe result in missed spikes and LFP saturation events
+            'stimulus' : very long frames (>3x the normal frame length) make any stimulus-locked analysis invalid
+            'probe#': probe # stopped sending data during this interval (spikes and LFP samples will be missing)
+            'optotagging': missing optotagging data
+
+        Returns
+        -------
+        pd.DataFrame :
+            Rows are invalid intervals, columns are 'start_time' (s), 'stop_time' (s), 'tags'
+        """
 
         return self.invalid_times
 

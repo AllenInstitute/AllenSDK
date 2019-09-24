@@ -146,7 +146,8 @@ def compute_csd(trial_mean_lfp: np.ndarray,
     '''Compute current source density for real or virtual channels from
     a neuropixels probe.
 
-    Uses the numerical approximation to the Laplacian, after Pitts (1952).
+    Compute a second spatial derivative along the probe length
+    as a 1D approximation of the Laplacian, after Pitts (1952).
 
     Parameters
     ----------
