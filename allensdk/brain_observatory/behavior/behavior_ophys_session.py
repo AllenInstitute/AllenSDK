@@ -256,8 +256,8 @@ class BehaviorOphysSession(LazyPropertyMixin):
         allensdk.brain_observatory.behavior.image_api.Image:
             array-like interface to segmentation_mask image data and metadata
         """
-        masks = self.get_roi_masks()
-        mask_image_data = masks.any(dim='cell_specimen_id').astype(int)
+        masks = self._get_roi_masks_by_cell_roi_id()
+        mask_image_data = masks.any(dim='cell_roi_id').astype(int)
         mask_image = Image(
             data = mask_image_data.values,
             spacing = masks.attrs['spacing'],
