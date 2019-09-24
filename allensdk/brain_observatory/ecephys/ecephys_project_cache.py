@@ -219,20 +219,22 @@ class EcephysProjectCache(Cache):
         )
 
         if annotate:
-            units = self.get_units(annotate=True)
+            units = self.get_units()
             units = units[units["ecephys_session_id"] == session_id]
-            metrics = units.merge(metrics, left_index=True, right_index=True, how="left")
+            metrics = pd.merge(units, metrics, left_index=True, right_index=True, how="inner")
             metrics.index.rename("ecephys_unit_id", inplace=True)
 
         return metrics
 
-    def get_unit_analysis_metrics_by_session_type(self, session_type):
+    def get_unit_analysis_metrics_by_session_type(self, session_type, annotate=True):
+        """ Cache and return a table of analysis metrics calculated on each unit 
+        """
         known_session_types = self.get_all_stimulus_sets()
         if session_type not in known_session_types:
             raise ValueError(f"unrecognized session type: {session_type}. Available types: {known_session_types}")
 
         path = self.get_cache_path(None, self.TYPEWISE_ANALYSIS_METRICS_KEY, session_type)
-        return call_caching(
+        metrics = call_caching(
             self.fetch_api.get_unit_analysis_metrics, 
             path, 
             strategy='lazy', 
@@ -240,6 +242,14 @@ class EcephysProjectCache(Cache):
             reader=lambda path: pd.read_csv(path, index_col='ecephys_unit_id'),
             writer=lambda path, df: df.to_csv(path)
         )
+
+        if annotate:
+            units = self.get_units()
+            metrics = pd.merge(units, metrics, left_index=True, right_index=True, how="inner")
+            metrics.index.rename("ecephys_unit_id", inplace=True)
+
+        return metrics
+
 
     def add_manifest_paths(self, manifest_builder):
         manifest_builder = super(EcephysProjectCache, self).add_manifest_paths(manifest_builder)
