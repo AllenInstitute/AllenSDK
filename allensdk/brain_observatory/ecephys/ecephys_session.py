@@ -152,29 +152,18 @@ class EcephysSession(LazyPropertyMixin):
 
 
     @property
-    def corneal_reflection_ellipse_fits(self):
-        return self._eye_tracking_ellipse_fit_data["cr_ellipse_fits"]
-
-
-    @property
-    def eye_ellipse_fits(self):
-        return self._eye_tracking_ellipse_fit_data["eye_ellipse_fits"]
-
-
-    @property
-    def pupil_ellipse_fits(self):
-        return self._eye_tracking_ellipse_fit_data["pupil_ellipse_fits"]
-    
-
-    @property
     def rig_geometry_data(self):
-        return self._eye_tracking_ellipse_fit_data["rig_geometry_data"]
-
+        if self._rig_metadata:
+            return self._rig_metadata["rig_geometry_data"]
+        else:
+            return None
 
     @property
     def rig_equipment_name(self):
-        return self._eye_tracking_ellipse_fit_data["rig_equipment"]
-
+        if self._rig_metadata:
+            return self._rig_metadata["rig_equipment"]
+        else:
+            return None
 
     @property
     def specimen_name(self):
@@ -220,9 +209,7 @@ class EcephysSession(LazyPropertyMixin):
         self.inter_presentation_intervals = self.LazyProperty(self._build_inter_presentation_intervals)
         self.invalid_times = self.LazyProperty(self.api.get_invalid_times)
 
-        self._eye_tracking_ellipse_fit_data = self.LazyProperty(self.api.get_eye_tracking_ellipse_fit_data)
-        self.raw_eye_gaze_mapping_data = self.LazyProperty(self.api.get_raw_eye_gaze_mapping_data)
-        self.filtered_eye_gaze_mapping_data = self.LazyProperty(self.api.get_filtered_eye_gaze_mapping_data)
+        self._rig_metadata = self.LazyProperty(self.api.get_rig_metadata)
 
         self._metadata = self.LazyProperty(self.api.get_metadata)
 
@@ -379,6 +366,34 @@ class EcephysSession(LazyPropertyMixin):
 
         return self.invalid_times
 
+    def get_eye_tracking_data(self, suppress_eye_gaze_data: bool = True) -> pd.DataFrame:
+        """Return a dataframe with eye tracking data
+
+        Parameters
+        ----------
+        suppress_eye_gaze_data : bool, optional
+            Whether or not to suppress eye gaze mapping data in output
+            dataframe, by default True.
+
+        Returns
+        -------
+        pd.DataFrame
+            Contains columns for eye, pupil and cr ellipse fits:
+                *_center_x
+                *_center_y
+                *_height
+                *_width
+                *_phi
+            May also contain raw/filtered columns for gaze mapping if
+            suppress_eye_gaze_data is set to False:
+                *_eye_area
+                *_pupil_area
+                *_screen_coordinates_x_cm
+                *_screen_coordinates_y_cm
+                *_screen_coordinates_spherical_x_deg
+                *_screen_coorindates_spherical_y_deg
+        """
+        return self.api.get_eye_tracking_data(suppress_eye_gaze_data=suppress_eye_gaze_data)
 
     def presentationwise_spike_counts(
         self, 

@@ -148,58 +148,86 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
             "supply_voltage": supply_voltage_series.data[:]
         })
 
-    def get_eye_tracking_ellipse_fit_data(self):
-        et_mod = self.nwbfile.get_processing_module("eye_tracking")
+    def get_rig_metadata(self) -> Optional[dict]:
+        try:
+            et_mod = self.nwbfile.get_processing_module("eye_tracking")
+        except KeyError as e:
+            print(f"This ecephys session '{int(self.nwbfile.identifier)}' has no eye tracking data (and thus no rig geometry data). (NWB error: {e})")
+            return None
 
-        et_data = {}
-        et_data["cr_ellipse_fits"] = et_mod.get_data_interface("cr_ellipse_fits").to_dataframe()
-        et_data["eye_ellipse_fits"] = et_mod.get_data_interface("eye_ellipse_fits").to_dataframe()
-        et_data["pupil_ellipse_fits"] = et_mod.get_data_interface("pupil_ellipse_fits").to_dataframe()
-        et_data["rig_geometry_data"] = et_mod.get_data_interface("rig_geometry_data").to_dataframe()
+        rig_metadata = {}
+        rig_metadata["rig_geometry_data"] = et_mod.get_data_interface("rig_geometry_data").to_dataframe()
         rig_equipment = et_mod.get_data_interface("equipment").to_dataframe()
-        et_data["rig_equipment"] = rig_equipment["equipment"][0]
+        rig_metadata["rig_equipment"] = rig_equipment["equipment"][0]
 
-        return et_data
+        return rig_metadata
 
-    def get_raw_eye_gaze_mapping_data(self):
-        rgm_mod = self.nwbfile.get_processing_module("raw_gaze_mapping")
+    def get_eye_tracking_data(self, suppress_eye_gaze_data: bool = True) -> Optional[pd.DataFrame]:
+        try:
+            et_mod = self.nwbfile.get_processing_module("eye_tracking")
+            rgm_mod = self.nwbfile.get_processing_module("raw_gaze_mapping")
+            fgm_mod = self.nwbfile.get_processing_module("filtered_gaze_mapping")
+        except KeyError as e:
+            print(f"This ecephys session '{int(self.nwbfile.identifier)}' has no eye tracking data. (NWB error: {e})")
+            return None
 
-        eye_area_ts = rgm_mod.get_data_interface("eye_area")
-        pupil_area_ts = rgm_mod.get_data_interface("pupil_area")
-        screen_coordinates_ts = rgm_mod.get_data_interface("screen_coordinates")
-        screen_coordinates_spherical_ts = rgm_mod.get_data_interface("screen_coordinates_spherical")
+        raw_eye_area_ts = rgm_mod.get_data_interface("eye_area")
+        raw_pupil_area_ts = rgm_mod.get_data_interface("pupil_area")
+        raw_screen_coordinates_ts = rgm_mod.get_data_interface("screen_coordinates")
+        raw_screen_coordinates_spherical_ts = rgm_mod.get_data_interface("screen_coordinates_spherical")
 
-        return pd.DataFrame({
-            "frame_time": eye_area_ts.timestamps[:],
-            "eye_area": eye_area_ts.data[:],
-            "pupil_area": pupil_area_ts.data[:],
-            "screen_coordinates_x_cm": screen_coordinates_ts.data[:, 1],
-            "screen_coordinates_y_cm": screen_coordinates_ts.data[:, 0],
-            "screen_coordinates_spherical_x_deg": screen_coordinates_spherical_ts.data[:, 1],
-            "screen_coordinates_spherical_y_deg": screen_coordinates_spherical_ts.data[:, 0]
-        })
+        filtered_eye_area_ts = fgm_mod.get_data_interface("eye_area")
+        filtered_pupil_area_ts = fgm_mod.get_data_interface("pupil_area")
+        filtered_screen_coordinates_ts = fgm_mod.get_data_interface("screen_coordinates")
+        filtered_screen_coordinates_spherical_ts = fgm_mod.get_data_interface("screen_coordinates_spherical")
 
-    def get_filtered_eye_gaze_mapping_data(self):
-        fgm_mod = self.nwbfile.get_processing_module("filtered_gaze_mapping")
+        cr_ellipse_fits = et_mod.get_data_interface("cr_ellipse_fits").to_dataframe()
+        eye_ellipse_fits = et_mod.get_data_interface("eye_ellipse_fits").to_dataframe()
+        pupil_ellipse_fits = et_mod.get_data_interface("pupil_ellipse_fits").to_dataframe()
 
-        eye_area_ts = fgm_mod.get_data_interface("eye_area")
-        pupil_area_ts = fgm_mod.get_data_interface("pupil_area")
-        screen_coordinates_ts = fgm_mod.get_data_interface("screen_coordinates")
-        screen_coordinates_spherical_ts = fgm_mod.get_data_interface("screen_coordinates_spherical")
+        eye_tracking_data = {
+            "corneal_reflection_center_x": cr_ellipse_fits["center_x"].values,
+            "corneal_reflection_center_y": cr_ellipse_fits["center_y"].values,
+            "corneal_reflection_height": cr_ellipse_fits["height"].values,
+            "corneal_reflection_width": cr_ellipse_fits["width"].values,
+            "corneal_reflection_phi": cr_ellipse_fits["phi"].values,
 
-        return pd.DataFrame({
-            "frame_time": eye_area_ts.timestamps[:],
-            "eye_area": eye_area_ts.data[:],
-            "pupil_area": pupil_area_ts.data[:],
-            "screen_coordinates_x_cm": screen_coordinates_ts.data[:, 1],
-            "screen_coordinates_y_cm": screen_coordinates_ts.data[:, 0],
-            "screen_coordinates_spherical_x_deg": screen_coordinates_spherical_ts.data[:, 1],
-            "screen_coordinates_spherical_y_deg": screen_coordinates_spherical_ts.data[:, 0]
-        })
+            "pupil_center_x": pupil_ellipse_fits["center_x"].values,
+            "pupil_center_y": pupil_ellipse_fits["center_y"].values,
+            "pupil_height": pupil_ellipse_fits["height"].values,
+            "pupil_width": pupil_ellipse_fits["width"].values,
+            "pupil_phi": pupil_ellipse_fits["phi"].values,
+
+            "eye_center_x": eye_ellipse_fits["center_x"].values,
+            "eye_center_y": eye_ellipse_fits["center_y"].values,
+            "eye_height": eye_ellipse_fits["height"].values,
+            "eye_width": eye_ellipse_fits["width"].values,
+            "eye_phi": eye_ellipse_fits["phi"].values
+        }
+
+        if not suppress_eye_gaze_data:
+            eye_tracking_data.update(
+                {
+                    "raw_eye_area": raw_eye_area_ts.data[:],
+                    "raw_pupil_area": raw_pupil_area_ts.data[:],
+                    "raw_screen_coordinates_x_cm": raw_screen_coordinates_ts.data[:, 1],
+                    "raw_screen_coordinates_y_cm": raw_screen_coordinates_ts.data[:, 0],
+                    "raw_screen_coordinates_spherical_x_deg": raw_screen_coordinates_spherical_ts.data[:, 1],
+                    "raw_screen_coordinates_spherical_y_deg": raw_screen_coordinates_spherical_ts.data[:, 0],
+
+                    "filtered_eye_area": filtered_eye_area_ts.data[:],
+                    "filtered_pupil_area": filtered_pupil_area_ts.data[:],
+                    "filtered_screen_coordinates_x_cm": filtered_screen_coordinates_ts.data[:, 1],
+                    "filtered_screen_coordinates_y_cm": filtered_screen_coordinates_ts.data[:, 0],
+                    "filtered_screen_coordinates_spherical_x_deg": filtered_screen_coordinates_spherical_ts.data[:, 1],
+                    "filtered_screen_coordinates_spherical_y_deg": filtered_screen_coordinates_spherical_ts.data[:, 0]
+                }
+            )
+
+        return pd.DataFrame(eye_tracking_data, index=raw_eye_area_ts.timestamps[:])
 
     def get_ecephys_session_id(self) -> int:
         return int(self.nwbfile.identifier)
-
 
     def get_current_source_density(self, probe_id):
         csd_mod = self._probe_nwbfile(probe_id).get_processing_module("current_source_density")

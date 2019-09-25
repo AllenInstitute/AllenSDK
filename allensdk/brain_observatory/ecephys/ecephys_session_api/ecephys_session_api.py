@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Optional
 from datetime import datetime
 
 import numpy as np
@@ -56,13 +56,10 @@ class EcephysSessionApi:
     def get_spike_amplitudes(self) -> Dict[int, np.ndarray]:
         raise NotImplementedError
 
-    def get_eye_tracking_ellipse_fit_data(self):
+    def get_rig_metadata(self) -> Optional[dict]:
         raise NotImplementedError
 
-    def get_raw_eye_gaze_mapping_data(self):
-        raise NotImplementedError
-
-    def get_filtered_eye_gaze_mapping_data(self):
+    def get_eye_tracking_data(self, suppress_eye_gaze_data: bool) -> Optional[pd.DataFrame]:
         raise NotImplementedError
 
     def get_metadata(self):
