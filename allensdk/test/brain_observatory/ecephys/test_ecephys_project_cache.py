@@ -46,7 +46,8 @@ def channels():
     return pd.DataFrame({
         'ecephys_probe_id': [11, 11],
         'ap': [1000, 2000],
-        "unit_count": [5, 10]
+        "unit_count": [5, 10],
+        "structure_acronym": ["a", "b"]
     }, index=pd.Series(name='id', data=[1, 2]))
 
 

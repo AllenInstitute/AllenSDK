@@ -135,6 +135,8 @@ class EcephysProjectCache(Cache):
         count_owned(sessions, self._get_annotated_channels(), "ecephys_session_id", "channel_count", inplace=True)
         count_owned(sessions, self._get_annotated_probes(), "ecephys_session_id", "probe_count", inplace=True)
 
+        get_grouped_uniques(sessions, self._get_annotated_channels(), "ecephys_session_id", "structure_acronym", "structure_acronyms", inplace=True)
+
         return sessions
 
 
@@ -143,6 +145,8 @@ class EcephysProjectCache(Cache):
 
         count_owned(probes, self._get_annotated_units(), "ecephys_probe_id", "unit_count", inplace=True)
         count_owned(probes, self._get_annotated_channels(), "ecephys_probe_id", "channel_count", inplace=True)
+
+        get_grouped_uniques(probes, self._get_annotated_channels(), "ecephys_probe_id", "structure_acronym", "structure_acronyms", inplace=True)
 
         return probes
 
@@ -421,6 +425,19 @@ def count_owned(this, other, foreign_key, count_key, inplace=False):
     counts = other.loc[:, foreign_key].value_counts()
     this[count_key] = 0
     this.loc[counts.index.values, count_key] = counts.values
+
+    if not inplace:
+        return this
+
+def get_grouped_uniques(this, other, foreign_key, field_key, unique_key, inplace=False):
+    if not inplace:
+        this = this.copy()
+
+    uniques = other.groupby(foreign_key)\
+        .apply(lambda grp: pd.DataFrame(grp)[field_key]\
+        .unique())
+    this[unique_key] = 0
+    this.loc[uniques.index.values, unique_key] = uniques.values
 
     if not inplace:
         return this
