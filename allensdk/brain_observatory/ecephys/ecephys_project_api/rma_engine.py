@@ -52,12 +52,6 @@ class RmaEngine(HttpEngine):
 
     def get_rma_tabular(self, query):
         response = []
-        unique_ids = set([])
         for chunk in self.get_rma(query):
-            for ii in chunk:
-                if ii["id"] not in unique_ids:
-                    unique_ids.add(ii["id"])
-                else:
-                    print(ii["id"])
             response.extend(chunk)
         return pd.DataFrame(response)
