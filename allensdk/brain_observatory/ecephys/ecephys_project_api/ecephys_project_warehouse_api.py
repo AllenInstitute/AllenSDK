@@ -114,25 +114,39 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
 
         return response
 
-    def get_channels(self, channel_ids=None, probe_ids=None, session_ids=None):
-        criteria = probe_ids is not None and session_ids is not None
+    def get_channels(self, channel_ids=None, probe_ids=None):
         response = build_and_execute(
             (
                 "{% import 'rma_macros' as rm %}"
                 "{% import 'macros' as m %}"           
                 "criteria=model::EcephysChannel"
-                r"{{',rma::criteria' if criteria}}"
                 r"{{rm.optional_contains('id',channel_ids)}}"
                 r"{{rm.optional_contains('ecephys_probe_id',probe_ids)}}"
-                r"{%if session_ids is not none%},rma::criteria,ecephys_probe[ecephys_session_id$in{{m.comma_sep(session_ids)}}]{%endif%}"
+                ",rma::include,structure"   
+                ",rma::options[tabular$eq'"
+                    "ecephys_channels.id"
+                    ",ecephys_probe_id"
+                    ",local_index"
+                    ",probe_horizontal_position"
+                    ",probe_vertical_position"
+                    ",anterior_posterior_ccf_coordinate"
+                    ",dorsal_ventral_ccf_coordinate"
+                    ",left_right_ccf_coordinate"
+                    ",structures.id as structure_id"
+                    ",structures.acronym as structure_acronym"
+                "']"
             ),
-            base=rma_macros(), engine=self.rma_engine.get_rma_tabular, session_ids=session_ids, probe_ids=probe_ids,
-            channel_ids=channel_ids, criteria=criteria
+            base=rma_macros(), 
+            engine=self.rma_engine.get_rma_tabular, 
+            probe_ids=probe_ids,
+            channel_ids=channel_ids
         )
+
+        response.set_index("id", inplace=True)
 
         return response
 
-    def get_units(self, unit_ids=None, channel_ids=None, probe_ids=None, session_ids=None):
+    def get_units(self, unit_ids=None, channel_ids=None, probe_ids=None, session_ids=None, *a, **k):
         criteria = probe_ids is not None and session_ids is not None
         response =  build_and_execute(
             (
@@ -146,7 +160,7 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
             base=rma_macros(), engine=self.rma_engine.get_rma_tabular, session_ids=session_ids, probe_ids=probe_ids,
             channel_ids=channel_ids, unit_ids=unit_ids, criteria=criteria
         )
-
+        
         response.set_index("id", inplace=True)
 
         return response

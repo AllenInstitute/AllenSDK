@@ -74,9 +74,17 @@ class EcephysProjectCache(Cache):
         path = self.get_cache_path(None, self.PROBES_KEY)
         return call_caching(self.fetch_api.get_probes, path, strategy='lazy', **csv_io)
 
-    def get_channels(self):
+    def get_channels(self, include_counts=True):
+        """ Load (potentially downloading and caching) a table whose rows are individual channels.
+        """
+
         path = self.get_cache_path(None, self.CHANNELS_KEY)
-        return call_caching(self.fetch_api.get_channels, path, strategy='lazy', **csv_io)
+        response = call_caching(self.fetch_api.get_channels, path, strategy='lazy', **csv_io)
+
+        if include_counts:
+            count_owned(response, self.get_units(), "ecephys_channel_id", "unit_count", inplace=True)
+
+        return response
 
     def get_units(self, annotate=True, **kwargs):
         """ Reports a table consisting of all sorted units across the entire extracellular electrophysiology project.
@@ -116,9 +124,11 @@ class EcephysProjectCache(Cache):
             & (units["presence_ratio"] >= get_unit_filter_value("presence_ratio_minimum", **kwargs))
             & (units["isi_violations"] <= get_unit_filter_value("isi_violations_maximum", **kwargs))
         ]
+        if "quality" in units.columns:
+            units = units[units["quality"] == "good"]
+            units.drop(columns="quality", inplace=True)
         
         return units
-
 
     def get_session_data(self, session_id):
         path = self.get_cache_path(None, self.SESSION_NWB_KEY, session_id, session_id)
@@ -359,3 +369,14 @@ class EcephysProjectCache(Cache):
     @classmethod
     def fixed(cls, **kwargs):
         return cls(fetch_api=EcephysProjectFixedApi(), **kwargs)
+
+def count_owned(this, other, foreign_key, count_key, inplace=False):
+    if not inplace:
+        this = this.copy()
+
+    counts = other.loc[:, foreign_key].value_counts()
+    this[count_key] = 0
+    this.loc[counts.index.values, count_key] = counts.values
+
+    if not inplace:
+        return this
