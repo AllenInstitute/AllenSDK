@@ -28,3 +28,6 @@ class EcephysProjectApi:
 
     def get_natural_scene_template(self, number, *args, **kwargs):
         raise NotImplementedError()
+
+    def get_unit_analysis_metrics(self, unit_ids=None, ecephys_session_ids=None, session_types=None, *args, **kwargs):
+        raise NotImplementedError()

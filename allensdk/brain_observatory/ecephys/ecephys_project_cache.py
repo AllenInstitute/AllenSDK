@@ -47,7 +47,10 @@ class EcephysProjectCache(Cache):
     NATURAL_SCENE_DIR_KEY = "natural_scene_dir"
     NATURAL_SCENE_KEY = "natural_scene"
 
-    MANIFEST_VERSION = '0.2.0'
+    SESSION_ANALYSIS_METRICS_KEY = "session_analysis_metrics"
+    TYPEWISE_ANALYSIS_METRICS_KEY = "typewise_analysis_metrics"
+
+    MANIFEST_VERSION = '0.2.1'
 
     def __init__(self, fetch_api, **kwargs):
         
@@ -75,7 +78,7 @@ class EcephysProjectCache(Cache):
         path = self.get_cache_path(None, self.CHANNELS_KEY)
         return call_caching(self.fetch_api.get_channels, path, strategy='lazy', **csv_io)
 
-    def get_units(self, annotate=False, **kwargs):
+    def get_units(self, annotate=True, **kwargs):
         """ Reports a table consisting of all sorted units across the entire extracellular electrophysiology project.
 
         Parameters
@@ -140,7 +143,13 @@ class EcephysProjectCache(Cache):
             writer=write_from_stream,
         )
 
-        session_api = EcephysNwbSessionApi(path=path, probe_lfp_paths=probe_promises)
+        get_analysis_metrics = functools.partial(self.get_unit_analysis_metrics_for_session, session_id)
+
+        session_api = EcephysNwbSessionApi(
+            path=path, 
+            probe_lfp_paths=probe_promises, 
+            additional_unit_metrics=get_analysis_metrics
+        )
         return EcephysSession(api=session_api)
 
     def get_natural_movie_template(self, number):
@@ -198,6 +207,82 @@ class EcephysProjectCache(Cache):
         data = method(**method_kwargs)
         return data[key].unique().tolist()
 
+    def get_unit_analysis_metrics_for_session(self, session_id, annotate=True):
+        """ Cache and return a table of analysis metrics calculated on each unit from a specified session. See 
+        get_sessions for a list of sessions.
+
+        Parameters
+        ----------
+        session_id : int
+            identifies the session from which to fetch analysis metrics.
+        annotate : bool, optional
+            if True, information from the annotated units table will be merged onto the outputs
+
+        Returns
+        -------
+        metrics : pd.DataFrame
+            Each row corresponds to a single unit, describing a set of analysis metrics calculated on that unit.
+
+        """
+
+        path = self.get_cache_path(None, self.SESSION_ANALYSIS_METRICS_KEY, session_id, session_id)
+        metrics = call_caching(
+            self.fetch_api.get_unit_analysis_metrics, 
+            path, 
+            strategy='lazy', 
+            ecephys_session_ids=[session_id],
+            reader=lambda path: pd.read_csv(path, index_col='ecephys_unit_id'),
+            writer=lambda path, df: df.to_csv(path)
+        )
+
+        if annotate:
+            units = self.get_units()
+            units = units[units["ecephys_session_id"] == session_id]
+            metrics = pd.merge(units, metrics, left_index=True, right_index=True, how="inner")
+            metrics.index.rename("ecephys_unit_id", inplace=True)
+
+        return metrics
+
+    def get_unit_analysis_metrics_by_session_type(self, session_type, annotate=True):
+        """ Cache and return a table of analysis metrics calculated on each unit from a specified session type. See 
+        get_all_stimulus_sets for a list of session types.
+
+        Parameters
+        ----------
+        session_type : str
+            identifies the session type for which to fetch analysis metrics.
+        annotate : bool, optional
+            if True, information from the annotated units table will be merged onto the outputs
+
+        Returns
+        -------
+        metrics : pd.DataFrame
+            Each row corresponds to a single unit, describing a set of analysis metrics calculated on that unit.
+
+        """
+
+        known_session_types = self.get_all_stimulus_sets()
+        if session_type not in known_session_types:
+            raise ValueError(f"unrecognized session type: {session_type}. Available types: {known_session_types}")
+
+        path = self.get_cache_path(None, self.TYPEWISE_ANALYSIS_METRICS_KEY, session_type)
+        metrics = call_caching(
+            self.fetch_api.get_unit_analysis_metrics, 
+            path, 
+            strategy='lazy', 
+            session_types=[session_type],
+            reader=lambda path: pd.read_csv(path, index_col='ecephys_unit_id'),
+            writer=lambda path, df: df.to_csv(path)
+        )
+
+        if annotate:
+            units = self.get_units()
+            metrics = pd.merge(units, metrics, left_index=True, right_index=True, how="inner")
+            metrics.index.rename("ecephys_unit_id", inplace=True)
+
+        return metrics
+
+
     def add_manifest_paths(self, manifest_builder):
         manifest_builder = super(EcephysProjectCache, self).add_manifest_paths(manifest_builder)
                                   
@@ -226,11 +311,19 @@ class EcephysProjectCache(Cache):
         )
 
         manifest_builder.add_path(
+            self.SESSION_ANALYSIS_METRICS_KEY, 'session_%d_analysis_metrics.csv', parent_key=self.SESSION_DIR_KEY, typename='file'
+        )
+
+        manifest_builder.add_path(
             self.PROBE_LFP_NWB_KEY, 'probe_%d_lfp.nwb', parent_key=self.SESSION_DIR_KEY, typename='file'
         )
 
         manifest_builder.add_path(
             self.NATURAL_MOVIE_DIR_KEY, "natural_movie_templates", parent_key="BASEDIR", typename="dir"
+        )
+
+        manifest_builder.add_path(
+            self.TYPEWISE_ANALYSIS_METRICS_KEY, "%s_analysis_metrics.csv", parent_key='BASEDIR', typename="file"
         )
 
         manifest_builder.add_path(
