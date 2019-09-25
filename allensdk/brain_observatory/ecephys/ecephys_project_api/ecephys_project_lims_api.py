@@ -116,7 +116,6 @@ class EcephysProjectLimsApi(EcephysProjectApi):
         )
 
         response.set_index("id", inplace=True)
-        response.rename(columns={"ecephys_channel_id": "peak_channel_id"}, inplace=True)
 
         return response
 

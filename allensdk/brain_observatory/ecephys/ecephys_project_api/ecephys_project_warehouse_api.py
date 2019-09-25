@@ -45,21 +45,22 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
 
 
     def get_sessions(self, session_ids=None, has_eye_tracking=None, stimulus_names=None):
-        criteria = session_ids is not None or has_eye_tracking is not None or stimulus_names is not None
         response = build_and_execute(
             (
                 "{% import 'rma_macros' as rm %}"
                 "{% import 'macros' as m %}"
                 "criteria=model::EcephysSession"
-                r"{{',rma::criteria' if criteria}}"
                 r"{{rm.optional_contains('id',session_ids)}}"
                 r"{%if has_eye_tracking is not none%}[fail_eye_tracking$eq{{m.str(not has_eye_tracking).lower()}}]{%endif%}"
                 r"{{rm.optional_contains('stimulus_name',stimulus_names,True)}}"
                 ",rma::include,specimen(donor(age))"
                 ",well_known_files(well_known_file_type)"
             ), 
-            base=rma_macros(), engine=self.rma_engine.get_rma_tabular, criteria=criteria, session_ids=session_ids, 
-            has_eye_tracking=has_eye_tracking, stimulus_names=stimulus_names
+            base=rma_macros(), 
+            engine=self.rma_engine.get_rma_tabular, 
+            session_ids=session_ids, 
+            has_eye_tracking=has_eye_tracking, 
+            stimulus_names=stimulus_names
         )
 
         response.set_index("id", inplace=True)
@@ -96,18 +97,18 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
 
 
     def get_probes(self, probe_ids=None, session_ids=None):
-        criteria = probe_ids is not None and session_ids is not None
         response = build_and_execute(
             (
                 "{% import 'rma_macros' as rm %}"
                 "{% import 'macros' as m %}"           
                 "criteria=model::EcephysProbe"
-                r"{{',rma::criteria' if criteria}}"
                 r"{{rm.optional_contains('id',probe_ids)}}"
                 r"{{rm.optional_contains('ecephys_session_id',session_ids)}}"
             ),
-            base=rma_macros(), engine=self.rma_engine.get_rma_tabular, session_ids=session_ids, probe_ids=probe_ids,
-            criteria=criteria
+            base=rma_macros(), 
+            engine=self.rma_engine.get_rma_tabular, 
+            session_ids=session_ids, 
+            probe_ids=probe_ids
         )
 
         response.set_index("id", inplace=True)
@@ -147,7 +148,6 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
         return response
 
     def get_units(self, unit_ids=None, channel_ids=None, probe_ids=None, session_ids=None, *a, **k):
-        criteria = probe_ids is not None and session_ids is not None
         response =  build_and_execute(
             (
                 "{% import 'macros' as m %}" 
@@ -157,8 +157,11 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
                 r"{% if probe_ids is not none %},rma::criteria,ecephys_channel(ecephys_probe[id$in{{m.comma_sep(probe_ids)}}]){% endif %}"
                 r"{% if session_ids is not none %},rma::criteria,ecephys_channel(ecephys_probe(ecephys_session[id$in{{m.comma_sep(session_ids)}}])){% endif %}"
             ),
-            base=rma_macros(), engine=self.rma_engine.get_rma_tabular, session_ids=session_ids, probe_ids=probe_ids,
-            channel_ids=channel_ids, unit_ids=unit_ids, criteria=criteria
+            base=rma_macros(), engine=self.rma_engine.get_rma_tabular, 
+            session_ids=session_ids, 
+            probe_ids=probe_ids,
+            channel_ids=channel_ids, 
+            unit_ids=unit_ids
         )
         
         response.set_index("id", inplace=True)

@@ -61,32 +61,102 @@ class EcephysProjectCache(Cache):
         self.fetch_api = fetch_api
 
 
-    def get_sessions(self):
+    def _get_sessions(self):
         path = self.get_cache_path(None, self.SESSIONS_KEY)
+
         def reader(path):
             response = pd.read_csv(path, index_col='id')
             if "structure_acronyms" in response.columns: #  unfortunately, structure_acronyms is a list of str
                 response["structure_acronyms"] = [ast.literal_eval(item) for item in response["structure_acronyms"]]
             return response
+
         return call_caching(self.fetch_api.get_sessions, path=path, strategy='lazy', writer=csv_io["writer"], reader=reader)
 
-    def get_probes(self):
+
+    def _get_probes(self):
         path = self.get_cache_path(None, self.PROBES_KEY)
         return call_caching(self.fetch_api.get_probes, path, strategy='lazy', **csv_io)
 
-    def get_channels(self, include_counts=True):
+
+    def _get_channels(self):
+        path = self.get_cache_path(None, self.CHANNELS_KEY)
+        return call_caching(self.fetch_api.get_channels, path, strategy='lazy', **csv_io)
+
+
+    def _get_units(self, **kwargs):
+        path = self.get_cache_path(None, self.UNITS_KEY)
+        get_units = functools.partial(
+            self.fetch_api.get_units, 
+            amplitude_cutoff_maximum=None, # pull down all the units to csv and filter on the way out
+            presence_ratio_minimum=None, 
+            isi_violations_maximum=None
+        )
+        units = call_caching(get_units, path, strategy='lazy', **csv_io)
+
+        units =units[
+            (units["amplitude_cutoff"] <= get_unit_filter_value("amplitude_cutoff_maximum", **kwargs))
+            & (units["presence_ratio"] >= get_unit_filter_value("presence_ratio_minimum", **kwargs))
+            & (units["isi_violations"] <= get_unit_filter_value("isi_violations_maximum", **kwargs))
+        ]
+
+        if "quality" in units.columns:
+            units = units[units["quality"] == "good"]
+            units.drop(columns="quality", inplace=True)
+        
+        return units
+
+
+    def _get_annotated_probes(self):
+        sessions = self._get_sessions()
+        probes = self._get_probes()
+
+        return pd.merge(probes, sessions, left_on="ecephys_session_id", right_index=True, suffixes=['_probe', '_session'])
+
+
+    def _get_annotated_channels(self):
+        channels = self._get_channels()
+        probes = self._get_annotated_probes()
+
+        return pd.merge(channels, probes, left_on="ecephys_probe_id", right_index=True, suffixes=['_channel', '_probe'])
+
+
+    def _get_annotated_units(self, **kwargs):
+        units = self._get_units(**kwargs)
+        channels = self._get_annotated_channels()
+
+        return pd.merge(units, channels, left_on='ecephys_channel_id', right_index=True, suffixes=['_unit', '_channel'])
+
+
+    def get_sessions(self):
+        sessions = self._get_sessions()
+
+        count_owned(sessions, self._get_annotated_units(), "ecephys_session_id", "unit_count", inplace=True)
+        count_owned(sessions, self._get_annotated_channels(), "ecephys_session_id", "channel_count", inplace=True)
+        count_owned(sessions, self._get_annotated_probes(), "ecephys_session_id", "probe_count", inplace=True)
+
+        return sessions
+
+
+    def get_probes(self):
+        probes = self._get_annotated_probes()
+
+        count_owned(probes, self._get_annotated_units(), "ecephys_probe_id", "unit_count", inplace=True)
+        count_owned(probes, self._get_annotated_channels(), "ecephys_probe_id", "channel_count", inplace=True)
+
+        return probes
+
+
+    def get_channels(self):
         """ Load (potentially downloading and caching) a table whose rows are individual channels.
         """
 
-        path = self.get_cache_path(None, self.CHANNELS_KEY)
-        response = call_caching(self.fetch_api.get_channels, path, strategy='lazy', **csv_io)
+        channels = self._get_annotated_channels()
+        count_owned(channels, self._get_annotated_units(), "ecephys_channel_id", "unit_count", inplace=True)
 
-        if include_counts:
-            count_owned(response, self.get_units(), "ecephys_channel_id", "unit_count", inplace=True)
+        return channels
 
-        return response
 
-    def get_units(self, annotate=True, **kwargs):
+    def get_units(self, **kwargs):
         """ Reports a table consisting of all sorted units across the entire extracellular electrophysiology project.
 
         Parameters
@@ -100,35 +170,9 @@ class EcephysProjectCache(Cache):
             each row describes a single sorted unit
 
         """
-
-        path = self.get_cache_path(None, self.UNITS_KEY)
-        get_units = functools.partial(
-            self.fetch_api.get_units, 
-            amplitude_cutoff_maximum=None, # pull down all the units to csv and filter on the way out
-            presence_ratio_minimum=None, 
-            isi_violations_maximum=None
-        )
-        units = call_caching(get_units, path, strategy='lazy', **csv_io)
-
-        if annotate:
-            channels = self.get_channels().drop(columns=["unit_count"])
-            probes = self.get_probes().drop(columns=["unit_count", "channel_count"])
-            sessions = self.get_sessions().drop(columns=["probe_count", "unit_count", "channel_count", "structure_acronyms"])
-
-            units = pd.merge(units, channels, left_on='peak_channel_id', right_index=True, suffixes=['_unit', '_channel'])
-            units = pd.merge(units, probes, left_on='ecephys_probe_id', right_index=True, suffixes=['_unit', '_probe'])
-            units = pd.merge(units, sessions, left_on='ecephys_session_id', right_index=True, suffixes=['_unit', '_session'])
-
-        units =units[
-            (units["amplitude_cutoff"] <= get_unit_filter_value("amplitude_cutoff_maximum", **kwargs))
-            & (units["presence_ratio"] >= get_unit_filter_value("presence_ratio_minimum", **kwargs))
-            & (units["isi_violations"] <= get_unit_filter_value("isi_violations_maximum", **kwargs))
-        ]
-        if "quality" in units.columns:
-            units = units[units["quality"] == "good"]
-            units.drop(columns="quality", inplace=True)
         
-        return units
+        return self._get_annotated_units(**kwargs)
+
 
     def get_session_data(self, session_id):
         path = self.get_cache_path(None, self.SESSION_NWB_KEY, session_id, session_id)
