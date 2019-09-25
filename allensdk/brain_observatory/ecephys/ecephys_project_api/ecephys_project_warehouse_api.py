@@ -1,3 +1,5 @@
+import re
+
 import pandas as pd
 
 from .rma_engine import RmaEngine
@@ -5,6 +7,9 @@ from .ecephys_project_api import EcephysProjectApi
 from .utilities import rma_macros, build_and_execute
 
 class EcephysProjectWarehouseApi(EcephysProjectApi):
+
+    movie_re = re.compile(r".*natural_movie_(?P<num>\d+).npy")
+    scene_re = re.compile(r".*/(?P<num>\d+).tiff")
     
     def __init__(self, rma_engine):
         self.rma_engine = rma_engine
@@ -23,9 +28,62 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
         if well_known_files.shape[0] != 1:
             raise ValueError(f"expected exactly 1 nwb file for session {session_id}, found: {well_known_files}")
         
-        download_link = well_known_files.loc[0, "download_link"]
+        download_link = well_known_files.iloc[0]["download_link"]
         return self.rma_engine.stream(download_link)
-        
+
+    def get_natural_movie_template(self, number):
+        well_known_files = self.stimulus_templates[self.stimulus_templates["movie_number"] == number]
+        if well_known_files.shape[0] != 1:
+            raise ValueError(f"expected exactly one natural movie template with number {number}, found {well_known_files}")
+
+        download_link = well_known_files.iloc[0]["download_link"]
+        return self.rma_engine.stream(download_link)
+
+    def get_natural_scene_template(self, number):
+        well_known_files = self.stimulus_templates[self.stimulus_templates["scene_number"] == number]
+        if well_known_files.shape[0] != 1:
+            raise ValueError(f"expected exactly one natural scene template with number {number}, found {well_known_files}")
+
+        download_link = well_known_files.iloc[0]["download_link"]
+        return self.rma_engine.stream(download_link)
+
+    @property
+    def stimulus_templates(self):
+        if not hasattr(self, "_stimulus_templates_list"):
+            self._stimulus_templates_list = self._list_stimulus_templates()
+        return self._stimulus_templates_list
+
+
+    def _list_stimulus_templates(self, ecephys_product_id=714914585):
+        well_known_files = build_and_execute(
+            (
+                "criteria=model::WellKnownFile"
+                ",rma::criteria,well_known_file_type[name$eq'Stimulus']"
+                "[attachable_type$eq'Product']"
+                r"[attachable_id$eq{{ecephys_product_id}}]"
+            ),
+             engine=self.rma_engine.get_rma_tabular, ecephys_product_id=ecephys_product_id
+        )
+
+        scene_number = []
+        movie_number = []
+        for _, row in well_known_files.iterrows():
+            scene_match = self.scene_re.match(row["path"])
+            movie_match = self.movie_re.match(row["path"])
+
+            if scene_match is not None:
+                scene_number.append(int(scene_match["num"]))
+                movie_number.append(None)
+
+            elif movie_match is not None:
+                movie_number.append(int(movie_match["num"]))
+                scene_number.append(None)
+
+        well_known_files["scene_number"] = scene_number
+        well_known_files["movie_number"] = movie_number
+        return well_known_files
+
+
     def get_probe_lfp_data(self, probe_id):
         well_known_files = build_and_execute(
             (

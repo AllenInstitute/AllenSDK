@@ -5,6 +5,7 @@ import ast
 import pandas as pd
 import SimpleITK as sitk
 import h5py
+import numpy as np
 
 from allensdk.api.cache import Cache
 
@@ -210,8 +211,7 @@ class EcephysProjectCache(Cache):
         path = self.get_cache_path(None, self.NATURAL_MOVIE_KEY, number)
 
         def reader(path):
-            with h5py.File(path, "r") as fil:
-                return fil["data"][:]
+            return np.load(path, allow_pickle=False)
 
         return call_caching(
             self.fetch_api.get_natural_movie_template,

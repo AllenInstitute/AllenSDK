@@ -114,9 +114,8 @@ def mock_api(shared_tmpdir, sessions, units, channels, probes, analysis_metrics)
             return open(path, "rb")
 
         def get_natural_movie_template(self, number):
-            path = os.path.join(shared_tmpdir, "tmp.png")
-            with h5py.File(path, "w") as f:
-                f.create_dataset("data", data=np.eye(100))
+            path = os.path.join(shared_tmpdir, "tmp.npy")
+            np.save(path, np.eye(100))
             return open(path, "rb")
 
         def get_unit_analysis_metrics(self, *a, **k):
