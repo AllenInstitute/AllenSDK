@@ -237,7 +237,7 @@ class EcephysProjectCache(Cache):
             writer=write_from_stream,
         )
 
-        get_analysis_metrics = functools.partial(self.get_unit_analysis_metrics_for_session, session_id)
+        get_analysis_metrics = functools.partial(self.get_unit_analysis_metrics_for_session, session_id, False)
 
         session_api = EcephysNwbSessionApi(
             path=path, 
