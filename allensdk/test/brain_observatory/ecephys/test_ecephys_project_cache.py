@@ -25,7 +25,7 @@ def sessions():
 @pytest.fixture
 def units():
     return pd.DataFrame({
-        'peak_channel_id': [2, 1],
+        'ecephys_channel_id': [2, 1],
         'snr': [1.5, 4.9],
         "amplitude_cutoff": [0.05, 0.2],
         "presence_ratio": [10, 20],
@@ -46,7 +46,8 @@ def channels():
     return pd.DataFrame({
         'ecephys_probe_id': [11, 11],
         'ap': [1000, 2000],
-        "unit_count": [5, 10]
+        "unit_count": [5, 10],
+        "structure_acronym": ["a", "b"]
     }, index=pd.Series(name='id', data=[1, 2]))
 
 
@@ -57,6 +58,21 @@ def probes():
         "unit_count": [50],
         "channel_count": [10]
     }, index=pd.Series(name='id', data=[11]))
+
+
+@pytest.fixture
+def annotated_probes(probes, sessions):
+    return pd.merge(probes, sessions, left_on="ecephys_session_id", right_index=True, suffixes=["_probe", "_session"])
+
+
+@pytest.fixture
+def annotated_channels(channels, annotated_probes):
+    return pd.merge(channels, annotated_probes, left_on="ecephys_probe_id", right_index=True, suffixes=["_channel", "_probe"])
+
+
+@pytest.fixture
+def annotated_units(units, annotated_channels):
+    return pd.merge(units, annotated_channels, left_on="ecephys_channel_id", right_index=True, suffixes=["_unit", "_channel"])
 
 
 @pytest.fixture
@@ -99,9 +115,8 @@ def mock_api(shared_tmpdir, sessions, units, channels, probes, analysis_metrics)
             return open(path, "rb")
 
         def get_natural_movie_template(self, number):
-            path = os.path.join(shared_tmpdir, "tmp.png")
-            with h5py.File(path, "w") as f:
-                f.create_dataset("data", data=np.eye(100))
+            path = os.path.join(shared_tmpdir, "tmp.npy")
+            np.save(path, np.eye(100))
             return open(path, "rb")
 
         def get_unit_analysis_metrics(self, *a, **k):
@@ -133,25 +148,34 @@ def lazy_cache_test(cache, cache_name, api_name, expected, *args, **kwargs):
 
 
 def test_get_sessions(tmpdir_cache, sessions):
-    lazy_cache_test(tmpdir_cache, 'get_sessions', "get_sessions", sessions)
+    lazy_cache_test(tmpdir_cache, '_get_sessions', "get_sessions", sessions)
 
 
 def test_get_units(tmpdir_cache, units):
     units = units[units["amplitude_cutoff"] <= 0.1]
-    lazy_cache_test(tmpdir_cache, 'get_units', "get_units", units, annotate=False)
-
-
-def test_get_units_annotated(tmpdir_cache, units, channels, probes, sessions):
-    units = tmpdir_cache.get_units(annotate=True, amplitude_cutoff_maximum=10)
-    assert units.loc[2, "session_type"] == "stimulus_set_two"
+    lazy_cache_test(tmpdir_cache, '_get_units', "get_units", units)
 
 
 def test_get_probes(tmpdir_cache, probes):
-    lazy_cache_test(tmpdir_cache, 'get_probes', "get_probes", probes)
+    lazy_cache_test(tmpdir_cache, '_get_probes', "get_probes", probes)
 
 
 def test_get_channels(tmpdir_cache, channels):
-    lazy_cache_test(tmpdir_cache, 'get_channels', "get_channels", channels)
+    lazy_cache_test(tmpdir_cache, '_get_channels', "get_channels", channels)
+
+
+def test_get_annotated_probes(tmpdir_cache, probes, annotated_probes):
+    lazy_cache_test(tmpdir_cache, "_get_annotated_probes", "get_probes", annotated_probes)
+
+
+def test_get_annotated_channels(tmpdir_cache, channels, annotated_channels):
+    lazy_cache_test(tmpdir_cache, "_get_annotated_channels", "get_channels", annotated_channels)
+
+
+def test_get_annotated_units(tmpdir_cache, units, annotated_units):
+    annotated_units = annotated_units[annotated_units["amplitude_cutoff"] < 0.1]
+
+    lazy_cache_test(tmpdir_cache, "_get_annotated_units", "get_units", annotated_units)
 
 
 def test_get_session_data(shared_tmpdir, tmpdir_cache):

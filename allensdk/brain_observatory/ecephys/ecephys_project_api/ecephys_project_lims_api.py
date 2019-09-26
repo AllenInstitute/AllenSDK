@@ -116,7 +116,6 @@ class EcephysProjectLimsApi(EcephysProjectApi):
         )
 
         response.set_index("id", inplace=True)
-        response.rename(columns={"ecephys_channel_id": "peak_channel_id"}, inplace=True)
 
         return response
 
@@ -130,8 +129,8 @@ class EcephysProjectLimsApi(EcephysProjectApi):
                     ec.local_index,
                     ec.probe_vertical_position,
                     ec.probe_horizontal_position,
-                    ec.manual_structure_id,
-                    st.acronym as manual_structure_acronym,
+                    ec.manual_structure_id as structure_id,
+                    st.acronym as structure_acronym,
                     pc.unit_count
                 from ecephys_channels ec 
                 join ecephys_probes ep on ep.id = ec.ecephys_probe_id
@@ -251,7 +250,9 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             presence_ratio_minimum=get_unit_filter_value("presence_ratio_minimum", replace_none=False, **kwargs),
             isi_violations_maximum=get_unit_filter_value("isi_violations_maximum", replace_none=False, **kwargs)
         )
-        return response.set_index("id")
+        response = response.set_index("id")
+
+        return response
 
     def get_sessions(
         self,

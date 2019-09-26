@@ -1,4 +1,6 @@
 import sys
+import logging
+import time
 
 import requests
 import pandas as pd
@@ -25,14 +27,16 @@ class RmaEngine(HttpEngine):
     def add_page_params(self, url, start, count=None):
         if count is None:
             count = self.page_size
-        return f"{url},rma::options[start_row$eq{start}][num_rows$eq{count}]"
+        return f"{url},rma::options[start_row$eq{start}][num_rows$eq{count}][order$eq'id']"
 
     def get_rma(self, query):
         url = f"{self.scheme}://{self.host}/{self.rma_prefix}/{self.format_query_string}?{query}"
+        logging.debug(url)
 
         start_row = 0
         total_rows = None
 
+        start_time = time.time()
         while total_rows is None or start_row < total_rows:
             current_url = self.add_page_params(url, start_row)
             response_json = requests.get(current_url).json()
@@ -43,10 +47,15 @@ class RmaEngine(HttpEngine):
             if total_rows is None:
                 total_rows = response_json["total_rows"]
 
+            logging.debug(f"downloaded {start_row} of {total_rows} records ({time.time() - start_time:.3f} seconds)")
             yield response_json["msg"]
 
-    def get_rma_tabular(self, query):
+
+    def get_rma_list(self, query):
         response = []
         for chunk in self.get_rma(query):
             response.extend(chunk)
-        return pd.DataFrame(response)
+        return response
+
+    def get_rma_tabular(self, query):
+        return pd.DataFrame(get_rma_list(query))
