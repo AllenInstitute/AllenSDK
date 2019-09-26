@@ -50,8 +50,12 @@ class RmaEngine(HttpEngine):
             logging.debug(f"downloaded {start_row} of {total_rows} records ({time.time() - start_time:.3f} seconds)")
             yield response_json["msg"]
 
-    def get_rma_tabular(self, query):
+
+    def get_rma_list(self, query):
         response = []
         for chunk in self.get_rma(query):
             response.extend(chunk)
-        return pd.DataFrame(response)
+        return response
+
+    def get_rma_tabular(self, query):
+        return pd.DataFrame(get_rma_list(query))
