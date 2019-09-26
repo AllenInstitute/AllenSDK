@@ -53,6 +53,22 @@ class EcephysProjectCache(Cache):
 
     MANIFEST_VERSION = '0.2.1'
 
+    SUPPRESS_FROM_UNITS = ("air_channel_index", "surface_channel_index", "has_nwb")
+    SUPPRESS_FROM_CHANNELS = (
+        "air_channel_index", "surface_channel_index", "name"
+        "date_of_acquisition", "published_at", "specimen_id", "session_type", "isi_experiment_id", "age_in_days", 
+        "sex", "genotype", "has_nwb"
+    )
+    SUPPRESS_FROM_PROBES = (
+        "air_channel_index", "surface_channel_index",
+        "date_of_acquisition", "published_at", "specimen_id", "session_type", "isi_experiment_id", "age_in_days", 
+        "sex", "genotype", "has_nwb"
+    )
+    SUPPRESS_FROM_SESSIONS = (
+        "has_nwb",
+    )
+
+
     def __init__(self, fetch_api, **kwargs):
         
         kwargs['manifest'] = kwargs.get('manifest', 'ecephys_project_manifest.json')
@@ -128,7 +144,7 @@ class EcephysProjectCache(Cache):
         return pd.merge(units, channels, left_on='ecephys_channel_id', right_index=True, suffixes=['_unit', '_channel'])
 
 
-    def get_sessions(self):
+    def get_sessions(self, suppress=None):
         sessions = self._get_sessions()
 
         count_owned(sessions, self._get_annotated_units(), "ecephys_session_id", "unit_count", inplace=True)
@@ -137,10 +153,14 @@ class EcephysProjectCache(Cache):
 
         get_grouped_uniques(sessions, self._get_annotated_channels(), "ecephys_session_id", "structure_acronym", "structure_acronyms", inplace=True)
 
+        if suppress is None:
+            suppress = list(self.SUPPRESS_FROM_SESSIONS)
+        sessions.drop(columns=suppress, inplace=True, errors="ignore")
+
         return sessions
 
 
-    def get_probes(self):
+    def get_probes(self, suppress=None):
         probes = self._get_annotated_probes()
 
         count_owned(probes, self._get_annotated_units(), "ecephys_probe_id", "unit_count", inplace=True)
@@ -148,20 +168,29 @@ class EcephysProjectCache(Cache):
 
         get_grouped_uniques(probes, self._get_annotated_channels(), "ecephys_probe_id", "structure_acronym", "structure_acronyms", inplace=True)
 
+        if suppress is None:
+            suppress = list(self.SUPPRESS_FROM_PROBES)
+        probes.drop(columns=suppress, inplace=True, errors="ignore")
+
         return probes
 
 
-    def get_channels(self):
+    def get_channels(self, suppress=None):
         """ Load (potentially downloading and caching) a table whose rows are individual channels.
         """
 
         channels = self._get_annotated_channels()
         count_owned(channels, self._get_annotated_units(), "ecephys_channel_id", "unit_count", inplace=True)
 
+        if suppress is None:
+            suppress = list(self.SUPPRESS_FROM_CHANNELS)
+        channels.drop(columns=suppress, inplace=True, errors="ignore")
+        channels.rename(columns={"name": "probe_name"}, inplace=True, errors="ignore")
+
         return channels
 
 
-    def get_units(self, **kwargs):
+    def get_units(self, suppress=None, **kwargs):
         """ Reports a table consisting of all sorted units across the entire extracellular electrophysiology project.
 
         Parameters
@@ -175,8 +204,14 @@ class EcephysProjectCache(Cache):
             each row describes a single sorted unit
 
         """
+
+        if suppress is None:
+            suppress = list(self.SUPPRESS_FROM_UNITS)
+
+        units = self._get_annotated_units(**kwargs)
+        units.drop(columns=suppress, inplace=True, errors="ignore")
         
-        return self._get_annotated_units(**kwargs)
+        return units
 
 
     def get_session_data(self, session_id):
@@ -441,3 +476,4 @@ def get_grouped_uniques(this, other, foreign_key, field_key, unique_key, inplace
 
     if not inplace:
         return this
+    
