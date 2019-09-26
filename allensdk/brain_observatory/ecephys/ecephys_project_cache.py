@@ -283,7 +283,7 @@ class EcephysProjectCache(Cache):
         return self._get_all_values("genotype", self.get_sessions, **session_kwargs)
 
     def get_all_recorded_structures(self, **channel_kwargs):
-        return self._get_all_values("manual_structure_acronym", self.get_channels, **channel_kwargs)
+        return self._get_all_values("structure_acronym", self.get_channels, **channel_kwargs)
 
     def get_all_project_codes(self):
         return self._get_all_values("project_code", self.get_sessions, **session_kwargs)
