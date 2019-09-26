@@ -289,7 +289,7 @@ class EcephysSession(LazyPropertyMixin):
 
         '''
 
-        stimulus_names = warn_on_scalar(stimulus_names, f'expected stimulus_names to be a collection (list-like), but found {type(stimulus_names)}: {stimulus_names}')
+        stimulus_names = coerce_scalar(stimulus_names, f'expected stimulus_names to be a collection (list-like), but found {type(stimulus_names)}: {stimulus_names}')
         filtered_presentations = self.stimulus_presentations[self.stimulus_presentations['stimulus_name'].isin(stimulus_names)]
         filtered_ids = set(filtered_presentations.index.values)
 
@@ -314,7 +314,7 @@ class EcephysSession(LazyPropertyMixin):
 
         '''
 
-        stimulus_names = warn_on_scalar(stimulus_names, f'expected stimulus_names to be a collection (list-like), but found {type(stimulus_names)}: {stimulus_names}')
+        stimulus_names = coerce_scalar(stimulus_names, f'expected stimulus_names to be a collection (list-like), but found {type(stimulus_names)}: {stimulus_names}')
         filtered_presentations = self.stimulus_presentations[self.stimulus_presentations['stimulus_name'].isin(stimulus_names)]
         return removed_unused_stimulus_presentation_columns(filtered_presentations)
 
@@ -839,7 +839,7 @@ class EcephysSession(LazyPropertyMixin):
         if ids is None:
             return df
         
-        ids = warn_on_scalar(ids, f'a scalar ({ids}) was provided as ids, filtering to a single row of {key}.')
+        ids = coerce_scalar(ids, f'a scalar ({ids}) was provided as ids, filtering to a single row of {key}.')
 
         df = df.loc[ids]
 
@@ -966,8 +966,9 @@ def array_intervals(array):
     return np.concatenate([ [0], changes, [len(array)] ])
 
 
-def warn_on_scalar(value, message):
+def coerce_scalar(value, message, warn=False):
     if not isinstance(value, Collection) or isinstance(value, str):
-        warnings.warn(message)
+        if warn:
+            warnings.warn(message)
         return [value]
     return value
