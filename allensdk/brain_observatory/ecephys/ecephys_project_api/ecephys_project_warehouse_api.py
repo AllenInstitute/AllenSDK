@@ -1,4 +1,5 @@
 import re
+import json
 
 import pandas as pd
 
@@ -225,6 +226,34 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
         response.set_index("id", inplace=True)
 
         return response
+
+    def get_unit_analysis_metrics(self, unit_ids=None, ecephys_session_ids=None, session_types=None):
+        response = build_and_execute(
+            (
+                "{% import 'macros' as m %}" 
+                "criteria=model::EcephysUnitMetricBundle"
+                r"{% if unit_ids is not none %},rma::criteria[ecephys_unit_id$in{{m.comma_sep(unit_ids)}}]{% endif %}"
+                r"{% if session_ids is not none %},rma::criteria,ecephys_unit(ecephys_channel(ecephys_probe(ecephys_session[id$in{{m.comma_sep(session_ids)}}]))){% endif %}"
+                r"{% if session_types is not none %},rma::criteria,ecephys_unit(ecephys_channel(ecephys_probe(ecephys_session[stimulus_name$in{{m.comma_sep(session_types, True)}}]))){% endif %}"
+            ),
+            base=rma_macros(), 
+            engine=self.rma_engine.get_rma_list, 
+            session_ids=ecephys_session_ids, 
+            unit_ids=unit_ids,
+            session_types=session_types
+        )
+
+        output = []
+        for item in response:
+            data = json.loads(item.pop("data"))
+            item.update(data)
+            output.append(item)
+        
+        output = pd.DataFrame(output)
+        output.set_index("ecephys_unit_id", inplace=True)
+        output.drop(columns="id", inplace=True)
+
+        return output
 
 
     @classmethod
