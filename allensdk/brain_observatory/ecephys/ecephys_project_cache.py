@@ -276,7 +276,7 @@ class EcephysProjectCache(Cache):
             reader=reader
         )
 
-    def get_all_stimulus_sets(self, **session_kwargs):
+    def get_all_session_types(self, **session_kwargs):
         return self._get_all_values("session_type", self.get_sessions, **session_kwargs)
 
     def get_all_genotypes(self, **session_kwargs):
@@ -285,14 +285,11 @@ class EcephysProjectCache(Cache):
     def get_all_recorded_structures(self, **channel_kwargs):
         return self._get_all_values("structure_acronym", self.get_channels, **channel_kwargs)
 
-    def get_all_project_codes(self):
-        return self._get_all_values("project_code", self.get_sessions, **session_kwargs)
-
-    def get_all_ages(self):
-        return self._get_all_values("age", self.get_sessions, **session_kwargs)
+    def get_all_ages(self, **session_kwargs):
+        return self._get_all_values("age_in_days", self.get_sessions, **session_kwargs)
     
-    def get_all_genders(self):
-        return self._get_all_values("gender", self.get_sessions, **session_kwargs)
+    def get_all_sexes(self, **session_kwargs):
+        return self._get_all_values("sex", self.get_sessions, **session_kwargs)
 
     def _get_all_values(self, key, method=None, **method_kwargs):
         if method is None:
@@ -338,7 +335,7 @@ class EcephysProjectCache(Cache):
 
     def get_unit_analysis_metrics_by_session_type(self, session_type, annotate=True):
         """ Cache and return a table of analysis metrics calculated on each unit from a specified session type. See 
-        get_all_stimulus_sets for a list of session types.
+        get_all_session_types for a list of session types.
 
         Parameters
         ----------
@@ -354,7 +351,7 @@ class EcephysProjectCache(Cache):
 
         """
 
-        known_session_types = self.get_all_stimulus_sets()
+        known_session_types = self.get_all_session_types()
         if session_type not in known_session_types:
             raise ValueError(f"unrecognized session type: {session_type}. Available types: {known_session_types}")
 
