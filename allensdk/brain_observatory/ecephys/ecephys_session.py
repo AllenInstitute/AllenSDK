@@ -204,7 +204,8 @@ class EcephysSession(LazyPropertyMixin):
         self.probes = self.LazyProperty(self.api.get_probes)
         self.channels = self.LazyProperty(self.api.get_channels)
 
-        self.stimulus_presentations = self.LazyProperty(self.api.get_stimulus_presentations, wrappers=[self._build_stimulus_presentations])
+        self.stimulus_presentations = self.LazyProperty(self.api.get_stimulus_presentations,
+                                                        wrappers=[self._build_stimulus_presentations, self._mask_invalid_stimulus_presentations])
         self.units = self.LazyProperty(self.api.get_units, wrappers=[self._build_units_table])
         self.inter_presentation_intervals = self.LazyProperty(self._build_inter_presentation_intervals)
         self.invalid_times = self.LazyProperty(self.api.get_invalid_times)
@@ -394,6 +395,59 @@ class EcephysSession(LazyPropertyMixin):
                 *_screen_coorindates_spherical_y_deg
         """
         return self.api.get_eye_tracking_data(suppress_eye_gaze_data=suppress_eye_gaze_data)
+
+    def _mask_invalid_stimulus_presentations(self, stimulus_presentations):
+        """Mask invalid stimulus presentations
+
+        Find stimulus presentations overlapping with invalid times
+        Mask stimulus names with "invalid_presentation", keep "start_time" and "stop_time", mask remaining data with np.nan
+
+        Parameters
+        ----------
+        stimulus_presentations : pd.DataFrame
+            table including all stimulus presentations
+
+        Returns
+        -------
+        pd.DataFrame :
+            table with masked invalid presentations
+
+        """
+
+        def overlap(a, b):
+            """Check if the two intervals overlap
+
+            Parameters
+            ----------
+            a : tuple
+                start, stop times
+            b : tuple
+                start, stop times
+            Returns
+            -------
+            bool : True if overlap, otherwise False
+            """
+            return max(a[0], b[0]) <= min(a[1], b[1])
+
+        invalid_times = self.invalid_times.copy()
+
+        fail_tags = ["stimulus"]
+        if not invalid_times.empty:
+            mask = invalid_times['tags'].apply(lambda x: any([t in x for t in fail_tags]))
+            invalid_times = invalid_times[mask]
+
+        for ix_sp, sp in stimulus_presentations.iterrows():
+            stim_epoch = sp['start_time'], sp['stop_time']
+
+            for ix_it, it in invalid_times.iterrows():
+                invalid_interval = it['start_time'], it['stop_time']
+                if overlap(stim_epoch, invalid_interval):
+                    stimulus_presentations.iloc[ix_sp, :] = np.nan
+                    stimulus_presentations.at[ix_sp, "stimulus_name"] = "invalid_presentation"
+                    stimulus_presentations.at[ix_sp, "start_time"] = stim_epoch[0]
+                    stimulus_presentations.at[ix_sp, "stop_time"] = stim_epoch[1]
+
+        return stimulus_presentations
 
     def presentationwise_spike_counts(
         self, 

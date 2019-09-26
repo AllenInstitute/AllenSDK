@@ -70,7 +70,7 @@ class NwbApi:
         if container:
             return container.to_dataframe()
         else:
-            raise ValueError('There are no invalid time intervals in this session!')
+            return pd.DataFrame()
 
     def get_image(self, name, module, image_api=None) -> sitk.Image:
 
