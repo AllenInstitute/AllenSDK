@@ -55,7 +55,7 @@ class EcephysProjectCache(Cache):
 
     SUPPRESS_FROM_UNITS = ("air_channel_index", "surface_channel_index", "has_nwb")
     SUPPRESS_FROM_CHANNELS = (
-        "air_channel_index", "surface_channel_index", "name"
+        "air_channel_index", "surface_channel_index", "name",
         "date_of_acquisition", "published_at", "specimen_id", "session_type", "isi_experiment_id", "age_in_days", 
         "sex", "genotype", "has_nwb"
     )
