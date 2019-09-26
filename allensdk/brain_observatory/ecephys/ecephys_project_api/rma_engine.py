@@ -58,4 +58,4 @@ class RmaEngine(HttpEngine):
         return response
 
     def get_rma_tabular(self, query):
-        return pd.DataFrame(get_rma_list(query))
+        return pd.DataFrame(self.get_rma_list(query))
