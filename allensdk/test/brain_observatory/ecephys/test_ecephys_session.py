@@ -31,8 +31,8 @@ def raw_stimulus_table():
 @pytest.fixture
 def raw_invalid_times_table():
     return pd.DataFrame({
-        "start_time": [2114.0,114.0],
-        "end_time": [2121.0,211.0],
+        "start_time": [0.3, 1.6],
+        "stop_time": [0.6, 2.3],
         "tags":[["EcephysSession", "739448407", "stimulus"],
                 ["EcephysProbe", "123448407", "ProbeB"]],
     })
@@ -104,14 +104,10 @@ def just_stimulus_table_api(raw_stimulus_table):
     class EcephysJustStimulusTableApi(EcephysSessionApi):
         def get_stimulus_presentations(self):
             return raw_stimulus_table
+        def get_invalid_times(self):
+            return pd.DataFrame()
     return EcephysJustStimulusTableApi()
 
-@pytest.fixture
-def just_invalid_times_table_api(raw_invalid_times_table):
-    class EcephysJustInvalidTimesTableApi(EcephysSessionApi):
-        def get_invalid_times(self):
-            return raw_invalid_times_table
-    return EcephysJustInvalidTimesTableApi()
 
 @pytest.fixture
 def channels_table_api(raw_channels, raw_probes, raw_lfp):
@@ -135,6 +131,15 @@ def units_table_api(raw_channels, raw_units, raw_probes):
         def get_probes(self):
             return raw_probes  
     return EcephysUnitsTableApi()
+
+@pytest.fixture
+def valid_stimulus_table_api(raw_stimulus_table,raw_invalid_times_table):
+    class EcephysValidStimulusTableApi(EcephysSessionApi):
+        def get_invalid_times(self):
+            return raw_invalid_times_table
+        def get_stimulus_presentations(self):
+            return raw_stimulus_table
+    return EcephysValidStimulusTableApi()
 
 
 @pytest.fixture
@@ -164,6 +169,10 @@ def spike_times_api(raw_units, raw_channels, raw_probes, raw_stimulus_table, raw
             return raw_probes
         def get_stimulus_presentations(self):
             return raw_stimulus_table
+
+        def get_invalid_times(self):
+            return pd.DataFrame()
+
     return EcephysSpikeTimesApi()
 
 
@@ -204,19 +213,48 @@ def test_get_stimulus_epochs(just_stimulus_table_api):
     pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)
 
 
-def test_get_invalid_times(just_invalid_times_table_api):
+def test_get_invalid_times(valid_stimulus_table_api, raw_invalid_times_table):
 
-    expected = pd.DataFrame({
-        "start_time": [2114.0,114.0],
-        "end_time": [2121.0,211.0],
-        "tags":[["EcephysSession", "739448407", "stimulus"],
-                ["EcephysProbe", "123448407", "ProbeB"]],
-    })
+    expected = raw_invalid_times_table
 
-
-    session = EcephysSession(api=just_invalid_times_table_api)
+    session = EcephysSession(api=valid_stimulus_table_api)
 
     obtained = session.get_invalid_times()
+
+    pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)
+
+
+def test_get_stimulus_presentations(valid_stimulus_table_api):
+
+    expected = pd.DataFrame({
+        "start_time": [0, 1/2, 1, 3/2],
+        "stop_time": [1/2, 1, 3/2, 2],
+        "stimulus_name": ['invalid_presentation', 'invalid_presentation', 'a', 'a_movie'],
+        "phase": [np.nan, np.nan, 120.0, 180.0]
+    }, index=pd.Index(name='stimulus_presentations_id', data=[0, 1, 2, 3]))
+
+    session = EcephysSession(api=valid_stimulus_table_api)
+    obtained = session.stimulus_presentations[["start_time", "stop_time", "stimulus_name", "phase"]]
+
+    print(expected)
+    print(obtained)
+    pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)
+
+
+def test_get_stimulus_presentations_no_invalid_times(just_stimulus_table_api):
+
+    expected = pd.DataFrame({
+        "start_time": [0, 1/2, 1, 3/2],
+        "stop_time": [1/2, 1, 3/2, 2],
+        'stimulus_name': ['a', 'a', 'a', 'a_movie'],
+
+    }, index=pd.Index(name='stimulus_presentations_id', data=[0, 1, 2, 3]))
+
+    session = EcephysSession(api=just_stimulus_table_api)
+
+    obtained = session.stimulus_presentations[["start_time", "stop_time", "stimulus_name"]]
+    print(expected)
+    print(obtained)
 
     pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)
 
