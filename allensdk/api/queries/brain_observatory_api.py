@@ -159,7 +159,27 @@ class BrainObservatoryApi(RmaTemplate):
              'criteria': '[id$eq{{ mapping_table_id }}],well_known_file_type[name$eqOphysCellSpecimenIdMapping]',
              'num_rows': 'all',
              'count': False,
-             'criteria_params': ['mapping_table_id']}
+             'criteria_params': ['mapping_table_id']
+             },
+            {'name': 'eye_gaze_mapping_file',
+             'description': 'h5 file containing mouse eye gaze mapped onto screen coordinates (as well as pupil and eye sizes)',
+             'model': 'WellKnownFile',
+             'criteria': '[attachable_id$eq{{ ophys_session_id }}],well_known_file_type[name$eqEyeDlcScreenMapping]',
+             'num_rows': 'all',
+             'count': False,
+             'criteria_params': ['ophys_session_id']
+             },
+            # NOTE: 'all_eye_mapping_files' query is for facilitating an ugly
+            # hack to get around lack of relationship between experiment id
+            # and session id in current warehouse. This should be removed when
+            # the relationship is added.
+            {'name': 'all_eye_mapping_files',
+             'description': 'Get a list of dictionaries for all eye mapping wkfs',
+             'model': 'WellKnownFile',
+             'criteria': 'well_known_file_type[name$eqEyeDlcScreenMapping]',
+             'num_rows': 'all',
+             'count': False
+             }
         ]}
 
     _QUERY_TEMPLATES = {
@@ -404,6 +424,29 @@ class BrainObservatoryApi(RmaTemplate):
                             ophys_experiment_id)
         self._log.warning(
             "Downloading ophys_experiment %d events file. This can take some time." % ophys_experiment_id)
+
+        self.retrieve_file_over_http(self.api_url + file_url, file_name)
+
+    @cacheable(strategy='create',
+               pathfinder=Cache.pathfinder(file_name_position=3,
+                                           path_keyword='file_name'))
+    def save_ophys_experiment_eye_gaze_data(self,
+                                            ophys_experiment_id: int,
+                                            ophys_session_id: int,
+                                            file_name: str):
+        data = self.template_query('brain_observatory_queries',
+                                   'eye_gaze_mapping_file',
+                                   ophys_session_id=ophys_session_id)
+
+        experiment_session_string = f"ophys_experiment '{ophys_experiment_id}' (session '{ophys_session_id}')"
+
+        try:
+            file_url = data[0]['download_link']
+        except Exception:
+            raise Exception(f"{experiment_session_string} has no eye gaze mapping file")
+        self._log.warning(
+            f"Downloading {experiment_session_string} gaze mapping file. This can take some time."
+        )
 
         self.retrieve_file_over_http(self.api_url + file_url, file_name)
 
