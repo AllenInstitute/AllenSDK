@@ -12,7 +12,7 @@ export PYTHON_VERSION=${bamboo_PYTHON_VERSION:-"3.6"}
 
 NUM_EXISTING_ENVS=`conda env list | grep ${bamboo_NEXT_PRODUCTION_ENVIRONMENT} | wc -l`
 if [ ${NUM_EXISTING_ENVS} != 0 ] ; then
-    conda remove -y -${bamboo_VERBOSITY} --prefix ${bamboo_NEXT_PRODUCTION_ENVIRONMENT} --all
+    conda remove -y -${bamboo_VERBOSITY} --prefix ${bamboo_NEXT_PRODUCTION_ENVIRONMENT} --all -vvv
 fi
 conda create -y -${bamboo_VERBOSITY} --prefix ${bamboo_NEXT_PRODUCTION_ENVIRONMENT} python=$PYTHON_VERSION
 
