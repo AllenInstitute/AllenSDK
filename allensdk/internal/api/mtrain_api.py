@@ -12,9 +12,9 @@ from allensdk.brain_observatory.behavior.trials_processing import EDF_COLUMNS
 
 class MtrainApi(PostgresQueryMixin):
 
-    def __init__(self, api_base='http://mtrain:5000'):
+    def __init__(self, api_base='http://mtrain:5000', behavior_session_id=None):
         self.api_base = api_base
-        self.behavior_lims_api = BehaviorLimsApi()
+        self.behavior_lims_api = BehaviorLimsApi(behavior_session_id=behavior_session_id)
 
     def get_page(self, table_name, get_obj=None, filters=[], **kwargs):
       

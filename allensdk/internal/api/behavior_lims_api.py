@@ -18,7 +18,7 @@ from allensdk.internal.core.lims_utilities import safe_system_path
 
 class BehaviorLimsApi(PostgresQueryMixin):
 
-    def __init__(self, behavior_session_id):
+    def __init__(self, behavior_session_id=None):
         """
         Notes
         -----
