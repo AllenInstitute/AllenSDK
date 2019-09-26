@@ -34,20 +34,29 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 import os
-from . import json_utilities as ju
+import six
+import numpy as np
+
+from pathlib import Path
+
 from allensdk.api.cache import Cache, get_default_manifest_file
 from allensdk.api.queries.brain_observatory_api import BrainObservatoryApi
 from allensdk.config.manifest_builder import ManifestBuilder
 from .brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
 import allensdk.brain_observatory.stimulus_info as stim_info
-import six
-import numpy as np
 
 from allensdk.brain_observatory.locally_sparse_noise import LocallySparseNoise
 from allensdk.brain_observatory.natural_scenes import NaturalScenes
 from allensdk.brain_observatory.natural_movie import NaturalMovie
 from allensdk.brain_observatory.static_gratings import StaticGratings
 from allensdk.brain_observatory.drifting_gratings import DriftingGratings
+
+from allensdk.brain_observatory.nwb import (read_eye_gaze_mappings,
+                                            create_eye_gaze_mapping_dataframe)
+
+# NOTE: This is a really ugly hack to get around the fact that warehouse does
+# not have Ophys session ids associated with experiment ids.
+from .ophys_experiment_session_id_mapping import ophys_experiment_session_id_map
 
 ANALYSIS_CLASS_DICT = {stim_info.LOCALLY_SPARSE_NOISE: LocallySparseNoise,
                        stim_info.LOCALLY_SPARSE_NOISE_4DEG: LocallySparseNoise,
@@ -93,7 +102,8 @@ class BrainObservatoryCache(Cache):
     ANALYSIS_DATA_KEY = 'ANALYSIS_DATA'
     EVENTS_DATA_KEY = 'EVENTS_DATA'
     STIMULUS_MAPPINGS_KEY = 'STIMULUS_MAPPINGS'
-    MANIFEST_VERSION='1.2'
+    EYE_GAZE_DATA_KEY = 'EYE_GAZE_DATA'
+    MANIFEST_VERSION = '1.3'
 
     def __init__(self, cache=True, manifest_file=None, base_uri=None, api=None):
 
@@ -316,6 +326,28 @@ class BrainObservatoryCache(Cache):
                                               strategy='lazy',
                                               **Cache.cache_json())
 
+        # NOTE: Ugly hack to update the 'fail_eye_tracking' field
+        # which is using True/False values for the previous eye mapping
+        # implementation. This will also need to be fixed in warehouse.
+        # ----- Start of ugly hack -----
+        response = self.api.template_query('brain_observatory_queries',
+                                           'all_eye_mapping_files')
+
+        session_ids_with_eye_tracking: set = {entry['attachable_id']
+                                              for entry in response
+                                              if entry['attachable_type'] == "OphysSession"}
+
+        for indx, exp in enumerate(exps):
+            try:
+                ophys_session_id = ophys_experiment_session_id_map[exp['id']]
+                if ophys_session_id in session_ids_with_eye_tracking:
+                    exps[indx]['fail_eye_tracking'] = False
+                else:
+                    exps[indx]['fail_eye_tracking'] = True
+            except KeyError:
+                exps[indx]['fail_eye_tracking'] = True
+        # ----- End of ugly hack -----
+
         if cell_specimen_ids is not None:
             cells = self.get_cell_specimens(ids=cell_specimen_ids)
             cell_container_ids = set([cell['experiment_container_id'] for cell in cells])
@@ -518,6 +550,51 @@ class BrainObservatoryCache(Cache):
 
         return np.load(file_name, allow_pickle=False)["ev"]
 
+    def get_ophys_eye_gaze_data(self,
+                                ophys_experiment_id: int,
+                                file_name=None):
+        """Download the h5 eye gaze mapping file for an ophys_experiment if
+        it hasn't already been downloaded and return it as a pandas.DataFrame.
+
+        Parameters
+        ----------
+        file_name: string
+            File name to save/read the data set.  If file_name is None,
+            the file_name will be pulled out of the manifest.  If caching
+            is disabled, no file will be saved. Default is None.
+
+        ophys_experiment_id: int
+            id of the ophys_experiment to retrieve eye_gaze_mapping data for.
+
+        Returns:
+            pandas.DataFrame: [description]
+        """
+
+        # NOTE: This is a really ugly hack to get around the fact that warehouse does
+        # not have Ophys session ids associated with experiment ids. This should be
+        # removed when warehouse session ids have associations with experiment ids.
+        # ----- Start of ugly hack -----
+        try:
+            ophys_session_id = ophys_experiment_session_id_map[ophys_experiment_id]
+        except KeyError as e:
+            raise RuntimeError(f"Experiment id '{ophys_experiment_id}' has no associated session!")
+        # ----- End of ugly hack -----
+
+        file_name = self.get_cache_path(file_name,
+                                        self.EYE_GAZE_DATA_KEY,
+                                        ophys_session_id)
+
+        # NOTE: `save_ophys_experiment_eye_gaze_data` will also need to be
+        # updated to remove ophy_session_id param when ugly hack is removed.
+        self.api.save_ophys_experiment_eye_gaze_data(ophys_experiment_id,
+                                                     ophys_session_id,
+                                                     file_name,
+                                                     strategy='lazy')
+
+        gaze_mapping_data = read_eye_gaze_mappings(Path(file_name))
+
+        return create_eye_gaze_mapping_dataframe(gaze_mapping_data)
+
     def build_manifest(self, file_name):
         """
         Construct a manifest for this Cache class and save it in a file.
@@ -546,6 +623,8 @@ class BrainObservatoryCache(Cache):
         mb.add_path(self.CELL_SPECIMENS_KEY, 'cell_specimens.json',
                     typename='file', parent_key='BASEDIR')
         mb.add_path(self.STIMULUS_MAPPINGS_KEY, 'stimulus_mappings.json',
+                    typename='file', parent_key='BASEDIR')
+        mb.add_path(self.EYE_GAZE_DATA_KEY, 'ophys_eye_gaze_mapping/%d_eyetracking_dlc_to_screen_mapping.h5',
                     typename='file', parent_key='BASEDIR')
 
         mb.write_json_file(file_name)

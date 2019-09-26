@@ -87,6 +87,29 @@ def read_eye_gaze_mappings(input_path: Path) -> dict:
     return eye_gaze_data
 
 
+def create_eye_gaze_mapping_dataframe(eye_gaze_data: dict) -> pd.DataFrame:
+
+    eye_gaze_mapping_df = pd.DataFrame(
+        {
+            "raw_eye_area": eye_gaze_data["raw_eye_areas"].values,
+            "raw_pupil_area": eye_gaze_data["raw_pupil_areas"].values,
+            "raw_screen_coordinates_x_cm": eye_gaze_data["raw_screen_coordinates"]["x_pos_cm"].values,
+            "raw_screen_coordinates_y_cm": eye_gaze_data["raw_screen_coordinates"]["y_pos_cm"].values,
+            "raw_screen_coordinates_spherical_x_deg": eye_gaze_data["raw_screen_coordinates_spherical"]["x_pos_deg"].values,
+            "raw_screen_coordinates_spherical_y_deg": eye_gaze_data["raw_screen_coordinates_spherical"]["y_pos_deg"].values,
+
+            "filtered_eye_area": eye_gaze_data["new_eye_areas"].values,
+            "filtered_pupil_area": eye_gaze_data["new_pupil_areas"].values,
+            "filtered_screen_coordinates_x_cm": eye_gaze_data["new_screen_coordinates"]["x_pos_cm"].values,
+            "filtered_screen_coordinates_y_cm": eye_gaze_data["new_screen_coordinates"]["y_pos_cm"].values,
+            "filtered_screen_coordinates_spherical_x_deg": eye_gaze_data["new_screen_coordinates_spherical"]["x_pos_deg"].values,
+            "filtered_screen_coordinates_spherical_y_deg": eye_gaze_data["new_screen_coordinates_spherical"]["y_pos_deg"].values
+        },
+        index=eye_gaze_data["synced_frame_timestamps"].values
+    )
+    return eye_gaze_mapping_df
+
+
 def eye_tracking_data_is_valid(eye_dlc_tracking_data: dict,
                                synced_timestamps: pd.Series) -> bool:
     is_valid = True
