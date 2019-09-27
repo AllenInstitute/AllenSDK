@@ -36,6 +36,7 @@
 import os
 import six
 import numpy as np
+import pandas as pd
 
 from pathlib import Path
 
@@ -552,7 +553,8 @@ class BrainObservatoryCache(Cache):
 
     def get_ophys_eye_gaze_data(self,
                                 ophys_experiment_id: int,
-                                file_name=None):
+                                file_name: str = None,
+                                suppress_eye_gaze_data: bool = True) -> pd.DataFrame:
         """Download the h5 eye gaze mapping file for an ophys_experiment if
         it hasn't already been downloaded and return it as a pandas.DataFrame.
 
@@ -566,9 +568,31 @@ class BrainObservatoryCache(Cache):
         ophys_experiment_id: int
             id of the ophys_experiment to retrieve eye_gaze_mapping data for.
 
-        Returns:
-            pandas.DataFrame: [description]
+        suppress_eye_gaze_data: bool
+            Whether or not to suppress eye gaze mapping data from dataset.
+            Default is True.
+
+        Returns
+        -------
+        pd.DataFrame
+            If 'suppress_eye_gaze_data' is set to 'False':
+                Contains raw/filtered columns for gaze mapping:
+                    *_eye_area
+                    *_pupil_area
+                    *_screen_coordinates_x_cm
+                    *_screen_coordinates_y_cm
+                    *_screen_coordinates_spherical_x_deg
+                    *_screen_coorindates_spherical_y_deg
+            Otherwise:
+                An empty pandas DataFrame
         """
+
+        if suppress_eye_gaze_data:
+            print("This eye gaze mapping data is obtained using a new eye "
+                  "tracking algorithm and is in the process of being validated. "
+                  "If you would like to view the data anyways, "
+                  "please set the 'suppress_eye_gaze_data' parameter to 'False'.")
+            return pd.DataFrame()
 
         # NOTE: This is a really ugly hack to get around the fact that warehouse does
         # not have Ophys session ids associated with experiment ids. This should be

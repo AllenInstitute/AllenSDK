@@ -300,7 +300,7 @@ def test_get_ophys_eye_gaze_data(mock_json_msg_query,
     with patch.dict('allensdk.core.ophys_experiment_session_id_mapping.ophys_experiment_session_id_map', {111: 777}, clear=True):
         # We are only testing that rma query is correct
         try:
-            tls = brain_observatory_cache.get_ophys_eye_gaze_data(111)
+            tls = brain_observatory_cache.get_ophys_eye_gaze_data(111, suppress_eye_gaze_data=False)
         except Exception:
             pass
 
