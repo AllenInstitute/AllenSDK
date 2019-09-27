@@ -54,6 +54,10 @@ class MockSessionApi(EcephysSessionApi):
             'conditions': [0, 0, 0, 0, 1, 1, 1, 0, 2, 3]  # generic stimulus condition
         }, index=pd.Index(name='id', data=np.arange(10)))
 
+    def get_invalid_times(self):
+        return pd.DataFrame()
+
+
     def get_running_speed(self):
         return pd.DataFrame({
             "start_time": np.linspace(0.0, 9.9, 100),
