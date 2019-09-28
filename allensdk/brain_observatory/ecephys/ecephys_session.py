@@ -262,6 +262,50 @@ class EcephysSession(LazyPropertyMixin):
         return self.api.get_lfp(probe_id)
 
 
+    def get_lfp_mask_invalid(self, probe_id):
+
+        lfp = self.api.get_lfp(probe_id)
+
+        all_time_points = xr.DataArray(
+            name="time_points",
+            data=[True] * len(lfp.time),
+            dims=['time'],
+            coords=[lfp.time]
+        )
+
+        fail_tags = ["all_probes", "probeA", "probeB", "probeC", "probeD", "probeE", "probeF"]
+        invalid_times = self._filter_invalid_times_by_tags(fail_tags)
+
+        valid_time_points = all_time_points
+        for ix, invalid_time_interval in invalid_times.iterrows():
+            invalid_time_points = (lfp.time >= invalid_time_interval['start_time']) & (lfp.time <= invalid_time_interval['stop_time'])
+            valid_time_points = np.logical_and(valid_time_points, np.logical_not(invalid_time_points))
+
+        lfp_mask_invalid = lfp.where(cond=valid_time_points)
+
+        return lfp_mask_invalid
+
+    def _filter_invalid_times_by_tags(self, tags):
+        """
+        Parameters
+        ----------
+        invalid_times: pd.DataFrame
+            of invalid times
+        tags: list
+            of tags
+
+        Returns
+        -------
+        pd.DataFrame of invalid times having tags
+        """
+        invalid_times = self.invalid_times.copy()
+        if not invalid_times.empty:
+            mask = invalid_times['tags'].apply(lambda x: any([t in x for t in tags]))
+            invalid_times = invalid_times[mask]
+
+        return invalid_times
+
+
     def get_inter_presentation_intervals_for_stimulus(self, stimulus_names):
         ''' Get a subset of this session's inter-presentation intervals, filtered by stimulus name.
 
@@ -429,12 +473,8 @@ class EcephysSession(LazyPropertyMixin):
             """
             return max(a[0], b[0]) <= min(a[1], b[1])
 
-        invalid_times = self.invalid_times.copy()
-
         fail_tags = ["stimulus"]
-        if not invalid_times.empty:
-            mask = invalid_times['tags'].apply(lambda x: any([t in x for t in fail_tags]))
-            invalid_times = invalid_times[mask]
+        invalid_times = self._filter_invalid_times_by_tags(fail_tags)
 
         for ix_sp, sp in stimulus_presentations.iterrows():
             stim_epoch = sp['start_time'], sp['stop_time']

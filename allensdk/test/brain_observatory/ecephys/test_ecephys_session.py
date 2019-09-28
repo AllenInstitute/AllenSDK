@@ -33,7 +33,7 @@ def raw_invalid_times_table():
         "start_time": [0.3, 1.6],
         "stop_time": [0.6, 2.3],
         "tags":[["EcephysSession", "739448407", "stimulus"],
-                ["EcephysProbe", "123448407", "ProbeB"]],
+                ["EcephysProbe", "123448407", "probeB"]],
     })
 
 
@@ -92,9 +92,10 @@ def raw_probes():
 def raw_lfp():
     return {
         0: xr.DataArray(
-            data=np.array([[1, 2, 3], [4, 5, 6]]),
+            data=np.array([[1, 2, 3, 4, 5],
+                           [6, 7, 8, 9, 10]]),
             dims=['channel', 'time'],
-            coords=[[2, 1], np.linspace(0, 1, 3)]
+            coords=[[2, 1], np.linspace(0, 2, 5)]
         )
     }
 
@@ -109,7 +110,7 @@ def just_stimulus_table_api(raw_stimulus_table):
 
 
 @pytest.fixture
-def channels_table_api(raw_channels, raw_probes, raw_lfp):
+def channels_table_api(raw_channels, raw_probes, raw_lfp, raw_stimulus_table):
     class EcephysChannelsTableApi(EcephysSessionApi):
         def get_channels(self):
             return raw_channels
@@ -117,7 +118,28 @@ def channels_table_api(raw_channels, raw_probes, raw_lfp):
             return raw_probes
         def get_lfp(self, pid):
             return raw_lfp[pid]
+        def get_stimulus_presentations(self):
+            return raw_stimulus_table
+        def get_invalid_times(self):
+            return pd.DataFrame()
+
     return EcephysChannelsTableApi()
+
+
+@pytest.fixture
+def lfp_masking_api(raw_channels, raw_probes, raw_lfp, raw_stimulus_table, raw_invalid_times_table):
+    class EcephysMaskInvalidLFPApi(EcephysSessionApi):
+        def get_channels(self):
+            return raw_channels
+        def get_probes(self):
+            return raw_probes
+        def get_lfp(self, pid):
+            return raw_lfp[pid]
+        def get_stimulus_presentations(self):
+            return raw_stimulus_table
+        def get_invalid_times(self):
+            return raw_invalid_times_table
+    return EcephysMaskInvalidLFPApi()
 
 
 @pytest.fixture
@@ -473,15 +495,33 @@ def test_get_inter_presentation_intervals_for_stimulus(just_stimulus_table_api):
 
     pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)
 
+
 def test_get_lfp(channels_table_api):
     session = EcephysSession(api=channels_table_api)
-    obtained = session.get_lfp(0)
+    obtained = session.get_lfp_mask_invalid(0)
 
     expected = xr.DataArray(
-        data=np.array([[1, 2, 3], [4, 5, 6]]),
+        data=np.array([[1, 2, 3, 4, 5],
+                       [6, 7, 8, 9, 10]]),
         dims=['channel', 'time'],
-        coords=[[2, 1], np.linspace(0, 1, 3)]
+        coords=[[2, 1], np.linspace(0, 2, 5)]
     )
+
+    xr.testing.assert_equal(expected, obtained)
+
+
+def test_get_lfp_mask_invalid(lfp_masking_api):
+    session = EcephysSession(api=lfp_masking_api)
+    obtained = session.get_lfp_mask_invalid(0)
+
+    expected = xr.DataArray(
+        data=np.array([[1, 2, 3, 4, np.nan],
+                       [6, 7, 8, 9, np.nan]]),
+        dims=['channel', 'time'],
+        coords=[[2, 1], np.linspace(0, 2, 5)]
+    )
+    print(expected)
+    print(obtained)
 
     xr.testing.assert_equal(expected, obtained)
 
