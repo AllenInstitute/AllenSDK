@@ -12,5 +12,6 @@ come in future updates.
    connectivity
    reference_space
    data_api_client 
+   visual_coding_neuropixels
 
 

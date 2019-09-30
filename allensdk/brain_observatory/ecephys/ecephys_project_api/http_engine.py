@@ -9,7 +9,6 @@ class HttpEngine:
 
     def stream(self, path):
         url = f"{self.scheme}://{self.host}/{path}"
-        print(url)
         
         response = requests.get(url, stream=True)
         response_mb = None
