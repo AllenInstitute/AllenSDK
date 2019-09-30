@@ -89,7 +89,7 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
         well_known_files = build_and_execute(
             (
                 "criteria=model::WellKnownFile"
-                ",rma::criteria,well_known_file_type[name$eq'EcephysNwb']"
+                ",rma::criteria,well_known_file_type[name$eq'EcephysLfpNwb']"
                 "[attachable_type$eq'EcephysProbe']"
                 r"[attachable_id$eq{{probe_id}}]"
             ),
