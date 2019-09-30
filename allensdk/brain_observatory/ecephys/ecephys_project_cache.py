@@ -116,7 +116,7 @@ class EcephysProjectCache(Cache):
             & (units["isi_violations"] <= get_unit_filter_value("isi_violations_maximum", **kwargs))
         ]
 
-        if "quality" in units.columns:
+        if "quality" in units.columns and kwargs.get("filter_by_validity", True):
             units = units[units["quality"] == "good"]
             units.drop(columns="quality", inplace=True)
         
