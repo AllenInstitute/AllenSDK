@@ -13,4 +13,4 @@ which covers downloading data, building peristimulus time histograms, and decodi
 see the `full example notebook <_static/examples/nb/ecephys_session.html>`_ `(download .ipynb) <_static/examples/nb/ecephys_session.ipynb>`_.
 
 The experimental design, data acquisition, and informatics methods are described in the technical whitepaper. AllenSDK 
-API documentation is available here.
+API documentation `is available here <allensdk.brain_observatory.ecephys.html>`_.
