@@ -13,3 +13,4 @@ pynrrd
 SimpleITK
 scikit-image
 statsmodels
+sklearn
