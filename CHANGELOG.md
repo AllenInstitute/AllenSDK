@@ -1,6 +1,20 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.0.0] = 2019-10-3
+
+### Added
+ - Support for Brain Observatory - Visual Coding Neuropixels data.
+ - https://github.com/AllenInstitute/AllenSDK/issues/447 Implemented improved eye tracking module based on DeepLabCut
+
+### Changed
+ - Python 2.x is no longer supported.
+ - statsmodels is now pinned at 0.9.0
+
+### Bug Fixes
+ - https://github.com/AllenInstitute/AllenSDK/commit/f76678 Fix integer division bug in receptive field analysis
+
+
 ## [0.16.3] = 2019-5-22
 
 ### Bug Fixes
