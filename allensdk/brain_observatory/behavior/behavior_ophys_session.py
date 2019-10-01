@@ -335,7 +335,7 @@ class BehaviorOphysSession(LazyPropertyMixin):
         performance_metrics['mean_false_alarm_rate_engaged'] = rolling_performance_df['false_alarm_rate'][engaged_trial_mask].mean()
         performance_metrics['mean_dprime'] = rolling_performance_df['rolling_dprime'].mean()
         performance_metrics['mean_dprime_engaged'] = rolling_performance_df['rolling_dprime'][engaged_trial_mask].mean()
-        performance_metrics['max_dprime'] = rolling_performance_df['rolling_dprime'].mean()
+        performance_metrics['max_dprime'] = rolling_performance_df['rolling_dprime'].max()
         performance_metrics['max_dprime_engaged'] = rolling_performance_df['rolling_dprime'][engaged_trial_mask].max()
 
         return performance_metrics
