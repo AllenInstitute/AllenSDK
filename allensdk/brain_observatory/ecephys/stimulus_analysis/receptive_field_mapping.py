@@ -144,8 +144,9 @@ class ReceptiveFieldMapping(StimulusAnalysis):
                                    'width_rf',
                                    'height_rf',
                                    'area_rf',
+                                   'p_value_rf',
                                    'on_screen_rf',
-                                   'p_value_rf']] = [self._get_rf_stats(unit) for unit in unit_ids]
+                                   ]] = [self._get_rf_stats(unit) for unit in unit_ids]
                 metrics_df['firing_rate_rf'] = [self._get_overall_firing_rate(unit) for unit in unit_ids]
                 metrics_df['fano_rf'] = [self._get_fano_factor(unit, self._get_preferred_condition(unit))
                                          for unit in unit_ids]

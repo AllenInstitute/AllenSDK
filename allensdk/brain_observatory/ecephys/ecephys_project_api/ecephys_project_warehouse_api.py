@@ -1,7 +1,9 @@
 import re
 import json
+import ast
 
 import pandas as pd
+import numpy as np
 
 from .rma_engine import RmaEngine
 from .ecephys_project_api import EcephysProjectApi
@@ -228,6 +230,26 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
         return response
 
     def get_unit_analysis_metrics(self, unit_ids=None, ecephys_session_ids=None, session_types=None):
+        """ Download analysis metrics - precalculated descriptions of unitwise responses to visual stimulation.
+
+        Parameters
+        ----------
+        unit_ids : array-like of int, optional
+            Unique identifiers for ecephys units. If supplied, only download metrics for these units.
+        ecephys_session_ids : array-like of int, optional
+            Unique identifiers for ecephys sessions. If supplied, only download metrics for units collected during 
+            these sessions.
+        session_types : array-like of str, optional
+            Names of session types. e.g. "brain_observatory_1.1" or "functional_connectivity". If supplied, only download 
+            metrics for units collected during sessions of these types
+
+        Returns
+        -------
+        pd.DataFrame : 
+            A table of analysis metrics, indexed by unit_id.
+
+        """
+
         response = build_and_execute(
             (
                 "{% import 'macros' as m %}" 
@@ -248,10 +270,32 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
             data = json.loads(item.pop("data"))
             item.update(data)
             output.append(item)
+
         
         output = pd.DataFrame(output)
         output.set_index("ecephys_unit_id", inplace=True)
         output.drop(columns="id", inplace=True)
+
+        for colname in output.columns:
+            try:
+                output[colname] = output.apply(lambda row: ast.literal_eval(str(row[colname])), axis=1)
+            except ValueError:
+                pass
+
+        # TODO: remove this
+        # on_screen_rf and p_value_rf were correctly calculated, but switched with one another. This snippet unswitches them.
+        columns = set(output.columns.values.tolist())
+        if "p_value_rf" in columns and "on_screen_rf" in columns:
+
+            pv_is_bool = np.issubdtype(output["p_value_rf"].values[0], bool)
+            on_screen_is_float = np.issubdtype(output["on_screen_rf"].values[0].dtype, np.floating)
+
+            # this is not a good test, but it avoids the case where we fix these in the data for a future release, but 
+            # reintroduce the bug by forgetting to update the code.
+            if pv_is_bool and on_screen_is_float:
+                p_value_rf = output["p_value_rf"].copy()
+                output["p_value_rf"] = output["on_screen_rf"].copy()
+                output["on_screen_rf"] = p_value_rf
 
         return output
 
