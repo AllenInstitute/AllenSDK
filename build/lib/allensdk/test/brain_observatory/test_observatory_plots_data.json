@@ -1,0 +1,24 @@
+{
+  "image_directory": "/data/informatics/module_test_data/observatory/plots/",
+  "cells": [
+    517446551
+  ], 
+  "experiments": [
+    {
+      "nwb_file": "/data/informatics/module_test_data/observatory/plots/510859641.nwb", 
+      "session": "three_session_A", 
+      "analysis_file": "/data/informatics/module_test_data/observatory/plots/510859641_three_session_A_analysis.h5"
+    }, 
+    {
+      "nwb_file": "/data/informatics/module_test_data/observatory/plots/510698988.nwb", 
+      "session": "three_session_B", 
+      "analysis_file": "/data/informatics/module_test_data/observatory/plots/510698988_three_session_B_analysis.h5"
+    }, 
+    {
+      "nwb_file": "/data/informatics/module_test_data/observatory/plots/510532780.nwb", 
+      "session": "three_session_C", 
+      "analysis_file": "/data/informatics/module_test_data/observatory/plots/510532780_three_session_C_analysis.h5"
+    }
+  ], 
+  "id": 511511083
+}

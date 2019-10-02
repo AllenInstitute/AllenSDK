@@ -1,0 +1,6 @@
+namespaces:
+- doc: ""
+  name: AIBS_ecephys
+  schema:
+  - namespace: core
+  - source: AIBS_ecephys_extension.yaml
