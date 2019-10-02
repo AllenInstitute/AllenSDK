@@ -1,10 +1,8 @@
-allensdk/internal
 .cache
 .idea
 .coverage*
 htmlcov
 .settings
-cell_types
 dist
 .eggs/
 eggs/
@@ -28,7 +26,9 @@ allensdk.egg-info/
 debug.log
 *~
 *#*#
-
-# editor configs
+**.ipynb_checkpoints**
 .vscode/
 .mypy_cache/
+/cell_types/
+example_ecephys_project_cache/
+.DS_Store

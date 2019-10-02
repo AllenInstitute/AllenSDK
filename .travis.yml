@@ -9,13 +9,10 @@ env:
     - TEST_OBSERVATORY_EXPERIMENT_PLOTS_DATA=skip
     - TEST_API_ENDPOINT=http://api.brain-map.org 
     - TEST_COMPLETE=false
+    - TEST_BAMBOO=false
 
 matrix:
   include:
-    - os: linux
-      sudo: required
-      python: 2.7
-      env: TEST_PYTHON_VERSION=2.7
     - os: linux
       sudo: required
       python: 3.6
@@ -26,9 +23,6 @@ matrix:
       env: TEST_PYTHON_VERSION=3.7.3
     - os: osx
       language: generic
-      env: TEST_PYTHON_VERSION=2.7
-    - os: osx
-      language: generic
       env: TEST_PYTHON_VERSION=3.6
     - os: osx
       language: generic
@@ -37,18 +31,10 @@ matrix:
 install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
       sudo apt-get update;
-      if [[ "$TEST_PYTHON_VERSION" == "2.7" ]]; then
-        wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh;
-      else
-        wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
-      fi
+      wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
     else
       brew update;
-      if [[ "$TEST_PYTHON_VERSION" == "2.7" ]]; then
-        wget https://repo.continuum.io/miniconda/Miniconda2-latest-MacOSX-x86_64.sh -O miniconda.sh;
-      else
-        wget https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh;
-      fi
+      wget https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh;
     fi
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH="$HOME/miniconda/bin:$PATH"

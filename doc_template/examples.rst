@@ -18,4 +18,6 @@ Dynamic Brain Workshop 2015 experiment detail         `Jupyter notebook <_static
 Stimulating a biophysical model with a square pulse   `Jupyter notebook <_static/examples/nb/pulse_stimulus.html>`_ `(download .ipynb) <_static/examples/nb/pulse_stimulus.ipynb>`_
 Using a Reference Space                               `Jupyter notebook <_static/examples/nb/reference_space.html>`_ `(download .ipynb) <_static/examples/nb/reference_space.ipynb>`_  
 Downloading Images                                    `Jupyter notebook <_static/examples/nb/image_download.html>`_ `(download .ipynb) <_static/examples/nb/image_download.ipynb>`_
+Visual Coding Neuropixels Quick Start                 `Jupyter notebook <_static/examples/nb/ecephys_quickstart.html>`_ `(download .ipynb) <_static/examples/nb/ecephys_quickstart.ipynb>`_
+Visual Coding Neuropixels Reference                   `Jupyter notebook <_static/examples/nb/ecephys_session.html>`_ `(download .ipynb) <_static/examples/nb/ecephys_session.ipynb>`_
 ===================================================== ====

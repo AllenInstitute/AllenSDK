@@ -1,2 +1,2 @@
-recursive-include allensdk *.py *.conf *.json *.txt
+recursive-include allensdk *.py *.conf *.json *.txt *.yaml
 include README.md LICENSE.txt Makefile *requirements.txt

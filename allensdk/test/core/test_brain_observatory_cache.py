@@ -36,7 +36,7 @@
 import pytest
 import os
 import numpy as np
-from mock import patch, mock_open, MagicMock
+from mock import call, patch, mock_open, MagicMock
 from allensdk.core.brain_observatory_cache import BrainObservatoryCache
 from allensdk.api.queries.brain_observatory_api import BrainObservatoryApi
 import json
@@ -54,7 +54,7 @@ CACHE_MANIFEST = """
   "manifest": [
     {
       "type": "manifest_version",
-      "value": "1.2"
+      "value": "1.3"
     },
     {
       "type": "dir",
@@ -102,6 +102,12 @@ CACHE_MANIFEST = """
       "type": "file",
       "spec": "ophys_experiment_events/%d_events.npz",
       "key": "EVENTS_DATA"
+    },
+    {
+      "parent_key": "BASEDIR",
+      "type": "file",
+      "spec": "ophys_eye_gaze_mapping/%d_eyetracking_dlc_to_screen_mapping.h5",
+      "key": "EYE_GAZE_DATA"
     }
   ]
 }
@@ -211,12 +217,17 @@ def test_get_ophys_experiments(mock_json_msg_query,
                 # Download a list of all transgenic driver lines
                 tls = brain_observatory_cache.get_ophys_experiments()
 
-    mock_json_msg_query.assert_called_once_with(
-        "http://api.brain-map.org/api/v2/data/query.json?q="
-        "model::OphysExperiment,rma::include,experiment_container,"
-        "well_known_files(well_known_file_type),targeted_structure,"
-        "specimen(donor(age,transgenic_lines)),"
-        "rma::options[num_rows$eq'all'][count$eqfalse]")
+    calls = [call("http://api.brain-map.org/api/v2/data/query.json?q="
+                  "model::OphysExperiment,rma::include,experiment_container,"
+                  "well_known_files(well_known_file_type),targeted_structure,"
+                  "specimen(donor(age,transgenic_lines)),"
+                  "rma::options[num_rows$eq'all'][count$eqfalse]"),
+
+             call("http://api.brain-map.org/api/v2/data/query.json?q="
+                  "model::WellKnownFile,rma::criteria,well_known_file_type[name$eqEyeDlcScreenMapping],"
+                  "rma::options[num_rows$eq'all'][count$eqfalse]")]
+
+    mock_json_msg_query.assert_has_calls(calls)
 
 
 @patch.object(BrainObservatoryApi, "json_msg_query")
@@ -232,12 +243,17 @@ def test_get_all_session_types(mock_json_msg_query,
                 # Download a list of all transgenic driver lines
                 tls = brain_observatory_cache.get_all_session_types()
 
-    mock_json_msg_query.assert_called_once_with(
-        "http://api.brain-map.org/api/v2/data/query.json?q="
-        "model::OphysExperiment,rma::include,experiment_container,"
-        "well_known_files(well_known_file_type),targeted_structure,"
-        "specimen(donor(age,transgenic_lines)),"
-        "rma::options[num_rows$eq'all'][count$eqfalse]")
+    calls = [call("http://api.brain-map.org/api/v2/data/query.json?q="
+                  "model::OphysExperiment,rma::include,experiment_container,"
+                  "well_known_files(well_known_file_type),targeted_structure,"
+                  "specimen(donor(age,transgenic_lines)),"
+                  "rma::options[num_rows$eq'all'][count$eqfalse]"),
+
+             call("http://api.brain-map.org/api/v2/data/query.json?q="
+                  "model::WellKnownFile,rma::criteria,well_known_file_type[name$eqEyeDlcScreenMapping],"
+                  "rma::options[num_rows$eq'all'][count$eqfalse]")]
+
+    mock_json_msg_query.assert_has_calls(calls)
 
 
 @patch.object(BrainObservatoryApi, "json_msg_query")
@@ -273,6 +289,27 @@ def test_get_cell_specimens(mock_json_msg_query,
 
     mock_json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q=")
+
+
+# NOTE: This test should be updated when ugly hack for associating
+# ophys experiment id with ophys session id is resolved.
+@patch.object(BrainObservatoryApi, "json_msg_query")
+def test_get_ophys_eye_gaze_data(mock_json_msg_query,
+                                 brain_observatory_cache):
+
+    with patch.dict('allensdk.core.ophys_experiment_session_id_mapping.ophys_experiment_session_id_map', {111: 777}, clear=True):
+        # We are only testing that rma query is correct
+        try:
+            tls = brain_observatory_cache.get_ophys_eye_gaze_data(111, suppress_eye_gaze_data=False)
+        except Exception:
+            pass
+
+    mock_json_msg_query.assert_called_once_with(
+        "http://api.brain-map.org/api/v2/data/query.json?q="
+        "model::WellKnownFile,"
+        "rma::criteria,[attachable_id$eq777],well_known_file_type[name$eqEyeDlcScreenMapping],"
+        "rma::options[num_rows$eq'all'][count$eqfalse]"
+    )
 
 
 def test_build_manifest(tmpdir_factory):

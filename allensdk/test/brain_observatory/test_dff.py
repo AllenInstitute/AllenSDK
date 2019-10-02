@@ -79,13 +79,6 @@ def test_movingmode_fast():
     assert np.all(x == y)
 
 
-def test_compute_dff():
-    x = np.array([[1, 5, 0, 0, 1, 10, 0, 0, 30, 5]])
-
-    with pytest.warns(FutureWarning):
-        dff.compute_dff(x)
-
-
 def test_compute_dff_windowed_mode():
     x = np.array([[1, 5, -2, 3, 1, 10, 1, -2, 30, 5]])
 

@@ -80,3 +80,24 @@ def class_deprecated(message=None):
         return cls
         
     return output_class_decorator
+
+
+def legacy(message=None):
+
+    if message is None:
+        message = '' 
+    
+    def output_decorator(fn):
+        
+        @functools.wraps(fn)
+        def wrapper(*args, **kwargs):
+        
+            warnings.warn("Function {0} is provided for backward-compatibilty with a legacy API, and may be removed in the future. {1}".format(
+                          fn.__name__, message), 
+                          category=VisibleDeprecationWarning, stacklevel=2)
+            
+            return fn(*args, **kwargs)
+            
+        return wrapper
+        
+    return output_decorator

@@ -1,6 +1,15 @@
 from setuptools import setup, find_packages
 import os
 import allensdk
+import re
+
+def parse_requirements_line(line):
+    split = line.split("#")
+    return split[0].strip()
+
+def parse_requirements_file(path):
+    with open(path, 'r') as fil:
+        return [parse_requirements_line(line) for line in fil.read().splitlines()]
 
 # http://bugs.python.org/issue8876#msg208792
 if hasattr(os, 'link'):
@@ -17,19 +26,21 @@ def prepend_find_packages(*roots):
         
     return packages
 
-with open('requirements.txt', 'r') as f:
-    required = f.read().splitlines()
+required = parse_requirements_file('requirements.txt')
 
-with open('test_requirements.txt', 'r') as f:
-    test_required = f.read().splitlines()
+if os.environ.get('ALLENSDK_INTERNAL_REQUIREMENTS', 'false') == 'true':
+    required.extend(parse_requirements_file('internal_requirements.txt'))
+
+test_required = parse_requirements_file('test_requirements.txt')
 
 setup(
     version = allensdk.__version__,
     name = 'allensdk',
     author = 'David Feng',
     author_email = 'davidf@alleninstitute.org',
-    packages = prepend_find_packages('allensdk'),
-    package_data={'': ['*.conf', '*.cfg', '*.md', '*.json', '*.dat', '*.env', '*.sh', '*.txt', 'bps', 'Makefile', 'LICENSE', '*.hoc'] },
+    packages = ['allensdk'],
+    include_package_data = True,
+    package_data={'allensdk': ['*.conf', '*.cfg', '*.md', '*.json', '*.dat', '*.env', '*.sh', '*.txt', 'bps', 'Makefile', 'LICENSE', '*.hoc', 'allensdk/brain_observatory/nwb/*.yaml'] },
     description = 'core libraries for the allensdk.',
     install_requires = required,
     tests_require=test_required,
