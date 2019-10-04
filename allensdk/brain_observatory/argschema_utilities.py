@@ -2,9 +2,40 @@ import os
 import pathlib
 
 import argparse
+import marshmallow
 from marshmallow import RAISE, ValidationError
 from argschema import ArgSchemaParser
 from argschema.schemas import DefaultSchema
+
+
+class InputFile(marshmallow.fields.String):
+    """A marshmallow String field subclass which deserializes json str fields
+       that represent a desired input path to pathlib.Path.
+       Also performs read access checking.
+    """
+    def _deserialize(self, value, attr, obj, **kwargs) -> pathlib.Path:
+        return pathlib.Path(value)
+
+    def _serialize(self, value, attr, obj, **kwargs) -> str:
+        return str(value)
+
+    def _validate(self, value: pathlib.Path):
+        check_read_access(str(value))
+
+
+class OutputFile(marshmallow.fields.String):
+    """A marshmallow String field subclass which deserializes json str fields
+       that represent a desired output file path to a pathlib.Path.
+       Also performs write access checking.
+    """
+    def _deserialize(self, value, attr, obj, **kwargs) -> pathlib.Path:
+        return pathlib.Path(value)
+
+    def _serialize(self, value, attr, obj, **kwargs) -> str:
+        return str(value)
+
+    def _validate(self, value: pathlib.Path):
+        check_write_access_overwrite(str(value))
 
 
 def write_or_print_outputs(data, parser):
@@ -12,7 +43,7 @@ def write_or_print_outputs(data, parser):
     if 'output_json' in parser.args:
         parser.output(data, indent=2)
     else:
-        print(parser.get_output_json(data))  
+        print(parser.get_output_json(data))
 
 
 def check_write_access_dir(dirpath):
@@ -74,7 +105,7 @@ def check_read_access(path):
 
 class RaisingSchema(DefaultSchema):
     class Meta:
-        unknown=RAISE
+        unknown = RAISE
 
 
 class ArgSchemaParserPlus(ArgSchemaParser):  # pragma: no cover
