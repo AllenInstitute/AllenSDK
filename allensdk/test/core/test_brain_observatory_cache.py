@@ -294,13 +294,13 @@ def test_get_cell_specimens(mock_json_msg_query,
 # NOTE: This test should be updated when ugly hack for associating
 # ophys experiment id with ophys session id is resolved.
 @patch.object(BrainObservatoryApi, "json_msg_query")
-def test_get_ophys_eye_gaze_data(mock_json_msg_query,
-                                 brain_observatory_cache):
+def test_get_ophys_pupil_data(mock_json_msg_query,
+                              brain_observatory_cache):
 
     with patch.dict('allensdk.core.ophys_experiment_session_id_mapping.ophys_experiment_session_id_map', {111: 777}, clear=True):
         # We are only testing that rma query is correct
         try:
-            tls = brain_observatory_cache.get_ophys_eye_gaze_data(111, suppress_eye_gaze_data=False)
+            tls = brain_observatory_cache.get_ophys_pupil_data(111, suppress_pupil_data=False)
         except Exception:
             pass
 

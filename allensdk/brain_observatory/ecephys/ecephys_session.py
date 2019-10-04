@@ -366,12 +366,12 @@ class EcephysSession(LazyPropertyMixin):
 
         return self.invalid_times
 
-    def get_eye_tracking_data(self, suppress_eye_gaze_data: bool = True) -> pd.DataFrame:
+    def get_pupil_data(self, suppress_pupil_data: bool = True) -> pd.DataFrame:
         """Return a dataframe with eye tracking data
 
         Parameters
         ----------
-        suppress_eye_gaze_data : bool, optional
+        suppress_pupil_data : bool, optional
             Whether or not to suppress eye gaze mapping data in output
             dataframe, by default True.
 
@@ -385,7 +385,7 @@ class EcephysSession(LazyPropertyMixin):
                 *_width
                 *_phi
             May also contain raw/filtered columns for gaze mapping if
-            suppress_eye_gaze_data is set to False:
+            suppress_pupil_data is set to False:
                 *_eye_area
                 *_pupil_area
                 *_screen_coordinates_x_cm
@@ -393,7 +393,7 @@ class EcephysSession(LazyPropertyMixin):
                 *_screen_coordinates_spherical_x_deg
                 *_screen_coorindates_spherical_y_deg
         """
-        return self.api.get_eye_tracking_data(suppress_eye_gaze_data=suppress_eye_gaze_data)
+        return self.api.get_pupil_data(suppress_pupil_data=suppress_pupil_data)
 
     def presentationwise_spike_counts(
         self, 
