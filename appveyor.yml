@@ -1,7 +1,7 @@
 branches:
   only:
     - master
-    - internal
+    - /rc\/.+/
 
 build: false
 
