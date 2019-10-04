@@ -162,7 +162,7 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
 
         return rig_metadata
 
-    def get_eye_tracking_data(self, suppress_eye_gaze_data: bool = True) -> Optional[pd.DataFrame]:
+    def get_pupil_data(self, suppress_pupil_data: bool = True) -> Optional[pd.DataFrame]:
         try:
             et_mod = self.nwbfile.get_processing_module("eye_tracking")
             rgm_mod = self.nwbfile.get_processing_module("raw_gaze_mapping")
@@ -205,7 +205,7 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
             "eye_phi": eye_ellipse_fits["phi"].values
         }
 
-        if not suppress_eye_gaze_data:
+        if not suppress_pupil_data:
             eye_tracking_data.update(
                 {
                     "raw_eye_area": raw_eye_area_ts.data[:],

@@ -551,10 +551,10 @@ class BrainObservatoryCache(Cache):
 
         return np.load(file_name, allow_pickle=False)["ev"]
 
-    def get_ophys_eye_gaze_data(self,
-                                ophys_experiment_id: int,
-                                file_name: str = None,
-                                suppress_eye_gaze_data: bool = True) -> pd.DataFrame:
+    def get_ophys_pupil_data(self,
+                             ophys_experiment_id: int,
+                             file_name: str = None,
+                             suppress_pupil_data: bool = True) -> pd.DataFrame:
         """Download the h5 eye gaze mapping file for an ophys_experiment if
         it hasn't already been downloaded and return it as a pandas.DataFrame.
 
@@ -566,10 +566,10 @@ class BrainObservatoryCache(Cache):
             is disabled, no file will be saved. Default is None.
 
         ophys_experiment_id: int
-            id of the ophys_experiment to retrieve eye_gaze_mapping data for.
+            id of the ophys_experiment to retrieve pupil data for.
 
-        suppress_eye_gaze_data: bool
-            Whether or not to suppress eye gaze mapping data from dataset.
+        suppress_pupil_data: bool
+            Whether or not to suppress pupil data from dataset.
             Default is True.
 
         Returns
@@ -587,11 +587,11 @@ class BrainObservatoryCache(Cache):
                 An empty pandas DataFrame
         """
 
-        if suppress_eye_gaze_data:
-            print("This eye gaze mapping data is obtained using a new eye "
+        if suppress_pupil_data:
+            print("This pupil data is obtained using a new eye "
                   "tracking algorithm and is in the process of being validated. "
                   "If you would like to view the data anyways, "
-                  "please set the 'suppress_eye_gaze_data' parameter to 'False'.")
+                  "please set the 'suppress_pupil_data' parameter to 'False'.")
             return pd.DataFrame()
 
         # NOTE: This is a really ugly hack to get around the fact that warehouse does
@@ -600,13 +600,18 @@ class BrainObservatoryCache(Cache):
         # ----- Start of ugly hack -----
         try:
             ophys_session_id = ophys_experiment_session_id_map[ophys_experiment_id]
-        except KeyError as e:
+        except KeyError:
             raise RuntimeError(f"Experiment id '{ophys_experiment_id}' has no associated session!")
         # ----- End of ugly hack -----
 
         file_name = self.get_cache_path(file_name,
                                         self.EYE_GAZE_DATA_KEY,
                                         ophys_session_id)
+
+        if not file_name:
+            raise RuntimeError("Could not obtain a file_name for pupil data "
+                               f"with experiment id: {ophys_experiment_id} "
+                               f"(session id: {ophys_session_id})")
 
         # NOTE: `save_ophys_experiment_eye_gaze_data` will also need to be
         # updated to remove ophy_session_id param when ugly hack is removed.
