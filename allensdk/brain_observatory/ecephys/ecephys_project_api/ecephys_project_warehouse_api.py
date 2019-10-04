@@ -171,9 +171,9 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
             session_ids=session_ids, 
             probe_ids=probe_ids
         )
-
         response.set_index("id", inplace=True)
-
+        # Clarify name for external users
+        response.rename(columns={"use_lfp_data": "has_lfp_data"}, inplace=True)
         return response
 
     def get_channels(self, channel_ids=None, probe_ids=None):

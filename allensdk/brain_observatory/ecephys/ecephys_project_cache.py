@@ -53,16 +53,16 @@ class EcephysProjectCache(Cache):
 
     MANIFEST_VERSION = '0.2.1'
 
-    SUPPRESS_FROM_UNITS = ("air_channel_index", "surface_channel_index", "has_nwb")
+    SUPPRESS_FROM_UNITS = ("air_channel_index", "surface_channel_index", "has_nwb", "lfp_temporal_subsampling_factor")
     SUPPRESS_FROM_CHANNELS = (
         "air_channel_index", "surface_channel_index", "name",
         "date_of_acquisition", "published_at", "specimen_id", "session_type", "isi_experiment_id", "age_in_days", 
-        "sex", "genotype", "has_nwb"
+        "sex", "genotype", "has_nwb", "lfp_temporal_subsampling_factor"
     )
     SUPPRESS_FROM_PROBES = (
         "air_channel_index", "surface_channel_index",
         "date_of_acquisition", "published_at", "specimen_id", "session_type", "isi_experiment_id", "age_in_days", 
-        "sex", "genotype", "has_nwb"
+        "sex", "genotype", "has_nwb", "lfp_temporal_subsampling_factor"
     )
     SUPPRESS_FROM_SESSIONS = (
         "has_nwb",
@@ -92,7 +92,11 @@ class EcephysProjectCache(Cache):
 
     def _get_probes(self):
         path = self.get_cache_path(None, self.PROBES_KEY)
-        return call_caching(self.fetch_api.get_probes, path, strategy='lazy', **csv_io)
+        probes = call_caching(self.fetch_api.get_probes, path, strategy='lazy', **csv_io)
+        # Divide the lfp sampling by the subsampling factor for clearer presentation
+        probes["lfp_sampling_rate"] = (
+            probes["lfp_sampling_rate"] / probes["lfp_temporal_subsampling_factor"])
+        return probes
 
 
     def _get_channels(self):
