@@ -136,6 +136,9 @@ class EcephysProjectCache(Cache):
             units = units[units["quality"] == "good"]
             units.drop(columns="quality", inplace=True)
 
+        if "structure_id" in units.columns and kwargs.get("filter_out_of_brain_units", True):
+            units = units[~(units["structure_id"].isna())]
+        
         return units
 
     def _get_annotated_probes(self):

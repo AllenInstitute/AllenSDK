@@ -24,6 +24,7 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
     ):
 
         self.filter_by_validity = kwargs.pop("filter_by_validity", True)
+        self.filter_out_of_brain_units = kwargs.pop("filter_out_of_brain_units", True)
         self.amplitude_cutoff_maximum = get_unit_filter_value("amplitude_cutoff_maximum", **kwargs)
         self.presence_ratio_minimum = get_unit_filter_value("presence_ratio_minimum", **kwargs)
         self.isi_violations_maximum = get_unit_filter_value("isi_violations_maximum", **kwargs)
@@ -264,6 +265,9 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
                 & (units["peak_channel_id"].isin(valid_channels))
             ]
             units.drop(columns=["quality"], inplace=True)
+
+        if self.filter_out_of_brain_units:
+            units = units[~(units["structure_id"].isna())]
 
         units = units[units["amplitude_cutoff"] <= self.amplitude_cutoff_maximum]
         units = units[units["presence_ratio"] >= self.presence_ratio_minimum]
