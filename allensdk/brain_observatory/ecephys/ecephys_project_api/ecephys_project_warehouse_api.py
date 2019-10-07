@@ -17,7 +17,9 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
     movie_re = re.compile(r".*natural_movie_(?P<num>\d+).npy")
     scene_re = re.compile(r".*/(?P<num>\d+).tiff")
     
-    def __init__(self, rma_engine):
+    def __init__(self, rma_engine=None):
+        if rma_engine is None:
+            rma_engine = RmaEngine(scheme="http", host="api.brain-map.org")
         self.rma_engine = rma_engine
 
     def get_session_data(self, session_id):
