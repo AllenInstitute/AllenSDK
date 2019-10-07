@@ -29,4 +29,4 @@ def test_infer_column_types(dataframe, expected_types):
     assert(set(expected_types.keys()) == set(obtained_types.keys()))
 
     for key, value in expected_types.items():
-        assert value == obtained_types[key]
+        assert np.dtype(value) == np.dtype(obtained_types[key])
