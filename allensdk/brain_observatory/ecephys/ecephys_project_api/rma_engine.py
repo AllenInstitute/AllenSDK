@@ -62,7 +62,7 @@ class RmaEngine(HttpEngine):
         response = pd.DataFrame(self.get_rma_list(query))
 
         if try_infer_dtypes:
-            infer_column_types(response)
+            response = infer_column_types(response)
 
         return response
 
