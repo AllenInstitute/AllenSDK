@@ -698,7 +698,8 @@ class EcephysSession(LazyPropertyMixin):
 
         return output_spike_times
 
-    def _build_stimulus_presentations(self, stimulus_presentations):
+
+    def _build_stimulus_presentations(self, stimulus_presentations, nonapplicable="null"):
         stimulus_presentations.index.name = 'stimulus_presentation_id'
         stimulus_presentations = stimulus_presentations.drop(columns=['stimulus_index'])
 
@@ -712,9 +713,9 @@ class EcephysSession(LazyPropertyMixin):
         )
         stimulus_presentations = naming_utilities.map_column_names(stimulus_presentations, default_column_renames)
 
-        # pandas groupby ops ignore nans, so we need a new null value that pandas does not recognize as null ...
-        stimulus_presentations[stimulus_presentations == ''] = np.nan
-        stimulus_presentations = stimulus_presentations.fillna('null')  # 123 / 2**8
+        # pandas groupby ops ignore nans, so we need a new "nonapplicable" value that pandas does not recognize as null ...
+        stimulus_presentations.replace("", nonapplicable, inplace=True)
+        stimulus_presentations.fillna(nonapplicable, inplace=True)
 
         stimulus_presentations['duration'] = stimulus_presentations['stop_time'] - stimulus_presentations['start_time']
 
