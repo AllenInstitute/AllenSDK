@@ -9,6 +9,9 @@ from .rma_engine import RmaEngine
 from .ecephys_project_api import EcephysProjectApi
 from .utilities import rma_macros, build_and_execute
 
+from allensdk.brain_observatory.ecephys.ecephys_project_api.warehouse_patches import replace_bad_structure_assignments
+
+
 class EcephysProjectWarehouseApi(EcephysProjectApi):
 
     movie_re = re.compile(r".*natural_movie_(?P<num>\d+).npy")
@@ -205,6 +208,7 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
         )
 
         response.set_index("id", inplace=True)
+        replace_bad_structure_assignments(response, inplace=True)
 
         return response
 
