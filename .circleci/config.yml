@@ -1,0 +1,57 @@
+version: 2
+jobs:
+  build:
+    parallelism: 4
+    environment:
+      TEST_NWB_FILES: skip
+      TEST_OBSERVATORY_EXPERIMENT_PLOTS_DATA: skip
+      TEST_API_ENDPOINT: http://api.brain-map.org 
+      TEST_COMPLETE: false
+      TEST_BAMBOO: false
+    branches:
+      only:
+        - master
+        - /^rc\/.*/
+        - /^feature\/.*/
+    docker:
+      - image: circleci/python:3.6
+    working_directory: ~/repo
+    
+    steps:
+      - checkout
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "requirements.txt" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+
+      - run: 
+          name: install dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install codecov
+            pip install -r test_requirements.txt
+            pip install .
+
+      - save_cache:
+          paths:
+            - ./venv
+          key: v1-dependencies-{{ checksum "requirements.txt" }}
+      
+      # run tests
+      - run: 
+          name: run py36 job tests
+          command: |
+            . venv/bin/activate
+            mkdir test-results
+            circleci tests glob test/**.py | circleci tests split --split-by=timings | xargs python3 -m pytest --cov=allensdk --junitxml=test-results/junit.xml
+            codecov
+
+      - store_test_results:
+          path: test-results
+
+      - store_artifacts:
+          path: test-results
+          destination: tr1
