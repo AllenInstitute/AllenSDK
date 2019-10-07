@@ -258,16 +258,18 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         units = self.nwbfile.units.to_dataframe()
         units.index = units.index.astype(int)
 
-        if self.filter_by_validity:
-            valid_channels = set(self.get_channels().index.values.tolist())
-            units = units[
-                (units["quality"] == "good")
-                & (units["peak_channel_id"].isin(valid_channels))
-            ]
-            units.drop(columns=["quality"], inplace=True)
+        if self.filter_by_validity or self.filter_out_of_brain_units:
+            channels = self.get_channels()
 
-        if self.filter_out_of_brain_units:
-            units = units[~(units["structure_id"].isna())]
+            if self.filter_out_of_brain_units:
+                channels = channels[~(channels["manual_structure_id"].isna())]
+            
+            channel_ids = set(channels.index.values.tolist())
+            units = units[units["peak_channel_id"].isin(channel_ids)]
+
+        if self.filter_by_validity:
+            units = units[units["quality"] == "good"]
+            units.drop(columns=["quality"], inplace=True)
 
         units = units[units["amplitude_cutoff"] <= self.amplitude_cutoff_maximum]
         units = units[units["presence_ratio"] >= self.presence_ratio_minimum]
