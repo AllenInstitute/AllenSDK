@@ -69,10 +69,15 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         channels = self.nwbfile.electrodes.to_dataframe()
         channels.drop(columns='group', inplace=True)
 
+        # Rename columns for clarity
+        channels.rename(
+            columns={"manual_structure_id": "ecephys_structure_id",
+                     "manual_structure_acronym": "ecephys_structure_acronym"},
+            inplace=True)
+
         # these are stored as string in nwb 2, which is not ideal
         # float is also not ideal, but we have nans indicating out-of-brain structures
-        channels["structure_id"] = [float(chid) if chid != "" else np.nan for chid in channels["manual_structure_id"]]
-        channels.drop(columns="manual_structure_id")
+        channels["ecephys_structure_id"] = [float(chid) if chid != "" else np.nan for chid in channels["ecephys_structure_id"]]
         
         if self.filter_by_validity:
             channels = channels[channels["valid_data"]]
@@ -274,6 +279,7 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         units = units[units["amplitude_cutoff"] <= self.amplitude_cutoff_maximum]
         units = units[units["presence_ratio"] >= self.presence_ratio_minimum]
         units = units[units["isi_violations"] <= self.isi_violations_maximum]
+
 
         return units
 

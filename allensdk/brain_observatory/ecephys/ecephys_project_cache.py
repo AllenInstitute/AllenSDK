@@ -86,8 +86,9 @@ class EcephysProjectCache(Cache):
 
         def reader(path):
             response = pd.read_csv(path, index_col='id')
-            if "structure_acronyms" in response.columns:  # unfortunately, structure_acronyms is a list of str
-                response["structure_acronyms"] = [ast.literal_eval(item) for item in response["structure_acronyms"]]
+            if "structure_acronyms" in response.columns: #  unfortunately, structure_acronyms is a list of str
+                response["ecephys_structure_acronyms"] = [ast.literal_eval(item) for item in response["structure_acronyms"]]
+                response.drop(columns=["structure_acronyms"], inplace=True)
             return response
 
         return call_caching(self.fetch_api.get_sessions, path=path, strategy='lazy', writer=csv_io["writer"], reader=reader)
@@ -176,7 +177,7 @@ class EcephysProjectCache(Cache):
         count_owned(sessions, self._get_annotated_channels(), "ecephys_session_id", "channel_count", inplace=True)
         count_owned(sessions, self._get_annotated_probes(), "ecephys_session_id", "probe_count", inplace=True)
 
-        get_grouped_uniques(sessions, self._get_annotated_channels(), "ecephys_session_id", "structure_acronym", "structure_acronyms", inplace=True)
+        get_grouped_uniques(sessions, self._get_annotated_channels(), "ecephys_session_id", "ecephys_structure_acronym", "ecephys_structure_acronyms", inplace=True)
 
         if suppress is None:
             suppress = list(self.SUPPRESS_FROM_SESSIONS)
@@ -190,7 +191,7 @@ class EcephysProjectCache(Cache):
         count_owned(probes, self._get_annotated_units(), "ecephys_probe_id", "unit_count", inplace=True)
         count_owned(probes, self._get_annotated_channels(), "ecephys_probe_id", "channel_count", inplace=True)
 
-        get_grouped_uniques(probes, self._get_annotated_channels(), "ecephys_probe_id", "structure_acronym", "structure_acronyms", inplace=True)
+        get_grouped_uniques(probes, self._get_annotated_channels(), "ecephys_probe_id", "ecephys_structure_acronym", "ecephys_structure_acronyms", inplace=True)
 
         if suppress is None:
             suppress = list(self.SUPPRESS_FROM_PROBES)
@@ -304,7 +305,7 @@ class EcephysProjectCache(Cache):
         return self._get_all_values("genotype", self.get_sessions, **session_kwargs)
 
     def get_all_recorded_structures(self, **channel_kwargs):
-        return self._get_all_values("structure_acronym", self.get_channels, **channel_kwargs)
+        return self._get_all_values("ecephys_structure_acronym", self.get_channels, **channel_kwargs)
 
     def get_all_ages(self, **session_kwargs):
         return self._get_all_values("age_in_days", self.get_sessions, **session_kwargs)
