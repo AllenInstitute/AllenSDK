@@ -251,6 +251,8 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             isi_violations_maximum=get_unit_filter_value("isi_violations_maximum", replace_none=False, **kwargs)
         )
         response = response.set_index("id")
+        # Clarify name for external users
+        response.rename(columns={"use_lfp_data": "has_lfp_data"}, inplace=True)
 
         return response
 

@@ -52,13 +52,24 @@ def channels():
 
 
 @pytest.fixture
-def probes():
+def raw_probes():
     return pd.DataFrame({
         'ecephys_session_id': [3],
         "unit_count": [50],
-        "channel_count": [10]
+        "channel_count": [10],
+        "lfp_temporal_subsampling_factor": [2.0],
+        "lfp_sampling_rate": [1000.0],
     }, index=pd.Series(name='id', data=[11]))
 
+@pytest.fixture
+def probes():
+       return pd.DataFrame({
+        'ecephys_session_id': [3],
+        "unit_count": [50],
+        "channel_count": [10],
+        "lfp_temporal_subsampling_factor": [2.0],
+        "lfp_sampling_rate": [500.0],
+    }, index=pd.Series(name='id', data=[11])) 
 
 @pytest.fixture
 def annotated_probes(probes, sessions):
@@ -81,7 +92,7 @@ def shared_tmpdir(tmpdir_factory):
 
 
 @pytest.fixture
-def mock_api(shared_tmpdir, sessions, units, channels, probes, analysis_metrics):
+def mock_api(shared_tmpdir, sessions, units, channels, raw_probes, analysis_metrics):
     class MockApi:
         
         def __init__(self, **kwargs):
@@ -100,7 +111,7 @@ def mock_api(shared_tmpdir, sessions, units, channels, probes, analysis_metrics)
             return channels
 
         def get_probes(self, **kwargs):
-            return probes
+            return raw_probes
 
         def get_session_data(self, session_id):
             path = os.path.join(shared_tmpdir, 'tmp.txt')
