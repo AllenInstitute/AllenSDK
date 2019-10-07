@@ -83,7 +83,11 @@ def build_environment(template_strings, base=None):
     return Environment(loader=DictLoader(base), lstrip_blocks=True, trim_blocks=True)
 
 
-def execute_templated(environment, name, engine, **kwargs):
+def execute_templated(environment, name, engine, engine_kwargs=None, **kwargs):
+    if engine_kwargs is None:
+        engine_kwargs = {}
+
     template = environment.get_template(name)
     rendered = template.render(**kwargs)
+
     return engine(rendered)
