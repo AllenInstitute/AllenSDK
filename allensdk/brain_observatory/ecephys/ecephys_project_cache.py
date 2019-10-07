@@ -52,7 +52,13 @@ class EcephysProjectCache(Cache):
 
     MANIFEST_VERSION = '0.2.1'
 
-    SUPPRESS_FROM_UNITS = ("air_channel_index", "surface_channel_index", "has_nwb", "lfp_temporal_subsampling_factor")
+    SUPPRESS_FROM_UNITS = ("air_channel_index",
+                           "surface_channel_index",
+                           "has_nwb",
+                           "lfp_temporal_subsampling_factor",
+                           "epoch_name_quality_metrics",
+                           "epoch_name_waveform_metrics",
+                           "isi_experiment_id")
     SUPPRESS_FROM_CHANNELS = (
         "air_channel_index", "surface_channel_index", "name",
         "date_of_acquisition", "published_at", "specimen_id", "session_type", "isi_experiment_id", "age_in_days",
@@ -107,6 +113,18 @@ class EcephysProjectCache(Cache):
             isi_violations_maximum=None
         )
         units = call_caching(get_units, path, strategy='lazy', **csv_io)
+        units = units.rename(columns={
+            'PT_ratio': 'waveform_PT_ratio',
+            'amplitude': 'waveform_amplitude',
+            'duration': 'waveform_duration',
+            'halfwidth': 'waveform_halfwidth',
+            'recovery_slope': 'waveform_recovery_slope',
+            'repolarization_slope': 'waveform_repolarization_slope',
+            'spread': 'waveform_spread',
+            'velocity_above': 'waveform_velocity_above',
+            'velocity_below': 'waveform_velocity_below',
+            'l_ratio': 'L_ratio',
+        })
 
         units = units[
             (units["amplitude_cutoff"] <= get_unit_filter_value("amplitude_cutoff_maximum", **kwargs))
@@ -135,6 +153,14 @@ class EcephysProjectCache(Cache):
     def _get_annotated_units(self, **kwargs):
         units = self._get_units(**kwargs)
         channels = self._get_annotated_channels()
+        annotated_units = pd.merge(units, channels, left_on='ecephys_channel_id', right_index=True, suffixes=['_unit', '_channel'])
+        annotated_units = annotated_units.rename(columns={
+            'name': 'probe_name',
+            'phase': 'probe_phase',
+            'sampling_rate': 'probe_sampling_rate',
+            'lfp_sampling_rate': 'probe_lfp_sampling_rate',
+            'local_index': 'peak_channel'
+        })
 
         return pd.merge(units, channels, left_on='ecephys_channel_id', right_index=True, suffixes=['_unit', '_channel'])
 

@@ -121,7 +121,7 @@ class EcephysSession(LazyPropertyMixin):
 
     @property
     def num_units(self):
-        return self.units.shape[0]
+        return self._units.shape[0]
 
     @property
     def num_probes(self):
@@ -178,6 +178,14 @@ class EcephysSession(LazyPropertyMixin):
     def session_type(self):
         return self._metadata["stimulus_name"]
 
+    @property
+    def units(self):
+        return self._units.drop(columns=['width_rf', 'height_rf',
+                                         'on_screen_rf', 'time_to_peak_fl',
+                                         'time_to_peak_rf', 'time_to_peak_sg',
+                                         'sustained_idx_fl', 'time_to_peak_dg'],
+                                errors='ignore')
+
     def __init__(self, api, **kwargs):
         self.api: EcephysSessionApi = api
 
@@ -193,12 +201,11 @@ class EcephysSession(LazyPropertyMixin):
         self.channels = self.LazyProperty(self.api.get_channels)
 
         self.stimulus_presentations = self.LazyProperty(self.api.get_stimulus_presentations, wrappers=[self._build_stimulus_presentations])
-        self.units = self.LazyProperty(self.api.get_units, wrappers=[self._build_units_table])
         self.inter_presentation_intervals = self.LazyProperty(self._build_inter_presentation_intervals)
         self.invalid_times = self.LazyProperty(self.api.get_invalid_times)
 
+        self._units = self.LazyProperty(self.api.get_units, wrappers=[self._build_units_table])
         self._rig_metadata = self.LazyProperty(self.api.get_rig_metadata)
-
         self._metadata = self.LazyProperty(self.api.get_metadata)
 
     def get_current_source_density(self, probe_id):
@@ -680,7 +687,7 @@ class EcephysSession(LazyPropertyMixin):
         return labels, intervals
 
     def _build_spike_times(self, spike_times):
-        retained_units = set(self.units.index.values)
+        retained_units = set(self._units.index.values)
         output_spike_times = {}
 
         for unit_id in list(spike_times.keys()):
@@ -756,6 +763,22 @@ class EcephysSession(LazyPropertyMixin):
             # 'manual_structure_id': 'structure_id',
             # 'manual_structure_acronym': 'structure_acronym',
             'local_index_channel': 'channel_local_index',
+            'PT_ratio': 'waveform_PT_ratio',
+            'amplitude': 'waveform_amplitude',
+            'duration': 'waveform_duration',
+            'halfwidth': 'waveform_halfwidth',
+            'recovery_slope': 'waveform_recovery_slope',
+            'repolarization_slope': 'waveform_repolarization_slope',
+            'spread': 'waveform_spread',
+            'velocity_above': 'waveform_velocity_above',
+            'velocity_below': 'waveform_velocity_below',
+            'sampling_rate': 'probe_sampling_rate',
+            'lfp_sampling_rate': 'probe_lfp_sampling_rate',
+            'has_lfp_data': 'probe_has_lfp_data',
+            'l_ratio': 'L_ratio',
+            'p_value_rf': 'on_screen_rf',
+            'on_screen_rf': 'p_value_rf',
+            'pref_images_multi_ns': 'pref_image_multi_ns',
         })
 
         return table.sort_values(by=['probe_description', 'probe_vertical_position', 'probe_horizontal_position'])
@@ -763,7 +786,7 @@ class EcephysSession(LazyPropertyMixin):
     def _build_nwb1_waveforms(self, mean_waveforms):
         # _build_mean_waveforms() assumes every unit has the same number of waveforms and that a unit-waveform exists
         # for all channels. This is not true for NWB 1 files where each unit has ONE waveform on ONE channel
-        units_df = self.units
+        units_df = self._units
         output_waveforms = {}
         sampling_rate_lu = {uid: self.probes.loc[r['probe_id']]['sampling_rate'] for uid, r in units_df.iterrows()}
 
@@ -788,7 +811,7 @@ class EcephysSession(LazyPropertyMixin):
         for cid, row in self.channels.iterrows():
             channel_id_lut[(row["local_index"], row["probe_id"])] = cid
 
-        probe_id_lut = {uid: row['probe_id'] for uid, row in self.units.iterrows()}
+        probe_id_lut = {uid: row['probe_id'] for uid, row in self._units.iterrows()}
 
         output_waveforms = {}
         for uid in list(mean_waveforms.keys()):
