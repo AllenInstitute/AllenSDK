@@ -4,7 +4,6 @@ import ast
 
 import pandas as pd
 import SimpleITK as sitk
-import h5py
 import numpy as np
 
 from allensdk.api.cache import Cache
@@ -26,7 +25,7 @@ def call_caching(fn, path, strategy=None, pre=lambda d: d, writer=None, reader=N
     fn = functools.partial(fn, *args, **kwargs)
     try:
         return Cache.cacher(fn, path=path, strategy=strategy, pre=pre, writer=writer, reader=reader, post=post)
-    except:
+    except Exception:
         Path(path).unlink
         raise
 
@@ -56,39 +55,36 @@ class EcephysProjectCache(Cache):
     SUPPRESS_FROM_UNITS = ("air_channel_index", "surface_channel_index", "has_nwb", "lfp_temporal_subsampling_factor")
     SUPPRESS_FROM_CHANNELS = (
         "air_channel_index", "surface_channel_index", "name",
-        "date_of_acquisition", "published_at", "specimen_id", "session_type", "isi_experiment_id", "age_in_days", 
+        "date_of_acquisition", "published_at", "specimen_id", "session_type", "isi_experiment_id", "age_in_days",
         "sex", "genotype", "has_nwb", "lfp_temporal_subsampling_factor"
     )
     SUPPRESS_FROM_PROBES = (
         "air_channel_index", "surface_channel_index",
-        "date_of_acquisition", "published_at", "specimen_id", "session_type", "isi_experiment_id", "age_in_days", 
+        "date_of_acquisition", "published_at", "specimen_id", "session_type", "isi_experiment_id", "age_in_days",
         "sex", "genotype", "has_nwb", "lfp_temporal_subsampling_factor"
     )
     SUPPRESS_FROM_SESSIONS = (
         "has_nwb",
     )
 
-
     def __init__(self, fetch_api, **kwargs):
-        
+
         kwargs['manifest'] = kwargs.get('manifest', 'ecephys_project_manifest.json')
         kwargs['version'] = kwargs.get('version', self.MANIFEST_VERSION)
 
         super(EcephysProjectCache, self).__init__(**kwargs)
         self.fetch_api = fetch_api
 
-
     def _get_sessions(self):
         path = self.get_cache_path(None, self.SESSIONS_KEY)
 
         def reader(path):
             response = pd.read_csv(path, index_col='id')
-            if "structure_acronyms" in response.columns: #  unfortunately, structure_acronyms is a list of str
+            if "structure_acronyms" in response.columns:  # unfortunately, structure_acronyms is a list of str
                 response["structure_acronyms"] = [ast.literal_eval(item) for item in response["structure_acronyms"]]
             return response
 
         return call_caching(self.fetch_api.get_sessions, path=path, strategy='lazy', writer=csv_io["writer"], reader=reader)
-
 
     def _get_probes(self):
         path = self.get_cache_path(None, self.PROBES_KEY)
@@ -98,23 +94,21 @@ class EcephysProjectCache(Cache):
             probes["lfp_sampling_rate"] / probes["lfp_temporal_subsampling_factor"])
         return probes
 
-
     def _get_channels(self):
         path = self.get_cache_path(None, self.CHANNELS_KEY)
         return call_caching(self.fetch_api.get_channels, path, strategy='lazy', **csv_io)
 
-
     def _get_units(self, **kwargs):
         path = self.get_cache_path(None, self.UNITS_KEY)
         get_units = functools.partial(
-            self.fetch_api.get_units, 
-            amplitude_cutoff_maximum=None, # pull down all the units to csv and filter on the way out
-            presence_ratio_minimum=None, 
+            self.fetch_api.get_units,
+            amplitude_cutoff_maximum=None,  # pull down all the units to csv and filter on the way out
+            presence_ratio_minimum=None,
             isi_violations_maximum=None
         )
         units = call_caching(get_units, path, strategy='lazy', **csv_io)
 
-        units =units[
+        units = units[
             (units["amplitude_cutoff"] <= get_unit_filter_value("amplitude_cutoff_maximum", **kwargs))
             & (units["presence_ratio"] >= get_unit_filter_value("presence_ratio_minimum", **kwargs))
             & (units["isi_violations"] <= get_unit_filter_value("isi_violations_maximum", **kwargs))
@@ -123,9 +117,8 @@ class EcephysProjectCache(Cache):
         if "quality" in units.columns and kwargs.get("filter_by_validity", True):
             units = units[units["quality"] == "good"]
             units.drop(columns="quality", inplace=True)
-        
-        return units
 
+        return units
 
     def _get_annotated_probes(self):
         sessions = self._get_sessions()
@@ -133,20 +126,17 @@ class EcephysProjectCache(Cache):
 
         return pd.merge(probes, sessions, left_on="ecephys_session_id", right_index=True, suffixes=['_probe', '_session'])
 
-
     def _get_annotated_channels(self):
         channels = self._get_channels()
         probes = self._get_annotated_probes()
 
         return pd.merge(channels, probes, left_on="ecephys_probe_id", right_index=True, suffixes=['_channel', '_probe'])
 
-
     def _get_annotated_units(self, **kwargs):
         units = self._get_units(**kwargs)
         channels = self._get_annotated_channels()
 
         return pd.merge(units, channels, left_on='ecephys_channel_id', right_index=True, suffixes=['_unit', '_channel'])
-
 
     def get_sessions(self, suppress=None):
         sessions = self._get_sessions()
@@ -163,7 +153,6 @@ class EcephysProjectCache(Cache):
 
         return sessions
 
-
     def get_probes(self, suppress=None):
         probes = self._get_annotated_probes()
 
@@ -177,7 +166,6 @@ class EcephysProjectCache(Cache):
         probes.drop(columns=suppress, inplace=True, errors="ignore")
 
         return probes
-
 
     def get_channels(self, suppress=None):
         """ Load (potentially downloading and caching) a table whose rows are individual channels.
@@ -193,7 +181,6 @@ class EcephysProjectCache(Cache):
 
         return channels
 
-
     def get_units(self, suppress=None, **kwargs):
         """ Reports a table consisting of all sorted units across the entire extracellular electrophysiology project.
 
@@ -204,7 +191,7 @@ class EcephysProjectCache(Cache):
 
         Returns
         -------
-        pd.DataFrame : 
+        pd.DataFrame :
             each row describes a single sorted unit
 
         """
@@ -214,16 +201,15 @@ class EcephysProjectCache(Cache):
 
         units = self._get_annotated_units(**kwargs)
         units.drop(columns=suppress, inplace=True, errors="ignore")
-        
-        return units
 
+        return units
 
     def get_session_data(self, session_id):
         path = self.get_cache_path(None, self.SESSION_NWB_KEY, session_id, session_id)
 
         probes = self.get_probes()
         probe_ids = probes[probes["ecephys_session_id"] == session_id].index.values
-        
+
         probe_promises = {
             probe_id: FilePromise(
                 source=functools.partial(self.fetch_api.get_probe_lfp_data, probe_id),
@@ -234,9 +220,9 @@ class EcephysProjectCache(Cache):
         }
 
         call_caching(
-            self.fetch_api.get_session_data, 
-            path, 
-            session_id=session_id, 
+            self.fetch_api.get_session_data,
+            path,
+            session_id=session_id,
             strategy='lazy',
             writer=write_from_stream,
         )
@@ -244,8 +230,8 @@ class EcephysProjectCache(Cache):
         get_analysis_metrics = functools.partial(self.get_unit_analysis_metrics_for_session, session_id, False)
 
         session_api = EcephysNwbSessionApi(
-            path=path, 
-            probe_lfp_paths=probe_promises, 
+            path=path,
+            probe_lfp_paths=probe_promises,
             additional_unit_metrics=get_analysis_metrics
         )
         return EcephysSession(api=session_api)
@@ -272,9 +258,9 @@ class EcephysProjectCache(Cache):
             return sitk.GetArrayFromImage(sitk.ReadImage(path))
 
         return call_caching(
-            self.fetch_api.get_natural_scene_template, 
-            path, 
-            number=number, 
+            self.fetch_api.get_natural_scene_template,
+            path,
+            number=number,
             strategy="lazy",
             writer=write_from_stream,
             reader=reader
@@ -291,7 +277,7 @@ class EcephysProjectCache(Cache):
 
     def get_all_ages(self, **session_kwargs):
         return self._get_all_values("age_in_days", self.get_sessions, **session_kwargs)
-    
+
     def get_all_sexes(self, **session_kwargs):
         return self._get_all_values("sex", self.get_sessions, **session_kwargs)
 
@@ -302,7 +288,7 @@ class EcephysProjectCache(Cache):
         return data[key].unique().tolist()
 
     def get_unit_analysis_metrics_for_session(self, session_id, annotate=True):
-        """ Cache and return a table of analysis metrics calculated on each unit from a specified session. See 
+        """ Cache and return a table of analysis metrics calculated on each unit from a specified session. See
         get_sessions for a list of sessions.
 
         Parameters
@@ -321,9 +307,9 @@ class EcephysProjectCache(Cache):
 
         path = self.get_cache_path(None, self.SESSION_ANALYSIS_METRICS_KEY, session_id, session_id)
         metrics = call_caching(
-            self.fetch_api.get_unit_analysis_metrics, 
-            path, 
-            strategy='lazy', 
+            self.fetch_api.get_unit_analysis_metrics,
+            path,
+            strategy='lazy',
             ecephys_session_ids=[session_id],
             reader=lambda path: pd.read_csv(path, index_col='ecephys_unit_id'),
             writer=lambda path, df: df.to_csv(path)
@@ -338,7 +324,7 @@ class EcephysProjectCache(Cache):
         return metrics
 
     def get_unit_analysis_metrics_by_session_type(self, session_type, annotate=True):
-        """ Cache and return a table of analysis metrics calculated on each unit from a specified session type. See 
+        """ Cache and return a table of analysis metrics calculated on each unit from a specified session type. See
         get_all_session_types for a list of session types.
 
         Parameters
@@ -361,9 +347,9 @@ class EcephysProjectCache(Cache):
 
         path = self.get_cache_path(None, self.TYPEWISE_ANALYSIS_METRICS_KEY, session_type)
         metrics = call_caching(
-            self.fetch_api.get_unit_analysis_metrics, 
-            path, 
-            strategy='lazy', 
+            self.fetch_api.get_unit_analysis_metrics,
+            path,
+            strategy='lazy',
             session_types=[session_type],
             reader=lambda path: pd.read_csv(path, index_col='ecephys_unit_id'),
             writer=lambda path, df: df.to_csv(path)
@@ -376,10 +362,9 @@ class EcephysProjectCache(Cache):
 
         return metrics
 
-
     def add_manifest_paths(self, manifest_builder):
         manifest_builder = super(EcephysProjectCache, self).add_manifest_paths(manifest_builder)
-                                  
+
         manifest_builder.add_path(
             self.SESSIONS_KEY, 'sessions.csv', parent_key='BASEDIR', typename='file'
         )
@@ -438,7 +423,7 @@ class EcephysProjectCache(Cache):
     def from_lims(cls, lims_kwargs=None, **kwargs):
         lims_kwargs = {} if lims_kwargs is None else lims_kwargs
         return cls(
-            fetch_api=EcephysProjectLimsApi.default(**lims_kwargs), 
+            fetch_api=EcephysProjectLimsApi.default(**lims_kwargs),
             **kwargs
         )
 
@@ -446,13 +431,14 @@ class EcephysProjectCache(Cache):
     def from_warehouse(cls, warehouse_kwargs=None, **kwargs):
         warehouse_kwargs = {} if warehouse_kwargs is None else warehouse_kwargs
         return cls(
-            fetch_api=EcephysProjectWarehouseApi.default(**warehouse_kwargs), 
+            fetch_api=EcephysProjectWarehouseApi.default(**warehouse_kwargs),
             **kwargs
         )
 
     @classmethod
     def fixed(cls, **kwargs):
         return cls(fetch_api=EcephysProjectFixedApi(), **kwargs)
+
 
 def count_owned(this, other, foreign_key, count_key, inplace=False):
     if not inplace:
@@ -465,16 +451,15 @@ def count_owned(this, other, foreign_key, count_key, inplace=False):
     if not inplace:
         return this
 
+
 def get_grouped_uniques(this, other, foreign_key, field_key, unique_key, inplace=False):
     if not inplace:
         this = this.copy()
 
     uniques = other.groupby(foreign_key)\
-        .apply(lambda grp: pd.DataFrame(grp)[field_key]\
-        .unique())
+        .apply(lambda grp: pd.DataFrame(grp)[field_key].unique())
     this[unique_key] = 0
     this.loc[uniques.index.values, unique_key] = uniques.values
 
     if not inplace:
         return this
-    
