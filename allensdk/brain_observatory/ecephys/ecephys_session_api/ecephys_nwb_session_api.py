@@ -6,12 +6,11 @@ import ast
 import pandas as pd
 import numpy as np
 import xarray as xr
-import pynwb
 
 from .ecephys_session_api import EcephysSessionApi
 from allensdk.brain_observatory.ecephys.file_promise import FilePromise
 from allensdk.brain_observatory.nwb.nwb_api import NwbApi
-import allensdk.brain_observatory.ecephys.nwb
+import allensdk.brain_observatory.ecephys.nwb  # noqa Necessary to import pyNWB namespaces
 from allensdk.brain_observatory.ecephys import get_unit_filter_value
 
 
@@ -20,15 +19,14 @@ color_triplet_re = re.compile(r"\[(-{0,1}\d*\.\d*,\s*)*(-{0,1}\d*\.\d*)\]")
 
 class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
 
-    def __init__(self, 
-        path, 
-        probe_lfp_paths: Optional[Dict[int, FilePromise]] = None, 
-        additional_unit_metrics=None, 
-        **kwargs
-    ):
+    def __init__(self,
+                 path,
+                 probe_lfp_paths: Optional[Dict[int, FilePromise]] = None,
+                 additional_unit_metrics=None,
+                 **kwargs):
 
-        self.filter_by_validity = kwargs.pop("filter_by_validity", True)
         self.filter_out_of_brain_units = kwargs.pop("filter_out_of_brain_units", True)
+        self.filter_by_validity = kwargs.pop("filter_by_validity", True)
         self.amplitude_cutoff_maximum = get_unit_filter_value("amplitude_cutoff_maximum", **kwargs)
         self.presence_ratio_minimum = get_unit_filter_value("presence_ratio_minimum", **kwargs)
         self.isi_violations_maximum = get_unit_filter_value("isi_violations_maximum", **kwargs)
@@ -68,13 +66,12 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
 
         return self.probe_lfp_paths[probe_id]()
 
-
     def get_probes(self) -> pd.DataFrame:
         probes: Union[List, pd.DataFrame] = []
         for k, v in self.nwbfile.electrode_groups.items():
             probes.append({
-                'id': int(k), 
-                'description': v.description, 
+                'id': int(k),
+                'description': v.description,
                 'location': v.location,
                 "sampling_rate": v.sampling_rate,
                 "lfp_sampling_rate": v.lfp_sampling_rate,
@@ -97,7 +94,7 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         # these are stored as string in nwb 2, which is not ideal
         # float is also not ideal, but we have nans indicating out-of-brain structures
         channels["ecephys_structure_id"] = [float(chid) if chid != "" else np.nan for chid in channels["ecephys_structure_id"]]
-        
+
         if self.filter_by_validity:
             channels = channels[channels["valid_data"]]
             channels = channels.drop(columns=["valid_data"])
@@ -277,7 +274,6 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         table.drop(columns=["tags", "timeseries"], inplace=True)
         return table
 
-
     def _get_full_units_table(self) -> pd.DataFrame:
         units = self.nwbfile.units.to_dataframe()
         units.index = units.index.astype(int)
@@ -287,7 +283,7 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
 
             if self.filter_out_of_brain_units:
                 channels = channels[~(channels["ecephys_structure_id"].isna())]
-            
+
             channel_ids = set(channels.index.values.tolist())
             units = units[units["peak_channel_id"].isin(channel_ids)]
 
@@ -298,8 +294,6 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         units = units[units["amplitude_cutoff"] <= self.amplitude_cutoff_maximum]
         units = units[units["presence_ratio"] >= self.presence_ratio_minimum]
         units = units[units["isi_violations"] <= self.isi_violations_maximum]
-
-
         return units
 
     def get_metadata(self):

@@ -17,7 +17,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
         self.postgres_engine = postgres_engine
         self.app_engine = app_engine
 
-    def get_session_data(self, session_id):
+    def get_session_data(self, session_id, **kwargs):
         nwb_response = build_and_execute(
             """
             select wkf.id, wkf.filename, wkf.storage_directory, wkf.attachable_id from well_known_files wkf 

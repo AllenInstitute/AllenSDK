@@ -22,7 +22,7 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
             rma_engine = RmaEngine(scheme="http", host="api.brain-map.org")
         self.rma_engine = rma_engine
 
-    def get_session_data(self, session_id):
+    def get_session_data(self, session_id, **kwargs):
         well_known_files = build_and_execute(
             (
                 "criteria=model::WellKnownFile"
