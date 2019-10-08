@@ -530,12 +530,24 @@ class EcephysSession(LazyPropertyMixin):
 
         if not spike_times:
             # If there are no units firing during the given stimulus return an empty dataframe
-            return pd.DataFrame(columns=['spike_times', 'stimulus_presentation', 'unit_id'])
+            return pd.DataFrame(columns=['spike_times', 'stimulus_presentation', 
+                                         'unit_id', 'time_since_stimulus_presentation_onset'])
 
-        return pd.DataFrame({
+        spike_df =  pd.DataFrame({
             'stimulus_presentation_id': np.concatenate(presentation_ids).astype(int),
             'unit_id': np.concatenate(unit_ids).astype(int)
-        }, index=pd.Index(np.concatenate(spike_times), name='spike_time')).sort_values('spike_time', axis=0)
+        }, index=pd.Index(np.concatenate(spike_times), name='spike_time'))
+
+        # Add time since stimulus presentation onset
+        onset_times = self._filter_owned_df(
+            "stimulus_presentations", ids=all_presentation_ids)["start_time"]
+        spikes_with_onset = spike_df.join(onset_times, 
+                                          on=["stimulus_presentation_id"])
+        spikes_with_onset["time_since_stimulus_presentation_onset"] = (
+                spikes_with_onset.index - spikes_with_onset["start_time"])
+        spikes_with_onset.sort_values('spike_time', axis=0, inplace=True)
+        spikes_with_onset.drop(columns=["start_time"], inplace=True)
+        return spikes_with_onset
 
 
     def conditionwise_spike_statistics(self, stimulus_presentation_ids=None, unit_ids=None, use_rates=False):

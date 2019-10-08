@@ -316,7 +316,8 @@ def test_presentationwise_spike_times(spike_times_api):
 
     expected = pd.DataFrame({
         'unit_id': [2, 2, 2],
-        'stimulus_presentation_id': [2, 2, 2, ]
+        'stimulus_presentation_id': [2, 2, 2, ],
+        'time_since_stimulus_presentation_onset': [0.01, 0.02, 0.03]
     }, index=pd.Index(name='spike_time', data=[1.01, 1.02, 1.03]))
 
     pd.testing.assert_frame_equal(expected, obtained, check_like=True, check_dtype=False)    
