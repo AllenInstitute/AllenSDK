@@ -140,6 +140,7 @@ class EcephysSession(LazyPropertyMixin):
         "nDots",
         "dotSize",
         "dotLife",
+        "color_triplet"
     )
 
     @property
