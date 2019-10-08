@@ -190,7 +190,7 @@ def test_presentationwise_spike_times(ecephys_api):
     stim_analysis = StimulusAnalysis(ecephys_session=session, stimulus_key='s0')
     assert(len(stim_analysis.presentationwise_spike_times) == 12)
     assert(list(stim_analysis.presentationwise_spike_times.index.names) == ['spike_time'])
-    assert(set(stim_analysis.presentationwise_spike_times.columns) == {'stimulus_presentation_id', 'unit_id'})
+    assert(set(stim_analysis.presentationwise_spike_times.columns) == {'stimulus_presentation_id', 'unit_id', 'time_since_stimulus_presentation_onset'})
     assert(stim_analysis.presentationwise_spike_times.loc[1.01]['unit_id'] == 2)
     assert(stim_analysis.presentationwise_spike_times.loc[1.01]['stimulus_presentation_id'] == 2)
     assert(len(stim_analysis.presentationwise_spike_times.loc[3.0]) == 2)
