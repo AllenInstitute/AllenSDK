@@ -15,7 +15,7 @@ import allensdk.brain_observatory.ecephys.nwb
 from allensdk.brain_observatory.ecephys import get_unit_filter_value
 
 
-color_triplet_re = re.compile(r"\[(-{0,1}\d+\.\d*,\s*)*(-{0,1}\d+\.\d*)\]")
+color_triplet_re = re.compile(r"\[(-{0,1}\d*\.\d*,\s*)*(-{0,1}\d*\.\d*)\]")
 
 
 class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
