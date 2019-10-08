@@ -9,12 +9,17 @@ from .rma_engine import RmaEngine
 from .ecephys_project_api import EcephysProjectApi
 from .utilities import rma_macros, build_and_execute
 
+from allensdk.brain_observatory.ecephys.ecephys_project_api.warehouse_patches import replace_bad_structure_assignments
+
+
 class EcephysProjectWarehouseApi(EcephysProjectApi):
 
     movie_re = re.compile(r".*natural_movie_(?P<num>\d+).npy")
     scene_re = re.compile(r".*/(?P<num>\d+).tiff")
     
-    def __init__(self, rma_engine):
+    def __init__(self, rma_engine=None):
+        if rma_engine is None:
+            rma_engine = RmaEngine(scheme="http", host="api.brain-map.org")
         self.rma_engine = rma_engine
 
     def get_session_data(self, session_id):
@@ -205,6 +210,7 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
         )
 
         response.set_index("id", inplace=True)
+        replace_bad_structure_assignments(response, inplace=True)
 
         return response
 

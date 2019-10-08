@@ -1,6 +1,7 @@
 import sys
 import logging
 import time
+import ast
 
 import requests
 import pandas as pd
@@ -57,5 +58,26 @@ class RmaEngine(HttpEngine):
             response.extend(chunk)
         return response
 
-    def get_rma_tabular(self, query):
-        return pd.DataFrame(self.get_rma_list(query))
+    def get_rma_tabular(self, query, try_infer_dtypes=True):
+        response = pd.DataFrame(self.get_rma_list(query))
+
+        if try_infer_dtypes:
+            response = infer_column_types(response)
+
+        return response
+
+
+def infer_column_types(dataframe):
+    """ RMA queries often come back with string-typed columns. This utility tries to infer numeric types.
+    """
+
+    dataframe = dataframe.copy()
+
+    for colname in dataframe.columns:
+        try:
+            dataframe[colname] = dataframe[colname].apply(ast.literal_eval)
+        except (ValueError, SyntaxError):
+            continue
+    
+    dataframe = dataframe.infer_objects()
+    return dataframe
