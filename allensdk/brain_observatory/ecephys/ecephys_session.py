@@ -537,7 +537,8 @@ class EcephysSession(LazyPropertyMixin):
             'unit_id': np.concatenate(unit_ids).astype(int)
         }, index=pd.Index(np.concatenate(spike_times), name='spike_time')).sort_values('spike_time', axis=0)
 
-    def conditionwise_spike_statistics(self, stimulus_presentation_ids=None, unit_ids=None):
+
+    def conditionwise_spike_statistics(self, stimulus_presentation_ids=None, unit_ids=None, use_rates=False):
         """ Produce summary statistics for each distinct stimulus condition
 
         Parameters
@@ -546,6 +547,8 @@ class EcephysSession(LazyPropertyMixin):
             identifies stimulus presentations from which spikes will be considered
         unit_ids : array-like
             identifies units whose spikes will be considered
+        use_rates : bool, optional
+            If True, use firing rates. If False, use spike counts.
 
         Returns
         -------
@@ -558,7 +561,7 @@ class EcephysSession(LazyPropertyMixin):
         # TODO: To use filter_owned_df() make sure to convert the results from a Series to a Dataframe
         stimulus_presentation_ids = (stimulus_presentation_ids if stimulus_presentation_ids is not None
                                      else self.stimulus_presentations.index.values)  # In case
-        presentations = self.stimulus_presentations.loc[stimulus_presentation_ids, ["stimulus_condition_id"]]
+        presentations = self.stimulus_presentations.loc[stimulus_presentation_ids, ["stimulus_condition_id", "duration"]]
 
         spikes = self.presentationwise_spike_times(
             stimulus_presentation_ids=stimulus_presentation_ids, unit_ids=unit_ids
@@ -583,17 +586,17 @@ class EcephysSession(LazyPropertyMixin):
         sp = pd.merge(spike_counts, presentations, left_on="stimulus_presentation_id", right_index=True, how="left")
         sp.reset_index(inplace=True)
 
+        if use_rates:
+            sp["spike_rate"] = sp["spike_count"] / sp["duration"]
+            sp.drop(columns=["spike_count"], inplace=True)
+            extractor = _extract_summary_rate_statistics
+        else:
+            sp.drop(columns=["duration"])
+            extractor = _extract_summary_count_statistics
+        
         summary = []
         for ind, gr in sp.groupby(["stimulus_condition_id", "unit_id"]):
-            summary.append({
-                "stimulus_condition_id": ind[0],
-                "unit_id": ind[1],
-                "spike_count": gr["spike_count"].sum(),
-                "stimulus_presentation_count": gr.shape[0],
-                "spike_mean": np.mean(gr["spike_count"].values),
-                "spike_std": np.std(gr["spike_count"].values, ddof=1),
-                "spike_sem": scipy.stats.sem(gr["spike_count"].values)
-            })
+            summary.append(extractor(ind, gr))
 
         return pd.DataFrame(summary).set_index(keys=["unit_id", "stimulus_condition_id"])
 
@@ -982,3 +985,26 @@ def coerce_scalar(value, message, warn=False):
             warnings.warn(message)
         return [value]
     return value
+
+
+def _extract_summary_count_statistics(index, group):
+    return {
+        "stimulus_condition_id": index[0],
+        "unit_id": index[1],
+        "spike_count": group["spike_count"].sum(),
+        "stimulus_presentation_count": group.shape[0],
+        "spike_mean": np.mean(group["spike_count"].values),
+        "spike_std": np.std(group["spike_count"].values, ddof=1),
+        "spike_sem": scipy.stats.sem(group["spike_count"].values)
+    }
+
+
+def _extract_summary_rate_statistics(index, group):
+    return {
+        "stimulus_condition_id": index[0],
+        "unit_id": index[1],
+        "stimulus_presentation_count": group.shape[0],
+        "spike_mean": np.mean(group["spike_rate"].values),
+        "spike_std": np.std(group["spike_rate"].values, ddof=1),
+        "spike_sem": scipy.stats.sem(group["spike_rate"].values)
+    }

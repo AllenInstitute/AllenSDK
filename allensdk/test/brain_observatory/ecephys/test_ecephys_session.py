@@ -342,6 +342,14 @@ def test_conditionwise_spike_statistics(spike_times_api):
     assert obtained.loc[(2, 2), "stimulus_presentation_count"] == 1
 
 
+def test_conditionwise_spike_statistics_using_rates(spike_times_api):
+    session = EcephysSession(api=spike_times_api)
+    obtained = session.conditionwise_spike_statistics(stimulus_presentation_ids=[0, 1, 2], use_rates=True)
+
+    pd.set_option('display.max_columns', None)
+    assert np.allclose([0, 0, 6], obtained["spike_mean"].values)
+
+
 def test_empty_conditionwise_spike_statistics(spike_times_api):
     # special case when there are no spikes
     spike_times_api.get_spike_times = types.MethodType(get_no_spikes_times, spike_times_api)
