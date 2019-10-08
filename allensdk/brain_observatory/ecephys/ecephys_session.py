@@ -241,6 +241,14 @@ class EcephysSession(LazyPropertyMixin):
     def stimulus_presentations(self):
         return self.__class__._remove_detailed_stimulus_parameters(self._stimulus_presentations)
 
+    @property
+    def spike_times(self):
+        if not hasattr(self, "_accessed_spike_times"):
+            self._accessed_spike_times = True
+            self._warn_invalid_spike_intervals()
+
+        return self._spike_times
+
     def __init__(self, api, **kwargs):
         self.api: EcephysSessionApi = api
 
@@ -248,7 +256,7 @@ class EcephysSession(LazyPropertyMixin):
         self.session_start_time = self.LazyProperty(self.api.get_session_start_time)
         self.running_speed = self.LazyProperty(self.api.get_running_speed)
         self.mean_waveforms = self.LazyProperty(self.api.get_mean_waveforms, wrappers=[self._build_mean_waveforms])
-        self.spike_times = self.LazyProperty(self.api.get_spike_times, wrappers=[self._build_spike_times])
+        self._spike_times = self.LazyProperty(self.api.get_spike_times, wrappers=[self._build_spike_times])
         self.optogenetic_stimulation_epochs = self.LazyProperty(self.api.get_optogenetic_stimulation)
         self.spike_amplitudes = self.LazyProperty(self.api.get_spike_amplitudes)
 
@@ -1059,6 +1067,15 @@ flipVert
 
         return cls(api=NWBAdaptorCls.from_path(path=path, **api_kwargs), **kwargs)
 
+    def _warn_invalid_spike_intervals(self):
+
+        fail_tags = list(self.probes["description"])
+        fail_tags.append("all_probes")
+        invalid_time_intervals = self._filter_invalid_times_by_tags(fail_tags)
+
+        if not invalid_time_intervals.empty:
+            warnings.warn("Session includes invalid time intervals that could be accessed with the attribute 'invalid_times',"
+                         "Spikes within these intervals are invalid and may need to be excluded from the analysis.")
 
 def build_spike_histogram(time_domain, spike_times, unit_ids, dtype=None, binarize=False):
 
