@@ -11,7 +11,7 @@ import allensdk.brain_observatory.ecephys.ecephys_project_api.rma_engine as rma_
             "a": ["1", "2", "3"],
             "b": ["a", "1", "2"]
         }),
-        {"a": int, "b": np.dtype("O")}
+        {"a": np.dtype("int64"), "b": np.dtype("O")}
     ],
     [
         pd.DataFrame({
