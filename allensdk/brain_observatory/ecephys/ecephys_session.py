@@ -212,13 +212,11 @@ class EcephysSession(LazyPropertyMixin):
 
     @property
     def structure_acronyms(self):
-        return self.channels["manual_structure_acronym"].unique().tolist()
-
+        return self.channels["ecephys_structure_acronym"].unique().tolist()
 
     @property
     def structurewise_unit_counts(self):
-        return self.units["manual_structure_acronym"].value_counts()
-
+        return self.units["ecephys_structure_acronym"].value_counts()
 
     @property
     def metadata(self):
@@ -228,7 +226,6 @@ class EcephysSession(LazyPropertyMixin):
             "full_genotype": self.full_genotype,
             "sex": self.sex,
             "age_in_days": self.age_in_days,
-            "specimen_name": self.specimen_name,
             "rig_equipment_name": self.rig_equipment_name,
             "num_units": self.num_units,
             "num_channels": self.num_channels,
@@ -239,7 +236,6 @@ class EcephysSession(LazyPropertyMixin):
             "structure_acronyms": self.structure_acronyms,
             "stimulus_names": self.stimulus_names
         }
-
 
     @property
     def stimulus_presentations(self):
@@ -356,7 +352,7 @@ class EcephysSession(LazyPropertyMixin):
 
         stimulus_names = coerce_scalar(stimulus_names, f'expected stimulus_names to be a collection (list-like), but found {type(stimulus_names)}: {stimulus_names}')
         presentations = self._stimulus_presentations[self._stimulus_presentations['stimulus_name'].isin(stimulus_names)]
-        
+
         if not include_detailed_parameters:
             presentations = self.__class__._remove_detailed_stimulus_parameters(presentations)
 
@@ -599,10 +595,10 @@ flipVert
 
         if not spike_times:
             # If there are no units firing during the given stimulus return an empty dataframe
-            return pd.DataFrame(columns=['spike_times', 'stimulus_presentation', 
+            return pd.DataFrame(columns=['spike_times', 'stimulus_presentation',
                                          'unit_id', 'time_since_stimulus_presentation_onset'])
 
-        spike_df =  pd.DataFrame({
+        spike_df = pd.DataFrame({
             'stimulus_presentation_id': np.concatenate(presentation_ids).astype(int),
             'unit_id': np.concatenate(unit_ids).astype(int)
         }, index=pd.Index(np.concatenate(spike_times), name='spike_time'))
@@ -610,14 +606,14 @@ flipVert
         # Add time since stimulus presentation onset
         onset_times = self._filter_owned_df(
             "stimulus_presentations", ids=all_presentation_ids)["start_time"]
-        spikes_with_onset = spike_df.join(onset_times, 
+        spikes_with_onset = spike_df.join(onset_times,
                                           on=["stimulus_presentation_id"])
         spikes_with_onset["time_since_stimulus_presentation_onset"] = (
-                spikes_with_onset.index - spikes_with_onset["start_time"])
+            spikes_with_onset.index - spikes_with_onset["start_time"]
+        )
         spikes_with_onset.sort_values('spike_time', axis=0, inplace=True)
         spikes_with_onset.drop(columns=["start_time"], inplace=True)
         return spikes_with_onset
-
 
     def conditionwise_spike_statistics(self, stimulus_presentation_ids=None, unit_ids=None, use_rates=False):
         """ Produce summary statistics for each distinct stimulus condition
@@ -674,7 +670,7 @@ flipVert
         else:
             sp.drop(columns=["duration"])
             extractor = _extract_summary_count_statistics
-        
+
         summary = []
         for ind, gr in sp.groupby(["stimulus_condition_id", "unit_id"]):
             summary.append(extractor(ind, gr))
@@ -782,7 +778,6 @@ flipVert
 
         return output_spike_times
 
-
     def _build_stimulus_presentations(self, stimulus_presentations, nonapplicable="null"):
         stimulus_presentations.index.name = 'stimulus_presentation_id'
         stimulus_presentations = stimulus_presentations.drop(columns=['stimulus_index'])
@@ -845,8 +840,6 @@ flipVert
         table.index.name = 'unit_id'
         table = table.rename(columns={
             'description': 'probe_description',
-            # 'manual_structure_id': 'structure_id',
-            # 'manual_structure_acronym': 'structure_acronym',
             'local_index_channel': 'channel_local_index',
             'PT_ratio': 'waveform_PT_ratio',
             'amplitude': 'waveform_amplitude',
