@@ -95,9 +95,11 @@ class EcephysProjectCache(Cache):
     def _get_probes(self):
         path = self.get_cache_path(None, self.PROBES_KEY)
         probes = call_caching(self.fetch_api.get_probes, path, strategy='lazy', **csv_io)
-        # Divide the lfp sampling by the subsampling factor for clearer presentation
-        probes["lfp_sampling_rate"] = (
-            probes["lfp_sampling_rate"] / probes["lfp_temporal_subsampling_factor"])
+        # Divide the lfp sampling by the subsampling factor for clearer presentation (if provided)
+        if all(c in list(probes) for c in 
+               ["lfp_sampling_rate", "lfp_temporal_subsampling_factor"]):
+            probes["lfp_sampling_rate"] = (
+                probes["lfp_sampling_rate"] / probes["lfp_temporal_subsampling_factor"])
         return probes
 
     def _get_channels(self):
