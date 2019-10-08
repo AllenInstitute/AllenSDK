@@ -139,8 +139,8 @@ class EcephysProjectCache(Cache):
             units = units[units["quality"] == "good"]
             units.drop(columns="quality", inplace=True)
 
-        if "structure_id" in units.columns and kwargs.get("filter_out_of_brain_units", True):
-            units = units[~(units["structure_id"].isna())]
+        if "ecephys_structure_id" in units.columns and kwargs.get("filter_out_of_brain_units", True):
+            units = units[~(units["ecephys_structure_id"].isna())]
         
         return units
 

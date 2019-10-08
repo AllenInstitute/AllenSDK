@@ -38,8 +38,8 @@ def load_structure_assignments(probe_ids=None):
 
 def replace_bad_structure_assignments(
     channels, 
-    structure_id_key="structure_id", 
-    structure_acronym_key="structure_acronym",
+    structure_id_key="ecephys_structure_id", 
+    structure_acronym_key="ecephys_structure_acronym",
     inplace=False
 ):
     if not inplace:

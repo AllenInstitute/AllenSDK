@@ -267,7 +267,7 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
             channels = self.get_channels()
 
             if self.filter_out_of_brain_units:
-                channels = channels[~(channels["manual_structure_id"].isna())]
+                channels = channels[~(channels["ecephys_structure_id"].isna())]
             
             channel_ids = set(channels.index.values.tolist())
             units = units[units["peak_channel_id"].isin(channel_ids)]
