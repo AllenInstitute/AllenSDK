@@ -559,8 +559,8 @@ class EcephysSession(LazyPropertyMixin):
         """
         # TODO: Need to return an empty df if no matching unit-ids or presentation-ids are found
         # TODO: To use filter_owned_df() make sure to convert the results from a Series to a Dataframe
-        stimulus_presentation_ids = stimulus_presentation_ids if stimulus_presentation_ids is not None else \
-                self.stimulus_presentations.index.values  # In case
+        stimulus_presentation_ids = (stimulus_presentation_ids if stimulus_presentation_ids is not None
+                                     else self.stimulus_presentations.index.values)  # In case
         presentations = self.stimulus_presentations.loc[stimulus_presentation_ids, ["stimulus_condition_id", "duration"]]
 
         spikes = self.presentationwise_spike_times(
@@ -987,24 +987,24 @@ def coerce_scalar(value, message, warn=False):
     return value
 
 
-def _extract_summary_count_statistics(ind, gr):
+def _extract_summary_count_statistics(index, group):
     return {
-        "stimulus_condition_id": ind[0],
-        "unit_id": ind[1],
-        "spike_count": gr["spike_count"].sum(),
-        "stimulus_presentation_count": gr.shape[0],
-        "spike_mean": np.mean(gr["spike_count"].values),
-        "spike_std": np.std(gr["spike_count"].values, ddof=1),
-        "spike_sem": scipy.stats.sem(gr["spike_count"].values)
+        "stimulus_condition_id": index[0],
+        "unit_id": index[1],
+        "spike_count": group["spike_count"].sum(),
+        "stimulus_presentation_count": group.shape[0],
+        "spike_mean": np.mean(group["spike_count"].values),
+        "spike_std": np.std(group["spike_count"].values, ddof=1),
+        "spike_sem": scipy.stats.sem(group["spike_count"].values)
     }
 
 
-def _extract_summary_rate_statistics(ind, gr):
+def _extract_summary_rate_statistics(index, group):
     return {
-        "stimulus_condition_id": ind[0],
-        "unit_id": ind[1],
-        "stimulus_presentation_count": gr.shape[0],
-        "spike_mean": np.mean(gr["spike_rate"].values),
-        "spike_std": np.std(gr["spike_rate"].values, ddof=1),
-        "spike_sem": scipy.stats.sem(gr["spike_rate"].values)
+        "stimulus_condition_id": index[0],
+        "unit_id": index[1],
+        "stimulus_presentation_count": group.shape[0],
+        "spike_mean": np.mean(group["spike_rate"].values),
+        "spike_std": np.std(group["spike_rate"].values, ddof=1),
+        "spike_sem": scipy.stats.sem(group["spike_rate"].values)
     }
