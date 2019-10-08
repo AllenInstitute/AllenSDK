@@ -186,6 +186,36 @@ class EcephysSession(LazyPropertyMixin):
                                          'sustained_idx_fl', 'time_to_peak_dg'],
                                 errors='ignore')
 
+    @property
+    def structure_acronyms(self):
+        return self.channels["manual_structure_acronym"].unique().tolist()
+
+
+    @property
+    def structurewise_unit_counts(self):
+        return self.units["manual_structure_acronym"].value_counts()
+
+
+    @property
+    def metadata(self):
+        return {
+            "specimen_name": self.specimen_name,
+            "session_type": self.session_type,
+            "full_genotype": self.full_genotype,
+            "sex": self.sex,
+            "age_in_days": self.age_in_days,
+            "specimen_name": self.specimen_name,
+            "rig_equipment_name": self.rig_equipment_name,
+            "num_units": self.num_units,
+            "num_channels": self.num_channels,
+            "num_probes": self.num_probes,
+            "num_stimulus_presentations": self.num_stimulus_presentations,
+            "session_start_time": self.session_start_time,
+            "ecephys_session_id": self.ecephys_session_id,
+            "structure_acronyms": self.structure_acronyms,
+            "stimulus_names": self.stimulus_names
+        }
+
     def __init__(self, api, **kwargs):
         self.api: EcephysSessionApi = api
 
