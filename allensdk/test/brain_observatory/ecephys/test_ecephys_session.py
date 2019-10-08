@@ -380,9 +380,9 @@ def test_get_stimulus_parameter_values(just_stimulus_table_api):
     assert len(expected) == len(obtained)
 
 
-def test_get_presentations_for_stimulus(just_stimulus_table_api, raw_stimulus_table):
+def get_stimulus_table(just_stimulus_table_api, raw_stimulus_table):
     session = EcephysSession(api=just_stimulus_table_api)
-    obtained = session.get_presentations_for_stimulus(['a'])
+    obtained = session.get_stimulus_table(['a'])
 
     expected = raw_stimulus_table.loc[:2, [
         'start_time', 'stop_time', 'stimulus_name', 'stimulus_block', 'Color', 'Phase'

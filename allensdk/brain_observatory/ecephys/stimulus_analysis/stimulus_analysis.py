@@ -149,7 +149,7 @@ class StimulusAnalysis(object):
                     raise Exception('Could not find approipate stimulus_name key for current stimulus type. Please '
                                     'specify using the stimulus_key parameter.')
 
-            self._stim_table = self.ecephys_session.get_presentations_for_stimulus(
+            self._stim_table = self.ecephys_session.get_stimulus_table(
                 [self._stimulus_key] if isinstance(self._stimulus_key, string_types) else self._stimulus_key
             )
 
@@ -202,7 +202,7 @@ class StimulusAnalysis(object):
         # Used by sweep_p_events for creating null dist.
         # TODO: This may not be need anymore? Ask the scientists if sweep_p_events will be required in the future.
         if self._stim_table_spontaneous is None:
-            stim_table = self.ecephys_session.get_presentations_for_stimulus(self.known_spontaneous_keys)
+            stim_table = self.ecephys_session.get_stimulus_table(self.known_spontaneous_keys)
             # TODO: If duration does not exists in stim_table create it from stop and start times
             self._stim_table_spontaneous = stim_table[stim_table['duration'] > self._spontaneous_threshold]
 
