@@ -183,7 +183,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
                         when nwb_id is not null then true
                         else false
                     end as has_lfp_nwb,
-                    str.structure_acronyms as structure_actronyms
+                    str.structure_acronyms as structure_acronyms
                 from ecephys_probes ep 
                 join ecephys_sessions es on es.id = ep.ecephys_session_id 
                 join (
