@@ -287,14 +287,15 @@ class EcephysSession(LazyPropertyMixin):
 
         return self.api.get_current_source_density(probe_id)
 
-    def get_lfp(self, probe_id):
+    def get_lfp(self, probe_id, mask_invalid_intervals=True):
         ''' Load an xarray DataArray with LFP data from channels on a single probe
 
         Parameters
         ----------
         probe_id : int
             identify the probe whose LFP data ought to be loaded
-
+        mask_invalid_intervals : bool
+            if True (default) will mask data in the invalid intervals with np.nan
         Returns
         -------
         xr.DataArray :
@@ -307,7 +308,55 @@ class EcephysSession(LazyPropertyMixin):
 
         '''
 
-        return self.api.get_lfp(probe_id)
+        if mask_invalid_intervals:
+            probe_name = self.probes.loc[probe_id]["description"]
+            fail_tags = ["all_probes", probe_name]
+            invalid_time_intervals = self._filter_invalid_times_by_tags(fail_tags)
+            lfp = self.api.get_lfp(probe_id)
+            time_points = lfp.time
+            valid_time_points = self._get_valid_time_points(time_points, invalid_time_intervals)
+            return lfp.where(cond=valid_time_points)
+        else:
+            return self.api.get_lfp(probe_id)
+
+
+    def _get_valid_time_points(self, time_points, invalid_time_intevals):
+
+        all_time_points = xr.DataArray(
+            name="time_points",
+            data=[True] * len(time_points),
+            dims=['time'],
+            coords=[time_points]
+        )
+
+        valid_time_points = all_time_points
+        for ix, invalid_time_interval in invalid_time_intevals.iterrows():
+            invalid_time_points = (time_points >= invalid_time_interval['start_time']) & (time_points <= invalid_time_interval['stop_time'])
+            valid_time_points = np.logical_and(valid_time_points, np.logical_not(invalid_time_points))
+
+        return valid_time_points
+
+
+    def _filter_invalid_times_by_tags(self, tags):
+        """
+        Parameters
+        ----------
+        invalid_times: pd.DataFrame
+            of invalid times
+        tags: list
+            of tags
+
+        Returns
+        -------
+        pd.DataFrame of invalid times having tags
+        """
+        invalid_times = self.invalid_times.copy()
+        if not invalid_times.empty:
+            mask = invalid_times['tags'].apply(lambda x: any([t in x for t in tags]))
+            invalid_times = invalid_times[mask]
+
+        return invalid_times
+
 
     def get_inter_presentation_intervals_for_stimulus(self, stimulus_names):
         ''' Get a subset of this session's inter-presentation intervals, filtered by stimulus name.
@@ -484,12 +533,8 @@ flipVert
             """
             return max(a[0], b[0]) <= min(a[1], b[1])
 
-        invalid_times = self.invalid_times.copy()
-
         fail_tags = ["stimulus"]
-        if not invalid_times.empty:
-            mask = invalid_times['tags'].apply(lambda x: any([t in x for t in fail_tags]))
-            invalid_times = invalid_times[mask]
+        invalid_times = self._filter_invalid_times_by_tags(fail_tags)
 
         for ix_sp, sp in stimulus_presentations.iterrows():
             stim_epoch = sp['start_time'], sp['stop_time']
