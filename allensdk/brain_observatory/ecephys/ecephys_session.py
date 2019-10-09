@@ -241,6 +241,7 @@ class EcephysSession(LazyPropertyMixin):
         }
 
 
+    @property
     def stimulus_presentations(self):
         return self.__class__._remove_detailed_stimulus_parameters(self._stimulus_presentations)
 
