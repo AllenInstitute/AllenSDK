@@ -30,7 +30,7 @@ class NaturalMovies(StimulusAnalysis):
 
     You can also pass in a unit filter dictionary which will only select units with certain properties. For example
     to get only those units which are on probe C and found in the VISp area::
-        nm_analysis = NaturalMovies(session, filter={'location': 'probeC', 'structure_acronym': 'VISp'})
+        nm_analysis = NaturalMovies(session, filter={'location': 'probeC', 'ecephys_structure_acronym': 'VISp'})
 
     To get a table of the individual unit metrics ranked by unit ID::
         metrics_table_df = nm_analysis.metrics()

@@ -12,13 +12,24 @@ import allensdk.brain_observatory.ecephys.ecephys_project_cache as epc
 
 
 @pytest.fixture
-def sessions():
+def raw_sessions():
     return pd.DataFrame({
         'session_type': ['stimulus_set_one', 'stimulus_set_two', 'stimulus_set_two'],
         "unit_count": [500, 1000, 1500],
         "channel_count": [40, 90, 140],
         "probe_count": [3, 4, 5],
         "structure_acronyms": [["a", "v"], ["a", "c"], ["b"]]
+    }, index=pd.Series(name='id', data=[1, 2, 3]))
+
+
+@pytest.fixture
+def sessions():
+    return pd.DataFrame({
+        'session_type': ['stimulus_set_one', 'stimulus_set_two', 'stimulus_set_two'],
+        "unit_count": [500, 1000, 1500],
+        "channel_count": [40, 90, 140],
+        "probe_count": [3, 4, 5],
+        "ecephys_structure_acronyms": [["a", "v"], ["a", "c"], ["b"]]
     }, index=pd.Series(name='id', data=[1, 2, 3]))
 
 
@@ -47,7 +58,7 @@ def channels():
         'ecephys_probe_id': [11, 11],
         'ap': [1000, 2000],
         "unit_count": [5, 10],
-        "structure_acronym": ["a", "b"]
+        "ecephys_structure_acronym": ["a", "b"]
     }, index=pd.Series(name='id', data=[1, 2]))
 
 
@@ -92,7 +103,7 @@ def shared_tmpdir(tmpdir_factory):
 
 
 @pytest.fixture
-def mock_api(shared_tmpdir, sessions, units, channels, raw_probes, analysis_metrics):
+def mock_api(shared_tmpdir, raw_sessions, units, channels, raw_probes, analysis_metrics):
     class MockApi:
         
         def __init__(self, **kwargs):
@@ -102,7 +113,7 @@ def mock_api(shared_tmpdir, sessions, units, channels, raw_probes, analysis_metr
             self.accesses[name] += 1
 
         def get_sessions(self, **kwargs):
-            return sessions
+            return raw_sessions
 
         def get_units(self, **kwargs):
             return units

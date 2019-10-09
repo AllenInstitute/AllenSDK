@@ -129,8 +129,8 @@ class EcephysProjectLimsApi(EcephysProjectApi):
                     ec.local_index,
                     ec.probe_vertical_position,
                     ec.probe_horizontal_position,
-                    ec.manual_structure_id as structure_id,
-                    st.acronym as structure_acronym,
+                    ec.manual_structure_id as ecephys_structure_id,
+                    st.acronym as ecephys_structure_acronym,
                     pc.unit_count
                 from ecephys_channels ec 
                 join ecephys_probes ep on ep.id = ec.ecephys_probe_id

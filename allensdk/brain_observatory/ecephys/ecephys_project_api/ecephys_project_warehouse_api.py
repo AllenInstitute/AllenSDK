@@ -199,8 +199,8 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
                     ",anterior_posterior_ccf_coordinate"
                     ",dorsal_ventral_ccf_coordinate"
                     ",left_right_ccf_coordinate"
-                    ",structures.id as structure_id"
-                    ",structures.acronym as structure_acronym"
+                    ",structures.id as ecephys_structure_id"
+                    ",structures.acronym as ecephys_structure_acronym"
                 "']"
             ),
             base=rma_macros(), 

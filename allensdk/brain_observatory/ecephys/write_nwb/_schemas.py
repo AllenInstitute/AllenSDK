@@ -26,8 +26,8 @@ class Channel(RaisingSchema):
     local_index = Int(required=True)
     probe_vertical_position = Int(required=True)
     probe_horizontal_position = Int(required=True)
-    manual_structure_id = Int(required=True, allow_none=True)
-    manual_structure_acronym = String(required=True, allow_none=True)
+    structure_id = Int(required=True, allow_none=True)
+    structure_acronym = String(required=True, allow_none=True)
 
 
 class Unit(RaisingSchema):
