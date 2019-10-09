@@ -52,7 +52,9 @@ jobs:
             sudo apt install rsync    # for copy utility tests
             . venv/bin/activate
             mkdir test-results
-            circleci tests glob test/**.py | circleci tests split --split-by=timings | xargs python3 -m pytest --cov=allensdk --junitxml=test-results/junit.xml
+            TESTFILES=$(circleci tests glob test/**.py | circleci tests split --split-by=timings)
+            echo ${TESTFILES}
+            python3 -m pytest ${TESTFILES} --cov=allensdk --junitxml=test-results/junit.xml 
             codecov
 
       - store_test_results:
