@@ -119,6 +119,30 @@ class EcephysSession(LazyPropertyMixin):
 
     '''
 
+    DETAILED_STIMULUS_PARAMETERS = (
+        "colorSpace",
+        "flipHoriz",
+        "flipVert",
+        "depth",
+        "interpolate",
+        "mask",
+        "opacity",
+        "rgbPedestal",
+        "tex",
+        "texRes",
+        "units",
+        "rgb",
+        "signalDots",
+        "noiseDots",
+        "fieldSize",
+        "fieldShape",
+        "fieldPos",
+        "nDots",
+        "dotSize",
+        "dotLife",
+        "color_triplet"
+    )
+
     @property
     def num_units(self):
         return self._units.shape[0]
@@ -216,6 +240,11 @@ class EcephysSession(LazyPropertyMixin):
             "stimulus_names": self.stimulus_names
         }
 
+
+    @property
+    def stimulus_presentations(self):
+        return self.__class__._remove_detailed_stimulus_parameters(self._stimulus_presentations)
+
     def __init__(self, api, **kwargs):
         self.api: EcephysSessionApi = api
 
@@ -230,7 +259,7 @@ class EcephysSession(LazyPropertyMixin):
         self.probes = self.LazyProperty(self.api.get_probes)
         self.channels = self.LazyProperty(self.api.get_channels)
 
-        self.stimulus_presentations = self.LazyProperty(self.api.get_stimulus_presentations, wrappers=[self._build_stimulus_presentations])
+        self._stimulus_presentations = self.LazyProperty(self.api.get_stimulus_presentations, wrappers=[self._build_stimulus_presentations])
         self.inter_presentation_intervals = self.LazyProperty(self._build_inter_presentation_intervals)
         self.invalid_times = self.LazyProperty(self.api.get_invalid_times)
 
@@ -307,7 +336,7 @@ class EcephysSession(LazyPropertyMixin):
             & (self.inter_presentation_intervals.index.isin(filtered_ids, level='to_presentation_id'))
         ]
 
-    def get_presentations_for_stimulus(self, stimulus_names):
+    def get_stimulus_table(self, stimulus_names=None, include_detailed_parameters=False, include_unused_parameters=False):
         '''Get a subset of stimulus presentations by name, with irrelevant parameters filtered off
 
         Parameters
@@ -322,13 +351,23 @@ class EcephysSession(LazyPropertyMixin):
 
         '''
 
+        if stimulus_names is None:
+            stimulus_names = self.stimulus_names
+
         stimulus_names = coerce_scalar(stimulus_names, f'expected stimulus_names to be a collection (list-like), but found {type(stimulus_names)}: {stimulus_names}')
-        filtered_presentations = self.stimulus_presentations[self.stimulus_presentations['stimulus_name'].isin(stimulus_names)]
-        return removed_unused_stimulus_presentation_columns(filtered_presentations)
+        presentations = self._stimulus_presentations[self._stimulus_presentations['stimulus_name'].isin(stimulus_names)]
+        
+        if not include_detailed_parameters:
+            presentations = self.__class__._remove_detailed_stimulus_parameters(presentations)
+
+        if not include_unused_parameters:
+            presentations = removed_unused_stimulus_presentation_columns(presentations)
+
+        return presentations
 
     def get_stimulus_epochs(self, duration_thresholds=None):
         """ Reports continuous periods of time during which a single kind of stimulus was presented
-
+flipVert
         Parameters
         ---------
         duration_thresholds : dict, optional
@@ -658,7 +697,7 @@ class EcephysSession(LazyPropertyMixin):
 
         """
 
-        presentation_ids = self.get_presentations_for_stimulus([stimulus_name]).index.values
+        presentation_ids = self.get_stimulus_table([stimulus_name]).index.values
         return self.get_stimulus_parameter_values(presentation_ids, drop_nulls=drop_nulls)
 
     def get_stimulus_parameter_values(self, stimulus_presentation_ids=None, drop_nulls=True):
@@ -904,6 +943,11 @@ class EcephysSession(LazyPropertyMixin):
             warnings.warn(f'filtering to an empty set of {key}!')
 
         return df
+
+    @classmethod
+    def _remove_detailed_stimulus_parameters(cls, presentations):
+        columns = list(cls.DETAILED_STIMULUS_PARAMETERS)
+        return presentations.drop(columns=columns, errors="ignore")
 
     @classmethod
     def from_nwb_path(cls, path, nwb_version=2, api_kwargs=None, **kwargs):

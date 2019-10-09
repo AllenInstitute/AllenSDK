@@ -25,6 +25,7 @@ def raw_stimulus_table():
         'Color': np.arange(4)*5.5,
         'Image': np.empty(4) * np.nan,
         'Phase': np.linspace(0, 180, 4),
+        "texRes": np.ones([4])
     }, index=pd.Index(name='id', data=np.arange(4)))
 
 @pytest.fixture
@@ -380,13 +381,16 @@ def test_get_stimulus_parameter_values(just_stimulus_table_api):
     assert len(expected) == len(obtained)
 
 
-def test_get_presentations_for_stimulus(just_stimulus_table_api, raw_stimulus_table):
+@pytest.mark.parametrize("detailed", [True, False])
+def test_get_stimulus_table(detailed, just_stimulus_table_api, raw_stimulus_table):
     session = EcephysSession(api=just_stimulus_table_api)
-    obtained = session.get_presentations_for_stimulus(['a'])
+    obtained = session.get_stimulus_table(['a'], include_detailed_parameters=detailed)
 
-    expected = raw_stimulus_table.loc[:2, [
-        'start_time', 'stop_time', 'stimulus_name', 'stimulus_block', 'Color', 'Phase'
-    ]]
+    expected_columns = ['start_time', 'stop_time', 'stimulus_name', 'stimulus_block', 'Color', 'Phase']
+    if detailed:
+        expected_columns.append("texRes")
+    expected = raw_stimulus_table.loc[:2, expected_columns]
+
     expected['duration'] = expected['stop_time'] - expected['start_time']
     expected["stimulus_condition_id"] = [0, 1, 2]
     expected.rename(columns={"Color": "color", "Phase": "phase"}, inplace=True)
