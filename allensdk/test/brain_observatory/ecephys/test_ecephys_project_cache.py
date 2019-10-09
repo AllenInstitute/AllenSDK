@@ -138,7 +138,8 @@ def mock_api(shared_tmpdir, raw_sessions, units, filtered_units, channels, raw_p
         def get_probes(self, **kwargs):
             return raw_probes
 
-        def get_session_data(self, session_id):
+        def get_session_data(self, session_id, **kwargs):
+            assert kwargs.get('filter_by_validity')
             path = os.path.join(shared_tmpdir, 'tmp.txt')
             with open(path, 'w') as f:
                 f.write(f'{session_id}')
