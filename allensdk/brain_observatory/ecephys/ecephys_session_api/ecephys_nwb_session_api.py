@@ -1,6 +1,7 @@
 from typing import Dict, Union, List, Optional, Callable, Iterable, Any
 from pathlib import Path
-from enum import IntEnum
+import re
+import ast
 
 import pandas as pd
 import numpy as np
@@ -12,6 +13,9 @@ from allensdk.brain_observatory.ecephys.file_promise import FilePromise
 from allensdk.brain_observatory.nwb.nwb_api import NwbApi
 import allensdk.brain_observatory.ecephys.nwb
 from allensdk.brain_observatory.ecephys import get_unit_filter_value
+
+
+color_triplet_re = re.compile(r"\[(-{0,1}\d*\.\d*,\s*)*(-{0,1}\d*\.\d*)\]")
 
 
 class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
@@ -37,6 +41,21 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
     def get_session_start_time(self):
         return self.nwbfile.session_start_time
 
+    def get_stimulus_presentations(self):
+        table = super(EcephysNwbSessionApi, self).get_stimulus_presentations()
+        
+        if "color" in table.columns:
+            # the color column actually contains two parameters. One is coded as rgb triplets and the other as -1 or 1
+            if "color_triplet" not in table.columns:
+                table["color_triplet"] = pd.Series("", index=table.index)
+            rgb_color_match = table["color"].str.match(color_triplet_re)
+            table.loc[rgb_color_match, "color_triplet"] = table.loc[rgb_color_match, "color"]
+            table.loc[rgb_color_match, "color"] = ""
+
+            # make sure the color column's values are numeric
+            table.loc[table["color"] != "", "color"] = table.loc[table["color"] != "", "color"].apply(ast.literal_eval)
+
+        return table
 
     def _probe_nwbfile(self, probe_id: int):
         if self.probe_lfp_paths is None:

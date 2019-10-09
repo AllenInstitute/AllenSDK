@@ -211,7 +211,6 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
 
         response.set_index("id", inplace=True)
         replace_bad_structure_assignments(response, inplace=True)
-
         return response
 
     def get_units(self, unit_ids=None, channel_ids=None, probe_ids=None, session_ids=None, *a, **k):

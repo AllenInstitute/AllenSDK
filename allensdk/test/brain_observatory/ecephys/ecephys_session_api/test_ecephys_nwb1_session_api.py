@@ -30,14 +30,14 @@ def test_spikes_nwb1(nwb_path):
 
     assert(isinstance(session.stimulus_presentations, pd.DataFrame))
     assert(len(session.stimulus_presentations) == 70390)
-    assert(len(session.get_presentations_for_stimulus(['Natural Images_5'])) == 5950)
-    assert(len(session.get_presentations_for_stimulus(['drifting_gratings_2'])) == 630)
-    assert(len(session.get_presentations_for_stimulus(['flash_250ms_1'])) == 150)
-    assert(len(session.get_presentations_for_stimulus(['gabor_20_deg_250ms_0'])) == 3645)
-    assert(len(session.get_presentations_for_stimulus(['natural_movie_one_three'])) == 18000)
-    assert(len(session.get_presentations_for_stimulus(['natural_movie_three_four'])) == 36000)
-    assert(len(session.get_presentations_for_stimulus(['spontaneous'])) == 15)
-    assert(len(session.get_presentations_for_stimulus(['static_gratings_6'])) == 6000)
+    assert(len(session.get_stimulus_table(['Natural Images_5'])) == 5950)
+    assert(len(session.get_stimulus_table(['drifting_gratings_2'])) == 630)
+    assert(len(session.get_stimulus_table(['flash_250ms_1'])) == 150)
+    assert(len(session.get_stimulus_table(['gabor_20_deg_250ms_0'])) == 3645)
+    assert(len(session.get_stimulus_table(['natural_movie_one_three'])) == 18000)
+    assert(len(session.get_stimulus_table(['natural_movie_three_four'])) == 36000)
+    assert(len(session.get_stimulus_table(['spontaneous'])) == 15)
+    assert(len(session.get_stimulus_table(['static_gratings_6'])) == 6000)
 
     assert(session.running_speed.shape[0] == 365700)
 
