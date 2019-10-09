@@ -26,3 +26,6 @@ What actually happened. If the bug produced an error message or incorrect values
 
 **Additional context**
 Add any other context about the problem here.
+
+**Do you want to work on this issue?**
+Are you willing and able to fix this bug? If so, let us know here (and see [the guide](https://github.com/AllenInstitute/AllenSDK/blob/master/CONTRIBUTING.md)). Thank you!
