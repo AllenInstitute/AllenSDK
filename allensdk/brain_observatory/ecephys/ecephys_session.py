@@ -526,21 +526,6 @@ flipVert
 
         """
 
-        def overlap(a, b):
-            """Check if the two intervals overlap
-
-            Parameters
-            ----------
-            a : tuple
-                start, stop times
-            b : tuple
-                start, stop times
-            Returns
-            -------
-            bool : True if overlap, otherwise False
-            """
-            return max(a[0], b[0]) <= min(a[1], b[1])
-
         fail_tags = ["stimulus"]
         invalid_times = self._filter_invalid_times_by_tags(fail_tags)
 
@@ -549,7 +534,7 @@ flipVert
 
             for ix_it, it in invalid_times.iterrows():
                 invalid_interval = it['start_time'], it['stop_time']
-                if overlap(stim_epoch, invalid_interval):
+                if _overlap(stim_epoch, invalid_interval):
                     stimulus_presentations.iloc[ix_sp, :] = np.nan
                     stimulus_presentations.at[ix_sp, "stimulus_name"] = "invalid_presentation"
                     stimulus_presentations.at[ix_sp, "start_time"] = stim_epoch[0]
@@ -1204,3 +1189,19 @@ def _extract_summary_rate_statistics(index, group):
         "spike_std": np.std(group["spike_rate"].values, ddof=1),
         "spike_sem": scipy.stats.sem(group["spike_rate"].values)
     }
+
+
+def _overlap(a, b):
+    """Check if the two intervals overlap
+
+    Parameters
+    ----------
+    a : tuple
+        start, stop times
+    b : tuple
+        start, stop times
+    Returns
+    -------
+    bool : True if overlap, otherwise False
+    """
+    return max(a[0], b[0]) <= min(a[1], b[1])
