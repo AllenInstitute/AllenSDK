@@ -90,23 +90,21 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
-What's New - Release 1.0.1 (October 9, 2019) and 1.0.0 (October 3, 2019)
-------------------------------------------------------------------------
+What's New - Release 0.16.3 (May 22, 2019)
+-----------------------------------------------
 
-The 1.0.0 release brings support for the Allen Brain Observatory - Visual Coding Neuropixels dataset! This dataset is a large-scale extracellular electrophysiological survey of mouse subcortical visual cortical regions using high-density neuropixels probes. 
-To get started with these data, take a look at the `quick start guide <_static/examples/nb/ecephys_quickstart.html>`_ `(download .ipynb) <_static/examples/nb/ecephys_quickstart.ipynb>`_, 
-and `full example notebook <_static/examples/nb/ecephys_session.html>`_ `(download .ipynb) <_static/examples/nb/ecephys_session.ipynb>`_.
+The 0.16.3 release resolves changes to the api of a dependency that resizes an image:
 
-We have implemented new and improved eye-tracking methods based on Deep Lab Cut. These eye tracking results can be accessed for existing brain observatory experiments by calling `get_ophys_eye_gaze_data` on a `BrainObservatoryCache` object. For Neuropixels sessions, you can access these data by calling `get_eye_tracking_data` on an `EcephysSession` object.
+    * `#659 <https://github.com/AllenInstitute/AllenSDK/issues/659>`_ Use pillow/Image.resize instead of scipy.misc.imresize
+    
+We also went back and made sure that the example Jupyter notebooks still run:
 
-With this release, we are no longer supporting Python 2. 
-
-The 1.0.1 release finalizes naming conventions for Neuropixels and pupil data access (cross-project). It adds several new options and conveniences. 8 Ecephys probes with incorrect structure assignments are fixed as part of this release.
+    * `#661 <https://github.com/AllenInstitute/AllenSDK/issues/661>`_ Update example notebooks
 
 Previous Release Notes
 ----------------------
 
-    * `0.16.3 <https://github.com/AllenInstitute/AllenSDK/wiki/Release-Notes-(0.16.3)>`_
+    * `0.16.2 <https://github.com/AllenInstitute/AllenSDK/wiki/Release-Notes-(0.16.2)>`_
     * `0.16.2 <https://github.com/AllenInstitute/AllenSDK/wiki/Release-Notes-(0.16.2)>`_
     * `0.16.1 <https://github.com/AllenInstitute/AllenSDK/wiki/Release-Notes-(0.16.1)>`_
     * `0.16.0 <https://github.com/AllenInstitute/AllenSDK/wiki/Release-Notes-(0.16.0)>`_
