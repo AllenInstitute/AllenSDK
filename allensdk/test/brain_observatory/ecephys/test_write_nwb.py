@@ -56,6 +56,16 @@ def raw_running_data():
     })
 
 
+@pytest.fixture
+def stimulus_presentations_color():
+    return pd.DataFrame({
+        "alpha": [0.5, 0.4, 0.3, 0.2, 0.1],
+        "start_time": [1., 2., 4., 5., 6.],
+        "stop_time": [2., 4., 5., 6., 8.],
+        "color": ["1.0", "", r"[1.0,-1.0, 10., -42.12, -.1]", "-1.0", ""]
+    }, index=pd.Index(name='stimulus_presentations_id', data=[0, 1, 2, 3, 4]))
+
+
 def test_roundtrip_basic_metadata(roundtripper):
     dt = datetime.now(timezone.utc)
     nwbfile = pynwb.NWBFile(
@@ -101,7 +111,25 @@ def test_add_stimulus_presentations(nwbfile, stimulus_presentations, roundtrippe
     obtained_stimulus_table = api.get_stimulus_presentations()
     
     pd.testing.assert_frame_equal(stimulus_presentations, obtained_stimulus_table, check_dtype=False)
+
+
+def test_add_stimulus_presentations_color(nwbfile, stimulus_presentations_color, roundtripper):
+    write_nwb.add_stimulus_timestamps(nwbfile, [0, 1])
+    write_nwb.add_stimulus_presentations(nwbfile, stimulus_presentations_color)
+
+    api = roundtripper(nwbfile, EcephysNwbSessionApi)
+    obtained_stimulus_table = api.get_stimulus_presentations()
     
+    expected_color = [1.0, "", "", -1.0, ""]
+    obtained_color = obtained_stimulus_table["color"].values.tolist()
+
+    mismatched = False
+    for expected, obtained in zip(expected_color, obtained_color):
+        if expected != obtained:
+            mismatched = True
+
+    assert not mismatched, f"expected: {expected_color}, obtained: {obtained_color}"
+
 
 def test_add_optotagging_table_to_nwbfile(nwbfile, roundtripper):
     opto_table = pd.DataFrame({

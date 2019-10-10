@@ -27,7 +27,7 @@ class ReceptiveFieldMapping(StimulusAnalysis):
 
     You can also pass in a unit filter dictionary which will only select units with certain properties. For example
     to get only those units which are on probe C and found in the VISp area::
-        rf_analysis = ReceptiveFieldMapping(session, filter={'location': 'probeC', 'structure_acronym': 'VISp'})
+        rf_analysis = ReceptiveFieldMapping(session, filter={'location': 'probeC', 'ecephys_structure_acronym': 'VISp'})
 
     To get a table of the individual unit metrics ranked by unit ID::
         metrics_table_df = rf_analysis.metrics()
@@ -144,8 +144,9 @@ class ReceptiveFieldMapping(StimulusAnalysis):
                                    'width_rf',
                                    'height_rf',
                                    'area_rf',
+                                   'p_value_rf',
                                    'on_screen_rf',
-                                   'p_value_rf']] = [self._get_rf_stats(unit) for unit in unit_ids]
+                                   ]] = [self._get_rf_stats(unit) for unit in unit_ids]
                 metrics_df['firing_rate_rf'] = [self._get_overall_firing_rate(unit) for unit in unit_ids]
                 metrics_df['fano_rf'] = [self._get_fano_factor(unit, self._get_preferred_condition(unit))
                                          for unit in unit_ids]

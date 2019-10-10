@@ -36,8 +36,8 @@ test_required = parse_requirements_file('test_requirements.txt')
 setup(
     version = allensdk.__version__,
     name = 'allensdk',
-    author = 'David Feng',
-    author_email = 'davidf@alleninstitute.org',
+    author = 'Allen Institute for Brain Science',
+    author_email = 'instituteci@alleninstitute.org',
     packages = ['allensdk'],
     include_package_data = True,
     package_data={'allensdk': ['*.conf', '*.cfg', '*.md', '*.json', '*.dat', '*.env', '*.sh', '*.txt', 'bps', 'Makefile', 'LICENSE', '*.hoc', 'allensdk/brain_observatory/nwb/*.yaml'] },
@@ -50,12 +50,12 @@ setup(
     keywords = ['neuroscience', 'bioinformatics', 'scientific'  ],
     scripts=['allensdk/model/biophys_sim/scripts/bps'],
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Science/Research',
         'License :: Other/Proprietary License', # Allen Institute Software License
         'Natural Language :: English',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.6', 
+        'Programming Language :: Python :: 3.7', 
         'Topic :: Scientific/Engineering :: Bio-Informatics'
         ])

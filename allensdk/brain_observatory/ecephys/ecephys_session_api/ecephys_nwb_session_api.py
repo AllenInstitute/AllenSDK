@@ -1,28 +1,31 @@
 from typing import Dict, Union, List, Optional, Callable, Iterable, Any
 from pathlib import Path
-from enum import IntEnum
+import re
+import ast
 
 import pandas as pd
 import numpy as np
 import xarray as xr
-import pynwb
 
 from .ecephys_session_api import EcephysSessionApi
 from allensdk.brain_observatory.ecephys.file_promise import FilePromise
 from allensdk.brain_observatory.nwb.nwb_api import NwbApi
-import allensdk.brain_observatory.ecephys.nwb
+import allensdk.brain_observatory.ecephys.nwb  # noqa Necessary to import pyNWB namespaces
 from allensdk.brain_observatory.ecephys import get_unit_filter_value
+
+
+color_triplet_re = re.compile(r"\[(-{0,1}\d*\.\d*,\s*)*(-{0,1}\d*\.\d*)\]")
 
 
 class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
 
-    def __init__(self, 
-        path, 
-        probe_lfp_paths: Optional[Dict[int, FilePromise]] = None, 
-        additional_unit_metrics=None, 
-        **kwargs
-    ):
+    def __init__(self,
+                 path,
+                 probe_lfp_paths: Optional[Dict[int, FilePromise]] = None,
+                 additional_unit_metrics=None,
+                 **kwargs):
 
+        self.filter_out_of_brain_units = kwargs.pop("filter_out_of_brain_units", True)
         self.filter_by_validity = kwargs.pop("filter_by_validity", True)
         self.amplitude_cutoff_maximum = get_unit_filter_value("amplitude_cutoff_maximum", **kwargs)
         self.presence_ratio_minimum = get_unit_filter_value("presence_ratio_minimum", **kwargs)
@@ -36,6 +39,21 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
     def get_session_start_time(self):
         return self.nwbfile.session_start_time
 
+    def get_stimulus_presentations(self):
+        table = super(EcephysNwbSessionApi, self).get_stimulus_presentations()
+        
+        if "color" in table.columns:
+            # the color column actually contains two parameters. One is coded as rgb triplets and the other as -1 or 1
+            if "color_triplet" not in table.columns:
+                table["color_triplet"] = pd.Series("", index=table.index)
+            rgb_color_match = table["color"].str.match(color_triplet_re)
+            table.loc[rgb_color_match, "color_triplet"] = table.loc[rgb_color_match, "color"]
+            table.loc[rgb_color_match, "color"] = ""
+
+            # make sure the color column's values are numeric
+            table.loc[table["color"] != "", "color"] = table.loc[table["color"] != "", "color"].apply(ast.literal_eval)
+
+        return table
 
     def _probe_nwbfile(self, probe_id: int):
         if self.probe_lfp_paths is None:
@@ -48,13 +66,12 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
 
         return self.probe_lfp_paths[probe_id]()
 
-
     def get_probes(self) -> pd.DataFrame:
         probes: Union[List, pd.DataFrame] = []
         for k, v in self.nwbfile.electrode_groups.items():
             probes.append({
-                'id': int(k), 
-                'description': v.description, 
+                'id': int(k),
+                'description': v.description,
                 'location': v.location,
                 "sampling_rate": v.sampling_rate,
                 "lfp_sampling_rate": v.lfp_sampling_rate,
@@ -68,11 +85,16 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         channels = self.nwbfile.electrodes.to_dataframe()
         channels.drop(columns='group', inplace=True)
 
+        # Rename columns for clarity
+        channels.rename(
+            columns={"manual_structure_id": "ecephys_structure_id",
+                     "manual_structure_acronym": "ecephys_structure_acronym"},
+            inplace=True)
+
         # these are stored as string in nwb 2, which is not ideal
         # float is also not ideal, but we have nans indicating out-of-brain structures
-        channels["structure_id"] = [float(chid) if chid != "" else np.nan for chid in channels["manual_structure_id"]]
-        channels.drop(columns="manual_structure_id")
-        
+        channels["ecephys_structure_id"] = [float(chid) if chid != "" else np.nan for chid in channels["ecephys_structure_id"]]
+
         if self.filter_by_validity:
             channels = channels[channels["valid_data"]]
             channels = channels.drop(columns=["valid_data"])
@@ -162,7 +184,7 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
 
         return rig_metadata
 
-    def get_eye_tracking_data(self, suppress_eye_gaze_data: bool = True) -> Optional[pd.DataFrame]:
+    def get_pupil_data(self, suppress_pupil_data: bool = True) -> Optional[pd.DataFrame]:
         try:
             et_mod = self.nwbfile.get_processing_module("eye_tracking")
             rgm_mod = self.nwbfile.get_processing_module("raw_gaze_mapping")
@@ -205,7 +227,7 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
             "eye_phi": eye_ellipse_fits["phi"].values
         }
 
-        if not suppress_eye_gaze_data:
+        if not suppress_pupil_data:
             eye_tracking_data.update(
                 {
                     "raw_eye_area": raw_eye_area_ts.data[:],
@@ -252,23 +274,26 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         table.drop(columns=["tags", "timeseries"], inplace=True)
         return table
 
-
     def _get_full_units_table(self) -> pd.DataFrame:
         units = self.nwbfile.units.to_dataframe()
         units.index = units.index.astype(int)
 
+        if self.filter_by_validity or self.filter_out_of_brain_units:
+            channels = self.get_channels()
+
+            if self.filter_out_of_brain_units:
+                channels = channels[~(channels["ecephys_structure_id"].isna())]
+
+            channel_ids = set(channels.index.values.tolist())
+            units = units[units["peak_channel_id"].isin(channel_ids)]
+
         if self.filter_by_validity:
-            valid_channels = set(self.get_channels().index.values.tolist())
-            units = units[
-                (units["quality"] == "good")
-                & (units["peak_channel_id"].isin(valid_channels))
-            ]
+            units = units[units["quality"] == "good"]
             units.drop(columns=["quality"], inplace=True)
 
         units = units[units["amplitude_cutoff"] <= self.amplitude_cutoff_maximum]
         units = units[units["presence_ratio"] >= self.presence_ratio_minimum]
         units = units[units["isi_violations"] <= self.isi_violations_maximum]
-
         return units
 
     def get_metadata(self):

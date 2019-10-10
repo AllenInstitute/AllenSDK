@@ -220,7 +220,7 @@ class EcephysNwb1Api(EcephysSessionApi):
             'probe_id': prb_ids[:n_channels],
             'probe_horizontal_position': prb_hrz_pos[:n_channels],
             'probe_vertical_position': prb_vert_pos[:n_channels],
-            'manual_structure_acronym': struct_acronyms[:n_channels],
+            'ecephys_structure_acronym': struct_acronyms[:n_channels],
             'valid_data': True  # TODO: Pull out valid table column from NWB
         })
         channels_df.set_index('id', inplace=True)

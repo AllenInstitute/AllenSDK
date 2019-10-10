@@ -64,6 +64,10 @@ class MockDGSessionApi(MockSessionApi):
 
         return stim_table
 
+    def get_invalid_times(self):
+        return pd.DataFrame()
+
+
 
 
 @pytest.fixture

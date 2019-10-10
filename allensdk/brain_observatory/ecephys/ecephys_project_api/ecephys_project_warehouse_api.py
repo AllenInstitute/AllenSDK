@@ -1,21 +1,28 @@
 import re
 import json
+import ast
 
 import pandas as pd
+import numpy as np
 
 from .rma_engine import RmaEngine
 from .ecephys_project_api import EcephysProjectApi
 from .utilities import rma_macros, build_and_execute
+
+from allensdk.brain_observatory.ecephys.ecephys_project_api.warehouse_patches import replace_bad_structure_assignments
+
 
 class EcephysProjectWarehouseApi(EcephysProjectApi):
 
     movie_re = re.compile(r".*natural_movie_(?P<num>\d+).npy")
     scene_re = re.compile(r".*/(?P<num>\d+).tiff")
     
-    def __init__(self, rma_engine):
+    def __init__(self, rma_engine=None):
+        if rma_engine is None:
+            rma_engine = RmaEngine(scheme="http", host="api.brain-map.org")
         self.rma_engine = rma_engine
 
-    def get_session_data(self, session_id):
+    def get_session_data(self, session_id, **kwargs):
         well_known_files = build_and_execute(
             (
                 "criteria=model::WellKnownFile"
@@ -169,9 +176,9 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
             session_ids=session_ids, 
             probe_ids=probe_ids
         )
-
         response.set_index("id", inplace=True)
-
+        # Clarify name for external users
+        response.rename(columns={"use_lfp_data": "has_lfp_data"}, inplace=True)
         return response
 
     def get_channels(self, channel_ids=None, probe_ids=None):
@@ -192,8 +199,8 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
                     ",anterior_posterior_ccf_coordinate"
                     ",dorsal_ventral_ccf_coordinate"
                     ",left_right_ccf_coordinate"
-                    ",structures.id as structure_id"
-                    ",structures.acronym as structure_acronym"
+                    ",structures.id as ecephys_structure_id"
+                    ",structures.acronym as ecephys_structure_acronym"
                 "']"
             ),
             base=rma_macros(), 
@@ -203,7 +210,7 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
         )
 
         response.set_index("id", inplace=True)
-
+        replace_bad_structure_assignments(response, inplace=True)
         return response
 
     def get_units(self, unit_ids=None, channel_ids=None, probe_ids=None, session_ids=None, *a, **k):
@@ -228,6 +235,26 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
         return response
 
     def get_unit_analysis_metrics(self, unit_ids=None, ecephys_session_ids=None, session_types=None):
+        """ Download analysis metrics - precalculated descriptions of unitwise responses to visual stimulation.
+
+        Parameters
+        ----------
+        unit_ids : array-like of int, optional
+            Unique identifiers for ecephys units. If supplied, only download metrics for these units.
+        ecephys_session_ids : array-like of int, optional
+            Unique identifiers for ecephys sessions. If supplied, only download metrics for units collected during 
+            these sessions.
+        session_types : array-like of str, optional
+            Names of session types. e.g. "brain_observatory_1.1" or "functional_connectivity". If supplied, only download 
+            metrics for units collected during sessions of these types
+
+        Returns
+        -------
+        pd.DataFrame : 
+            A table of analysis metrics, indexed by unit_id.
+
+        """
+
         response = build_and_execute(
             (
                 "{% import 'macros' as m %}" 
@@ -248,10 +275,32 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
             data = json.loads(item.pop("data"))
             item.update(data)
             output.append(item)
+
         
         output = pd.DataFrame(output)
         output.set_index("ecephys_unit_id", inplace=True)
         output.drop(columns="id", inplace=True)
+
+        for colname in output.columns:
+            try:
+                output[colname] = output.apply(lambda row: ast.literal_eval(str(row[colname])), axis=1)
+            except ValueError:
+                pass
+
+        # TODO: remove this
+        # on_screen_rf and p_value_rf were correctly calculated, but switched with one another. This snippet unswitches them.
+        columns = set(output.columns.values.tolist())
+        if "p_value_rf" in columns and "on_screen_rf" in columns:
+
+            pv_is_bool = np.issubdtype(output["p_value_rf"].values[0], bool)
+            on_screen_is_float = np.issubdtype(output["on_screen_rf"].values[0].dtype, np.floating)
+
+            # this is not a good test, but it avoids the case where we fix these in the data for a future release, but 
+            # reintroduce the bug by forgetting to update the code.
+            if pv_is_bool and on_screen_is_float:
+                p_value_rf = output["p_value_rf"].copy()
+                output["p_value_rf"] = output["on_screen_rf"].copy()
+                output["on_screen_rf"] = p_value_rf
 
         return output
 

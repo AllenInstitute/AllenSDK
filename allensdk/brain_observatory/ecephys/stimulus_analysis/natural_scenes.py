@@ -25,7 +25,7 @@ class NaturalScenes(StimulusAnalysis):
 
     You can also pass in a unit filter dictionary which will only select units with certain properties. For example
     to get only those units which are on probe C and found in the VISp area::
-        ns_analysis = NaturalScenes(session, filter={'location': 'probeC', 'structure_acronym': 'VISp'})
+        ns_analysis = NaturalScenes(session, filter={'location': 'probeC', 'ecephys_structure_acronym': 'VISp'})
 
     To get a table of the individual unit metrics ranked by unit ID::
         metrics_table_df = ns_analysis.metrics()
