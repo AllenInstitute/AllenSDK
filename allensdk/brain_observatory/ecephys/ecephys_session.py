@@ -241,6 +241,14 @@ class EcephysSession(LazyPropertyMixin):
     def stimulus_presentations(self):
         return self.__class__._remove_detailed_stimulus_parameters(self._stimulus_presentations)
 
+    @property
+    def spike_times(self):
+        if not hasattr(self, "_accessed_spike_times"):
+            self._accessed_spike_times = True
+            self._warn_invalid_spike_intervals()
+
+        return self._spike_times
+
     def __init__(self, api, **kwargs):
         self.api: EcephysSessionApi = api
 
@@ -248,14 +256,15 @@ class EcephysSession(LazyPropertyMixin):
         self.session_start_time = self.LazyProperty(self.api.get_session_start_time)
         self.running_speed = self.LazyProperty(self.api.get_running_speed)
         self.mean_waveforms = self.LazyProperty(self.api.get_mean_waveforms, wrappers=[self._build_mean_waveforms])
-        self.spike_times = self.LazyProperty(self.api.get_spike_times, wrappers=[self._build_spike_times])
+        self._spike_times = self.LazyProperty(self.api.get_spike_times, wrappers=[self._build_spike_times])
         self.optogenetic_stimulation_epochs = self.LazyProperty(self.api.get_optogenetic_stimulation)
         self.spike_amplitudes = self.LazyProperty(self.api.get_spike_amplitudes)
 
         self.probes = self.LazyProperty(self.api.get_probes)
         self.channels = self.LazyProperty(self.api.get_channels)
 
-        self._stimulus_presentations = self.LazyProperty(self.api.get_stimulus_presentations, wrappers=[self._build_stimulus_presentations])
+        self._stimulus_presentations = self.LazyProperty(self.api.get_stimulus_presentations,
+                                                        wrappers=[self._build_stimulus_presentations, self._mask_invalid_stimulus_presentations])
         self.inter_presentation_intervals = self.LazyProperty(self._build_inter_presentation_intervals)
         self.invalid_times = self.LazyProperty(self.api.get_invalid_times)
 
@@ -286,14 +295,15 @@ class EcephysSession(LazyPropertyMixin):
 
         return self.api.get_current_source_density(probe_id)
 
-    def get_lfp(self, probe_id):
+    def get_lfp(self, probe_id, mask_invalid_intervals=True):
         ''' Load an xarray DataArray with LFP data from channels on a single probe
 
         Parameters
         ----------
         probe_id : int
             identify the probe whose LFP data ought to be loaded
-
+        mask_invalid_intervals : bool
+            if True (default) will mask data in the invalid intervals with np.nan
         Returns
         -------
         xr.DataArray :
@@ -306,7 +316,55 @@ class EcephysSession(LazyPropertyMixin):
 
         '''
 
-        return self.api.get_lfp(probe_id)
+        if mask_invalid_intervals:
+            probe_name = self.probes.loc[probe_id]["description"]
+            fail_tags = ["all_probes", probe_name]
+            invalid_time_intervals = self._filter_invalid_times_by_tags(fail_tags)
+            lfp = self.api.get_lfp(probe_id)
+            time_points = lfp.time
+            valid_time_points = self._get_valid_time_points(time_points, invalid_time_intervals)
+            return lfp.where(cond=valid_time_points)
+        else:
+            return self.api.get_lfp(probe_id)
+
+
+    def _get_valid_time_points(self, time_points, invalid_time_intevals):
+
+        all_time_points = xr.DataArray(
+            name="time_points",
+            data=[True] * len(time_points),
+            dims=['time'],
+            coords=[time_points]
+        )
+
+        valid_time_points = all_time_points
+        for ix, invalid_time_interval in invalid_time_intevals.iterrows():
+            invalid_time_points = (time_points >= invalid_time_interval['start_time']) & (time_points <= invalid_time_interval['stop_time'])
+            valid_time_points = np.logical_and(valid_time_points, np.logical_not(invalid_time_points))
+
+        return valid_time_points
+
+
+    def _filter_invalid_times_by_tags(self, tags):
+        """
+        Parameters
+        ----------
+        invalid_times: pd.DataFrame
+            of invalid times
+        tags: list
+            of tags
+
+        Returns
+        -------
+        pd.DataFrame of invalid times having tags
+        """
+        invalid_times = self.invalid_times.copy()
+        if not invalid_times.empty:
+            mask = invalid_times['tags'].apply(lambda x: any([t in x for t in tags]))
+            invalid_times = invalid_times[mask]
+
+        return invalid_times
+
 
     def get_inter_presentation_intervals_for_stimulus(self, stimulus_names):
         ''' Get a subset of this session's inter-presentation intervals, filtered by stimulus name.
@@ -449,6 +507,40 @@ flipVert
                 *_screen_coorindates_spherical_y_deg
         """
         return self.api.get_pupil_data(suppress_pupil_data=suppress_pupil_data)
+
+    def _mask_invalid_stimulus_presentations(self, stimulus_presentations):
+        """Mask invalid stimulus presentations
+
+        Find stimulus presentations overlapping with invalid times
+        Mask stimulus names with "invalid_presentation", keep "start_time" and "stop_time", mask remaining data with np.nan
+
+        Parameters
+        ----------
+        stimulus_presentations : pd.DataFrame
+            table including all stimulus presentations
+
+        Returns
+        -------
+        pd.DataFrame :
+            table with masked invalid presentations
+
+        """
+
+        fail_tags = ["stimulus"]
+        invalid_times = self._filter_invalid_times_by_tags(fail_tags)
+
+        for ix_sp, sp in stimulus_presentations.iterrows():
+            stim_epoch = sp['start_time'], sp['stop_time']
+
+            for ix_it, it in invalid_times.iterrows():
+                invalid_interval = it['start_time'], it['stop_time']
+                if _overlap(stim_epoch, invalid_interval):
+                    stimulus_presentations.iloc[ix_sp, :] = np.nan
+                    stimulus_presentations.at[ix_sp, "stimulus_name"] = "invalid_presentation"
+                    stimulus_presentations.at[ix_sp, "start_time"] = stim_epoch[0]
+                    stimulus_presentations.at[ix_sp, "stop_time"] = stim_epoch[1]
+
+        return stimulus_presentations
 
     def presentationwise_spike_counts(
         self,
@@ -960,6 +1052,15 @@ flipVert
 
         return cls(api=NWBAdaptorCls.from_path(path=path, **api_kwargs), **kwargs)
 
+    def _warn_invalid_spike_intervals(self):
+
+        fail_tags = list(self.probes["description"])
+        fail_tags.append("all_probes")
+        invalid_time_intervals = self._filter_invalid_times_by_tags(fail_tags)
+
+        if not invalid_time_intervals.empty:
+            warnings.warn("Session includes invalid time intervals that could be accessed with the attribute 'invalid_times',"
+                         "Spikes within these intervals are invalid and may need to be excluded from the analysis.")
 
 def build_spike_histogram(time_domain, spike_times, unit_ids, dtype=None, binarize=False):
 
@@ -1088,3 +1189,19 @@ def _extract_summary_rate_statistics(index, group):
         "spike_std": np.std(group["spike_rate"].values, ddof=1),
         "spike_sem": scipy.stats.sem(group["spike_rate"].values)
     }
+
+
+def _overlap(a, b):
+    """Check if the two intervals overlap
+
+    Parameters
+    ----------
+    a : tuple
+        start, stop times
+    b : tuple
+        start, stop times
+    Returns
+    -------
+    bool : True if overlap, otherwise False
+    """
+    return max(a[0], b[0]) <= min(a[1], b[1])

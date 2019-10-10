@@ -26,6 +26,10 @@ class MockDMSessionApi(MockSessionApi):
             'Speed': np.concatenate(([np.nan], features[1, :], [np.nan]))
         }, index=pd.Index(name='id', data=np.arange(35)))
 
+    def get_invalid_times(self):
+        return pd.DataFrame()
+
+
 
 @pytest.fixture
 def ecephys_api():
