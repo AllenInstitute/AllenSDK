@@ -6,6 +6,7 @@ RELEASEDIR = $(PROJECTNAME)-$(VERSION).$(RELEASE)
 EGGINFODIR = $(PROJECTNAME).egg-info
 DOCDIR = doc
 COVDIR = htmlcov
+TEST_THREADS ?= 4
 
 DOC_URL=http://alleninstitute.github.io/AllenSDK
 #ZIP_FILENAME=AllenSDK-master.zip
@@ -38,7 +39,7 @@ pypi_deploy:
 	python setup.py sdist upload --repository https://testpypi.python.org/pypi
 
 pytest_lax:
-	py.test -s --boxed --cov=allensdk --cov-config coveragerc --cov-report html --junitxml=test-reports/test.xml
+	py.test -s --boxed --cov=allensdk --cov-config coveragerc --cov-report html --junitxml=test-reports/test.xml -n $(TEST_THREADS) --durations=0
 
 pytest: pytest_lax
 
