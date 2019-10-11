@@ -63,4 +63,6 @@ Shreejoy Tripathy `@stripathy <https://github.com/stripathy>`_
 
 Werner Van Geit `@wvangeit <https://github.com/wvangeit>`_
 
+Michael Wang `@aimichaelwang <https://github.com/aimichaelwang>`_
+
 Derric Williams `@derricw <https://github.com/derricw>`_
