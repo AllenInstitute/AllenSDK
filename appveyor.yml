@@ -30,5 +30,5 @@ install:
   - pip install .
 
 test_script:
-  - py.test --cov=allensdk
+  - py.test --cov=allensdk -n 4 --durations=0
   - codecov
