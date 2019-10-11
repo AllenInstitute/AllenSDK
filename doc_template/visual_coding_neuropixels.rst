@@ -5,8 +5,6 @@ The Visual Coding – Neuropixels project uses high-density extracellular electr
 
 Spike-sorted data and metadata are available via the AllenSDK as `Neurodata Without Borders <https://www.nwb.org/>`_ files. However, if you're using the AllenSDK to interact with the data, no knowledge of the NWB data format is required.
 
-[image of lots of spikes]
-
 
 Getting Started
 ---------------
