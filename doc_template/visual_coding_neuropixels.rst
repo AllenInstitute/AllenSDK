@@ -1,7 +1,7 @@
 Visual Coding – Neuropixels
 =========================
 
-The Visual Coding – Neuropixels project uses high-density extracellular electrophysiology (Ecephys) probes to record spikes  from a wide variety of regions in the mouse brain. Our experiments are designed to study the activity of the visual cortex and thalamus in the context of passive visual stimulation, but these data can be used to address a wide variety of topics.
+The Visual Coding – Neuropixels project uses high-density extracellular electrophysiology (**Ecephys**) probes to record spikes  from a wide variety of regions in the mouse brain. Our experiments are designed to study the activity of the visual cortex and thalamus in the context of passive visual stimulation, but these data can be used to address a wide variety of topics.
 
 Spike-sorted data and metadata are available via the AllenSDK as `Neurodata Without Borders <https://www.nwb.org/>`_ files. However, if you're using the AllenSDK to interact with the data, no knowledge of the NWB data format is required.
 
@@ -10,12 +10,12 @@ Getting Started
 ---------------
 To jump right in, check out the `quick start guide <_static/examples/nb/ecephys_quickstart.html>`_ `(download .ipynb) <_static/examples/nb/ecephys_quickstart.ipynb>`_, which will show you how to download the data, align spikes to a visual stimulus, and decode natural images from neural activity patterns.
 
-If you would like more example code, the `full example notebook <_static/examples/nb/ecephys_session.html>`_ covers all of the ways to access data for each experiment. `(download .ipynb) <_static/examples/nb/ecephys_session.ipynb>`_.
+If you would like more example code, the `full example notebook <_static/examples/nb/ecephys_session.html>`_ `(download .ipynb) <_static/examples/nb/ecephys_session.ipynb>`_ covers all of the ways to access data for each experiment.
 
 For detailed information about the experimental design, data acquisition, and informatics methods, please refer to our `technical whitepaper <https://brainmapportal-live-4cc80a57cd6e400d854-f7fdcae.divio-media.net/filer_public/80/75/8075a100-ca64-429a-b39a-569121b612b2/neuropixels_visual_coding_-_white_paper_v10.pdf>`_. AllenSDK 
 API documentation `is available here <allensdk.brain_observatory.ecephys.html>`_.
 
-**A note on terminology: ** Throughout the SDK, we refer to neurons as "units," because we cannot guarantee that all the spikes assigned to one unit actually originate from a single cell. Unlike in two-photon imaging, where you can visualize each neuron throughout the entire experiment, with electrophysiology we can only "see" a neuron when it fires a spike. If a neuron moves relative to the probe, or if it's far away from the probe, some of its spikes may get mixed together with those from other neurons. Because of this inherent ambiguity, we provide a variety of quality metrics to allow you to find the right units for your analysis. Even highly contaminated units contain potentially valuable information about brain states, so we didn't want to leave them out of the dataset. But certain types of analysis require more stringent quality thresholds, to ensure that all of the included units are well isolated from their neighbors.
+**A note on terminology:** Throughout the SDK, we refer to neurons as "units," because we cannot guarantee that all the spikes assigned to one unit actually originate from a single cell. Unlike in two-photon imaging, where you can visualize each neuron throughout the entire experiment, with electrophysiology we can only "see" a neuron when it fires a spike. If a neuron moves relative to the probe, or if it's far away from the probe, some of its spikes may get mixed together with those from other neurons. Because of this inherent ambiguity, we provide a variety of quality metrics to allow you to find the right units for your analysis. Even highly contaminated units contain potentially valuable information about brain states, so we didn't want to leave them out of the dataset. But certain types of analysis require more stringent quality thresholds, to ensure that all of the included units are well isolated from their neighbors.
 
 
 Data Processing
@@ -23,6 +23,7 @@ Data Processing
 
 .. image:: /_static/neuropixels_data_processing.png
    :align: center
+   :width: 200
 
 Neuropixels probes contain 374 or 383 channels that continuously detect voltage fluctuations in the surrounding neural tissue. The "spike band" is digitized at 30 kHz, and contains information about action potentials fired by neurons directly adjacent to the probe. The "LFP band" is digitized at 2.5 kHz, and records the low-frequency (<1000 Hz) fluctuations that result from synchronized neural activity over a wider area.
 
@@ -58,6 +59,7 @@ Visual Stimulus Sets
 
 .. image:: /_static/neuropixels_stimulus_sets.png
    :align: center
+   :width: 200
 
 A central aim of the Visual Coding – Neuropixels project is to measure the impact of visual stimuli on neurons throughout the mouse visual system. To that end, all mice viewed one of two possible stimulus sets, known as "Brain Observatory 1.1" or "Functional Connectivity". Both stimulus sets began with a Gabor stimulus flashed at 81 different locations on the screen, used to map receptive fields of visually responsive units. Next, the mice were shown brief flashes of light or dark, to measure the temporal dynamics of the visual response.
 
@@ -69,6 +71,7 @@ Quality Metrics
 
 .. image:: /_static/neuropixels_quality_metrics.png
    :align: center
+   :width: 200
 
 Every NWB file includes a table of quality metrics, which can be used to assess the completeness, contamination, and stability of units in the recording. By default, we won't show you units below a pre-determined quality threshold; we hide any units that are not present for the whole session (presence_ratio < 0.95), that include many contaminating spikes (isi_violations > 0.5), or are likely missing a large fraction of spikes (amplitude_cutoff > 0.1). However, even contaminated or incomplete units contain information about brain states, and may be of interest to analyze. Therefore, the complete units table can be accessed via special flags in the AllenSDK.
 
