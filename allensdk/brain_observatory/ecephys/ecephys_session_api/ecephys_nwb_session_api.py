@@ -316,7 +316,7 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
 
 
 def clobbering_merge(to_df, from_df, **kwargs):
-    overlapping = set(to_df.columns.values.tolist()) & set(from_df.columns.values.tolist())
+    overlapping = set(to_df.columns) & set(from_df.columns)
     
     for merge_param in ["on", "left_on", "right_on"]:
         if merge_param in kwargs:
