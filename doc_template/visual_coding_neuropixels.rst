@@ -35,7 +35,7 @@ To go from the raw spike-band data to NWB files, we perform the following proces
    4. Computing the mean waveform for each unit
    5. Removing units with artifactual waveforms
    6. Computing quality metrics for every unit
-   8. Computing stimulus-specific tuning metrics
+   7. Computing stimulus-specific tuning metrics
 
 For the LFP band, we:
 
