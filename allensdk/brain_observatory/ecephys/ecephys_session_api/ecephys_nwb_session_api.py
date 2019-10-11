@@ -23,6 +23,7 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
                  path,
                  probe_lfp_paths: Optional[Dict[int, FilePromise]] = None,
                  additional_unit_metrics=None,
+                 external_channel_columns=None,
                  **kwargs):
 
         self.filter_out_of_brain_units = kwargs.pop("filter_out_of_brain_units", True)
@@ -35,6 +36,7 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         self.probe_lfp_paths = probe_lfp_paths
 
         self.additional_unit_metrics = additional_unit_metrics
+        self.external_channel_columns = external_channel_columns
 
     def get_session_start_time(self):
         return self.nwbfile.session_start_time
@@ -93,7 +95,20 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
 
         # these are stored as string in nwb 2, which is not ideal
         # float is also not ideal, but we have nans indicating out-of-brain structures
-        channels["ecephys_structure_id"] = [float(chid) if chid != "" else np.nan for chid in channels["ecephys_structure_id"]]
+        channels["ecephys_structure_id"] = [
+            float(chid) if chid != "" 
+            else np.nan 
+            for chid in channels["ecephys_structure_id"]
+        ]
+        channels["ecephys_structure_acronym"] = [
+            ch_acr if ch_acr not in set(["None", ""]) 
+            else np.nan 
+            for ch_acr in channels["ecephys_structure_acronym"]
+        ]
+
+        if self.external_channel_columns is not None:
+            external_channel_columns = self.external_channel_columns()
+            channels = clobbering_merge(channels, external_channel_columns, left_index=True, right_index=True)
 
         if self.filter_by_validity:
             channels = channels[channels["valid_data"]]
@@ -298,3 +313,17 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
 
     def get_metadata(self):
         return self.nwbfile.lab_meta_data['metadata'].to_dict()
+
+
+def clobbering_merge(to_df, from_df, **kwargs):
+    overlapping = set(to_df.columns) & set(from_df.columns)
+    
+    for merge_param in ["on", "left_on", "right_on"]:
+        if merge_param in kwargs:
+            merge_arg = kwargs.get(merge_param)
+            if isinstance(merge_arg, str):
+                merge_arg = [merge_arg]
+            overlapping = overlapping - set(list(merge_arg))
+
+    to_df = to_df.drop(columns=list(overlapping))
+    return pd.merge(to_df, from_df, **kwargs)

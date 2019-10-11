@@ -290,10 +290,21 @@ class EcephysProjectCache(Cache):
                                                  filter_by_validity=True,
                                                  **unit_filter_kwargs)
 
+        def get_channel_columns():
+            channels = self.get_channels()
+            return channels.loc[channels["ecephys_session_id"] == session_id, [
+                "ecephys_structure_id", 
+                "ecephys_structure_acronym", 
+                "anterior_posterior_ccf_coordinate",
+                "dorsal_ventral_ccf_coordinate", 
+                "left_right_ccf_coordinate"
+            ]]
+
         session_api = EcephysNwbSessionApi(
             path=path,
             probe_lfp_paths=probe_promises,
             additional_unit_metrics=get_analysis_metrics,
+            external_channel_columns=get_channel_columns,
             filter_by_validity=filter_by_validity,
             **unit_filter_kwargs
         )
