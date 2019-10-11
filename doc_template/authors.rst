@@ -60,3 +60,5 @@ Shu Shi `@shus2018 <http://github.com/shus2018>`_
 Chris Mochizuki `@mochic <http://github.com/mochic>`_
 
 Peter Ledochowitsch `@ledochowitsch <http://github.com/ledochowitsch>`_
+
+Josh Siegle `@jsiegle <http://github.com/jsiegle>`_
