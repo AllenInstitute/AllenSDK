@@ -62,3 +62,5 @@ Chris Mochizuki `@mochic <http://github.com/mochic>`_
 Peter Ledochowitsch `@ledochowitsch <http://github.com/ledochowitsch>`_
 
 Josh Siegle `@jsiegle <http://github.com/jsiegle>`_
+
+Michael Oliver `@the-moliver <http://github.com/the-moliver>`_
