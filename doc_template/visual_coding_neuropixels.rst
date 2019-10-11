@@ -23,7 +23,7 @@ Data Processing
 
 .. image:: /_static/neuropixels_data_processing.png
    :align: center
-   :width: 200
+   :width: 700
 
 Neuropixels probes contain 374 or 383 channels that continuously detect voltage fluctuations in the surrounding neural tissue. The "spike band" is digitized at 30 kHz, and contains information about action potentials fired by neurons directly adjacent to the probe. The "LFP band" is digitized at 2.5 kHz, and records the low-frequency (<1000 Hz) fluctuations that result from synchronized neural activity over a wider area.
 
@@ -59,7 +59,7 @@ Visual Stimulus Sets
 
 .. image:: /_static/neuropixels_stimulus_sets.png
    :align: center
-   :width: 200
+   :width: 700
 
 A central aim of the Visual Coding – Neuropixels project is to measure the impact of visual stimuli on neurons throughout the mouse visual system. To that end, all mice viewed one of two possible stimulus sets, known as "Brain Observatory 1.1" or "Functional Connectivity". Both stimulus sets began with a Gabor stimulus flashed at 81 different locations on the screen, used to map receptive fields of visually responsive units. Next, the mice were shown brief flashes of light or dark, to measure the temporal dynamics of the visual response.
 
@@ -71,7 +71,7 @@ Quality Metrics
 
 .. image:: /_static/neuropixels_quality_metrics.png
    :align: center
-   :width: 200
+   :width: 700
 
 Every NWB file includes a table of quality metrics, which can be used to assess the completeness, contamination, and stability of units in the recording. By default, we won't show you units below a pre-determined quality threshold; we hide any units that are not present for the whole session (presence_ratio < 0.95), that include many contaminating spikes (isi_violations > 0.5), or are likely missing a large fraction of spikes (amplitude_cutoff > 0.1). However, even contaminated or incomplete units contain information about brain states, and may be of interest to analyze. Therefore, the complete units table can be accessed via special flags in the AllenSDK.
 
