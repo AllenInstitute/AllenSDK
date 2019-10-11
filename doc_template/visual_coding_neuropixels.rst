@@ -25,7 +25,7 @@ Data Processing
    :align: center
    :width: 700
 
-Neuropixels probes contain 374 or 383 channels that continuously detect voltage fluctuations in the surrounding neural tissue. The "spike band" is digitized at 30 kHz, and contains information about action potentials fired by neurons directly adjacent to the probe. The "LFP band" is digitized at 2.5 kHz, and records the low-frequency (<1000 Hz) fluctuations that result from synchronized neural activity over a wider area.
+Neuropixels probes contain 374 or 383 channels that continuously detect voltage fluctuations in the surrounding neural tissue. Each channel is split into two separate data streams, or "bands," on the probes. The "spike band" is digitized at 30 kHz, and contains information about action potentials fired by neurons directly adjacent to the probe. The "LFP band" is digitized at 2.5 kHz, and records the low-frequency (<1000 Hz) fluctuations that result from synchronized neural activity over a wider area.
 
 To go from the raw spike-band data to NWB files, we perform the following processing steps:
 
