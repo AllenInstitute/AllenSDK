@@ -26,7 +26,7 @@ The Allen Software Development Kit houses source code for reading and processing
 The Allen SDK focuses on the Allen Brain Observatory, Cell Types Database, and Mouse Brain Connectivity Atlas.
 
 .. ATTENTION::
-    We will be dropping for py2 support in October 2019, and any files with a py2 dependency (for example analysis files) will also be updated.
+    As of October 2019, we have dropped Python 2 support and any files with a py2 dependency (for example analysis files) have been updated.
 
 .. image:: /_static/sdk_cam.png
    :align: right
