@@ -9,45 +9,4 @@ in the [Allen Brain Atlas](http://brain-map.org/).
 
 Please visit http://alleninstitute.github.io/AllenSDK for more information.
 
-We welcome contributions! See the [contribution guide](CONTRIBUTING.md) here.
-
-
-# Authors
-
-Tim Fliss @tfliss
-
-David Feng @dyf
-
-@jennan
-
-Michael Buice @mabuice
-
-Nicholas Cain @nicain
-
-Florian Franzen @FlorianFranzen
-
-Werner Van Geit @wvangeit
-
-Richard Gerkin @rgerkin
-
-Nathan Gouwens @gouwens
-
-Nile Graddis @nilegraddis
-
-Gabe Ocker @gocker
-
-Corinne Teeter @corinneteeter
-
-Shreejoy Tripathy @stripathy
-
-Saskia de Vries @saskiad
-
-Derric Williams @derricw
-
-Jed Perkins @jfperkins
-
-Joe Knox @jknox13
-
-Justin Kiggins @neuromusic
-
-Kat Schelonka @kschelonka
+We welcome contributions! See the [contribution guide](CONTRIBUTING.md) here. See here for [the list of authors](doc_template/authors.rst).
