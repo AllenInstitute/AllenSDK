@@ -10,10 +10,11 @@ import numpy as np
 import h5py
 import SimpleITK as sitk
 from pandas.util.testing import assert_frame_equal
+from imageio import imread
 
 from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorOphysSession
 from allensdk.brain_observatory.behavior.write_nwb.__main__ import BehaviorOphysJsonApi
-from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi, equals
+from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi, equals, compare_fields
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
 from allensdk.brain_observatory.behavior.behavior_ophys_api import BehaviorOphysApiBase
 from allensdk.brain_observatory.behavior.image_api import ImageApi
@@ -30,17 +31,28 @@ def test_equal(oeid1, oeid2, expected):
 
     assert equals(d1, d2) == expected
 
-@pytest.mark.parametrize("session_data_key,getter", [
-    ["ophys_experiment_id", lambda ssn: ssn.ophys_experiment_id],
-    ["targeted_structure", lambda ssn: ssn.metadata["targeted_structure"]]
+@pytest.mark.parametrize("get_expected,get_from_session", [
+    [
+        lambda ssn_data: ssn_data["ophys_experiment_id"], 
+        lambda ssn: ssn.ophys_experiment_id],
+    [
+        lambda ssn_data: ssn_data["targeted_structure"], 
+        lambda ssn: ssn.metadata["targeted_structure"]
+    ],
+    [
+        lambda ssn_data: imread(ssn_data["max_projection_file"]) / 255,
+        lambda ssn: ssn.get_max_projection()
+    ]
+
 ])
-def test_session_from_json(tmpdir_factory, session_data, session_data_key, getter):
+def test_session_from_json(tmpdir_factory, session_data, get_expected, get_from_session):
     session = BehaviorOphysSession(api=BehaviorOphysJsonApi(session_data))
 
-    expected = session_data[session_data_key]
-    obtained = getter(session)
+    expected = get_expected(session_data)
+    obtained = get_from_session(session)
 
-    assert expected == obtained
+    compare_fields(expected, obtained)
+    
 
 
 @pytest.mark.requires_bamboo
