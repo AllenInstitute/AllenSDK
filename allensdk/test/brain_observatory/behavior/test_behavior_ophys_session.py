@@ -81,7 +81,7 @@ def test_visbeh_ophys_data_set():
     assert data_set.metadata == {'stimulus_frame_rate': 60.0,
                                  'full_genotype': 'Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;Ai93(TITL-GCaMP6f)/wt',
                                  'ophys_experiment_id': 789359614,
-                                 'session_type': 'Unknown',
+                                 'session_type': 'OPHYS_6_images_B',
                                  'driver_line': ['Camk2a-tTA', 'Slc17a7-IRES2-Cre'],
                                  'behavior_session_uuid': uuid.UUID('69cdbe09-e62b-4b42-aab1-54b5773dfe78'),
                                  'experiment_datetime': pytz.utc.localize(datetime.datetime(2018, 11, 30, 23, 28, 37)),
