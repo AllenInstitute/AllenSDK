@@ -30,14 +30,17 @@ def test_equal(oeid1, oeid2, expected):
 
     assert equals(d1, d2) == expected
 
-@pytest.mark.nightly
-def test_session_from_json(tmpdir_factory, session_data):
-    oeid = 789359614
+@pytest.mark.parametrize("session_data_key,getter", [
+    ["ophys_experiment_id", lambda ssn: ssn.ophys_experiment_id],
+    ["targeted_structure", lambda ssn: ssn.metadata["targeted_structure"]]
+])
+def test_session_from_json(tmpdir_factory, session_data, session_data_key, getter):
+    session = BehaviorOphysSession(api=BehaviorOphysJsonApi(session_data))
 
-    d1 = BehaviorOphysSession(api=BehaviorOphysJsonApi(session_data))
-    d2 = BehaviorOphysSession.from_lims(oeid)
+    expected = session_data[session_data_key]
+    obtained = getter(session)
 
-    assert equals(d1, d2)
+    assert expected == obtained
 
 
 @pytest.mark.requires_bamboo
