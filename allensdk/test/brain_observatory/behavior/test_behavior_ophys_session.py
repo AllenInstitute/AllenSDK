@@ -31,6 +31,7 @@ def test_equal(oeid1, oeid2, expected):
 
     assert equals(d1, d2) == expected
 
+@pytest.mark.requires_bamboo
 @pytest.mark.parametrize("get_expected,get_from_session", [
     [
         lambda ssn_data: ssn_data["ophys_experiment_id"], 
