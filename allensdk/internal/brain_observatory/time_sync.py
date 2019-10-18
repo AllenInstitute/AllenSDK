@@ -79,14 +79,17 @@ def monitor_delay(sync_dset, stim_times, photodiode_key,
 def get_photodiode_events(sync_dset, photodiode_key):
     """Returns the photodiode events with the start/stop indicators and
     the window init flash stripped off.
+    Computes the first valid event with the following criteria:
+        Given two consecutive rising edges or falling edges,
+        find the earliest same-edge pair that meets the criteria
+        (REG_PHOTODIODE_MIN <= e2-e1 <= REG_PHOTODIODE_MAX)
+        The first edge can be either rising or falling.
     """
-    all_events = sync_dset.get_events_by_line(photodiode_key)
-    pdr = sync_dset.get_rising_edges(photodiode_key)
-    pdf = sync_dset.get_falling_edges(photodiode_key)
+    sample_freq = sync_dset.sample_freq
 
-    all_events_sec = all_events/sync_dset.sample_freq
-    pdr_sec = pdr/sync_dset.sample_freq
-    pdf_sec = pdf/sync_dset.sample_freq
+    all_events_sec = sync_dset.get_events_by_line(photodiode_key)/sample_freq
+    pdr_sec = sync_dset.get_rising_edges(photodiode_key)/sample_freq
+    pdf_sec = sync_dset.get_falling_edges(photodiode_key)/sample_freq
 
     pdf_diff = np.ediff1d(pdf_sec, to_end=0)
     pdr_diff = np.ediff1d(pdr_sec, to_end=0)
@@ -94,16 +97,21 @@ def get_photodiode_events(sync_dset, photodiode_key):
     reg_pd_falling = pdf_sec[(pdf_diff >= REG_PHOTODIODE_MIN) &
                              (pdf_diff <= REG_PHOTODIODE_MAX)]
 
+    reg_pd_rising = pdr_sec[(pdr_diff >= REG_PHOTODIODE_MIN) &
+                             (pdr_diff <= REG_PHOTODIODE_MAX)]
+
     short_pd_rising = pdr_sec[(pdr_diff >= SHORT_PHOTODIODE_MIN) &
                               (pdr_diff <= SHORT_PHOTODIODE_MAX)]
 
     first_falling = reg_pd_falling[0]
+    first_rising = reg_pd_rising[0]
+    first_valid_event = min(first_falling, first_rising)
     last_falling = reg_pd_falling[-1]
 
     end_indicators = short_pd_rising[short_pd_rising > last_falling]
     first_end_indicator = end_indicators[0]
 
-    pd_events =  all_events_sec[(all_events_sec >= first_falling) &
+    pd_events =  all_events_sec[(all_events_sec >= first_valid_event) &
                                 (all_events_sec < first_end_indicator)]
     return pd_events
 
