@@ -52,7 +52,11 @@ class OneResultExpectedError(RuntimeError):
 def one(x):
     if isinstance(x, str):
         return x
-    if len(x) != 1:
+    try:
+        xlen = len(x)
+    except TypeError:
+        return x
+    if xlen != 1:
         raise OneResultExpectedError('Expected length one result, received: {} results from query'.format(x))
     if isinstance(x, set):
         return list(x)[0]
