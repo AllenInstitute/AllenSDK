@@ -10,10 +10,11 @@ import numpy as np
 import h5py
 import SimpleITK as sitk
 from pandas.util.testing import assert_frame_equal
+from imageio import imread
 
 from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorOphysSession
 from allensdk.brain_observatory.behavior.write_nwb.__main__ import BehaviorOphysJsonApi
-from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi, equals
+from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import BehaviorOphysNwbApi, equals, compare_fields
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
 from allensdk.brain_observatory.behavior.behavior_ophys_api import BehaviorOphysApiBase
 from allensdk.brain_observatory.behavior.image_api import ImageApi
@@ -30,14 +31,29 @@ def test_equal(oeid1, oeid2, expected):
 
     assert equals(d1, d2) == expected
 
-@pytest.mark.nightly
-def test_session_from_json(tmpdir_factory, session_data):
-    oeid = 789359614
+@pytest.mark.requires_bamboo
+@pytest.mark.parametrize("get_expected,get_from_session", [
+    [
+        lambda ssn_data: ssn_data["ophys_experiment_id"], 
+        lambda ssn: ssn.ophys_experiment_id],
+    [
+        lambda ssn_data: ssn_data["targeted_structure"], 
+        lambda ssn: ssn.metadata["targeted_structure"]
+    ],
+    [
+        lambda ssn_data: imread(ssn_data["max_projection_file"]) / 255,
+        lambda ssn: ssn.get_max_projection()
+    ]
 
-    d1 = BehaviorOphysSession(api=BehaviorOphysJsonApi(session_data))
-    d2 = BehaviorOphysSession.from_lims(oeid)
+])
+def test_session_from_json(tmpdir_factory, session_data, get_expected, get_from_session):
+    session = BehaviorOphysSession(api=BehaviorOphysJsonApi(session_data))
 
-    assert equals(d1, d2)
+    expected = get_expected(session_data)
+    obtained = get_from_session(session)
+
+    compare_fields(expected, obtained)
+    
 
 
 @pytest.mark.requires_bamboo
@@ -81,7 +97,7 @@ def test_visbeh_ophys_data_set():
     assert data_set.metadata == {'stimulus_frame_rate': 60.0,
                                  'full_genotype': 'Slc17a7-IRES2-Cre/wt;Camk2a-tTA/wt;Ai93(TITL-GCaMP6f)/wt',
                                  'ophys_experiment_id': 789359614,
-                                 'session_type': 'Unknown',
+                                 'session_type': 'OPHYS_6_images_B',
                                  'driver_line': ['Camk2a-tTA', 'Slc17a7-IRES2-Cre'],
                                  'behavior_session_uuid': uuid.UUID('69cdbe09-e62b-4b42-aab1-54b5773dfe78'),
                                  'experiment_datetime': pytz.utc.localize(datetime.datetime(2018, 11, 30, 23, 28, 37)),

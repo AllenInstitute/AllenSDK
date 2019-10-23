@@ -1,28 +1,68 @@
 Authors
 -------
 
-Tim Fliss `@tfliss <http://github.com/tfliss>`_
+Michael Buice `@mabuice <https://github.com/mabuice>`_
 
-David Feng `@dyf <http://github.com/dyf>`_
+Nicholas Cain `@nicain <https://github.com/nicain>`_
 
-Michael Buice `@mabuice <http://github.com/mabuice>`_
+Tom Chartrand `@tmchartrand <https://github.com/tmchartrand>`_
 
-Nicholas Cain `@nicain <http://github.com/nicain>`_
+Kael Dai `@kaeldai <https://github.com/kaeldai>`_
 
-Werner Van Geit `@wvangeit <http://github.com/wvangeit>`_
+Saskia de Vries `@saskiad <https://github.com/saskiad>`_
 
-Richard Gerkin `@rgerkin <http://gihub.com/rgerkin>`_
+David Feng `@dyf <https://github.com/dyf>`_
 
-Nathan Gouwens `@gouwens <http://github.com/gouwens>`_
+Tim Fliss `@tfliss <https://github.com/tfliss>`_
 
-Nile Graddis
+Marina Garrett `@matchings <https://github.com/matchings>`_
 
-Gabe Ocker
+Richard Gerkin `@rgerkin <https://gihub.com/rgerkin>`_
 
-Corinne Teeter 
+Nathan Gouwens `@gouwens <https://github.com/gouwens>`_
 
-Shreejoy Tripathy `@stripathy <http://github.com/stripathy>`_
+Nile Graddis `@nilegraddis <https://github.com/nilegraddis>`_
 
-Saskia de Vries `@saskiad <http://github.com/saskiad>`_
+Sergey Gratiy `@sgratiy <https://github.com/sgratiy>`_
 
-Derric Williams `@derricw <http://github.com/derricw>`_
+@jennan `@jennan <https://github.com/jennan>`_
+
+Xiaoxuan Jia `@jiaxx <https://github.com/jiaxx>`_
+
+Justin Kiggins `@neuromusic <https://github.com/neuromusic>`_
+
+Joe Knox `@jknox13 <https://github.com/jknox13>`_
+
+Peter Ledochowitsch `@ledochowitsch <https://github.com/ledochowitsch>`_
+
+Nicholas Mei `@njmei <https://github.com/njmei>`_
+
+Chris Mochizuki `@mochic <https://github.com/mochic>`_
+
+Gabe Ocker `@gocker <https://github.com/gocker>`_
+
+Michael Oliver `@the-moliver <https://github.com/the-moliver>`_
+
+Doug Ollerenshaw `@dougollerenshaw <https://github.com/dougollerenshaw>`_
+
+Jed Perkins `@jfperkins <https://github.com/jfperkins>`_
+
+Alex Piet `@alexpiet <https://github.com/alexpiet>`_
+
+Nick Ponvert `@nickponvert <https://github.com/nickponvert>`_
+
+Kat Schelonka `@kschelonka <https://github.com/kschelonka>`_
+
+Shu Shi `@shus2018 <https://github.com/shus2018>`_
+
+Josh Siegle `@jsiegle <https://github.com/jsiegle>`_
+
+Corinne Teeter `@corinneteeter <https://github.com/corinneteeter>`_
+
+Shreejoy Tripathy `@stripathy <https://github.com/stripathy>`_
+
+Werner Van Geit `@wvangeit <https://github.com/wvangeit>`_
+
+Michael Wang `@aimichaelwang <https://github.com/aimichaelwang>`_
+
+Derric Williams `@derricw <https://github.com/derricw>`_

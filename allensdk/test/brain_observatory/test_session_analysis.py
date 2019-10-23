@@ -47,13 +47,16 @@ def mock_stimulus_table(dset, name):
     t = _orig_get_stimulus_table(dset, name)
     t.set_value(0, 'end',
                 t.loc[0,'start'] + 10)
-    
+
     return t
 
 
 @pytest.fixture
 def session_a():
-    filename = '/data/informatics/module_test_data/observatory/test_nwb/out_510390912.nwb'
+    filename = os.path.abspath(os.path.join(
+            "/", "allen", "aibs", "informatics", "module_test_data",
+            "observatory", "test_nwb", "out_510390912.nwb"
+    ))
     save_path = 'xyza'
 
     sa = SessionAnalysis(filename, save_path)
@@ -63,7 +66,10 @@ def session_a():
 
 @pytest.fixture
 def session_b():
-    filename = '/data/informatics/module_test_data/observatory/test_nwb/506278598.nwb'
+    filename = os.path.abspath(os.path.join(
+            "/", "allen", "aibs", "informatics", "module_test_data", 
+            "observatory", "test_nwb", "506278598.nwb"
+    ))
     save_path = 'xyzb'
 
     sa = SessionAnalysis(filename, save_path)
@@ -73,7 +79,10 @@ def session_b():
 
 @pytest.fixture
 def session_c():
-    filename = '/data/informatics/module_test_data/observatory/test_nwb/out_510221121.nwb'
+    filename = os.path.abspath(os.path.join(
+            "/", "allen", "aibs", "informatics", "module_test_data",
+            "observatory", "test_nwb", "out_510221121.nwb"
+    ))
     save_path = 'xyzc'
 
     sa = SessionAnalysis(filename, save_path)

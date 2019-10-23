@@ -235,38 +235,7 @@ def equals(A, B, reraise=False):
         for field in sorted(field_set):
             x1, x2 = getattr(A, field), getattr(B, field)
             err_msg = f"{field} on {A} did not equal {field} on {B} (\n{x1} vs\n{x2}\n)"
-
-            if isinstance(x1, pd.DataFrame):
-                try:
-                    assert_frame_equal(x1, x2, check_like=True)
-                except:
-                    print(err_msg)
-                    raise
-            elif isinstance(x1, np.ndarray):
-                np.testing.assert_array_almost_equal(x1, x2, err_msg=err_msg)
-            elif isinstance(x1, xr.DataArray):
-                xr.testing.assert_allclose(x1, x2)
-            elif isinstance(x1, (list,)):
-                assert x1 == x2, err_msg
-            elif isinstance(x1, (sitk.Image,)):
-                assert x1.GetSize() == x2.GetSize(), err_msg
-                assert x1 == x2, err_msg
-            elif isinstance(x1, (dict,)):
-                for key in set(x1.keys()).union(set(x2.keys())):
-                    key_err_msg = f"{key} on {field} on {A} did not equal {key} on {field} on {B}"
-
-                    if isinstance(x1[key], (np.ndarray,)):
-                        np.testing.assert_array_almost_equal(x1[key], x2[key], err_msg=key_err_msg)
-                    elif isinstance(x1[key], (float,)):
-                        if math.isnan(x1[key]) or math.isnan(x2[key]):
-                            assert math.isnan(x1[key]) and math.isnan(x2[key]), key_err_msg
-                        else:
-                            assert x1[key] == x2[key], key_err_msg
-                    else:
-                        assert x1[key] == x2[key], key_err_msg
-
-            else:
-                assert x1 == x2, err_msg
+            compare_fields(x1, x2, err_msg)
 
     except NotImplementedError as e:
         A_implements_get_field = hasattr(A.api, getattr(type(A), field).getter_name)
@@ -279,3 +248,38 @@ def equals(A, B, reraise=False):
         return False
 
     return True
+
+
+
+def compare_fields(x1, x2, err_msg=""):
+    if isinstance(x1, pd.DataFrame):
+        try:
+            assert_frame_equal(x1, x2, check_like=True)
+        except:
+            print(err_msg)
+            raise
+    elif isinstance(x1, np.ndarray):
+        np.testing.assert_array_almost_equal(x1, x2, err_msg=err_msg)
+    elif isinstance(x1, xr.DataArray):
+        xr.testing.assert_allclose(x1, x2)
+    elif isinstance(x1, (list,)):
+        assert x1 == x2, err_msg
+    elif isinstance(x1, (sitk.Image,)):
+        assert x1.GetSize() == x2.GetSize(), err_msg
+        assert x1 == x2, err_msg
+    elif isinstance(x1, (dict,)):
+        for key in set(x1.keys()).union(set(x2.keys())):
+            key_err_msg = f"mismatch when checking key {key}. {err_msg}"
+
+            if isinstance(x1[key], (np.ndarray,)):
+                np.testing.assert_array_almost_equal(x1[key], x2[key], err_msg=key_err_msg)
+            elif isinstance(x1[key], (float,)):
+                if math.isnan(x1[key]) or math.isnan(x2[key]):
+                    assert math.isnan(x1[key]) and math.isnan(x2[key]), key_err_msg
+                else:
+                    assert x1[key] == x2[key], key_err_msg
+            else:
+                assert x1[key] == x2[key], key_err_msg
+
+    else:
+        assert x1 == x2, err_msg
