@@ -17,12 +17,6 @@ from allensdk.brain_observatory.ecephys import get_unit_filter_value
 from allensdk.api.caching_utilities import one_file_call_caching
 
 
-csv_io = {
-    'read': lambda path: pd.read_csv(path, index_col='id'),
-    'write': lambda path, df: df.to_csv(path)
-}
-
-
 class EcephysProjectCache(Cache):
 
     SESSIONS_KEY = 'sessions'
@@ -78,19 +72,17 @@ class EcephysProjectCache(Cache):
 
     def _get_sessions(self):
         path = self.get_cache_path(None, self.SESSIONS_KEY)
+        response = one_file_call_caching(path, self.fetch_api.get_sessions, write_csv, read_csv)
 
-        def reader(path):
-            response = pd.read_csv(path, index_col='id')
-            if "structure_acronyms" in response.columns:  # unfortunately, structure_acronyms is a list of str
-                response["ecephys_structure_acronyms"] = [ast.literal_eval(item) for item in response["structure_acronyms"]]
-                response.drop(columns=["structure_acronyms"], inplace=True)
-            return response
+        if "structure_acronyms" in response.columns:  # unfortunately, structure_acronyms is a list of str
+            response["ecephys_structure_acronyms"] = [ast.literal_eval(item) for item in response["structure_acronyms"]]
+            response.drop(columns=["structure_acronyms"], inplace=True)
 
-        return one_file_call_caching(path, self.fetch_api.get_sessions, write=csv_io["write"], read=reader)
+        return response
 
     def _get_probes(self):
-        path = self.get_cache_path(None, self.PROBES_KEY)
-        probes = one_file_call_caching(path, self.fetch_api.get_probes, **csv_io)
+        path: str = self.get_cache_path(None, self.PROBES_KEY)
+        probes = one_file_call_caching(path, self.fetch_api.get_probes, write_csv, read_csv)
         # Divide the lfp sampling by the subsampling factor for clearer presentation (if provided)
         if all(c in list(probes) for c in
                ["lfp_sampling_rate", "lfp_temporal_subsampling_factor"]):
@@ -100,7 +92,7 @@ class EcephysProjectCache(Cache):
 
     def _get_channels(self):
         path = self.get_cache_path(None, self.CHANNELS_KEY)
-        return one_file_call_caching(path, self.fetch_api.get_channels, **csv_io)
+        return one_file_call_caching(path, self.fetch_api.get_channels, write_csv, read_csv)
 
     def _get_units(self, filter_by_validity: bool = True, **unit_filter_kwargs) -> pd.DataFrame:
         path = self.get_cache_path(None, self.UNITS_KEY)
@@ -111,7 +103,7 @@ class EcephysProjectCache(Cache):
             isi_violations_maximum=None,
             filter_by_validity=filter_by_validity
         )
-        units = one_file_call_caching(path, get_units, **csv_io)
+        units: pd.DataFrame = one_file_call_caching(path, get_units, write_csv, read_csv)
         units = units.rename(columns={
             'PT_ratio': 'waveform_PT_ratio',
             'amplitude': 'waveform_amplitude',
@@ -289,29 +281,19 @@ class EcephysProjectCache(Cache):
         return EcephysSession(api=session_api)
 
     def get_natural_movie_template(self, number):
-        path = self.get_cache_path(None, self.NATURAL_MOVIE_KEY, number)
-
-        def reader(path):
-            return np.load(path, allow_pickle=False)
-
         return one_file_call_caching(
-            path,
+            self.get_cache_path(None, self.NATURAL_MOVIE_KEY, number),
             partial(self.fetch_api.get_natural_movie_template, number=number),
-            write=write_from_stream,
-            read=reader
+            write_from_stream,
+            read_movie
         )
 
     def get_natural_scene_template(self, number):
-        path = self.get_cache_path(None, self.NATURAL_SCENE_KEY, number)
-
-        def reader(path):
-            return sitk.GetArrayFromImage(sitk.ReadImage(path))
-
         return one_file_call_caching(
-            path,
+            self.get_cache_path(None, self.NATURAL_SCENE_KEY, number),
             partial(self.fetch_api.get_natural_scene_template, number=number),
-            write=write_from_stream,
-            read=reader
+            write_from_stream,
+            read_scene
         )
 
     def get_all_session_types(self, **session_kwargs):
@@ -358,15 +340,9 @@ class EcephysProjectCache(Cache):
         """
 
         path = self.get_cache_path(None, self.SESSION_ANALYSIS_METRICS_KEY, session_id, session_id)
-        metrics = one_file_call_caching(
-            path,
-            partial(
-                self.fetch_api.get_unit_analysis_metrics,
-                ecephys_session_ids=[session_id],
-            ),
-            read=lambda path: pd.read_csv(path, index_col='ecephys_unit_id'),
-            write=lambda path, df: df.to_csv(path)
-        )
+        fetch_metrics = partial(self.fetch_api.get_unit_analysis_metrics, ecephys_session_ids=[session_id])
+        
+        metrics = one_file_call_caching(path, fetch_metrics, write_metrics_csv, read_metrics_csv)
 
         if annotate:
             units = self.get_units(filter_by_validity=filter_by_validity, **unit_filter_kwargs)
@@ -403,14 +379,13 @@ class EcephysProjectCache(Cache):
             raise ValueError(f"unrecognized session type: {session_type}. Available types: {known_session_types}")
 
         path = self.get_cache_path(None, self.TYPEWISE_ANALYSIS_METRICS_KEY, session_type)
+        fetch_metrics = partial(self.fetch_api.get_unit_analysis_metrics, session_types=[session_type])
+
         metrics = one_file_call_caching(
             path,
-            partial(
-                self.fetch_api.get_unit_analysis_metrics,
-                session_types=[session_type]
-            ),
-            read=lambda path: pd.read_csv(path, index_col='ecephys_unit_id'),
-            write=lambda path, df: df.to_csv(path)
+            fetch_metrics,
+            write_metrics_csv,
+            read_metrics_csv
         )
 
         if annotate:
@@ -521,3 +496,27 @@ def get_grouped_uniques(this, other, foreign_key, field_key, unique_key, inplace
 
     if not inplace:
         return this
+
+
+def read_csv(path) -> pd.DataFrame:
+    return pd.read_csv(path, index_col="id")
+
+
+def write_csv(path, df):
+    df.to_csv(path)
+
+
+def write_metrics_csv(path, df):
+    df.to_csv(path)
+
+
+def read_metrics_csv(path):
+    return pd.read_csv(path, index_col='ecephys_unit_id')
+
+
+def read_scene(path):
+    return sitk.GetArrayFromImage(sitk.ReadImage(path))
+
+
+def read_movie(path):
+    return np.load(path, allow_pickle=False)
