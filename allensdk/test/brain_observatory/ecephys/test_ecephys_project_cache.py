@@ -274,3 +274,41 @@ def test_get_unit_analysis_metrics_by_session_type(tmpdir_cache, analysis_metric
         session_type="stimulus_set_two",
         annotate=False
     )
+
+
+def test_get_session_data_eventual_success(tmpdir_factory, mock_api):
+    man_path = os.path.join(
+        tmpdir_factory.mktemp("get_session_data"),
+        "manifest.json"
+    )
+
+    class InitiallyFailingApi(mock_api):
+        def get_session_data(self, session_id, **kwargs):
+            if self.accesses["get_session_data"] < 1:
+                raise ValueError("bad news!")
+            return super(InitiallyFailingApi, self).get_session_data(session_id, **kwargs)
+
+    api = InitiallyFailingApi()
+    cache = epc.EcephysProjectCache(manifest=man_path, fetch_api=api)
+
+    sid = 12345
+    session = cache.get_session_data(sid)
+    assert session.ecephys_session_id == sid
+
+
+def test_get_session_data_continual_failure(tmpdir_factory, mock_api):
+    man_path = os.path.join(
+        tmpdir_factory.mktemp("get_session_data"),
+        "manifest.json"
+    )
+
+    class ContinuallyFailingApi(mock_api):
+        def get_session_data(self, session_id, **kwargs):
+            raise ValueError("bad news!")
+
+    api = ContinuallyFailingApi()
+    cache = epc.EcephysProjectCache(manifest=man_path, fetch_api=api)
+
+    sid = 12345
+    with pytest.raises(ValueError):
+        session = cache.get_session_data(sid)

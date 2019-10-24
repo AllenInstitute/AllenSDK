@@ -62,17 +62,18 @@ class EcephysProjectCache(Cache):
         "date_of_acquisition"
     )
 
-    def __init__(self, fetch_api, **kwargs):
+    def __init__(self, fetch_api, fetch_tries=2, **kwargs):
 
         kwargs['manifest'] = kwargs.get('manifest', 'ecephys_project_manifest.json')
         kwargs['version'] = kwargs.get('version', self.MANIFEST_VERSION)
 
         super(EcephysProjectCache, self).__init__(**kwargs)
         self.fetch_api = fetch_api
+        self.fetch_tries = fetch_tries
 
     def _get_sessions(self):
         path = self.get_cache_path(None, self.SESSIONS_KEY)
-        response = one_file_call_caching(path, self.fetch_api.get_sessions, write_csv, read_csv)
+        response = one_file_call_caching(path, self.fetch_api.get_sessions, write_csv, read_csv, num_tries=self.fetch_tries)
 
         if "structure_acronyms" in response.columns:  # unfortunately, structure_acronyms is a list of str
             response["ecephys_structure_acronyms"] = [ast.literal_eval(item) for item in response["structure_acronyms"]]
@@ -82,7 +83,7 @@ class EcephysProjectCache(Cache):
 
     def _get_probes(self):
         path: str = self.get_cache_path(None, self.PROBES_KEY)
-        probes = one_file_call_caching(path, self.fetch_api.get_probes, write_csv, read_csv)
+        probes = one_file_call_caching(path, self.fetch_api.get_probes, write_csv, read_csv, num_tries=self.fetch_tries)
         # Divide the lfp sampling by the subsampling factor for clearer presentation (if provided)
         if all(c in list(probes) for c in
                ["lfp_sampling_rate", "lfp_temporal_subsampling_factor"]):
@@ -92,7 +93,7 @@ class EcephysProjectCache(Cache):
 
     def _get_channels(self):
         path = self.get_cache_path(None, self.CHANNELS_KEY)
-        return one_file_call_caching(path, self.fetch_api.get_channels, write_csv, read_csv)
+        return one_file_call_caching(path, self.fetch_api.get_channels, write_csv, read_csv, num_tries=self.fetch_tries)
 
     def _get_units(self, filter_by_validity: bool = True, **unit_filter_kwargs) -> pd.DataFrame:
         path = self.get_cache_path(None, self.UNITS_KEY)
@@ -103,7 +104,7 @@ class EcephysProjectCache(Cache):
             isi_violations_maximum=None,
             filter_by_validity=filter_by_validity
         )
-        units: pd.DataFrame = one_file_call_caching(path, get_units, write_csv, read_csv)
+        units: pd.DataFrame = one_file_call_caching(path, get_units, write_csv, read_csv, num_tries=self.fetch_tries)
         units = units.rename(columns={
             'PT_ratio': 'waveform_PT_ratio',
             'amplitude': 'waveform_amplitude',
@@ -242,7 +243,8 @@ class EcephysProjectCache(Cache):
             self.get_cache_path(None, self.SESSION_NWB_KEY, session_id, session_id),
             partial(self.fetch_api.get_session_data, session_id),
             write_from_stream,
-            read
+            read,
+            num_tries=self.fetch_tries
         )
 
     def _build_nwb_api_for_session(self, path, session_id, filter_by_validity, **unit_filter_kwargs):
@@ -293,7 +295,8 @@ class EcephysProjectCache(Cache):
             self.get_cache_path(None, self.NATURAL_MOVIE_KEY, number),
             partial(self.fetch_api.get_natural_movie_template, number=number),
             write_from_stream,
-            read_movie
+            read_movie, 
+            num_tries=self.fetch_tries
         )
 
     def get_natural_scene_template(self, number):
@@ -301,7 +304,8 @@ class EcephysProjectCache(Cache):
             self.get_cache_path(None, self.NATURAL_SCENE_KEY, number),
             partial(self.fetch_api.get_natural_scene_template, number=number),
             write_from_stream,
-            read_scene
+            read_scene, 
+            num_tries=self.fetch_tries
         )
 
     def get_all_session_types(self, **session_kwargs):
@@ -350,7 +354,7 @@ class EcephysProjectCache(Cache):
         path = self.get_cache_path(None, self.SESSION_ANALYSIS_METRICS_KEY, session_id, session_id)
         fetch_metrics = partial(self.fetch_api.get_unit_analysis_metrics, ecephys_session_ids=[session_id])
         
-        metrics = one_file_call_caching(path, fetch_metrics, write_metrics_csv, read_metrics_csv)
+        metrics = one_file_call_caching(path, fetch_metrics, write_metrics_csv, read_metrics_csv, num_tries=self.fetch_tries)
 
         if annotate:
             units = self.get_units(filter_by_validity=filter_by_validity, **unit_filter_kwargs)
@@ -393,7 +397,8 @@ class EcephysProjectCache(Cache):
             path,
             fetch_metrics,
             write_metrics_csv,
-            read_metrics_csv
+            read_metrics_csv, 
+            num_tries=self.fetch_tries
         )
 
         if annotate:
