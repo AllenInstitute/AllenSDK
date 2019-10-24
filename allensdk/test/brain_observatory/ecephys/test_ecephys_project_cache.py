@@ -1,10 +1,12 @@
 import os
 import collections
+from datetime import datetime
 
 import pytest
 import pandas as pd
 import numpy as np
 import SimpleITK as sitk
+import pynwb
 
 import allensdk.brain_observatory.ecephys.ecephys_project_cache as epc
 
@@ -139,10 +141,16 @@ def mock_api(shared_tmpdir, raw_sessions, units, filtered_units, channels, raw_p
             return raw_probes
 
         def get_session_data(self, session_id, **kwargs):
-            assert kwargs.get('filter_by_validity')
             path = os.path.join(shared_tmpdir, 'tmp.txt')
-            with open(path, 'w') as f:
-                f.write(f'{session_id}')
+
+            nwbfile = pynwb.NWBFile(
+                session_description='EcephysSession',
+                identifier=f"{session_id}",
+                session_start_time=datetime.now()
+            )
+            with pynwb.NWBHDF5IO(path, "w") as io:
+                io.write(nwbfile)
+
             return open(path, 'rb')
 
         def get_natural_scene_template(self, number):
