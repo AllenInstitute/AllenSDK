@@ -231,25 +231,21 @@ class EcephysProjectCache(Cache):
         return units
 
     def get_session_data(self, session_id, filter_by_validity: bool = True, **unit_filter_kwargs):
-        path = self.get_cache_path(None, self.SESSION_NWB_KEY, session_id, session_id)
+        """ Obtain an EcephysSession object containing detailed data for a single session
+        """
 
-        probes = self.get_probes()
-        probe_ids = probes[probes["ecephys_session_id"] == session_id].index.values
+        def read(_path):
+            session_api = self._build_nwb_api_for_session(_path, session_id, filter_by_validity, **unit_filter_kwargs)
+            return EcephysSession(api=session_api, test=True)
 
-        probe_promises = {
-            probe_id: FilePromise(
-                source=partial(self.fetch_api.get_probe_lfp_data, probe_id),
-                path=Path(self.get_cache_path(None, self.PROBE_LFP_NWB_KEY, session_id, probe_id)),
-                reader=read_nwb
-            )
-            for probe_id in probe_ids
-        }
-
-        one_file_call_caching(
-            path,
-            partial(self.fetch_api.get_session_data, session_id, filter_by_validity=filter_by_validity, **unit_filter_kwargs),
-            write=write_from_stream
+        return one_file_call_caching(
+            self.get_cache_path(None, self.SESSION_NWB_KEY, session_id, session_id),
+            partial(self.fetch_api.get_session_data, session_id),
+            write_from_stream,
+            read
         )
+
+    def _build_nwb_api_for_session(self, path, session_id, filter_by_validity, **unit_filter_kwargs):
 
         get_analysis_metrics = partial(
             self.get_unit_analysis_metrics_for_session,
@@ -259,26 +255,38 @@ class EcephysProjectCache(Cache):
             **unit_filter_kwargs
         )
 
-        def get_channel_columns():
-            channels = self.get_channels()
-            return channels.loc[channels["ecephys_session_id"] == session_id, [
-                "ecephys_structure_id", 
-                "ecephys_structure_acronym", 
-                "anterior_posterior_ccf_coordinate",
-                "dorsal_ventral_ccf_coordinate", 
-                "left_right_ccf_coordinate"
-            ]]
-
-        session_api = EcephysNwbSessionApi(
+        return EcephysNwbSessionApi(
             path=path,
-            probe_lfp_paths=probe_promises,
+            probe_lfp_paths=self._setup_probe_promises(session_id),
             additional_unit_metrics=get_analysis_metrics,
-            external_channel_columns=get_channel_columns,
+            external_channel_columns=partial(self._get_substitute_channel_columns, session_id),
             filter_by_validity=filter_by_validity,
             **unit_filter_kwargs
         )
 
-        return EcephysSession(api=session_api)
+    def _setup_probe_promises(self, session_id):
+        probes = self.get_probes()
+        probe_ids = probes[probes["ecephys_session_id"] == session_id].index.values
+
+        return {
+            probe_id: FilePromise(
+                source=partial(self.fetch_api.get_probe_lfp_data, probe_id),
+                path=Path(self.get_cache_path(None, self.PROBE_LFP_NWB_KEY, session_id, probe_id)),
+                reader=read_nwb
+            )
+            for probe_id in probe_ids
+        }
+
+    def _get_substitute_channel_columns(self, session_id):
+        channels = self.get_channels()
+        return channels.loc[channels["ecephys_session_id"] == session_id, [
+            "ecephys_structure_id", 
+            "ecephys_structure_acronym", 
+            "anterior_posterior_ccf_coordinate",
+            "dorsal_ventral_ccf_coordinate", 
+            "left_right_ccf_coordinate"
+        ]]
+
 
     def get_natural_movie_template(self, number):
         return one_file_call_caching(
