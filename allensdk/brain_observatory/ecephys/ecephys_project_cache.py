@@ -209,19 +209,6 @@ class EcephysProjectCache(Cache):
 
         return channels
 
-        """ Reports a table consisting of all sorted units across the entire extracellular electrophysiology project.
-
-        Parameters
-        ----------
-        annotate : bool, optional
-            If True, the returned table of units will be merged with channel, probe, and session information.
-
-        Returns
-        -------
-        pd.DataFrame :
-            each row describes a single sorted unit
-
-        """
 
     def get_units(self, suppress: Optional[List[str]] = None, filter_by_validity: bool = True, **unit_filter_kwargs) -> pd.DataFrame:
         """Reports a table consisting of all sorted units across the entire extracellular electrophysiology project.
