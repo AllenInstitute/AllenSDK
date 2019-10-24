@@ -3,7 +3,7 @@ from pathlib import Path
 import warnings
 import os
 
-from typing import overload, Callable, Any, Union, Optional, TypeVar
+from typing import overload, Callable, Any, Union, Optional, TypeVar, Dict
 
 from allensdk.config.manifest import Manifest
 
@@ -14,15 +14,45 @@ Q = TypeVar("Q")
 AnyPath = Union[Path, str]
 
 
+@overload
 def call_caching(
     fetch: Callable[[], Q],
     write: Callable[[Q], None],
-    read: Optional[Callable[[], P]],
+    read: Callable[[], P],
     pre_write: Optional[Callable[[Q], Q]] = None,
     cleanup: Optional[Callable[[], None]] = None,
     lazy: bool = True,
     num_tries: int = 1,
-    failure_message: str = "",
+    failure_message: str = ""
+) -> P:
+    """ Case where a reader is provided
+    """
+
+
+@overload
+def call_caching(
+    fetch: Callable[[], Q],
+    write: Callable[[Q], None],
+    read: None = None,
+    pre_write: Optional[Callable[[Q], Q]] = None,
+    cleanup: Optional[Callable[[], None]] = None,
+    lazy: bool = True,
+    num_tries: int = 1,
+    failure_message: str = ""
+) -> None:
+    """ Case where no reader is provided (fetches and writes, but returns nothing)
+    """
+
+
+def call_caching(
+    fetch: Callable[[], Q],
+    write: Callable[[Q], None],
+    read: Optional[Callable[[], P]] = None,
+    pre_write: Optional[Callable[[Q], Q]] = None,
+    cleanup: Optional[Callable[[], None]] = None,
+    lazy: bool = True,
+    num_tries: int = 1,
+    failure_message: str = ""
 ) -> Optional[P]:
     """ Access data, caching on a local store for future accesses.
 
