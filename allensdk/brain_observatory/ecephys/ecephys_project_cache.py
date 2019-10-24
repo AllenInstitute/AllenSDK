@@ -537,9 +537,12 @@ def read_scene(path):
 def read_movie(path):
     return np.load(path, allow_pickle=False)
 
+
 def read_nwb(path):
     reader = pynwb.NWBHDF5IO(str(path), 'r')
-    return reader.read()
+    nwbfile = reader.read()
+    nwbfile.identifier  # if the file is corrupt, make sure an exception gets raised during read
+    return nwbfile
 
 
 def write_from_stream(path, stream):
