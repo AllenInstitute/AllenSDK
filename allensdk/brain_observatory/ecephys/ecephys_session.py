@@ -249,7 +249,7 @@ class EcephysSession(LazyPropertyMixin):
 
         return self._spike_times
 
-    def __init__(self, api, **kwargs):
+    def __init__(self, api, test=False, **kwargs):
         self.api: EcephysSessionApi = api
 
         self.ecephys_session_id = self.LazyProperty(self.api.get_ecephys_session_id)
@@ -271,6 +271,9 @@ class EcephysSession(LazyPropertyMixin):
         self._units = self.LazyProperty(self.api.get_units, wrappers=[self._build_units_table])
         self._rig_metadata = self.LazyProperty(self.api.get_rig_metadata)
         self._metadata = self.LazyProperty(self.api.get_metadata)
+
+        if test:
+            self.api.test()
 
     def get_current_source_density(self, probe_id):
         """ Obtain current source density (CSD) of trial-averaged response to a flash stimuli for this probe.

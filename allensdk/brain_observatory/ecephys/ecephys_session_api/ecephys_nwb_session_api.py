@@ -38,6 +38,16 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         self.additional_unit_metrics = additional_unit_metrics
         self.external_channel_columns = external_channel_columns
 
+    def test(self):
+        """ A minimal test to make sure that this API's NWB file exists and is 
+        readable. Ecephys NWB files use the required session identifier field 
+        to store the session id, so this is guaranteed to be present for any 
+        uncorrupted NWB file.
+
+        Of course, this does not ensure that the file as a whole is correct.
+        """
+        self.get_ecephys_session_id()
+
     def get_session_start_time(self):
         return self.nwbfile.session_start_time
 
