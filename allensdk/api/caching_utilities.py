@@ -59,7 +59,7 @@ def call_caching(
     """
 
     try:
-        if not lazy:
+        if not lazy or read is None:
             data = fetch()
             if pre_write is not None:
                 data = pre_write(data)
@@ -67,7 +67,6 @@ def call_caching(
 
         if read is not None:    
             return read()
-        return None
 
     except Exception:
         if cleanup is not None and not lazy:
@@ -98,12 +97,14 @@ def call_caching(
             failure_message=failure_message,
         )
 
+    return None  # required by mypy
+
 
 def one_file_call_caching(
     path: AnyPath,
     fetch: Callable[[], Q],
     write: Callable[[AnyPath, Q], None],
-    read: Optional[Callable[[AnyPath], P]],
+    read: Optional[Callable[[AnyPath], P]] = None,
     pre_write: Optional[Callable[[Q], Q]] = None,
     cleanup: Optional[Callable[[], None]] = None,
     lazy: bool = True,

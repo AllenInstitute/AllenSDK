@@ -268,9 +268,8 @@ class EcephysProjectCache(Cache):
 
         one_file_call_caching(
             path,
-            partial(self.fetch_api.get_session_data, filter_by_validity=filter_by_validity, session_id=session_id, **unit_filter_kwargs),
-            write=write_from_stream,
-            read=lambda path: None
+            partial(self.fetch_api.get_session_data, session_id, filter_by_validity=filter_by_validity, **unit_filter_kwargs),
+            write=write_from_stream
         )
 
         get_analysis_metrics = partial(
