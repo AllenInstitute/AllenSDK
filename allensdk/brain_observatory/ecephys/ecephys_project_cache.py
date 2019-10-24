@@ -6,13 +6,13 @@ import ast
 import pandas as pd
 import SimpleITK as sitk
 import numpy as np
+import pynwb
 
 from allensdk.api.cache import Cache
 
 from allensdk.brain_observatory.ecephys.ecephys_project_api import EcephysProjectLimsApi, EcephysProjectWarehouseApi, EcephysProjectFixedApi
 from allensdk.brain_observatory.ecephys.ecephys_session_api import EcephysNwbSessionApi
 from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
-from allensdk.brain_observatory.ecephys.file_promise import FilePromise, read_nwb, write_from_stream
 from allensdk.brain_observatory.ecephys import get_unit_filter_value
 from allensdk.api.caching_utilities import one_file_call_caching
 
@@ -536,3 +536,13 @@ def read_scene(path):
 
 def read_movie(path):
     return np.load(path, allow_pickle=False)
+
+def read_nwb(path):
+    reader = pynwb.NWBHDF5IO(str(path), 'r')
+    return reader.read()
+
+
+def write_from_stream(path, stream):
+    with open(path, "wb") as fil:
+        for chunk in stream:
+            fil.write(chunk)
