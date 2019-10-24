@@ -240,7 +240,7 @@ def test_call_caching(
     assert expected_cleanups == cleanup.count
 
 
-@pytest.mark.parametrize("existing", ["ok", "missing", "corrupt"])
+@pytest.mark.parametrize("existing", [True, False])
 def test_one_file_call_caching(tmpdir_factory, existing):
     tmpdir = str(tmpdir_factory.mktemp("foo"))
     path = os.path.join(tmpdir, "baz.csv")
@@ -248,12 +248,9 @@ def test_one_file_call_caching(tmpdir_factory, existing):
     getter = get_data
     data = getter()
 
-    if existing == "ok":
+    if existing:
         data.to_csv(path, index=False)
         getter = lambda: "foo"
-    elif existing == "corrupt":
-        with open(path, "w") as f:
-            pass
 
     obtained = cu.one_file_call_caching(
         path,
