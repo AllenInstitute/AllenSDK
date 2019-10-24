@@ -3,7 +3,7 @@ from pathlib import Path
 import warnings
 import os
 
-from typing import overload, Callable, Any, Union, Optional, TypeVar, Dict
+from typing import overload, Callable, Any, Union, Optional, TypeVar
 
 from allensdk.config.manifest import Manifest
 
