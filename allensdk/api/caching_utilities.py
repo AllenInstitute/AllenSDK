@@ -5,7 +5,7 @@ import os
 
 from typing import overload, Callable, Any, Union, Optional, TypeVar
 
-from allensdk.api.cache import Cache
+from allensdk.config.manifest import Manifest
 
 
 P = TypeVar("P")
@@ -17,13 +17,13 @@ AnyPath = Union[Path, str]
 def call_caching(
     fetch: Callable[[], Q],
     write: Callable[[Q], None],
-    read: Callable[[], P],
+    read: Optional[Callable[[], P]],
     pre_write: Optional[Callable[[Q], Q]] = None,
     cleanup: Optional[Callable[[], None]] = None,
     lazy: bool = True,
     num_tries: int = 1,
     failure_message: str = "",
-) -> P:
+) -> Optional[P]:
     """ Access data, caching on a local store for future accesses.
 
     Parameters
@@ -65,7 +65,9 @@ def call_caching(
                 data = pre_write(data)
             write(data)
 
-        return read()
+        if read is not None:    
+            return read()
+        return None
 
     except Exception:
         if cleanup is not None and not lazy:
@@ -81,7 +83,9 @@ def call_caching(
         retry_message = f"retrying fetch ({num_tries} tries remaining)"
         if failure_message:
             retry_message = f"{failure_message} {retry_message}"
-        warnings.warn(retry_message)
+
+        if not lazy:
+            warnings.warn(retry_message)
 
         return call_caching(
             fetch,
@@ -97,11 +101,15 @@ def call_caching(
 
 def one_file_call_caching(
     path: AnyPath,
-    fetch: Callable[[], Any],
-    write: Callable[[], Any],
-    read: Callable[[AnyPath], P],
-    **kwargs
-) -> P:
+    fetch: Callable[[], Q],
+    write: Callable[[AnyPath, Q], None],
+    read: Optional[Callable[[AnyPath], P]],
+    pre_write: Optional[Callable[[Q], Q]] = None,
+    cleanup: Optional[Callable[[], None]] = None,
+    lazy: bool = True,
+    num_tries: int = 1,
+    failure_message: str = "",
+) -> Optional[P]:
     """ A call_caching variant where the local store is a single file. See 
     call_caching for complete documentation.
 
@@ -118,14 +126,23 @@ def one_file_call_caching(
         except IOError:
             pass
 
-    write = functools.partial(write, path)
-    read = functools.partial(read, path)
-    cleanup = kwargs.pop("cleanup", safe_unlink)
+    def safe_write(data: Q):
+        Manifest.safe_make_parent_dirs(path)
+        write(path, data)
+
+    if read is not None:
+        read = functools.partial(read, path)
+
+    if cleanup is None:
+        cleanup = safe_unlink
 
     return call_caching(
         fetch,
-        write,
+        safe_write,
         read,
+        pre_write=pre_write,
         cleanup=cleanup,
-        **kwargs
+        lazy=lazy,
+        num_tries=num_tries,
+        failure_message=failure_message,
     )
