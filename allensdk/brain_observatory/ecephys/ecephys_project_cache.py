@@ -231,7 +231,7 @@ class EcephysProjectCache(Cache):
 
         return units
 
-    def get_session_data(self, session_id, filter_by_validity: bool = True, **unit_filter_kwargs):
+    def get_session_data(self, session_id: int, filter_by_validity: bool = True, **unit_filter_kwargs):
         """ Obtain an EcephysSession object containing detailed data for a single session
         """
 
@@ -271,11 +271,14 @@ class EcephysProjectCache(Cache):
         probe_ids = probes[probes["ecephys_session_id"] == session_id].index.values
 
         return {
-            probe_id: FilePromise(
-                source=partial(self.fetch_api.get_probe_lfp_data, probe_id),
-                path=Path(self.get_cache_path(None, self.PROBE_LFP_NWB_KEY, session_id, probe_id)),
-                reader=read_nwb
-            )
+            probe_id: lambda: 
+                one_file_call_caching(
+                    self.get_cache_path(None, self.PROBE_LFP_NWB_KEY, session_id, probe_id),
+                    partial(self.fetch_api.get_probe_lfp_data, probe_id),
+                    write_from_stream,
+                    read_nwb,
+                    num_tries=self.fetch_tries
+                )
             for probe_id in probe_ids
         }
 
