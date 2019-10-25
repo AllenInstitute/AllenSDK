@@ -249,7 +249,30 @@ class EcephysSession(LazyPropertyMixin):
 
         return self._spike_times
 
-    def __init__(self, api, test=False, **kwargs):
+    def __init__(
+        self, 
+        api: EcephysSessionApi, 
+        test: bool = False, 
+        **kwargs
+    ):
+        """ Construct an EcephysSession object, which provides access to 
+        detailed data for a single extracellular electrophysiology 
+        (neuropixels) session.
+
+        Parameters
+        ----------
+        api : 
+            Used to access data, which is then cached on this object. Must 
+            expose the EcephysSessionApi interface. Standard options include 
+            instances of:
+                EcephysSessionNwbApi :: reads data from a neurodata without 
+                    borders 2.0 file.
+        test : 
+            If true, check during construction that this session's api is 
+            valid.
+
+        """
+
         self.api: EcephysSessionApi = api
 
         self.ecephys_session_id = self.LazyProperty(self.api.get_ecephys_session_id)
