@@ -89,6 +89,13 @@ class EcephysProjectCache(Cache):
         fetch_tries : 
             Maximum number of times to attempt a download before giving up and 
             raising an exception. Note that this is total tries, not retries
+        **kwargs :
+            manifest : str or Path
+                full path at which manifest json will be stored
+            version : str
+                version of manifest file. If this mismatches the version 
+                recorded in the file at manifest, an error will be raised.
+            other kwargs are passed to allensdk.api.cache.Cache
 
         """
 
