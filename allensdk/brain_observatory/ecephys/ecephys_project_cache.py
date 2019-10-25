@@ -10,7 +10,7 @@ import pynwb
 
 from allensdk.api.cache import Cache
 
-from allensdk.brain_observatory.ecephys.ecephys_project_api import EcephysProjectLimsApi, EcephysProjectWarehouseApi, EcephysProjectFixedApi
+from allensdk.brain_observatory.ecephys.ecephys_project_api import EcephysProjectApi, EcephysProjectLimsApi, EcephysProjectWarehouseApi, EcephysProjectFixedApi
 from allensdk.brain_observatory.ecephys.ecephys_session_api import EcephysNwbSessionApi
 from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
 from allensdk.brain_observatory.ecephys import get_unit_filter_value
@@ -62,7 +62,35 @@ class EcephysProjectCache(Cache):
         "date_of_acquisition"
     )
 
-    def __init__(self, fetch_api, fetch_tries=2, **kwargs):
+    def __init__(
+        self, 
+        fetch_api: EcephysProjectApi = EcephysProjectWarehouseApi.default(), 
+        fetch_tries: int = 2, 
+        **kwargs):
+        """ Entrypoint for accessing ecephys (neuropixels) data. Supports 
+        access to cross-session data (like stimulus templates) and high-level 
+        summaries of sessionwise data and provides tools for downloading detailed 
+        sessionwise data (such as spike times).
+
+        Parameters
+        ==========
+        fetch_api :
+            Used to pull data from remote sources, after which it is locally
+            cached. Any object exposing the EcephysProjectApi interface is 
+            suitable. Standard options are:
+                EcephysProjectWarehouseApi :: The default. Fetches publically 
+                    available Allen Institute data
+                EcephysProjectFixedApi :: Refuses to fetch any data - only the 
+                    existing local cache is accessible. Useful if you want to 
+                    settle on a fixed dataset for analysis.
+                EcephysProjectLimsApi :: Fetches bleeding-edge data from the 
+                    Allen Institute's internal database. Only works if you are 
+                    on our internal network.
+        fetch_tries : 
+            Maximum number of times to attempt a download before giving up and 
+            raising an exception. Note that this is total tries, not retries
+
+        """
 
         kwargs['manifest'] = kwargs.get('manifest', 'ecephys_project_manifest.json')
         kwargs['version'] = kwargs.get('version', self.MANIFEST_VERSION)
@@ -271,14 +299,14 @@ class EcephysProjectCache(Cache):
         probe_ids = probes[probes["ecephys_session_id"] == session_id].index.values
 
         return {
-            probe_id: lambda: 
-                one_file_call_caching(
-                    self.get_cache_path(None, self.PROBE_LFP_NWB_KEY, session_id, probe_id),
-                    partial(self.fetch_api.get_probe_lfp_data, probe_id),
-                    write_from_stream,
-                    read_nwb,
-                    num_tries=self.fetch_tries
-                )
+            probe_id: partial( 
+                one_file_call_caching,
+                self.get_cache_path(None, self.PROBE_LFP_NWB_KEY, session_id, probe_id),
+                partial(self.fetch_api.get_probe_lfp_data, probe_id),
+                write_from_stream,
+                read_nwb,
+                num_tries=self.fetch_tries
+            )
             for probe_id in probe_ids
         }
 
