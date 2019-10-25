@@ -160,6 +160,12 @@ class TestOutputFile(object):
         # TODO: This is a stopgap for now
         if os.name == 'nt':
             pytest.skip()
+        # This test was failing on Bamboo because it was run in a container
+        # as root (which means pretty much anything is writable). If this test
+        # is run as root, skip it as it will always successfully create the
+        # output file.
+        if os.getuid() == 0:
+            pytest.skip()
 
         with pytest.raises(ValidationError, match="Can't build path to requested location"):
             self.parser.load(output_data)
