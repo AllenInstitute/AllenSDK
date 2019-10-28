@@ -252,7 +252,7 @@ class BrainObservatoryNwbDataSet(object):
                 'Fluorescence']['imaging_plane_1']['data']
 
             if cell_specimen_ids is None:
-                cell_traces = ds.value
+                cell_traces = ds[()]
             else:
                 inds = self.get_cell_specimen_indices(cell_specimen_ids)
                 cell_traces = ds[inds, :]
@@ -264,7 +264,7 @@ class BrainObservatoryNwbDataSet(object):
 
         with h5py.File(self.nwb_file, 'r') as f:
             timestamps = f['processing'][self.PIPELINE_DATASET][
-                'Fluorescence']['imaging_plane_1']['timestamps'].value
+                'Fluorescence']['imaging_plane_1']['timestamps'][()]
         return timestamps
 
     def get_neuropil_traces(self, cell_specimen_ids=None):
@@ -297,7 +297,7 @@ class BrainObservatoryNwbDataSet(object):
                     'Fluorescence']['imaging_plane_1']['neuropil_traces']
 
             if cell_specimen_ids is None:
-                np_traces = ds.value
+                np_traces = ds[()]
             else:
                 inds = self.get_cell_specimen_indices(cell_specimen_ids)
                 np_traces = ds[inds, :]
@@ -329,7 +329,7 @@ class BrainObservatoryNwbDataSet(object):
                     'Fluorescence']['imaging_plane_1']['r']
 
             if cell_specimen_ids is None:
-                r = r_ds.value
+                r = r_ds[()]
             else:
                 inds = self.get_cell_specimen_indices(cell_specimen_ids)
                 r = r_ds[inds]
@@ -361,7 +361,7 @@ class BrainObservatoryNwbDataSet(object):
             ds = f['processing'][self.PIPELINE_DATASET][
                 'Fluorescence']['imaging_plane_1_demixed_signal']['data']
             if cell_specimen_ids is None:
-                traces = ds.value
+                traces = ds[()]
             else:
                 inds = self.get_cell_specimen_indices(cell_specimen_ids)
                 traces = ds[inds, :]
@@ -442,10 +442,10 @@ class BrainObservatoryNwbDataSet(object):
             dff_ds = f['processing'][self.PIPELINE_DATASET][
                 'DfOverF']['imaging_plane_1']
 
-            timestamps = dff_ds['timestamps'].value
+            timestamps = dff_ds['timestamps'][()]
 
             if cell_specimen_ids is None:
-                cell_traces = dff_ds['data'].value
+                cell_traces = dff_ds['data'][()]
             else:
                 inds = self.get_cell_specimen_indices(cell_specimen_ids)
                 cell_traces = dff_ds['data'][inds, :]
@@ -461,7 +461,7 @@ class BrainObservatoryNwbDataSet(object):
         '''
         with h5py.File(self.nwb_file, 'r') as f:
             roi_id = f['processing'][self.PIPELINE_DATASET][
-                'ImageSegmentation']['roi_ids'].value
+                'ImageSegmentation']['roi_ids'][()]
         return roi_id
 
     def get_cell_specimen_ids(self):
@@ -473,7 +473,7 @@ class BrainObservatoryNwbDataSet(object):
         '''
         with h5py.File(self.nwb_file, 'r') as f:
             cell_id = f['processing'][self.PIPELINE_DATASET][
-                'ImageSegmentation']['cell_specimen_ids'].value
+                'ImageSegmentation']['cell_specimen_ids'][()]
         return cell_id
 
     def get_session_type(self):
@@ -485,7 +485,7 @@ class BrainObservatoryNwbDataSet(object):
         session type: string
         '''
         with h5py.File(self.nwb_file, 'r') as f:
-            session_type = f['general/session_type'].value
+            session_type = f['general/session_type'][()]
         return session_type.decode('utf-8')
 
     def get_max_projection(self):
@@ -498,7 +498,7 @@ class BrainObservatoryNwbDataSet(object):
 
         with h5py.File(self.nwb_file, 'r') as f:
             max_projection = f['processing'][self.PIPELINE_DATASET]['ImageSegmentation'][
-                'imaging_plane_1']['reference_images']['maximum_intensity_projection_image']['data'].value
+                'imaging_plane_1']['reference_images']['maximum_intensity_projection_image']['data'][()]
         return max_projection
 
     def list_stimuli(self):
@@ -596,7 +596,7 @@ class BrainObservatoryNwbDataSet(object):
         '''
         stim_name = stimulus_name + "_image_stack"
         with h5py.File(self.nwb_file, 'r') as f:
-            image_stack = f['stimulus']['templates'][stim_name]['data'].value
+            image_stack = f['stimulus']['templates'][stim_name]['data'][()]
         return image_stack
 
     def get_locally_sparse_noise_stimulus_template(self,
@@ -698,7 +698,7 @@ class BrainObservatoryNwbDataSet(object):
             mask_loc = f['processing'][self.PIPELINE_DATASET][
                 'ImageSegmentation']['imaging_plane_1']
             roi_list = f['processing'][self.PIPELINE_DATASET][
-                'ImageSegmentation']['imaging_plane_1']['roi_list'].value
+                'ImageSegmentation']['imaging_plane_1']['roi_list'][()]
 
             inds = None
             if cell_specimen_ids is None:
@@ -709,7 +709,7 @@ class BrainObservatoryNwbDataSet(object):
             roi_array = []
             for i in inds:
                 v = roi_list[i]
-                roi_mask = mask_loc[v]["img_mask"].value
+                roi_mask = mask_loc[v]["img_mask"][()]
                 m = roi.create_roi_mask(roi_mask.shape[1], roi_mask.shape[0],
                                         [0, 0, 0, 0], roi_mask=roi_mask, label=v)
                 roi_array.append(m)
@@ -739,7 +739,7 @@ class BrainObservatoryNwbDataSet(object):
         with h5py.File(self.nwb_file, 'r') as f:
             for memory_key, disk_key in BrainObservatoryNwbDataSet.FILE_METADATA_MAPPING.items():
                 try:
-                    v = f[disk_key].value
+                    v = f[disk_key][()]
 
                     # convert numpy strings to python strings
                     if v.dtype.type is np.string_:
@@ -806,8 +806,8 @@ class BrainObservatoryNwbDataSet(object):
         with h5py.File(self.nwb_file, 'r') as f:
             dx_ds = f['processing'][self.PIPELINE_DATASET][
                 'BehavioralTimeSeries']['running_speed']
-            dxcm = dx_ds['data'].value
-            dxtime = dx_ds['timestamps'].value
+            dxcm = dx_ds['data'][()]
+            dxtime = dx_ds['timestamps'][()]
 
         timestamps = self.get_fluorescence_timestamps()
 
@@ -844,8 +844,8 @@ class BrainObservatoryNwbDataSet(object):
             with h5py.File(self.nwb_file, 'r') as f:
                 eye_tracking = f['processing'][self.PIPELINE_DATASET][
                     'EyeTracking'][location_key]
-                pupil_location = eye_tracking['data'].value
-                pupil_times = eye_tracking['timestamps'].value
+                pupil_location = eye_tracking['data'][()]
+                pupil_times = eye_tracking['timestamps'][()]
         except KeyError:
             raise NoEyeTrackingException("No eye tracking for this experiment.")
 
@@ -864,8 +864,8 @@ class BrainObservatoryNwbDataSet(object):
             with h5py.File(self.nwb_file, 'r') as f:
                 pupil_tracking = f['processing'][self.PIPELINE_DATASET][
                     'PupilTracking']['pupil_size']
-                pupil_size = pupil_tracking['data'].value
-                pupil_times = pupil_tracking['timestamps'].value
+                pupil_size = pupil_tracking['data'][()]
+                pupil_times = pupil_tracking['timestamps'][()]
         except KeyError:
             raise NoEyeTrackingException("No pupil tracking for this experiment.")
 
@@ -885,9 +885,9 @@ class BrainObservatoryNwbDataSet(object):
                 try:
                     mc_ds = pipeline_ds[mc_ds_name]
 
-                    motion_log = mc_ds['data'].value
-                    motion_time = mc_ds['timestamps'].value
-                    motion_names = mc_ds['feature_description'].value
+                    motion_log = mc_ds['data'][()]
+                    motion_time = mc_ds['timestamps'][()]
+                    motion_names = mc_ds['feature_description'][()]
 
                     motion_correction = pd.DataFrame(motion_log, columns=motion_names)
                     motion_correction['timestamp'] = motion_time
