@@ -17,6 +17,9 @@ class EcephysSessionApi:
     def __init__(self, *args, **kwargs):
         pass
 
+    def test(self) -> bool:
+        raise NotImplementedError
+
     def get_session_start_time(self) -> datetime:
         raise NotImplementedError
 

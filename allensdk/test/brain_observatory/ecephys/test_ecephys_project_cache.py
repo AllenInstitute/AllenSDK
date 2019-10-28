@@ -1,12 +1,15 @@
 import os
 import collections
+from datetime import datetime
 
 import pytest
 import pandas as pd
 import numpy as np
 import SimpleITK as sitk
+import pynwb
 
 import allensdk.brain_observatory.ecephys.ecephys_project_cache as epc
+import allensdk.brain_observatory.ecephys.write_nwb.__main__ as write_nwb
 
 
 @pytest.fixture
@@ -139,10 +142,33 @@ def mock_api(shared_tmpdir, raw_sessions, units, filtered_units, channels, raw_p
             return raw_probes
 
         def get_session_data(self, session_id, **kwargs):
-            assert kwargs.get('filter_by_validity')
-            path = os.path.join(shared_tmpdir, 'tmp.txt')
-            with open(path, 'w') as f:
-                f.write(f'{session_id}')
+            path = os.path.join(shared_tmpdir, 'tmp.nwb')
+
+            nwbfile = pynwb.NWBFile(
+                session_description='EcephysSession',
+                identifier=f"{session_id}",
+                session_start_time=datetime.now()
+            )
+
+            write_nwb.add_probe_to_nwbfile(nwbfile, 11, sampling_rate=1.0, lfp_sampling_rate=2.0, has_lfp_data=True)
+
+            with pynwb.NWBHDF5IO(path, "w") as io:
+                io.write(nwbfile)
+
+            return open(path, 'rb')
+
+        def get_probe_lfp_data(self, probe_id):
+            path = os.path.join(shared_tmpdir, f"probe_{probe_id}.nwb")
+
+            nwbfile = pynwb.NWBFile(
+                session_description='EcephysProbe',
+                identifier=f"{probe_id}",
+                session_start_time=datetime.now()
+            )
+
+            with pynwb.NWBHDF5IO(path, "w") as io:
+                io.write(nwbfile)
+
             return open(path, 'rb')
 
         def get_natural_scene_template(self, number):
@@ -266,3 +292,87 @@ def test_get_unit_analysis_metrics_by_session_type(tmpdir_cache, analysis_metric
         session_type="stimulus_set_two",
         annotate=False
     )
+
+
+def test_get_session_data_eventual_success(tmpdir_factory, mock_api):
+    man_path = os.path.join(
+        tmpdir_factory.mktemp("get_session_data"),
+        "manifest.json"
+    )
+
+    class InitiallyFailingApi(mock_api):
+        def get_session_data(self, session_id, **kwargs):
+            if self.accesses["get_session_data"] < 1:
+                raise ValueError("bad news!")
+            return super(InitiallyFailingApi, self).get_session_data(session_id, **kwargs)
+
+    api = InitiallyFailingApi()
+    cache = epc.EcephysProjectCache(manifest=man_path, fetch_api=api)
+
+    sid = 12345
+    session = cache.get_session_data(sid)
+    assert session.ecephys_session_id == sid
+
+
+def test_get_session_data_continual_failure(tmpdir_factory, mock_api):
+    man_path = os.path.join(
+        tmpdir_factory.mktemp("get_session_data"),
+        "manifest.json"
+    )
+
+    class ContinuallyFailingApi(mock_api):
+        def get_session_data(self, session_id, **kwargs):
+            raise ValueError("bad news!")
+
+    api = ContinuallyFailingApi()
+    cache = epc.EcephysProjectCache(manifest=man_path, fetch_api=api)
+
+    sid = 12345
+    with pytest.raises(ValueError):
+        session = cache.get_session_data(sid)
+
+
+def test_get_probe_lfp_data(tmpdir_factory, mock_api):
+    man_path = os.path.join(
+        tmpdir_factory.mktemp("get_lfp_data"),
+        "manifest.json"
+    )
+
+    class InitiallyFailingApi(mock_api):
+        def get_probe_lfp_data(self, probe_id, **kwargs):
+            if self.accesses["get_probe_data"] < 1:
+                raise ValueError("bad news!")
+            return super(InitiallyFailingApi, self).get_probe_lfp_data(probe_id, **kwargs)
+
+    api = InitiallyFailingApi()
+    cache = epc.EcephysProjectCache(manifest=man_path, fetch_api=api)
+
+    sid = 3
+    pid = 11
+
+    session = cache.get_session_data(sid)
+    lfp_file =  session.api._probe_nwbfile(pid)
+
+    assert str(pid) == lfp_file.identifier
+
+
+def test_get_probe_lfp_data_continually_failing(tmpdir_factory, mock_api):
+    man_path = os.path.join(
+        tmpdir_factory.mktemp("get_lfp_data"),
+        "manifest.json"
+    )
+
+    class ContinuallyFailingApi(mock_api):
+        def get_probe_lfp_data(self, probe_id, **kwargs):
+            if True:
+                raise ValueError("bad news!")
+
+    api = ContinuallyFailingApi()
+    cache = epc.EcephysProjectCache(manifest=man_path, fetch_api=api)
+
+    sid = 3
+    pid = 11
+
+    with pytest.raises(ValueError):
+        session = cache.get_session_data(sid)
+        lfp_file = session.api._probe_nwbfile(pid)

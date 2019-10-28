@@ -1,4 +1,4 @@
-import functools
+from functools import partial
 from pathlib import Path
 from typing import Any, List, Optional
 import ast
@@ -6,29 +6,15 @@ import ast
 import pandas as pd
 import SimpleITK as sitk
 import numpy as np
+import pynwb
 
 from allensdk.api.cache import Cache
 
-from allensdk.brain_observatory.ecephys.ecephys_project_api import EcephysProjectLimsApi, EcephysProjectWarehouseApi, EcephysProjectFixedApi
+from allensdk.brain_observatory.ecephys.ecephys_project_api import EcephysProjectApi, EcephysProjectLimsApi, EcephysProjectWarehouseApi, EcephysProjectFixedApi
 from allensdk.brain_observatory.ecephys.ecephys_session_api import EcephysNwbSessionApi
 from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
-from allensdk.brain_observatory.ecephys.file_promise import FilePromise, read_nwb, write_from_stream
 from allensdk.brain_observatory.ecephys import get_unit_filter_value
-
-
-csv_io = {
-    'reader': lambda path: pd.read_csv(path, index_col='id'),
-    'writer': lambda path, df: df.to_csv(path)
-}
-
-
-def call_caching(fn, path, strategy=None, pre=lambda d: d, writer=None, reader=None, post=None, *args, **kwargs):
-    fn = functools.partial(fn, *args, **kwargs)
-    try:
-        return Cache.cacher(fn, path=path, strategy=strategy, pre=pre, writer=writer, reader=reader, post=post)
-    except Exception:
-        Path(path).unlink
-        raise
+from allensdk.api.caching_utilities import one_file_call_caching
 
 
 class EcephysProjectCache(Cache):
@@ -76,29 +62,63 @@ class EcephysProjectCache(Cache):
         "date_of_acquisition"
     )
 
-    def __init__(self, fetch_api, **kwargs):
+    def __init__(
+        self, 
+        fetch_api: EcephysProjectApi = EcephysProjectWarehouseApi.default(), 
+        fetch_tries: int = 2, 
+        **kwargs):
+        """ Entrypoint for accessing ecephys (neuropixels) data. Supports 
+        access to cross-session data (like stimulus templates) and high-level 
+        summaries of sessionwise data and provides tools for downloading detailed 
+        sessionwise data (such as spike times).
+
+        Parameters
+        ==========
+        fetch_api :
+            Used to pull data from remote sources, after which it is locally
+            cached. Any object exposing the EcephysProjectApi interface is 
+            suitable. Standard options are:
+                EcephysProjectWarehouseApi :: The default. Fetches publically 
+                    available Allen Institute data
+                EcephysProjectFixedApi :: Refuses to fetch any data - only the 
+                    existing local cache is accessible. Useful if you want to 
+                    settle on a fixed dataset for analysis.
+                EcephysProjectLimsApi :: Fetches bleeding-edge data from the 
+                    Allen Institute's internal database. Only works if you are 
+                    on our internal network.
+        fetch_tries : 
+            Maximum number of times to attempt a download before giving up and 
+            raising an exception. Note that this is total tries, not retries
+        **kwargs :
+            manifest : str or Path
+                full path at which manifest json will be stored
+            version : str
+                version of manifest file. If this mismatches the version 
+                recorded in the file at manifest, an error will be raised.
+            other kwargs are passed to allensdk.api.cache.Cache
+
+        """
 
         kwargs['manifest'] = kwargs.get('manifest', 'ecephys_project_manifest.json')
         kwargs['version'] = kwargs.get('version', self.MANIFEST_VERSION)
 
         super(EcephysProjectCache, self).__init__(**kwargs)
         self.fetch_api = fetch_api
+        self.fetch_tries = fetch_tries
 
     def _get_sessions(self):
         path = self.get_cache_path(None, self.SESSIONS_KEY)
+        response = one_file_call_caching(path, self.fetch_api.get_sessions, write_csv, read_csv, num_tries=self.fetch_tries)
 
-        def reader(path):
-            response = pd.read_csv(path, index_col='id')
-            if "structure_acronyms" in response.columns:  # unfortunately, structure_acronyms is a list of str
-                response["ecephys_structure_acronyms"] = [ast.literal_eval(item) for item in response["structure_acronyms"]]
-                response.drop(columns=["structure_acronyms"], inplace=True)
-            return response
+        if "structure_acronyms" in response.columns:  # unfortunately, structure_acronyms is a list of str
+            response["ecephys_structure_acronyms"] = [ast.literal_eval(item) for item in response["structure_acronyms"]]
+            response.drop(columns=["structure_acronyms"], inplace=True)
 
-        return call_caching(self.fetch_api.get_sessions, path=path, strategy='lazy', writer=csv_io["writer"], reader=reader)
+        return response
 
     def _get_probes(self):
-        path = self.get_cache_path(None, self.PROBES_KEY)
-        probes = call_caching(self.fetch_api.get_probes, path, strategy='lazy', **csv_io)
+        path: str = self.get_cache_path(None, self.PROBES_KEY)
+        probes = one_file_call_caching(path, self.fetch_api.get_probes, write_csv, read_csv, num_tries=self.fetch_tries)
         # Divide the lfp sampling by the subsampling factor for clearer presentation (if provided)
         if all(c in list(probes) for c in
                ["lfp_sampling_rate", "lfp_temporal_subsampling_factor"]):
@@ -108,18 +128,18 @@ class EcephysProjectCache(Cache):
 
     def _get_channels(self):
         path = self.get_cache_path(None, self.CHANNELS_KEY)
-        return call_caching(self.fetch_api.get_channels, path, strategy='lazy', **csv_io)
+        return one_file_call_caching(path, self.fetch_api.get_channels, write_csv, read_csv, num_tries=self.fetch_tries)
 
     def _get_units(self, filter_by_validity: bool = True, **unit_filter_kwargs) -> pd.DataFrame:
         path = self.get_cache_path(None, self.UNITS_KEY)
-        get_units = functools.partial(
+        get_units = partial(
             self.fetch_api.get_units,
             amplitude_cutoff_maximum=None,  # pull down all the units to csv and filter on the way out
             presence_ratio_minimum=None,
             isi_violations_maximum=None,
             filter_by_validity=filter_by_validity
         )
-        units = call_caching(get_units, path, strategy='lazy', **csv_io)
+        units: pd.DataFrame = one_file_call_caching(path, get_units, write_csv, read_csv, num_tries=self.fetch_tries)
         units = units.rename(columns={
             'PT_ratio': 'waveform_PT_ratio',
             'amplitude': 'waveform_amplitude',
@@ -217,19 +237,6 @@ class EcephysProjectCache(Cache):
 
         return channels
 
-        """ Reports a table consisting of all sorted units across the entire extracellular electrophysiology project.
-
-        Parameters
-        ----------
-        annotate : bool, optional
-            If True, the returned table of units will be merged with channel, probe, and session information.
-
-        Returns
-        -------
-        pd.DataFrame :
-            each row describes a single sorted unit
-
-        """
 
     def get_units(self, suppress: Optional[List[str]] = None, filter_by_validity: bool = True, **unit_filter_kwargs) -> pd.DataFrame:
         """Reports a table consisting of all sorted units across the entire extracellular electrophysiology project.
@@ -259,86 +266,84 @@ class EcephysProjectCache(Cache):
 
         return units
 
-    def get_session_data(self, session_id, filter_by_validity: bool = True, **unit_filter_kwargs):
-        path = self.get_cache_path(None, self.SESSION_NWB_KEY, session_id, session_id)
+    def get_session_data(self, session_id: int, filter_by_validity: bool = True, **unit_filter_kwargs):
+        """ Obtain an EcephysSession object containing detailed data for a single session
+        """
 
+        def read(_path):
+            session_api = self._build_nwb_api_for_session(_path, session_id, filter_by_validity, **unit_filter_kwargs)
+            return EcephysSession(api=session_api, test=True)
+
+        return one_file_call_caching(
+            self.get_cache_path(None, self.SESSION_NWB_KEY, session_id, session_id),
+            partial(self.fetch_api.get_session_data, session_id),
+            write_from_stream,
+            read,
+            num_tries=self.fetch_tries
+        )
+
+    def _build_nwb_api_for_session(self, path, session_id, filter_by_validity, **unit_filter_kwargs):
+
+        get_analysis_metrics = partial(
+            self.get_unit_analysis_metrics_for_session,
+            session_id=session_id,
+            annotate=False,
+            filter_by_validity=True,
+            **unit_filter_kwargs
+        )
+
+        return EcephysNwbSessionApi(
+            path=path,
+            probe_lfp_paths=self._setup_probe_promises(session_id),
+            additional_unit_metrics=get_analysis_metrics,
+            external_channel_columns=partial(self._get_substitute_channel_columns, session_id),
+            filter_by_validity=filter_by_validity,
+            **unit_filter_kwargs
+        )
+
+    def _setup_probe_promises(self, session_id):
         probes = self.get_probes()
         probe_ids = probes[probes["ecephys_session_id"] == session_id].index.values
 
-        probe_promises = {
-            probe_id: FilePromise(
-                source=functools.partial(self.fetch_api.get_probe_lfp_data, probe_id),
-                path=Path(self.get_cache_path(None, self.PROBE_LFP_NWB_KEY, session_id, probe_id)),
-                reader=read_nwb
+        return {
+            probe_id: partial( 
+                one_file_call_caching,
+                self.get_cache_path(None, self.PROBE_LFP_NWB_KEY, session_id, probe_id),
+                partial(self.fetch_api.get_probe_lfp_data, probe_id),
+                write_from_stream,
+                read_nwb,
+                num_tries=self.fetch_tries
             )
             for probe_id in probe_ids
         }
 
-        call_caching(
-            self.fetch_api.get_session_data,
-            path,
-            session_id=session_id,
-            strategy='lazy',
-            writer=write_from_stream,
-            filter_by_validity=filter_by_validity,
-            **unit_filter_kwargs
-        )
+    def _get_substitute_channel_columns(self, session_id):
+        channels = self.get_channels()
+        return channels.loc[channels["ecephys_session_id"] == session_id, [
+            "ecephys_structure_id", 
+            "ecephys_structure_acronym", 
+            "anterior_posterior_ccf_coordinate",
+            "dorsal_ventral_ccf_coordinate", 
+            "left_right_ccf_coordinate"
+        ]]
 
-        get_analysis_metrics = functools.partial(self.get_unit_analysis_metrics_for_session,
-                                                 session_id=session_id,
-                                                 annotate=False,
-                                                 filter_by_validity=True,
-                                                 **unit_filter_kwargs)
-
-        def get_channel_columns():
-            channels = self.get_channels()
-            return channels.loc[channels["ecephys_session_id"] == session_id, [
-                "ecephys_structure_id", 
-                "ecephys_structure_acronym", 
-                "anterior_posterior_ccf_coordinate",
-                "dorsal_ventral_ccf_coordinate", 
-                "left_right_ccf_coordinate"
-            ]]
-
-        session_api = EcephysNwbSessionApi(
-            path=path,
-            probe_lfp_paths=probe_promises,
-            additional_unit_metrics=get_analysis_metrics,
-            external_channel_columns=get_channel_columns,
-            filter_by_validity=filter_by_validity,
-            **unit_filter_kwargs
-        )
-
-        return EcephysSession(api=session_api)
 
     def get_natural_movie_template(self, number):
-        path = self.get_cache_path(None, self.NATURAL_MOVIE_KEY, number)
-
-        def reader(path):
-            return np.load(path, allow_pickle=False)
-
-        return call_caching(
-            self.fetch_api.get_natural_movie_template,
-            path,
-            number=number,
-            strategy="lazy",
-            writer=write_from_stream,
-            reader=reader
+        return one_file_call_caching(
+            self.get_cache_path(None, self.NATURAL_MOVIE_KEY, number),
+            partial(self.fetch_api.get_natural_movie_template, number=number),
+            write_from_stream,
+            read_movie, 
+            num_tries=self.fetch_tries
         )
 
     def get_natural_scene_template(self, number):
-        path = self.get_cache_path(None, self.NATURAL_SCENE_KEY, number)
-
-        def reader(path):
-            return sitk.GetArrayFromImage(sitk.ReadImage(path))
-
-        return call_caching(
-            self.fetch_api.get_natural_scene_template,
-            path,
-            number=number,
-            strategy="lazy",
-            writer=write_from_stream,
-            reader=reader
+        return one_file_call_caching(
+            self.get_cache_path(None, self.NATURAL_SCENE_KEY, number),
+            partial(self.fetch_api.get_natural_scene_template, number=number),
+            write_from_stream,
+            read_scene, 
+            num_tries=self.fetch_tries
         )
 
     def get_all_session_types(self, **session_kwargs):
@@ -385,14 +390,9 @@ class EcephysProjectCache(Cache):
         """
 
         path = self.get_cache_path(None, self.SESSION_ANALYSIS_METRICS_KEY, session_id, session_id)
-        metrics = call_caching(
-            self.fetch_api.get_unit_analysis_metrics,
-            path,
-            strategy='lazy',
-            ecephys_session_ids=[session_id],
-            reader=lambda path: pd.read_csv(path, index_col='ecephys_unit_id'),
-            writer=lambda path, df: df.to_csv(path)
-        )
+        fetch_metrics = partial(self.fetch_api.get_unit_analysis_metrics, ecephys_session_ids=[session_id])
+        
+        metrics = one_file_call_caching(path, fetch_metrics, write_metrics_csv, read_metrics_csv, num_tries=self.fetch_tries)
 
         if annotate:
             units = self.get_units(filter_by_validity=filter_by_validity, **unit_filter_kwargs)
@@ -429,13 +429,14 @@ class EcephysProjectCache(Cache):
             raise ValueError(f"unrecognized session type: {session_type}. Available types: {known_session_types}")
 
         path = self.get_cache_path(None, self.TYPEWISE_ANALYSIS_METRICS_KEY, session_type)
-        metrics = call_caching(
-            self.fetch_api.get_unit_analysis_metrics,
+        fetch_metrics = partial(self.fetch_api.get_unit_analysis_metrics, session_types=[session_type])
+
+        metrics = one_file_call_caching(
             path,
-            strategy='lazy',
-            session_types=[session_type],
-            reader=lambda path: pd.read_csv(path, index_col='ecephys_unit_id'),
-            writer=lambda path, df: df.to_csv(path)
+            fetch_metrics,
+            write_metrics_csv,
+            read_metrics_csv, 
+            num_tries=self.fetch_tries
         )
 
         if annotate:
@@ -546,3 +547,40 @@ def get_grouped_uniques(this, other, foreign_key, field_key, unique_key, inplace
 
     if not inplace:
         return this
+
+
+def read_csv(path) -> pd.DataFrame:
+    return pd.read_csv(path, index_col="id")
+
+
+def write_csv(path, df):
+    df.to_csv(path)
+
+
+def write_metrics_csv(path, df):
+    df.to_csv(path)
+
+
+def read_metrics_csv(path):
+    return pd.read_csv(path, index_col='ecephys_unit_id')
+
+
+def read_scene(path):
+    return sitk.GetArrayFromImage(sitk.ReadImage(path))
+
+
+def read_movie(path):
+    return np.load(path, allow_pickle=False)
+
+
+def read_nwb(path):
+    reader = pynwb.NWBHDF5IO(str(path), 'r')
+    nwbfile = reader.read()
+    nwbfile.identifier  # if the file is corrupt, make sure an exception gets raised during read
+    return nwbfile
+
+
+def write_from_stream(path, stream):
+    with open(path, "wb") as fil:
+        for chunk in stream:
+            fil.write(chunk)
