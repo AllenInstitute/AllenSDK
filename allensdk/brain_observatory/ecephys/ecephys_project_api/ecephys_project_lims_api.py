@@ -1,10 +1,11 @@
 from pathlib import Path
 import shutil
 import warnings
+from typing import Optional, TypeVar
 
 import pandas as pd
 
-from .ecephys_project_api import EcephysProjectApi
+from .ecephys_project_api import EcephysProjectApi, ArrayLike
 from .http_engine import HttpEngine
 from .utilities import postgres_macros, build_and_execute
 
@@ -75,33 +76,77 @@ class EcephysProjectLimsApi(EcephysProjectApi):
         )
 
     def get_units(
-        self, unit_ids=None, 
-        channel_ids=None, 
-        probe_ids=None, 
-        session_ids=None, 
-        quality="good",
-        **kwargs
+        self, 
+        unit_ids: Optional[ArrayLike] = None, 
+        channel_ids: Optional[ArrayLike] = None, 
+        probe_ids: Optional[ArrayLike] = None, 
+        session_ids: Optional[ArrayLike] = None, 
+        published_at: Optional[str] = None
     ):
+        """ Query LIMS for records describing sorted ecephys units.
+
+        Parameters
+        ----------
+        units_ids :
+        channel_ids :
+        probe_ids :
+        session_ids :
+        published_at :
+            If provided, only units from sessions published prior to this date 
+            will be returned. Format should be YYYY-MM-DD
+
+        """
+
+        published_at_not_null = None if published_at is None else True
+        published_at = f"'{published_at}'" if published_at is not None else None
+
         response = build_and_execute(
             """
                 {%- import 'postgres_macros' as pm -%}
                 {%- import 'macros' as m -%}
-                select eu.*
+                select 
+                    eu.id, 
+                    eu.ecephys_channel_id,
+                    eu.quality,
+                    eu.snr,
+                    eu.firing_rate,
+                    eu.isi_violations,
+                    eu.presence_ratio,
+                    eu.amplitude_cutoff,
+                    eu.isolation_distance,
+                    eu.l_ratio,
+                    eu.d_prime,
+                    eu.nn_hit_rate,
+                    eu.nn_miss_rate,
+                    eu.silhouette_score,
+                    eu.max_drift,
+                    eu.cumulative_drift,
+                    eu.epoch_name_quality_metrics,
+                    eu.epoch_name_waveform_metrics,
+                    eu.duration,
+                    eu.halfwidth,
+                    eu.\"PT_ratio\",
+                    eu.repolarization_slope,
+                    eu.recovery_slope,
+                    eu.amplitude,
+                    eu.spread,
+                    eu.velocity_above,
+                    eu.velocity_below
                 from ecephys_units eu
                 join ecephys_channels ec on ec.id = eu.ecephys_channel_id
                 join ecephys_probes ep on ep.id = ec.ecephys_probe_id
-                join ecephys_sessions es on es.id = ep.ecephys_session_id 
-                where ec.valid_data
-                and ep.workflow_state != 'failed'
-                and es.workflow_state != 'failed'
-                {{pm.optional_equals('eu.quality', quality) -}}
-                {{pm.optional_contains('eu.id', unit_ids) -}}
-                {{pm.optional_contains('ec.id', channel_ids) -}}
-                {{pm.optional_contains('ep.id', probe_ids) -}}
-                {{pm.optional_contains('es.id', session_ids) -}}
-                {{pm.optional_le('eu.amplitude_cutoff', amplitude_cutoff_maximum) -}}
-                {{pm.optional_ge('eu.presence_ratio', presence_ratio_minimum) -}}
-                {{pm.optional_le('eu.isi_violations', isi_violations_maximum) -}}
+                join ecephys_sessions es on es.id = ep.ecephys_session_id
+                where 
+                    not es.habituation 
+                    and ec.valid_data
+                    and ep.workflow_state != 'failed'
+                    and es.workflow_state != 'failed'
+                    {{pm.optional_not_null('es.published_at', published_at_not_null)}}
+                    {{pm.optional_le('es.published_at', published_at)}}
+                    {{pm.optional_contains('eu.id', unit_ids) -}}
+                    {{pm.optional_contains('ec.id', channel_ids) -}}
+                    {{pm.optional_contains('ep.id', probe_ids) -}}
+                    {{pm.optional_contains('es.id', session_ids) -}}
             """,
             base=postgres_macros(),
             engine=self.postgres_engine.select,
@@ -109,10 +154,8 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             channel_ids=channel_ids,
             probe_ids=probe_ids,
             session_ids=session_ids,
-            quality=f"'{quality}'" if quality is not None else quality,
-            amplitude_cutoff_maximum=get_unit_filter_value("amplitude_cutoff_maximum", replace_none=False, **kwargs),
-            presence_ratio_minimum=get_unit_filter_value("presence_ratio_minimum", replace_none=False, **kwargs),
-            isi_violations_maximum=get_unit_filter_value("isi_violations_maximum", replace_none=False, **kwargs)
+            published_at_not_null=published_at_not_null,
+            published_at=published_at
         )
 
         response.set_index("id", inplace=True)
