@@ -157,7 +157,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             published_at_not_null=published_at_not_null,
             published_at=published_at
         )
-        return response.set_index("id", inplace=True)
+        return response.set_index("id", inplace=False)
 
     def get_channels(
         self, 
