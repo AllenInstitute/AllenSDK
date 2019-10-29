@@ -1,3 +1,13 @@
+from typing import Optional, TypeVar
+
+import numpy as np
+import pandas as pd
+
+
+ArrayLike = TypeVar("ArrayLike", list, np.ndarray, pd.Series, tuple)
+
+
+
 class EcephysProjectApi:
     def get_sessions(self, *args, **kwargs):
         raise NotImplementedError()
@@ -11,7 +21,14 @@ class EcephysProjectApi:
     def get_isi_experiments(self, *args, **kwargs):
         raise NotImplementedError()
 
-    def get_units(self, *args, **kwargs):
+    def get_units(
+        self, 
+        unit_ids: Optional[ArrayLike] = None, 
+        channel_ids: Optional[ArrayLike] = None, 
+        probe_ids: Optional[ArrayLike] = None, 
+        session_ids: Optional[ArrayLike] = None, 
+        published_at: Optional[str] = None
+    ):
         raise NotImplementedError()
 
     def get_channels(self, *args, **kwargs):
