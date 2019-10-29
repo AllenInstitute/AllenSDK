@@ -40,7 +40,12 @@ class EcephysProjectApi:
     ):
         raise NotImplementedError()
 
-    def get_probes(self, *args, **kwargs):
+    def get_probes(
+        self, 
+        probe_ids: Optional[ArrayLike] = None, 
+        session_ids: Optional[ArrayLike] = None, 
+        published_at: Optional[str] = None
+    ):
         raise NotImplementedError()
 
     def get_probe_lfp_data(self, probe_id, *args, **kwargs):

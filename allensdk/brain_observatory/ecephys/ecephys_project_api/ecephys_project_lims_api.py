@@ -209,94 +209,50 @@ class EcephysProjectLimsApi(EcephysProjectApi):
         )
         return response.set_index("id")
 
-    def get_probes(self, probe_ids=None, session_ids=None, **kwargs):
+    def get_probes(
+        self, 
+        probe_ids: Optional[ArrayLike] = None, 
+        session_ids: Optional[ArrayLike] = None, 
+        published_at: Optional[str] = None
+    ):
+
+        published_at_not_null = None if published_at is None else True
+        published_at = f"'{published_at}'" if published_at is not None else None
+
         response = build_and_execute(
             """
                 {%- import 'postgres_macros' as pm -%}
                 select 
-                    ep.id as id,
-                    ep.ecephys_session_id,
-                    ep.global_probe_sampling_rate,
-                    ep.global_probe_lfp_sampling_rate,
-                    total_time_shift,
-                    channel_count,
-                    unit_count,
-                    case 
-                        when nwb_id is not null then true
-                        else false
-                    end as has_lfp_nwb,
-                    str.structure_acronyms as structure_acronyms
-                from ecephys_probes ep 
-                join ecephys_sessions es on es.id = ep.ecephys_session_id 
-                join (
-                    select epr.id as ecephys_probe_id,
-                    count (distinct ech.id) as channel_count,
-                    count (distinct eun.id) as unit_count
-                    from ecephys_probes epr
-                    join ecephys_channels ech on (
-                        ech.ecephys_probe_id = epr.id
-                        and ech.valid_data
-                    )
-                    join ecephys_units eun on (
-                        eun.ecephys_channel_id = ech.id
-                        and eun.quality = 'good'
-                        {{pm.optional_le('eun.amplitude_cutoff', amplitude_cutoff_maximum) -}}
-                        {{pm.optional_ge('eun.presence_ratio', presence_ratio_minimum) -}}
-                        {{pm.optional_le('eun.isi_violations', isi_violations_maximum) -}}
-                    )
-                    group by epr.id
-                ) chc on ep.id = chc.ecephys_probe_id
-                left join (
-                    select
-                        epr.id as ecephys_probe_id,
-                        wkf.id as nwb_id
-                    from ecephys_probes epr 
-                    join ecephys_analysis_runs ear on (
-                        ear.ecephys_session_id = epr.ecephys_session_id
-                        and ear.current
-                    )
-                    right join ecephys_analysis_run_probes earp on (
-                        earp.ecephys_probe_id = epr.id
-                        and earp.ecephys_analysis_run_id = ear.id
-                    )
-                    right join well_known_files wkf on (
-                        wkf.attachable_id = earp.id
-                        and wkf.attachable_type = 'EcephysAnalysisRunProbe'
-                    )
-                    join well_known_file_types wkft on wkft.id = wkf.well_known_file_type_id
-                    where wkft.name = 'EcephysLfpNwb'
-                ) nwb on ep.id = nwb.ecephys_probe_id
-                left join (
-                    select epr.id as ecephys_probe_id,
-                    array_agg (st.id) as structure_ids,
-                    array_agg (distinct st.acronym) as structure_acronyms
-                    from ecephys_probes epr
-                    join ecephys_channels ech on (
-                        ech.ecephys_probe_id = epr.id
-                        and ech.valid_data
-                    )
-                    left join structures st on st.id = ech.manual_structure_id
-                    group by epr.id
-                ) str on ep.id = str.ecephys_probe_id
-                where true
-                and ep.workflow_state != 'failed'
-                and es.workflow_state != 'failed'
-                {{pm.optional_contains('ep.id', probe_ids) -}}
-                {{pm.optional_contains('es.id', session_ids) -}}
+                    ep.id, 
+                    ep.ecephys_session_id, 
+                    ep.name, 
+                    ep.global_probe_sampling_rate as sampling_rate, 
+                    ep.global_probe_lfp_sampling_rate as lfp_sampling_rate,
+                    ep.phase,
+                    ep.air_channel_index,
+                    ep.surface_channel_index,
+                    ep.use_lfp_data as has_lfp_data,
+                    ep.temporal_subsampling_factor as lfp_temporal_subsampling_factor
+                from ecephys_probes ep
+                join ecephys_sessions es on es.id = ep.ecephys_session_id
+                where 
+                    not es.habituation 
+                    and ep.workflow_state != 'failed'
+                    and es.workflow_state != 'failed'
+                    {{pm.optional_not_null('es.published_at', published_at_not_null)}}
+                    {{pm.optional_le('es.published_at', published_at)}}
+                    {{pm.optional_contains('ep.id', probe_ids) -}}
+                    {{pm.optional_contains('es.id', session_ids) -}}
             """,
             base=postgres_macros(),
             engine=self.postgres_engine.select,
             probe_ids=probe_ids,
             session_ids=session_ids,
-            amplitude_cutoff_maximum=get_unit_filter_value("amplitude_cutoff_maximum", replace_none=False, **kwargs),
-            presence_ratio_minimum=get_unit_filter_value("presence_ratio_minimum", replace_none=False, **kwargs),
-            isi_violations_maximum=get_unit_filter_value("isi_violations_maximum", replace_none=False, **kwargs)
+            published_at_not_null=published_at_not_null,
+            published_at=published_at
         )
-        response = response.set_index("id")
-        # Clarify name for external users
-        response.rename(columns={"use_lfp_data": "has_lfp_data"}, inplace=True)
+        return response.set_index("id")
 
-        return response
 
     def get_sessions(
         self,
