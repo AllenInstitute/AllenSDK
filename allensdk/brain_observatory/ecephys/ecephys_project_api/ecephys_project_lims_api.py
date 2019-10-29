@@ -157,56 +157,55 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             published_at_not_null=published_at_not_null,
             published_at=published_at
         )
+        return response.set_index("id", inplace=True)
 
-        response.set_index("id", inplace=True)
+    def get_channels(
+        self, 
+        channel_ids: Optional[ArrayLike] = None, 
+        probe_ids: Optional[ArrayLike] = None, 
+        session_ids: Optional[ArrayLike] = None, 
+        published_at: Optional[str] = None
+    ):
 
-        return response
+        published_at_not_null = None if published_at is None else True
+        published_at = f"'{published_at}'" if published_at is not None else None
 
-    def get_channels(self, channel_ids=None, probe_ids=None, session_ids=None, **kwargs):
         response = build_and_execute(
             """
                 {%- import 'postgres_macros' as pm -%}
                 select 
-                    ec.id as id,
-                    ec.ecephys_probe_id,
+                    ec.id, 
+                    ec.ecephys_probe_id, 
                     ec.local_index,
                     ec.probe_vertical_position,
                     ec.probe_horizontal_position,
                     ec.manual_structure_id as ecephys_structure_id,
                     st.acronym as ecephys_structure_acronym,
-                    pc.unit_count
-                from ecephys_channels ec 
+                    ec.anterior_posterior_ccf_coordinate,
+                    ec.dorsal_ventral_ccf_coordinate,
+                    ec.left_right_ccf_coordinate
+                from ecephys_channels ec
                 join ecephys_probes ep on ep.id = ec.ecephys_probe_id
-                join ecephys_sessions es on es.id = ep.ecephys_session_id 
-                left join structures st on st.id = ec.manual_structure_id
-                join (
-                    select ech.id as ecephys_channel_id,
-                    count (distinct eun.id) as unit_count
-                    from ecephys_channels ech
-                    join ecephys_units eun on (
-                        eun.ecephys_channel_id = ech.id
-                        and eun.quality = 'good'
-                        {{pm.optional_le('eun.amplitude_cutoff', amplitude_cutoff_maximum) -}}
-                        {{pm.optional_ge('eun.presence_ratio', presence_ratio_minimum) -}}
-                        {{pm.optional_le('eun.isi_violations', isi_violations_maximum) -}}
-                    )
-                    group by ech.id
-                ) pc on ec.id = pc.ecephys_channel_id
-                where valid_data
-                and ep.workflow_state != 'failed'
-                and es.workflow_state != 'failed'
-                {{pm.optional_contains('ec.id', channel_ids) -}}
-                {{pm.optional_contains('ep.id', probe_ids) -}}
-                {{pm.optional_contains('es.id', session_ids) -}}
+                join ecephys_sessions es on es.id = ep.ecephys_session_id
+                left join structures st on ec.manual_structure_id = st.id
+                where 
+                    not es.habituation 
+                    and valid_data
+                    and ep.workflow_state != 'failed'
+                    and es.workflow_state != 'failed'
+                    {{pm.optional_not_null('es.published_at', published_at_not_null)}}
+                    {{pm.optional_le('es.published_at', published_at)}}
+                    {{pm.optional_contains('ec.id', channel_ids) -}}
+                    {{pm.optional_contains('ep.id', probe_ids) -}}
+                    {{pm.optional_contains('es.id', session_ids) -}}
             """,
             base=postgres_macros(),
             engine=self.postgres_engine.select,
             channel_ids=channel_ids,
             probe_ids=probe_ids,
             session_ids=session_ids,
-            amplitude_cutoff_maximum=get_unit_filter_value("amplitude_cutoff_maximum", replace_none=False, **kwargs),
-            presence_ratio_minimum=get_unit_filter_value("presence_ratio_minimum", replace_none=False, **kwargs),
-            isi_violations_maximum=get_unit_filter_value("isi_violations_maximum", replace_none=False, **kwargs)
+            published_at_not_null=published_at_not_null,
+            published_at=published_at
         )
         return response.set_index("id")
 

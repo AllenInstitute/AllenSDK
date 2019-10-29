@@ -31,7 +31,13 @@ class EcephysProjectApi:
     ):
         raise NotImplementedError()
 
-    def get_channels(self, *args, **kwargs):
+    def get_channels(
+        self, 
+        channel_ids: Optional[ArrayLike] = None, 
+        probe_ids: Optional[ArrayLike] = None, 
+        session_ids: Optional[ArrayLike] = None, 
+        published_at: Optional[str] = None
+    ):
         raise NotImplementedError()
 
     def get_probes(self, *args, **kwargs):
