@@ -256,63 +256,36 @@ class EcephysProjectLimsApi(EcephysProjectApi):
 
     def get_sessions(
         self,
-        session_ids=None,
-        workflow_states=("uploaded",),
-        published=None,
-        habituation=False,
-        project_names=(
-            "BrainTV Neuropixels Visual Behavior",
-            "BrainTV Neuropixels Visual Coding",
-        ),
-        **kwargs
+        session_ids: Optional[ArrayLike] = None,
+        published_at: Optional[str] = None
     ):
+
+        published_at_not_null = None if published_at is None else True
+        published_at = f"'{published_at}'" if published_at is not None else None
 
         response = build_and_execute(
             """
                 {%- import 'postgres_macros' as pm -%}
                 {%- import 'macros' as m -%}
                 select 
-                    stimulus_name as session_type,
-                    sp.id as specimen_id, 
-                    es.id as id, 
+                    es.id, 
+                    es.specimen_id, 
+                    es.stimulus_name as session_type, 
+                    es.isi_experiment_id, 
+                    es.date_of_acquisition, 
+                    es.published_at,  
                     dn.full_genotype as genotype,
-                    gd.name as gender, 
+                    gd.name as sex, 
                     ages.days as age_in_days,
-                    pr.code as project_code,
-                    probe_count,
-                    channel_count,
-                    unit_count,
                     case 
                         when nwb_id is not null then true
                         else false
-                    end as has_nwb,
-                    str.structure_acronyms as structure_acronyms
+                    end as has_nwb
                 from ecephys_sessions es
                 join specimens sp on sp.id = es.specimen_id 
                 join donors dn on dn.id = sp.donor_id 
                 join genders gd on gd.id = dn.gender_id 
                 join ages on ages.id = dn.age_id
-                join projects pr on pr.id = es.project_id
-                join (
-                    select es.id as ecephys_session_id,
-                    count (distinct epr.id) as probe_count,
-                    count (distinct ech.id) as channel_count,
-                    count (distinct eun.id) as unit_count
-                    from ecephys_sessions es
-                    join ecephys_probes epr on epr.ecephys_session_id = es.id
-                    join ecephys_channels ech on (
-                        ech.ecephys_probe_id = epr.id
-                        and ech.valid_data
-                    )
-                    join ecephys_units eun on (
-                        eun.ecephys_channel_id = ech.id
-                        and eun.quality = 'good'
-                        {{pm.optional_le('eun.amplitude_cutoff', amplitude_cutoff_maximum) -}}
-                        {{pm.optional_ge('eun.presence_ratio', presence_ratio_minimum) -}}
-                        {{pm.optional_le('eun.isi_violations', isi_violations_maximum) -}}
-                    )
-                    group by es.id
-                ) pc on es.id = pc.ecephys_session_id
                 left join (
                     select ecephys_sessions.id as ecephys_session_id,
                     wkf.id as nwb_id
@@ -328,36 +301,18 @@ class EcephysProjectLimsApi(EcephysProjectApi):
                     join well_known_file_types wkft on wkft.id = wkf.well_known_file_type_id
                     where wkft.name = 'EcephysNwb'
                 ) nwb on es.id = nwb.ecephys_session_id
-                left join (
-                    select es.id as ecephys_session_id,
-                    array_agg (st.id) as structure_ids,
-                    array_agg (distinct st.acronym) as structure_acronyms
-                    from ecephys_sessions es
-                    join ecephys_probes epr on epr.ecephys_session_id = es.id
-                    join ecephys_channels ech on (
-                        ech.ecephys_probe_id = epr.id
-                        and ech.valid_data
-                    )
-                    left join structures st on st.id = ech.manual_structure_id
-                    group by es.id
-                ) str on es.id = str.ecephys_session_id
-                where true
-                {{pm.optional_contains('es.id', session_ids) -}}
-                {{pm.optional_contains('es.workflow_state', workflow_states, True) -}}
-                {{pm.optional_equals('es.habituation', habituation) -}}
-                {{pm.optional_not_null('es.published_at', published) -}}
-                {{pm.optional_contains('pr.name', project_names, True) -}}
+                where 
+                    not es.habituation 
+                    and es.workflow_state != 'failed'
+                    {{pm.optional_contains('es.id', session_ids) -}}
+                    {{pm.optional_not_null('es.published_at', published_at_not_null)}}
+                    {{pm.optional_le('es.published_at', published_at)}}
             """,
             base=postgres_macros(),
             engine=self.postgres_engine.select,
             session_ids=session_ids,
-            workflow_states=workflow_states,
-            published=published,
-            habituation=f"{habituation}".lower() if habituation is not None else habituation,
-            project_names=project_names,
-            amplitude_cutoff_maximum=get_unit_filter_value("amplitude_cutoff_maximum", replace_none=False, **kwargs),
-            presence_ratio_minimum=get_unit_filter_value("presence_ratio_minimum", replace_none=False, **kwargs),
-            isi_violations_maximum=get_unit_filter_value("isi_violations_maximum", replace_none=False, **kwargs)
+            published_at_not_null=published_at_not_null,
+            published_at=published_at
         )
         
         response.set_index("id", inplace=True) 
