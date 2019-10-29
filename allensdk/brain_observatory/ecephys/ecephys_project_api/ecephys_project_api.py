@@ -9,7 +9,11 @@ ArrayLike = TypeVar("ArrayLike", list, np.ndarray, pd.Series, tuple)
 
 
 class EcephysProjectApi:
-    def get_sessions(self, *args, **kwargs):
+    def get_sessions(
+        self,
+        session_ids: Optional[ArrayLike] = None,
+        published_at: Optional[str] = None
+    ):
         raise NotImplementedError()
 
     def get_session_data(self, session_id, *args, **kwargs):
