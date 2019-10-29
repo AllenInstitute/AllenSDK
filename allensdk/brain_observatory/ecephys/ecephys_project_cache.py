@@ -133,7 +133,7 @@ class EcephysProjectCache(Cache):
     def _get_units(self, filter_by_validity: bool = True, **unit_filter_kwargs) -> pd.DataFrame:
         path = self.get_cache_path(None, self.UNITS_KEY)
 
-        units = call_caching(self.fetch_api.get_units, path, strategy='lazy', **csv_io)
+        units = one_file_call_caching(path, self.fetch_api.get_units, write_csv, read_csv, num_tries=self.fetch_tries)
         units = units.rename(columns={
             'PT_ratio': 'waveform_PT_ratio',
             'amplitude': 'waveform_amplitude',
