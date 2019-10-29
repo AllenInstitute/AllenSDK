@@ -49,6 +49,11 @@ Eye tracking rig geometry conventions
 
 6. Provided camera 'rotations' are applied in the CCS
 
+7. Eye tracking video images are presented as if looking at right eye with
+   subject anterior to right of image and subject posterior to the left of
+   image. (camera is actually pointed at a dichroic mirror but video frames are
+   compensated [rotated 180 degrees about y-axis] prior to video upload)
+
 General strategy
 ----
 

@@ -74,20 +74,21 @@ def test_compute_cr_coordinate(gaze_mapper_fixture, expected):
       "led_position": np.array([130, 0, 0])},
      {"cam_pupil_params": np.array([[300, 300], [350, 350], [325, 325], [290, 290]]),
       "cam_cr_params": np.array([[300, 300], [300, 300], [300, 300], [300, 300]])},
-     [[0.16820, 0.0000, 0.0000],
-      [0.15195, 0.0510, 0.0510],
-      [0.16428, 0.0255, 0.0255],
-      [0.16758, -0.0102, -0.0102]]),
+     [[-0.16820, 0.0000, 0.0000],
+      [-0.15195, -0.0510, 0.0510],
+      [-0.16428, -0.0255, 0.0255],
+      [-0.16758, 0.0102, -0.0102]]),
 
     # Test when params result in estimated pupil location outside of eye
     ({"monitor_position": np.array([170, 0, 0]),
       "camera_position": np.array([150, 0, 0]),
       "led_position": np.array([130, 0, 0])},
-     {"cam_pupil_params": np.array([[900, 900], [350, 350], [325, 325], [100, 100]]),
-      "cam_cr_params": np.array([[300, 300], [300, 300], [300, 300], [800, 800]])},
+     {"cam_pupil_params": np.array([[900, 900], [350, 350], [325, 325], [250, 250], [100, 100]]),
+      "cam_cr_params": np.array([[300, 300], [300, 300], [300, 300], [300, 300], [800, 800]])},
      [[np.nan, np.nan, np.nan],
-      [0.15195, 0.0510, 0.0510],
-      [0.16428, 0.0255, 0.0255],
+      [-0.15195, -0.0510, 0.0510],
+      [-0.16428, -0.0255, 0.0255],
+      [-0.15195, 0.051, -0.051],
       [np.nan, np.nan, np.nan]]),
 
 ], indirect=['gaze_mapper_fixture'])
@@ -105,9 +106,9 @@ def test_pupil_pos_in_eye_coords(gaze_mapper_fixture,
      {"cam_pupil_params": np.array([[300, 300], [350, 350], [325, 325], [290, 290]]),
       "cam_cr_params": np.array([[300, 300], [300, 300], [300, 300], [300, 300]])},
      [[0, 0],
-      [-57.057, 57.057],
-      [-26.386, 26.386],
-      [10.3472, -10.347]]),
+      [-57.057, -57.057],
+      [-26.386, -26.386],
+      [10.3472, 10.347]]),
 
     # Test when params result in estimated pupil location outside of eye
     ({"monitor_position": np.array([170, 0, 0]),
@@ -117,7 +118,7 @@ def test_pupil_pos_in_eye_coords(gaze_mapper_fixture,
       "cam_cr_params": np.array([[300, 300], [300, 300], [300, 300], [800, 800]])},
      [[0, 0],
       [np.nan, np.nan],
-      [-26.386, 26.386],
+      [-26.386, -26.386],
       [np.nan, np.nan]]),
 
 ], indirect=['gaze_mapper_fixture'])
@@ -151,25 +152,25 @@ def test_pupil_position_on_monitor_in_degrees(gaze_mapper_fixture,
     # General sanity check using extreme pupil values to see if output
     # screen mapped coordinates are generally in the right quadrant/hemisphere.
 
-    # As if looking up
+    # As if looking at top half of screen
     ({"led_position": np.array([135, 0, 0]),  # rig geometry parameters
       "monitor_position": np.array([170, 0, 0]),
       "camera_position": np.array([130, 0, 0])},
-     {"cam_pupil_params": np.array([[300, 400]]),  # Pupil center (x, y) coords
+     {"cam_pupil_params": np.array([[300, 200]]),  # Pupil center (x, y) coords
       "cam_cr_params": np.array([[300, 300]])},  # Corneal reflect (x, y) coords
      np.array([[0, 1]]),  # Expected general direction of outputs in unit vector form
      0),  # Allowed angle tolerance (in degrees) between `expected - obtained`
 
-    # As if looking down
+    # As if looking at bottom half of screen
     ({"led_position": np.array([135, 0, 0]),
       "monitor_position": np.array([170, 0, 0]),
       "camera_position": np.array([130, 0, 0])},
-     {"cam_pupil_params": np.array([[300, 200]]),
+     {"cam_pupil_params": np.array([[300, 400]]),
       "cam_cr_params": np.array([[300, 300]])},
      np.array([[0, -1]]),
      0),
 
-    # As if looking right (due to dichroic mirror)
+    # As if looking at right side of screen
     ({"led_position": np.array([135, 0, 0]),
       "monitor_position": np.array([170, 0, 0]),
       "camera_position": np.array([130, 0, 0])},
@@ -178,7 +179,7 @@ def test_pupil_position_on_monitor_in_degrees(gaze_mapper_fixture,
      np.array([[1, 0]]),
      0),
 
-    # As if looking left (due to dichroic mirror)
+    # As if looking at left side of screen
     ({"led_position": np.array([135, 0, 0]),
       "monitor_position": np.array([170, 0, 0]),
       "camera_position": np.array([130, 0, 0])},
@@ -187,38 +188,38 @@ def test_pupil_position_on_monitor_in_degrees(gaze_mapper_fixture,
      np.array([[-1, 0]]),
      0),
 
-    # As if looking to upper right
-    ({"led_position": np.array([135, 0, 0]),
-      "monitor_position": np.array([170, 0, 0]),
-      "camera_position": np.array([130, 0, 0])},
-     {"cam_pupil_params": np.array([[200, 400]]),
-      "cam_cr_params": np.array([[300, 300]])},
-     np.array([[1, 1]]),
-     0),
-
-    # As if looking to lower right
+    # As if looking at upper right quadrant of screen
     ({"led_position": np.array([135, 0, 0]),
       "monitor_position": np.array([170, 0, 0]),
       "camera_position": np.array([130, 0, 0])},
      {"cam_pupil_params": np.array([[200, 200]]),
       "cam_cr_params": np.array([[300, 300]])},
-     np.array([[1, -1]]),
+     np.array([[1, 1]]),
      0),
 
-    # As if looking to upper left
+    # As if looking at lower right quadrant of screen
     ({"led_position": np.array([135, 0, 0]),
       "monitor_position": np.array([170, 0, 0]),
       "camera_position": np.array([130, 0, 0])},
-     {"cam_pupil_params": np.array([[400, 400]]),
+     {"cam_pupil_params": np.array([[200, 400]]),
       "cam_cr_params": np.array([[300, 300]])},
-     np.array([[-1, 1]]),
+     np.array([[1, -1]]),
      0),
 
-    # As if looking to lower left
+    # As if looking to upper right quadrant of screen
     ({"led_position": np.array([135, 0, 0]),
       "monitor_position": np.array([170, 0, 0]),
       "camera_position": np.array([130, 0, 0])},
      {"cam_pupil_params": np.array([[400, 200]]),
+      "cam_cr_params": np.array([[300, 300]])},
+     np.array([[-1, 1]]),
+     0),
+
+    # As if looking at lower left quadrant of screen
+    ({"led_position": np.array([135, 0, 0]),
+      "monitor_position": np.array([170, 0, 0]),
+      "camera_position": np.array([130, 0, 0])},
+     {"cam_pupil_params": np.array([[400, 400]]),
       "cam_cr_params": np.array([[300, 300]])},
      np.array([[-1, -1]]),
      0),

@@ -191,9 +191,6 @@ class GazeMapper(object):
         delta_py = pupil_cr_delta.T[1]
 
         R_eye_to_cam = self.camera.generate_self_to_eye_frame_xform().inv()
-        # Camera captures images of eye off of a dichroic mirror
-        # so image will appear rotated 180 degrees about its y-axis.
-        self.camera.rotations = self.camera.rotations + [0, np.pi, 0]
         R_cam = self.camera.generate_rotations_xform()
 
         cr_pos_in_cam_coord_frame = R_cam.apply(R_eye_to_cam.apply(self.cr))
