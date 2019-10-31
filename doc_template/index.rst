@@ -90,6 +90,18 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
+What's New - 1.1.0 (October 31, 2019)
+-----------------------------------------------------------------------
+
+The 1.1.0 release adds:
+- an updated gaze mapping algorithm
+- automatic retries for failed neuropixels NWB file downloads
+
+and fixes:
+- several failing nightly build tests
+- warnings emitted due to use of deprecated `h5py.Dataset.value`
+
+
 What's New - 1.0.2 (October 14, 2019)
 ------------------------------------------------------------------------
 
@@ -103,6 +115,7 @@ With this release, we are no longer supporting Python 2.
 Previous Release Notes
 ----------------------
 
+    * `1.0.2 <https://github.com/AllenInstitute/AllenSDK/wiki/Release-Notes-(1.0.2)>`_
     * `0.16.3 <https://github.com/AllenInstitute/AllenSDK/wiki/Release-Notes-(0.16.3)>`_
     * `0.16.2 <https://github.com/AllenInstitute/AllenSDK/wiki/Release-Notes-(0.16.2)>`_
     * `0.16.2 <https://github.com/AllenInstitute/AllenSDK/wiki/Release-Notes-(0.16.2)>`_
