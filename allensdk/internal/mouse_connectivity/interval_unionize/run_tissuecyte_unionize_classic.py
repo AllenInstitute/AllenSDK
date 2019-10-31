@@ -1,10 +1,9 @@
 import logging
-from six import iteritems
 
 from allensdk.core.simple_tree import SimpleTree
 
 from allensdk.internal.mouse_connectivity.interval_unionize.tissuecyte_unionizer import TissuecyteUnionizer
-import data_utilities as du
+import allensdk.internal.mouse_connectivity.interval_unionize.data_utilities as du
 
 
 def get_ancestor_id_map(structures):
@@ -15,7 +14,7 @@ def get_ancestor_id_map(structures):
                        lambda st: st['parent_structure_id'])
     ancestor_id_map = tree.value_map( lambda st: st['id'], 
                                       lambda st: tree.ancestor_ids([st['id']])[0] )
-    for k in ancestor_id_map.keys():
+    for k in list(ancestor_id_map):
         ancestor_id_map[-k] = map(lambda x: -x, ancestor_id_map[k])
       
     return ancestor_id_map
@@ -54,7 +53,7 @@ def run(input_data):
     signal_arrays.update(du.get_sum_pixel_intensities(input_data['grid_paths']['sum_pixel_intensities'], 
                                                       input_data['grid_paths']['injection_sum_pixel_intensities']))
 
-    for k, v in iteritems(signal_arrays):
+    for k, v in signal_arrays.items():
         logging.info('sorting {0} array'.format(k))
         signal_arrays[k] = v.flat[unionizer.sort]
     

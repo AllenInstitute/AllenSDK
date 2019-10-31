@@ -249,7 +249,30 @@ class EcephysSession(LazyPropertyMixin):
 
         return self._spike_times
 
-    def __init__(self, api, **kwargs):
+    def __init__(
+        self, 
+        api: EcephysSessionApi, 
+        test: bool = False, 
+        **kwargs
+    ):
+        """ Construct an EcephysSession object, which provides access to 
+        detailed data for a single extracellular electrophysiology 
+        (neuropixels) session.
+
+        Parameters
+        ----------
+        api : 
+            Used to access data, which is then cached on this object. Must 
+            expose the EcephysSessionApi interface. Standard options include 
+            instances of:
+                EcephysSessionNwbApi :: reads data from a neurodata without 
+                    borders 2.0 file.
+        test : 
+            If true, check during construction that this session's api is 
+            valid.
+
+        """
+
         self.api: EcephysSessionApi = api
 
         self.ecephys_session_id = self.LazyProperty(self.api.get_ecephys_session_id)
@@ -271,6 +294,9 @@ class EcephysSession(LazyPropertyMixin):
         self._units = self.LazyProperty(self.api.get_units, wrappers=[self._build_units_table])
         self._rig_metadata = self.LazyProperty(self.api.get_rig_metadata)
         self._metadata = self.LazyProperty(self.api.get_metadata)
+
+        if test:
+            self.api.test()
 
     def get_current_source_density(self, probe_id):
         """ Obtain current source density (CSD) of trial-averaged response to a flash stimuli for this probe.

@@ -109,4 +109,4 @@ def test_create_sample_metadata():
     expected_data = pd.DataFrame(data=d, columns=["rna_well_id", "block_id", "block_name", "polygon_id", "specimen_id",
                                                   "specimen_name", "structure_abbreviation", "structure_color",
                                                   "structure_id", "structure_name", "tumor_id", "tumor_name"])
-    assert(expected_data.equals(data))
+    pd.testing.assert_frame_equal(expected_data, data, check_like=True)

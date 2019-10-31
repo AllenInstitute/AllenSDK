@@ -6,9 +6,9 @@ import ast
 import pandas as pd
 import numpy as np
 import xarray as xr
+import pynwb
 
 from .ecephys_session_api import EcephysSessionApi
-from allensdk.brain_observatory.ecephys.file_promise import FilePromise
 from allensdk.brain_observatory.nwb.nwb_api import NwbApi
 import allensdk.brain_observatory.ecephys.nwb  # noqa Necessary to import pyNWB namespaces
 from allensdk.brain_observatory.ecephys import get_unit_filter_value
@@ -21,7 +21,7 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
 
     def __init__(self,
                  path,
-                 probe_lfp_paths: Optional[Dict[int, FilePromise]] = None,
+                 probe_lfp_paths: Optional[Dict[int, Callable[[], pynwb.NWBFile]]] = None,
                  additional_unit_metrics=None,
                  external_channel_columns=None,
                  **kwargs):
@@ -37,6 +37,16 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
 
         self.additional_unit_metrics = additional_unit_metrics
         self.external_channel_columns = external_channel_columns
+
+    def test(self):
+        """ A minimal test to make sure that this API's NWB file exists and is 
+        readable. Ecephys NWB files use the required session identifier field 
+        to store the session id, so this is guaranteed to be present for any 
+        uncorrupted NWB file.
+
+        Of course, this does not ensure that the file as a whole is correct.
+        """
+        self.get_ecephys_session_id()
 
     def get_session_start_time(self):
         return self.nwbfile.session_start_time

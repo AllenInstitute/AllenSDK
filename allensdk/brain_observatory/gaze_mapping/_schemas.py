@@ -2,8 +2,8 @@ from argschema import ArgSchema
 from argschema.fields import Float, LogLevel, String
 
 from allensdk.brain_observatory.argschema_utilities import (
-    check_read_access,
-    check_write_access_overwrite,
+    InputFile,
+    OutputFile,
     RaisingSchema
 )
 
@@ -11,24 +11,21 @@ from allensdk.brain_observatory.argschema_utilities import (
 class InputSchema(ArgSchema):
 
     # ============== Required fields ==============
-    input_file = String(
+    input_file = InputFile(
         required=True,
-        validate=check_read_access,
         description=('An h5 file containing ellipses fits for '
                      'eye, pupil, and corneal reflections.')
     )
 
-    session_sync_file = String(
+    session_sync_file = InputFile(
         required=True,
-        validate=check_read_access,
         description=('An h5 file containing timestamps to synchronize '
                      'eye tracking video frames with rest of ephys '
                      'session events.')
     )
 
-    output_file = String(
+    output_file = OutputFile(
         required=True,
-        validate=check_write_access_overwrite,
         description=('Full save path of output h5 file that '
                      'will be created by this module.')
     )
@@ -83,15 +80,15 @@ class InputSchema(ArgSchema):
                                     'to acquire eye tracking videos.'))
     date_of_acquisition = String(required=True,
                                  description='Acquisition datetime string.')
-    eye_video_file = String(required=True, validate=check_read_access,
-                            description=('Full path to raw eye video '
-                                         'file (*.avi).'))
+    eye_video_file = InputFile(required=True,
+                               description=('Full path to raw eye video '
+                                            'file (*.avi).'))
 
     # ============== Optional fields ==============
     eye_radius_cm = Float(default=0.1682,
                           description=('Radius of tracked eye(s) in '
                                        'centimeters.'))
-    cm_per_pixel = Float(default=(10.2/10000.0),
+    cm_per_pixel = Float(default=(10.2 / 10000.0),
                          description=('Centimeter per pixel conversion '
                                       'ratio.'))
     log_level = LogLevel(default='INFO',
@@ -99,8 +96,7 @@ class InputSchema(ArgSchema):
 
 
 class OutputSchema(RaisingSchema):
-    screen_mapping_file = String(required=True,
-                                 validate=check_write_access_overwrite,
-                                 description=('Full save path of output h5 '
-                                              'file that will be created by '
-                                              'this module.'))
+    screen_mapping_file = OutputFile(required=True,
+                                     description=('Full save path of output h5 '
+                                                  'file that will be created '
+                                                  'by this module.'))

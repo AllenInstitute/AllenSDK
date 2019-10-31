@@ -49,6 +49,8 @@ def test_get_session(behavior_session_uuid, behavior_session_id):
     session_dict = api.get_session(**kwargs)
     trials_df = session_dict.pop('trials')
     assert len(trials_df) == 576
+    assert "stages" in session_dict.keys()    # Remove stages because it's very long
+    del session_dict["stages"]
     assert session_dict == {u'name': u'TRAINING_1_gratings',
                                                       u'parameters': {u'auto_reward_delay': 0.15,
                                                                       u'change_time_scale': 2.0,
@@ -86,8 +88,13 @@ def test_get_session(behavior_session_uuid, behavior_session_id):
                                                       u'LabTracks_ID': 431151,
                                                       u'date':
                                                       u'2019-02-15T13:01:23.672000',
-                                                      'regimen_name': u'VisualBehavior_Task1A_v1.0.1'}
-    # assert stage == 'OPHYS_6_images_B'
+                                                      'regimen_name': u'VisualBehavior_Task1A_v1.0.1',
+                                                      u'default_x': False,
+                                                      u'regimens': [{u'active': False, 
+                                                                     u'default': False, 
+                                                                     u'id': 14, 
+                                                                     u'name': u'VisualBehavior_Task1A_v1.0.1'}],
+                                                      u'default_y': False}
 
 
 
