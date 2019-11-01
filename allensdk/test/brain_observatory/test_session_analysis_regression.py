@@ -112,8 +112,6 @@ def analysis_a_new(nwb_a, tmpdir_factory):
 
     yield save_path
 
-    if os.path.exists(save_path):
-        os.remove(save_path)
 
 @pytest.fixture(scope="module")
 def analysis_b_new(nwb_b, tmpdir_factory):
@@ -127,8 +125,6 @@ def analysis_b_new(nwb_b, tmpdir_factory):
 
     yield save_path
 
-    if os.path.exists(save_path):
-        os.remove(save_path)
 
 @pytest.fixture(scope="module")
 def analysis_c_new(nwb_c, tmpdir_factory):
@@ -147,9 +143,6 @@ def analysis_c_new(nwb_c, tmpdir_factory):
     logging.debug(save_path)
 
     yield save_path
-
-    if os.path.exists(save_path):
-        os.remove(save_path)
 
 
 def compare_peak(p1, p2):
