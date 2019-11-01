@@ -4,8 +4,9 @@ import numpy as np
 import pandas as pd
 
 
+# TODO: This should be a generic over the type of the values, but there is not 
+# good support currently for numpy and pandas type annotations 
 ArrayLike = TypeVar("ArrayLike", list, np.ndarray, pd.Series, tuple)
-
 
 
 class EcephysProjectApi:
@@ -16,7 +17,7 @@ class EcephysProjectApi:
     ):
         raise NotImplementedError()
 
-    def get_session_data(self, session_id, *args, **kwargs):
+    def get_session_data(self, session_id: int) -> Generator:
         raise NotImplementedError()
 
     def get_targeted_regions(self, *args, **kwargs):
@@ -52,7 +53,7 @@ class EcephysProjectApi:
     ):
         raise NotImplementedError()
 
-    def get_probe_lfp_data(self, probe_id, *args, **kwargs):
+    def get_probe_lfp_data(self, probe_id: int) -> Generator:
         raise NotImplementedError()
 
     def get_natural_movie_template(self, number) -> Generator:
@@ -61,5 +62,10 @@ class EcephysProjectApi:
     def get_natural_scene_template(self, number) -> Generator:
         raise NotImplementedError()
 
-    def get_unit_analysis_metrics(self, unit_ids=None, ecephys_session_ids=None, session_types=None, *args, **kwargs):
+    def get_unit_analysis_metrics(
+        self, 
+        unit_ids: Optional[ArrayLike] = None, 
+        ecephys_session_ids: Optional[ArrayLike] = None, 
+        session_types: Optional[ArrayLike] = None
+    ) -> pd.DataFrame:
         raise NotImplementedError()

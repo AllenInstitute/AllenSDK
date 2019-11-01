@@ -1,4 +1,4 @@
-from typing import Optional, Generator
+from typing import Optional, Generator, Dict, Union
 
 import pandas as pd
 
@@ -11,13 +11,56 @@ from allensdk.internal.api import PostgresQueryMixin
 
 class EcephysProjectLimsApi(EcephysProjectApi):
 
-    STIMULUS_NAMESPACE = "brain_observatory_1.1"
+    STIMULUS_TEMPLATE_NAMESPACE = "brain_observatory_1.1"
 
     def __init__(self, postgres_engine, app_engine):
+        """ Downloads extracellular ephys data from the Allen Institute's 
+        internal Laboratory Information Management System (LIMS). If you are 
+        on our network you can use this class to get bleeding-edge data into 
+        an EcephysProjectCache. If not, it won't work at all
+
+        Parameters
+        ----------
+        postgres_engine : 
+            used for making queries against the LIMS postgres database. Must 
+            implement:
+                select : takes a postgres query as a string. Returns a pandas 
+                    dataframe of results
+                select_one : takes a postgres query as a string. If there is 
+                    exactly one record in the response, returns that record as 
+                    a dict. Otherwise returns an empty dict.
+        app_engine : 
+            used for making queries agains the lims web application. Must 
+            implement:
+                stream : takes a url as a string. Returns a generator yielding 
+                the response body as bytes.
+
+        Notes
+        -----
+        You almost certainly want to construct this class by calling 
+        EcephysProjectLimsApi.default() rather than this constructor directly.
+
+        """
+
+
         self.postgres_engine = postgres_engine
         self.app_engine = app_engine
 
-    def get_session_data(self, session_id, **kwargs):
+    def get_session_data(self, session_id: int) -> Generator[bytes, None, None]:
+        """ Download an NWB file containing detailed data for an ecephys 
+        session.
+
+        Parameters
+        ----------
+        session_id : 
+            Download an NWB file for this session
+
+        Returns
+        -------
+        A generator yielding an NWB file as bytes.
+
+        """
+
         nwb_response = build_and_execute(
             """
             select wkf.id, wkf.filename, wkf.storage_directory, wkf.attachable_id from well_known_files wkf 
@@ -45,7 +88,21 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             f"well_known_files/download/{nwb_id}?wkf_id={nwb_id}"
         )
 
-    def get_probe_lfp_data(self, probe_id):
+    def get_probe_lfp_data(self, probe_id: int) -> Generator[bytes, None, None]:
+        """ Download an NWB file containing detailed data for the local field 
+        potential recorded from an ecephys probe.
+
+        Parameters
+        ----------
+        probe_id : 
+            Download an NWB file for this probe's LFP
+
+        Returns
+        -------
+        A generator yielding an NWB file as bytes.
+
+        """
+
         nwb_response = build_and_execute(
             """
             select wkf.id from well_known_files wkf
@@ -81,23 +138,36 @@ class EcephysProjectLimsApi(EcephysProjectApi):
         probe_ids: Optional[ArrayLike] = None, 
         session_ids: Optional[ArrayLike] = None, 
         published_at: Optional[str] = None
-    ):
-        """ Query LIMS for records describing sorted ecephys units.
+    ) -> pd.DataFrame:
+        """ Download a table of records describing sorted ecephys units.
 
         Parameters
         ----------
-        units_ids :
-        channel_ids :
-        probe_ids :
-        session_ids :
-        published_at :
-            If provided, only units from sessions published prior to this date 
-            will be returned. Format should be YYYY-MM-DD
+        unit_ids : 
+            A collection of integer identifiers for sorted ecephys units. If 
+            provided, only return records describing these units.
+        channel_ids : 
+            A collection of integer identifiers for ecephys channels. If 
+            provided, results will be filtered to units recorded from these 
+            channels.
+        probe_ids : 
+            A collection of integer identifiers for ecephys probes. If 
+            provided, results will be filtered to units recorded from these 
+            probes.
+        session_ids : 
+            A collection of integer identifiers for ecephys sessions. If 
+            provided, results will be filtered to units recorded during
+            these sessions.
+        published_at : 
+            A date (rendered as "YYYY-MM-DD"). If provided, only units 
+            recorded during sessions published before this data will be 
+            returned.
+
+        Returns
+        -------
+        a pd.DataFrame whose rows are ecephys channels.
 
         """
-
-        published_at_not_null = None if published_at is None else True
-        published_at = f"'{published_at}'" if published_at is not None else None
 
         response = build_and_execute(
             """
@@ -153,8 +223,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             channel_ids=channel_ids,
             probe_ids=probe_ids,
             session_ids=session_ids,
-            published_at_not_null=published_at_not_null,
-            published_at=published_at
+            **_split_published_at(published_at)
         )
         return response.set_index("id", inplace=False)
 
@@ -164,10 +233,31 @@ class EcephysProjectLimsApi(EcephysProjectApi):
         probe_ids: Optional[ArrayLike] = None, 
         session_ids: Optional[ArrayLike] = None, 
         published_at: Optional[str] = None
-    ):
+    ) -> pd.DataFrame:
+        """ Download a table of ecephys channel records.
 
-        published_at_not_null = None if published_at is None else True
-        published_at = f"'{published_at}'" if published_at is not None else None
+        Parameters
+        ----------
+        channel_ids : 
+            A collection of integer identifiers for ecephys channels. If 
+            provided, results will be filtered to these channels.
+        probe_ids : 
+            A collection of integer identifiers for ecephys probes. If 
+            provided, results will be filtered to channels on these probes.
+        session_ids : 
+            A collection of integer identifiers for ecephys sessions. If 
+            provided, results will be filtered to channels recorded from during
+            these sessions.
+        published_at : 
+            A date (rendered as "YYYY-MM-DD"). If provided, only channels 
+            recorded from during sessions published before this date will be 
+            returned.
+
+        Returns
+        -------
+        a pd.DataFrame whose rows are ecephys channels.
+
+        """
 
         response = build_and_execute(
             """
@@ -203,8 +293,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             channel_ids=channel_ids,
             probe_ids=probe_ids,
             session_ids=session_ids,
-            published_at_not_null=published_at_not_null,
-            published_at=published_at
+            **_split_published_at(published_at)
         )
         return response.set_index("id")
 
@@ -213,10 +302,28 @@ class EcephysProjectLimsApi(EcephysProjectApi):
         probe_ids: Optional[ArrayLike] = None, 
         session_ids: Optional[ArrayLike] = None, 
         published_at: Optional[str] = None
-    ):
+    ) -> pd.DataFrame:
+        """ Download a table of ecephys probe records.
 
-        published_at_not_null = None if published_at is None else True
-        published_at = f"'{published_at}'" if published_at is not None else None
+        Parameters
+        ----------
+        probe_ids : 
+            A collection of integer identifiers for ecephys probes. If 
+            provided, results will be filtered to these probes.
+        session_ids : 
+            A collection of integer identifiers for ecephys sessions. If 
+            provided, results will be filtered to probes recorded from during
+            these sessions.
+        published_at : 
+            A date (rendered as "YYYY-MM-DD"). If provided, only probes 
+            recorded from during sessions published before this date will be 
+            returned.
+
+        Returns
+        -------
+        a pd.DataFrame whose rows are ecephys probes.
+
+        """
 
         response = build_and_execute(
             """
@@ -247,8 +354,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             engine=self.postgres_engine.select,
             probe_ids=probe_ids,
             session_ids=session_ids,
-            published_at_not_null=published_at_not_null,
-            published_at=published_at
+            **_split_published_at(published_at)
         )
         return response.set_index("id")
 
@@ -257,10 +363,23 @@ class EcephysProjectLimsApi(EcephysProjectApi):
         self,
         session_ids: Optional[ArrayLike] = None,
         published_at: Optional[str] = None
-    ):
+    ) -> pd.DataFrame:
+        """ Download a table of ecephys session records.
 
-        published_at_not_null = None if published_at is None else True
-        published_at = f"'{published_at}'" if published_at is not None else None
+        Parameters
+        ----------
+        session_ids : 
+            A collection of integer identifiers for ecephys sessions. If 
+            provided, results will be filtered to these sessions.
+        published_at : 
+            A date (rendered as "YYYY-MM-DD"). If provided, only sessions 
+            published before this date will be returned.
+
+        Returns
+        -------
+        a pd.DataFrame whose rows are ecephys sessions.
+
+        """
 
         response = build_and_execute(
             """
@@ -310,8 +429,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             base=postgres_macros(),
             engine=self.postgres_engine.select,
             session_ids=session_ids,
-            published_at_not_null=published_at_not_null,
-            published_at=published_at
+            **_split_published_at(published_at)
         )
         
         response.set_index("id", inplace=True) 
@@ -319,7 +437,37 @@ class EcephysProjectLimsApi(EcephysProjectApi):
         return response
 
 
-    def get_unit_analysis_metrics(self, unit_ids=None, ecephys_session_ids=None, session_types=None):
+    def get_unit_analysis_metrics(
+        self, 
+        unit_ids: Optional[ArrayLike] = None, 
+        ecephys_session_ids: Optional[ArrayLike] = None, 
+        session_types: Optional[ArrayLike] = None
+    ) -> pd.DataFrame:
+        """ Fetch analysis metrics (stimulus set-specific characterizations of 
+        unit response patterns) for ecephys units. Note that the metrics 
+        returned depend on the stimuli that were presented during recording (
+        and thus on the session_type)
+
+        Parameters
+        ---------
+        unit_ids :
+            integer identifiers for a set of ecephys units. If provided, the 
+            response will only include metrics calculated for these units
+        ecephys_session_ids :
+            integer identifiers for a set of ecephys sessions. If provided, the 
+            response will only include metrics calculated for units identified 
+            during these sessions
+        session_types :
+            string names identifying ecephys session types (e.g. 
+            "brain_observatory_1.1" or "functional_connectivity")
+
+        Returns
+        -------
+        a pandas dataframe indexed by ecephys unit id whose columns are 
+        metrics.
+
+        """
+
         response = build_and_execute(
             """
             {%- import 'postgres_macros' as pm -%}
@@ -350,6 +498,10 @@ class EcephysProjectLimsApi(EcephysProjectApi):
 
 
     def _get_template(self, name, namespace):
+        """ Identify the WellKnownFile record associated with a stimulus 
+        template and stream its data if present.
+        """
+
         try:
             well_known_file = build_and_execute(
                 f"""
@@ -384,11 +536,13 @@ class EcephysProjectLimsApi(EcephysProjectApi):
 
         Returns
         -------
-        A generator yielding a bytestream of this template's data.
+        A generator yielding an npy file as bytes
 
         """
 
-        return self._get_template(f"natural_movie_{number}", self.STIMULUS_NAMESPACE)
+        return self._get_template(
+            f"natural_movie_{number}", self.STIMULUS_TEMPLATE_NAMESPACE
+        )
 
 
     def get_natural_scene_template(self, number: int) -> Generator[bytes, None, None]:
@@ -402,10 +556,12 @@ class EcephysProjectLimsApi(EcephysProjectApi):
 
         Returns
         -------
-        A generator yielding a bytestream of this template's data.
+        A generator yielding a tiff file as bytes.
 
         """
-        return self._get_template(f"natural_scene_{int(number)}", self.STIMULUS_NAMESPACE)
+        return self._get_template(
+            f"natural_scene_{int(number)}", self.STIMULUS_TEMPLATE_NAMESPACE
+        )
 
 
     @classmethod
@@ -422,3 +578,15 @@ class EcephysProjectLimsApi(EcephysProjectApi):
         pg_engine = PostgresQueryMixin(**_pg_kwargs)
         app_engine = HttpEngine(**_app_kwargs)
         return cls(pg_engine, app_engine)
+
+
+# TODO: in 3.8, use a typed dict here
+def _split_published_at(published_at: Optional[str]) -> Dict[str, Optional[Union[bool, str]]]:
+    """ LIMS queries that filter on published_at need a couple of 
+    reformattings of the argued date string.
+    """
+
+    return {
+        "published_at": f"'{published_at}'" if published_at is not None else None,
+        "published_at_not_null": None if published_at is None else True
+    }
