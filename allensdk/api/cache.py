@@ -75,17 +75,18 @@ def memoize(f):
         result = f(*args, **kwargs)
         cache[key] = result
         return result
-    
-    def clear_cache():
+
+    def cache_clear():
         cache.clear()
-        
+
     def cache_size():
         return cache_len()
 
-    wrapper.clear_cache = clear_cache
+    wrapper.cache_clear = cache_clear
     wrapper.cache_size = cache_size
 
     return wrapper
+
 
 class Cache(object):
     _log = logging.getLogger('allensdk.api.cache')

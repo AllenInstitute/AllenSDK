@@ -23,7 +23,7 @@ class OphysLimsApi(PostgresQueryMixin):
     def get_ophys_experiment_id(self):
         return self.ophys_experiment_id
 
-    def clear_cache(self):
+    def cache_clear(self):
         """
         Calls `clear_cache` method on all bound methods in this instance
         (where valid).
@@ -34,7 +34,7 @@ class OphysLimsApi(PostgresQueryMixin):
         """
         for _, method in inspect.getmembers(self, inspect.ismethod):
             try:
-                method.clear_cache()
+                method.cache_clear()
             except (AttributeError, TypeError):
                 pass
 

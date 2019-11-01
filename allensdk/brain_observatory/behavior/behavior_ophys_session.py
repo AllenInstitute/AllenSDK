@@ -2,21 +2,21 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 from typing import Any
+import logging
 
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
 from allensdk.brain_observatory.behavior.behavior_ophys_api\
     .behavior_ophys_nwb_api import BehaviorOphysNwbApi
 from allensdk.deprecated import legacy
-from allensdk.brain_observatory.behavior.trials_processing\
-    import calculate_reward_rate
-from allensdk.brain_observatory.behavior.dprime import\
-    get_rolling_dprime, get_trial_count_corrected_false_alarm_rate,\
-    get_trial_count_corrected_hit_rate
-from allensdk.brain_observatory.behavior.dprime import get_hit_rate,\
-    get_false_alarm_rate
+from allensdk.brain_observatory.behavior.trials_processing import (
+    calculate_reward_rate)
+from allensdk.brain_observatory.behavior.dprime import (
+    get_rolling_dprime, get_trial_count_corrected_false_alarm_rate,
+    get_trial_count_corrected_hit_rate)
+from allensdk.brain_observatory.behavior.dprime import (
+    get_hit_rate, get_false_alarm_rate)
 from allensdk.brain_observatory.behavior.image_api import Image, ImageApi
 from allensdk.brain_observatory.running_speed import RunningSpeed
-import logging
 
 
 class BehaviorOphysSession(object):
@@ -59,7 +59,7 @@ class BehaviorOphysSession(object):
 
     @property
     def stimulus_timestamps(self) -> np.ndarray:
-        """Timestamps associated withs timulus presentations on the 
+        """Timestamps associated with stimulus presentations on the 
         monitor (corrected for monitor delay).
         :rtype: numpy.ndarray
         """
@@ -190,10 +190,10 @@ class BehaviorOphysSession(object):
         """
         return self.get_segmentation_mask_image()
 
-    def clear_cache(self) -> None:
+    def cache_clear(self) -> None:
         """Convenience method to clear the api cache, if applicable."""
         try:
-            self.api.clear_cache()
+            self.api.cache_clear()
         except AttributeError:
             logging.getLogger("BehaviorOphysSession").warning(
                 f"Attempted to clear API cache, but method `clear_cache`"

@@ -167,13 +167,13 @@ def test_memoize_with_function():
     def f(x):
         time.sleep(0.1)
         return x
-    
+
     # Build cache
     for i in range(3):
         uncached_result = f(i)
         assert uncached_result == i
     assert f.cache_size() == 3
-    
+
     # Test cache was accessed
     for i in range(3):
         t0 = time.time()
@@ -181,9 +181,9 @@ def test_memoize_with_function():
         t1 = time.time()
         assert result == i
         assert t1 - t0 < 0.1
-    
+
     # Test cache clear
-    f.clear_cache()
+    f.cache_clear()
     assert f.cache_size() == 0
 
 
@@ -192,7 +192,7 @@ def test_memoize_with_kwarg_function():
     def f(x, *, y, z=1):
         time.sleep(0.1)
         return (x * y * z)
-    
+
     # Build cache
     f(2, y=1, z=2)
     assert f.cache_size() == 1
