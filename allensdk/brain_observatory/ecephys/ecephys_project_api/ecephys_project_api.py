@@ -6,6 +6,9 @@ import pandas as pd
 
 # TODO: This should be a generic over the type of the values, but there is not 
 # good support currently for numpy and pandas type annotations 
+# we should investigate numpy and pandas typing support and migrate
+# https://github.com/numpy/numpy-stubs
+# https://github.com/pandas-dev/pandas/blob/master/pandas/_typing.py 
 ArrayLike = TypeVar("ArrayLike", list, np.ndarray, pd.Series, tuple)
 
 
