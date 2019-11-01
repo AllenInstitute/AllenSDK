@@ -163,82 +163,60 @@ def test_pg_query(method_name,kwargs, response, checks, expected):
         assert not any_checks_failed
 
 
-def test_get_session_data():
+WKF_ID = 12345
+class MockPgEngine:
 
-    session_id = 12345
-    wkf_id = 987
-
-    class MockPgEngine:
-        def select(self, rendered):
-            pattern = re.compile(
-                r".*and ear.ecephys_session_id = (?P<session_id>\d+).*", re.DOTALL
-            )
-            match = pattern.match(rendered)
-            sid_obt = int(match["session_id"])
-            assert session_id == sid_obt
-            return pd.DataFrame({"id": [wkf_id]})
-
-    class MockHttpEngine:
-        def stream(self, path):
-            assert path == f"well_known_files/download/{wkf_id}?wkf_id={wkf_id}"
-
-    api = epla.EcephysProjectLimsApi(
-        postgres_engine=MockPgEngine(), app_engine=MockHttpEngine()
-    )
-    api.get_session_data(session_id)
+    def __init__(self, query_pattern):
+        self.query_pattern = query_pattern
 
 
-def test_get_probe_data():
+class MockTemplatePgEngine(MockPgEngine):
 
-    probe_id = 12345
-    wkf_id = 987
-
-    class MockPgEngine:
-        def select(self, rendered):
-            pattern = re.compile(
-                r".*and earp.ecephys_probe_id = (?P<probe_id>\d+).*", re.DOTALL
-            )
-            match = pattern.match(rendered)
-            pid_obt = int(match["probe_id"])
-            assert probe_id == pid_obt
-            return pd.DataFrame({"id": [wkf_id]})
-
-    class MockHttpEngine:
-        def stream(self, path):
-            assert path == f"well_known_files/download/{wkf_id}?wkf_id={wkf_id}"
-
-    api = epla.EcephysProjectLimsApi(
-        postgres_engine=MockPgEngine(), app_engine=MockHttpEngine()
-    )
-    api.get_probe_lfp_data(probe_id)
+    def select_one(self, rendered):
+        assert self.query_pattern.match(rendered) is not None
+        return {"well_known_file_id": WKF_ID}
 
 
-@pytest.mark.parametrize("method,kwargs,query_pattern", [
+class MockDataPgEngine(MockPgEngine):
+    def select(self, rendered):
+        assert self.query_pattern.match(rendered) is not None
+        return pd.DataFrame({"id": [WKF_ID]})
+
+
+class MockHttpEngine:
+    def stream(self, url):
+        assert url == f"well_known_files/download/{WKF_ID}?wkf_id={WKF_ID}"
+
+
+@pytest.mark.parametrize("method,kwargs,query_pattern,pg_engine_cls", [
     [
         "get_natural_movie_template",
         {"number": 12},
-        re.compile(".+st.name = 'natural_movie_12'.+", re.DOTALL)
+        re.compile(".+st.name = 'natural_movie_12'.+", re.DOTALL),
+        MockTemplatePgEngine
     ],
     [
         "get_natural_scene_template",
         {"number": 12},
-        re.compile(".+st.name = 'natural_scene_12'.+", re.DOTALL)
+        re.compile(".+st.name = 'natural_scene_12'.+", re.DOTALL),
+        MockTemplatePgEngine
+    ],
+    [
+        "get_probe_lfp_data",
+        {"probe_id": 53},
+        re.compile(r".+and earp.ecephys_probe_id = 53.+", re.DOTALL),
+        MockDataPgEngine
+    ],
+    [
+        "get_session_data",
+        {"session_id": 53},
+        re.compile(r".+and ear.ecephys_session_id = 53.+", re.DOTALL),
+        MockDataPgEngine
     ]
 ])
-def test_template_getter(method, kwargs, query_pattern):
-
-    wkf_id = 12345
-
-    class MockPgEngine:
-        def select_one(self, rendered):
-            assert query_pattern.match(rendered) is not None
-            return {"well_known_file_id": wkf_id}
-
-    class MockHttpEngine:
-        def stream(self, url):
-             assert url == f"well_known_files/download/{wkf_id}?wkf_id={wkf_id}"
+def test_file_getter(method, kwargs, query_pattern, pg_engine_cls):
 
     api = epla.EcephysProjectLimsApi(
-        postgres_engine=MockPgEngine(), app_engine=MockHttpEngine()
+        postgres_engine=pg_engine_cls(query_pattern), app_engine=MockHttpEngine()
     )
     getattr(api, method)(**kwargs)
