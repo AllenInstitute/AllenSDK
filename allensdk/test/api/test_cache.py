@@ -38,7 +38,6 @@ import os
 import pandas as pd
 import pandas.io.json as pj
 import numpy as np
-import time
 
 import pytest
 from mock import MagicMock, mock_open, patch
@@ -161,70 +160,33 @@ def test_wrap_dataframe(ju_read_url_get, ju_write, mock_read_json, rma, cache):
     ju_write.assert_called_once_with('example.txt', _msg)
     mock_read_json.assert_called_once_with('example.txt', orient='records')
 
+def test_memoize():
 
-def test_memoize_with_function():
-    @memoize
-    def f(x):
-        time.sleep(0.1)
-        return x
-    
-    # Build cache
-    for i in range(3):
-        uncached_result = f(i)
-        assert uncached_result == i
-    assert f.cache_size() == 3
-    
-    # Test cache was accessed
-    for i in range(3):
-        t0 = time.time()
-        result = f(i)
-        t1 = time.time()
-        assert result == i
-        assert t1 - t0 < 0.1
-    
-    # Test cache clear
-    f.clear_cache()
-    assert f.cache_size() == 0
+        import time
 
-
-def test_memoize_with_kwarg_function():
-    @memoize
-    def f(x, *, y, z=1):
-        time.sleep(0.1)
-        return (x * y * z)
-    
-    # Build cache
-    f(2, y=1, z=2)
-    assert f.cache_size() == 1
-
-    # Test cache was accessed
-    t0 = time.time()
-    result = f(2, y=1, z=2)
-    t1 = time.time()
-    assert result == 4
-    assert t1 - t0 < 1.0 
-
-
-def test_memoize_with_instance_method():
-    class FooBar(object):
         @memoize
-        def f(self, x):
-            time.sleep(0.1)
+        def f(x):
+            time.sleep(1)
             return x
 
-    fb = FooBar()
-    # Build cache
-    for i in range(3):
-        uncached_result = fb.f(i)
-        assert uncached_result == i
-    assert fb.f.cache_size() == 3
+        for ii in range(2):
+            t0 = time.time()
+            print(f(0), time.time() - t0)
 
-    for i in range(3):
-        t0 = time.time()
-        result = fb.f(i)
-        t1 = time.time()
-        assert result == i
-        assert t1 - t0 < 0.1
+        class FooBar(object):
+
+            def __init__(self): pass
+
+            @memoize
+            def f(self, x):
+                time.sleep(.1)
+                return 1
+
+        fb = FooBar()
+
+        for ii in range(2):
+            t0 = time.time()
+            fb.f(0), time.time() - t0
 
 
 def test_get_default_manifest_file():
