@@ -12,6 +12,12 @@ an experiment container have different stimulus protocols, but cover the same im
 .. image:: /_static/container_session_layout.png
    :align: center
 
+**Note:** Version 1.3 of scipy fixed an error in its 2 sample Kolmogorov-Smirnoff test implementation. The new version produces more accurate p values for small and medium-sized samples.
+This change impacts speed tuning analysis p values (as returned by `StimulusAnalysis.get_speed_tuning`). 
+If you access precalculated analysis results via `BrainObservatoryCache.get_ophys_experiment_analysis`, you will see values calculated 
+using an older version of scipy's `ks_2samp`. To access values calculated from the new version, install scipy>=1.3.0 in your environment and construct a `StimulusAnalysis` object 
+from a `BrainObservatoryNwbDataSet` (as returned by `BrainObservatoryCache.get_ophys_experiment_data`).
+
 **Note:** Data collected after September 2016 uses a new session C stimulus designed to better-characterize spatial receptive fields in 
 higher visual areas.  The original locally sparse noise stimulus used 4.65 visual degree pixels.  Session C2 broke that stimulus
 into two separate stimulus blocks: one with 4.65 degree pixels and one with 9.3 degree pixels.  Note that the :py:mod:`~allensdk.brain_observatory.stimulus_info`
