@@ -55,7 +55,7 @@ class BehaviorBase(abc.ABC):
         """Get running speed using timestamps from
         self.get_stimulus_timestamps.
 
-        Note: Do not correct for monitor delay.
+        NOTE: Do not correct for monitor delay.
 
         Returns
         -------
@@ -70,6 +70,8 @@ class BehaviorBase(abc.ABC):
     @abc.abstractmethod
     def get_stimulus_presentations(self) -> pd.DataFrame:
         """Get stimulus presentation data.
+
+        NOTE: Uses timestamps that do not account for monitor delay.
 
         Returns
         -------
@@ -96,12 +98,13 @@ class BehaviorBase(abc.ABC):
     def get_stimulus_timestamps(self) -> np.ndarray:
         """Get stimulus timestamps from pkl file.
 
-        Note: Located with behavior_session_id
+        NOTE: Located with behavior_session_id
 
         Returns
         -------
         np.ndarray
-            Timestamps associated with stimulus presentations on the monitor.
+            Timestamps associated with stimulus presentations on the monitor
+            that do no account for monitor delay.
         """
         raise NotImplementedError()
 
