@@ -1,7 +1,4 @@
-from pathlib import Path
-import shutil
-import warnings
-from typing import Optional, TypeVar
+from typing import Optional, Generator
 
 import pandas as pd
 
@@ -10,10 +7,12 @@ from .http_engine import HttpEngine
 from .utilities import postgres_macros, build_and_execute
 
 from allensdk.internal.api import PostgresQueryMixin
-from allensdk.brain_observatory.ecephys import get_unit_filter_value
 
 
 class EcephysProjectLimsApi(EcephysProjectApi):
+
+    STIMULUS_NAMESPACE = "brain_observatory_1.1"
+
     def __init__(self, postgres_engine, app_engine):
         self.postgres_engine = postgres_engine
         self.app_engine = app_engine
@@ -348,6 +347,65 @@ class EcephysProjectLimsApi(EcephysProjectApi):
         response.set_index("ecephys_unit_id", inplace=True)
 
         return response
+
+
+    def _get_template(self, name, namespace):
+        try:
+            well_known_file = build_and_execute(
+                f"""
+                select 
+                    st.well_known_file_id
+                from stimuli st
+                join stimulus_namespaces sn on sn.id = st.stimulus_namespace_id
+                where
+                    st.name = '{name}'
+                    and sn.name = '{namespace}'
+                """,
+                base=postgres_macros(),
+                engine=self.postgres_engine.select_one
+            )
+            wkf_id = well_known_file["well_known_file_id"]
+        except (KeyError, IndexError):
+            raise ValueError(f"expected exactly 1 template for {name}")
+
+        download_link = f"well_known_files/download/{wkf_id}?wkf_id={wkf_id}"
+        return self.app_engine.stream(download_link)
+
+
+    def get_natural_movie_template(self, number: int) -> Generator[bytes, None, None]:
+        """ Download a template for the natural movie stimulus. This is the 
+        actual movie that was shown during the recording session.
+
+        Parameters
+        ----------
+        number :
+            idenfifier for this movie (note that this is an integer, so to get 
+            the template for natural_movie_three you should pass in 3)
+
+        Returns
+        -------
+        A generator yielding a bytestream of this template's data.
+
+        """
+
+        return self._get_template(f"natural_movie_{number}", self.STIMULUS_NAMESPACE)
+
+
+    def get_natural_scene_template(self, number: int) -> Generator[bytes, None, None]:
+        """ Download a template for the natural scene stimulus. This is the 
+        actual image that was shown during the recording session.
+
+        Parameters
+        ----------
+        number :
+            idenfifier for this scene
+
+        Returns
+        -------
+        A generator yielding a bytestream of this template's data.
+
+        """
+        return self._get_template(f"natural_scene_{int(number)}", self.STIMULUS_NAMESPACE)
 
 
     @classmethod

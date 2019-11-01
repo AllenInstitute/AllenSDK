@@ -1,4 +1,4 @@
-from typing import Optional, TypeVar
+from typing import Optional, TypeVar, Generator
 
 import numpy as np
 import pandas as pd
@@ -55,10 +55,10 @@ class EcephysProjectApi:
     def get_probe_lfp_data(self, probe_id, *args, **kwargs):
         raise NotImplementedError()
 
-    def get_natural_movie_template(self, number, *args, **kwargs):
+    def get_natural_movie_template(self, number) -> Generator:
         raise NotImplementedError()
 
-    def get_natural_scene_template(self, number, *args, **kwargs):
+    def get_natural_scene_template(self, number) -> Generator:
         raise NotImplementedError()
 
     def get_unit_analysis_metrics(self, unit_ids=None, ecephys_session_ids=None, session_types=None, *args, **kwargs):

@@ -70,7 +70,8 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
                 "[attachable_type$eq'Product']"
                 r"[attachable_id$eq{{ecephys_product_id}}]"
             ),
-             engine=self.rma_engine.get_rma_tabular, ecephys_product_id=ecephys_product_id
+            engine=self.rma_engine.get_rma_tabular, 
+            ecephys_product_id=ecephys_product_id
         )
 
         scene_number = []

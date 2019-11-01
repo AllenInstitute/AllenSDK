@@ -211,3 +211,34 @@ def test_get_probe_data():
         postgres_engine=MockPgEngine(), app_engine=MockHttpEngine()
     )
     api.get_probe_lfp_data(probe_id)
+
+
+@pytest.mark.parametrize("method,kwargs,query_pattern", [
+    [
+        "get_natural_movie_template",
+        {"number": 12},
+        re.compile(".+st.name = 'natural_movie_12'.+", re.DOTALL)
+    ],
+    [
+        "get_natural_scene_template",
+        {"number": 12},
+        re.compile(".+st.name = 'natural_scene_12'.+", re.DOTALL)
+    ]
+])
+def test_template_getter(method, kwargs, query_pattern):
+
+    wkf_id = 12345
+
+    class MockPgEngine:
+        def select_one(self, rendered):
+            assert query_pattern.match(rendered) is not None
+            return {"well_known_file_id": wkf_id}
+
+    class MockHttpEngine:
+        def stream(self, url):
+             assert url == f"well_known_files/download/{wkf_id}?wkf_id={wkf_id}"
+
+    api = epla.EcephysProjectLimsApi(
+        postgres_engine=MockPgEngine(), app_engine=MockHttpEngine()
+    )
+    getattr(api, method)(**kwargs)
