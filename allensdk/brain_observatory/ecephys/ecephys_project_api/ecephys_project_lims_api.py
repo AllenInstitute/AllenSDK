@@ -1,4 +1,4 @@
-from typing import Optional, Generator, Dict, Union
+from typing import Optional, Generator, NamedTuple
 
 import pandas as pd
 
@@ -223,7 +223,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             channel_ids=channel_ids,
             probe_ids=probe_ids,
             session_ids=session_ids,
-            **_split_published_at(published_at)
+            **_split_published_at(published_at)._asdict()
         )
         return response.set_index("id", inplace=False)
 
@@ -293,7 +293,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             channel_ids=channel_ids,
             probe_ids=probe_ids,
             session_ids=session_ids,
-            **_split_published_at(published_at)
+            **_split_published_at(published_at)._asdict()
         )
         return response.set_index("id")
 
@@ -354,7 +354,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             engine=self.postgres_engine.select,
             probe_ids=probe_ids,
             session_ids=session_ids,
-            **_split_published_at(published_at)
+            **_split_published_at(published_at)._asdict()
         )
         return response.set_index("id")
 
@@ -429,7 +429,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             base=postgres_macros(),
             engine=self.postgres_engine.select,
             session_ids=session_ids,
-            **_split_published_at(published_at)
+            **_split_published_at(published_at)._asdict()
         )
         
         response.set_index("id", inplace=True) 
@@ -580,13 +580,17 @@ class EcephysProjectLimsApi(EcephysProjectApi):
         return cls(pg_engine, app_engine)
 
 
-# TODO: in 3.8, use a typed dict here
-def _split_published_at(published_at: Optional[str]) -> Dict[str, Optional[Union[bool, str]]]:
+class SplitPublishedAt(NamedTuple):
+    published_at: Optional[str]
+    published_at_not_null: Optional[bool]
+
+
+def _split_published_at(published_at: Optional[str]) -> SplitPublishedAt:
     """ LIMS queries that filter on published_at need a couple of 
     reformattings of the argued date string.
     """
 
-    return {
-        "published_at": f"'{published_at}'" if published_at is not None else None,
-        "published_at_not_null": None if published_at is None else True
-    }
+    return SplitPublishedAt(
+        published_at=f"'{published_at}'" if published_at is not None else None,
+        published_at_not_null=None if published_at is None else True
+    )
