@@ -33,6 +33,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
+import warnings
 import scipy.stats as st
 import numpy as np
 import pandas as pd
@@ -85,6 +86,10 @@ class StimulusAnalysis(object):
         self._mean_sweep_response = StimulusAnalysis._PRELOAD
         self._pval = StimulusAnalysis._PRELOAD
         self._peak = StimulusAnalysis._PRELOAD
+
+        # get_speed_tuning emits a warning describing a scipy ks_2samp update. 
+        # we only want to see this warning once
+        self.__warned_speed_tuning = False
 
     @property
     def stim_table(self):
@@ -284,6 +289,13 @@ class StimulusAnalysis(object):
         -------
         tuple: binned_dx_sp, binned_cells_sp, binned_dx_vis, binned_cells_vis, peak_run
         """
+
+        if not self.__warned_speed_tuning:
+            self.__warned_speed_tuning = True
+            warnings.warn(
+                f"scipy 1.3 (your version: {scipy.__version__}) improved two-sample Kolmogorov-Smirnoff test p values for small and medium-sized samples. "
+                "Precalculated speed tuning p values may not agree with outputs obtained under recent scipy versions!"
+            )
 
         StimulusAnalysis._log.info(
             'Calculating speed tuning, spontaneous vs visually driven')
