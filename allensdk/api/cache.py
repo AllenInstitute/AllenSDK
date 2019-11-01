@@ -42,25 +42,39 @@ import pandas as pd
 import pandas.io.json as pj
 
 import functools
-from functools import wraps
+from functools import wraps, _make_key
 import os
 import logging
 import csv
 
 
 def memoize(f):
-   memodict = dict()
+    cache = {}
+    sentinel = object()         # unique object for cache misses
+    make_key = _make_key        # efficient key building from function args
+    cache_get = cache.get       
+    cache_len = cache.__len__   
 
-   @wraps(f)
-   def wrapper(*args, **kwargs):
-       key = (args, tuple(kwargs.items()))
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        key = make_key(args, kwargs, typed=False)    # Don't consider 3.0 and 3 different
+        result = cache_get(key, sentinel)
+        if result is not sentinel:
+            return result
+        result = f(*args, **kwargs)
+        cache[key] = result
+        return result
+    
+    def clear_cache():
+        cache.clear()
+        
+    def cache_size():
+        return cache_len()
 
-       if key not in memodict:
-           memodict[key] = f(*args, **kwargs)
+    wrapper.clear_cache = clear_cache
+    wrapper.cache_size = cache_size
 
-       return memodict[key]
-
-   return wrapper
+    return wrapper
 
 class Cache(object):
     _log = logging.getLogger('allensdk.api.cache')
