@@ -20,9 +20,6 @@ class EcephysProjectApi:
     def get_session_data(self, session_id: int) -> Generator:
         raise NotImplementedError()
 
-    def get_targeted_regions(self, *args, **kwargs):
-        raise NotImplementedError()
-
     def get_isi_experiments(self, *args, **kwargs):
         raise NotImplementedError()
 
