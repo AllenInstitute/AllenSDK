@@ -1,98 +1,203 @@
 import numpy as np
 import pandas as pd
 import xarray as xr
-import math
-from typing import NamedTuple
-import os
+from typing import Any
+import logging
 
-from allensdk.core.lazy_property import LazyProperty, LazyPropertyMixin
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
-from allensdk.brain_observatory.behavior.behavior_ophys_api.behavior_ophys_nwb_api import equals, BehaviorOphysNwbApi
+from allensdk.brain_observatory.behavior.behavior_ophys_api\
+    .behavior_ophys_nwb_api import BehaviorOphysNwbApi
 from allensdk.deprecated import legacy
-from allensdk.brain_observatory.behavior.trials_processing import calculate_reward_rate
-from allensdk.brain_observatory.behavior.dprime import get_rolling_dprime, get_trial_count_corrected_false_alarm_rate, get_trial_count_corrected_hit_rate
-from allensdk.brain_observatory.behavior.dprime import get_hit_rate, get_false_alarm_rate
+from allensdk.brain_observatory.behavior.trials_processing import (
+    calculate_reward_rate)
+from allensdk.brain_observatory.behavior.dprime import (
+    get_rolling_dprime, get_trial_count_corrected_false_alarm_rate,
+    get_trial_count_corrected_hit_rate)
+from allensdk.brain_observatory.behavior.dprime import (
+    get_hit_rate, get_false_alarm_rate)
 from allensdk.brain_observatory.behavior.image_api import Image, ImageApi
+from allensdk.brain_observatory.running_speed import RunningSpeed
 
 
-class BehaviorOphysSession(LazyPropertyMixin):
-    """Represents data from a single Visual Behavior Ophys imaging session.  LazyProperty attributes access the data only on the first demand, and then memoize the result for reuse.
-    
-    Attributes:
-        ophys_experiment_id : int (LazyProperty)
-            Unique identifier for this experimental session
-        max_projection : allensdk.brain_observatory.behavior.image_api.Image (LazyProperty)
-            2D max projection image
-        stimulus_timestamps : numpy.ndarray (LazyProperty)
-            Timestamps associated the stimulus presentations on the monitor 
-        ophys_timestamps : numpy.ndarray (LazyProperty)
-            Timestamps associated with frames captured by the microscope
-        metadata : dict (LazyProperty)
-            A dictionary of session-specific metadata
-        dff_traces : pandas.DataFrame (LazyProperty)
-            The traces of dff organized into a dataframe; index is the cell roi ids
-        cell_specimen_table : pandas.DataFrame (LazyProperty)
-            Cell roi information organized into a dataframe; index is the cell roi ids
-        running_speed : allensdk.brain_observatory.running_speed.RunningSpeed (LazyProperty)
-            NamedTuple with two fields
-                timestamps : numpy.ndarray
-                    Timestamps of running speed data samples
-                values : np.ndarray
-                    Running speed of the experimental subject (in cm / s).
-        running_data_df : pandas.DataFrame (LazyProperty)
-            Dataframe containing various signals used to compute running speed
-        stimulus_presentations : pandas.DataFrame (LazyProperty)
-            Table whose rows are stimulus presentations (i.e. a given image, for a given duration, typically 250 ms) and whose columns are presentation characteristics.
-        stimulus_templates : dict (LazyProperty)
-            A dictionary containing the stimulus images presented during the session keys are data set names, and values are 3D numpy arrays.
-        licks : pandas.DataFrame (LazyProperty)
-            A dataframe containing lick timestamps
-        rewards : pandas.DataFrame (LazyProperty)
-            A dataframe containing timestamps of delivered rewards
-        task_parameters : dict (LazyProperty)
-            A dictionary containing parameters used to define the task runtime behavior
-        trials : pandas.DataFrame (LazyProperty)
-            A dataframe containing behavioral trial start/stop times, and trial data
-        corrected_fluorescence_traces : pandas.DataFrame (LazyProperty)
-            The motion-corrected fluorescence traces organized into a dataframe; index is the cell roi ids
-        average_projection : allensdk.brain_observatory.behavior.image_api.Image (LazyProperty)
-            2D image of the microscope field of view, averaged across the experiment
-        motion_correction : pandas.DataFrame LazyProperty
-            A dataframe containing trace data used during motion correction computation
+class BehaviorOphysSession(object):
+    """Represents data from a single Visual Behavior Ophys imaging session.
+    Can be initialized with an api that fetches data, or by using class methods
+    `from_lims` and `from_nwb_path`.
     """
 
     @classmethod
-    def from_lims(cls, ophys_experiment_id):
+    def from_lims(cls, ophys_experiment_id: int) -> "BehaviorOphysSession":
         return cls(api=BehaviorOphysLimsApi(ophys_experiment_id))
 
     @classmethod
-    def from_nwb_path(cls, nwb_path, **api_kwargs):
-        api_kwargs["filter_invalid_rois"] = api_kwargs.get("filter_invalid_rois", True)
-        return cls(api=BehaviorOphysNwbApi.from_path(path=nwb_path, **api_kwargs))
+    def from_nwb_path(
+            cls, nwb_path: str, **api_kwargs: Any) -> "BehaviorOphysSession":
+        api_kwargs["filter_invalid_rois"] = api_kwargs.get(
+            "filter_invalid_rois", True)
+        return cls(api=BehaviorOphysNwbApi.from_path(
+            path=nwb_path, **api_kwargs))
 
     def __init__(self, api=None):
-
         self.api = api
 
-        self.ophys_experiment_id = LazyProperty(self.api.get_ophys_experiment_id)
-        self.max_projection = LazyProperty(self.get_max_projection)
-        self.stimulus_timestamps = LazyProperty(self.api.get_stimulus_timestamps)
-        self.ophys_timestamps = LazyProperty(self.api.get_ophys_timestamps)
-        self.metadata = LazyProperty(self.api.get_metadata)
-        self.dff_traces = LazyProperty(self.api.get_dff_traces)
-        self.cell_specimen_table = LazyProperty(self.api.get_cell_specimen_table)
-        self.running_speed = LazyProperty(self.api.get_running_speed)
-        self.running_data_df = LazyProperty(self.api.get_running_data_df)
-        self.stimulus_presentations = LazyProperty(self.api.get_stimulus_presentations)
-        self.stimulus_templates = LazyProperty(self.api.get_stimulus_templates)
-        self.licks = LazyProperty(self.api.get_licks)
-        self.rewards = LazyProperty(self.api.get_rewards)
-        self.task_parameters = LazyProperty(self.api.get_task_parameters)
-        self.trials = LazyProperty(self.api.get_trials)
-        self.corrected_fluorescence_traces = LazyProperty(self.api.get_corrected_fluorescence_traces)
-        self.average_projection = LazyProperty(self.get_average_projection)
-        self.motion_correction = LazyProperty(self.api.get_motion_correction)
-        self.segmentation_mask_image = LazyProperty(self.get_segmentation_mask_image)
+    # Using properties rather than initializing attributes to take advantage
+    # of API-level cache and not introduce a lot of overhead when the 
+    # class is initialized (sometimes these calls can take a while)
+    @property
+    def ophys_experiment_id(self) -> int:
+        """Unique identifier for this experimental session.
+        :rtype: int
+        """
+        return self.api.get_ophys_experiment_id()
+
+    @property
+    def max_projection(self) -> Image:
+        """2D max projection image.
+        :rtype: allensdk.brain_observatory.behavior.image_api.Image
+        """
+        return self.get_max_projection()
+
+    @property
+    def stimulus_timestamps(self) -> np.ndarray:
+        """Timestamps associated with stimulus presentations on the 
+        monitor (corrected for monitor delay).
+        :rtype: numpy.ndarray
+        """
+        return self.api.get_stimulus_timestamps()
+
+    @property
+    def ophys_timestamps(self) -> np.ndarray:
+        """Timestamps associated with frames captured by the microscope
+        :rtype: numpy.ndarray
+        """
+        return self.api.ophys_timestamps()
+
+    @property
+    def metadata(self) -> dict:
+        """Dictioanry of session-specific metadata.
+        :rtype: dict
+        """
+        return self.api.get_metadata()
+
+    @property
+    def dff_traces(self) -> pd.DataFrame:
+        """Traces of dff organized into a dataframe; index is the cell roi ids.
+        :rtype: pandas.DataFrame
+        """
+        return self.api.get_dff_traces()
+
+    @property
+    def cell_specimen_table(self) -> pd.DataFrame:
+        """Cell roi information organized into a dataframe; index is the cell
+        roi ids.
+        :rtype: pandas.DataFrame
+        """
+        return self.api.get_cell_specimen_table()
+
+    @property
+    def running_speed(self) -> RunningSpeed:
+        """Running speed of mouse.  NamedTuple with two fields
+            timestamps : numpy.ndarray
+                Timestamps of running speed data samples
+            values : np.ndarray
+                Running speed of the experimental subject (in cm / s).
+        :rtype: allensdk.brain_observatory.running_speed.RunningSpeed
+        """
+        return self.api.get_running_speed()
+
+    @property
+    def running_data_df(self) -> pd.DataFrame:
+        """Dataframe containing various signals used to compute running speed
+        :rtype: pandas.DataFrame
+        """
+        return self.api.get_running_data_df()
+
+    @property
+    def stimulus_presentations(self) -> pd.DataFrame:
+        """Table whose rows are stimulus presentations (i.e. a given image,
+        for a given duration, typically 250 ms) and whose columns are
+        presentation characteristics.
+        :rtype: pandas.DataFrame
+        """
+        return self.api.get_stimulus_presentations()
+
+    @property
+    def stimulus_templates(self) -> dict:
+        """A dictionary containing the stimulus images presented during the
+        session keys are data set names, and values are 3D numpy arrays.
+        :rtype: dict
+        """
+        return self.api.get_stimulus_templates()
+
+    @property
+    def licks(self) -> pd.DataFrame:
+        """A dataframe containing lick timestamps.
+        :rtype: pandas.DataFrame
+        """
+        return self.api.get_licks()
+
+    @property
+    def rewards(self) -> pd.DataFrame:
+        """A dataframe containing timestamps of delivered rewards.
+        :rtype: pandas.DataFrame
+        """
+        return self.api.get_rewards()
+
+    @property
+    def task_parameters(self) -> dict:
+        """A dictionary containing parameters used to define the task runtime
+        behavior.
+        :rtype: dict
+        """
+        return self.api.get_task_parameters()
+
+    @property
+    def trials(self) -> pd.DataFrame:
+        """A dataframe containing behavioral trial start/stop times, and trial
+        data
+        :rtype: pandas.DataFrame"""
+        return self.api.get_trials()
+
+    @property
+    def corrected_fluorescence_traces(self) -> pd.DataFrame:
+        """The motion-corrected fluorescence traces organized into a dataframe;
+        index is the cell roi ids.
+        :rtype: pandas.DataFrame
+        """
+        return self.api.get_corrected_fluorescence_traces()
+
+    @property
+    def average_projection(self) -> pd.DataFrame:
+        """2D image of the microscope field of view, averaged across the
+        experiment
+        :rtype: pandas.DataFrame
+        """
+        return self.get_average_projection()
+
+    @property
+    def motion_correction(self) -> pd.DataFrame:
+        """A dataframe containing trace data used during motion correction
+        computation
+        :rtype: pandas.DataFrame
+        """
+        return self.api.get_motion_correction()
+
+    @property
+    def segmentation_mask_image(self) -> Image:
+        """An image with pixel value 1 if that pixel was included in an ROI,
+        and 0 otherwise
+        :rtype: allensdk.brain_observatory.behavior.image_api.Image
+        """
+        return self.get_segmentation_mask_image()
+
+    def cache_clear(self) -> None:
+        """Convenience method to clear the api cache, if applicable."""
+        try:
+            self.api.cache_clear()
+        except AttributeError:
+            logging.getLogger("BehaviorOphysSession").warning(
+                f"Attempted to clear API cache, but method `clear_cache`"
+                " does not exist on {self.api.__name__}")
 
     def get_roi_masks(self, cell_specimen_ids=None):
         """ Obtains boolean masks indicating the location of one or more cell's ROIs in this session.
@@ -102,7 +207,7 @@ class BehaviorOphysSession(LazyPropertyMixin):
         cell_specimen_ids : array-like of int, optional
             ROI masks for these cell specimens will be returned. The default behavior is to return masks for all 
             cell specimens.
-        
+
         Returns
         -------
         result : xr.DataArray
