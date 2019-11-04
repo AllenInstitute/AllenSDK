@@ -35,6 +35,7 @@
 #
 import warnings
 import scipy.stats as st
+import scipy
 import numpy as np
 import pandas as pd
 import logging
