@@ -5,10 +5,8 @@ import argparse
 import sys
 import numpy as np
 from scipy.spatial.distance import euclidean
-import neuron_morphology.swc as swc
 import skimage.draw
 
-#import allensdk.core.json_utilities as json
 
 
 def calculate_centroid(x, y):
