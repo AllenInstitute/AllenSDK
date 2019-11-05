@@ -1,4 +1,4 @@
-from typing import Optional, TypeVar, Generator
+from typing import Optional, TypeVar, Iterable
 
 import numpy as np
 import pandas as pd
@@ -20,7 +20,7 @@ class EcephysProjectApi:
     ):
         raise NotImplementedError()
 
-    def get_session_data(self, session_id: int) -> Generator:
+    def get_session_data(self, session_id: int) -> Iterable:
         raise NotImplementedError()
 
     def get_isi_experiments(self, *args, **kwargs):
@@ -53,13 +53,13 @@ class EcephysProjectApi:
     ):
         raise NotImplementedError()
 
-    def get_probe_lfp_data(self, probe_id: int) -> Generator:
+    def get_probe_lfp_data(self, probe_id: int) -> Iterable:
         raise NotImplementedError()
 
-    def get_natural_movie_template(self, number) -> Generator:
+    def get_natural_movie_template(self, number) -> Iterable:
         raise NotImplementedError()
 
-    def get_natural_scene_template(self, number) -> Generator:
+    def get_natural_scene_template(self, number) -> Iterable:
         raise NotImplementedError()
 
     def get_unit_analysis_metrics(
