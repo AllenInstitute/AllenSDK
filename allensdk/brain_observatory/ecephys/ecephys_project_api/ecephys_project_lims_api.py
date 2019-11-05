@@ -1,4 +1,4 @@
-from typing import Optional, Generator, NamedTuple
+from typing import Optional, Iterable, NamedTuple
 
 import pandas as pd
 
@@ -32,7 +32,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
         app_engine : 
             used for making queries agains the lims web application. Must 
             implement:
-                stream : takes a url as a string. Returns a generator yielding 
+                stream : takes a url as a string. Returns an iterable yielding 
                 the response body as bytes.
 
         Notes
@@ -46,7 +46,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
         self.postgres_engine = postgres_engine
         self.app_engine = app_engine
 
-    def get_session_data(self, session_id: int) -> Generator[bytes, None, None]:
+    def get_session_data(self, session_id: int) -> Iterable[bytes]:
         """ Download an NWB file containing detailed data for an ecephys 
         session.
 
@@ -57,7 +57,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
 
         Returns
         -------
-        A generator yielding an NWB file as bytes.
+        An iterable yielding an NWB file as bytes.
 
         """
 
@@ -88,7 +88,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             f"well_known_files/download/{nwb_id}?wkf_id={nwb_id}"
         )
 
-    def get_probe_lfp_data(self, probe_id: int) -> Generator[bytes, None, None]:
+    def get_probe_lfp_data(self, probe_id: int) -> Iterable[bytes]:
         """ Download an NWB file containing detailed data for the local field 
         potential recorded from an ecephys probe.
 
@@ -99,7 +99,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
 
         Returns
         -------
-        A generator yielding an NWB file as bytes.
+        An iterable yielding an NWB file as bytes.
 
         """
 
@@ -160,7 +160,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             these sessions.
         published_at : 
             A date (rendered as "YYYY-MM-DD"). If provided, only units 
-            recorded during sessions published before this data will be 
+            recorded during sessions published before this date will be 
             returned.
 
         Returns
@@ -524,7 +524,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
         return self.app_engine.stream(download_link)
 
 
-    def get_natural_movie_template(self, number: int) -> Generator[bytes, None, None]:
+    def get_natural_movie_template(self, number: int) -> Iterable[bytes]:
         """ Download a template for the natural movie stimulus. This is the 
         actual movie that was shown during the recording session.
 
@@ -536,7 +536,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
 
         Returns
         -------
-        A generator yielding an npy file as bytes
+        An iterable yielding an npy file as bytes
 
         """
 
@@ -545,7 +545,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
         )
 
 
-    def get_natural_scene_template(self, number: int) -> Generator[bytes, None, None]:
+    def get_natural_scene_template(self, number: int) -> Iterable[bytes]:
         """ Download a template for the natural scene stimulus. This is the 
         actual image that was shown during the recording session.
 
@@ -556,7 +556,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
 
         Returns
         -------
-        A generator yielding a tiff file as bytes.
+        An iterable yielding a tiff file as bytes.
 
         """
         return self._get_template(
