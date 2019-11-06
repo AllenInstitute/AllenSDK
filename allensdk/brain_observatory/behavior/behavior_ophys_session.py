@@ -70,7 +70,7 @@ class BehaviorOphysSession(object):
         """Timestamps associated with frames captured by the microscope
         :rtype: numpy.ndarray
         """
-        return self.api.ophys_timestamps()
+        return self.api.get_ophys_timestamps()
 
     @property
     def metadata(self) -> dict:
