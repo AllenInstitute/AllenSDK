@@ -17,6 +17,7 @@ from allensdk.brain_observatory.gaze_mapping._schemas import (
 )
 from allensdk.brain_observatory.gaze_mapping._gaze_mapper import (
     compute_circular_areas,
+    compute_elliptical_areas,
     GazeMapper
 )
 from allensdk.brain_observatory.gaze_mapping._filter_utils import (
@@ -138,7 +139,7 @@ def run_gaze_mapping(pupil_parameters: pd.DataFrame,
                              cm_per_pixel=cm_per_pixel)
 
     raw_pupil_areas = compute_circular_areas(pupil_parameters)
-    raw_eye_areas = compute_circular_areas(eye_parameters)
+    raw_eye_areas = compute_elliptical_areas(eye_parameters)
 
     raw_pupil_on_monitor_cm = gaze_mapper.pupil_position_on_monitor_in_cm(
         cam_pupil_params=pupil_parameters[["center_x", "center_y"]].values,
