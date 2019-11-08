@@ -4,10 +4,7 @@ from typing import Dict, NamedTuple
 
 import numpy as np
 import pandas as pd
-
-
-RunningSpeed = NamedTuple("RunningSpeed", [("timestamps", np.ndarray),
-                                           ("values", np.ndarray)])
+from allensdk.brain_observatory.running_speed import RunningSpeed
 
 
 class BehaviorBase(abc.ABC):
