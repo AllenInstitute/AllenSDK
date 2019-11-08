@@ -1,6 +1,7 @@
 import logging
 import sys
 from pathlib import Path
+from typing import Dict
 
 import numpy as np
 import pandas as pd
@@ -29,23 +30,68 @@ from allensdk.brain_observatory.gaze_mapping._sync_frames import (
 )
 
 
-def repackage_input_args(parser_args: dict) -> dict:
-    """Repackage arguments obtained by argschema.
+def load_ellipse_fit_params(input_file: Path) -> Dict[str, pd.DataFrame]:
+    """Load Deep Lab Cut (DLC) ellipse fit h5 data as a dictionary of pandas
+    DataFrames.
+
+    Parameters
+    ----------
+    input_file : Path
+        Path to DLC .h5 file containing ellipse fits for pupil,
+            cr (corneal reflection), and eye.
+
+    Returns
+    -------
+    Dict[str, pd.DataFrame]
+        Dictionary where keys specify name of ellipse fit param type and values
+            are pandas DataFrames containing ellipse fit params.
+
+    Raises
+    ------
+    RuntimeError
+        If pupil, cr, and eye ellipse fits don't have the same number of rows.
+    """
+    # TODO: Some ellipses.h5 files have the 'cr' key as complex type instead of
+    # float. For now, when loading ellipses.h5 files, always coerce to float
+    # but this should eventually be resolved upstream...
+    pupil_params = pd.read_hdf(input_file, key="pupil").astype(float)
+    cr_params = pd.read_hdf(input_file, key="cr").astype(float)
+    eye_params = pd.read_hdf(input_file, key="eye").astype(float)
+
+    num_frames_match = ((pupil_params.shape[0] == cr_params.shape[0])
+                        and (cr_params.shape[0] == eye_params.shape[0]))
+    if not num_frames_match:
+        raise RuntimeError("The number of frames for ellipse fits don't "
+                           "match when they should: "
+                           f"pupil_params ({pupil_params.shape[0]}), "
+                           f"cr_params ({cr_params.shape[0]}), "
+                           f"eye_params ({eye_params.shape[0]}).")
+
+    return {"pupil_params": pupil_params,
+            "cr_params": cr_params,
+            "eye_params": eye_params}
+
+
+def preprocess_input_args(parser_args: dict) -> dict:
+    """Preprocess arguments obtained by argschema.
 
     1) Converts individual coordinate/rotation fields to numpy
        position/rotation arrays.
 
     2) Convert all arguments in millimeters to centimeters
 
-    Args:
-        parser_args (dict): Parsed args obtained from argschema.
+    Parameters
+    ----------
+    parser_args (dict): Parsed args obtained from argschema.
 
-    Returns:
-        dict: Repackaged args.
+    Returns
+    -------
+    dict: Repackaged args.
     """
     new_args: dict = {}
 
-    new_args["input_file"] = parser_args["input_file"]
+    new_args.update(load_ellipse_fit_params(parser_args["input_file"]))
+
     new_args["session_sync_file"] = parser_args["session_sync_file"]
     new_args["output_file"] = parser_args["output_file"]
 
@@ -101,32 +147,34 @@ def run_gaze_mapping(pupil_parameters: pd.DataFrame,
     Example: Z-axis for monitor and camera are aligned with X-axis for eye
     coordinate system
 
-    Args:
-        pupil_parameters (pd.DataFrame): A table of pupil parameters with
-        5 columns ("center_x", "center_y", "height", "phi", "width")
-        and n-row timepoints. Coordinate
-        cr_parameters (pd.DataFrame): A table of corneal reflection params with
+    Parameters
+    ----------
+    pupil_parameters (pd.DataFrame): A table of pupil parameters with
         5 columns ("center_x", "center_y", "height", "phi", "width")
         and n-row timepoints.
-        eye_parameters (pd.DataFrame): A table of eye parameters with
+    cr_parameters (pd.DataFrame): A table of corneal reflection params with
         5 columns ("center_x", "center_y", "height", "phi", "width")
         and n-row timepoints.
-        monitor_position (np.ndarray): An array describing monitor position
-            [x, y, z]
-        monitor_rotations (np.ndarray): An array describing monitor orientation
-            about [x, y, z] axes.
-        camera_position (np.ndarray): An array describing camera position
-            [x, y, z]
-        camera_rotations (np.ndarray): An array describing camera orientation
-            about [x, y, z] axes.
-        led_position (np.ndarray): An array describing LED position [x, y, z]
-        eye_radius_cm (float): Radius of eye being tracked in cm.
-        cm_per_pixel (float): Ratio of centimeters per pixel
+    eye_parameters (pd.DataFrame): A table of eye parameters with
+        5 columns ("center_x", "center_y", "height", "phi", "width")
+        and n-row timepoints.
+    monitor_position (np.ndarray): An array describing monitor position
+        [x, y, z]
+    monitor_rotations (np.ndarray): An array describing monitor orientation
+        about [x, y, z] axes.
+    camera_position (np.ndarray): An array describing camera position
+        [x, y, z]
+    camera_rotations (np.ndarray): An array describing camera orientation
+        about [x, y, z] axes.
+    led_position (np.ndarray): An array describing LED position [x, y, z]
+    eye_radius_cm (float): Radius of eye being tracked in cm.
+    cm_per_pixel (float): Ratio of centimeters per pixel
 
-    Returns:
+    Returns
+    -------
         dict: A dictionary of gaze mapping outputs with
-            fields for: `pupil_areas`, `eye_areas`, `pupil_on_monitor_cm`, and
-            `pupil_on_monitor_deg`.
+            fields for: `pupil_areas` (in cm^2), `eye_areas` (in cm^2),
+            `pupil_on_monitor_cm`, and `pupil_on_monitor_deg`.
     """
     output = {}
 
@@ -138,8 +186,11 @@ def run_gaze_mapping(pupil_parameters: pd.DataFrame,
                              eye_radius=eye_radius_cm,
                              cm_per_pixel=cm_per_pixel)
 
-    raw_pupil_areas = compute_circular_areas(pupil_parameters)
-    raw_eye_areas = compute_elliptical_areas(eye_parameters)
+    pupil_params_in_cm = pupil_parameters * cm_per_pixel
+    raw_pupil_areas = compute_circular_areas(pupil_params_in_cm)
+
+    eye_params_in_cm = eye_parameters * cm_per_pixel
+    raw_eye_areas = compute_elliptical_areas(eye_params_in_cm)
 
     raw_pupil_on_monitor_cm = gaze_mapper.pupil_position_on_monitor_in_cm(
         cam_pupil_params=pupil_parameters[["center_x", "center_y"]].values,
@@ -222,6 +273,39 @@ def write_gaze_mapping_output_to_h5(output_savepath: Path,
     version.to_hdf(output_savepath, key="version", mode="a")
 
 
+def load_sync_file_timings(sync_file: Path,
+                           pupil_params_rows: int) -> pd.Series:
+    """Load sync file timings from .h5 file.
+
+    Parameters
+    ----------
+    sync_file : Path
+        Path to .h5 sync file.
+    pupil_params_rows : int
+        Number of rows in pupil params.
+
+    Returns
+    -------
+    pd.Series
+        A series of frame times. (New frame times according to synchronized
+        timings from DAQ)
+
+    Raises
+    ------
+    RuntimeError
+        If the number of eye tracking frames (pupil_params_rows) does not match
+        up with number of new frame times from the sync file.
+    """
+    # Add synchronized frame times
+    frame_times = get_synchronized_camera_frame_times(sync_file)
+    if (pupil_params_rows != len(frame_times)):
+        raise RuntimeError("The number of camera sync pulses in the "
+                           f"sync file ({len(frame_times)}) do not match "
+                           "with the number of eye tracking frames "
+                           f"({pupil_params_rows})!!!")
+    return frame_times
+
+
 def main():
 
     logging.basicConfig(format=('%(asctime)s:%(funcName)s'
@@ -231,27 +315,11 @@ def main():
                              schema_type=InputSchema,
                              output_schema_type=OutputSchema)
 
-    args = repackage_input_args(parser.args)
+    args = preprocess_input_args(parser.args)
 
-    # TODO: Some ellipses.h5 files have the 'cr' key as complex type instead of
-    # float. For now, when loading ellipses.h5 files, always coerce to float
-    # but this should eventually be resolved upstream...
-    pupil_params = pd.read_hdf(args['input_file'], key="pupil").astype(float)
-    cr_params = pd.read_hdf(args['input_file'], key="cr").astype(float)
-    eye_params = pd.read_hdf(args['input_file'], key="eye").astype(float)
-
-    num_frames_match = ((pupil_params.shape[0] == cr_params.shape[0])
-                        and (cr_params.shape[0] == eye_params.shape[0]))
-    if not num_frames_match:
-        raise RuntimeError("The number of frames for ellipse fits don't "
-                           "match when they should: "
-                           f"pupil_params ({pupil_params.shape[0]}), "
-                           f"cr_params ({cr_params.shape[0]}), "
-                           f"eye_params ({eye_params.shape[0]}).")
-
-    output = run_gaze_mapping(pupil_parameters=pupil_params,
-                              cr_parameters=cr_params,
-                              eye_parameters=eye_params,
+    output = run_gaze_mapping(pupil_parameters=args["pupil_params"],
+                              cr_parameters=args["cr_params"],
+                              eye_parameters=args["eye_params"],
                               monitor_position=args["monitor_position"],
                               monitor_rotations=args["monitor_rotations"],
                               camera_position=args["camera_position"],
@@ -260,14 +328,8 @@ def main():
                               eye_radius_cm=args["eye_radius_cm"],
                               cm_per_pixel=args["cm_per_pixel"])
 
-    # Add synchronized frame times
-    frame_times = get_synchronized_camera_frame_times(args["session_sync_file"])
-    if (pupil_params.shape[0] != len(frame_times)):
-        raise RuntimeError("The number of camera sync pulses in the "
-                           f"sync file ({len(frame_times)}) do not match "
-                           "with the number of eye tracking frames "
-                           f"({pupil_params.shape[0]})!!!")
-    output["synced_frame_timestamps_sec"] = frame_times
+    output["synced_frame_timestamps_sec"] = load_sync_file_timings(args["session_sync_file"],
+                                                                   args["pupil_params"].shape[0])
 
     write_gaze_mapping_output_to_h5(args["output_file"], output)
     module_output = {"screen_mapping_file": str(args["output_file"])}
