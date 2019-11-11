@@ -198,6 +198,21 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         """
         return self.receptive_fields['spike_counts'].sel(unit_id=unit_id).data
 
+    def get_receptive_field(self, unit_id):
+        """ Alias for _get_rf()
+
+        Parameters
+        ----------
+        unit_id : int
+            unique ID for the unit of interest
+
+        Returns
+        -------
+        receptive_field : 9 x 9 numpy array
+
+        """
+        return self._get_rf(unit_id)
+
     def _response_by_stimulus_position(self, dataset, presentations, row_key=None, column_key=None, unit_key='unit_id',
                                        time_key='time_relative_to_stimulus_onset', spike_count_key='spike_count'):
         """ Calculate the unit's response to different locations
