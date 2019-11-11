@@ -182,7 +182,7 @@ class BehaviorDataLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin,
         return RunningSpeed(timestamps=running_data_df.index.values,
                             values=running_data_df.speed.values)
 
-    def get_stimulus_frame_rate(self):
+    def get_stimulus_frame_rate(self) -> float:
         stimulus_timestamps = self.get_stimulus_timestamps()
         return np.round(1 / np.mean(np.diff(stimulus_timestamps)), 0)
 
@@ -296,6 +296,19 @@ class BehaviorDataLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin,
                               lambda x: x)
 
         return trial_df
+
+    @memoize
+    def get_birth_date(self) -> datetime.date:
+        """Returns the birth date of the animal.
+        :rtype: datetime.date
+        """
+        query = f"""
+        SELECT d.date_of_birth
+        FROM behavior_sessions bs
+        JOIN donors d on d.id = bs.donor_id
+        WHERE bs.id = {self.behavior_session_id}
+        """
+        return self.fetchone(query, strict=True).date()
 
     @memoize
     def get_sex(self) -> str:
