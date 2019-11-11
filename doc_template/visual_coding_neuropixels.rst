@@ -12,6 +12,13 @@ To jump right in, check out the `quick start guide <_static/examples/nb/ecephys_
 
 If you would like more example code, the `full example notebook <_static/examples/nb/ecephys_session.html>`_ `(download .ipynb) <_static/examples/nb/ecephys_session.ipynb>`_ covers all of the ways to access data for each experiment.
 
+Additional tutorials are available on the following topics:
+
+  1. `Data access <_static/examples/nb/ecephys_data_access.html>`_ `(download .ipynb) <_static/examples/nb/ecephys_data_access.ipynb>`_
+  2. `Unit quality metrics <_static/examples/nb/ecephys_quality_metrics.html>`_ `(download .ipynb) <_static/examples/nb/ecephys_quality_metrics.ipynb>`_
+  3. `LFP data analysis <_static/examples/nb/ecephys_lfp_analysis.html>`_ `(download .ipynb) <_static/examples/nb/ecephys_lfp_analysis.ipynb>`_
+  4. `Receptive field mapping <_static/examples/nb/ecephys_receptive_fields.html>`_ `(download .ipynb) <_static/examples/nb/ecephys_receptive_fields.ipynb>`_
+
 For detailed information about the experimental design, data acquisition, and informatics methods, please refer to our `technical whitepaper <https://brainmapportal-live-4cc80a57cd6e400d854-f7fdcae.divio-media.net/filer_public/80/75/8075a100-ca64-429a-b39a-569121b612b2/neuropixels_visual_coding_-_white_paper_v10.pdf>`_. AllenSDK 
 API documentation `is available here <allensdk.brain_observatory.ecephys.html>`_.
 
@@ -80,6 +87,8 @@ In general, we do not make a distinction between 'single-unit' and 'multi-unit' 
 It should also be noted that all of these metrics assume that the spike waveform is stable throughout the experiment. Given that the probe drifts, on average, about 40 microns over the course of the ~3 hour recordings, this assumption is almost never valid. The resulting changes in waveform shape can cause a unit's quality to fluctuate. If you're unsure about a unit's quality, it can be helpful to plot its spike amplitudes over time. This can make it obvious if it's drifting below threshold, or if it contains spikes from multiple neurons.
 
 Documentation on the various quality metrics can be found in the `ecephys_spike_sorting <https://github.com/AllenInstitute/ecephys_spike_sorting/tree/master/ecephys_spike_sorting/modules/quality_metrics>`_ repository.
+
+For a detailed discussion of the appropriate way to apply each of these metrics, please check out `this tutorial <_static/examples/nb/ecephys_quality_metrics.html>`_ `(download .ipynb) <_static/examples/nb/ecephys_quality_metrics.ipynb>`_
 
 
 Precomputed Stimulus Metrics
