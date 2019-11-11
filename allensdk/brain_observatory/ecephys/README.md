@@ -14,13 +14,3 @@ Python compatibility
 --------------------
 The code in this subpackage is guaranteed to be compatible with Python versions 3.6 and later. It is not compatible with Python 2.
 
-
-Tutorials
----------
-
-We have assembled a variety of tutorials that provide an introduction to this dataset:
-
-1. Tutorial 1
-2. Tutorial 2
-3. Tutorial 3
-
