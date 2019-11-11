@@ -1,10 +1,11 @@
-from typing import Any, Optional, List, Dict
+from typing import Any, Optional, List, Dict, Type, Tuple
 import logging
 import pandas as pd
 import numpy as np
 import inspect
 
 from allensdk.internal.api.behavior_data_lims_api import BehaviorDataLimsApi
+from allensdk.brain_observatory.behavior.internal import BehaviorBase
 from allensdk.brain_observatory.running_speed import RunningSpeed
 
 BehaviorDataApi = Type[BehaviorBase]
@@ -173,10 +174,10 @@ class BehaviorDataSession(object):
             self.api.cache_clear()
         except AttributeError:
             logging.getLogger("BehaviorOphysSession").warning(
-                f"Attempted to clear API cache, but method `clear_cache`"
-                " does not exist on {self.api.__name__}")
+                "Attempted to clear API cache, but method `cache_clear`"
+                f" does not exist on {self.api.__class__.__name__}")
 
-    def list_api_methods(self, show: bool = False) -> List[tuple(str, str)]:
+    def list_api_methods(self) -> List[Tuple[str, str]]:
         """Convenience method to expose list of API `get` methods. These methods
         can be accessed by referencing the API used to initialize this
         BehaviorDataSession via its `api` instance attribute.
@@ -185,6 +186,6 @@ class BehaviorDataSession(object):
         """
         methods = [m for m in inspect.getmembers(self.api, inspect.ismethod)
                    if m[0].startswith("get_")]
-        docs = [inspect.getdoc(m[1] for m in methods)
+        docs = [inspect.getdoc(m[1]) or "" for m in methods]
         method_names = [m[0] for m in methods]
         return list(zip(method_names, docs))
