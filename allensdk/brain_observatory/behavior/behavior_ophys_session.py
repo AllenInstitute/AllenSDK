@@ -196,8 +196,8 @@ class BehaviorOphysSession(object):
             self.api.cache_clear()
         except AttributeError:
             logging.getLogger("BehaviorOphysSession").warning(
-                f"Attempted to clear API cache, but method `clear_cache`"
-                " does not exist on {self.api.__name__}")
+                "Attempted to clear API cache, but method `cache_clear`"
+                f" does not exist on {self.api.__class__.__name__}")
 
     def get_roi_masks(self, cell_specimen_ids=None):
         """ Obtains boolean masks indicating the location of one or more cell's ROIs in this session.

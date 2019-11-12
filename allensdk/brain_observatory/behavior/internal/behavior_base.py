@@ -12,7 +12,7 @@ class BehaviorBase(abc.ABC):
     behavior session data.
 
     Child classes should be instantiated with a fetch API that implements these
-    methods. Both fetch API and session object should inherit from this base.
+    methods.
     """
     @abc.abstractmethod
     def get_licks(self) -> pd.DataFrame:
