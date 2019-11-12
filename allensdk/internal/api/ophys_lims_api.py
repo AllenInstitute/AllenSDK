@@ -6,15 +6,16 @@ import h5py
 import pytz
 import pandas as pd
 
-from allensdk.internal.api import PostgresQueryMixin, OneOrMoreResultExpectedError
+from allensdk.internal.api import (
+    PostgresQueryMixin, OneOrMoreResultExpectedError)
 from allensdk.api.cache import memoize
 from allensdk.brain_observatory.behavior.image_api import ImageApi
 import allensdk.brain_observatory.roi_masks as roi
 from allensdk.internal.core.lims_utilities import safe_system_path
-import inspect
+from allensdk.core.cache_method_utilities import CachedInstanceMethodMixin
 
 
-class OphysLimsApi(PostgresQueryMixin):
+class OphysLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin):
 
     def __init__(self, ophys_experiment_id):
         self.ophys_experiment_id = ophys_experiment_id
@@ -22,21 +23,6 @@ class OphysLimsApi(PostgresQueryMixin):
 
     def get_ophys_experiment_id(self):
         return self.ophys_experiment_id
-
-    def cache_clear(self):
-        """
-        Calls `clear_cache` method on all bound methods in this instance
-        (where valid).
-        Intended to clear calls cached with the `memoize` decorator.
-        Note that this will also clear functions decorated with `lru_cache` and
-        `lfu_cache` in this class (or any other function with `clear_cache`
-        attribute).
-        """
-        for _, method in inspect.getmembers(self, inspect.ismethod):
-            try:
-                method.cache_clear()
-            except (AttributeError, TypeError):
-                pass
 
     @memoize
     def get_ophys_experiment_dir(self):
