@@ -1,5 +1,5 @@
 import pandas as pd
-from typing import Iterable, Optional, List, Union
+from typing import Optional, List, Union, Dict, Any
 import logging
 
 from allensdk.brain_observatory.behavior.internal.behavior_project_base\
@@ -11,7 +11,8 @@ from allensdk.brain_observatory.behavior.behavior_ophys_session import (
 from allensdk.internal.api.behavior_data_lims_api import BehaviorDataLimsApi
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
 from allensdk.internal.api import PostgresQueryMixin
-from allensdk.brain_observatory.ecephys.ecephys_project_api import HttpEngine
+from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine import (
+    HttpEngine)
 
 
 class BehaviorProjectLimsApi(BehaviorProjectBase):
@@ -24,6 +25,10 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         Typically want to construct an instance of this class by calling
             `BehaviorProjectLimsApi.default()`.
 
+        Note -- Currently the app engine is unused because we aren't yet
+        supporting the download of stimulus templates for visual behavior
+        data. This feature will be added at a later date.
+
         Parameters
         ----------
         postgres_engine :
@@ -31,9 +36,9 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             implement:
                 select : takes a postgres query as a string. Returns a pandas
                     dataframe of results
-                select_one : takes a postgres query as a string. If there is
-                    exactly one record in the response, returns that record as
-                    a dict. Otherwise returns an empty dict.
+                fetchall : takes a postgres query as a string. If there is
+                    exactly one column in the response, return the values as a
+                    list.
         app_engine :
             used for making queries agains the lims web application. Must
             implement:
@@ -45,19 +50,157 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         self.logger = logging.getLogger("BehaviorProjectLimsApi")
 
     @classmethod
-    def default(cls, pg_kwargs=None, app_kwargs=None):
+    def default(
+        cls,
+        pg_kwargs: Optional[Dict[str, Any]] = None,
+        app_kwargs: Optional[Dict[str, Any]] = None) -> \
+            "BehaviorProjectLimsApi":
+        """Construct a BehaviorProjectLimsApi instance with default
+        postgres and app engines.
 
-        _pg_kwargs = {}
-        if pg_kwargs is not None:
-            _pg_kwargs.update(pg_kwargs)
+        :param pg_kwargs: dict of keyword arguments to pass to the
+        PostgresQueryMixin class instance. Valid arguments include:
+            "dbname", "user", "host", "password", "port". Will use
+            defaults in PostGresQueryMixin.__init__ if unspecified.
+        :type pg_kwargs: dict
+        :param app_kwargs: dict of keyword arguments to pass to the
+            HTTPEngine class instance. Valid arguments include:
+            "scheme", "host". Will default to scheme=http, host=lims2
+            if left unspecified.
+        :type app_kwargs: dict
+        :rtype: BehaviorProjectLimsApi
+        """
+        _pg_kwargs = pg_kwargs or dict()
 
         _app_kwargs = {"scheme": "http", "host": "lims2"}
-        if app_kwargs is not None:
+        if app_kwargs:
             _app_kwargs.update(app_kwargs)
 
         pg_engine = PostgresQueryMixin(**_pg_kwargs)
         app_engine = HttpEngine(**_app_kwargs)
         return cls(pg_engine, app_engine)
+
+    @staticmethod
+    def _build_in_list_selector_query(
+            col,
+            valid_list: Optional[List[Union[str, int]]] = None,
+            operator: str = "WHERE") -> str:
+        """
+        Filter for rows where the value of a column is contained in a list.
+        If no list is specified in `valid_list`, return an empty string.
+
+        NOTE: if string ids are used, then the strings in `valid_list` must
+        be enclosed in single quotes, or else the query will throw a column
+        does not exist error. E.g. ["'mystringid1'", "'mystringid2'"...]
+
+        :param col: name of column to compare if in a list
+        :type col: str
+        :param valid_list: iterable of values that can be mapped to str
+            (e.g. string, int, float).
+        :type valid_list: list
+        :param operator: SQL operator to start the clause. Default="WHERE".
+            Valid inputs: "AND", "OR", "WHERE" (not case-sensitive).
+        :type operator: str
+        """
+        if not valid_list:
+            return ""
+        session_query = (
+            f"""{operator} {col} IN ({",".join(
+                sorted(set(map(str, valid_list))))})""")
+        return session_query
+
+    @staticmethod
+    def _build_experiment_from_session_query() -> str:
+        """Aggregate sql sub-query to get all ophys_experiment_ids associated
+        with a single ophys_session_id."""
+        query = f"""
+            -- -- begin getting all ophys_experiment_ids -- --
+            SELECT
+                (ARRAY_AGG(DISTINCT(oe.id))) as experiment_ids, os.id
+            FROM ophys_sessions os
+            RIGHT JOIN ophys_experiments oe ON oe.ophys_session_id = os.id
+            GROUP BY os.id
+            -- -- end getting all ophys_experiment_ids -- --
+        """
+        return query
+
+    def _get_behavior_summary_table(self,
+                                    session_sub_query: str) -> pd.DataFrame:
+        """Build and execute query to retrieve summary data for all data,
+        or a subset of session_ids (via the session_sub_query).
+        Should pass an empty string to `session_sub_query` if want to get
+        all data in the database.
+        :param session_sub_query: additional filtering logic to get a
+        subset of sessions.
+        :type session_sub_query: str
+        :rtype: pd.DataFrame
+        """
+        query = f"""
+            SELECT
+                bs.id as behavior_session_id,
+                bs.ophys_session_id,
+                bs.behavior_training_id,
+                sp.id as specimen_id,
+                d.full_genotype as genotype,
+                g.name as sex,
+                bs.foraging_id
+            FROM behavior_sessions bs
+            JOIN donors d on bs.donor_id = d.id
+            JOIN genders g on g.id = d.gender_id
+            JOIN specimens sp ON sp.donor_id = d.id
+            {session_sub_query}
+        """
+        return self.postgres_engine.select(query)
+
+    def _get_foraging_ids_from_behavior_session(
+            self, behavior_session_ids: List[int]) -> List[str]:
+        behav_ids = self._build_in_list_selector_query("id",
+                                                       behavior_session_ids,
+                                                       operator="AND")
+        forag_ids_query = f"""
+            SELECT foraging_id
+            FROM behavior_sessions
+            WHERE foraging_id IS NOT NULL
+            {behav_ids};
+            """
+        self.logger.debug("get_foraging_ids_from_behavior_session query: \n"
+                          f"{forag_ids_query}")
+        foraging_ids = self.postgres_engine.fetchall(forag_ids_query)
+
+        self.logger.debug(f"Retrieved {len(foraging_ids)} foraging ids for"
+                          f" behavior stage query. Ids = {foraging_ids}")
+        return foraging_ids
+
+    def _get_behavior_stage_table(
+            self,
+            behavior_session_ids: Optional[List[int]] = None,
+            mtrain_db: Optional[PostgresQueryMixin] = None):
+        # Select fewer rows if possible via behavior_session_id
+        if behavior_session_ids:
+            foraging_ids = self._get_foraging_ids_from_behavior_session(
+                behavior_session_ids)
+        # Otherwise just get the full table from mtrain
+        else:
+            foraging_ids = None
+
+        foraging_ids_query = self._build_in_list_selector_query(
+            "bs.id", foraging_ids)
+
+        # TODO: this password has already been exposed in code but we really
+        # need to move towards using a secrets database
+        if not mtrain_db:
+            mtrain_db = PostgresQueryMixin(
+                dbname="mtrain", user="mtrainreader",
+                host="prodmtrain1", port=5432, password="mtrainro")
+        query = f"""
+            SELECT
+                stages.name as session_type,
+                bs.id AS foraging_id
+            FROM behavior_sessions bs
+            JOIN stages ON stages.id = bs.state_id
+            {foraging_ids_query};
+        """
+        return mtrain_db.select(query)
 
     def get_session_data(self, ophys_session_id: int) -> BehaviorOphysSession:
         """Returns a BehaviorOphysSession object that contains methods
@@ -69,64 +212,46 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         return BehaviorOphysSession(BehaviorOphysLimsApi(ophys_session_id))
 
     def get_session_table(
-            self, 
+            self,
             ophys_session_ids: Optional[List[int]] = None) -> pd.DataFrame:
         """Return a pd.Dataframe table with all ophys_session_ids and relevant
         metadata.
         Return columns: ophys_session_id, behavior_session_id, specimen_id,
                         ophys_experiment_ids, isi_experiment_id, session_type,
                         date_of_acquisition, genotype, sex, age_in_days
+
+        :param ophys_session_ids: optional list of ophys_session_ids to include
         :rtype: pd.DataFrame
         """
-        session_query = self._build_id_selector_query("os.id",
-                                                      ophys_session_ids)
+        if not ophys_session_ids:
+            self.logger.warning("Getting all ophys sessions."
+                                " This might take a while.")
+        session_query = self._build_in_list_selector_query("os.id",
+                                                           ophys_session_ids)
         experiment_query = self._build_experiment_from_session_query()
         query = f"""
-        SELECT
-            os.id as ophys_session_id,
-            bs.id as behavior_session_id,
-            os.specimen_id,
-            os.isi_experiment_id,
-            os.stimulus_name as session_type,
-            os.date_of_acquisition,
-            d.full_genotype as genotype,
-            g.name as sex,
-            DATE_PART('day', os.date_of_acquisition - d.date_of_birth)
-                AS age_in_days
-        FROM ophys_sessions os
-        JOIN behavior_sessions bs ON os.id = bs.ophys_session_id
-        JOIN donors d ON d.id = bs.donor_id
-        JOIN genders g ON g.id = d.gender_id
-        JOIN (
-            {experiment_query}
-        ) exp_ids ON os.id = os.id
-        {session_query};
+            SELECT
+                os.id as ophys_session_id,
+                bs.id as behavior_session_id,
+                os.specimen_id,
+                os.isi_experiment_id,
+                os.stimulus_name as session_type,
+                os.date_of_acquisition,
+                d.full_genotype as genotype,
+                g.name as sex,
+                DATE_PART('day', os.date_of_acquisition - d.date_of_birth)
+                    AS age_in_days
+            FROM ophys_sessions os
+            JOIN behavior_sessions bs ON os.id = bs.ophys_session_id
+            JOIN donors d ON d.id = bs.donor_id
+            JOIN genders g ON g.id = d.gender_id
+            JOIN (
+                {experiment_query}
+            ) exp_ids ON os.id = exp_ids.id
+            {session_query};
         """
         self.logger.debug(f"get_session_table query: \n{query}")
         return self.postgres_engine.select(query)
-
-    @staticmethod
-    def _build_id_selector_query(
-            id_col,
-            session_ids: Optional[List[Union[str, int]]] = None) -> str:
-        if not session_ids:
-            return ""
-        session_query = f"""
-            WHERE {id_col} IN ({",".join(set(map(str, session_ids)))})"""
-        return session_query
-
-    @staticmethod
-    def _build_experiment_from_session_query():
-        query = f"""
-            -- -- begin getting all ophys_experiment_ids -- --
-            SELECT
-                (ARRAY_AGG(DISTINCT(oe.id))) as experiment_ids, os.id
-            FROM ophys_sessions os
-            RIGHT JOIN ophys_experiments oe ON oe.ophys_session_id = os.id
-            GROUP BY os.id
-            -- -- end getting all ophys_experiment_ids -- --
-        """
-        return query
 
     def get_behavior_only_session_data(
             self, behavior_session_id: int) -> BehaviorDataSession:
@@ -148,109 +273,11 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         acquisition date for behavior sessions (only in the stimulus pkl file)
         :rtype: pd.DataFrame
         """
-        session_query = self._build_id_selector_query("bs.id",
-                                                      behavior_session_ids)
-        summary_tbl = self._get_behavior_summary(session_query)
-        stimulus_names = self._get_behavior_stage(behavior_session_ids)
+        self.logger.warning("Getting behavior-only session data. "
+                            "This might take a while...")
+        session_query = self._build_in_list_selector_query(
+            "bs.id", behavior_session_ids)
+        summary_tbl = self._get_behavior_summary_table(session_query)
+        stimulus_names = self._get_behavior_stage_table(behavior_session_ids)
         return summary_tbl.merge(stimulus_names,
                                  on=["foraging_id"], how="left")
-
-    def _get_behavior_summary(self, session_sub_query):
-        query = f"""
-            SELECT
-                bs.id as behavior_session_id,
-                bs.ophys_session_id,
-                bs.behavior_training_id,
-                sp.id as specimen_id,
-                d.full_genotype as genotype,
-                g.name as sex,
-                bs.foraging_id
-            FROM behavior_sessions bs
-            JOIN donors d on bs.donor_id = d.id
-            JOIN genders g. on g.id = d.gender_id
-            JOIN specimens sp ON sp.donor_id = d.id
-            {session_sub_query}
-        """
-        return self.postgres_engine.select(query)
-
-    def _get_behavior_stage(
-            self,
-            behavior_session_ids: Optional[List[int]] = None,
-            mtrain_db: Optional[PostgresQueryMixin] = None):
-        # Select fewer rows if possible via behavior_session_id
-        if behavior_session_ids:
-            behav_ids = self._build_id_selector_query("id",
-                                                      behavior_session_ids)            
-            forag_ids_query = f"""
-                SELECT foraging_id
-                FROM behavior_sessions
-                {behav_ids}
-                AND foraging_id IS NOT NULL
-                """
-            foraging_ids = self.postgres_engine.fetchall(forag_ids_query)
-
-            self.logger.debug(f"Retrieved {len(foraging_ids)} foraging ids for"
-                              f" behavior stage query. Ids = {foraging_ids}")
-        # Otherwise just get the full table from mtrain
-        else:
-            foraging_ids = None
-
-        foraging_ids_query = self._build_id_selector_query(
-            "bs.id", foraging_ids)
-
-        # TODO: this password has already been exposed in code but we really
-        # need to move towards using a secrets database
-        if not mtrain_db:
-            mtrain_db = PostgresQueryMixin(
-                dbname="mtrain", user="mtrainreader",
-                host="prodmtrain1", port=5432, password="mtrainro")
-        query = f"""
-            SELECT
-                stages.name,
-                bs.id AS foraging_id
-            FROM behavior_sessions bs
-            JOIN stages ON stages.id = bs.state_id
-            {foraging_ids_query}
-        """
-
-        return mtrain_db.select(query)
-
-    def get_natural_movie_template(self, number: int) -> Iterable[bytes]:
-        """Download a template for the natural scene stimulus. This is the
-        actual image that was shown during the recording session.
-        :param number: idenfifier for this movie (note that this is an int,
-            so to get the template for natural_movie_three should pass 3)
-        :type number: int
-        :returns: iterable yielding a tiff file as bytes
-        """
-        return self._get_template(
-            f"natural_movie_{number}", self.STIMULUS_TEMPLATE_NAMESPACE
-        )
-
-    def get_natural_scene_template(self, number: int) -> Iterable[bytes]:
-        """ Download a template for the natural movie stimulus. This is the
-        actual movie that was shown during the recording session.
-        :param number: identifier for this scene
-        :type number: int
-        :returns: An iterable yielding an npy file as bytes
-        """
-        return self._get_template(
-            f"natural_scene_{int(number)}", self.STIMULUS_TEMPLATE_NAMESPACE
-        )
-
-    def _get_template(self, name, namespace):
-        """ Identify the WellKnownFile record associated with a stimulus
-        template and stream its data if present.
-        """
-        query = f"""
-                SELECT
-                    st.well_known_file_id
-                FROM stimuli st
-                JOIN stimulus_namespaces sn ON sn.id = st.stimulus_namespace_id
-                WHERE
-                    st.name = '{name}'
-                    AND sn.name = '{namespace}'
-                """
-        wkf_id = self.postgres_engine.fetchone(query)
-        download_link = f"well_known_files/download/{wkf_id}?wkf_id={wkf_id}"
-        return self.app_engine.stream(download_link)
