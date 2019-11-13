@@ -90,6 +90,7 @@ class Dataset(object):
     OPTOGENETIC_STIMULATION_KEYS = ("LED_sync", "opto_trial")
     EYE_TRACKING_KEYS = ("cam2_exposure",  # clocks eye tracking frame pulses (port 0, line 9)
                          "eyetracking")  # previous line label for eye tracking (prior to ~ Oct. 2018)
+    BEHAVIOR_TRACKING_KEYS = ("cam1_exposure")  # clocks behavior tracking frame pulses (port 0, line 8)
 
     def __init__(self, path):
         self.dfile = self.load(path)
