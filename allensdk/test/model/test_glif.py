@@ -121,12 +121,6 @@ def stimulus(neuron_config_file, ephys_sweeps_file):
     return stimulus
 
 
-def test_cache_stimulus(neuron_config_file, ephys_sweeps_file, fn_temp_dir,
-                        configured_glif_api):
-    nwb_path = os.path.join(fn_temp_dir, 'stimulus.nwb')
-    configured_glif_api.cache_stimulus_file(nwb_path)
-
-
 def test_run_glifneuron(configured_glif_api, neuron_config_file):
     # initialize the neuron
     neuron_config = json_utilities.read(neuron_config_file)
