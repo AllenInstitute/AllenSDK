@@ -24,6 +24,6 @@ def test_get_rewards():
     expected = pd.DataFrame(
         {"volume": [0.007],
          "timestamps": [1086.965144219165],
-         "auto_rewarded": False}).set_index("timestamps", drop=True)
+         "autorewarded": False}).set_index("timestamps", drop=True)
 
     pd.testing.assert_frame_equal(expected, get_rewards(data, lambda x: x+1.0))

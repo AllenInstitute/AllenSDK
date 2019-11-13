@@ -20,7 +20,6 @@ environment:
 install:
   - set PATH=%MINICONDA%;%MINICONDA%\\Scripts;%PATH%
   - conda config --set always_yes yes --set changeps1 no
-  - conda install conda==4.6.14
   - conda create -q -n test-environment python=%PYTHON% pip
   - activate test-environment
   - conda install statsmodels
