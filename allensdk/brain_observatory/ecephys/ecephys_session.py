@@ -972,8 +972,6 @@ flipVert
             'lfp_sampling_rate': 'probe_lfp_sampling_rate',
             'has_lfp_data': 'probe_has_lfp_data',
             'l_ratio': 'L_ratio',
-            'p_value_rf': 'on_screen_rf',
-            'on_screen_rf': 'p_value_rf',
             'pref_images_multi_ns': 'pref_image_multi_ns',
         })
 
