@@ -211,10 +211,11 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         """
         return BehaviorOphysSession(BehaviorOphysLimsApi(ophys_session_id))
 
-    def get_session_table(
+    def _get_session_table(
             self,
             ophys_session_ids: Optional[List[int]] = None) -> pd.DataFrame:
-        """Return a pd.Dataframe table with all ophys_session_ids and relevant
+        """Helper function for easier testing.
+        Return a pd.Dataframe table with all ophys_session_ids and relevant
         metadata.
         Return columns: ophys_session_id, behavior_session_id, specimen_id,
                         ophys_experiment_ids, isi_experiment_id, session_type,
@@ -253,6 +254,21 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         self.logger.debug(f"get_session_table query: \n{query}")
         return self.postgres_engine.select(query)
 
+    def get_session_table(
+            self,
+            ophys_session_ids: Optional[List[int]] = None) -> pd.DataFrame:
+        """Return a pd.Dataframe table with all ophys_session_ids and relevant
+        metadata.
+        Return columns: ophys_session_id, behavior_session_id, specimen_id,
+                        ophys_experiment_ids, isi_experiment_id, session_type,
+                        date_of_acquisition, genotype, sex, age_in_days
+
+        :param ophys_session_ids: optional list of ophys_session_ids to include
+        :rtype: pd.DataFrame
+        """
+        return (self._get_session_table(ophys_session_ids)
+                .set_index("ophys_session_id"))
+
     def get_behavior_only_session_data(
             self, behavior_session_id: int) -> BehaviorDataSession:
         """Returns a BehaviorDataSession object that contains methods to
@@ -279,5 +295,6 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             "bs.id", behavior_session_ids)
         summary_tbl = self._get_behavior_summary_table(session_query)
         stimulus_names = self._get_behavior_stage_table(behavior_session_ids)
-        return summary_tbl.merge(stimulus_names,
-                                 on=["foraging_id"], how="left")
+        return (summary_tbl.merge(stimulus_names,
+                                  on=["foraging_id"], how="left")
+                .set_index("behavior_session_id"))

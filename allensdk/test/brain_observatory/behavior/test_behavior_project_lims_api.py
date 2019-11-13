@@ -108,5 +108,5 @@ def test_get_behavior_stage_table(MockBehaviorProjectLimsApi):
 )
 def test_get_session_table(ophys_session_ids, expected,
                            MockBehaviorProjectLimsApi):
-    actual = MockBehaviorProjectLimsApi.get_session_table()
+    actual = MockBehaviorProjectLimsApi._get_session_table()
     assert expected == actual
