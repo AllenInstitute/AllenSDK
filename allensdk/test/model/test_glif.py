@@ -85,7 +85,6 @@ def configured_glif_api(glif_api, neuronal_model_id, neuron_config_file,
     return glif_api
 
 
-
 @pytest.fixture
 def output(neuron_config_file, ephys_sweeps_file):
     neuron_config = json_utilities.read(neuron_config_file)
@@ -145,9 +144,13 @@ def test_run_glifneuron(configured_glif_api, neuron_config_file):
     # simulate the neuron
     output = neuron.run(stimulus)
 
-    voltage = output['voltage']
-    threshold = output['threshold']
-    spike_times = output['interpolated_spike_times']
+    expected_fields = {"AScurrents", "grid_spike_times",
+                       "interpolated_spike_threshold",
+                       "interpolated_spike_times",
+                       "interpolated_spike_voltage",
+                       "spike_time_steps", "threshold", "voltage"}
+
+    assert expected_fields.difference(output.keys()) == set()
 
 
 @pytest.mark.skipif(True, reason="needs nwb file")
