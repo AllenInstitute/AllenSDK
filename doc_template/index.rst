@@ -90,6 +90,16 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
+What's New - 1.1.1 (November 12, 2019)
+-----------------------------------------------------------------------
+
+The 1.1.1 release adds 
+- several new Visual Coding - Neuropixels example notebooks
+
+and fixes
+- a bug in which p_value_rf and on_screen_rf were swapped when accessed from an EcephysSession
+
+
 What's New - 1.1.0 (October 31, 2019)
 -----------------------------------------------------------------------
 
