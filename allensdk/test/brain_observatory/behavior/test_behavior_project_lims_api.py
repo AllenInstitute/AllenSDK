@@ -84,6 +84,7 @@ def test_get_behavior_stage_table(MockBehaviorProjectLimsApi):
             SELECT
                 os.id as ophys_session_id,
                 bs.id as behavior_session_id,
+                experiment_ids as ophys_experiment_id,
                 os.specimen_id,
                 os.isi_experiment_id,
                 os.stimulus_name as session_type,

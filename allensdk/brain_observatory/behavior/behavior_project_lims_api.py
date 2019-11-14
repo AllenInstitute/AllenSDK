@@ -1,5 +1,5 @@
 import pandas as pd
-from typing import Optional, List, Union, Dict, Any
+from typing import Optional, List, Dict, Any
 import logging
 
 from allensdk.brain_observatory.behavior.internal.behavior_project_base\
@@ -13,6 +13,7 @@ from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
 from allensdk.internal.api import PostgresQueryMixin
 from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine import (
     HttpEngine)
+from allensdk.core.typing import SupportsStr
 
 
 class BehaviorProjectLimsApi(BehaviorProjectBase):
@@ -83,7 +84,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
     @staticmethod
     def _build_in_list_selector_query(
             col,
-            valid_list: Optional[List[Union[str, int]]] = None,
+            valid_list: Optional[SupportsStr] = None,
             operator: str = "WHERE") -> str:
         """
         Filter for rows where the value of a column is contained in a list.
@@ -234,6 +235,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             SELECT
                 os.id as ophys_session_id,
                 bs.id as behavior_session_id,
+                experiment_ids as ophys_experiment_id,
                 os.specimen_id,
                 os.isi_experiment_id,
                 os.stimulus_name as session_type,
@@ -266,8 +268,12 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         :param ophys_session_ids: optional list of ophys_session_ids to include
         :rtype: pd.DataFrame
         """
-        return (self._get_session_table(ophys_session_ids)
-                .set_index("ophys_session_id"))
+        # There is one ophys_session_id from 2018 that has multiple behavior
+        # ids, causing duplicates -- drop all dupes for now; # TODO
+        table = (self._get_session_table(ophys_session_ids)
+                 .drop_duplicates(subset=["ophys_session_id"], keep=False)
+                 .set_index("ophys_session_id"))
+        return table
 
     def get_behavior_only_session_data(
             self, behavior_session_id: int) -> BehaviorDataSession:
