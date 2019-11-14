@@ -9,6 +9,7 @@ class DataFrameKeyError(LookupError):
             error_string = msg
         super().__init__(error_string)
 
+
 class DataFrameIndexError(LookupError):
     """More verbose method for accessing invalid rows or columns 
     in a dataframe. Should be used when an index error is thrown on a dataframe.
@@ -20,3 +21,6 @@ class DataFrameIndexError(LookupError):
             error_string = msg
         super().__init__(error_string)
 
+
+class MissingDataError(ValueError):
+    pass
