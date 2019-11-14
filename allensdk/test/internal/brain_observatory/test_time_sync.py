@@ -434,3 +434,18 @@ def test_monitor_delay(scientifica_input):
         delay = ts.monitor_delay(dset, stim_times, "stim_photodiode",
                                  assumed_delay=30)
         assert delay == 30
+
+
+@pytest.mark.parametrize("deserialized_pkl,expected", [
+    ({"vsynccount": 100}, 100),
+    ({"items": {"behavior": {"intervalsms": [2, 2, 2, 2, 2]}}}, 6),
+    ({"vsynccount": 20, "items": {"behavior": {"intervalsms": [3, 3]}}}, 20)
+])
+def test_get_stim_data_length(monkeypatch, deserialized_pkl, expected):
+    def mock_read_pickle(*args, **kwargs):
+        return deserialized_pkl
+
+    monkeypatch.setattr(ts.pd, "read_pickle", mock_read_pickle)
+    obtained = ts.get_stim_data_length("dummy_filepath")
+
+    assert obtained == expected
