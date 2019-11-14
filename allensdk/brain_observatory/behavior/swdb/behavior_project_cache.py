@@ -10,6 +10,7 @@ from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorO
 from allensdk.core.lazy_property import LazyProperty
 from allensdk.brain_observatory.behavior.trials_processing import calculate_reward_rate
 from allensdk.brain_observatory.behavior.image_api import ImageApi
+from allensdk.deprecated import deprecated
 
 csv_io = {
     'reader': lambda path: pd.read_csv(path, index_col='Unnamed: 0'),
@@ -19,6 +20,9 @@ csv_io = {
 cache_path_example = '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/cache_20190813'
 
 
+@deprecated("swdb.behavior_project_cache.BehaviorProjectCache is deprecated "
+            "and will be removed in version 1.3. Please use brain_observatory."
+            "behavior.behavior_project_cache.BehaviorProjectCache.")
 class BehaviorProjectCache(object):
     def __init__(self, cache_base):
         '''
