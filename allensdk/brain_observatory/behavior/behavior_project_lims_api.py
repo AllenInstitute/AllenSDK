@@ -1,5 +1,5 @@
 import pandas as pd
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Iterable
 import logging
 
 from allensdk.brain_observatory.behavior.internal.behavior_project_base\
@@ -304,3 +304,22 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         return (summary_tbl.merge(stimulus_names,
                                   on=["foraging_id"], how="left")
                 .set_index("behavior_session_id"))
+
+    def get_natural_movie_template(self, number: int) -> Iterable[bytes]:
+        """Download a template for the natural scene stimulus. This is the
+        actual image that was shown during the recording session.
+        :param number: idenfifier for this movie (note that this is an int,
+            so to get the template for natural_movie_three should pass 3)
+        :type number: int
+        :returns: iterable yielding a tiff file as bytes
+        """
+        raise NotImplementedError()
+
+    def get_natural_scene_template(self, number: int) -> Iterable[bytes]:
+        """ Download a template for the natural movie stimulus. This is the
+        actual movie that was shown during the recording session.
+        :param number: identifier for this scene
+        :type number: int
+        :returns: An iterable yielding an npy file as bytes
+        """
+        raise NotImplementedError()
