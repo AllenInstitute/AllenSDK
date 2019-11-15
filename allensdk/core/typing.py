@@ -1,8 +1,8 @@
-from typing import _Protocol
+from typing import Protocol
 from abc import abstractmethod
 
 
-class SupportsStr(_Protocol):
+class SupportsStr(Protocol):
     """Classes that support the __str__ method"""
     @abstractmethod
     def __str__(self) -> str:
