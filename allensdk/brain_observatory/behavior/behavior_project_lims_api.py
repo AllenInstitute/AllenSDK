@@ -117,11 +117,29 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         query = f"""
             -- -- begin getting all ophys_experiment_ids -- --
             SELECT
-                (ARRAY_AGG(DISTINCT(oe.id))) as experiment_ids, os.id
+                (ARRAY_AGG(DISTINCT(oe.id))) AS experiment_ids, os.id
             FROM ophys_sessions os
             RIGHT JOIN ophys_experiments oe ON oe.ophys_session_id = os.id
             GROUP BY os.id
             -- -- end getting all ophys_experiment_ids -- --
+        """
+        return query
+    
+    @staticmethod
+    def _build_line_from_donor_query(line="driver") -> str:
+        """Sub-query to get a line from a donor.
+        :param line: 'driver' or 'reporter'
+        """
+        query = f"""
+            -- -- begin getting {line} line from donors -- --
+            SELECT ARRAY_AGG (g.name) AS {line}_line, d.id AS donor_id
+            FROM donors d
+            LEFT JOIN donors_genotypes dg ON dg.donor_id=d.id
+            LEFT JOIN genotypes g ON g.id=dg.genotype_id
+            LEFT JOIN genotype_types gt ON gt.id=g.genotype_type_id
+            WHERE gt.name='{line}'
+            GROUP BY d.id
+            -- -- end getting {line} line from donors -- --
         """
         return query
 
@@ -138,17 +156,26 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         """
         query = f"""
             SELECT
-                bs.id as behavior_session_id,
+                bs.id AS behavior_session_id,
                 bs.ophys_session_id,
                 bs.behavior_training_id,
-                sp.id as specimen_id,
-                d.full_genotype as genotype,
-                g.name as sex,
+                equipment.name as equipment_name,
+                d.id as donor_id,
+                d.full_genotype AS genotype,
+                reporter.reporter_line,
+                driver.driver_line,
+                g.name AS sex,
                 bs.foraging_id
             FROM behavior_sessions bs
             JOIN donors d on bs.donor_id = d.id
             JOIN genders g on g.id = d.gender_id
-            JOIN specimens sp ON sp.donor_id = d.id
+            JOIN (
+                {self._build_line_from_donor_query("reporter")}
+            ) reporter on reporter.donor_id = d.id
+            JOIN (
+                {self._build_line_from_donor_query("driver")}
+            ) driver on driver.donor_id = d.id
+            JOIN equipment ON equipment.id = bs.equipment_id
             {session_sub_query}
         """
         return self.postgres_engine.select(query)
@@ -212,15 +239,86 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         """
         return BehaviorOphysSession(BehaviorOphysLimsApi(ophys_session_id))
 
+    def _get_experiment_table(
+            self,
+            ophys_experiment_ids: Optional[List[int]] = None) -> pd.DataFrame:
+        """
+        Helper function for easier testing.
+        Return a pd.Dataframe table with all ophys_experiment_ids and relevant
+        metadata.
+        Return columns: ophys_session_id, behavior_session_id,
+                        ophys_experiment_id, project_code, session_name,
+                        session_type, equipment_name, date_of_acquisition,
+                        specimen_id, genotype, sex, age_in_days,
+                        reporter_line, driver_line
+
+        :param ophys_experiment_ids: optional list of ophys_experiment_ids
+            to include
+        :rtype: pd.DataFrame
+        """
+        if not ophys_experiment_ids:
+            self.logger.warning("Getting all ophys sessions."
+                                " This might take a while.")
+        experiment_query = self._build_in_list_selector_query(
+            "oe.id", ophys_experiment_ids)
+        query = f"""
+            SELECT
+                oe.id as ophys_experiment_id,
+                os.id as ophys_session_id,
+                bs.id as behavior_session_id,
+                oec.visual_behavior_experiment_container_id as container_id,
+                pr.code as project_code,
+                vbc.workflow_state as container_workflow_state,
+                oe.workflow_state as experiment_workflow_state,
+                os.name as session_name,
+                os.stimulus_name as session_type,
+                equipment.name as equipment_name,
+                os.date_of_acquisition,
+                os.isi_experiment_id,
+                os.specimen_id,
+                g.name as sex,
+                DATE_PART('day', os.date_of_acquisition - d.date_of_birth)
+                    AS age_in_days,
+                d.full_genotype as genotype,
+                reporter.reporter_line,
+                driver.driver_line,
+                id.depth as imaging_depth,
+                st.acronym as targeted_structure,
+                vbc.published_at
+            FROM ophys_experiments_visual_behavior_experiment_containers oec
+            JOIN visual_behavior_experiment_containers vbc
+                ON oec.visual_behavior_experiment_container_id = vbc.id
+            JOIN ophys_experiments oe ON oe.id = oec.ophys_experiment_id
+            JOIN ophys_sessions os ON os.id = oe.ophys_session_id
+            JOIN behavior_sessions bs ON os.id = bs.ophys_session_id
+            JOIN projects pr ON pr.id = os.project_id
+            JOIN donors d ON d.id = bs.donor_id
+            JOIN genders g ON g.id = d.gender_id
+            JOIN (
+                {self._build_line_from_donor_query(line="reporter")}
+            ) reporter on reporter.donor_id = d.id
+            JOIN (
+                {self._build_line_from_donor_query(line="driver")}
+            ) driver on driver.donor_id = d.id
+            LEFT JOIN imaging_depths id ON id.id = os.imaging_depth_id
+            JOIN structures st ON st.id = oe.targeted_structure_id
+            JOIN equipment ON equipment.id = os.equipment_id
+            {experiment_query};
+        """
+        self.logger.debug(f"get_experiment_table query: \n{query}")
+        return self.postgres_engine.select(query)
+
     def _get_session_table(
             self,
             ophys_session_ids: Optional[List[int]] = None) -> pd.DataFrame:
         """Helper function for easier testing.
         Return a pd.Dataframe table with all ophys_session_ids and relevant
         metadata.
-        Return columns: ophys_session_id, behavior_session_id, specimen_id,
-                        ophys_experiment_ids, isi_experiment_id, session_type,
-                        date_of_acquisition, genotype, sex, age_in_days
+        Return columns: ophys_session_id, behavior_session_id,
+                        ophys_experiment_id, project_code, session_name,
+                        session_type, equipment_name, date_of_acquisition,
+                        specimen_id, genotype, sex, age_in_days,
+                        reporter_line, driver_line
 
         :param ophys_session_ids: optional list of ophys_session_ids to include
         :rtype: pd.DataFrame
@@ -230,27 +328,38 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                                 " This might take a while.")
         session_query = self._build_in_list_selector_query("os.id",
                                                            ophys_session_ids)
-        experiment_query = self._build_experiment_from_session_query()
         query = f"""
             SELECT
                 os.id as ophys_session_id,
                 bs.id as behavior_session_id,
                 experiment_ids as ophys_experiment_id,
-                os.specimen_id,
-                os.isi_experiment_id,
+                pr.code as project_code,
+                os.name as session_name,
                 os.stimulus_name as session_type,
+                equipment.name as equipment_name,
                 os.date_of_acquisition,
-                d.full_genotype as genotype,
+                os.specimen_id,
                 g.name as sex,
                 DATE_PART('day', os.date_of_acquisition - d.date_of_birth)
-                    AS age_in_days
+                    AS age_in_days,
+                d.full_genotype as genotype,
+                reporter.reporter_line,
+                driver.driver_line
             FROM ophys_sessions os
             JOIN behavior_sessions bs ON os.id = bs.ophys_session_id
+            JOIN projects pr ON pr.id = os.project_id
             JOIN donors d ON d.id = bs.donor_id
             JOIN genders g ON g.id = d.gender_id
             JOIN (
-                {experiment_query}
+                {self._build_experiment_from_session_query()}
             ) exp_ids ON os.id = exp_ids.id
+            JOIN (
+                {self._build_line_from_donor_query(line="reporter")}
+            ) reporter on reporter.donor_id = d.id
+            JOIN (
+                {self._build_line_from_donor_query(line="driver")}
+            ) driver on driver.donor_id = d.id
+            JOIN equipment ON equipment.id = os.equipment_id
             {session_query};
         """
         self.logger.debug(f"get_session_table query: \n{query}")
@@ -261,9 +370,11 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             ophys_session_ids: Optional[List[int]] = None) -> pd.DataFrame:
         """Return a pd.Dataframe table with all ophys_session_ids and relevant
         metadata.
-        Return columns: ophys_session_id, behavior_session_id, specimen_id,
-                        ophys_experiment_ids, isi_experiment_id, session_type,
-                        date_of_acquisition, genotype, sex, age_in_days
+        Return columns: ophys_session_id, behavior_session_id,
+                        ophys_experiment_id, project_code, session_name,
+                        session_type, equipment_name, date_of_acquisition,
+                        specimen_id, genotype, sex, age_in_days,
+                        reporter_line, driver_line
 
         :param ophys_session_ids: optional list of ophys_session_ids to include
         :rtype: pd.DataFrame
@@ -284,6 +395,25 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         :rtype: BehaviorDataSession
         """
         return BehaviorDataSession(BehaviorDataLimsApi(behavior_session_id))
+
+    def get_experiment_table(
+            self,
+            ophys_experiment_ids: Optional[List[int]] = None) -> pd.DataFrame:
+        """Return a pd.Dataframe table with all ophys_experiment_ids and
+        relevant metadata. This is the most specific and most informative
+        level to examine the data.
+        Return columns:
+            ophys_experiment_id, ophys_session_id, behavior_session_id,
+            container_id, project_code, container_workflow_state,
+            experiment_workflow_state, session_name, session_type,
+            equipment_name, date_of_acquisition, isi_experiment_id,
+            specimen_id, sex, age_in_days, genotype, reporter_line,
+            driver_line, imaging_depth, targeted_structure, published_at
+        :param ophys_experiment_ids: optional list of ophys_experiment_ids
+            to include
+        :rtype: pd.DataFrame
+        """
+        return self._get_experiment_table().set_index("ophys_experiment_id")
 
     def get_behavior_only_session_table(
             self,

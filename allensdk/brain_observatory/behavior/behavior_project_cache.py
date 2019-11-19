@@ -24,6 +24,7 @@ class BehaviorProjectCache(Cache):
     MANIFEST_VERSION = "0.0.1-alpha"
     OPHYS_SESSIONS_KEY = "ophys_sessions"
     BEHAVIOR_SESSIONS_KEY = "behavior_sessions"
+    OPHYS_EXPERIMENTS_KEY = "ophys_experiments"
 
     # Temporary way for scientists to keep track of analyses
     OPHYS_ANALYSIS_LOG_KEY = "ophys_analysis_log"
@@ -40,6 +41,11 @@ class BehaviorProjectCache(Cache):
             "parent_key": "BASEDIR",
             "typename": "file"
             },
+        OPHYS_EXPERIMENTS_KEY: {
+            "spec": f"{OPHYS_EXPERIMENTS_KEY}.csv",
+            "parent_key": "BASEDIR",
+            "typename": "file"
+        },
         OPHYS_ANALYSIS_LOG_KEY: {
             "spec": f"{OPHYS_ANALYSIS_LOG_KEY}.csv",
             "parent_key": "BASEDIR",
@@ -124,22 +130,18 @@ class BehaviorProjectCache(Cache):
         :type by: str
         :rtype: pd.DataFrame
         """
-        def write_csv_(path, df):
-            """Format the array of experiment ids for saving"""
-            df_ = df.copy()
-            df_["ophys_experiment_id"] = df_["ophys_experiment_id"].apply(
-                lambda x: "|".join(map(str, x)))
-            df_.to_csv(path)
-
-        def read_csv_(path):
-            df = pd.read_csv(path, index_col="ophys_session_id")
-            df["ophys_experiment_id"] = df["ophys_experiment_id"].apply(
-                lambda x: np.fromstring(x, sep="|", dtype=int))
-            return df
-
+        write_csv = partial(
+            _write_csv,
+            array_fields=["reporter_line", "driver_line",
+                          "ophys_experiment_id"])
+        read_csv = partial(
+            _read_csv, index_col="ophys_session_id",
+            array_fields=["reporter_line", "driver_line",
+                          "ophys_experiment_id"],
+            array_types=[str, str, int])
         sessions = self._get_session_summary(
             self.fetch_api.get_session_table, self.OPHYS_SESSIONS_KEY,
-            write_csv_, read_csv_)
+            write_csv, read_csv)
         sessions = sessions.rename(columns={"genotype": "full_genotype"})
         if suppress:
             sessions.drop(columns=suppress, inplace=True, errors="ignore")
@@ -164,6 +166,31 @@ class BehaviorProjectCache(Cache):
             manifest_builder.add_path(key, **config)
         return manifest_builder
 
+    def get_experiment_table(
+            self,
+            suppress: Optional[List[str]] = None) -> pd.DataFrame:
+        """
+        Return summary table of all ophys_experiment_ids in the database.
+        :param suppress: optional list of columns to drop from the resulting
+            dataframe.
+        :type suppress: list of str
+        :rtype: pd.DataFrame
+        """
+        write_csv = partial(
+            _write_csv,
+            array_fields=["reporter_line", "driver_line"])
+        read_csv = partial(
+            _read_csv, index_col="ophys_experiment_id",
+            array_fields=["reporter_line", "driver_line"],
+            array_types=[str, str])
+        experiments = self._get_session_summary(
+            self.fetch_api.get_experiment_table, self.OPHYS_EXPERIMENTS_KEY,
+            write_csv, read_csv)
+        experiments = experiments.rename(columns={"genotype": "full_genotype"})
+        if suppress:
+            experiments.drop(columns=suppress, inplace=True, errors="ignore")
+        return experiments
+
     def get_behavior_session_table(
             self,
             suppress: Optional[List[str]] = None) -> pd.DataFrame:
@@ -174,10 +201,15 @@ class BehaviorProjectCache(Cache):
         :type suppress: list of str
         :rtype: pd.DataFrame
         """
-        read_csv_ = partial(read_csv, index_col="behavior_session_id")
+        read_csv = partial(
+            _read_csv, index_col="behavior_session_id",
+            array_fields=["reporter_line", "driver_line"],
+            array_types=[str, str])
+        write_csv = partial(
+            _write_csv, array_fields=["reporter_line", "driver_line"])
         sessions = self._get_session_summary(
             self.fetch_api.get_behavior_only_session_table,
-            self.BEHAVIOR_SESSIONS_KEY, write_csv, read_csv_)
+            self.BEHAVIOR_SESSIONS_KEY, write_csv, read_csv)
         sessions = sessions.rename(columns={"genotype": "full_genotype"})
         if suppress:
             sessions.drop(columns=suppress, inplace=True, errors="ignore")
@@ -281,14 +313,6 @@ class BehaviorProjectCache(Cache):
         )
 
 
-def read_csv(path: str, index_col: str) -> pd.DataFrame:
-    return pd.read_csv(path, index_col=index_col)
-
-
-def write_csv(path: str, df: str):
-    df.to_csv(path)
-
-
 def _write_log(data: Any, path: str, key_name: str, key_value: Any):
     """
     Helper method to create and add to a log. Invoked any time a session
@@ -322,3 +346,26 @@ def _write_log(data: Any, path: str, key_name: str, key_value: Any):
             w = csv.DictWriter(f, fieldnames=keys)
             w.writeheader()
             w.writerow(dict(zip(keys, values)))
+
+
+def _write_csv(path, df, array_fields=None):
+    """Private writer that encodes array fields into pipe-delimited strings
+    for saving a csv.
+    """
+    df_ = df.copy()
+    for field in array_fields:
+        df_[field] = df_[field].apply(lambda x: "|".join(map(str, x)))
+    df_.to_csv(path)
+
+
+def _read_csv(path, index_col, array_fields=None, array_types=None):
+    """Private reader that can open a csv with pipe-delimited array
+    fields and convert them to array."""
+    df = pd.read_csv(path, index_col=index_col)
+    for field, type_ in zip(array_fields, array_types):
+        if type_ == str:
+            df[field] = df[field].apply(lambda x: x.split("|"))
+        else:
+            df[field] = df[field].apply(
+                lambda x: np.fromstring(x, sep="|", dtype=type_))
+    return df

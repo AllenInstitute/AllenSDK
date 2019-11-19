@@ -80,6 +80,7 @@ class BehaviorDataSession(object):
         """
         return self.api.get_running_data_df()
 
+    @property
     def running_speed(self) -> RunningSpeed:
         """Get running speed using timestamps from
         self.get_stimulus_timestamps.
