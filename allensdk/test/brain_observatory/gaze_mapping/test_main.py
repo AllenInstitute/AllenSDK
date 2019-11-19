@@ -142,11 +142,11 @@ def test_preprocess_input_args(monkeypatch, input_args: dict, expected: dict):
     (4, None, True)
 ])
 def test_load_sync_file_timings(monkeypatch, pupil_params_rows, expected, expect_fail):
-    def mock_get_synchronized_camera_frame_times(*args, **kwargs):
+    def mock_get_synchronized_frame_times(*args, **kwargs):
         return pd.Series([1, 2, 3, 4, 5])
 
-    monkeypatch.setattr(main, "get_synchronized_camera_frame_times",
-                        mock_get_synchronized_camera_frame_times)
+    monkeypatch.setattr(main.su, "get_synchronized_frame_times",
+                        mock_get_synchronized_frame_times)
 
     if expect_fail:
         with pytest.raises(RuntimeError, match="number of camera sync pulses"):

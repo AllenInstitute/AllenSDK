@@ -25,9 +25,9 @@ from allensdk.brain_observatory.gaze_mapping._filter_utils import (
     post_process_areas,
     post_process_cr,
 )
-from allensdk.brain_observatory.gaze_mapping._sync_frames import (
-    get_synchronized_camera_frame_times
-)
+
+from allensdk.brain_observatory.sync_dataset import Dataset
+import allensdk.brain_observatory.sync_utilities as su
 
 
 def load_ellipse_fit_params(input_file: Path) -> Dict[str, pd.DataFrame]:
@@ -297,7 +297,8 @@ def load_sync_file_timings(sync_file: Path,
         up with number of new frame times from the sync file.
     """
     # Add synchronized frame times
-    frame_times = get_synchronized_camera_frame_times(sync_file)
+    frame_times = su.get_synchronized_frame_times(session_sync_file=sync_file,
+                                                  sync_line_label_keys=Dataset.EYE_TRACKING_KEYS)
     if (pupil_params_rows != len(frame_times)):
         raise RuntimeError("The number of camera sync pulses in the "
                            f"sync file ({len(frame_times)}) do not match "
