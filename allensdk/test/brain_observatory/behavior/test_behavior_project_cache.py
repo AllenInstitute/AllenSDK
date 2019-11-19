@@ -12,13 +12,17 @@ from allensdk.core.exceptions import MissingDataError
 @pytest.fixture
 def session_table():
     return (pd.DataFrame({"ophys_session_id": [1, 2, 3],
-                          "ophys_experiment_id": [[4], [5, 6], [7]]})
+                          "ophys_experiment_id": [[4], [5, 6], [7]],
+                          "reporter_line": [["aa"], ["aa", "bb"], ["cc"]],
+                          "driver_line": [["aa"], ["aa", "bb"], ["cc"]]})
             .set_index("ophys_session_id"))
 
 
 @pytest.fixture
 def behavior_table():
-    return (pd.DataFrame({"behavior_session_id": [1, 2, 3], "b": [4, 5, 6]})
+    return (pd.DataFrame({"behavior_session_id": [1, 2, 3],
+                          "reporter_line": [["aa"], ["aa", "bb"], ["cc"]],
+                          "driver_line": [["aa"], ["aa", "bb"], ["cc"]]})
             .set_index("behavior_session_id"))
 
 
@@ -122,7 +126,8 @@ def test_get_session_table_by_experiment(TempdirBehaviorCache):
     expected = (pd.DataFrame({"ophys_session_id": [1, 2, 2, 3],
                               "ophys_experiment_id": [4, 5, 6, 7]})
                 .set_index("ophys_experiment_id"))
-    actual = TempdirBehaviorCache.get_session_table(by="ophys_experiment_id")
+    actual = TempdirBehaviorCache.get_session_table(by="ophys_experiment_id")[
+        ["ophys_session_id"]]
     pd.testing.assert_frame_equal(expected, actual)
 
 
@@ -168,6 +173,3 @@ def test_write_session_log(TempdirBehaviorCache):
     # first one should have updated different than created since accessed 2x
     assert ((actual["created_at"] == actual["updated_at"]).values.tolist()
             == expected_times)
-
-
-

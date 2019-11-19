@@ -79,35 +79,30 @@ def test_get_behavior_stage_table(MockBehaviorProjectLimsApi):
 
 
 @pytest.mark.parametrize(
-    "ophys_session_ids,expected", [
-        (None, WhitespaceStrippedString("""
-            SELECT
-                os.id as ophys_session_id,
-                bs.id as behavior_session_id,
-                experiment_ids as ophys_experiment_id,
-                os.specimen_id,
-                os.isi_experiment_id,
-                os.stimulus_name as session_type,
-                os.date_of_acquisition,
-                d.full_genotype as genotype,
-                g.name as sex,
-                DATE_PART('day', os.date_of_acquisition - d.date_of_birth)
-                    AS age_in_days
-            FROM ophys_sessions os
-            JOIN behavior_sessions bs ON os.id = bs.ophys_session_id
-            JOIN donors d ON d.id = bs.donor_id
-            JOIN genders g ON g.id = d.gender_id
-            JOIN (-- -- begin getting all ophys_experiment_ids -- --
-            SELECT
-                (ARRAY_AGG(DISTINCT(oe.id))) as experiment_ids, os.id
-            FROM ophys_sessions os
-            RIGHT JOIN ophys_experiments oe ON oe.ophys_session_id = os.id
-            GROUP BY os.id
-            -- -- end getting all ophys_experiment_ids -- --
-            ) exp_ids ON os.id = exp_ids.id;
-        """))]
+    "line,expected", [
+        ("reporter", WhitespaceStrippedString(
+            """-- -- begin getting reporter line from donors -- --
+            SELECT ARRAY_AGG (g.name) AS reporter_line, d.id AS donor_id
+            FROM donors d
+            LEFT JOIN donors_genotypes dg ON dg.donor_id=d.id
+            LEFT JOIN genotypes g ON g.id=dg.genotype_id
+            LEFT JOIN genotype_types gt ON gt.id=g.genotype_type_id
+            WHERE gt.name='reporter'
+            GROUP BY d.id
+            -- -- end getting reporter line from donors -- --""")),
+        ("driver", WhitespaceStrippedString(
+            """-- -- begin getting driver line from donors -- --
+            SELECT ARRAY_AGG (g.name) AS driver_line, d.id AS donor_id
+            FROM donors d
+            LEFT JOIN donors_genotypes dg ON dg.donor_id=d.id
+            LEFT JOIN genotypes g ON g.id=dg.genotype_id
+            LEFT JOIN genotype_types gt ON gt.id=g.genotype_type_id
+            WHERE gt.name='driver'
+            GROUP BY d.id
+            -- -- end getting driver line from donors -- --"""))
+    ]
 )
-def test_get_session_table(ophys_session_ids, expected,
-                           MockBehaviorProjectLimsApi):
-    actual = MockBehaviorProjectLimsApi._get_session_table()
-    assert expected == actual
+def test_build_line_from_donor_query(line, expected, 
+                                     MockBehaviorProjectLimsApi):
+    mbp_api = MockBehaviorProjectLimsApi
+    assert expected == mbp_api._build_line_from_donor_query(line=line)
