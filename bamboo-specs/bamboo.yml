@@ -1,0 +1,15 @@
+version: 2
+plan:
+  project-key: IFR
+  key: TESTPLAN
+  name: Test Plan
+
+stages:
+  - Stage 1:
+      jobs:
+        - Job 1
+
+Job 1:
+  tasks:
+    - script:
+        - echo 'Hello from YAML Specs'
