@@ -139,10 +139,11 @@ class BehaviorProjectCache(Cache):
             array_fields=["reporter_line", "driver_line",
                           "ophys_experiment_id"],
             array_types=[str, str, int])
-        sessions = self._get_session_summary(
-            self.fetch_api.get_session_table, self.OPHYS_SESSIONS_KEY,
+        path = self.get_cache_path(None, self.OPHYS_SESSIONS_KEY)
+        sessions = one_file_call_caching(
+            path,
+            self.fetch_api.get_session_table,
             write_csv, read_csv)
-        sessions = sessions.rename(columns={"genotype": "full_genotype"})
         if suppress:
             sessions.drop(columns=suppress, inplace=True, errors="ignore")
 
@@ -183,10 +184,11 @@ class BehaviorProjectCache(Cache):
             _read_csv, index_col="ophys_experiment_id",
             array_fields=["reporter_line", "driver_line"],
             array_types=[str, str])
-        experiments = self._get_session_summary(
-            self.fetch_api.get_experiment_table, self.OPHYS_EXPERIMENTS_KEY,
+        path = self.get_cache_path(None, self.OPHYS_EXPERIMENTS_KEY)
+        experiments = one_file_call_caching(
+            path,
+            self.fetch_api.get_experiment_table,
             write_csv, read_csv)
-        experiments = experiments.rename(columns={"genotype": "full_genotype"})
         if suppress:
             experiments.drop(columns=suppress, inplace=True, errors="ignore")
         return experiments
@@ -207,27 +209,15 @@ class BehaviorProjectCache(Cache):
             array_types=[str, str])
         write_csv = partial(
             _write_csv, array_fields=["reporter_line", "driver_line"])
-        sessions = self._get_session_summary(
+        path = self.get_cache_path(None, self.BEHAVIOR_SESSIONS_KEY)
+        sessions = one_file_call_caching(
+            path,
             self.fetch_api.get_behavior_only_session_table,
-            self.BEHAVIOR_SESSIONS_KEY, write_csv, read_csv)
+            write_csv, read_csv)
         sessions = sessions.rename(columns={"genotype": "full_genotype"})
         if suppress:
             sessions.drop(columns=suppress, inplace=True, errors="ignore")
         return sessions
-
-    def _get_session_summary(
-            self,
-            fetch_call: Callable[[], pd.DataFrame],
-            cache_key: str,
-            write_csv: Callable[[str], None],
-            read_csv: Callable[[str], pd.DataFrame]) -> pd.DataFrame:
-        """
-        Generic helper method for caching calls to get session summary data,
-        such as `get_behavior_session_table` and `get_session_table`.
-        """
-        path = self.get_cache_path(None, cache_key)
-        response = one_file_call_caching(path, fetch_call, write_csv, read_csv)
-        return response
 
     def get_session_data(self, ophys_experiment_id: int, fixed: bool = False):
         """

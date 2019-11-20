@@ -161,7 +161,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                 bs.behavior_training_id,
                 equipment.name as equipment_name,
                 d.id as donor_id,
-                d.full_genotype AS genotype,
+                d.full_genotype,
                 reporter.reporter_line,
                 driver.driver_line,
                 g.name AS sex,
@@ -249,7 +249,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         Return columns: ophys_session_id, behavior_session_id,
                         ophys_experiment_id, project_code, session_name,
                         session_type, equipment_name, date_of_acquisition,
-                        specimen_id, genotype, sex, age_in_days,
+                        specimen_id, full_genotype, sex, age_in_days,
                         reporter_line, driver_line
 
         :param ophys_experiment_ids: optional list of ophys_experiment_ids
@@ -279,7 +279,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                 g.name as sex,
                 DATE_PART('day', os.date_of_acquisition - d.date_of_birth)
                     AS age_in_days,
-                d.full_genotype as genotype,
+                d.full_genotype,
                 reporter.reporter_line,
                 driver.driver_line,
                 id.depth as imaging_depth,
@@ -317,7 +317,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         Return columns: ophys_session_id, behavior_session_id,
                         ophys_experiment_id, project_code, session_name,
                         session_type, equipment_name, date_of_acquisition,
-                        specimen_id, genotype, sex, age_in_days,
+                        specimen_id, full_genotype, sex, age_in_days,
                         reporter_line, driver_line
 
         :param ophys_session_ids: optional list of ophys_session_ids to include
@@ -342,7 +342,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
                 g.name as sex,
                 DATE_PART('day', os.date_of_acquisition - d.date_of_birth)
                     AS age_in_days,
-                d.full_genotype as genotype,
+                d.full_genotype,
                 reporter.reporter_line,
                 driver.driver_line
             FROM ophys_sessions os
@@ -373,7 +373,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
         Return columns: ophys_session_id, behavior_session_id,
                         ophys_experiment_id, project_code, session_name,
                         session_type, equipment_name, date_of_acquisition,
-                        specimen_id, genotype, sex, age_in_days,
+                        specimen_id, full_genotype, sex, age_in_days,
                         reporter_line, driver_line
 
         :param ophys_session_ids: optional list of ophys_session_ids to include
@@ -407,7 +407,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             container_id, project_code, container_workflow_state,
             experiment_workflow_state, session_name, session_type,
             equipment_name, date_of_acquisition, isi_experiment_id,
-            specimen_id, sex, age_in_days, genotype, reporter_line,
+            specimen_id, sex, age_in_days, full_genotype, reporter_line,
             driver_line, imaging_depth, targeted_structure, published_at
         :param ophys_experiment_ids: optional list of ophys_experiment_ids
             to include
