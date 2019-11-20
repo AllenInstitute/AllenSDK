@@ -13,3 +13,4 @@ Job 1:
   tasks:
     - script:
         - echo 'Hello from YAML Specs'
+        - echo 'trying again'
