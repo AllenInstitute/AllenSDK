@@ -511,34 +511,34 @@ class EcephysProjectCache(Cache):
         return manifest_builder
 
     @classmethod
-    def from_lims(cls, lims_kwargs=None, asynchronous=True, **kwargs):
-        lims_kwargs = {} if lims_kwargs is None else lims_kwargs
+    def _from_http_source_default(cls, fetch_api_cls, fetch_api_kwargs, **kwargs):
+        fetch_api_kwargs = {
+            "asynchronous": True
+        } if fetch_api_kwargs is None else fetch_api_kwargs
 
-        if asynchronous and "stream_writer" not in kwargs:
+        if "stream_writer" not in kwargs:
+            if fetch_api_kwargs.get("asynchronous", True):
                 kwargs["stream_writer"] = write_bytes_from_coroutine
+            else:
+                kwargs["stream_writer"] = write_from_stream
 
         return cls(
-            fetch_api=EcephysProjectLimsApi.default(
-                asynchronous=asynchronous,
-                **lims_kwargs
-            ),
+            fetch_api=fetch_api_cls.default(**fetch_api_kwargs),
             **kwargs
         )
 
     @classmethod
-    def from_warehouse(cls, warehouse_kwargs=None, asynchronous=True, **kwargs):
-        warehouse_kwargs = {} if warehouse_kwargs is None else warehouse_kwargs
-
-        if asynchronous and "stream_writer" not in kwargs:
-                kwargs["stream_writer"] = write_bytes_from_coroutine
-
-        return cls(
-            fetch_api=EcephysProjectWarehouseApi.default(
-                asynchronous=asynchronous,
-                **warehouse_kwargs
-            ),
-            **kwargs
+    def from_lims(cls, lims_kwargs=None, **kwargs):
+        return cls._from_http_source_default(
+            EcephysProjectLimsApi, lims_kwargs, **kwargs
         )
+
+    @classmethod
+    def from_warehouse(cls, warehouse_kwargs=None, **kwargs):
+        return cls._from_http_source_default(
+            EcephysProjectWarehouseApi, warehouse_kwargs, **kwargs
+        )
+
 
     @classmethod
     def fixed(cls, **kwargs):
