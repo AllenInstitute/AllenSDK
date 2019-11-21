@@ -523,12 +523,11 @@ class EcephysProjectCache(Cache):
         warehouse_kwargs = {} if warehouse_kwargs is None else warehouse_kwargs
 
         if asynchronous:
+            api_constructor = EcephysProjectWarehouseApi.async_default
 
             if "stream_writer" not in kwargs:
                 kwargs["stream_writer"] = write_bytes_from_coroutine
 
-            api_constructor = EcephysProjectWarehouseApi.async_default
-            
         else:
             api_constructor = EcephysProjectWarehouseApi.default
 
