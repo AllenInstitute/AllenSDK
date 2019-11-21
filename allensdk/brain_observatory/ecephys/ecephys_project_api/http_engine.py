@@ -46,8 +46,9 @@ class HttpEngine:
                 logging.warning(f"downloading a {size_message} file from {url}")
             yield chunk
 
-            if time.time() - start_time > self.timeout:
-                raise requests.Timeout
+            elapsed = time.time() - start_time
+            if elapsed > self.timeout:
+                raise requests.Timeout(f"Download took {elapsed} seconds, but timeout was set to {self.timeout}")
 
 
 class AsyncHttpEngine(HttpEngine):
@@ -70,7 +71,6 @@ class AsyncHttpEngine(HttpEngine):
             self.session = aiohttp.ClientSession(
                 timeout=aiohttp.client.ClientTimeout(self.timeout)
             )
-
 
     async def _stream_coroutine(self, route, callback):
         url = self._build_url(route)
