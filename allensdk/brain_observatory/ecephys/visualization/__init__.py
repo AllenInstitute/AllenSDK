@@ -22,7 +22,7 @@ def plot_mean_waveforms(mean_waveforms, unit_ids, peak_channels): # pragma: no c
         ax.plot(wf.loc[{'channel_id': peak_channels[uid]}])
 
     ax.legend(unit_ids)
-    ax.set_ylabel('membrane potential (mV)', fontsize=16)
+    ax.set_ylabel('membrane potential (uV)', fontsize=16)
     ax.set_xlabel('time (s)', fontsize=16)
 
     ax.set_xticks(np.arange(0, len(wf['time']), 20))
