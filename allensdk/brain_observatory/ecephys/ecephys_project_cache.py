@@ -10,8 +10,19 @@ import pynwb
 
 from allensdk.api.cache import Cache
 
-from allensdk.brain_observatory.ecephys.ecephys_project_api import EcephysProjectApi, EcephysProjectLimsApi, EcephysProjectWarehouseApi, EcephysProjectFixedApi
-from allensdk.brain_observatory.ecephys.ecephys_session_api import EcephysNwbSessionApi
+from allensdk.brain_observatory.ecephys.ecephys_project_api import (
+    EcephysProjectApi, EcephysProjectLimsApi, EcephysProjectWarehouseApi, 
+    EcephysProjectFixedApi
+)
+from allensdk.brain_observatory.ecephys.ecephys_project_api.rma_engine import (
+    AsyncRmaEngine,
+)
+from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine import (
+    write_bytes_from_coroutine, write_from_stream
+)
+from allensdk.brain_observatory.ecephys.ecephys_session_api import (
+    EcephysNwbSessionApi
+)
 from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
 from allensdk.brain_observatory.ecephys import get_unit_filter_value
 from allensdk.api.caching_utilities import one_file_call_caching
@@ -66,6 +77,7 @@ class EcephysProjectCache(Cache):
         self, 
         fetch_api: EcephysProjectApi = EcephysProjectWarehouseApi.default(), 
         fetch_tries: int = 2, 
+        stream_writer = write_from_stream,
         **kwargs):
         """ Entrypoint for accessing ecephys (neuropixels) data. Supports 
         access to cross-session data (like stimulus templates) and high-level 
@@ -105,6 +117,7 @@ class EcephysProjectCache(Cache):
         super(EcephysProjectCache, self).__init__(**kwargs)
         self.fetch_api = fetch_api
         self.fetch_tries = fetch_tries
+        self.stream_writer = stream_writer
 
     def _get_sessions(self):
         path = self.get_cache_path(None, self.SESSIONS_KEY)
@@ -271,7 +284,7 @@ class EcephysProjectCache(Cache):
         return one_file_call_caching(
             self.get_cache_path(None, self.SESSION_NWB_KEY, session_id, session_id),
             partial(self.fetch_api.get_session_data, session_id),
-            write_from_stream,
+            self.stream_writer,
             read,
             num_tries=self.fetch_tries
         )
@@ -304,7 +317,7 @@ class EcephysProjectCache(Cache):
                 one_file_call_caching,
                 self.get_cache_path(None, self.PROBE_LFP_NWB_KEY, session_id, probe_id),
                 partial(self.fetch_api.get_probe_lfp_data, probe_id),
-                write_from_stream,
+                self.stream_writer,
                 read_nwb,
                 num_tries=self.fetch_tries
             )
@@ -326,7 +339,7 @@ class EcephysProjectCache(Cache):
         return one_file_call_caching(
             self.get_cache_path(None, self.NATURAL_MOVIE_KEY, number),
             partial(self.fetch_api.get_natural_movie_template, number=number),
-            write_from_stream,
+            self.stream_writer,
             read_movie, 
             num_tries=self.fetch_tries
         )
@@ -335,7 +348,7 @@ class EcephysProjectCache(Cache):
         return one_file_call_caching(
             self.get_cache_path(None, self.NATURAL_SCENE_KEY, number),
             partial(self.fetch_api.get_natural_scene_template, number=number),
-            write_from_stream,
+            self.stream_writer,
             read_scene, 
             num_tries=self.fetch_tries
         )
@@ -506,10 +519,21 @@ class EcephysProjectCache(Cache):
         )
 
     @classmethod
-    def from_warehouse(cls, warehouse_kwargs=None, **kwargs):
+    def from_warehouse(cls, warehouse_kwargs=None, asynchronous=True, **kwargs):
         warehouse_kwargs = {} if warehouse_kwargs is None else warehouse_kwargs
+
+        if asynchronous:
+
+            if "stream_writer" not in kwargs:
+                kwargs["stream_writer"] = write_bytes_from_coroutine
+
+            api_constructor = EcephysProjectWarehouseApi.async_default
+            
+        else:
+            api_constructor = EcephysProjectWarehouseApi.default
+
         return cls(
-            fetch_api=EcephysProjectWarehouseApi.default(**warehouse_kwargs),
+            fetch_api=api_constructor(**warehouse_kwargs),
             **kwargs
         )
 
@@ -573,8 +597,3 @@ def read_nwb(path):
     nwbfile.identifier  # if the file is corrupt, make sure an exception gets raised during read
     return nwbfile
 
-
-def write_from_stream(path, stream):
-    with open(path, "wb") as fil:
-        for chunk in stream:
-            fil.write(chunk)
