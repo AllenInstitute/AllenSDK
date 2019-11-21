@@ -1,16 +1,32 @@
 import logging
 import functools
+import os
+import asyncio
+import time
+import warnings
 
 import requests
 import aiohttp
 import nest_asyncio
 
 
+DEFAULT_TIMEOUT = 10 * 60  # seconds
+DEFAULT_CHUNKSIZE = 1024 * 10  # bytes
+
 
 class HttpEngine:
-    def __init__(self, scheme, host, **kwargs):
+    def __init__(
+        self, 
+        scheme, 
+        host, 
+        timeout=DEFAULT_TIMEOUT, 
+        chunksize=DEFAULT_CHUNKSIZE, 
+        **kwargs
+    ):
         self.scheme = scheme
         self.host = host
+        self.timeout = timeout
+        self.chunksize = chunksize
 
     def _build_url(self, route):
         return f"{self.scheme}://{self.host}/{route}"
@@ -18,39 +34,55 @@ class HttpEngine:
     def stream(self, path):
         url = self._build_url(path)
         
+        start_time = time.time()
         response = requests.get(url, stream=True)
         response_mb = None
         if "Content-length" in response.headers:
             response_mb = float(response.headers["Content-length"]) / 1024 ** 2
 
-        # TODO: this should be async with write (response.raw.read_chunked?)
-        for ii, chunk in enumerate(response):
+        for ii, chunk in enumerate(response.iter_content(self.chunksize)):
             if ii == 0:
                 size_message = f"{response_mb:3.3}mb" if response_mb is not None else "potentially large"
                 logging.warning(f"downloading a {size_message} file from {url}")
             yield chunk
 
+            if time.time() - start_time > self.timeout:
+                raise requests.Timeout
+
 
 class AsyncHttpEngine(HttpEngine):
 
-    def __init__(self, scheme, host, session=None, **kwargs):
+    def __init__(
+        self, 
+        scheme, 
+        host, 
+        session=None, 
+        **kwargs
+    ):
         super(AsyncHttpEngine, self).__init__(scheme, host, **kwargs)
-        self.session = session or aiohttp.ClientSession()
+
+        if session:
+            self.session = session
+            warnings.warn(
+                "Recieved preconstructed session, ignoring timeout parameter."
+            )
+        else:
+            self.session = aiohttp.ClientSession(
+                timeout=aiohttp.client.ClientTimeout(self.timeout)
+            )
+
 
     async def _stream_coroutine(self, route, callback):
         url = self._build_url(route)
 
         async with self.session.get(url) as response:
-            await callback(response.content.iter_chunked(1024*10))  # TODO: don't hardcode chunksize
+            await callback(response.content.iter_chunked(self.chunksize))
 
     def stream(self, path):
         return functools.partial(self._stream_coroutine, path)
 
 
 def write_bytes_from_coroutine(path, coroutine):
-    
-    import os
-    import asyncio
     
     os.makedirs(os.path.dirname(path), exist_ok=True)
     
@@ -62,7 +94,7 @@ def write_bytes_from_coroutine(path, coroutine):
         with open(path, "wb") as file_:
             callback_ = functools.partial(callback, file_)
             await coroutine(callback_)
-                
+
     nest_asyncio.apply()
     
     loop = asyncio.get_event_loop()
