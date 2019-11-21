@@ -72,6 +72,7 @@ class AsyncRmaEngine(RmaEngine, AsyncHttpEngine):
     def __init__(self, scheme, host, **kwargs):
         super(AsyncRmaEngine, self).__init__(scheme, host, **kwargs)
 
+
 def infer_column_types(dataframe):
     """ RMA queries often come back with string-typed columns. This utility tries to infer numeric types.
     """
