@@ -307,13 +307,9 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
 
 
     @classmethod
-    def default(cls, **rma_kwargs):
+    def default(cls, asynchronous=True, **rma_kwargs):
         _rma_kwargs = {"scheme": "http", "host": "api.brain-map.org"}
         _rma_kwargs.update(rma_kwargs)
-        return cls(RmaEngine(**_rma_kwargs))
 
-    @classmethod
-    def async_default(cls, **rma_kwargs):
-        _rma_kwargs = {"scheme": "http", "host": "api.brain-map.org"}
-        _rma_kwargs.update(rma_kwargs)
-        return cls(AsyncRmaEngine(**_rma_kwargs))
+        engine_cls = AsyncRmaEngine if asynchronous else RmaEngine
+        return cls(engine_cls(**_rma_kwargs))
