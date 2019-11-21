@@ -6,7 +6,7 @@ import ast
 import requests
 import pandas as pd
 
-from .http_engine import HttpEngine
+from .http_engine import HttpEngine, AsyncHttpEngine
 
 
 class RmaRequestError(Exception):
@@ -19,8 +19,8 @@ class RmaEngine(HttpEngine):
     def format_query_string(self):
         return f"query.{self.rma_format}"
 
-    def __init__(self, scheme, host, rma_prefix="api/v2/data", rma_format="json", page_size=5000):
-        super(RmaEngine, self).__init__(scheme, host)
+    def __init__(self, scheme, host, rma_prefix="api/v2/data", rma_format="json", page_size=5000, **kwargs):
+        super(RmaEngine, self).__init__(scheme, host, **kwargs)
         self.rma_prefix = rma_prefix
         self.rma_format = rma_format
         self.page_size = page_size
@@ -66,6 +66,11 @@ class RmaEngine(HttpEngine):
 
         return response
 
+
+class AsyncRmaEngine(RmaEngine, AsyncHttpEngine):
+    
+    def __init__(self, scheme, host, **kwargs):
+        super(AsyncRmaEngine, self).__init__(scheme, host, **kwargs)
 
 def infer_column_types(dataframe):
     """ RMA queries often come back with string-typed columns. This utility tries to infer numeric types.
