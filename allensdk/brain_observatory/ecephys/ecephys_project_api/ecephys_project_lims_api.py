@@ -565,17 +565,17 @@ class EcephysProjectLimsApi(EcephysProjectApi):
 
 
     @classmethod
-    def default(cls, pg_kwargs=None, app_kwargs=None, asynchronous=True):
+    def default(cls, pg_kwargs=None, app_kwargs=None):
 
         _pg_kwargs = {}
         if pg_kwargs is not None:
             _pg_kwargs.update(pg_kwargs)
 
-        _app_kwargs = {"scheme": "http", "host": "lims2"}
+        _app_kwargs = {"scheme": "http", "host": "lims2", "asynchronous": True}
         if app_kwargs is not None:
             _app_kwargs.update(app_kwargs)
 
-        app_engine_cls = AsyncHttpEngine if asynchronous else HttpEngine
+        app_engine_cls = AsyncHttpEngine if app_kwargs["asynchronous"] else HttpEngine
 
         pg_engine = PostgresQueryMixin(**_pg_kwargs)
         app_engine = app_engine_cls(**_app_kwargs)

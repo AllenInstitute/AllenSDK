@@ -31,8 +31,8 @@ class HttpEngine:
     def _build_url(self, route):
         return f"{self.scheme}://{self.host}/{route}"
 
-    def stream(self, path):
-        url = self._build_url(path)
+    def stream(self, route):
+        url = self._build_url(route)
         
         start_time = time.time()
         response = requests.get(url, stream=True)
@@ -78,8 +78,8 @@ class AsyncHttpEngine(HttpEngine):
         async with self.session.get(url) as response:
             await callback(response.content.iter_chunked(self.chunksize))
 
-    def stream(self, path):
-        return functools.partial(self._stream_coroutine, path)
+    def stream(self, route):
+        return functools.partial(self._stream_coroutine, route)
 
 
 def write_bytes_from_coroutine(path, coroutine):
