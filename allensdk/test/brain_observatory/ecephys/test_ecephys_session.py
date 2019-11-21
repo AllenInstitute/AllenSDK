@@ -80,7 +80,9 @@ def raw_units():
         'local_index': [0, 0, 1],
         'peak_channel_id': [2, 1, 0],
         'quality': ['good', 'good', 'noise'],
-        'snr': [0.1, 1.4, 10.0]
+        'snr': [0.1, 1.4, 10.0],
+        'on_screen_rf': [True, False, True],
+        'p_value_rf': [0.001, 0.01, 0.05]
     }, index=pd.Index(name='unit_id', data=np.arange(3)[::-1]))
 
 
@@ -323,6 +325,7 @@ def test_build_units_table(units_table_api):
     assert 3 == session.num_units
     assert np.allclose([10, 22, 33], obtained['probe_vertical_position'])
     assert np.allclose([0, 1, 2], obtained.index.values)
+    assert np.allclose([0.05, 0.01, 0.001], obtained['p_value_rf'].values)
 
 
 def test_presentationwise_spike_counts(spike_times_api):
