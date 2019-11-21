@@ -511,10 +511,17 @@ class EcephysProjectCache(Cache):
         return manifest_builder
 
     @classmethod
-    def from_lims(cls, lims_kwargs=None, **kwargs):
+    def from_lims(cls, lims_kwargs=None, asynchronous=True, **kwargs):
         lims_kwargs = {} if lims_kwargs is None else lims_kwargs
+
+        if asynchronous and "stream_writer" not in kwargs:
+                kwargs["stream_writer"] = write_bytes_from_coroutine
+
         return cls(
-            fetch_api=EcephysProjectLimsApi.default(**lims_kwargs),
+            fetch_api=EcephysProjectLimsApi.default(
+                asynchronous=asynchronous,
+                **lims_kwargs
+            ),
             **kwargs
         )
 
@@ -522,17 +529,14 @@ class EcephysProjectCache(Cache):
     def from_warehouse(cls, warehouse_kwargs=None, asynchronous=True, **kwargs):
         warehouse_kwargs = {} if warehouse_kwargs is None else warehouse_kwargs
 
-        if asynchronous:
-            api_constructor = EcephysProjectWarehouseApi.async_default
-
-            if "stream_writer" not in kwargs:
+        if asynchronous and "stream_writer" not in kwargs:
                 kwargs["stream_writer"] = write_bytes_from_coroutine
 
-        else:
-            api_constructor = EcephysProjectWarehouseApi.default
-
         return cls(
-            fetch_api=api_constructor(**warehouse_kwargs),
+            fetch_api=EcephysProjectWarehouseApi.default(
+                asynchronous=asynchronous,
+                **warehouse_kwargs
+            ),
             **kwargs
         )
 

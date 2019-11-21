@@ -3,7 +3,7 @@ from typing import Optional, Iterable, NamedTuple
 import pandas as pd
 
 from .ecephys_project_api import EcephysProjectApi, ArrayLike
-from .http_engine import HttpEngine
+from .http_engine import HttpEngine, AsyncHttpEngine
 from .utilities import postgres_macros, build_and_execute
 
 from allensdk.internal.api import PostgresQueryMixin
@@ -565,7 +565,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
 
 
     @classmethod
-    def default(cls, pg_kwargs=None, app_kwargs=None):
+    def default(cls, pg_kwargs=None, app_kwargs=None, asynchronous=True):
 
         _pg_kwargs = {}
         if pg_kwargs is not None:
@@ -575,8 +575,10 @@ class EcephysProjectLimsApi(EcephysProjectApi):
         if app_kwargs is not None:
             _app_kwargs.update(app_kwargs)
 
+        app_engine_cls = AsyncHttpEngine if asynchronous else HttpEngine
+
         pg_engine = PostgresQueryMixin(**_pg_kwargs)
-        app_engine = HttpEngine(**_app_kwargs)
+        app_engine = app_engine_cls(**_app_kwargs)
         return cls(pg_engine, app_engine)
 
 
