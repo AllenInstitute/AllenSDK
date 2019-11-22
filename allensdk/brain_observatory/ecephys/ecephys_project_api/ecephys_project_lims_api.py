@@ -575,7 +575,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
         if app_kwargs is not None:
             _app_kwargs.update(app_kwargs)
 
-        app_engine_cls = AsyncHttpEngine if app_kwargs["asynchronous"] else HttpEngine
+        app_engine_cls = AsyncHttpEngine if _app_kwargs["asynchronous"] else HttpEngine
 
         pg_engine = PostgresQueryMixin(**_pg_kwargs)
         app_engine = app_engine_cls(**_app_kwargs)

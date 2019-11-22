@@ -21,7 +21,8 @@ class HttpEngine:
         scheme: str, 
         host: str, 
         timeout: float = DEFAULT_TIMEOUT, 
-        chunksize: int = DEFAULT_CHUNKSIZE
+        chunksize: int = DEFAULT_CHUNKSIZE,
+        **kwargs
     ):
         """ Simple tool for making streaming http requests.
 
@@ -37,6 +38,9 @@ class HttpEngine:
             when the initial request is made.
         chunksize : 
             When streaming data, how many bytes ought to be requested at once.
+        **kwargs : 
+            unused. Defined here so that parameters can fall through from 
+            subclasses
         """
 
         self.scheme = scheme
@@ -136,9 +140,10 @@ class AsyncHttpEngine(HttpEngine):
         return functools.partial(self._stream_coroutine, route)
 
     def __del__(self):
-        nest_asyncio.apply()
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(self.session.close())
+        if hasattr(self, "session"):
+            nest_asyncio.apply()
+            loop = asyncio.get_event_loop()
+            loop.run_until_complete(self.session.close())
         
 
 def write_bytes_from_coroutine(path: str, coroutine):
