@@ -139,9 +139,30 @@ def get_ophys_data_length(filename):
         return f["data"].shape[1]
 
 
-def get_stim_data_length(filename):
+def get_stim_data_length(filename: str) -> int:
+    """Get stimulus data length from .pkl file.
+
+    Parameters
+    ----------
+    filename : str
+        Path of stimulus data .pkl file.
+
+    Returns
+    -------
+    int
+        Stimulus data length.
+    """
     stim_data = pd.read_pickle(filename)
-    return stim_data["vsynccount"]
+
+    # A subset of stimulus .pkl files do not have the "vsynccount" field.
+    # MPE *won't* be backfilling the "vsynccount" field for these .pkl files.
+    # So the least worst option is to recalculate the vsync_count.
+    try:
+        vsync_count = stim_data["vsynccount"]
+    except KeyError:
+        vsync_count = len(stim_data["items"]["behavior"]["intervalsms"]) + 1
+
+    return vsync_count
 
 
 def corrected_video_timestamps(video_name, timestamps, data_length):

@@ -6,14 +6,16 @@ import h5py
 import pytz
 import pandas as pd
 
-from allensdk.internal.api import PostgresQueryMixin, OneOrMoreResultExpectedError
+from allensdk.internal.api import (
+    PostgresQueryMixin, OneOrMoreResultExpectedError)
 from allensdk.api.cache import memoize
 from allensdk.brain_observatory.behavior.image_api import ImageApi
 import allensdk.brain_observatory.roi_masks as roi
 from allensdk.internal.core.lims_utilities import safe_system_path
+from allensdk.core.cache_method_utilities import CachedInstanceMethodMixin
 
 
-class OphysLimsApi(PostgresQueryMixin):
+class OphysLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin):
 
     def __init__(self, ophys_experiment_id):
         self.ophys_experiment_id = ophys_experiment_id

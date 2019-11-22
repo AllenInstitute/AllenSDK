@@ -2,6 +2,7 @@ import functools
 from pathlib import Path
 import warnings
 import os
+import logging
 
 from typing import overload, Callable, Any, Union, Optional, TypeVar
 
@@ -87,18 +88,23 @@ def call_caching(
     The result of calling read
 
     """
+    logger = logging.getLogger("call_caching")
 
     try:
         if not lazy or read is None:
+            logger.info("Fetching data from remote")
             data = fetch()
             if pre_write is not None:
                 data = pre_write(data)
+            logger.info("Writing data to cache")
             write(data)
 
-        if read is not None:    
+        if read is not None:
+            logger.info("Reading data from cache")
             return read()
-
-    except Exception:
+    except Exception as e:
+        if isinstance(e, FileNotFoundError):
+            logger.info("No cache file found.")
         if cleanup is not None and not lazy:
             cleanup()
 
@@ -150,7 +156,6 @@ def one_file_call_caching(
         Path at which the data will be stored
 
     """
-
     def safe_unlink():
         try:
             os.unlink(path)

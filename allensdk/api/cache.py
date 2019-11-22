@@ -42,25 +42,51 @@ import pandas as pd
 import pandas.io.json as pj
 
 import functools
-from functools import wraps
+from functools import wraps, _make_key
 import os
 import logging
 import csv
 
 
 def memoize(f):
-   memodict = dict()
+    """
+    Creates an unbound cache of function calls and results. Note that arguments
+    of different types are not cached separately (so f(3.0) and f(3) are not 
+    treated as distinct calls)
 
-   @wraps(f)
-   def wrapper(*args, **kwargs):
-       key = (args, tuple(kwargs.items()))
+    Arguments to the cached function must be hashable.
 
-       if key not in memodict:
-           memodict[key] = f(*args, **kwargs)
+    View the cache size with f.cache_size().
+    Clear the cache with f.cache_clear().
+    Access the underlying function with f.__wrapped__.
+    """
+    cache = {}
+    sentinel = object()         # unique object for cache misses
+    make_key = _make_key        # efficient key building from function args
+    cache_get = cache.get       
+    cache_len = cache.__len__   
 
-       return memodict[key]
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        key = make_key(args, kwargs, typed=False)    # Don't consider 3.0 and 3 different
+        result = cache_get(key, sentinel)
+        if result is not sentinel:
+            return result
+        result = f(*args, **kwargs)
+        cache[key] = result
+        return result
 
-   return wrapper
+    def cache_clear():
+        cache.clear()
+
+    def cache_size():
+        return cache_len()
+
+    wrapper.cache_clear = cache_clear
+    wrapper.cache_size = cache_size
+
+    return wrapper
+
 
 class Cache(object):
     _log = logging.getLogger('allensdk.api.cache')

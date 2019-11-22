@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-import node
+import allensdk.internal.morphology.node as node
 
 class Compartment(object):
     def __init__(self, node1, node2):

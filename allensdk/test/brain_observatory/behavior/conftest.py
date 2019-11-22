@@ -8,6 +8,18 @@ import uuid
 import os
 import json
 
+from allensdk.test_utilities.custom_comparators import WhitespaceStrippedString
+
+
+def pytest_assertrepr_compare(config, op, left, right):
+    if isinstance(left, WhitespaceStrippedString) and op == "==":
+        if isinstance(right, WhitespaceStrippedString):
+            right_compare = right.orig
+        else:
+            right_compare = right
+        return ["Comparing strings with whitespace stripped. ",
+                f"{left.orig} != {right_compare}.", "Diff:"] + left.diff
+
 
 def pytest_ignore_collect(path, config):
     ''' The brain_observatory.ecephys submodule uses python 3.6 features that may not be backwards compatible!
