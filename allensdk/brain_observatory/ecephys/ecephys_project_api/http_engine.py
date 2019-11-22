@@ -81,6 +81,11 @@ class AsyncHttpEngine(HttpEngine):
     def stream(self, route):
         return functools.partial(self._stream_coroutine, route)
 
+    def __del__(self):
+        nest_asyncio.apply()
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(self.session.close())
+        
 
 def write_bytes_from_coroutine(path, coroutine):
     
@@ -96,7 +101,6 @@ def write_bytes_from_coroutine(path, coroutine):
             await coroutine(callback_)
 
     nest_asyncio.apply()
-    
     loop = asyncio.get_event_loop()
     loop.run_until_complete(wrapper())
 
