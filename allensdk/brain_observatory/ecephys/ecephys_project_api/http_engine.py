@@ -1,9 +1,10 @@
-import logging
 import functools
 import os
 import asyncio
 import time
 import warnings
+import logging
+from typing import Optional, Iterable
 
 import requests
 import aiohttp
@@ -17,12 +18,27 @@ DEFAULT_CHUNKSIZE = 1024 * 10  # bytes
 class HttpEngine:
     def __init__(
         self, 
-        scheme, 
-        host, 
-        timeout=DEFAULT_TIMEOUT, 
-        chunksize=DEFAULT_CHUNKSIZE, 
-        **kwargs
+        scheme: str, 
+        host: str, 
+        timeout: float = DEFAULT_TIMEOUT, 
+        chunksize: int = DEFAULT_CHUNKSIZE
     ):
+        """ Simple tool for making streaming http requests.
+
+        Parameters
+        ----------
+        scheme :
+            e.g "http" or "https"
+        host : 
+            will be used as the base for request urls
+        timeout : 
+            requests taking longer than this (in seconds) will raise a 
+            `requests.Timeout` error. The clock on this timeout starts running 
+            when the initial request is made.
+        chunksize : 
+            When streaming data, how many bytes ought to be requested at once.
+        """
+
         self.scheme = scheme
         self.host = host
         self.timeout = timeout
@@ -32,6 +48,15 @@ class HttpEngine:
         return f"{self.scheme}://{self.host}/{route}"
 
     def stream(self, route):
+        """ Makes an http request and returns an iterator over the response.
+
+        Parameters
+        ----------
+        route :
+            the http route (under this object's host) to request against.
+
+        """
+
         url = self._build_url(route)
         
         start_time = time.time()
@@ -55,11 +80,28 @@ class AsyncHttpEngine(HttpEngine):
 
     def __init__(
         self, 
-        scheme, 
-        host, 
-        session=None, 
+        scheme: str, 
+        host: str, 
+        session: Optional[aiohttp.ClientSession] = None, 
         **kwargs
     ):
+        """ Simple tool for making asynchronous streaming http requests.
+
+        Parameters
+        ----------
+        scheme :
+            e.g "http" or "https"
+        host : 
+            will be used as the base for request urls
+        session : 
+            If provided, this preconstructed session will be used rather than 
+            a new one. Keep in mind that AsyncHttpEngine closes its session 
+            when it is garbage collected!
+        **kwargs :
+            Will be passed to parent.
+
+        """
+
         super(AsyncHttpEngine, self).__init__(scheme, host, **kwargs)
 
         if session:
@@ -79,6 +121,18 @@ class AsyncHttpEngine(HttpEngine):
             await callback(response.content.iter_chunked(self.chunksize))
 
     def stream(self, route):
+        """ Returns a coroutine which
+            - makes an http request
+            - exposes internally an asynchronous iterator over the response
+            - takes a callback parameter, which should consume the iterator.
+
+        Parameters
+        ----------
+        route :
+            the http route (under this object's host) to request against.
+
+        """
+
         return functools.partial(self._stream_coroutine, route)
 
     def __del__(self):
@@ -87,7 +141,18 @@ class AsyncHttpEngine(HttpEngine):
         loop.run_until_complete(self.session.close())
         
 
-def write_bytes_from_coroutine(path, coroutine):
+def write_bytes_from_coroutine(path: str, coroutine):
+    """ Utility for streaming http from an asynchronous requester to a file.
+
+    Parameters
+    ----------
+    path : 
+        Write to this file
+    coroutine : 
+        Ought to accept a callback which itself accepts an asynchronous 
+        iterator.
+    
+    """
     
     os.makedirs(os.path.dirname(path), exist_ok=True)
     
@@ -105,7 +170,18 @@ def write_bytes_from_coroutine(path, coroutine):
     loop.run_until_complete(wrapper())
 
 
-def write_from_stream(path, stream):
+def write_from_stream(path: str, stream: Iterable[bytes]):
+    """ Write bytes to a file from an iterator
+
+    Parameters
+    ----------
+    path : 
+        write to this file
+    stream : 
+        iterable yielding bytes to be written
+
+    """
+
     with open(path, "wb") as fil:
         for chunk in stream:
             fil.write(chunk)
