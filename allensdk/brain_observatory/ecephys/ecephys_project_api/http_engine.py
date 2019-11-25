@@ -63,7 +63,7 @@ class HttpEngine:
 
         url = self._build_url(route)
         
-        start_time = time.time()
+        start_time = time.perf_counter()
         response = requests.get(url, stream=True)
         response_mb = None
         if "Content-length" in response.headers:
@@ -75,7 +75,7 @@ class HttpEngine:
                 logging.warning(f"downloading a {size_message} file from {url}")
             yield chunk
 
-            elapsed = time.time() - start_time
+            elapsed = time.perf_counter() - start_time
             if elapsed > self.timeout:
                 raise requests.Timeout(f"Download took {elapsed} seconds, but timeout was set to {self.timeout}")
 
