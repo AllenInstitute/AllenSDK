@@ -4,7 +4,7 @@ import asyncio
 import time
 import warnings
 import logging
-from typing import Optional, Iterable
+from typing import Optional, Iterable, Callable, AsyncIterator, Awaitable
 
 import requests
 import aiohttp
@@ -80,6 +80,9 @@ class HttpEngine:
                 raise requests.Timeout(f"Download took {elapsed} seconds, but timeout was set to {self.timeout}")
 
 
+AsyncStreamCallbackType = Callable[[AsyncIterator[bytes]], Awaitable[None]]
+
+
 class AsyncHttpEngine(HttpEngine):
 
     def __init__(
@@ -118,13 +121,20 @@ class AsyncHttpEngine(HttpEngine):
                 timeout=aiohttp.client.ClientTimeout(self.timeout)
             )
 
-    async def _stream_coroutine(self, route, callback):
+    async def _stream_coroutine(
+        self, 
+        route: str, 
+        callback: AsyncStreamCallbackType
+    ):
         url = self._build_url(route)
 
         async with self.session.get(url) as response:
             await callback(response.content.iter_chunked(self.chunksize))
 
-    def stream(self, route):
+    def stream(
+        self, 
+        route: str
+    ) -> Callable[[AsyncStreamCallbackType], Awaitable[None]]:
         """ Returns a coroutine which
             - makes an http request
             - exposes internally an asynchronous iterator over the response
@@ -146,7 +156,10 @@ class AsyncHttpEngine(HttpEngine):
             loop.run_until_complete(self.session.close())
         
 
-def write_bytes_from_coroutine(path: str, coroutine):
+def write_bytes_from_coroutine(
+    path: str, 
+    coroutine: Callable[[AsyncStreamCallbackType], Awaitable[None]]
+):
     """ Utility for streaming http from an asynchronous requester to a file.
 
     Parameters
@@ -154,8 +167,14 @@ def write_bytes_from_coroutine(path: str, coroutine):
     path : 
         Write to this file
     coroutine : 
-        Ought to accept a callback which itself accepts an asynchronous 
-        iterator.
+        The source of the data. Needs to have a specific structure, namely:
+            - the first-position parameter of the coroutine ought to accept a
+            callback. This callback ought to itself be awaitable.
+            - within the coroutine, this callback ought to be called with a 
+            single argument. That single argument should be an asynchronous 
+            iterator.
+        Please see AsyncHttpEngine.stream (and 
+        AsyncHttpEngine._stream_coroutine) for an example. 
     
     """
     
