@@ -145,6 +145,18 @@ class AsyncHttpEngine(HttpEngine):
         route :
             the http route (under this object's host) to request against.
 
+        Notes
+        -----
+        To use this method, you will need an appropriate consumer. For
+        instance, If you want to write the streamed data to a local file, you
+        can use write_bytes_from_coroutine.
+
+        Examples
+        --------
+        >>> engine = AsyncHttpEngine("http", "examplehost")
+        >>> stream_coro = engine.stream("example/route")
+        >>> write_bytes_from_coroutine("example/file/path.txt", stream_coro)
+
         """
 
         return functools.partial(self._stream_coroutine, route)
