@@ -7,10 +7,20 @@ plan:
 stages:
   - Stage 1:
       jobs:
-        - Job 1
+        - Setup
+        - Run Tests
 
-Job 1:
+Setup:
   tasks:
     - script:
-        - echo 'Hello from YAML Specs'
-        - echo 'trying again'
+        - mkdir htmlcov
+        - mkdir doc
+        - chmod go+rw htmlcov
+        - chmod go+rw test-reports
+        - chmod go+rw doc
+        - docker pull docker.aibs-artifactory.corp.alleninstitute.org/allensdk_anaconda3
+        - docker tag docker.aibs-artifactory.corp.alleninstitute.org/allensdk_anaconda3 alleninstitute/allensdk_anaconda3
+Run Tests:
+  tasks:
+    - script: 
+        - echo "Made it past setup"
