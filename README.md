@@ -10,3 +10,5 @@ in the [Allen Brain Atlas](http://brain-map.org/).
 Please visit http://alleninstitute.github.io/AllenSDK for more information.
 
 We welcome contributions! See the [contribution guide](CONTRIBUTING.md) here. See here for [the list of authors](doc_template/authors.rst).
+
+If you have more general questions or comments about the AllenSDK please post them to the [Allen Brain Map Community Forum](https://community.brain-map.org).
