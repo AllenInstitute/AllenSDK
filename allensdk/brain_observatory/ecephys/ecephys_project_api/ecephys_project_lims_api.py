@@ -1,23 +1,66 @@
-from pathlib import Path
-import shutil
-import warnings
+from typing import Optional, Iterable, NamedTuple
 
 import pandas as pd
 
-from .ecephys_project_api import EcephysProjectApi
+from .ecephys_project_api import EcephysProjectApi, ArrayLike
 from .http_engine import HttpEngine
 from .utilities import postgres_macros, build_and_execute
 
 from allensdk.internal.api import PostgresQueryMixin
-from allensdk.brain_observatory.ecephys import get_unit_filter_value
 
 
 class EcephysProjectLimsApi(EcephysProjectApi):
+
+    STIMULUS_TEMPLATE_NAMESPACE = "brain_observatory_1.1"
+
     def __init__(self, postgres_engine, app_engine):
+        """ Downloads extracellular ephys data from the Allen Institute's 
+        internal Laboratory Information Management System (LIMS). If you are 
+        on our network you can use this class to get bleeding-edge data into 
+        an EcephysProjectCache. If not, it won't work at all
+
+        Parameters
+        ----------
+        postgres_engine : 
+            used for making queries against the LIMS postgres database. Must 
+            implement:
+                select : takes a postgres query as a string. Returns a pandas 
+                    dataframe of results
+                select_one : takes a postgres query as a string. If there is 
+                    exactly one record in the response, returns that record as 
+                    a dict. Otherwise returns an empty dict.
+        app_engine : 
+            used for making queries agains the lims web application. Must 
+            implement:
+                stream : takes a url as a string. Returns an iterable yielding 
+                the response body as bytes.
+
+        Notes
+        -----
+        You almost certainly want to construct this class by calling 
+        EcephysProjectLimsApi.default() rather than this constructor directly.
+
+        """
+
+
         self.postgres_engine = postgres_engine
         self.app_engine = app_engine
 
-    def get_session_data(self, session_id, **kwargs):
+    def get_session_data(self, session_id: int) -> Iterable[bytes]:
+        """ Download an NWB file containing detailed data for an ecephys 
+        session.
+
+        Parameters
+        ----------
+        session_id : 
+            Download an NWB file for this session
+
+        Returns
+        -------
+        An iterable yielding an NWB file as bytes.
+
+        """
+
         nwb_response = build_and_execute(
             """
             select wkf.id, wkf.filename, wkf.storage_directory, wkf.attachable_id from well_known_files wkf 
@@ -45,7 +88,21 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             f"well_known_files/download/{nwb_id}?wkf_id={nwb_id}"
         )
 
-    def get_probe_lfp_data(self, probe_id):
+    def get_probe_lfp_data(self, probe_id: int) -> Iterable[bytes]:
+        """ Download an NWB file containing detailed data for the local field 
+        potential recorded from an ecephys probe.
+
+        Parameters
+        ----------
+        probe_id : 
+            Download an NWB file for this probe's LFP
+
+        Returns
+        -------
+        An iterable yielding an NWB file as bytes.
+
+        """
+
         nwb_response = build_and_execute(
             """
             select wkf.id from well_known_files wkf
@@ -75,33 +132,90 @@ class EcephysProjectLimsApi(EcephysProjectApi):
         )
 
     def get_units(
-        self, unit_ids=None, 
-        channel_ids=None, 
-        probe_ids=None, 
-        session_ids=None, 
-        quality="good",
-        **kwargs
-    ):
+        self, 
+        unit_ids: Optional[ArrayLike] = None, 
+        channel_ids: Optional[ArrayLike] = None, 
+        probe_ids: Optional[ArrayLike] = None, 
+        session_ids: Optional[ArrayLike] = None, 
+        published_at: Optional[str] = None
+    ) -> pd.DataFrame:
+        """ Download a table of records describing sorted ecephys units.
+
+        Parameters
+        ----------
+        unit_ids : 
+            A collection of integer identifiers for sorted ecephys units. If 
+            provided, only return records describing these units.
+        channel_ids : 
+            A collection of integer identifiers for ecephys channels. If 
+            provided, results will be filtered to units recorded from these 
+            channels.
+        probe_ids : 
+            A collection of integer identifiers for ecephys probes. If 
+            provided, results will be filtered to units recorded from these 
+            probes.
+        session_ids : 
+            A collection of integer identifiers for ecephys sessions. If 
+            provided, results will be filtered to units recorded during
+            these sessions.
+        published_at : 
+            A date (rendered as "YYYY-MM-DD"). If provided, only units 
+            recorded during sessions published before this date will be 
+            returned.
+
+        Returns
+        -------
+        a pd.DataFrame whose rows are ecephys channels.
+
+        """
+
         response = build_and_execute(
             """
                 {%- import 'postgres_macros' as pm -%}
                 {%- import 'macros' as m -%}
-                select eu.*
+                select 
+                    eu.id, 
+                    eu.ecephys_channel_id,
+                    eu.quality,
+                    eu.snr,
+                    eu.firing_rate,
+                    eu.isi_violations,
+                    eu.presence_ratio,
+                    eu.amplitude_cutoff,
+                    eu.isolation_distance,
+                    eu.l_ratio,
+                    eu.d_prime,
+                    eu.nn_hit_rate,
+                    eu.nn_miss_rate,
+                    eu.silhouette_score,
+                    eu.max_drift,
+                    eu.cumulative_drift,
+                    eu.epoch_name_quality_metrics,
+                    eu.epoch_name_waveform_metrics,
+                    eu.duration,
+                    eu.halfwidth,
+                    eu.\"PT_ratio\",
+                    eu.repolarization_slope,
+                    eu.recovery_slope,
+                    eu.amplitude,
+                    eu.spread,
+                    eu.velocity_above,
+                    eu.velocity_below
                 from ecephys_units eu
                 join ecephys_channels ec on ec.id = eu.ecephys_channel_id
                 join ecephys_probes ep on ep.id = ec.ecephys_probe_id
-                join ecephys_sessions es on es.id = ep.ecephys_session_id 
-                where ec.valid_data
-                and ep.workflow_state != 'failed'
-                and es.workflow_state != 'failed'
-                {{pm.optional_equals('eu.quality', quality) -}}
-                {{pm.optional_contains('eu.id', unit_ids) -}}
-                {{pm.optional_contains('ec.id', channel_ids) -}}
-                {{pm.optional_contains('ep.id', probe_ids) -}}
-                {{pm.optional_contains('es.id', session_ids) -}}
-                {{pm.optional_le('eu.amplitude_cutoff', amplitude_cutoff_maximum) -}}
-                {{pm.optional_ge('eu.presence_ratio', presence_ratio_minimum) -}}
-                {{pm.optional_le('eu.isi_violations', isi_violations_maximum) -}}
+                join ecephys_sessions es on es.id = ep.ecephys_session_id
+                where 
+                    not es.habituation 
+                    and ec.valid_data
+                    and ep.workflow_state != 'failed'
+                    and es.workflow_state != 'failed'
+                    {{pm.optional_not_null('es.published_at', published_at_not_null)}}
+                    {{pm.optional_le('es.published_at', published_at)}}
+                    {{pm.optional_contains('eu.id', unit_ids) -}}
+                    {{pm.optional_contains('ec.id', channel_ids) -}}
+                    {{pm.optional_contains('ep.id', probe_ids) -}}
+                    {{pm.optional_contains('es.id', session_ids) -}}
             """,
             base=postgres_macros(),
             engine=self.postgres_engine.select,
@@ -109,212 +223,187 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             channel_ids=channel_ids,
             probe_ids=probe_ids,
             session_ids=session_ids,
-            quality=f"'{quality}'" if quality is not None else quality,
-            amplitude_cutoff_maximum=get_unit_filter_value("amplitude_cutoff_maximum", replace_none=False, **kwargs),
-            presence_ratio_minimum=get_unit_filter_value("presence_ratio_minimum", replace_none=False, **kwargs),
-            isi_violations_maximum=get_unit_filter_value("isi_violations_maximum", replace_none=False, **kwargs)
+            **_split_published_at(published_at)._asdict()
         )
+        return response.set_index("id", inplace=False)
 
-        response.set_index("id", inplace=True)
+    def get_channels(
+        self, 
+        channel_ids: Optional[ArrayLike] = None, 
+        probe_ids: Optional[ArrayLike] = None, 
+        session_ids: Optional[ArrayLike] = None, 
+        published_at: Optional[str] = None
+    ) -> pd.DataFrame:
+        """ Download a table of ecephys channel records.
 
-        return response
+        Parameters
+        ----------
+        channel_ids : 
+            A collection of integer identifiers for ecephys channels. If 
+            provided, results will be filtered to these channels.
+        probe_ids : 
+            A collection of integer identifiers for ecephys probes. If 
+            provided, results will be filtered to channels on these probes.
+        session_ids : 
+            A collection of integer identifiers for ecephys sessions. If 
+            provided, results will be filtered to channels recorded from during
+            these sessions.
+        published_at : 
+            A date (rendered as "YYYY-MM-DD"). If provided, only channels 
+            recorded from during sessions published before this date will be 
+            returned.
 
-    def get_channels(self, channel_ids=None, probe_ids=None, session_ids=None, **kwargs):
+        Returns
+        -------
+        a pd.DataFrame whose rows are ecephys channels.
+
+        """
+
         response = build_and_execute(
             """
                 {%- import 'postgres_macros' as pm -%}
                 select 
-                    ec.id as id,
-                    ec.ecephys_probe_id,
+                    ec.id, 
+                    ec.ecephys_probe_id, 
                     ec.local_index,
                     ec.probe_vertical_position,
                     ec.probe_horizontal_position,
                     ec.manual_structure_id as ecephys_structure_id,
                     st.acronym as ecephys_structure_acronym,
-                    pc.unit_count
-                from ecephys_channels ec 
+                    ec.anterior_posterior_ccf_coordinate,
+                    ec.dorsal_ventral_ccf_coordinate,
+                    ec.left_right_ccf_coordinate
+                from ecephys_channels ec
                 join ecephys_probes ep on ep.id = ec.ecephys_probe_id
-                join ecephys_sessions es on es.id = ep.ecephys_session_id 
-                left join structures st on st.id = ec.manual_structure_id
-                join (
-                    select ech.id as ecephys_channel_id,
-                    count (distinct eun.id) as unit_count
-                    from ecephys_channels ech
-                    join ecephys_units eun on (
-                        eun.ecephys_channel_id = ech.id
-                        and eun.quality = 'good'
-                        {{pm.optional_le('eun.amplitude_cutoff', amplitude_cutoff_maximum) -}}
-                        {{pm.optional_ge('eun.presence_ratio', presence_ratio_minimum) -}}
-                        {{pm.optional_le('eun.isi_violations', isi_violations_maximum) -}}
-                    )
-                    group by ech.id
-                ) pc on ec.id = pc.ecephys_channel_id
-                where valid_data
-                and ep.workflow_state != 'failed'
-                and es.workflow_state != 'failed'
-                {{pm.optional_contains('ec.id', channel_ids) -}}
-                {{pm.optional_contains('ep.id', probe_ids) -}}
-                {{pm.optional_contains('es.id', session_ids) -}}
+                join ecephys_sessions es on es.id = ep.ecephys_session_id
+                left join structures st on ec.manual_structure_id = st.id
+                where 
+                    not es.habituation 
+                    and valid_data
+                    and ep.workflow_state != 'failed'
+                    and es.workflow_state != 'failed'
+                    {{pm.optional_not_null('es.published_at', published_at_not_null)}}
+                    {{pm.optional_le('es.published_at', published_at)}}
+                    {{pm.optional_contains('ec.id', channel_ids) -}}
+                    {{pm.optional_contains('ep.id', probe_ids) -}}
+                    {{pm.optional_contains('es.id', session_ids) -}}
             """,
             base=postgres_macros(),
             engine=self.postgres_engine.select,
             channel_ids=channel_ids,
             probe_ids=probe_ids,
             session_ids=session_ids,
-            amplitude_cutoff_maximum=get_unit_filter_value("amplitude_cutoff_maximum", replace_none=False, **kwargs),
-            presence_ratio_minimum=get_unit_filter_value("presence_ratio_minimum", replace_none=False, **kwargs),
-            isi_violations_maximum=get_unit_filter_value("isi_violations_maximum", replace_none=False, **kwargs)
+            **_split_published_at(published_at)._asdict()
         )
         return response.set_index("id")
 
-    def get_probes(self, probe_ids=None, session_ids=None, **kwargs):
+    def get_probes(
+        self, 
+        probe_ids: Optional[ArrayLike] = None, 
+        session_ids: Optional[ArrayLike] = None, 
+        published_at: Optional[str] = None
+    ) -> pd.DataFrame:
+        """ Download a table of ecephys probe records.
+
+        Parameters
+        ----------
+        probe_ids : 
+            A collection of integer identifiers for ecephys probes. If 
+            provided, results will be filtered to these probes.
+        session_ids : 
+            A collection of integer identifiers for ecephys sessions. If 
+            provided, results will be filtered to probes recorded from during
+            these sessions.
+        published_at : 
+            A date (rendered as "YYYY-MM-DD"). If provided, only probes 
+            recorded from during sessions published before this date will be 
+            returned.
+
+        Returns
+        -------
+        a pd.DataFrame whose rows are ecephys probes.
+
+        """
+
         response = build_and_execute(
             """
                 {%- import 'postgres_macros' as pm -%}
                 select 
-                    ep.id as id,
-                    ep.ecephys_session_id,
-                    ep.global_probe_sampling_rate,
-                    ep.global_probe_lfp_sampling_rate,
-                    total_time_shift,
-                    channel_count,
-                    unit_count,
-                    case 
-                        when nwb_id is not null then true
-                        else false
-                    end as has_lfp_nwb,
-                    str.structure_acronyms as structure_acronyms
-                from ecephys_probes ep 
-                join ecephys_sessions es on es.id = ep.ecephys_session_id 
-                join (
-                    select epr.id as ecephys_probe_id,
-                    count (distinct ech.id) as channel_count,
-                    count (distinct eun.id) as unit_count
-                    from ecephys_probes epr
-                    join ecephys_channels ech on (
-                        ech.ecephys_probe_id = epr.id
-                        and ech.valid_data
-                    )
-                    join ecephys_units eun on (
-                        eun.ecephys_channel_id = ech.id
-                        and eun.quality = 'good'
-                        {{pm.optional_le('eun.amplitude_cutoff', amplitude_cutoff_maximum) -}}
-                        {{pm.optional_ge('eun.presence_ratio', presence_ratio_minimum) -}}
-                        {{pm.optional_le('eun.isi_violations', isi_violations_maximum) -}}
-                    )
-                    group by epr.id
-                ) chc on ep.id = chc.ecephys_probe_id
-                left join (
-                    select
-                        epr.id as ecephys_probe_id,
-                        wkf.id as nwb_id
-                    from ecephys_probes epr 
-                    join ecephys_analysis_runs ear on (
-                        ear.ecephys_session_id = epr.ecephys_session_id
-                        and ear.current
-                    )
-                    right join ecephys_analysis_run_probes earp on (
-                        earp.ecephys_probe_id = epr.id
-                        and earp.ecephys_analysis_run_id = ear.id
-                    )
-                    right join well_known_files wkf on (
-                        wkf.attachable_id = earp.id
-                        and wkf.attachable_type = 'EcephysAnalysisRunProbe'
-                    )
-                    join well_known_file_types wkft on wkft.id = wkf.well_known_file_type_id
-                    where wkft.name = 'EcephysLfpNwb'
-                ) nwb on ep.id = nwb.ecephys_probe_id
-                left join (
-                    select epr.id as ecephys_probe_id,
-                    array_agg (st.id) as structure_ids,
-                    array_agg (distinct st.acronym) as structure_acronyms
-                    from ecephys_probes epr
-                    join ecephys_channels ech on (
-                        ech.ecephys_probe_id = epr.id
-                        and ech.valid_data
-                    )
-                    left join structures st on st.id = ech.manual_structure_id
-                    group by epr.id
-                ) str on ep.id = str.ecephys_probe_id
-                where true
-                and ep.workflow_state != 'failed'
-                and es.workflow_state != 'failed'
-                {{pm.optional_contains('ep.id', probe_ids) -}}
-                {{pm.optional_contains('es.id', session_ids) -}}
+                    ep.id, 
+                    ep.ecephys_session_id, 
+                    ep.name, 
+                    ep.global_probe_sampling_rate as sampling_rate, 
+                    ep.global_probe_lfp_sampling_rate as lfp_sampling_rate,
+                    ep.phase,
+                    ep.air_channel_index,
+                    ep.surface_channel_index,
+                    ep.use_lfp_data as has_lfp_data,
+                    ep.temporal_subsampling_factor as lfp_temporal_subsampling_factor
+                from ecephys_probes ep
+                join ecephys_sessions es on es.id = ep.ecephys_session_id
+                where 
+                    not es.habituation 
+                    and ep.workflow_state != 'failed'
+                    and es.workflow_state != 'failed'
+                    {{pm.optional_not_null('es.published_at', published_at_not_null)}}
+                    {{pm.optional_le('es.published_at', published_at)}}
+                    {{pm.optional_contains('ep.id', probe_ids) -}}
+                    {{pm.optional_contains('es.id', session_ids) -}}
             """,
             base=postgres_macros(),
             engine=self.postgres_engine.select,
             probe_ids=probe_ids,
             session_ids=session_ids,
-            amplitude_cutoff_maximum=get_unit_filter_value("amplitude_cutoff_maximum", replace_none=False, **kwargs),
-            presence_ratio_minimum=get_unit_filter_value("presence_ratio_minimum", replace_none=False, **kwargs),
-            isi_violations_maximum=get_unit_filter_value("isi_violations_maximum", replace_none=False, **kwargs)
+            **_split_published_at(published_at)._asdict()
         )
-        response = response.set_index("id")
-        # Clarify name for external users
-        response.rename(columns={"use_lfp_data": "has_lfp_data"}, inplace=True)
+        return response.set_index("id")
 
-        return response
 
     def get_sessions(
         self,
-        session_ids=None,
-        workflow_states=("uploaded",),
-        published=None,
-        habituation=False,
-        project_names=(
-            "BrainTV Neuropixels Visual Behavior",
-            "BrainTV Neuropixels Visual Coding",
-        ),
-        **kwargs
-    ):
+        session_ids: Optional[ArrayLike] = None,
+        published_at: Optional[str] = None
+    ) -> pd.DataFrame:
+        """ Download a table of ecephys session records.
+
+        Parameters
+        ----------
+        session_ids : 
+            A collection of integer identifiers for ecephys sessions. If 
+            provided, results will be filtered to these sessions.
+        published_at : 
+            A date (rendered as "YYYY-MM-DD"). If provided, only sessions 
+            published before this date will be returned.
+
+        Returns
+        -------
+        a pd.DataFrame whose rows are ecephys sessions.
+
+        """
 
         response = build_and_execute(
             """
                 {%- import 'postgres_macros' as pm -%}
                 {%- import 'macros' as m -%}
                 select 
-                    stimulus_name as session_type,
-                    sp.id as specimen_id, 
-                    es.id as id, 
+                    es.id, 
+                    es.specimen_id, 
+                    es.stimulus_name as session_type, 
+                    es.isi_experiment_id, 
+                    es.date_of_acquisition, 
+                    es.published_at,  
                     dn.full_genotype as genotype,
-                    gd.name as gender, 
+                    gd.name as sex, 
                     ages.days as age_in_days,
-                    pr.code as project_code,
-                    probe_count,
-                    channel_count,
-                    unit_count,
                     case 
                         when nwb_id is not null then true
                         else false
-                    end as has_nwb,
-                    str.structure_acronyms as structure_acronyms
+                    end as has_nwb
                 from ecephys_sessions es
                 join specimens sp on sp.id = es.specimen_id 
                 join donors dn on dn.id = sp.donor_id 
                 join genders gd on gd.id = dn.gender_id 
                 join ages on ages.id = dn.age_id
-                join projects pr on pr.id = es.project_id
-                join (
-                    select es.id as ecephys_session_id,
-                    count (distinct epr.id) as probe_count,
-                    count (distinct ech.id) as channel_count,
-                    count (distinct eun.id) as unit_count
-                    from ecephys_sessions es
-                    join ecephys_probes epr on epr.ecephys_session_id = es.id
-                    join ecephys_channels ech on (
-                        ech.ecephys_probe_id = epr.id
-                        and ech.valid_data
-                    )
-                    join ecephys_units eun on (
-                        eun.ecephys_channel_id = ech.id
-                        and eun.quality = 'good'
-                        {{pm.optional_le('eun.amplitude_cutoff', amplitude_cutoff_maximum) -}}
-                        {{pm.optional_ge('eun.presence_ratio', presence_ratio_minimum) -}}
-                        {{pm.optional_le('eun.isi_violations', isi_violations_maximum) -}}
-                    )
-                    group by es.id
-                ) pc on es.id = pc.ecephys_session_id
                 left join (
                     select ecephys_sessions.id as ecephys_session_id,
                     wkf.id as nwb_id
@@ -330,36 +419,17 @@ class EcephysProjectLimsApi(EcephysProjectApi):
                     join well_known_file_types wkft on wkft.id = wkf.well_known_file_type_id
                     where wkft.name = 'EcephysNwb'
                 ) nwb on es.id = nwb.ecephys_session_id
-                left join (
-                    select es.id as ecephys_session_id,
-                    array_agg (st.id) as structure_ids,
-                    array_agg (distinct st.acronym) as structure_acronyms
-                    from ecephys_sessions es
-                    join ecephys_probes epr on epr.ecephys_session_id = es.id
-                    join ecephys_channels ech on (
-                        ech.ecephys_probe_id = epr.id
-                        and ech.valid_data
-                    )
-                    left join structures st on st.id = ech.manual_structure_id
-                    group by es.id
-                ) str on es.id = str.ecephys_session_id
-                where true
-                {{pm.optional_contains('es.id', session_ids) -}}
-                {{pm.optional_contains('es.workflow_state', workflow_states, True) -}}
-                {{pm.optional_equals('es.habituation', habituation) -}}
-                {{pm.optional_not_null('es.published_at', published) -}}
-                {{pm.optional_contains('pr.name', project_names, True) -}}
+                where 
+                    not es.habituation 
+                    and es.workflow_state != 'failed'
+                    {{pm.optional_contains('es.id', session_ids) -}}
+                    {{pm.optional_not_null('es.published_at', published_at_not_null)}}
+                    {{pm.optional_le('es.published_at', published_at)}}
             """,
             base=postgres_macros(),
             engine=self.postgres_engine.select,
             session_ids=session_ids,
-            workflow_states=workflow_states,
-            published=published,
-            habituation=f"{habituation}".lower() if habituation is not None else habituation,
-            project_names=project_names,
-            amplitude_cutoff_maximum=get_unit_filter_value("amplitude_cutoff_maximum", replace_none=False, **kwargs),
-            presence_ratio_minimum=get_unit_filter_value("presence_ratio_minimum", replace_none=False, **kwargs),
-            isi_violations_maximum=get_unit_filter_value("isi_violations_maximum", replace_none=False, **kwargs)
+            **_split_published_at(published_at)._asdict()
         )
         
         response.set_index("id", inplace=True) 
@@ -367,7 +437,37 @@ class EcephysProjectLimsApi(EcephysProjectApi):
         return response
 
 
-    def get_unit_analysis_metrics(self, unit_ids=None, ecephys_session_ids=None, session_types=None):
+    def get_unit_analysis_metrics(
+        self, 
+        unit_ids: Optional[ArrayLike] = None, 
+        ecephys_session_ids: Optional[ArrayLike] = None, 
+        session_types: Optional[ArrayLike] = None
+    ) -> pd.DataFrame:
+        """ Fetch analysis metrics (stimulus set-specific characterizations of 
+        unit response patterns) for ecephys units. Note that the metrics 
+        returned depend on the stimuli that were presented during recording (
+        and thus on the session_type)
+
+        Parameters
+        ---------
+        unit_ids :
+            integer identifiers for a set of ecephys units. If provided, the 
+            response will only include metrics calculated for these units
+        ecephys_session_ids :
+            integer identifiers for a set of ecephys sessions. If provided, the 
+            response will only include metrics calculated for units identified 
+            during these sessions
+        session_types :
+            string names identifying ecephys session types (e.g. 
+            "brain_observatory_1.1" or "functional_connectivity")
+
+        Returns
+        -------
+        a pandas dataframe indexed by ecephys unit id whose columns are 
+        metrics.
+
+        """
+
         response = build_and_execute(
             """
             {%- import 'postgres_macros' as pm -%}
@@ -397,6 +497,73 @@ class EcephysProjectLimsApi(EcephysProjectApi):
         return response
 
 
+    def _get_template(self, name, namespace):
+        """ Identify the WellKnownFile record associated with a stimulus 
+        template and stream its data if present.
+        """
+
+        try:
+            well_known_file = build_and_execute(
+                f"""
+                select 
+                    st.well_known_file_id
+                from stimuli st
+                join stimulus_namespaces sn on sn.id = st.stimulus_namespace_id
+                where
+                    st.name = '{name}'
+                    and sn.name = '{namespace}'
+                """,
+                base=postgres_macros(),
+                engine=self.postgres_engine.select_one
+            )
+            wkf_id = well_known_file["well_known_file_id"]
+        except (KeyError, IndexError):
+            raise ValueError(f"expected exactly 1 template for {name}")
+
+        download_link = f"well_known_files/download/{wkf_id}?wkf_id={wkf_id}"
+        return self.app_engine.stream(download_link)
+
+
+    def get_natural_movie_template(self, number: int) -> Iterable[bytes]:
+        """ Download a template for the natural movie stimulus. This is the 
+        actual movie that was shown during the recording session.
+
+        Parameters
+        ----------
+        number :
+            idenfifier for this movie (note that this is an integer, so to get 
+            the template for natural_movie_three you should pass in 3)
+
+        Returns
+        -------
+        An iterable yielding an npy file as bytes
+
+        """
+
+        return self._get_template(
+            f"natural_movie_{number}", self.STIMULUS_TEMPLATE_NAMESPACE
+        )
+
+
+    def get_natural_scene_template(self, number: int) -> Iterable[bytes]:
+        """ Download a template for the natural scene stimulus. This is the 
+        actual image that was shown during the recording session.
+
+        Parameters
+        ----------
+        number :
+            idenfifier for this scene
+
+        Returns
+        -------
+        An iterable yielding a tiff file as bytes.
+
+        """
+        return self._get_template(
+            f"natural_scene_{int(number)}", self.STIMULUS_TEMPLATE_NAMESPACE
+        )
+
+
     @classmethod
     def default(cls, pg_kwargs=None, app_kwargs=None):
 
@@ -411,3 +578,19 @@ class EcephysProjectLimsApi(EcephysProjectApi):
         pg_engine = PostgresQueryMixin(**_pg_kwargs)
         app_engine = HttpEngine(**_app_kwargs)
         return cls(pg_engine, app_engine)
+
+
+class SplitPublishedAt(NamedTuple):
+    published_at: Optional[str]
+    published_at_not_null: Optional[bool]
+
+
+def _split_published_at(published_at: Optional[str]) -> SplitPublishedAt:
+    """ LIMS queries that filter on published_at need a couple of 
+    reformattings of the argued date string.
+    """
+
+    return SplitPublishedAt(
+        published_at=f"'{published_at}'" if published_at is not None else None,
+        published_at_not_null=None if published_at is None else True
+    )

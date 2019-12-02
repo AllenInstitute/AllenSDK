@@ -297,29 +297,51 @@ class GazeMapper(object):
 
 
 def compute_circular_areas(ellipse_params: pd.DataFrame) -> pd.Series:
-    """Compute circular area of a pupil or eye ellipse using half-major axis.
+    """Compute circular area of a pupil using half-major axis.
 
-    Assume the pupil/eye is a circle, and that as it moves off-axis
+    Assume the pupil is a circle, and that as it moves off-axis
     with the camera, the observed ellipse semi-major axis remains the
     radius of the circle.
 
-    Args:
-        ellipse_params (pandas.DataFrame): A table of pupil/eye parameters
-            consisting of 5 columns:
-            ("center_x", "center_y", "height", "phi", "width")
-            and n-row timepoints.
+    Parameters
+    ----------
+    ellipse_params (pandas.DataFrame): A table of pupil parameters consisting
+        of 5 columns: ("center_x", "center_y", "height", "phi", "width")
+        and n-row timepoints.
 
-            NOTE: For ellipse_params produced by the Deep Lab Cut pipeline,
-            "width" and "height" columns, in fact, refer to the
-            "half-width" and "half-height".
+        NOTE: For ellipse_params produced by the Deep Lab Cut pipeline,
+        "width" and "height" columns, in fact, refer to the
+        "half-width" and "half-height".
 
-    Returns:
-        pandas.Series: A series of pupil/eye areas for n-timepoints.
+    Returns
+    -------
+        pandas.Series: A series of pupil areas for n-timepoints.
     """
     # Take the biggest value between height and width columns and
-    # assume that it is the pupil/eye circle radius.
+    # assume that it is the pupil circle radius.
     radii = ellipse_params[["height", "width"]].max(axis=1)
     return np.pi * radii * radii
+
+
+def compute_elliptical_areas(ellipse_params: pd.DataFrame) -> pd.Series:
+    """Compute the elliptical area using elliptical fit parameters.
+
+    Parameters
+    ----------
+    ellipse_params (pandas.DataFrame): A table of pupil parameters consisting
+        of 5 columns: ("center_x", "center_y", "height", "phi", "width")
+        and n-row timepoints.
+
+        NOTE: For ellipse_params produced by the Deep Lab Cut pipeline,
+        "width" and "height" columns, in fact, refer to the
+        "half-width" and "half-height".
+
+    Returns
+    -------
+    pd.Series
+        pandas.Series: A series of areas for n-timepoints.
+    """
+    return np.pi * ellipse_params["height"] * ellipse_params["width"]
 
 
 def project_to_plane(plane_normal: np.ndarray,

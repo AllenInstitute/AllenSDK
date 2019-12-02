@@ -20,17 +20,6 @@ from allensdk.brain_observatory.behavior.behavior_ophys_api import BehaviorOphys
 from allensdk.brain_observatory.behavior.image_api import ImageApi
 
 
-@pytest.mark.nightly
-@pytest.mark.parametrize('oeid1, oeid2, expected', [
-    pytest.param(789359614, 789359614, True),
-    pytest.param(789359614, 739216204, False)
-])
-def test_equal(oeid1, oeid2, expected):
-    d1 = BehaviorOphysSession.from_lims(oeid1)
-    d2 = BehaviorOphysSession.from_lims(oeid2)
-
-    assert equals(d1, d2) == expected
-
 @pytest.mark.requires_bamboo
 @pytest.mark.parametrize("get_expected,get_from_session", [
     [

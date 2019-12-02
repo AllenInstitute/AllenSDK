@@ -247,12 +247,30 @@ def test_mapping_gives_sane_outputs(gaze_mapper_fixture, ellipse_fits, expected,
      pd.Series([4 * np.pi, 16 * np.pi, 81 * np.pi, 729 * np.pi])),
 
     (pd.DataFrame({"height": [1, 3, 9, 27], "width": [2, 4, 8, 16]}),
-     pd.Series([4 * np.pi, 16 * np.pi, 81 * np.pi, 729 * np.pi]))
+     pd.Series([4 * np.pi, 16 * np.pi, 81 * np.pi, 729 * np.pi])),
+
+    (pd.DataFrame({"height": [np.nan, 3, np.nan, 27],
+                  "width": [2, 4, np.nan, np.nan]}),
+     pd.Series([4 * np.pi, 16 * np.pi, np.nan, 729 * np.pi])),
 ])
 def test_compute_circular_areas(ellipse_params, expected):
     obtained = gm.compute_circular_areas(ellipse_params)
 
-    assert np.allclose(obtained, expected)
+    assert np.allclose(obtained, expected, equal_nan=True)
+
+
+@pytest.mark.parametrize('ellipse_params, expected', [
+    (pd.DataFrame({"height": [1, 2, 3, 4], "width": [4, 3, 2, 1]}),
+     pd.Series([4 * np.pi, 6 * np.pi, 6 * np.pi, 4 * np.pi])),
+
+    (pd.DataFrame({"height": [np.nan, 7, 11, 12, np.nan],
+                   "width": [5, 3, 11, np.nan, np.nan]}),
+     pd.Series([np.nan, np.pi * 21, np.pi * 121, np.nan, np.nan]))
+])
+def test_compute_elliptical_areas(ellipse_params, expected):
+    obtained = gm.compute_elliptical_areas(ellipse_params)
+
+    assert np.allclose(obtained, expected, equal_nan=True)
 
 
 @pytest.mark.parametrize("function_inputs,expected", [

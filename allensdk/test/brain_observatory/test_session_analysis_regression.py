@@ -4,7 +4,6 @@ logging.basicConfig(level=logging.DEBUG)
 
 import pytest
 import os
-import tempfile
 import json
 from pkg_resources import resource_filename  # @UnresolvedImport
 import numpy as np
@@ -102,9 +101,8 @@ def nm2(nwb_c, analysis_c):
     return NaturalMovie.from_analysis_file(BODS(nwb_c), analysis_c, si.NATURAL_MOVIE_TWO)
 
 @pytest.fixture(scope="module")
-def analysis_a_new(nwb_a):
-    with tempfile.NamedTemporaryFile(delete=True) as tf:
-        save_path = tf.name
+def analysis_a_new(nwb_a, tmpdir_factory):
+    save_path = str(tmpdir_factory.mktemp("session_a") / "session_a_new.h5")
 
     logging.debug("running analysis a")
     session_analysis = SessionAnalysis(nwb_a, save_path)
@@ -114,13 +112,10 @@ def analysis_a_new(nwb_a):
 
     yield save_path
 
-    if os.path.exists(save_path):
-        os.remove(save_path)
 
 @pytest.fixture(scope="module")
-def analysis_b_new(nwb_b):
-    with tempfile.NamedTemporaryFile(delete=True) as tf:
-        save_path = tf.name
+def analysis_b_new(nwb_b, tmpdir_factory):
+    save_path = str(tmpdir_factory.mktemp("session_b") / "session_b_new.h5")
 
     logging.debug("running analysis b")
     session_analysis = SessionAnalysis(nwb_b, save_path)
@@ -130,13 +125,10 @@ def analysis_b_new(nwb_b):
 
     yield save_path
 
-    if os.path.exists(save_path):
-        os.remove(save_path)
 
 @pytest.fixture(scope="module")
-def analysis_c_new(nwb_c):
-    with tempfile.NamedTemporaryFile(delete=True) as tf:
-        save_path = tf.name
+def analysis_c_new(nwb_c, tmpdir_factory):
+    save_path = str(tmpdir_factory.mktemp("session_c") / "session_c_new.h5")
 
     logging.debug("running analysis c")
     session_analysis = SessionAnalysis(nwb_c, save_path)
@@ -151,9 +143,6 @@ def analysis_c_new(nwb_c):
     logging.debug(save_path)
 
     yield save_path
-
-    if os.path.exists(save_path):
-        os.remove(save_path)
 
 
 def compare_peak(p1, p2):

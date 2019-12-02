@@ -90,13 +90,31 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
+What's New - 1.2.0 (November 21, 2019)
+-----------------------------------------------------------------------
+
+The 1.2.0 release adds 
+
+- (internal feature) A project cache for the Behavior Ophys project, with example notebook
+- (internal feature) A major overhaul of the `BehaviorOphysLimsApi`
+- (internal feature) Updates to the `EcephysProjectLimsApi` such that it returns data in the same format as the `EcephyProjectWarehouseApi`
+- improved eye-tracking area calculation
+
+and fixes
+
+- several flaky tests
+- regress tests which depend on scipy's `ks_2samp`
+- (internal feature) duplicate caching on the Bevavior Ophys Lims Api
+
 What's New - 1.1.1 (November 12, 2019)
 -----------------------------------------------------------------------
 
 The 1.1.1 release adds 
+
 - several new Visual Coding - Neuropixels example notebooks
 
 and fixes
+
 - a bug in which p_value_rf and on_screen_rf were swapped when accessed from an EcephysSession
 
 
@@ -104,10 +122,12 @@ What's New - 1.1.0 (October 31, 2019)
 -----------------------------------------------------------------------
 
 The 1.1.0 release adds:
+
 - an updated gaze mapping algorithm
 - automatic retries for failed neuropixels NWB file downloads
 
 and fixes:
+
 - several failing nightly build tests
 - warnings emitted due to use of deprecated `h5py.Dataset.value`
 

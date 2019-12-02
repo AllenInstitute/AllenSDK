@@ -41,19 +41,9 @@ def units():
         'snr': [1.5, 4.9],
         "amplitude_cutoff": [0.05, 0.2],
         "presence_ratio": [10, 20],
-        "isi_violations": [0.3, 0.4]
+        "isi_violations": [0.3, 0.4],
+        "quality": ["good", "noise"]
     }, index=pd.Series(name='id', data=[1, 2]))
-
-
-@pytest.fixture
-def filtered_units():
-    return pd.DataFrame({
-        'ecephys_channel_id': [3],
-        'snr': [4.2],
-        'amplitude_cutoff': [0.08],
-        'presence_ratio': [15],
-        'isi_violations': [0.35]
-    }, index=pd.Series(name='id', data=[3]))
 
 
 @pytest.fixture
@@ -117,7 +107,7 @@ def shared_tmpdir(tmpdir_factory):
 
 
 @pytest.fixture
-def mock_api(shared_tmpdir, raw_sessions, units, filtered_units, channels, raw_probes, analysis_metrics):
+def mock_api(shared_tmpdir, raw_sessions, units, channels, raw_probes, analysis_metrics):
     class MockApi:
 
         def __init__(self, **kwargs):
@@ -130,10 +120,7 @@ def mock_api(shared_tmpdir, raw_sessions, units, filtered_units, channels, raw_p
             return raw_sessions
 
         def get_units(self, **kwargs):
-            if kwargs['filter_by_validity']:
-                return filtered_units
-            else:
-                return units
+            return units
 
         def get_channels(self, **kwargs):
             return channels
@@ -214,9 +201,10 @@ def test_get_sessions(tmpdir_cache, sessions):
 
 
 @pytest.mark.parametrize("filter_by_validity", [False, True])
-def test_get_units(tmpdir_cache, units, filtered_units, filter_by_validity):
+def test_get_units(tmpdir_cache, units, filter_by_validity):
     if filter_by_validity:
-        lazy_cache_test(tmpdir_cache, '_get_units', "get_units", filtered_units, filter_by_validity=filter_by_validity)
+        units = units[units["quality"] == "good"].drop(columns="quality")
+        lazy_cache_test(tmpdir_cache, '_get_units', "get_units", units, filter_by_validity=filter_by_validity)
     else:
         units = units[units["amplitude_cutoff"] <= 0.1]
         lazy_cache_test(tmpdir_cache, '_get_units', "get_units", units, filter_by_validity=filter_by_validity)

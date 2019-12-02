@@ -1,116 +1,175 @@
 import os
-import numpy as np
-import pandas as pd
 import pytest
-from allensdk.brain_observatory.behavior.swdb import behavior_project_cache as bpc
+import pandas as pd
+import tempfile
+import logging
+import time
+from allensdk.brain_observatory.behavior.behavior_project_cache import (
+    BehaviorProjectCache)
+from allensdk.core.exceptions import MissingDataError
 
 
 @pytest.fixture
-def cache_test_base():
-    return '/allen/programs/braintv/workgroups/nc-ophys/visual_behavior/SWDB_2019/test_data'
+def session_table():
+    return (pd.DataFrame({"ophys_session_id": [1, 2, 3],
+                          "ophys_experiment_id": [[4], [5, 6], [7]],
+                          "reporter_line": [["aa"], ["aa", "bb"], ["cc"]],
+                          "driver_line": [["aa"], ["aa", "bb"], ["cc"]]})
+            .set_index("ophys_session_id"))
+
 
 @pytest.fixture
-def cache(cache_test_base):
-    return bpc.BehaviorProjectCache(cache_test_base)
+def behavior_table():
+    return (pd.DataFrame({"behavior_session_id": [1, 2, 3],
+                          "reporter_line": [["aa"], ["aa", "bb"], ["cc"]],
+                          "driver_line": [["aa"], ["aa", "bb"], ["cc"]]})
+            .set_index("behavior_session_id"))
+
 
 @pytest.fixture
-def session(cache):
-    return cache.get_session(792815735)
+def mock_api(session_table, behavior_table):
+    class MockApi:
+        def get_session_table(self):
+            return session_table
 
-# Test trials extra columns
-@pytest.mark.requires_bamboo
-def test_extra_trials_columns(session):
-    for new_key in ['reward_rate', 'response_binary']:
-        assert new_key in session.trials.keys()
+        def get_behavior_only_session_table(self):
+            return behavior_table
 
-@pytest.mark.requires_bamboo
-def test_extra_stimulus_presentation_columns(session):
-    for new_key in [
-            'absolute_flash_number',
-            'time_from_last_lick',
-            'time_from_last_reward',
-            'time_from_last_change',
-            'block_index',
-            'image_block_repetition',
-            'repeat_within_block']:
-        assert new_key in session.stimulus_presentations.keys()
+        def get_session_data(self, ophys_session_id):
+            return ophys_session_id
 
-@pytest.mark.requires_bamboo
-def test_stimulus_presentations_image_set(session):
-    # We made the image set just 'A' or 'B'
-    assert session.stimulus_presentations['image_set'].unique() == np.array(['A'])
+        def get_behavior_only_session_data(self, behavior_session_id):
+            return behavior_session_id
+    return MockApi
 
-@pytest.mark.requires_bamboo
-def test_stimulus_templates(session):
-    # Was a dict with only one key, where the value was a 3d array.
-    # We made it a dict with image names as keys and 2d arrs (the images) as values
-    for image_name, image_arr in session.stimulus_templates.items():
-        assert image_arr.ndim == 2
 
-# Test trial response df
-@pytest.mark.requires_bamboo
-@pytest.mark.parametrize('key, output', [
-    ('mean_response', 0.0053334),
-    ('baseline_response', -0.0020357),
-    ('p_value', 0.6478659),
-])
-def test_session_trial_response(key, output, session):
-    trial_response = session.trial_response_df
-    np.testing.assert_almost_equal(trial_response.query("cell_specimen_id == 817103993").iloc[0][key], output, decimal=6)
+@pytest.fixture
+def TempdirBehaviorCache(mock_api):
+    temp_dir = tempfile.TemporaryDirectory()
+    manifest = os.path.join(temp_dir.name, "manifest.json")
+    yield BehaviorProjectCache(fetch_api=mock_api(),
+                               manifest=manifest)
+    temp_dir.cleanup()
 
-@pytest.mark.requires_bamboo
-@pytest.mark.parametrize('key, output', [
-    ('time_from_last_lick', 7.3577),
-    ('mean_running_speed', 22.143871),
-    ('duration', 0.25024),
-])
-def test_session_flash_response(key, output, session):
-    flash_response = session.flash_response_df
-    np.testing.assert_almost_equal(flash_response.query("cell_specimen_id == 817103993").iloc[0][key], output, decimal=6)
 
-@pytest.mark.requires_bamboo
-def test_analysis_files_metadata(cache):
-    assert cache.analysis_files_metadata[
-        'trial_response_df_params'
-    ]['response_window_duration_seconds'] == 0.5
+def test_get_session_table(TempdirBehaviorCache, session_table):
+    cache = TempdirBehaviorCache
+    actual = cache.get_session_table()
+    path = cache.manifest.path_info.get("ophys_sessions").get("spec")
+    assert os.path.exists(path)
+    pd.testing.assert_frame_equal(session_table, actual)
 
-@pytest.mark.requires_bamboo
-def test_session_image_loading(session):
-    assert isinstance(session.max_projection.data, np.ndarray)
 
-@pytest.mark.requires_bamboo
-def test_no_invalid_rois(session):
-    # We made the cache return sessions without the invalid rois
-    assert session.cell_specimen_table['valid_roi'].all()
+def test_get_behavior_table(TempdirBehaviorCache, behavior_table):
+    cache = TempdirBehaviorCache
+    actual = cache.get_behavior_session_table()
+    path = cache.manifest.path_info.get("behavior_sessions").get("spec")
+    assert os.path.exists(path)
+    pd.testing.assert_frame_equal(behavior_table, actual)
 
-@pytest.mark.requires_bamboo
-def test_get_container_sessions(cache):
-    container_id = cache.experiment_table['container_id'].unique()[0]
-    container_sessions = cache.get_container_sessions(container_id)
-    session = container_sessions['OPHYS_1_images_A']
-    assert isinstance(session, bpc.ExtendedBehaviorSession)
-    np.testing.assert_almost_equal(session.dff_traces.loc[817103993]['dff'][0], 0.3538657529565)
 
-@pytest.mark.requires_bamboo
-def test_binarized_segmentation_mask_image(session):
-    np.testing.assert_array_equal(
-        np.unique(np.array(session.segmentation_mask_image.data).ravel()),
-        np.array([0, 1])
-    )
+def test_session_table_reads_from_cache(TempdirBehaviorCache, session_table,
+                                        caplog):
+    caplog.set_level(logging.INFO, logger="call_caching")
+    cache = TempdirBehaviorCache
+    cache.get_session_table()
+    expected_first = [
+        ("call_caching", logging.INFO, "Reading data from cache"),
+        ("call_caching", logging.INFO, "No cache file found."),
+        ("call_caching", logging.INFO, "Fetching data from remote"),
+        ("call_caching", logging.INFO, "Writing data to cache"),
+        ("call_caching", logging.INFO, "Reading data from cache")]
+    assert expected_first == caplog.record_tuples
+    caplog.clear()
+    cache.get_session_table()
+    assert [expected_first[0]] == caplog.record_tuples
 
-@pytest.mark.requires_bamboo
-def test_no_nan_flash_running_speed(session):
-    assert not pd.isnull(session.stimulus_presentations['mean_running_speed']).any()
 
-@pytest.mark.requires_bamboo
-def test_licks_correct_colname(session):
-    assert session.licks.columns == ['timestamps']
+def test_behavior_table_reads_from_cache(TempdirBehaviorCache, behavior_table,
+                                         caplog):
+    caplog.set_level(logging.INFO, logger="call_caching")
+    cache = TempdirBehaviorCache
+    cache.get_behavior_session_table()
+    expected_first = [
+        ("call_caching", logging.INFO, "Reading data from cache"),
+        ("call_caching", logging.INFO, "No cache file found."),
+        ("call_caching", logging.INFO, "Fetching data from remote"),
+        ("call_caching", logging.INFO, "Writing data to cache"),
+        ("call_caching", logging.INFO, "Reading data from cache")]
+    assert expected_first == caplog.record_tuples
+    caplog.clear()
+    cache.get_behavior_session_table()
+    assert [expected_first[0]] == caplog.record_tuples
 
-@pytest.mark.requires_bamboo
-def test_rewards_correct_colname(session):
-    assert (session.rewards.columns == ['timestamps', 'volume', 'autorewarded']).all()
 
-@pytest.mark.requires_bamboo
-def test_dff_traces_correct_colname(session):
-    # This is a Friday-harbor specific change
-    assert 'cell_roi_id' not in session.dff_traces.columns
+def test_behavior_session_fails_fixed_if_no_cache(TempdirBehaviorCache):
+    cache = TempdirBehaviorCache
+    with pytest.raises(MissingDataError):
+        cache.get_behavior_session_data(1, fixed=True)
+    cache.get_behavior_session_data(1)
+    # Also fails if there is a cache, but the id is not contained therein
+    with pytest.raises(MissingDataError):
+        cache.get_behavior_session_data(2, fixed=True)
+
+
+def test_session_fails_fixed_if_no_cache(TempdirBehaviorCache):
+    cache = TempdirBehaviorCache
+    with pytest.raises(MissingDataError):
+        cache.get_session_data(1, fixed=True)
+    cache.get_session_data(1)
+    # Also fails if there is a cache, but the id is not contained therein
+    with pytest.raises(MissingDataError):
+        cache.get_session_data(2, fixed=True)
+
+
+def test_get_session_table_by_experiment(TempdirBehaviorCache):
+    expected = (pd.DataFrame({"ophys_session_id": [1, 2, 2, 3],
+                              "ophys_experiment_id": [4, 5, 6, 7]})
+                .set_index("ophys_experiment_id"))
+    actual = TempdirBehaviorCache.get_session_table(by="ophys_experiment_id")[
+        ["ophys_session_id"]]
+    pd.testing.assert_frame_equal(expected, actual)
+
+
+def test_write_behavior_log(TempdirBehaviorCache):
+    expected_cols = ["behavior_session_id", "created_at", "updated_at"]
+    expected_ids = [1, 2]
+    expected_times = [False, True]
+    cache = TempdirBehaviorCache
+    cache.get_behavior_session_data(1)
+    cache.get_behavior_session_data(2)
+    time.sleep(1)
+    cache.get_behavior_session_data(1)
+    path = cache.manifest.path_info.get("behavior_analysis_log").get("spec")
+    # Log exists
+    assert os.path.exists(path)
+    actual = pd.read_csv(path)
+    # columns exist
+    assert list(actual) == expected_cols
+    # ids exist
+    assert actual["behavior_session_id"].values.tolist() == expected_ids
+    # first one should have updated different than created since accessed 2x
+    assert ((actual["created_at"] == actual["updated_at"]).values.tolist()
+            == expected_times)
+
+
+def test_write_session_log(TempdirBehaviorCache):
+    expected_cols = ["ophys_experiment_id", "created_at", "updated_at"]
+    expected_ids = [1, 2]
+    expected_times = [False, True]
+    cache = TempdirBehaviorCache
+    cache.get_session_data(1)
+    cache.get_session_data(2)
+    time.sleep(1)
+    cache.get_session_data(1)
+    path = cache.manifest.path_info.get("ophys_analysis_log").get("spec")
+    # Log exists
+    assert os.path.exists(path)
+    actual = pd.read_csv(path)
+    # columns exist
+    assert list(actual) == expected_cols
+    # ids exist
+    assert actual["ophys_experiment_id"].values.tolist() == expected_ids
+    # first one should have updated different than created since accessed 2x
+    assert ((actual["created_at"] == actual["updated_at"]).values.tolist()
+            == expected_times)
