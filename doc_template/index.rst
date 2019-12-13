@@ -95,11 +95,11 @@ What's New - 1.3.0 (December 12, 2019)
 
 The 1.3.0 release adds
 
-- Improved Neuropixels data download performance by enabling asynchronous transfers. Data downloads will now raise timeout errors when data cannot be retrieved in a reasonable timeframe.
+- Improved Neuropixels data download performance by enabling asynchronous transfers. Users can now also specify a timeout and number of retries when downloading data.
 
 and fixes
 
-- A bug in the http engine for ecephys data access
+- Hanging downloads for Neuropixels NWB files
 - Updated AllenSDK readme and contributing documentation
 
 What's New - 1.2.0 (November 21, 2019)
