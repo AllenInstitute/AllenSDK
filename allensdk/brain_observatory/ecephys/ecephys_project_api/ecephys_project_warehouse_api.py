@@ -5,7 +5,7 @@ import ast
 import pandas as pd
 import numpy as np
 
-from .rma_engine import RmaEngine
+from .rma_engine import RmaEngine, AsyncRmaEngine
 from .ecephys_project_api import EcephysProjectApi
 from .utilities import rma_macros, build_and_execute
 
@@ -307,7 +307,9 @@ class EcephysProjectWarehouseApi(EcephysProjectApi):
 
 
     @classmethod
-    def default(cls, **rma_kwargs):
+    def default(cls, asynchronous=True, **rma_kwargs):
         _rma_kwargs = {"scheme": "http", "host": "api.brain-map.org"}
         _rma_kwargs.update(rma_kwargs)
-        return cls(RmaEngine(**_rma_kwargs))
+
+        engine_cls = AsyncRmaEngine if asynchronous else RmaEngine
+        return cls(engine_cls(**_rma_kwargs))

@@ -6,7 +6,7 @@ import ast
 import requests
 import pandas as pd
 
-from .http_engine import HttpEngine
+from .http_engine import HttpEngine, AsyncHttpEngine
 
 
 class RmaRequestError(Exception):
@@ -19,8 +19,34 @@ class RmaEngine(HttpEngine):
     def format_query_string(self):
         return f"query.{self.rma_format}"
 
-    def __init__(self, scheme, host, rma_prefix="api/v2/data", rma_format="json", page_size=5000):
-        super(RmaEngine, self).__init__(scheme, host)
+    def __init__(
+        self, 
+        scheme, 
+        host, 
+        rma_prefix: str = "api/v2/data", 
+        rma_format: str = "json", 
+        page_size: int = 5000, 
+        **kwargs
+    ):
+        """ Simple tool for making rma and streaming http requests.
+
+        Parameters
+        ----------
+        scheme :
+            e.g "http" or "https"
+        host : 
+            will be used as the base for request urls
+        rma_prefix :
+            rma request routes will be prefixed with this string
+        rma_format : 
+            Format of reuturned response. e.g. "json", "xml", "csv"
+        page_size :
+            how many rma records to request in one query.
+        **kwargs : 
+            will be passed to parent
+        """
+
+        super(RmaEngine, self).__init__(scheme, host, **kwargs)
         self.rma_prefix = rma_prefix
         self.rma_format = rma_format
         self.page_size = page_size
@@ -30,7 +56,15 @@ class RmaEngine(HttpEngine):
             count = self.page_size
         return f"{url},rma::options[start_row$eq{start}][num_rows$eq{count}][order$eq'id']"
 
-    def get_rma(self, query):
+    def get_rma(self, query: str):
+        """ Makes a paging rma query
+
+        Parameters
+        ----------
+        query : 
+            The RMA query parameters
+
+        """
         url = f"{self.scheme}://{self.host}/{self.rma_prefix}/{self.format_query_string}?{query}"
         logging.debug(url)
 
@@ -65,6 +99,25 @@ class RmaEngine(HttpEngine):
             response = infer_column_types(response)
 
         return response
+
+
+class AsyncRmaEngine(RmaEngine, AsyncHttpEngine):
+    
+    def __init__(self, scheme: str, host: str, **kwargs):
+        """ Simple tool for making rma and asynchronous streaming http 
+        requests.
+
+        Parameters
+        ----------
+        scheme :
+            e.g "http" or "https"
+        host : 
+            will be used as the base for request urls
+        **kwargs : 
+            will be passed to parent
+        """
+
+        super(AsyncRmaEngine, self).__init__(scheme, host, **kwargs)
 
 
 def infer_column_types(dataframe):
