@@ -1,6 +1,18 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.3.0] = 2019-12-12
+
+### Added
+ - Improved Neuropixels data download performance by enabling asynchronous transfers. Data downloads will now raise timeout errors when data cannot be retrieved in a reasonable timeframe.
+
+### Changed
+ - Updated AllenSDK readme and contributing documentation
+
+### Bug Fixes
+ - https://github.com/AllenInstitute/AllenSDK/issues/1214 Fix hanging downloads for Neuropixels NWB files
+
+
 ## [1.0.0] = 2019-10-3
 
 ### Added
