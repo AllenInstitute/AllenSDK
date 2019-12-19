@@ -131,6 +131,7 @@ class TimeSyncWriter:
                 "allensdk_version": allensdk.__version__,
                 "date": str(datetime.datetime.now()),
                 "experiment_id": outputs.experiment_id,
+                "output_h5_path": self.output_h5_path,
                 "ophys_delta": outputs.ophys_delta,
                 "stim_delta": outputs.stimulus_delta,
                 "stim_delay": outputs.stimulus_delay,
