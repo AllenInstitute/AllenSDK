@@ -5,6 +5,7 @@ test_time_sync
 
 import os
 import json
+from typing import NamedTuple
 
 import pytest
 import numpy as np
@@ -12,7 +13,7 @@ import h5py
 
 import allensdk
 from allensdk.internal.pipeline_modules.run_ophys_time_sync import (
-    TimeSyncOutputs, TimeSyncWriter, run_ophys_time_sync
+    TimeSyncOutputs, TimeSyncWriter, check_stimulus_delay, run_ophys_time_sync
 )
 
 
@@ -94,3 +95,64 @@ def test_write_output_json(writer, outputs, json_key, expected):
         assert obtained == expected
 
 
+@pytest.mark.parametrize("obt", np.linspace(0, 1, 4))
+@pytest.mark.parametrize("mn", np.linspace(0, 1, 4))
+@pytest.mark.parametrize("mx", np.linspace(0, 1, 4))
+def test_check_stimulus_delay(obt, mn, mx):
+
+    if obt < mn or obt > mx:
+        with pytest.raises(ValueError):
+            check_stimulus_delay(obt, mn, mx)
+    else:
+        check_stimulus_delay(obt, mn, mx)
+
+
+def test_run_ophys_time_sync():
+
+    class Aligner(NamedTuple):
+        corrected_stim_timestamps: np.ndarray
+        corrected_ophys_timestamps: np.ndarray
+        corrected_eye_video_timestamps: np.ndarray
+        corrected_behavior_video_timestamps: np.ndarray
+    
+    aligner = Aligner(
+        (np.arange(10), 0, 0.5), 
+        (np.arange(10), 1), 
+        (np.arange(10), 2), 
+        (np.arange(10), 3)
+    )
+
+    obtained = run_ophys_time_sync(aligner, 100, 0.0, 2.0)
+
+    # store mismatches in an array so we can show every distinct failure
+    mismatches = []
+    for name, expected in [
+        ["experiment_id", 100],
+        ["stimulus_delay", 0.5],
+        ["ophys_delta", 1],
+        ["stimulus_delta", 0],
+        ["eye_delta", 2],
+        ["behavior_delta", 3],
+        ["ophys_times", np.arange(10)],
+        ["stimulus_times", np.arange(10)],
+        ["eye_times", np.arange(10)],
+        ["behavior_times", np.arange(10)],
+        ["stimulus_alignment", np.arange(10)],
+        ["eye_alignment", np.arange(10)],
+        ["behavior_alignment", np.arange(10)]
+    ]:
+
+        current_obt = getattr(obtained, name)
+
+        if isinstance(expected, np.ndarray):
+            match = np.allclose(expected, current_obt)
+        else:
+            match = expected == current_obt
+
+        if not match:
+            mismatches.append(
+                f"{name} mismatched: expected {expected}, "
+                f"obtained {current_obt}"
+            )
+
+    assert len(mismatches) == 0, "\n" + "\n".join(mismatches)
