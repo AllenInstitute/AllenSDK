@@ -284,7 +284,7 @@ class OphysTimeAligner(object):
         photodiode_key = self._keys["photodiode"]
         delay = monitor_delay(self.dataset, timestamps, photodiode_key)
         
-        return timestamps + delay, delta
+        return timestamps + delay, delta, delay
 
     @property
     def behavior_video_timestamps(self):
