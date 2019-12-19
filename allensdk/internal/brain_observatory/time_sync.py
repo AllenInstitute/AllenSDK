@@ -135,7 +135,7 @@ def get_video_length(filename):
 
 
 def get_ophys_data_length(filename):
-    with h5py.File(filename) as f:
+    with h5py.File(filename, "r") as f:
         return f["data"].shape[1]
 
 
