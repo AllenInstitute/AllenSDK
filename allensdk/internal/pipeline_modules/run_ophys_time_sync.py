@@ -3,7 +3,7 @@ import argparse
 import os
 import datetime
 import json
-from typing import NamedTuple, Optional, Dict
+from typing import NamedTuple, Optional
 
 import numpy as np
 import h5py
@@ -140,20 +140,43 @@ class TimeSyncWriter:
             }, output_json, indent=2)
 
 
+def check_stimulus_delay(obt_delay: float, min_delay: float, max_delay: float):
+    """ Raise an exception if the monitor delay is not within specified bounds
+
+    Parameters
+    ----------
+    obt_delay : obtained monitor delay (s)
+    min_delay : lower threshold (s)
+    max_delay : upper threshold (s)
+
+    """
+
+    if obt_delay < min_delay or obt_delay > max_delay:
+        raise ValueError(
+            f"calculated monitor delay was {obt_delay:.3f}s "
+            f"(acceptable interval: [{min_delay:.3f}s, "
+            f"{max_delay:.3f}s])"
+        )
+
+
 def run_ophys_time_sync(
-    input_data: Dict, 
+    aligner: ts.OphysTimeAligner, 
     experiment_id: int,
-    sync_file: str
+    min_stimulus_delay: float,
+    max_stimulus_delay: float
 ) -> TimeSyncOutputs:
     """ Carry out synchronization of timestamps across the data streams of an 
     ophys experiment.
 
     Parameters
     ----------
-    input_data : parameters that will be provided to the OphysTimeAligner 
-        driving this synchronization.
-    experiment_id: unique identifier for the experiment being aligned
-    sync_file : path to h5 file containing sync timestamps
+    aligner : drives alignment. See OphysTimeAligner for details of the 
+        attributes and properties that must be implemented.
+    experiment_id : unique identifier for the experiment being aligned
+    min_stimulus_delay : reject alignment run (raise a ValueError) if the 
+        calculated monitor delay is below this value (s).
+    max_stimulus_delay : reject alignment run (raise a ValueError) if the 
+        calculated monitor delay is above this value (s).
 
     Returns
     -------
@@ -162,10 +185,10 @@ def run_ophys_time_sync(
 
     """
 
-    aligner = ts.OphysTimeAligner(sync_file, **input_data)
+    stim_times, stim_delta, stim_delay = aligner.corrected_stim_timestamps
+    check_stimulus_delay(stim_delay, min_stimulus_delay, max_stimulus_delay)
 
     ophys_times, ophys_delta = aligner.corrected_ophys_timestamps
-    stim_times, stim_delta, stim_delay = aligner.corrected_stim_timestamps
     eye_times, eye_delta = aligner.corrected_eye_video_timestamps
     beh_times, beh_delta = aligner.corrected_behavior_video_timestamps
 
@@ -202,20 +225,43 @@ def run_ophys_time_sync(
 def main():
     parser = argparse.ArgumentParser("Generate brain observatory alignment.")
     parser.add_argument("input_json", type=str, 
-        help="path to input json")
+        help="path to input json"
+    )
     parser.add_argument("output_json", type=str, nargs="?",
-        help="path to which output json will be written")
+        help="path to which output json will be written"
+    )
     parser.add_argument("--log-level", default=logging.DEBUG)
+    parser.add_argument("--min-stimulus-delay", type=float, default=0.0, 
+        help="reject results if monitor delay less than this value (s)"
+    )
+    parser.add_argument("--max-stimulus-delay", type=float, default=0.07, 
+        help="reject results if monitor delay greater than this value (s)"
+    )
     mod = PipelineModule("Generate brain observatory alignment.", parser)
 
     input_data = mod.input_data()
-    experiment_id = input_data.pop("ophys_experiment_id")
-    sync_file = input_data.pop("sync_file")
 
-    writer = TimeSyncWriter(input_data.pop("output_file"), mod.args.output_json)
+    writer = TimeSyncWriter(input_data.get("output_file"), mod.args.output_json)
     writer.validate_paths()
 
-    outputs = run_ophys_time_sync(input_data, experiment_id, sync_file)
+    aligner = ts.OphysTimeAligner(
+        input_data.get("sync_file"), 
+        scanner=input_data.get("scanner", None),
+        dff_file=input_data.get("dff_file", None),
+        stimulus_pkl=input_data.get("stimulus_pkl", None),
+        eye_video=input_data.get("eye_video", None),
+        behavior_video=input_data.get("behavior_video", None),
+        long_stim_threshold=input_data.get(
+            "long_stim_threshold", ts.LONG_STIM_THRESHOLD
+        )
+    )
+
+    outputs = run_ophys_time_sync(
+        aligner, 
+        input_data.get("ophys_experiment_id"), 
+        mod.args.min_stimulus_delay, 
+        mod.args.max_stimulus_delay
+    )
     writer.write(outputs)
 
 
