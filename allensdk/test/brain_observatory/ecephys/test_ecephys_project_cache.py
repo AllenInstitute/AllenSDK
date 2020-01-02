@@ -10,6 +10,9 @@ import pynwb
 
 import allensdk.brain_observatory.ecephys.ecephys_project_cache as epc
 import allensdk.brain_observatory.ecephys.write_nwb.__main__ as write_nwb
+from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine import (
+    write_bytes_from_coroutine, AsyncHttpEngine
+)
 
 
 @pytest.fixture
@@ -364,3 +367,13 @@ def test_get_probe_lfp_data_continually_failing(tmpdir_factory, mock_api):
     with pytest.raises(ValueError):
         session = cache.get_session_data(sid)
         lfp_file = session.api._probe_nwbfile(pid)
+
+
+def test_from_lims_default(tmpdir_factory):
+    tmpdir = str(tmpdir_factory.mktemp("test_from_lims_default"))
+
+    cache = epc.EcephysProjectCache.from_lims(
+        manifest_path=os.path.join(tmpdir, "manifest.json")
+    )
+    assert isinstance(cache.fetch_api.app_engine, AsyncHttpEngine)
+    assert cache.stream_writer is epc.write_bytes_from_coroutine
