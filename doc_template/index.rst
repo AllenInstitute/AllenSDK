@@ -90,6 +90,14 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
+What's New - 1.4.0 (January 23, 2020)
+-----------------------------------------------------------------------
+
+As of the 1.4.0 release:
+
+- users of the ephys extractor can supply their own cutoff frequency for low-pass bessel filter.
+- (internal feature) the ophys time sync module writes an output json describing its results.
+
 What's New - 1.3.0 (December 12, 2019)
 -----------------------------------------------------------------------
 
