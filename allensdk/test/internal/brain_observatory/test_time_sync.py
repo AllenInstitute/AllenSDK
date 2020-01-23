@@ -236,7 +236,6 @@ def test_regression_calculate_camera_alignment(nikon_input,
         assert len(mis_o) < 0.005*len(aligner.ophys_timestamps[1:])
 
 
-@pytest.mark.skipif(reason="No sync")
 @pytest.mark.parametrize("eye_data_length", (None, 5000, 6000))
 def test_get_corrected_eye_times(eye_data_length):
     true_times = np.arange(6000)
@@ -265,7 +264,6 @@ def test_get_corrected_eye_times(eye_data_length):
         assert delta == (len(true_times) - eye_data_length)
 
 
-@pytest.mark.skipif(reason="No sync")
 @pytest.mark.parametrize("behavior_data_length", (None, 5000, 6000))
 def test_get_corrected_behavior_times(behavior_data_length):
     true_times = np.arange(6000)
@@ -294,7 +292,6 @@ def test_get_corrected_behavior_times(behavior_data_length):
         assert delta == (len(true_times) - behavior_data_length)
 
 
-@pytest.mark.skipif(reason="No sync")
 @pytest.mark.parametrize("stim_data_length,start_delay", [
     (None, False),
     (None, True),
@@ -321,7 +318,7 @@ def test_get_corrected_stim_times(stim_data_length, start_delay):
             with patch.object(ts.Dataset, "get_rising_edges",
                           return_value=true_rising) as mock_rising:
                 with patch("logging.info") as mock_log:
-                    times, delta = aligner.corrected_stim_timestamps
+                    times, delta, stim_delay = aligner.corrected_stim_timestamps
 
     if stim_data_length is None:
         mock_log.assert_called_once()
@@ -345,7 +342,6 @@ def test_get_corrected_stim_times(stim_data_length, start_delay):
         assert delta == 0
 
 
-@pytest.mark.skipif(reason="No sync")
 @pytest.mark.parametrize("ophys_data_length", (None, 5000, 6000, 7000))
 def test_get_corrected_ophys_times_nikon(ophys_data_length):
     true_times = np.arange(6000)
@@ -401,7 +397,7 @@ def test_module(input_json):
         t, d = aligner.corrected_ophys_timestamps
         assert np.all(t == f['twop_vsync_fall'].value)
         assert np.all(d == f['ophys_delta'].value)
-        st, sd = aligner.corrected_stim_timestamps
+        st, sd, stim_delay = aligner.corrected_stim_timestamps
         align = ts.get_alignment_array(t, st)
         assert np.allclose(align, f['stimulus_alignment'].value,
                            equal_nan=True)

@@ -122,7 +122,8 @@ class EphysSweepFeatureExtractor:
         thresholds = ft.refine_threshold_indexes(v, t, upstrokes, self.thresh_frac,
                                                  self.filter, dvdt)
         thresholds, peaks, upstrokes, clipped = ft.check_thresholds_and_peaks(v, t, thresholds, peaks,
-                                                                     upstrokes, self.end, self.max_interval)
+                                                                     upstrokes, self.end, self.max_interval,
+                                                                             dvdt=dvdt, filter=self.filter)
         if not thresholds.size:
             # Save time if no spikes detected
             self._spikes_df = DataFrame()
