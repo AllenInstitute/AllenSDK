@@ -14,6 +14,7 @@ DbCredentials = namedtuple("DbCredentials",
 
 
 class CredentialProvider(ABC):
+    METHOD = "custom"
     @abstractmethod
     def provide(self, credential):
         pass
@@ -44,11 +45,26 @@ class EnvCredentialProvider(CredentialProvider):
         return self.credentials.get(credential)
 
 
+CREDENTIAL_PROVIDER = EnvCredentialProvider()
+
+
+def set_credential_provider(provider):
+    logger.info(f"Setting provider to method '{provider.METHOD}.")
+    global CREDENTIAL_PROVIDER
+    CREDENTIAL_PROVIDER = provider
+
+
+def get_credential_provider():
+    return CREDENTIAL_PROVIDER
+
+
 def credential_injector(credential_map: Dict[str, Any],
                         provider: Optional[CredentialProvider] = None):
     """
     Decorator used to inject credentials from another source if not
-    explicitly provided in the function call.
+    explicitly provided in the function call. This function will only supply
+    values for keyword arguments. All keys defined in `credential_map` must
+    correspond to keyword arguments in the function signature.
 
     PARAMETERS
     ----------
@@ -73,7 +89,7 @@ def credential_injector(credential_map: Dict[str, Any],
         variables.
     """
     if provider is None:
-        provider = EnvCredentialProvider()
+        provider = get_credential_provider()
 
     def injector_decorator(func):
         @wraps(func)
