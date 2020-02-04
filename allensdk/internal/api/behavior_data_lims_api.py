@@ -236,7 +236,6 @@ class BehaviorDataLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin,
                              f" {len(stim_pres_df)}.")
         return stim_pres_df[sorted(stim_pres_df)]
 
-    @memoize
     def get_stimulus_templates(self) -> Dict[str, np.ndarray]:
         """Get stimulus templates (movies, scenes) for behavior session.
 
@@ -249,7 +248,6 @@ class BehaviorDataLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin,
         data = self._behavior_stimulus_file()
         return get_stimulus_templates(data)
 
-    @memoize
     def get_stimulus_timestamps(self) -> np.ndarray:
         """Get stimulus timestamps (vsyncs) from pkl file.
 
@@ -440,6 +438,7 @@ class BehaviorDataLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin,
                 """
         return self.fetchone(query, strict=True)
 
+    @memoize
     def get_experiment_date(self) -> datetime:
         """Return timestamp the behavior stimulus file began recording in UTC
         :rtype: datetime
