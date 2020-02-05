@@ -574,7 +574,7 @@ class EcephysProjectLimsApi(EcephysProjectApi):
 
         Parameters
         ----------
-        pg_kwargs : DbCredentials
+        lims_credentials : DbCredentials
             Credentials and configuration for postgres queries against
             the LIMS database. If left unspecified will attempt to provide
             credentials from environment variables.
