@@ -15,7 +15,7 @@ from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 
 class BehaviorLimsApi:
 
-    def __init__(self, behavior_experiment_id: int, 
+    def __init__(self, behavior_experiment_id: int,
                  lims_credentials: Optional[DbCredentials] = None):
         """
         Notes
@@ -78,5 +78,5 @@ class BehaviorLimsApi:
     def from_foraging_id(cls, foraging_id: str,
                          lims_credentials: Optional[DbCredentials] = None):
         return cls(
-            behavior_experiment_id=cls.foraging_id_to_behavior_session_id(foraging_id),
-        )
+            behavior_experiment_id=cls.foraging_id_to_behavior_session_id(
+                foraging_id, lims_credentials))
