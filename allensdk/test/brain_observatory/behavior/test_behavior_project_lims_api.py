@@ -22,7 +22,8 @@ class MockQueryEngine:
 
 @pytest.fixture
 def MockBehaviorProjectLimsApi():
-    return BehaviorProjectLimsApi(MockQueryEngine(), MockQueryEngine())
+    return BehaviorProjectLimsApi(MockQueryEngine(), MockQueryEngine(), 
+                                  MockQueryEngine())
 
 
 @pytest.mark.parametrize(
@@ -74,7 +75,7 @@ def test_get_behavior_stage_table(MockBehaviorProjectLimsApi):
             ;
         """)
     mock_api = MockBehaviorProjectLimsApi
-    actual = mock_api._get_behavior_stage_table(mtrain_db=MockQueryEngine())
+    actual = mock_api._get_behavior_stage_table()
     assert expected == actual
 
 

@@ -3,6 +3,7 @@ import numpy as np
 import h5py
 import pandas as pd
 import uuid
+from typing import Optional
 import json
 
 from allensdk.api.cache import memoize
@@ -19,12 +20,15 @@ from allensdk.internal.api import PostgresQueryMixin
 from allensdk.brain_observatory.behavior.behavior_ophys_api import BehaviorOphysApiBase
 from allensdk.brain_observatory.behavior.trials_processing import get_extended_trials
 from allensdk.internal.core.lims_utilities import safe_system_path
+from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
+from allensdk.core.authentication import credential_injector, DbCredentials
 
 
 class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
 
-    def __init__(self, ophys_experiment_id):
-        super().__init__(ophys_experiment_id)
+    def __init__(self, ophys_experiment_id: int,
+                 lims_credentials: Optional[DbCredentials] = None):
+        super().__init__(ophys_experiment_id, lims_credentials)
 
     @memoize
     def get_sync_data(self):
@@ -59,7 +63,7 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
                 FROM ophys_experiments_visual_behavior_experiment_containers 
                 WHERE ophys_experiment_id= {};
                 '''.format(self.get_ophys_experiment_id())
-        return self.fetchone(query, strict=False)
+        return self.lims_db.fetchone(query, strict=False)
 
     @memoize
     def get_behavior_stimulus_file(self):
@@ -71,7 +75,7 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
                 LEFT JOIN well_known_files stim ON stim.attachable_id=bs.id AND stim.attachable_type = 'BehaviorSession' AND stim.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'StimulusPickle')
                 WHERE oe.id= {};
                 '''.format(self.get_ophys_experiment_id())
-        return safe_system_path(self.fetchone(query, strict=True))
+        return safe_system_path(self.lims_db.fetchone(query, strict=True))
 
     def get_behavior_session_uuid(self):
         behavior_stimulus_file = self.get_behavior_stimulus_file()
@@ -229,7 +233,7 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
                 LEFT JOIN well_known_files wkf ON wkf.attachable_id=oe.id AND wkf.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'BehaviorOphysNwb')
                 WHERE oe.id = {};
                 '''.format(self.get_ophys_experiment_id())
-        return safe_system_path(self.fetchone(query, strict=True))
+        return safe_system_path(self.lims_db.fetchone(query, strict=True))
 
     def get_stimulus_rebase_function(self):
         stimulus_timestamps_no_monitor_delay = self.get_sync_data()['stimulus_times_no_delay']
@@ -246,7 +250,8 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
     @staticmethod
     def get_ophys_experiment_df():
 
-        api = PostgresQueryMixin()
+        api = (credential_injector(LIMS_DB_CREDENTIAL_MAP)
+               (PostgresQueryMixin)())
         query = '''
                 SELECT
 
@@ -274,7 +279,8 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
     @staticmethod
     def get_containers_df(only_passed=True):
 
-        api = PostgresQueryMixin()
+        api = (credential_injector(LIMS_DB_CREDENTIAL_MAP)
+               (PostgresQueryMixin)())
         if only_passed is True:
             query = '''
                     SELECT *
