@@ -1100,10 +1100,17 @@ def build_spike_histogram(time_domain, spike_times, unit_ids, dtype=None, binari
     ends = time_domain[:, 1:]
 
     for ii, unit_id in enumerate(unit_ids):
-        data = np.array(spike_times[unit_id])
+        data_tmp = np.array(spike_times[unit_id])
 
-        start_positions = np.searchsorted(data, starts.flat)
-        end_positions = np.searchsorted(data, ends.flat, side="right")
+         #ignore invalid spike times
+        pos = np.where(data_tmp > 0)[0]
+        data = data_tmp[pos]
+
+        #Ensure spike times are sorted
+        sort_indices = np.argsort(data)
+
+        start_positions = np.searchsorted(data, starts.flat,sorter=sort_indices)
+        end_positions = np.searchsorted(data, ends.flat, side="right",sorter=sort_indices)
         counts = (end_positions - start_positions)
 
         tiled_data[:, :, ii].flat = counts > 0 if binarize else counts
