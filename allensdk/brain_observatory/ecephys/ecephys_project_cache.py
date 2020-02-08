@@ -1,6 +1,6 @@
 from functools import partial
 from pathlib import Path
-from typing import Any, List, Optional
+from typing import Any, List, Optional,  Union, Callable
 import ast
 
 import pandas as pd
@@ -9,13 +9,13 @@ import numpy as np
 import pynwb
 
 from allensdk.api.cache import Cache
-
+from allensdk.core.authentication import DbCredentials
 from allensdk.brain_observatory.ecephys.ecephys_project_api import (
     EcephysProjectApi, EcephysProjectLimsApi, EcephysProjectWarehouseApi, 
     EcephysProjectFixedApi
 )
 from allensdk.brain_observatory.ecephys.ecephys_project_api.rma_engine import (
-    AsyncRmaEngine,
+    AsyncRmaEngine, RmaEngine
 )
 from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine import (
     write_bytes_from_coroutine, write_from_stream
@@ -26,7 +26,6 @@ from allensdk.brain_observatory.ecephys.ecephys_session_api import (
 from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
 from allensdk.brain_observatory.ecephys import get_unit_filter_value
 from allensdk.api.caching_utilities import one_file_call_caching
-
 
 class EcephysProjectCache(Cache):
 
@@ -74,11 +73,13 @@ class EcephysProjectCache(Cache):
     )
 
     def __init__(
-        self, 
-        fetch_api: EcephysProjectApi = EcephysProjectWarehouseApi.default(), 
-        fetch_tries: int = 2, 
-        stream_writer = write_from_stream,
-        **kwargs):
+            self,
+            fetch_api: EcephysProjectApi = EcephysProjectWarehouseApi.default(), 
+            fetch_tries: int = 2,
+            stream_writer: Callable = write_from_stream,
+            manifest: Optional[Union[str, Path]] = None,
+            version: Optional[str] = None,
+            cache: bool = True):
         """ Entrypoint for accessing ecephys (neuropixels) data. Supports 
         access to cross-session data (like stimulus templates) and high-level 
         summaries of sessionwise data and provides tools for downloading detailed 
@@ -88,33 +89,34 @@ class EcephysProjectCache(Cache):
         ==========
         fetch_api :
             Used to pull data from remote sources, after which it is locally
-            cached. Any object exposing the EcephysProjectApi interface is 
+            cached. Any object exposing the EcephysProjectApi interface is
             suitable. Standard options are:
-                EcephysProjectWarehouseApi :: The default. Fetches publically 
+                EcephysProjectWarehouseApi :: The default. Fetches publically
                     available Allen Institute data
-                EcephysProjectFixedApi :: Refuses to fetch any data - only the 
-                    existing local cache is accessible. Useful if you want to 
-                    settle on a fixed dataset for analysis.
-                EcephysProjectLimsApi :: Fetches bleeding-edge data from the 
-                    Allen Institute's internal database. Only works if you are 
+                EcephysProjectFixedApi :: Refuses to fetch any data - only the
+                    existing local cache is accessible. Useful if you want to
+                    settle on a fixed dataset for analysis
+                EcephysProjectLimsApi :: Fetches bleeding-edge data from the
+                    Allen Institute's internal database. Only works if you are
                     on our internal network.
-        fetch_tries : 
-            Maximum number of times to attempt a download before giving up and 
+        fetch_tries : int
+            Maximum number of times to attempt a download before giving up and
             raising an exception. Note that this is total tries, not retries
-        **kwargs :
-            manifest : str or Path
-                full path at which manifest json will be stored
-            version : str
-                version of manifest file. If this mismatches the version 
-                recorded in the file at manifest, an error will be raised.
-            other kwargs are passed to allensdk.api.cache.Cache
-
+        manifest : str or Path
+            full path at which manifest json will be stored (default =
+            "ecephys_project_manifest.json" in the local directory.)
+        version : str
+            version of manifest file. If this mismatches the version
+            recorded in the file at manifest, an error will be raised.
+        cache: bool
+            Whether to write to the cache (default=True)
         """
+        manifest_ = manifest or "ecephys_project_manifest.json"
+        version_ = version or self.MANIFEST_VERSION
 
-        kwargs['manifest'] = kwargs.get('manifest', 'ecephys_project_manifest.json')
-        kwargs['version'] = kwargs.get('version', self.MANIFEST_VERSION)
-
-        super(EcephysProjectCache, self).__init__(**kwargs)
+        super(EcephysProjectCache, self).__init__(manifest=manifest_,
+                                                  version=version_,
+                                                  cache=cache)
         self.fetch_api = fetch_api
         self.fetch_tries = fetch_tries
         self.stream_writer = stream_writer
@@ -516,7 +518,7 @@ class EcephysProjectCache(Cache):
             "asynchronous": True
         } if fetch_api_kwargs is None else fetch_api_kwargs
 
-        if "stream_writer" not in kwargs:
+        if kwargs.get("stream_writer") is None:
             if fetch_api_kwargs.get("asynchronous", True):
                 kwargs["stream_writer"] = write_bytes_from_coroutine
             else:
@@ -528,21 +530,124 @@ class EcephysProjectCache(Cache):
         )
 
     @classmethod
-    def from_lims(cls, lims_kwargs=None, **kwargs):
+    def from_lims(cls, lims_credentials: Optional[DbCredentials] = None,
+                  scheme: Optional[str] = None,
+                  host: Optional[str] = None, 
+                  asynchronous: bool = True,
+                  manifest: Optional[str] = None, 
+                  version: Optional[str] = None, 
+                  cache: bool = True,
+                  fetch_tries: int = 2):
+        """
+        Create an instance of EcephysProjectCache with an 
+        EcephysProjectLimsApi. Retrieves bleeding-edge data stored
+        locally on Allen Institute servers. Only available for use
+        on-site at the Allen Institute or through a vpn. Requires Allen
+        Institute database credentials.
+
+        Parameters
+        ==========
+        lims_credentials : DbCredentials
+            Credentials to access LIMS database. If not provided will
+            attempt to find credentials in environment variables.
+        scheme : str
+            URI scheme, such as "http". Defaults to 
+            EcephysProjectLimsApi.default value if unspecified.
+            Will not be used unless `host` is also specified.
+        host : str
+            Web host. Defaults to EcephysProjectLimsApi.default 
+            value if unspecified. Will not be used unless `scheme` is
+            also specified.
+        asynchronous : bool
+            Whether to fetch file asynchronously. Defaults to True.
+        manifest : str or Path
+            full path at which manifest json will be stored
+        version : str
+            version of manifest file. If this mismatches the version 
+            recorded in the file at manifest, an error will be raised.
+        cache: bool
+            Whether to write to the cache (default=True)
+        fetch_tries : int
+            Maximum number of times to attempt a download before giving up and 
+            raising an exception. Note that this is total tries, not retries
+        """
+        if scheme and host:
+            app_kwargs = {"scheme": scheme, "host": host}
+        else:
+            app_kwargs = None
         return cls._from_http_source_default(
-            EcephysProjectLimsApi, lims_kwargs, **kwargs
+            EcephysProjectLimsApi, 
+            {"lims_credentials": lims_credentials,
+             "app_kwargs": app_kwargs,
+             "asynchronous": asynchronous,
+            },    # expects dictionary of kwargs
+            manifest=manifest, version=version, cache=cache, 
+            fetch_tries=fetch_tries)
+
+    @classmethod
+    def from_warehouse(cls, 
+                       scheme: Optional[str] = None, 
+                       host: Optional[str] = None,
+                       asynchronous: bool = True,
+                       manifest: Optional[Union[str, Path]] = None, 
+                       version: Optional[str] = None,
+                       cache: bool = True, 
+                       fetch_tries: int = 2):
+        """
+        Create an instance of EcephysProjectCache with an 
+        EcephysProjectWarehouseApi. Retrieves released data stored in
+        the warehouse. 
+        
+        Parameters
+        ==========
+        scheme : str
+            URI scheme, such as "http". Defaults to 
+            EcephysProjectWarehouseAPI.default value if unspecified.
+            Will not be used unless `host` is also specified.
+        host : str
+            Web host. Defaults to EcephysProjectWarehouseApi.default 
+            value if unspecified. Will not be used unless `scheme` is also
+            specified.
+        asynchronous : bool
+            Whether to fetch file asynchronously. Defaults to True.
+        manifest : str or Path
+            full path at which manifest json will be stored
+        version : str
+            version of manifest file. If this mismatches the version 
+            recorded in the file at manifest, an error will be raised.
+        cache: bool
+            Whether to write to the cache (default=True)
+        fetch_tries : int
+            Maximum number of times to attempt a download before giving up and 
+            raising an exception. Note that this is total tries, not retries
+        """
+        if scheme and host:
+            app_kwargs = {"scheme": scheme, "host": host, 
+                          "asynchronous": asynchronous}
+        else:
+            app_kwargs = None
+        return cls._from_http_source_default(
+            EcephysProjectWarehouseApi, app_kwargs, manifest=manifest,
+             version=version, cache=cache, fetch_tries=fetch_tries
         )
 
     @classmethod
-    def from_warehouse(cls, warehouse_kwargs=None, **kwargs):
-        return cls._from_http_source_default(
-            EcephysProjectWarehouseApi, warehouse_kwargs, **kwargs
-        )
-
-
-    @classmethod
-    def fixed(cls, **kwargs):
-        return cls(fetch_api=EcephysProjectFixedApi(), **kwargs)
+    def fixed(cls, manifest=None, version=None):
+        """
+        Creates a EcephysProjectCache that refuses to fetch any data 
+        - only the existing local cache is accessible. Useful if you
+        want to settle on a fixed dataset for analysis.
+        
+        Parameters
+        ==========
+        manifest : str or Path
+            full path to existing manifest json
+        version : str
+            version of manifest file. If this mismatches the version 
+            recorded in the file at manifest, an error will be raised.
+        """
+        return cls(fetch_api=EcephysProjectFixedApi(), manifest=manifest,
+                   version=version)
 
 
 def count_owned(this, other, foreign_key, count_key, inplace=False):
