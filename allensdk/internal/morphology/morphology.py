@@ -808,7 +808,7 @@ class Morphology( object ):
         #
         if scale is None:
             # calculate the determinant
-            determinant = np.linalg.det(np.reshape(aff, (3, 3)))
+            determinant = np.linalg.det(np.reshape(aff[0:9], (3, 3)))
             # determinant is change of volume that occurred during transform
             # assume equal scaling along all axes. take 3rd root to get
             #   scale factor
