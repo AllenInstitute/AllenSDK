@@ -3,7 +3,7 @@ from typing import Optional, Iterable, NamedTuple
 import pandas as pd
 
 from .ecephys_project_api import EcephysProjectApi, ArrayLike
-from .http_engine import HttpEngine
+from .http_engine import HttpEngine, AsyncHttpEngine
 from .utilities import postgres_macros, build_and_execute
 
 from allensdk.internal.api import PostgresQueryMixin
@@ -565,18 +565,42 @@ class EcephysProjectLimsApi(EcephysProjectApi):
 
 
     @classmethod
-    def default(cls, pg_kwargs=None, app_kwargs=None):
+    def default(cls, pg_kwargs=None, app_kwargs=None, asynchronous=True):
+        """ Construct a "straightforward" lims api that can fetch data from 
+        lims2.
+
+        Parameters
+        ----------
+        pg_kwargs : dict
+            High-level configuration for postgres queries. See 
+            allensdk.internal.api.PostgresQueryMixin for details.
+        app_kwargs : dict
+            High-level configuration for http requests. See 
+            allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine.HttpEngine 
+            and AsyncHttpEngine for details.
+        asynchronous : bool
+            If true, (http) queries will be made asynchronously.
+
+        Returns
+        -------
+        EcephysProjectLimsApi
+
+        """
 
         _pg_kwargs = {}
         if pg_kwargs is not None:
             _pg_kwargs.update(pg_kwargs)
 
-        _app_kwargs = {"scheme": "http", "host": "lims2"}
+        _app_kwargs = {"scheme": "http", "host": "lims2", "asynchronous": asynchronous}
         if app_kwargs is not None:
+            if "asynchronous" in app_kwargs:
+                raise TypeError("please specify asynchronicity option at the api level rather than for the http engine")
             _app_kwargs.update(app_kwargs)
 
+        app_engine_cls = AsyncHttpEngine if _app_kwargs["asynchronous"] else HttpEngine
+
         pg_engine = PostgresQueryMixin(**_pg_kwargs)
-        app_engine = HttpEngine(**_app_kwargs)
+        app_engine = app_engine_cls(**_app_kwargs)
         return cls(pg_engine, app_engine)
 
 
