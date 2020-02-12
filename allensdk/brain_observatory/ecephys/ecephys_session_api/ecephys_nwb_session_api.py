@@ -12,7 +12,8 @@ from .ecephys_session_api import EcephysSessionApi
 from allensdk.brain_observatory.nwb.nwb_api import NwbApi
 import allensdk.brain_observatory.ecephys.nwb  # noqa Necessary to import pyNWB namespaces
 from allensdk.brain_observatory.ecephys import get_unit_filter_value
-
+from allensdk.brain_observatory.ecephys.write_nwb.__main__ import \
+    remove_invalid_spikes_from_units
 
 color_triplet_re = re.compile(r"\[(-{0,1}\d*\.\d*,\s*)*(-{0,1}\d*\.\d*)\]")
 
@@ -319,6 +320,8 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         units = units[units["amplitude_cutoff"] <= self.amplitude_cutoff_maximum]
         units = units[units["presence_ratio"] >= self.presence_ratio_minimum]
         units = units[units["isi_violations"] <= self.isi_violations_maximum]
+
+        units = remove_invalid_spikes_from_units(units)
         return units
 
     def get_metadata(self):
