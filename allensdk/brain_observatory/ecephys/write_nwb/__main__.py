@@ -215,15 +215,15 @@ def remove_invalid_spikes(
 
     out = row.copy(deep=True)
 
-    spikes = np.array(out.pop(times_key))
+    spike_times = np.array(out.pop(times_key))
     amps = np.array(out.pop(amps_key))
 
-    valid = spikes >= 0
-    spikes = spikes[valid]
+    valid = spike_times >= 0
+    spike_times = spike_times[valid]
     amps = amps[valid]
 
-    order = np.argsort(spikes)
-    out[times_key] = spikes[order]
+    order = np.argsort(spike_times)
+    out[times_key] = spike_times[order]
     out[amps_key] = amps[order]
 
     return out
