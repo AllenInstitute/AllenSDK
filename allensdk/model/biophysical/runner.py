@@ -49,11 +49,13 @@ _runner_log = logging.getLogger('allensdk.model.biophysical.runner')
 
 _lock = None
 
+axon_replacement_dict = {'axon_type' : 'stub_axon'}
+
 def _init_lock(lock):
     global _lock
     _lock = lock
 
-def run(description, sweeps=None, procs=6):
+def run(description, sweeps=None, procs=6,axon_type=None):
     '''Main function for simulating sweeps in a biophysical experiment.
 
     Parameters
@@ -66,6 +68,10 @@ def run(description, sweeps=None, procs=6):
         list of experiment sweep numbers to simulate.  If None, simulate all sweeps.
     '''
 
+    
+    if axon_type == 'stub_axon':
+        description.update_data(axon_replacement_dict,'biophys')
+    
     prepare_nwb_output(description.manifest.get_path('stimulus_path'),
                        description.manifest.get_path('output_path'))
 
@@ -102,8 +108,9 @@ def run_sync(description, sweeps=None):
 
     # configure model
     manifest = description.manifest
-    morphology_path = description.manifest.get_path('MORPHOLOGY')
-    utils.generate_morphology(morphology_path.encode('ascii', 'ignore'))
+    morphology_path = description.manifest.get_path('MORPHOLOGY').encode('ascii', 'ignore')
+    morphology_path = morphology_path.decode("utf-8")
+    utils.generate_morphology(morphology_path)
     utils.load_cell_parameters()
 
     # configure stimulus and recording
@@ -214,6 +221,9 @@ def load_description(manifest_json_path):
 
 if '__main__' == __name__:
     import sys
-
-    description = load_description(sys.argv[-1])
+    if len(sys.argv) > 2 and sys.argv[-1] == 'stub_axon':
+        description = load_description(sys.argv[-2])
+        description.update_data(axon_replacement_dict,'biophys')
+    else:
+        description = load_description(sys.argv[-1])
     run(description)
