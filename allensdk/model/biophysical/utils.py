@@ -71,10 +71,15 @@ def create_utils(description, model_type=None):
         except KeyError as e:
             logging.error("Could not infer model type from description")
 
+    try:
+       axon_type =  description.data['biophys'][1]['axon_type']
+    except IndexError or KeyError:
+        axon_type = None
+        
     if model_type == PERISOMATIC_TYPE:
         return Utils(description)
     elif model_type == ALL_ACTIVE_TYPE:
-        return AllActiveUtils(description)
+        return AllActiveUtils(description,axon_type)
 
 
 class Utils(HocUtils):
@@ -93,7 +98,7 @@ class Utils(HocUtils):
 
     _log = logging.getLogger(__name__)
 
-    def __init__(self, description):                    
+    def __init__(self, description,axon_type=None):                    
         self.update_default_cell_hoc(description)
 
         super(Utils, self).__init__(description)
@@ -103,7 +108,7 @@ class Utils(HocUtils):
         self.stimulus_sampling_rate = None
 
         self.stim_vec_list = []
-        
+        self.axon_type = axon_type
 
     def update_default_cell_hoc(self, description, default_cell_hoc='cell.hoc'):
         ''' replace the default 'cell.hoc' path in the manifest with 'cell.hoc' packaged
@@ -319,49 +324,53 @@ class AllActiveUtils(Utils):
         morph_filename : string
             Path to morphology.
         '''
-
-        morph_basename = os.path.basename(morph_filename)
-        morph_extension = morph_basename.split('.')[-1]
-        if morph_extension.lower() == 'swc':
-            morph = self.h.Import3d_SWC_read()
-        elif morph_extension.lower() == 'asc':
-            morph = self.h.Import3d_Neurolucida3()
+        if self.axon_type == 'stub_axon':
+            print('Replacing axon with a stub : length 60 micron, diameter 1 micron')
+            super(AllActiveUtils,self).generate_morphology(morph_filename)
         else:
-            raise Exception("Unknown filetype: %s" % morph_extension)
+            print('Legacy model-Replacing axon with a stub: length 60 micron, diameter read from .swc')
+            morph_basename = os.path.basename(morph_filename)
+            morph_extension = morph_basename.split('.')[-1]
+            if morph_extension.lower() == 'swc':
+                morph = self.h.Import3d_SWC_read()
+            elif morph_extension.lower() == 'asc':
+                morph = self.h.Import3d_Neurolucida3()
+            else:
+                raise Exception("Unknown filetype: %s" % morph_extension)
 
-        morph.input(morph_filename)
-        imprt = self.h.Import3d_GUI(morph, 0)
+            morph.input(morph_filename)
+            imprt = self.h.Import3d_GUI(morph, 0)
 
-        self.h("objref this")
-        imprt.instantiate(self.h.this)
+            self.h("objref this")
+            imprt.instantiate(self.h.this)
 
-        for sec in self.h.allsec():
-            sec.nseg = 1 + 2 * int(sec.L / 40.0)
+            for sec in self.h.allsec():
+                sec.nseg = 1 + 2 * int(sec.L / 40.0)
 
-        self.h("soma[0] area(0.5)")
-        axon_diams = [self.h.axon[0].diam, self.h.axon[0].diam]
-        self.h.distance(sec=self.h.soma[0])
-        for sec in self.h.allsec():
-            if sec.name()[:4] == "axon":
-                if self.h.distance(0.5, sec=sec) > 60:
-                    axon_diams[1] = sec.diam
-                    break
-        for sec in self.h.allsec():
-            if sec.name()[:4] == "axon":
-                self.h.delete_section(sec=sec)
-        self.h('create axon[2]')
-        for index, sec in enumerate(self.h.axon):
-            sec.L = 30
-            sec.diam = axon_diams[index]
+            self.h("soma[0] area(0.5)")
+            axon_diams = [self.h.axon[0].diam, self.h.axon[0].diam]
+            self.h.distance(sec=self.h.soma[0])
+            for sec in self.h.allsec():
+                if sec.name()[:4] == "axon":
+                    if self.h.distance(0.5, sec=sec) > 60:
+                        axon_diams[1] = sec.diam
+                        break
+            for sec in self.h.allsec():
+                if sec.name()[:4] == "axon":
+                    self.h.delete_section(sec=sec)
+            self.h('create axon[2]')
+            for index, sec in enumerate(self.h.axon):
+                sec.L = 30
+                sec.diam = axon_diams[index]
 
-        for sec in self.h.allsec():
-            sec.nseg = 1 + 2 * int(sec.L / 40.0)
+            for sec in self.h.allsec():
+                sec.nseg = 1 + 2 * int(sec.L / 40.0)
 
-        self.h.axon[0].connect(self.h.soma[0], 1.0, 0.0)
-        self.h.axon[1].connect(self.h.axon[0], 1.0, 0.0)
+            self.h.axon[0].connect(self.h.soma[0], 1.0, 0.0)
+            self.h.axon[1].connect(self.h.axon[0], 1.0, 0.0)
 
-        # make sure diam reflects 3d points
-        self.h.area(.5, sec=self.h.soma[0])
+            # make sure diam reflects 3d points
+            self.h.area(.5, sec=self.h.soma[0])
 
     def load_cell_parameters(self):
         '''Configure a neuron after the cell morphology has been loaded.'''
