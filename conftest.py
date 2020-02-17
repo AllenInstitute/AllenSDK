@@ -45,7 +45,7 @@ def pytest_collection_modifyitems(config, items):
     )
 
     skip_neuron_test = pytest.mark.skipif(
-        (os.getenv('TEST_COMPLETE') != 'true') and (os.getenv('TEST_NEURON') != 'true'),
+        os.getenv('TEST_NEURON') != 'true',
         reason='this test depends on the NEURON simulation library. This dependency is not straghtforward to build '\
             'and install, so you must opt in to running this test'
     )
