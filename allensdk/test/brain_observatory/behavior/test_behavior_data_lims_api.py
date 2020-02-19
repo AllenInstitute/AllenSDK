@@ -32,6 +32,22 @@ def MockBehaviorDataLimsApi():
                             "lick_events": [2, 6, 9],
                         }],
                         "intervalsms": np.array([16.0]*10),
+                        "trial_log": [
+                            {
+                                "events":
+                                    [
+                                        ["trial_start", 2, 2],
+                                        ["trial_end", 3, 3],
+                                    ],
+                            },
+                            {
+                                "events":
+                                    [
+                                        ["trial_start", 4, 4],
+                                        ["trial_start", 5, 5],
+                                    ],
+                            },
+                        ],
                     },
                 },
                 "session_uuid": 123456,

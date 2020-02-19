@@ -3,7 +3,8 @@ Created on Sunday July 15 2018
 
 @author: marinag
 """
-
+from itertools import chain
+from typing import Dict, Any
 from .process_sync import filter_digital, calculate_delay  # NOQA: E402
 from allensdk.brain_observatory.sync_dataset import Dataset as SyncDataset  # NOQA: E402
 import numpy as np
@@ -62,21 +63,66 @@ def get_sync_data(sync_path):
 
     return sync_data
 
+
+def frame_time_offset(data: Dict[str, Any]) -> float:
+    """
+    Contained in the behavior "pickle" file is a series of time between
+    consecutive vsync frames (`intervalsms`). This information required
+    to get the timestamp (via frame number) for events that occured
+    outside of a trial(e.g. licks). However, we don't have the value
+    in the trial log time stream when the first vsync frame actually
+    occured -- so we estimate it with a linear regression (frame
+    number x time). All trials in the `trial_log` have events for
+    `trial_start` and `trial_end`, so these are used to fit the
+    regression. A linear regression is used rather than just
+    subtracting the time from the first trial, since there can be some
+    jitter given the 60Hz refresh rate.
+
+    Parameters
+    ----------
+    data: dict
+        behavior pickle well-known file data
+
+    Returns
+    -------
+    float
+        Time offset to add to the vsync stream to sync it with the
+        `trial_log` time stream. The "zero-th" frame time.
+    """
+    events = [trial["events"] for trial
+              in data["items"]["behavior"]["trial_log"]]
+    # First event in `events` is `trial_start`, and last is `trial_end`
+    # Event log has following schema:
+    #    event name, description: 'enter'/'exit'/'', time, frame number
+    # We want last two fields for first and last trial event
+    trial_by_frame = list(chain(
+        [event[i][-2:] for event in events for i in [0, -1]]))
+    times = [trials[0] for trials in trial_by_frame]
+    frames = [trials[1] for trials in trial_by_frame]
+    time_to_first_vsync = sps.linregress(frames, times).intercept
+    return time_to_first_vsync
+
+
 def get_stimulus_rebase_function(data, stimulus_timestamps_no_monitor_delay):
-    
-    # Time rebasing: times in stimulus_timestamps_pickle and lick log will agree with times in event log
+    """
+    Create a rebase function to align times for licks and stimulus timestamps
+    in the "pickle" log with the same events in the event "sync" log.
+    """
     vsyncs = data["items"]["behavior"]['intervalsms']
     stimulus_timestamps_pickle_pre = np.hstack((0, vsyncs)).cumsum() / 1000.0
 
-    assert len(stimulus_timestamps_pickle_pre) == len(stimulus_timestamps_no_monitor_delay)
-    first_trial = data["items"]["behavior"]["trial_log"][0]
-    first_trial_start_time, first_trial_start_frame = {(e[0], e[1]):(e[2], e[3]) for e in first_trial['events']}['trial_start','']
-    offset_time = first_trial_start_time-stimulus_timestamps_pickle_pre[first_trial_start_frame]
-    stimulus_timestamps_pickle = np.array([t+offset_time for t in stimulus_timestamps_pickle_pre])
-
+    if (len(stimulus_timestamps_pickle_pre)
+            != len(stimulus_timestamps_no_monitor_delay)):
+        raise ValueError("Number of stimulus timestamps in pickle file are "
+                         "not equal to timestamps in the sync file (pickle="
+                         f"{len(stimulus_timestamps_pickle_pre)}, sync="
+                         f"{len(stimulus_timestamps_no_monitor_delay)}).")
+    time_to_first_vsync = frame_time_offset(data)
+    stimulus_timestamps_pickle = (stimulus_timestamps_pickle_pre
+                                  + time_to_first_vsync)
     # Rebase used to transform trial log times to sync times:
-    time_slope, time_intercept, _, _, _ = sps.linregress(stimulus_timestamps_pickle, stimulus_timestamps_no_monitor_delay)
-    def rebase(t):
-        return time_intercept+time_slope*t
+    time_slope, time_intercept, _, _, _ = sps.linregress(
+        stimulus_timestamps_pickle, stimulus_timestamps_no_monitor_delay)
 
-    return rebase
+    # return transform of trial log time to sync time
+    return lambda t: time_intercept + time_slope * t

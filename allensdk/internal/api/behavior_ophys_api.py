@@ -8,7 +8,8 @@ import json
 
 from allensdk.api.cache import memoize
 from allensdk.internal.api.ophys_lims_api import OphysLimsApi
-from allensdk.brain_observatory.behavior.sync import get_sync_data, get_stimulus_rebase_function
+from allensdk.brain_observatory.behavior.sync import (
+    get_sync_data, get_stimulus_rebase_function, frame_time_offset)
 from allensdk.brain_observatory.behavior.stimulus_processing import get_stimulus_presentations, get_stimulus_templates, get_stimulus_metadata
 from allensdk.brain_observatory.behavior.metadata_processing import get_task_parameters
 from allensdk.brain_observatory.behavior.running_processing import get_running_df
@@ -160,9 +161,26 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
         return get_stimulus_templates(data)
 
     @memoize
-    def get_licks(self):
+    def get_sync_licks(self):
         lick_times = self.get_sync_data()['lick_times']
         return pd.DataFrame({'time': lick_times})
+
+    @memoize
+    def get_licks(self):
+        behavior_stimulus_file = self.get_behavior_stimulus_file()
+        data = pd.read_pickle(behavior_stimulus_file)
+        rebase_function = self.get_stimulus_rebase_function()
+        # Get licks from pickle file (need to add an offset to align with
+        # the trial_log time stream)
+        lick_frames = (data["items"]["behavior"]["lick_sensors"][0]
+                       ["lick_events"])
+        vsyncs = data["items"]["behavior"]["intervalsms"]
+        vsync_times_raw = np.hstack((0, vsyncs)).cumsum() / 1000.0  # cumulative time
+        vsync_offset = frame_time_offset(data)
+        vsync_times = vsync_times_raw + vsync_offset
+        lick_times = [vsync_times[frame] for frame in lick_frames]
+        # Align pickle data with sync time stream
+        return pd.DataFrame({"time": list(map(rebase_function, lick_times))})
 
     @memoize
     def get_rewards(self):
