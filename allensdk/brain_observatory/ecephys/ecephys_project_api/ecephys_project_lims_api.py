@@ -7,6 +7,8 @@ from .http_engine import HttpEngine, AsyncHttpEngine
 from .utilities import postgres_macros, build_and_execute
 
 from allensdk.internal.api import PostgresQueryMixin
+from allensdk.core.authentication import credential_injector, DbCredentials
+from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 
 
 class EcephysProjectLimsApi(EcephysProjectApi):
@@ -565,15 +567,17 @@ class EcephysProjectLimsApi(EcephysProjectApi):
 
 
     @classmethod
-    def default(cls, pg_kwargs=None, app_kwargs=None, asynchronous=True):
+    def default(cls, lims_credentials: Optional[DbCredentials] = None, 
+                app_kwargs=None, asynchronous=True):
         """ Construct a "straightforward" lims api that can fetch data from 
         lims2.
 
         Parameters
         ----------
-        pg_kwargs : dict
-            High-level configuration for postgres queries. See 
-            allensdk.internal.api.PostgresQueryMixin for details.
+        lims_credentials : DbCredentials
+            Credentials and configuration for postgres queries against
+            the LIMS database. If left unspecified will attempt to provide
+            credentials from environment variables.
         app_kwargs : dict
             High-level configuration for http requests. See 
             allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine.HttpEngine 
@@ -587,10 +591,6 @@ class EcephysProjectLimsApi(EcephysProjectApi):
 
         """
 
-        _pg_kwargs = {}
-        if pg_kwargs is not None:
-            _pg_kwargs.update(pg_kwargs)
-
         _app_kwargs = {"scheme": "http", "host": "lims2", "asynchronous": asynchronous}
         if app_kwargs is not None:
             if "asynchronous" in app_kwargs:
@@ -598,9 +598,18 @@ class EcephysProjectLimsApi(EcephysProjectApi):
             _app_kwargs.update(app_kwargs)
 
         app_engine_cls = AsyncHttpEngine if _app_kwargs["asynchronous"] else HttpEngine
-
-        pg_engine = PostgresQueryMixin(**_pg_kwargs)
         app_engine = app_engine_cls(**_app_kwargs)
+
+        if lims_credentials is not None:
+            pg_engine = PostgresQueryMixin(
+                dbname=lims_credentials.dbname, user=lims_credentials.user,
+                host=lims_credentials.host, password=lims_credentials.password,
+                port=lims_credentials.port)
+        else:
+            # Currying is equivalent to decorator syntactic sugar
+            pg_engine = (credential_injector(LIMS_DB_CREDENTIAL_MAP)
+                         (PostgresQueryMixin)())
+
         return cls(pg_engine, app_engine)
 
 

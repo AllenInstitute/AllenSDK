@@ -39,6 +39,23 @@ class BehaviorOphysSession(object):
 
     def __init__(self, api=None):
         self.api = api
+        # Initialize attributes to be lazily evaluated
+        self._stimulus_timestamps = None
+        self._ophys_timestamps = None
+        self._metadata = None
+        self._dff_traces = None
+        self._cell_specimen_table = None
+        self._running_speed = None
+        self._running_data_df = None
+        self._stimulus_presentations = None
+        self._stimulus_templates = None
+        self._licks = None
+        self._rewards = None
+        self._task_parameters = None
+        self._trials = None
+        self._corrected_fluorescence_traces = None
+        self._motion_correction = None
+        self._segmentation_mask_image = None
 
     # Using properties rather than initializing attributes to take advantage
     # of API-level cache and not introduce a lot of overhead when the 
@@ -63,28 +80,52 @@ class BehaviorOphysSession(object):
         monitor (corrected for monitor delay).
         :rtype: numpy.ndarray
         """
-        return self.api.get_stimulus_timestamps()
+        if self._stimulus_timestamps is None:
+            self._stimulus_timestamps = self.api.get_stimulus_timestamps()
+        return self._stimulus_timestamps
+
+    @stimulus_timestamps.setter
+    def stimulus_timestamps(self, value):
+        self._stimulus_timestamps = value
 
     @property
     def ophys_timestamps(self) -> np.ndarray:
         """Timestamps associated with frames captured by the microscope
         :rtype: numpy.ndarray
         """
-        return self.api.get_ophys_timestamps()
+        if self._ophys_timestamps is None: 
+            self._ophys_timestamps = self.api.get_ophys_timestamps()
+        return self._ophys_timestamps
+
+    @ophys_timestamps.setter
+    def ophys_timestamps(self, value):
+        self._ophys_timestamps = value
 
     @property
     def metadata(self) -> dict:
-        """Dictioanry of session-specific metadata.
+        """Dictionary of session-specific metadata.
         :rtype: dict
         """
-        return self.api.get_metadata()
+        if self._metadata is None:
+            self._metadata = self.api.get_metadata()
+        return self._metadata
+
+    @metadata.setter
+    def metadata(self, value):
+        self._metadata = value
 
     @property
     def dff_traces(self) -> pd.DataFrame:
         """Traces of dff organized into a dataframe; index is the cell roi ids.
         :rtype: pandas.DataFrame
         """
-        return self.api.get_dff_traces()
+        if self._dff_traces is None:
+            self._dff_traces = self.api.get_dff_traces()
+        return self._dff_traces
+
+    @dff_traces.setter
+    def dff_traces(self, value):
+        self._dff_traces = value
 
     @property
     def cell_specimen_table(self) -> pd.DataFrame:
@@ -92,7 +133,13 @@ class BehaviorOphysSession(object):
         roi ids.
         :rtype: pandas.DataFrame
         """
-        return self.api.get_cell_specimen_table()
+        if self._cell_specimen_table is None:
+            self._cell_specimen_table = self.api.get_cell_specimen_table()
+        return self._cell_specimen_table
+
+    @cell_specimen_table.setter
+    def cell_specimen_table(self, value):
+        self._cell_specimen_table = value
 
     @property
     def running_speed(self) -> RunningSpeed:
@@ -103,14 +150,26 @@ class BehaviorOphysSession(object):
                 Running speed of the experimental subject (in cm / s).
         :rtype: allensdk.brain_observatory.running_speed.RunningSpeed
         """
-        return self.api.get_running_speed()
+        if self._running_speed is None:
+            self._running_speed = self.api.get_running_speed()
+        return self._running_speed
+
+    @running_speed.setter
+    def running_speed(self, value):
+        self._running_speed = value
 
     @property
     def running_data_df(self) -> pd.DataFrame:
         """Dataframe containing various signals used to compute running speed
         :rtype: pandas.DataFrame
         """
-        return self.api.get_running_data_df()
+        if self._running_data_df is None:
+            self._running_data_df = self.api.get_running_data_df()
+        return self._running_data_df
+
+    @running_data_df.setter
+    def running_data_df(self, value):
+        self._running_data_df = value
 
     @property
     def stimulus_presentations(self) -> pd.DataFrame:
@@ -119,7 +178,14 @@ class BehaviorOphysSession(object):
         presentation characteristics.
         :rtype: pandas.DataFrame
         """
-        return self.api.get_stimulus_presentations()
+        if self._stimulus_presentations is None:
+            self._stimulus_presentations = (
+                self.api.get_stimulus_presentations())
+        return self._stimulus_presentations
+
+    @stimulus_presentations.setter
+    def stimulus_presentations(self, value):
+        self._stimulus_presentations = value
 
     @property
     def stimulus_templates(self) -> dict:
@@ -127,21 +193,39 @@ class BehaviorOphysSession(object):
         session keys are data set names, and values are 3D numpy arrays.
         :rtype: dict
         """
-        return self.api.get_stimulus_templates()
+        if self._stimulus_templates is None:
+            self._stimulus_templates = self.api.get_stimulus_templates()
+        return self._stimulus_templates
+
+    @stimulus_templates.setter
+    def stimulus_templates(self, value):
+        self._stimulus_templates = value
 
     @property
     def licks(self) -> pd.DataFrame:
         """A dataframe containing lick timestamps.
         :rtype: pandas.DataFrame
         """
-        return self.api.get_licks()
+        if self._licks is None:
+            self._licks = self.api.get_licks()
+        return self._licks
+
+    @licks.setter
+    def licks(self, value):
+        self._licks = value
 
     @property
     def rewards(self) -> pd.DataFrame:
         """A dataframe containing timestamps of delivered rewards.
         :rtype: pandas.DataFrame
         """
-        return self.api.get_rewards()
+        if self._rewards is None:
+            self._rewards = self.api.get_rewards()
+        return self._rewards
+
+    @rewards.setter
+    def rewards(self, value):
+        self._rewards = value
 
     @property
     def task_parameters(self) -> dict:
@@ -149,14 +233,26 @@ class BehaviorOphysSession(object):
         behavior.
         :rtype: dict
         """
-        return self.api.get_task_parameters()
+        if self._task_parameters is None:
+            self._task_parameters = self.api.get_task_parameters()
+        return self._task_parameters
+
+    @task_parameters.setter
+    def task_parameters(self, value):
+        self._task_parameters = value
 
     @property
     def trials(self) -> pd.DataFrame:
         """A dataframe containing behavioral trial start/stop times, and trial
         data
         :rtype: pandas.DataFrame"""
-        return self.api.get_trials()
+        if self._trials is None:
+            self._trials = self.api.get_trials()
+        return self._trials
+
+    @trials.setter
+    def trials(self, value):
+        self._trials = value
 
     @property
     def corrected_fluorescence_traces(self) -> pd.DataFrame:
@@ -164,7 +260,14 @@ class BehaviorOphysSession(object):
         index is the cell roi ids.
         :rtype: pandas.DataFrame
         """
-        return self.api.get_corrected_fluorescence_traces()
+        if self._corrected_fluorescence_traces is None:
+            self._corrected_fluorescence_traces = (
+                self.api.get_corrected_fluorescence_traces())
+        return self._corrected_fluorescence_traces
+
+    @corrected_fluorescence_traces.setter
+    def corrected_fluorescence_traces(self, value):
+        self._corrected_fluorescence_traces = value
 
     @property
     def average_projection(self) -> pd.DataFrame:
@@ -180,7 +283,13 @@ class BehaviorOphysSession(object):
         computation
         :rtype: pandas.DataFrame
         """
-        return self.api.get_motion_correction()
+        if self._motion_correction is None:
+            self._motion_correction = self.api.get_motion_correction()
+        return self._motion_correction
+
+    @motion_correction.setter
+    def motion_correction(self, value):
+        self._motion_correction = value
 
     @property
     def segmentation_mask_image(self) -> Image:
@@ -188,7 +297,13 @@ class BehaviorOphysSession(object):
         and 0 otherwise
         :rtype: allensdk.brain_observatory.behavior.image_api.Image
         """
-        return self.get_segmentation_mask_image()
+        if self._segmentation_mask_image is None:
+            self._segmentation_mask_image = self.get_segmentation_mask_image()
+        return self._segmentation_mask_image
+
+    @segmentation_mask_image.setter
+    def segmentation_mask_image(self, value):
+        self._segmentation_mask_image = value
 
     def cache_clear(self) -> None:
         """Convenience method to clear the api cache, if applicable."""

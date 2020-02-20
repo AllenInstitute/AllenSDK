@@ -1,7 +1,16 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.5.0] = 2020-02-10
+
+### Added
+ - Users have an option to provide credentials for accessing the database either explicitly via public API or by setting up the environment variables
+
+### Changed
+ - Allow users to modify BehaviorDataSession and BehaviorOphysSession data
+
 ## [1.3.0] = 2019-12-12
+
 
 ### Added
  - Improved Neuropixels data download performance by enabling asynchronous transfers. Data downloads will now raise timeout errors when data cannot be retrieved in a reasonable timeframe.
