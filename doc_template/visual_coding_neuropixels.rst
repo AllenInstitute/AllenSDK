@@ -18,6 +18,7 @@ Additional tutorials are available on the following topics:
   2. `Unit quality metrics <_static/examples/nb/ecephys_quality_metrics.html>`_ `(download .ipynb) <_static/examples/nb/ecephys_quality_metrics.ipynb>`_
   3. `LFP data analysis <_static/examples/nb/ecephys_lfp_analysis.html>`_ `(download .ipynb) <_static/examples/nb/ecephys_lfp_analysis.ipynb>`_
   4. `Receptive field mapping <_static/examples/nb/ecephys_receptive_fields.html>`_ `(download .ipynb) <_static/examples/nb/ecephys_receptive_fields.ipynb>`_
+  4. `Optotagging <_static/examples/nb/ecephys_optotagging.html>`_ `(download .ipynb) <_static/examples/nb/ecephys_optotagging.ipynb>`_
 
 For detailed information about the experimental design, data acquisition, and informatics methods, please refer to our `technical whitepaper <https://brainmapportal-live-4cc80a57cd6e400d854-f7fdcae.divio-media.net/filer_public/80/75/8075a100-ca64-429a-b39a-569121b612b2/neuropixels_visual_coding_-_white_paper_v10.pdf>`_. AllenSDK 
 API documentation `is available here <allensdk.brain_observatory.ecephys.html>`_.
