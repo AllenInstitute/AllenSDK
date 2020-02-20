@@ -17,6 +17,7 @@ from allensdk.brain_observatory.behavior.stimulus_processing import (
 from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory.behavior.metadata_processing import (
     get_task_parameters)
+from allensdk.brain_observatory.behavior.sync import frame_time_offset
 from allensdk.brain_observatory.behavior.trials_processing import get_trials
 from allensdk.internal.core.lims_utilities import safe_system_path
 from allensdk.internal.api import PostgresQueryMixin
@@ -150,11 +151,20 @@ class BehaviorDataLimsApi(CachedInstanceMethodMixin, BehaviorBase):
         lick_sensors is the desired lick sensor. If this changes we need
         to update to get the proper line.
 
+        Since licks can occur outside of a trial context, the lick times
+        are extracted from the vsyncs and the frame number in `lick_events`.
+        Since we don't have a timestamp for when in "experiment time" the
+        vsync stream starts (from self.get_stimulus_timestamps), we compute
+        it by fitting a linear regression (frame number x time) for the
+        `start_trial` and `end_trial` events in the `trial_log`, to true
+        up these time streams.
+
         :returns: pd.DataFrame -- A dataframe containing lick timestamps
         """
         # Get licks from pickle file instead of sync
         data = self._behavior_stimulus_file()
-        stimulus_timestamps = self.get_stimulus_timestamps()
+        offset = frame_time_offset(data)
+        stimulus_timestamps = self.get_stimulus_timestamps() + offset
         lick_frames = (data["items"]["behavior"]["lick_sensors"][0]
                        ["lick_events"])
         lick_times = [stimulus_timestamps[frame] for frame in lick_frames]
