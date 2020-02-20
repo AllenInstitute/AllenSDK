@@ -102,7 +102,10 @@ class BehaviorDataLimsApi(CachedInstanceMethodMixin, BehaviorBase):
             WHERE
                 ophys_experiment_id IN ({",".join(set(map(str, oed)))});
             """
-            container_id = self.lims_db.fetchone(container_query, strict=True)
+            try:
+                container_id = self.lims_db.fetchone(container_query, strict=True)
+            except OneResultExpectedError:
+                container_id = None
 
             ids_dict.update({"ophys_experiment_ids": oed,
                              "ophys_container_id": container_id})
