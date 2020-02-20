@@ -93,6 +93,8 @@ class BehaviorDataLimsApi(CachedInstanceMethodMixin, BehaviorBase):
                 WHERE ophys_session_id = {ids_dict["ophys_session_id"]};
                 """
             oed = self.lims_db.fetchall(oed_query)
+            if len(oed) == 0:
+                oed = None
 
             container_query = f"""
             SELECT DISTINCT
