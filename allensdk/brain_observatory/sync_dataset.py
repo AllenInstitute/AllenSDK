@@ -15,6 +15,7 @@ h5py   http://www.h5py.org/
 
 """
 import collections
+from typing import Union, Sequence, Optional
 
 import h5py as h5
 import numpy as np
@@ -294,8 +295,37 @@ class Dataset(object):
         changes = self.get_bit_changes(bit)
         return self.get_all_times(units)[np.where(changes == 1)]
 
-    def get_edges(self, kind, keys, units='seconds'):
+    def get_edges(
+        self, 
+        kind: str, 
+        keys: Union[str, Sequence[str]], 
+        units: str = "seconds", 
+        raise_missing: bool = True
+    ) -> Optional[np.ndarray]:
         """ Utility function for extracting edge times from a line
+
+        Parameters
+        ----------
+        kind : One of "rising", "falling", or "all". Should this method return 
+            timestamps for rising, falling or both edges on the appropriate 
+            line
+        keys : These will be checked in sequence. Timestamps will be returned 
+            for the first which is present in the line labels
+        units : one of "seconds", "samples", or "indices". The returned 
+            "time"stamps will be given in these units.
+        raise_missing : If True and no matching line is found, a KeyError will
+            be raised
+
+        Returns
+        -------
+        An array of edge times. If raise_missing is False and none of the keys 
+            were found, returns None.
+
+        Raises
+        ------
+        KeyError : none of the provided keys were found among this dataset's 
+            line labels
+
         """
         if kind == 'falling':
             fn = self.get_falling_edges
@@ -316,7 +346,9 @@ class Dataset(object):
             except ValueError:
                 continue
 
-        raise KeyError(f"none of {keys} were found in this dataset's line labels")
+        if raise_missing:
+            raise KeyError(
+                f"none of {keys} were found in this dataset's line labels")
 
     def get_falling_edges(self, line, units='samples'):
         """
