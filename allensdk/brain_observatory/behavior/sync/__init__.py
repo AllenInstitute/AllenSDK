@@ -5,7 +5,8 @@ Created on Sunday July 15 2018
 """
 from itertools import chain
 from typing import Dict, Any, Optional, List, Union
-from .process_sync import filter_digital, calculate_delay  # NOQA: E402
+from allensdk.brain_observatory.behavior.sync.process_sync import (
+    filter_digital, calculate_delay)  # NOQA: E402
 from allensdk.brain_observatory.sync_dataset import Dataset as SyncDataset  # NOQA: E402
 import numpy as np
 import scipy.stats as sps
