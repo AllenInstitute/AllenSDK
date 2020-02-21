@@ -97,6 +97,8 @@ As of the 1.5.0 release:
 
 - users have an option to provide credentials for accessing the database either explicitly via public API or by setting up the environment variables
 - allow users to modify BehaviorDataSession and BehaviorOphysSession data
+- invalid extracellular electrophysiology spikes no longer show up as spikes at time -1
+- morphology.apply_affine correctly rescales radii
 
 
 What's New - 1.4.0 (January 23, 2020)
@@ -107,22 +109,11 @@ As of the 1.4.0 release:
 - users of the ephys extractor can supply their own cutoff frequency for low-pass bessel filter.
 - (internal feature) the ophys time sync module writes an output json describing its results.
 
-What's New - 1.3.0 (December 12, 2019)
------------------------------------------------------------------------
-
-The 1.3.0 release adds
-
-- Improved Neuropixels data download performance by enabling asynchronous transfers. Users can now also specify a timeout and number of retries when downloading data.
-
-and fixes
-
-- Hanging downloads for Neuropixels NWB files
-- Updated AllenSDK readme and contributing documentation
-
 
 Previous Release Notes
 ----------------------
-    * `1.1.1 <https://github.com/AllenInstitute/AllenSDK/releases/tag/v1.2.0>
+    * `1.3.0 <https://github.com/AllenInstitute/AllenSDK/releases/tag/v1.3.0>
+    * `1.2.0 <https://github.com/AllenInstitute/AllenSDK/releases/tag/v1.2.0>
     * `1.1.1 <https://github.com/AllenInstitute/AllenSDK/releases/tag/v1.1.1>
     * `1.1.0 <https://github.com/AllenInstitute/AllenSDK/releases/tag/v1.1.0>`_
     * `1.0.2 <https://github.com/AllenInstitute/AllenSDK/releases/tag/v1.0.2>`_

@@ -9,6 +9,11 @@ All notable changes to this project will be documented in this file.
 ### Changed
  - Allow users to modify BehaviorDataSession and BehaviorOphysSession data
 
+### Bug Fixes
+ - morphology.apply_affine correctly rescales radii
+ - invalid extracellular electrophysiology spikes no longer show up as spikes at time -1
+ - (internal) When loading a behavior session, behavior and eye tracking video frame times are assessed from the correct lines
+
 ## [1.3.0] = 2019-12-12
 
 
