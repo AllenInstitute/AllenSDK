@@ -121,7 +121,21 @@ def get_trigger(
     dataset: SyncDataset, 
     permissive: bool = False
 ) -> Optional[np.ndarray]:
-    """
+    """ Returns (as a 1-element array) the time at which optical physiology 
+    acquisition was started.
+
+    Parameters
+    ----------
+    dataset : describes experiment timing
+    permissive : If True, None will be returned if timestamps are not found. If 
+        False, a KeyError will be raised
+
+   Returns
+    -------
+    timestamps (floating point; seconds; relative to experiment start) 
+        or None. If None, no eye tracking timestamps were found in this sync 
+        dataset.
+
     """
     return dataset.get_edges(
         "rising", ["2p_trigger", "acq_trigger"], "seconds", permissive)
@@ -195,7 +209,7 @@ def get_sync_data(
     A dictionary with the following keys. All timestamps in seconds:
         ophys_frames : timestamps of each optical physiology frame
         lick_times : timestamps of each detected lick
-        ophys_trigger : 
+        ophys_trigger : The time at which ophys acquisition was started
         eye_tracking : timestamps of each eye tracking video frame
         behavior_monitoring : timestamps of behavior monitoring video frame
         stim_photodiode : timestamps of each photodiode transition
