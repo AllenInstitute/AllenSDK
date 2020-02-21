@@ -133,8 +133,13 @@ def get_trigger(
    Returns
     -------
     timestamps (floating point; seconds; relative to experiment start) 
-        or None. If None, no eye tracking timestamps were found in this sync 
-        dataset.
+        or None. If None, no timestamps were found in this sync dataset.
+
+    Notes
+    -----
+    Ophys frame timestamps can be recorded before acquisition start when 
+        experimenters are setting up the recording session. These do not 
+        correspond to acquired ophys frames.
 
     """
     return dataset.get_edges(
