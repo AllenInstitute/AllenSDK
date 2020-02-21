@@ -3,7 +3,7 @@ import psycopg2.extras
 import pandas as pd
 
 from allensdk import one, OneResultExpectedError
-
+from allensdk.core.authentication import credential_injector
 
 class OneOrMoreResultExpectedError(RuntimeError):
     pass
@@ -28,8 +28,7 @@ def psycopg2_select(query, database, host, port, username, password):
 
 
 class PostgresQueryMixin(object):
-
-    def __init__(self, dbname="lims2", user="limsreader", host="limsdb2", password="limsro", port=5432):
+    def __init__(self, *, dbname, user, host, password, port):
 
         self.dbname = dbname
         self.user = user

@@ -1,7 +1,21 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.5.0] = 2020-02-10
+
+### Added
+ - Users have an option to provide credentials for accessing the database either explicitly via public API or by setting up the environment variables
+
+### Changed
+ - Allow users to modify BehaviorDataSession and BehaviorOphysSession data
+
+### Bug Fixes
+ - morphology.apply_affine correctly rescales radii
+ - invalid extracellular electrophysiology spikes no longer show up as spikes at time -1
+ - (internal) When loading a behavior session, behavior and eye tracking video frame times are assessed from the correct lines
+
 ## [1.3.0] = 2019-12-12
+
 
 ### Added
  - Improved Neuropixels data download performance by enabling asynchronous transfers. Data downloads will now raise timeout errors when data cannot be retrieved in a reasonable timeframe.

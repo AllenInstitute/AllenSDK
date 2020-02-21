@@ -14,6 +14,17 @@ BehaviorDataApi = Type[BehaviorBase]
 class BehaviorDataSession(object):
     def __init__(self, api: Optional[BehaviorDataApi] = None):
         self.api = api
+        # Initialize attributes to be lazily evaluated
+        self._licks = None
+        self._rewards = None
+        self._running_data_df = None
+        self._running_speed = None
+        self._stimulus_presentations = None
+        self._stimulus_templates = None
+        self._stimulus_timestamps = None
+        self._task_parameters = None
+        self._trials = None
+        self._metadata = None
 
     @classmethod
     def from_lims(cls, behavior_session_id: int) -> "BehaviorDataSession":
@@ -56,7 +67,13 @@ class BehaviorDataSession(object):
         np.ndarray
             A dataframe containing lick timestamps.
         """
-        return self.api.get_licks()
+        if self._licks is None:
+            self._licks = self.api.get_licks()
+        return self._licks
+
+    @licks.setter
+    def licks(self, value):
+        self._licks = value
 
     @property
     def rewards(self) -> pd.DataFrame:
@@ -67,7 +84,13 @@ class BehaviorDataSession(object):
         pd.DataFrame
             A dataframe containing timestamps of delivered rewards.
         """
-        return self.api.get_rewards()
+        if self._rewards is None:
+            self._rewards = self.api.get_rewards()
+        return self._rewards
+
+    @rewards.setter
+    def rewards(self, value):
+        self._rewards = value
 
     @property
     def running_data_df(self) -> pd.DataFrame:
@@ -78,7 +101,13 @@ class BehaviorDataSession(object):
         pd.DataFrame
             Dataframe containing various signals used to compute running speed.
         """
-        return self.api.get_running_data_df()
+        if self._running_data_df is None:
+            self._running_data_df = self.api.get_running_data_df()
+        return self._running_data_df
+
+    @running_data_df.setter
+    def running_data_df(self, value):
+        self._running_data_df = value
 
     @property
     def running_speed(self) -> RunningSpeed:
@@ -95,7 +124,13 @@ class BehaviorDataSession(object):
             values : np.ndarray
                 Running speed of the experimental subject (in cm / s).
         """
-        return self.api.get_running_speed()
+        if self._running_speed is None:
+            self._running_speed = self.api.get_running_speed()
+        return self._running_speed
+
+    @running_speed.setter
+    def running_speed(self, value):
+        self._running_speed = value
 
     @property
     def stimulus_presentations(self) -> pd.DataFrame:
@@ -110,7 +145,14 @@ class BehaviorDataSession(object):
             (i.e. a given image, for a given duration, typically 250 ms)
             and whose columns are presentation characteristics.
         """
-        return self.api.get_stimulus_presentations()
+        if self._stimulus_presentations is None:
+            self._stimulus_presentations = (
+                self.api.get_stimulus_presentations())
+        return self._stimulus_presentations
+
+    @stimulus_presentations.setter
+    def stimulus_presentations(self, value):
+        self._stimulus_presentations = value
 
     @property
     def stimulus_templates(self) -> Dict[str, np.ndarray]:
@@ -122,7 +164,13 @@ class BehaviorDataSession(object):
             A dictionary containing the stimulus images presented during the
             session. Keys are data set names, and values are 3D numpy arrays.
         """
-        return self.api.get_stimulus_templates()
+        if self._stimulus_templates is None:
+            self._stimulus_templates = self.api.get_stimulus_templates()
+        return self._stimulus_templates
+
+    @stimulus_templates.setter
+    def stimulus_templates(self, value):
+        self._stimulus_templates = value
 
     @property
     def stimulus_timestamps(self) -> np.ndarray:
@@ -136,7 +184,13 @@ class BehaviorDataSession(object):
             Timestamps associated with stimulus presentations on the monitor
             that do no account for monitor delay.
         """
-        return self.api.get_stimulus_timestamps()
+        if self._stimulus_timestamps is None:
+            self._stimulus_timestamps = self.api.get_stimulus_timestamps()
+        return self._stimulus_timestamps
+
+    @stimulus_timestamps.setter
+    def stimulus_timestamps(self, value):
+        self._stimulus_timestamps = value
 
     @property
     def task_parameters(self) -> dict:
@@ -148,7 +202,13 @@ class BehaviorDataSession(object):
             A dictionary containing parameters used to define the task runtime
             behavior.
         """
-        return self.api.get_task_parameters()
+        if self._task_parameters is None:
+            self._task_parameters = self.api.get_task_parameters()
+        return self._task_parameters
+
+    @task_parameters.setter
+    def task_parameters(self, value):
+        self._task_parameters = value
 
     @property
     def trials(self) -> pd.DataFrame:
@@ -160,14 +220,26 @@ class BehaviorDataSession(object):
             A dataframe containing behavioral trial start/stop times,
             and trial data
         """
-        return self.api.get_trials()
+        if self._trials is None:
+            self._trials = self.api.get_trials()
+        return self._trials
+
+    @trials.setter
+    def trials(self, value):
+        self._trials = value
 
     @property
     def metadata(self) -> Dict[str, Any]:
         """Return metadata about the session.
         :rtype: dict
         """
-        return self.api.get_metadata()
+        if self._metadata is None:
+            self._metadata = self.api.get_metadata()
+        return self._metadata
+
+    @metadata.setter
+    def metadata(self, value):
+        self._metadata = value
 
     def cache_clear(self) -> None:
         """Convenience method to clear the api cache, if applicable."""

@@ -5,6 +5,7 @@ import os
 import h5py
 import pytz
 import pandas as pd
+from typing import Optional
 
 from allensdk.internal.api import (
     PostgresQueryMixin, OneOrMoreResultExpectedError)
@@ -13,13 +14,24 @@ from allensdk.brain_observatory.behavior.image_api import ImageApi
 import allensdk.brain_observatory.roi_masks as roi
 from allensdk.internal.core.lims_utilities import safe_system_path
 from allensdk.core.cache_method_utilities import CachedInstanceMethodMixin
+from allensdk.core.authentication import credential_injector, DbCredentials
+from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
 
 
-class OphysLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin):
+class OphysLimsApi(CachedInstanceMethodMixin):
 
-    def __init__(self, ophys_experiment_id):
+    def __init__(self, ophys_experiment_id: int,
+                 lims_credentials: Optional[DbCredentials] = None):
         self.ophys_experiment_id = ophys_experiment_id
-        super().__init__()
+        if lims_credentials:
+            self.lims_db = PostgresQueryMixin(
+                dbname=lims_credentials.dbname, user=lims_credentials.user,
+                host=lims_credentials.host, password=lims_credentials.password,
+                port=lims_credentials.port)
+        else:
+            # Currying is equivalent to decorator syntactic sugar
+            self.lims_db = (credential_injector(LIMS_DB_CREDENTIAL_MAP)
+                            (PostgresQueryMixin)())
 
     def get_ophys_experiment_id(self):
         return self.ophys_experiment_id
@@ -31,7 +43,7 @@ class OphysLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin):
                 FROM ophys_experiments oe
                 WHERE oe.id = {};
                 '''.format(self.get_ophys_experiment_id())
-        return safe_system_path(self.fetchone(query, strict=True))
+        return safe_system_path(self.lims_db.fetchone(query, strict=True))
 
     @memoize
     def get_nwb_filepath(self):
@@ -41,7 +53,7 @@ class OphysLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin):
                 LEFT JOIN well_known_files wkf ON wkf.attachable_id=oe.id AND wkf.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'NWBOphys')
                 WHERE oe.id = {};
                 '''.format(self.get_ophys_experiment_id())
-        return safe_system_path(self.fetchone(query, strict=True))
+        return safe_system_path(self.lims_db.fetchone(query, strict=True))
 
     @memoize
     def get_sync_file(self, ophys_experiment_id=None):
@@ -52,7 +64,7 @@ class OphysLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin):
                 LEFT JOIN well_known_files sync ON sync.attachable_id=os.id AND sync.attachable_type = 'OphysSession' AND sync.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'OphysRigSync')
                 WHERE oe.id= {};
                 '''.format(self.get_ophys_experiment_id())
-        return safe_system_path(self.fetchone(query, strict=True))
+        return safe_system_path(self.lims_db.fetchone(query, strict=True))
 
     @memoize
     def get_max_projection_file(self):
@@ -63,7 +75,7 @@ class OphysLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin):
                 LEFT JOIN well_known_files wkf ON wkf.attachable_id=ocsr.id AND wkf.attachable_type = 'OphysCellSegmentationRun' AND wkf.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'OphysMaxIntImage')
                 WHERE oe.id= {};
                 '''.format(self.get_ophys_experiment_id())
-        return safe_system_path(self.fetchone(query, strict=True))
+        return safe_system_path(self.lims_db.fetchone(query, strict=True))
 
     @memoize
     def get_max_projection(self, image_api=None):
@@ -84,7 +96,7 @@ class OphysLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin):
                 LEFT JOIN structures st ON st.id=oe.targeted_structure_id
                 WHERE oe.id= {};
                 '''.format(self.get_ophys_experiment_id())
-        return self.fetchone(query, strict=True)
+        return self.lims_db.fetchone(query, strict=True)
 
     @memoize
     def get_imaging_depth(self):
@@ -95,7 +107,7 @@ class OphysLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin):
                 LEFT JOIN imaging_depths id ON id.id=os.imaging_depth_id
                 WHERE oe.id= {};
                 '''.format(self.get_ophys_experiment_id())
-        return self.fetchone(query, strict=True)
+        return self.lims_db.fetchone(query, strict=True)
 
     @memoize
     def get_stimulus_name(self):
@@ -105,7 +117,7 @@ class OphysLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin):
                 JOIN ophys_sessions os ON oe.ophys_session_id = os.id
                 WHERE oe.id= {};
                 '''.format(self.get_ophys_experiment_id())
-        stimulus_name = self.fetchone(query, strict=False)
+        stimulus_name = self.lims_db.fetchone(query, strict=False)
         stimulus_name = 'Unknown' if stimulus_name is None else stimulus_name
         return stimulus_name
 
@@ -119,7 +131,7 @@ class OphysLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin):
                 WHERE oe.id= {};
                 '''.format(self.get_ophys_experiment_id())
 
-        experiment_date = self.fetchone(query, strict=True)
+        experiment_date = self.lims_db.fetchone(query, strict=True)
         return pytz.utc.localize(experiment_date)
 
     @memoize
@@ -135,7 +147,7 @@ class OphysLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin):
                 JOIN genotype_types gt ON gt.id=g.genotype_type_id AND gt.name = 'reporter'
                 WHERE oe.id= {};
                 '''.format(self.get_ophys_experiment_id())
-        result = self.fetchall(query)
+        result = self.lims_db.fetchall(query)
         if result is None or len(result) < 1:
             raise OneOrMoreResultExpectedError('Expected one or more, but received: {} from query'.format(result))
         return result
@@ -153,7 +165,7 @@ class OphysLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin):
                 JOIN genotype_types gt ON gt.id=g.genotype_type_id AND gt.name = 'driver'
                 WHERE oe.id= {};
                 '''.format(self.get_ophys_experiment_id())
-        result = self.fetchall(query)
+        result = self.lims_db.fetchall(query)
         if result is None or len(result) < 1:
             raise OneOrMoreResultExpectedError('Expected one or more, but received: {} from query'.format(result))
         return result
@@ -167,7 +179,7 @@ class OphysLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin):
                 JOIN specimens sp ON sp.id=os.specimen_id
                 WHERE oe.id= {};
                 '''.format(self.get_ophys_experiment_id())
-        return int(self.fetchone(query, strict=True))
+        return int(self.lims_db.fetchone(query, strict=True))
 
     @memoize
     def get_full_genotype(self):
@@ -179,7 +191,7 @@ class OphysLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin):
                 JOIN donors d ON d.id=sp.donor_id
                 WHERE oe.id= {};
                 '''.format(self.get_ophys_experiment_id())
-        return self.fetchone(query, strict=True)
+        return self.lims_db.fetchone(query, strict=True)
 
     @memoize
     def get_equipment_id(self):
@@ -190,7 +202,7 @@ class OphysLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin):
                 JOIN equipment e ON e.id=os.equipment_id
                 WHERE oe.id= {};
                 '''.format(self.get_ophys_experiment_id())
-        return self.fetchone(query, strict=True)
+        return self.lims_db.fetchone(query, strict=True)
 
     @memoize
     def get_dff_file(self):
@@ -200,7 +212,7 @@ class OphysLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin):
                 LEFT JOIN well_known_files dff ON dff.attachable_id=oe.id AND dff.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'OphysDffTraceFile')
                 WHERE oe.id= {};
                 '''.format(self.get_ophys_experiment_id())
-        return safe_system_path(self.fetchone(query, strict=True))
+        return safe_system_path(self.lims_db.fetchone(query, strict=True))
 
     @memoize
     def get_cell_roi_ids(self):
@@ -217,7 +229,7 @@ class OphysLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin):
                 LEFT JOIN well_known_files obj ON obj.attachable_id=ocsr.id AND obj.attachable_type = 'OphysCellSegmentationRun' AND obj.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'OphysSegmentationObjects')
                 WHERE oe.id= {};
                 '''.format(self.get_ophys_experiment_id())
-        return safe_system_path(self.fetchone(query, strict=True))
+        return safe_system_path(self.lims_db.fetchone(query, strict=True))
 
     @memoize
     def get_demix_file(self):
@@ -227,7 +239,7 @@ class OphysLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin):
                 LEFT JOIN well_known_files wkf ON wkf.attachable_id=oe.id AND wkf.attachable_type = 'OphysExperiment' AND wkf.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'DemixedTracesFile')
                 WHERE oe.id= {};
                 '''.format(self.get_ophys_experiment_id())
-        return safe_system_path(self.fetchone(query, strict=True))
+        return safe_system_path(self.lims_db.fetchone(query, strict=True))
 
     @memoize
     def get_average_intensity_projection_image_file(self):
@@ -238,7 +250,7 @@ class OphysLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin):
                 LEFT JOIN well_known_files avg ON avg.attachable_id=ocsr.id AND avg.attachable_type = 'OphysCellSegmentationRun' AND avg.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'OphysAverageIntensityProjectionImage')
                 WHERE oe.id = {};
                 '''.format(self.get_ophys_experiment_id())
-        return safe_system_path(self.fetchone(query, strict=True))
+        return safe_system_path(self.lims_db.fetchone(query, strict=True))
 
     @memoize
     def get_rigid_motion_transform_file(self):
@@ -248,7 +260,7 @@ class OphysLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin):
                 LEFT JOIN well_known_files tra ON tra.attachable_id=oe.id AND tra.attachable_type = 'OphysExperiment' AND tra.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'OphysMotionXyOffsetData')
                 WHERE oe.id= {};
                 '''.format(self.get_ophys_experiment_id())
-        return safe_system_path(self.fetchone(query, strict=True))
+        return safe_system_path(self.lims_db.fetchone(query, strict=True))
 
     @memoize
     def get_motion_corrected_image_stack_file(self):
@@ -259,7 +271,7 @@ class OphysLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin):
             where wkft.name = 'MotionCorrectedImageStack'
             and wkf.attachable_id = {self.get_ophys_experiment_id()}
         """
-        return safe_system_path(self.fetchone(query, strict=True))
+        return safe_system_path(self.lims_db.fetchone(query, strict=True))
 
     @memoize
     def get_foraging_id(self):
@@ -269,7 +281,7 @@ class OphysLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin):
                 LEFT JOIN ophys_sessions os ON oe.ophys_session_id = os.id
                 WHERE oe.id= {};
                 '''.format(self.get_ophys_experiment_id())        
-        return self.fetchone(query, strict=True)
+        return self.lims_db.fetchone(query, strict=True)
 
     def get_raw_dff_data(self):
         dff_path = self.get_dff_file()
@@ -286,7 +298,7 @@ class OphysLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin):
                 join equipment e on e.id = os.equipment_id
                 where oe.id = {}
                 '''.format(self.get_ophys_experiment_id())
-        return self.fetchone(query, strict=True)
+        return self.lims_db.fetchone(query, strict=True)
 
     @memoize
     def get_field_of_view_shape(self):
@@ -295,7 +307,7 @@ class OphysLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin):
                 from ophys_experiments oe
                 where oe.id = {}
                 '''
-        X = {c: self.fetchone(query.format('oe.movie_{}'.format(c), self.get_ophys_experiment_id()), strict=True) for c in ['width', 'height']}
+        X = {c: self.lims_db.fetchone(query.format('oe.movie_{}'.format(c), self.get_ophys_experiment_id()), strict=True) for c in ['width', 'height']}
         return X
 
     @memoize
@@ -321,7 +333,7 @@ class OphysLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin):
                 join ophys_cell_segmentation_runs oseg on oe.id = oseg.ophys_experiment_id
                 where oe.id = {} and oseg.current = 't'
                 '''.format(self.get_ophys_experiment_id())
-        return self.fetchone(query, strict=True)
+        return self.lims_db.fetchone(query, strict=True)
 
     @memoize
     def get_raw_cell_specimen_table_dict(self):
@@ -331,7 +343,7 @@ class OphysLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin):
                 from cell_rois cr
                 where cr.ophys_cell_segmentation_run_id = {}
                 '''.format(ophys_cell_segmentation_run_id)
-        cell_specimen_table = pd.read_sql(query, self.get_connection()).rename(columns={'id': 'cell_roi_id', 'mask_matrix': 'image_mask'})
+        cell_specimen_table = pd.read_sql(query, self.lims_db.get_connection()).rename(columns={'id': 'cell_roi_id', 'mask_matrix': 'image_mask'})
         cell_specimen_table.drop(['ophys_experiment_id', 'ophys_cell_segmentation_run_id'], inplace=True, axis=1)
         return cell_specimen_table.to_dict()
 
@@ -359,7 +371,7 @@ class OphysLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin):
                 JOIN scans sc ON sc.image_id=oe.ophys_primary_image_id
                 WHERE oe.id = {};
                 '''.format(self.get_ophys_experiment_id())
-        return self.fetchone(query, strict=True)
+        return self.lims_db.fetchone(query, strict=True)
 
 
     @memoize
@@ -369,7 +381,7 @@ class OphysLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin):
                 FROM ophys_experiments oe
                 WHERE oe.id = {};
                 '''.format(self.get_ophys_experiment_id())
-        return self.fetchone(query, strict=True)
+        return self.lims_db.fetchone(query, strict=True)
 
     @memoize
     def get_segmentation_mask_image_file(self):
@@ -380,7 +392,7 @@ class OphysLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin):
                 LEFT JOIN well_known_files obj ON obj.attachable_id=ocsr.id AND obj.attachable_type = 'OphysCellSegmentationRun' AND obj.well_known_file_type_id IN (SELECT id FROM well_known_file_types WHERE name = 'OphysSegmentationMaskImage')
                 WHERE oe.id= {};
                 '''.format(self.get_ophys_experiment_id())
-        return safe_system_path(self.fetchone(query, strict=True))
+        return safe_system_path(self.lims_db.fetchone(query, strict=True))
 
 
     @memoize
@@ -405,7 +417,7 @@ class OphysLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin):
                 JOIN genders g ON g.id=d.gender_id
                 WHERE oe.id= {};
                 '''.format(self.get_ophys_experiment_id())
-        return self.fetchone(query, strict=True)
+        return self.lims_db.fetchone(query, strict=True)
 
     @memoize
     def get_age(self):
@@ -418,7 +430,7 @@ class OphysLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin):
                 JOIN ages a ON a.id=d.age_id
                 WHERE oe.id= {};
                 '''.format(self.get_ophys_experiment_id())
-        return self.fetchone(query, strict=True)
+        return self.lims_db.fetchone(query, strict=True)
 
 
 if __name__ == "__main__":

@@ -17,6 +17,7 @@ from allensdk.brain_observatory.behavior.stimulus_processing import (
 from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory.behavior.metadata_processing import (
     get_task_parameters)
+from allensdk.brain_observatory.behavior.sync import frame_time_offset
 from allensdk.brain_observatory.behavior.trials_processing import get_trials
 from allensdk.internal.core.lims_utilities import safe_system_path
 from allensdk.internal.api import PostgresQueryMixin
@@ -24,17 +25,33 @@ from allensdk.api.cache import memoize
 from allensdk.internal.api import (
     OneResultExpectedError, OneOrMoreResultExpectedError)
 from allensdk.core.cache_method_utilities import CachedInstanceMethodMixin
+from allensdk.core.authentication import DbCredentials, credential_injector
+from allensdk.core.auth_config import (
+    LIMS_DB_CREDENTIAL_MAP, MTRAIN_DB_CREDENTIAL_MAP)
 
 
-class BehaviorDataLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin,
-                          BehaviorBase):
-    def __init__(self, behavior_session_id):
+class BehaviorDataLimsApi(CachedInstanceMethodMixin, BehaviorBase):
+    def __init__(self, behavior_session_id: int,
+                 lims_credentials: Optional[DbCredentials] = None,
+                 mtrain_credentials: Optional[DbCredentials] = None):
         super().__init__()
-        # TODO: this password has been exposed in code but we really need
-        # to move towards using a secrets database
-        self.mtrain_db = PostgresQueryMixin(
-            dbname="mtrain", user="mtrainreader",
-            host="prodmtrain1", port=5432, password="mtrainro")
+        if mtrain_credentials:
+            self.mtrain_db = PostgresQueryMixin(
+                dbname=mtrain_credentials.dbname, user=mtrain_credentials.user,
+                host=mtrain_credentials.host, port=mtrain_credentials.port,
+                password=mtrain_credentials.password)
+        else:
+            self.mtrain_db = (credential_injector(MTRAIN_DB_CREDENTIAL_MAP)
+                              (PostgresQueryMixin)())
+        if lims_credentials:
+            self.lims_db = PostgresQueryMixin(
+                dbname=lims_credentials.dbname, user=lims_credentials.user,
+                host=lims_credentials.host, port=lims_credentials.port,
+                password=lims_credentials.password)
+        else:
+            self.lims_db = (credential_injector(LIMS_DB_CREDENTIAL_MAP)
+                            (PostgresQueryMixin)())
+
         self.behavior_session_id = behavior_session_id
         ids = self._get_ids()
         self.ophys_experiment_ids = ids.get("ophys_experiment_ids")
@@ -62,7 +79,7 @@ class BehaviorDataLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin,
             WHERE
                 behavior_sessions.id = {self.behavior_session_id};
         """
-        ids_response = self.select(query)
+        ids_response = self.lims_db.select(query)
         if len(ids_response) > 1:
             raise OneResultExpectedError
         ids_dict = ids_response.iloc[0].to_dict()
@@ -75,7 +92,7 @@ class BehaviorDataLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin,
                 FROM ophys_experiments
                 WHERE ophys_session_id = {ids_dict["ophys_session_id"]};
                 """
-            oed = self.fetchall(oed_query)
+            oed = self.lims_db.fetchall(oed_query)
 
             container_query = f"""
             SELECT DISTINCT
@@ -85,7 +102,7 @@ class BehaviorDataLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin,
             WHERE
                 ophys_experiment_id IN ({",".join(set(map(str, oed)))});
             """
-            container_id = self.fetchone(container_query, strict=True)
+            container_id = self.lims_db.fetchone(container_query, strict=True)
 
             ids_dict.update({"ophys_experiment_ids": oed,
                              "ophys_container_id": container_id})
@@ -119,7 +136,7 @@ class BehaviorDataLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin,
                     FROM well_known_file_types
                     WHERE name = 'StimulusPickle');
         """
-        return safe_system_path(self.fetchone(query, strict=True))
+        return safe_system_path(self.lims_db.fetchone(query, strict=True))
 
     @memoize
     def _behavior_stimulus_file(self) -> pd.DataFrame:
@@ -134,11 +151,20 @@ class BehaviorDataLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin,
         lick_sensors is the desired lick sensor. If this changes we need
         to update to get the proper line.
 
+        Since licks can occur outside of a trial context, the lick times
+        are extracted from the vsyncs and the frame number in `lick_events`.
+        Since we don't have a timestamp for when in "experiment time" the
+        vsync stream starts (from self.get_stimulus_timestamps), we compute
+        it by fitting a linear regression (frame number x time) for the
+        `start_trial` and `end_trial` events in the `trial_log`, to true
+        up these time streams.
+
         :returns: pd.DataFrame -- A dataframe containing lick timestamps
         """
         # Get licks from pickle file instead of sync
         data = self._behavior_stimulus_file()
-        stimulus_timestamps = self.get_stimulus_timestamps()
+        offset = frame_time_offset(data)
+        stimulus_timestamps = self.get_stimulus_timestamps() + offset
         lick_frames = (data["items"]["behavior"]["lick_sensors"][0]
                        ["lick_events"])
         lick_times = [stimulus_timestamps[frame] for frame in lick_frames]
@@ -236,7 +262,6 @@ class BehaviorDataLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin,
                              f" {len(stim_pres_df)}.")
         return stim_pres_df[sorted(stim_pres_df)]
 
-    @memoize
     def get_stimulus_templates(self) -> Dict[str, np.ndarray]:
         """Get stimulus templates (movies, scenes) for behavior session.
 
@@ -249,7 +274,6 @@ class BehaviorDataLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin,
         data = self._behavior_stimulus_file()
         return get_stimulus_templates(data)
 
-    @memoize
     def get_stimulus_timestamps(self) -> np.ndarray:
         """Get stimulus timestamps (vsyncs) from pkl file.
 
@@ -308,7 +332,7 @@ class BehaviorDataLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin,
         JOIN donors d on d.id = bs.donor_id
         WHERE bs.id = {self.behavior_session_id}
         """
-        return self.fetchone(query, strict=True).date()
+        return self.lims_db.fetchone(query, strict=True).date()
 
     @memoize
     def get_sex(self) -> str:
@@ -322,7 +346,7 @@ class BehaviorDataLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin,
             JOIN genders g ON g.id = d.gender_id
             WHERE bs.id = {self.behavior_session_id};
             """
-        return self.fetchone(query, strict=True)
+        return self.lims_db.fetchone(query, strict=True)
 
     @memoize
     def get_age(self) -> str:
@@ -336,7 +360,7 @@ class BehaviorDataLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin,
             JOIN ages a ON a.id = d.age_id
             WHERE bs.id = {self.behavior_session_id};
         """
-        return self.fetchone(query, strict=True)
+        return self.lims_db.fetchone(query, strict=True)
 
     @memoize
     def get_rig_name(self) -> str:
@@ -349,7 +373,7 @@ class BehaviorDataLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin,
             JOIN equipment e ON e.id = bs.equipment_id
             WHERE bs.id = {self.behavior_session_id};
         """
-        return self.fetchone(query, strict=True)
+        return self.lims_db.fetchone(query, strict=True)
 
     @memoize
     def get_stimulus_name(self) -> str:
@@ -379,7 +403,7 @@ class BehaviorDataLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin,
                 ON gt.id=g.genotype_type_id AND gt.name = 'reporter'
             WHERE bs.id={self.behavior_session_id};
         """
-        result = self.fetchall(query)
+        result = self.lims_db.fetchall(query)
         if result is None or len(result) < 1:
             raise OneOrMoreResultExpectedError(
                 f"Expected one or more, but received: '{result}' "
@@ -401,7 +425,7 @@ class BehaviorDataLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin,
                 ON gt.id=g.genotype_type_id AND gt.name = 'driver'
             WHERE bs.id={self.behavior_session_id};
         """
-        result = self.fetchall(query)
+        result = self.lims_db.fetchall(query)
         if result is None or len(result) < 1:
             raise OneOrMoreResultExpectedError(
                 f"Expected one or more, but received: '{result}' "
@@ -425,7 +449,7 @@ class BehaviorDataLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin,
             WHERE bs.id={self.behavior_session_id}
             AND sp.external_specimen_name IS NOT NULL;
             """
-        return int(self.fetchone(query, strict=True))
+        return int(self.lims_db.fetchone(query, strict=True))
 
     @memoize
     def get_full_genotype(self) -> str:
@@ -438,8 +462,9 @@ class BehaviorDataLimsApi(PostgresQueryMixin, CachedInstanceMethodMixin,
                 JOIN donors d ON d.id=bs.donor_id
                 WHERE bs.id= {self.behavior_session_id};
                 """
-        return self.fetchone(query, strict=True)
+        return self.lims_db.fetchone(query, strict=True)
 
+    @memoize
     def get_experiment_date(self) -> datetime:
         """Return timestamp the behavior stimulus file began recording in UTC
         :rtype: datetime

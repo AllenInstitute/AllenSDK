@@ -90,6 +90,17 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
+What's New - 1.5.0 (February 10, 2020)
+-----------------------------------------------------------------------
+
+As of the 1.5.0 release:
+
+- users have an option to provide credentials for accessing the database either explicitly via public API or by setting up the environment variables
+- allow users to modify BehaviorDataSession and BehaviorOphysSession data
+- invalid extracellular electrophysiology spikes no longer show up as spikes at time -1
+- morphology.apply_affine correctly rescales radii
+
+
 What's New - 1.4.0 (January 23, 2020)
 -----------------------------------------------------------------------
 
@@ -98,36 +109,11 @@ As of the 1.4.0 release:
 - users of the ephys extractor can supply their own cutoff frequency for low-pass bessel filter.
 - (internal feature) the ophys time sync module writes an output json describing its results.
 
-What's New - 1.3.0 (December 12, 2019)
------------------------------------------------------------------------
-
-The 1.3.0 release adds
-
-- Improved Neuropixels data download performance by enabling asynchronous transfers. Users can now also specify a timeout and number of retries when downloading data.
-
-and fixes
-
-- Hanging downloads for Neuropixels NWB files
-- Updated AllenSDK readme and contributing documentation
-
-What's New - 1.2.0 (November 21, 2019)
------------------------------------------------------------------------
-
-The 1.2.0 release adds 
-
-- (internal feature) A project cache for the Behavior Ophys project, with example notebook
-- (internal feature) A major overhaul of the `BehaviorOphysLimsApi`
-- (internal feature) Updates to the `EcephysProjectLimsApi` such that it returns data in the same format as the `EcephyProjectWarehouseApi`
-- improved eye-tracking area calculation
-
-and fixes
-
-- several flaky tests
-- regress tests which depend on scipy's `ks_2samp`
-- (internal feature) duplicate caching on the Bevavior Ophys Lims Api
 
 Previous Release Notes
 ----------------------
+    * `1.3.0 <https://github.com/AllenInstitute/AllenSDK/releases/tag/v1.3.0>
+    * `1.2.0 <https://github.com/AllenInstitute/AllenSDK/releases/tag/v1.2.0>
     * `1.1.1 <https://github.com/AllenInstitute/AllenSDK/releases/tag/v1.1.1>
     * `1.1.0 <https://github.com/AllenInstitute/AllenSDK/releases/tag/v1.1.0>`_
     * `1.0.2 <https://github.com/AllenInstitute/AllenSDK/releases/tag/v1.0.2>`_
