@@ -68,9 +68,9 @@ def test_timestamp_extractors(fn, key, rise, fall, expect):
                 raise ValueError
             return fall
 
-    obtain = fn(Ds())
     if expect is None:
-        assert obtain is None
+        with pytest.raises(KeyError) as _err:
+            fn(Ds())
     else:
-        assert np.allclose(expect, obtain)
+        assert np.allclose(expect, fn(Ds()))
 

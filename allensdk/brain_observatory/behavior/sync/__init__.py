@@ -11,7 +11,10 @@ import numpy as np
 import scipy.stats as sps
 
 
-def get_raw_stimulus_frames(dataset: SyncDataset) -> np.ndarray:
+def get_raw_stimulus_frames(
+    dataset: SyncDataset, 
+    permissive: bool = False
+) -> np.ndarray:
     """ Report the raw timestamps of each stimulus frame. This corresponds to 
     the time at which the psychopy window's flip method returned, but not 
     necessarily to the time at which the stimulus frame was displayed.
@@ -19,20 +22,26 @@ def get_raw_stimulus_frames(dataset: SyncDataset) -> np.ndarray:
     Parameters
     ----------
     dataset : describes experiment timing
+    permissive : If True, None will be returned if timestamps are not found. If 
+        False, a KeyError will be raised
 
     Returns
     -------
     array of timestamps (floating point; seconds; relative to experiment start).
 
-    Raises
-    ------
-    KeyError : if no stimulus frame times are found in this dataset
-
     """
-    return dataset.get_edges("falling",'stim_vsync', "seconds")
+    try:
+        return dataset.get_edges("falling",'stim_vsync', "seconds")
+    except KeyError:
+        if not permissive:
+            raise
+        return
 
 
-def get_ophys_frames(dataset: SyncDataset) -> np.ndarray:
+def get_ophys_frames(
+    dataset: SyncDataset, 
+    permissive: bool = False
+) -> np.ndarray:
     """ Report the timestamps of each optical physiology video frame
 
     Parameters
@@ -42,10 +51,8 @@ def get_ophys_frames(dataset: SyncDataset) -> np.ndarray:
     Returns
     -------
     array of timestamps (floating point; seconds; relative to experiment start).
-
-    Raises
-    ------
-    KeyError : if no ophys frame times are found in this dataset
+    permissive : If True, None will be returned if timestamps are not found. If 
+        False, a KeyError will be raised
 
     Notes
     -----
@@ -54,15 +61,25 @@ def get_ophys_frames(dataset: SyncDataset) -> np.ndarray:
     This function uses rising edges
 
     """
-    return dataset.get_edges("rising", '2p_vsync', "seconds")
+    try:
+        return dataset.get_edges("rising", '2p_vsync', "seconds")
+    except KeyError:
+        if not permissive:
+            raise
+        return
 
 
-def get_lick_times(dataset: SyncDataset) -> Optional[np.ndarray]:
+def get_lick_times(
+    dataset: SyncDataset, 
+    permissive: bool = False
+) -> Optional[np.ndarray]:
     """ Report the timestamps of each detected lick
 
     Parameters
     ----------
     dataset : describes experiment timing
+    permissive : If True, None will be returned if timestamps are not found. If 
+        False, a KeyError will be raised
 
     Returns
     -------
@@ -72,16 +89,21 @@ def get_lick_times(dataset: SyncDataset) -> Optional[np.ndarray]:
 
     """
     return dataset.get_edges(
-        "rising", ["lick_times", "lick_sensor"], "seconds", False)
+        "rising", ["lick_times", "lick_sensor"], "seconds", permissive)
     
 
-def get_stim_photodiode(dataset: SyncDataset) -> Optional[List[float]]:
+def get_stim_photodiode(
+    dataset: SyncDataset, 
+    permissive: bool = False
+) -> Optional[List[float]]:
     """ Report the timestamps of each detected sync square transition (both 
     black -> white and white -> black) in this experiment.
 
     Parameters
     ----------
     dataset : describes experiment timing
+    permissive : If True, None will be returned if timestamps are not found. If 
+        False, a KeyError will be raised
 
     Returns
     -------
@@ -91,22 +113,30 @@ def get_stim_photodiode(dataset: SyncDataset) -> Optional[List[float]]:
 
     """
     return dataset.get_edges(
-        "all", ["stim_photodiode", "photodiode"], "seconds", False)
+        "all", ["stim_photodiode", "photodiode"], "seconds", permissive)
 
 
-def get_trigger(dataset: SyncDataset) -> Optional[np.ndarray]:
+def get_trigger(
+    dataset: SyncDataset, 
+    permissive: bool = False
+) -> Optional[np.ndarray]:
     """
     """
     return dataset.get_edges(
-        "rising", ["2p_trigger", "acq_trigger"], "seconds", False)
+        "rising", ["2p_trigger", "acq_trigger"], "seconds", permissive)
 
 
-def get_eye_tracking(dataset: SyncDataset) -> Optional[np.ndarray]:
+def get_eye_tracking(
+    dataset: SyncDataset, 
+    permissive: bool = False
+) -> Optional[np.ndarray]:
     """ Report the timestamps of each frame of the eye tracking video
 
     Parameters
     ----------
     dataset : describes experiment timing
+    permissive : If True, None will be returned if timestamps are not found. If 
+        False, a KeyError will be raised
 
     Returns
     -------
@@ -116,16 +146,21 @@ def get_eye_tracking(dataset: SyncDataset) -> Optional[np.ndarray]:
 
     """
     return dataset.get_edges(
-        "rising", ["cam2_exposure", "eye_tracking"], "seconds", False)
+        "rising", ["cam2_exposure", "eye_tracking"], "seconds", permissive)
 
 
-def get_behavior_monitoring(dataset: SyncDataset) -> Optional[np.ndarray]:
+def get_behavior_monitoring(
+    dataset: SyncDataset, 
+    permissive: bool = False
+) -> Optional[np.ndarray]:
     """ Report the timestamps of each frame of the behavior 
     monitoring video
 
     Parameters
     ----------
     dataset : describes experiment timing
+    permissive : If True, None will be returned if timestamps are not found. If 
+        False, a KeyError will be raised
 
     Returns
     -------
@@ -135,10 +170,14 @@ def get_behavior_monitoring(dataset: SyncDataset) -> Optional[np.ndarray]:
 
     """
     return dataset.get_edges(
-        "rising", ["cam1_exposure", "behavior_monitoring"], "seconds", False)
+        "rising", ["cam1_exposure", "behavior_monitoring"], "seconds", 
+        permissive)
 
 
-def get_sync_data(sync_path: str) -> Dict[str, Union[List, np.ndarray, None]]:
+def get_sync_data(
+    sync_path: str,
+    permissive: bool = False
+) -> Dict[str, Union[List, np.ndarray, None]]:
     """ Convenience function for extracting several timestamp arrays from a 
     sync file.
 
@@ -147,6 +186,8 @@ def get_sync_data(sync_path: str) -> Dict[str, Union[List, np.ndarray, None]]:
     sync_path : The hdf5 file here ought to be a Visual Behavior sync output 
         file. See allensdk.brain_observatory.sync_dataset for more details of 
         this format.
+    permissive : If True, None will be returned if timestamps are not found. If 
+        False, a KeyError will be raised
     
     Returns
     -------
@@ -165,13 +206,13 @@ def get_sync_data(sync_path: str) -> Dict[str, Union[List, np.ndarray, None]]:
 
     sync_dataset = SyncDataset(sync_path)
     return {
-        'ophys_frames': get_ophys_frames(sync_dataset),
-        'lick_times': get_lick_times(sync_dataset),
-        'ophys_trigger': get_trigger(sync_dataset),
-        'eye_tracking': get_eye_tracking(sync_dataset),
-        'behavior_monitoring': get_behavior_monitoring(sync_dataset),
-        'stim_photodiode': get_stim_photodiode(sync_dataset),
-        'stimulus_times_no_delay': get_raw_stimulus_frames(sync_dataset)
+        'ophys_frames': get_ophys_frames(sync_dataset, permissive),
+        'lick_times': get_lick_times(sync_dataset, permissive),
+        'ophys_trigger': get_trigger(sync_dataset, permissive),
+        'eye_tracking': get_eye_tracking(sync_dataset, permissive),
+        'behavior_monitoring': get_behavior_monitoring(sync_dataset, permissive),
+        'stim_photodiode': get_stim_photodiode(sync_dataset, permissive),
+        'stimulus_times_no_delay': get_raw_stimulus_frames(sync_dataset, permissive)
     }
 
 

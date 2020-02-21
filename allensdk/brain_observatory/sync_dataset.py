@@ -300,7 +300,7 @@ class Dataset(object):
         kind: str, 
         keys: Union[str, Sequence[str]], 
         units: str = "seconds", 
-        raise_missing: bool = True
+        permissive: bool = False
     ) -> Optional[np.ndarray]:
         """ Utility function for extracting edge times from a line
 
@@ -346,7 +346,7 @@ class Dataset(object):
             except ValueError:
                 continue
 
-        if raise_missing:
+        if not permissive:
             raise KeyError(
                 f"none of {keys} were found in this dataset's line labels")
 
