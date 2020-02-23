@@ -112,9 +112,9 @@ As of the 1.4.0 release:
 
 Previous Release Notes
 ----------------------
-    * `1.3.0 <https://github.com/AllenInstitute/AllenSDK/releases/tag/v1.3.0>
-    * `1.2.0 <https://github.com/AllenInstitute/AllenSDK/releases/tag/v1.2.0>
-    * `1.1.1 <https://github.com/AllenInstitute/AllenSDK/releases/tag/v1.1.1>
+    * `1.3.0 <https://github.com/AllenInstitute/AllenSDK/releases/tag/v1.3.0>`_
+    * `1.2.0 <https://github.com/AllenInstitute/AllenSDK/releases/tag/v1.2.0>`_
+    * `1.1.1 <https://github.com/AllenInstitute/AllenSDK/releases/tag/v1.1.1>`_
     * `1.1.0 <https://github.com/AllenInstitute/AllenSDK/releases/tag/v1.1.0>`_
     * `1.0.2 <https://github.com/AllenInstitute/AllenSDK/releases/tag/v1.0.2>`_
     * `0.16.3 <https://github.com/AllenInstitute/AllenSDK/releases/tag/v0.16.3>`_
