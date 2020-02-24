@@ -1,16 +1,36 @@
-pep8==1.7.0
-flake8>=1.5.0
-pylint>=1.5.4
-numpydoc>=0.6.0
-jupyter>=1.0.0
-matplotlib>=1.4.3
-simplejson
-h5py
-pandas
-scipy
-requests_toolbelt
-pynrrd
-SimpleITK
-scikit-image
-statsmodels
-sklearn
+pep8==1.7.0,<2.0.0
+flake8>=1.5.0,<4.0.0
+pylint>=1.5.4,<3.0.0
+numpydoc>=0.6.0,<1.0.0
+jupyter>=1.0.0,<2.0.0
+# from here on, this file should contain a subset of the packages specified in requirements.txt
+# some packages are excluded because they can't be installed on readthedocs
+# these ought to be mocked out in doc_template/conf.py so that docs are generated for allensdk modules that import 
+# those packages
+# known examples: tables
+psycopg2-binary>=2.7,<3.0.0
+h5py>=2.8,<3.0.0
+matplotlib>=1.4.3,<4.0.0
+numpy>=1.15.4,<1.19.0
+pandas>=0.25.1,<=0.25.3
+jinja2>=2.7.3,<2.12.0
+scipy>=0.15.1,<2.0.0
+six>=1.9.0,<2.0.0
+pynrrd>=0.2.1,<1.0.0
+future >= 0.14.3,<1.0.0
+requests<3.0.0
+requests-toolbelt<1.0.0
+simplejson>=3.10.0,<4.0.0
+scikit-image>=0.14.0,<0.17.0
+scikit-build<1.0.0
+statsmodels==0.9.0
+simpleitk<2.0.0
+argschema<2.0.0
+marshmallow==3.0.0rc6
+glymur==0.8.19
+xarray<0.16.0
+hdmf==1.0.2
+pynwb==1.0.2
+seaborn<1.0.0
+aiohttp==3.6.2
+nest_asyncio==1.2.0

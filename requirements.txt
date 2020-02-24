@@ -1,28 +1,28 @@
-psycopg2-binary>=2.7
-h5py>=2.8
-matplotlib>=1.4.3
-numpy>=1.15.4
+psycopg2-binary>=2.7,<3.0.0
+h5py>=2.8,<3.0.0
+matplotlib>=1.4.3,<4.0.0
+numpy>=1.15.4,<1.19.0
 pandas>=0.25.1,<=0.25.3
-jinja2>=2.7.3
-scipy>=0.15.1
-six>=1.9.0
-pynrrd>=0.2.1
-future >= 0.14.3
-requests
-requests-toolbelt
-simplejson>=3.10.0
-scikit-image>=0.14.0
-scikit-build
+jinja2>=2.7.3,<2.12.0
+scipy>=0.15.1,<2.0.0
+six>=1.9.0,<2.0.0
+pynrrd>=0.2.1,<1.0.0
+future >= 0.14.3,<1.0.0
+requests<3.0.0
+requests-toolbelt<1.0.0
+simplejson>=3.10.0,<4.0.0
+scikit-image>=0.14.0,<0.17.0
+scikit-build<1.0.0
 statsmodels==0.9.0
-simpleitk
-argschema
+simpleitk<2.0.0
+argschema<2.0.0
 marshmallow==3.0.0rc6
 glymur==0.8.19
-xarray
+xarray<0.16.0
 hdmf==1.0.2
 pynwb==1.0.2
 tables==3.5.1 # pinning this because updates tend to not include wheels immediately
-seaborn
+seaborn<1.0.0
 aiohttp==3.6.2
 nest_asyncio==1.2.0
 
