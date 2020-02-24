@@ -590,3 +590,60 @@ def test_read_spike_amplitudes_to_dictionary(tmpdir_factory, spike_amplitudes, t
 
     assert np.allclose(expected_amplitudes[:3], obtained[0])
     assert np.allclose(expected_amplitudes[3:], obtained[1])
+
+
+def test_remove_invalid_spikes():
+    row = pd.Series({
+        "spike_times": np.array([0, 1, 2, -1, 5, 4]),
+        "spike_amplitudes": np.arange(6),
+        "a": "b"
+    }, name=1000)
+
+    expct = pd.Series({
+        "spike_times": np.array([0, 1, 2, 4, 5]),
+        "spike_amplitudes": np.array([0, 1, 2, 5, 4]),
+        "a": "b"
+    }, name=1000)
+
+    obt = write_nwb.remove_invalid_spikes(row)
+    assert np.allclose(obt["spike_times"], expct["spike_times"])
+    assert np.allclose(obt["spike_amplitudes"], expct["spike_amplitudes"])
+
+
+def test_remove_invalid_spikes_from_units():
+
+    units = pd.DataFrame({
+        "spike_times": [
+            np.array([0, 1, 2, -1, 5, 4]),
+            np.arange(2),
+            np.arange(3)
+        ],
+        "spike_amplitudes": [
+            np.arange(6),
+            np.arange(2),
+            np.arange(3)
+        ],
+        "a": ["b", "c", "d"]
+    }, index=pd.Index(name="id", data=[5, 6, 7]))
+
+    expct = pd.DataFrame({
+        "spike_times": [
+            np.array([0, 1, 2, 4, 5]),
+            np.arange(2),
+            np.arange(3)
+        ],
+        "spike_amplitudes": [
+            np.array([0, 1, 2, 5, 4]),
+            np.arange(2),
+            np.arange(3)
+        ],
+        "a": ["b", "c", "d"]
+    }, index=pd.Index(name="id", data=[5, 6, 7]))
+
+    obt = write_nwb.remove_invalid_spikes_from_units(units)
+    for (_, expct_row), (_, obt_row) in zip(expct.iterrows(), obt.iterrows()):
+        assert np.allclose(obt_row["spike_times"], expct_row["spike_times"])
+        assert np.allclose(
+            obt_row["spike_amplitudes"], 
+            expct_row["spike_amplitudes"])
+        assert obt_row["a"] == expct_row["a"]

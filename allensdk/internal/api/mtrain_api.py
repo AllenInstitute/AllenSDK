@@ -9,8 +9,11 @@ import uuid
 from . import PostgresQueryMixin
 from .behavior_lims_api import BehaviorLimsApi
 from allensdk.brain_observatory.behavior.trials_processing import EDF_COLUMNS
+from allensdk.core.auth_config import MTRAIN_DB_CREDENTIAL_MAP
+from allensdk.core.authentication import credential_injector
 
-class MtrainApi(PostgresQueryMixin):
+
+class MtrainApi:
 
     def __init__(self, api_base='http://mtrain:5000'):
         self.api_base = api_base
@@ -104,19 +107,26 @@ class MtrainApi(PostgresQueryMixin):
         return state_response.json()['data']['parameters']['stage']
 
 
-class MtrainSqlApi(PostgresQueryMixin):
+class MtrainSqlApi:
     
-    def __init__(self, dbname="mtrain", user="mtrainreader", host="prodmtrain1", password="mtrainro", port=5432):
-        super(MtrainSqlApi, self).__init__(dbname=dbname, user=user, host=host, password=password, port=port)
-
+    def __init__(self, dbname=None, user=None, host=None, password=None,
+                 port=None):
+        if any(map(lambda x: x is None, [dbname, user, host, password, port])):
+            # Currying is equivalent to decorator syntactic sugar
+            self.mtrain_db = (
+                credential_injector(MTRAIN_DB_CREDENTIAL_MAP)
+                (PostgresQueryMixin)())
+        else:
+            self.mtrain_db = PostgresQueryMixin(
+                dbname=dbname, user=user, host=host, password=password,
+                port=port)
 
     def get_subjects(self):
         query = 'SELECT "LabTracks_ID" FROM subjects'
-        return self.fetchall(query)
-
+        return self.mtrain_db.fetchall(query)
 
     def get_behavior_training_df(self, LabTracks_ID):
-        connection = self.get_connection()
+        connection = self.mtrain_db.get_connection()
         dataframe = pd.read_sql(
             '''SELECT stages.name as stage_name, regimens.name as regimen_name, bs.date, bs.id as behavior_session_id
                FROM behavior_sessions bs
