@@ -299,6 +299,11 @@ skip_autodoc_names = [ 'DEFAULTS' ]
 
 numpydoc_show_class_members = False
 
+# some dependencies don't install correctly on readthedocs. Listing them here
+# allows allensdk modules which import them to still get autodocs
+autodoc_mock_imports = ["tables"]
+
+
 def skip_autodoc(app, what, name, obj, skip, options):
     #TODO: also check obj/module name, documentation isn't great though,
     # see: http://sphinx-doc.org/ext/autodoc.html
