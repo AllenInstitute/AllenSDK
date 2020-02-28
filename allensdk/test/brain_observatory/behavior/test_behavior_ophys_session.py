@@ -74,7 +74,7 @@ def test_visbeh_ophys_data_set():
     # All sorts of assert relationships:
     assert data_set.api.get_foraging_id() == str(data_set.api.get_behavior_session_uuid())
     assert list(data_set.stimulus_templates.values())[0].shape == (8, 918, 1174)
-    assert len(data_set.licks) == 2432 and list(data_set.licks.columns) == ['time']
+    assert len(data_set.licks) == 2421 and list(data_set.licks.columns) == ['time']
     assert len(data_set.rewards) == 85 and list(data_set.rewards.columns) == ['volume', 'autorewarded']
     assert len(data_set.corrected_fluorescence_traces) == 269 and sorted(data_set.corrected_fluorescence_traces.columns) == ['cell_roi_id', 'corrected_fluorescence']
     np.testing.assert_array_almost_equal(data_set.running_speed.timestamps, data_set.stimulus_timestamps)
