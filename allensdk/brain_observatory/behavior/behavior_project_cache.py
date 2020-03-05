@@ -62,7 +62,7 @@ class BehaviorProjectCache(Cache):
 
     def __init__(
             self,
-            fetch_api: BehaviorProjectApi = BehaviorProjectLimsApi.default(),
+            fetch_api: Optional[BehaviorProjectApi] = None,
             fetch_tries: int = 2,
             **kwargs):
         """ Entrypoint for accessing visual behavior data. Supports
@@ -106,7 +106,7 @@ class BehaviorProjectCache(Cache):
         kwargs["version"] = kwargs.get("version", self.MANIFEST_VERSION)
 
         super().__init__(**kwargs)
-        self.fetch_api = fetch_api
+        self.fetch_api = fetch_api or BehaviorProjectLimsApi.default()
         self.fetch_tries = fetch_tries
         self.logger = logging.getLogger(self.__class__.__name__)
 

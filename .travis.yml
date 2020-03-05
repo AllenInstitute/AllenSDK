@@ -10,6 +10,16 @@ env:
     - TEST_API_ENDPOINT=http://api.brain-map.org 
     - TEST_COMPLETE=false
     - TEST_BAMBOO=false
+    - LIMS_DBNAME=db
+    - LIMS_PORT=1234
+    - LIMS_PASSWORD=password
+    - LIMS_HOST=host
+    - LIMS_USER=user
+    - MTRAIN_DBNAME=db
+    - MTRAIN_USER=user
+    - MTRAIN_HOST=host
+    - MTRAIN_PORT=1234
+    - MTRAIN_PASSWORD=password
 
 matrix:
   include:
