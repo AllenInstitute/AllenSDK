@@ -413,22 +413,6 @@ def test_module(input_json):
                            equal_nan=True)
 
 
-@pytest.mark.parametrize(
-    "photodiode_events,stim_events,expected_delay",
-    [
-        (np.array([2, 3, 4, 5]), np.array([1, 2, 3, 4]), ts.ASSUMED_DELAY),
-        (np.array([2.02, 3.02, 4.02, 5.02]), np.array([2., 3., 4., 5.]), 0.02),
-        (np.array([2, 3, 4]), np.array([1, 2, 3, 4]), ts.ASSUMED_DELAY),
-    ]
-)
-def test_monitor_delay_mocked(photodiode_events, stim_events, expected_delay,
-                              monkeypatch):
-    monkeypatch.setattr(ts, "get_real_photodiode_events", lambda x, y: x)
-    assert (ts.monitor_delay(photodiode_events, stim_events, "dummy_key",
-                             transition_frame_interval=1)
-            == pytest.approx(expected_delay, 0.000001))
-
-
 @pytest.mark.skipif(data_skip, reason="No sync or data")
 def test_monitor_delay(scientifica_input):
     sync_file = scientifica_input.pop("sync_file")
