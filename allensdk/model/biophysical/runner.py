@@ -44,12 +44,12 @@ import time
 import os
 import multiprocessing as mp
 from functools import partial
+import argschema as ags
+from _schemas import runner_config
 
 _runner_log = logging.getLogger('allensdk.model.biophysical.runner')
 
 _lock = None
-
-axon_replacement_dict = {'axon_type' : 'stub_axon'}
 
 def _init_lock(lock):
     global _lock
@@ -66,6 +66,8 @@ def run(description, sweeps=None, procs=6,axon_type=None):
         number of sweeps to simulate simultaneously.
     sweeps : list
         list of experiment sweep numbers to simulate.  If None, simulate all sweeps.
+    axon_type : string
+        string handling axon replacement. If equal to stub_axon for all-active models the axon is replaced with 60 micron long 1 micron wide stub 
     '''
 
     
@@ -197,12 +199,12 @@ def save_nwb(output_path, v, sweep, sweeps_by_type):
         logging.info("sweep %d has no sweep features. %s" % (sweep, e.args))
 
 
-def load_description(manifest_json_path):
-    '''Read configuration file.
+def load_description(schema):
+    '''Read configurations.
 
     Parameters
     ----------
-    manifest_json_path : string
+    schema : string
         File containing the experiment configuration.
 
     Returns
@@ -210,7 +212,12 @@ def load_description(manifest_json_path):
     Config
         Object with all information needed to run the experiment.
     '''
+    manifest_json_path = schema.config_file
+    
     description = Config().load(manifest_json_path)
+    if schema.axon_type == 'stub_axon': # For newest all-active models update the axon replacement
+        axon_replacement_dict = {'axon_type' : schema.axon_type}
+        description.update_data(axon_replacement_dict,'biophys')
 
     # fix nonstandard description sections
     fix_sections = ['passive', 'axon_morph,', 'conditions', 'fitting']
@@ -220,10 +227,6 @@ def load_description(manifest_json_path):
 
 
 if '__main__' == __name__:
-    import sys
-    if len(sys.argv) > 2 and sys.argv[-1] == 'stub_axon':
-        description = load_description(sys.argv[-2])
-        description.update_data(axon_replacement_dict,'biophys')
-    else:
-        description = load_description(sys.argv[-1])
+    schema = ags.ArgSchemaParser(schema_type=runner_config)
+    description = load_description(schema.args)
     run(description)
