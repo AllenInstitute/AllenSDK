@@ -58,23 +58,11 @@ def monitor_delay(sync_dset, stim_times, photodiode_key,
     """Calculate monitor delay."""
     try:
         transitions = stim_times[::transition_frame_interval]
-        photodiode_events = get_real_photodiode_events(sync_dset,
-                                                       photodiode_key)
-        if len(transitions) > len(photodiode_events):
-            logging.warning(
-                "More stimulus transitions counted than "
-                f"photodiode events (transitions={len(transitions)}, "
-                f"events={len(photodiode_events)}). "
-                "Truncating stimulus transitions to length of "
-                "photodiode events.")
-            transitions = transitions[:len(photodiode_events)]
-
+        photodiode_events = get_real_photodiode_events(sync_dset, photodiode_key)
         transition_events = photodiode_events[0:len(transitions)]
-        delays = transition_events - transitions
-        delay = np.mean(delays)
-        logging.info(f"Calculated monitor delay: {delay}. \n "
-                     f"Max monitor delay: {np.max(delays)}. \n "
-                     f"Min monitor delay: {np.min(delays)}.")
+
+        delay = np.mean(transition_events-transitions)
+        logging.info("Calculated monitor delay: %s", delay)
 
         if delay < 0 or delay > max_monitor_delay:
             delay = assumed_delay
