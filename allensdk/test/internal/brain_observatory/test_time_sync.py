@@ -7,6 +7,11 @@ from pkg_resources import resource_filename
 from mock import patch
 from allensdk.internal.brain_observatory import time_sync as ts
 from allensdk.internal.pipeline_modules import run_ophys_time_sync
+from allensdk.brain_observatory.sync_dataset import Dataset
+
+
+ASSUMED_DELAY = 0.0351
+
 
 data_file = resource_filename(__name__, "time_sync_test_data.json")
 test_data = json.load(open(data_file, "r"))
@@ -19,6 +24,24 @@ if not os.path.exists(test_data["nikon"]["sync_file"]):
 
 MIN_BOUND = .03
 MAX_BOUND = .04
+
+
+class MockSyncDataset(Dataset):
+    """
+    Mock the Dataset class so it doesn't load an h5 file upon
+    initialization.
+    """
+    def __init__(self, data):
+        self.dfile = data
+
+
+def mock_get_real_photodiode_events(data, key):
+    return data
+
+
+def mock_get_events_by_line(line, units="seconds"):
+    return line
+
 
 def calculate_stimulus_alignment(stim_time, valid_twop_vsync_fall):
     stimulus_alignment = np.empty(len(stim_time))
@@ -312,7 +335,7 @@ def test_get_corrected_stim_times(stim_data_length, start_delay):
             aligner = ts.OphysTimeAligner("test")
 
     aligner.stim_data_length = stim_data_length
-    with patch.object(ts, "monitor_delay", return_value=ts.ASSUMED_DELAY):
+    with patch.object(ts, "monitor_delay", return_value=ASSUMED_DELAY):
         with patch.object(ts.Dataset, "get_falling_edges",
                           return_value=true_falling) as mock_falling:
             with patch.object(ts.Dataset, "get_rising_edges",
@@ -329,15 +352,15 @@ def test_get_corrected_stim_times(stim_data_length, start_delay):
         assert mock_log.call_count == 2
         assert len(times) == len(true_falling) - 1
         assert delta == len(true_falling) - 1 - stim_data_length
-        assert np.all(times == true_falling[1:] + ts.ASSUMED_DELAY)
+        assert np.all(times == true_falling[1:] + ASSUMED_DELAY)
     elif stim_data_length != len(true_falling):
         mock_rising.assert_called_once()
         mock_log.assert_called_once()
         assert delta == len(true_falling) - stim_data_length
-        assert np.all(times == true_falling + ts.ASSUMED_DELAY)
+        assert np.all(times == true_falling + ASSUMED_DELAY)
     else:
         assert mock_rising.call_count == 0
-        assert np.all(times == true_falling + ts.ASSUMED_DELAY)
+        assert np.all(times == true_falling + ASSUMED_DELAY)
         assert mock_log.call_count == 0
         assert delta == 0
 
@@ -413,23 +436,99 @@ def test_module(input_json):
                            equal_nan=True)
 
 
-@pytest.mark.skipif(data_skip, reason="No sync or data")
-def test_monitor_delay(scientifica_input):
-    sync_file = scientifica_input.pop("sync_file")
-    dset = ts.Dataset(sync_file)
-    stim_times = dset.get_falling_edges("stim_vsync")
+@pytest.mark.parametrize(
+    "sync_dset,stim_times,transition_interval,expected",
+    [
+        (np.array([1.0, 2.0, 3.0, 4.0, 5.0]),
+         np.array([0.99, 1.99, 2.99, 3.99, 4.99]), 1, 0.01),
+        (np.array([1.0, 2.0, 3.0, 4.0]),
+         np.array([0.95, 2.0, 2.95, 4.0]), 1, 0.025),
+        (np.array([1.0]), np.array([1.0]), 1, 0.0)
+    ],
+)
+def test_monitor_delay(sync_dset, stim_times, transition_interval, expected,
+                       monkeypatch):
+    monkeypatch.setattr(ts, "get_real_photodiode_events",
+                        mock_get_real_photodiode_events)
+    pytest.approx(expected, ts.monitor_delay(sync_dset, stim_times, "key",
+                                             transition_interval))
 
-    with patch("numpy.mean", side_effect=ValueError()) as mock_mean:
-        delay = ts.monitor_delay(dset, stim_times, "stim_photodiode",
-                                 assumed_delay=20)
-        assert delay == 20
-        mock_mean.assert_called_once()
 
-    with patch.object(ts, "get_real_photodiode_events",
-                      side_effect=IndexError()) as mock_events:
-        delay = ts.monitor_delay(dset, stim_times, "stim_photodiode",
-                                 assumed_delay=30)
-        assert delay == 30
+@pytest.mark.parametrize(
+    "sync_dset,stim_times,transition_interval",
+    [
+        (np.array([1.0, 2.0, 3.0]), np.array([0.9, 1.9, 2.9]), 1,),    # negative
+        (np.array([1.0, 2.0, 3.0, 4.0]), np.array([1.1, 2.1, 3.1, 4.1]), 1,),  # too big
+    ],
+)
+def test_monitor_delay_raises_error(
+        sync_dset, stim_times, transition_interval,
+        monkeypatch):
+    monkeypatch.setattr(ts, "get_real_photodiode_events",
+                        mock_get_real_photodiode_events)
+    with pytest.raises(ValueError):
+        ts.monitor_delay(sync_dset, stim_times, "key", transition_interval)
+
+
+@pytest.mark.parametrize(
+    "arr,cond,n,expected",
+    [
+        (np.array([1, 1, 1, 2]), lambda x: x < 2, 3, 0),
+        (np.array([2, 1, 1, 1]), lambda x: x < 2, 3, 1),
+        (np.array([1, 2, 2, 1, 1]), lambda x: x >= 1, 2, 0),
+        (np.array([]), lambda x: x < 1, 1, None),
+        (np.array([1, 2, 3]), lambda x: x < 3, 4, None),
+        (np.array([1, 2, 2, 3, 2]), lambda x: x == 2, 3, None),
+    ]
+)
+def test_find_n(arr, cond, n, expected):
+    assert expected == ts._find_n(arr, n, cond)
+
+
+@pytest.mark.parametrize(
+    "arr,cond,n,expected",
+    [
+        (np.array([1, 1, 1, 2]), lambda x: x < 2, 3, 2),
+        (np.array([2, 1, 1, 1]), lambda x: x < 2, 3, 3),
+        (np.array([1, 2, 2, 1, 1]), lambda x: x >= 1, 2, 4),
+        (np.array([]), lambda x: x < 1, 1, None),
+        (np.array([1, 2, 3]), lambda x: x < 3, 4, None),
+        (np.array([1, 2, 2, 3, 2]), lambda x: x == 2, 3, None),
+    ]
+)
+def test_find_last_n(arr, cond, n, expected):
+    assert expected == ts._find_last_n(arr, n, cond)
+
+
+@pytest.mark.parametrize(
+    "sync_dset,expected",
+    [
+        ([0.25, 0.5, 0.75, 1., 2., 3., 5., 5.75], [1., 2., 3.]),
+        ([1., 2., 3., 4.], [1., 2., 3., 4.]),
+        ([0.25, 1., 2., 2.1, 2.2, 3., 4., 5.], [3., 4., 5.]),   # false alarm start
+        ([0.25, 1., 2., 3., 4., 4.5, 5.1, 6.1], [1., 2., 3., 4.]),  # false alarm end
+    ],
+)
+def test_get_photodiode_events(sync_dset, expected, monkeypatch):
+    ds = MockSyncDataset(sync_dset)
+    monkeypatch.setattr(ds, "get_events_by_line", mock_get_events_by_line)
+    np.testing.assert_array_equal(
+        expected, ts.get_photodiode_events(ds, sync_dset))
+
+
+@pytest.mark.parametrize(
+    "sync_dset,",
+    [
+        ([]),
+        ([0.25, 0.25]),
+        ([1., 2.]),
+    ]
+)
+def test_photodiode_events_error_if_none_found(sync_dset, monkeypatch):
+    ds = MockSyncDataset(sync_dset)
+    monkeypatch.setattr(ds, "get_events_by_line", mock_get_events_by_line)
+    with pytest.raises(ValueError):
+        ts.get_photodiode_events(ds, sync_dset)
 
 
 @pytest.mark.parametrize("deserialized_pkl,expected", [

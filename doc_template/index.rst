@@ -97,6 +97,7 @@ As of the 1.7.0 release:
 
 - Added functionality so internal users can now access `eye_tracking` ellipse fit data from behavior + ophys Session objects
 - Added a new mixin for managing processing parameters for Session objects
+- Update the monitor delay calculation to better handle edge cases; no longer provide a default delay value if encounter an error
 
 What's New - 1.6.0 (March 23, 2020)
 -----------------------------------------------------------------------

@@ -8,6 +8,8 @@ All notable changes to this project will be documented in this file.
 - A new mixin for managing processing parameters for Session objects
 
 ### Changed
+- Monitor delay calculation is updated to properly handle photodiode streams that end
+on a rising edge. We are no longer providing a default delay value in case of error.
 
 ### Bug Fixes
 - experiment\_table from behavior project cache has NaNs in the 'imaging\_depth' column for MultiScope experiments due to incorrect join in behavior\_project\_lims\_api.py and 4 other places where ophys\_sessions was incorrectly queried for imaging\_depth\_id
