@@ -45,7 +45,7 @@ import os
 import multiprocessing as mp
 from functools import partial
 import argschema as ags
-from _schemas import runner_config
+from ._schemas import runner_config
 
 _runner_log = logging.getLogger('allensdk.model.biophysical.runner')
 
@@ -55,24 +55,20 @@ def _init_lock(lock):
     global _lock
     _lock = lock
 
-def run(description, sweeps=None, procs=6,axon_type=None):
+def run(args, sweeps=None, procs=6):
     '''Main function for simulating sweeps in a biophysical experiment.
 
     Parameters
     ----------
-    description : Config
-        All information needed to run the experiment.
+    args : dict
+        Parsed arguments to run the experiment.
     procs : int
         number of sweeps to simulate simultaneously.
     sweeps : list
         list of experiment sweep numbers to simulate.  If None, simulate all sweeps.
-    axon_type : string
-        string handling axon replacement. If equal to stub_axon for all-active models the axon is replaced with 60 micron long 1 micron wide stub 
     '''
 
-    
-    if axon_type == 'stub_axon':
-        description.update_data(axon_replacement_dict,'biophys')
+    description = load_description(args)
     
     prepare_nwb_output(description.manifest.get_path('stimulus_path'),
                        description.manifest.get_path('output_path'))
@@ -199,24 +195,24 @@ def save_nwb(output_path, v, sweep, sweeps_by_type):
         logging.info("sweep %d has no sweep features. %s" % (sweep, e.args))
 
 
-def load_description(schema):
+def load_description(args):
     '''Read configurations.
 
     Parameters
     ----------
-    schema : string
-        File containing the experiment configuration.
+    args : dict
+        schema containing the experiment configuration.
 
     Returns
     -------
     Config
         Object with all information needed to run the experiment.
     '''
-    manifest_json_path = schema.config_file
+    manifest_json_path = args['manifest_file']
     
     description = Config().load(manifest_json_path)
-    if schema.axon_type == 'stub_axon': # For newest all-active models update the axon replacement
-        axon_replacement_dict = {'axon_type' : schema.axon_type}
+    if args['axon_type'] == 'stub_axon': # For newest all-active models update the axon replacement
+        axon_replacement_dict = {'axon_type' : args['axon_type']}
         description.update_data(axon_replacement_dict,'biophys')
 
     # fix nonstandard description sections
@@ -228,5 +224,4 @@ def load_description(schema):
 
 if '__main__' == __name__:
     schema = ags.ArgSchemaParser(schema_type=runner_config)
-    description = load_description(schema.args)
-    run(description)
+    run(schema.args)
