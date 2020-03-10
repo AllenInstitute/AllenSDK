@@ -37,10 +37,12 @@ import pytest
 import os
 import numpy
 from allensdk.model.biophys_sim.config import Config
-from allensdk.model.biophysical.utils import Utils
+from allensdk.model.biophysical.utils import AllActiveUtils
 from allensdk.api.queries.biophysical_api import BiophysicalApi
+from allensdk.core.dat_utilities import DatUtilities
 from allensdk.ephys import ephys_features
 
+@pytest.mark.xfail(raises=ImportError,reason='neuron installation required')
 def test_biophysical_all_active():
     """
     Test for backward compatibility of the legacy all-active models
@@ -56,7 +58,7 @@ def test_biophysical_all_active():
     os.system('nrnivmodl modfiles')
 
     description = Config().load('manifest.json')
-    utils = Utils(description)
+    utils = AllActiveUtils(description)
     h = utils.h
 
     manifest = description.manifest
@@ -77,10 +79,13 @@ def test_biophysical_all_active():
     h.run()
 
     junction_potential = description.data['fitting'][0]['junction_potential']
-    mV = 1.0e-3
     ms = 1.0e-3
 
-    output_data = (numpy.array(vec['v']) - junction_potential) * mV
-    output_times = numpy.array(vec['t']) * ms
+    output_data = (numpy.array(vec['v']) - junction_potential) # in mV
+    output_times = numpy.array(vec['t']) * ms # in s
+    output_path = 'output_voltage.dat'
+
+    DatUtilities.save_voltage(output_path, output_data, output_times)
+    
     num_spikes = len(ephys_features.detect_putative_spikes(output_data,output_times))
     assert num_spikes == 18 # taken from the web app where the legacy model output is shown
