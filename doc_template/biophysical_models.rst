@@ -101,7 +101,9 @@ This can take some time.
 
     cd neuronal_model
     nrnivmodl ./modfiles   # compile the model (only needs to be done once)
-    python -m allensdk.model.biophysical.runner manifest.json
+    python -m allensdk.model.biophysical.runner --maniest_file manifest.json # perisomatic models
+    python -m allensdk.model.biophysical.runner --maniest_file manifest.json # legacy all-active models
+    python -m allensdk.model.biophysical.runner --maniest_file manifest.json --axon_type stub_axon # new all-active models (axon replaced by a 60 micron long 1 micron diameter stub)
 
 
 Selecting a Specific Sweep
