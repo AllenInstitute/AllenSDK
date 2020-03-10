@@ -325,11 +325,11 @@ class AllActiveUtils(Utils):
             Path to morphology.
         '''
         if self.axon_type == 'stub_axon':
-            print('Replacing axon with a stub : length 60 micron, diameter 1 micron')
+            self._log.info('Replacing axon with a stub : length 60 micron, diameter 1 micron')
             super(AllActiveUtils,self).generate_morphology(morph_filename)
             return
         
-        print('Legacy model-Replacing axon with a stub: length 60 micron, diameter read from .swc')
+        self._log.info('Legacy model - Replacing axon with a stub: length 60 micron, diameter read from .swc')
         morph_basename = os.path.basename(morph_filename)
         morph_extension = morph_basename.split('.')[-1]
         if morph_extension.lower() == 'swc':
