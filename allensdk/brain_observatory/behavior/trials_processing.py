@@ -345,6 +345,7 @@ def get_trials(data, licks_df, rewards_df, stimulus_presentations_df, rebase):
 
     trials = pd.DataFrame(all_trial_data).set_index('trial')
     trials.index = trials.index.rename('trials_id')
+    del trials["sham_change"]
 
     return trials
 

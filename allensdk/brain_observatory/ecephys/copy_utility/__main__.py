@@ -12,11 +12,17 @@ from ._schemas import InputSchema, OutputSchema, available_hashers
 from allensdk.brain_observatory.argschema_utilities import write_or_print_outputs
 
 
-def hash_file(path, hasher_cls):
-    with open(path, 'rb') as file_obj:
-        hasher = hasher_cls()
-        hasher.update(file_obj.read())
-        return hasher.digest()
+def hash_file(path, hasher_cls, blocks_per_chunk=128):
+    """
+
+    """
+    hasher = hasher_cls()
+    with open(path, 'rb') as f:
+        # TODO: Update to new assignment syntax if drop < python 3.8 support
+        for chunk in iter(
+                lambda: f.read(hasher.block_size*blocks_per_chunk), b""):
+            hasher.update(chunk)
+    return hasher.digest()
 
 
 def walk_fs_tree(root, fn):
