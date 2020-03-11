@@ -625,7 +625,7 @@ def write_probe_lfp_file(session_start_time, log_level, probe):
 
     with pynwb.NWBHDF5IO(probe['lfp']['output_path'], 'w') as lfp_writer:
         logging.info(f"writing probe lfp file to {probe['lfp']['output_path']}")
-        lfp_writer.write(nwbfile)
+        lfp_writer.write(nwbfile, cache_spec=True)
     return {"id": probe["id"], "nwb_path": probe["lfp"]["output_path"]}
 
 
