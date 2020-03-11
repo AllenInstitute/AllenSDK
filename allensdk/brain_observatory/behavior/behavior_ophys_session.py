@@ -56,9 +56,10 @@ class BehaviorOphysSession(object):
         self._corrected_fluorescence_traces = None
         self._motion_correction = None
         self._segmentation_mask_image = None
+        self._eye_tracking_data = None
 
     # Using properties rather than initializing attributes to take advantage
-    # of API-level cache and not introduce a lot of overhead when the 
+    # of API-level cache and not introduce a lot of overhead when the
     # class is initialized (sometimes these calls can take a while)
     @property
     def ophys_experiment_id(self) -> int:
@@ -76,7 +77,7 @@ class BehaviorOphysSession(object):
 
     @property
     def stimulus_timestamps(self) -> np.ndarray:
-        """Timestamps associated with stimulus presentations on the 
+        """Timestamps associated with stimulus presentations on the
         monitor (corrected for monitor delay).
         :rtype: numpy.ndarray
         """
@@ -93,7 +94,7 @@ class BehaviorOphysSession(object):
         """Timestamps associated with frames captured by the microscope
         :rtype: numpy.ndarray
         """
-        if self._ophys_timestamps is None: 
+        if self._ophys_timestamps is None:
             self._ophys_timestamps = self.api.get_ophys_timestamps()
         return self._ophys_timestamps
 
@@ -305,6 +306,21 @@ class BehaviorOphysSession(object):
     def segmentation_mask_image(self, value):
         self._segmentation_mask_image = value
 
+    @property
+    def eye_tracking_data(self) -> pd.DataFrame:
+        """A dataframe containing DeepLabCut eye tracking ellipse fit
+        parameters for eye, pupil, and corneal reflection.
+
+        :rtype: pandas.DataFrame
+        """
+        if self._eye_tracking_data is None:
+            self._eye_tracking_data = self.api.get_eye_tracking_data()
+        return self._eye_tracking_data
+
+    @eye_tracking_data.setter
+    def eye_tracking_data(self, value):
+        self._eye_tracking_data = value
+
     def cache_clear(self) -> None:
         """Convenience method to clear the api cache, if applicable."""
         try:
@@ -320,7 +336,7 @@ class BehaviorOphysSession(object):
         Parameters
         ----------
         cell_specimen_ids : array-like of int, optional
-            ROI masks for these cell specimens will be returned. The default behavior is to return masks for all 
+            ROI masks for these cell specimens will be returned. The default behavior is to return masks for all
             cell specimens.
 
         Returns
@@ -356,7 +372,7 @@ class BehaviorOphysSession(object):
         ----------
         cell_roi_ids : array-like of int, optional
             ROI masks for these rois will be returned. The default behavior is to return masks for all rois.
-        
+
         Returns
         -------
         result : xr.DataArray
@@ -399,12 +415,12 @@ class BehaviorOphysSession(object):
             dims=("cell_roi_id", "row", "column"),
             coords={
                 "cell_roi_id": cell_roi_ids,
-                "row": np.arange(full_image_shape[0])*spacing[0],
-                "column": np.arange(full_image_shape[1])*spacing[1]
+                "row": np.arange(full_image_shape[0]) * spacing[0],
+                "column": np.arange(full_image_shape[1]) * spacing[1]
             },
             attrs={
-                "spacing":spacing,
-                "unit":unit
+                "spacing": spacing,
+                "unit": unit
             }
         ).squeeze(drop=True)
 
@@ -479,9 +495,9 @@ class BehaviorOphysSession(object):
         masks = self._get_roi_masks_by_cell_roi_id()
         mask_image_data = masks.any(dim='cell_roi_id').astype(int)
         mask_image = Image(
-            data = mask_image_data.values,
-            spacing = masks.attrs['spacing'],
-            unit = masks.attrs['unit']
+            data=mask_image_data.values,
+            spacing=masks.attrs['spacing'],
+            unit=masks.attrs['unit']
         )
         return mask_image
 
@@ -510,7 +526,7 @@ class BehaviorOphysSession(object):
         # Hit rate raw:
         hit_rate_raw = get_hit_rate(hit=self.trials.hit, miss=self.trials.miss, aborted=self.trials.aborted)
         performance_metrics_df['hit_rate_raw'] = pd.Series(hit_rate_raw, index=not_aborted_index)
-        
+
         # Hit rate with trial count correction:
         hit_rate = get_trial_count_corrected_hit_rate(hit=self.trials.hit, miss=self.trials.miss, aborted=self.trials.aborted)
         performance_metrics_df['hit_rate'] = pd.Series(hit_rate, index=not_aborted_index)
@@ -518,7 +534,7 @@ class BehaviorOphysSession(object):
         # False-alarm rate raw:
         false_alarm_rate_raw = get_false_alarm_rate(false_alarm=self.trials.false_alarm, correct_reject=self.trials.correct_reject, aborted=self.trials.aborted)
         performance_metrics_df['false_alarm_rate_raw'] = pd.Series(false_alarm_rate_raw, index=not_aborted_index)
-        
+
         # False-alarm rate with trial count correction:
         false_alarm_rate = get_trial_count_corrected_false_alarm_rate(false_alarm=self.trials.false_alarm, correct_reject=self.trials.correct_reject, aborted=self.trials.aborted)
         performance_metrics_df['false_alarm_rate'] = pd.Series(false_alarm_rate, index=not_aborted_index)
@@ -563,8 +579,8 @@ class BehaviorOphysSession(object):
 
 def _translate_roi_mask(mask, row_offset, col_offset):
     return np.roll(
-        mask, 
-        shift=(row_offset, col_offset), 
+        mask,
+        shift=(row_offset, col_offset),
         axis=(0, 1)
     )
 

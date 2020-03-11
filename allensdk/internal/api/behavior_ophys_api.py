@@ -4,18 +4,21 @@ import h5py
 import pandas as pd
 import uuid
 from typing import Optional
-import json
+from pathlib import Path
 
 from allensdk.api.cache import memoize
 from allensdk.internal.api.ophys_lims_api import OphysLimsApi
 from allensdk.brain_observatory.behavior.sync import (
     get_sync_data, get_stimulus_rebase_function, frame_time_offset)
+from allensdk.brain_observatory.sync_dataset import Dataset
+from allensdk.brain_observatory import sync_utilities
 from allensdk.internal.brain_observatory.time_sync import OphysTimeAligner
 from allensdk.brain_observatory.behavior.stimulus_processing import get_stimulus_presentations, get_stimulus_templates, get_stimulus_metadata
 from allensdk.brain_observatory.behavior.metadata_processing import get_task_parameters
 from allensdk.brain_observatory.behavior.running_processing import get_running_df
 from allensdk.brain_observatory.behavior.rewards_processing import get_rewards
 from allensdk.brain_observatory.behavior.trials_processing import get_trials
+from allensdk.brain_observatory.behavior.eye_tracking_processing import load_eye_tracking_hdf, process_eye_tracking_data
 from allensdk.brain_observatory.running_speed import RunningSpeed
 from allensdk.brain_observatory.behavior.image_api import ImageApi
 from allensdk.internal.api import PostgresQueryMixin
@@ -63,8 +66,8 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
     @memoize
     def get_experiment_container_id(self):
         query = '''
-                SELECT visual_behavior_experiment_container_id 
-                FROM ophys_experiments_visual_behavior_experiment_containers 
+                SELECT visual_behavior_experiment_container_id
+                FROM ophys_experiments_visual_behavior_experiment_containers
                 WHERE ophys_experiment_id= {};
                 '''.format(self.get_ophys_experiment_id())
         return self.lims_db.fetchone(query, strict=False)
@@ -214,7 +217,7 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
     @memoize
     def get_corrected_fluorescence_traces(self):
         demix_file = self.get_demix_file()
-        
+
         g = h5py.File(demix_file)
         corrected_fluorescence_trace_array = np.asarray(g['data'])
         g.close()
@@ -268,6 +271,31 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
         data = pd.read_pickle(filename)
         return get_extended_trials(data)
 
+    @memoize
+    def get_eye_tracking_data_filepath(self):
+        query = '''SELECT wkf.storage_directory || wkf.filename AS eye_tracking_file
+                   FROM ophys_experiments oe
+                   LEFT JOIN well_known_files wkf ON wkf.attachable_id=oe.ophys_session_id
+                   AND wkf.attachable_type = 'OphysSession'
+                   AND wkf.well_known_file_type_id=(SELECT id FROM well_known_file_types WHERE name = 'EyeTracking Ellipses')
+                   WHERE oe.id={};
+                   '''.format(self.get_ophys_experiment_id())
+        return safe_system_path(self.lims_db.fetchone(query, strict=True))
+
+    def get_eye_tracking_data(self):
+        filepath = Path(self.get_eye_tracking_data_filepath())
+        sync_path = Path(self.get_sync_file())
+
+        eye_tracking_data = load_eye_tracking_hdf(filepath)
+        frame_times = sync_utilities.get_synchronized_frame_times(
+            session_sync_file=sync_path,
+            sync_line_label_keys=Dataset.EYE_TRACKING_KEYS)
+
+        eye_tracking_data = process_eye_tracking_data(eye_tracking_data,
+                                                      frame_times)
+
+        return eye_tracking_data
+
     @staticmethod
     def get_ophys_experiment_df():
 
@@ -314,7 +342,7 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
                     FROM visual_behavior_experiment_containers vbc
                     '''
 
-        return pd.read_sql(query, api.get_connection()).rename(columns={'id':'container_id'})[['container_id', 'specimen_id', 'workflow_state']]
+        return pd.read_sql(query, api.get_connection()).rename(columns={'id': 'container_id'})[['container_id', 'specimen_id', 'workflow_state']]
 
     @classmethod
     def get_api_list_by_container_id(cls, container_id):
@@ -322,8 +350,6 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
         df = cls.get_ophys_experiment_df()
         oeid_list = df[df['container_id'] == container_id]['ophys_experiment_id'].values
         return [cls(oeid) for oeid in oeid_list]
-
-
 
 
 if __name__ == "__main__":
