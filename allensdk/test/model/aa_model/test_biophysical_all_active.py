@@ -87,55 +87,7 @@ def test_biophysical_aa():
     output_path = 'output_voltage.dat'
 
     DatUtilities.save_voltage(output_path, output_data, output_times)
-    
+
     num_spikes = len(ephys_features.detect_putative_spikes(output_data,output_times))
     assert num_spikes == 18 # taken from the web app where the legacy model output is shown
 
-
-@pytest.mark.requires_neuron
-def test_biophysical_peri():
-    """
-    Test for backward compatibility of the perisomatic models
-    """
-    # neuronal_model_id = 482934212    # get this from the web site
-
-    # model_directory = 'peri_model'
-
-    # bp = BiophysicalApi('http://api.brain-map.org')
-    # bp.cache_stimulus = False  # don't want to download the large stimulus NWB file
-    # bp.cache_data(neuronal_model_id, working_directory=model_directory)
-    # os.chdir(model_directory)
-    subprocess.check_call(['nrnivmodl','modfiles/'])
-
-    description = Config().load('manifest.json')
-    utils = Utils(description)
-    h = utils.h
-
-    manifest = description.manifest
-    morphology_path = manifest.get_path('MORPHOLOGY')
-    utils.generate_morphology(morphology_path.encode('ascii', 'ignore').decode("utf-8"))
-    utils.load_cell_parameters()
-
-    stim = h.IClamp(h.soma[0](0.5))
-    stim.amp = 0.35   # Sweep 47
-    stim.delay = 1000.0
-    stim.dur = 1000.0
-
-    h.tstop = 3000.0
-
-    vec = utils.record_values()
-
-    h.finitialize()
-    h.run()
-
-    junction_potential = description.data['fitting'][0]['junction_potential']
-    ms = 1.0e-3
-
-    output_data = (numpy.array(vec['v']) - junction_potential) # in mV
-    output_times = numpy.array(vec['t']) * ms # in s
-    output_path = 'output_voltage.dat'
-
-    DatUtilities.save_voltage(output_path, output_data, output_times)
-    
-    num_spikes = len(ephys_features.detect_putative_spikes(output_data,output_times))
-    assert num_spikes == 27 # taken from the web app 
