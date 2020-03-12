@@ -74,12 +74,12 @@ def create_utils(description, model_type=None):
     try:
        axon_type =  description.data['biophys'][1]['axon_type']
     except IndexError or KeyError:
-        axon_type = None
+        axon_type = 'reconstructed_axon'
         
     if model_type == PERISOMATIC_TYPE:
         return Utils(description)
     elif model_type == ALL_ACTIVE_TYPE:
-        return AllActiveUtils(description,axon_type)
+        return AllActiveUtils(description, axon_type)
 
 
 class Utils(HocUtils):
@@ -98,7 +98,7 @@ class Utils(HocUtils):
 
     _log = logging.getLogger(__name__)
 
-    def __init__(self, description,axon_type=None):                    
+    def __init__(self, description):                    
         self.update_default_cell_hoc(description)
 
         super(Utils, self).__init__(description)
@@ -108,7 +108,7 @@ class Utils(HocUtils):
         self.stimulus_sampling_rate = None
 
         self.stim_vec_list = []
-        self.axon_type = axon_type
+        
 
     def update_default_cell_hoc(self, description, default_cell_hoc='cell.hoc'):
         ''' replace the default 'cell.hoc' path in the manifest with 'cell.hoc' packaged
@@ -315,6 +315,10 @@ class Utils(HocUtils):
 
 
 class AllActiveUtils(Utils):
+    
+    def __init__(self, description,axon_type='reconstructed_axon'):                    
+        super(AllActiveUtils, self).__init__(description)
+        self.axon_type = axon_type
 
     def generate_morphology(self, morph_filename):
         '''Load a neurolucida or swc-format cell morphology file.
