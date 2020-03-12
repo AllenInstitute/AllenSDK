@@ -1,7 +1,8 @@
-import argschema as ags
+import argparse
 
-class runner_config(ags.ArgSchema):
-    manifest_file = ags.fields.InputFile(description=".json configurations for running the simulations")
-    axon_type = ags.fields.Str(description="axon replacement for all-active models: pass stub_axon for running the new models",
-                               default=None,allow_none=True)
-
+# Create the parser
+sim_parser = argparse.ArgumentParser(description='arguments to be passed for biophysical simualtions')
+sim_parser.add_argument('manifest_file',
+                        help='.json configurations for running the simulations')
+sim_parser.add_argument('--axon_type', required= False,
+                        help='axon replacement for biophysical models')
