@@ -45,7 +45,7 @@ import os
 import multiprocessing as mp
 from functools import partial
 import argschema as ags
-from ._schemas import runner_config
+from ._schemas import sim_parser
 
 _runner_log = logging.getLogger('allensdk.model.biophysical.runner')
 
@@ -195,24 +195,29 @@ def save_nwb(output_path, v, sweep, sweeps_by_type):
         logging.info("sweep %d has no sweep features. %s" % (sweep, e.args))
 
 
-def load_description(args):
+def load_description(args_dict):
     '''Read configurations.
 
     Parameters
     ----------
-    args : dict
-        schema containing the experiment configuration.
+    args_dict : dict
+        Parsed arguments dictionary with following keys.
+        
+        manifest_file : string
+            .json file with containing the experiment configuration
+        axon_type : string
+            Axon handling for the all-active models
 
     Returns
     -------
     Config
         Object with all information needed to run the experiment.
     '''
-    manifest_json_path = args['manifest_file']
+    manifest_json_path = args_dict['manifest_file']
     
     description = Config().load(manifest_json_path)
-    if args['axon_type'] == 'stub_axon': # For newest all-active models update the axon replacement
-        axon_replacement_dict = {'axon_type' : args['axon_type']}
+    if 'axon_type' in args_dict: # For newest all-active models update the axon replacement
+        axon_replacement_dict = {'axon_type' : args_dict['axon_type']}
         description.update_data(axon_replacement_dict,'biophys')
 
     # fix nonstandard description sections
@@ -223,5 +228,6 @@ def load_description(args):
 
 
 if '__main__' == __name__:
-    schema = ags.ArgSchemaParser(schema_type=runner_config)
-    run(schema.args)
+    schema = sim_parser.parse_args()
+    run(vars(schema))
+
