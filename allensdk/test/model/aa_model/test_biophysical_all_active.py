@@ -41,21 +41,22 @@ from allensdk.model.biophysical.utils import Utils, AllActiveUtils
 from allensdk.api.queries.biophysical_api import BiophysicalApi
 from allensdk.core.dat_utilities import DatUtilities
 from allensdk.ephys import ephys_features
+import subprocess
 
-@pytest.mark.xfail(raises=ImportError,reason='neuron installation required')
+@pytest.mark.requires_neuron
 def test_biophysical_aa():
     """
     Test for backward compatibility of the legacy all-active models
     """
-    neuronal_model_id = 497233125    # get this from the web site
+    #neuronal_model_id = 497233125    # get this from the web site
 
-    model_directory = 'aa_model'
+    # model_directory = 'aa_model'
+    # bp = BiophysicalApi('http://api.brain-map.org')
+    # bp.cache_stimulus = False  # don't want to download the large stimulus NWB file
+    # bp.cache_data(neuronal_model_id, working_directory=model_directory)
+    # os.chdir(model_directory)
 
-    bp = BiophysicalApi('http://api.brain-map.org')
-    bp.cache_stimulus = False  # don't want to download the large stimulus NWB file
-    bp.cache_data(neuronal_model_id, working_directory=model_directory)
-    os.chdir(model_directory)
-    os.system('nrnivmodl modfiles')
+    subprocess.check_call(['nrnivmodl','modfiles/'])
 
     description = Config().load('manifest.json')
     utils = AllActiveUtils(description)
@@ -89,23 +90,22 @@ def test_biophysical_aa():
     
     num_spikes = len(ephys_features.detect_putative_spikes(output_data,output_times))
     assert num_spikes == 18 # taken from the web app where the legacy model output is shown
-    os.chdir(os.pardir)
 
 
-@pytest.mark.xfail(raises=ImportError,reason='neuron installation required')
+@pytest.mark.requires_neuron
 def test_biophysical_peri():
     """
     Test for backward compatibility of the perisomatic models
     """
-    neuronal_model_id = 482934212    # get this from the web site
+    # neuronal_model_id = 482934212    # get this from the web site
 
-    model_directory = 'peri_model'
+    # model_directory = 'peri_model'
 
-    bp = BiophysicalApi('http://api.brain-map.org')
-    bp.cache_stimulus = False  # don't want to download the large stimulus NWB file
-    bp.cache_data(neuronal_model_id, working_directory=model_directory)
-    os.chdir(model_directory)
-    os.system('nrnivmodl modfiles')
+    # bp = BiophysicalApi('http://api.brain-map.org')
+    # bp.cache_stimulus = False  # don't want to download the large stimulus NWB file
+    # bp.cache_data(neuronal_model_id, working_directory=model_directory)
+    # os.chdir(model_directory)
+    subprocess.check_call(['nrnivmodl','modfiles/'])
 
     description = Config().load('manifest.json')
     utils = Utils(description)
@@ -113,7 +113,7 @@ def test_biophysical_peri():
 
     manifest = description.manifest
     morphology_path = manifest.get_path('MORPHOLOGY')
-    utils.generate_morphology(morphology_path.encode('ascii', 'ignore'))
+    utils.generate_morphology(morphology_path.encode('ascii', 'ignore').decode("utf-8"))
     utils.load_cell_parameters()
 
     stim = h.IClamp(h.soma[0](0.5))
@@ -139,4 +139,3 @@ def test_biophysical_peri():
     
     num_spikes = len(ephys_features.detect_putative_spikes(output_data,output_times))
     assert num_spikes == 27 # taken from the web app 
-    os.chdir(os.pardir)
