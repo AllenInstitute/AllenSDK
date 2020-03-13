@@ -2,7 +2,8 @@ import numpy as np
 import os.path
 import csv
 from functools import partial
-from typing import Type, Callable, Optional, List, Any, Dict
+from typing import Type, Optional, List, Any, Dict, Union
+from pathlib import Path
 import pandas as pd
 import time
 import logging
@@ -15,8 +16,7 @@ from allensdk.brain_observatory.behavior.internal.behavior_project_base\
     import BehaviorProjectBase
 from allensdk.api.caching_utilities import one_file_call_caching, call_caching
 from allensdk.core.exceptions import MissingDataError
-from allensdk.core.auth_config import LIMS_DB_CREDENTIAL_MAP
-from allensdk.core.authentication import credential_injector, DbCredentials
+from allensdk.core.authentication import DbCredentials
 
 BehaviorProjectApi = Type[BehaviorProjectBase]
 
@@ -64,10 +64,16 @@ class BehaviorProjectCache(Cache):
             self,
             fetch_api: Optional[BehaviorProjectApi] = None,
             fetch_tries: int = 2,
-            **kwargs):
+            manifest: Optional[Union[str, Path]] = None,
+            version: Optional[str] = None,
+            cache: bool = True):
         """ Entrypoint for accessing visual behavior data. Supports
         access to summaries of session data and provides tools for
         downloading detailed session data (such as dff traces).
+
+        Likely you will want to use a class constructor, such as `from_lims`,
+        to initialize a BehaviorProjectCache, rather than calling this
+        directly.
 
         --- NOTE ---
         Because NWB files are not currently supported for this project (as of
@@ -87,38 +93,88 @@ class BehaviorProjectCache(Cache):
             Used to pull data from remote sources, after which it is locally
             cached. Any object inheriting from BehaviorProjectBase is
             suitable. Current options are:
-                EcephysProjectLimsApi :: Fetches bleeding-edge data from the
+                BehaviorProjectLimsApi :: Fetches bleeding-edge data from the
                     Allen Institute"s internal database. Only works if you are
                     on our internal network.
         fetch_tries :
             Maximum number of times to attempt a download before giving up and
-            raising an exception. Note that this is total tries, not retries
-        **kwargs :
-            manifest : str or Path
-                full path at which manifest json will be stored
-            version : str
-                version of manifest file. If this mismatches the version
-                recorded in the file at manifest, an error will be raised.
-            other kwargs are passed to allensdk.api.cache.Cache
+            raising an exception. Note that this is total tries, not retries.
+            Default=2.
+        manifest : str or Path
+            full path at which manifest json will be stored. Defaults
+            to "behavior_project_manifest.json" in the local directory.
+        version : str
+            version of manifest file. If this mismatches the version
+            recorded in the file at manifest, an error will be raised.
+            Defaults to the manifest version in the class.
+        cache : bool
+            Whether to write to the cache. Default=True.
         """
-        kwargs["manifest"] = kwargs.get("manifest",
-                                        "behavior_project_manifest.json")
-        kwargs["version"] = kwargs.get("version", self.MANIFEST_VERSION)
+        manifest_ = manifest or "behavior_project_manifest.json"
+        version_ = version or self.MANIFEST_VERSION
 
-        super().__init__(**kwargs)
-        self.fetch_api = fetch_api or BehaviorProjectLimsApi.default()
+        super().__init__(manifest=manifest_, version=version_, cache=cache)
+        self.fetch_api = fetch_api
         self.fetch_tries = fetch_tries
         self.logger = logging.getLogger(self.__class__.__name__)
 
     @classmethod
-    def from_lims(cls, lims_credentials: Optional[DbCredentials] = None,
+    def from_lims(cls, manifest: Optional[Union[str, Path]] = None,
+                  version: Optional[str] = None,
+                  cache: bool = True,
+                  fetch_tries: int = 2,
+                  lims_credentials: Optional[DbCredentials] = None,
                   mtrain_credentials: Optional[DbCredentials] = None,
-                  app_kwargs: Dict[str, Any] = None, **kwargs):
-        return cls(fetch_api=BehaviorProjectLimsApi.default(
+                  host: Optional[str] = None,
+                  scheme: Optional[str] = None,
+                  asynchronous: bool = True) -> "BehaviorProjectCache":
+        """
+        Construct a BehaviorProjectCache with a lims api. Use this method
+        to create a  BehaviorProjectCache instance rather than calling
+        BehaviorProjectCache directly.
+
+        Parameters
+        ==========
+        manifest : str or Path
+            full path at which manifest json will be stored
+        version : str
+            version of manifest file. If this mismatches the version
+            recorded in the file at manifest, an error will be raised.
+        cache : bool
+            Whether to write to the cache
+        fetch_tries : int
+            Maximum number of times to attempt a download before giving up and
+            raising an exception. Note that this is total tries, not retries
+        lims_credentials : DbCredentials
+            Optional credentials to access LIMS database.
+            If not set, will look for credentials in environment variables.
+        mtrain_credentials: DbCredentials
+            Optional credentials to access mtrain database.
+            If not set, will look for credentials in environment variables.
+        host : str
+            Web host for the app_engine. Currently unused. This argument is
+            included for consistency with EcephysProjectCache.from_lims.
+        scheme : str
+            URI scheme, such as "http". Currently unused. This argument is
+            included for consistency with EcephysProjectCache.from_lims.
+        asynchronous : bool
+            Whether to fetch from web asynchronously. Currently unused.
+        Returns
+        =======
+        BehaviorProjectCache
+            BehaviorProjectCache instance with a LIMS fetch API
+        """
+        if host and scheme:
+            app_kwargs = {"host": host, "scheme": scheme,
+                          "asynchronous": asynchronous}
+        else:
+            app_kwargs = None
+        fetch_api = BehaviorProjectLimsApi.default(
                         lims_credentials=lims_credentials,
                         mtrain_credentials=mtrain_credentials,
-                        app_kwargs=app_kwargs),
-                   **kwargs)
+                        app_kwargs=app_kwargs)
+        return cls(fetch_api=fetch_api, manifest=manifest, version=version,
+                   cache=cache, fetch_tries=fetch_tries)
 
     def get_session_table(
             self,
