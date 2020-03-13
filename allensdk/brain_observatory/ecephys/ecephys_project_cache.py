@@ -11,11 +11,8 @@ import pynwb
 from allensdk.api.cache import Cache
 from allensdk.core.authentication import DbCredentials
 from allensdk.brain_observatory.ecephys.ecephys_project_api import (
-    EcephysProjectApi, EcephysProjectLimsApi, EcephysProjectWarehouseApi, 
+    EcephysProjectApi, EcephysProjectLimsApi, EcephysProjectWarehouseApi,
     EcephysProjectFixedApi
-)
-from allensdk.brain_observatory.ecephys.ecephys_project_api.rma_engine import (
-    AsyncRmaEngine, RmaEngine
 )
 from allensdk.brain_observatory.ecephys.ecephys_project_api.http_engine import (
     write_bytes_from_coroutine, write_from_stream
@@ -26,6 +23,7 @@ from allensdk.brain_observatory.ecephys.ecephys_session_api import (
 from allensdk.brain_observatory.ecephys.ecephys_session import EcephysSession
 from allensdk.brain_observatory.ecephys import get_unit_filter_value
 from allensdk.api.caching_utilities import one_file_call_caching
+
 
 class EcephysProjectCache(Cache):
 

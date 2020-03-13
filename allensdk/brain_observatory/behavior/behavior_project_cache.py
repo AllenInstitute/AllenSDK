@@ -127,7 +127,7 @@ class BehaviorProjectCache(Cache):
                   mtrain_credentials: Optional[DbCredentials] = None,
                   host: Optional[str] = None,
                   scheme: Optional[str] = None,
-                  asynchronous: Optional[str] = None) -> "BehaviorProjectCache":
+                  asynchronous: bool = True) -> "BehaviorProjectCache":
         """
         Construct a BehaviorProjectCache with a lims api. Use this method
         to create a  BehaviorProjectCache instance rather than calling
