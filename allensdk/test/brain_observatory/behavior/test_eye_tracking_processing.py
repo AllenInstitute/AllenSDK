@@ -90,20 +90,26 @@ def test_load_eye_tracking_hdf(hdf_fixture: Path, expected: pd.DataFrame):
     (create_area_df(
         np.array([[1, 1, 2],
                   [2, 2, 1],
-                  [1, 9, 1],
+                  [1, 7, 3],
                   [1, 1, 1],
-                  [2, 1, 100]])),
-     3.0,
-     pd.Series([False, False, True, False, True])),
+                  [1, 3, 2],
+                  [1, 1, 1],
+                  [1, 2, 1],
+                  [2, 1, 1000]])),
+     2.5,
+     pd.Series([False, False, False, False, False, False, False, True])),
 
     (create_area_df(
         np.array([[1, 1, 2],
                   [2, 2, 1],
-                  [1, 9, 1],
+                  [1, 7, 3],
                   [1, 1, 1],
-                  [2, 1, 100]])),
-     3.7,
-     pd.Series([False, False, False, False, True])),
+                  [1, 3, 2],
+                  [1, 1, 1],
+                  [1, 2, 1],
+                  [2, 1, 1000]])),
+     2.0,
+     pd.Series([False, False, True, False, False, False, False, True])),
 
 ])
 def test_determine_outliers(data_df, z_threshold, expected):

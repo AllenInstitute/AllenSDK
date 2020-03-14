@@ -74,7 +74,7 @@ def determine_outliers(data_df: pd.DataFrame,
     # in determine_likely_blinks().
     nan_filled_df = data_df.fillna(data_df.mean())
 
-    outliers = (np.abs(stats.zscore(nan_filled_df, axis=1)) > z_threshold)
+    outliers = (nan_filled_df.apply(stats.zscore).apply(np.abs) > z_threshold)
     return pd.Series(outliers.any(axis=1))
 
 
