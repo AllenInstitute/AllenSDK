@@ -6,8 +6,8 @@ import numpy as np
 import pandas as pd
 
 from allensdk.brain_observatory.behavior.eye_tracking_processing import (
-    load_eye_tracking_hdf, determine_outliers, compute_pupil_area,
-    compute_eye_area, determine_likely_blinks, process_eye_tracking_data)
+    load_eye_tracking_hdf, determine_outliers, compute_circular_area,
+    compute_elliptical_area, determine_likely_blinks, process_eye_tracking_data)
 
 
 def create_preload_eye_tracking_df(data: np.ndarray) -> pd.DataFrame:
@@ -26,8 +26,8 @@ def create_loaded_eye_tracking_df(data: np.ndarray) -> pd.DataFrame:
 
 
 def create_refined_eye_tracking_df(data: np.ndarray) -> pd.DataFrame:
-    columns = ["time", "eye_area", "pupil_area", "likely_blink", "cr_center_x",
-               "cr_center_y", "cr_width", "cr_height", "cr_phi",
+    columns = ["time", "cr_area", "eye_area", "pupil_area", "likely_blink",
+               "cr_center_x", "cr_center_y", "cr_width", "cr_height", "cr_phi",
                "eye_center_x", "eye_center_y", "eye_width", "eye_height",
                "eye_phi", "pupil_center_x", "pupil_center_y", "pupil_width",
                "pupil_height", "pupil_phi"]
@@ -110,8 +110,8 @@ def test_determine_outliers(eye_tracking_df, z_threshold, expected):
     (pd.Series([3, 2], index=["width", "height"]), 9 * np.pi),
     (pd.Series([2, 3], index=["width", "height"]), 9 * np.pi),
 ])
-def test_compute_pupil_area(df_row: pd.Series, expected: float):
-    obtained_area = compute_pupil_area(df_row)
+def test_compute_circular_area(df_row: pd.Series, expected: float):
+    obtained_area = compute_circular_area(df_row)
     assert obtained_area == expected
 
 
@@ -119,8 +119,8 @@ def test_compute_pupil_area(df_row: pd.Series, expected: float):
     (pd.Series([3, 2], index=["width", "height"]), 6 * np.pi),
     (pd.Series([2, 3], index=["width", "height"]), 6 * np.pi),
 ])
-def test_compute_eye_area(df_row: pd.Series, expected: float):
-    obtained_area = compute_eye_area(df_row)
+def test_compute_elliptical_area(df_row: pd.Series, expected: float):
+    obtained_area = compute_elliptical_area(df_row)
     assert obtained_area == expected
 
 
@@ -162,9 +162,9 @@ def test_process_eye_tracking_data_raises_on_sync_error(eye_tracking_df,
                   [2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14., 15., 16.]])),
      pd.Series([0.1, 0.2]),
      create_refined_eye_tracking_df(
-         np.array([[0.1, 72 * np.pi, 196 * np.pi, False,
+         np.array([[0.1, 12 * np.pi, 72 * np.pi, 196 * np.pi, False,
                     1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14., 15.],
-                   [0.2, 90 * np.pi, 225 * np.pi, False,
+                   [0.2, 20 * np.pi, 90 * np.pi, 225 * np.pi, False,
                     2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14., 15., 16.]]))
      ),
 ])

@@ -76,14 +76,46 @@ def determine_outliers(eye_tracking_df: pd.DataFrame,
     return pd.Series(outliers.any(axis=1))
 
 
-def compute_pupil_area(df_row: pd.Series) -> float:
-    # Calculate the area of the pupil as a circle using the max of the
-    # height/width as radius
+def compute_circular_area(df_row: pd.Series) -> float:
+    """Calculate the area of the pupil as a circle using the max of the
+    height/width as radius.
+
+    Note: This calculation assumes that the pupil is a perfect circle
+    and any eccentricity is a result of the angle at which the pupil is
+    being viewed.
+
+    Parameters
+    ----------
+    df_row : pd.Series
+        A row from an eye tracking dataframe containing only "pupil_width"
+        and "pupil_height".
+
+    Returns
+    -------
+    float
+        The circular area of the pupil in pixels^2.
+    """
     max_dim = max(df_row.iloc[0], df_row.iloc[1])
     return np.pi * max_dim * max_dim
 
 
-def compute_eye_area(df_row: pd.Series) -> float:
+def compute_elliptical_area(df_row: pd.Series) -> float:
+    """Calculate the area of corneal reflection (cr) or eye ellipse fits using
+    the ellipse formula.
+
+    Parameters
+    ----------
+    df_row : pd.Series
+        A row from an eye tracking dataframe containing either:
+        "cr_width", "cr_height"
+        or
+        "eye_width", "eye_height"
+
+    Returns
+    -------
+    float
+        The elliptical area of the eye or cr in pixels^2
+    """
     return np.pi * df_row.iloc[0] * df_row.iloc[1]
 
 
@@ -149,16 +181,21 @@ def process_eye_tracking_data(eye_data: pd.DataFrame,
                            f"number of eye tracking frames "
                            f"({len(eye_data.index)})!")
 
-    eye_areas = eye_data[["eye_width", "eye_height"]].apply(compute_eye_area, axis=1)
-    pupil_areas = eye_data[["pupil_width", "pupil_height"]].apply(compute_pupil_area, axis=1)
+    cr_areas = (eye_data[["cr_width", "cr_height"]]
+                .apply(compute_elliptical_area, axis=1))
+    eye_areas = (eye_data[["eye_width", "eye_height"]]
+                 .apply(compute_elliptical_area, axis=1))
+    pupil_areas = (eye_data[["pupil_width", "pupil_height"]]
+                   .apply(compute_circular_area, axis=1))
     outliers = determine_outliers(eye_data, z_threshold=3.0)
     likely_blinks = determine_likely_blinks(eye_areas,
                                             pupil_areas,
                                             outliers)
 
     eye_data.insert(0, "time", frame_times)
-    eye_data.insert(1, "eye_area", eye_areas)
-    eye_data.insert(2, "pupil_area", pupil_areas)
-    eye_data.insert(3, "likely_blink", likely_blinks)
+    eye_data.insert(1, "cr_area", cr_areas)
+    eye_data.insert(2, "eye_area", eye_areas)
+    eye_data.insert(3, "pupil_area", pupil_areas)
+    eye_data.insert(4, "likely_blink", likely_blinks)
 
     return eye_data

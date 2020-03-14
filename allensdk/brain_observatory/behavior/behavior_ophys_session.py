@@ -308,8 +308,32 @@ class BehaviorOphysSession(object):
 
     @property
     def eye_tracking_data(self) -> pd.DataFrame:
-        """A dataframe containing DeepLabCut eye tracking ellipse fit
-        parameters for eye, pupil, and corneal reflection.
+        """A dataframe containing ellipse fit parameters for the eye, pupil
+        and corneal reflection (cr). Fits are derived from tracking points
+        from a DeepLabCut model applied to video frames of a subject's
+        right eye. Raw tracking points and raw video frames are not exposed
+        by the SDK.
+
+        Notes:
+        - All columns starting with 'pupil_' represent ellipse fit parameters
+          relating to the pupil.
+        - All columns starting with 'eye_' represent ellipse fit parameters
+          relating to the eyelid.
+        - All columns starting with 'cr_' represent ellipse fit parameters
+          relating to the corneal reflection, which is caused by an infrared
+          LED positioned near the eye tracking camera.
+        - All positions are in units of pixels.
+        - All areas are in units of pixels^2
+        - All values are in the coordinate space of the eye tracking camera,
+          NOT the coordinate space of the stimulus display (i.e. this is not
+          gaze location), with (0, 0) being the upper-left corner of the
+          eye-tracking image.
+        - The 'likely_blink' column is True for any row (frame) where the pupil
+          fit failed OR eye fit failed OR an outlier fit was identified.
+        - All ellipse fits are derived from tracking points that were output by
+          a DeepLabCut model that was trained on hand-annotated data frome a
+          subset of imaging sessions on optical physiology rigs.
+        - Raw DeepLabCut tracking points are not publicly available.
 
         :rtype: pandas.DataFrame
         """
