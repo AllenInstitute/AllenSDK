@@ -25,6 +25,11 @@ def create_loaded_eye_tracking_df(data: np.ndarray) -> pd.DataFrame:
     return df
 
 
+def create_area_df(data: np.ndarray) -> pd.DataFrame:
+    columns = ["cr_area", "eye_area", "pupil_area"]
+    return pd.DataFrame(data, columns=columns)
+
+
 def create_refined_eye_tracking_df(data: np.ndarray) -> pd.DataFrame:
     columns = ["time", "cr_area", "eye_area", "pupil_area", "likely_blink",
                "cr_center_x", "cr_center_y", "cr_width", "cr_height", "cr_phi",
@@ -81,28 +86,28 @@ def test_load_eye_tracking_hdf(hdf_fixture: Path, expected: pd.DataFrame):
     assert expected.equals(obtained)
 
 
-@pytest.mark.parametrize("eye_tracking_df, z_threshold, expected", [
-    (create_loaded_eye_tracking_df(
-        np.array([[1, 1, 2, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 2, 1],
-                  [2, 2, 1, 1, 2, 2, 1, 2, 2, 1, 2, 1, 2, 1, 2],
-                  [1, 2, 9, 1, 1, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1],
-                  [1, 1, 1, 2, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1],
-                  [2, 1, 1, 1, 2, 1, 1, 1, 1, 2, 1, 2, 1, 1, 100]])),
+@pytest.mark.parametrize("data_df, z_threshold, expected", [
+    (create_area_df(
+        np.array([[1, 1, 2],
+                  [2, 2, 1],
+                  [1, 9, 1],
+                  [1, 1, 1],
+                  [2, 1, 100]])),
      3.0,
      pd.Series([False, False, True, False, True])),
 
-    (create_loaded_eye_tracking_df(
-        np.array([[1, 1, 2, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 2, 1],
-                  [2, 2, 1, 1, 2, 2, 1, 2, 2, 1, 2, 1, 2, 1, 2],
-                  [1, 2, 9, 1, 1, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1],
-                  [1, 1, 1, 2, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1],
-                  [2, 1, 1, 1, 2, 1, 1, 1, 1, 2, 1, 2, 1, 1, 100]])),
+    (create_area_df(
+        np.array([[1, 1, 2],
+                  [2, 2, 1],
+                  [1, 9, 1],
+                  [1, 1, 1],
+                  [2, 1, 100]])),
      3.7,
      pd.Series([False, False, False, False, True])),
 
 ])
-def test_determine_outliers(eye_tracking_df, z_threshold, expected):
-    obtained = determine_outliers(eye_tracking_df, z_threshold)
+def test_determine_outliers(data_df, z_threshold, expected):
+    obtained = determine_outliers(data_df, z_threshold)
     assert np.allclose(obtained, expected)
 
 

@@ -49,28 +49,30 @@ def load_eye_tracking_hdf(eye_tracking_file: Path) -> pd.DataFrame:
     return eye_tracking_data.astype(float)
 
 
-def determine_outliers(eye_tracking_df: pd.DataFrame,
-                       z_threshold: float) -> np.ndarray:
-    """Given an eye tracking dataframe and some z-score threshold return
-    a set of frames indices whose column values exceed the z-score threshold.
+def determine_outliers(data_df: pd.DataFrame,
+                       z_threshold: float) -> pd.Series:
+    """Given a dataframe and some z-score threshold return a pandas boolean
+    Series where each entry indicates whether a given row contains at least
+    one outlier (where outliers are calculated along columns).
 
     Parameters
     ----------
-    eye_tracking_df : pd.DataFrame
-        An eye tracking dataframe produced by load_eye_tracking_hdf().
+    data_df : pd.DataFrame
+        A dataframe containing only columns where outlier detection is
+        desired. (e.g. "cr_area", "eye_area", "pupil_area")
     z_threshold : float
         z-score values higher than the z_threshold will be considered outliers.
 
     Returns
     -------
-    np.ndarray
-        A numpy boolean array whose length == len(eye_tracking_df.index).
-        True denotes that a row in the eye_tracking_df contains an outlier.
+    pd.Series
+        A pandas boolean Series whose length == len(data_df.index).
+        True denotes that a row in the data_df contains at least one outlier.
     """
-
     # Dataframe must have NANs filled to prevent warning when performing
-    # comparisons against the z_threshold
-    nan_filled_df = eye_tracking_df.fillna(eye_tracking_df.mean())
+    # comparisons against the z_threshold. NANs will be filtered out
+    # in determine_likely_blinks().
+    nan_filled_df = data_df.fillna(data_df.mean())
 
     outliers = (np.abs(stats.zscore(nan_filled_df, axis=1)) > z_threshold)
     return pd.Series(outliers.any(axis=1))
@@ -187,7 +189,10 @@ def process_eye_tracking_data(eye_data: pd.DataFrame,
                  .apply(compute_elliptical_area, axis=1))
     pupil_areas = (eye_data[["pupil_width", "pupil_height"]]
                    .apply(compute_circular_area, axis=1))
-    outliers = determine_outliers(eye_data, z_threshold=3.0)
+
+    area_df = pd.concat([cr_areas, eye_areas, pupil_areas], axis=1)
+    outliers = determine_outliers(area_df, z_threshold=3.0)
+
     likely_blinks = determine_likely_blinks(eye_areas,
                                             pupil_areas,
                                             outliers)
