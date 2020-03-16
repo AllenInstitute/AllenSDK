@@ -58,6 +58,10 @@ class BehaviorOphysSession(object):
         self._segmentation_mask_image = None
         self._eye_tracking_data = None
 
+        # Keep track of args for data processing functions that hydrate
+        # ophys behavior session properties.
+        self._eye_tracking_processing_args = None
+
     # Using properties rather than initializing attributes to take advantage
     # of API-level cache and not introduce a lot of overhead when the
     # class is initialized (sometimes these calls can take a while)
@@ -337,13 +341,56 @@ class BehaviorOphysSession(object):
 
         :rtype: pandas.DataFrame
         """
+        kwargs = self.eye_tracking_processing_args
+
+        logging.getLogger("BehaviorOphysSession").info(
+            f"Eye tracking data retrieved with the following parameters:"
+            f" {kwargs}"
+        )
+
         if self._eye_tracking_data is None:
-            self._eye_tracking_data = self.api.get_eye_tracking_data()
+            self._eye_tracking_data = self.api.get_eye_tracking_data(**kwargs)
         return self._eye_tracking_data
 
     @eye_tracking_data.setter
     def eye_tracking_data(self, value):
         self._eye_tracking_data = value
+
+    @property
+    def eye_tracking_processing_args(self) -> dict:
+        """Arguments used when processing 'eye_tracking_data'.
+
+        This must be a python dictionary with the following items:
+
+        z_threshold : float
+            z-score values higher than the z_threshold in the
+            'eye_tracking_data' will be considered outliers, by default 3.0.
+
+        dilation_frames : int
+            Determines the number of additional adjacent frames to mark as
+            'likely_blink' when detecting likely blinks for the
+            'eye_tracking_data', by default 2.
+
+        :rtype: dict
+        """
+        if self._eye_tracking_processing_args is None:
+            self._eye_tracking_processing_args = {"z_threshold": 3.0,
+                                                  "dilation_frames": 2}
+        return self._eye_tracking_processing_args
+
+    @eye_tracking_processing_args.setter
+    def eye_tracking_processing_args(self, value: dict):
+        if ((not isinstance(value, dict)) or ("z_threshold" not in value) or ("dilation_frames" not in value)):
+            raise TypeError("'eye_tracking_processing_args' must be a dict "
+                            "with the following items: {'z_threshold': "
+                            "(float), 'dilation_frames': (int)}")
+
+        self._eye_tracking_processing_args = value
+        logging.getLogger("BehaviorOphysSession").info(
+            "'eye_tracking_processing_args' have been changed! "
+            "The session 'eye_tracking_data' will now be cleared."
+        )
+        self._eye_tracking_data = None
 
     def cache_clear(self) -> None:
         """Convenience method to clear the api cache, if applicable."""

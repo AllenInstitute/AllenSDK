@@ -151,7 +151,9 @@ def determine_likely_blinks(eye_areas: pd.Series,
 
 
 def process_eye_tracking_data(eye_data: pd.DataFrame,
-                              frame_times: pd.Series) -> pd.DataFrame:
+                              frame_times: pd.Series,
+                              z_threshold: float = 3.0,
+                              dilation_frames: int = 2) -> pd.DataFrame:
     """Processes and refines raw eye tracking data by adding additional
     computed feature columns.
 
@@ -162,6 +164,12 @@ def process_eye_tracking_data(eye_data: pd.DataFrame,
     frame_times : pd.Series
         A series of frame times acquired from a behavior + ophy session
         'sync file'.
+    z_threshold : float
+        z-score values higher than the z_threshold will be considered outliers,
+        by default 3.0.
+    dilation_frames : int, optional
+        Determines the number of additional adjacent frames to mark as
+        'likely_blink', by default 2.
 
     Returns
     -------
@@ -191,11 +199,12 @@ def process_eye_tracking_data(eye_data: pd.DataFrame,
                    .apply(compute_circular_area, axis=1))
 
     area_df = pd.concat([cr_areas, eye_areas, pupil_areas], axis=1)
-    outliers = determine_outliers(area_df, z_threshold=3.0)
+    outliers = determine_outliers(area_df, z_threshold=z_threshold)
 
     likely_blinks = determine_likely_blinks(eye_areas,
                                             pupil_areas,
-                                            outliers)
+                                            outliers,
+                                            dilation_frames=dilation_frames)
 
     eye_data.insert(0, "time", frame_times)
     eye_data.insert(1, "cr_area", cr_areas)

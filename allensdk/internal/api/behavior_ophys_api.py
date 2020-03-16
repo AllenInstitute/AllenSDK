@@ -282,7 +282,9 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
                    '''.format(self.get_ophys_experiment_id())
         return safe_system_path(self.lims_db.fetchone(query, strict=True))
 
-    def get_eye_tracking_data(self):
+    def get_eye_tracking_data(self,
+                              z_threshold: float = 3.0,
+                              dilation_frames: int = 2):
         filepath = Path(self.get_eye_tracking_data_filepath())
         sync_path = Path(self.get_sync_file())
 
@@ -292,7 +294,9 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
             sync_line_label_keys=Dataset.EYE_TRACKING_KEYS)
 
         eye_tracking_data = process_eye_tracking_data(eye_tracking_data,
-                                                      frame_times)
+                                                      frame_times,
+                                                      z_threshold,
+                                                      dilation_frames)
 
         return eye_tracking_data
 
