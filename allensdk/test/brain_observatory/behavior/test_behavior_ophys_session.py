@@ -1,5 +1,4 @@
 import os
-import warnings
 import datetime
 import uuid
 import math
@@ -7,9 +6,6 @@ import pytest
 import pandas as pd
 import pytz
 import numpy as np
-import h5py
-import SimpleITK as sitk
-from pandas.util.testing import assert_frame_equal
 from imageio import imread
 
 from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorOphysSession
@@ -23,10 +19,10 @@ from allensdk.brain_observatory.behavior.image_api import ImageApi
 @pytest.mark.requires_bamboo
 @pytest.mark.parametrize("get_expected,get_from_session", [
     [
-        lambda ssn_data: ssn_data["ophys_experiment_id"], 
+        lambda ssn_data: ssn_data["ophys_experiment_id"],
         lambda ssn: ssn.ophys_experiment_id],
     [
-        lambda ssn_data: ssn_data["targeted_structure"], 
+        lambda ssn_data: ssn_data["targeted_structure"],
         lambda ssn: ssn.metadata["targeted_structure"]
     ],
     [
@@ -42,7 +38,6 @@ def test_session_from_json(tmpdir_factory, session_data, get_expected, get_from_
     obtained = get_from_session(session)
 
     compare_fields(expected, obtained)
-    
 
 
 @pytest.mark.requires_bamboo
@@ -69,7 +64,6 @@ def test_visbeh_ophys_data_set():
     # print
     # for _, row in data_set.roi_masks.iterrows():
     #     print(np.array(row.to_dict()['mask']).sum())
-
 
     # All sorts of assert relationships:
     assert data_set.api.get_foraging_id() == str(data_set.api.get_behavior_session_uuid())
@@ -161,11 +155,11 @@ def test_trial_response_window_bounds_reward(ophys_experiment_id):
 
             # monitor delay is incorporated into the trials table change time
             # TODO: where is this set in the session object?
-            camstim_change_time = row.change_time - 0.0351  
+            camstim_change_time = row.change_time - 0.0351
 
             reward_time = (row.reward_time - camstim_change_time)
-            assert response_window[0] < reward_time + 1/60
-            assert reward_time < response_window[1] + 1/60
+            assert response_window[0] < reward_time + 1 / 60
+            assert reward_time < response_window[1] + 1 / 60
             if len(session.licks) > 0:
                 assert lick_times[0] < reward_time
 
@@ -190,20 +184,24 @@ def cell_specimen_table_api():
     ])
 
     class CellSpecimenTableApi(BehaviorOphysApiBase):
+
         def get_cell_specimen_table(self):
-            return pd.DataFrame({
-                "cell_roi_id": [1, 2],
-                "y": [1, 1],
-                "x": [2, 1],
-                "image_mask": [roi_1, roi_2]
-            }, index=pd.Index(data=[10, 11], name="cell_specimen_id")
-        )
+            return pd.DataFrame(
+                {
+                    "cell_roi_id": [1, 2],
+                    "y": [1, 1],
+                    "x": [2, 1],
+                    "image_mask": [roi_1, roi_2]
+                }, index=pd.Index(data=[10, 11], name="cell_specimen_id")
+            )
+
         def get_segmentation_mask_image(self):
-            data = roi_1 #useless image data here
+            data = roi_1  # useless image data here
             spacing = (1, 1)
             unit = 'index'
             return ImageApi.serialize(data, spacing, unit)
     return CellSpecimenTableApi()
+
 
 @pytest.mark.parametrize("roi_ids,expected", [
     [

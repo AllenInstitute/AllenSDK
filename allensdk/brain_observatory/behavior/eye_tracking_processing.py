@@ -146,7 +146,11 @@ def determine_likely_blinks(eye_areas: pd.Series,
         of eye tracking dataframe rows (frames).
     """
     blinks = pd.isnull(eye_areas) | pd.isnull(pupil_areas) | outliers
-    likely_blinks = ndimage.binary_dilation(blinks, iterations=dilation_frames)
+    if dilation_frames > 0:
+        likely_blinks = ndimage.binary_dilation(blinks,
+                                                iterations=dilation_frames)
+    else:
+        likely_blinks = blinks
     return pd.Series(likely_blinks)
 
 

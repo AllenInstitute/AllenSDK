@@ -147,6 +147,13 @@ def test_compute_elliptical_area(df_row: pd.Series, expected: float):
      pd.Series([False, False, False, False, False, False, False, False, True]),
      1,
      pd.Series([True, True, False, True, True, True, False, True, True])),
+
+
+    (pd.Series([4, 8, 3, 20, np.nan, 10, 21, 19, 42]),
+     pd.Series([np.nan, 10, 2, 30, 99, 80, 93, 18, 777]),
+     pd.Series([False, False, False, False, False, False, False, False, True]),
+     0,
+     pd.Series([True, False, False, False, True, False, False, False, True])),
 ])
 def test_determine_likely_blinks(eye_areas, pupil_areas, outliers,
                                  dilation_frames, expected):
