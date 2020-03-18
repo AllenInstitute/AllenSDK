@@ -1,10 +1,12 @@
-import matplotlib.image as mpimg  # NOQA: E402
+import logging
+from typing import Optional
+from pathlib import Path
+
 import numpy as np
 import h5py
 import pandas as pd
 import uuid
-from typing import Optional
-from pathlib import Path
+import matplotlib.image as mpimg  # NOQA: E402
 
 from allensdk.api.cache import memoize
 from allensdk.internal.api.ophys_lims_api import OphysLimsApi
@@ -272,7 +274,7 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
         return get_extended_trials(data)
 
     @memoize
-    def get_eye_tracking_data_filepath(self):
+    def get_eye_tracking_filepath(self):
         query = '''SELECT wkf.storage_directory || wkf.filename AS eye_tracking_file
                    FROM ophys_experiments oe
                    LEFT JOIN well_known_files wkf ON wkf.attachable_id=oe.ophys_session_id
@@ -282,10 +284,16 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
                    '''.format(self.get_ophys_experiment_id())
         return safe_system_path(self.lims_db.fetchone(query, strict=True))
 
-    def get_eye_tracking_data(self,
-                              z_threshold: float = 3.0,
-                              dilation_frames: int = 2):
-        filepath = Path(self.get_eye_tracking_data_filepath())
+    def get_eye_tracking(self,
+                         z_threshold: float = 3.0,
+                         dilation_frames: int = 2):
+        logger = logging.getLogger("BehaviorOphysLimsApi")
+
+        logger.info(f"Getting eye_tracking_data with "
+                    f"'z_threshold={z_threshold}', "
+                    f"'dilation_frames={dilation_frames}'")
+
+        filepath = Path(self.get_eye_tracking_filepath())
         sync_path = Path(self.get_sync_file())
 
         eye_tracking_data = load_eye_tracking_hdf(filepath)
