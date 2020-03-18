@@ -7,6 +7,7 @@ import pandas as pd
 import pytz
 import numpy as np
 from imageio import imread
+from unittest.mock import MagicMock
 
 from allensdk.brain_observatory.behavior.behavior_ophys_session import BehaviorOphysSession
 from allensdk.brain_observatory.behavior.write_nwb.__main__ import BehaviorOphysJsonApi
@@ -275,3 +276,27 @@ def test_get_roi_masks(cell_specimen_ids, expected, cell_specimen_table_api):
     ssn = BehaviorOphysSession(api=cell_specimen_table_api)
     obtained = ssn.get_roi_masks(cell_specimen_ids)
     assert np.allclose(expected, obtained.values)
+
+
+@pytest.mark.parametrize("dilation_frames, z_threshold, eye_tracking_start_value", [
+    (5, 9, None),
+    (1, 2, None),
+    (3, 3, pd.DataFrame([5, 6, 7]))
+])
+def test_eye_tracking(dilation_frames, z_threshold, eye_tracking_start_value):
+    mock = MagicMock()
+    mock.get_eye_tracking.return_value = pd.DataFrame([1, 2, 3])
+    session = BehaviorOphysSession(api=mock,
+                                   eye_tracking_z_threshold=z_threshold,
+                                   eye_tracking_dilation_frames=dilation_frames)
+
+    if eye_tracking_start_value is not None:
+        session.eye_tracking = eye_tracking_start_value
+        obtained = session.eye_tracking
+        assert not session.api.get_eye_tracking.called
+        assert obtained.equals(eye_tracking_start_value)
+    else:
+        obtained = session.eye_tracking
+        assert obtained.equals(pd.DataFrame([1, 2, 3]))
+        assert session.api.get_eye_tracking.called_with(z_threshold=z_threshold,
+                                                        dilation_frames=dilation_frames)
