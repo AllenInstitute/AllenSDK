@@ -48,15 +48,8 @@ def test_biophysical_aa():
     """
     Test for backward compatibility of the legacy all-active models
     """
-    #neuronal_model_id = 497233125    # get this from the web site
-
-    # model_directory = 'aa_model'
-    # bp = BiophysicalApi('http://api.brain-map.org')
-    # bp.cache_stimulus = False  # don't want to download the large stimulus NWB file
-    # bp.cache_data(neuronal_model_id, working_directory=model_directory)
-    # os.chdir(model_directory)
-
-    subprocess.check_call(['nrnivmodl','modfiles/'])
+    
+    subprocess.check_call(['nrnivmodl', 'modfiles/'])
 
     description = Config().load('manifest.json')
     utils = AllActiveUtils(description)
@@ -82,12 +75,11 @@ def test_biophysical_aa():
     junction_potential = description.data['fitting'][0]['junction_potential']
     ms = 1.0e-3
 
-    output_data = (numpy.array(vec['v']) - junction_potential) # in mV
-    output_times = numpy.array(vec['t']) * ms # in s
+    output_data = (numpy.array(vec['v']) - junction_potential)  # in mV
+    output_times = numpy.array(vec['t']) * ms  # in s
     output_path = 'output_voltage.dat'
 
     DatUtilities.save_voltage(output_path, output_data, output_times)
 
-    num_spikes = len(ephys_features.detect_putative_spikes(output_data,output_times))
-    assert num_spikes == 18 # taken from the web app where the legacy model output is shown
-
+    num_spikes = len(ephys_features.detect_putative_spikes(output_data, output_times))
+    assert num_spikes == 18  # taken from the web app where the legacy model output is shown

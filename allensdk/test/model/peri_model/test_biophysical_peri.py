@@ -48,15 +48,8 @@ def test_biophysical_peri():
     """
     Test for backward compatibility of the perisomatic models
     """
-    # neuronal_model_id = 482934212    # get this from the web site
-
-    # model_directory = 'peri_model'
-
-    # bp = BiophysicalApi('http://api.brain-map.org')
-    # bp.cache_stimulus = False  # don't want to download the large stimulus NWB file
-    # bp.cache_data(neuronal_model_id, working_directory=model_directory)
-    # os.chdir(model_directory)
-    subprocess.check_call(['nrnivmodl','modfiles/'])
+    
+    subprocess.check_call(['nrnivmodl', 'modfiles/'])
 
     description = Config().load('manifest.json')
     utils = Utils(description)
@@ -82,11 +75,11 @@ def test_biophysical_peri():
     junction_potential = description.data['fitting'][0]['junction_potential']
     ms = 1.0e-3
 
-    output_data = (numpy.array(vec['v']) - junction_potential) # in mV
-    output_times = numpy.array(vec['t']) * ms # in s
+    output_data = (numpy.array(vec['v']) - junction_potential)  # in mV
+    output_times = numpy.array(vec['t']) * ms  # in s
     output_path = 'output_voltage.dat'
 
     DatUtilities.save_voltage(output_path, output_data, output_times)
 
-    num_spikes = len(ephys_features.detect_putative_spikes(output_data,output_times))
-    assert num_spikes == 27 # taken from the web app
+    num_spikes = len(ephys_features.detect_putative_spikes(output_data, output_times))
+    assert num_spikes == 27  # taken from the web app

@@ -72,7 +72,7 @@ def create_utils(description, model_type=None):
             logging.error("Could not infer model type from description")
 
     try:
-       axon_type =  description.data['biophys'][1]['axon_type']
+       axon_type = description.data['biophys'][1]['axon_type']
     except IndexError or KeyError:
         axon_type = 'reconstructed_axon'
         
@@ -98,7 +98,7 @@ class Utils(HocUtils):
 
     _log = logging.getLogger(__name__)
 
-    def __init__(self, description):                    
+    def __init__(self, description):
         self.update_default_cell_hoc(description)
 
         super(Utils, self).__init__(description)
@@ -316,7 +316,18 @@ class Utils(HocUtils):
 
 class AllActiveUtils(Utils):
     
-    def __init__(self, description,axon_type='reconstructed_axon'):                    
+    def __init__(self, description, axon_type='reconstructed_axon'):
+        """
+        Parameters
+        ----------
+        description : Config
+            Configuration to run the simulation
+        axon_type : string
+                reconstructed_axon - diameter of the axon segments is read from .swc (default)
+                stub_axon - diameter of axon segments is 1 micron
+            How the axon is replaced within NEURON
+                
+        """
         super(AllActiveUtils, self).__init__(description)
         self.axon_type = axon_type
 
@@ -330,7 +341,7 @@ class AllActiveUtils(Utils):
         '''
         if self.axon_type == 'stub_axon':
             self._log.info('Replacing axon with a stub : length 60 micron, diameter 1 micron')
-            super(AllActiveUtils,self).generate_morphology(morph_filename)
+            super(AllActiveUtils, self).generate_morphology(morph_filename)
             return
         
         self._log.info('Legacy model - Replacing axon with a stub: length 60 micron, diameter read from .swc')
