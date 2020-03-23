@@ -260,7 +260,7 @@ def plot_condition_histogram(vals, bins, color=STIM_COLOR):
         n, hbins, patches = plt.hist(vals,
                                      bins=np.arange(len(bins)+1)+1,
                                      align='left',
-                                     normed=False,
+                                     density=False,
                                      rwidth=.8,
                                      color=color,
                                      zorder=3)
@@ -287,7 +287,7 @@ def plot_selectivity_cumulative_histogram(sis,
 
     # orientation selectivity cumulative histogram
     if len(sis) > 0:
-        n, bins, patches = plt.hist(sis, normed=True, bins=bins,
+        n, bins, patches = plt.hist(sis, density=True, bins=bins,
                                     cumulative=True, histtype='stepfilled',
                                     color=color)
     plt.xlim(si_range)
