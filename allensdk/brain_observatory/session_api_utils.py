@@ -1,20 +1,42 @@
 import inspect
 import warnings
 
-
+from itertools import zip_longest
 from typing import Any, Dict, List
+
+import numpy as np
+import pandas as pd
 
 
 def is_equal(a: Any, b: Any) -> bool:
     """Function to deal with checking if two variables of possibly mixed types
     have the same value."""
 
-    result = (a == b)
+    if type(a) != type(b):
+        return False
 
-    try:
-        return bool(result)
-    except ValueError:
-        return bool(result.all())
+    if isinstance(a, (pd.Series, pd.DataFrame)):
+        return a.equals(b)
+    elif isinstance(a, np.ndarray):
+        return np.array_equal(a, b)
+    elif isinstance(a, (list, tuple)):
+        for a_elem, b_elem in zip_longest(a, b):
+            if not is_equal(a_elem, b_elem):
+                return False
+        return True
+    elif isinstance(a, set):
+        for a_elem, b_elem in zip_longest(sorted(a), sorted(b)):
+            if not is_equal(a_elem, b_elem):
+                return False
+        return True
+    elif isinstance(a, dict):
+        for (a_k, a_v), (b_k, b_v) in zip_longest(sorted(a.items()),
+                                                  sorted(b.items())):
+            if (a_k != b_k) or (not is_equal(a_v, b_v)):
+                return False
+        return True
+    else:
+        return bool(a == b)
 
 
 class ParamsMixin:
@@ -97,28 +119,13 @@ class ParamsMixin:
                         setattr(self, f"_{param}", value)
                         self._updated_params.add(param)
                 else:
-                    try:
-                        cast_value = param_types[param](value)
-                        if not is_equal(current_value, cast_value):
-                            setattr(self, f"_{param}", cast_value)
-                            self._updated_params.add(param)
-
-                        warnings.warn(f"The value ({value}) for parameter "
-                                      f"'{param}' should be of type "
-                                      f"'{param_types[param]}' but is instead "
-                                      f"{type(value)}. It was type-casted to: "
-                                      f"{cast_value} ({type(cast_value)}).",
-                                      stacklevel=2)
-
-                    except (ValueError, TypeError):
-                        warnings.warn(f"The value ({value}) for parameter "
-                                      f"'{param}' should be of type "
-                                      f"'{param_types[param]}' but is instead "
-                                      f"{type(value)}. Type-casting failed "
-                                      f"and it remains: "
-                                      f"{current_value} "
-                                      f"({type(current_value)}).",
-                                      stacklevel=2)
+                    warnings.warn(f"The value ({value}) for parameter "
+                                  f"'{param}' should be of type "
+                                  f"'{param_types[param]}' but is instead "
+                                  f"{type(value)}. It will remain as: "
+                                  f"{current_value} "
+                                  f"({type(current_value)}).",
+                                  stacklevel=2)
             else:
                 warnings.warn(f"The parameter '{param}' is not valid "
                               f"and is being ignored! "
