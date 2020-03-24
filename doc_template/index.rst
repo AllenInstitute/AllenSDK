@@ -90,6 +90,12 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
+What's New - 1.7.0 (UPDATE DATE)
+-----------------------------------------------------------------------
+
+As of the 1.7.0 release:
+
+
 What's New - 1.6.0 (March 23, 2020)
 -----------------------------------------------------------------------
 

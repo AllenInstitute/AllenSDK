@@ -1,6 +1,15 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.7.0] = UPDATE\_DATE
+
+### Added
+
+### Changed
+
+### Bug Fixes
+
+
 ## [1.6.0] = 2020-03-23
 
 ### Added
