@@ -329,7 +329,7 @@ class BehaviorProjectLimsApi(BehaviorProjectBase):
             JOIN (
                 {self._build_line_from_donor_query(line="driver")}
             ) driver on driver.donor_id = d.id
-            LEFT JOIN imaging_depths id ON id.id = os.imaging_depth_id
+            LEFT JOIN imaging_depths id ON id.id = oe.imaging_depth_id
             JOIN structures st ON st.id = oe.targeted_structure_id
             JOIN equipment ON equipment.id = os.equipment_id
             {experiment_query};
