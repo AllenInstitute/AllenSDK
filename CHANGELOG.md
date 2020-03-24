@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 ## [1.7.0] = UPDATE\_DATE
 
 ### Added
+- Internal users can now access `eye_tracking` ellipse fit data from behavior + ophys Session objects
+- A new mixin for managing processing parameters for Session objects
 
 ### Changed
 

@@ -95,6 +95,8 @@ What's New - 1.7.0 (UPDATE DATE)
 
 As of the 1.7.0 release:
 
+- Added functionality so internal users can now access `eye_tracking` ellipse fit data from behavior + ophys Session objects
+- Added a new mixin for managing processing parameters for Session objects
 
 What's New - 1.6.0 (March 23, 2020)
 -----------------------------------------------------------------------
