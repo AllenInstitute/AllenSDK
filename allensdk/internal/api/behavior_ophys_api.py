@@ -10,6 +10,7 @@ from allensdk.api.cache import memoize
 from allensdk.internal.api.ophys_lims_api import OphysLimsApi
 from allensdk.brain_observatory.behavior.sync import (
     get_sync_data, get_stimulus_rebase_function, frame_time_offset)
+from allensdk.internal.brain_observatory.time_sync import OphysTimeAligner
 from allensdk.brain_observatory.behavior.stimulus_processing import get_stimulus_presentations, get_stimulus_templates, get_stimulus_metadata
 from allensdk.brain_observatory.behavior.metadata_processing import get_task_parameters
 from allensdk.brain_observatory.behavior.running_processing import get_running_df
@@ -38,8 +39,10 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
 
     @memoize
     def get_stimulus_timestamps(self):
-        monitor_delay = .0351
-        return self.get_sync_data()['stimulus_times_no_delay'] + monitor_delay
+        sync_path = self.get_sync_file()
+        timestamps, _, _ = (OphysTimeAligner(sync_file=sync_path)
+                            .corrected_stim_timestamps)
+        return timestamps
 
     @memoize
     def get_ophys_timestamps(self):

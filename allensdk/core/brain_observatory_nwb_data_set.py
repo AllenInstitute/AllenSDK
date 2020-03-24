@@ -218,7 +218,7 @@ class BrainObservatoryNwbDataSet(object):
                                     'duration':duration_signature_list,
                                     'interval':interval_signature_list})
 
-        # Gaps are ininformative; remove them:
+        # Gaps are uninformative; remove them:
         interval_df = interval_df[interval_df.stimulus != 'gap']
         interval_df['start'] = [x[0] for x in interval_df['interval'].values]
         interval_df['end'] = [x[1] for x in interval_df['interval'].values]
