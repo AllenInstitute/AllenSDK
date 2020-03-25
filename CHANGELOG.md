@@ -8,7 +8,7 @@ All notable changes to this project will be documented in this file.
 ### Changed
 
 ### Bug Fixes
-- experiment\_table from behavior project cache has NaNs in the 'imaging\_depth' column for MultiScope experiments due to incorrect join in behavior\_project\_lims\_api.py
+- experiment\_table from behavior project cache has NaNs in the 'imaging\_depth' column for MultiScope experiments due to incorrect join in behavior\_project\_lims\_api.py and 4 other places where ophys\_sessions was incorrectly queried for imaging\_depth\_id
 
 
 ## [1.6.0] = 2020-03-23

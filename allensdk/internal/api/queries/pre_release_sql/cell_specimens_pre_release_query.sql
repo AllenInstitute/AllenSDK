@@ -37,7 +37,7 @@ JOIN experiment_containers ec ON ec.id=exa.experiment_container_id AND ec.id=exb
 
 JOIN donors d ON d.id=sp.donor_id 
 JOIN ophys_experiments o ON o.id=exa.ophys_experiment_id 
-JOIN ophys_sessions os ON os.id=o.ophys_session_id JOIN imaging_depths ON imaging_depths.id=os.imaging_depth_id
+JOIN ophys_sessions os ON os.id=o.ophys_session_id JOIN imaging_depths ON imaging_depths.id=o.imaging_depth_id
 JOIN projects p ON p.id=os.project_id
 JOIN structures st ON st.id=os.targeted_structure_id
 JOIN donors_genotypes dgd ON dgd.donor_id=d.id JOIN genotypes tld1 ON tld1.id = dgd.genotype_id AND tld1.genotype_type_id = 177835595 AND tld1.name != 'Camk2a-tTA' --driver1 
