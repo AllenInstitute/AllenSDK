@@ -104,7 +104,7 @@ class OphysLimsApi(CachedInstanceMethodMixin):
                 SELECT id.depth
                 FROM ophys_experiments oe
                 JOIN ophys_sessions os ON oe.ophys_session_id = os.id
-                LEFT JOIN imaging_depths id ON id.id=os.imaging_depth_id
+                LEFT JOIN imaging_depths id ON id.id=oe.imaging_depth_id
                 WHERE oe.id= {};
                 '''.format(self.get_ophys_experiment_id())
         return self.lims_db.fetchone(query, strict=True)

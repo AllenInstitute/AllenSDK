@@ -290,7 +290,7 @@ class BehaviorOphysLimsApi(OphysLimsApi, BehaviorOphysApiBase):
                 LEFT JOIN ophys_sessions os ON oe.ophys_session_id = os.id
                 LEFT JOIN specimens sp ON sp.id=os.specimen_id
                 LEFT JOIN donors d ON d.id=sp.donor_id
-                LEFT JOIN imaging_depths id ON id.id=os.imaging_depth_id
+                LEFT JOIN imaging_depths id ON id.id=oe.imaging_depth_id
                 LEFT JOIN structures st ON st.id=oe.targeted_structure_id
                 LEFT JOIN equipment ON equipment.id=os.equipment_id
                 '''

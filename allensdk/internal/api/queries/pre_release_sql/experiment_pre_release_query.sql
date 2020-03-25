@@ -21,7 +21,7 @@ LEFT JOIN eye_trackings et on et.id = os.eye_tracking_id
 LEFT JOIN well_known_files awkf ON awkf.attachable_id=o.id AND awkf.well_known_file_type_id = 514173041
 --514173063 NWBOphys
 JOIN well_known_files wkf ON wkf.attachable_id=o.id AND wkf.well_known_file_type_id = 514173063
-JOIN specimens sp ON sp.id=os.specimen_id JOIN structures st ON st.id=os.targeted_structure_id JOIN imaging_depths i ON i.id=os.imaging_depth_id
+JOIN specimens sp ON sp.id=os.specimen_id JOIN structures st ON st.id=os.targeted_structure_id JOIN imaging_depths i ON i.id=o.imaging_depth_id
 JOIN donors d ON d.id=sp.donor_id 
 JOIN donors_genotypes dg  ON  dg.donor_id=d.id JOIN genotypes g  ON g.id = dg.genotype_id AND  g.genotype_type_id = 177835595 AND g.name != 'Camk2a-tTA' --driver
 JOIN donors_genotypes dgr ON dgr.donor_id=d.id JOIN genotypes gr ON gr.id=dgr.genotype_id AND gr.genotype_type_id = 177835597 --reporter
