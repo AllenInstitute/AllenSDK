@@ -42,20 +42,18 @@ import logging
 import matplotlib.colors as colors
 from allensdk.config.manifest import Manifest
 
-def demix_time_dep_masks(raw_traces, stack, masks):
+def demix_time_dep_masks(raw_traces, stack, masks, block_size=1000):
     '''
 
     :param raw_traces: extracted traces
     :param stack: movie (same length as traces)
     :param masks: binary roi masks
+    :param block_size: number of movie frames to read at a time
     :return: demixed traces
     '''
     N, T = raw_traces.shape
     _, x, y = masks.shape
     P = x * y
-
-    if len(stack.shape) == 3:
-        stack = stack.reshape(T, P)
 
     num_pixels_in_mask = np.sum(masks, axis=(1, 2))
     F = raw_traces.T * num_pixels_in_mask  # shape (T,N)
@@ -72,9 +70,14 @@ def demix_time_dep_masks(raw_traces, stack, masks):
         weighted_mask_sum = F[:, t]
         drop_test = (weighted_mask_sum == 0)
 
+        block_t = t % block_size
+        if block_t == 0: # load next block into memory
+            block_T = np.min([(T - t), block_size])
+            stack_block = stack[t: t + block_size].reshape(block_T, P)
+
         if np.sum(drop_test == 0):
             norm_mat = sparse.diags(num_pixels_in_mask / weighted_mask_sum, offsets=0)
-            stack_t = sparse.diags(stack[t], offsets=0)
+            stack_t = sparse.diags(stack_block[block_t], offsets=0)
 
             flat_weighted_masks = norm_mat.dot(flat_masks.dot(stack_t))
 
