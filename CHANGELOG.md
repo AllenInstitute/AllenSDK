@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Internal users can now access `eye_tracking` ellipse fit data from behavior + ophys Session objects
 - A new mixin for managing processing parameters for Session objects
+- Added support for additional sync file line labels
 
 ### Changed
 - Monitor delay calculation is updated to properly handle photodiode streams that end

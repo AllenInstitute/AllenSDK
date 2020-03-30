@@ -89,12 +89,30 @@ class Dataset(object):
     FRAME_KEYS = ('frames', 'stim_vsync')
     PHOTODIODE_KEYS = ('photodiode', 'stim_photodiode')
     OPTOGENETIC_STIMULATION_KEYS = ("LED_sync", "opto_trial")
-    EYE_TRACKING_KEYS = ("cam2_exposure",  # clocks eye tracking frame pulses (port 0, line 9)
-                         "eyetracking")  # previous line label for eye tracking (prior to ~ Oct. 2018)
-    BEHAVIOR_TRACKING_KEYS = ("cam1_exposure",)  # clocks behavior tracking frame pulses (port 0, line 8)
+    EYE_TRACKING_KEYS = ("eye_frame_received",  # Expected eye tracking line label after 3/27/2020
+                         "cam2_exposure",  # clocks eye tracking frame pulses (port 0, line 9)
+                         "eyetracking",  # previous line label for eye tracking (prior to ~ Oct. 2018)
+                         "eye_tracking")  # An undocumented, but possible eye tracking line label
+    BEHAVIOR_TRACKING_KEYS = ("beh_frame_received",  # Expected behavior line label after 3/27/2020
+                              "cam1_exposure",  # clocks behavior tracking frame pulses (port 0, line 8)
+                              "behavior_monitoring")
+
+    DEPRECATED_KEYS = {"cam2_exposure",
+                       "eyetracking",
+                       "eye_tracking",
+                       "cam1_exposure",
+                       "behavior_monitoring"}
 
     def __init__(self, path):
         self.dfile = self.load(path)
+        self._check_line_labels()
+
+    def _check_line_labels(self):
+        deprecated_keys = set(self.line_labels) & self.DEPRECATED_KEYS
+        if deprecated_keys:
+            logger.info(f"The loaded sync file contains uses the following "
+                        f"deprecated line label keys: {deprecated_keys}. "
+                        f"Consider updating the sync file line labels.")
 
     def _process_times(self):
         """
