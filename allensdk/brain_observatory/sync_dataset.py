@@ -20,6 +20,7 @@ from typing import Union, Sequence, Optional
 import h5py as h5
 import numpy as np
 
+import warnings
 import logging
 logger = logging.getLogger(__name__)
 
@@ -108,11 +109,16 @@ class Dataset(object):
         self._check_line_labels()
 
     def _check_line_labels(self):
-        deprecated_keys = set(self.line_labels) & self.DEPRECATED_KEYS
-        if deprecated_keys:
-            logger.info(f"The loaded sync file contains uses the following "
-                        f"deprecated line label keys: {deprecated_keys}. "
-                        f"Consider updating the sync file line labels.")
+        if hasattr(self, "line_labels"):
+            deprecated_keys = set(self.line_labels) & self.DEPRECATED_KEYS
+            if deprecated_keys:
+                warnings.warn((f"The loaded sync file contains the "
+                               f"following deprecated line label keys: "
+                               f"{deprecated_keys}. Consider updating the sync "
+                               f"file line labels."), stacklevel=2)
+        else:
+            warnings.warn((f"The loaded sync file has no line labels and may "
+                           f"not be valid."), stacklevel=2)
 
     def _process_times(self):
         """
