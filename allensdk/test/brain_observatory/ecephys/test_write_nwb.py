@@ -42,7 +42,7 @@ def running_speed():
         "start_time": [1., 2., 3., 4., 5.],
         "end_time": [2., 3., 4., 5., 6.],
         "velocity": [-1., -2., -1., 0., 1.],
-        "net_rotation": [-np.pi, -2 *np.pi, -np.pi, 0, np.pi]
+        "net_rotation": [-np.pi, -2 * np.pi, -np.pi, 0, np.pi]
     })
 
 
@@ -253,7 +253,7 @@ def test_add_running_speed_to_nwbfile(nwbfile, running_speed, roundtripper, roun
         api_obt = EcephysNwbSessionApi.from_nwbfile(nwbfile)
 
     obtained = api_obt.get_running_speed(include_rotation=include_rotation)
-    
+
     expected = running_speed
     if not include_rotation:
         expected = expected.drop(columns="net_rotation")

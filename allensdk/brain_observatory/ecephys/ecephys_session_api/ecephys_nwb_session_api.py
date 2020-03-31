@@ -168,13 +168,17 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
             coords=[timestamps, electrodes.index.values]
         )
 
-    def get_running_speed(self, include_rotation=False):
+    def get_running_speed(self, include_rotation=False) -> pd.DataFrame:
         running_module = self.nwbfile.get_processing_module("running")
         running_speed_series = running_module["running_speed"]
+        running_speed_start_times = running_speed_series.timestamps[:]
+
+        running_speed_end_series = running_module["running_speed_end_times"]
+        running_speed_end_times = running_speed_end_series.timestamps[:]
 
         running = pd.DataFrame({
-            "start_time": running_speed_series.timestamps[0, :],
-            "end_time": running_speed_series.timestamps[1, :],
+            "start_time": running_speed_start_times,
+            "end_time": running_speed_end_times,
             "velocity": running_speed_series.data[:]
         })
 
