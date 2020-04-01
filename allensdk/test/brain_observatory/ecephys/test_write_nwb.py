@@ -647,3 +647,38 @@ def test_remove_invalid_spikes_from_units():
             obt_row["spike_amplitudes"], 
             expct_row["spike_amplitudes"])
         assert obt_row["a"] == expct_row["a"]
+
+
+@pytest.mark.parametrize('roundtrip', [True, False])
+@pytest.mark.parametrize('eye_tracking_rig_geometry, expected', [
+    ({'monitor_position_mm': [1., 2., 3.],
+      'monitor_rotation_deg': [4., 5., 6.],
+      'camera_position_mm': [7., 8., 9.],
+      'camera_rotation_deg': [10., 11., 12.],
+      'led_position_mm': [13., 14., 15.],
+      'equipment': 'test_rig'},
+
+     #  Expected
+     {'geometry': pd.DataFrame({'monitor_position_mm': [1., 2., 3.],
+                                'monitor_rotation_deg': [4., 5., 6.],
+                                'camera_position_mm': [7., 8., 9.],
+                                'camera_rotation_deg': [10., 11., 12.],
+                                'led_position_mm': [13., 14., 15.]},
+                               index=['x', 'y', 'z']),
+      'equipment': 'test_rig'}),
+])
+def test_add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile, roundtripper,
+                                                       roundtrip,
+                                                       eye_tracking_rig_geometry,
+                                                       expected):
+
+    nwbfile = write_nwb.add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile,
+                                                                      eye_tracking_rig_geometry)
+    if roundtrip:
+        obt = roundtripper(nwbfile, EcephysNwbSessionApi)
+    else:
+        obt = EcephysNwbSessionApi.from_nwbfile(nwbfile)
+    obtained_metadata = obt.get_rig_metadata()
+
+    assert obtained_metadata['geometry'].equals(expected['geometry'])
+    assert obtained_metadata['equipment'] == expected['equipment']
