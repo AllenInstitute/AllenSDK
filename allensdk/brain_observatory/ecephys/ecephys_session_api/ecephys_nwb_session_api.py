@@ -202,15 +202,20 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
 
     def get_rig_metadata(self) -> Optional[dict]:
         try:
-            et_mod = self.nwbfile.get_processing_module("eye_tracking")
+            et_mod = self.nwbfile.get_processing_module("eye_tracking_rig_metadata")
         except KeyError as e:
-            print(f"This ecephys session '{int(self.nwbfile.identifier)}' has no eye tracking data (and thus no rig geometry data). (NWB error: {e})")
+            print(f"This ecephys session '{int(self.nwbfile.identifier)}' has no eye tracking rig metadata. (NWB error: {e})")
             return None
 
-        rig_metadata = {}
-        rig_metadata["rig_geometry_data"] = et_mod.get_data_interface("rig_geometry_data").to_dataframe()
+        rig_geometry = et_mod.get_data_interface("rig_geometry_data").to_dataframe()
+        rig_geometry.reset_index(inplace=True, drop=True)
+        rig_geometry = rig_geometry.rename(index={0: 'x', 1: 'y', 2: 'z'})
         rig_equipment = et_mod.get_data_interface("equipment").to_dataframe()
-        rig_metadata["rig_equipment"] = rig_equipment["equipment"][0]
+
+        rig_metadata = {
+            "geometry": rig_geometry,
+            "equipment": rig_equipment["equipment"][0]
+        }
 
         return rig_metadata
 
