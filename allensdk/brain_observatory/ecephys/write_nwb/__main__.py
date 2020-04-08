@@ -62,7 +62,7 @@ def fill_df(df, str_fill=""):
 
 def get_inputs_from_lims(host, ecephys_session_id, output_root, job_queue, strategy):
     """
-     This is a development / testing utility for running this module from the Allen Institute for Brain Science's 
+     This is a development / testing utility for running this module from the Allen Institute for Brain Science's
     Laboratory Information Management System (LIMS). It will only work if you are on our internal network.
 
     Parameters
@@ -94,7 +94,7 @@ def get_inputs_from_lims(host, ecephys_session_id, output_root, job_queue, strat
 
 
 def read_stimulus_table(path, column_renames_map=None):
-    """ Loads from a CSV on disk the stimulus table for this session. Optionally renames columns to match NWB 
+    """ Loads from a CSV on disk the stimulus table for this session. Optionally renames columns to match NWB
     epoch specifications.
 
     Parameters
@@ -102,12 +102,12 @@ def read_stimulus_table(path, column_renames_map=None):
     path : str
         path to stimulus table csv
     column_renames_map : dict, optional
-        if provided will be used to rename columns from keys -> values. Default renames 'Start' -> 'start_time' and 
+        if provided will be used to rename columns from keys -> values. Default renames 'Start' -> 'start_time' and
         'End' -> 'stop_time'
-    
+
     Returns
     -------
-    pd.DataFrame : 
+    pd.DataFrame :
         stimulus table with applied renames
 
     """
@@ -135,7 +135,7 @@ def read_spike_times_to_dictionary(
     spike_times_path : str
         npy file identifying, per spike, the time at which that spike occurred.
     spike_units_path : str
-        npy file identifying, per spike, the unit associated with that spike. These are probe-local, so a 
+        npy file identifying, per spike, the unit associated with that spike. These are probe-local, so a
         local_to_global_unit_map is used to associate spikes with global unit identifiers.
     local_to_global_unit_map : dict, optional
         Maps probewise local unit indices to global unit ids
@@ -154,7 +154,7 @@ def read_spike_times_to_dictionary(
 
 
 def read_spike_amplitudes_to_dictionary(
-    spike_amplitudes_path, spike_units_path, 
+    spike_amplitudes_path, spike_units_path,
     templates_path, spike_templates_path, inverse_whitening_matrix_path,
     local_to_global_unit_map=None,
     scale_factor=1.0
@@ -168,8 +168,8 @@ def read_spike_amplitudes_to_dictionary(
     inverse_whitening_matrix = load_and_squeeze_npy(inverse_whitening_matrix_path)
 
     for temp_idx in range(templates.shape[0]):
-        templates[temp_idx,:,:] = np.dot(
-            np.ascontiguousarray(templates[temp_idx,:,:]), 
+        templates[temp_idx, :, :] = np.dot(
+            np.ascontiguousarray(templates[temp_idx, :, :]),
             np.ascontiguousarray(inverse_whitening_matrix)
         )
 
@@ -188,12 +188,12 @@ def scale_amplitudes(spike_amplitudes, templates, spike_templates, scale_factor=
 
 
 def remove_invalid_spikes(
-    row: pd.Series, 
-    times_key: str = "spike_times", 
+    row: pd.Series,
+    times_key: str = "spike_times",
     amps_key: str = "spike_amplitudes"
 ) -> pd.Series:
-    """ Given a row from a units table, ensure that invalid spike times and 
-    corresponding amplitudes are removed. Also ensure the spikes are sorted 
+    """ Given a row from a units table, ensure that invalid spike times and
+    corresponding amplitudes are removed. Also ensure the spikes are sorted
     ascending in time.
 
     Parameters
@@ -204,12 +204,12 @@ def remove_invalid_spikes(
 
     Returns
     -------
-    A version of the input row, with spike times sorted and invalid times 
+    A version of the input row, with spike times sorted and invalid times
     removed
 
     Notes
     -----
-    This function is needed because currently released NWB files might have 
+    This function is needed because currently released NWB files might have
     invalid spike times. It can be removed if these files are updated.
 
     """
@@ -232,11 +232,11 @@ def remove_invalid_spikes(
 
 def remove_invalid_spikes_from_units(
     units: pd.DataFrame,
-    times_key: str = "spike_times", 
+    times_key: str = "spike_times",
     amps_key: str = "spike_amplitudes"
 ) -> pd.DataFrame:
-    """ Given a units table, ensure that invalid spike times and 
-    corresponding amplitudes are removed. Also ensure the spikes are sorted 
+    """ Given a units table, ensure that invalid spike times and
+    corresponding amplitudes are removed. Also ensure the spikes are sorted
     ascending in time.
 
     Parameters
@@ -247,12 +247,12 @@ def remove_invalid_spikes_from_units(
 
     Returns
     -------
-    A version of the input table, with spike times sorted and invalid times 
+    A version of the input table, with spike times sorted and invalid times
     removed
 
     Notes
     -----
-    This function is needed because currently released NWB files might have 
+    This function is needed because currently released NWB files might have
     invalid spike times. It can be removed if these files are updated.
 
     """
@@ -313,7 +313,7 @@ def read_waveforms_to_dictionary(
     local_to_global_unit_map : dict, optional
         Maps probewise local unit indices to global unit ids
     peak_channel_map : dict, optional
-        Maps unit identifiers to indices of peak channels. If provided, the output will contain only samples on the peak 
+        Maps unit identifiers to indices of peak channels. If provided, the output will contain only samples on the peak
         channel for each unit.
 
     Returns
@@ -355,14 +355,14 @@ def read_running_speed(path):
 
     Returns
     -------
-    tuple : 
-        first item is dataframe of running speed data, second is dataframe of 
+    tuple :
+        first item is dataframe of running speed data, second is dataframe of
         raw values (vsig, vin, encoder rotation)
 
     """
 
     return (
-        pd.read_hdf(path, key="running_speed"), 
+        pd.read_hdf(path, key="running_speed"),
         pd.read_hdf(path, key="raw_data")
     )
 
@@ -370,7 +370,7 @@ def read_running_speed(path):
 def add_probe_to_nwbfile(nwbfile, probe_id, sampling_rate, lfp_sampling_rate, has_lfp_data,
                          description="",
                          location=""):
-    """ Creates objects required for representation of a single extracellular ephys probe within an NWB file. These objects amount 
+    """ Creates objects required for representation of a single extracellular ephys probe within an NWB file. These objects amount
     to a Device (this will be removed at some point from pynwb) and an ElectrodeGroup.
 
     Parameters
@@ -389,7 +389,7 @@ def add_probe_to_nwbfile(nwbfile, probe_id, sampling_rate, lfp_sampling_rate, ha
         human-readable description of this probe. Practically (and temporarily), we use tags like "probeA" or "probeB"
     location : str, optional
         unspecified information about the location of this probe. Currently left blank, but in the future will probably contain
-        an expanded form of the information currently implicit in 'probeA' (ie targeting and insertion plan) while channels will 
+        an expanded form of the information currently implicit in 'probeA' (ie targeting and insertion plan) while channels will
         carry the results of ccf registration.
 
     Returns
@@ -570,8 +570,7 @@ def write_probe_lfp_file(session_start_time, log_level, probe):
         session_description='EcephysProbe',
         identifier=f"{probe['id']}",
         session_start_time=session_start_time
-    )    
-
+    )
 
     if probe.get("temporal_subsampling_factor", None) is not None:
         probe["lfp_sampling_rate"] = probe["lfp_sampling_rate"] / probe["temporal_subsampling_factor"]
@@ -588,7 +587,7 @@ def write_probe_lfp_file(session_start_time, log_level, probe):
     channels = prepare_probewise_channel_table(probe['channels'], probe_nwb_electrode_group)
     channel_li_id_map = {row["local_index"]: cid for cid, row in channels.iterrows()}
     lfp_channels = np.load(probe['lfp']['input_channels_path'], allow_pickle=False)
-    
+
     channels.reset_index(inplace=True)
     channels.set_index("local_index", inplace=True)
     channels = channels.loc[lfp_channels, :]
@@ -596,7 +595,7 @@ def write_probe_lfp_file(session_start_time, log_level, probe):
     channels.set_index("id", inplace=True)
 
     channels = fill_df(channels)
-    
+
     nwbfile.electrodes = pynwb.file.ElectrodeTable().from_dataframe(channels, name='electrodes')
     electrode_table_region = nwbfile.create_electrode_table_region(
         region=np.arange(channels.shape[0]).tolist(),  # must use raw indices here
@@ -669,7 +668,7 @@ def write_probewise_lfp_files(probes, session_start_time, pool_size=3):
         output_paths.append(pout)
 
     return output_paths
-    
+
 
 def add_probewise_data_to_nwbfile(nwbfile, probes):
     """ Adds channel and spike data for a single probe to the session-level nwb file.
@@ -709,12 +708,12 @@ def add_probewise_data_to_nwbfile(nwbfile, probes):
         ))
 
         spike_amplitudes.update(read_spike_amplitudes_to_dictionary(
-            probe["spike_amplitudes_path"], probe["spike_clusters_file"], 
+            probe["spike_amplitudes_path"], probe["spike_clusters_file"],
             probe["templates_path"], probe["spike_templates_path"], probe["inverse_whitening_matrix_path"],
             local_to_global_unit_map=local_to_global_unit_map,
             scale_factor=probe["amplitude_scale_factor"]
         ))
-    
+
     electrodes_table = fill_df(pd.concat(list(channel_tables.values())))
     nwbfile.electrodes = pynwb.file.ElectrodeTable().from_dataframe(electrodes_table, name='electrodes')
     units_table = pd.concat(unit_tables).set_index(keys='id', drop=True)
@@ -840,7 +839,7 @@ def write_ecephys_nwb(
         nwbfile = add_metadata_to_nwbfile(nwbfile, session_metadata)
 
     stimulus_table = read_stimulus_table(stimulus_table_path)
-    nwbfile = add_stimulus_timestamps(nwbfile, stimulus_table['start_time'].values) # TODO: patch until full timestamps are output by stim table module
+    nwbfile = add_stimulus_timestamps(nwbfile, stimulus_table['start_time'].values)  # TODO: patch until full timestamps are output by stim table module
     nwbfile = add_stimulus_presentations(nwbfile, stimulus_table)
     nwbfile = add_invalid_times(nwbfile, invalid_epochs)
 
