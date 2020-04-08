@@ -1,5 +1,4 @@
-from typing import Dict, Union, List, Optional, Callable, Iterable, Any
-from pathlib import Path
+from typing import Dict, Union, List, Optional, Callable
 import re
 import ast
 
@@ -40,9 +39,9 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         self.external_channel_columns = external_channel_columns
 
     def test(self):
-        """ A minimal test to make sure that this API's NWB file exists and is 
-        readable. Ecephys NWB files use the required session identifier field 
-        to store the session id, so this is guaranteed to be present for any 
+        """ A minimal test to make sure that this API's NWB file exists and is
+        readable. Ecephys NWB files use the required session identifier field
+        to store the session id, so this is guaranteed to be present for any
         uncorrupted NWB file.
 
         Of course, this does not ensure that the file as a whole is correct.
@@ -54,7 +53,7 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
 
     def get_stimulus_presentations(self):
         table = super(EcephysNwbSessionApi, self).get_stimulus_presentations()
-        
+
         if "color" in table.columns:
             # the color column actually contains two parameters. One is coded as rgb triplets and the other as -1 or 1
             if "color_triplet" not in table.columns:
@@ -107,13 +106,13 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         # these are stored as string in nwb 2, which is not ideal
         # float is also not ideal, but we have nans indicating out-of-brain structures
         channels["ecephys_structure_id"] = [
-            float(chid) if chid != "" 
-            else np.nan 
+            float(chid) if chid != ""
+            else np.nan
             for chid in channels["ecephys_structure_id"]
         ]
         channels["ecephys_structure_acronym"] = [
-            ch_acr if ch_acr not in set(["None", ""]) 
-            else np.nan 
+            ch_acr if ch_acr not in set(["None", ""])
+            else np.nan
             for ch_acr in channels["ecephys_structure_acronym"]
         ]
 
@@ -339,7 +338,7 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
 
 def clobbering_merge(to_df, from_df, **kwargs):
     overlapping = set(to_df.columns) & set(from_df.columns)
-    
+
     for merge_param in ["on", "left_on", "right_on"]:
         if merge_param in kwargs:
             merge_arg = kwargs.get(merge_param)

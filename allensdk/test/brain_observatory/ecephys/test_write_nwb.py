@@ -83,12 +83,12 @@ def test_roundtrip_basic_metadata(roundtripper):
 
 def test_add_metadata(nwbfile, roundtripper):
     metadata = {
-      "specimen_name": "mouse_1",
-      "age_in_days": 100.0,
-      "full_genotype": "wt",
-      "strain": "c57",
-      "sex": "F",
-      "stimulus_name": "brain_observatory_2.0"
+        "specimen_name": "mouse_1",
+        "age_in_days": 100.0,
+        "full_genotype": "wt",
+        "strain": "c57",
+        "sex": "F",
+        "stimulus_name": "brain_observatory_2.0"
     }
     write_nwb.add_metadata_to_nwbfile(nwbfile, metadata)
 
@@ -148,21 +148,21 @@ def test_add_optotagging_table_to_nwbfile(nwbfile, roundtripper):
     obtained = api.get_optogenetic_stimulation()
     pd.set_option("display.max_columns", None)
     print(obtained)
-    
+
     pd.testing.assert_frame_equal(opto_table, obtained, check_like=True)
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
 @pytest.mark.parametrize('pid,desc,srate,lfp_srate,has_lfp,expected', [
     [
-        12, 
-        'a probe', 
+        12,
+        'a probe',
         30000.0,
         2500.0,
         True,
         pd.DataFrame({
-            'description': ['a probe'], 
-            'sampling_rate': [30000.0], 
+            'description': ['a probe'],
+            'sampling_rate': [30000.0],
             "lfp_sampling_rate": [2500.0],
             "has_lfp_data": [True],
             "location": [""]
@@ -344,7 +344,7 @@ def probe_data():
         "sampling_rate": 29.0,
         "lfp_sampling_rate": 10.0,
         "temporal_subsampling_factor": 2.0,
-        "channels":  [
+        "channels": [
             {
                 'id': 0,
                 'probe_id': 12,
@@ -414,7 +414,7 @@ def test_write_probe_lfp_file(tmpdir_factory, lfp_data, probe_data, csd_data):
 
     write_csd_to_h5(path=input_csd_path, **csd_data)
 
-    np.save(input_timestamps_path, lfp_data["timestamps"],  allow_pickle=False)
+    np.save(input_timestamps_path, lfp_data["timestamps"], allow_pickle=False)
     np.save(input_channels_path, lfp_data["subsample_channels"], allow_pickle=False)
     with open(input_data_path, "wb") as input_data_file:
         input_data_file.write(lfp_data["data"].tobytes())
@@ -431,7 +431,7 @@ def test_write_probe_lfp_file(tmpdir_factory, lfp_data, probe_data, csd_data):
         assert np.allclose(lfp_data["timestamps"], obt_ser.timestamps[:])
 
         obt_electrodes = obt_f.electrodes.to_dataframe().loc[
-            :, ['local_index', 'probe_horizontal_position', 'probe_id','probe_vertical_position']
+            :, ['local_index', 'probe_horizontal_position', 'probe_id', 'probe_vertical_position']
         ]
 
         pd.testing.assert_frame_equal(exp_electrodes, obt_electrodes, check_like=True)
@@ -480,11 +480,11 @@ def test_write_probe_lfp_file_roundtrip(tmpdir_factory, roundtrip, lfp_data, pro
     }
 
     probe_data.update({"lfp": test_lfp_paths})
-    probe_data.update({"csd_path": input_csd_path}) 
+    probe_data.update({"csd_path": input_csd_path})
 
     write_csd_to_h5(path=input_csd_path, **csd_data)
 
-    np.save(input_timestamps_path, lfp_data["timestamps"],  allow_pickle=False)
+    np.save(input_timestamps_path, lfp_data["timestamps"], allow_pickle=False)
     np.save(input_channels_path, lfp_data["subsample_channels"], allow_pickle=False)
     with open(input_data_path, "wb") as input_data_file:
         input_data_file.write(lfp_data["data"].tobytes())
@@ -500,7 +500,6 @@ def test_write_probe_lfp_file_roundtrip(tmpdir_factory, roundtrip, lfp_data, pro
 
     xr.testing.assert_equal(obtained_lfp, expected_lfp)
     xr.testing.assert_equal(obtained_csd, expected_csd)
-
 
 
 @pytest.fixture
@@ -658,10 +657,10 @@ def test_read_spike_amplitudes_to_dictionary(tmpdir_factory, spike_amplitudes, t
     np.save(inverse_whitening_matrix_path, inverse_whitening_matrix, allow_pickle=False)
 
     obtained = write_nwb.read_spike_amplitudes_to_dictionary(
-        spike_amplitudes_path, 
-        spike_units_path, 
-        templates_path, 
-        spike_templates_path, 
+        spike_amplitudes_path,
+        spike_units_path,
+        templates_path,
+        spike_templates_path,
         inverse_whitening_matrix_path
     )
 
@@ -721,7 +720,7 @@ def test_remove_invalid_spikes_from_units():
     for (_, expct_row), (_, obt_row) in zip(expct.iterrows(), obt.iterrows()):
         assert np.allclose(obt_row["spike_times"], expct_row["spike_times"])
         assert np.allclose(
-            obt_row["spike_amplitudes"], 
+            obt_row["spike_amplitudes"],
             expct_row["spike_amplitudes"])
         assert obt_row["a"] == expct_row["a"]
 
