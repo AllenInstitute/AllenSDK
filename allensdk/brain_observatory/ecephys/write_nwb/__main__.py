@@ -1,5 +1,6 @@
 import logging
 import sys
+from typing import Dict
 from pathlib import Path, PurePath
 import multiprocessing as mp
 from functools import partial
@@ -793,12 +794,31 @@ def add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile: pynwb.NWBFile,
     return nwbfile
 
 
+def add_eye_tracking_data_to_nwbfile(nwbfile: pynwb.NWBFile,
+                                     eye_tracking_frame_times: pd.Series,
+                                     eye_dlc_tracking_data: Dict[str, pd.DataFrame],
+                                     eye_gaze_data: Dict[str, pd.DataFrame]) -> pynwb.NWBFile:
+
+    if eye_tracking_data_is_valid(eye_dlc_tracking_data=eye_dlc_tracking_data,
+                                  synced_timestamps=eye_tracking_frame_times):
+        add_eye_tracking_ellipse_fit_data_to_nwbfile(nwbfile,
+                                                     eye_dlc_tracking_data=eye_dlc_tracking_data,
+                                                     synced_timestamps=eye_tracking_frame_times)
+
+        # --- Add gaze mapped positions to nwb file ---
+        if eye_gaze_data:
+            add_eye_gaze_mapping_data_to_nwbfile(nwbfile,
+                                                 eye_gaze_data=eye_gaze_data)
+
+    return nwbfile
+
+
 def write_ecephys_nwb(
-    output_path, 
-    session_id, session_start_time, 
+    output_path,
+    session_id, session_start_time,
     stimulus_table_path,
     invalid_epochs,
-    probes, 
+    probes,
     running_speed_path,
     session_sync_path,
     eye_tracking_rig_geometry,
@@ -837,22 +857,19 @@ def write_ecephys_nwb(
     add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile,
                                                   eye_tracking_rig_geometry)
 
-    # --- Add eye tracking ellipse fits to nwb file ---
+    # Collect eye tracking/gaze mapping data from files
     eye_tracking_frame_times = su.get_synchronized_frame_times(session_sync_file=session_sync_path,
                                                                sync_line_label_keys=Dataset.EYE_TRACKING_KEYS)
     eye_dlc_tracking_data = read_eye_dlc_tracking_ellipses(Path(eye_dlc_ellipses_path))
+    if eye_gaze_mapping_path:
+        eye_gaze_data = read_eye_gaze_mappings(Path(eye_gaze_mapping_path))
+    else:
+        eye_gaze_data = None
 
-    if eye_tracking_data_is_valid(eye_dlc_tracking_data=eye_dlc_tracking_data,
-                                  synced_timestamps=eye_tracking_frame_times):
-        add_eye_tracking_ellipse_fit_data_to_nwbfile(nwbfile,
-                                                     eye_dlc_tracking_data=eye_dlc_tracking_data,
-                                                     synced_timestamps=eye_tracking_frame_times)
-
-        # --- Add gaze mapped positions to nwb file ---
-        if eye_gaze_mapping_path:
-            eye_gaze_data = read_eye_gaze_mappings(Path(eye_gaze_mapping_path))
-            add_eye_gaze_mapping_data_to_nwbfile(nwbfile,
-                                                 eye_gaze_data=eye_gaze_data)
+    add_eye_tracking_data_to_nwbfile(nwbfile,
+                                     eye_tracking_frame_times,
+                                     eye_dlc_tracking_data,
+                                     eye_gaze_data)
 
     Manifest.safe_make_parent_dirs(output_path)
     with pynwb.NWBHDF5IO(output_path, mode='w') as io:
