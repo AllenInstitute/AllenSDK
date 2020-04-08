@@ -1,5 +1,4 @@
-from typing import Dict, Union, List, Optional, Callable, Iterable, Any
-from pathlib import Path
+from typing import Dict, Union, List, Optional, Callable
 import re
 import ast
 
@@ -40,9 +39,9 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         self.external_channel_columns = external_channel_columns
 
     def test(self):
-        """ A minimal test to make sure that this API's NWB file exists and is 
-        readable. Ecephys NWB files use the required session identifier field 
-        to store the session id, so this is guaranteed to be present for any 
+        """ A minimal test to make sure that this API's NWB file exists and is
+        readable. Ecephys NWB files use the required session identifier field
+        to store the session id, so this is guaranteed to be present for any
         uncorrupted NWB file.
 
         Of course, this does not ensure that the file as a whole is correct.
@@ -54,7 +53,7 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
 
     def get_stimulus_presentations(self):
         table = super(EcephysNwbSessionApi, self).get_stimulus_presentations()
-        
+
         if "color" in table.columns:
             # the color column actually contains two parameters. One is coded as rgb triplets and the other as -1 or 1
             if "color_triplet" not in table.columns:
@@ -107,13 +106,13 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
         # these are stored as string in nwb 2, which is not ideal
         # float is also not ideal, but we have nans indicating out-of-brain structures
         channels["ecephys_structure_id"] = [
-            float(chid) if chid != "" 
-            else np.nan 
+            float(chid) if chid != ""
+            else np.nan
             for chid in channels["ecephys_structure_id"]
         ]
         channels["ecephys_structure_acronym"] = [
-            ch_acr if ch_acr not in set(["None", ""]) 
-            else np.nan 
+            ch_acr if ch_acr not in set(["None", ""])
+            else np.nan
             for ch_acr in channels["ecephys_structure_acronym"]
         ]
 
@@ -168,13 +167,17 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
             coords=[timestamps, electrodes.index.values]
         )
 
-    def get_running_speed(self, include_rotation=False):
+    def get_running_speed(self, include_rotation=False) -> pd.DataFrame:
         running_module = self.nwbfile.get_processing_module("running")
         running_speed_series = running_module["running_speed"]
+        running_speed_start_times = running_speed_series.timestamps[:]
+
+        running_speed_end_series = running_module["running_speed_end_times"]
+        running_speed_end_times = running_speed_end_series.timestamps[:]
 
         running = pd.DataFrame({
-            "start_time": running_speed_series.timestamps[0, :],
-            "end_time": running_speed_series.timestamps[1, :],
+            "start_time": running_speed_start_times,
+            "end_time": running_speed_end_times,
             "velocity": running_speed_series.data[:]
         })
 
@@ -198,15 +201,20 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
 
     def get_rig_metadata(self) -> Optional[dict]:
         try:
-            et_mod = self.nwbfile.get_processing_module("eye_tracking")
+            et_mod = self.nwbfile.get_processing_module("eye_tracking_rig_metadata")
         except KeyError as e:
-            print(f"This ecephys session '{int(self.nwbfile.identifier)}' has no eye tracking data (and thus no rig geometry data). (NWB error: {e})")
+            print(f"This ecephys session '{int(self.nwbfile.identifier)}' has no eye tracking rig metadata. (NWB error: {e})")
             return None
 
-        rig_metadata = {}
-        rig_metadata["rig_geometry_data"] = et_mod.get_data_interface("rig_geometry_data").to_dataframe()
+        rig_geometry = et_mod.get_data_interface("rig_geometry_data").to_dataframe()
+        rig_geometry.reset_index(inplace=True, drop=True)
+        rig_geometry = rig_geometry.rename(index={0: 'x', 1: 'y', 2: 'z'})
         rig_equipment = et_mod.get_data_interface("equipment").to_dataframe()
-        rig_metadata["rig_equipment"] = rig_equipment["equipment"][0]
+
+        rig_metadata = {
+            "geometry": rig_geometry,
+            "equipment": rig_equipment["equipment"][0]
+        }
 
         return rig_metadata
 
@@ -330,7 +338,7 @@ class EcephysNwbSessionApi(NwbApi, EcephysSessionApi):
 
 def clobbering_merge(to_df, from_df, **kwargs):
     overlapping = set(to_df.columns) & set(from_df.columns)
-    
+
     for merge_param in ["on", "left_on", "right_on"]:
         if merge_param in kwargs:
             merge_arg = kwargs.get(merge_param)

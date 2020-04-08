@@ -495,8 +495,8 @@ def add_trials(nwbfile, trials, description_dict={}):
 
     for c in [c for c in trials.columns if c not in ['start_time', 'stop_time']]:
         index, data = dict_to_indexed_array(trials[c].to_dict(), order)
-        if data.dtype == '<U1':
-            data = trials[c].values
+        if data.dtype == '<U1':  # data type is composed of unicode characters
+            data = trials[c].tolist()
         if not len(data) == len(order):
             if len(data) == 0:
                 data = ['']

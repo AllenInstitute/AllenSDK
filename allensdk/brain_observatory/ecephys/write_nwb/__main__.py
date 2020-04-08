@@ -1,5 +1,6 @@
 import logging
 import sys
+from typing import Dict
 from pathlib import Path, PurePath
 import multiprocessing as mp
 from functools import partial
@@ -61,7 +62,7 @@ def fill_df(df, str_fill=""):
 
 def get_inputs_from_lims(host, ecephys_session_id, output_root, job_queue, strategy):
     """
-     This is a development / testing utility for running this module from the Allen Institute for Brain Science's 
+     This is a development / testing utility for running this module from the Allen Institute for Brain Science's
     Laboratory Information Management System (LIMS). It will only work if you are on our internal network.
 
     Parameters
@@ -93,7 +94,7 @@ def get_inputs_from_lims(host, ecephys_session_id, output_root, job_queue, strat
 
 
 def read_stimulus_table(path, column_renames_map=None):
-    """ Loads from a CSV on disk the stimulus table for this session. Optionally renames columns to match NWB 
+    """ Loads from a CSV on disk the stimulus table for this session. Optionally renames columns to match NWB
     epoch specifications.
 
     Parameters
@@ -101,12 +102,12 @@ def read_stimulus_table(path, column_renames_map=None):
     path : str
         path to stimulus table csv
     column_renames_map : dict, optional
-        if provided will be used to rename columns from keys -> values. Default renames 'Start' -> 'start_time' and 
+        if provided will be used to rename columns from keys -> values. Default renames 'Start' -> 'start_time' and
         'End' -> 'stop_time'
-    
+
     Returns
     -------
-    pd.DataFrame : 
+    pd.DataFrame :
         stimulus table with applied renames
 
     """
@@ -134,7 +135,7 @@ def read_spike_times_to_dictionary(
     spike_times_path : str
         npy file identifying, per spike, the time at which that spike occurred.
     spike_units_path : str
-        npy file identifying, per spike, the unit associated with that spike. These are probe-local, so a 
+        npy file identifying, per spike, the unit associated with that spike. These are probe-local, so a
         local_to_global_unit_map is used to associate spikes with global unit identifiers.
     local_to_global_unit_map : dict, optional
         Maps probewise local unit indices to global unit ids
@@ -153,7 +154,7 @@ def read_spike_times_to_dictionary(
 
 
 def read_spike_amplitudes_to_dictionary(
-    spike_amplitudes_path, spike_units_path, 
+    spike_amplitudes_path, spike_units_path,
     templates_path, spike_templates_path, inverse_whitening_matrix_path,
     local_to_global_unit_map=None,
     scale_factor=1.0
@@ -167,8 +168,8 @@ def read_spike_amplitudes_to_dictionary(
     inverse_whitening_matrix = load_and_squeeze_npy(inverse_whitening_matrix_path)
 
     for temp_idx in range(templates.shape[0]):
-        templates[temp_idx,:,:] = np.dot(
-            np.ascontiguousarray(templates[temp_idx,:,:]), 
+        templates[temp_idx, :, :] = np.dot(
+            np.ascontiguousarray(templates[temp_idx, :, :]),
             np.ascontiguousarray(inverse_whitening_matrix)
         )
 
@@ -187,12 +188,12 @@ def scale_amplitudes(spike_amplitudes, templates, spike_templates, scale_factor=
 
 
 def remove_invalid_spikes(
-    row: pd.Series, 
-    times_key: str = "spike_times", 
+    row: pd.Series,
+    times_key: str = "spike_times",
     amps_key: str = "spike_amplitudes"
 ) -> pd.Series:
-    """ Given a row from a units table, ensure that invalid spike times and 
-    corresponding amplitudes are removed. Also ensure the spikes are sorted 
+    """ Given a row from a units table, ensure that invalid spike times and
+    corresponding amplitudes are removed. Also ensure the spikes are sorted
     ascending in time.
 
     Parameters
@@ -203,12 +204,12 @@ def remove_invalid_spikes(
 
     Returns
     -------
-    A version of the input row, with spike times sorted and invalid times 
+    A version of the input row, with spike times sorted and invalid times
     removed
 
     Notes
     -----
-    This function is needed because currently released NWB files might have 
+    This function is needed because currently released NWB files might have
     invalid spike times. It can be removed if these files are updated.
 
     """
@@ -231,11 +232,11 @@ def remove_invalid_spikes(
 
 def remove_invalid_spikes_from_units(
     units: pd.DataFrame,
-    times_key: str = "spike_times", 
+    times_key: str = "spike_times",
     amps_key: str = "spike_amplitudes"
 ) -> pd.DataFrame:
-    """ Given a units table, ensure that invalid spike times and 
-    corresponding amplitudes are removed. Also ensure the spikes are sorted 
+    """ Given a units table, ensure that invalid spike times and
+    corresponding amplitudes are removed. Also ensure the spikes are sorted
     ascending in time.
 
     Parameters
@@ -246,12 +247,12 @@ def remove_invalid_spikes_from_units(
 
     Returns
     -------
-    A version of the input table, with spike times sorted and invalid times 
+    A version of the input table, with spike times sorted and invalid times
     removed
 
     Notes
     -----
-    This function is needed because currently released NWB files might have 
+    This function is needed because currently released NWB files might have
     invalid spike times. It can be removed if these files are updated.
 
     """
@@ -312,7 +313,7 @@ def read_waveforms_to_dictionary(
     local_to_global_unit_map : dict, optional
         Maps probewise local unit indices to global unit ids
     peak_channel_map : dict, optional
-        Maps unit identifiers to indices of peak channels. If provided, the output will contain only samples on the peak 
+        Maps unit identifiers to indices of peak channels. If provided, the output will contain only samples on the peak
         channel for each unit.
 
     Returns
@@ -354,14 +355,14 @@ def read_running_speed(path):
 
     Returns
     -------
-    tuple : 
-        first item is dataframe of running speed data, second is dataframe of 
+    tuple :
+        first item is dataframe of running speed data, second is dataframe of
         raw values (vsig, vin, encoder rotation)
 
     """
 
     return (
-        pd.read_hdf(path, key="running_speed"), 
+        pd.read_hdf(path, key="running_speed"),
         pd.read_hdf(path, key="raw_data")
     )
 
@@ -369,7 +370,7 @@ def read_running_speed(path):
 def add_probe_to_nwbfile(nwbfile, probe_id, sampling_rate, lfp_sampling_rate, has_lfp_data,
                          description="",
                          location=""):
-    """ Creates objects required for representation of a single extracellular ephys probe within an NWB file. These objects amount 
+    """ Creates objects required for representation of a single extracellular ephys probe within an NWB file. These objects amount
     to a Device (this will be removed at some point from pynwb) and an ElectrodeGroup.
 
     Parameters
@@ -388,7 +389,7 @@ def add_probe_to_nwbfile(nwbfile, probe_id, sampling_rate, lfp_sampling_rate, ha
         human-readable description of this probe. Practically (and temporarily), we use tags like "probeA" or "probeB"
     location : str, optional
         unspecified information about the location of this probe. Currently left blank, but in the future will probably contain
-        an expanded form of the information currently implicit in 'probeA' (ie targeting and insertion plan) while channels will 
+        an expanded form of the information currently implicit in 'probeA' (ie targeting and insertion plan) while channels will
         carry the results of ccf registration.
 
     Returns
@@ -502,12 +503,14 @@ def add_running_speed_to_nwbfile(nwbfile, running_speed, units=None):
 
     running_speed_timeseries = pynwb.base.TimeSeries(
         name="running_speed",
-        timestamps=np.array([
-            running_speed["start_time"].values, 
-            running_speed["end_time"].values
-        ]),
+        timestamps=running_speed["start_time"].values,
         data=running_speed["velocity"].values,
         unit=units["velocity"]
+    )
+
+    running_speed_end_timeseries = pynwb.base.TimeSeries(
+        name="running_speed_end_times",
+        timestamps=running_speed["end_time"].values
     )
 
     rotation_timeseries = pynwb.base.TimeSeries(
@@ -518,6 +521,7 @@ def add_running_speed_to_nwbfile(nwbfile, running_speed, units=None):
     )
 
     running_mod.add_data_interface(running_speed_timeseries)
+    running_mod.add_data_interface(running_speed_end_timeseries)
     running_mod.add_data_interface(rotation_timeseries)
 
     return nwbfile
@@ -566,8 +570,7 @@ def write_probe_lfp_file(session_start_time, log_level, probe):
         session_description='EcephysProbe',
         identifier=f"{probe['id']}",
         session_start_time=session_start_time
-    )    
-
+    )
 
     if probe.get("temporal_subsampling_factor", None) is not None:
         probe["lfp_sampling_rate"] = probe["lfp_sampling_rate"] / probe["temporal_subsampling_factor"]
@@ -584,7 +587,7 @@ def write_probe_lfp_file(session_start_time, log_level, probe):
     channels = prepare_probewise_channel_table(probe['channels'], probe_nwb_electrode_group)
     channel_li_id_map = {row["local_index"]: cid for cid, row in channels.iterrows()}
     lfp_channels = np.load(probe['lfp']['input_channels_path'], allow_pickle=False)
-    
+
     channels.reset_index(inplace=True)
     channels.set_index("local_index", inplace=True)
     channels = channels.loc[lfp_channels, :]
@@ -592,7 +595,7 @@ def write_probe_lfp_file(session_start_time, log_level, probe):
     channels.set_index("id", inplace=True)
 
     channels = fill_df(channels)
-    
+
     nwbfile.electrodes = pynwb.file.ElectrodeTable().from_dataframe(channels, name='electrodes')
     electrode_table_region = nwbfile.create_electrode_table_region(
         region=np.arange(channels.shape[0]).tolist(),  # must use raw indices here
@@ -665,7 +668,7 @@ def write_probewise_lfp_files(probes, session_start_time, pool_size=3):
         output_paths.append(pout)
 
     return output_paths
-    
+
 
 def add_probewise_data_to_nwbfile(nwbfile, probes):
     """ Adds channel and spike data for a single probe to the session-level nwb file.
@@ -705,12 +708,12 @@ def add_probewise_data_to_nwbfile(nwbfile, probes):
         ))
 
         spike_amplitudes.update(read_spike_amplitudes_to_dictionary(
-            probe["spike_amplitudes_path"], probe["spike_clusters_file"], 
+            probe["spike_amplitudes_path"], probe["spike_clusters_file"],
             probe["templates_path"], probe["spike_templates_path"], probe["inverse_whitening_matrix_path"],
             local_to_global_unit_map=local_to_global_unit_map,
             scale_factor=probe["amplitude_scale_factor"]
         ))
-    
+
     electrodes_table = fill_df(pd.concat(list(channel_tables.values())))
     nwbfile.electrodes = pynwb.file.ElectrodeTable().from_dataframe(electrodes_table, name='electrodes')
     units_table = pd.concat(unit_tables).set_index(keys='id', drop=True)
@@ -753,7 +756,7 @@ def add_optotagging_table_to_nwbfile(nwbfile, optotagging_table, tag="optical_st
     nwbfile.add_processing_module(opto_mod)
 
     optotagging_table = setup_table_for_epochs(optotagging_table, opto_ts, tag)
-    
+
     if len(optotagging_table) > 0:
         container = pynwb.epoch.TimeIntervals.from_dataframe(optotagging_table, "optogenetic_stimuluation")
         opto_mod.add_data_interface(container)
@@ -761,8 +764,8 @@ def add_optotagging_table_to_nwbfile(nwbfile, optotagging_table, tag="optical_st
     return nwbfile
 
 
-def append_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile: pynwb.NWBFile,
-                                                     eye_tracking_rig_geometry: dict) -> pynwb.NWBFile:
+def add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile: pynwb.NWBFile,
+                                                  eye_tracking_rig_geometry: dict) -> pynwb.NWBFile:
     """ Rig geometry dict should consist of the following fields:
     monitor_position_mm: [x, y, z]
     monitor_rotation_deg: [x, y, z]
@@ -771,29 +774,50 @@ def append_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile: pynwb.NWBFile,
     led_position_mm: [x, y, z]
     equipment: A string describing rig
     """
-    rig_geometry_data = pd.DataFrame(eye_tracking_rig_geometry,
-                                     index=['x', 'y', 'z']).drop('equipment', axis=1)
-    rig_geometry_data['pynwb_index'] = range(len(rig_geometry_data))
-    equipment_data = pd.DataFrame({"equipment": eye_tracking_rig_geometry['equipment']}, index=[0])
+    eye_tracking_rig_mod = pynwb.ProcessingModule(name='eye_tracking_rig_metadata',
+                                                  description='Eye tracking rig metadata module')
 
-    eye_tracking_mod = nwbfile.modules['eye_tracking']
+    rig_geometry_data = pd.DataFrame(eye_tracking_rig_geometry).drop('equipment', axis=1)
+    equipment_data = pd.DataFrame({"equipment": [eye_tracking_rig_geometry['equipment']]})
+
     rig_geometry_interface = pynwb.core.DynamicTable.from_dataframe(df=rig_geometry_data,
-                                                                    name="rig_geometry_data",
-                                                                    index_column='pynwb_index')
+                                                                    name="rig_geometry_data")
     equipment_interface = pynwb.core.DynamicTable.from_dataframe(df=equipment_data,
                                                                  name="equipment")
-    eye_tracking_mod.add_data_interface(rig_geometry_interface)
-    eye_tracking_mod.add_data_interface(equipment_interface)
+
+    eye_tracking_rig_mod.add_data_interface(rig_geometry_interface)
+    eye_tracking_rig_mod.add_data_interface(equipment_interface)
+
+    nwbfile.add_processing_module(eye_tracking_rig_mod)
+
+    return nwbfile
+
+
+def add_eye_tracking_data_to_nwbfile(nwbfile: pynwb.NWBFile,
+                                     eye_tracking_frame_times: pd.Series,
+                                     eye_dlc_tracking_data: Dict[str, pd.DataFrame],
+                                     eye_gaze_data: Dict[str, pd.DataFrame]) -> pynwb.NWBFile:
+
+    if eye_tracking_data_is_valid(eye_dlc_tracking_data=eye_dlc_tracking_data,
+                                  synced_timestamps=eye_tracking_frame_times):
+        add_eye_tracking_ellipse_fit_data_to_nwbfile(nwbfile,
+                                                     eye_dlc_tracking_data=eye_dlc_tracking_data,
+                                                     synced_timestamps=eye_tracking_frame_times)
+
+        # --- Add gaze mapped positions to nwb file ---
+        if eye_gaze_data:
+            add_eye_gaze_mapping_data_to_nwbfile(nwbfile,
+                                                 eye_gaze_data=eye_gaze_data)
 
     return nwbfile
 
 
 def write_ecephys_nwb(
-    output_path, 
-    session_id, session_start_time, 
+    output_path,
+    session_id, session_start_time,
     stimulus_table_path,
     invalid_epochs,
-    probes, 
+    probes,
     running_speed_path,
     session_sync_path,
     eye_tracking_rig_geometry,
@@ -815,9 +839,9 @@ def write_ecephys_nwb(
         nwbfile = add_metadata_to_nwbfile(nwbfile, session_metadata)
 
     stimulus_table = read_stimulus_table(stimulus_table_path)
-    nwbfile = add_stimulus_timestamps(nwbfile, stimulus_table['start_time'].values) # TODO: patch until full timestamps are output by stim table module
+    nwbfile = add_stimulus_timestamps(nwbfile, stimulus_table['start_time'].values)  # TODO: patch until full timestamps are output by stim table module
     nwbfile = add_stimulus_presentations(nwbfile, stimulus_table)
-    nwbfile = add_invalid_times(nwbfile,invalid_epochs)
+    nwbfile = add_invalid_times(nwbfile, invalid_epochs)
 
     if optotagging_table_path is not None:
         optotagging_table = pd.read_csv(optotagging_table_path)
@@ -829,26 +853,22 @@ def write_ecephys_nwb(
     add_running_speed_to_nwbfile(nwbfile, running_speed)
     add_raw_running_data_to_nwbfile(nwbfile, raw_running_data)
 
-    # --- Add eye tracking ellipse fits to nwb file ---
+    add_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile,
+                                                  eye_tracking_rig_geometry)
+
+    # Collect eye tracking/gaze mapping data from files
     eye_tracking_frame_times = su.get_synchronized_frame_times(session_sync_file=session_sync_path,
                                                                sync_line_label_keys=Dataset.EYE_TRACKING_KEYS)
     eye_dlc_tracking_data = read_eye_dlc_tracking_ellipses(Path(eye_dlc_ellipses_path))
+    if eye_gaze_mapping_path:
+        eye_gaze_data = read_eye_gaze_mappings(Path(eye_gaze_mapping_path))
+    else:
+        eye_gaze_data = None
 
-    if eye_tracking_data_is_valid(eye_dlc_tracking_data=eye_dlc_tracking_data,
-                                  synced_timestamps=eye_tracking_frame_times):
-        add_eye_tracking_ellipse_fit_data_to_nwbfile(nwbfile,
-                                                     eye_dlc_tracking_data=eye_dlc_tracking_data,
-                                                     synced_timestamps=eye_tracking_frame_times)
-
-        # --- Append eye tracking rig geometry info to nwb file (with eye tracking) ---
-        append_eye_tracking_rig_geometry_data_to_nwbfile(nwbfile,
-                                                         eye_tracking_rig_geometry=eye_tracking_rig_geometry)
-
-        # --- Add gaze mapped positions to nwb file ---
-        if eye_gaze_mapping_path:
-            eye_gaze_data = read_eye_gaze_mappings(Path(eye_gaze_mapping_path))
-            add_eye_gaze_mapping_data_to_nwbfile(nwbfile,
-                                                 eye_gaze_data=eye_gaze_data)
+    add_eye_tracking_data_to_nwbfile(nwbfile,
+                                     eye_tracking_frame_times,
+                                     eye_dlc_tracking_data,
+                                     eye_gaze_data)
 
     Manifest.safe_make_parent_dirs(output_path)
     with pynwb.NWBHDF5IO(output_path, mode='w') as io:
