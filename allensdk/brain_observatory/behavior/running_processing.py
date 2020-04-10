@@ -32,14 +32,15 @@ def get_running_df(data, time):
     v_sig = data["items"]["behavior"]["encoders"][0]["vsig"]
     v_in = data["items"]["behavior"]["encoders"][0]["vin"]
     if len(v_in) > len(time) + 1:
-            error_string = "length of v_in ({}) cannot be longer than length of time ({}) + 1, they are off by {}".format(
+        error_string = "length of v_in ({}) cannot be longer than length of time ({}) + 1, they are off by {}".format(
             len(v_in),
             len(time),
             abs(len(v_in) - len(time))
         )
         raise ValueError(error_string)
     if len(v_in) == len(time) + 1:
-        warnings.warn('time array is 1 value shorter than encoder array. Last encoder value removed\n', stacklevel=1)
+        warnings.warn(
+            'time array is 1 value shorter than encoder array. Last encoder value removed\n', stacklevel=1)
     # remove big, single frame spikes in encoder values
     dx = scipy.signal.medfilt(dx_raw[:len(time)], kernel_size=5)
     dx = np.cumsum(dx)  # wheel rotations
