@@ -133,23 +133,50 @@ def test_add_stimulus_presentations_color(nwbfile, stimulus_presentations_color,
     assert not mismatched, f"expected: {expected_color}, obtained: {obtained_color}"
 
 
-def test_add_optotagging_table_to_nwbfile(nwbfile, roundtripper):
-    opto_table = pd.DataFrame({
+@pytest.mark.parametrize('opto_table, expected', [
+    (pd.DataFrame({
         "start_time": [0., 1., 2., 3.],
         "stop_time": [0.5, 1.5, 2.5, 3.5],
         "level": [10., 9., 8., 7.],
-        "condition": ["a", "a", "b", "c"]
-    })
+        "condition": ["a", "a", "b", "c"]}),
+     None),
+
+    # Test for older version of optotable that used nwb reserved "name" col
+    (pd.DataFrame({
+        "start_time": [0., 1., 2., 3.],
+        "stop_time": [0.5, 1.5, 2.5, 3.5],
+        "level": [10., 9., 8., 7.],
+        "condition": ["a", "a", "b", "c"],
+        "name": ["w", "x", "y", "z"]}),
+     pd.DataFrame({
+        "start_time": [0., 1., 2., 3.],
+        "stop_time": [0.5, 1.5, 2.5, 3.5],
+        "level": [10., 9., 8., 7.],
+        "condition": ["a", "a", "b", "c"],
+        "stimulus_name": ["w", "x", "y", "z"],
+        "duration": [0.5, 0.5, 0.5, 0.5]})),
+
+    (pd.DataFrame({
+        "start_time": [0., 1., 2., 3.],
+        "stop_time": [0.5, 1.5, 2.5, 3.5],
+        "level": [10., 9., 8., 7.],
+        "condition": ["a", "a", "b", "c"],
+        "stimulus_name": ["w", "x", "y", "z"]}),
+     None)
+])
+def test_add_optotagging_table_to_nwbfile(nwbfile, roundtripper, opto_table, expected):
+
     opto_table["duration"] = opto_table["stop_time"] - opto_table["start_time"]
 
     nwbfile = write_nwb.add_optotagging_table_to_nwbfile(nwbfile, opto_table)
     api = roundtripper(nwbfile, EcephysNwbSessionApi)
 
     obtained = api.get_optogenetic_stimulation()
-    pd.set_option("display.max_columns", None)
-    print(obtained)
 
-    pd.testing.assert_frame_equal(opto_table, obtained, check_like=True)
+    if expected is None:
+        expected = opto_table
+
+    pd.testing.assert_frame_equal(obtained, expected, check_like=True)
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])

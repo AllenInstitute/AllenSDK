@@ -745,6 +745,11 @@ def add_probewise_data_to_nwbfile(nwbfile, probes):
 
 
 def add_optotagging_table_to_nwbfile(nwbfile, optotagging_table, tag="optical_stimulation"):
+    # "name" is a pynwb reserved column name that older versions of the
+    # pre-processed optotagging_table may use.
+    if "name" in optotagging_table.columns:
+        optotagging_table = optotagging_table.rename(columns={"name": "stimulus_name"})
+
     opto_ts = pynwb.base.TimeSeries(
         name="optotagging",
         timestamps=optotagging_table["start_time"].values,
