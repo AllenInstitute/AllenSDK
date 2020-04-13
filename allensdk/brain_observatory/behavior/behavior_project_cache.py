@@ -386,7 +386,7 @@ def _write_log(data: Any, path: str, key_name: str, key_value: Any):
         record = pd.read_csv(path, index_col=key_name)
         if key_value in record.index:
             # if the value is already in the table, update it
-            record.loc[key_value ,keys[1:]]  = values[1:]
+            record.loc[key_value, keys[1:]] = values[1:]
         else:
             # if the value is not in the table, create a new row, append it
             new_row = pd.DataFrame.from_dict(
