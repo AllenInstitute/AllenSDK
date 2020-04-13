@@ -383,16 +383,18 @@ def _write_log(data: Any, path: str, key_name: str, key_value: Any):
     keys = [key_name, "created_at", "updated_at"]
     values = [key_value, now, now]
     if os.path.exists(path):
-        record = (pd.read_csv(path, index_col=key_name)
-                    .to_dict(orient="index"))
-        experiment = record.get(key_value)
-        if experiment:
-            experiment.update({"updated_at": now})
+        record = pd.read_csv(path, index_col=key_name)
+        if key_value in record.index:
+            # if the value is already in the table, update it
+            record.loc[key_value ,keys[1:]]  = values[1:]
         else:
-            record.update({key_value: dict(zip(keys[1:], values[1:]))})
-        (pd.DataFrame.from_dict(record, orient="index")
-            .rename_axis(index=key_name)
-            .to_csv(path))
+            # if the value is not in the table, create a new row, append it
+            new_row = pd.DataFrame.from_dict(
+                {key_value: dict(zip(keys[1:], values[1:]))},
+                orient="index"
+            )
+            record = pd.concat([record, new_row])
+        record.to_csv(path)
     else:
         with open(path, "w") as f:
             w = csv.DictWriter(f, fieldnames=keys)
