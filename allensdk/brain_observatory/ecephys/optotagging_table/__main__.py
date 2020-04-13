@@ -21,11 +21,11 @@ def build_opto_table(args):
         raise ValueError(f"there are {len(start_times) - len(conditions)} extra optotagging sync times!")
 
     optotagging_table = pd.DataFrame({
-        'start_time':start_times,
+        'start_time': start_times,
         'condition': conditions,
         'level': levels
     })
-    optotagging_table = optotagging_table.sort_values(by='start_time', axis=0)    
+    optotagging_table = optotagging_table.sort_values(by='start_time', axis=0)
 
     stop_times = []
     names = []
@@ -37,7 +37,7 @@ def build_opto_table(args):
         conditions.append(condition["condition"])
 
     optotagging_table["stop_time"] = stop_times
-    optotagging_table["name"] = names
+    optotagging_table["stimulus_name"] = names
     optotagging_table["condition"] = conditions
     optotagging_table["duration"] = optotagging_table["stop_time"] - optotagging_table["start_time"]
 
@@ -56,7 +56,6 @@ def main():
     else:
         print(mod.get_output_json(output))
 
-    
+
 if __name__ == "__main__":
     main()
-
