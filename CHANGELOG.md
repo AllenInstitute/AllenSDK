@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [1.7.0] = UPDATE\_DATE
+## [1.7.0] = 2020-04-20
 
 ### Added
 - Internal users can now access `eye_tracking` ellipse fit data from behavior + ophys Session objects
