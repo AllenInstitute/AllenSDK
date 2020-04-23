@@ -1,6 +1,6 @@
 import logging
 import sys
-from typing import Dict
+from typing import Any, Dict, List, Tuple
 from pathlib import Path, PurePath
 import multiprocessing as mp
 from functools import partial
@@ -187,79 +187,43 @@ def scale_amplitudes(spike_amplitudes, templates, spike_templates, scale_factor=
     return spike_amplitudes
 
 
-def remove_invalid_spikes(
-    row: pd.Series,
-    times_key: str = "spike_times",
-    amps_key: str = "spike_amplitudes"
-) -> pd.Series:
-    """ Given a row from a units table, ensure that invalid spike times and
-    corresponding amplitudes are removed. Also ensure the spikes are sorted
-    ascending in time.
+def filter_and_sort_spikes(spike_times_mapping: Dict[int, np.ndarray],
+                           spike_amplitudes_mapping: Dict[int, np.ndarray]) -> Tuple[Dict[int, np.ndarray], Dict[int, np.ndarray]]:
+    """Filter out invalid spike timepoints and sort spike data
+    (times + amplitudes) by times.
 
     Parameters
     ----------
-    row : a row representing a single sorted unit
-    times_key : name of column containing spike times
-    amps_key : name of column containing spike amplitudes
+    spike_times_mapping : Dict[int, np.ndarray]
+        Keys: unit identifiers, Values: spike time arrays
+    spike_amplitudes_mapping : Dict[int, np.ndarray]
+        Keys: unit identifiers, Values: spike amplitude arrays
 
     Returns
     -------
-    A version of the input row, with spike times sorted and invalid times
-    removed
-
-    Notes
-    -----
-    This function is needed because currently released NWB files might have
-    invalid spike times. It can be removed if these files are updated.
-
+    Tuple[Dict[int, np.ndarray], Dict[int, np.ndarray]]
+        A tuple containing filtered and sorted spike_times_mapping and
+        spike_amplitudes_mapping data.
     """
+    sorted_spike_times_mapping = {}
+    sorted_spike_amplitudes_mapping = {}
 
-    out = row.copy(deep=True)
+    for unit_id, _ in spike_times_mapping.items():
+        spike_times = spike_times_mapping[unit_id]
+        spike_amplitudes = spike_amplitudes_mapping[unit_id]
 
-    spike_times = np.array(out.pop(times_key))
-    amps = np.array(out.pop(amps_key))
+        valid = spike_times >= 0
+        filtered_spike_times = spike_times[valid]
+        filtered_spike_amplitudes = spike_amplitudes[valid]
 
-    valid = spike_times >= 0
-    spike_times = spike_times[valid]
-    amps = amps[valid]
+        order = np.argsort(filtered_spike_times)
+        sorted_spike_times = filtered_spike_times[order]
+        sorted_spike_amplitudes = filtered_spike_amplitudes[order]
 
-    order = np.argsort(spike_times)
-    out[times_key] = spike_times[order]
-    out[amps_key] = amps[order]
+        sorted_spike_times_mapping[unit_id] = sorted_spike_times
+        sorted_spike_amplitudes_mapping[unit_id] = sorted_spike_amplitudes
 
-    return out
-
-
-def remove_invalid_spikes_from_units(
-    units: pd.DataFrame,
-    times_key: str = "spike_times",
-    amps_key: str = "spike_amplitudes"
-) -> pd.DataFrame:
-    """ Given a units table, ensure that invalid spike times and
-    corresponding amplitudes are removed. Also ensure the spikes are sorted
-    ascending in time.
-
-    Parameters
-    ----------
-    units : A units table
-    times_key : name of column containing spike times
-    amps_key : name of column containing spike amplitudes
-
-    Returns
-    -------
-    A version of the input table, with spike times sorted and invalid times
-    removed
-
-    Notes
-    -----
-    This function is needed because currently released NWB files might have
-    invalid spike times. It can be removed if these files are updated.
-
-    """
-
-    remover = partial(
-        remove_invalid_spikes, times_key=times_key, amps_key=amps_key)
-    return units.apply(remover, axis=1)
+    return (sorted_spike_times_mapping, sorted_spike_amplitudes_mapping)
 
 
 def group_1d_by_unit(data, data_unit_map, local_to_global_unit_map=None):
@@ -670,32 +634,43 @@ def write_probewise_lfp_files(probes, session_start_time, pool_size=3):
     return output_paths
 
 
-def add_probewise_data_to_nwbfile(nwbfile, probes):
-    """ Adds channel and spike data for a single probe to the session-level nwb file.
+ParsedProbeData = Tuple[pd.DataFrame,  # unit_tables
+                        Dict[int, np.ndarray],  # spike_times
+                        Dict[int, np.ndarray],  # spike_amplitudes
+                        Dict[int, np.ndarray]]  # mean_waveforms
+
+
+def parse_probes_data(probes: List[Dict[str, Any]]) -> ParsedProbeData:
+    """Given a list of probe dictionaries specifying data file locations, load
+    and parse probe data into intermediate data structures needed for adding
+    probe data to an nwbfile.
+
+    Parameters
+    ----------
+    probes : List[Dict[str, Any]]
+        A list of dictionaries (one entry for each probe), where each probe
+        dictionary contains metadata (id, name, sampling_rate, etc...) as well
+        as filepaths pointing to where probe lfp data can be found.
+
+    Returns
+    -------
+    ParsedProbeData : Tuple[...]
+        unit_tables : pd.DataFrame
+            A table containing unit metadata from all probes.
+        spike_times : Dict[int, np.ndarray]
+            Keys: unit identifiers, Values: spike time arrays
+        spike_amplitudes : Dict[int, np.ndarray]
+            Keys: unit identifiers, Values: spike amplitude arrays
+        mean_waveforms : Dict[int, np.ndarray]
+            Keys: unit identifiers, Values: mean waveform arrays
     """
 
-    channel_tables = {}
     unit_tables = []
     spike_times = {}
     spike_amplitudes = {}
     mean_waveforms = {}
 
     for probe in probes:
-        logging.info(f'found probe {probe["id"]} with name {probe["name"]}')
-
-        if probe.get("temporal_subsampling_factor", None) is not None:
-            probe["lfp_sampling_rate"] = probe["lfp_sampling_rate"] / probe["temporal_subsampling_factor"]
-
-        nwbfile, probe_nwb_device, probe_nwb_electrode_group = add_probe_to_nwbfile(
-            nwbfile,
-            probe_id=probe["id"],
-            description=probe["name"],
-            sampling_rate=probe["sampling_rate"],
-            lfp_sampling_rate=probe["lfp_sampling_rate"],
-            has_lfp_data=probe["lfp"] is not None
-        )
-
-        channel_tables[probe["id"]] = prepare_probewise_channel_table(probe['channels'], probe_nwb_electrode_group)
         unit_tables.append(pd.DataFrame(probe['units']))
 
         local_to_global_unit_map = {unit['cluster_id']: unit['id'] for unit in probe['units']}
@@ -714,22 +689,52 @@ def add_probewise_data_to_nwbfile(nwbfile, probes):
             scale_factor=probe["amplitude_scale_factor"]
         ))
 
+    units_table = pd.concat(unit_tables).set_index(keys='id', drop=True)
+
+    return (units_table, spike_times, spike_amplitudes, mean_waveforms)
+
+
+def add_probewise_data_to_nwbfile(nwbfile, probes):
+    """ Adds channel and spike data for a single probe to the session-level nwb file.
+    """
+
+    channel_tables = {}
+
+    for probe in probes:
+        logging.info(f'found probe {probe["id"]} with name {probe["name"]}')
+
+        if probe.get("temporal_subsampling_factor", None) is not None:
+            probe["lfp_sampling_rate"] = probe["lfp_sampling_rate"] / probe["temporal_subsampling_factor"]
+
+        nwbfile, probe_nwb_device, probe_nwb_electrode_group = add_probe_to_nwbfile(
+            nwbfile,
+            probe_id=probe["id"],
+            description=probe["name"],
+            sampling_rate=probe["sampling_rate"],
+            lfp_sampling_rate=probe["lfp_sampling_rate"],
+            has_lfp_data=probe["lfp"] is not None
+        )
+
+        channel_tables[probe["id"]] = prepare_probewise_channel_table(probe['channels'], probe_nwb_electrode_group)
+
     electrodes_table = fill_df(pd.concat(list(channel_tables.values())))
     nwbfile.electrodes = pynwb.file.ElectrodeTable().from_dataframe(electrodes_table, name='electrodes')
-    units_table = pd.concat(unit_tables).set_index(keys='id', drop=True)
-    units_table = remove_invalid_spikes_from_units(units_table)
+
+    units_table, spike_times, spike_amplitudes, mean_waveforms = parse_probes_data(probes)
     nwbfile.units = pynwb.misc.Units.from_dataframe(fill_df(units_table), name='units')
+
+    sorted_spike_times, sorted_spike_amplitudes = filter_and_sort_spikes(spike_times, spike_amplitudes)
 
     add_ragged_data_to_dynamic_table(
         table=nwbfile.units,
-        data=spike_times,
+        data=sorted_spike_times,
         column_name="spike_times",
         column_description="times (s) of detected spiking events",
     )
 
     add_ragged_data_to_dynamic_table(
         table=nwbfile.units,
-        data=spike_amplitudes,
+        data=sorted_spike_amplitudes,
         column_name="spike_amplitudes",
         column_description="amplitude (s) of detected spiking events"
     )
