@@ -695,61 +695,100 @@ def test_read_spike_amplitudes_to_dictionary(tmpdir_factory, spike_amplitudes, t
     assert np.allclose(expected_amplitudes[3:], obtained[1])
 
 
-def test_remove_invalid_spikes():
-    row = pd.Series({
-        "spike_times": np.array([0, 1, 2, -1, 5, 4]),
-        "spike_amplitudes": np.arange(6),
-        "a": "b"
-    }, name=1000)
+@pytest.mark.parametrize("spike_times_mapping, spike_amplitudes_mapping, expected", [
 
-    expct = pd.Series({
-        "spike_times": np.array([0, 1, 2, 4, 5]),
-        "spike_amplitudes": np.array([0, 1, 2, 5, 4]),
-        "a": "b"
-    }, name=1000)
+    ({12345: np.array([0, 1, 2, -1, 5, 4])},  # spike_times_mapping
 
-    obt = write_nwb.remove_invalid_spikes(row)
-    assert np.allclose(obt["spike_times"], expct["spike_times"])
-    assert np.allclose(obt["spike_amplitudes"], expct["spike_amplitudes"])
+     {12345: np.array([0, 1, 2, 3, 4, 5])},  # spike_amplitudes_mapping
+
+     ({12345: np.array([0, 1, 2, 4, 5])},  # expected
+      {12345: np.array([0, 1, 2, 5, 4])})),
+
+    ({12345: np.array([0, 1, 2, -1, 5, 4]),  # spike_times_mapping
+      54321: np.array([5, 4, 3, -1, 6])},
+
+     {12345: np.array([0, 1, 2, 3, 4, 5]),  # spike_amplitudes_mapping
+      54321: np.array([0, 1, 2, 3, 4])},
+
+     ({12345: np.array([0, 1, 2, 4, 5]),  # expected
+       54321: np.array([3, 4, 5, 6])},
+      {12345: np.array([0, 1, 2, 5, 4]),
+       54321: np.array([2, 1, 0, 4])})),
+])
+def test_filter_and_sort_spikes(spike_times_mapping, spike_amplitudes_mapping, expected):
+    expected_spike_times, expected_spike_amplitudes = expected
+
+    obtained_spike_times, obtained_spike_amplitudes = write_nwb.filter_and_sort_spikes(spike_times_mapping,
+                                                                                       spike_amplitudes_mapping)
+
+    np.testing.assert_equal(obtained_spike_times, expected_spike_times)
+    np.testing.assert_equal(obtained_spike_amplitudes, expected_spike_amplitudes)
 
 
-def test_remove_invalid_spikes_from_units():
+@pytest.mark.parametrize('roundtrip', [True, False])
+@pytest.mark.parametrize('probes, parsed_probe_data, expected', [
+    ([{"id": 1234,
+       "name": "probeA",
+       "sampling_rate": 29999.9655245905,
+       "lfp_sampling_rate": 2499.99712704921,
+       "temporal_subsampling_factor": 2.0,
+       "lfp": {},
+       "spike_times_path": "/dummy_path",
+       "spike_clusters_files": "/dummy_path",
+       "mean_waveforms_path": "/dummy_path",
+       "channels": [{"id": 1,
+                     "probe_id": 1234,
+                     "valid_data": True,
+                     "local_index": 0,
+                     "a": 42.0},
+                    {"id": 2,
+                     "probe_id": 1234,
+                     "valid_data": True,
+                     "local_index": 1,
+                     "a": 84.0}],
+       "units": [{"id": 777,
+                  "local_index": 7,
+                  "quality": "good",
+                  "a": 0.5,
+                  "b": 5},
+                 {"id": 778,
+                  "local_index": 9,
+                  "quality": "noise",
+                  "a": 1.0,
+                  "b": 10}]}],
 
-    units = pd.DataFrame({
-        "spike_times": [
-            np.array([0, 1, 2, -1, 5, 4]),
-            np.arange(2),
-            np.arange(3)
-        ],
-        "spike_amplitudes": [
-            np.arange(6),
-            np.arange(2),
-            np.arange(3)
-        ],
-        "a": ["b", "c", "d"]
-    }, index=pd.Index(name="id", data=[5, 6, 7]))
+     (pd.DataFrame({"id": [777, 778], "local_index": [7, 9],  # units_table
+                    "a": [0.5, 1.0], "b": [5, 10]}).set_index(keys='id', drop=True),
+      {777: np.array([0., 1., 2., -1., 5., 4.]),  # spike_times
+       778: np.array([5., 4., 3., -1., 6.])},
+      {777: np.array([0., 1., 2., 3., 4., 5.]),  # spike_amplitudes
+       778: np.array([0., 1., 2., 3., 4.])},
+      {777: np.array([1., 2., 3., 4., 5., 6.]),  # mean_waveforms
+       778: np.array([1., 2., 3., 4., 5.])}),
 
-    expct = pd.DataFrame({
-        "spike_times": [
-            np.array([0, 1, 2, 4, 5]),
-            np.arange(2),
-            np.arange(3)
-        ],
-        "spike_amplitudes": [
-            np.array([0, 1, 2, 5, 4]),
-            np.arange(2),
-            np.arange(3)
-        ],
-        "a": ["b", "c", "d"]
-    }, index=pd.Index(name="id", data=[5, 6, 7]))
+     pd.DataFrame({"id": [777, 778], "local_index": [7, 9],  # units_table
+                   "a": [0.5, 1.0], "b": [5, 10],
+                   "spike_times": [[0., 1., 2., 4., 5.], [3., 4., 5., 6.]],
+                   "spike_amplitudes": [[0., 1., 2., 5., 4.], [2., 1., 0., 4.]],
+                   "waveform_mean": [[1., 2., 3., 4., 5., 6.], [1., 2., 3., 4., 5.]]}
+                  ).set_index(keys='id', drop=True)),
+])
+def test_add_probewise_data_to_nwbfile(monkeypatch, nwbfile, roundtripper,
+                                       roundtrip, probes, parsed_probe_data,
+                                       expected):
 
-    obt = write_nwb.remove_invalid_spikes_from_units(units)
-    for (_, expct_row), (_, obt_row) in zip(expct.iterrows(), obt.iterrows()):
-        assert np.allclose(obt_row["spike_times"], expct_row["spike_times"])
-        assert np.allclose(
-            obt_row["spike_amplitudes"],
-            expct_row["spike_amplitudes"])
-        assert obt_row["a"] == expct_row["a"]
+    def mock_parse_probes_data(probes):
+        return parsed_probe_data
+
+    monkeypatch.setattr(write_nwb, 'parse_probes_data', mock_parse_probes_data)
+    nwbfile = write_nwb.add_probewise_data_to_nwbfile(nwbfile, probes)
+
+    if roundtrip:
+        obt = roundtripper(nwbfile, EcephysNwbSessionApi)
+    else:
+        obt = EcephysNwbSessionApi.from_nwbfile(nwbfile)
+
+    pd.testing.assert_frame_equal(obt.nwbfile.units.to_dataframe(), expected)
 
 
 @pytest.mark.parametrize('roundtrip', [True, False])
