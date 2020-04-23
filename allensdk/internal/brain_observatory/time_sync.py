@@ -30,7 +30,7 @@ VERSION_1_KEYS = {
 
 # MPE is changing keys. This isn't versioned in the file.
 VERSION_2_KEYS = {
-    "photodiode": "photodiode",
+    "photodiode": "stim_photodiode",
     "2p": "2p_vsync",
     "stimulus": "stim_vsync",
     "eye_camera": "eye_tracking",
