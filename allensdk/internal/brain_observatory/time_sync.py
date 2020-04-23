@@ -1,5 +1,5 @@
 from collections import deque
-from typing import Optional, Callable, Any, List, Dict, Set
+from typing import Optional, Callable, Any, Dict, Set
 
 import numpy as np
 import h5py
@@ -17,6 +17,12 @@ REG_PHOTODIODE_STD = 0.05    # seconds
 PHOTODIODE_ANOMALY_THRESHOLD = 0.5     # seconds
 LONG_STIM_THRESHOLD = 0.2     # seconds
 MAX_MONITOR_DELAY = 0.07     # seconds
+
+"""
+These are the old legacy key pairs, I kept these in comments because
+I want a record of what we assumed the key pairs looked like at one
+point. This is for anyone that has to refactor key finding in the future
+to have some idea of what keys are supposed to exist in sync dataset line labels
 
 VERSION_1_KEYS = {
     "photodiode": "photodiode",
@@ -38,6 +44,35 @@ VERSION_2_KEYS = {
     "acquiring": "2p_acquiring",
     "lick_sensor": "lick_sensor"
     }
+"""
+
+POSSIBLE_KEY_PAIRS = {
+        "photodiode": ("stim_photodiode", "photodiode"),
+        "eye_camera": ("cam2_exposure", "eye_tracking"),
+        "behavior_camera": ("cam1_exposure", "behavior_monitoring"),
+        "lick_sensor": ("lick_1", "lick_sensor")
+        }
+
+
+def validate_keys(key_set: Set, dictionary_with_keys: Dict):
+    """
+    Validates that all values in the dictionary_with_keys are present in
+    the list.
+
+    Args:
+        key_set: Set of key values
+        dictionary_with_keys: Dictionary where values should be contained in
+                              key_list
+
+    Returns:
+        non_matches: returns a list of values not found in the key_set but
+                    present in dictionary
+    """
+    return_keys = []
+    for key, value in dictionary_with_keys.items():
+        if key not in key_set:
+            return_keys.append(key)
+    return return_keys
 
 POSSIBLE_KEY_PAIRS = {
         "photodiode": ("stim_photodiode", "photodiode"),
@@ -73,6 +108,14 @@ def get_keys(sync_dset):
 
     This method is fragile, but not all old data contains the full list
     of keys.
+
+    Update (4/24/2020):
+    This function was changed as previous test cases were failing
+    and the error was being handled. When this error handling was removed
+    in the monitor delay refactor (#1438) the tests broke. This method now
+    searches for the possible keys in the set and if they exist adds them to
+    the return dictionary. If keys don't exist it presumes old file and defaults
+    to legacy keys, logging this as a warning. This fixes the bamboo test issues
     """
     key_dict = {
             "photodiode": None,
