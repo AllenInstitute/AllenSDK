@@ -1,5 +1,5 @@
 from collections import deque
-from typing import Optional, Callable, Any
+from typing import Optional, Callable, Any, Dict, Set
 
 import numpy as np
 import h5py
@@ -18,8 +18,14 @@ PHOTODIODE_ANOMALY_THRESHOLD = 0.5     # seconds
 LONG_STIM_THRESHOLD = 0.2     # seconds
 MAX_MONITOR_DELAY = 0.07     # seconds
 
+"""
+These are the old legacy key pairs, I kept these in comments because
+I want a record of what we assumed the key pairs looked like at one
+point. This is for anyone that has to refactor key finding in the future
+to have some idea of what keys are supposed to exist in sync dataset line labels
+
 VERSION_1_KEYS = {
-    "photodiode": "stim_photodiode",
+    "photodiode": "photodiode",
     "2p": "2p_vsync",
     "stimulus": "stim_vsync",
     "eye_camera": "cam2_exposure",
@@ -30,7 +36,7 @@ VERSION_1_KEYS = {
 
 # MPE is changing keys. This isn't versioned in the file.
 VERSION_2_KEYS = {
-    "photodiode": "photodiode",
+    "photodiode": "stim_photodiode",
     "2p": "2p_vsync",
     "stimulus": "stim_vsync",
     "eye_camera": "eye_tracking",
@@ -38,6 +44,35 @@ VERSION_2_KEYS = {
     "acquiring": "2p_acquiring",
     "lick_sensor": "lick_sensor"
     }
+"""
+
+POSSIBLE_KEY_PAIRS = {
+        "photodiode": ("stim_photodiode", "photodiode"),
+        "eye_camera": ("cam2_exposure", "eye_tracking"),
+        "behavior_camera": ("cam1_exposure", "behavior_monitoring"),
+        "lick_sensor": ("lick_1", "lick_sensor")
+        }
+
+
+def validate_keys(key_set: Set, dictionary_with_keys: Dict):
+    """
+    Validates that all values in the dictionary_with_keys are present in
+    the list.
+
+    Args:
+        key_set: Set of key values
+        dictionary_with_keys: Dictionary where values should be contained in
+                              key_list
+
+    Returns:
+        non_matches: returns a list of values not found in the key_set but
+                    present in dictionary
+    """
+    return_keys = []
+    for key, value in dictionary_with_keys.items():
+        if key not in key_set:
+            return_keys.append(key)
+    return return_keys
 
 
 def get_keys(sync_dset):
@@ -45,10 +80,41 @@ def get_keys(sync_dset):
 
     This method is fragile, but not all old data contains the full list
     of keys.
+
+    Update (4/24/2020):
+    This function was changed as previous test cases were failing
+    and the error was being handled. When this error handling was removed
+    in the monitor delay refactor (#1438) the tests broke. This method now
+    searches for the possible keys in the set and if they exist adds them to
+    the return dictionary. If keys don't exist it presumes old file and defaults
+    to legacy keys, logging this as a warning. This fixes the bamboo test issues
     """
-    if "cam2_exposure" in sync_dset.line_labels:
-        return VERSION_1_KEYS
-    return VERSION_2_KEYS
+    key_dict = {
+            "photodiode": None,
+            "2p": "2p_vsync",
+            "stimulus": "stim_vsync",
+            "eye_camera": None,
+            "behavior_camera": None,
+            "acquiring": "2p_acquiring",
+            "lick_sensor": None
+            }
+    for key, value in POSSIBLE_KEY_PAIRS.items():
+        if value[0] in sync_dset.line_labels:
+            key_dict[key] = value[0]
+        elif value[1] in sync_dset.line_labels:
+            key_dict[key] = value[1]
+        else:
+            logging.warning(f"No key found in sync dataset line labels for key:"
+                            f" {key}.Assuming old dataset and defaulting to "
+                            f"older key option")
+            key_dict[key] = value[0]
+    line_label_set = set(sync_dset.line_labels)
+    non_found_keys = validate_keys(line_label_set, key_dict)
+    if len(non_found_keys) > 0:
+        logging.warning(f"Keys not found in sync dataset line labels, assuming"
+                        "old file and not all keys are present. Keys not "
+                        "found: {non_found_keys}")
+    return key_dict
 
 
 def monitor_delay(sync_dset, stim_times, photodiode_key,
