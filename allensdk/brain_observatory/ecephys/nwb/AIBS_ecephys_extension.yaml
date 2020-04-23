@@ -3,10 +3,6 @@ groups:
     neurodata_type_inc: ElectrodeGroup
     doc: A group consisting of the channels on a single neuropixels probe.
     attributes:
-    - name: help
-      dtype: text
-      value: A physical grouping of channels
-      doc: Value is 'Metadata about a physical grouping of channels'
     - name: description
       dtype: text
       doc: description of this electrode group

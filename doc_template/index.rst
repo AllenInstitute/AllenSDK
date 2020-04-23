@@ -90,6 +90,18 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
+What's New - 1.6.0 (March 23, 2020)
+-----------------------------------------------------------------------
+
+As of the 1.6.0 release:
+
+- added get_receptive_field alias() for _get_rf() in allensdk/brain_observatory/ecephys/stimulus_analysis/receptive_field_mapping.py
+- Added required version to namespace and caches spec in ecephy nwb outputs in allensdk/brain_observatory/ecephys/nwb/AIBS_ecephys_namespace.yaml
+- Added version for ophys behavior nwb output to allensdk/brain_observatory/nwb/AIBS_ophys_behavior_namespace.yaml
+- Behavior and ECEphys project caches no longer accept arbitrary keywords to prevent confusion when user supplies incorrect kwargs to constructor.
+- New ecephys notebook for optotagging tutorial.
+
+
 What's New - 1.5.0 (February 10, 2020)
 -----------------------------------------------------------------------
 
@@ -101,17 +113,9 @@ As of the 1.5.0 release:
 - morphology.apply_affine correctly rescales radii
 
 
-What's New - 1.4.0 (January 23, 2020)
------------------------------------------------------------------------
-
-As of the 1.4.0 release:
-
-- users of the ephys extractor can supply their own cutoff frequency for low-pass bessel filter.
-- (internal feature) the ophys time sync module writes an output json describing its results.
-
-
 Previous Release Notes
 ----------------------
+    * `1.4.0 <https://github.com/AllenInstitute/AllenSDK/releases/tag/v1.4.0>`_
     * `1.3.0 <https://github.com/AllenInstitute/AllenSDK/releases/tag/v1.3.0>`_
     * `1.2.0 <https://github.com/AllenInstitute/AllenSDK/releases/tag/v1.2.0>`_
     * `1.1.1 <https://github.com/AllenInstitute/AllenSDK/releases/tag/v1.1.1>`_

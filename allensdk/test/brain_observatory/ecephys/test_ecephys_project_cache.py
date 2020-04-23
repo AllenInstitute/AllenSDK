@@ -373,7 +373,7 @@ def test_from_lims_default(tmpdir_factory):
     tmpdir = str(tmpdir_factory.mktemp("test_from_lims_default"))
 
     cache = epc.EcephysProjectCache.from_lims(
-        manifest_path=os.path.join(tmpdir, "manifest.json")
+        manifest=os.path.join(tmpdir, "manifest.json")
     )
     assert isinstance(cache.fetch_api.app_engine, AsyncHttpEngine)
     assert cache.stream_writer is epc.write_bytes_from_coroutine

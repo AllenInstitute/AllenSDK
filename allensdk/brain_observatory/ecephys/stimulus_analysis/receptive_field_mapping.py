@@ -184,6 +184,12 @@ class ReceptiveFieldMapping(StimulusAnalysis):
         self._pos_x = np.sort(self.stimulus_conditions.loc[self.stimulus_conditions[self._col_pos_x]
                                                            != 'null'][self._col_pos_x].unique())
 
+    def get_receptive_field(self, unit_id):
+        """ Alias for _get_rf
+        """
+        
+        return self._get_rf(unit_id)
+
     def _get_rf(self, unit_id):
         """ Extract the receptive field for one unit
 

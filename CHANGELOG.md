@@ -1,6 +1,24 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.6.0] = 2020-03-23
+
+### Added
+- tutorial for optotagging for ecephys notebook
+- get\_receptive\_field() method in ecephys receptive field mapping
+
+### Changed
+- remove redundant sham\_change column in behavior sessions.trials table
+- versions for NWB output for ecephys and ophys behavior.
+- monitor delay is now calculated for BehaviorOphysLimsApi rather than defaulting to 0.0351
+
+### Bug Fixes
+- Fixed a bug where auto-rewarded trials were not properly attributed in the rewards property of a visual behavior
+- return None rather than raise exception if no container id was returned from lims id for given ophys id
+- Project caches no longer accept arbitrary keywords
+- matplotloib.pyplot.hist parameter normed no longer supported
+
+
 ## [1.5.0] = 2020-02-10
 
 ### Added

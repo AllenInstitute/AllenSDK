@@ -625,7 +625,7 @@ def write_probe_lfp_file(session_start_time, log_level, probe):
 
     with pynwb.NWBHDF5IO(probe['lfp']['output_path'], 'w') as lfp_writer:
         logging.info(f"writing probe lfp file to {probe['lfp']['output_path']}")
-        lfp_writer.write(nwbfile)
+        lfp_writer.write(nwbfile, cache_spec=True)
     return {"id": probe["id"], "nwb_path": probe["lfp"]["output_path"]}
 
 
@@ -851,10 +851,9 @@ def write_ecephys_nwb(
                                                  eye_gaze_data=eye_gaze_data)
 
     Manifest.safe_make_parent_dirs(output_path)
-    io = pynwb.NWBHDF5IO(output_path, mode='w')
-    logging.info(f"writing session nwb file to {output_path}")
-    io.write(nwbfile)
-    io.close()
+    with pynwb.NWBHDF5IO(output_path, mode='w') as io:
+        logging.info(f"writing session nwb file to {output_path}")
+        io.write(nwbfile, cache_spec=True)
 
     probes_with_lfp = [p for p in probes if p["lfp"] is not None]
     probe_outputs = write_probewise_lfp_files(probes_with_lfp, session_start_time, pool_size=pool_size)
