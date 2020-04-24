@@ -47,7 +47,7 @@ def get_keys(sync_dset: Dataset) -> dict:
             value_set = set(value)
             diff = value_set - (label_set - value_set)
             if len(diff) == 1:
-                key_dict[key] = diff[0]
+                key_dict[key] = diff.pop()
             else:
                 key_dict[key] = value[0]
                 logging.warning("No key found in sync dataset line labels for "
