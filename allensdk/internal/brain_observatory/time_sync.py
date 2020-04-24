@@ -1,9 +1,5 @@
 from collections import deque
-<<<<<<< HEAD
-from typing import Optional, Callable, Any, List, Dict, Set
-=======
 from typing import Optional, Callable, Any, Dict, Set
->>>>>>> fbe861ba41389e519d4a7eb7e71ac4dbf846c10c
 
 import numpy as np
 import h5py
@@ -40,17 +36,15 @@ def get_keys(sync_dset):
     label_set = set(sync_dset.line_labels)
     for key, value in key_dict.items():
         if isinstance(value, list):
-            diff = label_set - set(value)
-            print(diff)
-            if value[1] in label_set:
-                key_dict[key] = value[1]
-            elif value[0] in label_set:
-                key_dict[key] = value[0]
+            value_set = set(value)
+            diff = value_set - (label_set - value_set)
+            if len(diff) == 1:
+                key_dict[key] = diff[0]
             else:
-                logging.warning("No key found in sync dataset line labels for "
-                                "key: {key}.Assuming old dataset and defaulting"
-                                " to older key option")
                 key_dict[key] = value[0]
+                logging.warning("No key found in sync dataset line labels for "
+                                f"key: {key}.Assuming old dataset and defaulting"
+                                " to older key option")
     line_label_set = set(sync_dset.line_labels)
     non_found_keys = line_label_set - set(list(key_dict.values()))
     if len(non_found_keys) > 0:
