@@ -1,6 +1,5 @@
 from collections import deque
 from typing import Optional, Callable, Any, List, Dict, Set
-from sets import Set
 
 import numpy as np
 import h5py
@@ -41,28 +40,30 @@ VERSION_2_KEYS = {
     }
 
 POSSIBLE_KEY_PAIRS = {
-        "photodiode": Set("stim_photodiode", "photodiode"),
-        "eye_camera": Set("cam2_exposure", "eye_tracking"),
-        "behavior_camera": Set("cam1_exposure", "behavior_monitoring"),
-        "lick_sensor": Set("lick_1", "lick_sensor")
+        "photodiode": ("stim_photodiode", "photodiode"),
+        "eye_camera": ("cam2_exposure", "eye_tracking"),
+        "behavior_camera": ("cam1_exposure", "behavior_monitoring"),
+        "lick_sensor": ("lick_1", "lick_sensor")
         }
 
+
 def validate_keys(key_set: Set, dictionary_with_keys: Dict):
-"""
-Validates that all values in the dictionary_with_keys are present in
-the list.
+    """
+    Validates that all values in the dictionary_with_keys are present in
+    the list.
 
-Args:
-    key_set: Set of key values
-    dictionary_with_keys: Dictionary where values should be contained in key_list
+    Args:
+        key_set: Set of key values
+        dictionary_with_keys: Dictionary where values should be contained in
+                              key_list
 
-Returns:
-    non_matches: returns a list of values not found in the key_set but present in
-                 dictionary
-"""
+    Returns:
+        non_matches: returns a list of values not found in the key_set but
+                    present in dictionary
+    """
     return_keys = []
-    for key, value in dictonary_with_keys:
-        if not key in key_set:
+    for key, value in dictionary_with_keys.items():
+        if key not in key_set:
             return_keys.append(key)
     return return_keys
 
@@ -88,14 +89,16 @@ def get_keys(sync_dset):
         elif value[1] in sync_dset.line_labels:
             key_dict[key] = value[1]
         else:
-            logging.warning(f"No key found in sync dataset line labels for key: {key}."
-                             "Assuming old dataset and defaulting to older key option")
+            logging.warning(f"No key found in sync dataset line labels for key:"
+                            f" {key}.Assuming old dataset and defaulting to "
+                            f"older key option")
             key_dict[key] = value[0]
-    line_label_set = Set(sync_dset.line_labels)
+    line_label_set = set(sync_dset.line_labels)
     non_found_keys = validate_keys(line_label_set, key_dict)
     if len(non_found_keys) > 0:
         logging.warning(f"Keys not found in sync dataset line labels, assuming"
-                         "old file and not all keys are present. Keys not found: {non_found_keys}")
+                        "old file and not all keys are present. Keys not "
+                        "found: {non_found_keys}")
     return key_dict
 
 
