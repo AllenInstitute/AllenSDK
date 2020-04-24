@@ -19,11 +19,18 @@ LONG_STIM_THRESHOLD = 0.2     # seconds
 MAX_MONITOR_DELAY = 0.07     # seconds
 
 
-def get_keys(sync_dset):
-    """Get the correct lookup for line labels.
+def get_keys(sync_dset: Dataset) -> dict:
+    """
+    Gets the correct keys for the sync file by searching the sync file
+    line labels. Assumes to use old keys if none of the correct ones are
+    found in line labels
+    Args:
+        sync_dset: The sync dataset to search for keys within
 
-    This method is fragile, but not all old data contains the full list
-    of keys.
+    Returns:
+        key_dict: dictionary of key value pairs for finding data in the
+                  sync file
+
     """
     key_dict = {
             "photodiode": ["stim_photodiode", "photodiode"],
@@ -37,17 +44,15 @@ def get_keys(sync_dset):
     label_set = set(sync_dset.line_labels)
     for key, value in key_dict.items():
         if isinstance(value, list):
-            diff = label_set - set(value)
-            print(diff)
-            if value[1] in label_set:
-                key_dict[key] = value[1]
-            elif value[0] in label_set:
-                key_dict[key] = value[0]
+            value_set = set(value)
+            diff = value_set - (label_set - value_set)
+            if len(diff) == 1:
+                key_dict[key] = diff[0]
             else:
-                logging.warning("No key found in sync dataset line labels for "
-                                "key: {key}.Assuming old dataset and defaulting"
-                                " to older key option")
                 key_dict[key] = value[0]
+                logging.warning("No key found in sync dataset line labels for "
+                                f"key: {key}.Assuming old dataset and defaulting"
+                                " to older key option")
     line_label_set = set(sync_dset.line_labels)
     non_found_keys = line_label_set - set(list(key_dict.values()))
     if len(non_found_keys) > 0:
