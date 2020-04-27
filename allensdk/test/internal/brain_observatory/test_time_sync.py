@@ -547,125 +547,135 @@ def test_get_stim_data_length(monkeypatch, deserialized_pkl, expected):
     assert obtained == expected
 
 
-@pytest.mark.parametrize("sync_dset, line_labels, expected_line_labels", [
-    (None, ['2p_vsync', 'stim_vsync', 'stim_photodiode', 'acq_trigger',
-            '', 'cam1_exposure', 'cam2_exposure', 'lick_sensor'],
-     {
-         "photodiode": "stim_photodiode",
-         "2p": "2p_vsync",
-         "stimulus": "stim_vsync",
-         "eye_camera": "cam2_exposure",
-         "behavior_camera": "cam1_exposure",
-         "acquiring": "2p_acquiring",
-         "lick_sensor": "lick_sensor"
-     }),
-    (None, ['2p_vsync', 'stim_vsync', 'photodiode', 'acq_trigger',
-            '', 'behavior_monitoring', 'eye_tracking', 'lick_1'],
-     {
-         "photodiode": "photodiode",
-         "2p": "2p_vsync",
-         "stimulus": "stim_vsync",
-         "eye_camera": "eye_tracking",
-         "behavior_camera": "behavior_monitoring",
-         "acquiring": "2p_acquiring",
-         "lick_sensor": "lick_1"
-     }),
-    (None, ['2p_vsync', 'stim_vsync', 'photodiode', 'acq_trigger',
-            '', 'behavior_monitoring', 'lick_1'],
-     {
-         "photodiode": "photodiode",
-         "2p": "2p_vsync",
-         "stimulus": "stim_vsync",
-         "eye_camera": "cam2_exposure",
-         "behavior_camera": "behavior_monitoring",
-         "acquiring": "2p_acquiring",
-         "lick_sensor": "lick_1"
-     }),
-    (None, ['2p_vsync', '', 'stim_vsync', '', 'photodiode', 'acq_trigger',
-            '', '', 'eye_tracking', 'lick_1'],
-     {
-         "photodiode": "photodiode",
-         "2p": "2p_vsync",
-         "stimulus": "stim_vsync",
-         "eye_camera": "eye_tracking",
-         "behavior_camera": "cam1_exposure",
-         "acquiring": "2p_acquiring",
-         "lick_sensor": "lick_1"
-     }),
-    (None, ['2p_vsync', 'stim_vsync', 'stim_photodiode', 'acq_trigger',
-            '', 'cam1_exposure', 'cam2_exposure'],
-     {
-         "photodiode": "stim_photodiode",
-         "2p": "2p_vsync",
-         "stimulus": "stim_vsync",
-         "eye_camera": "cam2_exposure",
-         "behavior_camera": "cam1_exposure",
-         "acquiring": "2p_acquiring",
-         "lick_sensor": "lick_1"
-     }),
-    (None, [],
-     {
-         "photodiode": "stim_photodiode",
-         "2p": "2p_vsync",
-         "stimulus": "stim_vsync",
-         "eye_camera": "cam2_exposure",
-         "behavior_camera": "cam1_exposure",
-         "acquiring": "2p_acquiring",
-         "lick_sensor": "lick_1"
-     }),
-    (None, ['', 'stim_vsync', 'photodiode', 'acq_trigger', 'eye_tracking',
-            'lick_1'],
-     {
-         "photodiode": "photodiode",
-         "2p": "2p_vsync",
-         "stimulus": "stim_vsync",
-         "eye_camera": "eye_tracking",
-         "behavior_camera": "cam1_exposure",
-         "acquiring": "2p_acquiring",
-         "lick_sensor": "lick_1"
-     }),
-    (None, ['', '2p_vsync', 'photodiode', 'acq_trigger', 'eye_tracking',
-            'lick_1'],
-     {
-         "photodiode": "photodiode",
-         "2p": "2p_vsync",
-         "stimulus": "stim_vsync",
-         "eye_camera": "eye_tracking",
-         "behavior_camera": "cam1_exposure",
-         "acquiring": "2p_acquiring",
-         "lick_sensor": "lick_1"
-     }),
-    (None, ['barcode_ephys', 'vsync_stim', 'stim_photodiode', 'stim_running',
-            'beh_frame_received', 'eye_frame_received', 'face_frame_received',
-            'stim_running_opto', 'stim_trial_opto', 'face_came_frame_readout',
-            'eye_cam_frame_readout', 'beh_cam_frame_readout',
-            'face_cam_exposing', 'eye_cam_exposing', 'beh_cam_exposing',
-            'lick_sensor'],
-     {
-         "photodiode": "stim_photodiode",
-         "2p": "2p_vsync",
-         "stimulus": "vsync_stim",
-         "eye_camera": "eye_frame_received",
-         "behavior_camera": "beh_frame_received",
-         "acquiring": "2p_acquiring",
-         "lick_sensor": "lick_sensor"
-     })
+@pytest.mark.parametrize("sync_dset, line_labels, expected_line_labels,"
+                         "expected_log",
+                         [(None, ['2p_vsync', 'stim_vsync', 'stim_photodiode',
+                                  'acq_trigger', '', 'cam1_exposure',
+                                  'cam2_exposure', 'lick_sensor'],
+                          {
+                            "photodiode": "stim_photodiode",
+                            "2p": "2p_vsync",
+                            "stimulus": "stim_vsync",
+                            "eye_camera": "cam2_exposure",
+                            "behavior_camera": "cam1_exposure",
+                            "acquiring": "2p_acquiring",
+                            "lick_sensor": "lick_sensor"},
+                           [('root', 30,
+                             'Keys not found in sync dataset line labels,'
+                             ' assuming old file and not all keys are present. '
+                             "Keys not found: {'2p_acquiring'}")]),
+                          (None, ['2p_vsync', 'stim_vsync', 'photodiode',
+                                  'acq_trigger', 'behavior_monitoring',
+                                  'eye_tracking', 'lick_1'],
+                          {
+                            "photodiode": "photodiode",
+                            "2p": "2p_vsync",
+                            "stimulus": "stim_vsync",
+                            "eye_camera": "eye_tracking",
+                            "behavior_camera": "behavior_monitoring",
+                            "acquiring": "2p_acquiring",
+                            "lick_sensor": "lick_1"},
+                           [('root', 30,
+                             'Keys not found in sync dataset line labels,'
+                             ' assuming old file and not all keys are present. '
+                             "Keys not found: {'2p_acquiring'}")]),
+                          (None, ['2p_vsync', 'stim_vsync', 'photodiode',
+                                  'acq_trigger', '', 'behavior_monitoring', 'lick_1'],
+                          {
+                            "photodiode": "photodiode",
+                            "2p": "2p_vsync",
+                            "stimulus": "stim_vsync",
+                            "behavior_camera": "behavior_monitoring",
+                            "acquiring": "2p_acquiring",
+                            "lick_sensor": "lick_1"},
+                           [('root', 30,
+                             'Value not found for key eye_camera. Deleting key '
+                             'and value from dictionary'),
+                            ('root', 30,
+                             'Keys not found in sync dataset line labels, '
+                             'assuming old file and not all keys are present. '
+                             "Keys not found: {'2p_acquiring'}")]),
+                          (None, [],
+                          {
+                            "acquiring": "2p_acquiring"},
+                           [('root', 30,
+                             'Value not found for key photodiode.'
+                             ' Deleting key and value from dictionary'),
+                            ('root', 30,
+                             'Value not found for key 2p. '
+                             'Deleting key and value from dictionary'),
+                            ('root', 30,
+                             'Value not found for key stimulus. '
+                             'Deleting key and value from dictionary'),
+                            ('root', 30,
+                             'Value not found for key eye_camera. '
+                             'Deleting key and value from dictionary'),
+                            ('root', 30,
+                             'Value not found for key behavior_camera. '
+                             'Deleting key and value from dictionary'),
+                            ('root', 30,
+                             'Value not found for key lick_sensor. '
+                             'Deleting key and value from dictionary'),
+                            ('root', 30,
+                             'Keys not found in sync dataset line labels,'
+                             ' assuming old file and not all keys are present. '
+                             "Keys not found: {'2p_acquiring'}")]),
+                          (None, ['', 'stim_vsync', 'photodiode', 'acq_trigger',
+                                  'eye_tracking', 'lick_1', 'acq_trigger',
+                                  'cam1_exposure'],
+                          {
+                            "photodiode": "photodiode",
+                            "stimulus": "stim_vsync",
+                            "eye_camera": "eye_tracking",
+                            "behavior_camera": "cam1_exposure",
+                            "acquiring": "2p_acquiring",
+                            "lick_sensor": "lick_1"},
+                           [('root', 30,
+                             'Value not found for key 2p. '
+                             'Deleting key and value from dictionary'),
+                           ('root', 30,
+                            'Keys not found in sync dataset line labels, '
+                            'assuming old file and not all keys are present. '
+                            "Keys not found: {'2p_acquiring'}")]),
+                          (None, ['barcode_ephys', 'vsync_stim',
+                                  'stim_photodiode', 'stim_running',
+                                  'beh_frame_received', 'eye_frame_received',
+                                  'face_frame_received', 'stim_running_opto',
+                                  'stim_trial_opto', 'face_came_frame_readout',
+                                  'eye_cam_frame_readout',
+                                  'beh_cam_frame_readout', 'face_cam_exposing',
+                                  'eye_cam_exposing', 'beh_cam_exposing',
+                                  'lick_sensor'],
+                          {
+                            "photodiode": "stim_photodiode",
+                            "stimulus": "vsync_stim",
+                            "eye_camera": "eye_frame_received",
+                            "behavior_camera": "beh_frame_received",
+                            "acquiring": "2p_acquiring",
+                            "lick_sensor": "lick_sensor"},
+                           [('root', 30,
+                             'Value not found for key 2p. '
+                             'Deleting key and value from dictionary'),
+                            ('root', 30,
+                             'Keys not found in sync dataset line labels, '
+                             'assuming old file and not all keys are present. '
+                             "Keys not found: {'2p_acquiring'}")])
 ])
-def test_get_keys(sync_dset, line_labels, expected_line_labels):
+def test_get_keys(sync_dset, line_labels, expected_line_labels, expected_log,
+                  caplog):
     """
     Test Cases:
-        1) Test Case from Wayne running a job on this branch,
-           simple case with all keys present
-        2) Test Case with alternate key set
+        1) Test Case with V2 keys
+        2) Test Case with V1 keys
         3) Test Case with eye camera key missing
-        4) Test Case with behavior camera key missing
-        5) Test Case with lick sensor key missing
-        6) Test Case with all keys missing
-        7) Test Case with 2p key missing
-        8) Test Case with stimulus key missing
-        9) Test Case with V3 keys
+        4) Test Case with all keys missing
+        5) Test Case with 2p key missing
+        6) Test Case with V3 keys
 
     """
     ds = MockSyncDataset(None, line_labels)
     keys = ts.get_keys(ds)
     assert keys == expected_line_labels
+    assert caplog.record_tuples == expected_log
+
+

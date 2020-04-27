@@ -33,7 +33,7 @@ def get_keys(sync_dset: Dataset) -> dict:
     """
     key_dict = {
             "photodiode": ["stim_photodiode", "photodiode"],
-            "2p": "2p_vsync",
+            "2p": ["2p_vsync"],
             "stimulus": ["stim_vsync", "vsync_stim"],
             "eye_camera": ["cam2_exposure", "eye_tracking",
                            "eye_frame_received"],
@@ -43,6 +43,7 @@ def get_keys(sync_dset: Dataset) -> dict:
             "lick_sensor": ["lick_1", "lick_sensor"]
             }
     label_set = set(sync_dset.line_labels)
+    remove_keys = []
     for key, value in key_dict.items():
         if isinstance(value, list):
             value_set = set(value)
@@ -50,10 +51,11 @@ def get_keys(sync_dset: Dataset) -> dict:
             if len(diff) == 1:
                 key_dict[key] = diff.pop()
             else:
-                key_dict[key] = value[0]
-                logging.warning("No key found in sync dataset line labels for "
-                                f"key: {key}. Assuming old dataset and"
-                                " defaulting to older key option")
+                logging.warning(f"Value not found for key {key}. Deleting"
+                                " key and value from dictionary")
+                remove_keys.append(key)
+    for key in remove_keys:
+        key_dict.pop(key)
     line_label_set = set(sync_dset.line_labels)
     non_found_keys = set(list(key_dict.values())) - line_label_set
     if len(non_found_keys) > 0:
