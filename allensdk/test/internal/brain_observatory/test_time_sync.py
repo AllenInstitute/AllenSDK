@@ -31,8 +31,9 @@ class MockSyncDataset(Dataset):
     Mock the Dataset class so it doesn't load an h5 file upon
     initialization.
     """
-    def __init__(self, data):
+    def __init__(self, data, line_labels=None):
         self.dfile = data
+        self.line_labels=line_labels
 
 
 def mock_get_real_photodiode_events(data, key):
@@ -544,3 +545,111 @@ def test_get_stim_data_length(monkeypatch, deserialized_pkl, expected):
     obtained = ts.get_stim_data_length("dummy_filepath")
 
     assert obtained == expected
+
+
+@pytest.mark.parametrize("sync_dset, line_labels, expected_line_labels", [
+    (None, ['2p_vsync', 'stim_vsync', 'stim_photodiode', 'acq_trigger',
+            '', 'cam1_exposure', 'cam2_exposure', 'lick_sensor'],
+     {
+         "photodiode": "stim_photodiode",
+         "2p": "2p_vsync",
+         "stimulus": "stim_vsync",
+         "eye_camera": "cam2_exposure",
+         "behavior_camera": "cam1_exposure",
+         "acquiring": "2p_acquiring",
+         "lick_sensor": "lick_sensor"
+     }),
+    (None, ['2p_vsync', 'stim_vsync', 'photodiode', 'acq_trigger',
+            '', 'behavior_monitoring', 'eye_tracking', 'lick_1'],
+     {
+         "photodiode": "photodiode",
+         "2p": "2p_vsync",
+         "stimulus": "stim_vsync",
+         "eye_camera": "eye_tracking",
+         "behavior_camera": "behavior_monitoring",
+         "acquiring": "2p_acquiring",
+         "lick_sensor": "lick_1"
+     }),
+    (None, ['2p_vsync', 'stim_vsync', 'photodiode', 'acq_trigger',
+            '', 'behavior_monitoring', 'lick_1'],
+     {
+         "photodiode": "photodiode",
+         "2p": "2p_vsync",
+         "stimulus": "stim_vsync",
+         "eye_camera": "cam2_exposure",
+         "behavior_camera": "behavior_monitoring",
+         "acquiring": "2p_acquiring",
+         "lick_sensor": "lick_1"
+     }),
+    (None, ['2p_vsync', '', 'stim_vsync', '', 'photodiode', 'acq_trigger',
+            '', '', 'eye_tracking', 'lick_1'],
+     {
+         "photodiode": "photodiode",
+         "2p": "2p_vsync",
+         "stimulus": "stim_vsync",
+         "eye_camera": "eye_tracking",
+         "behavior_camera": "cam1_exposure",
+         "acquiring": "2p_acquiring",
+         "lick_sensor": "lick_1"
+     }),
+    (None, ['2p_vsync', 'stim_vsync', 'stim_photodiode', 'acq_trigger',
+            '', 'cam1_exposure', 'cam2_exposure'],
+     {
+         "photodiode": "stim_photodiode",
+         "2p": "2p_vsync",
+         "stimulus": "stim_vsync",
+         "eye_camera": "cam2_exposure",
+         "behavior_camera": "cam1_exposure",
+         "acquiring": "2p_acquiring",
+         "lick_sensor": "lick_1"
+     }),
+    (None, [],
+     {
+         "photodiode": "stim_photodiode",
+         "2p": "2p_vsync",
+         "stimulus": "stim_vsync",
+         "eye_camera": "cam2_exposure",
+         "behavior_camera": "cam1_exposure",
+         "acquiring": "2p_acquiring",
+         "lick_sensor": "lick_1"
+     }),
+    (None, ['', 'stim_vsync', 'photodiode', 'acq_trigger', 'eye_tracking',
+            'lick_1'],
+     {
+         "photodiode": "photodiode",
+         "2p": "2p_vsync",
+         "stimulus": "stim_vsync",
+         "eye_camera": "eye_tracking",
+         "behavior_camera": "cam1_exposure",
+         "acquiring": "2p_acquiring",
+         "lick_sensor": "lick_1"
+     }),
+    (None, ['', '2p_vsync', 'photodiode', 'acq_trigger', 'eye_tracking',
+            'lick_1'],
+     {
+         "photodiode": "photodiode",
+         "2p": "2p_vsync",
+         "stimulus": "stim_vsync",
+         "eye_camera": "eye_tracking",
+         "behavior_camera": "cam1_exposure",
+         "acquiring": "2p_acquiring",
+         "lick_sensor": "lick_1"
+     })
+])
+def test_get_keys(sync_dset, line_labels, expected_line_labels):
+    """
+    Test Cases:
+        1) Test Case from Wayne running a job on this branch,
+           simple case with all keys present
+        2) Test Case with alternate key set
+        3) Test Case with eye camera key missing
+        4) Test Case with behavior camera key missing
+        5) Test Case with lick sensor key missing
+        6) Test Case with all keys missing
+        7) Test Case with 2p key missing
+        8) Test Case with stimulus key missing
+
+    """
+    ds = MockSyncDataset(None, line_labels)
+    keys = ts.get_keys(ds)
+    assert keys == expected_line_labels

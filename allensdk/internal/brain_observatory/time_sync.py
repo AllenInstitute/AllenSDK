@@ -18,11 +18,17 @@ PHOTODIODE_ANOMALY_THRESHOLD = 0.5     # seconds
 LONG_STIM_THRESHOLD = 0.2     # seconds
 MAX_MONITOR_DELAY = 0.07     # seconds
 
-def get_keys(sync_dset):
-    """Get the correct lookup for line labels.
+def get_keys(sync_dset: Dataset) -> dict:
+    """
+    Gets the correct keys for the sync file by searching the sync file
+    line labels. Assumes to use old keys if none of the correct ones are
+    found in line labels
+    Args:
+        sync_dset: The sync dataset to search for keys within
 
-    This method is fragile, but not all old data contains the full list
-    of keys.
+    Returns:
+        key_dict: dictionary of key value pairs for finding data in the
+                  sync file
     """
     key_dict = {
             "photodiode": ["stim_photodiode", "photodiode"],
@@ -37,19 +43,19 @@ def get_keys(sync_dset):
     for key, value in key_dict.items():
         if isinstance(value, list):
             value_set = set(value)
-            diff = value_set - (label_set - value_set)
+            diff = value_set.intersection(label_set)
             if len(diff) == 1:
-                key_dict[key] = diff[0]
+                key_dict[key] = diff.pop()
             else:
                 key_dict[key] = value[0]
                 logging.warning("No key found in sync dataset line labels for "
-                                f"key: {key}.Assuming old dataset and defaulting"
-                                " to older key option")
+                                f"key: {key}. Assuming old dataset and"
+                                " defaulting to older key option")
     line_label_set = set(sync_dset.line_labels)
-    non_found_keys = line_label_set - set(list(key_dict.values()))
+    non_found_keys = set(list(key_dict.values())) - line_label_set
     if len(non_found_keys) > 0:
         logging.warning("Keys not found in sync dataset line labels, assuming"
-                        "old file and not all keys are present. Keys not "
+                        " old file and not all keys are present. Keys not "
                         f"found: {non_found_keys}")
     return key_dict
 
