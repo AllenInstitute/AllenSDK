@@ -634,6 +634,21 @@ def test_get_stim_data_length(monkeypatch, deserialized_pkl, expected):
          "behavior_camera": "cam1_exposure",
          "acquiring": "2p_acquiring",
          "lick_sensor": "lick_1"
+     }),
+    (None, ['barcode_ephys', 'vsync_stim', 'stim_photodiode', 'stim_running',
+            'beh_frame_received', 'eye_frame_received', 'face_frame_received',
+            'stim_running_opto', 'stim_trial_opto', 'face_came_frame_readout',
+            'eye_cam_frame_readout', 'beh_cam_frame_readout',
+            'face_cam_exposing', 'eye_cam_exposing', 'beh_cam_exposing',
+            'lick_sensor'],
+     {
+         "photodiode": "stim_photodiode",
+         "2p": "2p_vsync",
+         "stimulus": "vsync_stim",
+         "eye_camera": "eye_frame_received",
+         "behavior_camera": "beh_frame_received",
+         "acquiring": "2p_acquiring",
+         "lick_sensor": "lick_sensor"
      })
 ])
 def test_get_keys(sync_dset, line_labels, expected_line_labels):
@@ -648,6 +663,7 @@ def test_get_keys(sync_dset, line_labels, expected_line_labels):
         6) Test Case with all keys missing
         7) Test Case with 2p key missing
         8) Test Case with stimulus key missing
+        9) Test Case with V3 keys
 
     """
     ds = MockSyncDataset(None, line_labels)

@@ -18,6 +18,7 @@ PHOTODIODE_ANOMALY_THRESHOLD = 0.5     # seconds
 LONG_STIM_THRESHOLD = 0.2     # seconds
 MAX_MONITOR_DELAY = 0.07     # seconds
 
+
 def get_keys(sync_dset: Dataset) -> dict:
     """
     Gets the correct keys for the sync file by searching the sync file
@@ -33,9 +34,11 @@ def get_keys(sync_dset: Dataset) -> dict:
     key_dict = {
             "photodiode": ["stim_photodiode", "photodiode"],
             "2p": "2p_vsync",
-            "stimulus": "stim_vsync",
-            "eye_camera": ["cam2_exposure", "eye_tracking"],
-            "behavior_camera": ["cam1_exposure", "behavior_monitoring"],
+            "stimulus": ["stim_vsync", "vsync_stim"],
+            "eye_camera": ["cam2_exposure", "eye_tracking",
+                           "eye_frame_received"],
+            "behavior_camera": ["cam1_exposure", "behavior_monitoring",
+                                "beh_frame_received"],
             "acquiring": "2p_acquiring",
             "lick_sensor": ["lick_1", "lick_sensor"]
             }
