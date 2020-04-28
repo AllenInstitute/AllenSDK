@@ -31,6 +31,10 @@ def get_keys(sync_dset: Dataset) -> dict:
         key_dict: dictionary of key value pairs for finding data in the
                   sync file
     """
+
+    # key_dict contains key value pairs where key is expected label category
+    # and value is the possible data for each category existing in sync dataset
+    # line labels
     key_dict = {
             "photodiode": ["stim_photodiode", "photodiode"],
             "2p": ["2p_vsync"],
@@ -45,13 +49,12 @@ def get_keys(sync_dset: Dataset) -> dict:
     label_set = set(sync_dset.line_labels)
     remove_keys = []
     for key, value in key_dict.items():
-        if isinstance(value, list):
-            value_set = set(value)
-            diff = value_set.intersection(label_set)
-            if len(diff) == 1:
-                key_dict[key] = diff.pop()
-            else:
-                remove_keys.append(key)
+        value_set = set(value)
+        diff = value_set.intersection(label_set)
+        if len(diff) == 1:
+            key_dict[key] = diff.pop()
+        else:
+            remove_keys.append(key)
     if len(remove_keys) > 0:
         logging.warning("Could not find valid lines for the following data "
                         "sources")
