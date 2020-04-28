@@ -1,6 +1,7 @@
 import scipy.signal
 import numpy as np
 import pandas as pd
+import warnings
 
 
 def calc_deriv(x, time):
@@ -30,19 +31,24 @@ def get_running_df(data, time):
     dx_raw = data["items"]["behavior"]["encoders"][0]["dx"]
     v_sig = data["items"]["behavior"]["encoders"][0]["vsig"]
     v_in = data["items"]["behavior"]["encoders"][0]["vin"]
-    assert len(v_in) == len(time), "length of v_in ({}) must match length of time ({}), they are off by {}".format(
-        len(v_in), 
-        len(time), 
-        abs(len(v_in) - len(time))
-    )
+    if len(v_in) > len(time) + 1:
+        error_string = "length of v_in ({}) cannot be longer than length of time ({}) + 1, they are off by {}".format(
+            len(v_in),
+            len(time),
+            abs(len(v_in) - len(time))
+        )
+        raise ValueError(error_string)
+    if len(v_in) == len(time) + 1:
+        warnings.warn(
+            'time array is 1 value shorter than encoder array. Last encoder value removed\n', stacklevel=1)
     # remove big, single frame spikes in encoder values
-    dx = scipy.signal.medfilt(dx_raw, kernel_size=5)
+    dx = scipy.signal.medfilt(dx_raw[:len(time)], kernel_size=5)
     dx = np.cumsum(dx)  # wheel rotations
     speed = calc_deriv(dx, time)  # speed in degrees/s
     speed = deg_to_dist(speed)
     return pd.DataFrame({
-        'speed': speed,
-        'dx': dx_raw,
-        'v_sig': v_sig,
-        'v_in': v_in,
+        'speed': speed[:len(time)],
+        'dx': dx_raw[:len(time)],
+        'v_sig': v_sig[:len(time)],
+        'v_in': v_in[:len(time)],
     }, index=pd.Index(time, name='timestamps'))
