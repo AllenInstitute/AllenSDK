@@ -558,12 +558,11 @@ def test_get_stim_data_length(monkeypatch, deserialized_pkl, expected):
                             "stimulus": "stim_vsync",
                             "eye_camera": "cam2_exposure",
                             "behavior_camera": "cam1_exposure",
-                            "acquiring": "2p_acquiring",
                             "lick_sensor": "lick_sensor"},
-                           [('root', 30,
-                             'Keys not found in sync dataset line labels,'
-                             ' assuming old file and not all keys are present. '
-                             "Keys not found: {'2p_acquiring'}")]),
+                           [('root', 30, 'Could not find valid lines for the '
+                                         'following data sources'),
+                            ('root', 30, "acquiring (valid line label(s) = "
+                                         "['2p_acquiring']")]),
                           (None, ['2p_vsync', 'stim_vsync', 'photodiode',
                                   'acq_trigger', 'behavior_monitoring',
                                   'eye_tracking', 'lick_1'],
@@ -573,53 +572,48 @@ def test_get_stim_data_length(monkeypatch, deserialized_pkl, expected):
                             "stimulus": "stim_vsync",
                             "eye_camera": "eye_tracking",
                             "behavior_camera": "behavior_monitoring",
-                            "acquiring": "2p_acquiring",
                             "lick_sensor": "lick_1"},
-                           [('root', 30,
-                             'Keys not found in sync dataset line labels,'
-                             ' assuming old file and not all keys are present. '
-                             "Keys not found: {'2p_acquiring'}")]),
+                           [('root', 30, 'Could not find valid lines for the '
+                                         'following data sources'),
+                            ('root', 30, "acquiring (valid line label(s) = "
+                                         "['2p_acquiring']")]),
                           (None, ['2p_vsync', 'stim_vsync', 'photodiode',
-                                  'acq_trigger', '', 'behavior_monitoring', 'lick_1'],
+                                  'acq_trigger', '', 'behavior_monitoring',
+                                  'lick_1'],
                           {
                             "photodiode": "photodiode",
                             "2p": "2p_vsync",
                             "stimulus": "stim_vsync",
                             "behavior_camera": "behavior_monitoring",
-                            "acquiring": "2p_acquiring",
                             "lick_sensor": "lick_1"},
-                           [('root', 30,
-                             'Value not found for key eye_camera. Deleting key '
-                             'and value from dictionary'),
-                            ('root', 30,
-                             'Keys not found in sync dataset line labels, '
-                             'assuming old file and not all keys are present. '
-                             "Keys not found: {'2p_acquiring'}")]),
+                           [('root', 30, 'Could not find valid lines for the '
+                                         'following data sources'),
+                            ('root', 30, "eye_camera (valid line label(s) = "
+                                         "['cam2_exposure', 'eye_tracking', "
+                                         "'eye_frame_received']"),
+                            ('root', 30, "acquiring (valid line label(s) = "
+                                         "['2p_acquiring']")]),
                           (None, [],
-                          {
-                            "acquiring": "2p_acquiring"},
-                           [('root', 30,
-                             'Value not found for key photodiode.'
-                             ' Deleting key and value from dictionary'),
-                            ('root', 30,
-                             'Value not found for key 2p. '
-                             'Deleting key and value from dictionary'),
-                            ('root', 30,
-                             'Value not found for key stimulus. '
-                             'Deleting key and value from dictionary'),
-                            ('root', 30,
-                             'Value not found for key eye_camera. '
-                             'Deleting key and value from dictionary'),
-                            ('root', 30,
-                             'Value not found for key behavior_camera. '
-                             'Deleting key and value from dictionary'),
-                            ('root', 30,
-                             'Value not found for key lick_sensor. '
-                             'Deleting key and value from dictionary'),
-                            ('root', 30,
-                             'Keys not found in sync dataset line labels,'
-                             ' assuming old file and not all keys are present. '
-                             "Keys not found: {'2p_acquiring'}")]),
+                          {},
+                           [('root', 30, 'Could not find valid lines for the '
+                                         'following data sources'),
+                            ('root', 30, "photodiode (valid line label(s) = "
+                                          "['stim_photodiode', 'photodiode']"),
+                            ('root', 30, "2p (valid line label(s) = "
+                                          "['2p_vsync']"),
+                            ('root', 30, "stimulus (valid line label(s) = "
+                                          "['stim_vsync', 'vsync_stim']"),
+                            ('root', 30, "eye_camera (valid line label(s) = "
+                                          "['cam2_exposure', 'eye_tracking', "
+                                          "'eye_frame_received']"),
+                            ('root', 30, "behavior_camera (valid line label(s) "
+                                         "= ['cam1_exposure', "
+                                         "'behavior_monitoring', "
+                                         "'beh_frame_received']"),
+                            ('root', 30, "acquiring (valid line label(s) = "
+                                         "['2p_acquiring']"),
+                            ('root', 30, "lick_sensor (valid line label(s) = "
+                                         "['lick_1', 'lick_sensor']")]),
                           (None, ['', 'stim_vsync', 'photodiode', 'acq_trigger',
                                   'eye_tracking', 'lick_1', 'acq_trigger',
                                   'cam1_exposure'],
@@ -628,15 +622,13 @@ def test_get_stim_data_length(monkeypatch, deserialized_pkl, expected):
                             "stimulus": "stim_vsync",
                             "eye_camera": "eye_tracking",
                             "behavior_camera": "cam1_exposure",
-                            "acquiring": "2p_acquiring",
                             "lick_sensor": "lick_1"},
-                           [('root', 30,
-                             'Value not found for key 2p. '
-                             'Deleting key and value from dictionary'),
-                           ('root', 30,
-                            'Keys not found in sync dataset line labels, '
-                            'assuming old file and not all keys are present. '
-                            "Keys not found: {'2p_acquiring'}")]),
+                           [('root', 30, 'Could not find valid lines for the '
+                                         'following data sources'),
+                            ('root', 30, "2p (valid line label(s) = "
+                                         "['2p_vsync']"),
+                            ('root', 30, "acquiring (valid line label(s) = "
+                                         "['2p_acquiring']")]),
                           (None, ['barcode_ephys', 'vsync_stim',
                                   'stim_photodiode', 'stim_running',
                                   'beh_frame_received', 'eye_frame_received',
@@ -651,15 +643,13 @@ def test_get_stim_data_length(monkeypatch, deserialized_pkl, expected):
                             "stimulus": "vsync_stim",
                             "eye_camera": "eye_frame_received",
                             "behavior_camera": "beh_frame_received",
-                            "acquiring": "2p_acquiring",
                             "lick_sensor": "lick_sensor"},
-                           [('root', 30,
-                             'Value not found for key 2p. '
-                             'Deleting key and value from dictionary'),
-                            ('root', 30,
-                             'Keys not found in sync dataset line labels, '
-                             'assuming old file and not all keys are present. '
-                             "Keys not found: {'2p_acquiring'}")])
+                           [('root', 30, 'Could not find valid lines for the '
+                                         'following data sources'),
+                            ('root', 30, "2p (valid line label(s) = "
+                                         "['2p_vsync']"),
+                            ('root', 30, "acquiring (valid line label(s) = "
+                                         "['2p_acquiring']")])
 ])
 def test_get_keys(sync_dset, line_labels, expected_line_labels, expected_log,
                   caplog):

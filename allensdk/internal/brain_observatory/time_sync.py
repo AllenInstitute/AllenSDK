@@ -39,7 +39,7 @@ def get_keys(sync_dset: Dataset) -> dict:
                            "eye_frame_received"],
             "behavior_camera": ["cam1_exposure", "behavior_monitoring",
                                 "beh_frame_received"],
-            "acquiring": "2p_acquiring",
+            "acquiring": ["2p_acquiring"],
             "lick_sensor": ["lick_1", "lick_sensor"]
             }
     label_set = set(sync_dset.line_labels)
@@ -51,17 +51,13 @@ def get_keys(sync_dset: Dataset) -> dict:
             if len(diff) == 1:
                 key_dict[key] = diff.pop()
             else:
-                logging.warning(f"Value not found for key {key}. Deleting"
-                                " key and value from dictionary")
                 remove_keys.append(key)
-    for key in remove_keys:
-        key_dict.pop(key)
-    line_label_set = set(sync_dset.line_labels)
-    non_found_keys = set(list(key_dict.values())) - line_label_set
-    if len(non_found_keys) > 0:
-        logging.warning("Keys not found in sync dataset line labels, assuming"
-                        " old file and not all keys are present. Keys not "
-                        f"found: {non_found_keys}")
+    if len(remove_keys) > 0:
+        logging.warning("Could not find valid lines for the following data "
+                        "sources")
+        for key in remove_keys:
+            logging.warning(f"{key} (valid line label(s) = {key_dict[key]}")
+            key_dict.pop(key)
     return key_dict
 
 
