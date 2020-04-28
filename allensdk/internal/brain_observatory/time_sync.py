@@ -22,8 +22,8 @@ MAX_MONITOR_DELAY = 0.07     # seconds
 def get_keys(sync_dset: Dataset) -> dict:
     """
     Gets the correct keys for the sync file by searching the sync file
-    line labels. Assumes to use old keys if none of the correct ones are
-    found in line labels
+    line labels. Removes key from the dictionary if it is not in the
+    sync dataset line labels.
     Args:
         sync_dset: The sync dataset to search for keys within
 
