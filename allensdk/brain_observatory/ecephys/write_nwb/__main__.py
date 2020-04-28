@@ -366,15 +366,18 @@ def add_probe_to_nwbfile(nwbfile, probe_id, sampling_rate, lfp_sampling_rate, ha
             electrode group object corresponding to this probe
 
     """
-    probe_nwb_device = pynwb.device.Device(name=str(probe_id))
-    probe_nwb_electrode_group = EcephysProbe(
-        name=str(probe_id),
-        description=description,
-        location=location,
-        device=probe_nwb_device,
+    probe_nwb_device = EcephysProbe(
+        name='Ecephys_Probe',
+        probe_id=probe_id,
         sampling_rate=sampling_rate,
         lfp_sampling_rate=lfp_sampling_rate,
-        has_lfp_data=has_lfp_data,
+        has_lfp_data=has_lfp_data
+    )
+    probe_nwb_electrode_group = pynwb.ecephys.ElectrodeGroup(
+        name='Ecephys_Probe_Group',
+        description=description,
+        location=location,
+        device=probe_nwb_device
     )
 
     nwbfile.add_device(probe_nwb_device)
