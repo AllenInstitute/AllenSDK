@@ -1,9 +1,9 @@
 namespaces:
-- doc: "Allen Institute ECEPHYS Extension"
+- doc: Allen Institute ECEPHYS Extension
   version: 0.2.0
   name: AIBS_ecephys
-  author: Allen Institute
-  contact: waynew@alleninstitute.org
+  author: Allen Institute for Brain Science
+  contact: "waynew@alleninstitute.org"
   schema:
   - namespace: core
   - source: AIBS_ecephys_extension.yaml
