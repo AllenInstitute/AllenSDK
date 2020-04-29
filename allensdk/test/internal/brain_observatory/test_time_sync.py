@@ -31,8 +31,9 @@ class MockSyncDataset(Dataset):
     Mock the Dataset class so it doesn't load an h5 file upon
     initialization.
     """
-    def __init__(self, data):
+    def __init__(self, data, line_labels=None):
         self.dfile = data
+        self.line_labels=line_labels
 
 
 def mock_get_real_photodiode_events(data, key):
@@ -544,3 +545,127 @@ def test_get_stim_data_length(monkeypatch, deserialized_pkl, expected):
     obtained = ts.get_stim_data_length("dummy_filepath")
 
     assert obtained == expected
+
+
+@pytest.mark.parametrize("sync_dset, line_labels, expected_line_labels,"
+                         "expected_log",
+                         [(None, ['2p_vsync', 'stim_vsync', 'stim_photodiode',
+                                  'acq_trigger', '', 'cam1_exposure',
+                                  'cam2_exposure', 'lick_sensor'],
+                          {
+                            "photodiode": "stim_photodiode",
+                            "2p": "2p_vsync",
+                            "stimulus": "stim_vsync",
+                            "eye_camera": "cam2_exposure",
+                            "behavior_camera": "cam1_exposure",
+                            "lick_sensor": "lick_sensor"},
+                           [('root', 30, 'Could not find valid lines for the '
+                                         'following data sources'),
+                            ('root', 30, "acquiring (valid line label(s) = "
+                                         "['2p_acquiring']")]),
+                          (None, ['2p_vsync', 'stim_vsync', 'photodiode',
+                                  'acq_trigger', 'behavior_monitoring',
+                                  'eye_tracking', 'lick_1'],
+                          {
+                            "photodiode": "photodiode",
+                            "2p": "2p_vsync",
+                            "stimulus": "stim_vsync",
+                            "eye_camera": "eye_tracking",
+                            "behavior_camera": "behavior_monitoring",
+                            "lick_sensor": "lick_1"},
+                           [('root', 30, 'Could not find valid lines for the '
+                                         'following data sources'),
+                            ('root', 30, "acquiring (valid line label(s) = "
+                                         "['2p_acquiring']")]),
+                          (None, ['2p_vsync', 'stim_vsync', 'photodiode',
+                                  'acq_trigger', '', 'behavior_monitoring',
+                                  'lick_1'],
+                          {
+                            "photodiode": "photodiode",
+                            "2p": "2p_vsync",
+                            "stimulus": "stim_vsync",
+                            "behavior_camera": "behavior_monitoring",
+                            "lick_sensor": "lick_1"},
+                           [('root', 30, 'Could not find valid lines for the '
+                                         'following data sources'),
+                            ('root', 30, "eye_camera (valid line label(s) = "
+                                         "['cam2_exposure', 'eye_tracking', "
+                                         "'eye_frame_received']"),
+                            ('root', 30, "acquiring (valid line label(s) = "
+                                         "['2p_acquiring']")]),
+                          (None, [],
+                          {},
+                           [('root', 30, 'Could not find valid lines for the '
+                                         'following data sources'),
+                            ('root', 30, "photodiode (valid line label(s) = "
+                                          "['stim_photodiode', 'photodiode']"),
+                            ('root', 30, "2p (valid line label(s) = "
+                                          "['2p_vsync']"),
+                            ('root', 30, "stimulus (valid line label(s) = "
+                                          "['stim_vsync', 'vsync_stim']"),
+                            ('root', 30, "eye_camera (valid line label(s) = "
+                                          "['cam2_exposure', 'eye_tracking', "
+                                          "'eye_frame_received']"),
+                            ('root', 30, "behavior_camera (valid line label(s) "
+                                         "= ['cam1_exposure', "
+                                         "'behavior_monitoring', "
+                                         "'beh_frame_received']"),
+                            ('root', 30, "acquiring (valid line label(s) = "
+                                         "['2p_acquiring']"),
+                            ('root', 30, "lick_sensor (valid line label(s) = "
+                                         "['lick_1', 'lick_sensor']")]),
+                          (None, ['', 'stim_vsync', 'photodiode', 'acq_trigger',
+                                  'eye_tracking', 'lick_1', 'acq_trigger',
+                                  'cam1_exposure'],
+                          {
+                            "photodiode": "photodiode",
+                            "stimulus": "stim_vsync",
+                            "eye_camera": "eye_tracking",
+                            "behavior_camera": "cam1_exposure",
+                            "lick_sensor": "lick_1"},
+                           [('root', 30, 'Could not find valid lines for the '
+                                         'following data sources'),
+                            ('root', 30, "2p (valid line label(s) = "
+                                         "['2p_vsync']"),
+                            ('root', 30, "acquiring (valid line label(s) = "
+                                         "['2p_acquiring']")]),
+                          (None, ['barcode_ephys', 'vsync_stim',
+                                  'stim_photodiode', 'stim_running',
+                                  'beh_frame_received', 'eye_frame_received',
+                                  'face_frame_received', 'stim_running_opto',
+                                  'stim_trial_opto', 'face_came_frame_readout',
+                                  'eye_cam_frame_readout',
+                                  'beh_cam_frame_readout', 'face_cam_exposing',
+                                  'eye_cam_exposing', 'beh_cam_exposing',
+                                  'lick_sensor'],
+                          {
+                            "photodiode": "stim_photodiode",
+                            "stimulus": "vsync_stim",
+                            "eye_camera": "eye_frame_received",
+                            "behavior_camera": "beh_frame_received",
+                            "lick_sensor": "lick_sensor"},
+                           [('root', 30, 'Could not find valid lines for the '
+                                         'following data sources'),
+                            ('root', 30, "2p (valid line label(s) = "
+                                         "['2p_vsync']"),
+                            ('root', 30, "acquiring (valid line label(s) = "
+                                         "['2p_acquiring']")])
+])
+def test_get_keys(sync_dset, line_labels, expected_line_labels, expected_log,
+                  caplog):
+    """
+    Test Cases:
+        1) Test Case with V2 keys
+        2) Test Case with V1 keys
+        3) Test Case with eye camera key missing
+        4) Test Case with all keys missing
+        5) Test Case with 2p key missing
+        6) Test Case with V3 keys
+
+    """
+    ds = MockSyncDataset(None, line_labels)
+    keys = ts.get_keys(ds)
+    assert keys == expected_line_labels
+    assert caplog.record_tuples == expected_log
+
+

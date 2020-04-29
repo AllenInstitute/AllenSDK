@@ -1,5 +1,5 @@
 from collections import deque
-from typing import Optional, Callable, Any
+from typing import Optional, Callable, Any, Dict, Set
 
 import numpy as np
 import h5py
@@ -18,37 +18,50 @@ PHOTODIODE_ANOMALY_THRESHOLD = 0.5     # seconds
 LONG_STIM_THRESHOLD = 0.2     # seconds
 MAX_MONITOR_DELAY = 0.07     # seconds
 
-VERSION_1_KEYS = {
-    "photodiode": "stim_photodiode",
-    "2p": "2p_vsync",
-    "stimulus": "stim_vsync",
-    "eye_camera": "cam2_exposure",
-    "behavior_camera": "cam1_exposure",
-    "acquiring": "2p_acquiring",
-    "lick_sensor": "lick_1"
-    }
 
-# MPE is changing keys. This isn't versioned in the file.
-VERSION_2_KEYS = {
-    "photodiode": "photodiode",
-    "2p": "2p_vsync",
-    "stimulus": "stim_vsync",
-    "eye_camera": "eye_tracking",
-    "behavior_camera": "behavior_monitoring",
-    "acquiring": "2p_acquiring",
-    "lick_sensor": "lick_sensor"
-    }
-
-
-def get_keys(sync_dset):
-    """Get the correct lookup for line labels.
-
-    This method is fragile, but not all old data contains the full list
-    of keys.
+def get_keys(sync_dset: Dataset) -> dict:
     """
-    if "cam2_exposure" in sync_dset.line_labels:
-        return VERSION_1_KEYS
-    return VERSION_2_KEYS
+    Gets the correct keys for the sync file by searching the sync file
+    line labels. Removes key from the dictionary if it is not in the
+    sync dataset line labels.
+    Args:
+        sync_dset: The sync dataset to search for keys within
+
+    Returns:
+        key_dict: dictionary of key value pairs for finding data in the
+                  sync file
+    """
+
+    # key_dict contains key value pairs where key is expected label category
+    # and value is the possible data for each category existing in sync dataset
+    # line labels
+    key_dict = {
+            "photodiode": ["stim_photodiode", "photodiode"],
+            "2p": ["2p_vsync"],
+            "stimulus": ["stim_vsync", "vsync_stim"],
+            "eye_camera": ["cam2_exposure", "eye_tracking",
+                           "eye_frame_received"],
+            "behavior_camera": ["cam1_exposure", "behavior_monitoring",
+                                "beh_frame_received"],
+            "acquiring": ["2p_acquiring"],
+            "lick_sensor": ["lick_1", "lick_sensor"]
+            }
+    label_set = set(sync_dset.line_labels)
+    remove_keys = []
+    for key, value in key_dict.items():
+        value_set = set(value)
+        diff = value_set.intersection(label_set)
+        if len(diff) == 1:
+            key_dict[key] = diff.pop()
+        else:
+            remove_keys.append(key)
+    if len(remove_keys) > 0:
+        logging.warning("Could not find valid lines for the following data "
+                        "sources")
+        for key in remove_keys:
+            logging.warning(f"{key} (valid line label(s) = {key_dict[key]}")
+            key_dict.pop(key)
+    return key_dict
 
 
 def monitor_delay(sync_dset, stim_times, photodiode_key,
