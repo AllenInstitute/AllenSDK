@@ -243,7 +243,7 @@ class TestBehaviorRegression:
     def test_get_trials_regression(self):
         """ A lot of timestamp dependent values. Test what we can."""
         cols_to_test = ["reward_volume", "hit", "false_alarm", "miss",
-                        "sham_change", "stimulus_change", "aborted", "go",
+                        "stimulus_change", "aborted", "go",
                         "catch", "auto_rewarded", "correct_reject",
                         "trial_length", "change_frame", "initial_image_name",
                         "change_image_name"]

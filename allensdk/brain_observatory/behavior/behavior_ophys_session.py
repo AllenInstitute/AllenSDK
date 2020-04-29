@@ -4,6 +4,8 @@ import xarray as xr
 from typing import Any
 import logging
 
+
+from allensdk.brain_observatory.session_api_utils import ParamsMixin
 from allensdk.internal.api.behavior_ophys_api import BehaviorOphysLimsApi
 from allensdk.brain_observatory.behavior.behavior_ophys_api\
     .behavior_ophys_nwb_api import BehaviorOphysNwbApi
@@ -19,15 +21,19 @@ from allensdk.brain_observatory.behavior.image_api import Image, ImageApi
 from allensdk.brain_observatory.running_speed import RunningSpeed
 
 
-class BehaviorOphysSession(object):
+class BehaviorOphysSession(ParamsMixin):
     """Represents data from a single Visual Behavior Ophys imaging session.
     Can be initialized with an api that fetches data, or by using class methods
     `from_lims` and `from_nwb_path`.
     """
 
     @classmethod
-    def from_lims(cls, ophys_experiment_id: int) -> "BehaviorOphysSession":
-        return cls(api=BehaviorOphysLimsApi(ophys_experiment_id))
+    def from_lims(cls, ophys_experiment_id: int,
+                  eye_tracking_z_threshold: float = 3.0,
+                  eye_tracking_dilation_frames: int = 2) -> "BehaviorOphysSession":
+        return cls(api=BehaviorOphysLimsApi(ophys_experiment_id),
+                   eye_tracking_z_threshold=eye_tracking_z_threshold,
+                   eye_tracking_dilation_frames=eye_tracking_dilation_frames)
 
     @classmethod
     def from_nwb_path(
@@ -37,7 +43,25 @@ class BehaviorOphysSession(object):
         return cls(api=BehaviorOphysNwbApi.from_path(
             path=nwb_path, **api_kwargs))
 
-    def __init__(self, api=None):
+    def __init__(self, api=None,
+                 eye_tracking_z_threshold: float = 3.0,
+                 eye_tracking_dilation_frames: int = 2):
+        """
+        Parameters
+        ----------
+        api : object, optional
+            The backend api used by the session object to get behavior ophys
+            data, by default None.
+        eye_tracking_z_threshold : float, optional
+            Determines the z-score threshold used for processing
+            `eye_tracking` data, by default 3.0.
+        eye_tracking_dilation_frames : int, optional
+            Determines the number of adjacent frames that will be marked
+            as 'likely_blink' when performing blink detection for
+            `eye_tracking` data, by default 2
+        """
+        super().__init__(ignore={'api'})
+
         self.api = api
         # Initialize attributes to be lazily evaluated
         self._stimulus_timestamps = None
@@ -56,9 +80,14 @@ class BehaviorOphysSession(object):
         self._corrected_fluorescence_traces = None
         self._motion_correction = None
         self._segmentation_mask_image = None
+        self._eye_tracking = None
+
+        # eye_tracking params
+        self._eye_tracking_z_threshold = eye_tracking_z_threshold
+        self._eye_tracking_dilation_frames = eye_tracking_dilation_frames
 
     # Using properties rather than initializing attributes to take advantage
-    # of API-level cache and not introduce a lot of overhead when the 
+    # of API-level cache and not introduce a lot of overhead when the
     # class is initialized (sometimes these calls can take a while)
     @property
     def ophys_experiment_id(self) -> int:
@@ -76,7 +105,7 @@ class BehaviorOphysSession(object):
 
     @property
     def stimulus_timestamps(self) -> np.ndarray:
-        """Timestamps associated with stimulus presentations on the 
+        """Timestamps associated with stimulus presentations on the
         monitor (corrected for monitor delay).
         :rtype: numpy.ndarray
         """
@@ -93,7 +122,7 @@ class BehaviorOphysSession(object):
         """Timestamps associated with frames captured by the microscope
         :rtype: numpy.ndarray
         """
-        if self._ophys_timestamps is None: 
+        if self._ophys_timestamps is None:
             self._ophys_timestamps = self.api.get_ophys_timestamps()
         return self._ophys_timestamps
 
@@ -305,6 +334,50 @@ class BehaviorOphysSession(object):
     def segmentation_mask_image(self, value):
         self._segmentation_mask_image = value
 
+    @property
+    def eye_tracking(self) -> pd.DataFrame:
+        """A dataframe containing ellipse fit parameters for the eye, pupil
+        and corneal reflection (cr). Fits are derived from tracking points
+        from a DeepLabCut model applied to video frames of a subject's
+        right eye. Raw tracking points and raw video frames are not exposed
+        by the SDK.
+
+        Notes:
+        - All columns starting with 'pupil_' represent ellipse fit parameters
+          relating to the pupil.
+        - All columns starting with 'eye_' represent ellipse fit parameters
+          relating to the eyelid.
+        - All columns starting with 'cr_' represent ellipse fit parameters
+          relating to the corneal reflection, which is caused by an infrared
+          LED positioned near the eye tracking camera.
+        - All positions are in units of pixels.
+        - All areas are in units of pixels^2
+        - All values are in the coordinate space of the eye tracking camera,
+          NOT the coordinate space of the stimulus display (i.e. this is not
+          gaze location), with (0, 0) being the upper-left corner of the
+          eye-tracking image.
+        - The 'likely_blink' column is True for any row (frame) where the pupil
+          fit failed OR eye fit failed OR an outlier fit was identified.
+        - All ellipse fits are derived from tracking points that were output by
+          a DeepLabCut model that was trained on hand-annotated data frome a
+          subset of imaging sessions on optical physiology rigs.
+        - Raw DeepLabCut tracking points are not publicly available.
+
+        :rtype: pandas.DataFrame
+        """
+        params = {'eye_tracking_dilation_frames', 'eye_tracking_z_threshold'}
+
+        if (self._eye_tracking is None) or self.needs_data_refresh(params):
+            self._eye_tracking = self.api.get_eye_tracking(z_threshold=self._eye_tracking_z_threshold,
+                                                           dilation_frames=self._eye_tracking_dilation_frames)
+            self.clear_updated_params(params)
+
+        return self._eye_tracking
+
+    @eye_tracking.setter
+    def eye_tracking(self, value):
+        self._eye_tracking = value
+
     def cache_clear(self) -> None:
         """Convenience method to clear the api cache, if applicable."""
         try:
@@ -320,7 +393,7 @@ class BehaviorOphysSession(object):
         Parameters
         ----------
         cell_specimen_ids : array-like of int, optional
-            ROI masks for these cell specimens will be returned. The default behavior is to return masks for all 
+            ROI masks for these cell specimens will be returned. The default behavior is to return masks for all
             cell specimens.
 
         Returns
@@ -356,7 +429,7 @@ class BehaviorOphysSession(object):
         ----------
         cell_roi_ids : array-like of int, optional
             ROI masks for these rois will be returned. The default behavior is to return masks for all rois.
-        
+
         Returns
         -------
         result : xr.DataArray
@@ -399,12 +472,12 @@ class BehaviorOphysSession(object):
             dims=("cell_roi_id", "row", "column"),
             coords={
                 "cell_roi_id": cell_roi_ids,
-                "row": np.arange(full_image_shape[0])*spacing[0],
-                "column": np.arange(full_image_shape[1])*spacing[1]
+                "row": np.arange(full_image_shape[0]) * spacing[0],
+                "column": np.arange(full_image_shape[1]) * spacing[1]
             },
             attrs={
-                "spacing":spacing,
-                "unit":unit
+                "spacing": spacing,
+                "unit": unit
             }
         ).squeeze(drop=True)
 
@@ -479,9 +552,9 @@ class BehaviorOphysSession(object):
         masks = self._get_roi_masks_by_cell_roi_id()
         mask_image_data = masks.any(dim='cell_roi_id').astype(int)
         mask_image = Image(
-            data = mask_image_data.values,
-            spacing = masks.attrs['spacing'],
-            unit = masks.attrs['unit']
+            data=mask_image_data.values,
+            spacing=masks.attrs['spacing'],
+            unit=masks.attrs['unit']
         )
         return mask_image
 
@@ -510,7 +583,7 @@ class BehaviorOphysSession(object):
         # Hit rate raw:
         hit_rate_raw = get_hit_rate(hit=self.trials.hit, miss=self.trials.miss, aborted=self.trials.aborted)
         performance_metrics_df['hit_rate_raw'] = pd.Series(hit_rate_raw, index=not_aborted_index)
-        
+
         # Hit rate with trial count correction:
         hit_rate = get_trial_count_corrected_hit_rate(hit=self.trials.hit, miss=self.trials.miss, aborted=self.trials.aborted)
         performance_metrics_df['hit_rate'] = pd.Series(hit_rate, index=not_aborted_index)
@@ -518,7 +591,7 @@ class BehaviorOphysSession(object):
         # False-alarm rate raw:
         false_alarm_rate_raw = get_false_alarm_rate(false_alarm=self.trials.false_alarm, correct_reject=self.trials.correct_reject, aborted=self.trials.aborted)
         performance_metrics_df['false_alarm_rate_raw'] = pd.Series(false_alarm_rate_raw, index=not_aborted_index)
-        
+
         # False-alarm rate with trial count correction:
         false_alarm_rate = get_trial_count_corrected_false_alarm_rate(false_alarm=self.trials.false_alarm, correct_reject=self.trials.correct_reject, aborted=self.trials.aborted)
         performance_metrics_df['false_alarm_rate'] = pd.Series(false_alarm_rate, index=not_aborted_index)
@@ -563,8 +636,8 @@ class BehaviorOphysSession(object):
 
 def _translate_roi_mask(mask, row_offset, col_offset):
     return np.roll(
-        mask, 
-        shift=(row_offset, col_offset), 
+        mask,
+        shift=(row_offset, col_offset),
         axis=(0, 1)
     )
 

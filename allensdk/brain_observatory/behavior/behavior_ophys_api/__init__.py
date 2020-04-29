@@ -57,3 +57,6 @@ class BehaviorOphysApiBase:
 
     def get_segmentation_mask_image(self):
         raise NotImplementedError
+
+    def get_eye_tracking_data(self):
+        raise NotImplementedError

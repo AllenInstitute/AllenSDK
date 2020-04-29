@@ -7,6 +7,11 @@ from pkg_resources import resource_filename
 from mock import patch
 from allensdk.internal.brain_observatory import time_sync as ts
 from allensdk.internal.pipeline_modules import run_ophys_time_sync
+from allensdk.brain_observatory.sync_dataset import Dataset
+
+
+ASSUMED_DELAY = 0.0351
+
 
 data_file = resource_filename(__name__, "time_sync_test_data.json")
 test_data = json.load(open(data_file, "r"))
@@ -19,6 +24,25 @@ if not os.path.exists(test_data["nikon"]["sync_file"]):
 
 MIN_BOUND = .03
 MAX_BOUND = .04
+
+
+class MockSyncDataset(Dataset):
+    """
+    Mock the Dataset class so it doesn't load an h5 file upon
+    initialization.
+    """
+    def __init__(self, data, line_labels=None):
+        self.dfile = data
+        self.line_labels=line_labels
+
+
+def mock_get_real_photodiode_events(data, key):
+    return data
+
+
+def mock_get_events_by_line(line, units="seconds"):
+    return line
+
 
 def calculate_stimulus_alignment(stim_time, valid_twop_vsync_fall):
     stimulus_alignment = np.empty(len(stim_time))
@@ -312,7 +336,7 @@ def test_get_corrected_stim_times(stim_data_length, start_delay):
             aligner = ts.OphysTimeAligner("test")
 
     aligner.stim_data_length = stim_data_length
-    with patch.object(ts, "monitor_delay", return_value=ts.ASSUMED_DELAY):
+    with patch.object(ts, "monitor_delay", return_value=ASSUMED_DELAY):
         with patch.object(ts.Dataset, "get_falling_edges",
                           return_value=true_falling) as mock_falling:
             with patch.object(ts.Dataset, "get_rising_edges",
@@ -329,15 +353,15 @@ def test_get_corrected_stim_times(stim_data_length, start_delay):
         assert mock_log.call_count == 2
         assert len(times) == len(true_falling) - 1
         assert delta == len(true_falling) - 1 - stim_data_length
-        assert np.all(times == true_falling[1:] + ts.ASSUMED_DELAY)
+        assert np.all(times == true_falling[1:] + ASSUMED_DELAY)
     elif stim_data_length != len(true_falling):
         mock_rising.assert_called_once()
         mock_log.assert_called_once()
         assert delta == len(true_falling) - stim_data_length
-        assert np.all(times == true_falling + ts.ASSUMED_DELAY)
+        assert np.all(times == true_falling + ASSUMED_DELAY)
     else:
         assert mock_rising.call_count == 0
-        assert np.all(times == true_falling + ts.ASSUMED_DELAY)
+        assert np.all(times == true_falling + ASSUMED_DELAY)
         assert mock_log.call_count == 0
         assert delta == 0
 
@@ -413,23 +437,99 @@ def test_module(input_json):
                            equal_nan=True)
 
 
-@pytest.mark.skipif(data_skip, reason="No sync or data")
-def test_monitor_delay(scientifica_input):
-    sync_file = scientifica_input.pop("sync_file")
-    dset = ts.Dataset(sync_file)
-    stim_times = dset.get_falling_edges("stim_vsync")
+@pytest.mark.parametrize(
+    "sync_dset,stim_times,transition_interval,expected",
+    [
+        (np.array([1.0, 2.0, 3.0, 4.0, 5.0]),
+         np.array([0.99, 1.99, 2.99, 3.99, 4.99]), 1, 0.01),
+        (np.array([1.0, 2.0, 3.0, 4.0]),
+         np.array([0.95, 2.0, 2.95, 4.0]), 1, 0.025),
+        (np.array([1.0]), np.array([1.0]), 1, 0.0)
+    ],
+)
+def test_monitor_delay(sync_dset, stim_times, transition_interval, expected,
+                       monkeypatch):
+    monkeypatch.setattr(ts, "get_real_photodiode_events",
+                        mock_get_real_photodiode_events)
+    pytest.approx(expected, ts.monitor_delay(sync_dset, stim_times, "key",
+                                             transition_interval))
 
-    with patch("numpy.mean", side_effect=ValueError()) as mock_mean:
-        delay = ts.monitor_delay(dset, stim_times, "stim_photodiode",
-                                 assumed_delay=20)
-        assert delay == 20
-        mock_mean.assert_called_once()
 
-    with patch.object(ts, "get_real_photodiode_events",
-                      side_effect=IndexError()) as mock_events:
-        delay = ts.monitor_delay(dset, stim_times, "stim_photodiode",
-                                 assumed_delay=30)
-        assert delay == 30
+@pytest.mark.parametrize(
+    "sync_dset,stim_times,transition_interval",
+    [
+        (np.array([1.0, 2.0, 3.0]), np.array([0.9, 1.9, 2.9]), 1,),    # negative
+        (np.array([1.0, 2.0, 3.0, 4.0]), np.array([1.1, 2.1, 3.1, 4.1]), 1,),  # too big
+    ],
+)
+def test_monitor_delay_raises_error(
+        sync_dset, stim_times, transition_interval,
+        monkeypatch):
+    monkeypatch.setattr(ts, "get_real_photodiode_events",
+                        mock_get_real_photodiode_events)
+    with pytest.raises(ValueError):
+        ts.monitor_delay(sync_dset, stim_times, "key", transition_interval)
+
+
+@pytest.mark.parametrize(
+    "arr,cond,n,expected",
+    [
+        (np.array([1, 1, 1, 2]), lambda x: x < 2, 3, 0),
+        (np.array([2, 1, 1, 1]), lambda x: x < 2, 3, 1),
+        (np.array([1, 2, 2, 1, 1]), lambda x: x >= 1, 2, 0),
+        (np.array([]), lambda x: x < 1, 1, None),
+        (np.array([1, 2, 3]), lambda x: x < 3, 4, None),
+        (np.array([1, 2, 2, 3, 2]), lambda x: x == 2, 3, None),
+    ]
+)
+def test_find_n(arr, cond, n, expected):
+    assert expected == ts._find_n(arr, n, cond)
+
+
+@pytest.mark.parametrize(
+    "arr,cond,n,expected",
+    [
+        (np.array([1, 1, 1, 2]), lambda x: x < 2, 3, 2),
+        (np.array([2, 1, 1, 1]), lambda x: x < 2, 3, 3),
+        (np.array([1, 2, 2, 1, 1]), lambda x: x >= 1, 2, 4),
+        (np.array([]), lambda x: x < 1, 1, None),
+        (np.array([1, 2, 3]), lambda x: x < 3, 4, None),
+        (np.array([1, 2, 2, 3, 2]), lambda x: x == 2, 3, None),
+    ]
+)
+def test_find_last_n(arr, cond, n, expected):
+    assert expected == ts._find_last_n(arr, n, cond)
+
+
+@pytest.mark.parametrize(
+    "sync_dset,expected",
+    [
+        ([0.25, 0.5, 0.75, 1., 2., 3., 5., 5.75], [1., 2., 3.]),
+        ([1., 2., 3., 4.], [1., 2., 3., 4.]),
+        ([0.25, 1., 2., 2.1, 2.2, 3., 4., 5.], [3., 4., 5.]),   # false alarm start
+        ([0.25, 1., 2., 3., 4., 4.5, 5.1, 6.1], [1., 2., 3., 4.]),  # false alarm end
+    ],
+)
+def test_get_photodiode_events(sync_dset, expected, monkeypatch):
+    ds = MockSyncDataset(sync_dset)
+    monkeypatch.setattr(ds, "get_events_by_line", mock_get_events_by_line)
+    np.testing.assert_array_equal(
+        expected, ts.get_photodiode_events(ds, sync_dset))
+
+
+@pytest.mark.parametrize(
+    "sync_dset,",
+    [
+        ([]),
+        ([0.25, 0.25]),
+        ([1., 2.]),
+    ]
+)
+def test_photodiode_events_error_if_none_found(sync_dset, monkeypatch):
+    ds = MockSyncDataset(sync_dset)
+    monkeypatch.setattr(ds, "get_events_by_line", mock_get_events_by_line)
+    with pytest.raises(ValueError):
+        ts.get_photodiode_events(ds, sync_dset)
 
 
 @pytest.mark.parametrize("deserialized_pkl,expected", [
@@ -445,3 +545,127 @@ def test_get_stim_data_length(monkeypatch, deserialized_pkl, expected):
     obtained = ts.get_stim_data_length("dummy_filepath")
 
     assert obtained == expected
+
+
+@pytest.mark.parametrize("sync_dset, line_labels, expected_line_labels,"
+                         "expected_log",
+                         [(None, ['2p_vsync', 'stim_vsync', 'stim_photodiode',
+                                  'acq_trigger', '', 'cam1_exposure',
+                                  'cam2_exposure', 'lick_sensor'],
+                          {
+                            "photodiode": "stim_photodiode",
+                            "2p": "2p_vsync",
+                            "stimulus": "stim_vsync",
+                            "eye_camera": "cam2_exposure",
+                            "behavior_camera": "cam1_exposure",
+                            "lick_sensor": "lick_sensor"},
+                           [('root', 30, 'Could not find valid lines for the '
+                                         'following data sources'),
+                            ('root', 30, "acquiring (valid line label(s) = "
+                                         "['2p_acquiring']")]),
+                          (None, ['2p_vsync', 'stim_vsync', 'photodiode',
+                                  'acq_trigger', 'behavior_monitoring',
+                                  'eye_tracking', 'lick_1'],
+                          {
+                            "photodiode": "photodiode",
+                            "2p": "2p_vsync",
+                            "stimulus": "stim_vsync",
+                            "eye_camera": "eye_tracking",
+                            "behavior_camera": "behavior_monitoring",
+                            "lick_sensor": "lick_1"},
+                           [('root', 30, 'Could not find valid lines for the '
+                                         'following data sources'),
+                            ('root', 30, "acquiring (valid line label(s) = "
+                                         "['2p_acquiring']")]),
+                          (None, ['2p_vsync', 'stim_vsync', 'photodiode',
+                                  'acq_trigger', '', 'behavior_monitoring',
+                                  'lick_1'],
+                          {
+                            "photodiode": "photodiode",
+                            "2p": "2p_vsync",
+                            "stimulus": "stim_vsync",
+                            "behavior_camera": "behavior_monitoring",
+                            "lick_sensor": "lick_1"},
+                           [('root', 30, 'Could not find valid lines for the '
+                                         'following data sources'),
+                            ('root', 30, "eye_camera (valid line label(s) = "
+                                         "['cam2_exposure', 'eye_tracking', "
+                                         "'eye_frame_received']"),
+                            ('root', 30, "acquiring (valid line label(s) = "
+                                         "['2p_acquiring']")]),
+                          (None, [],
+                          {},
+                           [('root', 30, 'Could not find valid lines for the '
+                                         'following data sources'),
+                            ('root', 30, "photodiode (valid line label(s) = "
+                                          "['stim_photodiode', 'photodiode']"),
+                            ('root', 30, "2p (valid line label(s) = "
+                                          "['2p_vsync']"),
+                            ('root', 30, "stimulus (valid line label(s) = "
+                                          "['stim_vsync', 'vsync_stim']"),
+                            ('root', 30, "eye_camera (valid line label(s) = "
+                                          "['cam2_exposure', 'eye_tracking', "
+                                          "'eye_frame_received']"),
+                            ('root', 30, "behavior_camera (valid line label(s) "
+                                         "= ['cam1_exposure', "
+                                         "'behavior_monitoring', "
+                                         "'beh_frame_received']"),
+                            ('root', 30, "acquiring (valid line label(s) = "
+                                         "['2p_acquiring']"),
+                            ('root', 30, "lick_sensor (valid line label(s) = "
+                                         "['lick_1', 'lick_sensor']")]),
+                          (None, ['', 'stim_vsync', 'photodiode', 'acq_trigger',
+                                  'eye_tracking', 'lick_1', 'acq_trigger',
+                                  'cam1_exposure'],
+                          {
+                            "photodiode": "photodiode",
+                            "stimulus": "stim_vsync",
+                            "eye_camera": "eye_tracking",
+                            "behavior_camera": "cam1_exposure",
+                            "lick_sensor": "lick_1"},
+                           [('root', 30, 'Could not find valid lines for the '
+                                         'following data sources'),
+                            ('root', 30, "2p (valid line label(s) = "
+                                         "['2p_vsync']"),
+                            ('root', 30, "acquiring (valid line label(s) = "
+                                         "['2p_acquiring']")]),
+                          (None, ['barcode_ephys', 'vsync_stim',
+                                  'stim_photodiode', 'stim_running',
+                                  'beh_frame_received', 'eye_frame_received',
+                                  'face_frame_received', 'stim_running_opto',
+                                  'stim_trial_opto', 'face_came_frame_readout',
+                                  'eye_cam_frame_readout',
+                                  'beh_cam_frame_readout', 'face_cam_exposing',
+                                  'eye_cam_exposing', 'beh_cam_exposing',
+                                  'lick_sensor'],
+                          {
+                            "photodiode": "stim_photodiode",
+                            "stimulus": "vsync_stim",
+                            "eye_camera": "eye_frame_received",
+                            "behavior_camera": "beh_frame_received",
+                            "lick_sensor": "lick_sensor"},
+                           [('root', 30, 'Could not find valid lines for the '
+                                         'following data sources'),
+                            ('root', 30, "2p (valid line label(s) = "
+                                         "['2p_vsync']"),
+                            ('root', 30, "acquiring (valid line label(s) = "
+                                         "['2p_acquiring']")])
+])
+def test_get_keys(sync_dset, line_labels, expected_line_labels, expected_log,
+                  caplog):
+    """
+    Test Cases:
+        1) Test Case with V2 keys
+        2) Test Case with V1 keys
+        3) Test Case with eye camera key missing
+        4) Test Case with all keys missing
+        5) Test Case with 2p key missing
+        6) Test Case with V3 keys
+
+    """
+    ds = MockSyncDataset(None, line_labels)
+    keys = ts.get_keys(ds)
+    assert keys == expected_line_labels
+    assert caplog.record_tuples == expected_log
+
+

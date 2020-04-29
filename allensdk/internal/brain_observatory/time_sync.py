@@ -1,3 +1,6 @@
+from collections import deque
+from typing import Optional, Callable, Any, Dict, Set
+
 import numpy as np
 import h5py
 from allensdk.brain_observatory.sync_dataset import Dataset
@@ -9,102 +12,157 @@ except ImportError:
     cv2 = None
 
 TRANSITION_FRAME_INTERVAL = 60
-SHORT_PHOTODIODE_MIN = 0.1 # seconds
-SHORT_PHOTODIODE_MAX = 0.5 # seconds
-REG_PHOTODIODE_MIN = 1.9 # seconds
-REG_PHOTODIODE_MAX = 2.1 # seconds
-PHOTODIODE_ANOMALY_THRESHOLD = 0.5 # seconds
-LONG_STIM_THRESHOLD = 0.2 # seconds
-ASSUMED_DELAY = 0.0215 # seconds
-MAX_MONITOR_DELAY = 0.07 # seconds
-
-VERSION_1_KEYS = {
-    "photodiode": "stim_photodiode",
-    "2p": "2p_vsync",
-    "stimulus": "stim_vsync",
-    "eye_camera": "cam2_exposure",
-    "behavior_camera": "cam1_exposure",
-    "acquiring": "2p_acquiring",
-    "lick_sensor": "lick_1"
-    }
-
-# MPE is changing keys. This isn't versioned in the file.
-VERSION_2_KEYS = {
-    "photodiode": "photodiode",
-    "2p": "2p_vsync",
-    "stimulus": "stim_vsync",
-    "eye_camera": "eye_tracking",
-    "behavior_camera": "behavior_monitoring",
-    "acquiring": "2p_acquiring",
-    "lick_sensor": "lick_sensor"
-    }
+REG_PHOTODIODE_INTERVAL = 1.0     # seconds
+REG_PHOTODIODE_STD = 0.05    # seconds
+PHOTODIODE_ANOMALY_THRESHOLD = 0.5     # seconds
+LONG_STIM_THRESHOLD = 0.2     # seconds
+MAX_MONITOR_DELAY = 0.07     # seconds
 
 
-def get_keys(sync_dset):
-    """Get the correct lookup for line labels.
-
-    This method is fragile, but not all old data contains the full list
-    of keys.
+def get_keys(sync_dset: Dataset) -> dict:
     """
-    if "cam2_exposure" in sync_dset.line_labels:
-        return VERSION_1_KEYS
-    return VERSION_2_KEYS
+    Gets the correct keys for the sync file by searching the sync file
+    line labels. Removes key from the dictionary if it is not in the
+    sync dataset line labels.
+    Args:
+        sync_dset: The sync dataset to search for keys within
+
+    Returns:
+        key_dict: dictionary of key value pairs for finding data in the
+                  sync file
+    """
+
+    # key_dict contains key value pairs where key is expected label category
+    # and value is the possible data for each category existing in sync dataset
+    # line labels
+    key_dict = {
+            "photodiode": ["stim_photodiode", "photodiode"],
+            "2p": ["2p_vsync"],
+            "stimulus": ["stim_vsync", "vsync_stim"],
+            "eye_camera": ["cam2_exposure", "eye_tracking",
+                           "eye_frame_received"],
+            "behavior_camera": ["cam1_exposure", "behavior_monitoring",
+                                "beh_frame_received"],
+            "acquiring": ["2p_acquiring"],
+            "lick_sensor": ["lick_1", "lick_sensor"]
+            }
+    label_set = set(sync_dset.line_labels)
+    remove_keys = []
+    for key, value in key_dict.items():
+        value_set = set(value)
+        diff = value_set.intersection(label_set)
+        if len(diff) == 1:
+            key_dict[key] = diff.pop()
+        else:
+            remove_keys.append(key)
+    if len(remove_keys) > 0:
+        logging.warning("Could not find valid lines for the following data "
+                        "sources")
+        for key in remove_keys:
+            logging.warning(f"{key} (valid line label(s) = {key_dict[key]}")
+            key_dict.pop(key)
+    return key_dict
 
 
 def monitor_delay(sync_dset, stim_times, photodiode_key,
                   transition_frame_interval=TRANSITION_FRAME_INTERVAL,
-                  max_monitor_delay=MAX_MONITOR_DELAY,
-                  assumed_delay=ASSUMED_DELAY):
+                  max_monitor_delay=MAX_MONITOR_DELAY):
     """Calculate monitor delay."""
-    try:
-        transitions = stim_times[::transition_frame_interval]
-        photodiode_events = get_real_photodiode_events(sync_dset, photodiode_key)
-        transition_events = photodiode_events[0:len(transitions)]
+    transitions = stim_times[::transition_frame_interval]
+    photodiode_events = get_real_photodiode_events(sync_dset, photodiode_key)
+    transition_events = photodiode_events[0:len(transitions)]
 
-        delay = np.mean(transition_events-transitions)
-        logging.info("Calculated monitor delay: %s", delay)
+    delays = transition_events - transitions
+    delay = np.mean(delays)
+    logging.info(f"Calculated monitor delay: {delay}. \n "
+                 f"Max monitor delay: {np.max(delays)}. \n "
+                 f"Min monitor delay: {np.min(delays)}.\n "
+                 f"Std monitor delay: {np.std(delays)}.")
 
-        if delay < 0 or delay > max_monitor_delay:
-            delay = assumed_delay
-            logging.warning("Setting delay to assumed value: %s", delay)
-    except (IndexError, ValueError) as e:
-        logging.error(e)
-        delay = assumed_delay
-        logging.warning("Bad photodiode signal, setting delay to assumed "
-                        "value: %s", delay)
-
+    if delay < 0 or delay > max_monitor_delay:
+        raise ValueError(f"Delay ({delay}s) falls outside expected value "
+                         f"range (0-{MAX_MONITOR_DELAY}s).")
     return delay
+
+
+def _find_last_n(arr: np.ndarray, n: int,
+                 cond: Callable[[Any], bool]) -> Optional[int]:
+    """
+    Find the final index where the prior `n` values in an array meet
+    the condition `cond` (inclusive).
+    Parameters
+    ==========
+    arr: numpy.1darray
+    n: int
+    cond: Callable that returns True if condition is met, False
+    otherwise. Should be able to be applied to the array elements
+    without any additional arguments.
+    """
+    reversed_ix = _find_n(arr[::-1], n, cond)
+    if reversed_ix is not None:
+        reversed_ix = len(arr) - reversed_ix - 1
+    return reversed_ix
+
+
+def _find_n(arr: np.ndarray, n: int,
+            cond: Callable[[Any], bool]) -> Optional[int]:
+    """
+    Find the index where the next `n` values in an array meet the
+    condition `cond` (inclusive).
+    Parameters
+    ==========
+    arr: numpy.1darray
+    n: int
+    cond: Callable that returns True if condition is met, False
+    otherwise. Should be able to be applied to the array elements
+    without any additional arguments.
+    """
+    if len(arr) < n:
+        return None
+    queue = deque(np.apply_along_axis(cond, 0, arr[:n]), maxlen=n)
+    i = 0
+    while queue.count(True) < n:
+        try:
+            i += 1
+            queue.append(cond(arr[i+n-1]))
+        except IndexError:
+            return None
+    return i
 
 
 def get_photodiode_events(sync_dset, photodiode_key):
     """Returns the photodiode events with the start/stop indicators and
-    the window init flash stripped off.
+    the window init flash stripped off. These transitions occur roughly
+    ~1.0s apart, since the sync square changes state every N frames
+    (where N = 60, and frame rate is 60 Hz). Because there are no
+    markers for when the first transition of this type started, we
+    estimate based on the event intervals. For the first valid event,
+    find the first two events that both meet the following criteria:
+        The next event occurs ~1.0s later
+    First the last valid event, find the first two events that both meet
+    the following criteria:
+        The last valid event occured ~1.0s before
     """
-    all_events = sync_dset.get_events_by_line(photodiode_key)
-    pdr = sync_dset.get_rising_edges(photodiode_key)
-    pdf = sync_dset.get_falling_edges(photodiode_key)
-
-    all_events_sec = all_events/sync_dset.sample_freq
-    pdr_sec = pdr/sync_dset.sample_freq
-    pdf_sec = pdf/sync_dset.sample_freq
-
-    pdf_diff = np.ediff1d(pdf_sec, to_end=0)
-    pdr_diff = np.ediff1d(pdr_sec, to_end=0)
-
-    reg_pd_falling = pdf_sec[(pdf_diff >= REG_PHOTODIODE_MIN) &
-                             (pdf_diff <= REG_PHOTODIODE_MAX)]
-
-    short_pd_rising = pdr_sec[(pdr_diff >= SHORT_PHOTODIODE_MIN) &
-                              (pdr_diff <= SHORT_PHOTODIODE_MAX)]
-
-    first_falling = reg_pd_falling[0]
-    last_falling = reg_pd_falling[-1]
-
-    end_indicators = short_pd_rising[short_pd_rising > last_falling]
-    first_end_indicator = end_indicators[0]
-
-    pd_events =  all_events_sec[(all_events_sec >= first_falling) &
-                                (all_events_sec < first_end_indicator)]
+    all_events = sync_dset.get_events_by_line(photodiode_key, units="seconds")
+    all_events_diff = np.ediff1d(all_events, to_begin=0, to_end=0)
+    all_events_diff_prev = all_events_diff[:-1]
+    all_events_diff_next = all_events_diff[1:]
+    min_interval = REG_PHOTODIODE_INTERVAL - REG_PHOTODIODE_STD
+    max_interval = REG_PHOTODIODE_INTERVAL + REG_PHOTODIODE_STD
+    if not len(all_events):
+        raise ValueError("No photodiode events found. Please check "
+                         "the input data for errors. ")
+    first_valid_index = _find_n(
+        all_events_diff_next, 2,
+        lambda x: (x >= min_interval) & (x <= max_interval))
+    last_valid_index = _find_last_n(
+        all_events_diff_prev, 2,
+        lambda x: (x >= min_interval) & (x <= max_interval))
+    if first_valid_index is None:
+        raise ValueError("Can't find valid start event")
+    if last_valid_index is None:
+        raise ValueError("Can't find valid end event")
+    pd_events = all_events[first_valid_index:last_valid_index+1]
     return pd_events
 
 
@@ -174,7 +232,7 @@ def corrected_video_timestamps(video_name, timestamps, data_length):
                          "%s", video_name, data_length, len(timestamps))
     else:
         logging.info("No data length provided for %s", video_name)
-    
+
     return timestamps, delta
 
 
@@ -283,7 +341,7 @@ class OphysTimeAligner(object):
 
         photodiode_key = self._keys["photodiode"]
         delay = monitor_delay(self.dataset, timestamps, photodiode_key)
-        
+
         return timestamps + delay, delta, delay
 
     @property

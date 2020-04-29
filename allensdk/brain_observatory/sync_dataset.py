@@ -20,6 +20,7 @@ from typing import Union, Sequence, Optional
 import h5py as h5
 import numpy as np
 
+import warnings
 import logging
 logger = logging.getLogger(__name__)
 
@@ -89,12 +90,35 @@ class Dataset(object):
     FRAME_KEYS = ('frames', 'stim_vsync')
     PHOTODIODE_KEYS = ('photodiode', 'stim_photodiode')
     OPTOGENETIC_STIMULATION_KEYS = ("LED_sync", "opto_trial")
-    EYE_TRACKING_KEYS = ("cam2_exposure",  # clocks eye tracking frame pulses (port 0, line 9)
-                         "eyetracking")  # previous line label for eye tracking (prior to ~ Oct. 2018)
-    BEHAVIOR_TRACKING_KEYS = ("cam1_exposure",)  # clocks behavior tracking frame pulses (port 0, line 8)
+    EYE_TRACKING_KEYS = ("eye_frame_received",  # Expected eye tracking line label after 3/27/2020
+                         "cam2_exposure",  # clocks eye tracking frame pulses (port 0, line 9)
+                         "eyetracking",  # previous line label for eye tracking (prior to ~ Oct. 2018)
+                         "eye_tracking")  # An undocumented, but possible eye tracking line label
+    BEHAVIOR_TRACKING_KEYS = ("beh_frame_received",  # Expected behavior line label after 3/27/2020
+                              "cam1_exposure",  # clocks behavior tracking frame pulses (port 0, line 8)
+                              "behavior_monitoring")
+
+    DEPRECATED_KEYS = {"cam2_exposure",
+                       "eyetracking",
+                       "eye_tracking",
+                       "cam1_exposure",
+                       "behavior_monitoring"}
 
     def __init__(self, path):
         self.dfile = self.load(path)
+        self._check_line_labels()
+
+    def _check_line_labels(self):
+        if hasattr(self, "line_labels"):
+            deprecated_keys = set(self.line_labels) & self.DEPRECATED_KEYS
+            if deprecated_keys:
+                warnings.warn((f"The loaded sync file contains the "
+                               f"following deprecated line label keys: "
+                               f"{deprecated_keys}. Consider updating the sync "
+                               f"file line labels."), stacklevel=2)
+        else:
+            warnings.warn((f"The loaded sync file has no line labels and may "
+                           f"not be valid."), stacklevel=2)
 
     def _process_times(self):
         """
