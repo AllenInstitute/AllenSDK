@@ -1,6 +1,8 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.8.0] = [UPDATE_DATE]
+
 ## [1.7.0] = 2020-04-29
 
 ### Added
